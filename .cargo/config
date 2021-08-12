@@ -2,13 +2,13 @@
 runner = 'wasm-bindgen-test-runner'
 
 [target.aarch64-linux-android]
-rustflags = ["-C", "link-arg=-Wl,--hash-style=both"]
+rustflags = ["-C", "link-arg=-Wl,--hash-style=gnu"]
 
 [target.armv7-linux-androideabi]
-rustflags = ["-C", "link-arg=-Wl,--hash-style=both"]
+rustflags = ["-C", "link-arg=-Wl,--hash-style=gnu"]
 
 [target.i686-linux-android]
-rustflags = ["-C", "link-arg=-Wl,--hash-style=both"]
+rustflags = ["-C", "link-arg=-Wl,--hash-style=gnu"]
 
 [target.x86_64-linux-android]
-rustflags = ["-C", "link-arg=-Wl,--hash-style=both"]
+rustflags = ["-C", "link-arg=-Wl,--hash-style=gnu"]
