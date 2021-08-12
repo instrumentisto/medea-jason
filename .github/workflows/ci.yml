@@ -27,7 +27,7 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
       - run: make rustup.android
-      - run: make lint
+      - run: make cargo.lint
 
   rustfmt:
     if: ${{ github.ref == 'refs/heads/master'

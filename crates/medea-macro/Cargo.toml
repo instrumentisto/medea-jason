@@ -25,4 +25,4 @@ synstructure = "0.12"
 
 [dev-dependencies]
 async-trait = "0.1"
-medea-jason = { path = "../../jason" }
+medea-jason = { path = "../../" }
