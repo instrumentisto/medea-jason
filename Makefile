@@ -60,6 +60,11 @@ else
 	@make docker.down.webdriver browser=$(browser)
 endif
 
+cargo-build-crate = $(if $(call eq,$(crate),),@all,$(crate))
+cargo-build-platform = $(if $(call eq,$(platform),),web,$(platform))
+cargo-build-targets = $(strip \
+	$(if $(call eq,$(targets),),$(ANDROID_TARGETS),$(targets)))
+
 cargo.build:
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -234,7 +239,7 @@ yarn.version:
 #	make test.flutter [device=<device-id>]
 
 test.flutter:
-	cd jason/flutter/example/ && \
+	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))
@@ -321,18 +326,6 @@ else
 		selenoid/chrome:$(CHROME_VERSION)
 endif
 
-
-
-# Runs Flutter plugin integration tests on an attached device.
-#
-# Usage:
-#	make test.flutter [device=<device-id>]
-
-test.flutter:
-	cd flutter/example/ && \
-	flutter drive --driver=test_driver/integration_test.dart \
-	              --target=integration_test/jason.dart \
-	              $(if $(call eq,$(device),),,-d $(device))
 
 
 .PHONY: flutter cargo.build
