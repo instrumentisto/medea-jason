@@ -171,6 +171,22 @@ flutter.fmt:
 		flutter/
 
 
+# Lint Rust sources with Clippy.
+#
+# Usage:
+#	make cargo.lint
+
+cargo.lint:
+	cargo clippy --workspace -- -D clippy::pedantic -D warnings
+	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
+		$(call cargo.lint.medea-jason.android,$(target)))
+define cargo.lint.medea-jason.android
+	$(eval target := $(strip $(1)))
+	cargo clippy --manifest-path Cargo.toml --target=$(target) -- \
+		-D clippy::pedantic -D warnings
+endef
+
+
 # Lint Flutter Dart sources with dartanalyzer.
 #
 # Usage:
@@ -327,5 +343,24 @@ else
 endif
 
 
+# Generate project documentation of Rust sources.
+#
+# Usage:
+#	make docs.rust [crate=(@all|medea|medea-jason|<crate-name>)]
+#	               [open=(yes|no)] [clean=(no|yes)]
+#	               [dev=(no|yes)]
+
+docs-rust-crate = $(if $(call eq,$(crate),),@all,$(crate))
+
+docs.rust:
+ifeq ($(clean),yes)
+	@rm -rf target/doc/
+endif
+	$(if $(call eq,$(docs-rust-crate),@all),\
+		cargo doc --workspace,\
+		cd $(crate-dir)/ && cargo doc)\
+			--no-deps \
+			$(if $(call eq,$(dev),yes),--document-private-items,) \
+			$(if $(call eq,$(open),no),,--open)
 
 .PHONY: flutter cargo.build

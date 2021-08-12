@@ -41,7 +41,7 @@ jobs:
           profile: minimal
           toolchain: nightly
           components: rustfmt
-      - run: make fmt check=yes
+      - run: make cargo.fmt check=yes
 
   dartfmt:
     if: ${{ github.ref == 'refs/heads/master'
