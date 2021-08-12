@@ -1,0 +1,78 @@
+# Values for `medea-demo` Helm chart deployed into 'staging' Kubernetes cluster.
+#
+# NOTE: To temporary override these values DO NOT change them here, but rather
+#       declare overridden values in `my.staging.vals.yaml` file.
+
+server:
+  image:
+    tag: edge
+    pullPolicy: Always
+  conf:
+    server:
+      client:
+        http:
+          public_url: wss://demo.medea.stg.t11913.org/ws
+          bind_port: 9980
+    rpc:
+      idle_timeout: 60s
+      reconnect_timeout: 5m
+      ping_interval: 5s
+    turn:
+      host: demo.medea.stg.t11913.org
+      pass: changeme
+    log:
+      level: DEBUG
+
+  control-mock:
+    image:
+      tag: edge
+      pullPolicy: Always
+
+  coturn:
+    conf:
+      listening-port: 9934
+      cli-password: changeme
+    extraArgs:
+      - --verbose
+
+  coturn-db:
+    conf:
+      port: 9963
+      requirepass: changeme
+
+  deployment:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: "role/application"
+                  operator: In
+                  values: ["true"]
+
+
+web-client:
+  image:
+    tag: edge
+    pullPolicy: Always
+
+  deployment:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: "role/application"
+                  operator: In
+                  values: ["true"]
+
+
+ingress:
+  hosts:
+    - demo.medea.stg.t11913.org
+  tls:
+    enabled: yes
+    auto: yes
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Cache-Control: must-revalidate";
