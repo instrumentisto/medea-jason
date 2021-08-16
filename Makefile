@@ -363,4 +363,103 @@ endif
 			$(if $(call eq,$(dev),yes),--document-private-items,) \
 			$(if $(call eq,$(open),no),,--open)
 
+# Run E2E tests of project.
+#
+# Usage:
+#	make test.e2e [only=<regex>]
+#		[( [up=no]
+#		 | up=yes [browser=(chrome|firefox)]
+#		          [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea debug=$(debug) tag=$(tag)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e browser=$(browser) background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+	@make wait.port port=4444
+endif
+ifeq ($(dockerized),yes)
+	docker run --rm --network=host -v "$(PWD)":/app -w /app \
+			   -v "$(abspath $(CARGO_HOME))/registry":/usr/local/cargo/registry\
+		ghcr.io/instrumentisto/rust:$(RUST_VER) \
+			make test.e2e dockerized=no up=no
+else
+	cargo test -p medea-e2e --test e2e \
+		$(if $(call eq,$(only),),,-- -e '$(only)')
+endif
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
+# Run E2E tests environment in Docker Compose.
+#
+# Usage:
+#	make docker.up.e2e [browser=(chrome|firefox)]
+#	                   [( [dockerized=no]
+#	                    | dockerized=yes [tag=(dev|<tag>)] )]
+#	                   [debug=(yes|no)]
+#	                   [( [background=no]
+#	                    | background=yes [log=(no|yes)] )]
+
+docker-up-e2e-env = RUST_BACKTRACE=1 \
+	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
+	COMPOSE_IMAGE_VER=$(if $(call eq,$(tag),),dev,$(tag)) \
+	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(if $(call eq,$(tag),),dev,$(tag)) \
+	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
+		$(if $(call eq,$(browser),firefox),\
+			ghcr.io/instrumentisto/geckodriver ,\
+			selenoid/chrome )) \
+	COMPOSE_WEBDRIVER_IMAGE_VER=$(strip \
+		$(if $(call eq,$(browser),firefox),\
+			$(FIREFOX_VERSION) ,\
+			$(CHROME_VERSION) ))
+
+docker.up.e2e: docker.down.e2e
+	@make build.jason debug=$(debug) dockerized=no
+	env $(docker-up-e2e-env) \
+	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
+		up $(if $(call eq,$(dockerized),yes),\
+		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
+ifeq ($(background),yes)
+ifeq ($(log),yes)
+	env $(docker-up-e2e-env) \
+	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
+		logs -f &
+endif
+endif
+ifneq ($(dockerized),yes)
+	@MEDEA_SERVER__CLIENT__HTTP__BIND_PORT=8001 \
+	make docker.up.medea dockerized=no debug=$(debug) \
+	                     background=$(background) log-to-file=$(log)
+	@make wait.port port=6565
+	@make up.control background=$(background)
+endif
+
+# Stop non-dockerized Control API mock server.
+#
+# Usage:
+#   make down.control
+
+down.control:
+	-killall medea-control-api-mock
+
+# Stop E2E tests environment in Docker Compose and remove all related
+# containers.
+#
+# Usage:
+#	make docker.down.e2e
+
+docker.down.e2e: down.control
+	@make docker.down.medea dockerized=no
+	docker-compose -f e2e/docker-compose.yml down --rmi=local -v
+
 .PHONY: flutter cargo.build

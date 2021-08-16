@@ -1,10 +1,9 @@
 //! HTTP client interacting with Medea via its Control API.
 
 use derive_more::{Display, Error, From};
-use medea_control_api_mock::{
-    api::Response,
+use medea_control_api_mock_proto::{
     callback::CallbackItem,
-    proto::{CreateResponse, Element, SingleGetResponse},
+    CreateResponse, Element, SingleGetResponse, Response,
 };
 
 /// All errors which can happen while working with a Control API.

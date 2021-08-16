@@ -1,8 +1,9 @@
 use std::time::Duration;
 
 use cucumber_rust::{then, when};
-use medea_control_api_mock::proto::{
-    self as proto, AudioSettings, VideoSettings,
+use medea_control_api_mock_proto::{
+    endpoint::AudioSettings, endpoint::VideoSettings,
+    endpoint::PublishPolicy,
 };
 use tokio::time::{sleep, timeout};
 
@@ -26,10 +27,10 @@ async fn when_interconnects_kind(
     right_member_id: String,
 ) {
     let send_video = kind.contains("video").then(|| VideoSettings {
-        publish_policy: proto::PublishPolicy::Optional,
+        publish_policy: PublishPolicy::Optional,
     });
     let send_audio = kind.contains("audio").then(|| AudioSettings {
-        publish_policy: proto::PublishPolicy::Optional,
+        publish_policy: PublishPolicy::Optional,
     });
 
     world

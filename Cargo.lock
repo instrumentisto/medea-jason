@@ -1154,6 +1154,7 @@ dependencies = [
  "derive_more",
  "fantoccini",
  "futures",
+ "medea-control-api-mock-proto",
  "once_cell",
  "reqwest",
  "serde",

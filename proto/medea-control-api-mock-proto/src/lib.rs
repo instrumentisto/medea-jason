@@ -1,16 +1,20 @@
 pub mod endpoint;
 pub mod member;
 pub mod room;
+pub mod callback;
 
 use std::collections::HashMap;
 
 use derive_more::From;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    endpoint::{WebRtcPlayEndpoint, WebRtcPublishEndpoint},
-    member::Member,
-    room::Room,
+pub use crate::{
+    endpoint::{
+        AudioSettings, Endpoint, P2pMode, PublishPolicy, VideoSettings,
+        WebRtcPlayEndpoint, WebRtcPublishEndpoint,
+    },
+    member::{Credentials, Member},
+    room::{Room, RoomElement},
 };
 
 /// Response which returns sids.

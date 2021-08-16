@@ -9,10 +9,10 @@ use std::{collections::HashMap, time::Duration};
 use async_trait::async_trait;
 use cucumber_rust::WorldInit;
 use derive_more::{Display, Error, From};
-use medea_control_api_mock::{
+use medea_control_api_mock_proto::{
     callback::{CallbackEvent, CallbackItem},
-    proto,
-    proto::PublishPolicy,
+    self as proto,
+    endpoint::PublishPolicy,
 };
 use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
