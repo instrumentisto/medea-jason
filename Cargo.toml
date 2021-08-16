@@ -1,0 +1,21 @@
+[package]
+name = "medea-jason"
+version = "0.3.0-dev"
+edition = "2018"
+resolver = "2"
+description = "Client library for Medea media server"
+authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
+license = "MPL-2.0"
+documentation = "https://docs.rs/medea-jason"
+homepage = "https://github.com/instrumentisto/medea-jason"
+repository = "https://github.com/instrumentisto/medea-jason"
+readme = "README.md"
+keywords = ["medea", "jason", "webrtc", "client", "browser"]
+categories = ["multimedia", "api-bindings", "web-programming", "wasm"]
+
+[workspace]
+members = [
+    "proto/control-api-mock",
+]
+
+[dependencies]
