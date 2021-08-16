@@ -8,7 +8,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- Entities ([#??]):
+- Entities ([#1]):
     - `P2pMode`;
     - `PublishPolicy`;
     - `AudioSettings`;
@@ -21,10 +21,10 @@ All user visible changes to this project will be documented in this file. This p
     - `Room`;
     - `RoomElement`;
     - `Element`.
-- Responses ([#??]):
+- Responses ([#1]):
     - `CreateResponse`;
     - `Response`;
     - `ErrorResponse`;
     - `SingleGetResponse`.
 
-[#??]: /../../pull/??
+[#1]: /../../pull/1
