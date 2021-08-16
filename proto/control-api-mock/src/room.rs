@@ -1,3 +1,5 @@
+//! `Member` related methods and entities.
+
 use std::collections::HashMap;
 
 use crate::member::Member;

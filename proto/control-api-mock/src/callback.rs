@@ -1,4 +1,4 @@
-//! Control API Callback service implementation.
+//! Callback service DTOs.
 
 use serde::{Deserialize, Serialize};
 

@@ -1,3 +1,5 @@
+//! `Member` related methods and entities.
+
 use std::{collections::HashMap, time::Duration};
 
 use serde::{Deserialize, Serialize};
