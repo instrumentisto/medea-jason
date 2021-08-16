@@ -21,6 +21,15 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook", "wee_alloc"]
 mockable = ["downcast", "fragile", "mockall", "predicates-tree"]
 
+[workspace]
+members = [
+    "crates/medea-macro",
+    "crates/medea-reactive",
+    "e2e",
+    "proto/medea-client-api-proto",
+    "proto/medea-control-api-mock-proto",
+]
+
 [dependencies]
 async-recursion = "0.3"
 async-trait = "0.1"
