@@ -1,7 +1,2 @@
-/.idea/
-/.vscode/
-/*.iml
-.DS_Store
-
+/pkg/
 /target/
-/Cargo.lock

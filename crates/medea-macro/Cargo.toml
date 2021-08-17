@@ -1,0 +1,28 @@
+[package]
+name = "medea-macro"
+version = "0.2.1"
+edition = "2018"
+resolver = "2"
+description = "Internal macros and codegen for Medea media server project"
+authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
+license = "BlueOak-1.0.0"
+documentation = "https://docs.rs/medea-macro"
+homepage = "https://github.com/instrumentisto/medea/tree/master/crates/medea-macro"
+repository = "https://github.com/instrumentisto/medea/tree/master/crates/medea-macro"
+readme = "README.md"
+keywords = ["medea", "macro", "derive", "codegen"]
+categories = ["development-tools::build-utils"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+Inflector = "0.11"
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["full"] }
+synstructure = "0.12"
+
+[dev-dependencies]
+async-trait = "0.1"
+medea-jason = { path = "../../" }
