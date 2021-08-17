@@ -431,14 +431,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: medea
-            cache: false  # temporary disable caching due to CI issues
-            #cache: ${{ github.ref != 'refs/heads/master'
-            #           && !startsWith(github.ref, 'refs/tags/medea-')
-            #           && !contains(github.event.head_commit.message, '[fresh ci]') }}
-            export: true
-            if: true
-
           - image: medea-control-api-mock
             cache: ${{ github.ref != 'refs/heads/master'
                        && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
