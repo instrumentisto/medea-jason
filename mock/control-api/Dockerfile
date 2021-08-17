@@ -35,7 +35,6 @@ COPY proto/control-api/build.rs /app/proto/control-api/
 COPY proto/control-api/src/grpc/api.proto \
      proto/control-api/src/grpc/api*.rs \
      /app/proto/control-api/src/grpc/
-COPY jason/Cargo.toml /app/jason/
 COPY e2e/Cargo.toml /app/e2e/
 COPY Cargo.toml Cargo.lock /app/
 WORKDIR /app/
