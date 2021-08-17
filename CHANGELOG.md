@@ -7,9 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.3.0] · 2021-??-?? · To-be-done
-[0.3.0]: /../../tree/medea-jason-0.3.0/jason
+[0.3.0]: https://github.com/instrumentisto/medea/tree/medea-jason-0.3.0/jason
 
-[Diff](/../../compare/medea-jason-0.2.0...medea-jason-0.3.0) | [Milestone](/../../milestone/3) | [Roadmap](/../../issues/182)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-jason-0.2.0...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
 
 ### BC Breaks
 TODO: Mention #209
@@ -27,9 +27,9 @@ TODO: Mention #209
 
 
 ## [0.2.0] · 2021-04-09
-[0.2.0]: /../../tree/medea-jason-0.2.0/jason
+[0.2.0]: https://github.com/instrumentisto/medea/tree/medea-jason-0.2.0/jason
 
-[Diff](/../../compare/medea-jason-0.1.0...medea-jason-0.2.0) | [Milestone](/../../milestone/2) | [Roadmap](/../../issues/27)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-jason-0.1.0...medea-jason-0.2.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/2) | [Roadmap](https://github.com/instrumentisto/medea/issues/27)
 
 ### BC Breaks
 
@@ -128,60 +128,60 @@ TODO: Mention #209
 - Signalling:
     - Skipped `IceCandidate`s received before receiving remote SDP ([#50]).
 
-[#40]: /../../pull/40
-[#46]: /../../pull/46
-[#50]: /../../pull/59
-[#54]: /../../pull/54
-[#55]: /../../pull/55
-[#71]: /../../pull/71
-[#75]: /../../pull/75
-[#78]: /../../pull/78
-[#79]: /../../pull/79
-[#81]: /../../pull/81
-[#87]: /../../pull/87
-[#90]: /../../pull/90
-[#97]: /../../pull/97
-[#105]: /../../pull/105
-[#106]: /../../pull/106
-[#109]: /../../pull/109
-[#120]: /../../pull/120
-[#123]: /../../pull/123
-[#124]: /../../pull/124
-[#127]: /../../pull/127
-[#132]: /../../pull/132
-[#137]: /../../pull/137
-[#138]: /../../pull/138
-[#139]: /../../pull/139
-[#143]: /../../pull/143
-[#144]: /../../pull/144
-[#145]: /../../pull/145
-[#146]: /../../pull/146
-[#147]: /../../pull/147
-[#155]: /../../pull/155
-[#156]: /../../pull/156
-[#158]: /../../pull/158
-[#160]: /../../pull/160
-[#167]: /../../pull/167
-[#191]: /../../pull/191
+[#40]: https://github.com/instrumentisto/medea/pull/40
+[#46]: https://github.com/instrumentisto/medea/pull/46
+[#50]: https://github.com/instrumentisto/medea/pull/59
+[#54]: https://github.com/instrumentisto/medea/pull/54
+[#55]: https://github.com/instrumentisto/medea/pull/55
+[#71]: https://github.com/instrumentisto/medea/pull/71
+[#75]: https://github.com/instrumentisto/medea/pull/75
+[#78]: https://github.com/instrumentisto/medea/pull/78
+[#79]: https://github.com/instrumentisto/medea/pull/79
+[#81]: https://github.com/instrumentisto/medea/pull/81
+[#87]: https://github.com/instrumentisto/medea/pull/87
+[#90]: https://github.com/instrumentisto/medea/pull/90
+[#97]: https://github.com/instrumentisto/medea/pull/97
+[#105]: https://github.com/instrumentisto/medea/pull/105
+[#106]: https://github.com/instrumentisto/medea/pull/106
+[#109]: https://github.com/instrumentisto/medea/pull/109
+[#120]: https://github.com/instrumentisto/medea/pull/120
+[#123]: https://github.com/instrumentisto/medea/pull/123
+[#124]: https://github.com/instrumentisto/medea/pull/124
+[#127]: https://github.com/instrumentisto/medea/pull/127
+[#132]: https://github.com/instrumentisto/medea/pull/132
+[#137]: https://github.com/instrumentisto/medea/pull/137
+[#138]: https://github.com/instrumentisto/medea/pull/138
+[#139]: https://github.com/instrumentisto/medea/pull/139
+[#143]: https://github.com/instrumentisto/medea/pull/143
+[#144]: https://github.com/instrumentisto/medea/pull/144
+[#145]: https://github.com/instrumentisto/medea/pull/145
+[#146]: https://github.com/instrumentisto/medea/pull/146
+[#147]: https://github.com/instrumentisto/medea/pull/147
+[#155]: https://github.com/instrumentisto/medea/pull/155
+[#156]: https://github.com/instrumentisto/medea/pull/156
+[#158]: https://github.com/instrumentisto/medea/pull/158
+[#160]: https://github.com/instrumentisto/medea/pull/160
+[#167]: https://github.com/instrumentisto/medea/pull/167
+[#191]: https://github.com/instrumentisto/medea/pull/191
 
 
 
 
 ## [0.1.0] · 2019-08-21
-[0.1.0]: /../../tree/medea-jason-0.1.0/jason
+[0.1.0]: https://github.com/instrumentisto/medea/tree/medea-jason-0.1.0/jason
 
-[Milestone](/../../milestone/1) | [Roadmap](/../../issues/8)
+[Milestone](https://github.com/instrumentisto/medea/milestone/1) | [Roadmap](https://github.com/instrumentisto/medea/issues/8)
 
 ### Added
 
-- Transport and messaging ([#18](/../../pull/18)):
+- Transport and messaging ([#18]):
     - Library API:
         - `new Jason()`;
         - `Jason.join_room()`;
         - `Jason.dispose()`.
     - RPC transport and heartbeat.
-- Ability to use ICE servers provided by server ([#20](/../../pull/20)).
-- Signalling ([#22](/../../pull/22)):
+- Ability to use ICE servers provided by server ([#20]).
+- Signalling ([#22]):
     - Library API:
        - `RoomHandle.on_new_connection` callback.
     - Handling of RPC events:
@@ -193,11 +193,15 @@ TODO: Mention #209
         - `MakeSdpOffer`;
         - `MakeSdpAnswer`;
         - `SetIceCandidate`.
-- Media management ([#22](/../../pull/22)):
+- Media management ([#22]):
     - Library API:
         - `MediaStreamHandle.get_media_stream()`;
         - `ConnectionHandle.on_remote_stream` callback;
         - `Jason.on_local_stream` callback.
+    
+[#18]: https://github.com/instrumentisto/medea/pull/18
+[#20]: https://github.com/instrumentisto/medea/pull/20
+[#22]: https://github.com/instrumentisto/medea/pull/22
 
 
 
