@@ -201,12 +201,6 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          name: docker-medea-${{ github.run_number }}
-      - name: Unpack `medea` Docker image
-        run: make docker.untar from-file=image.tar
-
-      - uses: actions/download-artifact@v2
-        with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
