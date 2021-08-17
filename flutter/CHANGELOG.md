@@ -7,7 +7,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.1.0] · 2021-??-?? ~TBD
-[0.1.0]: /../../tree/medea-jason-flutter-0.1.0/jason/flutter
+[0.1.0]: /../../tree/medea-jason-flutter-0.1.0/flutter
 
 [Milestone](/../../milestone/3) | [Roadmap](/../../issues/182)
 

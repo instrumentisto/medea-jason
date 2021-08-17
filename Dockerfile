@@ -30,11 +30,11 @@ RUN cd /src/ \
 # https://hub.docker.com/_/nginx
 FROM nginx:stable-alpine AS runtime
 
-COPY jason/demo/chart/medea-demo/conf/nginx.vh.conf \
+COPY demo/chart/medea-demo/conf/nginx.vh.conf \
      /etc/nginx/conf.d/default.conf
 
-COPY jason/demo/index.html /app/
-COPY --from=dist /src/jason/pkg/ /app/js/
+COPY demo/index.html /app/
+COPY --from=dist /src/pkg/ /app/js/
 
 WORKDIR /app
 

@@ -33,4 +33,4 @@ COPY --from=dist /npm/node_modules/medea-jason/ /app/js/
 WORKDIR /app
 
 LABEL org.opencontainers.image.source="\
-    https://github.com/instrumentisto/medea/tree/master/jason/demo"
+    https://github.com/instrumentisto/medea/tree/master/demo"

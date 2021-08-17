@@ -567,7 +567,7 @@ endif
 #	make test.flutter [device=<device-id>]
 
 test.flutter:
-	cd jason/flutter/example/ && \
+	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))

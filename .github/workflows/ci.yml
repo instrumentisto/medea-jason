@@ -680,12 +680,12 @@ jobs:
           - image: medea-demo
             tags: latest,@versions
             repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: jason/demo/README.md
+            readme_file: demo/README.md
             if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
           - image: medea-demo-edge
             tags: edge
             repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: jason/demo/README.md
+            readme_file: demo/README.md
             if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:

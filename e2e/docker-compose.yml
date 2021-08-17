@@ -14,7 +14,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ../jason/pkg/:/usr/share/nginx/html/pkg/:ro
+      - ../pkg/:/usr/share/nginx/html/pkg/:ro
   medea:
     container_name: ${COMPOSE_PROJECT_NAME}-medea
     image: ${COMPOSE_IMAGE_NAME}:${COMPOSE_IMAGE_VER}

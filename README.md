@@ -20,7 +20,7 @@ Client library for integration with [Medea] media server in a web browser.
 
 Copyright © 2019 Instrumentisto Team, <https://github.com/instrumentisto>
 
-This Source Code Form is subject to the terms of the [Mozilla Public License, v. 2.0](https://github.com/instrumentisto/medea/blob/master/jason/LICENSE.md). If a copy of the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
+This Source Code Form is subject to the terms of the [Mozilla Public License, v. 2.0](https://github.com/instrumentisto/medea/blob/master/LICENSE.md). If a copy of the MPL was not distributed with this file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 
 

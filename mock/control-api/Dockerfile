@@ -44,7 +44,7 @@ RUN mkdir -p crates/medea-macro/src/ && touch crates/medea-macro/src/lib.rs \
  && mkdir -p mock/control-api/src/ && touch mock/control-api/src/lib.rs \
  && mkdir -p proto/client-api/src/ && touch proto/client-api/src/lib.rs \
  && mkdir -p proto/control-api/src/ && touch proto/control-api/src/lib.rs \
- && mkdir -p jason/src/ && touch jason/src/lib.rs \
+ && mkdir -p src/ && touch src/lib.rs \
  && mkdir -p e2e/src/ && touch e2e/src/lib.rs \
  && mkdir -p src/ && touch src/lib.rs
 
