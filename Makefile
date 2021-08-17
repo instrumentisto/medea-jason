@@ -53,9 +53,6 @@ endif
 ifeq ($(crate),medea-reactive)
 crate-dir = crates/medea-reactive
 endif
-ifeq ($(crate),medea-coturn-telnet-client)
-crate-dir = crates/medea-coturn-telnet-client
-endif
 crate-ver := $(strip \
 	$(shell grep -m1 'version = "' $(crate-dir)/Cargo.toml | cut -d '"' -f2))
 
