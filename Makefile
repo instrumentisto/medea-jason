@@ -546,7 +546,6 @@ test.e2e:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
-	@make docker.build image=medea debug=$(debug) tag=$(tag)
 	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
 endif
 endif

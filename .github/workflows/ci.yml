@@ -213,10 +213,10 @@ jobs:
 
       - name: Chrome
         run: make test.e2e browser=chrome up=yes dockerized=yes
-                           tag=build-${{ github.run_number }}
+                           tag=edge
       - name: Firefox
         run: make test.e2e browser=firefox up=yes dockerized=yes
-                           tag=build-${{ github.run_number }}
+                           tag=edge
 
   test-integration:
     name: Integration tests
