@@ -191,7 +191,7 @@ up.medea: docker.up.medea
 #	make up.jason
 
 up.jason:
-	npm run start --prefix=jason/e2e-demo
+	npm run start --prefix=./e2e-demo
 
 
 
@@ -276,8 +276,8 @@ define cargo.build.medea-jason.android
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
 	cargo ndk -p $(ANDROID_SDK_COMPILE_VERSION) -t $(target) \
-	          -o jason/flutter/android/src/main/jniLibs \
-	          --manifest-path=jason/Cargo.toml \
+	          -o ./flutter/android/src/main/jniLibs \
+	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
 endef
 
