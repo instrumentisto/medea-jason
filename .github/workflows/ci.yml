@@ -209,10 +209,10 @@ jobs:
         run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }} -p ${{ secrets.MEDEA_DOCKER_PASS }} hub.instrumentisto.com
 
       - name: Set Medea branch name env var
-        run: echo "MEDEA_BRANCH=$( \
-             echo ${{ github.event.head_commit_message }} \
-             | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p" \
-             | grep .  || echo "master" \
+        run: echo "MEDEA_BRANCH=$(
+             echo ${{ github.event.head_commit_message }}
+             | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p"
+             | grep .  || echo "master"
         )" >> $GITHUB_ENV
 
       - name: Pull Medea Docker image
