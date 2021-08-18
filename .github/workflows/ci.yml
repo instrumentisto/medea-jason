@@ -216,10 +216,10 @@ jobs:
 
       - name: Chrome
         run: make test.e2e browser=chrome up=yes dockerized=yes
-                           tag=edge
+                           tag=${{ env.MEDEA_BRANCH }}
       - name: Firefox
         run: make test.e2e browser=firefox up=yes dockerized=yes
-                           tag=edge
+                           tag=${{ env.MEDEA_BRANCH }}
 
   test-integration:
     name: Integration tests
