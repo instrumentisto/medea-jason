@@ -206,7 +206,7 @@ jobs:
         run: make docker.untar from-file=image.tar
 
       - name: Login to Medea Docker registry
-        run: docker login -u $MEDEA_DOCKER_USER -p $MEDEA_DOCKER_PASSWORD hub.instrumentisto.com
+        run: docker login -u $MEDEA_DOCKER_USER -p $MEDEA_DOCKER_PASS hub.instrumentisto.com
 
       - name: Pull Medea Docker image
         run: docker pull hub.instrumentisto.com/streaming/medea/medea:$(echo $GITHUB_REF | cut -d'/' -f 3)
