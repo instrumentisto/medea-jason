@@ -109,19 +109,6 @@ jobs:
           - crate: medea-client-api-proto
             if: ${{ startsWith(github.ref, 'refs/tags/medea-client-api-proto-')
                     || !startsWith(github.ref, 'refs/tags/medea-') }}
-          - crate: medea
-            if: ${{ !startsWith(github.ref, 'refs/tags/medea-')
-                    || startsWith(github.ref, 'refs/tags/medea-0')
-                    || startsWith(github.ref, 'refs/tags/medea-1')
-                    || startsWith(github.ref, 'refs/tags/medea-2')
-                    || startsWith(github.ref, 'refs/tags/medea-3')
-                    || startsWith(github.ref, 'refs/tags/medea-4')
-                    || startsWith(github.ref, 'refs/tags/medea-5')
-                    || startsWith(github.ref, 'refs/tags/medea-6')
-                    || startsWith(github.ref, 'refs/tags/medea-7')
-                    || startsWith(github.ref, 'refs/tags/medea-8')
-                    || startsWith(github.ref, 'refs/tags/medea-9') }}
-                    # don't ask, pass through...
           - crate: medea-jason
             wasm: true
             if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
@@ -206,10 +193,17 @@ jobs:
         run: make docker.untar from-file=image.tar
 
       - name: Login to Medea Docker registry
-        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }} -p ${{ secrets.MEDEA_DOCKER_PASS }} hub.instrumentisto.com
+        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+                          -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                          hub.instrumentisto.com
 
       - name: Set Medea branch name env var
-        run: echo "MEDEA_BRANCH=$(echo ${{ github.event.head_commit.message }} | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p" | grep .  || echo "master")" >> $GITHUB_ENV
+        run: >-
+            echo "MEDEA_BRANCH=$(
+                echo ${{ github.event.head_commit.message }}
+                | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p"
+                | grep .  || echo "master"
+            )" >> $GITHUB_ENV
 
       - name: Pull Medea Docker image
         run: docker pull hub.instrumentisto.com/streaming/medea/medea:${{ env.MEDEA_BRANCH }}
@@ -386,20 +380,6 @@ jobs:
       - run: make docs.rust crate=medea-jason open=no
         if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
                 || !startsWith(github.ref, 'refs/tags/medea-') }}
-
-      - run: make docs.rust crate=medea open=no
-        if: ${{ !startsWith(github.ref, 'refs/tags/medea-')
-                || startsWith(github.ref, 'refs/tags/medea-0')
-                || startsWith(github.ref, 'refs/tags/medea-1')
-                || startsWith(github.ref, 'refs/tags/medea-2')
-                || startsWith(github.ref, 'refs/tags/medea-3')
-                || startsWith(github.ref, 'refs/tags/medea-4')
-                || startsWith(github.ref, 'refs/tags/medea-5')
-                || startsWith(github.ref, 'refs/tags/medea-6')
-                || startsWith(github.ref, 'refs/tags/medea-7')
-                || startsWith(github.ref, 'refs/tags/medea-8')
-                || startsWith(github.ref, 'refs/tags/medea-9') }}
-                # still, that's OK...
 
   docker:
     name: Docker image
