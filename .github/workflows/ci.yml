@@ -206,10 +206,13 @@ jobs:
         run: make docker.untar from-file=image.tar
 
       - name: Login to Medea Docker registry
-        run: docker login -u $MEDEA_DOCKER_USER -p $MEDEA_DOCKER_PASS hub.instrumentisto.com
+        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }} -p ${{ secrets.MEDEA_DOCKER_PASS }} hub.instrumentisto.com
+
+      - name: Set Medea branch name env var
+        run: echo ${{ github.event.head_commit_message }} | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p" | grep .  || echo "master" >> $MEDEA_BRANCH
 
       - name: Pull Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea/medea:$(echo $GITHUB_REF | cut -d'/' -f 3)
+        run: docker pull hub.instrumentisto.com/streaming/medea/medea:$MEDEA_BRANCH
 
       - name: Chrome
         run: make test.e2e browser=chrome up=yes dockerized=yes
