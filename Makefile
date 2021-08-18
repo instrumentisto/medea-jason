@@ -15,7 +15,7 @@ eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
 # Project parameters #
 ######################
 
-IMAGE_REPO := hub.instrumentisto.com/streaming/medea/medea
+IMAGE_REPO := instrumentisto
 IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),),medea,\
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
@@ -930,7 +930,7 @@ endif
 #	                                        | background=yes [log=(no|yes)] )])]
 #	                     [log-to-file=(no|yes)]
 
-docker-up-medea-image = $(IMAGE_REPO)/medea
+docker-up-medea-image = hub.instrumentisto.com/streaming/medea/medea
 docker-up-medea-tag = $(if $(call eq,$(tag),),dev,$(tag))
 
 docker.up.medea: docker.down.medea
