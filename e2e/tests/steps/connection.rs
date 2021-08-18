@@ -28,7 +28,7 @@ async fn then_member_doesnt_receive_connection(
         .get(responder_id)
         .await
         .unwrap()
-        .is_none())
+        .is_none());
 }
 
 #[then(regex = r"^(\S+)'s connection with (\S+) closes$")]
