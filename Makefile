@@ -880,15 +880,16 @@ docker.up.demo: docker.down.demo
 # Usage:
 #	make docker.up.e2e [browser=(chrome|firefox)]
 #	                   [( [dockerized=no]
-#	                    | dockerized=yes [tag=(dev|<tag>)] )]
+#	                    | dockerized=yes [medea-tag=(dev|<tag>)]
+#                         [control-tag=(dev|<tag>)] )]
 #	                   [debug=(yes|no)]
 #	                   [( [background=no]
 #	                    | background=yes [log=(no|yes)] )]
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
-	COMPOSE_IMAGE_VER=$(if $(call eq,$(tag),),dev,$(tag)) \
-	COMPOSE_CONTROL_MOCK_IMAGE_VER=dev \
+	COMPOSE_IMAGE_VER=$(if $(call eq,$(medea-tag),),dev,$(medea-tag)) \
+	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(if $(call eq,$(control-tag),),dev,$(control-tag)) \
 	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			ghcr.io/instrumentisto/geckodriver ,\
@@ -914,9 +915,10 @@ endif
 ifneq ($(dockerized),yes)
 	@MEDEA_SERVER__CLIENT__HTTP__BIND_PORT=8001 \
 	make docker.up.medea dockerized=no debug=$(debug) \
-	                     background=$(background) log-to-file=$(log)
+	                     background=$(background) log-to-file=$(log) \
+	                     tag=$(medea-tag)
 	@make wait.port port=6565
-	@make up.control background=$(background) tag=dev
+	@make up.control background=$(background) tag=$(control-tag)
 endif
 
 
