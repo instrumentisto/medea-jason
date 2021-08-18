@@ -212,7 +212,7 @@ jobs:
         run: echo "MEDEA_BRANCH=$(echo ${{ github.event.head_commit_message }} | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p" | grep .  || echo "master")" >> $GITHUB_ENV
 
       - name: Pull Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea/medea:$MEDEA_BRANCH
+        run: docker pull hub.instrumentisto.com/streaming/medea/medea:${{ env.MEDEA_BRANCH }}
 
       - name: Chrome
         run: make test.e2e browser=chrome up=yes dockerized=yes
