@@ -888,7 +888,7 @@ docker.up.demo: docker.down.demo
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
 	COMPOSE_IMAGE_VER=$(if $(call eq,$(tag),),dev,$(tag)) \
-	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(if $(call eq,$(tag),),dev,$(tag)) \
+	COMPOSE_CONTROL_MOCK_IMAGE_VER=dev \
 	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			ghcr.io/instrumentisto/geckodriver ,\
