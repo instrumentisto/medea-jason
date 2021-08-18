@@ -15,7 +15,7 @@ eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
 # Project parameters #
 ######################
 
-IMAGE_REPO := instrumentisto
+IMAGE_REPO := hub.instrumentisto.com/streaming/medea/medea
 IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),),medea,\
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
