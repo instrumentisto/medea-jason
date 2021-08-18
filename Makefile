@@ -916,7 +916,7 @@ ifneq ($(dockerized),yes)
 	make docker.up.medea dockerized=no debug=$(debug) \
 	                     background=$(background) log-to-file=$(log)
 	@make wait.port port=6565
-	@make up.control background=$(background)
+	@make up.control background=$(background) tag=dev
 endif
 
 
