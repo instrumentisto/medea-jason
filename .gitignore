@@ -1,2 +1,8 @@
-/pkg/
+/.idea/
+/.vscode/
+/*.iml
+.DS_Store
+
 /target/
+
+/pkg/

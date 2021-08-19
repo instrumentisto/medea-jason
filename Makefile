@@ -147,8 +147,7 @@ down.demo: docker.down.demo
 #	make down.dev
 
 down.dev:
-	@make docker.down.medea dockerized=no
-	@make docker.down.medea dockerized=yes
+	@make docker.down.medea
 	@make down.control
 	@make docker.down.coturn
 
@@ -213,26 +212,22 @@ cargo:
 #
 # Usage:
 #	make cargo.build
-#		[( [crate=@all]
-#		 | crate=medea
-#		 | crate=medea-jason [debug=(yes|no)] [dockerized=(no|yes)]
+#		[ [debug=(yes|no)] [dockerized=(no|yes)]
 #		   	[( [platform=web]
+# 			 | platform=all
 #		   	 | platform=android
 #		   	   	[targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )] )]
 # 		[args=<cargo-build-args>]
 
-cargo-build-crate = $(if $(call eq,$(crate),),@all,$(crate))
 cargo-build-platform = $(if $(call eq,$(platform),),web,$(platform))
 cargo-build-targets = $(strip \
 	$(if $(call eq,$(targets),),$(ANDROID_TARGETS),$(targets)))
 
 cargo.build:
-ifeq ($(cargo-build-crate),@all)
-	@make build crate=medea
-	@make build crate=medea-jason platform=web
-	@make build crate=medea-jason platform=android targets=$(targets)
-endif
-ifeq ($(cargo-build-crate),medea-jason)
+ifeq ($(platform),)
+	@make build platform=web
+	@make build platform=android targets=$(targets)
+else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
 	docker run --rm --network=host -v "$(PWD)":/app -w /app \
@@ -241,8 +236,7 @@ ifeq ($(cargo-build-platform),web)
 		-v "$(HOME):$(HOME)" \
 		-e XDG_CACHE_HOME=$(HOME) \
 		ghcr.io/instrumentisto/rust:$(RUST_VER) \
-			make cargo.build crate=$(cargo-build-crate) \
-			                 debug=$(debug) dockerized=no \
+			make cargo.build debug=$(debug) dockerized=no \
 			                 pre-install=yes
 endif
 ifeq ($(cargo-build-platform),android)
@@ -252,8 +246,7 @@ ifeq ($(cargo-build-platform),android)
 		-v "$(HOME):$(HOME)" \
 		-e XDG_CACHE_HOME=$(HOME) \
 		instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
-			make cargo.build crate=$(cargo-build-crate) \
-			                 debug=$(debug) dockerized=no \
+			make cargo.build debug=$(debug) dockerized=no \
 			                 platform=$(platform) targets=$(targets)
 endif
 else
@@ -275,7 +268,7 @@ endif
 define cargo.build.medea-jason.android
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo ndk -p $(ANDROID_SDK_COMPILE_VERSION) -t $(target) \
+	cargo ndk -p $(ANDROID_SDK_MIN_VERSION) -t $(target) \
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
@@ -709,7 +702,7 @@ docker.down.demo:
 #	make docker.down.e2e
 
 docker.down.e2e: down.control
-	@make docker.down.medea dockerized=no
+	@make docker.down.medea
 	docker-compose -f e2e/docker-compose.yml down --rmi=local -v
 
 
@@ -717,14 +710,10 @@ docker.down.e2e: down.control
 # and remove all related containers.
 #
 # Usage:
-# 	make docker.down.medea [dockerized=(no|yes)]
+# 	make docker.down.medea
 
 docker.down.medea:
-ifeq ($(dockerized),yes)
 	docker-compose -f docker-compose.medea.yml down --rmi=local -v
-else
-	-killall medea
-endif
 
 
 # Stop dockerized WebDriver and remove all related containers.
@@ -912,14 +901,6 @@ ifeq ($(log),yes)
 		logs -f &
 endif
 endif
-ifneq ($(dockerized),yes)
-	@MEDEA_SERVER__CLIENT__HTTP__BIND_PORT=8001 \
-	make docker.up.medea dockerized=no debug=$(debug) \
-	                     background=$(background) log-to-file=$(log) \
-	                     tag=$(medea-tag)
-	@make wait.port port=6565
-	@make up.control background=$(background) tag=$(control-tag)
-endif
 
 
 # Run Medea media server in Docker Compose environment.
@@ -932,11 +913,10 @@ endif
 #	                                        | background=yes [log=(no|yes)] )])]
 #	                     [log-to-file=(no|yes)]
 
-docker-up-medea-image = hub.instrumentisto.com/streaming/medea/medea
-docker-up-medea-tag = $(if $(call eq,$(tag),),dev,$(tag))
+docker-up-medea-image = hub.instrumentisto.com/streaming/medea
+docker-up-medea-tag = $(if $(call eq,$(tag),),edge,$(tag))
 
 docker.up.medea: docker.down.medea
-ifeq ($(dockerized),yes)
 	COMPOSE_IMAGE_NAME=$(docker-up-medea-image) \
 	COMPOSE_IMAGE_VER=$(docker-up-medea-tag) \
 	docker-compose -f docker-compose.medea.yml up \
@@ -945,15 +925,6 @@ ifeq ($(background),yes)
 ifeq ($(log),yes)
 	docker-compose -f docker-compose.medea.yml logs -f &
 endif
-endif
-else
-ifeq ($(log-to-file),yes)
-	@rm -f /tmp/medea.log
-endif
-	cargo build --bin medea $(if $(call eq,$(debug),no),--release,)
-	cargo run --bin medea $(if $(call eq,$(debug),no),--release,) \
-		$(if $(call eq,$(log-to-file),yes),> /tmp/medea.log,) \
-		$(if $(call eq,$(background),yes),&,)
 endif
 
 
@@ -1108,8 +1079,6 @@ ifeq ($(helm-chart),medea-demo)
 ifeq ($(rebuild),yes)
 	@make docker.build image=medea-demo-edge tag=dev \
 	                   minikube=yes no-cache=$(no-cache)
-	@make docker.build image=medea tag=dev \
-	                   minikube=yes no-cache=$(no-cache)
 	@make docker.build image=medea-control-api-mock tag=dev \
 	                   minikube=yes no-cache=$(no-cache)
 endif
@@ -1171,7 +1140,7 @@ endef
 # .PHONY section #
 ##################
 
-.PHONY: build build.jason build.medea \
+.PHONY: build build.jason \
         cargo cargo.build cargo.changelog.link cargo.fmt cargo.gen cargo.lint \
         	cargo.version \
         docker.build \
