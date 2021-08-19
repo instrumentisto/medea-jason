@@ -25,7 +25,7 @@ RUST_VER := 1.54
 CHROME_VERSION := 92.0
 FIREFOX_VERSION := 91.0.1
 
-CARGO_NDK_VER := 2.4.1-ndkr21e-rust$(RUST_VER)
+CARGO_NDK_VER := 2.4.1-ndkr22b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
