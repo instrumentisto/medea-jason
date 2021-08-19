@@ -72,8 +72,7 @@ build: build.jason
 
 
 build.jason:
-	@make cargo.build crate=medea-jason \
-	                  platform=$(platform) targets=$(targets) \
+	@make cargo.build platform=$(platform) targets=$(targets) \
 	                  debug=$(debug) dockerized=$(dockerized)
 
 
@@ -616,7 +615,7 @@ release.helm: helm.package.release
 
 release.npm:
 ifneq ($(filter $(crate),medea-jason),)
-	@make cargo.build crate=$(crate) debug=no dockerized=no
+	@make cargo.build debug=no dockerized=no
 ifeq ($(publish),yes)
 	wasm-pack publish $(crate-dir)/
 endif
