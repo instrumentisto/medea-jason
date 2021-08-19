@@ -94,6 +94,6 @@ COPY --from=dist /out/ /
 USER nobody:nobody
 
 LABEL org.opencontainers.image.source="\
-    https://github.com/instrumentisto/medea/tree/master/mock/control-api"
+    https://github.com/instrumentisto/medea-jason/tree/master/mock/control-api"
 
 ENTRYPOINT ["/medea-control-api-mock"]

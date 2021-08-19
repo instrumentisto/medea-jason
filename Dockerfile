@@ -39,4 +39,4 @@ COPY --from=dist /src/pkg/ /app/js/
 WORKDIR /app
 
 LABEL org.opencontainers.image.source="\
-    https://github.com/instrumentisto/medea/tree/master/jason/demo"
+    https://github.com/instrumentisto/medea-jason/tree/master/demo"

@@ -21,9 +21,9 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(image))))
 
-RUST_VER := 1.53
-CHROME_VERSION := 91.0
-FIREFOX_VERSION := 89.0.2
+RUST_VER := 1.54
+CHROME_VERSION := 92.0
+FIREFOX_VERSION := 91.0.1
 
 CARGO_NDK_VER := 2.4.1-ndkr21e-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -100,7 +100,7 @@ lint: cargo.lint
 # Build and publish project crate everywhere.
 #
 # Usage:
-#	make release crate=(medea|medea-jason|<crate-name>)
+#	make release crate=(medea-jason|<crate-name>)
 #	             [publish=(no|yes)]
 
 release: release.crates release.npm
@@ -285,14 +285,14 @@ endef
 # Show permalink to CHANGELOG of a concrete version of project's Cargo crate.
 #
 # Usage:
-#	make cargo.changelog.link [crate=(medea|medea-jason|<crate-name>)]
+#	make cargo.changelog.link [crate=(medea-jason|<crate-name>)]
 #	                          [ver=($(crate-ver)|<version>)]
 
 cargo-changelog-link-crate = $(if $(call eq,$(crate),),medea,$(crate))
 cargo-changelog-link-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))
 
 cargo.changelog.link:
-	@printf "https://github.com/instrumentisto/medea/blob/$(cargo-changelog-link-crate)-$(cargo-changelog-link-ver)/$(if $(call eq,$(crate-dir),.),,$(crate-dir)/)CHANGELOG.md#$(shell sed -n '/^## \[$(cargo-changelog-link-ver)\]/{s/^## \[\(.*\)\][^0-9]*\([0-9].*\)/\1--\2/;s/[^0-9a-z-]*//g;p;}' $(crate-dir)/CHANGELOG.md)"
+	@printf "https://github.com/instrumentisto/medea-jason/blob/$(cargo-changelog-link-crate)-$(cargo-changelog-link-ver)/$(if $(call eq,$(crate-dir),.),,$(crate-dir)/)CHANGELOG.md#$(shell sed -n '/^## \[$(cargo-changelog-link-ver)\]/{s/^## \[\(.*\)\][^0-9]*\([0-9].*\)/\1--\2/;s/[^0-9a-z-]*//g;p;}' $(crate-dir)/CHANGELOG.md)"
 
 
 # Format Rust sources with rustfmt.
@@ -336,7 +336,7 @@ endef
 # Show version of project's Cargo crate.
 #
 # Usage:
-#	make cargo.version [crate=(medea|medea-jason|<crate-name>)]
+#	make cargo.version [crate=(medea-jason|<crate-name>)]
 
 cargo.version:
 	@printf "$(crate-ver)"
@@ -464,7 +464,7 @@ yarn.version:
 # Generate project documentation of Rust sources.
 #
 # Usage:
-#	make docs.rust [crate=(@all|medea|medea-jason|<crate-name>)]
+#	make docs.rust [crate=(@all|medea-jason|<crate-name>)]
 #	               [open=(yes|no)] [clean=(no|yes)]
 #	               [dev=(no|yes)]
 
@@ -492,7 +492,7 @@ endif
 #
 # Usage:
 #	make test.unit [( [crate=@all]
-#	                | crate=(medea|<crate-name>)
+#	                | crate=(<crate-name>)
 #	                | crate=medea-jason
 #	                  [browser=(chrome|firefox|default)]
 #	                  [timeout=(60|<seconds>)] )]
@@ -597,7 +597,7 @@ wait.port:
 # Build and publish project crate to crates.io.
 #
 # Usage:
-#	make release.crates crate=(medea|medea-jason|<crate-name>)
+#	make release.crates crate=(medea-jason|<crate-name>)
 #	                    [token=($CARGO_TOKEN|<cargo-token>)]
 #	                    [publish=(no|yes)]
 
@@ -643,7 +643,7 @@ docker-env = $(strip $(if $(call eq,$(minikube),yes),\
 #
 # Usage:
 #	make docker.build [debug=(yes|no)] [no-cache=(no|yes)]
-#		[image=(medea|medea-control-api-mock|medea-demo|medea-demo-edge)]
+#		[image=(medea-control-api-mock|medea-demo|medea-demo-edge)]
 #		[tag=(dev|<tag>)]
 #		[minikube=(no|yes)]
 
@@ -740,7 +740,7 @@ docker.down.webdriver:
 #
 # Usage:
 #	make docker.pull
-#		[image=(medea|medea-control-api-mock|medea-demo)]
+#		[image=(medea-control-api-mock|medea-demo)]
 #		[repos=($(IMAGE_REPO)|<prefix-1>[,<prefix-2>...])]
 #		[tags=(@all|<t1>[,<t2>...])]
 #		[minikube=(no|yes)]
@@ -768,7 +768,7 @@ endef
 #
 # Usage:
 #	make docker.push
-#		[image=(medea|medea-control-api-mock|medea-demo)]
+#		[image=(medea-control-api-mock|medea-demo)]
 #		[repos=($(IMAGE_REPO)|<prefix-1>[,<prefix-2>...])]
 #		[tags=(dev|<t1>[,<t2>...])]
 #		[minikube=(no|yes)]
@@ -791,7 +791,7 @@ endef
 #
 # Usage:
 #	make docker.tag [of=(dev|<tag>)]
-#		[image=(medea|medea-control-api-mock|medea-demo)]
+#		[image=(medea-control-api-mock|medea-demo)]
 #		[repos=($(IMAGE_REPO)|<with-prefix-1>[,<with-prefix-2>...])]
 #		[tags=(dev|<with-t1>[,<with-t2>...])]
 #		[minikube=(no|yes)]
@@ -817,7 +817,7 @@ endef
 #
 # Usage:
 #	make docker.tar [to-file=(.cache/image.tar|<file-path>)]
-#		[image=(medea|medea-control-api-mock|medea-demo)]
+#		[image=(medea-control-api-mock|medea-demo)]
 #		[tags=(dev|<t1>[,<t2>...])]
 #		[minikube=(no|yes)]
 

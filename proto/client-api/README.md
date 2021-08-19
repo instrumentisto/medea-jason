@@ -8,7 +8,7 @@ Medea Client API protocol
 [![Rust docs](https://docs.rs/medea-client-api-proto/badge.svg)](https://docs.rs/medea-client-api-proto)
 
 [API Docs](https://docs.rs/medea-client-api-proto) |
-[Changelog](https://github.com/instrumentisto/medea/blob/master/proto/client-api/CHANGELOG.md)
+[Changelog](https://github.com/instrumentisto/medea-jason/blob/master/proto/client-api/CHANGELOG.md)
 
 [Client API] protocol implementation for [Medea] media server.
 

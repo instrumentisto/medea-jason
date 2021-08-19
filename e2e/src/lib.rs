@@ -1,6 +1,6 @@
 //! Tools for testing [Medea] client ([Jason]) through a [WebDriver] protocol.
 //!
-//! [Jason]: https://github.com/instrumentisto/medea/tree/master/jason
+//! [Jason]: https://github.com/instrumentisto/medea-jason/tree/master
 //! [Medea]: https://github.com/instrumentisto/medea
 //! [WebDriver]: https://w3.org/TR/webdriver
 

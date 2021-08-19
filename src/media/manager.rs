@@ -397,7 +397,6 @@ impl MediaManager {
 #[derive(Clone)]
 pub struct MediaManagerHandle(Weak<InnerMediaManager>);
 
-#[allow(clippy::unused_self)]
 impl MediaManagerHandle {
     /// Returns a list of [`platform::InputDeviceInfo`] objects representing
     /// available media input and devices, such as microphones, cameras, and so
@@ -406,6 +405,7 @@ impl MediaManagerHandle {
     /// # Errors
     ///
     /// See [`EnumerateDevicesError`] for details.
+    #[allow(clippy::unused_self)]
     pub async fn enumerate_devices(
         &self,
     ) -> Result<Vec<platform::InputDeviceInfo>, Traced<EnumerateDevicesError>>

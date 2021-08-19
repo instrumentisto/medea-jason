@@ -1,8 +1,6 @@
 //! [`Future`] returned from `when_*_processed` methods of progressable
 //! containers.
 
-#![allow(clippy::module_name_repetitions)]
-
 use std::{
     fmt,
     pin::Pin,
@@ -19,6 +17,7 @@ pub type Factory<'a, T> = Box<dyn Fn() -> LocalBoxFuture<'a, T> + 'static>;
 
 /// Creates [`AllProcessed`] [`Future`] from the provided [`Iterator`] of
 /// [`Factory`]s.
+#[allow(clippy::module_name_repetitions)]
 pub fn when_all_processed<I, T>(futures: I) -> AllProcessed<'static>
 where
     I: IntoIterator<Item = Factory<'static, T>>,
@@ -86,6 +85,7 @@ impl<'a, T> fmt::Debug for Processed<'a, T> {
 /// conditions are still met.
 ///
 /// Inner [`Factory`] can be unwrapped using [`Into`] implementation.
+#[allow(clippy::module_name_repetitions)]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
 pub struct AllProcessed<'a, T = ()> {
     /// Factory creating the underlying [`Future`] and recreating it to recheck
