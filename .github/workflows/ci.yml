@@ -258,6 +258,10 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: 2.4.0-4.2.pre
@@ -270,7 +274,7 @@ jobs:
           echo ::set-output name=target::$(make flutter.android.version.compile)
 
       - name: Compile shared object
-        run: make cargo.build dockerized=yes platform=android targets=x86_64
+        run: make cargo.build platform=android targets=x86_64
                               args="--features mockable"
 
       - name: Test on min Android NDK version
