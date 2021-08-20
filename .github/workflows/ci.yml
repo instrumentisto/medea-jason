@@ -264,6 +264,7 @@ jobs:
           use-tool-cache: true
       - uses: subosito/flutter-action@v1
         with:
+          flutter_version: 2.4.0-4.2.pre
           channel: beta
 
       - name: Parse Android NDK versions
@@ -276,16 +277,16 @@ jobs:
         run: make cargo.build crate=medea-jason platform=android targets=x86_64
                               args="--features mockable"
 
-#      - name: Test on min Android NDK version
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: ${{ steps.ndk-version.outputs.min }}
-#          target: google_apis
-#          arch: x86_64
-#          # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
-#          emulator-build: 7425822
-#          profile: Nexus 6
-#          script: make test.flutter
+      - name: Test on min Android NDK version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.ndk-version.outputs.min }}
+          target: google_apis
+          arch: x86_64
+          # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
+          emulator-build: 7425822
+          profile: Nexus 6
+          script: make test.flutter
       - name: Test on target Android NDK version
         uses: reactivecircus/android-emulator-runner@v2
         with:
