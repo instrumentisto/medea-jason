@@ -223,7 +223,7 @@ cargo-build-targets = $(strip \
 	$(if $(call eq,$(targets),),$(ANDROID_TARGETS),$(targets)))
 
 cargo.build:
-ifeq ($(platform),)
+ifeq ($(platform),all)
 	@make build platform=web
 	@make build platform=android targets=$(targets)
 else
