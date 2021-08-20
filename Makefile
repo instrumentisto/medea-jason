@@ -236,7 +236,7 @@ ifeq ($(cargo-build-platform),web)
 		-e XDG_CACHE_HOME=$(HOME) \
 		ghcr.io/instrumentisto/rust:$(RUST_VER) \
 			make cargo.build debug=$(debug) dockerized=no \
-			                 pre-install=yes
+			                 pre-install=yes args=$(args)
 endif
 ifeq ($(cargo-build-platform),android)
 	docker run --rm --network=host -v "$(PWD)":/app -w /app \
@@ -246,7 +246,7 @@ ifeq ($(cargo-build-platform),android)
 		-e XDG_CACHE_HOME=$(HOME) \
 		instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
 			make cargo.build debug=$(debug) dockerized=no \
-			                 platform=$(platform) targets=$(targets)
+			                 platform=$(platform) targets=$(targets) args="$(args)"
 endif
 else
 ifeq ($(cargo-build-platform),web)
