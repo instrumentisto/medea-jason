@@ -217,30 +217,6 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
-  test-integration:
-    name: Integration tests
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        with:
-          key: test-integration-{hash}
-          restore-keys: test-integration-
-        continue-on-error: true
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-
-      - run: make test.integration up=yes dockerized=no
-
   test-flutter:
     name: Flutter tests
     if: ${{ github.ref == 'refs/heads/master'
@@ -451,7 +427,7 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ['clippy', 'rustfmt', 'rustdoc', 'test-e2e', 'test-integration', 'test-unit']
+    needs: ['clippy', 'rustfmt', 'rustdoc', 'test-e2e', 'test-unit']
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
