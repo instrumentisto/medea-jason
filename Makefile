@@ -112,7 +112,6 @@ release: release.crates release.npm
 
 test:
 	@make test.unit
-	@make test.integration up=yes dockerized=no
 	@make test.e2e up=yes dockerized=no
 
 
@@ -875,8 +874,8 @@ docker.up.demo: docker.down.demo
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
-	COMPOSE_IMAGE_NAME=$(if $(call eq,$(medea-tag),edge),hub.instrumentisto.com/streaming/medea,hub.instrumentisto.com/streaming/medea/review) \
-	COMPOSE_IMAGE_VER=$(if $(call eq,$(medea-tag),),dev,$(medea-tag)) \
+	COMPOSE_MEDEA_IMAGE_NAME=$(if $(call eq,$(medea-tag),edge),hub.instrumentisto.com/streaming/medea,hub.instrumentisto.com/streaming/medea/review) \
+	COMPOSE_MEDEA_IMAGE_VER=$(if $(call eq,$(medea-tag),),dev,$(medea-tag)) \
 	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(if $(call eq,$(control-tag),),dev,$(control-tag)) \
 	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
 		$(if $(call eq,$(browser),firefox),\
@@ -916,8 +915,8 @@ docker-up-medea-image = hub.instrumentisto.com/streaming/medea
 docker-up-medea-tag = $(if $(call eq,$(tag),),edge,$(tag))
 
 docker.up.medea: docker.down.medea
-	COMPOSE_IMAGE_NAME=$(docker-up-medea-image) \
-	COMPOSE_IMAGE_VER=$(docker-up-medea-tag) \
+	COMPOSE_MEDEA_IMAGE_NAME=$(docker-up-medea-image) \
+	COMPOSE_MEDEA_IMAGE_VER=$(docker-up-medea-tag) \
 	docker-compose -f docker-compose.medea.yml up \
 		$(if $(call eq,$(background),yes),-d,--abort-on-container-exit)
 ifeq ($(background),yes)
@@ -1158,7 +1157,7 @@ endef
         minikube.boot \
         release release.crates release.helm release.npm \
         rustup.android \
-        test test.e2e test.flutter test.integration test.unit \
+        test test.e2e test.flutter test.unit \
         up up.control up.coturn up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version

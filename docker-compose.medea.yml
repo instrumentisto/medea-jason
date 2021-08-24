@@ -3,7 +3,7 @@ version: "2"
 services:
   medea:
     container_name: ${COMPOSE_PROJECT_NAME}-backend
-    image: ${COMPOSE_IMAGE_NAME}:${COMPOSE_IMAGE_VER}
+    image: ${COMPOSE_MEDEA_IMAGE_NAME}:${COMPOSE_MEDEA_IMAGE_VER}
     environment:
       RUST_LOG: ${RUST_LOG}
       MEDEA_CONF: ${MEDEA_CONF}
