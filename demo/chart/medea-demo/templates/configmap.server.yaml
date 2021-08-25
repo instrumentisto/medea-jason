@@ -1,0 +1,48 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ printf "%s.server.conf" (include "medea-demo.fullname" .) | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    helm.sh/chart: {{ include "medea-demo.chart" . | quote }}
+    app.kubernetes.io/name: {{ include "medea-demo.name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/component: server
+  {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  medea.toml: |
+    {{- $medeaConf := .Values.server.conf | toJson | fromJson }}
+    {{- if $medeaConf.turn }}
+      {{- $_ := unset $medeaConf.turn "pass" }}
+      {{- if $medeaConf.turn.db }}
+        {{- if $medeaConf.turn.db.redis }}
+          {{- $_ := unset $medeaConf.turn.db.redis "host" }}
+          {{- $_ := unset $medeaConf.turn.db.redis "pass" }}
+        {{- end }}
+      {{- end }}
+      {{- if $medeaConf.turn.cli }}
+        {{- $_ := unset $medeaConf.turn.cli "host" }}
+        {{- $_ := unset $medeaConf.turn.cli "pass" }}
+      {{- end }}
+    {{- end }}
+    {{- toToml $medeaConf | nindent 4 }}
+
+  turnserver.conf: |
+    {{- $coturnConf := .Values.server.coturn.conf }}
+    lt-cred-mech
+    fingerprint
+    no-tls
+    no-dtls
+    realm=medea
+    listening-port={{ index $coturnConf "listening-port" | int }}
+    cli-port={{ index $coturnConf "cli-port" | int }}
+
+  redis.conf: |
+    {{- $redisConf := index .Values "server" "coturn-db" "conf" | toJson | fromJson }}
+    {{- $_ := unset $redisConf "requirepass" }}
+  {{- range $name, $val := $redisConf }}
+    {{ $name }} {{ $val }}
+  {{- end }}

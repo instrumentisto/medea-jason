@@ -1,0 +1,35 @@
+[package]
+name = "medea-control-api-mock"
+version = "0.2.1-dev"
+edition = "2018"
+resolver = "2"
+description = "Mock server for Medea's Control API."
+authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
+license = "BlueOak-1.0.0"
+documentation = "https://docs.rs/medea-control-api-mock"
+homepage = "https://github.com/instrumentisto/medea-jason/tree/master/mock/control-api"
+repository = "https://github.com/instrumentisto/medea-jason"
+readme = "README.md"
+publish = false
+
+[dependencies]
+actix = "0.12"
+actix-cors = "=0.6.0-beta.2"
+actix-web = "=4.0.0-beta.8"
+actix-web-actors = "=4.0.0-beta.6"
+clap = "2.33"
+derive_more = "0.99"
+dotenv = "0.15"
+humantime-serde = "1.0"
+medea-control-api-proto = { version = "0.3", path = "../../proto/control-api" }
+protobuf = "2.11"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+slog = "2.5"
+slog-async = "2.5"
+slog-envlogger = "2.2"
+slog-scope = "4.3"
+slog-stdlog = "4.0"
+slog-term = "2.5"
+smart-default = "0.6"
+tonic = "0.5"

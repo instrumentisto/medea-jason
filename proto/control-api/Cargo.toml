@@ -1,0 +1,26 @@
+[package]
+name = "medea-control-api-proto"
+version = "0.3.0"
+edition = "2018"
+resolver = "2"
+description = "Control API protocol implementation for Medea media server"
+authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
+license = "BlueOak-1.0.0"
+documentation = "https://docs.rs/medea-control-api-proto"
+homepage = "https://github.com/instrumentisto/medea-jason/tree/master/proto/control-api"
+repository = "https://github.com/instrumentisto/medea-jason"
+readme = "README.md"
+keywords = ["medea", "grpc", "control-api"]
+categories = ["api-bindings", "network-programming"]
+
+[features]
+default = ["grpc"]
+grpc = ["prost", "prost-types", "tonic", "tonic-build"]
+
+[dependencies]
+prost = { version = "0.8", optional = true }
+prost-types = { version = "0.8", optional = true }
+tonic = { version = "0.5", optional = true }
+
+[build-dependencies]
+tonic-build = { version = "0.5", optional = true }
