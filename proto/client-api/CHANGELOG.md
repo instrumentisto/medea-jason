@@ -7,9 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.3.0] · 2021-04-09
-[0.3.0]: /../../tree/medea-client-api-proto-0.3.0/proto/client-api
+[0.3.0]: https://github.com/instrumentisto/medea/tree/medea-client-api-proto-0.3.0/proto/client-api
 
-[Diff](/../../compare/medea-client-api-proto-0.2.0...medea-client-api-proto-0.3.0) | [Milestone](/../../milestone/2)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-client-api-proto-0.2.0...medea-client-api-proto-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/2)
 
 ### BC Breaks
 
@@ -19,16 +19,16 @@ All user visible changes to this project will be documented in this file. This p
 
 - `PeerUpdate::Removed` variant to `PeerUpdated` event ([#109]).
 
-[#109]: /../../pull/109
-[#139]: /../../pull/139
+[#109]: https://github.com/instrumentisto/medea/pull/109
+[#139]: https://github.com/instrumentisto/medea/pull/139
 
 
 
 
 ## [0.2.0] · 2021-02-01
-[0.2.0]: /../../tree/medea-client-api-proto-0.2.0/proto/client-api
+[0.2.0]: https://github.com/instrumentisto/medea/tree/medea-client-api-proto-0.2.0/proto/client-api
 
-[Diff](/../../compare/medea-client-api-proto-0.1.0...medea-client-api-proto-0.2.0) | [Milestone](/../../milestone/2) | [Roadmap](/../../issues/27)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-client-api-proto-0.1.0...medea-client-api-proto-0.2.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/2) | [Roadmap](https://github.com/instrumentisto/medea/issues/27)
 
 ### BC Breaks
 
@@ -96,39 +96,39 @@ All user visible changes to this project will be documented in this file. This p
     - `Sender`;
     - `Receiver`.
 
-[#28]: /../../pull/28
-[#58]: /../../pull/58
-[#71]: /../../pull/71
-[#75]: /../../pull/75
-[#79]: /../../pull/79
-[#81]: /../../pull/81
-[#87]: /../../pull/87
-[#90]: /../../pull/90
-[#102]: /../../pull/102
-[#105]: /../../pull/105
-[#106]: /../../pull/106
-[#115]: /../../pull/115
-[#132]: /../../pull/132
-[#127]: /../../pull/127
-[#138]: /../../pull/138
-[#145]: /../../pull/145
-[#147]: /../../pull/147
-[#148]: /../../pull/148
-[#155]: /../../pull/155
-[#156]: /../../pull/156
-[#167]: /../../pull/167
+[#28]: https://github.com/instrumentisto/medea/pull/28
+[#58]: https://github.com/instrumentisto/medea/pull/58
+[#71]: https://github.com/instrumentisto/medea/pull/71
+[#75]: https://github.com/instrumentisto/medea/pull/75
+[#79]: https://github.com/instrumentisto/medea/pull/79
+[#81]: https://github.com/instrumentisto/medea/pull/81
+[#87]: https://github.com/instrumentisto/medea/pull/87
+[#90]: https://github.com/instrumentisto/medea/pull/90
+[#102]: https://github.com/instrumentisto/medea/pull/102
+[#105]: https://github.com/instrumentisto/medea/pull/105
+[#106]: https://github.com/instrumentisto/medea/pull/106
+[#115]: https://github.com/instrumentisto/medea/pull/115
+[#132]: https://github.com/instrumentisto/medea/pull/132
+[#127]: https://github.com/instrumentisto/medea/pull/127
+[#138]: https://github.com/instrumentisto/medea/pull/138
+[#145]: https://github.com/instrumentisto/medea/pull/145
+[#147]: https://github.com/instrumentisto/medea/pull/147
+[#148]: https://github.com/instrumentisto/medea/pull/148
+[#155]: https://github.com/instrumentisto/medea/pull/155
+[#156]: https://github.com/instrumentisto/medea/pull/156
+[#167]: https://github.com/instrumentisto/medea/pull/167
 
 
 
 
 ## [0.1.0] · 2019-08-21
-[0.1.0]: /../../tree/medea-client-api-proto-0.1.0/proto/client-api
+[0.1.0]: https://github.com/instrumentisto/medea/tree/medea-client-api-proto-0.1.0/proto/client-api
 
-[Milestone](/../../milestone/1) | [Roadmap](/../../issues/8)
+[Milestone](https://github.com/instrumentisto/medea/milestone/1) | [Roadmap](https://github.com/instrumentisto/medea/issues/8)
 
 ### Added
 
-- RPC messages ([#16](/../../pull/16)):
+- RPC messages ([#16](https://github.com/instrumentisto/medea/pull/16)):
     - Server messages:
         - `Pong`;
         - `Event`.

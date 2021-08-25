@@ -1,5 +1,5 @@
 # See full list at:
-# https://github.com/rust-lang-nursery/rustfmt/blob/master/Configurations.md
+# https://github.com/rust-lang/rustfmt/blob/master/Configurations.md
 
 max_width = 80
 format_strings = false

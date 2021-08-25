@@ -1,0 +1,23 @@
+*
+
+# Jason sources and manifest.
+!Cargo.toml
+!Cargo.lock
+!src/
+
+# Project sub-crates.
+!crates/
+!mock/
+!proto/
+
+# Demo assets and configs.
+!demo/chart/medea-demo/conf/
+!demo/index.html
+
+# E2E tests sources and manifest.
+!e2e/Cargo.toml
+!e2e/src/
+
+# Makefile may be used in Dockerfiles.
+!.env
+!Makefile

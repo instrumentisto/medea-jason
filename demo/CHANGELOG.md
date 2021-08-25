@@ -26,17 +26,17 @@ All user visible changes to this project will be documented in this file. This p
     - [Docker] image ([#38]);
     - [Helm] chart ([#41]).
 
-[#38]: /../../pull/38
-[#40]: /../../pull/40
-[#41]: /../../pull/41
-[#75]: /../../pull/75
-[#79]: /../../pull/79
-[#127]: /../../pull/127
-[#132]: /../../pull/132
-[#144]: /../../pull/144
-[#147]: /../../pull/147
-[#155]: /../../pull/155
-[#156]: /../../pull/156
+[#38]: https://github.com/instrumentisto/medea/pull/38
+[#40]: https://github.com/instrumentisto/medea/pull/40
+[#41]: https://github.com/instrumentisto/medea/pull/41
+[#75]: https://github.com/instrumentisto/medea/pull/75
+[#79]: https://github.com/instrumentisto/medea/pull/79
+[#127]: https://github.com/instrumentisto/medea/pull/127
+[#132]: https://github.com/instrumentisto/medea/pull/132
+[#144]: https://github.com/instrumentisto/medea/pull/144
+[#147]: https://github.com/instrumentisto/medea/pull/147
+[#155]: https://github.com/instrumentisto/medea/pull/155
+[#156]: https://github.com/instrumentisto/medea/pull/156
 
 
 

@@ -17,9 +17,9 @@ Demo application for performing video calls via [Medea] media server.
 
 ### [Helm] chart
 
-Use [`medea-demo` Helm chart](https://github.com/instrumentisto/medea-jason/blob/master/demo/chart/medea-demo) from `@medea` [Helm] charts repository:
+Use [`medea-demo` Helm chart](https://github.com/instrumentisto/medea-jason/blob/master/demo/chart/medea-demo) from `@medea-jason` [Helm] charts repository:
 ```bash
-helm repo add medea https://instrumentisto.github.io/medea/charts
+helm repo add medea-jason https://instrumentisto.github.io/medea-jason/charts
 ```
 
 See [values file](https://github.com/instrumentisto/medea-jason/blob/master/demo/chart/medea-demo/values.yaml) for details.

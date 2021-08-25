@@ -22,9 +22,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.2.0] · 2021-02-01
-[0.2.0]: /../../tree/medea-macro-0.2.0/crates/medea-macro
+[0.2.0]: https://github.com/instrumentisto/medea/tree/medea-macro-0.2.0/crates/medea-macro
 
-[Diff](/../../compare/medea-macro-0.1.0...medea-macro-0.2.0)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-macro-0.1.0...medea-macro-0.2.0)
 
 ### BC Breaks
 

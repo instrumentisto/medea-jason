@@ -7,9 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.3.0] · 2021-05-12
-[0.3.0]: /../../tree/medea-control-api-proto-0.3.0/proto/control-api
+[0.3.0]: https://github.com/instrumentisto/medea/tree/medea-control-api-proto-0.3.0/proto/control-api
 
-[Diff](/../../compare/medea-control-api-proto-0.2.0...medea-control-api-proto-0.3.0)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-control-api-proto-0.2.0...medea-control-api-proto-0.3.0)
 
 ### Upgraded
 
@@ -17,15 +17,15 @@ All user visible changes to this project will be documented in this file. This p
     - `prost` to `0.7`;
     - `tonic` to `0.4`.
 
-[#199]: /../../pull/199
+[#199]: https://github.com/instrumentisto/medea/pull/199
 
 
 
 
 ## [0.2.0] · 2021-04-08
-[0.2.0]: /../../tree/medea-control-api-proto-0.2.0/proto/control-api
+[0.2.0]: https://github.com/instrumentisto/medea/tree/medea-control-api-proto-0.2.0/proto/control-api
 
-[Diff](/../../compare/medea-control-api-proto-0.1.0...medea-control-api-proto-0.2.0) | [Milestone](/../../milestone/2)
+[Diff](https://github.com/instrumentisto/medea/compare/medea-control-api-proto-0.1.0...medea-control-api-proto-0.2.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/2)
 
 ### Added
 
@@ -34,15 +34,15 @@ All user visible changes to this project will be documented in this file. This p
         - Methods:
             - `Apply` ([#187]).
 
-[#187]: /../../pull/187
+[#187]: https://github.com/instrumentisto/medea/pull/187
 
 
 
 
 ## [0.1.0] · 2021-02-01
-[0.1.0]: /../../tree/medea-control-api-proto-0.1.0/proto/control-api
+[0.1.0]: https://github.com/instrumentisto/medea/tree/medea-control-api-proto-0.1.0/proto/control-api
 
-[Milestone](/../../milestone/2) | [Roadmap](/../../issues/27)
+[Milestone](https://github.com/instrumentisto/medea/milestone/2) | [Roadmap](https://github.com/instrumentisto/medea/issues/27)
 
 ### Added
 
@@ -65,10 +65,10 @@ All user visible changes to this project will be documented in this file. This p
             - `OnJoin`;
             - `OnLeave`.
 
-[#57]: /../../pull/57
-[#63]: /../../pull/63
-[#79]: /../../pull/79
-[#106]: /../../pull/106
+[#57]: https://github.com/instrumentisto/medea/pull/57
+[#63]: https://github.com/instrumentisto/medea/pull/63
+[#79]: https://github.com/instrumentisto/medea/pull/79
+[#106]: https://github.com/instrumentisto/medea/pull/106
 
 
 

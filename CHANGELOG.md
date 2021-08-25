@@ -7,9 +7,9 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.3.0] · 2021-??-?? · To-be-done
-[0.3.0]: https://github.com/instrumentisto/medea/tree/medea-jason-0.3.0/jason
+[0.3.0]: /../../tree/medea-jason-0.3.0
 
-[Diff](https://github.com/instrumentisto/medea/compare/medea-jason-0.2.0...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
 
 ### BC Breaks
 TODO: Mention #209
@@ -21,7 +21,7 @@ TODO: Mention #209
 - Library API:
     - Optional argument to `ReconnectHandle.reconnect_with_backoff()` function that limits max elapsed time ([#206]).
 
-[#206]: /../../pull/206
+[#206]: https://github.com/instrumentisto/medea/pull/206
 
 
 

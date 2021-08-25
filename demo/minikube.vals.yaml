@@ -5,8 +5,7 @@
 
 server:
   image:
-    image: instrumentisto/medea
-    tag: dev
+    tag: edge
     pullPolicy: IfNotPresent
   conf:
     server:
