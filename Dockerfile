@@ -18,7 +18,7 @@ RUN cargo install wasm-pack \
 COPY / /src/
 
 RUN cd /src/ \
- && make cargo.build platform=web debug=${debug} dockerized=no
+ && make cargo.build.jason platform=web debug=${debug} dockerized=no
 
 
 

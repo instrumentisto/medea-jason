@@ -260,8 +260,8 @@ jobs:
           echo ::set-output name=target::$(make flutter.android.version.compile)
 
       - name: Compile shared object
-        run: make cargo.build platform=android targets=x86_64
-                              args="--features mockable"
+        run: make cargo.build.jason platform=android targets=x86_64
+                                    args="--features mockable"
 
       - name: Test on min Android NDK version
         uses: reactivecircus/android-emulator-runner@v2

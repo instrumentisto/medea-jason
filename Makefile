@@ -22,17 +22,17 @@ IMAGE_NAME := $(strip \
 
 RUST_VER := 1.54
 CHROME_VERSION := 92.0
-FIREFOX_VERSION := 91.0.1
+FIREFOX_VERSION := 91.0.2
 
-CARGO_NDK_VER := 2.4.1-ndkr22b-rust$(RUST_VER)
+CARGO_NDK_VER := 2.4.1-ndkr23-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
                    x86_64-linux-android
-ANDROID_SDK_COMPILE_VERSION := $(strip \
+ANDROID_SDK_COMPILE_VERSION = $(strip \
 	$(shell grep compileSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-ANDROID_SDK_MIN_VERSION := $(strip \
+ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
 
@@ -1022,7 +1022,7 @@ helm.package:
 # Usage:
 #	make helm.package.release [chart=medea-demo] [build=(yes|no)]
 
-helm-package-release-ver := $(strip $(shell \
+helm-package-release-ver = $(strip $(shell \
 	grep 'version: ' demo/chart/medea-demo/Chart.yaml | cut -d ':' -f2))
 
 helm.package.release:
