@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.4.0] · 2021-08-25
+[0.4.0]: /../../tree/medea-control-api-proto-0.4.0/proto/control-api
+
+[Diff](/../../compare/a2ce6b92...medea-control-api-proto-0.4.0)
+
+### Upgraded
+
+- Dependencies:
+    - [`prost`] to `0.8`;
+    - [`tonic`] to `0.5`.
+
+
+
+
 ## [0.3.0] · 2021-05-12
 [0.3.0]: https://github.com/instrumentisto/medea/tree/medea-control-api-proto-0.3.0/proto/control-api
 
@@ -14,8 +28,8 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies: ([#199])
-    - `prost` to `0.7`;
-    - `tonic` to `0.4`.
+    - [`prost`] to `0.7`;
+    - [`tonic`] to `0.4`.
 
 [#199]: https://github.com/instrumentisto/medea/pull/199
 
@@ -73,5 +87,8 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+
+[`prost`]: https://docs.rs/prost
+[`tonic`]: https://docs.rs/tonic
 
 [Semantic Versioning 2.0.0]: https://semver.org
