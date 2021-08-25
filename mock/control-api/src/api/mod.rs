@@ -327,7 +327,7 @@ impl From<proto::Error> for ErrorResponse {
 pub struct CreateResponse {
     /// URIs with which [Jason] can connect `Member`s.
     ///
-    /// [Jason]: https://github.com/instrumentisto/medea-jason/tree/master
+    /// [Jason]: https://github.com/instrumentisto/medea-jason
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sids: Option<HashMap<String, String>>,
 

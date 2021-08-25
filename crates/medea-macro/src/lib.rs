@@ -2,7 +2,7 @@
 //!
 //! This crate is indented for inner use only by [Medea] media server.
 //!
-//! [Medea]: https://github.com/instrumentisto/medea
+//! [Medea]: https://github.com/instrumentisto/medea-jason
 
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![forbid(non_ascii_idents, unsafe_code)]

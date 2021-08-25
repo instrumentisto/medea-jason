@@ -17,9 +17,8 @@ eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
 
 IMAGE_REPO := instrumentisto
 IMAGE_NAME := $(strip \
-	$(if $(call eq,$(image),),medea,\
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
-	$(image))))
+	$(or $(image),medea-control-api-mock)))
 
 RUST_VER := 1.54
 CHROME_VERSION := 92.0
@@ -71,9 +70,7 @@ crate-ver := $(strip \
 build: build.jason
 
 
-build.jason:
-	@make cargo.build platform=$(platform) targets=$(targets) \
-	                  debug=$(debug) dockerized=$(dockerized)
+build.jason: cargo.build.jason
 
 
 # Resolve all project dependencies.
@@ -203,28 +200,25 @@ up.jason:
 #	make cargo [cmd=(fetch|<cargo-cmd>)]
 
 cargo:
-	cargo $(if $(call eq,$(cmd),),fetch,$(cmd))
+	cargo $(or $(cmd),fetch)
 
 
-# Build medea's related crates.
+# Build `medea-jason` crate.
 #
 # Usage:
-#	make cargo.build
-#		[ [debug=(yes|no)] [dockerized=(no|yes)]
-#		   	[( [platform=web]
-# 			 | platform=all
-#		   	 | platform=android
-#		   	   	[targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )] )]
-# 		[args=<cargo-build-args>]
+#	make cargo.build.jason [args=<cargo-build-args>]
+#		[( [platform=web]
+# 		 | platform=all
+#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )]
+#		[debug=(yes|no)] [dockerized=(no|yes)]
 
-cargo-build-platform = $(if $(call eq,$(platform),),web,$(platform))
-cargo-build-targets = $(strip \
-	$(if $(call eq,$(targets),),$(ANDROID_TARGETS),$(targets)))
+cargo-build-platform = $(or $(platform),web)
+cargo-build-targets = $(or $(targets),$(ANDROID_TARGETS))
 
-cargo.build:
+cargo.build.jason:
 ifeq ($(platform),all)
-	@make build platform=web
-	@make build platform=android targets=$(targets)
+	@make cargo.build.jason platform=web
+	@make cargo.build.jason platform=android targets=$(targets)
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -234,8 +228,9 @@ ifeq ($(cargo-build-platform),web)
 		-v "$(HOME):$(HOME)" \
 		-e XDG_CACHE_HOME=$(HOME) \
 		ghcr.io/instrumentisto/rust:$(RUST_VER) \
-			make cargo.build debug=$(debug) dockerized=no \
-			                 pre-install=yes args=$(args)
+			make cargo.build.jason debug=$(debug) dockerized=no \
+			                       platform=web args="$(args)" \
+			                       pre-install=yes
 endif
 ifeq ($(cargo-build-platform),android)
 	docker run --rm --network=host -v "$(PWD)":/app -w /app \
@@ -243,9 +238,10 @@ ifeq ($(cargo-build-platform),android)
 		-v "$(HOME)/.cargo/registry":/usr/local/cargo/registry \
 		-v "$(HOME):$(HOME)" \
 		-e XDG_CACHE_HOME=$(HOME) \
-		instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
-			make cargo.build debug=$(debug) dockerized=no \
-			                 platform=$(platform) targets=$(targets) args="$(args)"
+		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
+			make cargo.build.jason debug=$(debug) dockerized=no \
+			                       platform=$(platform) args="$(args)"
+			                       targets=$(targets)
 endif
 else
 ifeq ($(cargo-build-platform),web)
@@ -279,11 +275,10 @@ endef
 #	make cargo.changelog.link [crate=(medea-jason|<crate-name>)]
 #	                          [ver=($(crate-ver)|<version>)]
 
-cargo-changelog-link-crate = $(if $(call eq,$(crate),),medea,$(crate))
 cargo-changelog-link-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))
 
 cargo.changelog.link:
-	@printf "https://github.com/instrumentisto/medea-jason/blob/$(cargo-changelog-link-crate)-$(cargo-changelog-link-ver)/$(if $(call eq,$(crate-dir),.),,$(crate-dir)/)CHANGELOG.md#$(shell sed -n '/^## \[$(cargo-changelog-link-ver)\]/{s/^## \[\(.*\)\][^0-9]*\([0-9].*\)/\1--\2/;s/[^0-9a-z-]*//g;p;}' $(crate-dir)/CHANGELOG.md)"
+	@printf "https://github.com/instrumentisto/medea-jason/blob/$(or $(crate),medea-jason)-$(cargo-changelog-link-ver)/$(if $(call eq,$(crate-dir),.),,$(crate-dir)/)CHANGELOG.md#$(shell sed -n '/^## \[$(cargo-changelog-link-ver)\]/{s/^## \[\(.*\)\][^0-9]*\([0-9].*\)/\1--\2/;s/[^0-9a-z-]*//g;p;}' $(crate-dir)/CHANGELOG.md)"
 
 
 # Format Rust sources with rustfmt.
@@ -373,7 +368,7 @@ flutter.android.version.min:
 
 flutter:
 	cd flutter && \
-	flutter $(if $(call eq,$(cmd),),pub get,$(cmd))
+	flutter $(or $(cmd),pub get)
 
 
 # Format Flutter Dart sources with dartfmt.
@@ -422,7 +417,7 @@ flutter.run:
 #	          [pkg=(e2e|medea-demo)]
 #	          [dockerized=(yes|no)]
 
-yarn-cmd = $(if $(call eq,$(cmd),),install --pure-lockfile,$(cmd))
+yarn-cmd = $(or $(cmd),install --pure-lockfile)
 yarn-pkg-dir = $(if $(call eq,$(pkg),medea-demo),demo,e2e-demo)
 
 yarn:
@@ -459,13 +454,11 @@ yarn.version:
 #	               [open=(yes|no)] [clean=(no|yes)]
 #	               [dev=(no|yes)]
 
-docs-rust-crate = $(if $(call eq,$(crate),),@all,$(crate))
-
 docs.rust:
 ifeq ($(clean),yes)
 	@rm -rf target/doc/
 endif
-	$(if $(call eq,$(docs-rust-crate),@all),\
+	$(if $(call eq,$(or $(crate),@all),@all),\
 		cargo doc --workspace,\
 		cd $(crate-dir)/ && cargo doc)\
 			--no-deps \
@@ -483,17 +476,15 @@ endif
 #
 # Usage:
 #	make test.unit [( [crate=@all]
-#	                | crate=(<crate-name>)
+#	                | crate=<crate-name>
 #	                | crate=medea-jason
 #	                  [browser=(chrome|firefox|default)]
 #	                  [timeout=(60|<seconds>)] )]
 
-test-unit-crate = $(if $(call eq,$(crate),),@all,$(crate))
-wasm-bindgen-timeout = $(if $(call eq,$(timeout),),60,$(timeout))
 webdriver-env = $(if $(call eq,$(browser),firefox),GECKO,CHROME)DRIVER_REMOTE
 
 test.unit:
-ifeq ($(test-unit-crate),@all)
+ifeq ($(or $(crate),@all),@all)
 	@make test.unit crate=medea-macro
 	@make test.unit crate=medea-reactive
 	@make test.unit crate=medea-client-api-proto
@@ -503,14 +494,14 @@ else
 ifeq ($(crate),medea-jason)
 ifeq ($(browser),default)
 	cd $(crate-dir)/ && \
-	WASM_BINDGEN_TEST_TIMEOUT=$(wasm-bindgen-timeout) \
+	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),60) \
 	cargo test --target wasm32-unknown-unknown --features mockable
 else
 	@make docker.up.webdriver browser=$(browser)
 	sleep 10
 	cd $(crate-dir)/ && \
 	$(webdriver-env)="http://127.0.0.1:4444" \
-	WASM_BINDGEN_TEST_TIMEOUT=$(wasm-bindgen-timeout) \
+	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),60) \
 	cargo test --target wasm32-unknown-unknown --features mockable
 	@make docker.down.webdriver browser=$(browser)
 endif
@@ -591,13 +582,11 @@ wait.port:
 #	                    [token=($CARGO_TOKEN|<cargo-token>)]
 #	                    [publish=(no|yes)]
 
-release-crates-token = $(if $(call eq,$(token),),${CARGO_TOKEN},$(token))
-
 release.crates:
 ifneq ($(filter $(crate),medea-jason medea-client-api-proto medea-control-api-proto medea-macro medea-reactive),)
 	cd $(crate-dir)/ && \
 	$(if $(call eq,$(publish),yes),\
-		cargo publish --token $(release-crates-token) ,\
+		cargo publish --token $(or $(token),${CARGO_TOKEN}) ,\
 		cargo package --allow-dirty )
 endif
 
@@ -666,7 +655,7 @@ docker.build:
 # Stop dockerized Control API mock server and remove all related containers.
 #
 # Usage:
-#   make docker.down.control
+#	make docker.down.control
 
 docker.down.control:
 	-docker stop medea-control-api-mock
@@ -676,7 +665,7 @@ docker.down.control:
 # and remove all related containers.
 #
 # Usage:
-# 	make docker.down.coturn
+#	make docker.down.coturn
 
 docker.down.coturn:
 	docker-compose -f docker-compose.coturn.yml down --rmi=local -v
@@ -731,8 +720,8 @@ docker.down.webdriver:
 #		[tags=(@all|<t1>[,<t2>...])]
 #		[minikube=(no|yes)]
 
-docker-pull-repos = $(if $(call eq,$(repos),),$(IMAGE_REPO),$(repos))
-docker-pull-tags = $(if $(call eq,$(tags),),@all,$(tags))
+docker-pull-repos = $(or $(repos),$(IMAGE_REPO))
+docker-pull-tags = $(or $(tags),@all)
 
 docker.pull:
 ifeq ($(docker-pull-tags),@all)
@@ -759,8 +748,8 @@ endef
 #		[tags=(dev|<t1>[,<t2>...])]
 #		[minikube=(no|yes)]
 
-docker-push-repos = $(if $(call eq,$(repos),),$(IMAGE_REPO),$(repos))
-docker-push-tags = $(if $(call eq,$(tags),),dev,$(tags))
+docker-push-repos = $(or $(repos),$(IMAGE_REPO))
+docker-push-tags = $(or $(tags),dev)
 
 docker.push:
 	$(foreach tag,$(subst $(comma), ,$(docker-push-tags)),\
@@ -782,9 +771,9 @@ endef
 #		[tags=(dev|<with-t1>[,<with-t2>...])]
 #		[minikube=(no|yes)]
 
-docker-tag-of := $(if $(call eq,$(of),),dev,$(of))
-docker-tag-with := $(if $(call eq,$(tags),),dev,$(tags))
-docker-tag-repos = $(if $(call eq,$(repos),),$(IMAGE_REPO),$(repos))
+docker-tag-of := $(or $(of),dev)
+docker-tag-with := $(or $(tags),dev)
+docker-tag-repos = $(or $(repos),$(IMAGE_REPO))
 
 docker.tag:
 	$(foreach tag,$(subst $(comma), ,$(docker-tag-with)),\
@@ -807,8 +796,8 @@ endef
 #		[tags=(dev|<t1>[,<t2>...])]
 #		[minikube=(no|yes)]
 
-docker-tar-file = $(if $(call eq,$(to-file),),.cache/image.tar,$(to-file))
-docker-tar-tags = $(if $(call eq,$(tags),),dev,$(tags))
+docker-tar-file = $(or $(to-file),.cache/image.tar)
+docker-tar-tags = $(or $(tags),dev)
 
 docker.tar:
 	@mkdir -p $(dir $(docker-tar-file))
@@ -824,11 +813,9 @@ docker.tar:
 #	make docker.untar [from-file=(.cache/image.tar|<file-path>)]
 #		[minikube=(no|yes)]
 
-docker-untar-file = $(if $(call eq,$(from-file),),.cache/image.tar,$(from-file))
-
 docker.untar:
 	$(docker-env) \
-	docker load -i $(docker-untar-file)
+	docker load -i $(or $(from-file),.cache/image.tar)
 
 
 # Run dockerized Medea Control API mock server.
@@ -839,7 +826,7 @@ docker.untar:
 docker.up.control:
 	docker run --rm -d --network=host \
 		--name medea-control-api-mock \
-		$(IMAGE_REPO)/medea-control-api-mock:$(if $(call eq,$(tag),),dev,$(tag))
+		$(IMAGE_REPO)/medea-control-api-mock:$(or $(tag),dev)
 
 
 # Run Coturn STUN/TURN server in Docker Compose environment.
@@ -874,9 +861,10 @@ docker.up.demo: docker.down.demo
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
-	COMPOSE_MEDEA_IMAGE_NAME=$(if $(call eq,$(medea-tag),edge),hub.instrumentisto.com/streaming/medea,hub.instrumentisto.com/streaming/medea/review) \
-	COMPOSE_MEDEA_IMAGE_VER=$(if $(call eq,$(medea-tag),),dev,$(medea-tag)) \
-	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(if $(call eq,$(control-tag),),dev,$(control-tag)) \
+	COMPOSE_MEDEA_IMAGE_NAME=hub.instrumentisto.com/streaming/medea$(if \
+		$(call eq,$(medea-tag),edge),,/review) \
+	COMPOSE_MEDEA_IMAGE_VER=$(or $(medea-tag),dev) \
+	COMPOSE_CONTROL_MOCK_IMAGE_VER=$(or $(control-tag),dev) \
 	COMPOSE_WEBDRIVER_IMAGE_NAME=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			ghcr.io/instrumentisto/geckodriver ,\
@@ -951,10 +939,10 @@ endif
 # Helm and Minikube commands #
 ##############################
 
-helm-cluster = $(if $(call eq,$(cluster),),minikube,$(cluster))
+helm-cluster = $(or $(cluster),minikube)
 helm-cluster-args = --kube-context=$(helm-cluster)
 
-helm-chart = $(if $(call eq,$(chart),),medea-demo,$(chart))
+helm-chart = $(or $(chart),medea-demo)
 helm-chart-dir = demo/chart/medea-demo
 helm-chart-vals-dir = demo
 
@@ -969,7 +957,7 @@ helm-release-namespace = $(strip \
 #	          [cluster=(minikube|staging)]
 
 helm:
-	helm $(helm-cluster-args) $(if $(call eq,$(cmd),),--help,$(cmd))
+	helm $(helm-cluster-args) $(or $(cmd),--help)
 
 
 # Show root directory path of project Helm chart.
@@ -1048,7 +1036,7 @@ endif
 	cp -rf $(helm-package-dir)/* charts/
 	if [ -n "$$(git add -v charts/)" ]; then \
 		helm repo index charts/ \
-			--url=https://instrumentisto.github.io/medea/charts ; \
+			--url=https://instrumentisto.github.io/medea-jason/charts ; \
 		git add -v charts/ ; \
 		git commit -m \
 			"Release $(helm-chart)-$(helm-package-release-ver) Helm chart" ; \
@@ -1139,8 +1127,8 @@ endef
 ##################
 
 .PHONY: build build.jason \
-        cargo cargo.build cargo.changelog.link cargo.fmt cargo.gen cargo.lint \
-        	cargo.version \
+        cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
+        	cargo.lint cargo.version \
         docker.build \
         	docker.down.control docker.down.coturn docker.down.demo \
         	docker.down.e2e docker.down.medea docker.down.webdriver  \

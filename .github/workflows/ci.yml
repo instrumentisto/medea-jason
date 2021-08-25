@@ -1,6 +1,11 @@
 name: CI
 
-on: push
+on:
+  push:
+    branches: ["master"]
+    tags: ["medea-*"]
+  pull_request:
+    branches: ["master"]
 
 env:
   RUST_BACKTRACE: 1
@@ -12,7 +17,6 @@ jobs:
   ##########################
 
   clippy:
-    name: Clippy
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
@@ -26,8 +30,10 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
       - run: make rustup.android
-      - run: make lint
+
+      - run: make cargo.lint
 
   rustfmt:
     if: ${{ github.ref == 'refs/heads/master'
@@ -41,7 +47,8 @@ jobs:
           profile: minimal
           toolchain: nightly
           components: rustfmt
-      - run: make fmt check=yes
+
+      - run: make cargo.fmt check=yes
 
   helm-lint:
     name: Lint Helm chart
@@ -56,6 +63,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: azure/setup-helm@v1
+
       - run: make helm.lint chart=${{ matrix.chart }}
 
   dartfmt:
@@ -69,6 +77,7 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: stable
+
       - run: make flutter.fmt check=yes
 
   dartanalyzer:
@@ -82,7 +91,9 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: beta
+
       - run: make flutter
+
       - run: make flutter.lint
 
 
@@ -117,7 +128,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         if: ${{ matrix.if }}
-
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -129,7 +139,6 @@ jobs:
           toolchain: stable
           target: wasm32-unknown-unknown
         if: ${{ matrix.if && matrix.wasm }}
-
       - uses: Swatinem/rust-cache@v1
         if: ${{ matrix.if
                 && !contains(github.event.head_commit.message, '[fresh ci]') }}
@@ -198,15 +207,16 @@ jobs:
                           hub.instrumentisto.com
 
       - name: Set Medea branch name env var
-        run: echo "MEDEA_BRANCH=$(echo ${{ github.event.head_commit.message }} | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p" | grep .  || echo "edge")" >> $GITHUB_ENV
+        run: echo "MEDEA_BRANCH=$(echo ${{ github.event.head_commit.message }}
+                                  | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p"
+                                  | grep .  || echo "edge")" >> $GITHUB_ENV
 
       - name: Pull edge Medea Docker image
-        if: ${{ env.MEDEA_BRANCH == 'edge' }}
         run: docker pull hub.instrumentisto.com/streaming/medea:edge
-
+        if: ${{ env.MEDEA_BRANCH == 'edge' }}
       - name: Pull review Medea Docker image
-        if: ${{ env.MEDEA_BRANCH != 'edge' }}
         run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
+        if: ${{ env.MEDEA_BRANCH != 'edge' }}
 
       - name: Chrome
         run: make test.e2e browser=chrome up=yes dockerized=yes
@@ -320,8 +330,8 @@ jobs:
       - run: make rustup.android
         if: ${{ matrix.platform == 'android' }}
 
-      - run: make cargo.build crate=medea-jason platform=${{ matrix.platform }}
-                              dockerized=no debug=yes
+      - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    dockerized=no debug=yes
 
   rustdoc:
     if: ${{ github.ref == 'refs/heads/master'
@@ -370,7 +380,7 @@ jobs:
             cache: ${{ github.ref != 'refs/heads/master'
                        && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
                        && !contains(github.event.head_commit.message, '[fresh ci]') }}
-            export: true
+            export: true  # required for E2E tests
             if: true
 
           - image: medea-demo
@@ -378,8 +388,8 @@ jobs:
                        && !startsWith(github.ref, 'refs/tags/medea-demo-')
                        && !contains(github.event.head_commit.message, '[fresh ci]') }}
             export: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
-            if: ${{ !startsWith(github.ref, 'refs/tags/medea-')
-                    || startsWith(github.ref, 'refs/tags/medea-demo-')}}
+            if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-')
+                    || !startsWith(github.ref, 'refs/tags/medea-') }}
           - image: medea-demo-edge
             cache: false  # temporary disable caching due to CI issues
             #cache: ${{ github.ref != 'refs/heads/master'

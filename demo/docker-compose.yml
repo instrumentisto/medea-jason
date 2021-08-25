@@ -12,7 +12,7 @@ services:
       - ./chart/medea-demo/conf/nginx.vh.conf:/etc/nginx/conf.d/default.conf
   medea:
     container_name: demo-medea
-    image: instrumentisto/medea:edge
+    image: ghcr.io/instrumentisto/medea:edge
     depends_on: ["coturn-db"]
     environment:
       MEDEA_LOG__LEVEL: "DEBUG"
