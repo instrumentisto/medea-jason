@@ -11,6 +11,9 @@ use self::world::World;
 
 #[tokio::main]
 async fn main() {
-    let runner = World::init(&[conf::FEATURES_PATH.as_str()]);
-    runner.run_and_exit().await;
+    World::cucumber()
+        .fail_on_skipped()
+        .max_concurrent_scenarios(15)
+        .run_and_exit(conf::FEATURES_PATH.as_str())
+        .await;
 }
