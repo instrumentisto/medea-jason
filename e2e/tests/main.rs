@@ -6,8 +6,8 @@ mod steps;
 mod world;
 
 use cucumber_rust::WorldInit as _;
-use structopt::StructOpt;
 use regex::Regex;
+use structopt::StructOpt;
 
 use self::world::World;
 
