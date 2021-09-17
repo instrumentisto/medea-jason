@@ -13,7 +13,7 @@ use self::world::World;
 async fn main() {
     World::cucumber()
         .fail_on_skipped()
-        .max_concurrent_scenarios(15)
+        .max_concurrent_scenarios(10)
         .run_and_exit(conf::FEATURES_PATH.as_str())
         .await;
 }
