@@ -6,14 +6,29 @@ mod steps;
 mod world;
 
 use cucumber_rust::WorldInit as _;
+use structopt::StructOpt;
+use regex::Regex;
 
 use self::world::World;
 
+#[derive(StructOpt)]
+struct Conf {
+    #[structopt(long)]
+    scenario: Option<String>,
+}
+
 #[tokio::main]
 async fn main() {
+    let conf: Conf = Conf::from_args();
+
+    let filter = conf.scenario.as_ref().map(|s| Regex::new(s).unwrap());
     World::cucumber()
         .fail_on_skipped()
-        .max_concurrent_scenarios(10)
-        .run_and_exit(conf::FEATURES_PATH.as_str())
+        .max_concurrent_scenarios(Some(10))
+        .filter_run_and_exit(conf::FEATURES_PATH.as_str(), move |_, _, s| {
+            filter
+                .as_ref()
+                .map_or(true, |filter| filter.find(&s.name).is_some())
+        })
         .await;
 }

@@ -536,7 +536,7 @@ endif
 	@make wait.port port=4444
 endif
 	cargo test -p medea-e2e --test e2e \
-		$(if $(call eq,$(only),),,-- -e '$(only)')
+		$(if $(call eq,$(only),),,-- --scenario '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
