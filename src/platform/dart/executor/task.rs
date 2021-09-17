@@ -1,6 +1,6 @@
 //! [`Task`] for execution by a [`platform::dart::executor`].
 
-use std::{ptr, rc::Rc};
+use std::rc::Rc;
 
 use std::{
     cell::RefCell,
@@ -19,6 +19,8 @@ struct Inner {
 
     /// Handle for waking up this [`Task`].
     waker: Waker,
+
+    _task_handle: Rc<Task>,
 }
 
 /// Wrapper for a [`Future`] that can be polled by an external single threaded
@@ -39,7 +41,11 @@ impl Task {
 
         let waker =
             unsafe { Waker::from_raw(Task::into_raw_waker(Rc::clone(&this))) };
-        this.inner.borrow_mut().replace(Inner { future, waker });
+        this.inner.borrow_mut().replace(Inner {
+            future,
+            waker,
+            _task_handle: Rc::clone(&this),
+        });
 
         this
     }
@@ -71,7 +77,7 @@ impl Task {
 
     /// Calls the [`task_wake()`] function by the provided reference.
     fn wake_by_ref(this: &Rc<Self>) {
-        task_wake(ptr::NonNull::from(Rc::as_ref(this)));
+        task_wake(this);
     }
 
     /// Pretty much a copy of [`std::task::Wake`] implementation but for
