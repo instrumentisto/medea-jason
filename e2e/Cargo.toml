@@ -22,14 +22,12 @@ webdriver = "0.43"
 async-recursion = "0.3"
 async-trait = "0.1"
 atomic = "0.5"
+cucumber_rust = { branch = "initial-redesign", git = "https://github.com/ilslv/cucumber-rust/" }
 medea-control-api-mock = { path = "../mock/control-api" }
 regex = "1.5"
 reqwest = { version = "0.11", features = ["json"] }
 structopt = "0.3"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-[dev-dependencies.cucumber_rust]
-    git = "https://github.com/ilslv/cucumber-rust/"
-    branch = "initial-redesign"
 
 [[test]]
 name = "e2e"
