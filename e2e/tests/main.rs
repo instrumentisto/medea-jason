@@ -39,8 +39,8 @@ async fn main() {
 /// Indicates whether `WebDriver` implementation supports multiple simultaneous
 /// clients.
 ///
-/// This is done, because `geckodriver` [doesn't support this feature][1], so
-/// tests won't run concurrently on `FireFox`.
+/// This is done, because geckodriver [doesn't support this feature][1], so
+/// tests won't run concurrently on Firefox.
 ///
 /// [1]: https://github.com/mozilla/geckodriver/issues/1523
 async fn supports_multiple_webdriver_clients() -> bool {
