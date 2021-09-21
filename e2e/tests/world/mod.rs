@@ -4,11 +4,7 @@
 
 pub mod member;
 
-use std::{
-    collections::HashMap,
-    fmt::{Debug, Formatter},
-    time::Duration,
-};
+use std::{collections::HashMap, fmt, time::Duration};
 
 use async_trait::async_trait;
 use cucumber_rust::WorldInit;
@@ -79,8 +75,8 @@ pub struct World {
     window_factory: WindowFactory,
 }
 
-impl Debug for World {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for World {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("World")
             .field("room_id", &self.room_id)
             .field("members", &self.members)

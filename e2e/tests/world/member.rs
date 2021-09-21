@@ -1,10 +1,6 @@
 //! Medea media server member representation.
 
-use std::{
-    cell::RefCell,
-    collections::HashMap,
-    fmt::{Debug, Formatter},
-};
+use std::{cell::RefCell, collections::HashMap, fmt};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
@@ -104,8 +100,8 @@ pub struct Member {
     window: Window,
 }
 
-impl Debug for Member {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for Member {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Member")
             .field("id", &self.id)
             .field("is_send", &self.is_send)
