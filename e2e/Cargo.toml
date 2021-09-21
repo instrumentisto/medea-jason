@@ -21,7 +21,6 @@ webdriver = "0.43"
 [dev-dependencies]
 async-recursion = "0.3"
 async-trait = "0.1"
-atomic = "0.5"
 cucumber_rust = { branch = "initial-redesign", git = "https://github.com/ilslv/cucumber-rust/" }
 medea-control-api-mock = { path = "../mock/control-api" }
 regex = "1.5"
