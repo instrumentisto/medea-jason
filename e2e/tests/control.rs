@@ -27,10 +27,7 @@ impl Client {
     #[must_use]
     pub fn new(control_api_address: &str) -> Self {
         Self {
-            inner: reqwest::Client::builder()
-                .pool_max_idle_per_host(0)
-                .build()
-                .unwrap(),
+            inner: reqwest::Client::new(),
             control_api_address: control_api_address.to_owned(),
         }
     }
