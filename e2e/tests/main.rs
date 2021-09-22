@@ -23,7 +23,7 @@ async fn main() {
 
     let concurrent = supports_multiple_webdriver_clients()
         .await
-        .then(|| 7)
+        .then(|| 10)
         .unwrap_or(1);
 
     let filter = conf.scenario.as_ref().map(|s| Regex::new(s).unwrap());
