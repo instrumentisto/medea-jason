@@ -21,9 +21,11 @@ webdriver = "0.43"
 [dev-dependencies]
 async-recursion = "0.3"
 async-trait = "0.1"
-cucumber_rust = { version = "0.9", features = ["macros"] }
+cucumber_rust = { branch = "initial-redesign", git = "https://github.com/ilslv/cucumber-rust/" }
 medea-control-api-mock = { path = "../mock/control-api" }
+regex = "1.5"
 reqwest = { version = "0.11", features = ["json"] }
+structopt = "0.3"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
 [[test]]
