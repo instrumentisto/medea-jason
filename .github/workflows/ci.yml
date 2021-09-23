@@ -219,11 +219,11 @@ jobs:
         if: ${{ env.MEDEA_BRANCH != 'edge' }}
 
       - name: Chrome
-        run: make test.e2e browser=chrome up=yes dockerized=yes
+        run: make test.e2e browser=chrome up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
       - name: Firefox
-        run: make test.e2e browser=firefox up=yes dockerized=yes
+        run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
