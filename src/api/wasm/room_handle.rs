@@ -8,7 +8,7 @@ use wasm_bindgen::{prelude::*, JsValue};
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{ConstraintsUpdateException, MediaSourceKind, MediaStreamSettings},
+    api::{MediaSourceKind, MediaStreamSettings},
     room,
 };
 
@@ -163,7 +163,7 @@ impl RoomHandle {
                 rollback_on_fail,
             )
             .await
-            .map_err(ConstraintsUpdateException::from)?;
+            .map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }

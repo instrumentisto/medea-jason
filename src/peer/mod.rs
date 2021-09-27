@@ -33,7 +33,7 @@ use crate::{
         MediaStreamSettings, RecvConstraints,
     },
     platform,
-    utils::JsCaused,
+    utils::Caused,
 };
 
 #[doc(inline)]
@@ -52,17 +52,17 @@ pub use self::{
 };
 
 /// Errors occurring in [`PeerConnection::update_local_stream()`] method.
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Clone, Debug, Display, From, Caused)]
+#[cause(error = "platform::Error")]
 pub enum UpdateLocalStreamError {
     /// Errors occurred when [`TracksRequest`] validation fails.
     InvalidLocalTracks(TracksRequestError),
 
     /// [`MediaManager`] failed to acquire [`local::Track`]s.
-    CouldNotGetLocalMedia(#[js(cause)] InitLocalTracksError),
+    CouldNotGetLocalMedia(#[cause] InitLocalTracksError),
 
     /// Errors occurred in [`MediaConnections::insert_local_tracks()`] method.
-    InsertLocalTracksError(#[js(cause)] InsertLocalTracksError),
+    InsertLocalTracksError(#[cause] InsertLocalTracksError),
 }
 
 /// Events emitted from a [`Sender`] or a [`Receiver`].
@@ -92,11 +92,11 @@ pub enum TrackEvent {
 
 /// Local media update errors that [`PeerConnection`] reports in
 /// [`PeerEvent::FailedLocalMedia`] messages.
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Clone, Debug, Display, From, Caused)]
+#[cause(error = "platform::Error")]
 pub enum LocalMediaError {
     /// Error occurred in [`PeerConnection::update_local_stream()`] method.
-    UpdateLocalStreamError(#[js(cause)] UpdateLocalStreamError),
+    UpdateLocalStreamError(#[cause] UpdateLocalStreamError),
 
     /// Error occurred when creating a new [`Sender`].
     ///
@@ -375,7 +375,7 @@ impl PeerConnection {
                     id,
                     &sender,
                     peer_connection_state,
-                );
+                )
             },
         ));
 
@@ -451,7 +451,7 @@ impl PeerConnection {
     /// [`Sender`]: sender::Sender
     #[inline]
     pub async fn drop_send_tracks(&self, kinds: LocalStreamUpdateCriteria) {
-        self.media_connections.drop_send_tracks(kinds).await;
+        self.media_connections.drop_send_tracks(kinds).await
     }
 
     /// Filters out already sent stats, and send new stats from the provided

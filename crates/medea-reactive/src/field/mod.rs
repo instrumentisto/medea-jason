@@ -286,6 +286,7 @@ pub trait Whenable<D: 'static> {
     ) -> LocalBoxFuture<'static, Result<(), DroppedError>>;
 }
 
+#[allow(clippy::use_self)]
 impl<D: 'static> Whenable<D> for RefCell<Vec<UniversalSubscriber<D>>> {
     fn when(
         &self,
@@ -378,7 +379,7 @@ where
 
     #[inline]
     fn deref(&self) -> &Self::Target {
-        self.data
+        &self.data
     }
 }
 
@@ -401,7 +402,7 @@ where
     #[inline]
     fn drop(&mut self) {
         if self.data != &self.value_before_mutation {
-            self.subs.on_modify(self.data);
+            self.subs.on_modify(&self.data);
         }
     }
 }

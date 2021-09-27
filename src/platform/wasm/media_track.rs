@@ -173,7 +173,7 @@ impl MediaStreamTrack {
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
     #[inline]
     pub fn stop(&self) {
-        self.sys_track.stop();
+        self.sys_track.stop()
     }
 
     /// Returns an [`enabled`][1] attribute of the underlying
@@ -238,7 +238,7 @@ impl MediaStreamTrack {
     /// If binding to the [`ended`][1] event fails. Not supposed to ever happen.
     ///
     /// [1]: https://tinyurl.com/w3-streams#event-mediastreamtrack-ended
-    #[allow(clippy::needless_pass_by_value)]
+    #[allow(clippy::unused_self, clippy::needless_pass_by_value)]
     pub fn on_ended<F>(&self, f: Option<F>)
     where
         F: 'static + FnOnce(),

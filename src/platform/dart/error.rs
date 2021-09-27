@@ -40,9 +40,7 @@ impl Drop for Error {
     #[inline]
     fn drop(&mut self) {
         if Rc::strong_count(&self.0) == 1 {
-            unsafe {
-                Dart_DeletePersistentHandle_DL_Trampolined(*self.0);
-            }
+            unsafe { Dart_DeletePersistentHandle_DL_Trampolined(*self.0) }
         }
     }
 }

@@ -27,12 +27,12 @@ use crate::{
         websocket::RpcEventHandler, ClientDisconnect, CloseReason,
         ConnectionInfo, RpcClientError, WebSocketRpcClient,
     },
-    utils::JsCaused,
+    utils::Caused,
 };
 
 /// Errors which can be returned from the [`WebSocketRpcSession`].
-#[derive(Clone, Debug, From, JsCaused, Display)]
-#[js(error = "platform::Error")]
+#[derive(Clone, Debug, From, Caused, Display)]
+#[cause(error = "platform::Error")]
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't
     /// be used.
@@ -50,8 +50,8 @@ pub enum SessionError {
     AuthorizationFailed,
 
     /// [`WebSocketRpcClient`] returned [`RpcClientError`].
-    #[display(fmt = "RpcClientError: {:?}", _0)]
-    RpcClient(#[js(cause)] RpcClientError),
+    #[display(fmt = "RpcClientError: {}", _0)]
+    RpcClient(#[cause] RpcClientError),
 
     /// [`WebSocketRpcSession`] was unexpectedly dropped.
     #[display(fmt = "RPC Session was unexpectedly dropped")]
@@ -79,23 +79,13 @@ pub enum ConnectionLostReason {
     Lost(super::ConnectionLostReason),
 }
 
-impl JsCaused for ConnectionLostReason {
+impl Caused for ConnectionLostReason {
     type Error = platform::Error;
 
     #[inline]
-    fn name(&self) -> &'static str {
+    fn cause(self) -> Option<Self::Error> {
         match self {
-            ConnectionLostReason::ConnectError(_) => "ConnectError",
-            ConnectionLostReason::Lost(_) => "Lost",
-        }
-    }
-
-    #[inline]
-    fn js_cause(self) -> Option<Self::Error> {
-        match self {
-            ConnectionLostReason::ConnectError(err) => {
-                err.into_inner().js_cause()
-            }
+            ConnectionLostReason::ConnectError(err) => err.into_inner().cause(),
             ConnectionLostReason::Lost(_) => None,
         }
     }
@@ -373,7 +363,7 @@ impl WebSocketRpcSession {
                 let this = upgrade_or_break!(weak_this);
                 msg.dispatch_with(this.as_ref());
             }
-        });
+        })
     }
 }
 

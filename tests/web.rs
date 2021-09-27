@@ -1,5 +1,7 @@
 #![cfg(target_arch = "wasm32")]
-#![forbid(non_ascii_idents, unsafe_code)]
+#![forbid(non_ascii_idents)]
+
+use js_sys::Reflect;
 
 /// Analog for [`assert_eq`] but for [`js_callback`] macro.
 /// Simply use it as [`assert_eq`]. For use cases and reasons
@@ -97,7 +99,7 @@ use medea_jason::{
     rpc::ApiUrl,
 };
 use url::Url;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{convert::FromWasmAbi, prelude::*};
 use wasm_bindgen_futures::JsFuture;
 use wasm_bindgen_test::*;
 
@@ -138,18 +140,13 @@ extern "C" {
     fn stop(this: &MockNavigator);
 }
 
-#[wasm_bindgen(inline_js = "export const get_jason_error = (err) => err;")]
-extern "C" {
-    fn get_jason_error(err: JsValue) -> api::Error;
-}
+/// Performs a unchecked conversion from a [`JsValue`] into an instance of
+/// specified `FromWasmAbi<Abi = u32>` implementor.
+pub fn unchecked_jsval_cast<T: FromWasmAbi<Abi = u32>>(val: JsValue) -> T {
+    let ptr = Reflect::get(&val, &JsValue::from_str("ptr")).unwrap();
+    let ptr = ptr.as_f64().unwrap() as u32;
 
-#[wasm_bindgen(
-    inline_js = "export const get_constraints_update_exception = (e) => e;"
-)]
-extern "C" {
-    fn get_constraints_update_exception(
-        err: JsValue,
-    ) -> api::ConstraintsUpdateException;
+    unsafe { T::from_abi(ptr) }
 }
 
 pub fn get_test_required_tracks() -> (Track, Track) {
