@@ -56,7 +56,7 @@ async fn failed_get_media_devices_info() {
             let err: EnumerateDevicesException = unchecked_jsval_cast(err);
 
             assert_eq!(err.cause().message(), "failed_get_media_devices_info",);
-            assert!(&err.trace().contains("at jason/src"));
+            assert!(&err.trace().contains("at src"));
         }
     }
 }
@@ -94,7 +94,7 @@ async fn failed_get_user_media() {
                  failed: Error: failed_get_user_media",
             );
             assert_eq!(&cause.message(), "failed_get_user_media");
-            assert!(&err.trace().contains("at jason/src"));
+            assert!(&err.trace().contains("at src"));
         }
     }
 }

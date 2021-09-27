@@ -135,7 +135,6 @@ mod mock {
             dart::utils::{
                 DartError, DartFuture, DartResult, IntoDartFuture as _,
             },
-            errors::{RpcClientException, RpcClientExceptionKind},
         },
         platform,
         rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
