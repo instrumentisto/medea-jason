@@ -363,7 +363,7 @@ impl WebSocketRpcSession {
                 let this = upgrade_or_break!(weak_this);
                 msg.dispatch_with(this.as_ref());
             }
-        })
+        });
     }
 }
 

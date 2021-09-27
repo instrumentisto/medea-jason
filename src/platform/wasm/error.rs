@@ -38,7 +38,7 @@ impl From<JsValue> for Error {
 // So we could use Error as return type in exported functions.
 impl WasmDescribe for Error {
     fn describe() {
-        js_sys::Error::describe()
+        js_sys::Error::describe();
     }
 }
 

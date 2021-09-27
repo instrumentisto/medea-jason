@@ -21,7 +21,7 @@ pub struct Error(JsValue);
 // So we could use Error as return type in exported functions.
 impl WasmDescribe for Error {
     fn describe() {
-        JsValue::describe()
+        JsValue::describe();
     }
 }
 

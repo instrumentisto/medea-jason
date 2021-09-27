@@ -159,7 +159,7 @@ async fn error_get_local_stream_on_new_peer() {
              Error: error_get_local_stream_on_new_peer"
         );
         assert_eq!(&cause.message(), "error_get_local_stream_on_new_peer");
-        assert!(&err.trace().contains("at jason/src"));
+        assert!(&err.trace().contains("at src"));
     });
 
     room_handle.on_failed_local_media(cb.into()).unwrap();

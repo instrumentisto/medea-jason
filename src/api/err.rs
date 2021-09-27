@@ -542,7 +542,7 @@ impl From<Traced<SessionError>> for Error {
             SE::AuthorizationFailed => Some(Kind::AuthorizationFailed),
             SE::ConnectionLost(reason) => {
                 if let Reason::ConnectError(err) = reason {
-                    cause = err.into_inner().cause()
+                    cause = err.into_inner().cause();
                 };
                 Some(Kind::ConnectionLost)
             }
