@@ -35,14 +35,16 @@ impl From<JsValue> for Error {
     }
 }
 
-/// This implementation allows us to use [`Error`] as return type in functions exported to JS.
+/// This implementation allows us to use [`Error`] as return type in functions
+/// exported to JS.
 impl WasmDescribe for Error {
     fn describe() {
         js_sys::Error::describe();
     }
 }
 
-/// This implementation allows us to use [`Error`] as return type in functions exported to JS.
+/// This implementation allows us to use [`Error`] as return type in functions
+/// exported to JS.
 impl IntoWasmAbi for Error {
     type Abi = <js_sys::Error as IntoWasmAbi>::Abi;
 
@@ -52,7 +54,8 @@ impl IntoWasmAbi for Error {
     }
 }
 
-/// This implementation allows us to use [`Error`] as return type in functions exported to JS.
+/// This implementation allows us to use [`Error`] as return type in functions
+/// exported to JS.
 impl OptionIntoWasmAbi for Error {
     #[inline]
     fn none() -> u32 {
