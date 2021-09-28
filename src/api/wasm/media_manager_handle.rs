@@ -36,7 +36,6 @@ use super::Error;
 pub struct MediaManagerHandle(media::MediaManagerHandle);
 
 #[wasm_bindgen]
-#[allow(clippy::unused_self)]
 impl MediaManagerHandle {
     /// Returns a list of [`InputDeviceInfo`] objects representing available
     /// media input and output devices, such as microphones, cameras, and so
