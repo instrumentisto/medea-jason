@@ -79,7 +79,7 @@ void main() {
         e is LocalMediaInitException &&
             e.kind == LocalMediaInitExceptionKind.GetUserMediaFailed &&
             e.cause == 'Dart err cause1' &&
-            e.nativeStackTrace.contains('at jason/src'))));
+            e.nativeStackTrace.contains('at src'))));
 
     var err;
     try {
@@ -351,7 +351,7 @@ void main() {
         predicate((e) =>
         e is MediaStateTransitionException &&
             e.message == 'SimpleTracksRequest should have at least one track' &&
-            e.nativeStackTrace.contains('at jason/src')));
+            e.nativeStackTrace.contains('at src')));
   });
 
   testWidgets('ReconnectHandle', (WidgetTester tester) async {
