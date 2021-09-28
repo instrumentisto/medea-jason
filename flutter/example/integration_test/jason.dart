@@ -94,14 +94,14 @@ void main() {
         e is LocalMediaInitException &&
             e.kind == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
             e.cause == 'Dart err cause2' &&
-            e.nativeStackTrace.contains('at jason/src')));
+            e.nativeStackTrace.contains('at src')));
 
     expect(
             () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
         throwsA(predicate((e) =>
         e is EnumerateDevicesException &&
             e.cause == 'Dart err cause3' &&
-            e.nativeStackTrace.contains('at jason/src'))));
+            e.nativeStackTrace.contains('at src'))));
 
     var err2;
     try {
@@ -115,7 +115,7 @@ void main() {
         predicate((e) =>
         e is EnumerateDevicesException &&
             e.cause == 'Dart err cause4' &&
-            e.nativeStackTrace.contains('at jason/src')));
+            e.nativeStackTrace.contains('at src')));
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
@@ -421,7 +421,7 @@ void main() {
             e.kind == RpcClientExceptionKind.ConnectionLost &&
             e.cause == 'Dart err cause1' &&
             e.message == 'RpcClientException::ConnectionLost' &&
-            e.nativeStackTrace.contains('at jason/src'))));
+            e.nativeStackTrace.contains('at src'))));
 
     var exception5;
     try {
@@ -436,7 +436,7 @@ void main() {
             e.kind == RpcClientExceptionKind.SessionFinished &&
             e.message == 'RpcClientException::SessionFinished' &&
             e.cause == 'Dart err cause2' &&
-            e.nativeStackTrace.contains('at jason/src')));
+            e.nativeStackTrace.contains('at src')));
   });
 
   final returnsInputDevicePtr =
