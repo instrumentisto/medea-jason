@@ -131,11 +131,17 @@ mod mock {
     use tracerr::{Trace, Traced};
 
     use crate::{
-        api::dart::utils::{
-            DartError, DartFuture, DartResult, IntoDartFuture as _,
+        api::{
+            dart::utils::{
+                DartError, DartFuture, DartResult, IntoDartFuture as _,
+            },
+            err::{RpcClientException, RpcClientExceptionKind},
         },
         platform,
-        rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
+        rpc::{
+            ReconnectError,
+            ReconnectHandle as CoreReconnectHandle,
+        },
     };
 
     #[derive(Clone)]
