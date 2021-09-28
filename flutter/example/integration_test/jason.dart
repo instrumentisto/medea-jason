@@ -33,17 +33,17 @@ void main() {
 
   testWidgets('MediaManager', (WidgetTester tester) async {
     final returnsLocalMediaInitException =
-        dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
-            'returns_local_media_init_exception');
+    dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
+        'returns_local_media_init_exception');
     final returnsFutureWithLocalMediaInitException =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'returns_future_with_local_media_init_exception');
+    dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+        'returns_future_with_local_media_init_exception');
     final returnsEnumerateDevicesException =
-        dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
-            'returns_enumerate_devices_exception');
+    dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
+        'returns_enumerate_devices_exception');
     final returnsFutureWithEnumerateDevicesException =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'returns_future_enumerate_devices_exception');
+    dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+        'returns_future_enumerate_devices_exception');
 
     var jason = Jason();
     var mediaManager = jason.mediaManager();
@@ -74,48 +74,48 @@ void main() {
     expect(() => tracks.first.kind(), throwsStateError);
 
     expect(
-        () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
+            () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
-            e is LocalMediaInitException &&
+        e is LocalMediaInitException &&
             e.kind == LocalMediaInitExceptionKind.GetUserMediaFailed &&
             e.cause == 'Dart err cause1' &&
-            e.nativeStackTrace.contains('at src'))));
+            e.nativeStackTrace.contains('at jason/src'))));
 
     var err;
     try {
       await (returnsFutureWithLocalMediaInitException('Dart err cause2')
-          as Future);
+      as Future);
     } catch (e) {
       err = e as LocalMediaInitException;
     }
     expect(
         err,
         predicate((e) =>
-            e is LocalMediaInitException &&
+        e is LocalMediaInitException &&
             e.kind == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
             e.cause == 'Dart err cause2' &&
-            e.nativeStackTrace.contains('at src')));
+            e.nativeStackTrace.contains('at jason/src')));
 
     expect(
-        () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
+            () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
         throwsA(predicate((e) =>
-            e is EnumerateDevicesException &&
+        e is EnumerateDevicesException &&
             e.cause == 'Dart err cause3' &&
-            e.nativeStackTrace.contains('at src'))));
+            e.nativeStackTrace.contains('at jason/src'))));
 
     var err2;
     try {
       await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
-          as Future);
+      as Future);
     } catch (e) {
       err2 = e as EnumerateDevicesException;
     }
     expect(
         err2,
         predicate((e) =>
-            e is EnumerateDevicesException &&
+        e is EnumerateDevicesException &&
             e.cause == 'Dart err cause4' &&
-            e.nativeStackTrace.contains('at src')));
+            e.nativeStackTrace.contains('at jason/src')));
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
@@ -235,11 +235,11 @@ void main() {
     var conn = await connFut.future;
 
     expect(
-        () => conn.getRemoteMemberId(),
+            () => conn.getRemoteMemberId(),
         throwsA(allOf(
             isStateError,
-            predicate((e) =>
-                e.message == 'ConnectionHandle is in detached state.'))));
+            predicate(
+                    (e) => e.message == 'ConnectionHandle is in detached state'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -326,7 +326,7 @@ void main() {
     expect(
         stateErr,
         allOf(isStateError,
-            predicate((e) => e.message == 'RoomHandle is in detached state.')));
+            predicate((e) => e.message == 'RoomHandle is in detached state')));
 
     var formatExc;
     try {
@@ -339,7 +339,7 @@ void main() {
         allOf(
             isFormatException,
             predicate(
-                (e) => e.message.contains('relative URL without a base'))));
+                    (e) => e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {
@@ -349,18 +349,18 @@ void main() {
     expect(
         err,
         predicate((e) =>
-            e is MediaStateTransitionException &&
+        e is MediaStateTransitionException &&
             e.message == 'SimpleTracksRequest should have at least one track' &&
-            e.nativeStackTrace.contains('at src')));
+            e.nativeStackTrace.contains('at jason/src')));
   });
 
   testWidgets('ReconnectHandle', (WidgetTester tester) async {
     final returnsRpcClientException =
-        dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
-            'returns_rpc_client_exception');
+    dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
+        'returns_rpc_client_exception');
     final returnsFutureWithRpcClientException =
-        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'returns_future_rpc_client_exception');
+    dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+        'returns_future_rpc_client_exception');
 
     var jason = Jason();
     var room = jason.initRoom();
@@ -415,13 +415,13 @@ void main() {
     expect(argumentError2.message, 'Expected u32');
 
     expect(
-        () => returnsRpcClientException('Dart err cause1').unwrap(),
+            () => returnsRpcClientException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
-            e is RpcClientException &&
+        e is RpcClientException &&
             e.kind == RpcClientExceptionKind.ConnectionLost &&
             e.cause == 'Dart err cause1' &&
             e.message == 'RpcClientException::ConnectionLost' &&
-            e.nativeStackTrace.contains('at src'))));
+            e.nativeStackTrace.contains('at jason/src'))));
 
     var exception5;
     try {
@@ -432,34 +432,34 @@ void main() {
     expect(
         exception5,
         predicate((e) =>
-            e is RpcClientException &&
+        e is RpcClientException &&
             e.kind == RpcClientExceptionKind.SessionFinished &&
             e.message == 'RpcClientException::SessionFinished' &&
             e.cause == 'Dart err cause2' &&
-            e.nativeStackTrace.contains('at src')));
+            e.nativeStackTrace.contains('at jason/src')));
   });
 
   final returnsInputDevicePtr =
-      dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-          'returns_input_device_info_ptr');
+  dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
+      'returns_input_device_info_ptr');
 
   testWidgets('ForeignValue Rust => Dart', (WidgetTester tester) async {
     final returnsNone =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_none');
+    dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
+        'returns_none');
     final returnsHandlePtr = dl.lookupFunction<ForeignValue Function(Handle),
         ForeignValue Function(Object)>('returns_handle_ptr');
     final returnsString =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_string');
+    dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
+        'returns_string');
     final returnsInt =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_int');
+    dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
+        'returns_int');
 
     expect(returnsNone().toDart(), equals(null));
 
     var inputDevice =
-        InputDeviceInfo(NullablePointer(returnsInputDevicePtr().toDart()));
+    InputDeviceInfo(NullablePointer(returnsInputDevicePtr().toDart()));
     expect(inputDevice.deviceId(), equals('InputDeviceInfo.device_id'));
     inputDevice.free();
 
@@ -484,7 +484,7 @@ void main() {
 
     var none = ForeignValue.none();
     var ptr =
-        ForeignValue.fromPtr(NullablePointer(returnsInputDevicePtr().toDart()));
+    ForeignValue.fromPtr(NullablePointer(returnsInputDevicePtr().toDart()));
     var str = ForeignValue.fromString('my string');
     var num = ForeignValue.fromInt(235);
 
