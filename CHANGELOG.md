@@ -12,16 +12,56 @@ All user visible changes to this project will be documented in this file. This p
 [Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
 
 ### BC Breaks
-TODO: Mention #209
+
 - Library API:
     - `ReconnectHandle.reconnect_with_backoff()` performs first reconnect attempt immediately now ([#206]).
+    - Errors propagation ([#4]):
+        - Remove `JasonError`;
+        - Throw exceptions from functions:
+            - `ConnectionHandle`:
+                - `on_close` - `StateError`;
+                - `get_remote_member_id` - `StateError`;
+                - `on_remote_track_added` - `StateError`;
+                - `on_quality_score_update` - `StateError`.
+            - `MediaManager`:
+                - `enumerate_devices` - `EnumerateDevicesException`.
+                - `init_local_tracks` - `LocalMediaInitException`.
+            - `RoomHandle`:
+                - `join`:
+                    - `StateError`;
+                    - `FormatException`;
+                    - `RpcClientException`;
+                    - `InternalException`.
+                - `on_new_connection` - `StateError`;
+                - `on_close` - `StateError`;
+                - `on_local_track` - `StateError`;
+                - `on_failed_local_media` - `StateError`;
+                - `on_connection_loss` - `StateError`;
+                - `set_local_media_settings` - `MediaSettingsUpdateException`;
+                - `mute_audio`, `unmute_audio`, `mute_video`, `unmute_video`, `disable_audio`, `enable_audio`,
+                  `disable_video`, `enable_video`, `disable_remote_video`, `enable_remote_video`, `disable_remote_audio`,
+                  `enable_remote_audio`:
+                    - `StateError`;
+                    - `MediaStateTransitionException`;
+                    - `InternalException`;
+                    - `LocalMediaInitException`.
 
 ### Added
 
 - Library API:
     - Optional argument to `ReconnectHandle.reconnect_with_backoff()` function that limits max elapsed time ([#206]).
+    - Exceptions ([#4]):
+        - `StateError`;
+        - `LocalMediaInitException`;
+        - `EnumerateDevicesException`;
+        - `RpcClientException`;
+        - `InternalException`;
+        - `FormatException`;
+        - `MediaStateTransitionException`;
+        - `MediaSettingsUpdateException`.
 
 [#206]: https://github.com/instrumentisto/medea/pull/206
+[#4]: /../../pull/4
 
 
 
