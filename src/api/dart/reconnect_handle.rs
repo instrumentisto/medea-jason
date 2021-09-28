@@ -138,10 +138,7 @@ mod mock {
             err::{RpcClientException, RpcClientExceptionKind},
         },
         platform,
-        rpc::{
-            ReconnectError,
-            ReconnectHandle as CoreReconnectHandle,
-        },
+        rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
     };
 
     #[derive(Clone)]
