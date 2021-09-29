@@ -243,7 +243,7 @@ void main() {
         throwsA(allOf(
             // isStateError,
             predicate((e) =>
-                e is InternalException && e.message == 'ConnectionHandle is in detached state.'))));
+                e is StateError && e.message == 'ConnectionHandle is in detached state.'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -304,7 +304,6 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
-    print("RoomHandle tests");
     var jason = Jason();
     var room = jason.initRoom();
 
@@ -326,7 +325,6 @@ void main() {
     try {
       await room.enableRemoteVideo();
     } catch (e) {
-      throw e;
       stateErr = e;
     }
     print(stateErr);
@@ -334,7 +332,7 @@ void main() {
     expect(
         stateErr,
         allOf(/* isStateError, */
-            predicate((e) => e is InternalException && e.message == 'RoomHandle is in detached state.')));
+            predicate((e) => e is StateError && e.message == 'RoomHandle is in detached state.')));
 
     var formatExc;
     try {
@@ -347,7 +345,7 @@ void main() {
         allOf(
             // isFormatException,
             predicate(
-                (e) => e is RpcClientException && e.message.contains('relative URL without a base'))));
+                (e) => e is FormatException && e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {
