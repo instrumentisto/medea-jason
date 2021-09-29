@@ -241,7 +241,7 @@ void main() {
     expect(
         () => conn.getRemoteMemberId(),
         throwsA(allOf(
-            isStateError,
+            // isStateError,
             predicate((e) =>
                 e is InternalException && e.message == 'ConnectionHandle is in detached state.'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
@@ -329,7 +329,7 @@ void main() {
     }
     expect(
         stateErr,
-        allOf(isStateError,
+        allOf(/* isStateError, */
             predicate((e) => e is InternalException && e.message == 'RoomHandle is in detached state.')));
 
     var formatExc;
@@ -341,7 +341,7 @@ void main() {
     expect(
         formatExc,
         allOf(
-            isFormatException,
+            // isFormatException,
             predicate(
                 (e) => e is RpcClientException && e.message.contains('relative URL without a base'))));
 
