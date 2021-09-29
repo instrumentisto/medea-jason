@@ -58,7 +58,7 @@ impl MediaManagerHandle {
                         .into()
                 })
                 .map_err(Error::from)
-                .map_err(JsValue::from)
+                .map_err(Into::into)
         })
     }
 
@@ -83,7 +83,7 @@ impl MediaManagerHandle {
                         .into()
                 })
                 .map_err(Error::from)
-                .map_err(JsValue::from)
+                .map_err(Into::into)
         })
     }
 }

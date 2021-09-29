@@ -286,7 +286,6 @@ pub trait Whenable<D: 'static> {
     ) -> LocalBoxFuture<'static, Result<(), DroppedError>>;
 }
 
-#[allow(clippy::use_self)]
 impl<D: 'static> Whenable<D> for RefCell<Vec<UniversalSubscriber<D>>> {
     fn when(
         &self,

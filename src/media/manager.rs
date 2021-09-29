@@ -317,7 +317,6 @@ impl InnerMediaManager {
     /// [`MediaManager`]'s tracks storage.
     ///
     /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    #[allow(clippy::needless_pass_by_value)]
     fn parse_and_save_tracks(
         &self,
         tracks: Vec<platform::MediaStreamTrack>,
@@ -397,7 +396,6 @@ impl MediaManager {
 #[derive(Clone)]
 pub struct MediaManagerHandle(Weak<InnerMediaManager>);
 
-#[allow(clippy::unused_self)]
 impl MediaManagerHandle {
     /// Returns a list of [`platform::InputDeviceInfo`] objects representing
     /// available media input and devices, such as microphones, cameras, and so

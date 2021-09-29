@@ -15,36 +15,34 @@ All user visible changes to this project will be documented in this file. This p
 
 - Library API:
     - `ReconnectHandle.reconnect_with_backoff()` performs first reconnect attempt immediately now ([#206]).
-    - Errors propagation ([#4]):
-        - Remove `JasonError`;
-        - Throw exceptions from functions:
-            - `ConnectionHandle`:
-                - `on_close` - `StateError`;
-                - `get_remote_member_id` - `StateError`;
-                - `on_remote_track_added` - `StateError`;
-                - `on_quality_score_update` - `StateError`.
-            - `MediaManager`:
-                - `enumerate_devices` - `EnumerateDevicesException`.
-                - `init_local_tracks` - `LocalMediaInitException`.
-            - `RoomHandle`:
-                - `join`:
-                    - `StateError`;
-                    - `FormatException`;
-                    - `RpcClientException`;
-                    - `InternalException`.
-                - `on_new_connection` - `StateError`;
-                - `on_close` - `StateError`;
-                - `on_local_track` - `StateError`;
-                - `on_failed_local_media` - `StateError`;
-                - `on_connection_loss` - `StateError`;
-                - `set_local_media_settings` - `MediaSettingsUpdateException`;
-                - `mute_audio`, `unmute_audio`, `mute_video`, `unmute_video`, `disable_audio`, `enable_audio`,
-                  `disable_video`, `enable_video`, `disable_remote_video`, `enable_remote_video`, `disable_remote_audio`,
-                  `enable_remote_audio`:
-                    - `StateError`;
-                    - `MediaStateTransitionException`;
-                    - `InternalException`;
-                    - `LocalMediaInitException`.
+    - Remove `JasonError` and change thrown exceptions kind ([#4]):
+        - `ConnectionHandle`:
+            - `on_close` - `StateError`;
+            - `get_remote_member_id` - `StateError`;
+            - `on_remote_track_added` - `StateError`;
+            - `on_quality_score_update` - `StateError`.
+        - `MediaManager`:
+            - `enumerate_devices` - `EnumerateDevicesException`.
+            - `init_local_tracks` - `LocalMediaInitException`.
+        - `RoomHandle`:
+            - `join`:
+                - `StateError`;
+                - `FormatException`;
+                - `RpcClientException`;
+                - `InternalException`.
+            - `on_new_connection` - `StateError`;
+            - `on_close` - `StateError`;
+            - `on_local_track` - `StateError`;
+            - `on_failed_local_media` - `StateError`;
+            - `on_connection_loss` - `StateError`;
+            - `set_local_media_settings` - `MediaSettingsUpdateException`;
+            - `mute_audio`, `unmute_audio`, `mute_video`, `unmute_video`, `disable_audio`, `enable_audio`,
+              `disable_video`, `enable_video`, `disable_remote_video`, `enable_remote_video`, `disable_remote_audio`,
+              `enable_remote_audio`:
+                - `StateError`;
+                - `MediaStateTransitionException`;
+                - `InternalException`;
+                - `LocalMediaInitException`.
 
 ### Added
 
