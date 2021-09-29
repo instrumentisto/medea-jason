@@ -243,7 +243,7 @@ void main() {
         throwsA(allOf(
             isStateError,
             predicate((e) =>
-                e.toString() == 'ConnectionHandle is in detached state.'))));
+                e is InternalException && e.message == 'ConnectionHandle is in detached state.'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -330,7 +330,7 @@ void main() {
     expect(
         stateErr,
         allOf(isStateError,
-            predicate((e) => e.toString() == 'RoomHandle is in detached state.')));
+            predicate((e) => e is InternalException && e.message == 'RoomHandle is in detached state.')));
 
     var formatExc;
     try {
@@ -343,7 +343,7 @@ void main() {
         allOf(
             isFormatException,
             predicate(
-                (e) => e.toString().contains('relative URL without a base'))));
+                (e) => e is RpcClientException && e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {
