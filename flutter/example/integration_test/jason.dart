@@ -51,6 +51,7 @@ void main() {
 
     var jason = Jason();
     var mediaManager = jason.mediaManager();
+    print('mediaManager: ' + mediaManager.runtimeType.toString());
 
     var devices = await mediaManager.enumerateDevices();
     var tracks = await mediaManager.initLocalTracks(MediaStreamSettings());
