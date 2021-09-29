@@ -51,7 +51,6 @@ void main() {
 
     var jason = Jason();
     var mediaManager = jason.mediaManager();
-    print('mediaManager: ' + mediaManager.runtimeType.toString());
 
     var devices = await mediaManager.enumerateDevices();
     var tracks = await mediaManager.initLocalTracks(MediaStreamSettings());
@@ -59,10 +58,13 @@ void main() {
     expect(devices.length, equals(3));
     expect(tracks.length, equals(3));
 
-    // expect((devices.first as NativeInputDeviceInfo).ptr.getInnerPtr(),
-    //     isNot(equals((devices.last as NativeInputDeviceInfo).ptr.getInnerPtr())));
-    // expect((tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
-    //     isNot(equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
+    print('Devices: ' + devices.toString());
+    print('Device: ' + devices.first.runtimeType.toString());
+    print('Device toString: ' + devices.first.toString());
+    expect((devices.first as NativeInputDeviceInfo).ptr.getInnerPtr(),
+        isNot(equals((devices.last as NativeInputDeviceInfo).ptr.getInnerPtr())));
+    expect((tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
+        isNot(equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
 
     expect(devices.first.deviceId(), equals('InputDeviceInfo.device_id'));
     expect(devices.first.groupId(), equals('InputDeviceInfo.group_id'));
