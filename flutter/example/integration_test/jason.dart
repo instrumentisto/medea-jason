@@ -304,6 +304,7 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
+    print("RoomHandle tests");
     var jason = Jason();
     var room = jason.initRoom();
 
@@ -325,6 +326,7 @@ void main() {
     try {
       await room.enableRemoteVideo();
     } catch (e) {
+      throw e;
       stateErr = e;
     }
     print(stateErr);
