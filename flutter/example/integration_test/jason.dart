@@ -327,6 +327,8 @@ void main() {
     } catch (e) {
       stateErr = e;
     }
+    print(stateErr);
+    print(stateErr.runtimeType);
     expect(
         stateErr,
         allOf(/* isStateError, */
