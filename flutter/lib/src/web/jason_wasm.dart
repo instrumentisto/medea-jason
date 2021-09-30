@@ -292,7 +292,7 @@ class MediaManagerHandle {
   external void free();
 }
 
-@JS("MediaManagerHandle")
+@JS('MediaManagerHandle')
 abstract class _MediaManagerHandle {
   /// Returns a list of [`InputDeviceInfo`] objects representing available
   /// media input and output devices, such as microphones, cameras, and so
@@ -350,7 +350,7 @@ class ReconnectHandle {
   external void free();
 }
 
-@JS("ReconnectHandle")
+@JS('ReconnectHandle')
 abstract class _ReconnectHandle {
   /// Tries to reconnect after the provided delay in milliseconds.
   /// If [`RpcSession`] is already reconnecting then a new reconnection
@@ -496,7 +496,7 @@ class RoomHandle {
   external void on_connection_loss(Function cb);
 }
 
-@JS("RoomHandle")
+@JS('RoomHandle')
 abstract class _RoomHandle {
   external Promise<dynamic> join(String token);
 
@@ -705,6 +705,7 @@ extension RoomHandleExtensions on RoomHandle {
 @JS()
 abstract class Promise<T> {
   external factory Promise(
-      void executor(void resolve(T result), Function reject));
-  external Promise then(void onFulfilled(T result), [Function onRejected]);
+      void Function(void Function(T result) resolve, Function reject) executor);
+  external Promise then(void Function(T result) onFulfilled,
+      [Function onRejected]);
 }

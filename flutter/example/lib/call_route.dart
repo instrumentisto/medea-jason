@@ -5,13 +5,10 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'call.dart';
 
 class CallRoute extends StatefulWidget {
-  late String _roomId;
-  late String _memberId;
+  final String _roomId;
+  final String _memberId;
 
-  CallRoute(String roomId, String memberId) {
-    _roomId = roomId;
-    _memberId = memberId;
-  }
+  CallRoute(this._roomId, this._memberId);
 
   @override
   _CallState createState() => _CallState(_roomId, _memberId);
@@ -20,8 +17,8 @@ class CallRoute extends StatefulWidget {
 class _CallState extends State {
   bool _videoEnabled = true;
   bool _audioEnabled = true;
-  List<RTCVideoView> _videos = List.empty(growable: true);
-  Call _call = Call();
+  final List<RTCVideoView> _videos = List.empty(growable: true);
+  final Call _call = Call();
   late String _roomId;
   late String _memberId;
 

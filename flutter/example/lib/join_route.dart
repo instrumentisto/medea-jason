@@ -4,7 +4,7 @@ import 'call_route.dart';
 
 class JoinRoute extends StatefulWidget {
   @override
-  createState() => _JoinRouteState();
+  _JoinRouteState createState() => _JoinRouteState();
 }
 
 const DEFAULT_ROOM_ID = 'pub-pub-video-call';
@@ -50,20 +50,20 @@ class _JoinRouteState extends State<JoinRoute> {
                     ),
                   ),
                   TextButton(
-                    child: Text('Join Room'),
                     style: TextButton.styleFrom(
                       primary: Colors.white,
                       backgroundColor: Colors.blue,
                       onSurface: Colors.grey,
                     ),
                     onPressed: () {
-                      print("RoomID: ${_roomId} and MemberID: ${_memberId}");
+                      print('RoomID: $_roomId and MemberID: $_memberId');
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
                                   CallRoute(_roomId, _memberId)));
                     },
+                    child: Text('Join Room'),
                   )
                 ],
               ))),

@@ -571,7 +571,7 @@ mod mock {
             &self,
             cb: platform::Function<LocalMediaTrack>,
         ) -> Result<(), Traced<HandleDetachedError>> {
-            cb.call1(LocalMediaTrack);
+            cb.call1(LocalMediaTrack(0));
             Ok(())
         }
 

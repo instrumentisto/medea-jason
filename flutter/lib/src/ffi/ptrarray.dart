@@ -27,6 +27,7 @@ extension PtrArrayToList on Pointer<PtrArray> {
     try {
       var out = List<Pointer>.empty(growable: true);
       for (var i = 0; i < ref._len; i++) {
+        // ignore: omit_local_variable_types
         Pointer<Pointer> el = ref._ptr.elementAt(i);
         out.add(el.value);
       }

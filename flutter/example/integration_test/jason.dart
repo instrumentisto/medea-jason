@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/audio_track_constraints.dart';
-import 'package:medea_jason/src/native/connection_handle.dart';
 import 'package:medea_jason/src/native/device_video_track_constraints.dart';
 import 'package:medea_jason/src/native/display_video_track_constraints.dart';
 import 'package:medea_jason/src/ffi/exceptions.dart';
@@ -14,11 +13,8 @@ import 'package:medea_jason/src/ffi/result.dart';
 import 'package:medea_jason/src/native/input_device_info.dart';
 import 'package:medea_jason/src/native/jason.dart';
 import 'package:medea_jason/src/native/media_stream_settings.dart';
-import 'package:medea_jason/src/native/reconnect_handle.dart';
-import 'package:medea_jason/src/native/remote_media_track.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
-import 'package:medea_jason/src/native/room_close_reason.dart';
 import 'package:medea_jason/src/interface/track_kinds.dart';
 import 'package:medea_jason/src/util/nullable_pointer.dart';
 import 'package:medea_jason/src/interface/device_video_track_constraints.dart';
@@ -58,13 +54,14 @@ void main() {
     expect(devices.length, equals(3));
     expect(tracks.length, equals(3));
 
-    print('Devices: ' + devices.toString());
-    print('Device: ' + devices.first.runtimeType.toString());
-    print('Device toString: ' + devices.first.toString());
-    // expect((devices.first as NativeInputDeviceInfo).ptr.getInnerPtr(),
-    //     isNot(equals((devices.last as NativeInputDeviceInfo).ptr.getInnerPtr())));
-    expect((tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
-        isNot(equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
+    expect(
+        (devices.first as NativeInputDeviceInfo).ptr.getInnerPtr(),
+        isNot(
+            equals((devices.last as NativeInputDeviceInfo).ptr.getInnerPtr())));
+    expect(
+        (tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
+        isNot(
+            equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
 
     expect(devices.first.deviceId(), equals('InputDeviceInfo.device_id'));
     expect(devices.first.groupId(), equals('InputDeviceInfo.group_id'));
@@ -246,7 +243,8 @@ void main() {
         throwsA(allOf(
             // isStateError,
             predicate((e) =>
-                e is StateError && e.message == 'ConnectionHandle is in detached state.'))));
+                e is StateError &&
+                e.message == 'ConnectionHandle is in detached state.'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -330,12 +328,13 @@ void main() {
     } catch (e) {
       stateErr = e;
     }
-    print(stateErr);
-    print(stateErr.runtimeType);
     expect(
         stateErr,
-        allOf(/* isStateError, */
-            predicate((e) => e is StateError && e.message == 'RoomHandle is in detached state.')));
+        allOf(
+            isStateError,
+            predicate((e) =>
+                e is StateError &&
+                e.message == 'RoomHandle is in detached state.')));
 
     var formatExc;
     try {
@@ -346,9 +345,10 @@ void main() {
     expect(
         formatExc,
         allOf(
-            // isFormatException,
-            predicate(
-                (e) => e is FormatException && e.message.contains('relative URL without a base'))));
+            isFormatException,
+            predicate((e) =>
+                e is FormatException &&
+                e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {
@@ -457,7 +457,7 @@ void main() {
         dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
             'returns_none');
     final returnsHandlePtr = dl.lookupFunction<ForeignValue Function(Handle),
-        ForeignValue Function(Object)>('returns_handle_ptr');
+        ForeignValue Function(Object?)>('returns_handle_ptr');
     final returnsString =
         dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
             'returns_string');
@@ -467,14 +467,14 @@ void main() {
 
     expect(returnsNone().toDart(), equals(null));
 
-    var inputDevice =
-        NativeInputDeviceInfo(NullablePointer(returnsInputDevicePtr().toDart()));
+    var inputDevice = NativeInputDeviceInfo(
+        NullablePointer(returnsInputDevicePtr().toDart()));
     expect(inputDevice.deviceId(), equals('InputDeviceInfo.device_id'));
     inputDevice.free();
 
     expect(returnsHandlePtr('asd').toDart(), equals('asd'));
     expect(returnsHandlePtr(111).toDart(), equals(111));
-    // expect(returnsHandlePtr(null).toDart(), equals(null));
+    expect(returnsHandlePtr(null).toDart(), equals(null));
 
     expect(returnsString().toDart(), equals('QWERTY'));
 
@@ -518,7 +518,8 @@ void main() {
     var err;
     var arg = ForeignValue.fromInt(123);
     try {
-      await (_muteVideo((room as NativeRoomHandle).ptr.getInnerPtr(), arg.ref) as Future);
+      await (_muteVideo((room as NativeRoomHandle).ptr.getInnerPtr(), arg.ref)
+          as Future);
     } catch (e) {
       err = e as ArgumentError;
     } finally {
