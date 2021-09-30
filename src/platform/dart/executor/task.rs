@@ -20,6 +20,7 @@ struct Inner {
     /// Handle for waking up this [`Task`].
     waker: Waker,
 
+    /// Handle for the [`Task`] that can be polled.
     _task_handle: Rc<Task>,
 }
 
