@@ -1,6 +1,6 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap};
+use std::{cell::RefCell, collections::HashMap, fmt};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
@@ -98,6 +98,17 @@ pub struct Member {
 
     /// [`Window`] in which this [`Member`] is exists.
     window: Window,
+}
+
+impl fmt::Debug for Member {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Member")
+            .field("id", &self.id)
+            .field("is_send", &self.is_send)
+            .field("is_recv", &self.is_recv)
+            .field("is_joined", &self.is_joined)
+            .finish_non_exhaustive()
+    }
 }
 
 impl Member {

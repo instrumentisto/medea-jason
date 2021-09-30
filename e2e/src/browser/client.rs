@@ -2,7 +2,10 @@
 //!
 //! [WebDriver]: https://w3.org/TR/webdriver
 
-use std::sync::{mpsc, Arc};
+use std::{
+    sync::{mpsc, Arc},
+    time::Duration,
+};
 
 use fantoccini::{Client, ClientBuilder, Locator};
 use futures::lock::Mutex;
@@ -272,7 +275,11 @@ impl Inner {
         self.0
             .goto(&format!("http://{}/index.html", file_server_host))
             .await?;
-        self.0.wait_for_find(Locator::Id("loaded")).await?;
+        self.0
+            .wait()
+            .at_most(Duration::from_secs(120))
+            .for_element(Locator::Id("loaded"))
+            .await?;
 
         self.execute(Statement::new(
             // language=JavaScript
