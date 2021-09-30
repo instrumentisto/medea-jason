@@ -33,6 +33,7 @@ class _CallState extends State {
       var renderer = RTCVideoRenderer();
       await renderer.initialize();
       renderer.srcObject = stream;
+      renderer.muted = false;
       setState(() {
         _videos.add(RTCVideoView(renderer));
       });
@@ -60,10 +61,8 @@ class _CallState extends State {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Column(
-                  children: _videos
-                      .map((video) =>
-                          SizedBox(height: 500.0, width: 500.0, child: video))
-                      .toList(),
+                  children:
+                      _videos.map((video) => Expanded(child: video)).toList(),
                 ))),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Padding(

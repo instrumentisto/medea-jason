@@ -103,12 +103,10 @@ packages:
   flutter_webrtc:
     dependency: transitive
     description:
-      path: "."
-      ref: tracks-fix
-      resolved-ref: "4cfaff667a409f3b83a4379f4a3671421aa6a29e"
-      url: "https://github.com/evdokimovs/flutter-webrtc.git"
-    source: git
-    version: "0.6.3"
+      name: flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.8"
   fuchsia_remote_debug_protocol:
     dependency: transitive
     description: flutter

@@ -12,10 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^1.0.0
-  flutter_webrtc:
-    git:
-      url: https://github.com/evdokimovs/flutter-webrtc.git
-      ref: tracks-fix
+  flutter_webrtc: ^0.6.8
   js: ^0.6.3
 
 dev_dependencies:

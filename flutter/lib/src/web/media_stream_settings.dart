@@ -26,7 +26,7 @@ class MediaStreamSettings extends IMediaStreamSettings {
   /// Set constraints for capturing a local video from user's display.
   @override
   void displayVideo(@moveSemantics IDisplayVideoTrackConstraints constraints) {
-    obj.display_video((constraints as WebDisplayVideoTrackConstraints).obj);
+    obj.display_video((constraints as DisplayVideoTrackConstraints).obj);
   }
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.

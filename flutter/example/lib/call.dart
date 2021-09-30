@@ -20,6 +20,12 @@ class Call {
     constraints.deviceVideo(DeviceVideoTrackConstraints());
 
     var tracks = await _jason.mediaManager().initLocalTracks(constraints);
+    _room.onFailedLocalMedia((e) {
+      print('onFailedLocalMedia');
+    });
+    _room.onConnectionLoss((e) {
+      print('onConnectionLoss');
+    });
     await _room.setLocalMediaSettings(constraints, false, false);
     _tracks = tracks;
 
@@ -49,11 +55,9 @@ class Call {
       var remoteMemberId = conn.getRemoteMemberId();
       conn.onRemoteTrackAdded((track) async {
         var sysTrack = track.getTrack();
-        if (track.kind() == MediaKind.Video) {
-          var remoteStream = await createLocalMediaStream(remoteMemberId);
-          await remoteStream.addTrack(sysTrack);
-          f(remoteStream);
-        }
+        var remoteStream = await createLocalMediaStream(remoteMemberId);
+        await remoteStream.addTrack(sysTrack);
+        f(remoteStream);
       });
     });
   }
