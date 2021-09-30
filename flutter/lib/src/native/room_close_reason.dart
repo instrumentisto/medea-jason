@@ -32,9 +32,6 @@ final _isErr =
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RoomCloseReason__free');
 
-/// Reason of why a `Room` has been closed.
-///
-/// This struct is passed into the `RoomHandle.onClose()` callback.
 class NativeRoomCloseReason extends RoomCloseReason {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
@@ -43,25 +40,21 @@ class NativeRoomCloseReason extends RoomCloseReason {
   /// provided [Pointer].
   NativeRoomCloseReason(this.ptr);
 
-  /// Returns a close reason of the `Room`.
   @override
   String reason() {
     return _reason(ptr.getInnerPtr()).nativeStringToDartString();
   }
 
-  /// Indicates whether the `Room` was closed by server.
   @override
   bool isClosedByServer() {
     return _isClosedByServer(ptr.getInnerPtr()) > 0;
   }
 
-  /// Indicates whether the `Room`'s close reason is considered as an error.
   @override
   bool isErr() {
     return _isErr(ptr.getInnerPtr()) > 0;
   }
 
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   @override
   void free() {

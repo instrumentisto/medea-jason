@@ -26,14 +26,10 @@ final _deviceId = dl.lookupFunction<_deviceId_C, _deviceId_Dart>(
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('AudioTrackConstraints__free');
 
-/// Constraints applicable to audio tracks.
 class AudioTrackConstraints extends IAudioTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
-  /// Sets an exact [`deviceId`][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
   @override
   void deviceId(String deviceId) {
     var deviceIdPtr = deviceId.toNativeUtf8();

@@ -1,6 +1,9 @@
 import '../util/move_semantic.dart';
 import 'track_kinds.dart';
 
+/// [`MediaDeviceInfo`][1] interface.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams/#device-info
 abstract class InputDeviceInfo {
   /// Returns an unique identifier of the represented device.
   String deviceId() {

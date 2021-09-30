@@ -2,7 +2,12 @@ import '../util/move_semantic.dart';
 import 'media_manager.dart';
 import 'room_handle.dart';
 
+/// General library interface.
+///
+/// Responsible for managing shared transports, local media and room
+/// initialization.
 abstract class IJason {
+  /// Returns a [MediaManagerHandle] to the `MediaManager` of this [IJason].
   MediaManagerHandle mediaManager() {
     throw UnimplementedError();
   }

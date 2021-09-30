@@ -1,8 +1,16 @@
-import '../util/move_semantic.dart';
 import 'input_device_info.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
+import '../util/move_semantic.dart';
 
+/// External handle to a `MediaManager`.
+///
+/// `MediaManager` performs all media acquisition requests
+/// ([`getUserMedia()`][1]/[`getDisplayMedia()`][2]) and stores all received
+/// tracks for further re-usage.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+/// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 abstract class MediaManagerHandle {
   /// Obtains [LocalMediaTrack]s objects from local media devices (or screen
   /// capture) basing on the provided [IMediaStreamSettings].

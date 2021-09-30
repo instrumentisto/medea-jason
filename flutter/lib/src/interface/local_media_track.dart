@@ -3,6 +3,11 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../util/move_semantic.dart';
 import 'track_kinds.dart';
 
+/// Strongly referenced media track received from a
+/// [`getUserMedia()`][1]/[`getDisplayMedia()`][2] request.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+/// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 abstract class LocalMediaTrack {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
   /// audio track, or the [MediaKind.Video] if it represents a video track.
@@ -19,6 +24,7 @@ abstract class LocalMediaTrack {
     throw UnimplementedError();
   }
 
+  /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
   MediaStreamTrack getTrack() {
     throw UnimplementedError();
   }

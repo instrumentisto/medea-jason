@@ -151,7 +151,6 @@ final _enableRemoteVideo =
     dl.lookupFunction<_enableRemoteVideo_C, _enableRemoteVideo_Dart>(
         'RoomHandle__enable_remote_video');
 
-/// External handle to a `Room`.
 class NativeRoomHandle extends RoomHandle {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
@@ -160,20 +159,6 @@ class NativeRoomHandle extends RoomHandle {
   /// provided [Pointer].
   NativeRoomHandle(this.ptr);
 
-  /// Connects to a media server and joins the `Room` with the provided
-  /// authorization [token].
-  ///
-  /// Authorization token has a fixed format:
-  /// `{{ Host URL }}/{{ Room ID }}/{{ Member ID }}?token={{ Auth Token }}`
-  /// (e.g. `wss://medea.com/MyConf1/Alice?token=777`).
-  ///
-  /// Throws [StateError] if the underlying [Pointer] has been freed or if some
-  /// mandatory callback is not set. These callbacks are:
-  /// [RoomHandle.onConnectionLoss] and [RoomHandle.onFailedLocalMedia].
-  ///
-  /// Throws [FormatException] if the provided [token] string has bad format.
-  ///
-  /// Throws `RpcClientException` if could not connect to media server.
   @override
   Future<void> join(String token) async {
     var tokenPtr = token.toNativeUtf8();
@@ -184,32 +169,6 @@ class NativeRoomHandle extends RoomHandle {
     }
   }
 
-  /// Updates this `Room`'s [IMediaStreamSettings]. This affects all the
-  /// `PeerConnection`s in this `Room`. If [IMediaStreamSettings] are configured
-  /// for some `Room`, then this `Room` can only send media tracks that
-  /// correspond to these settings. [IMediaStreamSettings] update will change
-  /// media tracks in all sending peers, so that might cause a new
-  /// [getUserMedia()][1] request to happen.
-  ///
-  /// Media obtaining/injection errors are additionally fired to
-  /// [RoomHandle.onFailedLocalMedia()] callback.
-  ///
-  /// If [stop_first] set to `true` then affected local [LocalMediaTrack]s will
-  /// be dropped before new [IMediaStreamSettings] are applied. This is usually
-  /// required when changing video source device due to hardware limitations,
-  /// e.g. having an active track sourced from device `A` may hinder
-  /// [getUserMedia()][1] requests to device `B`.
-  ///
-  /// [rollback_on_fail] option configures [IMediaStreamSettings] update request
-  /// to automatically rollback to previous settings if new settings cannot be
-  /// applied.
-  ///
-  /// If recovering from fail state isn't possible then affected media types
-  /// will be disabled.
-  ///
-  /// Throws a [MediaSettingsUpdateException] if settings could not be updated.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   @override
   Future<void> setLocalMediaSettings(IMediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
@@ -220,66 +179,26 @@ class NativeRoomHandle extends RoomHandle {
         rollbackOnFail ? 1 : 0) as Future);
   }
 
-  /// Mutes outbound audio in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.unmuteAudio] was
-  /// called while muting or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> muteAudio() async {
     await (_muteAudio(ptr.getInnerPtr()) as Future);
   }
 
-  /// Unmutes outbound audio in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.muteAudio] was
-  /// called while unmuting or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> unmuteAudio() async {
     await (_unmuteAudio(ptr.getInnerPtr()) as Future);
   }
 
-  /// Enables outbound audio in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.disableAudio] was
-  /// called while enabling or a media server didn't approve this state
-  /// transition.
-  ///
-  /// Throws a `LocalMediaInitException` if a request of platform media devices
-  /// access failed.
   @override
   Future<void> enableAudio() async {
     await (_enableAudio(ptr.getInnerPtr()) as Future);
   }
 
-  /// Disables outbound audio in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.enableAudio] was
-  /// called while disabling or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> disableAudio() async {
     await (_disableAudio(ptr.getInnerPtr()) as Future);
   }
 
-  /// Mutes outbound video in this `Room`.
-  ///
-  /// Affects only video with specific [MediaSourceKind] if specified.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.unmuteVideo] was
-  /// called while muting or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
     var kind_arg =
@@ -291,15 +210,6 @@ class NativeRoomHandle extends RoomHandle {
     }
   }
 
-  /// Unmutes outbound video in this `Room`.
-  ///
-  /// Affects only video with specific [MediaSourceKind] if specified.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.muteVideo] was
-  /// called while unmuting or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
     var kind_arg =
@@ -311,18 +221,6 @@ class NativeRoomHandle extends RoomHandle {
     }
   }
 
-  /// Enables outbound video.
-  ///
-  /// Affects only video with specific [MediaSourceKind] if specified.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.disableVideo] was
-  /// called while enabling or a media server didn't approve this state
-  /// transition.
-  ///
-  /// Throws a `LocalMediaInitException` if a request of platform media devices
-  /// access failed.
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
     var kind_arg =
@@ -334,15 +232,6 @@ class NativeRoomHandle extends RoomHandle {
     }
   }
 
-  /// Disables outbound video.
-  ///
-  /// Affects only video with specific [MediaSourceKind] if specified.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.enableVideo] was
-  /// called while disabling or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
     var kind_arg =
@@ -354,58 +243,26 @@ class NativeRoomHandle extends RoomHandle {
     }
   }
 
-  /// Enables inbound audio in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if
-  /// [RoomHandle.disableRemoteAudio] was called while enabling or a media
-  /// server didn't approve this state transition.
   @override
   Future<void> enableRemoteAudio() async {
     await (_enableRemoteAudio(ptr.getInnerPtr()) as Future);
   }
 
-  /// Disables inbound audio in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if [RoomHandle.enableRemoteAudio]
-  /// was called while disabling or a media server didn't approve this state
-  /// transition.
   @override
   Future<void> disableRemoteAudio() async {
     await (_disableRemoteAudio(ptr.getInnerPtr()) as Future);
   }
 
-  /// Enables inbound video in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if
-  /// [RoomHandle.disableRemoteVideo] was called while enabling or a media
-  /// server didn't approve this state transition.
   @override
   Future<void> enableRemoteVideo() async {
     await (_enableRemoteVideo(ptr.getInnerPtr()) as Future);
   }
 
-  /// Disables inbound video in this `Room`.
-  ///
-  /// Throws a [StateError] if the underlying [Pointer] has been freed.
-  ///
-  /// Throws a `MediaStateTransitionException` if
-  /// [RoomHandle.enableRemoteVideo] was called while disabling or a media
-  /// server didn't approve this state transition.
   @override
   Future<void> disableRemoteVideo() async {
     await (_disableRemoteVideo(ptr.getInnerPtr()) as Future);
   }
 
-  /// Sets callback, invoked when a new `Connection` with some remote `Peer`
-  /// is established.
-  ///
-  /// Throws [StateError] if the underlying [Pointer] has been freed.
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
     _onNewConnection(ptr.getInnerPtr(), (t) {
@@ -413,10 +270,6 @@ class NativeRoomHandle extends RoomHandle {
     }).unwrap();
   }
 
-  /// Sets callback, invoked when this `Room` is closed, providing a
-  /// [RoomCloseReason].
-  ///
-  /// Throws [StateError] if the underlying [Pointer] has been freed.
   @override
   void onClose(void Function(RoomCloseReason) f) {
     _onClose(ptr.getInnerPtr(), (t) {
@@ -424,17 +277,6 @@ class NativeRoomHandle extends RoomHandle {
     }).unwrap();
   }
 
-  /// Sets callback, invoked when a new [LocalMediaTrack] is added to this
-  /// `Room`.
-  ///
-  /// This might happen in the following cases:
-  /// 1. Media server initiates a media request.
-  /// 2. [RoomHandle.enableAudio] or [RoomHandle.enableVideo] call resulted in
-  ///    new media track acquisition.
-  /// 3. [IMediaStreamSettings] were updated via
-  ///    [RoomHandle.setLocalMediaSettings] method.
-  ///
-  /// Throws [StateError] if the underlying [Pointer] has been freed.
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
     _onLocalTrack(ptr.getInnerPtr(), (t) {
@@ -442,10 +284,6 @@ class NativeRoomHandle extends RoomHandle {
     }).unwrap();
   }
 
-  /// Sets callback, invoked when a connection with a media server is lost,
-  /// providing a [ReconnectHandle].
-  ///
-  /// Throws [StateError] if the underlying [Pointer] has been freed.
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
     _onConnectionLoss(ptr.getInnerPtr(), (t) {
@@ -453,9 +291,6 @@ class NativeRoomHandle extends RoomHandle {
     }).unwrap();
   }
 
-  /// Sets callback, invoked on a local media acquisition failures.
-  ///
-  /// Throws [StateError] if the underlying [Pointer] has been freed.
   @override
   void onFailedLocalMedia(void Function(Object) f) {
     _onFailedLocalMedia(ptr.getInnerPtr(), (err) {
@@ -463,7 +298,6 @@ class NativeRoomHandle extends RoomHandle {
     }).unwrap();
   }
 
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   @override
   void free() {

@@ -73,9 +73,6 @@ final _getTrack = dl
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
 
-/// Representation of a received remote [`MediaStreamTrack`][1].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 class NativeRemoteMediaTrack extends RemoteMediaTrack {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
@@ -84,26 +81,22 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   /// provided [Pointer].
   NativeRemoteMediaTrack(this.ptr);
 
-  /// Indicates whether this [RemoteMediaTrack] is enabled.
   @override
   bool enabled() {
     return _enabled(ptr.getInnerPtr()) > 0;
   }
 
-  /// Indicate whether this [RemoteMediaTrack] is muted.
   @override
   bool muted() {
     return _muted(ptr.getInnerPtr()) > 0;
   }
 
-  /// Returns this [RemoteMediaTrack]'s kind (audio/video).
   @override
   MediaKind kind() {
     var index = _kind(ptr.getInnerPtr());
     return MediaKind.values[index];
   }
 
-  /// Returns this [RemoteMediaTrack]'s media source kind (device/display).
   @override
   MediaSourceKind mediaSourceKind() {
     var index = _mediaSourceKind(ptr.getInnerPtr());
@@ -115,37 +108,31 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
     return _getTrack(ptr.getInnerPtr()) as MediaStreamTrack;
   }
 
-  /// Sets callback, invoked when this [RemoteMediaTrack] is enabled.
   @override
   void onEnabled(void Function() f) {
     _onEnabled(ptr.getInnerPtr(), f);
   }
 
-  /// Sets callback, invoked when this [RemoteMediaTrack] is disabled.
   @override
   void onDisabled(void Function() f) {
     _onDisabled(ptr.getInnerPtr(), f);
   }
 
-  /// Sets callback to invoke when this [RemoteMediaTrack] is muted.
   @override
   void onMuted(void Function() f) {
     _onMuted(ptr.getInnerPtr(), f);
   }
 
-  /// Sets callback to invoke when this [RemoteMediaTrack] is unmuted.
   @override
   void onUnmuted(void Function() f) {
     _onUnmuted(ptr.getInnerPtr(), f);
   }
 
-  /// Sets callback to invoke when this [RemoteMediaTrack] is stopped.
   @override
   void onStopped(void Function() f) {
     _onStopped(ptr.getInnerPtr(), f);
   }
 
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   @override
   void free() {

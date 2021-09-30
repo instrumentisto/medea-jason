@@ -27,6 +27,7 @@ abstract class RemoteMediaTrack {
     throw UnimplementedError();
   }
 
+  /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
   MediaStreamTrack getTrack() {
     throw UnimplementedError();
   }

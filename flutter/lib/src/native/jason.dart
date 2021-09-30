@@ -81,28 +81,21 @@ DynamicLibrary _dl_load() {
   return dl;
 }
 
-/// General library interface.
-///
-/// Responsible for managing shared transports, local media and room
-/// initialization.
 class Jason extends IJason {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
-  /// Returns a [MediaManagerHandle] to the `MediaManager` of this [IJason].
   @override
   MediaManagerHandle mediaManager() {
     return NativeMediaManagerHandle(
         NullablePointer(_media_manager(ptr.getInnerPtr())));
   }
 
-  /// Creates a new `Room` and returns its [RoomHandle].
   @override
   RoomHandle initRoom() {
     return NativeRoomHandle(NullablePointer(_initRoom(ptr.getInnerPtr())));
   }
 
-  /// Closes the `Room` by the provided [RoomHandle].
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
     _close_room(
@@ -110,7 +103,6 @@ class Jason extends IJason {
     room.ptr.free();
   }
 
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @override
   @moveSemantics
   void free() {

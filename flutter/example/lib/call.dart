@@ -1,7 +1,7 @@
 import 'package:medea_jason/medea_jason.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-const MEDEA_HOST = '192.168.1.134';
+const MEDEA_HOST = '127.0.0.1';
 const MEDEA_PORT = 8080;
 
 class Call {

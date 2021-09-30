@@ -40,14 +40,10 @@ final _displayVideo = dl.lookupFunction<_displayVideo_C, _displayVideo_Dart>(
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('MediaStreamSettings__free');
 
-/// Representation of [`MediaStreamConstraints`][1].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 class MediaStreamSettings extends IMediaStreamSettings {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
-  /// Specifies a nature and settings of the audio `LocalMediaTrack`.
   @override
   void audio(@moveSemantics IAudioTrackConstraints constraints) {
     _audio(ptr.getInnerPtr(),
@@ -55,7 +51,6 @@ class MediaStreamSettings extends IMediaStreamSettings {
     constraints.ptr.free();
   }
 
-  /// Sets constraints for obtaining a local video, sourced from a media device.
   @override
   void deviceVideo(@moveSemantics IDeviceVideoTrackConstraints constraints) {
     _deviceVideo(ptr.getInnerPtr(),
@@ -63,7 +58,6 @@ class MediaStreamSettings extends IMediaStreamSettings {
     constraints.ptr.free();
   }
 
-  /// Set constraints for capturing a local video from user's display.
   @override
   void displayVideo(@moveSemantics IDisplayVideoTrackConstraints constraints) {
     _displayVideo(ptr.getInnerPtr(),
@@ -71,7 +65,6 @@ class MediaStreamSettings extends IMediaStreamSettings {
     constraints.ptr.free();
   }
 
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   @override
   void free() {
