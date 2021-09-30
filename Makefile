@@ -361,6 +361,18 @@ flutter.android.version.min:
 	@printf "$(ANDROID_SDK_MIN_VERSION)"
 
 
+# Generates assets needed for Flutter Web Jason plugin.
+#
+# Usage:
+#   make flutter.web.assets
+
+flutter.web.assets:
+	make build.jason platform=web
+	rm -rf flutter/assets/pkg
+	cp -R pkg flutter/assets/
+	rm -f flutter/assets/pkg/.gitignore
+
+
 # Resolve Flutter project dependencies.
 #
 # Usage:

@@ -1,0 +1,30 @@
+{
+  "name": "medea-jason",
+  "collaborators": [
+    "Instrumentisto Team <developer@instrumentisto.com>"
+  ],
+  "description": "Client library for Medea media server",
+  "version": "0.3.0-dev",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/instrumentisto/medea-jason"
+  },
+  "files": [
+    "medea_jason_bg.wasm",
+    "medea_jason.js",
+    "medea_jason.d.ts",
+    "LICENSE.md"
+  ],
+  "module": "medea_jason.js",
+  "homepage": "https://github.com/instrumentisto/medea-jason",
+  "types": "medea_jason.d.ts",
+  "sideEffects": false,
+  "keywords": [
+    "medea",
+    "jason",
+    "webrtc",
+    "client",
+    "browser"
+  ]
+}
