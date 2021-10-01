@@ -1,5 +1,5 @@
 @JS()
-library pkg;
+library medea_jason;
 
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' show promiseToFuture;
@@ -57,6 +57,50 @@ class MediaKind {
       Video;
 }
 
+/// Possible error kinds of a [`LocalMediaInitException`].
+@JS()
+class LocalMediaInitExceptionKind {
+  external static num get
+
+      /// Occurs if the [getUserMedia()][1] request failed.
+      /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+      GetUserMediaFailed;
+  external static num get
+
+      /// Occurs if the [getDisplayMedia()][1] request failed.
+      /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+      GetDisplayMediaFailed;
+  external static num get
+
+      /// Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
+      /// or [getDisplayMedia()][3] request.
+      /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
+      /// [2]: https://tinyurl.com/rnxcavf
+      /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+      LocalTrackIsEnded;
+}
+
+/// Possible error kinds of a [`RpcClientException`].
+@JS()
+class RpcClientExceptionKind {
+  external static num get
+
+      /// Connection with a server was lost.
+      /// This usually means that some transport error occurred, so a client can
+      /// continue performing reconnecting attempts.
+      ConnectionLost;
+  external static num get
+
+      /// Could not authorize an RPC session.
+      /// This usually means that authentication data a client provides is
+      /// obsolete.
+      AuthorizationFailed;
+  external static num get
+
+      /// RPC session has been finished. This is a terminal state.
+      SessionFinished;
+}
+
 /// Constraints applicable to audio tracks.
 @JS()
 class AudioTrackConstraints {
@@ -94,30 +138,6 @@ class ConnectionHandle {
   /// Sets callback, invoked when connection quality score is updated by a
   /// server.
   external void on_quality_score_update(Function cb);
-}
-
-/// Exception returned from [`RoomHandle::set_local_media_settings()`][1].
-/// [1]: crate::api::RoomHandle::set_local_media_settings
-@JS()
-class ConstraintsUpdateException {
-  external void free();
-
-  /// Returns name of this [`ConstraintsUpdateException`].
-  external String name();
-
-  /// Returns an [`Error`] if this [`ConstraintsUpdateException`] represents
-  /// a `RecoveredException` or a `RecoverFailedException`.
-  /// Returns `undefined` otherwise.
-  external dynamic /*JasonError|dynamic*/ recover_reason();
-
-  /// Returns [`js_sys::Array`] with an [`Error`]s if this
-  /// [`ConstraintsUpdateException`] represents a `RecoverFailedException`.
-  external dynamic recover_fail_reasons();
-
-  /// Returns [`Error`] if this [`ConstraintsUpdateException`] represents
-  /// an `ErroredException`.
-  /// Returns `undefined` otherwise.
-  external dynamic /*JasonError|dynamic*/ error();
 }
 
 /// Constraints applicable to video tracks that are sourced from some media
@@ -177,6 +197,29 @@ class DisplayVideoTrackConstraints {
   external factory DisplayVideoTrackConstraints();
 }
 
+/// Exception thrown when cannot get info of available media devices.
+@JS()
+class EnumerateDevicesException {
+  external void free();
+
+  /// Returns [`platform::Error`] that caused this
+  /// [`EnumerateDevicesException`].
+  external Error cause();
+
+  /// Returns stacktrace of this [`EnumerateDevicesException`].
+  external String trace();
+}
+
+/// Exception thrown when a string or some other data doesn't have an expected
+/// format and cannot be parsed or processed.
+@JS()
+class FormatException {
+  external void free();
+
+  /// Returns describing of the problem.
+  external String message();
+}
+
 /// Representation of a [MediaDeviceInfo][1].
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
 @JS()
@@ -205,6 +248,23 @@ class InputDeviceInfo {
   external String group_id();
 }
 
+/// Jason's internal exception.
+/// This is either a programmatic error or some unexpected platform component
+/// failure that cannot be handled in any way.
+@JS()
+class InternalException {
+  external void free();
+
+  /// Returns error message describing the problem.
+  external String message();
+
+  /// Returns [`platform::Error`] that caused this [`RpcClientException`].
+  external dynamic /*Error|dynamic*/ cause();
+
+  /// Returns stacktrace of this [`InternalException`].
+  external String trace();
+}
+
 /// General JS side library interface.
 /// Responsible for managing shared transports, local media and room
 /// initialization.
@@ -231,23 +291,23 @@ class Jason {
   external void dispose();
 }
 
-/// Representation of an app error exported to JS side.
-/// Contains JS side error if it's the cause, and a trace information.
+/// Exception thrown when accessing media devices.
 @JS()
-class JasonError {
+class LocalMediaInitException {
   external void free();
 
-  /// Returns a name of this error.
-  external String name();
+  /// Returns concrete error kind of this [`LocalMediaInitException`].
+  external num kind();
 
-  /// Returns a message of this error.
+  /// Returns error message describing the problem.
   external String message();
 
-  /// Returns a trace information of this error.
-  external String trace();
+  /// Returns [`platform::Error`] that caused this
+  /// [`LocalMediaInitException`].
+  external dynamic /*Error|dynamic*/ cause();
 
-  /// Returns a JS side error if it's the cause.
-  external dynamic /*Error|dynamic*/ source();
+  /// Returns stacktrace of this [`LocalMediaInitException`].
+  external String trace();
 }
 
 /// Wrapper around a local [MediaStreamTrack][1].
@@ -314,6 +374,37 @@ extension MediaManagerHandleExtensions on MediaManagerHandle {
     final tt = this as _MediaManagerHandle;
     return promiseToFuture(tt.init_local_tracks(caps));
   }
+}
+
+/// Errors occurring in [`RoomHandle::set_local_media_settings()`][1] method.
+/// [1]: crate::api::RoomHandle::set_local_media_settings
+@JS()
+class MediaSettingsUpdateException {
+  external void free();
+
+  /// Returns error message describing the problem.
+  external String message();
+
+  /// Returns original [`ChangeMediaStateError`] that was encountered while
+  /// updating local media settings.
+  external dynamic cause();
+
+  /// Returns whether media settings were successfully rolled back after new
+  /// settings application failed.
+  external bool rolled_back();
+}
+
+/// Exception thrown when the requested media state transition could not be
+/// performed.
+@JS()
+class MediaStateTransitionException {
+  external void free();
+
+  /// Returns error message describing the problem.
+  external String message();
+
+  /// Returns stacktrace of this [`MediaStateTransitionException`].
+  external String trace();
 }
 
 /// [MediaStreamConstraints][1] wrapper.
@@ -700,6 +791,38 @@ extension RoomHandleExtensions on RoomHandle {
     final tt = this as _RoomHandle;
     return promiseToFuture(tt.enable_remote_video());
   }
+}
+
+/// Exceptions thrown from an RPC client that implements messaging with media
+/// server.
+@JS()
+class RpcClientException {
+  external void free();
+
+  /// Returns concrete error kind of this [`RpcClientException`].
+  external num kind();
+
+  /// Returns error message describing the problem.
+  external String message();
+
+  /// Returns [`platform::Error`] that caused this [`RpcClientException`].
+  external dynamic cause();
+
+  /// Returns stacktrace of this [`RpcClientException`].
+  external String trace();
+}
+
+/// Error thrown when the operation wasn't allowed by the current state of the
+/// object.
+@JS()
+class StateError {
+  external void free();
+
+  /// Returns message describing the problem.
+  external String message();
+
+  /// Returns native stacktrace of this [`StateError`].
+  external String trace();
 }
 
 @JS()
