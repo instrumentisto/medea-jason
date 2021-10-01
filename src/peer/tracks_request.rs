@@ -20,7 +20,7 @@ use crate::{
 
 /// Errors that may occur when validating [`TracksRequest`] or
 /// parsing [`local::Track`]s.
-#[derive(Clone, Debug, Display, Eq, Caused, PartialEq)]
+#[derive(Caused, Clone, Debug, Display, Eq, PartialEq)]
 #[cause(error = "platform::Error")]
 pub enum TracksRequestError {
     /// [`TracksRequest`] contains multiple [`AudioTrackConstraints`].

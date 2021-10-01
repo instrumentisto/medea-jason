@@ -22,13 +22,13 @@ use crate::{
 use super::track::local;
 
 /// Errors returned from the [`MediaManagerHandle::enumerate_devices()`] method.
-#[derive(Clone, Debug, Display, From, Caused, Into)]
+#[derive(Caused, Clone, Debug, Display, From, Into)]
 #[cause(error = "platform::Error")]
 #[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
 pub struct EnumerateDevicesError(platform::Error);
 
 /// Errors returned from the [`MediaManagerHandle::init_local_tracks()`] method.
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum InitLocalTracksError {
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer could not be upgraded.
@@ -61,7 +61,7 @@ struct LocalTrackIsEndedError(MediaKind);
 /// Errors occurring when [getUserMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum GetUserMediaError {
     /// [getUserMedia()][1] request failed.
@@ -90,7 +90,7 @@ impl From<LocalTrackIsEndedError> for GetUserMediaError {
 /// Error occurring when [getDisplayMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum GetDisplayMediaError {
     /// [getDisplayMedia()][1] request failed.

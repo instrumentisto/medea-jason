@@ -26,7 +26,7 @@ use super::{
 pub use self::component::{Component, State};
 
 /// Errors occurring when creating a new [`Sender`].
-#[derive(Clone, Debug, Display, Caused)]
+#[derive(Caused, Clone, Debug, Display)]
 #[cause(error = "platform::Error")]
 pub enum CreateError {
     /// [`Sender`] cannot be disabled because it's marked as `required`.
@@ -42,7 +42,7 @@ pub enum CreateError {
 /// Error occuring in [`RTCRtpSender.replaceTrack()`][1] method.
 ///
 /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 #[display(fmt = "MediaManagerHandle is in detached state")]
 pub struct InsertTrackError(platform::Error);

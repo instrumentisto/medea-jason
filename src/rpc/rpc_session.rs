@@ -31,7 +31,7 @@ use crate::{
 };
 
 /// Errors which can be returned from the [`WebSocketRpcSession`].
-#[derive(Clone, Debug, From, Caused, Display)]
+#[derive(Caused, Clone, Debug, From, Display)]
 #[cause(error = "platform::Error")]
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't

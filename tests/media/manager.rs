@@ -86,7 +86,7 @@ async fn failed_get_user_media() {
 
             assert_eq!(
                 err.kind(),
-                LocalMediaInitExceptionKind::GetUserMediaFailed
+                LocalMediaInitExceptionKind::GetUserMediaFailed,
             );
             assert_eq!(
                 err.message(),
@@ -134,7 +134,7 @@ async fn failed_get_user_media2() {
             );
             assert_eq!(
                 err.kind(),
-                LocalMediaInitExceptionKind::GetUserMediaFailed
+                LocalMediaInitExceptionKind::GetUserMediaFailed,
             );
             assert_eq!(
                 cause.to_string(),

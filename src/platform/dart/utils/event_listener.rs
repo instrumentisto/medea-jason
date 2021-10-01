@@ -6,7 +6,7 @@ use tracerr::Traced;
 use crate::{platform, utils::Caused};
 
 /// Failure to bind a listener to some event.
-#[derive(Clone, Debug, Display, From, Caused, PartialEq)]
+#[derive(Caused, Clone, Debug, Display, From, PartialEq)]
 #[cause(error = "platform::Error")]
 pub struct EventListenerBindError(platform::Error);
 

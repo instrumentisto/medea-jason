@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// Errors occurring in a [`ReconnectHandle`].
-#[derive(Clone, Debug, From, Display, Caused)]
+#[derive(Caused, Clone, Debug, From, Display)]
 #[cause(error = "platform::Error")]
 pub enum ReconnectError {
     /// Some [`SessionError`] has occurred while reconnecting.

@@ -13,9 +13,8 @@ use wasm_bindgen::{
 pub struct Error(js_sys::Error);
 
 impl Error {
-    /// Returns a brief description of the error if one is available or has been
+    /// Returns a brief description of the error if it's available or has been
     /// set.
-    #[inline]
     #[must_use]
     pub fn message(&self) -> String {
         self.0.message().into()
@@ -23,7 +22,6 @@ impl Error {
 }
 
 impl From<JsValue> for Error {
-    #[inline]
     fn from(val: JsValue) -> Self {
         match val.dyn_into::<js_sys::Error>() {
             Ok(err) => Error(err),
@@ -35,7 +33,7 @@ impl From<JsValue> for Error {
     }
 }
 
-/// This implementation allows us to use [`Error`] as return type in functions
+/// This implementation allows us to use [`Error`] as a return type in functions
 /// exported to JS.
 impl WasmDescribe for Error {
     fn describe() {
@@ -43,21 +41,19 @@ impl WasmDescribe for Error {
     }
 }
 
-/// This implementation allows us to use [`Error`] as return type in functions
+/// This implementation allows us to use [`Error`] as a return type in functions
 /// exported to JS.
 impl IntoWasmAbi for Error {
     type Abi = <js_sys::Error as IntoWasmAbi>::Abi;
 
-    #[inline]
     fn into_abi(self) -> Self::Abi {
         self.0.into_abi()
     }
 }
 
-/// This implementation allows us to use [`Error`] as return type in functions
+/// This implementation allows us to use [`Error`] as a return type in functions
 /// exported to JS.
 impl OptionIntoWasmAbi for Error {
-    #[inline]
     fn none() -> u32 {
         js_sys::Error::none()
     }

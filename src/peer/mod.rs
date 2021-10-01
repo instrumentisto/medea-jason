@@ -52,7 +52,7 @@ pub use self::{
 };
 
 /// Errors occurring in [`PeerConnection::update_local_stream()`] method.
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum UpdateLocalStreamError {
     /// Errors occurred when [`TracksRequest`] validation fails.
@@ -92,7 +92,7 @@ pub enum TrackEvent {
 
 /// Local media update errors that [`PeerConnection`] reports in
 /// [`PeerEvent::FailedLocalMedia`] messages.
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum LocalMediaError {
     /// Error occurred in [`PeerConnection::update_local_stream()`] method.

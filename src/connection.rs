@@ -85,7 +85,7 @@ impl Connections {
 }
 
 /// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.
-#[derive(Clone, Copy, Debug, Display, Caused)]
+#[derive(Caused, Clone, Copy, Debug, Display)]
 #[cause(error = "platform::Error")]
 #[display(fmt = "ConnectionHandle is in detached state")]
 pub struct HandleDetachedError;

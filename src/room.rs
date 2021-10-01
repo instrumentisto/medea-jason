@@ -103,7 +103,7 @@ impl RoomCloseReason {
 }
 
 /// Errors occurring in [`RoomHandle::join()`] method.
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum RoomJoinError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
@@ -125,7 +125,7 @@ pub enum RoomJoinError {
 }
 
 /// Error of [`RoomHandle`]'s [`Weak`] pointer being detached.
-#[derive(Clone, Debug, Display, Eq, From, Caused, PartialEq)]
+#[derive(Caused, Clone, Debug, Display, Eq, From, PartialEq)]
 #[cause(error = "platform::Error")]
 pub struct HandleDetachedError;
 
@@ -133,7 +133,7 @@ pub struct HandleDetachedError;
 ///
 /// [`Sender`]: peer::media::Sender
 /// [`Receiver`]: peer::media::Receiver
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
@@ -195,7 +195,7 @@ impl From<UpdateLocalStreamError> for ChangeMediaStateError {
 
 /// Errors occurring when a [`Room`] tries to acquire [`local::Track`]s via
 /// [`MediaManager`].
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum GetLocalTracksError {
     /// Validating [`TracksRequest`] doesn't pass.

@@ -9,7 +9,7 @@ use crate::{platform, utils::Caused};
 /// Errors which can occur during deserialization of a [`RtcStatsType`].
 ///
 /// [`RtcStatsType`]: medea_client_api_proto::stats::RtcStatsType
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum RtcStatsError {
     /// [RTCStats.id][1] is undefined.

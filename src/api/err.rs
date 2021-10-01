@@ -39,7 +39,6 @@ pub struct StateError {
 
 impl StateError {
     /// Creates a new [`StateError`] with the provided `message` and `trace`.
-    #[inline]
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(message: T, trace: Trace) -> Self {
         Self {
@@ -97,7 +96,7 @@ pub struct LocalMediaInitException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
 
-    /// [`platform::Error`] that caused this [`LocalMediaInitException`].
+    /// [`platform::Error`] causing this [`LocalMediaInitException`].
     cause: Option<platform::Error>,
 
     /// Stacktrace of this [`LocalMediaInitException`].
@@ -107,7 +106,6 @@ pub struct LocalMediaInitException {
 impl LocalMediaInitException {
     /// Creates a new [`LocalMediaInitException`] from the provided error
     /// `kind`, `message`, optional `cause` and `trace`.
-    #[inline]
     #[must_use]
     pub fn new<M: Into<Cow<'static, str>>>(
         kind: LocalMediaInitExceptionKind,
@@ -132,14 +130,13 @@ impl LocalMediaInitException {
         self.kind
     }
 
-    /// Returns error message describing the problem.
+    /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
         self.message.to_string()
     }
 
-    /// Returns [`platform::Error`] that caused this
-    /// [`LocalMediaInitException`].
+    /// Returns [`platform::Error`] causing this [`LocalMediaInitException`].
     #[must_use]
     pub fn cause(&self) -> Option<platform::Error> {
         self.cause.clone()
@@ -155,7 +152,7 @@ impl LocalMediaInitException {
 /// Exception thrown when cannot get info of available media devices.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 pub struct EnumerateDevicesException {
-    /// [`platform::Error`] that caused this [`EnumerateDevicesException`].
+    /// [`platform::Error`] causing this [`EnumerateDevicesException`].
     cause: platform::Error,
 
     /// Stacktrace of this [`EnumerateDevicesException`].
@@ -165,7 +162,6 @@ pub struct EnumerateDevicesException {
 impl EnumerateDevicesException {
     /// Creates a new [`EnumerateDevicesException`] from the provided error
     /// `cause` and `trace`.
-    #[inline]
     #[must_use]
     pub fn new(cause: platform::Error, trace: Trace) -> Self {
         Self { cause, trace }
@@ -174,8 +170,7 @@ impl EnumerateDevicesException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl EnumerateDevicesException {
-    /// Returns [`platform::Error`] that caused this
-    /// [`EnumerateDevicesException`].
+    /// Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
     #[must_use]
     pub fn cause(&self) -> platform::Error {
         self.cause.clone()
@@ -209,7 +204,7 @@ pub enum RpcClientExceptionKind {
     SessionFinished,
 }
 
-/// Exceptions thrown from an RPC client that implements messaging with media
+/// Exceptions thrown from a RPC client that implements messaging with media
 /// server.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 pub struct RpcClientException {
@@ -219,7 +214,7 @@ pub struct RpcClientException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
 
-    /// [`platform::Error`] that caused this [`RpcClientException`].
+    /// [`platform::Error`] causing this [`RpcClientException`].
     cause: Option<platform::Error>,
 
     /// Stacktrace of this [`RpcClientException`].
@@ -229,7 +224,6 @@ pub struct RpcClientException {
 impl RpcClientException {
     /// Creates a new [`RpcClientException`] from the provided error `kind`,
     /// `message`, optional `cause` and `trace`.
-    #[inline]
     #[must_use]
     pub fn new<M: Into<Cow<'static, str>>>(
         kind: RpcClientExceptionKind,
@@ -254,13 +248,13 @@ impl RpcClientException {
         self.kind
     }
 
-    /// Returns error message describing the problem.
+    /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
         self.message.to_string()
     }
 
-    /// Returns [`platform::Error`] that caused this [`RpcClientException`].
+    /// Returns [`platform::Error`] causing this [`RpcClientException`].
     #[must_use]
     pub fn cause(&self) -> Option<platform::Error> {
         self.cause.clone()
@@ -282,7 +276,7 @@ pub struct InternalException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
 
-    /// [`platform::Error`] that caused this [`RpcClientException`].
+    /// [`platform::Error`] causing this [`RpcClientException`].
     cause: Option<platform::Error>,
 
     /// Stacktrace of this [`InternalException`].
@@ -292,7 +286,6 @@ pub struct InternalException {
 impl InternalException {
     /// Creates a new [`InternalException`] from the provided error `message`,
     /// `trace` and an optional `cause`.
-    #[inline]
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(
         message: T,
@@ -309,13 +302,13 @@ impl InternalException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl InternalException {
-    /// Returns error message describing the problem.
+    /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
         self.message.to_string()
     }
 
-    /// Returns [`platform::Error`] that caused this [`RpcClientException`].
+    /// Returns [`platform::Error`] causing this [`RpcClientException`].
     #[must_use]
     pub fn cause(&self) -> Option<platform::Error> {
         self.cause.clone()
@@ -336,7 +329,6 @@ pub struct FormatException(Cow<'static, str>);
 impl FormatException {
     /// Creates a new [`FormatException`] with the provided `message` describing
     /// the problem.
-    #[inline]
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(message: T) -> Self {
         Self(message.into())
@@ -345,7 +337,7 @@ impl FormatException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl FormatException {
-    /// Returns describing of the problem.
+    /// Returns an error message describing of the problem.
     #[must_use]
     pub fn message(&self) -> String {
         self.0.to_string()
@@ -366,7 +358,6 @@ pub struct MediaStateTransitionException {
 impl MediaStateTransitionException {
     /// Creates a new [`MediaStateTransitionException`] from the provided error
     /// `message` and `trace`.
-    #[inline]
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(message: T, trace: Trace) -> Self {
         Self {
@@ -378,7 +369,7 @@ impl MediaStateTransitionException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaStateTransitionException {
-    /// Returns error message describing the problem.
+    /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
         self.message.to_string()
@@ -411,7 +402,6 @@ pub struct MediaSettingsUpdateException {
 impl MediaSettingsUpdateException {
     /// Creates a new [`MediaSettingsUpdateException`] from the provided error
     /// `message`, `cause` and `rolled_back` property.
-    #[inline]
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(
         message: T,
@@ -428,14 +418,14 @@ impl MediaSettingsUpdateException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaSettingsUpdateException {
-    /// Returns error message describing the problem.
+    /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
         self.message.to_string()
     }
 
-    /// Returns original [`ChangeMediaStateError`] that was encountered while
-    /// updating local media settings.
+    /// Returns the original [`ChangeMediaStateError`] that was encountered
+    /// while updating local media settings.
     #[must_use]
     pub fn cause(&self) -> Error {
         self.cause.clone().into()
@@ -466,7 +456,6 @@ impl From<Traced<room::HandleDetachedError>> for Error {
 }
 
 impl From<Traced<EnumerateDevicesError>> for Error {
-    #[inline]
     fn from(err: Traced<EnumerateDevicesError>) -> Self {
         let (err, stacktrace) = err.into_parts();
         EnumerateDevicesException::new(err.into(), stacktrace).into()
@@ -504,7 +493,6 @@ impl From<Traced<InitLocalTracksError>> for Error {
 }
 
 impl From<Traced<ReconnectError>> for Error {
-    #[inline]
     fn from(err: Traced<ReconnectError>) -> Self {
         let (err, trace) = err.into_parts();
 
@@ -557,7 +545,6 @@ impl From<Traced<SessionError>> for Error {
 }
 
 impl From<Traced<RoomJoinError>> for Error {
-    #[inline]
     fn from(err: Traced<RoomJoinError>) -> Self {
         let (err, trace) = err.into_parts();
         let message = err.to_string();
@@ -577,7 +564,6 @@ impl From<Traced<RoomJoinError>> for Error {
 }
 
 impl From<Traced<ChangeMediaStateError>> for Error {
-    #[inline]
     fn from(err: Traced<ChangeMediaStateError>) -> Self {
         let (err, trace) = err.into_parts();
         let message = err.to_string();
@@ -602,7 +588,6 @@ impl From<Traced<ChangeMediaStateError>> for Error {
 }
 
 impl From<ConstraintsUpdateError> for Error {
-    #[inline]
     fn from(err: ConstraintsUpdateError) -> Self {
         let message = err.to_string();
 

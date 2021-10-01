@@ -83,7 +83,7 @@ impl ConnectionInfo {
 }
 
 /// Errors which can occur while [`ConnectionInfo`] parsing from the [`str`].
-#[derive(Clone, Debug, Display, Caused)]
+#[derive(Caused, Clone, Debug, Display)]
 #[cause(error = "platform::Error")]
 pub enum ConnectionInfoParseError {
     /// [`Url::parse`] returned error.
@@ -198,7 +198,7 @@ pub enum ConnectionLostReason {
 }
 
 /// Errors that may occur in [`WebSocketRpcClient`].
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum RpcClientError {
     /// Occurs if WebSocket connection to remote media server failed.

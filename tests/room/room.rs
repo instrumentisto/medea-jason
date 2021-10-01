@@ -2025,7 +2025,7 @@ async fn send_enabling_holds_local_tracks() {
             .await
             .unwrap_err(),
     );
-    assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed,);
+    assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed);
     assert_eq!(
         err.message(),
         "Failed to get local tracks: MediaDevices.getUserMedia() failed: \
@@ -2276,7 +2276,7 @@ mod set_local_media_settings {
         assert_eq!(err.rolled_back(), false);
         assert_eq!(
             cause.message(),
-            "provided multiple device video MediaStreamTracks"
+            "provided multiple device video MediaStreamTracks",
         );
 
         wait_and_check_test_result(test_result, || {}).await;
@@ -2466,7 +2466,7 @@ mod set_local_media_settings {
             unchecked_jsval_cast(err.cause().into());
         assert_eq!(err.rolled_back(), true);
         assert!(cause.message().contains(
-            "Failed to get local tracks: MediaDevices.getUserMedia() failed"
+            "Failed to get local tracks: MediaDevices.getUserMedia() failed",
         ));
 
         assert_eq!(mock_navigator.get_user_media_requests_count(), 2);
@@ -2506,7 +2506,7 @@ mod set_local_media_settings {
             unchecked_jsval_cast(err.cause().into());
         assert_eq!(err.rolled_back(), false);
         assert!(cause.message().contains(
-            "Failed to get local tracks: MediaDevices.getUserMedia() failed"
+            "Failed to get local tracks: MediaDevices.getUserMedia() failed",
         ));
         assert!(!peer1.is_send_video_enabled(Some(MediaSourceKind::Device)));
         assert!(peer1.get_send_tracks().is_empty());
@@ -2546,7 +2546,7 @@ mod set_local_media_settings {
             unchecked_jsval_cast(err.cause().into());
         assert_eq!(err.rolled_back(), true);
         assert!(cause.message().contains(
-            "Failed to get local tracks: MediaDevices.getUserMedia() failed"
+            "Failed to get local tracks: MediaDevices.getUserMedia() failed",
         ));
 
         assert!(peer1.is_send_video_enabled(Some(MediaSourceKind::Device)));

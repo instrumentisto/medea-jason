@@ -61,7 +61,7 @@ pub trait RpcTransport {
 }
 
 /// Errors that may occur when working with a [`RpcTransport`].
-#[derive(Clone, Debug, Display, Caused, PartialEq)]
+#[derive(Caused, Clone, Debug, Display, PartialEq)]
 #[cause(error = "platform::Error")]
 pub enum TransportError {
     /// Error encountered when trying to establish connection.

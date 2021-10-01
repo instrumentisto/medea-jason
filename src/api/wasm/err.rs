@@ -1,5 +1,5 @@
-//! Implementations and definitions of the errors which can be returned from the
-//! API functions.
+//! Implementations and definitions of errors which can be returned from API
+//! functions.
 
 use derive_more::{From, Into};
 use wasm_bindgen::{
@@ -14,22 +14,23 @@ use crate::api::err::{
     MediaStateTransitionException, RpcClientException, StateError,
 };
 
-/// Wrapper around [`JsValue`] which represents JS error.
+/// Wrapper around [`JsValue`] which represents a JS error.
 #[derive(Into, From)]
 pub struct Error(JsValue);
 
-// So we could use Error as return type in exported functions.
+/// This implementation allows us to use [`Error`] as a return type in functions
+/// exported to JS.
 impl WasmDescribe for Error {
     fn describe() {
         JsValue::describe();
     }
 }
 
-// So we could use Error as return type in exported functions.
+/// This implementation allows us to use [`Error`] as a return type in functions
+/// exported to JS.
 impl IntoWasmAbi for Error {
     type Abi = <JsValue as IntoWasmAbi>::Abi;
 
-    #[inline]
     fn into_abi(self) -> Self::Abi {
         self.0.into_abi()
     }

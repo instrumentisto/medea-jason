@@ -9,14 +9,12 @@ All user visible changes to this project will be documented in this file. This p
 ## [0.3.0] · ????-??-?? · To-be-done
 [0.3.0]: /../../tree/medea-jason-0.3.0/crates/medea-macro
 
-### BC breaks
+### BC Breaks
 
 - `#[derive(JsCaused)]` ([#4]):
     - Renamed to `#[derive(Caused)]`;
     - `#[js(cause)]` renamed to `#[cause]`;
     - `#[js(error = "...")]` renamed to `#[cause(error = "...")]`.
-
-- Rename `#[derive(JsCaused)]` macro to `#[derive(Caused)]` ([#4])
 
 [#4]: /../../pull/4
 

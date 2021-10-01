@@ -20,13 +20,13 @@ pub fn derive(mut s: Structure) -> Result<TokenStream> {
 
     let cause_body = s.bind_with(|_| BindStyle::Move).each_variant(|v| {
         if let Some(caused) = v.bindings().iter().find(|&bi| is_caused(bi)) {
-            quote!(return #caused.cause())
+            quote! { return #caused.cause() }
         } else if let Some(error) =
             v.bindings().iter().find(|&bi| is_error(bi, &error_type))
         {
-            quote!(return Some(#error))
+            quote! { return Some(#error) }
         } else {
-            quote!(return None)
+            quote! { return None }
         }
     });
 

@@ -140,7 +140,7 @@ extern "C" {
     fn stop(this: &MockNavigator);
 }
 
-/// Performs a unchecked conversion from a [`JsValue`] into an instance of
+/// Performs a unchecked conversion from a [`JsValue`] into an instance of the
 /// specified `FromWasmAbi<Abi = u32>` implementor.
 pub fn unchecked_jsval_cast<T: FromWasmAbi<Abi = u32>>(val: JsValue) -> T {
     let ptr = Reflect::get(&val, &JsValue::from_str("ptr")).unwrap();

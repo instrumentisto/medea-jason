@@ -9,7 +9,7 @@ use crate::{platform, utils::Caused};
 /// Failed to bind to [`EventTarget`][1] event.
 ///
 /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget
-#[derive(Clone, Debug, Display, From, Caused, PartialEq)]
+#[derive(Caused, Clone, Debug, Display, From, PartialEq)]
 #[cause(error = "platform::Error")]
 #[display(fmt = "EventTarget.addEventListener() failed: {}", _0)]
 pub struct EventListenerBindError(platform::Error);

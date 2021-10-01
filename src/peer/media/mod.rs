@@ -220,7 +220,7 @@ pub enum ProhibitedStateError {
 }
 
 /// Errors occurring in [`MediaConnections::insert_local_tracks()`] method.
-#[derive(Clone, Debug, Display, From, Caused)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum InsertLocalTracksError {
     /// [`local::Track`] doesn't satisfy [`Sender`]'s constraints.
