@@ -272,7 +272,7 @@ endef
 # Show permalink to CHANGELOG of a concrete version of project's Cargo crate.
 #
 # Usage:
-#	make cargo.changelog.link [crate=(medea-jason|<crate-name>)]
+#	make cargo.changelog.link [crate=(;medea-jason|<crate-name>)]
 #	                          [ver=($(crate-ver)|<version>)]
 
 cargo-changelog-link-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))
@@ -367,10 +367,12 @@ flutter.android.version.min:
 #   make flutter.web.assets
 
 flutter.web.assets:
-	make build.jason platform=web
 	rm -rf flutter/assets/pkg
-	cp -R pkg flutter/assets/
-	rm -f flutter/assets/pkg/.gitignore
+	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
+	cd flutter/assets/pkg && \
+		rm -f *.md && \
+		rm -f package.json && \
+		rm -f .gitignore
 
 
 # Resolve Flutter project dependencies.
@@ -1152,6 +1154,7 @@ endef
         flutter flutter.fmt flutter.lint flutter.run flutter.test \
         	flutter.android.compile_api_version \
         	flutter.android.min_api_version \
+        	flutter.web.assets \
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
