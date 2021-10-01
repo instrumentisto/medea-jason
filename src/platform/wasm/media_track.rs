@@ -238,7 +238,6 @@ impl MediaStreamTrack {
     /// If binding to the [`ended`][1] event fails. Not supposed to ever happen.
     ///
     /// [1]: https://tinyurl.com/w3-streams#event-mediastreamtrack-ended
-    #[allow(clippy::needless_pass_by_value)]
     pub fn on_ended<F>(&self, f: Option<F>)
     where
         F: 'static + FnOnce(),

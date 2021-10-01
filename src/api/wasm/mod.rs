@@ -4,10 +4,9 @@
 //! [`Jason`]: crate::api::Jason
 
 pub mod connection_handle;
-pub mod constraints_update_exception;
+pub mod err;
 pub mod input_device_info;
 pub mod jason;
-pub mod jason_error;
 pub mod local_media_track;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
@@ -23,10 +22,9 @@ use crate::media;
 
 pub use self::{
     connection_handle::ConnectionHandle,
-    constraints_update_exception::ConstraintsUpdateException,
+    err::Error,
     input_device_info::InputDeviceInfo,
     jason::Jason,
-    jason_error::JasonError as Error,
     local_media_track::LocalMediaTrack,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::{
