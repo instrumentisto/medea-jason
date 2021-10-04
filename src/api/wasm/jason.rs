@@ -44,7 +44,6 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    #[allow(clippy::needless_pass_by_value)]
     pub fn close_room(&self, room_to_delete: RoomHandle) {
         self.0.close_room(room_to_delete.into());
     }

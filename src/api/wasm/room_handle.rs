@@ -8,7 +8,7 @@ use wasm_bindgen::{prelude::*, JsValue};
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{ConstraintsUpdateException, MediaSourceKind, MediaStreamSettings},
+    api::{MediaSourceKind, MediaStreamSettings},
     room,
 };
 
@@ -64,7 +64,7 @@ impl RoomHandle {
         self.0
             .on_new_connection(cb.into())
             .map_err(Error::from)
-            .map_err(JsValue::from)
+            .map_err(Into::into)
     }
 
     /// Sets `on_close` callback, invoked when this [`Room`] is closed,
@@ -76,7 +76,7 @@ impl RoomHandle {
         self.0
             .on_close(cb.into())
             .map_err(Error::from)
-            .map_err(JsValue::from)
+            .map_err(Into::into)
     }
 
     /// Sets callback, invoked when a new [`LocalMediaTrack`] is added to this
@@ -93,7 +93,7 @@ impl RoomHandle {
         self.0
             .on_local_track(cb.into())
             .map_err(Error::from)
-            .map_err(JsValue::from)
+            .map_err(Into::into)
     }
 
     /// Sets `on_failed_local_media` callback, invoked on local media
@@ -105,7 +105,7 @@ impl RoomHandle {
         self.0
             .on_failed_local_media(cb.into())
             .map_err(Error::from)
-            .map_err(JsValue::from)
+            .map_err(Into::into)
     }
 
     /// Sets `on_connection_loss` callback, invoked when a connection with a
@@ -117,7 +117,7 @@ impl RoomHandle {
         self.0
             .on_connection_loss(cb.into())
             .map_err(Error::from)
-            .map_err(JsValue::from)
+            .map_err(Into::into)
     }
 
     /// Updates this [`Room`]s [`MediaStreamSettings`]. This affects all
@@ -163,7 +163,7 @@ impl RoomHandle {
                 rollback_on_fail,
             )
             .await
-            .map_err(ConstraintsUpdateException::from)?;
+            .map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }

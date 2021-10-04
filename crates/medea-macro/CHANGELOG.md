@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.3.0] · ????-??-?? · To-be-done
+[0.3.0]: /../../tree/medea-jason-0.3.0/crates/medea-macro
+
+### BC Breaks
+
+- `#[derive(JsCaused)]` ([#4]):
+    - Renamed to `#[derive(Caused)]`;
+    - `#[js(cause)]` renamed to `#[cause]`;
+    - `#[js(error = "...")]` renamed to `#[cause(error = "...")]`.
+
+[#4]: /../../pull/4
+
+
+
+
 ## [0.2.1] · 2021-04-09
 [0.2.1]: https://github.com/instrumentisto/medea/tree/medea-macro-0.2.1/crates/medea-macro
 

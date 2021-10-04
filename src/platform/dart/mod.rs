@@ -56,5 +56,5 @@ pub fn init_logger() {
 /// [`Future`]: std::future::Future
 #[allow(clippy::unused_async)]
 pub async fn delay_for(delay: Duration) {
-    unimplemented!()
+    unimplemented!();
 }
