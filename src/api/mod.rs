@@ -1,5 +1,7 @@
 //! External [`Jason`] API.
 
+pub mod err;
+
 cfg_if::cfg_if! {
     if #[cfg(target_os = "android")] {
         mod dart;

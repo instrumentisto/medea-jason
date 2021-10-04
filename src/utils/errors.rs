@@ -1,26 +1,25 @@
 //! Helpers for application errors.
 
-use std::{fmt::Debug, rc::Rc};
+use std::rc::Rc;
 
 use derive_more::{Display, From};
 
-pub use medea_macro::JsCaused;
+pub use medea_macro::Caused;
 
-/// Representation of an error which can caused by error returned from the
-/// JS side.
-pub trait JsCaused {
-    /// Type of wrapper for JS error.
+/// Representation of an error caused by FFI side.
+pub trait Caused {
+    /// Type of a wrapper for the FFI error.
     type Error;
 
-    /// Returns name of error.
-    fn name(&self) -> &'static str;
-
-    /// Returns JS error if it is the cause.
-    fn js_cause(self) -> Option<Self::Error>;
+    /// Returns the FFI error if represents the cause.
+    fn cause(self) -> Option<Self::Error>;
 }
 
 /// Wrapper for [`serde_json::error::Error`] that provides [`Clone`], [`Debug`],
 /// [`Display`] implementations.
+///
+/// [`Debug`]: std::fmt::Debug
+/// [`Display`]: std::fmt::Display
 #[derive(Clone, Debug, Display, From)]
 #[from(forward)]
 pub struct JsonParseError(Rc<serde_json::error::Error>);

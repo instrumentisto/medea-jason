@@ -23,7 +23,7 @@ use crate::platform::{
 #[allow(clippy::unused_async)]
 pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
 {
-    unimplemented!()
+    unimplemented!();
 }
 
 /// Prompts a user for a permission to use a media input which produces vector
@@ -42,7 +42,7 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
 pub async fn get_user_media(
     caps: MediaStreamConstraints,
 ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-    unimplemented!()
+    unimplemented!();
 }
 
 /// Prompts a user to select and grant a permission to capture contents of a
@@ -62,5 +62,5 @@ pub async fn get_user_media(
 pub async fn get_display_media(
     caps: DisplayMediaStreamConstraints,
 ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-    unimplemented!()
+    unimplemented!();
 }
