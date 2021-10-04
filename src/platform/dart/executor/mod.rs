@@ -2,7 +2,7 @@
 
 mod task;
 
-use std::{future::Future, mem, ptr, rc::Rc};
+use std::{future::Future, ptr, rc::Rc};
 
 use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 

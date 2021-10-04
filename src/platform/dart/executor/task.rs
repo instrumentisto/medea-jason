@@ -34,7 +34,6 @@ pub struct Task {
 
 impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
-    #[must_use]
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Rc::new(Self {
             inner: RefCell::new(None),
@@ -49,7 +48,7 @@ impl Task {
         });
 
         // Task is leaked and must be freed manually by the external executor.
-        task_wake(ptr::NonNull::from(ManuallyDrop::new(task).as_ref()));
+        task_wake(ptr::NonNull::from(ManuallyDrop::new(this).as_ref()));
     }
 
     /// Polls the underlying [`Future`].
