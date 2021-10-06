@@ -3,6 +3,7 @@
 //! [Medea]: https://github.com/instrumentisto/medea
 
 #![allow(clippy::module_name_repetitions)]
+#![allow(clippy::missing_safety_doc)]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![forbid(non_ascii_idents)]
 #![cfg_attr(not(feature = "mockable"), warn(missing_docs))]

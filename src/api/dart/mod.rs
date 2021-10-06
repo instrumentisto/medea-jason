@@ -29,9 +29,7 @@ use derive_more::Display;
 use libc::c_char;
 
 use crate::{
-    api::dart::utils::{
-        c_str_into_string, string_into_c_str, DartError, PtrArray,
-    },
+    api::dart::utils::{DartError, PtrArray},
     media::MediaSourceKind,
 };
 
@@ -40,13 +38,16 @@ pub use self::{
     connection_handle::ConnectionHandle,
     device_video_track_constraints::DeviceVideoTrackConstraints,
     display_video_track_constraints::DisplayVideoTrackConstraints,
-    input_device_info::InputDeviceInfo, jason::Jason,
+    input_device_info::InputDeviceInfo,
+    jason::Jason,
     local_media_track::LocalMediaTrack,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::MediaStreamSettings,
-    reconnect_handle::ReconnectHandle, remote_media_track::RemoteMediaTrack,
-    room_close_reason::RoomCloseReason, room_handle::RoomHandle,
-    utils::DartError as Error,
+    reconnect_handle::ReconnectHandle,
+    remote_media_track::RemoteMediaTrack,
+    room_close_reason::RoomCloseReason,
+    room_handle::RoomHandle,
+    utils::{c_str_into_string, string_into_c_str, DartError as Error},
 };
 
 /// Rust structure having wrapper class in Dart.
