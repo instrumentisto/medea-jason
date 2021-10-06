@@ -11,8 +11,8 @@ use crate::platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined;
 use self::task::Task;
 
 /// Runs a Rust [`Future`] on the current thread.
-pub fn spawn(future: impl Future<Output = ()> + 'static) {
-    Task::spawn(Box::pin(future));
+pub fn spawn(fut: impl Future<Output = ()> + 'static) {
+    Task::spawn(Box::pin(fut));
 }
 
 /// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust

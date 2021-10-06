@@ -20,7 +20,8 @@ struct Inner {
     /// Handle for waking up this [`Task`].
     waker: Waker,
 
-    /// Indicates whether there is a pending awake request.
+    /// Indicates whether there is a [`Poll::Pending`] awake request of this
+    /// [`Task`].
     is_scheduled: Cell<bool>,
 }
 
@@ -77,8 +78,9 @@ impl Task {
         poll
     }
 
-    /// Calls the [`task_wake()`] function by the provided reference if the task
-    /// is incomplete and there are no pending wake requests.
+    /// Calls the [`task_wake()`] function by the provided reference if this
+    /// [`Task`] s incomplete and there are no [`Poll::Pending`] awake requests
+    /// already.
     fn wake_by_ref(this: &Rc<Self>) {
         if let Some(inner) = this.inner.borrow().as_ref() {
             if !inner.is_scheduled.get() {
