@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:js/js.dart';
 
 import '../interface/connection_handle.dart';
@@ -18,7 +20,7 @@ class WebConnectionHandle extends ConnectionHandle {
 
   @override
   void onClose(void Function() f) {
-    obj.on_close(f);
+    obj.on_close(allowInterop(f));
   }
 
   @override
