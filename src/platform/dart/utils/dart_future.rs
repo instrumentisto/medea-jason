@@ -8,10 +8,7 @@ use futures::channel::oneshot;
 
 use crate::{
     api::c_str_into_string,
-    platform::dart::{
-        error::DartError,
-        utils::{handle::DartHandle, option::RustHandleOption},
-    },
+    platform::dart::{error::DartError, utils::handle::DartHandle},
 };
 
 /// Pointer to an extern function that spawns Dart Future which returns `Int32`
@@ -38,6 +35,10 @@ pub unsafe extern "C" fn register_int_future_spawner_function(
 }
 
 /// Resolves provided [`IntFuture`] with a provided `val`.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`IntFuture`] is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn IntFuture__resolve(fut: *mut IntFuture, val: i32) {
     let fut = Box::from_raw(fut);
@@ -210,6 +211,11 @@ pub unsafe extern "C" fn register_void_future_spawner_function(
 }
 
 /// Resolves provided [`VoidDartFuture`].
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`VoidDartFuture`] is not
+/// freed.
 #[no_mangle]
 pub unsafe extern "C" fn VoidDartFuture__resolve(fut: *mut VoidDartFuture) {
     let fut = Box::from_raw(fut);
@@ -242,6 +248,11 @@ pub unsafe extern "C" fn register_string_future_spawner_function(
 }
 
 /// Resolves provided [`StringFuture`] with a provided `val`.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`StringFuture`] and
+/// [`c_char`] pointer is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn StringFuture__resolve(
     fut: *mut StringFuture,
@@ -276,6 +287,11 @@ pub unsafe extern "C" fn register_spawn_dart_future_function(
 
 /// Resolves provided [`DartFuture`] with a provided `val` as `Ok` [`Result`]
 /// variant.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`DartFuture`] and
+/// [`Dart_Handle`] pointer is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn DartFuture__resolve_ok(
     fut: *mut DartFuture,
@@ -287,6 +303,11 @@ pub unsafe extern "C" fn DartFuture__resolve_ok(
 
 /// Resolves provided [`DartFuture`] with a provided `val` as `Err` [`Result`]
 /// variant.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`DartFuture`] and
+/// [`Dart_Handle`] pointer is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn DartFuture__resolve_err(
     fut: *mut DartFuture,
@@ -294,60 +315,4 @@ pub unsafe extern "C" fn DartFuture__resolve_err(
 ) {
     let fut = Box::from_raw(fut);
     fut.resolve_err(val);
-}
-
-/// Pointer to an extern function that spawns Dart Future which returns
-/// [`Dart_Handle`] or `null` on the Dart side and resolves provided
-/// [`HandleOptionFuture`] when it's resolved on Dart.
-type HandleOptionSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut HandleOptionFuture);
-
-/// Stores pointer to the [`HandleOptionSpawnerFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut HANDLE_OPTION_SPAWNER_FUNCTION: Option<HandleOptionSpawnerFunction> =
-    None;
-
-/// Resolves provided [`HandleOptionFuture`] with a provided `val`.
-#[no_mangle]
-pub unsafe extern "C" fn HandleOptionFuture__resolve(
-    fut: *mut HandleOptionFuture,
-    val: Dart_Handle,
-) {
-    let val = RustHandleOption::from(val);
-    let fut = Box::from_raw(fut);
-    fut.resolve(val);
-}
-
-/// Compatibility layer of the Dart side Futures which resolves into
-/// [`Dart_Handle`] or `null` with a Rust side [`Future`].
-pub struct HandleOptionFuture(oneshot::Sender<RustHandleOption>);
-
-impl HandleOptionFuture {
-    /// Converts Dart side Future to the Rust's [`Future`].
-    ///
-    /// Returned [`Future`] will be resolved with a [`RustHandleOption`] on Dart
-    /// side Future resolve.
-    pub fn execute(
-        dart_fut: Dart_Handle,
-    ) -> impl Future<Output = RustHandleOption> {
-        let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
-
-        unsafe {
-            HANDLE_OPTION_SPAWNER_FUNCTION.unwrap()(
-                dart_fut,
-                Box::into_raw(Box::new(this)),
-            );
-        }
-
-        async move { rx.await.unwrap() }
-    }
-
-    /// Resolves this [`HandleOptionFuture`] with a provided `val`.
-    ///
-    /// __Should be only called by Dart side.__
-    fn resolve(self, val: RustHandleOption) {
-        drop(self.0.send(val));
-    }
 }

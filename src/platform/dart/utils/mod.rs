@@ -10,7 +10,6 @@ pub mod handle;
 pub mod list;
 pub mod map;
 pub mod nullable;
-pub mod option;
 
 #[doc(inline)]
 pub use self::{completer::Completer, function::Function};

@@ -52,8 +52,11 @@ impl Drop for Error {
     }
 }
 
+/// Pointer to an extern function that returns name of the provided Dart error.
 type NameFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 
+/// Pointer to an extern function that returns message of the provided Dart
+/// error.
 type MessageFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 
 /// Stores pointer to the [`NameFunction`] extern function.

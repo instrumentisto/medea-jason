@@ -50,6 +50,10 @@ impl VoidCallback {
 
 /// Notifies underlying closure of the [`VoidCallback`] about Dart side callback
 /// firing.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn VoidCallback__call(cb: *mut VoidCallback) {
     let cb = Box::from_raw(cb);
@@ -62,6 +66,11 @@ pub unsafe extern "C" fn VoidCallback__call(cb: *mut VoidCallback) {
 /// This function is used for notifying Rust side about Dart side callback
 /// firing. All arguments of the fired Dart callback should be passed to this
 /// function.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`StringCallback`] and
+/// [`c_char`] is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn StringCallback__call(
     cb: *const StringCallback,
@@ -150,6 +159,11 @@ pub unsafe extern "C" fn register_HandleMutCallback__callback(
 /// This function is used for notifying Rust side about Dart side callback
 /// firing. All arguments of the fired Dart callback should be passed to this
 /// function.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`HandleMutCallback`] and
+/// [`Dart_Handle`] is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn HandleMutCallback__call(
     cb: *mut HandleMutCallback,
@@ -208,6 +222,11 @@ pub unsafe extern "C" fn register_HandleCallback__callback(
 /// This function is used for notifying Rust side about Dart side callback
 /// firing. All arguments of the fired Dart callback should be passed to this
 /// function.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`HandleCallback`] and
+/// [`Dart_Handle`] is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn HandleCallback__call(
     cb: *mut HandleCallback,
@@ -265,6 +284,10 @@ pub unsafe extern "C" fn register_IntCallback__callback(
 /// This function is used for notifying Rust side about Dart side callback
 /// firing. All arguments of the fired Dart callback should be passed to this
 /// function.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`IntCallback`] is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn IntCallback__call(cb: *mut IntCallback, val: i32) {
     (*cb).0(val);
@@ -318,6 +341,11 @@ pub unsafe extern "C" fn register_TwoArgCallback__callback(
 /// This function is used for notifying Rust side about Dart side callback
 /// firing. All arguments of the fired Dart callback should be passed to this
 /// function.
+///
+/// # Safety
+///
+/// Should be called only when provided pointer to [`HandleCallback`] and
+/// [`Dart_Handle`] is not freed.
 #[no_mangle]
 pub unsafe extern "C" fn TwoArgCallback__call(
     cb: *mut TwoArgCallback,
