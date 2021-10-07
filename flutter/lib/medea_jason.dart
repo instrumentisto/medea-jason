@@ -14,6 +14,7 @@ export 'src/interface/local_media_track.dart';
 export 'src/interface/track_kinds.dart';
 export 'src/native/audio_track_constraints.dart'
     if (dart.library.html) 'src/web/audio_track_constraints.dart';
+export 'src/interface/device_video_track_constraints.dart' show FacingMode;
 export 'src/native/device_video_track_constraints.dart'
     if (dart.library.html) 'src/web/device_video_track_constraints.dart';
 export 'src/native/display_video_track_constraints.dart'
