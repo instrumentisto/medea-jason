@@ -1,5 +1,6 @@
 import 'package:medea_jason/medea_jason.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_jason/src/interface/exceptions.dart' as exceptions;
 
 const MEDEA_HOST = '127.0.0.1';
 const MEDEA_PORT = 8080;
@@ -38,7 +39,11 @@ class Call {
     });
 
     var url = 'ws://$MEDEA_HOST:$MEDEA_PORT/ws/$roomId/$memberId?token=test';
-    await _room.join(url);
+    try {
+      await _room.join(url);
+    } catch (e) {
+      print((e as exceptions.IRpcClientException).cause());
+    }
   }
 
   void dispose() {

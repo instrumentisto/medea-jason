@@ -1,6 +1,7 @@
 import 'dart:js';
 
 import 'package:js/js.dart';
+import 'package:medea_jason/src/web/exceptions.dart';
 
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
@@ -15,24 +16,24 @@ class WebConnectionHandle extends ConnectionHandle {
 
   @override
   String getRemoteMemberId() {
-    return obj.get_remote_member_id();
+    return failableFunction(() => obj.get_remote_member_id());
   }
 
   @override
   void onClose(void Function() f) {
-    obj.on_close(allowInterop(f));
+    failableFunction(() => obj.on_close(allowInterop(f)));
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    obj.on_remote_track_added(allowInterop((track) {
+    failableFunction(() => obj.on_remote_track_added(allowInterop((track) {
       f(WebRemoteMediaTrack(track));
-    }));
+    })));
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    obj.on_quality_score_update(allowInterop(f));
+    failableFunction(() => obj.on_quality_score_update(allowInterop(f)));
   }
 
   @moveSemantics
