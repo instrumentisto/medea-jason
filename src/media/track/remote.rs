@@ -99,10 +99,7 @@ impl Track {
         track.0.track.on_ended({
             let weak_inner = Rc::downgrade(&track.0);
             Some(move || {
-                // Not supposed to ever happen, but call `on_stopped` just
-                // in case.
                 if let Some(inner) = weak_inner.upgrade() {
-                    log::error!("Unexpected track stop: {}", inner.track.id());
                     inner.on_stopped.call0();
                 }
             })
