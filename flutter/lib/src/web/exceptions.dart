@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
