@@ -241,9 +241,10 @@ void main() {
     expect(
         () => conn.getRemoteMemberId(),
         throwsA(allOf(
-            isStateError,
-            predicate(
-                (e) => e.message == 'ConnectionHandle is in detached state'))));
+            // isStateError,
+            predicate((e) =>
+                e is StateError &&
+                e.message == 'ConnectionHandle is in detached state.'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -329,8 +330,11 @@ void main() {
     }
     expect(
         stateErr,
-        allOf(isStateError,
-            predicate((e) => e.message == 'RoomHandle is in detached state')));
+        allOf(
+            // isStateError,
+            predicate((e) =>
+                e is StateError &&
+                e.message == 'RoomHandle is in detached state')));
 
     var formatExc;
     try {
@@ -342,8 +346,9 @@ void main() {
         formatExc,
         allOf(
             isFormatException,
-            predicate(
-                (e) => e.message.contains('relative URL without a base'))));
+            predicate((e) =>
+                e is FormatException &&
+                e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {
