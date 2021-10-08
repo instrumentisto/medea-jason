@@ -241,7 +241,7 @@ void main() {
     expect(
         () => conn.getRemoteMemberId(),
         throwsA(allOf(
-            // isStateError,
+            isStateError,
             predicate((e) =>
                 e is StateError &&
                 e.message == 'ConnectionHandle is in detached state'))));
@@ -331,7 +331,7 @@ void main() {
     expect(
         stateErr,
         allOf(
-            // isStateError,
+            isStateError,
             predicate((e) =>
                 e is StateError &&
                 e.message == 'RoomHandle is in detached state')));
