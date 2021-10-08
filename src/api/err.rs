@@ -51,6 +51,8 @@ impl StateError {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl StateError {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "StateError".to_string()
     }
@@ -130,6 +132,8 @@ impl LocalMediaInitException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "LocalMediaInitException".to_string()
     }
@@ -181,6 +185,8 @@ impl EnumerateDevicesException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl EnumerateDevicesException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "EnumerateDevicesException".to_string()
     }
@@ -258,6 +264,8 @@ impl RpcClientException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl RpcClientException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "RpcClientException".to_string()
     }
@@ -323,6 +331,8 @@ impl InternalException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl InternalException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "InternalException".to_string()
     }
@@ -363,6 +373,8 @@ impl FormatException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl FormatException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "FormatException".to_string()
     }
@@ -400,6 +412,8 @@ impl MediaStateTransitionException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaStateTransitionException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "MediaStateTransitionException".to_string()
     }
@@ -454,6 +468,8 @@ impl MediaSettingsUpdateException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaSettingsUpdateException {
     /// Returns name of this exception.
+    #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn name(&self) -> String {
         "MediaSettingsUpdateException".to_string()
     }
