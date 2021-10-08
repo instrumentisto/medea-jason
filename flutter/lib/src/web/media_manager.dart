@@ -18,7 +18,8 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       IMediaStreamSettings caps) async {
-    var tracks = await failableFuture(obj.init_local_tracks((caps as MediaStreamSettings).obj));
+    var tracks = await failableFuture(
+        obj.init_local_tracks((caps as MediaStreamSettings).obj));
     return tracks.map((t) => WebLocalMediaTrack(t)).toList();
   }
 

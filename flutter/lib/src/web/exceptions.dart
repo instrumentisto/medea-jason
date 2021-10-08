@@ -16,9 +16,11 @@ dynamic convertException(dynamic e) {
   } else if (name == 'LocalMediaInitException') {
     return WebLocalMediaInitException(e as wasm.LocalMediaInitException);
   } else if (name == 'MediaSettingsUpdateException') {
-    return WebMediaSettingsUpdateException(e as wasm.MediaSettingsUpdateException);
+    return WebMediaSettingsUpdateException(
+        e as wasm.MediaSettingsUpdateException);
   } else if (name == 'MediaStateTransitionException') {
-    return WebMediaStateTransitionException(e as wasm.MediaStateTransitionException);
+    return WebMediaStateTransitionException(
+        e as wasm.MediaStateTransitionException);
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
   } else if (name == 'StateError') {
@@ -29,7 +31,7 @@ dynamic convertException(dynamic e) {
 }
 
 /// Wraps provided [Function] to the try/catch block and wraps [wasm] exception to the Dart wrapper.
-T failableFunction<T>(T Function()  f) {
+T failableFunction<T>(T Function() f) {
   try {
     return f();
   } catch (e) {
@@ -39,11 +41,11 @@ T failableFunction<T>(T Function()  f) {
 
 /// Wraps provided [Future] to the try/catch block and wraps [wasm] exception to the Dart wrapper.
 Future<T> failableFuture<T>(Future<T> f) async {
- try {
-   return await f;
- } catch (e) {
-   throw convertException(e);
- }
+  try {
+    return await f;
+  } catch (e) {
+    throw convertException(e);
+  }
 }
 
 /// Exception thrown when cannot get info of available media devices.

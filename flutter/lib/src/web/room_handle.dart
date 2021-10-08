@@ -96,29 +96,29 @@ class WebRoomHandle extends RoomHandle {
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
     failableFunction(() => obj.on_new_connection(allowInterop((handle) {
-      f(WebConnectionHandle(handle));
-    })));
+          f(WebConnectionHandle(handle));
+        })));
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
     failableFunction(() => obj.on_close(allowInterop((reason) {
-      f(WebRoomCloseReason(reason));
-    })));
+          f(WebRoomCloseReason(reason));
+        })));
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
     failableFunction(() => obj.on_local_track(allowInterop((track) {
-      f(WebLocalMediaTrack(track));
-    })));
+          f(WebLocalMediaTrack(track));
+        })));
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
     failableFunction(() => obj.on_connection_loss(allowInterop((handle) {
-      f(WebReconnectHandle(handle));
-    })));
+          f(WebReconnectHandle(handle));
+        })));
   }
 
   @override

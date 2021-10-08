@@ -15,19 +15,22 @@ class MediaStreamSettings extends IMediaStreamSettings {
   /// Specifies a nature and settings of the audio `LocalMediaTrack`.
   @override
   void audio(@moveSemantics IAudioTrackConstraints constraints) {
-    failableFunction(() => obj.audio((constraints as AudioTrackConstraints).obj));
+    failableFunction(
+        () => obj.audio((constraints as AudioTrackConstraints).obj));
   }
 
   /// Sets constraints for obtaining a local video, sourced from a media device.
   @override
   void deviceVideo(@moveSemantics IDeviceVideoTrackConstraints constraints) {
-    failableFunction(() => obj.device_video((constraints as DeviceVideoTrackConstraints).obj));
+    failableFunction(() =>
+        obj.device_video((constraints as DeviceVideoTrackConstraints).obj));
   }
 
   /// Set constraints for capturing a local video from user's display.
   @override
   void displayVideo(@moveSemantics IDisplayVideoTrackConstraints constraints) {
-    failableFunction(() => obj.display_video((constraints as DisplayVideoTrackConstraints).obj));
+    failableFunction(() =>
+        obj.display_video((constraints as DisplayVideoTrackConstraints).obj));
   }
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.

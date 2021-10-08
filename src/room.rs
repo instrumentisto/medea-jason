@@ -33,14 +33,14 @@ use crate::{
         TrackDirection, TracksRequestError, UpdateLocalStreamError,
     },
     platform,
+    platform::TransportError,
     rpc::{
         ClientDisconnect, CloseReason, ConnectionInfo,
-        ConnectionInfoParseError, ReconnectHandle, RpcSession, SessionError,
+        ConnectionInfoParseError, ReconnectHandle, RpcClientError, RpcSession,
+        SessionError,
     },
     utils::{AsProtoState, Caused},
 };
-use crate::rpc::RpcClientError;
-use crate::platform::TransportError;
 
 /// Reason of why [`Room`] has been closed.
 ///
@@ -241,7 +241,9 @@ impl RoomHandle {
             .ok_or_else(|| tracerr::new!(RoomJoinError::Detached))?;
 
         let connection_info: ConnectionInfo =
-            "wss://lkjlkjkl.com/asd/asd?token=7123".parse().map_err(tracerr::map_from_and_wrap!())?;
+            "wss://lkjlkjkl.com/asd/asd?token=7123"
+                .parse()
+                .map_err(tracerr::map_from_and_wrap!())?;
 
         if !inner.on_failed_local_media.is_set() {
             return Err(tracerr::new!(RoomJoinError::CallbackNotSet(

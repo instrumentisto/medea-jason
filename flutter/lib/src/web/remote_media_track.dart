@@ -30,7 +30,8 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return failableFunction(() => MediaSourceKind.values[obj.media_source_kind().toInt()]);
+    return failableFunction(
+        () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
   }
 
   @override

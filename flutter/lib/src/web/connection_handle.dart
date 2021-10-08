@@ -27,8 +27,8 @@ class WebConnectionHandle extends ConnectionHandle {
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
     failableFunction(() => obj.on_remote_track_added(allowInterop((track) {
-      f(WebRemoteMediaTrack(track));
-    })));
+          f(WebRemoteMediaTrack(track));
+        })));
   }
 
   @override
