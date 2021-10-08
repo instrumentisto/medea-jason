@@ -244,7 +244,7 @@ void main() {
             // isStateError,
             predicate((e) =>
                 e is StateError &&
-                e.message == 'ConnectionHandle is in detached state.'))));
+                e.message == 'ConnectionHandle is in detached state'))));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
