@@ -12,6 +12,7 @@ export 'src/interface/room_handle.dart';
 export 'src/interface/track_kinds.dart';
 export 'src/interface/local_media_track.dart';
 export 'src/interface/track_kinds.dart';
+export 'src/interface/exceptions.dart';
 export 'src/native/audio_track_constraints.dart'
     if (dart.library.html) 'src/web/audio_track_constraints.dart';
 export 'src/interface/device_video_track_constraints.dart' show FacingMode;
