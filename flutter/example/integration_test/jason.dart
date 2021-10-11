@@ -80,7 +80,7 @@ void main() {
     expect(
         () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
-            e is LocalMediaInitException &&
+            e is NativeLocalMediaInitException &&
             e.kind == LocalMediaInitExceptionKind.GetUserMediaFailed &&
             e.cause == 'Dart err cause1' &&
             e.nativeStackTrace.contains('at src'))));
@@ -90,12 +90,12 @@ void main() {
       await (returnsFutureWithLocalMediaInitException('Dart err cause2')
           as Future);
     } catch (e) {
-      err = e as LocalMediaInitException;
+      err = e as NativeLocalMediaInitException;
     }
     expect(
         err,
         predicate((e) =>
-            e is LocalMediaInitException &&
+            e is NativeLocalMediaInitException &&
             e.kind == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
             e.cause == 'Dart err cause2' &&
             e.nativeStackTrace.contains('at src')));
@@ -103,7 +103,7 @@ void main() {
     expect(
         () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
         throwsA(predicate((e) =>
-            e is EnumerateDevicesException &&
+            e is NativeEnumerateDevicesException &&
             e.cause == 'Dart err cause3' &&
             e.nativeStackTrace.contains('at src'))));
 
@@ -112,12 +112,12 @@ void main() {
       await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
           as Future);
     } catch (e) {
-      err2 = e as EnumerateDevicesException;
+      err2 = e as NativeEnumerateDevicesException;
     }
     expect(
         err2,
         predicate((e) =>
-            e is EnumerateDevicesException &&
+            e is NativeEnumerateDevicesException &&
             e.cause == 'Dart err cause4' &&
             e.nativeStackTrace.contains('at src')));
   });
@@ -358,7 +358,7 @@ void main() {
     expect(
         err,
         predicate((e) =>
-            e is MediaStateTransitionException &&
+            e is NativeMediaStateTransitionException &&
             e.message == 'SimpleTracksRequest should have at least one track' &&
             e.nativeStackTrace.contains('at src')));
   });
@@ -426,7 +426,7 @@ void main() {
     expect(
         () => returnsRpcClientException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
-            e is RpcClientException &&
+            e is NativeRpcClientException &&
             e.kind == RpcClientExceptionKind.ConnectionLost &&
             e.cause == 'Dart err cause1' &&
             e.message == 'RpcClientException::ConnectionLost' &&
@@ -441,7 +441,7 @@ void main() {
     expect(
         exception5,
         predicate((e) =>
-            e is RpcClientException &&
+            e is NativeRpcClientException &&
             e.kind == RpcClientExceptionKind.SessionFinished &&
             e.message == 'RpcClientException::SessionFinished' &&
             e.cause == 'Dart err cause2' &&

@@ -46,13 +46,6 @@ abstract class EnumerateDevicesException {
   String trace();
 }
 
-/// Exception thrown when a string or some other data doesn't have an expected
-/// format and cannot be parsed or processed.
-abstract class FormatException {
-  /// Returns describing of the problem.
-  String message();
-}
-
 /// Jason's internal exception.
 ///
 /// This is either a programmatic error or some unexpected platform component
@@ -149,7 +142,7 @@ abstract class RpcClientException {
 
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
-abstract class StateError {
+abstract class JasonStateError {
   /// Returns message describing the problem.
   String message();
 

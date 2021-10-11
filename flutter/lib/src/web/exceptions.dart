@@ -5,7 +5,7 @@ import 'jason_wasm.dart' as wasm;
 dynamic convertException(dynamic e) {
   var name = (e as wasm.GenericException).name();
   if (name == 'FormatException') {
-    return WebFormatException(e as wasm.FormatException);
+    return FormatException((e as wasm.FormatException).message());
   } else if (name == 'EnumerateDevicesException') {
     return WebEnumerateDevicesException(e as wasm.EnumerateDevicesException);
   } else if (name == 'InternalException') {
@@ -21,7 +21,7 @@ dynamic convertException(dynamic e) {
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
   } else if (name == 'StateError') {
-    return WebStateError(e as wasm.StateError);
+    return WebJasonStateError(e as wasm.StateError);
   } else {
     return e;
   }
@@ -61,20 +61,6 @@ class WebEnumerateDevicesException extends EnumerateDevicesException {
   @override
   String trace() {
     return _exception.trace();
-  }
-}
-
-/// Exception thrown when a string or some other data doesn't have an expected
-/// format and cannot be parsed or processed.
-class WebFormatException extends FormatException {
-  final wasm.FormatException _exception;
-
-  WebFormatException(this._exception);
-
-  /// Returns describing of the problem.
-  @override
-  String message() {
-    return _exception.message();
   }
 }
 
@@ -216,10 +202,10 @@ class WebRpcClientException extends RpcClientException {
 
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
-class WebStateError extends StateError {
+class WebJasonStateError extends JasonStateError {
   final wasm.StateError _exception;
 
-  WebStateError(this._exception);
+  WebJasonStateError(this._exception);
 
   /// Returns message describing the problem.
   @override
