@@ -42,7 +42,7 @@ class Call {
     try {
       await _room.join(url);
     } catch (e) {
-      print((e as exceptions.IRpcClientException).cause());
+      print((e as exceptions.RpcClientException).cause());
     }
   }
 

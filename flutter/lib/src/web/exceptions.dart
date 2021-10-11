@@ -3,8 +3,7 @@ import 'jason_wasm.dart' as wasm;
 
 /// Converts provided [wasm] exception to the Dart exception
 dynamic convertException(dynamic e) {
-  var foo = e as wasm.GenericException;
-  var name = foo.name();
+  var name = (e as wasm.GenericException).name();
   if (name == 'FormatException') {
     return WebFormatException(e as wasm.FormatException);
   } else if (name == 'EnumerateDevicesException') {
@@ -47,18 +46,18 @@ Future<T> failableFuture<T>(Future<T> f) async {
 }
 
 /// Exception thrown when cannot get info of available media devices.
-class WebEnumerateDevicesException extends IEnumerateDevicesException {
+class WebEnumerateDevicesException extends EnumerateDevicesException {
   final wasm.EnumerateDevicesException _exception;
 
   WebEnumerateDevicesException(this._exception);
 
-  /// Returns error that caused this [IEnumerateDevicesException].
+  /// Returns error that caused this [EnumerateDevicesException].
   @override
   dynamic cause() {
     return _exception.cause();
   }
 
-  /// Returns stacktrace of this [IEnumerateDevicesException].
+  /// Returns stacktrace of this [EnumerateDevicesException].
   @override
   String trace() {
     return _exception.trace();
@@ -67,7 +66,7 @@ class WebEnumerateDevicesException extends IEnumerateDevicesException {
 
 /// Exception thrown when a string or some other data doesn't have an expected
 /// format and cannot be parsed or processed.
-class WebFormatException extends IFormatException {
+class WebFormatException extends FormatException {
   final wasm.FormatException _exception;
 
   WebFormatException(this._exception);
@@ -82,7 +81,7 @@ class WebFormatException extends IFormatException {
 /// Jason's internal exception.
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-class WebInternalException extends IInternalException {
+class WebInternalException extends InternalException {
   final wasm.InternalException _exception;
 
   WebInternalException(this._exception);
@@ -93,13 +92,13 @@ class WebInternalException extends IInternalException {
     return _exception.message();
   }
 
-  /// Returns error that caused this [IRpcClientException].
+  /// Returns error that caused this [RpcClientException].
   @override
   dynamic cause() {
     return _exception.cause();
   }
 
-  /// Returns stacktrace of this [IInternalException].
+  /// Returns stacktrace of this [InternalException].
   @override
   String trace() {
     return _exception.trace();
@@ -107,12 +106,12 @@ class WebInternalException extends IInternalException {
 }
 
 /// Exception thrown when accessing media devices.
-class WebLocalMediaInitException extends ILocalMediaInitException {
+class WebLocalMediaInitException extends LocalMediaInitException {
   final wasm.LocalMediaInitException _exception;
 
   WebLocalMediaInitException(this._exception);
 
-  /// Returns concrete error kind of this [ILocalMediaInitException].
+  /// Returns concrete error kind of this [LocalMediaInitException].
   @override
   LocalMediaInitExceptionKind kind() {
     return LocalMediaInitExceptionKind.values[_exception.kind().toInt()];
@@ -124,13 +123,13 @@ class WebLocalMediaInitException extends ILocalMediaInitException {
     return _exception.message();
   }
 
-  /// Returns error that caused this [ILocalMediaInitException].
+  /// Returns error that caused this [LocalMediaInitException].
   @override
   dynamic cause() {
     return _exception.cause();
   }
 
-  /// Returns stacktrace of this [ILocalMediaInitException].
+  /// Returns stacktrace of this [LocalMediaInitException].
   @override
   String trace() {
     return _exception.trace();
@@ -138,7 +137,7 @@ class WebLocalMediaInitException extends ILocalMediaInitException {
 }
 
 /// Errors occurring in `RoomHandle::set_local_media_settings` method.
-class WebMediaSettingsUpdateException extends IMediaSettingsUpdateException {
+class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
   final wasm.MediaSettingsUpdateException _exception;
 
   WebMediaSettingsUpdateException(this._exception);
@@ -165,7 +164,7 @@ class WebMediaSettingsUpdateException extends IMediaSettingsUpdateException {
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-class WebMediaStateTransitionException extends IMediaStateTransitionException {
+class WebMediaStateTransitionException extends MediaStateTransitionException {
   final wasm.MediaStateTransitionException _exception;
 
   WebMediaStateTransitionException(this._exception);
@@ -176,7 +175,7 @@ class WebMediaStateTransitionException extends IMediaStateTransitionException {
     return _exception.message();
   }
 
-  /// Returns stacktrace of this [IMediaStateTransitionException].
+  /// Returns stacktrace of this [MediaStateTransitionException].
   @override
   String trace() {
     return _exception.trace();
@@ -185,12 +184,12 @@ class WebMediaStateTransitionException extends IMediaStateTransitionException {
 
 /// Exceptions thrown from an RPC client that implements messaging with media
 /// server.
-class WebRpcClientException extends IRpcClientException {
+class WebRpcClientException extends RpcClientException {
   final wasm.RpcClientException _exception;
 
   WebRpcClientException(this._exception);
 
-  /// Returns concrete error kind of this [IRpcClientException].
+  /// Returns concrete error kind of this [RpcClientException].
   @override
   RpcClientExceptionKind kind() {
     return RpcClientExceptionKind.values[_exception.kind().toInt()];
@@ -202,13 +201,13 @@ class WebRpcClientException extends IRpcClientException {
     return _exception.message();
   }
 
-  /// Returns error that caused this [IRpcClientException].
+  /// Returns error that caused this [RpcClientException].
   @override
   dynamic cause() {
     return _exception.cause();
   }
 
-  /// Returns stacktrace of this [IRpcClientException].
+  /// Returns stacktrace of this [RpcClientException].
   @override
   String trace() {
     return _exception.trace();
@@ -217,7 +216,7 @@ class WebRpcClientException extends IRpcClientException {
 
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
-class WebStateError extends IStateError {
+class WebStateError extends StateError {
   final wasm.StateError _exception;
 
   WebStateError(this._exception);
@@ -228,7 +227,7 @@ class WebStateError extends IStateError {
     return _exception.message();
   }
 
-  /// Returns native stacktrace of this [IStateError].
+  /// Returns native stacktrace of this [StateError].
   @override
   String trace() {
     return _exception.trace();

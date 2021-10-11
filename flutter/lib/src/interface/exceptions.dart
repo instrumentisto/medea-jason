@@ -1,4 +1,4 @@
-/// Possible error kinds of a [ILocalMediaInitException].
+/// Possible error kinds of a [LocalMediaInitException].
 enum LocalMediaInitExceptionKind {
   /// Occurs if the [getUserMedia()][1] request failed.
   ///
@@ -19,7 +19,7 @@ enum LocalMediaInitExceptionKind {
   LocalTrackIsEnded,
 }
 
-/// Possible error kinds of a [IRpcClientException].
+/// Possible error kinds of a [RpcClientException].
 enum RpcClientExceptionKind {
   /// Connection with a server was lost.
   ///
@@ -38,17 +38,17 @@ enum RpcClientExceptionKind {
 }
 
 /// Exception thrown when cannot get info of available media devices.
-abstract class IEnumerateDevicesException {
-  /// Returns error that caused this [IEnumerateDevicesException].
+abstract class EnumerateDevicesException {
+  /// Returns error that caused this [EnumerateDevicesException].
   dynamic cause();
 
-  /// Returns stacktrace of this [IEnumerateDevicesException].
+  /// Returns stacktrace of this [EnumerateDevicesException].
   String trace();
 }
 
 /// Exception thrown when a string or some other data doesn't have an expected
 /// format and cannot be parsed or processed.
-abstract class IFormatException {
+abstract class FormatException {
   /// Returns describing of the problem.
   String message();
 }
@@ -57,14 +57,14 @@ abstract class IFormatException {
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-abstract class IInternalException {
+abstract class InternalException {
   /// Returns error message describing the problem.
   String message();
 
-  /// Returns error that caused this [IRpcClientException].
+  /// Returns error that caused this [RpcClientException].
   dynamic cause();
 
-  /// Returns stacktrace of this [IInternalException].
+  /// Returns stacktrace of this [InternalException].
   String trace();
 
   @override
@@ -74,17 +74,17 @@ abstract class IInternalException {
 }
 
 /// Exception thrown when accessing media devices.
-abstract class ILocalMediaInitException {
-  /// Returns concrete error kind of this [ILocalMediaInitException].
+abstract class LocalMediaInitException {
+  /// Returns concrete error kind of this [LocalMediaInitException].
   LocalMediaInitExceptionKind kind();
 
   /// Returns error message describing the problem.
   String message();
 
-  /// Returns error that caused this [ILocalMediaInitException].
+  /// Returns error that caused this [LocalMediaInitException].
   dynamic cause();
 
-  /// Returns stacktrace of this [ILocalMediaInitException].
+  /// Returns stacktrace of this [LocalMediaInitException].
   String trace();
 
   @override
@@ -94,7 +94,7 @@ abstract class ILocalMediaInitException {
 }
 
 /// Errors occurring in `RoomHandle.set_local_media_settings` method.
-abstract class IMediaSettingsUpdateException {
+abstract class MediaSettingsUpdateException {
   /// Returns error message describing the problem.
   String message();
 
@@ -113,11 +113,11 @@ abstract class IMediaSettingsUpdateException {
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-abstract class IMediaStateTransitionException {
+abstract class MediaStateTransitionException {
   /// Returns error message describing the problem.
   String message();
 
-  /// Returns stacktrace of this [IMediaStateTransitionException].
+  /// Returns stacktrace of this [MediaStateTransitionException].
   String trace();
 
   @override
@@ -128,17 +128,17 @@ abstract class IMediaStateTransitionException {
 
 /// Exceptions thrown from an RPC client that implements messaging with media
 /// server.
-abstract class IRpcClientException {
-  /// Returns concrete error kind of this [IRpcClientException].
+abstract class RpcClientException {
+  /// Returns concrete error kind of this [RpcClientException].
   RpcClientExceptionKind kind();
 
   /// Returns error message describing the problem.
   String message();
 
-  /// Returns error that caused this [IRpcClientException].
+  /// Returns error that caused this [RpcClientException].
   dynamic cause();
 
-  /// Returns stacktrace of this [IRpcClientException].
+  /// Returns stacktrace of this [RpcClientException].
   String trace();
 
   @override
@@ -149,11 +149,11 @@ abstract class IRpcClientException {
 
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
-abstract class IStateError {
+abstract class StateError {
   /// Returns message describing the problem.
   String message();
 
-  /// Returns native stacktrace of this [IStateError].
+  /// Returns native stacktrace of this [StateError].
   String trace();
 
   @override
