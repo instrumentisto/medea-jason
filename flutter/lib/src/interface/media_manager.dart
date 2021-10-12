@@ -21,9 +21,7 @@ abstract class MediaManagerHandle {
   ///
   /// Throws a [LocalMediaInitException] if a request of platform media devices
   /// access failed.
-  Future<List<LocalMediaTrack>> initLocalTracks(IMediaStreamSettings caps) {
-    throw UnimplementedError();
-  }
+  Future<List<LocalMediaTrack>> initLocalTracks(IMediaStreamSettings caps);
 
   /// Returns a list of [InputDeviceInfo] objects representing available media
   /// input devices, such as microphones, cameras, and so forth.
@@ -34,13 +32,9 @@ abstract class MediaManagerHandle {
   ///
   /// Throws a [EnumerateDevicesException] if a request of platform media
   /// devices access failed.
-  Future<List<InputDeviceInfo>> enumerateDevices() {
-    throw UnimplementedError();
-  }
+  Future<List<InputDeviceInfo>> enumerateDevices();
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

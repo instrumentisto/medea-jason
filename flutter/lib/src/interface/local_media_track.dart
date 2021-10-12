@@ -11,23 +11,17 @@ import 'track_kinds.dart';
 abstract class LocalMediaTrack {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
   /// audio track, or the [MediaKind.Video] if it represents a video track.
-  MediaKind kind() {
-    throw UnimplementedError();
-  }
+  MediaKind kind();
 
   /// Returns the [MediaSourceKind.Device] if this [LocalMediaTrack] is sourced
   /// from some device (webcam/microphone), or the [MediaSourceKind.Display]
   /// if it's captured via [`MediaDevices.getDisplayMedia()`][1].
   ///
   /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-  MediaSourceKind mediaSourceKind() {
-    throw UnimplementedError();
-  }
+  MediaSourceKind mediaSourceKind();
 
   /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
-  MediaStreamTrack getTrack() {
-    throw UnimplementedError();
-  }
+  MediaStreamTrack getTrack();
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   ///
@@ -35,7 +29,5 @@ abstract class LocalMediaTrack {
   /// track if there are no other strong references (i.e., not used in local
   /// peer's senders).
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

@@ -22,9 +22,7 @@ abstract class RoomHandle {
   /// Throws [FormatException] if the provided [token] string has bad format.
   ///
   /// Throws `RpcClientException` if could not connect to media server.
-  Future<void> join(String token) {
-    throw UnimplementedError();
-  }
+  Future<void> join(String token);
 
   /// Updates this `Room`'s [IMediaStreamSettings]. This affects all the
   /// `PeerConnection`s in this `Room`. If [IMediaStreamSettings] are configured
@@ -53,9 +51,7 @@ abstract class RoomHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   Future<void> setLocalMediaSettings(
-      IMediaStreamSettings settings, bool stopFirst, bool rollbackOnFail) {
-    throw UnimplementedError();
-  }
+      IMediaStreamSettings settings, bool stopFirst, bool rollbackOnFail);
 
   /// Mutes outbound audio in this `Room`.
   ///
@@ -64,9 +60,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.unmuteAudio] was
   /// called while muting or a media server didn't approve this state
   /// transition.
-  Future<void> muteAudio() {
-    throw UnimplementedError();
-  }
+  Future<void> muteAudio();
 
   /// Unmutes outbound audio in this `Room`.
   ///
@@ -75,9 +69,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.muteAudio] was
   /// called while unmuting or a media server didn't approve this state
   /// transition.
-  Future<void> unmuteAudio() {
-    throw UnimplementedError();
-  }
+  Future<void> unmuteAudio();
 
   /// Enables outbound audio in this `Room`.
   ///
@@ -89,9 +81,7 @@ abstract class RoomHandle {
   ///
   /// Throws a `LocalMediaInitException` if a request of platform media devices
   /// access failed.
-  Future<void> enableAudio() {
-    throw UnimplementedError();
-  }
+  Future<void> enableAudio();
 
   /// Disables outbound audio in this `Room`.
   ///
@@ -100,9 +90,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.enableAudio] was
   /// called while disabling or a media server didn't approve this state
   /// transition.
-  Future<void> disableAudio() {
-    throw UnimplementedError();
-  }
+  Future<void> disableAudio();
 
   /// Mutes outbound video in this `Room`.
   ///
@@ -113,9 +101,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.unmuteVideo] was
   /// called while muting or a media server didn't approve this state
   /// transition.
-  Future<void> muteVideo([MediaSourceKind? kind]) {
-    throw UnimplementedError();
-  }
+  Future<void> muteVideo([MediaSourceKind? kind]);
 
   /// Unmutes outbound video in this `Room`.
   ///
@@ -126,9 +112,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.muteVideo] was
   /// called while unmuting or a media server didn't approve this state
   /// transition.
-  Future<void> unmuteVideo([MediaSourceKind? kind]) {
-    throw UnimplementedError();
-  }
+  Future<void> unmuteVideo([MediaSourceKind? kind]);
 
   /// Enables outbound video.
   ///
@@ -142,9 +126,7 @@ abstract class RoomHandle {
   ///
   /// Throws a `LocalMediaInitException` if a request of platform media devices
   /// access failed.
-  Future<void> enableVideo([MediaSourceKind? kind]) {
-    throw UnimplementedError();
-  }
+  Future<void> enableVideo([MediaSourceKind? kind]);
 
   /// Disables outbound video.
   ///
@@ -155,9 +137,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.enableVideo] was
   /// called while disabling or a media server didn't approve this state
   /// transition.
-  Future<void> disableVideo([MediaSourceKind? kind]) {
-    throw UnimplementedError();
-  }
+  Future<void> disableVideo([MediaSourceKind? kind]);
 
   /// Enables inbound audio in this `Room`.
   ///
@@ -166,9 +146,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if
   /// [RoomHandle.disableRemoteAudio] was called while enabling or a media
   /// server didn't approve this state transition.
-  Future<void> enableRemoteAudio() {
-    throw UnimplementedError();
-  }
+  Future<void> enableRemoteAudio();
 
   /// Disables inbound audio in this `Room`.
   ///
@@ -177,9 +155,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if [RoomHandle.enableRemoteAudio]
   /// was called while disabling or a media server didn't approve this state
   /// transition.
-  Future<void> disableRemoteAudio() {
-    throw UnimplementedError();
-  }
+  Future<void> disableRemoteAudio();
 
   /// Enables inbound video in this `Room`.
   ///
@@ -188,9 +164,7 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if
   /// [RoomHandle.disableRemoteVideo] was called while enabling or a media
   /// server didn't approve this state transition.
-  Future<void> enableRemoteVideo() {
-    throw UnimplementedError();
-  }
+  Future<void> enableRemoteVideo();
 
   /// Disables inbound video in this `Room`.
   ///
@@ -199,25 +173,19 @@ abstract class RoomHandle {
   /// Throws a `MediaStateTransitionException` if
   /// [RoomHandle.enableRemoteVideo] was called while disabling or a media
   /// server didn't approve this state transition.
-  Future<void> disableRemoteVideo() {
-    throw UnimplementedError();
-  }
+  Future<void> disableRemoteVideo();
 
   /// Sets callback, invoked when a new `Connection` with some remote `Peer`
   /// is established.
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.
-  void onNewConnection(void Function(ConnectionHandle) f) {
-    throw UnimplementedError();
-  }
+  void onNewConnection(void Function(ConnectionHandle) f);
 
   /// Sets callback, invoked when this `Room` is closed, providing a
   /// [RoomCloseReason].
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.
-  void onClose(void Function(RoomCloseReason) f) {
-    throw UnimplementedError();
-  }
+  void onClose(void Function(RoomCloseReason) f);
 
   /// Sets callback, invoked when a new [LocalMediaTrack] is added to this
   /// `Room`.
@@ -230,28 +198,20 @@ abstract class RoomHandle {
   ///    [RoomHandle.setLocalMediaSettings] method.
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.
-  void onLocalTrack(void Function(LocalMediaTrack) f) {
-    throw UnimplementedError();
-  }
+  void onLocalTrack(void Function(LocalMediaTrack) f);
 
   /// Sets callback, invoked when a connection with a media server is lost,
   /// providing a [ReconnectHandle].
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.
-  void onConnectionLoss(void Function(ReconnectHandle) f) {
-    throw UnimplementedError();
-  }
+  void onConnectionLoss(void Function(ReconnectHandle) f);
 
   /// Sets callback, invoked on a local media acquisition failures.
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.
-  void onFailedLocalMedia(void Function(Object) f) {
-    throw UnimplementedError();
-  }
+  void onFailedLocalMedia(void Function(Object) f);
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

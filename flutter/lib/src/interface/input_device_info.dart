@@ -6,26 +6,20 @@ import 'track_kinds.dart';
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
 abstract class InputDeviceInfo {
   /// Returns an unique identifier of the represented device.
-  String deviceId() {
-    throw UnimplementedError();
-  }
+  String deviceId();
 
   /// Returns label describing the represented device (for example "External USB
   /// Webcam").
   ///
   /// If the device has no associated label, then returns an empty string.
-  String label() {
-    throw UnimplementedError();
-  }
+  String label();
 
   /// Returns kind of the represented device.
   ///
   /// This representation of a [`MediaDeviceInfo`][1] is ONLY for input devices.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-  MediaKind kind() {
-    throw UnimplementedError();
-  }
+  MediaKind kind();
 
   /// Returns a group identifier of the represented device.
   ///
@@ -35,13 +29,9 @@ abstract class InputDeviceInfo {
   /// same [`groupId`][1].
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
-  String groupId() {
-    throw UnimplementedError();
-  }
+  String groupId();
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }
