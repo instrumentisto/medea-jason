@@ -30,6 +30,15 @@ All user visible changes to this project will be documented in this file. This p
     - `MediaKind`;
     - `MediaSourceKind`;
     - `FacingMode`.
+- Exceptions ([#9]):
+    - `EnumerateDevicesException`;
+    - `FormatException`;
+    - `InternalException`;
+    - `LocalMediaInitException`;
+    - `MediaSettingsUpdateException`;
+    - `MediaStateTransitionException`;
+    - `RpcClientException`;
+    - `StateError`.
 
 #### Changed
 
@@ -42,6 +51,7 @@ All user visible changes to this project will be documented in this file. This p
 
 [#2]: /../../pull/2
 [#5]: /../../pull/5
+[#9]: /../../pull/9
 
 
 

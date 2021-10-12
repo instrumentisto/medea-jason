@@ -1,3 +1,5 @@
+import 'package:medea_jason/src/web/exceptions.dart';
+
 import '../interface/audio_track_constraints.dart';
 import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
@@ -7,7 +9,7 @@ class AudioTrackConstraints extends IAudioTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    obj.device_id(deviceId);
+    failableFunction(() => obj.device_id(deviceId));
   }
 
   @moveSemantics

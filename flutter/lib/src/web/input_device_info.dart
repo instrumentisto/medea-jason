@@ -2,6 +2,7 @@ import '../interface/input_device_info.dart';
 import '../interface/track_kinds.dart';
 import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
+import 'exceptions.dart';
 
 class WebInputDeviceInfo extends InputDeviceInfo {
   late wasm.InputDeviceInfo obj;
@@ -10,22 +11,22 @@ class WebInputDeviceInfo extends InputDeviceInfo {
 
   @override
   String deviceId() {
-    return obj.device_id();
+    return failableFunction(() => obj.device_id());
   }
 
   @override
   String label() {
-    return obj.label();
+    return failableFunction(() => obj.label());
   }
 
   @override
   MediaKind kind() {
-    return MediaKind.values[obj.kind().toInt()];
+    return failableFunction(() => MediaKind.values[obj.kind().toInt()]);
   }
 
   @override
   String groupId() {
-    return obj.group_id();
+    return failableFunction(() => obj.group_id());
   }
 
   @moveSemantics
