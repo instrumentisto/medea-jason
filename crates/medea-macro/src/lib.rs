@@ -97,7 +97,7 @@ pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
         .unwrap_or_else(|e| e.to_compile_error().into())
 }
 
-/// Generates `*Handler` trait and displatching function for some event,
+/// Generates a `*Handler` trait and dispatching function for some event,
 /// represented as `enum`.
 ///
 /// # How to use
