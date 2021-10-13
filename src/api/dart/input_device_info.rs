@@ -74,7 +74,7 @@ pub unsafe extern "C" fn InputDeviceInfo__free(
 mod mock {
     use crate::media::MediaKind;
 
-    pub struct InputDeviceInfo(pub u32);
+    pub struct InputDeviceInfo(pub u8);
 
     impl InputDeviceInfo {
         pub fn device_id(&self) -> String {

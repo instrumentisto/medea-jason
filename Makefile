@@ -272,7 +272,7 @@ endef
 # Show permalink to CHANGELOG of a concrete version of project's Cargo crate.
 #
 # Usage:
-#	make cargo.changelog.link [crate=(;medea-jason|<crate-name>)]
+#	make cargo.changelog.link [crate=(medea-jason|<crate-name>)]
 #	                          [ver=($(crate-ver)|<version>)]
 
 cargo-changelog-link-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))

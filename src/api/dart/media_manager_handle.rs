@@ -82,7 +82,7 @@ mod mock {
     };
 
     #[derive(Clone)]
-    pub struct MediaManagerHandle;
+    pub struct MediaManagerHandle(u8);
 
     #[allow(clippy::missing_errors_doc)]
     impl MediaManagerHandle {
