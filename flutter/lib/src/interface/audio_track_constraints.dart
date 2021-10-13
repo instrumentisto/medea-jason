@@ -1,7 +1,7 @@
 import '../util/move_semantic.dart';
 
 /// Constraints applicable to audio tracks.
-abstract class IAudioTrackConstraints {
+abstract class AudioTrackConstraints {
   /// Sets an exact [`deviceId`][1] constraint.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId

@@ -1,6 +1,6 @@
 import '../interface/reconnect_handle.dart';
-import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
+import 'jason_wasm.dart' as wasm;
 
 class WebReconnectHandle extends ReconnectHandle {
   late wasm.ReconnectHandle obj;

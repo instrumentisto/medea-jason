@@ -1151,7 +1151,7 @@ endef
         	docker.up.medea docker.up.webdriver \
         docs docs.rust \
         down down.control down.coturn down.demo down.dev down.medea \
-        flutter flutter.fmt flutter.lint flutter.run flutter.test \
+        flutter flutter.fmt flutter.lint flutter.run \
         	flutter.android.compile_api_version \
         	flutter.android.min_api_version \
         	flutter.web.assets \

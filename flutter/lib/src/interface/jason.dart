@@ -6,8 +6,8 @@ import 'room_handle.dart';
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-abstract class IJason {
-  /// Returns a [MediaManagerHandle] to the `MediaManager` of this [IJason].
+abstract class Jason {
+  /// Returns a [MediaManagerHandle] to the `MediaManager` of this [Jason].
   MediaManagerHandle mediaManager();
 
   /// Creates a new `Room` and returns its [RoomHandle].

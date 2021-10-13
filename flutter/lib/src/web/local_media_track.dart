@@ -3,8 +3,8 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../interface/local_media_track.dart';
 import '../interface/track_kinds.dart';
-import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
+import 'jason_wasm.dart' as wasm;
 
 class WebLocalMediaTrack extends LocalMediaTrack {
   late wasm.LocalMediaTrack obj;

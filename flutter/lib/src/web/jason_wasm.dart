@@ -3,6 +3,7 @@ library medea_jason;
 
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' show promiseToFuture;
+
 import 'dart:html' as html;
 
 /// tslint:disable
@@ -12,93 +13,74 @@ import 'dart:html' as html;
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-videofacingmodeenum
 @JS()
 class FacingMode {
-  external static num get
+  /// Facing towards a user (a self-view camera).
+  external static num get User;
 
-      /// Facing towards a user (a self-view camera).
-      User;
-  external static num get
+  /// Facing away from a user (viewing the environment).
+  external static num get Environment;
 
-      /// Facing away from a user (viewing the environment).
-      Environment;
-  external static num get
+  /// Facing to the left of a user.
+  external static num get Left;
 
-      /// Facing to the left of a user.
-      Left;
-  external static num get
-
-      /// Facing to the right of a user.
-      Right;
+  /// Facing to the right of a user.
+  external static num get Right;
 }
 
 /// Media source type.
 @JS()
 class MediaSourceKind {
-  external static num get
+  /// Media is sourced from some media device (webcam or microphone).
+  external static num get Device;
 
-      /// Media is sourced from some media device (webcam or microphone).
-      Device;
-  external static num get
-
-      /// Media is obtained via screen capturing.
-      Display;
+  /// Media is obtained via screen capturing.
+  external static num get Display;
 }
 
 /// [MediaStreamTrack.kind][1] representation.
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
 @JS()
 class MediaKind {
-  external static num get
+  /// Audio track.
+  external static num get Audio;
 
-      /// Audio track.
-      Audio;
-  external static num get
-
-      /// Video track.
-      Video;
+  /// Video track.
+  external static num get Video;
 }
 
 /// Possible error kinds of a [`LocalMediaInitException`].
 @JS()
 class LocalMediaInitExceptionKind {
-  external static num get
+  /// Occurs if the [getUserMedia()][1] request failed.
+  /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+  external static num get GetUserMediaFailed;
 
-      /// Occurs if the [getUserMedia()][1] request failed.
-      /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-      GetUserMediaFailed;
-  external static num get
+  /// Occurs if the [getDisplayMedia()][1] request failed.
+  /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+  external static num get GetDisplayMediaFailed;
 
-      /// Occurs if the [getDisplayMedia()][1] request failed.
-      /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-      GetDisplayMediaFailed;
-  external static num get
-
-      /// Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
-      /// or [getDisplayMedia()][3] request.
-      /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-      /// [2]: https://tinyurl.com/rnxcavf
-      /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-      LocalTrackIsEnded;
+  /// Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
+  /// or [getDisplayMedia()][3] request.
+  /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
+  /// [2]: https://tinyurl.com/rnxcavf
+  /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+  external static num get LocalTrackIsEnded;
 }
 
 /// Possible error kinds of a [`RpcClientException`].
 @JS()
 class RpcClientExceptionKind {
-  external static num get
+  /// Connection with a server was lost.
+  /// This usually means that some transport error occurred, so a client can
+  /// continue performing reconnecting attempts.
+  external static num get ConnectionLost;
 
-      /// Connection with a server was lost.
-      /// This usually means that some transport error occurred, so a client can
-      /// continue performing reconnecting attempts.
-      ConnectionLost;
-  external static num get
+  /// Could not authorize an RPC session.
+  /// This usually means that authentication data a client provides is
+  /// obsolete.
+  external static num get AuthorizationFailed;
 
-      /// Could not authorize an RPC session.
-      /// This usually means that authentication data a client provides is
-      /// obsolete.
-      AuthorizationFailed;
-  external static num get
-
-      /// RPC session has been finished. This is a terminal state.
-      SessionFinished;
+  /// RPC session has been finished. This is a terminal state.
+  external static num get SessionFinished;
 }
 
 /// Constraints applicable to audio tracks.

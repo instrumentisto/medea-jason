@@ -24,10 +24,10 @@ abstract class RoomHandle {
   /// Throws `RpcClientException` if could not connect to media server.
   Future<void> join(String token);
 
-  /// Updates this `Room`'s [IMediaStreamSettings]. This affects all the
-  /// `PeerConnection`s in this `Room`. If [IMediaStreamSettings] are configured
+  /// Updates this `Room`'s [MediaStreamSettings]. This affects all the
+  /// `PeerConnection`s in this `Room`. If [MediaStreamSettings] are configured
   /// for some `Room`, then this `Room` can only send media tracks that
-  /// correspond to these settings. [IMediaStreamSettings] update will change
+  /// correspond to these settings. [MediaStreamSettings] update will change
   /// media tracks in all sending peers, so that might cause a new
   /// [getUserMedia()][1] request to happen.
   ///
@@ -35,12 +35,12 @@ abstract class RoomHandle {
   /// [RoomHandle.onFailedLocalMedia()] callback.
   ///
   /// If [stop_first] set to `true` then affected local [LocalMediaTrack]s will
-  /// be dropped before new [IMediaStreamSettings] are applied. This is usually
+  /// be dropped before new [MediaStreamSettings] are applied. This is usually
   /// required when changing video source device due to hardware limitations,
   /// e.g. having an active track sourced from device `A` may hinder
   /// [getUserMedia()][1] requests to device `B`.
   ///
-  /// [rollback_on_fail] option configures [IMediaStreamSettings] update request
+  /// [rollback_on_fail] option configures [MediaStreamSettings] update request
   /// to automatically rollback to previous settings if new settings cannot be
   /// applied.
   ///
@@ -51,7 +51,7 @@ abstract class RoomHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   Future<void> setLocalMediaSettings(
-      IMediaStreamSettings settings, bool stopFirst, bool rollbackOnFail);
+      MediaStreamSettings settings, bool stopFirst, bool rollbackOnFail);
 
   /// Mutes outbound audio in this `Room`.
   ///
@@ -194,7 +194,7 @@ abstract class RoomHandle {
   /// 1. Media server initiates a media request.
   /// 2. [RoomHandle.enableAudio] or [RoomHandle.enableVideo] call resulted in
   ///    new media track acquisition.
-  /// 3. [IMediaStreamSettings] were updated via
+  /// 3. [MediaStreamSettings] were updated via
   ///    [RoomHandle.setLocalMediaSettings] method.
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.

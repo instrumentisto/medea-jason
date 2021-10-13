@@ -1,6 +1,6 @@
 import '../interface/room_close_reason.dart';
-import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
+import 'jason_wasm.dart' as wasm;
 
 class WebRoomCloseReason extends RoomCloseReason {
   late wasm.RoomCloseReason obj;

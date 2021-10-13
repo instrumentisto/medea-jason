@@ -4,9 +4,9 @@ import 'package:js/js.dart';
 
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
-import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
-import '../web/remote_media_track.dart';
+import 'jason_wasm.dart' as wasm;
+import 'remote_media_track.dart';
 
 class WebConnectionHandle extends ConnectionHandle {
   late wasm.ConnectionHandle obj;

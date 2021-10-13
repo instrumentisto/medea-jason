@@ -4,20 +4,19 @@ import 'dart:ffi';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/interface/track_kinds.dart';
 import 'package:medea_jason/src/native/audio_track_constraints.dart';
 import 'package:medea_jason/src/native/device_video_track_constraints.dart';
 import 'package:medea_jason/src/native/display_video_track_constraints.dart';
-import 'package:medea_jason/src/ffi/exceptions.dart';
-import 'package:medea_jason/src/ffi/foreign_value.dart';
-import 'package:medea_jason/src/ffi/result.dart';
+import 'package:medea_jason/src/native/ffi/exceptions.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
+import 'package:medea_jason/src/native/ffi/result.dart';
 import 'package:medea_jason/src/native/input_device_info.dart';
 import 'package:medea_jason/src/native/jason.dart';
-import 'package:medea_jason/src/native/media_stream_settings.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
+import 'package:medea_jason/src/native/media_stream_settings.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
-import 'package:medea_jason/src/interface/track_kinds.dart';
-import 'package:medea_jason/src/util/nullable_pointer.dart';
-import 'package:medea_jason/src/interface/device_video_track_constraints.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -240,11 +239,9 @@ void main() {
 
     expect(
         () => conn.getRemoteMemberId(),
-        throwsA(allOf(
-            isStateError,
-            predicate((e) =>
-                e is StateError &&
-                e.message == 'ConnectionHandle is in detached state.'))));
+        throwsA(predicate((e) =>
+            e is StateError &&
+            e.message == 'ConnectionHandle is in detached state')));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -330,11 +327,9 @@ void main() {
     }
     expect(
         stateErr,
-        allOf(
-            isStateError,
-            predicate((e) =>
-                e is StateError &&
-                e.message == 'RoomHandle is in detached state')));
+        allOf(predicate((e) =>
+            e is StateError &&
+            e.message == 'RoomHandle is in detached state')));
 
     var formatExc;
     try {
@@ -344,11 +339,9 @@ void main() {
     }
     expect(
         formatExc,
-        allOf(
-            isFormatException,
-            predicate((e) =>
-                e is FormatException &&
-                e.message.contains('relative URL without a base'))));
+        allOf(predicate((e) =>
+            e is FormatException &&
+            e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {

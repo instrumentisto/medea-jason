@@ -1,12 +1,12 @@
 import 'dart:ffi';
 
-import '../ffi/result.dart';
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
+import '../util/move_semantic.dart';
+import 'ffi/nullable_pointer.dart';
+import 'ffi/result.dart';
 import 'jason.dart';
 import 'remote_media_track.dart';
-import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
 
 typedef _getRemoteMemberId_C = Result Function(Pointer);
 typedef _getRemoteMemberId_Dart = Result Function(Pointer);

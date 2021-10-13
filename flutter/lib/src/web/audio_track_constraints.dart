@@ -1,8 +1,8 @@
-import '../interface/audio_track_constraints.dart';
-import '../web/jason_wasm.dart' as wasm;
+import '../interface/audio_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
+import 'jason_wasm.dart' as wasm;
 
-class AudioTrackConstraints extends IAudioTrackConstraints {
+class AudioTrackConstraints extends base.AudioTrackConstraints {
   final wasm.AudioTrackConstraints obj = wasm.AudioTrackConstraints();
 
   @override

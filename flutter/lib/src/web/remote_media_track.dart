@@ -4,8 +4,8 @@ import 'package:js/js.dart';
 
 import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';
-import '../web/jason_wasm.dart' as wasm;
 import '../util/move_semantic.dart';
+import 'jason_wasm.dart' as wasm;
 
 class WebRemoteMediaTrack extends RemoteMediaTrack {
   late wasm.RemoteMediaTrack obj;

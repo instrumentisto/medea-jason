@@ -1,8 +1,8 @@
-import '../interface/device_video_track_constraints.dart';
-import '../web/jason_wasm.dart' as wasm;
+import '../interface/device_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
+import 'jason_wasm.dart' as wasm;
 
-class DeviceVideoTrackConstraints extends IDeviceVideoTrackConstraints {
+class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   final wasm.DeviceVideoTrackConstraints obj =
       wasm.DeviceVideoTrackConstraints();
 
@@ -12,12 +12,12 @@ class DeviceVideoTrackConstraints extends IDeviceVideoTrackConstraints {
   }
 
   @override
-  void exactFacingMode(FacingMode facingMode) {
+  void exactFacingMode(base.FacingMode facingMode) {
     obj.exact_facing_mode(facingMode.index);
   }
 
   @override
-  void idealFacingMode(FacingMode facingMode) {
+  void idealFacingMode(base.FacingMode facingMode) {
     obj.ideal_facing_mode(facingMode.index);
   }
 

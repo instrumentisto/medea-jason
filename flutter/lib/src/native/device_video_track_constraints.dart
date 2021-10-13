@@ -2,11 +2,11 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../ffi/result.dart';
-import 'jason.dart';
+import '../interface/device_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
-import '../interface/device_video_track_constraints.dart';
+import 'ffi/nullable_pointer.dart';
+import 'ffi/result.dart';
+import 'jason.dart';
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();
@@ -76,7 +76,7 @@ final _widthInRange = dl.lookupFunction<_widthInRange_C, _widthInRange_Dart>(
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('DeviceVideoTrackConstraints__free');
 
-class DeviceVideoTrackConstraints extends IDeviceVideoTrackConstraints {
+class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
@@ -91,12 +91,12 @@ class DeviceVideoTrackConstraints extends IDeviceVideoTrackConstraints {
   }
 
   @override
-  void exactFacingMode(FacingMode facingMode) {
+  void exactFacingMode(base.FacingMode facingMode) {
     _exactFacingMode(ptr.getInnerPtr(), facingMode.index);
   }
 
   @override
-  void idealFacingMode(FacingMode facingMode) {
+  void idealFacingMode(base.FacingMode facingMode) {
     _idealFacingMode(ptr.getInnerPtr(), facingMode.index);
   }
 

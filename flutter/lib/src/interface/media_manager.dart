@@ -13,7 +13,7 @@ import '../util/move_semantic.dart';
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 abstract class MediaManagerHandle {
   /// Obtains [LocalMediaTrack]s objects from local media devices (or screen
-  /// capture) basing on the provided [IMediaStreamSettings].
+  /// capture) basing on the provided [MediaStreamSettings].
   ///
   /// Throws a [StateError] if an underlying object has been disposed, e.g.
   /// [free] was called on this [MediaManagerHandle], or on a [Jason] that
@@ -21,7 +21,7 @@ abstract class MediaManagerHandle {
   ///
   /// Throws a [LocalMediaInitException] if a request of platform media devices
   /// access failed.
-  Future<List<LocalMediaTrack>> initLocalTracks(IMediaStreamSettings caps);
+  Future<List<LocalMediaTrack>> initLocalTracks(MediaStreamSettings caps);
 
   /// Returns a list of [InputDeviceInfo] objects representing available media
   /// input devices, such as microphones, cameras, and so forth.

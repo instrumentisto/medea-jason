@@ -1,19 +1,19 @@
 import 'package:js/js.dart';
 
+import '../interface/connection_handle.dart';
 import '../interface/local_media_track.dart';
-import '../interface/media_stream_settings.dart';
+import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/reconnect_handle.dart';
 import '../interface/room_close_reason.dart';
-import '../interface/track_kinds.dart';
-import '../web/jason_wasm.dart' as wasm;
 import '../interface/room_handle.dart';
-import '../interface/connection_handle.dart';
+import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
-import '../web/connection_handle.dart';
-import '../web/local_media_track.dart';
-import '../web/media_stream_settings.dart';
-import '../web/reconnect_handle.dart';
-import '../web/room_close_reason.dart';
+import 'connection_handle.dart';
+import 'jason_wasm.dart' as wasm;
+import 'local_media_track.dart';
+import 'media_stream_settings.dart';
+import 'reconnect_handle.dart';
+import 'room_close_reason.dart';
 
 class WebRoomHandle extends RoomHandle {
   late wasm.RoomHandle obj;
@@ -26,7 +26,7 @@ class WebRoomHandle extends RoomHandle {
   }
 
   @override
-  Future<void> setLocalMediaSettings(IMediaStreamSettings settings,
+  Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
     await obj.set_local_media_settings(
         (settings as MediaStreamSettings).obj, stopFirst, rollbackOnFail);
