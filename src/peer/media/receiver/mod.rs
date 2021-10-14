@@ -14,7 +14,7 @@ use crate::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,
     },
-    platform,
+    platform, utils,
 };
 
 use super::TransceiverSide;
@@ -56,13 +56,12 @@ impl Receiver {
     /// arrives.
     ///
     /// [1]: platform::TransceiverDirection::INACTIVE
-    pub fn new(
+    pub async fn new(
         state: &State,
         media_connections: &MediaConnections,
         track_events_sender: mpsc::UnboundedSender<TrackEvent>,
         recv_constraints: &RecvConstraints,
     ) -> Self {
-        let connections = media_connections.0.borrow();
         let caps = TrackConstraints::from(state.media_type().clone());
         let kind = MediaKind::from(&caps);
         let transceiver_direction = if state.enabled_individual() {
@@ -73,21 +72,30 @@ impl Receiver {
 
         let transceiver = if state.mid().is_none() {
             // Try to find send transceiver that can be used as sendrecv.
-            let mut senders = connections.senders.values();
-            let sender = senders.find(|sndr| {
+            let senders: Vec<_> = media_connections
+                .0
+                .borrow()
+                .senders
+                .values()
+                .map(utils::component::Component::obj)
+                .collect();
+            let sender = senders.iter().find(|sndr| {
                 sndr.caps().media_kind() == caps.media_kind()
                     && sndr.caps().media_source_kind()
                         == caps.media_source_kind()
             });
-            Some(sender.map_or_else(
-                || connections.add_transceiver(kind, transceiver_direction),
-                |sender| {
-                    let trnsvr = sender.transceiver();
-                    trnsvr.add_direction(transceiver_direction);
+            if let Some(sender) = sender {
+                let trnsvr = sender.transceiver();
+                trnsvr.add_direction(transceiver_direction).await;
 
-                    trnsvr
-                },
-            ))
+                Some(trnsvr)
+            } else {
+                let fut = media_connections
+                    .0
+                    .borrow()
+                    .add_transceiver(kind, transceiver_direction);
+                Some(fut.await)
+            }
         } else {
             None
         };
@@ -100,7 +108,11 @@ impl Receiver {
             mid: RefCell::new(state.mid().map(ToString::to_string)),
             track: RefCell::new(None),
             is_track_notified: Cell::new(false),
-            peer_events_sender: connections.peer_events_sender.clone(),
+            peer_events_sender: media_connections
+                .0
+                .borrow()
+                .peer_events_sender
+                .clone(),
             enabled_general: Cell::new(state.enabled_individual()),
             enabled_individual: Cell::new(state.enabled_general()),
             muted: Cell::new(state.muted()),
@@ -193,10 +205,21 @@ impl Receiver {
             self.muted.get(),
         );
 
-        if self.enabled_individual.get() {
-            transceiver.add_direction(platform::TransceiverDirection::RECV);
-        } else {
-            transceiver.sub_direction(platform::TransceiverDirection::RECV);
+        {
+            let transceiver = transceiver.clone();
+            if self.enabled_individual.get() {
+                platform::spawn(async move {
+                    transceiver
+                        .add_direction(platform::TransceiverDirection::RECV)
+                        .await;
+                });
+            } else {
+                platform::spawn(async move {
+                    transceiver
+                        .sub_direction(platform::TransceiverDirection::RECV)
+                        .await;
+                });
+            }
         }
 
         self.transceiver.replace(Some(transceiver));
@@ -262,9 +285,13 @@ impl Receiver {
 
 impl Drop for Receiver {
     fn drop(&mut self) {
-        if let Some(transceiver) = self.transceiver.borrow().as_ref() {
+        if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             if !transceiver.is_stopped() {
-                transceiver.sub_direction(platform::TransceiverDirection::RECV);
+                crate::platform::spawn(async move {
+                    transceiver
+                        .sub_direction(platform::TransceiverDirection::RECV)
+                        .await;
+                });
             }
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {

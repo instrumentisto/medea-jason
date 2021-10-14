@@ -299,7 +299,7 @@ impl PeerConnection {
     ///
     /// Errors with an [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`platform::RtcPeerConnection`] creating fails.
-    pub fn new(
+    pub async fn new(
         state: &State,
         peer_events_sender: mpsc::UnboundedSender<PeerEvent>,
         media_manager: Rc<MediaManager>,
@@ -312,6 +312,7 @@ impl PeerConnection {
                 state.ice_servers().clone(),
                 state.force_relay(),
             )
+            .await
             .map_err(tracerr::map_from_and_wrap!())?,
         );
         let (track_events_sender, mut track_events_rx) = mpsc::unbounded();
@@ -873,7 +874,7 @@ impl PeerConnection {
             .await
             .map_err(tracerr::map_from_and_wrap!())?;
         self.has_remote_description.set(true);
-        self.media_connections.sync_receivers();
+        self.media_connections.sync_receivers().await;
 
         let ice_candidates_buffer_flush_fut = future::try_join_all(
             self.ice_candidates_buffer.borrow_mut().drain(..).map(

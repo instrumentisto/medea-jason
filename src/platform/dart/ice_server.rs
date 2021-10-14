@@ -14,7 +14,7 @@ impl<I> From<I> for RtcIceServers
 where
     I: IntoIterator<Item = IceServer>,
 {
-    fn from(servers: I) -> Self {
+    fn from(_servers: I) -> Self {
         unimplemented!()
     }
 }

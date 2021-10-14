@@ -280,16 +280,28 @@ impl Component {
                 if let Some(track) = receiver.track.borrow().as_ref() {
                     track.set_enabled(false);
                 }
-                if let Some(trnscvr) = receiver.transceiver.borrow().as_ref() {
-                    trnscvr.sub_direction(platform::TransceiverDirection::RECV);
+                let fut = {
+                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
+                        trnscvr
+                            .sub_direction(platform::TransceiverDirection::RECV)
+                    })
+                };
+                if let Some(fut) = fut {
+                    fut.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
                 if let Some(track) = receiver.track.borrow().as_ref() {
                     track.set_enabled(true);
                 }
-                if let Some(trnscvr) = receiver.transceiver.borrow().as_ref() {
-                    trnscvr.add_direction(platform::TransceiverDirection::RECV);
+                let fut = {
+                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
+                        trnscvr
+                            .add_direction(platform::TransceiverDirection::RECV)
+                    })
+                };
+                if let Some(fut) = fut {
+                    fut.await;
                 }
             }
         }

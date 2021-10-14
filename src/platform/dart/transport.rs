@@ -41,7 +41,7 @@ impl WebSocketRpcTransport {
     /// [WebSocket]: https://developer.mozilla.org/docs/WebSockets
     /// [1]: https://developer.mozilla.org/docs/Web/API/WebSocket/onclose
     /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
-    pub async fn new(url: ApiUrl) -> Result<Self> {
+    pub async fn new(_url: ApiUrl) -> Result<Self> {
         unimplemented!()
     }
 }
@@ -53,11 +53,11 @@ impl RpcTransport for WebSocketRpcTransport {
     }
 
     #[inline]
-    fn set_close_reason(&self, close_reason: ClientDisconnect) {
+    fn set_close_reason(&self, _close_reason: ClientDisconnect) {
         unimplemented!()
     }
 
-    fn send(&self, msg: &ClientMsg) -> Result<()> {
+    fn send(&self, _msg: &ClientMsg) -> Result<()> {
         unimplemented!()
     }
 

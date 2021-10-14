@@ -83,7 +83,7 @@ impl Component {
                     peer.set_remote_answer(description)
                         .await
                         .map_err(tracerr::map_from_and_wrap!())?;
-                    peer.media_connections.sync_receivers();
+                    peer.media_connections.sync_receivers().await;
                     state.negotiation_state.set(NegotiationState::Stable);
                     state.negotiation_role.set(None);
                 }
@@ -91,7 +91,7 @@ impl Component {
                     peer.set_remote_offer(description)
                         .await
                         .map_err(tracerr::map_from_and_wrap!())?;
-                    peer.media_connections.sync_receivers();
+                    peer.media_connections.sync_receivers().await;
                 }
             }
         }
@@ -167,6 +167,7 @@ impl Component {
             peer.send_constraints.clone(),
             peer.track_events_sender.clone(),
         )
+        .await
         .map_err(|e| {
             drop(peer.peer_events_sender.unbounded_send(
                 PeerEvent::FailedLocalMedia {
@@ -200,12 +201,15 @@ impl Component {
             .create_connection(state.id, receiver.sender_id());
         peer.media_connections
             .insert_receiver(receiver::Component::new(
-                Rc::new(receiver::Receiver::new(
-                    &receiver,
-                    &peer.media_connections,
-                    peer.track_events_sender.clone(),
-                    &peer.recv_constraints,
-                )),
+                Rc::new(
+                    receiver::Receiver::new(
+                        &receiver,
+                        &peer.media_connections,
+                        peer.track_events_sender.clone(),
+                        &peer.recv_constraints,
+                    )
+                    .await,
+                ),
                 receiver,
             ));
         Ok(())
@@ -252,7 +256,7 @@ impl Component {
                             .set_offer(&sdp)
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        peer.media_connections.sync_receivers();
+                        peer.media_connections.sync_receivers().await;
                         let mids = peer
                             .get_mids()
                             .map_err(tracerr::map_from_and_wrap!())?;
@@ -274,7 +278,7 @@ impl Component {
                             .set_answer(&sdp)
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        peer.media_connections.sync_receivers();
+                        peer.media_connections.sync_receivers().await;
                         peer.peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpAnswer {
                                 peer_id: peer.id(),

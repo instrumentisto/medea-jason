@@ -74,7 +74,7 @@ impl Sender {
     /// but it cannot be disabled according to the provide [`State`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
-    pub fn new(
+    pub async fn new(
         state: &State,
         media_connections: &MediaConnections,
         send_constraints: LocalTracksConstraints,
@@ -92,32 +92,43 @@ impl Sender {
             ));
         }
 
-        let connections = media_connections.0.borrow();
         let caps = TrackConstraints::from(state.media_type().clone());
         let kind = MediaKind::from(&caps);
+
         let transceiver = match state.mid() {
-            // Try to find rcvr transceiver that can be used as sendrecv.
-            None => connections
-                .receivers
-                .values()
-                .find(|rcvr| {
-                    rcvr.caps().media_kind() == caps.media_kind()
-                        && rcvr.caps().media_source_kind()
-                            == caps.media_source_kind()
-                })
-                .and_then(|rcvr| rcvr.transceiver())
-                .unwrap_or_else(|| {
-                    connections.add_transceiver(
+            None => {
+                let trnsvr = media_connections
+                    .0
+                    .borrow()
+                    .receivers
+                    .values()
+                    .find(|rcvr| {
+                        rcvr.caps().media_kind() == caps.media_kind()
+                            && rcvr.caps().media_source_kind()
+                                == caps.media_source_kind()
+                    })
+                    .and_then(|rcvr| rcvr.transceiver());
+                if let Some(transceiver) = trnsvr {
+                    transceiver
+                } else {
+                    let fut = media_connections.0.borrow().add_transceiver(
                         kind,
                         platform::TransceiverDirection::INACTIVE,
-                    )
-                }),
-            Some(mid) => connections
-                .get_transceiver_by_mid(mid)
-                .ok_or_else(|| {
-                    CreateError::TransceiverNotFound(mid.to_string())
-                })
-                .map_err(tracerr::wrap!())?,
+                    );
+                    fut.await
+                }
+            }
+            Some(mid) => {
+                let fut = media_connections
+                    .0
+                    .borrow()
+                    .get_transceiver_by_mid(mid.to_string());
+                fut.await
+                    .ok_or_else(|| {
+                        CreateError::TransceiverNotFound(mid.to_string())
+                    })
+                    .map_err(tracerr::wrap!())?
+            }
         };
 
         let this = Rc::new(Sender {
@@ -293,8 +304,12 @@ impl Sender {
 impl Drop for Sender {
     fn drop(&mut self) {
         if !self.transceiver.is_stopped() {
-            self.transceiver
-                .sub_direction(platform::TransceiverDirection::SEND);
+            let transceiver = self.transceiver.clone();
+            platform::spawn(async move {
+                transceiver
+                    .sub_direction(platform::TransceiverDirection::SEND)
+                    .await;
+            });
             platform::spawn(self.transceiver.drop_send_track());
         }
     }

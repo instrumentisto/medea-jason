@@ -23,6 +23,7 @@ pub struct InputDeviceInfo;
 
 impl InputDeviceInfo {
     /// Returns unique identifier for the represented device.
+    #[allow(clippy::unused_self)]
     #[inline]
     #[must_use]
     pub fn device_id(&self) -> String {
@@ -34,6 +35,7 @@ impl InputDeviceInfo {
     /// This representation of [MediaDeviceInfo][1] ONLY for input device.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
+    #[allow(clippy::unused_self)]
     #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
@@ -43,6 +45,7 @@ impl InputDeviceInfo {
     /// Returns label describing the represented device (for example
     /// "External USB Webcam").
     /// If the device has no associated label, then returns an empty string.
+    #[allow(clippy::unused_self)]
     #[inline]
     #[must_use]
     pub fn label(&self) -> String {
@@ -57,6 +60,7 @@ impl InputDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
+    #[allow(clippy::unused_self)]
     #[inline]
     #[must_use]
     pub fn group_id(&self) -> String {

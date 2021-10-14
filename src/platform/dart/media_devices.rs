@@ -40,7 +40,7 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
 /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
 #[allow(clippy::unused_async)]
 pub async fn get_user_media(
-    caps: MediaStreamConstraints,
+    _caps: MediaStreamConstraints,
 ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
     unimplemented!();
 }
@@ -60,7 +60,7 @@ pub async fn get_user_media(
 /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
 #[allow(clippy::unused_async)]
 pub async fn get_display_media(
-    caps: DisplayMediaStreamConstraints,
+    _caps: DisplayMediaStreamConstraints,
 ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
     unimplemented!();
 }

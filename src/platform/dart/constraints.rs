@@ -25,16 +25,18 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+    #[allow(clippy::unused_self, clippy::needless_pass_by_value)]
     #[inline]
-    pub fn audio(&mut self, audio: AudioTrackConstraints) {
+    pub fn audio(&mut self, _audio: AudioTrackConstraints) {
         unimplemented!()
     }
 
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+    #[allow(clippy::unused_self, clippy::needless_pass_by_value)]
     #[inline]
-    pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
+    pub fn video(&mut self, _video: DeviceVideoTrackConstraints) {
         unimplemented!()
     }
 }
@@ -71,8 +73,9 @@ impl DisplayMediaStreamConstraints {
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+    #[allow(clippy::unused_self, clippy::needless_pass_by_value)]
     #[inline]
-    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
+    pub fn video(&mut self, _video: DisplayVideoTrackConstraints) {
         unimplemented!()
     }
 }
