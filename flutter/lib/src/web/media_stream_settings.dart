@@ -1,39 +1,36 @@
-import '../interface/audio_track_constraints.dart';
-import '../interface/device_video_track_constraints.dart';
-import '../interface/display_video_track_constraints.dart';
-import '../interface/media_stream_settings.dart';
-import '../web/jason_wasm.dart' as wasm;
+import '../interface/audio_track_constraints.dart' as base_audio;
+import '../interface/device_video_track_constraints.dart' as base_device_video;
+import '../interface/display_video_track_constraints.dart'
+    as base_display_video;
+import '../interface/media_stream_settings.dart' as base;
 import '../util/move_semantic.dart';
-import '../web/audio_track_constraints.dart';
-import '../web/device_video_track_constraints.dart';
+import 'audio_track_constraints.dart';
+import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
-import 'exceptions.dart';
+import 'jason_wasm.dart' as wasm;
 
-class MediaStreamSettings extends IMediaStreamSettings {
+class MediaStreamSettings extends base.MediaStreamSettings {
   final wasm.MediaStreamSettings obj = wasm.MediaStreamSettings();
 
-  /// Specifies a nature and settings of the audio `LocalMediaTrack`.
   @override
-  void audio(@moveSemantics IAudioTrackConstraints constraints) {
-    failableFunction(
-        () => obj.audio((constraints as AudioTrackConstraints).obj));
+  void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
+    obj.audio((constraints as AudioTrackConstraints).obj);
   }
 
-  /// Sets constraints for obtaining a local video, sourced from a media device.
   @override
-  void deviceVideo(@moveSemantics IDeviceVideoTrackConstraints constraints) {
-    failableFunction(() =>
-        obj.device_video((constraints as DeviceVideoTrackConstraints).obj));
+  void deviceVideo(
+      @moveSemantics
+          base_device_video.DeviceVideoTrackConstraints constraints) {
+    obj.device_video((constraints as DeviceVideoTrackConstraints).obj);
   }
 
-  /// Set constraints for capturing a local video from user's display.
   @override
-  void displayVideo(@moveSemantics IDisplayVideoTrackConstraints constraints) {
-    failableFunction(() =>
-        obj.display_video((constraints as DisplayVideoTrackConstraints).obj));
+  void displayVideo(
+      @moveSemantics
+          base_display_video.DisplayVideoTrackConstraints constraints) {
+    obj.display_video((constraints as DisplayVideoTrackConstraints).obj);
   }
 
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   @override
   void free() {

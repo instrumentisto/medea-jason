@@ -415,6 +415,19 @@ flutter.run:
 		$(if $(call eq,$(device),),,-d $(device))
 
 
+# Generates assets required for Flutter Web Jason plugin.
+#
+# Usage:
+#	make flutter.web.assets
+
+flutter.web.assets:
+	@rm -rf flutter/assets/pkg
+	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
+	rm -rf flutter/assets/pkg/*.md \
+	       flutter/assets/pkg/.gitignore \
+	       flutter/assets/pkg/package.json
+
+
 
 
 #################
@@ -1151,7 +1164,7 @@ endef
         	docker.up.medea docker.up.webdriver \
         docs docs.rust \
         down down.control down.coturn down.demo down.dev down.medea \
-        flutter flutter.fmt flutter.lint flutter.run flutter.test \
+        flutter flutter.fmt flutter.lint flutter.run \
         	flutter.android.compile_api_version \
         	flutter.android.min_api_version \
         	flutter.web.assets \

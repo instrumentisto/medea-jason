@@ -1,16 +1,16 @@
 import 'dart:ffi';
 
-import '../ffi/ptrarray.dart';
-import 'input_device_info.dart';
 import '../interface/input_device_info.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';
-import '../interface/media_stream_settings.dart';
+import '../interface/media_stream_settings.dart' as base_settings;
+import '../util/move_semantic.dart';
+import 'ffi/nullable_pointer.dart';
+import 'ffi/ptrarray.dart';
+import 'input_device_info.dart';
 import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
-import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
 
 typedef _initLocalTracks_C = Handle Function(Pointer, Pointer);
 typedef _initLocalTracks_Dart = Object Function(Pointer, Pointer);
@@ -42,7 +42,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
-      IMediaStreamSettings caps) async {
+      base_settings.MediaStreamSettings caps) async {
     Pointer tracks = await (_initLocalTracks(
             ptr.getInnerPtr(), (caps as MediaStreamSettings).ptr.getInnerPtr())
         as Future);

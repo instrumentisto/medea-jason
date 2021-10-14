@@ -2,12 +2,12 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../ffi/native_string.dart';
 import '../interface/input_device_info.dart';
-import 'jason.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
+import 'ffi/native_string.dart';
+import 'ffi/nullable_pointer.dart';
+import 'jason.dart';
 
 typedef _deviceId_C = Pointer<Utf8> Function(Pointer);
 typedef _deviceId_Dart = Pointer<Utf8> Function(Pointer);

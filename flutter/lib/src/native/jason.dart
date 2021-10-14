@@ -3,17 +3,17 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
-import '../ffi/callback.dart' as callback;
-import '../ffi/completer.dart' as completer;
-import '../ffi/exceptions.dart' as exceptions;
-import '../ffi/executor.dart';
-import '../interface/jason.dart';
+import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
+import '../util/move_semantic.dart';
+import 'ffi/callback.dart' as callback;
+import 'ffi/completer.dart' as completer;
+import 'ffi/exceptions.dart' as exceptions;
+import 'ffi/executor.dart';
+import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
 import 'room_handle.dart';
-import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();
@@ -81,7 +81,7 @@ DynamicLibrary _dl_load() {
   return dl;
 }
 
-class Jason extends IJason {
+class Jason extends base.Jason {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 

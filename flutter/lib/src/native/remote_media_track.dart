@@ -3,10 +3,10 @@ import 'dart:ffi';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../interface/remote_media_track.dart';
-import 'jason.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
+import 'ffi/nullable_pointer.dart';
+import 'jason.dart';
 
 typedef _enabled_C = Uint8 Function(Pointer);
 typedef _enabled_Dart = int Function(Pointer);

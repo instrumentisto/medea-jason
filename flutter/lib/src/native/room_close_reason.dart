@@ -2,11 +2,11 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../ffi/native_string.dart';
 import '../interface/room_close_reason.dart';
-import 'jason.dart';
 import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
+import 'ffi/native_string.dart';
+import 'ffi/nullable_pointer.dart';
+import 'jason.dart';
 
 typedef _reason_C = Pointer<Utf8> Function(Pointer);
 typedef _reason_Dart = Pointer<Utf8> Function(Pointer);

@@ -2,8 +2,8 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../native/jason.dart';
-import '../util/move_semantic.dart';
+import '../jason.dart';
+import '../../util/move_semantic.dart';
 
 typedef _free_C = Void Function(Pointer<Utf8>);
 typedef _free_Dart = void Function(Pointer<Utf8>);

@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import '../native/jason.dart';
+import '../jason.dart';
 
 typedef _unboxDartHandle_C = Handle Function(Pointer<Handle>);
 typedef _unboxDartHandle_Dart = Object Function(Pointer<Handle>);

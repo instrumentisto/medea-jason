@@ -16,9 +16,7 @@ abstract class ReconnectHandle {
   ///
   /// Converts the provided [delayMs] into an `u32`. Throws an [ArgumentError]
   /// if conversion fails.
-  Future<void> reconnectWithDelay(int delayMs) {
-    throw UnimplementedError();
-  }
+  Future<void> reconnectWithDelay(int delayMs);
 
   /// Tries to reconnect a `Room` in a loop with a growing backoff delay.
   ///
@@ -48,13 +46,9 @@ abstract class ReconnectHandle {
   /// into an `u32`s. Throws an [ArgumentError] if any conversion fails.
   Future<void> reconnectWithBackoff(
       int startingDelayMs, double multiplier, int maxDelay,
-      [int? maxElapsedTimeMs]) {
-    throw UnimplementedError();
-  }
+      [int? maxElapsedTimeMs]);
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

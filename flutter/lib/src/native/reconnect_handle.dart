@@ -1,10 +1,10 @@
 import 'dart:ffi';
 
 import '../interface/reconnect_handle.dart';
-import '../ffi/foreign_value.dart';
-import 'jason.dart';
 import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
+import 'ffi/foreign_value.dart';
+import 'ffi/nullable_pointer.dart';
+import 'jason.dart';
 
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);

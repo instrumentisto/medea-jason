@@ -8,58 +8,36 @@ import 'track_kinds.dart';
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 abstract class RemoteMediaTrack {
   /// Indicates whether this [RemoteMediaTrack] is enabled.
-  bool enabled() {
-    throw UnimplementedError();
-  }
+  bool enabled();
 
   /// Indicate whether this [RemoteMediaTrack] is muted.
-  bool muted() {
-    throw UnimplementedError();
-  }
+  bool muted();
 
   /// Returns this [RemoteMediaTrack]'s kind (audio/video).
-  MediaKind kind() {
-    throw UnimplementedError();
-  }
+  MediaKind kind();
 
   /// Returns this [RemoteMediaTrack]'s media source kind (device/display).
-  MediaSourceKind mediaSourceKind() {
-    throw UnimplementedError();
-  }
+  MediaSourceKind mediaSourceKind();
 
   /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
-  MediaStreamTrack getTrack() {
-    throw UnimplementedError();
-  }
+  MediaStreamTrack getTrack();
 
   /// Sets callback, invoked when this [RemoteMediaTrack] is enabled.
-  void onEnabled(void Function() f) {
-    throw UnimplementedError();
-  }
+  void onEnabled(void Function() f);
 
   /// Sets callback, invoked when this [RemoteMediaTrack] is disabled.
-  void onDisabled(void Function() f) {
-    throw UnimplementedError();
-  }
+  void onDisabled(void Function() f);
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is muted.
-  void onMuted(void Function() f) {
-    throw UnimplementedError();
-  }
+  void onMuted(void Function() f);
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is unmuted.
-  void onUnmuted(void Function() f) {
-    throw UnimplementedError();
-  }
+  void onUnmuted(void Function() f);
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is stopped.
-  void onStopped(void Function() f) {
-    throw UnimplementedError();
-  }
+  void onStopped(void Function() f);
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

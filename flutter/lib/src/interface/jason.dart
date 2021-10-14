@@ -6,25 +6,17 @@ import 'room_handle.dart';
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-abstract class IJason {
-  /// Returns a [MediaManagerHandle] to the `MediaManager` of this [IJason].
-  MediaManagerHandle mediaManager() {
-    throw UnimplementedError();
-  }
+abstract class Jason {
+  /// Returns a [MediaManagerHandle] to the `MediaManager` of this [Jason].
+  MediaManagerHandle mediaManager();
 
   /// Creates a new `Room` and returns its [RoomHandle].
-  RoomHandle initRoom() {
-    throw UnimplementedError();
-  }
+  RoomHandle initRoom();
 
   /// Closes the `Room` by the provided [RoomHandle].
-  void closeRoom(@moveSemantics RoomHandle room) {
-    throw UnimplementedError();
-  }
+  void closeRoom(@moveSemantics RoomHandle room);
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

@@ -8,9 +8,7 @@ abstract class ConnectionHandle {
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
-  String getRemoteMemberId() {
-    throw UnimplementedError();
-  }
+  String getRemoteMemberId();
 
   /// Sets callback, invoked when this `Connection` is closed.
   ///
@@ -18,9 +16,7 @@ abstract class ConnectionHandle {
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
-  void onClose(void Function() f) {
-    throw UnimplementedError();
-  }
+  void onClose(void Function() f);
 
   /// Sets callback, invoked when a new [RemoteMediaTrack] is added to this
   /// `Connection`.
@@ -29,9 +25,7 @@ abstract class ConnectionHandle {
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
-  void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    throw UnimplementedError();
-  }
+  void onRemoteTrackAdded(void Function(RemoteMediaTrack) f);
 
   /// Sets callback, invoked when a connection quality score is updated by a
   /// server.
@@ -40,12 +34,8 @@ abstract class ConnectionHandle {
   /// [free] was called on this [ConnectionHandle], or on a [Jason], or on a
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
-  void onQualityScoreUpdate(void Function(int) f) {
-    throw UnimplementedError();
-  }
+  void onQualityScoreUpdate(void Function(int) f);
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  void free() {
-    throw UnimplementedError();
-  }
+  void free();
 }

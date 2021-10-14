@@ -1,9 +1,9 @@
 import 'dart:ffi';
 
-import '../interface/display_video_track_constraints.dart';
-import 'jason.dart';
+import '../interface/display_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
+import 'ffi/nullable_pointer.dart';
+import 'jason.dart';
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();
@@ -17,7 +17,7 @@ final _new =
 final _free_Dart _free = dl
     .lookupFunction<_free_C, _free_Dart>('DisplayVideoTrackConstraints__free');
 
-class DisplayVideoTrackConstraints extends IDisplayVideoTrackConstraints {
+class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 

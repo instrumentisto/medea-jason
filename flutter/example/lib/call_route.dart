@@ -98,7 +98,6 @@ class _CallState extends State {
                 FloatingActionButton(
                   onPressed: () async {
                     _call.dispose();
-                    // Navigator.pop(context);
                   },
                   heroTag: null,
                   backgroundColor: Colors.red,

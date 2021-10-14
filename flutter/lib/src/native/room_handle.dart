@@ -2,23 +2,23 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import 'connection_handle.dart';
-import '../ffi/foreign_value.dart';
-import '../ffi/result.dart';
 import '../interface/connection_handle.dart';
 import '../interface/local_media_track.dart';
-import '../interface/media_stream_settings.dart';
+import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/reconnect_handle.dart';
 import '../interface/room_close_reason.dart';
 import '../interface/room_handle.dart';
+import '../interface/track_kinds.dart';
+import '../util/move_semantic.dart';
+import 'connection_handle.dart';
+import 'ffi/foreign_value.dart';
+import 'ffi/nullable_pointer.dart';
+import 'ffi/result.dart';
 import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
 import 'reconnect_handle.dart';
 import 'room_close_reason.dart';
-import '../interface/track_kinds.dart';
-import '../util/move_semantic.dart';
-import '../util/nullable_pointer.dart';
 
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
@@ -170,7 +170,7 @@ class NativeRoomHandle extends RoomHandle {
   }
 
   @override
-  Future<void> setLocalMediaSettings(IMediaStreamSettings settings,
+  Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
     await (_setLocalMediaSettings(
         ptr.getInnerPtr(),
