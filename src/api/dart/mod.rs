@@ -402,7 +402,7 @@ mod dart_value_extern_tests_helpers {
     #[no_mangle]
     pub unsafe extern "C" fn returns_input_device_info_ptr(
     ) -> DartValueArg<InputDeviceInfo> {
-        DartValueArg::from(InputDeviceInfo)
+        DartValueArg::from(InputDeviceInfo(0))
     }
 
     #[no_mangle]

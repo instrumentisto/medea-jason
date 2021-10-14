@@ -93,11 +93,11 @@ mod mock {
         platform,
     };
 
-    pub struct ConnectionHandle;
+    pub struct ConnectionHandle(pub u8);
 
     impl From<CoreConnectionHandle> for ConnectionHandle {
         fn from(_: CoreConnectionHandle) -> Self {
-            Self
+            Self(0)
         }
     }
 
@@ -120,7 +120,7 @@ mod mock {
             &self,
             f: platform::Function<RemoteMediaTrack>,
         ) -> Result<(), Traced<HandleDetachedError>> {
-            f.call1(RemoteMediaTrack);
+            f.call1(RemoteMediaTrack(0));
             Ok(())
         }
 
