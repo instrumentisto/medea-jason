@@ -211,27 +211,27 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_34(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_37(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_40(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_43(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_46(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_49(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3b75a8c535ed95c6(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h6d465b8077092408(arg0, arg1, addHeapObject(arg2));
 }
 
 function _assertClass(instance, klass) {
@@ -252,8 +252,8 @@ function handleError(f, args) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-function __wbg_adapter_342(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__h0b905333817aa2a5(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+function __wbg_adapter_350(arg0, arg1, arg2, arg3) {
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__hb6bcf9e4e0912e25(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
 /**
@@ -640,6 +640,22 @@ export class EnumerateDevicesException {
         wasm.__wbg_enumeratedevicesexception_free(ptr);
     }
     /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.enumeratedevicesexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
+    }
+    /**
     * Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
     * @returns {Error}
     */
@@ -687,6 +703,22 @@ export class FormatException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_formatexception_free(ptr);
+    }
+    /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.formatexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
     }
     /**
     * Returns an error message describing of the problem.
@@ -828,6 +860,22 @@ export class InternalException {
         wasm.__wbg_internalexception_free(ptr);
     }
     /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.internalexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
+    }
+    /**
     * Returns an error message describing the problem.
     * @returns {string}
     */
@@ -960,6 +1008,22 @@ export class LocalMediaInitException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_localmediainitexception_free(ptr);
+    }
+    /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.localmediainitexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
     }
     /**
     * Returns concrete error kind of this [`LocalMediaInitException`].
@@ -1158,6 +1222,22 @@ export class MediaSettingsUpdateException {
         wasm.__wbg_mediasettingsupdateexception_free(ptr);
     }
     /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.mediasettingsupdateexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
+    }
+    /**
     * Returns an error message describing the problem.
     * @returns {string}
     */
@@ -1215,6 +1295,22 @@ export class MediaStateTransitionException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_mediastatetransitionexception_free(ptr);
+    }
+    /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.mediastatetransitionexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
     }
     /**
     * Returns an error message describing the problem.
@@ -1953,6 +2049,22 @@ export class RpcClientException {
         wasm.__wbg_rpcclientexception_free(ptr);
     }
     /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.rpcclientexception_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
+    }
+    /**
     * Returns concrete error kind of this [`RpcClientException`].
     * @returns {number}
     */
@@ -2024,6 +2136,22 @@ export class StateError {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_stateerror_free(ptr);
+    }
+    /**
+    * Returns name of this exception.
+    * @returns {string}
+    */
+    name() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.stateerror_name(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
     }
     /**
     * Returns message describing the problem.
@@ -2107,14 +2235,6 @@ async function init(input) {
         var ret = RoomCloseReason.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_inputdeviceinfo_new = function(arg0) {
-        var ret = InputDeviceInfo.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_enumeratedevicesexception_new = function(arg0) {
-        var ret = EnumerateDevicesException.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         var ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
@@ -2126,6 +2246,14 @@ async function init(input) {
         var len0 = WASM_VECTOR_LEN;
         getInt32Memory0()[arg0 / 4 + 1] = len0;
         getInt32Memory0()[arg0 / 4 + 0] = ptr0;
+    };
+    imports.wbg.__wbg_inputdeviceinfo_new = function(arg0) {
+        var ret = InputDeviceInfo.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_enumeratedevicesexception_new = function(arg0) {
+        var ret = EnumerateDevicesException.__wrap(arg0);
+        return addHeapObject(ret);
     };
     imports.wbg.__wbg_localmediatrack_new = function(arg0) {
         var ret = LocalMediaTrack.__wrap(arg0);
@@ -2224,11 +2352,11 @@ async function init(input) {
             wasm.__wbindgen_free(arg0, arg1);
         }
     };
-    imports.wbg.__wbg_randomFillSync_64cc7d048f228ca8 = function() { return handleError(function (arg0, arg1, arg2) {
-        getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
-    }, arguments) };
     imports.wbg.__wbg_getRandomValues_98117e9a7e993920 = function() { return handleError(function (arg0, arg1) {
         getObject(arg0).getRandomValues(getObject(arg1));
+    }, arguments) };
+    imports.wbg.__wbg_randomFillSync_64cc7d048f228ca8 = function() { return handleError(function (arg0, arg1, arg2) {
+        getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
     }, arguments) };
     imports.wbg.__wbg_process_2f24d6544ea7b200 = function(arg0) {
         var ret = getObject(arg0).process;
@@ -2594,7 +2722,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_342(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_350(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -2677,28 +2805,28 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2326 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_34);
+    imports.wbg.__wbindgen_closure_wrapper2379 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_34);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2327 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_37);
+    imports.wbg.__wbindgen_closure_wrapper2380 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_37);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2330 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_40);
+    imports.wbg.__wbindgen_closure_wrapper2383 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_40);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2332 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_43);
+    imports.wbg.__wbindgen_closure_wrapper2385 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_43);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2334 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_46);
+    imports.wbg.__wbindgen_closure_wrapper2387 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_46);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2556 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 760, __wbg_adapter_49);
+    imports.wbg.__wbindgen_closure_wrapper2566 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 757, __wbg_adapter_49);
         return addHeapObject(ret);
     };
 

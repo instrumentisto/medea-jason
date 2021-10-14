@@ -1,5 +1,6 @@
 import '../interface/audio_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
+import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class AudioTrackConstraints extends base.AudioTrackConstraints {
@@ -7,7 +8,7 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    obj.device_id(deviceId);
+    failableFunction(() => obj.device_id(deviceId));
   }
 
   @moveSemantics

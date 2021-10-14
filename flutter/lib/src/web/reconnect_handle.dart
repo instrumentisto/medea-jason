@@ -1,5 +1,6 @@
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
+import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class WebReconnectHandle extends ReconnectHandle {
@@ -9,15 +10,15 @@ class WebReconnectHandle extends ReconnectHandle {
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
-    await obj.reconnect_with_delay(delayMs);
+    await failableFuture(obj.reconnect_with_delay(delayMs));
   }
 
   @override
   Future<void> reconnectWithBackoff(
       int startingDelayMs, double multiplier, int maxDelay,
       [int? maxElapsedTimeMs]) async {
-    await obj.reconnect_with_backoff(
-        startingDelayMs, multiplier, maxDelay, maxElapsedTimeMs);
+    await failableFuture(obj.reconnect_with_backoff(
+        startingDelayMs, multiplier, maxDelay, maxElapsedTimeMs));
   }
 
   @moveSemantics

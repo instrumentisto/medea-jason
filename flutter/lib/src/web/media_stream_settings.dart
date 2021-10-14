@@ -7,6 +7,7 @@ import '../util/move_semantic.dart';
 import 'audio_track_constraints.dart';
 import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
+import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class MediaStreamSettings extends base.MediaStreamSettings {
@@ -14,21 +15,24 @@ class MediaStreamSettings extends base.MediaStreamSettings {
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
-    obj.audio((constraints as AudioTrackConstraints).obj);
+    failableFunction(
+        () => obj.audio((constraints as AudioTrackConstraints).obj));
   }
 
   @override
   void deviceVideo(
       @moveSemantics
           base_device_video.DeviceVideoTrackConstraints constraints) {
-    obj.device_video((constraints as DeviceVideoTrackConstraints).obj);
+    failableFunction(() =>
+        obj.device_video((constraints as DeviceVideoTrackConstraints).obj));
   }
 
   @override
   void displayVideo(
       @moveSemantics
           base_display_video.DisplayVideoTrackConstraints constraints) {
-    obj.display_video((constraints as DisplayVideoTrackConstraints).obj);
+    failableFunction(() =>
+        obj.display_video((constraints as DisplayVideoTrackConstraints).obj));
   }
 
   @moveSemantics

@@ -4,6 +4,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../interface/local_media_track.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
+import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class WebLocalMediaTrack extends LocalMediaTrack {
@@ -13,17 +14,18 @@ class WebLocalMediaTrack extends LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    return MediaKind.values[obj.kind().toInt()];
+    return failableFunction(() => MediaKind.values[obj.kind().toInt()]);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return MediaSourceKind.values[obj.media_source_kind().toInt()];
+    return failableFunction(
+        () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
   }
 
   @override
   MediaStreamTrack getTrack() {
-    return MediaStreamTrackWeb(obj.get_track());
+    return failableFunction(() => MediaStreamTrackWeb(obj.get_track()));
   }
 
   @moveSemantics

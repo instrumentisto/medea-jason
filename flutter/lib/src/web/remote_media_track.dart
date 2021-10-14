@@ -5,6 +5,7 @@ import 'package:js/js.dart';
 import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
+import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class WebRemoteMediaTrack extends RemoteMediaTrack {
@@ -14,52 +15,53 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
 
   @override
   bool enabled() {
-    return obj.enabled();
+    return failableFunction(() => obj.enabled());
   }
 
   @override
   bool muted() {
-    return obj.muted();
+    return failableFunction(() => obj.muted());
   }
 
   @override
   MediaKind kind() {
-    return MediaKind.values[obj.kind().toInt()];
+    return failableFunction(() => MediaKind.values[obj.kind().toInt()]);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return MediaSourceKind.values[obj.media_source_kind().toInt()];
+    return failableFunction(
+        () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
   }
 
   @override
   MediaStreamTrack getTrack() {
-    return MediaStreamTrackWeb(obj.get_track());
+    return failableFunction(() => MediaStreamTrackWeb(obj.get_track()));
   }
 
   @override
   void onEnabled(void Function() f) {
-    obj.on_enabled(allowInterop(f));
+    failableFunction(() => obj.on_enabled(allowInterop(f)));
   }
 
   @override
   void onDisabled(void Function() f) {
-    obj.on_disabled(allowInterop(f));
+    failableFunction(() => obj.on_disabled(allowInterop(f)));
   }
 
   @override
   void onMuted(void Function() f) {
-    obj.on_muted(allowInterop(f));
+    failableFunction(() => obj.on_muted(allowInterop(f)));
   }
 
   @override
   void onUnmuted(void Function() f) {
-    obj.on_unmuted(allowInterop(f));
+    failableFunction(() => obj.on_unmuted(allowInterop(f)));
   }
 
   @override
   void onStopped(void Function() f) {
-    obj.on_stopped(allowInterop(f));
+    failableFunction(() => obj.on_stopped(allowInterop(f)));
   }
 
   @moveSemantics

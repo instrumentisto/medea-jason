@@ -794,6 +794,11 @@ class RpcClientException {
   external String trace();
 }
 
+@JS()
+class GenericException {
+  external String name();
+}
+
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
 @JS()
