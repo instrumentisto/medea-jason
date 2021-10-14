@@ -5,6 +5,9 @@
 
 use std::slice;
 
+// TODO: Если это прокся для листа, как написано в доке, то я бы ожидал что
+//       внутри будет лежать DartHandle. Что это? Где и как используется?
+//       Где тесты? Очень похоже на уже существующий PtrArray.
 /// Rust side representation of the Dart [List].
 ///
 /// [List]: https://api.dart.dev/stable/2.14.1/dart-core/List-class.html

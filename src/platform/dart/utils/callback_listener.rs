@@ -8,6 +8,11 @@ use crate::{
     api::c_str_into_string, platform::dart::utils::handle::DartHandle,
 };
 
+// TODO: Нужно это дело сливать одновременно с соответствующим кодом дарта.
+//       Точно нужны отдельные Void/String/Handle/Int каллбеки? Есть
+//       DartValue / ForeignValue, можно просто их прокидывать и анврапать к
+//       необходимому типу.
+
 /// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
 /// created Dart callback with a `void` as argument which will call Rust side
 /// callback when Dart side callback will be fired.

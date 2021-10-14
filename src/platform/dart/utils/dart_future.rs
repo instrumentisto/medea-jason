@@ -11,6 +11,9 @@ use crate::{
     platform::dart::{error::DartError, utils::handle::DartHandle},
 };
 
+
+// TODO: Точно нужны отдельные типы? Есть DartValue.
+
 /// Pointer to an extern function that spawns Dart Future which returns `Int32`
 /// on the Dart side and resolves provided [`IntFuture`] when it's resolved on
 /// Dart.

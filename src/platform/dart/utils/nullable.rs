@@ -7,6 +7,8 @@ use std::os::raw::c_char;
 
 use crate::api::string_into_c_str;
 
+// TODO: Может просто нул-пойнтер прокидывать? Ну и чекать на is_null.
+//       Оно вообще точно нужно? Есть DartValue.
 /// Rust side representation of the nullable Dart [`String`].
 #[repr(C)]
 pub struct NullableChar {
@@ -38,6 +40,7 @@ impl From<Option<String>> for NullableChar {
     }
 }
 
+// TODO: Оно вообще точно нужно? Есть DartValue.
 /// Rust side representation of the nullable Dart [`i32`].
 #[repr(C)]
 pub struct NullableInt {
