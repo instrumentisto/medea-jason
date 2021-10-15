@@ -3,9 +3,15 @@ import 'dart:js_util';
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
+/// Returns name of the provided [wasm] exception.
+String getExceptionName(dynamic e) {
+  var exceptionConstructor = getProperty(e, 'constructor');
+  return getProperty(exceptionConstructor, 'name');
+}
+
 /// Converts provided [wasm] exception to the Dart exception
 dynamic convertException(dynamic e) {
-  var name = (e as wasm.GenericException).name();
+  var name = getExceptionName(e);
   if (name == 'FormatException') {
     return FormatException((e as wasm.FormatException).message());
   } else if (name == 'EnumerateDevicesException') {
@@ -43,9 +49,6 @@ Future<T> failableFuture<T>(Future<T> f) async {
   try {
     return await f;
   } catch (e) {
-    var ctr = getProperty(e, 'constructor');
-    var n = getProperty(ctr, 'name');
-
     throw convertException(e);
   }
 }
