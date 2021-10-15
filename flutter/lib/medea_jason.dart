@@ -20,3 +20,4 @@ export 'src/native/display_video_track_constraints.dart'
     if (dart.library.html) 'src/web/display_video_track_constraints.dart';
 export 'src/native/media_stream_settings.dart'
     if (dart.library.html) 'src/web/media_stream_settings.dart';
+export 'src/interface/exceptions.dart';
