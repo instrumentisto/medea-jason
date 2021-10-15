@@ -272,7 +272,7 @@ endef
 # Show permalink to CHANGELOG of a concrete version of project's Cargo crate.
 #
 # Usage:
-#	make cargo.changelog.link [crate=(;medea-jason|<crate-name>)]
+#	make cargo.changelog.link [crate=(medea-jason|<crate-name>)]
 #	                          [ver=($(crate-ver)|<version>)]
 
 cargo-changelog-link-ver = $(if $(call eq,$(ver),),$(crate-ver),$(ver))
@@ -359,20 +359,6 @@ flutter.android.version.compile:
 
 flutter.android.version.min:
 	@printf "$(ANDROID_SDK_MIN_VERSION)"
-
-
-# Generates assets needed for Flutter Web Jason plugin.
-#
-# Usage:
-#   make flutter.web.assets
-
-flutter.web.assets:
-	rm -rf flutter/assets/pkg
-	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
-	cd flutter/assets/pkg && \
-		rm -f *.md && \
-		rm -f package.json && \
-		rm -f .gitignore
 
 
 # Resolve Flutter project dependencies.

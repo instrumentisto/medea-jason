@@ -1,3 +1,5 @@
+import 'dart:js_util';
+
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
@@ -41,6 +43,9 @@ Future<T> failableFuture<T>(Future<T> f) async {
   try {
     return await f;
   } catch (e) {
+    var ctr = getProperty(e, 'constructor');
+    var n = getProperty(ctr, 'name');
+
     throw convertException(e);
   }
 }

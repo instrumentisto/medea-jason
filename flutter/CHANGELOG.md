@@ -13,32 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 
 #### Added
 
-- API entities ([#2], [#5]):
-    - `AudioTrackConstraints`;
-    - `ConnectionHandle`;
-    - `DeviceVideoTrackConstraints`;
-    - `DisplayVideoTrackConstraints`;
-    - `InputDeviceInfo`;
-    - `Jason`;
-    - `LocalMediaTrack`;
-    - `MediaManager`;
-    - `MediaStreamSettings`;
-    - `ReconnectHandle`;
-    - `RemoteMediaTrack`;
-    - `RoomCloseReason`;
-    - `RoomHandle`;
-    - `MediaKind`;
-    - `MediaSourceKind`;
-    - `FacingMode`.
-- Exceptions ([#9]):
-    - `EnumerateDevicesException`;
-    - `FormatException`;
-    - `InternalException`;
-    - `LocalMediaInitException`;
-    - `MediaSettingsUpdateException`;
-    - `MediaStateTransitionException`;
-    - `RpcClientException`;
-    - `StateError`.
+...
 
 #### Changed
 
@@ -47,11 +22,6 @@ All user visible changes to this project will be documented in this file. This p
 #### Fixed
 
 ...
-
-
-[#2]: /../../pull/2
-[#5]: /../../pull/5
-[#9]: /../../pull/9
 
 
 

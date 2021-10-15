@@ -2,7 +2,7 @@
 //! used in a web environment with JavaScript.
 //!
 //! [`Jason`]: crate::api::Jason
-
+// TODO: update errors doc in public API
 pub mod connection_handle;
 pub mod err;
 pub mod input_device_info;
