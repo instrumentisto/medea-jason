@@ -252,7 +252,7 @@ function handleError(f, args) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-function __wbg_adapter_350(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_342(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__hb6bcf9e4e0912e25(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -426,7 +426,7 @@ export class ConnectionHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * With a [`StateError`] if an underlying object has been disposed, e.g.
     * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     * a [`RoomHandle`] that implicitly owns native object behind this
     * [`ConnectionHandle`].
@@ -445,7 +445,7 @@ export class ConnectionHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * With a [`StateError`] if an underlying object has been disposed, e.g.
     * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     * a [`RoomHandle`] that implicitly owns native object behind this
     * [`ConnectionHandle`].
@@ -473,7 +473,7 @@ export class ConnectionHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * With a [`StateError`] if an underlying object has been disposed, e.g.
     * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     * a [`RoomHandle`] that implicitly owns native object behind this
     * [`ConnectionHandle`].
@@ -494,7 +494,7 @@ export class ConnectionHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * With a [`StateError`] if an underlying object has been disposed, e.g.
     * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     * a [`RoomHandle`] that implicitly owns native object behind this
     * [`ConnectionHandle`].
@@ -682,22 +682,6 @@ export class EnumerateDevicesException {
         wasm.__wbg_enumeratedevicesexception_free(ptr);
     }
     /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.enumeratedevicesexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
     * Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
     * @returns {Error}
     */
@@ -745,22 +729,6 @@ export class FormatException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_formatexception_free(ptr);
-    }
-    /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.formatexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
     }
     /**
     * Returns an error message describing of the problem.
@@ -902,22 +870,6 @@ export class InternalException {
         wasm.__wbg_internalexception_free(ptr);
     }
     /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.internalexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
-    }
-    /**
     * Returns an error message describing the problem.
     * @returns {string}
     */
@@ -1050,22 +1002,6 @@ export class LocalMediaInitException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_localmediainitexception_free(ptr);
-    }
-    /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.localmediainitexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
     }
     /**
     * Returns concrete error kind of this [`LocalMediaInitException`].
@@ -1223,11 +1159,11 @@ export class MediaManagerHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * With a [`StateError`] if an underlying object has been disposed, e.g.
     * `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     * implicitly owns native object behind this [`MediaManagerHandle`].
     *
-    * Throws a [`EnumerateDevicesException`] if a request of platform media
+    * With a [`EnumerateDevicesException`] if a request of platform media
     * devices access failed.
     *
     * [`StateError`]: crate::api::err::StateError
@@ -1246,11 +1182,11 @@ export class MediaManagerHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * With a [`StateError`] if an underlying object has been disposed, e.g.
     * `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     * implicitly owns native object behind this [`MediaManagerHandle`].
     *
-    * Throws a [`LocalMediaInitException`] if a request of platform media
+    * With a [`LocalMediaInitException`] if a request of platform media
     * devices access failed.
     *
     * [`StateError`]: crate::api::err::StateError
@@ -1289,22 +1225,6 @@ export class MediaSettingsUpdateException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_mediasettingsupdateexception_free(ptr);
-    }
-    /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.mediasettingsupdateexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
     }
     /**
     * Returns an error message describing the problem.
@@ -1364,22 +1284,6 @@ export class MediaStateTransitionException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_mediastatetransitionexception_free(ptr);
-    }
-    /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.mediastatetransitionexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
     }
     /**
     * Returns an error message describing the problem.
@@ -1522,9 +1426,9 @@ export class ReconnectHandle {
     *
     * # Errors
     *
-    * Throws [`RpcClientException`] if reconnect attempt fails.
+    * With a [`RpcClientException`] if reconnect attempt fails.
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`RpcSession`]: rpc::RpcSession
     * [`RpcClientException`]: crate::api::err::RpcClientException
@@ -1562,9 +1466,9 @@ export class ReconnectHandle {
     *
     * # Errors
     *
-    * Throws [`RpcClientException`] if reconnect attempt fails.
+    * With a [`RpcClientException`] if reconnect attempt fails.
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`RpcSession`]: rpc::RpcSession
     * [`RpcClientException`]: crate::api::err::RpcClientException
@@ -1797,15 +1701,15 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed or if
+    * With a [`StateError`] if the underlying pointer has been freed or if
     * some mandatory callback is not set. These callbacks are:
     * [`RoomHandle::on_connection_loss`] and
     * [`RoomHandle::on_failed_local_media`].
     *
-    * Throws [`FormatException`] if the provided `token` string has bad
+    * With a [`FormatException`] if the provided `token` string has bad
     * format.
     *
-    * Throws [`RpcClientException`] if could not connect to media server.
+    * With a [`RpcClientException`] if could not connect to media server.
     *
     * [`Room`]: room::Room
     * [`StateError`]: crate::api::err::StateError
@@ -1826,7 +1730,7 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`Connection`]: crate::connection::Connection
     * [`StateError`]: crate::api::err::StateError
@@ -1841,7 +1745,7 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`Room`]: room::Room
     * [`RoomCloseReason`]: room::RoomCloseReason
@@ -1862,7 +1766,7 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`Room`]: room::Room
     * [`LocalMediaTrack`]: crate::api::LocalMediaTrack
@@ -1878,7 +1782,7 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
@@ -1892,7 +1796,7 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
     * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
@@ -1926,9 +1830,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaSettingsUpdateException`] if settings could not be
+    * With a [`MediaSettingsUpdateException`] if settings could not be
     * updated.
     *
     * [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
@@ -1953,11 +1857,11 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
-    * [`RoomHandle::unmute_audio`] was called while muting or a media server
-    * didn't approve this state transition.
+    * With a [`MediaStateTransitionException`] if [`RoomHandle::unmute_audio`]
+    * was called while muting or a media server didn't approve this state
+    * transition.
     *
     * [`Room`]: room::Room
     * [`StateError`]: crate::api::err::StateError
@@ -1974,9 +1878,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if [`RoomHandle::mute_audio`]
+    * With a [`MediaStateTransitionException`] if [`RoomHandle::mute_audio`]
     * was called while unmuting or a media server didn't approve this state
     * transition.
     *
@@ -1995,11 +1899,11 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
-    * [`RoomHandle::unmute_video`] was called while muting or a media server
-    * didn't approve this state transition.
+    * With a [`MediaStateTransitionException`] if [`RoomHandle::unmute_video`]
+    * was called while muting or a media server didn't approve this state
+    * transition.
     *
     * [`Room`]: room::Room
     * [`StateError`]: crate::api::err::StateError
@@ -2017,9 +1921,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if [`RoomHandle::mute_video`]
+    * With a [`MediaStateTransitionException`] if [`RoomHandle::mute_video`]
     * was called while unmuting or a media server didn't approve this state
     * transition.
     *
@@ -2039,11 +1943,11 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
-    * [`RoomHandle::enable_audio`] was called while disabling or a media
-    * server didn't approve this state transition.
+    * With a [`MediaStateTransitionException`] if [`RoomHandle::enable_audio`]
+    * was called while disabling or a media server didn't approve this state
+    * transition.
     *
     * [`Room`]: room::Room
     * [`StateError`]: crate::api::err::StateError
@@ -2060,13 +1964,13 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
+    * With a [`MediaStateTransitionException`] if
     * [`RoomHandle::disable_audio`] was called while enabling or a media
     * server didn't approve this state transition.
     *
-    * Throws a [`LocalMediaInitException`] if a request of platform media
+    * With a [`LocalMediaInitException`] if a request of platform media
     * devices access failed.
     *
     * [`Room`]: room::Room
@@ -2087,11 +1991,11 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
-    * [`RoomHandle::enable_video`] was called while disabling or a media
-    * server didn't approve this state transition.
+    * With a [`MediaStateTransitionException`] if [`RoomHandle::enable_video`]
+    * was called while disabling or a media server didn't approve this state
+    * transition.
     *
     * [`StateError`]: crate::api::err::StateError
     * [`MediaStateTransitionException`]:
@@ -2110,13 +2014,13 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
+    * With a [`MediaStateTransitionException`] if
     * [`RoomHandle::disable_video`] was called while enabling or a media
     * server didn't approve this state transition.
     *
-    * Throws a [`LocalMediaInitException`] if a request of platform media
+    * With a [`LocalMediaInitException`] if a request of platform media
     * devices access failed.
     *
     * [`StateError`]: crate::api::err::StateError
@@ -2135,9 +2039,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
+    * With a [`MediaStateTransitionException`] if
     * [`RoomHandle::enable_remote_audio`] was called while disabling or a
     * media server didn't approve this state transition.
     *
@@ -2156,9 +2060,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
+    * With a [`MediaStateTransitionException`] if
     * [`RoomHandle::enable_remote_video`] was called while disabling or a
     * media server didn't approve this state transition.
     *
@@ -2177,9 +2081,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
+    * With a [`MediaStateTransitionException`] if
     * [`RoomHandle::disable_remote_audio`] was called while enabling or a
     * media server didn't approve this state transition.
     *
@@ -2198,9 +2102,9 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * Throws a [`StateError`] if the underlying pointer has been freed.
+    * With a [`StateError`] if the underlying pointer has been freed.
     *
-    * Throws a [`MediaStateTransitionException`] if
+    * With a [`MediaStateTransitionException`] if
     * [`RoomHandle::disable_remote_video`] was called while enabling or a
     * media server didn't approve this state transition.
     *
@@ -2238,22 +2142,6 @@ export class RpcClientException {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_rpcclientexception_free(ptr);
-    }
-    /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.rpcclientexception_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
     }
     /**
     * Returns concrete error kind of this [`RpcClientException`].
@@ -2327,22 +2215,6 @@ export class StateError {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_stateerror_free(ptr);
-    }
-    /**
-    * Returns name of this exception.
-    * @returns {string}
-    */
-    name() {
-        try {
-            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.stateerror_name(retptr, this.ptr);
-            var r0 = getInt32Memory0()[retptr / 4 + 0];
-            var r1 = getInt32Memory0()[retptr / 4 + 1];
-            return getStringFromWasm0(r0, r1);
-        } finally {
-            wasm.__wbindgen_add_to_stack_pointer(16);
-            wasm.__wbindgen_free(r0, r1);
-        }
     }
     /**
     * Returns message describing the problem.
@@ -2913,7 +2785,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_350(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_342(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -2996,28 +2868,28 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2379 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_34);
+    imports.wbg.__wbindgen_closure_wrapper2327 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_34);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2380 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_37);
+    imports.wbg.__wbindgen_closure_wrapper2328 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_37);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2383 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_40);
+    imports.wbg.__wbindgen_closure_wrapper2331 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_40);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2385 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_43);
+    imports.wbg.__wbindgen_closure_wrapper2333 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_43);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2387 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_46);
+    imports.wbg.__wbindgen_closure_wrapper2335 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 659, __wbg_adapter_46);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2566 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 757, __wbg_adapter_49);
+    imports.wbg.__wbindgen_closure_wrapper2556 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 760, __wbg_adapter_49);
         return addHeapObject(ret);
     };
 

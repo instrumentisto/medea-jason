@@ -50,13 +50,6 @@ impl StateError {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl StateError {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "StateError".to_string()
-    }
-
     /// Returns message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
@@ -131,13 +124,6 @@ impl LocalMediaInitException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl LocalMediaInitException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "LocalMediaInitException".to_string()
-    }
-
     /// Returns concrete error kind of this [`LocalMediaInitException`].
     #[must_use]
     pub fn kind(&self) -> LocalMediaInitExceptionKind {
@@ -184,13 +170,6 @@ impl EnumerateDevicesException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl EnumerateDevicesException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "EnumerateDevicesException".to_string()
-    }
-
     /// Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
     #[must_use]
     pub fn cause(&self) -> platform::Error {
@@ -263,13 +242,6 @@ impl RpcClientException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl RpcClientException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "RpcClientException".to_string()
-    }
-
     /// Returns concrete error kind of this [`RpcClientException`].
     #[must_use]
     pub fn kind(&self) -> RpcClientExceptionKind {
@@ -330,13 +302,6 @@ impl InternalException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl InternalException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "InternalException".to_string()
-    }
-
     /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
@@ -372,13 +337,6 @@ impl FormatException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl FormatException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "FormatException".to_string()
-    }
-
     /// Returns an error message describing of the problem.
     #[must_use]
     pub fn message(&self) -> String {
@@ -411,13 +369,6 @@ impl MediaStateTransitionException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaStateTransitionException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "MediaStateTransitionException".to_string()
-    }
-
     /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
@@ -467,13 +418,6 @@ impl MediaSettingsUpdateException {
 
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaSettingsUpdateException {
-    /// Returns name of this exception.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    pub fn name(&self) -> String {
-        "MediaSettingsUpdateException".to_string()
-    }
-
     /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
