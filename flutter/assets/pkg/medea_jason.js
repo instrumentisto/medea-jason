@@ -211,27 +211,27 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_34(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_37(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_40(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_43(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_46(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h08028ced72d4f2c0(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h2022fc00a0daa960(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_49(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h3b75a8c535ed95c6(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h6d465b8077092408(arg0, arg1, addHeapObject(arg2));
 }
 
 function _assertClass(instance, klass) {
@@ -253,7 +253,7 @@ function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
 function __wbg_adapter_350(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__h0b905333817aa2a5(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__hb6bcf9e4e0912e25(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
 /**
@@ -424,7 +424,17 @@ export class ConnectionHandle {
     /**
     * Sets callback, invoked when this [`Connection`] is closed.
     *
+    * # Errors
+    *
+    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    * a [`RoomHandle`] that implicitly owns native object behind this
+    * [`ConnectionHandle`].
+    *
     * [`Connection`]: connection::Connection
+    * [`StateError`]: api::err::StateError
+    * [`Jason`]: api::Jason
+    * [`RoomHandle`]: api::RoomHandle
     * @param {Function} cb
     */
     on_close(cb) {
@@ -432,6 +442,17 @@ export class ConnectionHandle {
     }
     /**
     * Returns ID of the remote `Member`.
+    *
+    * # Errors
+    *
+    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    * a [`RoomHandle`] that implicitly owns native object behind this
+    * [`ConnectionHandle`].
+    *
+    * [`StateError`]: crate::api::err::StateError
+    * [`Jason`]: api::Jason
+    * [`RoomHandle`]: api::RoomHandle
     * @returns {string}
     */
     get_remote_member_id() {
@@ -450,8 +471,18 @@ export class ConnectionHandle {
     * Sets callback, invoked when a new [`RemoteMediaTrack`] is added to this
     * [`Connection`].
     *
+    * # Errors
+    *
+    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    * a [`RoomHandle`] that implicitly owns native object behind this
+    * [`ConnectionHandle`].
+    *
     * [`Connection`]: connection::Connection
     * [`RemoteMediaTrack`]: crate::api::RemoteMediaTrack
+    * [`StateError`]: crate::api::err::StateError
+    * [`Jason`]: api::Jason
+    * [`RoomHandle`]: api::RoomHandle
     * @param {Function} cb
     */
     on_remote_track_added(cb) {
@@ -460,6 +491,17 @@ export class ConnectionHandle {
     /**
     * Sets callback, invoked when connection quality score is updated by a
     * server.
+    *
+    * # Errors
+    *
+    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    * a [`RoomHandle`] that implicitly owns native object behind this
+    * [`ConnectionHandle`].
+    *
+    * [`StateError`]: crate::api::err::StateError
+    * [`Jason`]: api::Jason
+    * [`RoomHandle`]: api::RoomHandle
     * @param {Function} cb
     */
     on_quality_score_update(cb) {
@@ -1178,6 +1220,20 @@ export class MediaManagerHandle {
     * Returns a list of [`InputDeviceInfo`] objects representing available
     * media input and output devices, such as microphones, cameras, and so
     * forth.
+    *
+    * # Errors
+    *
+    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
+    * implicitly owns native object behind this [`MediaManagerHandle`].
+    *
+    * Throws a [`EnumerateDevicesException`] if a request of platform media
+    * devices access failed.
+    *
+    * [`StateError`]: crate::api::err::StateError
+    * [`Jason`]: crate::api::Jason
+    * [`EnumerateDevicesException`]:
+    * crate::api::err::EnumerateDevicesException
     * @returns {Promise<any>}
     */
     enumerate_devices() {
@@ -1187,6 +1243,19 @@ export class MediaManagerHandle {
     /**
     * Returns [`LocalMediaTrack`]s objects, built from the provided
     * [`MediaStreamSettings`].
+    *
+    * # Errors
+    *
+    * Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    * `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
+    * implicitly owns native object behind this [`MediaManagerHandle`].
+    *
+    * Throws a [`LocalMediaInitException`] if a request of platform media
+    * devices access failed.
+    *
+    * [`StateError`]: crate::api::err::StateError
+    * [`Jason`]: crate::api::Jason
+    * [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
     * @param {MediaStreamSettings} caps
     * @returns {Promise<any>}
     */
@@ -1451,7 +1520,15 @@ export class ReconnectHandle {
     * attempt won't be performed. Instead, it will wait for the first
     * reconnection attempt result and use it.
     *
+    * # Errors
+    *
+    * Throws [`RpcClientException`] if reconnect attempt fails.
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
     * [`RpcSession`]: rpc::RpcSession
+    * [`RpcClientException`]: crate::api::err::RpcClientException
+    * [`StateError`]: crate::api::err::StateError
     * @param {number} delay_ms
     * @returns {Promise<any>}
     */
@@ -1483,7 +1560,15 @@ export class ReconnectHandle {
     * won't be performed. Instead, it will wait for the first reconnection
     * attempt result and use it here.
     *
+    * # Errors
+    *
+    * Throws [`RpcClientException`] if reconnect attempt fails.
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
     * [`RpcSession`]: rpc::RpcSession
+    * [`RpcClientException`]: crate::api::err::RpcClientException
+    * [`StateError`]: crate::api::err::StateError
     * @param {number} starting_delay_ms
     * @param {number} multiplier
     * @param {number} max_delay
@@ -1710,15 +1795,22 @@ export class RoomHandle {
     *
     * Establishes connection with media server (if it doesn't exist already).
     *
-    * Effectively returns `Result<(), JasonError>`.
-    *
     * # Errors
     *
-    * - When `on_failed_local_media` callback is not set.
-    * - When `on_connection_loss` callback is not set.
-    * - When unable to connect to a media server.
+    * Throws [`StateError`] if the underlying pointer has been freed or if
+    * some mandatory callback is not set. These callbacks are:
+    * [`RoomHandle::on_connection_loss`] and
+    * [`RoomHandle::on_failed_local_media`].
+    *
+    * Throws [`FormatException`] if the provided `token` string has bad
+    * format.
+    *
+    * Throws [`RpcClientException`] if could not connect to media server.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`FormatException`]: crate::api::err::FormatException
+    * [`RpcClientException`]: crate::api::err::RpcClientException
     * @param {string} token
     * @returns {Promise<any>}
     */
@@ -1732,7 +1824,12 @@ export class RoomHandle {
     * Sets callback, invoked when a new [`Connection`] with some remote
     * `Member` is established.
     *
+    * # Errors
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
     * [`Connection`]: crate::connection::Connection
+    * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
     */
     on_new_connection(cb) {
@@ -1742,8 +1839,13 @@ export class RoomHandle {
     * Sets `on_close` callback, invoked when this [`Room`] is closed,
     * providing a [`RoomCloseReason`].
     *
+    * # Errors
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
     * [`Room`]: room::Room
     * [`RoomCloseReason`]: room::RoomCloseReason
+    * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
     */
     on_close(cb) {
@@ -1758,8 +1860,13 @@ export class RoomHandle {
     * 2. `enable_audio`/`enable_video` is called.
     * 3. [`MediaStreamSettings`] is updated via `set_local_media_settings`.
     *
+    * # Errors
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
     * [`Room`]: room::Room
     * [`LocalMediaTrack`]: crate::api::LocalMediaTrack
+    * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
     */
     on_local_track(cb) {
@@ -1768,6 +1875,12 @@ export class RoomHandle {
     /**
     * Sets `on_failed_local_media` callback, invoked on local media
     * acquisition failures.
+    *
+    * # Errors
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
+    * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
     */
     on_failed_local_media(cb) {
@@ -1776,6 +1889,12 @@ export class RoomHandle {
     /**
     * Sets `on_connection_loss` callback, invoked when a connection with a
     * server is lost.
+    *
+    * # Errors
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
+    * [`StateError`]: crate::api::err::StateError
     * @param {Function} cb
     */
     on_connection_loss(cb) {
@@ -1805,10 +1924,20 @@ export class RoomHandle {
     * If recovering from fail state isn't possible then affected media types
     * will be disabled.
     *
+    * # Errors
+    *
+    * Throws [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaSettingsUpdateException`] if settings could not be
+    * updated.
+    *
+    * [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     * [`Room`]: room::Room
     * [`PeerConnection`]: crate::peer::PeerConnection
     * [`LocalMediaTrack`]: crate::api::LocalMediaTrack
-    * [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaSettingsUpdateException`]:
+    * crate::api::err::MediaSettingsUpdateException
     * @param {MediaStreamSettings} settings
     * @param {boolean} stop_first
     * @param {boolean} rollback_on_fail
@@ -1824,11 +1953,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if [`RoomHandle::unmute_audio()`] was
-    * called while muting or a media server didn't approve this state
-    * transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::unmute_audio`] was called while muting or a media server
+    * didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     mute_audio() {
@@ -1840,11 +1974,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if [`RoomHandle::mute_audio()`] was
-    * called while unmuting or a media server didn't approve this state
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if [`RoomHandle::mute_audio`]
+    * was called while unmuting or a media server didn't approve this state
     * transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     unmute_audio() {
@@ -1856,11 +1995,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if [`RoomHandle::unmute_video()`] was
-    * called while muting or a media server didn't approve this state
-    * transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::unmute_video`] was called while muting or a media server
+    * didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
@@ -1873,11 +2017,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if [`RoomHandle::mute_video()`] was
-    * called while unmuting or a media server didn't approve this state
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if [`RoomHandle::mute_video`]
+    * was called while unmuting or a media server didn't approve this state
     * transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
@@ -1890,12 +2039,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if the target sender is configured as
-    * `required` by a media server or [`RoomHandle::enable_audio()`] was
-    * called while disabling or a media server didn't approve this state
-    * transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::enable_audio`] was called while disabling or a media
+    * server didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     disable_audio() {
@@ -1907,14 +2060,20 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if [`RoomHandle::disable_audio()`] was
-    * called while enabling or a media server didn't approve this state
-    * transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
     *
-    * With `name = 'MediaManagerError'` if media acquisition request to User
-    * Agent failed.
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::disable_audio`] was called while enabling or a media
+    * server didn't approve this state transition.
+    *
+    * Throws a [`LocalMediaInitException`] if a request of platform media
+    * devices access failed.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
+    * [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
     * @returns {Promise<any>}
     */
     enable_audio() {
@@ -1928,10 +2087,15 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if the target sender is configured as
-    * `required` by a media server or [`RoomHandle::enable_video()`] was
-    * called while disabling or a media server didn't approve this state
-    * transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::enable_video`] was called while disabling or a media
+    * server didn't approve this state transition.
+    *
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
@@ -1946,12 +2110,19 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if [`RoomHandle::disable_video()`] was
-    * called while enabling or a media server didn't approve this state
-    * transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
     *
-    * With `name = 'MediaManagerError'` if media acquisition request to User
-    * Agent failed.
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::disable_video`] was called while enabling or a media
+    * server didn't approve this state transition.
+    *
+    * Throws a [`LocalMediaInitException`] if a request of platform media
+    * devices access failed.
+    *
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
+    * [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
     * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
@@ -1964,11 +2135,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if
-    * [`RoomHandle::enable_remote_audio()`] was called while disabling or a
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::enable_remote_audio`] was called while disabling or a
     * media server didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     disable_remote_audio() {
@@ -1980,11 +2156,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if
-    * [`RoomHandle::enable_remote_video()`] was called while disabling or
-    * a media server didn't approve this state transition.
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::enable_remote_video`] was called while disabling or a
+    * media server didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     disable_remote_video() {
@@ -1996,11 +2177,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if
-    * [`RoomHandle::disable_remote_audio()`] was called while enabling or a
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::disable_remote_audio`] was called while enabling or a
     * media server didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     enable_remote_audio() {
@@ -2012,11 +2198,16 @@ export class RoomHandle {
     *
     * # Errors
     *
-    * With `name = 'MediaConnections'` if
-    * [`RoomHandle::disable_remote_video()`] was called while enabling or a
+    * Throws a [`StateError`] if the underlying pointer has been freed.
+    *
+    * Throws a [`MediaStateTransitionException`] if
+    * [`RoomHandle::disable_remote_video`] was called while enabling or a
     * media server didn't approve this state transition.
     *
     * [`Room`]: room::Room
+    * [`StateError`]: crate::api::err::StateError
+    * [`MediaStateTransitionException`]:
+    * crate::api::err::MediaStateTransitionException
     * @returns {Promise<any>}
     */
     enable_remote_video() {
@@ -2235,14 +2426,6 @@ async function init(input) {
         var ret = RoomCloseReason.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_inputdeviceinfo_new = function(arg0) {
-        var ret = InputDeviceInfo.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_enumeratedevicesexception_new = function(arg0) {
-        var ret = EnumerateDevicesException.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
         var ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
@@ -2255,6 +2438,18 @@ async function init(input) {
         getInt32Memory0()[arg0 / 4 + 1] = len0;
         getInt32Memory0()[arg0 / 4 + 0] = ptr0;
     };
+    imports.wbg.__wbg_inputdeviceinfo_new = function(arg0) {
+        var ret = InputDeviceInfo.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_enumeratedevicesexception_new = function(arg0) {
+        var ret = EnumerateDevicesException.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
+        var ret = LocalMediaTrack.__wrap(arg0);
+        return addHeapObject(ret);
+    };
     imports.wbg.__wbindgen_cb_drop = function(arg0) {
         const obj = takeObject(arg0).original;
         if (obj.cnt-- == 1) {
@@ -2263,10 +2458,6 @@ async function init(input) {
         }
         var ret = false;
         return ret;
-    };
-    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
-        var ret = LocalMediaTrack.__wrap(arg0);
-        return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_number_new = function(arg0) {
         var ret = arg0;
@@ -2352,11 +2543,11 @@ async function init(input) {
             wasm.__wbindgen_free(arg0, arg1);
         }
     };
-    imports.wbg.__wbg_randomFillSync_64cc7d048f228ca8 = function() { return handleError(function (arg0, arg1, arg2) {
-        getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
-    }, arguments) };
     imports.wbg.__wbg_getRandomValues_98117e9a7e993920 = function() { return handleError(function (arg0, arg1) {
         getObject(arg0).getRandomValues(getObject(arg1));
+    }, arguments) };
+    imports.wbg.__wbg_randomFillSync_64cc7d048f228ca8 = function() { return handleError(function (arg0, arg1, arg2) {
+        getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
     }, arguments) };
     imports.wbg.__wbg_process_2f24d6544ea7b200 = function(arg0) {
         var ret = getObject(arg0).process;
@@ -2805,27 +2996,27 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2364 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2379 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_34);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2365 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2380 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_37);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2368 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2383 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_40);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2370 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2385 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_43);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2372 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2387 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 667, __wbg_adapter_46);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2552 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2566 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 757, __wbg_adapter_49);
         return addHeapObject(ret);
     };
