@@ -4,16 +4,24 @@ import 'dart:js_util';
 import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-/// Returns class name of the provided [JsObject].
-String _getName(JsObject e) {
-  var exceptionConstructor = getProperty(e, 'constructor');
-  return getProperty(exceptionConstructor, 'name');
+/// Returns name of the provided [wasm] exception.
+///
+/// Returns null in case if provided exception is not from Jason.
+String? _getName(dynamic e) {
+  try {
+    var exceptionConstructor = getProperty(e, 'constructor');
+    return getProperty(exceptionConstructor, 'name');
+  } catch (e) {
+    return null;
+  }
 }
 
 /// Converts provided [wasm] exception to the Dart exception
-dynamic convertException(JsObject e) {
+dynamic convertException(dynamic e) {
   var name = _getName(e);
-  if (name == 'FormatException') {
+  if (name == null) {
+    return e;
+  } else if (name == 'FormatException') {
     return FormatException((e as wasm.FormatException).message());
   } else if (name == 'EnumerateDevicesException') {
     return WebEnumerateDevicesException(e as wasm.EnumerateDevicesException);
@@ -40,7 +48,7 @@ dynamic convertException(JsObject e) {
 T failableFunction<T>(T Function() f) {
   try {
     return f();
-  } on JsObject catch (e) {
+  } catch (e) {
     throw convertException(e);
   }
 }
@@ -49,7 +57,7 @@ T failableFunction<T>(T Function() f) {
 Future<T> failableFuture<T>(Future<T> f) async {
   try {
     return await f;
-  } on JsObject catch (e) {
+  } catch (e) {
     throw convertException(e);
   }
 }
