@@ -4,15 +4,23 @@ import '../interface/exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 /// Returns name of the provided [wasm] exception.
-String getExceptionName(dynamic e) {
-  var exceptionConstructor = getProperty(e, 'constructor');
-  return getProperty(exceptionConstructor, 'name');
+///
+/// Returns null in case if provided exception is not from Jason.
+String? getExceptionName(dynamic e) {
+  try {
+    var exceptionConstructor = getProperty(e, 'constructor');
+    return getProperty(exceptionConstructor, 'name');
+  } catch (e) {
+    return null;
+  }
 }
 
 /// Converts provided [wasm] exception to the Dart exception
 dynamic convertException(dynamic e) {
   var name = getExceptionName(e);
-  if (name == 'FormatException') {
+  if (name == null) {
+    return e;
+  } else if (name == 'FormatException') {
     return FormatException((e as wasm.FormatException).message());
   } else if (name == 'EnumerateDevicesException') {
     return WebEnumerateDevicesException(e as wasm.EnumerateDevicesException);
@@ -31,7 +39,7 @@ dynamic convertException(dynamic e) {
   } else if (name == 'StateError') {
     return WebJasonStateError(e as wasm.StateError);
   } else {
-    return e;
+    throw Exception('Unknown Jason exception with name: $name');
   }
 }
 
