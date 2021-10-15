@@ -2,6 +2,7 @@
 //! used in a web environment with JavaScript.
 //!
 //! [`Jason`]: crate::api::Jason
+
 pub mod connection_handle;
 pub mod err;
 pub mod input_device_info;

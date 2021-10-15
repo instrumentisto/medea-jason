@@ -43,11 +43,11 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
     /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     /// implicitly owns native object behind this [`MediaManagerHandle`].
     ///
-    /// Throws a [`EnumerateDevicesException`] if a request of platform media
+    /// With a [`EnumerateDevicesException`] if a request of platform media
     /// devices access failed.
     ///
     /// [`StateError`]: crate::api::err::StateError
@@ -81,11 +81,11 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
     /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     /// implicitly owns native object behind this [`MediaManagerHandle`].
     ///
-    /// Throws a [`LocalMediaInitException`] if a request of platform media
+    /// With a [`LocalMediaInitException`] if a request of platform media
     /// devices access failed.
     ///
     /// [`StateError`]: crate::api::err::StateError

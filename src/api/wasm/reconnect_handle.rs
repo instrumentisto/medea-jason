@@ -33,9 +33,9 @@ impl ReconnectHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`RpcClientException`] if reconnect attempt fails.
+    /// With a [`RpcClientException`] if reconnect attempt fails.
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`RpcSession`]: rpc::RpcSession
     /// [`RpcClientException`]: crate::api::err::RpcClientException
@@ -75,9 +75,9 @@ impl ReconnectHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`RpcClientException`] if reconnect attempt fails.
+    /// With a [`RpcClientException`] if reconnect attempt fails.
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`RpcSession`]: rpc::RpcSession
     /// [`RpcClientException`]: crate::api::err::RpcClientException

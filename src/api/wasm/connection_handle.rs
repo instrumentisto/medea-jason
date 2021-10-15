@@ -20,7 +20,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -40,7 +40,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -60,7 +60,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
@@ -85,7 +85,7 @@ impl ConnectionHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
     /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].

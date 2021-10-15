@@ -140,6 +140,7 @@ abstract class RpcClientException {
   }
 }
 
+// TODO: Use Dart's StateError.
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
 abstract class JasonStateError {

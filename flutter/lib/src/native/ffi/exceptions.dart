@@ -6,6 +6,8 @@ import 'foreign_value.dart';
 import 'native_string.dart';
 import 'unbox_handle.dart';
 
+// TODO: impl interfaces from interface/exceptions.dart
+
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(

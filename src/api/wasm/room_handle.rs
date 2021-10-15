@@ -37,15 +37,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed or if
+    /// With a [`StateError`] if the underlying pointer has been freed or if
     /// some mandatory callback is not set. These callbacks are:
     /// [`RoomHandle::on_connection_loss`] and
     /// [`RoomHandle::on_failed_local_media`].
     ///
-    /// Throws [`FormatException`] if the provided `token` string has bad
+    /// With a [`FormatException`] if the provided `token` string has bad
     /// format.
     ///
-    /// Throws [`RpcClientException`] if could not connect to media server.
+    /// With a [`RpcClientException`] if could not connect to media server.
     ///
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
@@ -65,7 +65,7 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`Connection`]: crate::connection::Connection
     /// [`StateError`]: crate::api::err::StateError
@@ -84,7 +84,7 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`Room`]: room::Room
     /// [`RoomCloseReason`]: room::RoomCloseReason
@@ -106,7 +106,7 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`Room`]: room::Room
     /// [`LocalMediaTrack`]: crate::api::LocalMediaTrack
@@ -123,7 +123,7 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`StateError`]: crate::api::err::StateError
     pub fn on_failed_local_media(
@@ -141,7 +141,7 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
     /// [`StateError`]: crate::api::err::StateError
     pub fn on_connection_loss(
@@ -179,9 +179,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaSettingsUpdateException`] if settings could not be
+    /// With a [`MediaSettingsUpdateException`] if settings could not be
     /// updated.
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
@@ -216,11 +216,11 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
-    /// [`RoomHandle::unmute_audio`] was called while muting or a media server
-    /// didn't approve this state transition.
+    /// With a [`MediaStateTransitionException`] if [`RoomHandle::unmute_audio`]
+    /// was called while muting or a media server didn't approve this state
+    /// transition.
     ///
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
@@ -239,9 +239,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if [`RoomHandle::mute_audio`]
+    /// With a [`MediaStateTransitionException`] if [`RoomHandle::mute_audio`]
     /// was called while unmuting or a media server didn't approve this state
     /// transition.
     ///
@@ -262,11 +262,11 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
-    /// [`RoomHandle::unmute_video`] was called while muting or a media server
-    /// didn't approve this state transition.
+    /// With a [`MediaStateTransitionException`] if [`RoomHandle::unmute_video`]
+    /// was called while muting or a media server didn't approve this state
+    /// transition.
     ///
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
@@ -287,9 +287,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if [`RoomHandle::mute_video`]
+    /// With a [`MediaStateTransitionException`] if [`RoomHandle::mute_video`]
     /// was called while unmuting or a media server didn't approve this state
     /// transition.
     ///
@@ -315,11 +315,11 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
-    /// [`RoomHandle::enable_audio`] was called while disabling or a media
-    /// server didn't approve this state transition.
+    /// With a [`MediaStateTransitionException`] if [`RoomHandle::enable_audio`]
+    /// was called while disabling or a media server didn't approve this state
+    /// transition.
     ///
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
@@ -338,13 +338,13 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
+    /// With a [`MediaStateTransitionException`] if
     /// [`RoomHandle::disable_audio`] was called while enabling or a media
     /// server didn't approve this state transition.
     ///
-    /// Throws a [`LocalMediaInitException`] if a request of platform media
+    /// With a [`LocalMediaInitException`] if a request of platform media
     /// devices access failed.
     ///
     /// [`Room`]: room::Room
@@ -367,11 +367,11 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
-    /// [`RoomHandle::enable_video`] was called while disabling or a media
-    /// server didn't approve this state transition.
+    /// With a [`MediaStateTransitionException`] if [`RoomHandle::enable_video`]
+    /// was called while disabling or a media server didn't approve this state
+    /// transition.
     ///
     /// [`StateError`]: crate::api::err::StateError
     /// [`MediaStateTransitionException`]:
@@ -396,13 +396,13 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
+    /// With a [`MediaStateTransitionException`] if
     /// [`RoomHandle::disable_video`] was called while enabling or a media
     /// server didn't approve this state transition.
     ///
-    /// Throws a [`LocalMediaInitException`] if a request of platform media
+    /// With a [`LocalMediaInitException`] if a request of platform media
     /// devices access failed.
     ///
     /// [`StateError`]: crate::api::err::StateError
@@ -427,9 +427,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
+    /// With a [`MediaStateTransitionException`] if
     /// [`RoomHandle::enable_remote_audio`] was called while disabling or a
     /// media server didn't approve this state transition.
     ///
@@ -450,9 +450,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
+    /// With a [`MediaStateTransitionException`] if
     /// [`RoomHandle::enable_remote_video`] was called while disabling or a
     /// media server didn't approve this state transition.
     ///
@@ -473,9 +473,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
+    /// With a [`MediaStateTransitionException`] if
     /// [`RoomHandle::disable_remote_audio`] was called while enabling or a
     /// media server didn't approve this state transition.
     ///
@@ -496,9 +496,9 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// Throws a [`StateError`] if the underlying pointer has been freed.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// Throws a [`MediaStateTransitionException`] if
+    /// With a [`MediaStateTransitionException`] if
     /// [`RoomHandle::disable_remote_video`] was called while enabling or a
     /// media server didn't approve this state transition.
     ///
