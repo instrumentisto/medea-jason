@@ -31,7 +31,15 @@ impl ReconnectHandle {
     /// attempt won't be performed. Instead, it will wait for the first
     /// reconnection attempt result and use it.
     ///
+    /// # Errors
+    ///
+    /// Throws [`RpcClientException`] if reconnect attempt fails.
+    ///
+    /// Throws [`StateError`] if the underlying pointer has been freed.
+    ///
     /// [`RpcSession`]: rpc::RpcSession
+    /// [`RpcClientException`]: crate::api::err::RpcClientException
+    /// [`StateError`]: crate::api::err::StateError
     pub fn reconnect_with_delay(&self, delay_ms: u32) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
@@ -65,7 +73,15 @@ impl ReconnectHandle {
     /// won't be performed. Instead, it will wait for the first reconnection
     /// attempt result and use it here.
     ///
+    /// # Errors
+    ///
+    /// Throws [`RpcClientException`] if reconnect attempt fails.
+    ///
+    /// Throws [`StateError`] if the underlying pointer has been freed.
+    ///
     /// [`RpcSession`]: rpc::RpcSession
+    /// [`RpcClientException`]: crate::api::err::RpcClientException
+    /// [`StateError`]: crate::api::err::StateError
     pub fn reconnect_with_backoff(
         &self,
         starting_delay_ms: u32,

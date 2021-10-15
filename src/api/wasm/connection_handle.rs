@@ -18,7 +18,17 @@ pub struct ConnectionHandle(connection::ConnectionHandle);
 impl ConnectionHandle {
     /// Sets callback, invoked when this [`Connection`] is closed.
     ///
+    /// # Errors
+    ///
+    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
     /// [`Connection`]: connection::Connection
+    /// [`StateError`]: api::err::StateError
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
     pub fn on_close(&self, cb: js_sys::Function) -> Result<(), JsValue> {
         self.0
             .on_close(cb.into())
@@ -27,6 +37,17 @@ impl ConnectionHandle {
     }
 
     /// Returns ID of the remote `Member`.
+    ///
+    /// # Errors
+    ///
+    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
     pub fn get_remote_member_id(&self) -> Result<String, JsValue> {
         self.0
             .get_remote_member_id()
@@ -37,8 +58,18 @@ impl ConnectionHandle {
     /// Sets callback, invoked when a new [`RemoteMediaTrack`] is added to this
     /// [`Connection`].
     ///
+    /// # Errors
+    ///
+    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
     /// [`Connection`]: connection::Connection
     /// [`RemoteMediaTrack`]: crate::api::RemoteMediaTrack
+    /// [`StateError`]: crate::api::err::StateError
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
     pub fn on_remote_track_added(
         &self,
         cb: js_sys::Function,
@@ -51,6 +82,17 @@ impl ConnectionHandle {
 
     /// Sets callback, invoked when connection quality score is updated by a
     /// server.
+    ///
+    /// # Errors
+    ///
+    /// Throws a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`ConnectionHandle`], or on a [`Jason`], or on
+    /// a [`RoomHandle`] that implicitly owns native object behind this
+    /// [`ConnectionHandle`].
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [`Jason`]: api::Jason
+    /// [`RoomHandle`]: api::RoomHandle
     pub fn on_quality_score_update(
         &self,
         cb: js_sys::Function,
