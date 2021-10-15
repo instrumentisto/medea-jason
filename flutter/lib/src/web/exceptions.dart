@@ -30,7 +30,7 @@ dynamic convertException(JsObject e) {
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
   } else if (name == 'StateError') {
-    return WebJasonStateError(e as wasm.StateError);
+    return StateError((e as wasm.StateError).message());
   } else {
     return e;
   }
@@ -204,26 +204,6 @@ class WebRpcClientException extends RpcClientException {
   }
 
   /// Returns stacktrace of this [RpcClientException].
-  @override
-  String trace() {
-    return _exception.trace();
-  }
-}
-
-/// Error thrown when the operation wasn't allowed by the current state of the
-/// object.
-class WebJasonStateError extends JasonStateError {
-  final wasm.StateError _exception;
-
-  WebJasonStateError(this._exception);
-
-  /// Returns message describing the problem.
-  @override
-  String message() {
-    return _exception.message();
-  }
-
-  /// Returns native stacktrace of this [StateError].
   @override
   String trace() {
     return _exception.trace();

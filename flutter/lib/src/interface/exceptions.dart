@@ -139,19 +139,3 @@ abstract class RpcClientException {
     return message();
   }
 }
-
-// TODO: Use Dart's StateError.
-/// Error thrown when the operation wasn't allowed by the current state of the
-/// object.
-abstract class JasonStateError {
-  /// Returns message describing the problem.
-  String message();
-
-  /// Returns native stacktrace of this [StateError].
-  String trace();
-
-  @override
-  String toString() {
-    return message();
-  }
-}
