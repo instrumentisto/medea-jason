@@ -60,6 +60,13 @@ class ForeignValue extends Struct {
     return fVal;
   }
 
+  static Pointer<ForeignValue> fromHandle(Object obj) {
+    var fVal = calloc<ForeignValue>();
+    fVal.ref._tag = 2;
+    fVal.ref._payload.handlePtr = boxDartHandle(obj);
+    return fVal;
+  }
+
   /// Allocates a new [ForeignValue] with the provided [String].
   static Pointer<ForeignValue> fromString(String str) {
     var fVal = calloc<ForeignValue>();

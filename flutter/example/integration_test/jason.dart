@@ -518,4 +518,46 @@ void main() {
     expect(err.invalidValue, equals(123));
     expect(err.name, 'kind');
   });
+
+  testWidgets('Primitive arguments Callback validation', (WidgetTester widgetTester) async {
+    final intListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__int');
+    final stringListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__string');
+    final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__optional_int');
+    final optionalStringListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__optional_string');
+
+    var intVal = ForeignValue.fromInt(45);
+    var stringVal = ForeignValue.fromString('test string');
+    var noneVal = ForeignValue.none();
+
+    (intListener(intVal.ref) as Function)(45);
+    (stringListener(stringVal.ref) as Function)('test string');
+    (optionalIntListener(intVal.ref) as Function)(45);
+    (optionalIntListener(noneVal.ref) as Function)(null);
+    (optionalStringListener(stringVal.ref) as Function)('test string');
+    (optionalStringListener(noneVal.ref) as Function)(null);
+
+    intVal.free();
+    stringVal.free();
+    noneVal.free();
+  });
+
+  testWidgets('DartHandle argument Callback validation', (WidgetTester widgetTester) async {
+    dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+        'register__test__test_callback_handle_function')(
+        Pointer.fromFunction<Void Function(Handle)>(callbackHandleTestFunction));
+    final dartHandleListener = dl.lookupFunction<Handle Function(), Object Function()>('test__callback_listener__dart_handle');
+
+    var obj = CallbackTestObj();
+
+    (dartHandleListener() as Function)(obj);
+    expect(obj.x, equals(45));
+  });
+}
+
+class CallbackTestObj {
+  int x = 0;
+}
+
+void callbackHandleTestFunction(Object o) {
+  (o as CallbackTestObj).x = 45;
 }
