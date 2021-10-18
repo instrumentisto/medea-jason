@@ -39,6 +39,10 @@ pub unsafe extern "C" fn register_DartFutureResolver__spawner(
 /// Resolves provided [`DartFutureResolver`] with a provided [`DartValue`].
 ///
 /// Frees provided [`DartFutureResolver`].
+///
+/// # Safety
+///
+/// Provided [`DartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn DartFutureResolver__resolve(
     fut: *mut DartFutureResolver,
@@ -115,6 +119,10 @@ pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
 /// [`DartValue`] as `Ok` result.
 ///
 /// Frees provided [`DartFutureResolver`].
+///
+/// # Safety
+///
+/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
     fut: *mut FallibleDartFutureResolver,
@@ -128,6 +136,10 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
 /// [`DartError`] as `Err` result.
 ///
 /// Frees provided [`DartFutureResolver`].
+///
+/// # Safety
+///
+/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
     fut: *mut FallibleDartFutureResolver,
@@ -148,6 +160,10 @@ impl FallibleDartFutureResolver {
     ///
     /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
     /// result on Dart side Future resolve.
+    ///
+    /// # Errors
+    ///
+    /// Errors with a [`DartError`] if Dart side thrown exception.
     pub fn execute<T>(
         dart_fut: Dart_Handle,
     ) -> impl Future<Output = Result<DartValueArg<T>, DartError>> {

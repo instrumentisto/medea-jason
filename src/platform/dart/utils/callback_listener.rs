@@ -43,6 +43,10 @@ pub unsafe extern "C" fn register_Callback__callback(f: CallbackFunction) {
 }
 
 /// Calls provided [`Callback`] with a provided [`DartValue`] as argument.
+///
+/// # Safety
+///
+/// Provided [`Callback`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn Callback__call(cb: *mut Callback, val: DartValue) {
     let cb = Box::from_raw(cb);
