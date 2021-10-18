@@ -6,12 +6,11 @@ import '../../jason.dart';
 typedef _callbackCall_C = Void Function(Pointer, ForeignValue);
 typedef _callbackCall_Dart = void Function(Pointer, ForeignValue);
 final _callbackCall =
-  dl.lookupFunction<_callbackCall_C, _callbackCall_Dart>(
-      'Callback__call');
+    dl.lookupFunction<_callbackCall_C, _callbackCall_Dart>('Callback__call');
 
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_Callback__callback')(
+          'register_Callback__callback')(
       Pointer.fromFunction<Handle Function(Pointer)>(callback));
 }
 
@@ -27,7 +26,8 @@ Object callback(Pointer caller) {
     } else if (val is Object) {
       arg = ForeignValue.fromHandle(val);
     } else {
-      throw UnimplementedError("Callback can't process provided type. " + val.runtimeType.toString());
+      throw UnimplementedError("Callback can't process provided type. " +
+          val.runtimeType.toString());
     }
     _callbackCall(caller, arg.ref);
   };

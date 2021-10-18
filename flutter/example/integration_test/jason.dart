@@ -519,11 +519,18 @@ void main() {
     expect(err.name, 'kind');
   });
 
-  testWidgets('Primitive arguments Callback validation', (WidgetTester widgetTester) async {
-    final intListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__int');
-    final stringListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__string');
-    final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__optional_int');
-    final optionalStringListener = dl.lookupFunction<Handle Function(ForeignValue), Object Function(ForeignValue)>('test__callback_listener__optional_string');
+  testWidgets('Primitive arguments Callback validation',
+      (WidgetTester widgetTester) async {
+    final intListener = dl.lookupFunction<Handle Function(ForeignValue),
+        Object Function(ForeignValue)>('test__callback_listener__int');
+    final stringListener = dl.lookupFunction<Handle Function(ForeignValue),
+        Object Function(ForeignValue)>('test__callback_listener__string');
+    final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue),
+        Object Function(ForeignValue)>('test__callback_listener__optional_int');
+    final optionalStringListener = dl.lookupFunction<
+        Handle Function(ForeignValue),
+        Object Function(
+            ForeignValue)>('test__callback_listener__optional_string');
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
@@ -541,23 +548,65 @@ void main() {
     noneVal.free();
   });
 
-  testWidgets('DartHandle argument Callback validation', (WidgetTester widgetTester) async {
+  testWidgets('DartHandle argument Callback validation',
+      (WidgetTester widgetTester) async {
     dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-        'register__test__test_callback_handle_function')(
-        Pointer.fromFunction<Void Function(Handle)>(callbackHandleTestFunction));
-    final dartHandleListener = dl.lookupFunction<Handle Function(), Object Function()>('test__callback_listener__dart_handle');
+            'register__test__test_callback_handle_function')(
+        Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
+    final dartHandleListener =
+        dl.lookupFunction<Handle Function(), Object Function()>(
+            'test__callback_listener__dart_handle');
 
-    var obj = CallbackTestObj();
+    var obj = TestObj();
 
     (dartHandleListener() as Function)(obj);
     expect(obj.x, equals(45));
   });
+
+  testWidgets('FutureResolver primitives', (WidgetTester widgetTester) async {
+    final intResolver =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__dart_future_resolver__int');
+    final stringResolver =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__dart_future_resolver__string');
+
+    var intVal = await (intResolver(
+        Future.delayed(Duration(milliseconds: 500), () async {
+      return 45;
+    })) as Future);
+    var stringVal = await (stringResolver(
+        Future.delayed(Duration(milliseconds: 500), () async {
+      return 'test string';
+    })) as Future);
+
+    expect(intVal as int, equals(45));
+    expect(stringVal as String, 'test string');
+  });
+
+  testWidgets('DartHandle argument Future validation',
+      (WidgetTester widgetTester) async {
+    dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+            'register__test__dart_future_resolver_handle_fn')(
+        Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
+
+    final handleResolver =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__dart_future_resolver__handle');
+
+    var testObj = TestObj();
+    var fut = Future.delayed(Duration(milliseconds: 500), () async {
+      return testObj;
+    });
+    await (handleResolver(fut) as Future);
+    expect(testObj.x, equals(45));
+  });
 }
 
-class CallbackTestObj {
+class TestObj {
   int x = 0;
 }
 
-void callbackHandleTestFunction(Object o) {
-  (o as CallbackTestObj).x = 45;
+void testObjMutator(Object o) {
+  (o as TestObj).x = 45;
 }

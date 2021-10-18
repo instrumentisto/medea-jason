@@ -8,8 +8,7 @@ typedef _boxDartHandle_C = Pointer<Handle> Function(Handle);
 typedef _boxDartHandle_Dart = Pointer<Handle> Function(Object);
 
 final _boxDartHandle =
-dl.lookupFunction<_boxDartHandle_C, _boxDartHandle_Dart>(
-    'box_dart_handle');
+    dl.lookupFunction<_boxDartHandle_C, _boxDartHandle_Dart>('box_dart_handle');
 final _unboxDartHandle =
     dl.lookupFunction<_unboxDartHandle_C, _unboxDartHandle_Dart>(
         'unbox_dart_handle');
