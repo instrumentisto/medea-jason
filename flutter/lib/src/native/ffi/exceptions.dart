@@ -1,8 +1,8 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/interface/exceptions.dart';
 
+import '/src/interface/exceptions.dart';
 import 'foreign_value.dart';
 import 'native_string.dart';
 import 'unbox_handle.dart';
