@@ -96,7 +96,7 @@ abstract class MediaSettingsUpdateException {
 
   /// Returns whether media settings were successfully rolled back after new
   /// settings application failed.
-  bool rolled_back();
+  bool rolledBack();
 
   @override
   String toString() {

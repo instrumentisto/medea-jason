@@ -320,7 +320,7 @@ class NativeMediaSettingsUpdateException extends MediaSettingsUpdateException
   }
 
   @override
-  bool rolled_back() {
+  bool rolledBack() {
     return _rolledBack;
   }
 }

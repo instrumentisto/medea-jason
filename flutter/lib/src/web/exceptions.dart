@@ -30,7 +30,7 @@ dynamic convertException(dynamic e) {
     var message = e.message();
     e.free();
     return StateError(message);
-  } else if (name == 'EnumerateDevicesException') { // TODO: deconstruct and free.
+  } else if (name == 'EnumerateDevicesException') {
     return WebEnumerateDevicesException(e as wasm.EnumerateDevicesException);
   } else if (name == 'InternalException') {
     return WebInternalException(e as wasm.InternalException);
@@ -44,7 +44,7 @@ dynamic convertException(dynamic e) {
         e as wasm.MediaStateTransitionException);
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
-  }  else {
+  } else {
     return e;
   }
 }
@@ -69,20 +69,25 @@ Future<T> failableFuture<T>(Future<T> f) async {
 
 /// Exception thrown when cannot get info of available media devices.
 class WebEnumerateDevicesException extends EnumerateDevicesException {
-  final wasm.EnumerateDevicesException _exception;
+  late dynamic _cause;
+  late String _trace;
 
-  WebEnumerateDevicesException(this._exception);
+  WebEnumerateDevicesException(wasm.EnumerateDevicesException e) {
+    _cause = e.cause();
+    _trace = e.trace();
+    e.free();
+  }
 
   /// Returns error that caused this [EnumerateDevicesException].
   @override
   dynamic cause() {
-    return _exception.cause();
+    return _cause;
   }
 
   /// Returns stacktrace of this [EnumerateDevicesException].
   @override
   String trace() {
-    return _exception.trace();
+    return _trace;
   }
 }
 
@@ -91,134 +96,171 @@ class WebEnumerateDevicesException extends EnumerateDevicesException {
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
 class WebInternalException extends InternalException {
-  final wasm.InternalException _exception;
+  late String _message;
+  late dynamic _cause;
+  late String _trace;
 
-  WebInternalException(this._exception);
+  WebInternalException(wasm.InternalException e) {
+    _message = e.message();
+    _cause = e.cause();
+    _trace = e.trace();
+    e.free();
+  }
 
   /// Returns error message describing the problem.
   @override
   String message() {
-    return _exception.message();
+    return _message;
   }
 
   /// Returns error that caused this [RpcClientException].
   @override
   dynamic cause() {
-    return _exception.cause();
+    return _cause;
   }
 
   /// Returns stacktrace of this [InternalException].
   @override
   String trace() {
-    return _exception.trace();
+    return _trace;
   }
 }
 
 /// Exception thrown when accessing media devices.
 class WebLocalMediaInitException extends LocalMediaInitException {
-  final wasm.LocalMediaInitException _exception;
+  late LocalMediaInitExceptionKind _kind;
+  late String _message;
+  late dynamic _cause;
+  late String _trace;
 
-  WebLocalMediaInitException(this._exception);
+  WebLocalMediaInitException(wasm.LocalMediaInitException e) {
+    _kind = LocalMediaInitExceptionKind.values[e.kind().toInt()];
+    _message = e.message();
+    _cause = e.cause();
+    _trace = e.trace();
+    e.free();
+  }
 
   /// Returns concrete error kind of this [LocalMediaInitException].
   @override
   LocalMediaInitExceptionKind kind() {
-    return LocalMediaInitExceptionKind.values[_exception.kind().toInt()];
+    return _kind;
   }
 
   /// Returns error message describing the problem.
   @override
   String message() {
-    return _exception.message();
+    return _message;
   }
 
   /// Returns error that caused this [LocalMediaInitException].
   @override
   dynamic cause() {
-    return _exception.cause();
+    return _cause;
   }
 
   /// Returns stacktrace of this [LocalMediaInitException].
   @override
   String trace() {
-    return _exception.trace();
+    return _trace;
   }
 }
 
 /// Errors occurring in `RoomHandle::set_local_media_settings` method.
 class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
-  final wasm.MediaSettingsUpdateException _exception;
+  late String _message;
+  late dynamic _cause;
+  late bool _rolledBack;
 
-  WebMediaSettingsUpdateException(this._exception);
+  WebMediaSettingsUpdateException(wasm.MediaSettingsUpdateException e) {
+    _message = e.message();
+    _cause = e.cause();
+    _rolledBack = e.rolled_back();
+    e.free();
+  }
 
   /// Returns error message describing the problem.
   @override
   String message() {
-    return _exception.message();
+    return _message;
   }
 
   /// Returns original error that was encountered while updating local media settings.
   @override
   dynamic cause() {
-    return _exception.cause();
+    return _cause;
   }
 
   /// Returns whether media settings were successfully rolled back after new
   /// settings application failed.
   @override
-  bool rolled_back() {
-    return _exception.rolled_back();
+  bool rolledBack() {
+    return _rolledBack;
   }
 }
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
 class WebMediaStateTransitionException extends MediaStateTransitionException {
-  final wasm.MediaStateTransitionException _exception;
+  late String _message;
+  late String _trace;
 
-  WebMediaStateTransitionException(this._exception);
+  WebMediaStateTransitionException(wasm.MediaStateTransitionException e) {
+    _message = e.message();
+    _trace = e.trace();
+    e.free();
+  }
 
   /// Returns error message describing the problem.
   @override
   String message() {
-    return _exception.message();
+    return _message;
   }
 
   /// Returns stacktrace of this [MediaStateTransitionException].
   @override
   String trace() {
-    return _exception.trace();
+    return _trace;
   }
 }
 
 /// Exceptions thrown from an RPC client that implements messaging with media
 /// server.
 class WebRpcClientException extends RpcClientException {
-  final wasm.RpcClientException _exception;
+  late RpcClientExceptionKind _kind;
+  late String _message;
+  late dynamic _cause;
+  late String _trace;
 
-  WebRpcClientException(this._exception);
+  WebRpcClientException(wasm.RpcClientException e) {
+    _kind = RpcClientExceptionKind.values[e.kind().toInt()];
+    _message = e.message();
+    _cause = e.cause();
+    _trace = e.trace();
+    e.free();
+  }
 
   /// Returns concrete error kind of this [RpcClientException].
   @override
   RpcClientExceptionKind kind() {
-    return RpcClientExceptionKind.values[_exception.kind().toInt()];
+    return _kind;
   }
 
   /// Returns error message describing the problem.
   @override
   String message() {
-    return _exception.message();
+    return _message;
   }
 
   /// Returns error that caused this [RpcClientException].
   @override
   dynamic cause() {
-    return _exception.cause();
+    return _cause;
   }
 
   /// Returns stacktrace of this [RpcClientException].
   @override
   String trace() {
-    return _exception.trace();
+    return _trace;
   }
 }
