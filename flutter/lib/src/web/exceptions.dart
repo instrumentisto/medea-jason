@@ -21,8 +21,16 @@ dynamic convertException(dynamic e) {
   if (name == null) {
     return e;
   } else if (name == 'FormatException') {
-    return FormatException((e as wasm.FormatException).message());
-  } else if (name == 'EnumerateDevicesException') {
+    e as wasm.FormatException;
+    var message = e.message();
+    e.free();
+    return FormatException(message);
+  } else if (name == 'StateError') {
+    e as wasm.StateError;
+    var message = e.message();
+    e.free();
+    return StateError(message);
+  } else if (name == 'EnumerateDevicesException') { // TODO: deconstruct and free.
     return WebEnumerateDevicesException(e as wasm.EnumerateDevicesException);
   } else if (name == 'InternalException') {
     return WebInternalException(e as wasm.InternalException);
@@ -36,9 +44,7 @@ dynamic convertException(dynamic e) {
         e as wasm.MediaStateTransitionException);
   } else if (name == 'RpcClientException') {
     return WebRpcClientException(e as wasm.RpcClientException);
-  } else if (name == 'StateError') {
-    return StateError((e as wasm.StateError).message());
-  } else {
+  }  else {
     return e;
   }
 }
