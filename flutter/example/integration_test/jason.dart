@@ -8,7 +8,6 @@ import 'package:medea_jason/src/interface/track_kinds.dart';
 import 'package:medea_jason/src/native/audio_track_constraints.dart';
 import 'package:medea_jason/src/native/device_video_track_constraints.dart';
 import 'package:medea_jason/src/native/display_video_track_constraints.dart';
-import 'package:medea_jason/src/native/ffi/exceptions.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import 'package:medea_jason/src/native/ffi/result.dart';
@@ -17,7 +16,6 @@ import 'package:medea_jason/src/native/jason.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_jason/src/native/media_stream_settings.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
-import 'package:medea_jason/medea_jason.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -353,7 +351,8 @@ void main() {
         err,
         predicate((e) =>
             e is MediaStateTransitionException &&
-            e.message() == 'SimpleTracksRequest should have at least one track' &&
+            e.message() ==
+                'SimpleTracksRequest should have at least one track' &&
             e.trace().contains('at src')));
   });
 
