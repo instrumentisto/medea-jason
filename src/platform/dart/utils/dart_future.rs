@@ -6,7 +6,10 @@ use std::future::Future;
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
 
-use crate::api::{DartValue, DartValueArg};
+use crate::{
+    api::{DartValue, DartValueArg},
+    platform::dart::error::DartError,
+};
 
 type DartFutureResolverSpawnerFunction =
     extern "C" fn(Dart_Handle, *mut DartFutureResolver);
@@ -58,6 +61,71 @@ impl DartFutureResolver {
     }
 }
 
+type FallibleDartFutureResolverSpawnerFunction =
+    extern "C" fn(Dart_Handle, *mut FallibleDartFutureResolver);
+
+static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
+    FallibleDartFutureResolverSpawnerFunction,
+> = None;
+
+#[no_mangle]
+pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
+    f: FallibleDartFutureResolverSpawnerFunction,
+) {
+    FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER = Some(f);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
+    fut: *mut FallibleDartFutureResolver,
+    val: DartValue,
+) {
+    let fut = Box::from_raw(fut);
+    fut.resolve_ok(val);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
+    fut: *mut FallibleDartFutureResolver,
+    val: Dart_Handle,
+) {
+    let fut = Box::from_raw(fut);
+    fut.resolve_err(DartError::from(val));
+}
+
+pub struct FallibleDartFutureResolver(
+    oneshot::Sender<Result<DartValue, DartError>>,
+);
+
+impl FallibleDartFutureResolver {
+    pub fn execute<T>(
+        dart_fut: Dart_Handle,
+    ) -> impl Future<Output = Result<DartValueArg<T>, DartError>> {
+        let (tx, rx) = oneshot::channel();
+        let this = Self(tx);
+
+        unsafe {
+            FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
+                dart_fut,
+                Box::into_raw(Box::new(this)),
+            );
+        }
+
+        async {
+            let val: Result<DartValue, DartError> = rx.await.unwrap();
+            Ok(DartValueArg::<T>::from(val?))
+        }
+    }
+
+    fn resolve_ok(self, val: DartValue) {
+        drop(self.0.send(Ok(val)));
+    }
+
+    fn resolve_err(self, err: DartError) {
+        drop(self.0.send(Err(err)));
+    }
+}
+
 #[cfg(feature = "mockable")]
 pub mod tests {
     use std::{convert::TryInto, ptr};
@@ -69,7 +137,9 @@ pub mod tests {
             err::FormatException,
             utils::{DartFuture, IntoDartFuture as _},
         },
-        platform::dart::utils::handle::DartHandle,
+        platform::dart::utils::{
+            dart_future::FallibleDartFutureResolver, handle::DartHandle,
+        },
     };
 
     use super::DartFutureResolver;
@@ -124,6 +194,19 @@ pub mod tests {
                 (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.try_into().unwrap())
             }
             Ok(())
+        }
+        .into_dart_future()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__fallible_dart_future_resolver__fails(
+        fut: Dart_Handle,
+    ) -> DartFuture<Result<i64, FormatException>> {
+        let fut = DartHandle::new(fut);
+        async move {
+            let val =
+                FallibleDartFutureResolver::execute::<i64>(fut.get()).await;
+            Ok(if val.is_err() { 1 } else { 0 })
         }
         .into_dart_future()
     }
