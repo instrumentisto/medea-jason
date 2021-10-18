@@ -4,7 +4,12 @@ use dart_sys::Dart_Handle;
 
 use crate::api::{DartValue, DartValueArg};
 
+/// Listener for the Dart callback with `void` as argument.
+pub struct Callback(Box<dyn FnOnce(DartValue)>);
+
 impl Callback {
+    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
+    /// `f` closure when it will be called on Dart side.
     pub fn callback<F, T>(f: F) -> Dart_Handle
     where
         F: FnOnce(DartValueArg<T>) + 'static,
@@ -17,17 +22,27 @@ impl Callback {
     }
 }
 
+/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
+/// created Dart callback which will call Rust side callback when Dart side
+/// callback will be fired.
 type CallbackFunction = extern "C" fn(*mut Callback) -> Dart_Handle;
 
+/// Stores pointer to the [`CallbackFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
 static mut CALLBACK_FUNCTION: Option<CallbackFunction> = None;
 
-pub struct Callback(Box<dyn FnOnce(DartValue)>);
-
+/// Registers the provided [`CallbackFunction`] as [`CALLBACK_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn register_Callback__callback(f: CallbackFunction) {
     CALLBACK_FUNCTION = Some(f);
 }
 
+/// Calls provided [`Callback`] with a provided [`DartValue`] as argument.
 #[no_mangle]
 pub unsafe extern "C" fn Callback__call(cb: *mut Callback, val: DartValue) {
     let cb = Box::from_raw(cb);

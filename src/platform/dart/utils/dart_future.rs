@@ -11,13 +11,24 @@ use crate::{
     platform::dart::error::DartError,
 };
 
+/// Pointer to an extern function that resolves provided Dart `Future` with a
+/// provided [`DartFutureResolver`].
 type DartFutureResolverSpawnerFunction =
     extern "C" fn(Dart_Handle, *mut DartFutureResolver);
 
+/// Stores pointer to the [`DartFutureResolverSpawnerFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
 static mut DART_FUTURE_RESOLVER_SPAWNER: Option<
     DartFutureResolverSpawnerFunction,
 > = None;
 
+/// Registers the provided [`DartFutureResolverSpawnerFunction`] as
+/// [`DART_FUTURE_RESOLVER_SPAWNER`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn register_DartFutureResolver__spawner(
     f: DartFutureResolverSpawnerFunction,
@@ -25,6 +36,9 @@ pub unsafe extern "C" fn register_DartFutureResolver__spawner(
     DART_FUTURE_RESOLVER_SPAWNER = Some(f);
 }
 
+/// Resolves provided [`DartFutureResolver`] with a provided [`DartValue`].
+///
+/// Frees provided [`DartFutureResolver`].
 #[no_mangle]
 pub unsafe extern "C" fn DartFutureResolver__resolve(
     fut: *mut DartFutureResolver,
@@ -34,9 +48,15 @@ pub unsafe extern "C" fn DartFutureResolver__resolve(
     fut.resolve(val);
 }
 
+/// Compatibility layer of the infallible Dart side Futures with a Rust side
+/// [`Future`].
 pub struct DartFutureResolver(oneshot::Sender<DartValue>);
 
 impl DartFutureResolver {
+    /// Converts infallible Dart side Future to the Rust's [`Future`].
+    ///
+    /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
+    /// result on Dart side Future resolve.
     pub fn execute<T>(
         dart_fut: Dart_Handle,
     ) -> impl Future<Output = DartValueArg<T>> {
@@ -56,18 +76,34 @@ impl DartFutureResolver {
         }
     }
 
+    /// Resolves this [`DartFutureResolver`] with a provided [`DartValue`] as a
+    /// result.
+    ///
+    /// __Should be only called by Dart side.__
     fn resolve(self, val: DartValue) {
         let _ = self.0.send(val);
     }
 }
 
+/// Pointer to an extern function that resolves provided Dart `Future` with a
+/// provided [`FallibleDartFutureResolver`].
 type FallibleDartFutureResolverSpawnerFunction =
     extern "C" fn(Dart_Handle, *mut FallibleDartFutureResolver);
 
+/// Stores pointer to the [`FallibleDartFutureResolverSpawnerFunction`] extern
+/// function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
 static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
     FallibleDartFutureResolverSpawnerFunction,
 > = None;
 
+/// Registers the provided [`FallibleDartFutureResolverSpawnerFunction`] as
+/// [`FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
     f: FallibleDartFutureResolverSpawnerFunction,
@@ -75,6 +111,10 @@ pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
     FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER = Some(f);
 }
 
+/// Resolves provided [`FallibleDartFutureResolver`] with a provided
+/// [`DartValue`] as `Ok` result.
+///
+/// Frees provided [`DartFutureResolver`].
 #[no_mangle]
 pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
     fut: *mut FallibleDartFutureResolver,
@@ -84,6 +124,10 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
     fut.resolve_ok(val);
 }
 
+/// Resolves provided [`FallibleDartFutureResolver`] with a provided
+/// [`DartError`] as `Err` result.
+///
+/// Frees provided [`DartFutureResolver`].
 #[no_mangle]
 pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
     fut: *mut FallibleDartFutureResolver,
@@ -93,11 +137,17 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
     fut.resolve_err(DartError::from(val));
 }
 
+/// Compatibility layer of the fallible Dart side Futures with a Rust side
+/// [`Future`].
 pub struct FallibleDartFutureResolver(
     oneshot::Sender<Result<DartValue, DartError>>,
 );
 
 impl FallibleDartFutureResolver {
+    /// Converts fallible Dart side Future to the Rust's [`Future`].
+    ///
+    /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
+    /// result on Dart side Future resolve.
     pub fn execute<T>(
         dart_fut: Dart_Handle,
     ) -> impl Future<Output = Result<DartValueArg<T>, DartError>> {
@@ -117,10 +167,18 @@ impl FallibleDartFutureResolver {
         }
     }
 
+    /// Resolves this [`FallibleDartFutureResolver`] with a provided
+    /// [`DartValue`] as `Ok` result.
+    ///
+    /// __Should be only called by Dart side.__
     fn resolve_ok(self, val: DartValue) {
         drop(self.0.send(Ok(val)));
     }
 
+    /// Resolves this [`FallibleDartFutureResolver`] with a provided
+    /// [`DartError`] as `Err` result.
+    ///
+    /// __Should be only called by Dart side.__
     fn resolve_err(self, err: DartError) {
         drop(self.0.send(Err(err)));
     }
