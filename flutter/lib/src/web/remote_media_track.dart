@@ -15,53 +15,53 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
 
   @override
   bool enabled() {
-    return failableFunction(() => obj.enabled());
+    return fallibleFunction(() => obj.enabled());
   }
 
   @override
   bool muted() {
-    return failableFunction(() => obj.muted());
+    return fallibleFunction(() => obj.muted());
   }
 
   @override
   MediaKind kind() {
-    return failableFunction(() => MediaKind.values[obj.kind().toInt()]);
+    return fallibleFunction(() => MediaKind.values[obj.kind().toInt()]);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return failableFunction(
+    return fallibleFunction(
         () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
   }
 
   @override
   MediaStreamTrack getTrack() {
-    return failableFunction(() => MediaStreamTrackWeb(obj.get_track()));
+    return fallibleFunction(() => MediaStreamTrackWeb(obj.get_track()));
   }
 
   @override
   void onEnabled(void Function() f) {
-    failableFunction(() => obj.on_enabled(allowInterop(f)));
+    fallibleFunction(() => obj.on_enabled(allowInterop(f)));
   }
 
   @override
   void onDisabled(void Function() f) {
-    failableFunction(() => obj.on_disabled(allowInterop(f)));
+    fallibleFunction(() => obj.on_disabled(allowInterop(f)));
   }
 
   @override
   void onMuted(void Function() f) {
-    failableFunction(() => obj.on_muted(allowInterop(f)));
+    fallibleFunction(() => obj.on_muted(allowInterop(f)));
   }
 
   @override
   void onUnmuted(void Function() f) {
-    failableFunction(() => obj.on_unmuted(allowInterop(f)));
+    fallibleFunction(() => obj.on_unmuted(allowInterop(f)));
   }
 
   @override
   void onStopped(void Function() f) {
-    failableFunction(() => obj.on_stopped(allowInterop(f)));
+    fallibleFunction(() => obj.on_stopped(allowInterop(f)));
   }
 
   @moveSemantics

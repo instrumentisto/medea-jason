@@ -23,107 +23,107 @@ class WebRoomHandle extends RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    await failableFuture(obj.join(token));
+    await fallibleFuture(obj.join(token));
   }
 
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
-    await failableFuture(obj.set_local_media_settings(
+    await fallibleFuture(obj.set_local_media_settings(
         (settings as MediaStreamSettings).obj, stopFirst, rollbackOnFail));
   }
 
   @override
   Future<void> muteAudio() async {
-    await failableFuture(obj.mute_audio());
+    await fallibleFuture(obj.mute_audio());
   }
 
   @override
   Future<void> unmuteAudio() async {
-    await failableFuture(obj.unmute_audio());
+    await fallibleFuture(obj.unmute_audio());
   }
 
   @override
   Future<void> enableAudio() async {
-    await failableFuture(obj.enable_audio());
+    await fallibleFuture(obj.enable_audio());
   }
 
   @override
   Future<void> disableAudio() async {
-    await failableFuture(obj.disable_audio());
+    await fallibleFuture(obj.disable_audio());
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
-    await failableFuture(obj.mute_video(kind?.index));
+    await fallibleFuture(obj.mute_video(kind?.index));
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
-    await failableFuture(obj.unmute_video(kind?.index));
+    await fallibleFuture(obj.unmute_video(kind?.index));
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
-    await failableFuture(obj.enable_video(kind?.index));
+    await fallibleFuture(obj.enable_video(kind?.index));
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
-    await failableFuture(obj.disable_video(kind?.index));
+    await fallibleFuture(obj.disable_video(kind?.index));
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await failableFuture(obj.enable_remote_audio());
+    await fallibleFuture(obj.enable_remote_audio());
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await failableFuture(obj.disable_remote_audio());
+    await fallibleFuture(obj.disable_remote_audio());
   }
 
   @override
   Future<void> enableRemoteVideo() async {
-    await failableFuture(obj.enable_remote_video());
+    await fallibleFuture(obj.enable_remote_video());
   }
 
   @override
   Future<void> disableRemoteVideo() async {
-    await failableFuture(obj.disable_remote_video());
+    await fallibleFuture(obj.disable_remote_video());
   }
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    failableFunction(() => obj.on_new_connection(allowInterop((handle) {
+    fallibleFunction(() => obj.on_new_connection(allowInterop((handle) {
           f(WebConnectionHandle(handle));
         })));
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    failableFunction(() => obj.on_close(allowInterop((reason) {
+    fallibleFunction(() => obj.on_close(allowInterop((reason) {
           f(WebRoomCloseReason(reason));
         })));
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    failableFunction(() => obj.on_local_track(allowInterop((track) {
+    fallibleFunction(() => obj.on_local_track(allowInterop((track) {
           f(WebLocalMediaTrack(track));
         })));
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    failableFunction(() => obj.on_connection_loss(allowInterop((handle) {
+    fallibleFunction(() => obj.on_connection_loss(allowInterop((handle) {
           f(WebReconnectHandle(handle));
         })));
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    failableFunction(() => obj.on_failed_local_media(allowInterop(f)));
+    fallibleFunction(() => obj.on_failed_local_media(allowInterop(f)));
   }
 
   @moveSemantics

@@ -33,12 +33,12 @@ impl ReconnectHandle {
     ///
     /// # Errors
     ///
-    /// With a [`RpcClientException`] if reconnect attempt fails.
+    /// With a [`RpcClientException`] if reconnecting attempt fails.
     ///
     /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// [`RpcSession`]: rpc::RpcSession
     /// [`RpcClientException`]: crate::api::err::RpcClientException
+    /// [`RpcSession`]: rpc::RpcSession
     /// [`StateError`]: crate::api::err::StateError
     pub fn reconnect_with_delay(&self, delay_ms: u32) -> Promise {
         let this = self.0.clone();
@@ -75,12 +75,12 @@ impl ReconnectHandle {
     ///
     /// # Errors
     ///
-    /// With a [`RpcClientException`] if reconnect attempt fails.
+    /// With a [`RpcClientException`] if reconnecting attempt fails.
     ///
     /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// [`RpcSession`]: rpc::RpcSession
     /// [`RpcClientException`]: crate::api::err::RpcClientException
+    /// [`RpcSession`]: rpc::RpcSession
     /// [`StateError`]: crate::api::err::StateError
     pub fn reconnect_with_backoff(
         &self,

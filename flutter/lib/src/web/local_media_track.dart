@@ -14,18 +14,18 @@ class WebLocalMediaTrack extends LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    return failableFunction(() => MediaKind.values[obj.kind().toInt()]);
+    return fallibleFunction(() => MediaKind.values[obj.kind().toInt()]);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return failableFunction(
+    return fallibleFunction(
         () => MediaSourceKind.values[obj.media_source_kind().toInt()]);
   }
 
   @override
   MediaStreamTrack getTrack() {
-    return failableFunction(() => MediaStreamTrackWeb(obj.get_track()));
+    return fallibleFunction(() => MediaStreamTrackWeb(obj.get_track()));
   }
 
   @moveSemantics

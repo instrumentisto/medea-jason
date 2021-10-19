@@ -10,7 +10,7 @@ enum LocalMediaInitExceptionKind {
   /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
   GetDisplayMediaFailed,
 
-  /// Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
+  /// Occurs when local track is [ended][1] right after [getUserMedia()][2]
   /// or [getDisplayMedia()][3] request.
   ///
   /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
@@ -91,10 +91,11 @@ abstract class MediaSettingsUpdateException {
   /// Returns error message describing the problem.
   String message();
 
-  /// Returns original error that was encountered while updating local media settings.
+  /// Returns original error that was encountered while updating local media
+  /// settings.
   dynamic cause();
 
-  /// Returns whether media settings were successfully rolled back after new
+  /// Indicates whether media settings were successfully rolled back after new
   /// settings application failed.
   bool rolledBack();
 

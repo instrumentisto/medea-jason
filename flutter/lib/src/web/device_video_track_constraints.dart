@@ -9,47 +9,47 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    failableFunction(() => obj.device_id(deviceId));
+    fallibleFunction(() => obj.device_id(deviceId));
   }
 
   @override
   void exactFacingMode(base.FacingMode facingMode) {
-    failableFunction(() => obj.exact_facing_mode(facingMode.index));
+    fallibleFunction(() => obj.exact_facing_mode(facingMode.index));
   }
 
   @override
   void idealFacingMode(base.FacingMode facingMode) {
-    failableFunction(() => obj.ideal_facing_mode(facingMode.index));
+    fallibleFunction(() => obj.ideal_facing_mode(facingMode.index));
   }
 
   @override
   void exactHeight(int height) {
-    failableFunction(() => obj.exact_height(height));
+    fallibleFunction(() => obj.exact_height(height));
   }
 
   @override
   void idealHeight(int height) {
-    failableFunction(() => obj.ideal_height(height));
+    fallibleFunction(() => obj.ideal_height(height));
   }
 
   @override
   void heightInRange(int min, int max) {
-    failableFunction(() => obj.height_in_range(min, max));
+    fallibleFunction(() => obj.height_in_range(min, max));
   }
 
   @override
   void exactWidth(int width) {
-    failableFunction(() => obj.exact_width(width));
+    fallibleFunction(() => obj.exact_width(width));
   }
 
   @override
   void idealWidth(int width) {
-    failableFunction(() => obj.ideal_width(width));
+    fallibleFunction(() => obj.ideal_width(width));
   }
 
   @override
   void widthInRange(int min, int max) {
-    failableFunction(() => obj.width_in_range(min, max));
+    fallibleFunction(() => obj.width_in_range(min, max));
   }
 
   @moveSemantics

@@ -10,14 +10,14 @@ class WebReconnectHandle extends ReconnectHandle {
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
-    await failableFuture(obj.reconnect_with_delay(delayMs));
+    await fallibleFuture(obj.reconnect_with_delay(delayMs));
   }
 
   @override
   Future<void> reconnectWithBackoff(
       int startingDelayMs, double multiplier, int maxDelay,
       [int? maxElapsedTimeMs]) async {
-    await failableFuture(obj.reconnect_with_backoff(
+    await fallibleFuture(obj.reconnect_with_backoff(
         startingDelayMs, multiplier, maxDelay, maxElapsedTimeMs));
   }
 

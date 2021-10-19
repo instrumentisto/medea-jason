@@ -47,13 +47,12 @@ impl MediaManagerHandle {
     /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
     /// implicitly owns native object behind this [`MediaManagerHandle`].
     ///
-    /// With a [`EnumerateDevicesException`] if a request of platform media
+    /// With a [`EnumerateDevicesException`][0] if a request of platform media
     /// devices access failed.
     ///
-    /// [`StateError`]: crate::api::err::StateError
     /// [`Jason`]: crate::api::Jason
-    /// [`EnumerateDevicesException`]:
-    /// crate::api::err::EnumerateDevicesException
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::EnumerateDevicesException
     pub fn enumerate_devices(&self) -> Promise {
         let this = self.0.clone();
 
@@ -88,9 +87,9 @@ impl MediaManagerHandle {
     /// With a [`LocalMediaInitException`] if a request of platform media
     /// devices access failed.
     ///
-    /// [`StateError`]: crate::api::err::StateError
     /// [`Jason`]: crate::api::Jason
     /// [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
+    /// [`StateError`]: crate::api::err::StateError
     pub fn init_local_tracks(&self, caps: &MediaStreamSettings) -> Promise {
         let this = self.0.clone();
         let caps = caps.clone();

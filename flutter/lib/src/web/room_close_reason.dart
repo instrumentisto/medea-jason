@@ -10,17 +10,17 @@ class WebRoomCloseReason extends RoomCloseReason {
 
   @override
   String reason() {
-    return failableFunction(() => obj.reason());
+    return fallibleFunction(() => obj.reason());
   }
 
   @override
   bool isClosedByServer() {
-    return failableFunction(() => obj.is_closed_by_server());
+    return fallibleFunction(() => obj.is_closed_by_server());
   }
 
   @override
   bool isErr() {
-    return failableFunction(() => obj.is_err());
+    return fallibleFunction(() => obj.is_err());
   }
 
   @moveSemantics

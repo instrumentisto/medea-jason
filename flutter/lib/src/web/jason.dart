@@ -12,17 +12,17 @@ class Jason extends base.Jason {
 
   @override
   MediaManagerHandle mediaManager() {
-    return failableFunction(() => WebMediaManagerHandle(obj.media_manager()));
+    return fallibleFunction(() => WebMediaManagerHandle(obj.media_manager()));
   }
 
   @override
   RoomHandle initRoom() {
-    return failableFunction(() => WebRoomHandle(obj.init_room()));
+    return fallibleFunction(() => WebRoomHandle(obj.init_room()));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    failableFunction(() => obj.close_room((room as WebRoomHandle).obj));
+    fallibleFunction(() => obj.close_room((room as WebRoomHandle).obj));
   }
 
   @override

@@ -17,14 +17,14 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    var tracks = await failableFuture(
+    var tracks = await fallibleFuture(
         obj.init_local_tracks((caps as MediaStreamSettings).obj));
     return tracks.map((t) => WebLocalMediaTrack(t)).toList();
   }
 
   @override
   Future<List<InputDeviceInfo>> enumerateDevices() async {
-    var tracks = await failableFuture(obj.enumerate_devices());
+    var tracks = await fallibleFuture(obj.enumerate_devices());
     return tracks.map((t) => WebInputDeviceInfo(t)).toList();
   }
 

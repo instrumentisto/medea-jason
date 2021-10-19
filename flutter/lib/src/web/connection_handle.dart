@@ -16,24 +16,24 @@ class WebConnectionHandle extends ConnectionHandle {
 
   @override
   String getRemoteMemberId() {
-    return failableFunction(() => obj.get_remote_member_id());
+    return fallibleFunction(() => obj.get_remote_member_id());
   }
 
   @override
   void onClose(void Function() f) {
-    failableFunction(() => obj.on_close(allowInterop(f)));
+    fallibleFunction(() => obj.on_close(allowInterop(f)));
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    failableFunction(() => obj.on_remote_track_added(allowInterop((track) {
+    fallibleFunction(() => obj.on_remote_track_added(allowInterop((track) {
           f(WebRemoteMediaTrack(track));
         })));
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    failableFunction(() => obj.on_quality_score_update(allowInterop(f)));
+    fallibleFunction(() => obj.on_quality_score_update(allowInterop(f)));
   }
 
   @moveSemantics

@@ -11,22 +11,22 @@ class WebInputDeviceInfo extends InputDeviceInfo {
 
   @override
   String deviceId() {
-    return failableFunction(() => obj.device_id());
+    return fallibleFunction(() => obj.device_id());
   }
 
   @override
   String label() {
-    return failableFunction(() => obj.label());
+    return fallibleFunction(() => obj.label());
   }
 
   @override
   MediaKind kind() {
-    return failableFunction(() => MediaKind.values[obj.kind().toInt()]);
+    return fallibleFunction(() => MediaKind.values[obj.kind().toInt()]);
   }
 
   @override
   String groupId() {
-    return failableFunction(() => obj.group_id());
+    return fallibleFunction(() => obj.group_id());
   }
 
   @moveSemantics

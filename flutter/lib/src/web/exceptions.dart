@@ -5,7 +5,7 @@ import 'jason_wasm.dart' as wasm;
 
 /// Returns name of the provided [wasm] exception.
 ///
-/// Returns null in case if provided exception is not from Jason.
+/// Returns `null` in case if the provided exception is not from Jason.
 String? _getName(dynamic e) {
   try {
     var exceptionConstructor = getProperty(e, 'constructor');
@@ -15,7 +15,7 @@ String? _getName(dynamic e) {
   }
 }
 
-/// Converts provided [wasm] exception to the Dart exception
+/// Converts the provided [wasm] exception into the Dart exception.
 dynamic convertException(dynamic e) {
   var name = _getName(e);
   if (name == null) {
@@ -49,8 +49,9 @@ dynamic convertException(dynamic e) {
   }
 }
 
-/// Wraps provided [Function] to the try/catch block and wraps [wasm] exception to the Dart wrapper.
-T failableFunction<T>(T Function() f) {
+/// Wraps provided [Function] to the try/catch block and wraps [wasm] exception
+/// to the Dart wrapper.
+T fallibleFunction<T>(T Function() f) {
   try {
     return f();
   } catch (e) {
@@ -58,8 +59,9 @@ T failableFunction<T>(T Function() f) {
   }
 }
 
-/// Wraps provided [Future] to the try/catch block and wraps [wasm] exception to the Dart wrapper.
-Future<T> failableFuture<T>(Future<T> f) async {
+/// Wraps provided [Future] to the try/catch block and wraps [wasm] exception to
+/// the Dart wrapper.
+Future<T> fallibleFuture<T>(Future<T> f) async {
   try {
     return await f;
   } catch (e) {
@@ -166,7 +168,7 @@ class WebLocalMediaInitException extends LocalMediaInitException {
   }
 }
 
-/// Errors occurring in `RoomHandle::set_local_media_settings` method.
+/// Errors occurring in `RoomHandle::set_local_media_settings()` method.
 class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
   late String _message;
   late dynamic _cause;
@@ -191,7 +193,7 @@ class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
     return _cause;
   }
 
-  /// Returns whether media settings were successfully rolled back after new
+  /// Indicates whether media settings were successfully rolled back after new
   /// settings application failed.
   @override
   bool rolledBack() {
@@ -224,7 +226,7 @@ class WebMediaStateTransitionException extends MediaStateTransitionException {
   }
 }
 
-/// Exceptions thrown from an RPC client that implements messaging with media
+/// Exceptions thrown from an RPC client that implements messaging with a media
 /// server.
 class WebRpcClientException extends RpcClientException {
   late RpcClientExceptionKind _kind;

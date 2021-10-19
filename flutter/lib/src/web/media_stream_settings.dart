@@ -15,7 +15,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
-    failableFunction(
+    fallibleFunction(
         () => obj.audio((constraints as AudioTrackConstraints).obj));
   }
 
@@ -23,7 +23,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void deviceVideo(
       @moveSemantics
           base_device_video.DeviceVideoTrackConstraints constraints) {
-    failableFunction(() =>
+    fallibleFunction(() =>
         obj.device_video((constraints as DeviceVideoTrackConstraints).obj));
   }
 
@@ -31,7 +31,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void displayVideo(
       @moveSemantics
           base_display_video.DisplayVideoTrackConstraints constraints) {
-    failableFunction(() =>
+    fallibleFunction(() =>
         obj.display_video((constraints as DisplayVideoTrackConstraints).obj));
   }
 

@@ -8,7 +8,7 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    failableFunction(() => obj.device_id(deviceId));
+    fallibleFunction(() => obj.device_id(deviceId));
   }
 
   @moveSemantics

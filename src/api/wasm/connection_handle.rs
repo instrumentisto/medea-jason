@@ -26,9 +26,9 @@ impl ConnectionHandle {
     /// [`ConnectionHandle`].
     ///
     /// [`Connection`]: connection::Connection
-    /// [`StateError`]: api::err::StateError
     /// [`Jason`]: api::Jason
     /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: api::err::StateError
     pub fn on_close(&self, cb: js_sys::Function) -> Result<(), JsValue> {
         self.0
             .on_close(cb.into())
@@ -45,9 +45,9 @@ impl ConnectionHandle {
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
     ///
-    /// [`StateError`]: crate::api::err::StateError
     /// [`Jason`]: api::Jason
     /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
     pub fn get_remote_member_id(&self) -> Result<String, JsValue> {
         self.0
             .get_remote_member_id()
@@ -66,10 +66,10 @@ impl ConnectionHandle {
     /// [`ConnectionHandle`].
     ///
     /// [`Connection`]: connection::Connection
-    /// [`RemoteMediaTrack`]: crate::api::RemoteMediaTrack
-    /// [`StateError`]: crate::api::err::StateError
     /// [`Jason`]: api::Jason
+    /// [`RemoteMediaTrack`]: crate::api::RemoteMediaTrack
     /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_remote_track_added(
         &self,
         cb: js_sys::Function,
@@ -90,9 +90,9 @@ impl ConnectionHandle {
     /// a [`RoomHandle`] that implicitly owns native object behind this
     /// [`ConnectionHandle`].
     ///
-    /// [`StateError`]: crate::api::err::StateError
     /// [`Jason`]: api::Jason
     /// [`RoomHandle`]: api::RoomHandle
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_quality_score_update(
         &self,
         cb: js_sys::Function,
