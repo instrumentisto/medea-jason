@@ -24,7 +24,7 @@ impl Drop for Inner {
     }
 }
 
-/// Wrapper arount [`Dart_Handle`] which manages lifetimes of the
+/// Wrapper around [`Dart_Handle`] which manages lifetimes of the
 /// [`Dart_PersistentHandle`].
 #[derive(Clone, Debug, PartialEq)]
 pub struct DartHandle(Rc<Inner>);

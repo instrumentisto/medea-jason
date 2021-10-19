@@ -20,6 +20,7 @@ final _fallibleResolveErr =
     dl.lookupFunction<_fallibleResolveErr_C, _fallibleResolveErr_Dart>(
         'FallibleDartFutureResolver__resolve_err');
 
+/// Registers functions needed for `DartFutureResolver` working.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_DartFutureResolver__spawner')(
@@ -29,6 +30,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Void Function(Handle, Pointer)>(fallibleResolver));
 }
 
+/// Returns `Future` which will call provided `DartFutureResolver` on resolve.
 void resolver(Object fut, Pointer resolver) {
   fut as Future;
   fut.then((val) {
@@ -49,6 +51,7 @@ void resolver(Object fut, Pointer resolver) {
   });
 }
 
+/// Returns `Future` which will call provided `FallibleDartFutureResolver` on resolve.
 void fallibleResolver(Object fut, Pointer resolver) {
   fut as Future;
   fut.then((val) {
