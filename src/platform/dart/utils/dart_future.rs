@@ -10,6 +10,7 @@ use crate::{
     api::{DartValue, DartValueArg},
     platform::dart::error::DartError,
 };
+use std::{convert::TryInto, fmt::Debug};
 
 /// Pointer to an extern function that resolves provided Dart `Future` with a
 /// provided [`DartFutureResolver`].
@@ -54,18 +55,23 @@ pub unsafe extern "C" fn DartFutureResolver__resolve(
 
 /// Compatibility layer of the infallible Dart side Futures with a Rust side
 /// [`Future`].
-pub struct DartFutureResolver(oneshot::Sender<DartValue>);
+pub struct DartFutureResolver(Box<dyn FnOnce(DartValue)>);
 
 impl DartFutureResolver {
     /// Converts infallible Dart side Future to the Rust's [`Future`].
     ///
     /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
     /// result on Dart side Future resolve.
-    pub fn execute<T>(
-        dart_fut: Dart_Handle,
-    ) -> impl Future<Output = DartValueArg<T>> {
+    pub fn execute<T>(dart_fut: Dart_Handle) -> impl Future<Output = T>
+    where
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+    {
         let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
+        let this = Self(Box::new(|val| {
+            drop(tx.send(DartValueArg::<T>::from(val).try_into().unwrap()));
+        }));
 
         unsafe {
             DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
@@ -74,10 +80,7 @@ impl DartFutureResolver {
             );
         }
 
-        async move {
-            let val: DartValue = rx.await.unwrap();
-            DartValueArg::<T>::from(val)
-        }
+        async move { rx.await.unwrap() }
     }
 
     /// Resolves this [`DartFutureResolver`] with a provided [`DartValue`] as a
@@ -85,7 +88,7 @@ impl DartFutureResolver {
     ///
     /// __Should be only called by Dart side.__
     fn resolve(self, val: DartValue) {
-        let _ = self.0.send(val);
+        (self.0)(val);
     }
 }
 
@@ -152,7 +155,7 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
 /// Compatibility layer of the fallible Dart side Futures with a Rust side
 /// [`Future`].
 pub struct FallibleDartFutureResolver(
-    oneshot::Sender<Result<DartValue, DartError>>,
+    Box<dyn FnOnce(Result<DartValue, DartError>)>,
 );
 
 impl FallibleDartFutureResolver {
@@ -166,9 +169,18 @@ impl FallibleDartFutureResolver {
     /// Errors with a [`DartError`] if Dart side thrown exception.
     pub fn execute<T>(
         dart_fut: Dart_Handle,
-    ) -> impl Future<Output = Result<DartValueArg<T>, DartError>> {
+    ) -> impl Future<Output = Result<T, DartError>>
+    where
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+    {
         let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
+        let this = Self(Box::new(|res| {
+            drop(tx.send(
+                res.map(|val| DartValueArg::<T>::from(val).try_into().unwrap()),
+            ));
+        }));
 
         unsafe {
             FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
@@ -177,10 +189,7 @@ impl FallibleDartFutureResolver {
             );
         }
 
-        async {
-            let val: Result<DartValue, DartError> = rx.await.unwrap();
-            Ok(DartValueArg::<T>::from(val?))
-        }
+        async move { rx.await.unwrap() }
     }
 
     /// Resolves this [`FallibleDartFutureResolver`] with a provided
@@ -188,7 +197,7 @@ impl FallibleDartFutureResolver {
     ///
     /// __Should be only called by Dart side.__
     fn resolve_ok(self, val: DartValue) {
-        drop(self.0.send(Ok(val)));
+        (self.0)(Ok(val));
     }
 
     /// Resolves this [`FallibleDartFutureResolver`] with a provided
@@ -196,13 +205,13 @@ impl FallibleDartFutureResolver {
     ///
     /// __Should be only called by Dart side.__
     fn resolve_err(self, err: DartError) {
-        drop(self.0.send(Err(err)));
+        (self.0)(Err(err));
     }
 }
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    use std::{convert::TryInto, ptr};
+    use std::ptr;
 
     use dart_sys::Dart_Handle;
 
@@ -225,7 +234,6 @@ pub mod tests {
         let fut = DartHandle::new(fut);
         async move {
             let val = DartFutureResolver::execute::<i64>(fut.get()).await;
-            let val: i64 = val.try_into().unwrap();
             Ok(val)
         }
         .into_dart_future()
@@ -238,7 +246,6 @@ pub mod tests {
         let fut = DartHandle::new(fut);
         async move {
             let val = DartFutureResolver::execute::<String>(fut.get()).await;
-            let val: String = val.try_into().unwrap();
             Ok(val)
         }
         .into_dart_future()
@@ -266,9 +273,7 @@ pub mod tests {
                 fut.get(),
             )
             .await;
-            unsafe {
-                (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.try_into().unwrap())
-            }
+            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val) }
             Ok(())
         }
         .into_dart_future()

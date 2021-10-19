@@ -49,6 +49,7 @@ void resolver(Object f, Pointer resolver) {
           "Future can't process provided type. " + val.runtimeType.toString());
     }
     _futureResolve(resolver, arg.ref);
+    arg.free();
   });
 }
 
@@ -71,6 +72,7 @@ void fallibleResolver(Object f, Pointer resolver) {
           "Future can't process provided type. " + val.runtimeType.toString());
     }
     _fallibleResolveOk(resolver, arg.ref);
+    arg.free();
   }).onError((error, stackTrace) {
     _fallibleResolveErr(resolver, error!);
   });

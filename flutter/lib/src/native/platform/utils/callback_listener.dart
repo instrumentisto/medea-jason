@@ -32,5 +32,6 @@ Object callback(Pointer caller) {
           val.runtimeType.toString());
     }
     _callbackCall(caller, arg.ref);
+    arg.free();
   };
 }
