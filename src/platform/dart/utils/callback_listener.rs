@@ -1,377 +1,134 @@
 //! Definitions and implementations of the Dart callback listeners.
 
-use std::{os::raw::c_char, ptr};
-
 use dart_sys::Dart_Handle;
 
-use crate::{
-    api::c_str_into_string, platform::dart::utils::handle::DartHandle,
-};
-
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback with a `void` as argument which will call Rust side
-/// callback when Dart side callback will be fired.
-type VoidCallbackFunction = extern "C" fn(*mut VoidCallback) -> Dart_Handle;
-
-/// Stores pointer to the [`VoidCallbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut VOID_CALLBACK_FUNCTION: Option<VoidCallbackFunction> = None;
-
-/// Registers the provided [`VoidCallbackFunction`] as
-/// [`VOID_CALLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_VoidCallback__callback(
-    f: VoidCallbackFunction,
-) {
-    VOID_CALLBACK_FUNCTION = Some(f);
-}
+use crate::api::{DartValue, DartValueArg};
 
 /// Listener for the Dart callback with `void` as argument.
-pub struct VoidCallback(Box<dyn FnOnce()>);
+pub struct Callback(Box<dyn FnOnce(DartValue)>);
 
-impl VoidCallback {
+impl Callback {
     /// Returns [`Dart_Handle`] to the Dart callback which will call provided
     /// `f` closure when it will be called on Dart side.
-    pub fn callback<F>(f: F) -> Dart_Handle
+    pub fn callback<F, T>(f: F) -> Dart_Handle
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(DartValueArg<T>) + 'static,
     {
-        let this = Self(Box::new(f));
-        unsafe {
-            VOID_CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this)))
-        }
+        let this = Self(Box::new(move |val: DartValue| {
+            let var = DartValueArg::<T>::from(val);
+            (f)(var);
+        }));
+        unsafe { CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this))) }
     }
 }
 
-/// Notifies underlying closure of the [`VoidCallback`] about Dart side callback
-/// firing.
+/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
+/// created Dart callback which will call Rust side callback when Dart side
+/// callback will be fired.
+type CallbackFunction = extern "C" fn(*mut Callback) -> Dart_Handle;
+
+/// Stores pointer to the [`CallbackFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut CALLBACK_FUNCTION: Option<CallbackFunction> = None;
+
+/// Registers the provided [`CallbackFunction`] as [`CALLBACK_FUNCTION`].
 ///
 /// # Safety
 ///
-/// Should be called only when provided pointer is not freed.
+/// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
-pub unsafe extern "C" fn VoidCallback__call(cb: *mut VoidCallback) {
+pub unsafe extern "C" fn register_Callback__callback(f: CallbackFunction) {
+    CALLBACK_FUNCTION = Some(f);
+}
+
+/// Calls provided [`Callback`] with a provided [`DartValue`] as argument.
+///
+/// # Safety
+///
+/// Provided [`Callback`] shouldn't be freed.
+#[no_mangle]
+pub unsafe extern "C" fn Callback__call(cb: *mut Callback, val: DartValue) {
     let cb = Box::from_raw(cb);
-    cb.0();
+    (cb.0)(val);
 }
 
-/// Passes provided `val` argument to the [`StringCallback`]'s underlying
-/// closure.
-///
-/// This function is used for notifying Rust side about Dart side callback
-/// firing. All arguments of the fired Dart callback should be passed to this
-/// function.
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`StringCallback`] and
-/// [`c_char`] is not freed.
-#[no_mangle]
-pub unsafe extern "C" fn StringCallback__call(
-    cb: *const StringCallback,
-    val: ptr::NonNull<c_char>,
-) {
-    let s = c_str_into_string(val);
-    let cb = cb.as_ref().unwrap();
-    cb.0(s);
-}
+#[cfg(feature = "mockable")]
+pub mod tests {
+    use std::{convert::TryInto, ptr};
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback with a `String` as argument which will call Rust side
-/// callback when Dart side callback will be fired.
-type StringCallbackFunction =
-    extern "C" fn(*const StringCallback) -> Dart_Handle;
+    use dart_sys::Dart_Handle;
 
-/// Stores pointer to the [`StringCallbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut STRING_CALLBACK_FUNCTION: Option<StringCallbackFunction> = None;
+    use crate::api::DartValueArg;
 
-/// Registers the provided [`StringCallbackFunction`] as
-/// [`STRING_CALLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_StringCallback__callback(
-    f: StringCallbackFunction,
-) {
-    STRING_CALLBACK_FUNCTION = Some(f);
-}
+    use super::Callback;
 
-/// Listener for the Dart callback with `String` as argument.
-pub struct StringCallback(Box<dyn Fn(String)>);
-
-impl StringCallback {
-    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
-    /// `f` closure when it will be called on Dart side.
-    ///
-    /// Argument with which Dart side callback will be called will be passed to
-    /// the provided `f` closure.
-    pub fn callback<F>(f: F) -> DartHandle
-    where
-        F: Fn(String) + 'static,
-    {
-        let this = Self(Box::new(f));
-        unsafe {
-            DartHandle::new(STRING_CALLBACK_FUNCTION.unwrap()(Box::into_raw(
-                Box::new(this),
-            )))
-        }
+    #[no_mangle]
+    pub unsafe extern "C" fn test__callback_listener__int(
+        expects: DartValueArg<i64>,
+    ) -> Dart_Handle {
+        let expects: i64 = expects.try_into().unwrap();
+        Callback::callback(move |i: DartValueArg<i64>| {
+            let val: i64 = i.try_into().unwrap();
+            assert_eq!(val, expects);
+        })
     }
-}
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback with a mutable pointer to the [`Dart_Handle`] as
-/// argument which will call Rust side callback when Dart side callback will be
-/// fired.
-type HandleMutCallbackFunction =
-    extern "C" fn(*mut HandleMutCallback) -> Dart_Handle;
-
-/// Stores pointer to the [`HandleMutCallbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut HANDLE_MUT_CALLBACK_FUNCTION: Option<HandleMutCallbackFunction> =
-    None;
-
-/// Registers the provided [`HandleMutCallbackFunction`] as
-/// [`HANDLE_MUT_CALLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_HandleMutCallback__callback(
-    f: HandleMutCallbackFunction,
-) {
-    HANDLE_MUT_CALLBACK_FUNCTION = Some(f);
-}
-
-/// Passes provided `val` argument to the [`HandleMutCallback`]'s underlying
-/// closure.
-///
-/// This function is used for notifying Rust side about Dart side callback
-/// firing. All arguments of the fired Dart callback should be passed to this
-/// function.
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`HandleMutCallback`] and
-/// [`Dart_Handle`] is not freed.
-#[no_mangle]
-pub unsafe extern "C" fn HandleMutCallback__call(
-    cb: *mut HandleMutCallback,
-    val: Dart_Handle,
-) {
-    (*cb).0(val);
-}
-
-/// Listener for the Dart callback with a mutable pointer to [`Dart_Handle`] as
-/// argument.
-pub struct HandleMutCallback(Box<dyn FnMut(Dart_Handle)>);
-
-impl HandleMutCallback {
-    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
-    /// `f` closure when it will be called on Dart side.
-    ///
-    /// Argument with which Dart side callback will be called will be passed to
-    /// the provided `f` closure.
-    pub fn callback<F>(f: F) -> Dart_Handle
-    where
-        F: FnMut(Dart_Handle) + 'static,
-    {
-        let this = Self(Box::new(f));
-        unsafe {
-            HANDLE_MUT_CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this)))
-        }
+    #[no_mangle]
+    pub unsafe extern "C" fn test__callback_listener__string(
+        expects: DartValueArg<String>,
+    ) -> Dart_Handle {
+        let expects: String = expects.try_into().unwrap();
+        Callback::callback(move |val: DartValueArg<String>| {
+            let val: String = val.try_into().unwrap();
+            assert_eq!(val, expects);
+        })
     }
-}
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback with a pointer to the [`Dart_Handle`] as argument
-/// which will call Rust side callback when Dart side callback will be fired.
-type HandleCallbackFunction = extern "C" fn(*mut HandleCallback) -> Dart_Handle;
-
-/// Stores pointer to the [`HandleCallbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut HANDLE_CALLBACK_FUNCTION: Option<HandleCallbackFunction> = None;
-
-/// Registers the provided [`HandleCallbackFunction`] as
-/// [`HANDLE_CALLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_HandleCallback__callback(
-    f: HandleCallbackFunction,
-) {
-    HANDLE_CALLBACK_FUNCTION = Some(f);
-}
-
-/// Passes provided `val` argument to the [`HandleCallback`]'s underlying
-/// closure.
-///
-/// This function is used for notifying Rust side about Dart side callback
-/// firing. All arguments of the fired Dart callback should be passed to this
-/// function.
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`HandleCallback`] and
-/// [`Dart_Handle`] is not freed.
-#[no_mangle]
-pub unsafe extern "C" fn HandleCallback__call(
-    cb: *mut HandleCallback,
-    handle: Dart_Handle,
-) {
-    let cb = Box::from_raw(cb);
-    cb.0(handle);
-}
-
-/// Listener for the Dart callback with a pointer to [`Dart_Handle`] as
-/// argument.
-pub struct HandleCallback(Box<dyn Fn(Dart_Handle)>);
-
-impl HandleCallback {
-    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
-    /// `f` closure when it will be called on Dart side.
-    ///
-    /// Argument with which Dart side callback will be called will be passed to
-    /// the provided `f` closure.
-    pub fn callback<F>(f: F) -> Dart_Handle
-    where
-        F: Fn(Dart_Handle) + 'static,
-    {
-        let this = Self(Box::new(f));
-        unsafe {
-            HANDLE_CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this)))
-        }
+    #[no_mangle]
+    pub unsafe extern "C" fn test__callback_listener__optional_int(
+        expects: DartValueArg<Option<i64>>,
+    ) -> Dart_Handle {
+        let expects: Option<i64> = expects.try_into().unwrap();
+        Callback::callback(move |val: DartValueArg<Option<i64>>| {
+            let val: Option<i64> = val.try_into().unwrap();
+            assert_eq!(val, expects);
+        })
     }
-}
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback with a `Int32` as argument which will call Rust side
-/// callback when Dart side callback will be fired.
-type IntCallbackFunction = extern "C" fn(*mut IntCallback) -> Dart_Handle;
-
-/// Stores pointer to the [`IntCallbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut INT_CALLBACK_FUNCTION: Option<IntCallbackFunction> = None;
-
-/// Registers the provided [`IntCallbackFunction`] as [`INT_CALLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_IntCallback__callback(
-    f: IntCallbackFunction,
-) {
-    INT_CALLBACK_FUNCTION = Some(f);
-}
-
-/// Passes provided `val` argument to the [`IntCallback`]'s underlying closure.
-///
-/// This function is used for notifying Rust side about Dart side callback
-/// firing. All arguments of the fired Dart callback should be passed to this
-/// function.
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`IntCallback`] is not freed.
-#[no_mangle]
-pub unsafe extern "C" fn IntCallback__call(cb: *mut IntCallback, val: i32) {
-    (*cb).0(val);
-}
-
-/// Listener for the Dart callback with `Int32` as argument.
-pub struct IntCallback(Box<dyn FnMut(i32)>);
-
-impl IntCallback {
-    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
-    /// `f` closure when it will be called on Dart side.
-    ///
-    /// Argument with which Dart side callback will be called will be passed to
-    /// the provided `f` closure.
-    pub fn callback<F>(f: F) -> Dart_Handle
-    where
-        F: FnMut(i32) + 'static,
-    {
-        let this = Self(Box::new(f));
-        unsafe { INT_CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this))) }
+    #[no_mangle]
+    pub unsafe extern "C" fn test__callback_listener__optional_string(
+        expects: DartValueArg<Option<String>>,
+    ) -> Dart_Handle {
+        let expects: Option<String> = expects.try_into().unwrap();
+        Callback::callback(move |val: DartValueArg<Option<String>>| {
+            let val: Option<String> = val.try_into().unwrap();
+            assert_eq!(val, expects);
+        })
     }
-}
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback with a two pointers to the [`Dart_Handle`]s as
-/// argument which will call Rust side callback when Dart side callback will be
-/// fired.
-type TwoArgCallbackFunction = extern "C" fn(*mut TwoArgCallback) -> Dart_Handle;
+    type TestCallbackHandleFunction = extern "C" fn(ptr::NonNull<Dart_Handle>);
 
-/// Stores pointer to the [`TwoArgCallbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut TWO_ARG_CALLBACK_FUNCTION: Option<TwoArgCallbackFunction> = None;
+    static mut TEST_CALLBACK_HANDLE_FUNCTION: Option<
+        TestCallbackHandleFunction,
+    > = None;
 
-/// Registers the provided [`TwoArgCallbackFunction`] as
-/// [`TWO_ARG_CALLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_TwoArgCallback__callback(
-    f: TwoArgCallbackFunction,
-) {
-    TWO_ARG_CALLBACK_FUNCTION = Some(f);
-}
+    #[no_mangle]
+    pub unsafe extern "C" fn register__test__test_callback_handle_function(
+        f: TestCallbackHandleFunction,
+    ) {
+        TEST_CALLBACK_HANDLE_FUNCTION = Some(f);
+    }
 
-/// Passes provided `first` and `second` arguments to the [`TwoArgCallback`]'s
-/// underlying closure.
-///
-/// This function is used for notifying Rust side about Dart side callback
-/// firing. All arguments of the fired Dart callback should be passed to this
-/// function.
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`HandleCallback`] and
-/// [`Dart_Handle`] is not freed.
-#[no_mangle]
-pub unsafe extern "C" fn TwoArgCallback__call(
-    cb: *mut TwoArgCallback,
-    first: Dart_Handle,
-    second: Dart_Handle,
-) {
-    (*cb).0(first, second);
-}
-
-/// Listener for the Dart callback with a two pointers to [`Dart_Handle`]s as
-/// arguments.
-pub struct TwoArgCallback(Box<dyn FnMut(Dart_Handle, Dart_Handle)>);
-
-impl TwoArgCallback {
-    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
-    /// `f` closure when it will be called on Dart side.
-    ///
-    /// Arguments with which Dart side callback will be called will be passed to
-    /// the provided `f` closure.
-    pub fn callback<F>(f: F) -> Dart_Handle
-    where
-        F: FnMut(Dart_Handle, Dart_Handle) + 'static,
-    {
-        let this = Self(Box::new(f));
-        unsafe {
-            TWO_ARG_CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this)))
-        }
+    #[no_mangle]
+    pub unsafe extern "C" fn test__callback_listener__dart_handle(
+    ) -> Dart_Handle {
+        Callback::callback(move |val: DartValueArg<Dart_Handle>| {
+            unsafe {
+                (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(
+                    val.try_into().unwrap(),
+                )
+            };
+        })
     }
 }

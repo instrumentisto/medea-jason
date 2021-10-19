@@ -389,6 +389,12 @@ pub unsafe extern "C" fn unbox_dart_handle(
     *Box::from_raw(val.as_ptr())
 }
 
+/// Just returns a provided [`Dart_Handle`].
+#[no_mangle]
+pub unsafe extern "C" fn box_dart_handle(val: Dart_Handle) -> Dart_Handle {
+    val
+}
+
 #[cfg(feature = "mockable")]
 mod dart_value_extern_tests_helpers {
     use std::convert::TryInto;

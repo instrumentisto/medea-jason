@@ -1,17 +1,12 @@
 //! Multiplatform Dart runtime specific utility structs and functions.
 
-#[allow(clippy::pedantic, clippy::all)]
-pub mod array;
 pub mod callback_listener;
 pub mod completer;
 pub mod dart_api;
 pub mod dart_future;
 pub mod function;
 pub mod handle;
-pub mod list;
 pub mod map;
-pub mod nullable;
-pub mod option;
 
 use medea_client_api_proto::{IceConnectionState, PeerConnectionState};
 

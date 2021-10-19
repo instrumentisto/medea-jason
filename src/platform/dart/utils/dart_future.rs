@@ -1,318 +1,294 @@
 //! Definitions and implementation of the Rust side representation of the Dart
 //! Futures.
 
-use std::{future::Future, os::raw::c_char, ptr};
+use std::future::Future;
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
 
 use crate::{
-    api::c_str_into_string,
-    platform::dart::{error::DartError, utils::handle::DartHandle},
+    api::{DartValue, DartValueArg},
+    platform::dart::error::DartError,
 };
+use std::{convert::TryInto, fmt::Debug};
 
-/// Pointer to an extern function that spawns Dart Future which returns `Int32`
-/// on the Dart side and resolves provided [`IntFuture`] when it's resolved on
-/// Dart.
-type IntFutureSpawnerFunction = extern "C" fn(Dart_Handle, *mut IntFuture);
+/// Pointer to an extern function that resolves provided Dart `Future` with a
+/// provided [`DartFutureResolver`].
+type DartFutureResolverSpawnerFunction =
+    extern "C" fn(Dart_Handle, *mut DartFutureResolver);
 
-/// Stores pointer to the [`IntFutureSpawnerFunction`] extern function.
+/// Stores pointer to the [`DartFutureResolverSpawnerFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
-static mut INT_FUTURE_SPAWNER_FUNCTION: Option<IntFutureSpawnerFunction> = None;
+static mut DART_FUTURE_RESOLVER_SPAWNER: Option<
+    DartFutureResolverSpawnerFunction,
+> = None;
 
-/// Registers the provided [`IntFutureSpawnerFunction`] as
-/// [`INT_FUTURE_SPAWNER_FUNCTION`].
+/// Registers the provided [`DartFutureResolverSpawnerFunction`] as
+/// [`DART_FUTURE_RESOLVER_SPAWNER`].
 ///
 /// # Safety
 ///
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
-pub unsafe extern "C" fn register_int_future_spawner_function(
-    f: IntFutureSpawnerFunction,
+pub unsafe extern "C" fn register_DartFutureResolver__spawner(
+    f: DartFutureResolverSpawnerFunction,
 ) {
-    INT_FUTURE_SPAWNER_FUNCTION = Some(f);
+    DART_FUTURE_RESOLVER_SPAWNER = Some(f);
 }
 
-/// Resolves provided [`IntFuture`] with a provided `val`.
+/// Resolves provided [`DartFutureResolver`] with a provided [`DartValue`].
+///
+/// Frees provided [`DartFutureResolver`].
 ///
 /// # Safety
 ///
-/// Should be called only when provided pointer to [`IntFuture`] is not freed.
+/// Provided [`DartFutureResolver`] shouldn't be freed.
 #[no_mangle]
-pub unsafe extern "C" fn IntFuture__resolve(fut: *mut IntFuture, val: i32) {
-    let fut = Box::from_raw(fut);
-    fut.resolve(val);
-}
-
-/// Compatibility layer of the Dart side Futures which resolves into `Int32`
-/// with a Rust side [`Future`].
-pub struct IntFuture(oneshot::Sender<i32>);
-
-impl IntFuture {
-    /// Converts Dart side Future to the Rust's [`Future`].
-    ///
-    /// Returned [`Future`] will be resolved with a [`i32`] result on Dart side
-    /// Future resolve.
-    pub fn execute(dart_fut: Dart_Handle) -> impl Future<Output = i32> {
-        let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
-
-        unsafe {
-            INT_FUTURE_SPAWNER_FUNCTION.unwrap()(
-                dart_fut,
-                Box::into_raw(Box::new(this)),
-            );
-        }
-
-        async move { rx.await.unwrap() }
-    }
-
-    /// Resolves this [`IntFuture`] with a provided `val`.
-    ///
-    /// __Should be only called by Dart side.__
-    pub fn resolve(self, val: i32) {
-        let _ = self.0.send(val);
-    }
-}
-
-/// Compatibility layer of the Dart side Futures which resolved into `String`
-/// with a Rust side [`Future`].
-pub struct StringFuture(oneshot::Sender<String>);
-
-impl StringFuture {
-    /// Converts Dart side Future to the Rust's [`Future`].
-    ///
-    /// Returned [`Future`] will be resolved with a [`String`] result on Dart
-    /// side Future resolve.
-    pub fn execute(dart_fut: Dart_Handle) -> impl Future<Output = String> {
-        let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
-
-        unsafe {
-            STRING_FUTURE_SPAWNER_FUNCTION.unwrap()(
-                dart_fut,
-                Box::into_raw(Box::new(this)),
-            );
-        }
-
-        async move { rx.await.unwrap() }
-    }
-
-    /// Resolves this [`StringFuture`] with a provided `val`.
-    ///
-    /// __Should be only called by Dart side.__
-    pub fn resolve(self, val: ptr::NonNull<c_char>) {
-        drop(self.0.send(unsafe { c_str_into_string(val) }));
-    }
-}
-
-/// Compatibility layer of the Dart side Futures which resolves into
-/// [`Dart_Handle`] or throws exception with a Rust side [`Future`].
-pub struct DartFuture(oneshot::Sender<Result<DartHandle, DartError>>);
-
-impl DartFuture {
-    /// Converts Dart side Future to the Rust's [`Future`].
-    ///
-    /// Returned [`Future`] will be resolved with a [`DartHandle`] or
-    /// [`DartError`] result on Dart side Future resolve.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`DartError`] if provided Dart Future throws exception.
-    pub fn execute(
-        dart_fut: Dart_Handle,
-    ) -> impl Future<Output = Result<DartHandle, DartError>> {
-        let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
-
-        unsafe {
-            FUTURE_SPAWNER_FUNCTION.unwrap()(
-                dart_fut,
-                Box::into_raw(Box::new(this)),
-            );
-        }
-
-        async move { rx.await.unwrap() }
-    }
-
-    /// Resolves this [`DartFuture`] with a provided `val` as `Ok` variant of
-    /// [`Result`].
-    ///
-    /// __Should be only called by Dart side.__
-    fn resolve_ok(self, val: Dart_Handle) {
-        drop(self.0.send(Ok(DartHandle::new(val))));
-    }
-
-    /// Resolves this [`DartFuture`] with a provided `val` as `Err` variant of
-    /// [`Result`].
-    ///
-    /// __Should be only called by Dart side.__
-    fn resolve_err(self, val: Dart_Handle) {
-        drop(self.0.send(Err(DartError::from(val))));
-    }
-}
-
-/// Compatibility layer of the Dart side Futures which resolves into `void` with
-/// a Rust side [`Future`].
-pub struct VoidDartFuture(oneshot::Sender<()>);
-
-impl VoidDartFuture {
-    /// Converts Dart side Future to the Rust's [`Future`].
-    ///
-    /// Returned [`Future`] will be resolved  on Dart side Future resolve.
-    pub fn execute(dart_fut: Dart_Handle) -> impl Future<Output = ()> {
-        let (tx, rx) = oneshot::channel();
-        let this = Self(tx);
-
-        unsafe {
-            VOID_FUTURE_SPAWNER_FUNCTION.unwrap()(
-                dart_fut,
-                Box::into_raw(Box::new(this)),
-            );
-        }
-
-        async move {
-            rx.await.unwrap();
-        }
-    }
-
-    /// Resolves this [`VoidDartFuture`] with a provided `val`.
-    ///
-    /// __Should be only called by Dart side.__
-    pub fn resolve(self) {
-        #[allow(clippy::drop_copy)]
-        drop(self.0.send(()));
-    }
-}
-
-/// Pointer to an extern function that spawns Dart Future on the Dart side and
-/// resolves provided [`VoidFuture`] when it's resolved on Dart.
-type VoidFutureSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut VoidDartFuture);
-
-/// Stores pointer to the [`VoidFutureSpawnerFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut VOID_FUTURE_SPAWNER_FUNCTION: Option<VoidFutureSpawnerFunction> =
-    None;
-
-/// Registers the provided [`VoidFutureSpawnerFunction`] as
-/// [`VOID_FUTURE_SPAWNER_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_void_future_spawner_function(
-    f: VoidFutureSpawnerFunction,
-) {
-    VOID_FUTURE_SPAWNER_FUNCTION = Some(f);
-}
-
-/// Resolves provided [`VoidDartFuture`].
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`VoidDartFuture`] is not
-/// freed.
-#[no_mangle]
-pub unsafe extern "C" fn VoidDartFuture__resolve(fut: *mut VoidDartFuture) {
-    let fut = Box::from_raw(fut);
-    fut.resolve();
-}
-
-/// Pointer to an extern function that spawns Dart Future which returns `String`
-/// on the Dart side and resolves provided [`VoidFuture`] when it's resolved on
-/// Dart.
-type StringFutureSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut StringFuture);
-
-/// Stores pointer to the [`StringFutureSpawnerFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut STRING_FUTURE_SPAWNER_FUNCTION: Option<StringFutureSpawnerFunction> =
-    None;
-
-/// Registers the provided [`StringFutureSpawnerFunction`] as
-/// [`STRING_FUTURE_SPAWNER_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_string_future_spawner_function(
-    f: StringFutureSpawnerFunction,
-) {
-    STRING_FUTURE_SPAWNER_FUNCTION = Some(f);
-}
-
-/// Resolves provided [`StringFuture`] with a provided `val`.
-///
-/// # Safety
-///
-/// Should be called only when provided pointer to [`StringFuture`] and
-/// [`c_char`] pointer is not freed.
-#[no_mangle]
-pub unsafe extern "C" fn StringFuture__resolve(
-    fut: *mut StringFuture,
-    val: ptr::NonNull<c_char>,
+pub unsafe extern "C" fn DartFutureResolver__resolve(
+    fut: *mut DartFutureResolver,
+    val: DartValue,
 ) {
     let fut = Box::from_raw(fut);
     fut.resolve(val);
 }
 
-/// Pointer to an extern function that spawns Dart Future which returns
-/// [`Dart_Handle`] on the Dart side and resolves provided [`DartFuture`] when
-/// it's resolved on Dart.
-type FutureSpawnerFunction = extern "C" fn(Dart_Handle, *mut DartFuture);
+/// Compatibility layer of the infallible Dart side Futures with a Rust side
+/// [`Future`].
+pub struct DartFutureResolver(Box<dyn FnOnce(DartValue)>);
 
-/// Stores pointer to the [`FutureSpawnerFunction`] extern function.
+impl DartFutureResolver {
+    /// Converts infallible Dart side Future to the Rust's [`Future`].
+    ///
+    /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
+    /// result on Dart side Future resolve.
+    pub fn execute<T>(dart_fut: Dart_Handle) -> impl Future<Output = T>
+    where
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+    {
+        let (tx, rx) = oneshot::channel();
+        let this = Self(Box::new(|val| {
+            drop(tx.send(DartValueArg::<T>::from(val).try_into().unwrap()));
+        }));
+
+        unsafe {
+            DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
+                dart_fut,
+                Box::into_raw(Box::new(this)),
+            );
+        }
+
+        async move { rx.await.unwrap() }
+    }
+
+    /// Resolves this [`DartFutureResolver`] with a provided [`DartValue`] as a
+    /// result.
+    ///
+    /// __Should be only called by Dart side.__
+    fn resolve(self, val: DartValue) {
+        (self.0)(val);
+    }
+}
+
+/// Pointer to an extern function that resolves provided Dart `Future` with a
+/// provided [`FallibleDartFutureResolver`].
+type FallibleDartFutureResolverSpawnerFunction =
+    extern "C" fn(Dart_Handle, *mut FallibleDartFutureResolver);
+
+/// Stores pointer to the [`FallibleDartFutureResolverSpawnerFunction`] extern
+/// function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
-static mut FUTURE_SPAWNER_FUNCTION: Option<FutureSpawnerFunction> = None;
+static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
+    FallibleDartFutureResolverSpawnerFunction,
+> = None;
 
-/// Registers the provided [`FutureSpawnerFunction`] as
-/// [`FUTURE_SPAWNER_FUNCTION`].
+/// Registers the provided [`FallibleDartFutureResolverSpawnerFunction`] as
+/// [`FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER`].
 ///
 /// # Safety
 ///
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
-pub unsafe extern "C" fn register_spawn_dart_future_function(
-    f: FutureSpawnerFunction,
+pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
+    f: FallibleDartFutureResolverSpawnerFunction,
 ) {
-    FUTURE_SPAWNER_FUNCTION = Some(f);
+    FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER = Some(f);
 }
 
-/// Resolves provided [`DartFuture`] with a provided `val` as `Ok` [`Result`]
-/// variant.
+/// Resolves provided [`FallibleDartFutureResolver`] with a provided
+/// [`DartValue`] as `Ok` result.
+///
+/// Frees provided [`DartFutureResolver`].
 ///
 /// # Safety
 ///
-/// Should be called only when provided pointer to [`DartFuture`] and
-/// [`Dart_Handle`] pointer is not freed.
+/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
 #[no_mangle]
-pub unsafe extern "C" fn DartFuture__resolve_ok(
-    fut: *mut DartFuture,
-    val: Dart_Handle,
+pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
+    fut: *mut FallibleDartFutureResolver,
+    val: DartValue,
 ) {
     let fut = Box::from_raw(fut);
     fut.resolve_ok(val);
 }
 
-/// Resolves provided [`DartFuture`] with a provided `val` as `Err` [`Result`]
-/// variant.
+/// Resolves provided [`FallibleDartFutureResolver`] with a provided
+/// [`DartError`] as `Err` result.
+///
+/// Frees provided [`DartFutureResolver`].
 ///
 /// # Safety
 ///
-/// Should be called only when provided pointer to [`DartFuture`] and
-/// [`Dart_Handle`] pointer is not freed.
+/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
 #[no_mangle]
-pub unsafe extern "C" fn DartFuture__resolve_err(
-    fut: *mut DartFuture,
+pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
+    fut: *mut FallibleDartFutureResolver,
     val: Dart_Handle,
 ) {
     let fut = Box::from_raw(fut);
-    fut.resolve_err(val);
+    fut.resolve_err(DartError::from(val));
+}
+
+/// Compatibility layer of the fallible Dart side Futures with a Rust side
+/// [`Future`].
+pub struct FallibleDartFutureResolver(
+    Box<dyn FnOnce(Result<DartValue, DartError>)>,
+);
+
+impl FallibleDartFutureResolver {
+    /// Converts fallible Dart side Future to the Rust's [`Future`].
+    ///
+    /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
+    /// result on Dart side Future resolve.
+    ///
+    /// # Errors
+    ///
+    /// Errors with a [`DartError`] if Dart side thrown exception.
+    pub fn execute<T>(
+        dart_fut: Dart_Handle,
+    ) -> impl Future<Output = Result<T, DartError>>
+    where
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+    {
+        let (tx, rx) = oneshot::channel();
+        let this = Self(Box::new(|res| {
+            drop(tx.send(
+                res.map(|val| DartValueArg::<T>::from(val).try_into().unwrap()),
+            ));
+        }));
+
+        unsafe {
+            FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
+                dart_fut,
+                Box::into_raw(Box::new(this)),
+            );
+        }
+
+        async move { rx.await.unwrap() }
+    }
+
+    /// Resolves this [`FallibleDartFutureResolver`] with a provided
+    /// [`DartValue`] as `Ok` result.
+    ///
+    /// __Should be only called by Dart side.__
+    fn resolve_ok(self, val: DartValue) {
+        (self.0)(Ok(val));
+    }
+
+    /// Resolves this [`FallibleDartFutureResolver`] with a provided
+    /// [`DartError`] as `Err` result.
+    ///
+    /// __Should be only called by Dart side.__
+    fn resolve_err(self, err: DartError) {
+        (self.0)(Err(err));
+    }
+}
+
+#[cfg(feature = "mockable")]
+pub mod tests {
+    use std::ptr;
+
+    use dart_sys::Dart_Handle;
+
+    use crate::{
+        api::{
+            err::FormatException,
+            utils::{DartFuture, IntoDartFuture as _},
+        },
+        platform::dart::utils::{
+            dart_future::FallibleDartFutureResolver, handle::DartHandle,
+        },
+    };
+
+    use super::DartFutureResolver;
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__dart_future_resolver__int(
+        fut: Dart_Handle,
+    ) -> DartFuture<Result<i64, FormatException>> {
+        let fut = DartHandle::new(fut);
+        async move {
+            let val = DartFutureResolver::execute::<i64>(fut.get()).await;
+            Ok(val)
+        }
+        .into_dart_future()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__dart_future_resolver__string(
+        fut: Dart_Handle,
+    ) -> DartFuture<Result<String, FormatException>> {
+        let fut = DartHandle::new(fut);
+        async move {
+            let val = DartFutureResolver::execute::<String>(fut.get()).await;
+            Ok(val)
+        }
+        .into_dart_future()
+    }
+
+    type TestFutureHandleFunction = extern "C" fn(ptr::NonNull<Dart_Handle>);
+
+    static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
+        None;
+
+    #[no_mangle]
+    pub unsafe extern "C" fn register__test__dart_future_resolver_handle_fn(
+        f: TestFutureHandleFunction,
+    ) {
+        TEST_FUTURE_HANDLE_FUNCTION = Some(f);
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__dart_future_resolver__handle(
+        fut: Dart_Handle,
+    ) -> DartFuture<Result<(), FormatException>> {
+        let fut = DartHandle::new(fut);
+        async move {
+            let val = DartFutureResolver::execute::<ptr::NonNull<Dart_Handle>>(
+                fut.get(),
+            )
+            .await;
+            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val) }
+            Ok(())
+        }
+        .into_dart_future()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__fallible_dart_future_resolver__fails(
+        fut: Dart_Handle,
+    ) -> DartFuture<Result<i64, FormatException>> {
+        let fut = DartHandle::new(fut);
+        async move {
+            let val =
+                FallibleDartFutureResolver::execute::<i64>(fut.get()).await;
+            Ok(if val.is_err() { 1 } else { 0 })
+        }
+        .into_dart_future()
+    }
 }
