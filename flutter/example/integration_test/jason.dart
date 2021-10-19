@@ -575,13 +575,13 @@ void main() {
             'test__dart_future_resolver__string');
 
     var intVal = await (intResolver(
-        Future.delayed(Duration(milliseconds: 500), () async {
-      return 45;
-    })) as Future);
+        () => Future.delayed(Duration(milliseconds: 500), () async {
+              return 45;
+            })) as Future);
     var stringVal = await (stringResolver(
-        Future.delayed(Duration(milliseconds: 500), () async {
-      return 'test string';
-    })) as Future);
+        () => Future.delayed(Duration(milliseconds: 500), () async {
+              return 'test string';
+            })) as Future);
 
     expect(intVal as int, equals(45));
     expect(stringVal as String, 'test string');
@@ -598,11 +598,24 @@ void main() {
             'test__dart_future_resolver__handle');
 
     var testObj = TestObj();
-    var fut = Future.delayed(Duration(milliseconds: 500), () async {
-      return testObj;
-    });
+    var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
+          return testObj;
+        });
     await (handleResolver(fut) as Future);
     expect(testObj.x, equals(45));
+  });
+
+  testWidgets('FallibleFutureResolver catches exceptions',
+      (WidgetTester widgetTester) async {
+    final fallibleFutureCatchesException =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__fallible_dart_future_resolver__fails');
+
+    var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
+          throw Exception('Test Exception');
+        });
+    var res = await (fallibleFutureCatchesException(fut) as Future);
+    expect(res as int, equals(1));
   });
 }
 

@@ -222,8 +222,9 @@ pub mod tests {
     pub unsafe extern "C" fn test__dart_future_resolver__int(
         fut: Dart_Handle,
     ) -> DartFuture<Result<i64, FormatException>> {
+        let fut = DartHandle::new(fut);
         async move {
-            let val = DartFutureResolver::execute::<i64>(fut).await;
+            let val = DartFutureResolver::execute::<i64>(fut.get()).await;
             let val: i64 = val.try_into().unwrap();
             Ok(val)
         }
@@ -234,8 +235,9 @@ pub mod tests {
     pub unsafe extern "C" fn test__dart_future_resolver__string(
         fut: Dart_Handle,
     ) -> DartFuture<Result<String, FormatException>> {
+        let fut = DartHandle::new(fut);
         async move {
-            let val = DartFutureResolver::execute::<String>(fut).await;
+            let val = DartFutureResolver::execute::<String>(fut.get()).await;
             let val: String = val.try_into().unwrap();
             Ok(val)
         }

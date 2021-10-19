@@ -31,8 +31,9 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns `Future` which will call provided `DartFutureResolver` on resolve.
-void resolver(Object fut, Pointer resolver) {
-  fut as Future;
+void resolver(Object f, Pointer resolver) {
+  f as Function;
+  Future fut = f();
   fut.then((val) {
     Pointer<ForeignValue> arg;
     if (val == null) {
@@ -52,8 +53,9 @@ void resolver(Object fut, Pointer resolver) {
 }
 
 /// Returns `Future` which will call provided `FallibleDartFutureResolver` on resolve.
-void fallibleResolver(Object fut, Pointer resolver) {
-  fut as Future;
+void fallibleResolver(Object f, Pointer resolver) {
+  f as Function;
+  Future fut = f();
   fut.then((val) {
     Pointer<ForeignValue> arg;
     if (val == null) {
@@ -69,7 +71,7 @@ void fallibleResolver(Object fut, Pointer resolver) {
           "Future can't process provided type. " + val.runtimeType.toString());
     }
     _fallibleResolveOk(resolver, arg.ref);
-  }, onError: (e) {
-    _fallibleResolveErr(resolver, e);
+  }).onError((error, stackTrace) {
+    _fallibleResolveErr(resolver, error!);
   });
 }
