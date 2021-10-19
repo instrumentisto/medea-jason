@@ -2,7 +2,7 @@
 
 mod task;
 
-use std::{future::Future, mem, ptr, rc::Rc};
+use std::{future::Future, ptr, rc::Rc};
 
 use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 
@@ -11,12 +11,8 @@ use crate::platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined;
 use self::task::Task;
 
 /// Runs a Rust [`Future`] on the current thread.
-pub fn spawn(future: impl Future<Output = ()> + 'static) {
-    let task = Task::new(Box::pin(future));
-
-    // Task is leaked and will be freed by Dart calling the
-    // `rust_executor_drop_task()` function.
-    task_wake(ptr::NonNull::from(mem::ManuallyDrop::new(task).as_ref()));
+pub fn spawn(fut: impl Future<Output = ()> + 'static) {
+    Task::spawn(Box::pin(fut));
 }
 
 /// A [`Dart_Port`] used to send [`Task`]'s poll commands so Dart will poll Rust

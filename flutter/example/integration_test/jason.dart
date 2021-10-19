@@ -3,21 +3,19 @@ import 'dart:ffi';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:medea_jason/audio_track_constraints.dart';
-import 'package:medea_jason/connection_handle.dart';
-import 'package:medea_jason/device_video_track_constraints.dart';
-import 'package:medea_jason/display_video_track_constraints.dart';
-import 'package:medea_jason/ffi/exceptions.dart';
-import 'package:medea_jason/ffi/foreign_value.dart';
-import 'package:medea_jason/ffi/result.dart';
-import 'package:medea_jason/input_device_info.dart';
-import 'package:medea_jason/jason.dart';
-import 'package:medea_jason/media_stream_settings.dart';
-import 'package:medea_jason/reconnect_handle.dart';
-import 'package:medea_jason/remote_media_track.dart';
-import 'package:medea_jason/room_close_reason.dart';
-import 'package:medea_jason/track_kinds.dart';
-import 'package:medea_jason/util/nullable_pointer.dart';
+import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/interface/track_kinds.dart';
+import 'package:medea_jason/src/native/audio_track_constraints.dart';
+import 'package:medea_jason/src/native/device_video_track_constraints.dart';
+import 'package:medea_jason/src/native/display_video_track_constraints.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
+import 'package:medea_jason/src/native/ffi/result.dart';
+import 'package:medea_jason/src/native/input_device_info.dart';
+import 'package:medea_jason/src/native/jason.dart';
+import 'package:medea_jason/src/native/local_media_track.dart';
+import 'package:medea_jason/src/native/media_stream_settings.dart';
+import 'package:medea_jason/src/native/room_handle.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -54,10 +52,14 @@ void main() {
     expect(devices.length, equals(3));
     expect(tracks.length, equals(3));
 
-    expect(devices.first.ptr.getInnerPtr(),
-        isNot(equals(devices.last.ptr.getInnerPtr())));
-    expect(tracks.first.ptr.getInnerPtr(),
-        isNot(equals(tracks.last.ptr.getInnerPtr())));
+    expect(
+        (devices.first as NativeInputDeviceInfo).ptr.getInnerPtr(),
+        isNot(
+            equals((devices.last as NativeInputDeviceInfo).ptr.getInnerPtr())));
+    expect(
+        (tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
+        isNot(
+            equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
 
     expect(devices.first.deviceId(), equals('InputDeviceInfo.device_id'));
     expect(devices.first.groupId(), equals('InputDeviceInfo.group_id'));
@@ -77,9 +79,9 @@ void main() {
         () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
             e is LocalMediaInitException &&
-            e.kind == LocalMediaInitExceptionKind.GetUserMediaFailed &&
-            e.cause == 'Dart err cause1' &&
-            e.nativeStackTrace.contains('at src'))));
+            e.kind() == LocalMediaInitExceptionKind.GetUserMediaFailed &&
+            e.cause() == 'Dart err cause1' &&
+            e.trace().contains('at src'))));
 
     var err;
     try {
@@ -92,16 +94,16 @@ void main() {
         err,
         predicate((e) =>
             e is LocalMediaInitException &&
-            e.kind == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
-            e.cause == 'Dart err cause2' &&
-            e.nativeStackTrace.contains('at src')));
+            e.kind() == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
+            e.cause() == 'Dart err cause2' &&
+            e.trace().contains('at src')));
 
     expect(
         () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
         throwsA(predicate((e) =>
             e is EnumerateDevicesException &&
-            e.cause == 'Dart err cause3' &&
-            e.nativeStackTrace.contains('at src'))));
+            e.cause() == 'Dart err cause3' &&
+            e.trace().contains('at src'))));
 
     var err2;
     try {
@@ -114,8 +116,8 @@ void main() {
         err2,
         predicate((e) =>
             e is EnumerateDevicesException &&
-            e.cause == 'Dart err cause4' &&
-            e.nativeStackTrace.contains('at src')));
+            e.cause() == 'Dart err cause4' &&
+            e.trace().contains('at src')));
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
@@ -236,10 +238,9 @@ void main() {
 
     expect(
         () => conn.getRemoteMemberId(),
-        throwsA(allOf(
-            isStateError,
-            predicate(
-                (e) => e.message == 'ConnectionHandle is in detached state'))));
+        throwsA(predicate((e) =>
+            e is StateError &&
+            e.message == 'ConnectionHandle is in detached state')));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -325,8 +326,9 @@ void main() {
     }
     expect(
         stateErr,
-        allOf(isStateError,
-            predicate((e) => e.message == 'RoomHandle is in detached state')));
+        allOf(predicate((e) =>
+            e is StateError &&
+            e.message == 'RoomHandle is in detached state')));
 
     var formatExc;
     try {
@@ -336,10 +338,9 @@ void main() {
     }
     expect(
         formatExc,
-        allOf(
-            isFormatException,
-            predicate(
-                (e) => e.message.contains('relative URL without a base'))));
+        allOf(predicate((e) =>
+            e is FormatException &&
+            e.message.contains('relative URL without a base'))));
 
     var localMediaErr = Completer<Object>();
     room.onFailedLocalMedia((err) {
@@ -350,8 +351,9 @@ void main() {
         err,
         predicate((e) =>
             e is MediaStateTransitionException &&
-            e.message == 'SimpleTracksRequest should have at least one track' &&
-            e.nativeStackTrace.contains('at src')));
+            e.message() ==
+                'SimpleTracksRequest should have at least one track' &&
+            e.trace().contains('at src')));
   });
 
   testWidgets('ReconnectHandle', (WidgetTester tester) async {
@@ -418,10 +420,10 @@ void main() {
         () => returnsRpcClientException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
             e is RpcClientException &&
-            e.kind == RpcClientExceptionKind.ConnectionLost &&
-            e.cause == 'Dart err cause1' &&
-            e.message == 'RpcClientException::ConnectionLost' &&
-            e.nativeStackTrace.contains('at src'))));
+            e.kind() == RpcClientExceptionKind.ConnectionLost &&
+            e.cause() == 'Dart err cause1' &&
+            e.message() == 'RpcClientException::ConnectionLost' &&
+            e.trace().contains('at src'))));
 
     var exception5;
     try {
@@ -433,10 +435,10 @@ void main() {
         exception5,
         predicate((e) =>
             e is RpcClientException &&
-            e.kind == RpcClientExceptionKind.SessionFinished &&
-            e.message == 'RpcClientException::SessionFinished' &&
-            e.cause == 'Dart err cause2' &&
-            e.nativeStackTrace.contains('at src')));
+            e.kind() == RpcClientExceptionKind.SessionFinished &&
+            e.message() == 'RpcClientException::SessionFinished' &&
+            e.cause() == 'Dart err cause2' &&
+            e.trace().contains('at src')));
   });
 
   final returnsInputDevicePtr =
@@ -448,7 +450,7 @@ void main() {
         dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
             'returns_none');
     final returnsHandlePtr = dl.lookupFunction<ForeignValue Function(Handle),
-        ForeignValue Function(Object)>('returns_handle_ptr');
+        ForeignValue Function(Object?)>('returns_handle_ptr');
     final returnsString =
         dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
             'returns_string');
@@ -458,8 +460,8 @@ void main() {
 
     expect(returnsNone().toDart(), equals(null));
 
-    var inputDevice =
-        InputDeviceInfo(NullablePointer(returnsInputDevicePtr().toDart()));
+    var inputDevice = NativeInputDeviceInfo(
+        NullablePointer(returnsInputDevicePtr().toDart()));
     expect(inputDevice.deviceId(), equals('InputDeviceInfo.device_id'));
     inputDevice.free();
 
@@ -509,7 +511,8 @@ void main() {
     var err;
     var arg = ForeignValue.fromInt(123);
     try {
-      await (_muteVideo(room.ptr.getInnerPtr(), arg.ref) as Future);
+      await (_muteVideo((room as NativeRoomHandle).ptr.getInnerPtr(), arg.ref)
+          as Future);
     } catch (e) {
       err = e as ArgumentError;
     } finally {

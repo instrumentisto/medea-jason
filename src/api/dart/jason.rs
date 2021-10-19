@@ -61,20 +61,20 @@ pub unsafe extern "C" fn Jason__free(this: ptr::NonNull<Jason>) {
 mod mock {
     use crate::api::{MediaManagerHandle, RoomHandle};
 
-    pub struct Jason;
+    pub struct Jason(u8);
 
     impl Jason {
         pub fn new() -> Self {
             crate::platform::init_logger();
-            Self
+            Self(0)
         }
 
         pub fn init_room(&self) -> RoomHandle {
-            RoomHandle
+            RoomHandle(0)
         }
 
         pub fn media_manager(&self) -> MediaManagerHandle {
-            MediaManagerHandle
+            MediaManagerHandle(0)
         }
 
         pub fn close_room(&self, _: RoomHandle) {}

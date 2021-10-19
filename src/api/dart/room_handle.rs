@@ -434,7 +434,7 @@ mod mock {
     };
 
     #[derive(Clone)]
-    pub struct RoomHandle;
+    pub struct RoomHandle(pub u8);
 
     #[allow(clippy::missing_errors_doc)]
     impl RoomHandle {
@@ -442,7 +442,7 @@ mod mock {
             &self,
             cb: platform::Function<ConnectionHandle>,
         ) -> Result<(), Traced<HandleDetachedError>> {
-            cb.call1(ConnectionHandle);
+            cb.call1(ConnectionHandle(0));
             Ok(())
         }
 
@@ -461,7 +461,7 @@ mod mock {
             &self,
             cb: platform::Function<LocalMediaTrack>,
         ) -> Result<(), Traced<HandleDetachedError>> {
-            cb.call1(LocalMediaTrack);
+            cb.call1(LocalMediaTrack(0));
             Ok(())
         }
 
@@ -469,7 +469,7 @@ mod mock {
             &self,
             cb: platform::Function<ReconnectHandle>,
         ) -> Result<(), Traced<HandleDetachedError>> {
-            cb.call1(ReconnectHandle);
+            cb.call1(ReconnectHandle(0));
             Ok(())
         }
 

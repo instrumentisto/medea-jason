@@ -58,11 +58,11 @@ mod mock {
         MediaSourceKind,
     };
 
-    pub struct LocalMediaTrack;
+    pub struct LocalMediaTrack(pub u8);
 
     impl From<CoreLocalMediaTrack> for LocalMediaTrack {
         fn from(_: CoreLocalMediaTrack) -> Self {
-            Self
+            Self(0)
         }
     }
 
