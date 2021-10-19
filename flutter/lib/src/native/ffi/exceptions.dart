@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
+import '/src/interface/exceptions.dart';
 import 'foreign_value.dart';
 import 'native_string.dart';
 import 'unbox_handle.dart';
@@ -65,41 +66,41 @@ Object _newFormatException(Pointer<Utf8> message) {
   return FormatException(message.nativeStringToDartString());
 }
 
-/// Creates a new [LocalMediaInitException] with the provided error [kind],
+/// Creates a new [NativeLocalMediaInitException] with the provided error [kind],
 /// [message], [cause] and [stacktrace].
 Object _newLocalMediaInitException(int kind, Pointer<Utf8> message,
     ForeignValue cause, Pointer<Utf8> stacktrace) {
-  return LocalMediaInitException(
+  return NativeLocalMediaInitException(
       LocalMediaInitExceptionKind.values[kind],
       message.nativeStringToDartString(),
       cause.toDart(),
       stacktrace.nativeStringToDartString());
 }
 
-/// Creates a new [EnumerateDevicesException] with the provided error [cause]
+/// Creates a new [NativeEnumerateDevicesException] with the provided error [cause]
 /// and [stacktrace].
 Object _newEnumerateDevicesException(
     Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
-  return EnumerateDevicesException(
+  return NativeEnumerateDevicesException(
       unboxDartHandle(cause), stacktrace.nativeStringToDartString());
 }
 
-/// Creates a new [RpcClientException] with the provided error [kind],
+/// Creates a new [NativeRpcClientException] with the provided error [kind],
 /// [message], [cause] and [stacktrace].
 Object _newRpcClientException(int kind, Pointer<Utf8> message,
     ForeignValue cause, Pointer<Utf8> stacktrace) {
-  return RpcClientException(
+  return NativeRpcClientException(
       RpcClientExceptionKind.values[kind],
       message.nativeStringToDartString(),
       cause.toDart(),
       stacktrace.nativeStringToDartString());
 }
 
-/// Creates a new [MediaStateTransitionException] with the provided error
+/// Creates a new [NativeMediaStateTransitionException] with the provided error
 /// [message] and [stacktrace].
 Object _newMediaStateTransitionException(
     Pointer<Utf8> message, Pointer<Utf8> stacktrace) {
-  return MediaStateTransitionException(message.nativeStringToDartString(),
+  return NativeMediaStateTransitionException(message.nativeStringToDartString(),
       stacktrace.nativeStringToDartString());
 }
 
@@ -107,163 +108,219 @@ Object _newMediaStateTransitionException(
 /// [cause] and [stacktrace].
 Object _newInternalException(
     Pointer<Utf8> message, ForeignValue cause, Pointer<Utf8> stacktrace) {
-  return InternalException(message.nativeStringToDartString(), cause.toDart(),
-      stacktrace.nativeStringToDartString());
+  return NativeInternalException(message.nativeStringToDartString(),
+      cause.toDart(), stacktrace.nativeStringToDartString());
 }
 
-/// Creates a new [MediaSettingsUpdateException] with the provided error
+/// Creates a new [NativeMediaSettingsUpdateException] with the provided error
 /// [message], error [cause] and [rolledBack] property.
 Object _newMediaSettingsUpdateException(
     Pointer<Utf8> message, Pointer<Handle> cause, int rolledBack) {
-  return MediaSettingsUpdateException(message.nativeStringToDartString(),
+  return NativeMediaSettingsUpdateException(message.nativeStringToDartString(),
       unboxDartHandle(cause), rolledBack > 0);
 }
 
 /// Exception thrown when local media acquisition fails.
-class LocalMediaInitException implements Exception {
-  /// Concrete error kind of this [LocalMediaInitException].
-  late LocalMediaInitExceptionKind kind;
+class NativeLocalMediaInitException extends LocalMediaInitException
+    implements Exception {
+  /// Concrete error kind of this [NativeLocalMediaInitException].
+  late final LocalMediaInitExceptionKind _kind;
 
   /// Error message describing the problem.
-  late String message;
+  late final String _message;
 
-  /// Dart [Exception] or [Error] that caused this [LocalMediaInitException].
-  late Object? cause;
+  /// Dart [Exception] or [Error] that caused this [NativeLocalMediaInitException].
+  late final Object? _cause;
 
   /// Native stacktrace.
-  late String nativeStackTrace;
+  late final String _nativeStackTrace;
 
-  /// Instantiates a new [LocalMediaInitException].
-  LocalMediaInitException(
-      this.kind, this.message, this.cause, this.nativeStackTrace);
-}
+  /// Instantiates a new [NativeLocalMediaInitException].
+  NativeLocalMediaInitException(
+      this._kind, this._message, this._cause, this._nativeStackTrace);
 
-/// Possible error kinds of a [LocalMediaInitException].
-enum LocalMediaInitExceptionKind {
-  /// Occurs if the [getUserMedia()][1] request failed.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-  GetUserMediaFailed,
+  @override
+  dynamic cause() {
+    return _cause;
+  }
 
-  /// Occurs if the [getDisplayMedia()][1] request failed.
-  ///
-  /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-  GetDisplayMediaFailed,
+  @override
+  LocalMediaInitExceptionKind kind() {
+    return _kind;
+  }
 
-  /// Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
-  /// or [getDisplayMedia()][3] request.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-  /// [2]: https://tinyurl.com/rnxcavf
-  /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-  LocalTrackIsEnded,
+  @override
+  String message() {
+    return _message;
+  }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
 }
 
 /// Exception thrown when cannot get info about connected [MediaDevices][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#mediadevices
-class EnumerateDevicesException implements Exception {
-  /// Dart [Exception] or [Error] that caused this [EnumerateDevicesException].
-  late Object cause;
+class NativeEnumerateDevicesException extends EnumerateDevicesException
+    implements Exception {
+  /// Dart [Exception] or [Error] that caused this [NativeEnumerateDevicesException].
+  late final Object _cause;
 
   /// Native stacktrace.
-  late String nativeStackTrace;
+  late final String _nativeStackTrace;
 
-  /// Instantiates a new [EnumerateDevicesException].
-  EnumerateDevicesException(this.cause, this.nativeStackTrace);
+  /// Instantiates a new [NativeEnumerateDevicesException].
+  NativeEnumerateDevicesException(this._cause, this._nativeStackTrace);
+
+  @override
+  dynamic cause() {
+    return _cause;
+  }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
 }
 
 /// Exceptions thrown from `Jason`'s `RpcClient` which implements messaging with
 /// media server.
-class RpcClientException implements Exception {
-  /// Concrete error kind of this [RpcClientException].
-  late RpcClientExceptionKind kind;
+class NativeRpcClientException extends RpcClientException implements Exception {
+  /// Concrete error kind of this [NativeRpcClientException].
+  late final RpcClientExceptionKind _kind;
 
   /// Error message describing the problem.
-  late String message;
+  late final String _message;
 
-  /// Dart [Exception] or [Error] that caused this [RpcClientException].
-  late Object? cause;
+  /// Dart [Exception] or [Error] that caused this [NativeRpcClientException].
+  late final Object? _cause;
 
   /// Native stacktrace.
-  late String nativeStackTrace;
+  late final String _nativeStackTrace;
 
-  /// Instantiates a new [RpcClientException].
-  RpcClientException(
-      this.kind, this.message, this.cause, this.nativeStackTrace);
-}
+  /// Instantiates a new [NativeRpcClientException].
+  NativeRpcClientException(
+      this._kind, this._message, this._cause, this._nativeStackTrace);
 
-/// Possible error kinds of a [RpcClientException].
-enum RpcClientExceptionKind {
-  /// Connection with a server was lost.
-  ///
-  /// This usually means that some transport error occurred, so a client can
-  /// continue performing reconnecting attempts.
-  ConnectionLost,
+  @override
+  dynamic cause() {
+    return _cause;
+  }
 
-  /// Could not authorize an RPC session.
-  ///
-  /// This usually means that authentication data a client provides is obsolete.
-  AuthorizationFailed,
+  @override
+  RpcClientExceptionKind kind() {
+    return _kind;
+  }
 
-  /// RPC session has been finished. This is a terminal state.
-  SessionFinished,
+  @override
+  String message() {
+    return _message;
+  }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
 }
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-class MediaStateTransitionException implements Exception {
+class NativeMediaStateTransitionException extends MediaStateTransitionException
+    implements Exception {
   /// Error message describing the problem.
-  late String message;
+  late final String _message;
 
   /// Native stacktrace.
-  late String nativeStackTrace;
+  late final String _nativeStackTrace;
 
-  /// Instantiates a new [MediaStateTransitionException].
-  MediaStateTransitionException(this.message, this.nativeStackTrace);
+  /// Instantiates a new [NativeMediaStateTransitionException].
+  NativeMediaStateTransitionException(this._message, this._nativeStackTrace);
+
+  @override
+  String message() {
+    return _message;
+  }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
 }
 
 /// Jason's internal exception.
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-class InternalException implements Exception {
+class NativeInternalException extends InternalException implements Exception {
   /// Error message describing the problem.
-  late String message;
+  late final String _message;
 
   /// Dart [Exception] or [Error] that caused this [InternalException].
-  late Object? cause;
+  late final Object? _cause;
 
   /// Native stacktrace.
-  late String nativeStackTrace;
+  late final String _nativeStackTrace;
 
   /// Instantiates a new [InternalException].
-  InternalException(this.message, this.cause, this.nativeStackTrace);
+  NativeInternalException(this._message, this._cause, this._nativeStackTrace);
+
+  @override
+  dynamic cause() {
+    return _cause;
+  }
+
+  @override
+  String message() {
+    return _message;
+  }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
 }
 
 /// Exception that might happen when updating local media settings via
 /// `RoomHandle.setLocalMediaSettings`.
-class MediaSettingsUpdateException implements Exception {
+class NativeMediaSettingsUpdateException extends MediaSettingsUpdateException
+    implements Exception {
   /// Error message describing the problem.
-  late String message;
+  late final String _message;
 
   /// The reason why media settings update failed.
   ///
   /// Possible exception kinds are:
   /// - [StateError] if an underlying `RoomHandle` object has been disposed.
-  /// - [LocalMediaInitException] if a request of platform media devices access
+  /// - [NativeLocalMediaInitException] if a request of platform media devices access
   ///   failed.
-  /// - [MediaStateTransitionException] if transition is prohibited by tracks
+  /// - [NativeMediaStateTransitionException] if transition is prohibited by tracks
   ///   configuration or explicitly denied by server.
   /// - [InternalException] in case of a programmatic error or some unexpected
   ///   platform component failure.
-  late Object updateException;
+  late final Object _updateException;
 
   /// Whether media settings were successfully rolled back after new settings
   /// application failed.
-  late bool rolledBack;
+  late final bool _rolledBack;
 
-  /// Instantiates a new [MediaSettingsUpdateException].
-  MediaSettingsUpdateException(
-      this.message, this.updateException, this.rolledBack);
+  /// Instantiates a new [NativeMediaSettingsUpdateException].
+  NativeMediaSettingsUpdateException(
+      this._message, this._updateException, this._rolledBack);
+
+  @override
+  dynamic cause() {
+    return _updateException;
+  }
+
+  @override
+  String message() {
+    return _message;
+  }
+
+  @override
+  bool rolledBack() {
+    return _rolledBack;
+  }
 }

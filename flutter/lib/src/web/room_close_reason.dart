@@ -1,5 +1,6 @@
 import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
+import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class WebRoomCloseReason extends RoomCloseReason {
@@ -9,17 +10,17 @@ class WebRoomCloseReason extends RoomCloseReason {
 
   @override
   String reason() {
-    return obj.reason();
+    return fallibleFunction(() => obj.reason());
   }
 
   @override
   bool isClosedByServer() {
-    return obj.is_closed_by_server();
+    return fallibleFunction(() => obj.is_closed_by_server());
   }
 
   @override
   bool isErr() {
-    return obj.is_err();
+    return fallibleFunction(() => obj.is_err());
   }
 
   @moveSemantics
