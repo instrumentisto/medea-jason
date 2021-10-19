@@ -1,6 +1,6 @@
 import 'dart:ffi';
-import 'package:medea_jason/ffi/foreign_value.dart';
 
+import '../../ffi/foreign_value.dart';
 import '../../jason.dart';
 
 typedef _futureResolve_C = Void Function(Pointer, ForeignValue);
