@@ -142,11 +142,11 @@ mod mock {
     };
 
     #[derive(Clone)]
-    pub struct ReconnectHandle;
+    pub struct ReconnectHandle(pub u8);
 
     impl From<CoreReconnectHandle> for ReconnectHandle {
         fn from(_: CoreReconnectHandle) -> Self {
-            Self
+            Self(0)
         }
     }
 

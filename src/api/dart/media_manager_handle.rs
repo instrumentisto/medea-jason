@@ -82,7 +82,7 @@ mod mock {
     };
 
     #[derive(Clone)]
-    pub struct MediaManagerHandle;
+    pub struct MediaManagerHandle(pub u8);
 
     #[allow(clippy::missing_errors_doc)]
     impl MediaManagerHandle {
@@ -91,9 +91,9 @@ mod mock {
         ) -> Result<Vec<InputDeviceInfo>, Traced<EnumerateDevicesError>>
         {
             Ok(vec![
-                InputDeviceInfo {},
-                InputDeviceInfo {},
-                InputDeviceInfo {},
+                InputDeviceInfo(0),
+                InputDeviceInfo(0),
+                InputDeviceInfo(0),
             ])
         }
 
@@ -103,9 +103,9 @@ mod mock {
         ) -> Result<Vec<LocalMediaTrack>, Traced<InitLocalTracksError>>
         {
             Ok(vec![
-                LocalMediaTrack {},
-                LocalMediaTrack {},
-                LocalMediaTrack {},
+                LocalMediaTrack(0),
+                LocalMediaTrack(0),
+                LocalMediaTrack(0),
             ])
         }
     }

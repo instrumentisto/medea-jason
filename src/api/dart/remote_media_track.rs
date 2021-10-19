@@ -116,11 +116,11 @@ mod mock {
         platform,
     };
 
-    pub struct RemoteMediaTrack;
+    pub struct RemoteMediaTrack(pub u8);
 
     impl From<CoreRemoteMediaTrack> for RemoteMediaTrack {
         fn from(_: CoreRemoteMediaTrack) -> Self {
-            Self
+            Self(0)
         }
     }
 
