@@ -123,12 +123,6 @@ static mut ON_ENDED_FUNCTION: Option<OnEndedFunction> = None;
 #[derive(Clone, From, Debug)]
 pub struct MediaStreamTrack(DartHandle);
 
-impl From<Dart_Handle> for MediaStreamTrack {
-    fn from(handle: Dart_Handle) -> Self {
-        Self(DartHandle::new(handle))
-    }
-}
-
 /// Registers the provided [`IdFunction`] as [`ID_FUNCTION`].
 ///
 /// # Safety

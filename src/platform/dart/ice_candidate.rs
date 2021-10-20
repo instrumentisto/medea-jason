@@ -59,12 +59,6 @@ static mut SDP_MID_FUNCTION: Option<SdpMidFunction> = None;
 #[derive(From)]
 pub struct IceCandidate(DartHandle);
 
-impl From<Dart_Handle> for IceCandidate {
-    fn from(handle: Dart_Handle) -> Self {
-        Self(DartHandle::new(handle))
-    }
-}
-
 /// Registers the provided [`NewFunction`] as [`NEW_FUNCTION`].
 ///
 /// # Safety

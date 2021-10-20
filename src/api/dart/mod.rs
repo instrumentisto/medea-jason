@@ -31,6 +31,7 @@ use libc::c_char;
 use crate::{
     api::dart::utils::{DartError, PtrArray},
     media::MediaSourceKind,
+    platform::utils::handle::DartHandle,
 };
 
 pub use self::{
@@ -268,6 +269,22 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<c_void>> {
     }
 }
 
+impl TryFrom<DartValueArg<DartHandle>> for DartHandle {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<DartHandle>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::Handle(handle) => {
+                Ok(DartHandle::new(unsafe { *handle.as_ptr() }))
+            }
+            _ => Err(DartValueCastError {
+                expectation: "DartHandle",
+                value: value.0,
+            }),
+        }
+    }
+}
+
 impl TryFrom<DartValueArg<String>> for String {
     type Error = DartValueCastError;
 
@@ -290,6 +307,25 @@ impl TryFrom<DartValueArg<()>> for () {
             DartValue::None => Ok(()),
             _ => Err(DartValueCastError {
                 expectation: "()",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Option<DartHandle>>> for Option<DartHandle> {
+    type Error = DartValueCastError;
+
+    fn try_from(
+        value: DartValueArg<Option<DartHandle>>,
+    ) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Handle(handle) => {
+                Ok(Some(DartHandle::new(unsafe { *handle.as_ptr() })))
+            }
+            _ => Err(DartValueCastError {
+                expectation: "Option<DartHandle>",
                 value: value.0,
             }),
         }
