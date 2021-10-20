@@ -11,6 +11,7 @@ use medea_client_api_proto::{
 };
 
 use crate::{
+    api::dart::PrimitiveEnum,
     media::{track::MediaStreamTrackState, MediaKind},
     peer::{
         media_exchange_state, mute_state, LocalStreamUpdateCriteria, MediaState,
@@ -39,6 +40,8 @@ pub enum FacingMode {
     /// Facing to the right of a user.
     Right = 3,
 }
+
+impl PrimitiveEnum for FacingMode {}
 
 impl From<i32> for FacingMode {
     fn from(from: i32) -> Self {

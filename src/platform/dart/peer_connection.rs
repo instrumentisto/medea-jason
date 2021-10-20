@@ -71,7 +71,7 @@ type OnConnectionStateChangeFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 /// Pointer to an extern function that returns [`ConnectionState`] of the
 /// provided [`PeerConnection`].
 type ConnectionStateFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i32>>;
 
 /// Pointer to an extern function that request that ICE candidate gathering be
 /// redone on both ends of the connection.
@@ -548,11 +548,12 @@ impl RtcPeerConnection {
     #[must_use]
     pub fn connection_state(&self) -> Option<PeerConnectionState> {
         unsafe {
-            let connection_state: i64 = Option::try_from(
-                CONNECTION_STATE_FUNCTION.unwrap()(self.handle.get()),
-            )
+            let connection_state = Option::try_from(CONNECTION_STATE_FUNCTION
+                .unwrap()(
+                self.handle.get()
+            ))
             .unwrap()?;
-            Some(peer_connection_state_from_int(connection_state as i32))
+            Some(peer_connection_state_from_int(connection_state))
         }
     }
 
@@ -567,8 +568,8 @@ impl RtcPeerConnection {
             unsafe {
                 ON_ICE_CONNECTION_STATE_CHANGE_FUNCTION.unwrap()(
                     self.handle.get(),
-                    Callback::callback(move |v: i64| {
-                        f(ice_connection_from_int(v as i32));
+                    Callback::callback(move |v| {
+                        f(ice_connection_from_int(v));
                     }),
                 );
             }
@@ -586,8 +587,8 @@ impl RtcPeerConnection {
             unsafe {
                 ON_CONNECTION_STATE_CHANGE_FUNCTION.unwrap()(
                     self.handle.get(),
-                    Callback::callback(move |v: i64| {
-                        f(peer_connection_state_from_int(v as i32));
+                    Callback::callback(move |v| {
+                        f(peer_connection_state_from_int(v));
                     }),
                 );
             }

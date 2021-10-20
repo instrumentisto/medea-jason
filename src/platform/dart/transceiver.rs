@@ -43,9 +43,7 @@ type CurrentDirectionFunction = extern "C" fn(Dart_Handle) -> i32;
 /// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
 type GetSendTrackFunction =
-    extern "C" fn(
-        Dart_Handle,
-    ) -> DartValueArg<Option<ptr::NonNull<Dart_Handle>>>;
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<DartHandle>>;
 
 /// Pointer to an extern function that replaces `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
@@ -63,13 +61,6 @@ type IsStoppedFunction = extern "C" fn(Dart_Handle) -> bool;
 /// Pointer to an extern function that sets `enabled` field of `Send`
 /// [`MediaStreamTrack`] of the provided [`Transceiver`].
 type SetSendTrackEnabledFunction = extern "C" fn(Dart_Handle, bool);
-
-/// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
-/// the provided [`Transceiver`].
-type SendTrackFunction =
-    extern "C" fn(
-        Dart_Handle,
-    ) -> DartValueArg<Option<ptr::NonNull<Dart_Handle>>>;
 
 /// Pointer to an extern function that returns MID of the provided
 /// [`Transceiver`].
@@ -124,11 +115,6 @@ static mut IS_STOPPED_FUNCTION: Option<IsStoppedFunction> = None;
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut MID_FUNCTION: Option<MidFunction> = None;
-
-/// Stores pointer to the [`SendTrackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SEND_TRACK_FUNCTION: Option<SendTrackFunction> = None;
 
 /// Stores pointer to the [`HasSendTrackFunction`] extern function.
 ///
@@ -237,18 +223,6 @@ pub unsafe extern "C" fn register_Transceiver__is_stopped(
 #[no_mangle]
 pub unsafe extern "C" fn register_Transceiver__mid(f: MidFunction) {
     MID_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SendTrackFunction`] as [`SEND_TRACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Transceiver__send_track(
-    f: SendTrackFunction,
-) {
-    SEND_TRACK_FUNCTION = Some(f);
 }
 
 /// Registers the provided [`HasSendTrackFunction`] as
@@ -368,12 +342,12 @@ impl Transceiver {
     /// [WebAPI docs]: https://tinyurl.com/7pnszaa8
     pub fn drop_send_track(&self) -> impl Future<Output = ()> {
         unsafe {
-            if let Some(sender) = Option::<ptr::NonNull<Dart_Handle>>::try_from(
+            if let Some(sender) = Option::<DartHandle>::try_from(
                 GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()),
             )
             .unwrap()
             {
-                DROP_SENDER_FUNCTION.unwrap()(*sender.as_ptr());
+                DROP_SENDER_FUNCTION.unwrap()(sender.get());
             }
         }
         async {}
@@ -383,15 +357,12 @@ impl Transceiver {
     /// value, if any.
     pub fn set_send_track_enabled(&self, enabled: bool) {
         unsafe {
-            if let Some(sender) = Option::<ptr::NonNull<Dart_Handle>>::try_from(
+            if let Some(sender) = Option::<DartHandle>::try_from(
                 GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()),
             )
             .unwrap()
             {
-                SET_SEND_TRACK_ENABLED_FUNCTION.unwrap()(
-                    *sender.as_ptr(),
-                    enabled,
-                );
+                SET_SEND_TRACK_ENABLED_FUNCTION.unwrap()(sender.get(), enabled);
             }
         }
     }
@@ -403,11 +374,11 @@ impl Transceiver {
         let handle = self.transceiver.get();
         unsafe {
             async move {
-                (DartFutureResolver::execute::<i64>(
+                DartFutureResolver::execute::<i32>(
                     GET_CURRENT_DIRECTION_FUNCTION.unwrap()(handle),
                 )
-                .await as i32)
-                    .into()
+                .await
+                .into()
             }
         }
     }

@@ -26,15 +26,15 @@ type DeviceIdFunction =
 /// Pointer to an extern function that returns facing mode of the provided
 /// [`MediaStreamTrack`].
 type FacingModeFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i32>>;
 
 /// Pointer to an extern function that returns height of the provided
 /// [`MediaStreamTrack`].
-type HeightFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+type HeightFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
 
 /// Pointer to an extern function that returns width of the provided
 /// [`MediaStreamTrack`].
-type WidthFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+type WidthFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
 
 /// Pointer to an extern function that sets `enabled` field of the provided
 /// [`MediaStreamTrack`] to the provided [`bool`].
@@ -302,10 +302,9 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         unsafe {
-            let facing_mode: i64 =
-                Option::try_from(FACING_MODE_FUNCTION.unwrap()(self.0.get()))
-                    .unwrap()?;
-            Some(FacingMode::from(facing_mode as i32))
+            Option::<i32>::try_from(FACING_MODE_FUNCTION.unwrap()(self.0.get()))
+                .unwrap()
+                .map(FacingMode::from)
         }
     }
 
@@ -316,9 +315,7 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         unsafe {
-            Option::<i64>::try_from(HEIGHT_FUNCTION.unwrap()(self.0.get()))
-                .unwrap()
-                .map(|i| i as u32)
+            Option::try_from(HEIGHT_FUNCTION.unwrap()(self.0.get())).unwrap()
         }
     }
 
@@ -329,9 +326,7 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         unsafe {
-            Option::<i64>::try_from(WIDTH_FUNCTION.unwrap()(self.0.get()))
-                .unwrap()
-                .map(|i| i as u32)
+            Option::try_from(WIDTH_FUNCTION.unwrap()(self.0.get())).unwrap()
         }
     }
 

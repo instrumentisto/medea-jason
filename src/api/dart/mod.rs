@@ -50,6 +50,7 @@ pub use self::{
     room_handle::RoomHandle,
     utils::{c_str_into_string, string_into_c_str, DartError as Error},
 };
+use std::convert::TryInto;
 
 /// Rust structure having wrapper class in Dart.
 ///
@@ -380,7 +381,60 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<Dart_Handle>> {
     }
 }
 
-impl<T> TryFrom<DartValueArg<T>> for i64 {
+macro_rules! impl_primitive_dart_value_try_from {
+    ($arg:ty) => {
+        impl TryFrom<DartValueArg<$arg>> for $arg {
+            type Error = DartValueCastError;
+
+            fn try_from(value: DartValueArg<$arg>) -> Result<Self, Self::Error> {
+                match value.0 {
+                    DartValue::Int(num) => {
+                        Ok(<$arg>::try_from(num).map_err(|_| DartValueCastError {
+                            expectation: stringify!($arg),
+                            value: value.0,
+                        })?)
+                    }
+                    _ => Err(DartValueCastError {
+                        expectation: stringify!($arg),
+                        value: value.0,
+                    }),
+                }
+            }
+        }
+
+        impl TryFrom<DartValueArg<Option<$arg>>> for Option<$arg> {
+            type Error = DartValueCastError;
+
+            fn try_from(value: DartValueArg<Option<$arg>>) -> Result<Self, Self::Error> {
+                match value.0 {
+                    DartValue::None => Ok(None),
+                    DartValue::Int(num) => {
+                        Ok(Some(<$arg>::try_from(num).map_err(|_| DartValueCastError {
+                            expectation: concat!("Option<", stringify!($arg), ">"),
+                            value: value.0,
+                        })?))
+                    }
+                    _ => Err(DartValueCastError {
+                        expectation: concat!("Option<", stringify!($arg), ">"),
+                        value: value.0,
+                    }),
+                }
+            }
+        }
+    };
+    ($($arg:ty),*) => {
+        $(impl_primitive_dart_value_try_from!($arg);)+
+    }
+}
+
+impl_primitive_dart_value_try_from![
+    i8, i16, i32, i128, u8, u16, u32, u64, u128
+];
+
+impl<T> TryFrom<DartValueArg<T>> for i64
+where
+    T: PrimitiveEnum,
+{
     type Error = DartValueCastError;
 
     fn try_from(value: DartValueArg<T>) -> Result<Self, Self::Error> {
@@ -394,10 +448,44 @@ impl<T> TryFrom<DartValueArg<T>> for i64 {
     }
 }
 
-impl<T> TryFrom<DartValueArg<T>> for Option<i64> {
+impl TryFrom<DartValueArg<i64>> for i64 {
     type Error = DartValueCastError;
 
-    fn try_from(value: DartValueArg<T>) -> Result<Self, Self::Error> {
+    fn try_from(value: DartValueArg<i64>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::Int(num) => Ok(num),
+            _ => Err(DartValueCastError {
+                expectation: "i64",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+pub trait PrimitiveEnum {}
+
+impl<T> TryFrom<DartValueArg<Option<T>>> for Option<i64>
+where
+    T: PrimitiveEnum,
+{
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Option<T>>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Int(num) => Ok(Some(num)),
+            _ => Err(DartValueCastError {
+                expectation: "Option<i64>",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Option<i64>>> for Option<i64> {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Option<i64>>) -> Result<Self, Self::Error> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Int(num) => Ok(Some(num)),

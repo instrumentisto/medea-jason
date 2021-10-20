@@ -16,7 +16,7 @@ use std::convert::{TryFrom, TryInto};
 type NewFunction = extern "C" fn(
     DartValueArg<String>,
     DartValueArg<Option<String>>,
-    DartValueArg<Option<i64>>,
+    DartValueArg<Option<u16>>,
 ) -> Dart_Handle;
 
 /// Pointer to an extern function that returns candidate of the provided
@@ -27,7 +27,7 @@ type CandidateFunction =
 /// Pointer to an extern function that returns SDP line index of the provided
 /// [`IceCandidate`].
 type SdpMLineIndexFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<u16>>;
 
 /// Pointer to an extern function that returns SDP MID of the provided
 /// [`IceCandidate`].
@@ -142,12 +142,9 @@ impl IceCandidate {
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         unsafe {
-            let index: Option<i64> =
-                SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get())
-                    .try_into()
-                    .unwrap();
-            #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-            index.map(|i| i as u16)
+            SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get())
+                .try_into()
+                .unwrap()
         }
     }
 

@@ -5,6 +5,7 @@
 pub mod local;
 pub mod remote;
 
+use crate::api::dart::PrimitiveEnum;
 use medea_client_api_proto as proto;
 
 /// Liveness state of a [MediaStreamTrack][1] .
@@ -33,6 +34,8 @@ pub enum MediaSourceKind {
     /// Media is obtained with screen-capture.
     Display = 1,
 }
+
+impl PrimitiveEnum for MediaSourceKind {}
 
 impl From<MediaSourceKind> for proto::MediaSourceKind {
     #[inline]
