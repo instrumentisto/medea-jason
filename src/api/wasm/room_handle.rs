@@ -35,15 +35,22 @@ impl RoomHandle {
     ///
     /// Establishes connection with media server (if it doesn't exist already).
     ///
-    /// Effectively returns `Result<(), JasonError>`.
-    ///
     /// # Errors
     ///
-    /// - When `on_failed_local_media` callback is not set.
-    /// - When `on_connection_loss` callback is not set.
-    /// - When unable to connect to a media server.
+    /// With a [`StateError`] if the underlying pointer has been freed, or if
+    /// some mandatory callback is not set. These callbacks are:
+    /// [`RoomHandle::on_connection_loss`] and
+    /// [`RoomHandle::on_failed_local_media`].
     ///
+    /// With a [`FormatException`] if the provided `token` string has bad
+    /// format.
+    ///
+    /// With a [`RpcClientException`] if could not connect to a media server.
+    ///
+    /// [`FormatException`]: crate::api::err::FormatException
     /// [`Room`]: room::Room
+    /// [`RpcClientException`]: crate::api::err::RpcClientException
+    /// [`StateError`]: crate::api::err::StateError
     pub fn join(&self, token: String) -> Promise {
         let this = self.0.clone();
 
@@ -56,7 +63,12 @@ impl RoomHandle {
     /// Sets callback, invoked when a new [`Connection`] with some remote
     /// `Member` is established.
     ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
     /// [`Connection`]: crate::connection::Connection
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_new_connection(
         &self,
         cb: js_sys::Function,
@@ -70,8 +82,13 @@ impl RoomHandle {
     /// Sets `on_close` callback, invoked when this [`Room`] is closed,
     /// providing a [`RoomCloseReason`].
     ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
     /// [`Room`]: room::Room
     /// [`RoomCloseReason`]: room::RoomCloseReason
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_close(&self, cb: js_sys::Function) -> Result<(), JsValue> {
         self.0
             .on_close(cb.into())
@@ -87,8 +104,13 @@ impl RoomHandle {
     /// 2. `enable_audio`/`enable_video` is called.
     /// 3. [`MediaStreamSettings`] is updated via `set_local_media_settings`.
     ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
     /// [`Room`]: room::Room
     /// [`LocalMediaTrack`]: crate::api::LocalMediaTrack
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_local_track(&self, cb: js_sys::Function) -> Result<(), JsValue> {
         self.0
             .on_local_track(cb.into())
@@ -98,6 +120,12 @@ impl RoomHandle {
 
     /// Sets `on_failed_local_media` callback, invoked on local media
     /// acquisition failures.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_failed_local_media(
         &self,
         cb: js_sys::Function,
@@ -110,6 +138,12 @@ impl RoomHandle {
 
     /// Sets `on_connection_loss` callback, invoked when a connection with a
     /// server is lost.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_connection_loss(
         &self,
         cb: js_sys::Function,
@@ -143,9 +177,18 @@ impl RoomHandle {
     /// If recovering from fail state isn't possible then affected media types
     /// will be disabled.
     ///
-    /// [`Room`]: room::Room
-    /// [`PeerConnection`]: crate::peer::PeerConnection
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaSettingsUpdateException`][0] if media settings could not
+    /// be updated.
+    ///
     /// [`LocalMediaTrack`]: crate::api::LocalMediaTrack
+    /// [`PeerConnection`]: crate::peer::PeerConnection
+    /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaSettingsUpdateException
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     pub fn set_local_media_settings(
         &self,
@@ -172,11 +215,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if [`RoomHandle::unmute_audio()`] was
-    /// called while muting or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::unmute_audio()`] was called while muting or a media server
+    /// didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn mute_audio(&self) -> Promise {
         let this = self.0.clone();
 
@@ -190,11 +237,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if [`RoomHandle::mute_audio()`] was
-    /// called while unmuting or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::mute_audio()`] was called while unmuting or a media server
+    /// didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn unmute_audio(&self) -> Promise {
         let this = self.0.clone();
 
@@ -208,11 +259,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if [`RoomHandle::unmute_video()`] was
-    /// called while muting or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::unmute_video()`] was called while muting or a media server
+    /// didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn mute_video(&self, source_kind: Option<MediaSourceKind>) -> Promise {
         let this = self.0.clone();
 
@@ -228,11 +283,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if [`RoomHandle::mute_video()`] was
-    /// called while unmuting or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::mute_video()`] was called while unmuting or a media server
+    /// didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn unmute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -251,12 +310,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if the target sender is configured as
-    /// `required` by a media server or [`RoomHandle::enable_audio()`] was
-    /// called while disabling or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::enable_audio()`] was called while disabling or a media
+    /// server didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn disable_audio(&self) -> Promise {
         let this = self.0.clone();
 
@@ -270,14 +332,19 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if [`RoomHandle::disable_audio()`] was
-    /// called while enabling or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// With `name = 'MediaManagerError'` if media acquisition request to User
-    /// Agent failed.
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::disable_audio()`] was called while enabling or a media
+    /// server didn't approve this state transition.
     ///
+    /// With a [`LocalMediaInitException`] if a request of platform media
+    /// devices access failed.
+    ///
+    /// [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn enable_audio(&self) -> Promise {
         let this = self.0.clone();
 
@@ -293,10 +360,14 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if the target sender is configured as
-    /// `required` by a media server or [`RoomHandle::enable_video()`] was
-    /// called while disabling or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::enable_video()`] was called while disabling or a media
+    /// server didn't approve this state transition.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn disable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -317,12 +388,18 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if [`RoomHandle::disable_video()`] was
-    /// called while enabling or a media server didn't approve this state
-    /// transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
     ///
-    /// With `name = 'MediaManagerError'` if media acquisition request to User
-    /// Agent failed.
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::disable_video()`] was called while enabling or a media
+    /// server didn't approve this state transition.
+    ///
+    /// With a [`LocalMediaInitException`] if a request of platform media
+    /// devices access failed.
+    ///
+    /// [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn enable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
@@ -341,11 +418,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
     /// [`RoomHandle::enable_remote_audio()`] was called while disabling or a
     /// media server didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn disable_remote_audio(&self) -> Promise {
         let this = self.0.clone();
 
@@ -359,11 +440,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if
-    /// [`RoomHandle::enable_remote_video()`] was called while disabling or
-    /// a media server didn't approve this state transition.
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`RoomHandle::enable_remote_video()`] was called while disabling or a
+    /// media server didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn disable_remote_video(&self) -> Promise {
         let this = self.0.clone();
 
@@ -377,11 +462,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
     /// [`RoomHandle::disable_remote_audio()`] was called while enabling or a
     /// media server didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn enable_remote_audio(&self) -> Promise {
         let this = self.0.clone();
 
@@ -395,11 +484,15 @@ impl RoomHandle {
     ///
     /// # Errors
     ///
-    /// With `name = 'MediaConnections'` if
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
     /// [`RoomHandle::disable_remote_video()`] was called while enabling or a
     /// media server didn't approve this state transition.
     ///
     /// [`Room`]: room::Room
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
     pub fn enable_remote_video(&self) -> Promise {
         let this = self.0.clone();
 

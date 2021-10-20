@@ -40,6 +40,19 @@ impl MediaManagerHandle {
     /// Returns a list of [`InputDeviceInfo`] objects representing available
     /// media input and output devices, such as microphones, cameras, and so
     /// forth.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
+    /// implicitly owns native object behind this [`MediaManagerHandle`].
+    ///
+    /// With a [`EnumerateDevicesException`][0] if a request of platform media
+    /// devices access failed.
+    ///
+    /// [`Jason`]: crate::api::Jason
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::EnumerateDevicesException
     pub fn enumerate_devices(&self) -> Promise {
         let this = self.0.clone();
 
@@ -64,6 +77,19 @@ impl MediaManagerHandle {
 
     /// Returns [`LocalMediaTrack`]s objects, built from the provided
     /// [`MediaStreamSettings`].
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
+    /// implicitly owns native object behind this [`MediaManagerHandle`].
+    ///
+    /// With a [`LocalMediaInitException`] if a request of platform media
+    /// devices access failed.
+    ///
+    /// [`Jason`]: crate::api::Jason
+    /// [`LocalMediaInitException`]: crate::api::err::LocalMediaInitException
+    /// [`StateError`]: crate::api::err::StateError
     pub fn init_local_tracks(&self, caps: &MediaStreamSettings) -> Promise {
         let this = self.0.clone();
         let caps = caps.clone();
