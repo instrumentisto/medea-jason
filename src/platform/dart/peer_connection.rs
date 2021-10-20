@@ -14,13 +14,8 @@ use crate::{
         dart::{
             transceiver::Transceiver,
             utils::{
-                callback_listener::{
-                    HandleMutCallback, IntCallback, TwoArgCallback,
-                },
-                handle::DartHandle,
-                ice_connection_from_int,
-                option::DartIntOption,
-                peer_connection_state_from_int,
+                callback_listener::Callback, handle::DartHandle,
+                ice_connection_from_int, peer_connection_state_from_int,
             },
         },
         IceCandidate, RtcPeerConnectionError, RtcStats, SdpType,
@@ -30,9 +25,16 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack,
-    utils::dart_future::{DartFuture, StringFuture, VoidDartFuture},
+    media_track::MediaStreamTrack, utils::dart_future::DartFutureResolver,
 };
+use crate::{
+    api::dart::DartValueArg,
+    platform::dart::utils::{
+        callback_listener::TwoArgCallback,
+        dart_future::FallibleDartFutureResolver,
+    },
+};
+use std::convert::TryFrom;
 
 /// Representation of the Dart SDP type.
 // FIXME (evdokimovs): Migrate to the casting to i32 approach instead of
@@ -68,7 +70,8 @@ type OnConnectionStateChangeFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
 /// Pointer to an extern function that returns [`ConnectionState`] of the
 /// provided [`PeerConnection`].
-type ConnectionStateFunction = extern "C" fn(Dart_Handle) -> DartIntOption;
+type ConnectionStateFunction =
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Pointer to an extern function that request that ICE candidate gathering be
 /// redone on both ends of the connection.
@@ -462,11 +465,18 @@ impl RtcPeerConnection {
     where
         I: IntoIterator<Item = IceServer>,
     {
-        Ok(Self {
-            handle: DartFuture::execute(unsafe { NEW_PEER.unwrap()() })
-                .await
-                .unwrap(),
-        })
+        unsafe {
+            Ok(Self {
+                handle: DartHandle::new(
+                    *FallibleDartFutureResolver::execute::<
+                        ptr::NonNull<Dart_Handle>,
+                    >(unsafe { NEW_PEER.unwrap()() })
+                    .await
+                    .unwrap()
+                    .as_ptr(),
+                ),
+            })
+        }
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
@@ -488,10 +498,10 @@ impl RtcPeerConnection {
             unsafe {
                 ON_TRACK_FUNCTION.unwrap()(
                     self.handle.get(),
-                    TwoArgCallback::callback(move |track, transceiver| {
+                    TwoArgCallback::callback(move |track: ptr::NonNull<Dart_Handle>, transceiver: ptr::NonNull<Dart_Handle>| {
                         f(
-                            MediaStreamTrack::from(track),
-                            Transceiver::from(DartHandle::new(transceiver)),
+                            MediaStreamTrack::from(*track.as_ptr()),
+                            Transceiver::from(DartHandle::new(*transceiver.as_ptr())),
                         );
                     }),
                 );
@@ -512,14 +522,17 @@ impl RtcPeerConnection {
             unsafe {
                 ON_ICE_CANDIDATE_FUNCTION.unwrap()(
                     self.handle.get(),
-                    HandleMutCallback::callback(move |handle| {
-                        let candidate = PlatformIceCandidate::from(handle);
-                        f(IceCandidate {
-                            candidate: candidate.candidate(),
-                            sdp_m_line_index: candidate.sdp_m_line_index(),
-                            sdp_mid: candidate.sdp_mid(),
-                        });
-                    }),
+                    Callback::callback(
+                        move |handle: ptr::NonNull<Dart_Handle>| {
+                            let candidate =
+                                PlatformIceCandidate::from(*handle.as_ptr());
+                            f(IceCandidate {
+                                candidate: candidate.candidate(),
+                                sdp_m_line_index: candidate.sdp_m_line_index(),
+                                sdp_mid: candidate.sdp_mid(),
+                            });
+                        },
+                    ),
                 );
             }
         }
@@ -541,10 +554,11 @@ impl RtcPeerConnection {
     #[must_use]
     pub fn connection_state(&self) -> Option<PeerConnectionState> {
         unsafe {
-            let connection_state: i32 = Option::from(
+            let connection_state: i64 = Option::try_from(
                 CONNECTION_STATE_FUNCTION.unwrap()(self.handle.get()),
-            )?;
-            Some(peer_connection_state_from_int(connection_state))
+            )
+            .unwrap()?;
+            Some(peer_connection_state_from_int(connection_state as i32))
         }
     }
 
@@ -559,8 +573,8 @@ impl RtcPeerConnection {
             unsafe {
                 ON_ICE_CONNECTION_STATE_CHANGE_FUNCTION.unwrap()(
                     self.handle.get(),
-                    IntCallback::callback(move |v| {
-                        f(ice_connection_from_int(v));
+                    Callback::callback(move |v: i64| {
+                        f(ice_connection_from_int(v as i32));
                     }),
                 );
             }
@@ -578,8 +592,8 @@ impl RtcPeerConnection {
             unsafe {
                 ON_CONNECTION_STATE_CHANGE_FUNCTION.unwrap()(
                     self.handle.get(),
-                    IntCallback::callback(move |v| {
-                        f(peer_connection_state_from_int(v));
+                    Callback::callback(move |v: i64| {
+                        f(peer_connection_state_from_int(v as i32));
                     }),
                 );
             }
@@ -598,18 +612,18 @@ impl RtcPeerConnection {
         sdp_mid: &Option<String>,
     ) -> Result<()> {
         unsafe {
-            // TODO: Error handling
             let fut = ADD_ICE_CANDIDATE_FUNCTION.unwrap()(
                 self.handle.get(),
                 PlatformIceCandidate::new(candidate, sdp_m_line_index, sdp_mid)
                     .handle(),
             );
-            VoidDartFuture::execute(fut).await;
-            // .map_err(|_e| {
-            //     tracerr::new!(RtcPeerConnectionError::AddIceCandidateFailed(
-            //         todo!("Error::from(e)")
-            //     ))
-            // })?;
+            FallibleDartFutureResolver::execute::<()>(fut)
+                .await
+                .map_err(|e| {
+                    tracerr::new!(
+                        RtcPeerConnectionError::AddIceCandidateFailed(e)
+                    )
+                })?;
         };
         Ok(())
     }
@@ -644,14 +658,17 @@ impl RtcPeerConnection {
         sdp: String,
     ) -> Result<()> {
         unsafe {
-            DartFuture::execute(SET_LOCAL_DESCRIPTION_FUNCTION.unwrap()(
+            FallibleDartFutureResolver::execute(SET_LOCAL_DESCRIPTION_FUNCTION
+                .unwrap()(
                 self.handle.get(),
                 string_into_c_str(sdp_type.to_string()),
                 string_into_c_str(sdp),
             ))
             .await
-            .map_err::<Traced<RtcPeerConnectionError>, _>(|_| {
-                todo!("RtcPeerConnectionError::SetLocalDescriptionFailed")
+            .map_err::<Traced<RtcPeerConnectionError>, _>(|e| {
+                tracerr::new!(
+                    RtcPeerConnectionError::SetLocalDescriptionFailed(e.into())
+                )
             })?;
         }
         Ok(())
@@ -665,36 +682,34 @@ impl RtcPeerConnection {
     pub async fn set_remote_description(&self, sdp: SdpType) -> Result<()> {
         match sdp {
             SdpType::Offer(sdp) => unsafe {
-                VoidDartFuture::execute(SET_REMOTE_DESCRIPTION_FUNCTION
-                    .unwrap()(
-                    self.handle.get(),
-                    string_into_c_str(RtcSdpType::Offer.to_string()),
-                    string_into_c_str(sdp),
-                ))
-                .await;
-                // .map_err(|e| {
-                //     tracerr::new!(
-                //         RtcPeerConnectionError::SetRemoteDescriptionFailed(
-                //             e.into()
-                //         )
-                //     )
-                // })?;
+                FallibleDartFutureResolver::execute::<()>(
+                    SET_REMOTE_DESCRIPTION_FUNCTION.unwrap()(
+                        self.handle.get(),
+                        string_into_c_str(RtcSdpType::Offer.to_string()),
+                        string_into_c_str(sdp),
+                    ),
+                )
+                .await
+                .map_err(|e| {
+                    tracerr::new!(
+                        RtcPeerConnectionError::SetRemoteDescriptionFailed(e)
+                    )
+                })?;
             },
             SdpType::Answer(sdp) => unsafe {
-                VoidDartFuture::execute(SET_REMOTE_DESCRIPTION_FUNCTION
-                    .unwrap()(
-                    self.handle.get(),
-                    string_into_c_str(RtcSdpType::Answer.to_string()),
-                    string_into_c_str(sdp),
-                ))
-                .await;
-                // .map_err(|_e| {
-                //     tracerr::new!(
-                //         RtcPeerConnectionError::SetRemoteDescriptionFailed(
-                //             todo!("Error::from(e)")
-                //         )
-                //     )
-                // })?;
+                FallibleDartFutureResolver::execute::<()>(
+                    SET_REMOTE_DESCRIPTION_FUNCTION.unwrap()(
+                        self.handle.get(),
+                        string_into_c_str(RtcSdpType::Answer.to_string()),
+                        string_into_c_str(sdp),
+                    ),
+                )
+                .await
+                .map_err(|e| {
+                    tracerr::new!(
+                        RtcPeerConnectionError::SetRemoteDescriptionFailed(e)
+                    )
+                })?;
             },
         }
         Ok(())
@@ -706,12 +721,10 @@ impl RtcPeerConnection {
     /// Should be called whenever remote description has been changed.
     pub async fn create_answer(&self) -> Result<String> {
         unsafe {
-            Ok(
-                StringFuture::execute(CREATE_ANSWER.unwrap()(
-                    self.handle.get(),
-                ))
-                .await,
-            )
+            Ok(DartFutureResolver::execute(CREATE_ANSWER.unwrap()(
+                self.handle.get(),
+            ))
+            .await)
         }
     }
 
@@ -722,10 +735,10 @@ impl RtcPeerConnection {
     /// (re)negotiation.
     pub async fn create_offer(&self) -> Result<String> {
         unsafe {
-            Ok(
-                StringFuture::execute(CREATE_OFFER.unwrap()(self.handle.get()))
-                    .await,
-            )
+            Ok(DartFutureResolver::execute(CREATE_OFFER.unwrap()(
+                self.handle.get(),
+            ))
+            .await)
         }
     }
 
@@ -752,14 +765,17 @@ impl RtcPeerConnection {
         unsafe {
             let handle = self.handle.get();
             async move {
-                let trnsvr = DartFuture::execute(ADD_TRANSCEIVER_FUNCTION
-                    .unwrap()(
-                    handle,
-                    kind as i32,
-                    direction.into(),
-                ))
-                .await;
-                Transceiver::from(trnsvr.unwrap())
+                let trnsvr: ptr::NonNull<Dart_Handle> =
+                    FallibleDartFutureResolver::execute(
+                        ADD_TRANSCEIVER_FUNCTION.unwrap()(
+                            handle,
+                            kind as i32,
+                            direction.into(),
+                        ),
+                    )
+                    .await
+                    .unwrap();
+                Transceiver::from(DartHandle::new(*trnsvr.as_ptr()))
             }
         }
     }
@@ -773,23 +789,21 @@ impl RtcPeerConnection {
         &self,
         mid: String,
     ) -> impl Future<Output = Option<Transceiver>> + 'static {
-        // TODO: option
-        // if transceiver.is_null() {
-        //     None
-        // } else {
-        // }
         unsafe {
             let handle = self.handle.get();
             async move {
-                let transceiver: DartHandle =
-                    DartFuture::execute(GET_TRANSCEIVER_BY_MID_FUNCTION
-                        .unwrap()(
-                        handle,
-                        string_into_c_str(mid.to_string()),
-                    ))
+                let transceiver: Option<ptr::NonNull<Dart_Handle>> =
+                    FallibleDartFutureResolver::execute(
+                        GET_TRANSCEIVER_BY_MID_FUNCTION.unwrap()(
+                            handle,
+                            string_into_c_str(mid.to_string()),
+                        ),
+                    )
                     .await
                     .unwrap();
-                Some(Transceiver::from(transceiver))
+                transceiver.map(|transceiver| {
+                    Transceiver::from(DartHandle::new(*transceiver.as_ptr()))
+                })
             }
         }
     }

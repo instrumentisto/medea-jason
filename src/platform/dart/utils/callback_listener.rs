@@ -3,6 +3,53 @@
 use dart_sys::Dart_Handle;
 
 use crate::api::{DartValue, DartValueArg};
+use std::{convert::TryInto, fmt::Debug};
+
+pub struct TwoArgCallback(Box<dyn FnOnce(DartValue, DartValue)>);
+
+impl TwoArgCallback {
+    pub fn callback<F, T, S>(f: F) -> Dart_Handle
+    where
+        F: FnOnce(T, S) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+        DartValueArg<S>: TryInto<S>,
+        <DartValueArg<S> as TryInto<S>>::Error: Debug,
+        S: 'static,
+    {
+        let this =
+            Self(Box::new(move |first: DartValue, second: DartValue| {
+                let first = DartValueArg::<T>::from(first);
+                let second = DartValueArg::<S>::from(second);
+                (f)(first.try_into().unwrap(), second.try_into().unwrap());
+            }));
+        unsafe {
+            TWO_ARG_CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this)))
+        }
+    }
+}
+
+type TwoArgCallbackFunction = extern "C" fn(*mut TwoArgCallback) -> Dart_Handle;
+
+static mut TWO_ARG_CALLBACK_FUNCTION: Option<TwoArgCallbackFunction> = None;
+
+#[no_mangle]
+pub unsafe extern "C" fn register_TwoArgCallback__callback(
+    f: TwoArgCallbackFunction,
+) {
+    TWO_ARG_CALLBACK_FUNCTION = Some(f);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn TwoArgCallback__call(
+    cb: *mut TwoArgCallback,
+    first: DartValue,
+    second: DartValue,
+) {
+    let cb = Box::from_raw(cb);
+    (cb.0)(first, second);
+}
 
 /// Listener for the Dart callback with `void` as argument.
 pub struct Callback(Box<dyn FnOnce(DartValue)>);
@@ -12,11 +59,14 @@ impl Callback {
     /// `f` closure when it will be called on Dart side.
     pub fn callback<F, T>(f: F) -> Dart_Handle
     where
-        F: FnOnce(DartValueArg<T>) + 'static,
+        F: FnOnce(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         let this = Self(Box::new(move |val: DartValue| {
             let var = DartValueArg::<T>::from(val);
-            (f)(var);
+            (f)(var.try_into().unwrap());
         }));
         unsafe { CALLBACK_FUNCTION.unwrap()(Box::into_raw(Box::new(this))) }
     }

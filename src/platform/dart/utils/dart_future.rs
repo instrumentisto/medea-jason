@@ -8,7 +8,7 @@ use futures::channel::oneshot;
 
 use crate::{
     api::{DartValue, DartValueArg},
-    platform::dart::error::DartError,
+    platform::dart::error::Error as DartError,
 };
 use std::{convert::TryInto, fmt::Debug};
 

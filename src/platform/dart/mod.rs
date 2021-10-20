@@ -21,8 +21,6 @@ use crate::{
     platform::dart::utils::dart_api::Dart_PropagateError_DL_Trampolined,
 };
 
-use super::utils::dart_future::VoidDartFuture;
-
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
@@ -36,6 +34,7 @@ pub use self::{
     transport::WebSocketRpcTransport,
     utils::Function,
 };
+use crate::platform::dart::utils::dart_future::DartFutureResolver;
 
 /// Pointer to an extern function that returns [`Dart_Handle`] to the newly
 /// created Dart exception
@@ -102,5 +101,5 @@ pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
     let dart_fut = unsafe { DELAYED_FUTURE_FUNCTION.unwrap()(delay) };
-    VoidDartFuture::execute(dart_fut).await;
+    DartFutureResolver::execute::<()>(dart_fut).await;
 }

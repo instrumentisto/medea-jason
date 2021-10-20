@@ -8,14 +8,11 @@ use dart_sys::Dart_Handle;
 use derive_more::From;
 
 use crate::{
-    api::dart::utils::c_str_into_string,
+    api::dart::{utils::c_str_into_string, DartValueArg},
     media::{track::MediaStreamTrackState, FacingMode, MediaKind},
-    platform::dart::utils::{
-        callback_listener::VoidCallback,
-        handle::DartHandle,
-        option::{DartIntOption, DartStringOption, DartUIntOption},
-    },
+    platform::dart::utils::{callback_listener::Callback, handle::DartHandle},
 };
+use std::convert::{TryFrom, TryInto};
 
 /// Pointer to an extern function that returns ID of the provided
 /// [`MediaStreamTrack`].
@@ -23,19 +20,21 @@ type IdFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 
 /// Pointer to an extern function that returns device ID of the provided
 /// [`MediaStreamTrack`].
-type DeviceIdFunction = extern "C" fn(Dart_Handle) -> DartStringOption;
+type DeviceIdFunction =
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 
 /// Pointer to an extern function that returns facing mode of the provided
 /// [`MediaStreamTrack`].
-type FacingModeFunction = extern "C" fn(Dart_Handle) -> DartIntOption;
+type FacingModeFunction =
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Pointer to an extern function that returns height of the provided
 /// [`MediaStreamTrack`].
-type HeightFunction = extern "C" fn(Dart_Handle) -> DartUIntOption;
+type HeightFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Pointer to an extern function that returns width of the provided
 /// [`MediaStreamTrack`].
-type WidthFunction = extern "C" fn(Dart_Handle) -> DartUIntOption;
+type WidthFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Pointer to an extern function that sets `enabled` field of the provided
 /// [`MediaStreamTrack`] to the provided [`bool`].
@@ -295,7 +294,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()).into() }
+        unsafe {
+            DEVICE_ID_FUNCTION.unwrap()(self.0.get())
+                .try_into()
+                .unwrap()
+        }
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].
@@ -305,9 +308,10 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         unsafe {
-            let facing_mode: i32 =
-                Option::from(FACING_MODE_FUNCTION.unwrap()(self.0.get()))?;
-            Some(FacingMode::from(facing_mode))
+            let facing_mode: i64 =
+                Option::try_from(FACING_MODE_FUNCTION.unwrap()(self.0.get()))
+                    .unwrap()?;
+            Some(FacingMode::from(facing_mode as i32))
         }
     }
 
@@ -317,7 +321,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        unsafe { HEIGHT_FUNCTION.unwrap()(self.0.get()).into() }
+        unsafe {
+            Option::<i64>::try_from(HEIGHT_FUNCTION.unwrap()(self.0.get()))
+                .unwrap()
+                .map(|i| i as u32)
+        }
     }
 
     /// Return a [`width`][1] of the underlying [MediaStreamTrack][2].
@@ -326,7 +334,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        unsafe { WIDTH_FUNCTION.unwrap()(self.0.get()).into() }
+        unsafe {
+            Option::<i64>::try_from(WIDTH_FUNCTION.unwrap()(self.0.get()))
+                .unwrap()
+                .map(|i| i as u32)
+        }
     }
 
     /// Changes an [`enabled`][1] attribute in the underlying
@@ -395,7 +407,7 @@ impl MediaStreamTrack {
         F: 'static + FnOnce(),
     {
         if let Some(cb) = f {
-            let cb = VoidCallback::callback(cb);
+            let cb = Callback::callback(|_: ()| cb());
             unsafe { ON_ENDED_FUNCTION.unwrap()(self.0.get(), cb) };
         }
     }

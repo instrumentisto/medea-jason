@@ -156,6 +156,15 @@ impl From<Option<String>> for DartValue {
     }
 }
 
+impl From<Option<i64>> for DartValue {
+    fn from(val: Option<i64>) -> Self {
+        match val {
+            None => Self::None,
+            Some(i) => Self::from(i),
+        }
+    }
+}
+
 impl From<Dart_Handle> for DartValue {
     #[inline]
     fn from(handle: Dart_Handle) -> Self {
@@ -267,6 +276,20 @@ impl TryFrom<DartValueArg<String>> for String {
             DartValue::String(c_str) => unsafe { Ok(c_str_into_string(c_str)) },
             _ => Err(DartValueCastError {
                 expectation: "String",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<()>> for () {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<()>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(()),
+            _ => Err(DartValueCastError {
+                expectation: "()",
                 value: value.0,
             }),
         }

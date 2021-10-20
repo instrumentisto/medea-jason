@@ -88,27 +88,3 @@ pub unsafe extern "C" fn register_DartError__name(f: NameFunction) {
 pub unsafe extern "C" fn register_DartError__message(f: MessageFunction) {
     MESSAGE_FUNCTION = Some(f);
 }
-
-/// Rust representation of the exception thrown from the Dart side.
-#[derive(Clone, Debug, PartialEq)]
-pub struct DartError(DartHandle);
-
-impl DartError {
-    /// Returns name of the underlying Dart exception.
-    #[must_use]
-    pub fn name(&self) -> String {
-        unsafe { c_str_into_string(NAME_FUNCTION.unwrap()(self.0.get())) }
-    }
-
-    /// Returns message of the underlying Dart exception.
-    #[must_use]
-    pub fn message(&self) -> String {
-        unsafe { c_str_into_string(MESSAGE_FUNCTION.unwrap()(self.0.get())) }
-    }
-}
-
-impl From<Dart_Handle> for DartError {
-    fn from(from: Dart_Handle) -> Self {
-        Self(DartHandle::new(from))
-    }
-}

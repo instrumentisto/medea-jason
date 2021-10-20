@@ -6,33 +6,33 @@ use dart_sys::Dart_Handle;
 use derive_more::From;
 
 use crate::{
-    api::dart::string_into_c_str,
-    platform::dart::utils::{
-        handle::DartHandle,
-        nullable::{NullableChar, NullableInt},
-        option::{DartIntOption, DartStringOption},
-    },
+    api::dart::{string_into_c_str, DartValue, DartValueArg},
+    platform::dart::utils::handle::DartHandle,
 };
+use std::convert::{TryFrom, TryInto};
 
 /// Pointer to an extern function that creates new [`IceCandidate`] with a
 /// provided parameters.
 type NewFunction = extern "C" fn(
-    ptr::NonNull<c_char>,
-    NullableChar,
-    NullableInt,
+    DartValueArg<String>,
+    DartValueArg<Option<String>>,
+    DartValueArg<Option<i64>>,
 ) -> Dart_Handle;
 
 /// Pointer to an extern function that returns candidate of the provided
 /// [`IceCandidate`].
-type CandidateFunction = extern "C" fn(Dart_Handle) -> DartStringOption;
+type CandidateFunction =
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 
 /// Pointer to an extern function that returns SDP line index of the provided
 /// [`IceCandidate`].
-type SdpMLineIndexFunction = extern "C" fn(Dart_Handle) -> DartIntOption;
+type SdpMLineIndexFunction =
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Pointer to an extern function that returns SDP MID of the provided
 /// [`IceCandidate`].
-type SdpMidFunction = extern "C" fn(Dart_Handle) -> DartStringOption;
+type SdpMidFunction =
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 
 /// Stores pointer to the [`NewFunction`] extern function.
 ///
@@ -120,9 +120,9 @@ impl IceCandidate {
     ) -> Self {
         let handle = unsafe {
             NEW_FUNCTION.unwrap()(
-                string_into_c_str(candidate.to_owned()),
+                candidate.to_string().into(),
                 sdp_mid.clone().into(),
-                sdp_m_line_index.into(),
+                sdp_m_line_index.clone().map(|i| i as i64).into(),
             )
         };
         Self(DartHandle::new(handle))
@@ -138,7 +138,9 @@ impl IceCandidate {
     #[must_use]
     pub fn candidate(&self) -> String {
         unsafe {
-            Option::from(CANDIDATE_FUNCTION.unwrap()(self.0.get())).unwrap()
+            Option::try_from(CANDIDATE_FUNCTION.unwrap()(self.0.get()))
+                .unwrap()
+                .unwrap()
         }
     }
 
@@ -146,8 +148,10 @@ impl IceCandidate {
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         unsafe {
-            let index: Option<i32> =
-                SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get()).into();
+            let index: Option<i64> =
+                SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get())
+                    .try_into()
+                    .unwrap();
             #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
             index.map(|i| i as u16)
         }
@@ -156,6 +160,6 @@ impl IceCandidate {
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        unsafe { SDP_MID_FUNCTION.unwrap()(self.0.get()).into() }
+        unsafe { SDP_MID_FUNCTION.unwrap()(self.0.get()).try_into().unwrap() }
     }
 }

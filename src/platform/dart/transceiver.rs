@@ -1,23 +1,20 @@
 //! [`RtcRtpTransceiver`] wrapper.
 
-use std::{cell::RefCell, future::Future, rc::Rc};
+use std::{cell::RefCell, future::Future, ptr, rc::Rc};
 
 use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 
 use crate::{
+    api::dart::{DartValue, DartValueArg},
     media::track::local,
     platform,
     platform::{
-        dart::utils::{
-            handle::DartHandle,
-            option::{DartOption, DartStringOption},
-        },
+        dart::utils::{dart_future::DartFutureResolver, handle::DartHandle},
         TransceiverDirection,
     },
 };
-
-use super::utils::dart_future::{IntFuture, VoidDartFuture};
+use std::convert::{TryFrom, TryInto};
 
 /// Wrapper around `RTCRtpTransceiver`'s [`DartHandle`] which provides handy
 /// methods for direction changes.
@@ -45,7 +42,10 @@ type CurrentDirectionFunction = extern "C" fn(Dart_Handle) -> i32;
 
 /// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
-type GetSendTrackFunction = extern "C" fn(Dart_Handle) -> DartOption;
+type GetSendTrackFunction =
+    extern "C" fn(
+        Dart_Handle,
+    ) -> DartValueArg<Option<ptr::NonNull<Dart_Handle>>>;
 
 /// Pointer to an extern function that replaces `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
@@ -66,11 +66,14 @@ type SetSendTrackEnabledFunction = extern "C" fn(Dart_Handle, bool);
 
 /// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
-type SendTrackFunction = extern "C" fn(Dart_Handle) -> DartOption;
+type SendTrackFunction =
+    extern "C" fn(
+        Dart_Handle,
+    ) -> DartValueArg<Option<ptr::NonNull<Dart_Handle>>>;
 
 /// Pointer to an extern function that returns MID of the provided
 /// [`Transceiver`].
-type MidFunction = extern "C" fn(Dart_Handle) -> DartStringOption;
+type MidFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 
 /// Pointer to an extern function that returns `1` if provided [`Transceiver`]
 /// has `Send` [`MediaStreamTrack`].
@@ -286,7 +289,7 @@ impl Transceiver {
         &self,
         direction: TransceiverDirection,
     ) -> LocalBoxFuture<'static, ()> {
-        let fut = VoidDartFuture::execute(unsafe {
+        let fut = DartFutureResolver::execute::<()>(unsafe {
             SET_DIRECTION_FUNCTION.unwrap()(
                 self.transceiver.get(),
                 direction.into(),
@@ -344,7 +347,7 @@ impl Transceiver {
         new_sender: Rc<local::Track>,
     ) -> Result<(), platform::Error> {
         unsafe {
-            VoidDartFuture::execute(REPLACE_TRACK_FUNCTION.unwrap()(
+            DartFutureResolver::execute::<()>(REPLACE_TRACK_FUNCTION.unwrap()(
                 self.transceiver.get(),
                 new_sender.platform_track().handle(),
             ))
@@ -365,10 +368,12 @@ impl Transceiver {
     /// [WebAPI docs]: https://tinyurl.com/7pnszaa8
     pub fn drop_send_track(&self) -> impl Future<Output = ()> {
         unsafe {
-            if let Some(sender) =
-                GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()).into()
+            if let Some(sender) = Option::<ptr::NonNull<Dart_Handle>>::try_from(
+                GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()),
+            )
+            .unwrap()
             {
-                DROP_SENDER_FUNCTION.unwrap()(sender);
+                DROP_SENDER_FUNCTION.unwrap()(*sender.as_ptr());
             }
         }
         async {}
@@ -378,10 +383,15 @@ impl Transceiver {
     /// value, if any.
     pub fn set_send_track_enabled(&self, enabled: bool) {
         unsafe {
-            if let Some(sender) =
-                GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()).into()
+            if let Some(sender) = Option::<ptr::NonNull<Dart_Handle>>::try_from(
+                GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()),
+            )
+            .unwrap()
             {
-                SET_SEND_TRACK_ENABLED_FUNCTION.unwrap()(sender, enabled);
+                SET_SEND_TRACK_ENABLED_FUNCTION.unwrap()(
+                    *sender.as_ptr(),
+                    enabled,
+                );
             }
         }
     }
@@ -393,11 +403,11 @@ impl Transceiver {
         let handle = self.transceiver.get();
         unsafe {
             async move {
-                IntFuture::execute(GET_CURRENT_DIRECTION_FUNCTION.unwrap()(
-                    handle,
-                ))
-                .await
-                .into()
+                (DartFutureResolver::execute::<i64>(
+                    GET_CURRENT_DIRECTION_FUNCTION.unwrap()(handle),
+                )
+                .await as i32)
+                    .into()
             }
         }
     }
@@ -411,7 +421,11 @@ impl Transceiver {
     ///
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
     pub fn mid(&self) -> Option<String> {
-        unsafe { MID_FUNCTION.unwrap()(self.transceiver.get()).into() }
+        unsafe {
+            MID_FUNCTION.unwrap()(self.transceiver.get())
+                .try_into()
+                .unwrap()
+        }
     }
 
     /// Returns [`local::Track`] that is being send to remote, if any.
