@@ -1,12 +1,17 @@
 //! [`RtcRtpTransceiver`] wrapper.
 
-use std::{cell::RefCell, future::Future, ptr, rc::Rc};
+use std::{
+    cell::RefCell,
+    convert::{TryFrom, TryInto},
+    future::Future,
+    rc::Rc,
+};
 
 use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 
 use crate::{
-    api::dart::{DartValue, DartValueArg},
+    api::dart::DartValueArg,
     media::track::local,
     platform,
     platform::{
@@ -14,7 +19,6 @@ use crate::{
         TransceiverDirection,
     },
 };
-use std::convert::{TryFrom, TryInto};
 
 /// Wrapper around `RTCRtpTransceiver`'s [`DartHandle`] which provides handy
 /// methods for direction changes.

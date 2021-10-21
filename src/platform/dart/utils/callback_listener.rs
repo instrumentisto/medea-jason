@@ -1,13 +1,17 @@
 //! Definitions and implementations of the Dart callback listeners.
 
+use std::{convert::TryInto, fmt::Debug};
+
 use dart_sys::Dart_Handle;
 
 use crate::api::{DartValue, DartValueArg};
-use std::{convert::TryInto, fmt::Debug};
 
+/// Listener for the Dart callback with two [`DartValue`]s as arguments.
 pub struct TwoArgCallback(Box<dyn FnOnce(DartValue, DartValue)>);
 
 impl TwoArgCallback {
+    /// Returns [`Dart_Handle`] to the Dart callback which will call provided
+    /// `f` closure when it will be called on Dart side.
     pub fn callback<F, T, S>(f: F) -> Dart_Handle
     where
         F: FnOnce(T, S) + 'static,
@@ -30,10 +34,22 @@ impl TwoArgCallback {
     }
 }
 
+/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
+/// created Dart callback which will call Rust side callback when Dart side
+/// callback will be fired.
 type TwoArgCallbackFunction = extern "C" fn(*mut TwoArgCallback) -> Dart_Handle;
 
+/// Stores pointer to the [`TwoArgCallbackFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
 static mut TWO_ARG_CALLBACK_FUNCTION: Option<TwoArgCallbackFunction> = None;
 
+/// Registers the provided [`TwoArgCallbackFunction`] as
+/// [`TWO_ARG_CALLBACK_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn register_TwoArgCallback__callback(
     f: TwoArgCallbackFunction,
@@ -41,6 +57,12 @@ pub unsafe extern "C" fn register_TwoArgCallback__callback(
     TWO_ARG_CALLBACK_FUNCTION = Some(f);
 }
 
+/// Calls provided [`TwoArgCallback`] with a provided [`DartValue`]s as
+/// arguments.
+///
+/// # Safety
+///
+/// Provided [`Callback`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn TwoArgCallback__call(
     cb: *mut TwoArgCallback,
@@ -51,7 +73,7 @@ pub unsafe extern "C" fn TwoArgCallback__call(
     (cb.0)(first, second);
 }
 
-/// Listener for the Dart callback with `void` as argument.
+/// Listener for the Dart callback with [`DartValue`] as argument.
 pub struct Callback(Box<dyn FnOnce(DartValue)>);
 
 impl Callback {

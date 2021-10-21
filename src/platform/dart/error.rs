@@ -5,15 +5,10 @@ use std::{os::raw::c_char, ptr, rc::Rc};
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 use derive_more::Display;
 
-use crate::api::c_str_into_string;
-
-use super::utils::{
-    dart_api::{
-        Dart_DeletePersistentHandle_DL_Trampolined,
-        Dart_HandleFromPersistent_DL_Trampolined,
-        Dart_NewPersistentHandle_DL_Trampolined,
-    },
-    handle::DartHandle,
+use super::utils::dart_api::{
+    Dart_DeletePersistentHandle_DL_Trampolined,
+    Dart_HandleFromPersistent_DL_Trampolined,
+    Dart_NewPersistentHandle_DL_Trampolined,
 };
 
 /// Wrapper for Dart exception thrown when calling Dart code.

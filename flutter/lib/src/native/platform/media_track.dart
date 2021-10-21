@@ -65,7 +65,7 @@ Pointer<Utf8> deviceId(MediaStreamTrack track) {
 
 Pointer<Utf8> facingMode(MediaStreamTrack track) {
   // TODO: remove this dummy implementation when flutter_webrtc will be reworked
-  return "user".toNativeUtf8();
+  return 'user'.toNativeUtf8();
 }
 
 int height(MediaStreamTrack track) {

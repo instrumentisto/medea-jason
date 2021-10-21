@@ -18,7 +18,10 @@ use dart_sys::Dart_Handle;
 
 use crate::{
     api::dart::string_into_c_str,
-    platform::dart::utils::dart_api::Dart_PropagateError_DL_Trampolined,
+    platform::dart::utils::{
+        dart_api::Dart_PropagateError_DL_Trampolined,
+        dart_future::DartFutureResolver,
+    },
 };
 
 pub use self::{
@@ -34,7 +37,6 @@ pub use self::{
     transport::WebSocketRpcTransport,
     utils::Function,
 };
-use crate::platform::dart::utils::dart_future::DartFutureResolver;
 
 /// Pointer to an extern function that returns [`Dart_Handle`] to the newly
 /// created Dart exception

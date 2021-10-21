@@ -11,12 +11,12 @@ use medea_client_api_proto::{
 };
 
 use crate::{
-    api::dart::PrimitiveEnum,
     media::{track::MediaStreamTrackState, MediaKind},
     peer::{
         media_exchange_state, mute_state, LocalStreamUpdateCriteria, MediaState,
     },
     platform,
+    utils::PrimitiveEnum,
 };
 
 /// Describes directions that a camera can face, as seen from a user's

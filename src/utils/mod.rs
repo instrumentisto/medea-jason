@@ -19,6 +19,10 @@ pub use self::{
     resettable_delay::{resettable_delay_for, ResettableDelayHandle},
 };
 
+/// Marker trait which indicates that implementor is C-style enum which can be
+/// converted from the number primitives.
+pub trait PrimitiveEnum {}
+
 /// Wrapper around [`AbortHandle`] which aborts [`Future`] on [`Drop`].
 ///
 /// [`Future`]: std::future::Future

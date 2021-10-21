@@ -1,4 +1,4 @@
-use std::{future::Future, os::raw::c_char, ptr};
+use std::{convert::TryFrom, future::Future, os::raw::c_char, ptr};
 
 use dart_sys::Dart_Handle;
 use derive_more::Display;
@@ -8,13 +8,15 @@ use medea_client_api_proto::{
 use tracerr::Traced;
 
 use crate::{
-    api::dart::string_into_c_str,
+    api::dart::{string_into_c_str, DartValueArg},
     media::MediaKind,
     platform::{
         dart::{
             transceiver::Transceiver,
             utils::{
-                callback_listener::Callback, handle::DartHandle,
+                callback_listener::{Callback, TwoArgCallback},
+                dart_future::FallibleDartFutureResolver,
+                handle::DartHandle,
                 ice_connection_from_int, peer_connection_state_from_int,
             },
         },
@@ -27,17 +29,8 @@ use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
     media_track::MediaStreamTrack, utils::dart_future::DartFutureResolver,
 };
-use crate::{
-    api::dart::DartValueArg,
-    platform::dart::utils::{
-        callback_listener::TwoArgCallback,
-        dart_future::FallibleDartFutureResolver,
-    },
-};
-use std::convert::TryFrom;
 
 /// Representation of the Dart SDP type.
-// FIXME (evdokimovs): Migrate to the casting to i32 approach instead of
 // to_string
 #[derive(Display)]
 pub enum RtcSdpType {
@@ -476,7 +469,6 @@ impl RtcPeerConnection {
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     pub async fn get_stats(&self) -> Result<RtcStats> {
-        // TODO: Implement RTCStats
         Ok(RtcStats(Vec::new()))
     }
 
@@ -795,7 +787,7 @@ impl RtcPeerConnection {
                     )
                     .await
                     .unwrap();
-                transceiver.map(|h: DartHandle| Transceiver::from(h))
+                transceiver.map(Transceiver::from)
             }
         }
     }

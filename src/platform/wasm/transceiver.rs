@@ -1,6 +1,6 @@
 //! [`RtcRtpTransceiver`] wrapper.
 
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, future::Future, rc::Rc};
 
 use futures::future::LocalBoxFuture;
 use wasm_bindgen_futures::JsFuture;
@@ -10,7 +10,6 @@ use crate::{
     media::track::local,
     platform::{transceiver_direction::TransceiverDirection, Error},
 };
-use std::future::Future;
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
 /// direction changes.

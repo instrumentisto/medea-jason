@@ -167,7 +167,7 @@ ForeignValue iceConnectionState(RTCPeerConnection conn) {
 }
 
 void rollback(RTCPeerConnection conn) {
-  conn.setLocalDescription(RTCSessionDescription(null, "rollback"));
+  conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 Object getTransceivers(RTCPeerConnection conn) {

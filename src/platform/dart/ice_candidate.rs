@@ -1,15 +1,13 @@
 //! Entity for the ICE candidate from the `RTCPeerConnection`'s SDP offer.
 
-use std::{os::raw::c_char, ptr};
+use std::convert::{TryFrom, TryInto};
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
 
 use crate::{
-    api::dart::{string_into_c_str, DartValue, DartValueArg},
-    platform::dart::utils::handle::DartHandle,
+    api::dart::DartValueArg, platform::dart::utils::handle::DartHandle,
 };
-use std::convert::{TryFrom, TryInto};
 
 /// Pointer to an extern function that creates new [`IceCandidate`] with a
 /// provided parameters.

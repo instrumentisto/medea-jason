@@ -5,8 +5,9 @@
 pub mod local;
 pub mod remote;
 
-use crate::api::dart::PrimitiveEnum;
 use medea_client_api_proto as proto;
+
+use crate::utils::PrimitiveEnum;
 
 /// Liveness state of a [MediaStreamTrack][1] .
 ///
