@@ -18,19 +18,7 @@ void registerFunctions(DynamicLibrary dl) {
 /// Returns closure which will call provided `Callback` when it will be called.
 Object callback(Pointer caller) {
   return (val) {
-    Pointer<ForeignValue> arg;
-    if (val == null) {
-      arg = ForeignValue.none();
-    } else if (val is int) {
-      arg = ForeignValue.fromInt(val);
-    } else if (val is String) {
-      arg = ForeignValue.fromString(val);
-    } else if (val is Object) {
-      arg = ForeignValue.fromHandle(val);
-    } else {
-      throw UnimplementedError("Callback can't process provided type. " +
-          val.runtimeType.toString());
-    }
+    var arg = ForeignValue.fromDart(val);
     _callbackCall(caller, arg.ref);
     arg.free();
   };

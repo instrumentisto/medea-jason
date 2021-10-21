@@ -445,33 +445,73 @@ void main() {
       dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
           'returns_input_device_info_ptr');
 
-  testWidgets('ForeignValue Rust => Dart', (WidgetTester tester) async {
-    final returnsNone =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_none');
-    final returnsHandlePtr = dl.lookupFunction<ForeignValue Function(Handle),
-        ForeignValue Function(Object?)>('returns_handle_ptr');
-    final returnsString =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_string');
-    final returnsInt =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_int');
+  testWidgets('ForeignValue', (WidgetTester tester) async {
+    Pointer rustPtr1 = returnsInputDevicePtr().toDart();
 
-    expect(returnsNone().toDart(), equals(null));
+    var fvN = ForeignValue.none();
+    var fvI = ForeignValue.fromInt(145);
+    var fvS = ForeignValue.fromString('my string');
+    var fvH = ForeignValue.fromHandle(TestObj(x: 333));
+    var fvR = ForeignValue.fromPtr(NullablePointer(rustPtr1));
 
-    var inputDevice = NativeInputDeviceInfo(
-        NullablePointer(returnsInputDevicePtr().toDart()));
-    expect(inputDevice.deviceId(), equals('InputDeviceInfo.device_id'));
-    inputDevice.free();
+    expect(fvN.ref.toDart(), null);
+    expect(fvI.ref.toDart(), 145);
+    expect(fvS.ref.toDart(), 'my string');
+    expect((fvH.ref.toDart() as TestObj).val, 333);
+    expect((fvR.ref.toDart() as Pointer).address, rustPtr1.address);
 
-    expect(returnsHandlePtr('asd').toDart(), equals('asd'));
-    expect(returnsHandlePtr(111).toDart(), equals(111));
-    expect(returnsHandlePtr(null).toDart(), equals(null));
+    fvN.free();
+    fvI.free();
+    fvS.free();
+    fvH.free();
+    fvR.free();
 
-    expect(returnsString().toDart(), equals('QWERTY'));
+    Pointer rustPtr2 = returnsInputDevicePtr().toDart();
 
-    expect(returnsInt().toDart(), equals(333));
+    var fvN2 = ForeignValue.fromDart(null);
+    var fvI2 = ForeignValue.fromDart(555);
+    var fvS2 = ForeignValue.fromDart('my string');
+    var fvH2 = ForeignValue.fromDart(TestObj(x: 666));
+    var fvR2 = ForeignValue.fromDart(NullablePointer(rustPtr2));
+
+    expect(fvN2.ref.toDart(), null);
+    expect(fvI2.ref.toDart(), 555);
+    expect(fvS2.ref.toDart(), 'my string');
+    expect((fvH2.ref.toDart() as TestObj).val, 666);
+    expect((fvR2.ref.toDart() as Pointer).address, rustPtr2.address);
+
+    fvN2.free();
+    fvI2.free();
+    fvS2.free();
+    fvH2.free();
+    fvR2.free();
+  });
+
+  testWidgets('ForeignValue Dart => Rust', (WidgetTester tester) async {
+    final acceptsNone = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_none');
+    final acceptsPtr = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_input_device_info_pointer');
+    final acceptsString = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_string');
+    final acceptsInt = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_int');
+
+    var none = ForeignValue.none();
+    var ptr =
+        ForeignValue.fromPtr(NullablePointer(returnsInputDevicePtr().toDart()));
+    var str = ForeignValue.fromString('my string');
+    var num = ForeignValue.fromInt(235);
+
+    acceptsNone(none.ref);
+    acceptsPtr(ptr.ref);
+    acceptsString(str.ref);
+    acceptsInt(num.ref);
+
+    none.free();
+    ptr.free();
+    str.free();
+    num.free();
   });
 
   testWidgets('ForeignValue Dart => Rust', (WidgetTester tester) async {
@@ -563,7 +603,7 @@ void main() {
     var obj = TestObj();
 
     (dartHandleListener() as Function)(obj);
-    expect(obj.x, equals(45));
+    expect(obj.val, equals(45));
   });
 
   testWidgets('FutureResolver primitives', (WidgetTester widgetTester) async {
@@ -602,7 +642,7 @@ void main() {
           return testObj;
         });
     await (handleResolver(fut) as Future);
-    expect(testObj.x, equals(45));
+    expect(testObj.val, equals(45));
   });
 
   testWidgets('FallibleFutureResolver catches exceptions',
@@ -620,9 +660,11 @@ void main() {
 }
 
 class TestObj {
-  int x = 0;
+  TestObj({x});
+
+  int val = 0;
 }
 
 void testObjMutator(Object o) {
-  (o as TestObj).x = 45;
+  (o as TestObj).val = 45;
 }

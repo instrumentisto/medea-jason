@@ -44,6 +44,21 @@ class ForeignValue extends Struct {
     }
   }
 
+  /// Allocates a new [ForeignValue] guessing the provided [val] type.
+  static Pointer<ForeignValue> fromDart(Object? val) {
+    if (val == null) {
+      return ForeignValue.none();
+    } else if (val is int) {
+      return ForeignValue.fromInt(val);
+    } else if (val is String) {
+      return ForeignValue.fromString(val);
+    } else if (val is NullablePointer) {
+      return ForeignValue.fromPtr(val);
+    } else {
+      return ForeignValue.fromHandle(val);
+    }
+  }
+
   /// Allocates a new [ForeignValue] with no value.
   ///
   /// This can be used when calling native function with an optional argument.
@@ -63,6 +78,7 @@ class ForeignValue extends Struct {
   static Pointer<ForeignValue> fromHandle(Object obj) {
     var fVal = calloc<ForeignValue>();
     fVal.ref._tag = 2;
+    // TODO: а как мы конвертим Handle в Pointer<Handle>
     fVal.ref._payload.handlePtr = boxDartHandle(obj);
     return fVal;
   }

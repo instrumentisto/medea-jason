@@ -15,7 +15,7 @@ use super::utils::{
     },
     handle::DartHandle,
 };
-
+// TODO: А какая разница между Error и DartError?
 /// Wrapper for Dart exception thrown when calling Dart code.
 #[derive(Clone, Debug, Display, PartialEq)]
 #[display(fmt = "DartPlatformError")]

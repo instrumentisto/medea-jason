@@ -35,19 +35,7 @@ void resolver(Object f, Pointer resolver) {
   f as Function;
   Future fut = f();
   fut.then((val) {
-    Pointer<ForeignValue> arg;
-    if (val == null) {
-      arg = ForeignValue.none();
-    } else if (val is int) {
-      arg = ForeignValue.fromInt(val);
-    } else if (val is String) {
-      arg = ForeignValue.fromString(val);
-    } else if (val is Object) {
-      arg = ForeignValue.fromHandle(val);
-    } else {
-      throw UnimplementedError(
-          "Future can't process provided type. " + val.runtimeType.toString());
-    }
+    var arg = ForeignValue.fromDart(val);
     _futureResolve(resolver, arg.ref);
     arg.free();
   });
@@ -58,19 +46,7 @@ void fallibleResolver(Object f, Pointer resolver) {
   f as Function;
   Future fut = f();
   fut.then((val) {
-    Pointer<ForeignValue> arg;
-    if (val == null) {
-      arg = ForeignValue.none();
-    } else if (val is int) {
-      arg = ForeignValue.fromInt(val);
-    } else if (val is String) {
-      arg = ForeignValue.fromString(val);
-    } else if (val is Object) {
-      arg = ForeignValue.fromHandle(val);
-    } else {
-      throw UnimplementedError(
-          "Future can't process provided type. " + val.runtimeType.toString());
-    }
+    var arg = ForeignValue.fromDart(val);
     _fallibleResolveOk(resolver, arg.ref);
     arg.free();
   }).onError((error, stackTrace) {
