@@ -1,7 +1,7 @@
 //! Definitions and implementation of the Rust side representation of the Dart
 //! Futures.
 
-use std::future::Future;
+use std::{convert::TryInto, fmt::Debug, future::Future, ptr};
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
@@ -10,18 +10,30 @@ use crate::{
     api::{DartValue, DartValueArg},
     platform::dart::error::DartError,
 };
-use std::{convert::TryInto, fmt::Debug};
 
 /// Pointer to an extern function that resolves provided Dart `Future` with a
 /// provided [`DartFutureResolver`].
 type DartFutureResolverSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut DartFutureResolver);
+    extern "C" fn(Dart_Handle, ptr::NonNull<DartFutureResolver>);
+
+/// Pointer to an extern function that resolves provided Dart `Future` with a
+/// provided [`FallibleDartFutureResolver`].
+type FallibleDartFutureResolverSpawnerFunction =
+    extern "C" fn(Dart_Handle, ptr::NonNull<FallibleDartFutureResolver>);
 
 /// Stores pointer to the [`DartFutureResolverSpawnerFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut DART_FUTURE_RESOLVER_SPAWNER: Option<
     DartFutureResolverSpawnerFunction,
+> = None;
+
+/// Stores pointer to the [`FallibleDartFutureResolverSpawnerFunction`] extern
+/// function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
+    FallibleDartFutureResolverSpawnerFunction,
 > = None;
 
 /// Registers the provided [`DartFutureResolverSpawnerFunction`] as
@@ -46,11 +58,58 @@ pub unsafe extern "C" fn register_DartFutureResolver__spawner(
 /// Provided [`DartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn DartFutureResolver__resolve(
-    fut: *mut DartFutureResolver,
+    resolver: ptr::NonNull<DartFutureResolver>,
     val: DartValue,
 ) {
-    let fut = Box::from_raw(fut);
-    fut.resolve(val);
+    let resolver = Box::from_raw(resolver.as_ptr());
+    resolver.resolve(val);
+}
+
+/// Registers the provided [`FallibleDartFutureResolverSpawnerFunction`] as
+/// [`FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
+#[no_mangle]
+pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
+    f: FallibleDartFutureResolverSpawnerFunction,
+) {
+    FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER = Some(f);
+}
+
+/// Resolves provided [`FallibleDartFutureResolver`] with a provided
+/// [`DartValue`] as `Ok` result.
+///
+/// Frees provided [`DartFutureResolver`].
+///
+/// # Safety
+///
+/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
+#[no_mangle]
+pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
+    fut: ptr::NonNull<FallibleDartFutureResolver>,
+    val: DartValue,
+) {
+    let resolver = Box::from_raw(fut.as_ptr());
+    resolver.resolve_ok(val);
+}
+
+/// Resolves provided [`FallibleDartFutureResolver`] with a provided
+/// [`DartError`] as `Err` result.
+///
+/// Frees provided [`DartFutureResolver`].
+///
+/// # Safety
+///
+/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
+#[no_mangle]
+pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
+    resolver: ptr::NonNull<FallibleDartFutureResolver>,
+    val: Dart_Handle,
+) {
+    let fut = Box::from_raw(resolver.as_ptr());
+    fut.resolve_err(DartError::from(val));
 }
 
 /// Compatibility layer of the infallible Dart side Futures with a Rust side
@@ -76,7 +135,7 @@ impl DartFutureResolver {
         unsafe {
             DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
                 dart_fut,
-                Box::into_raw(Box::new(this)),
+                ptr::NonNull::from(Box::leak(Box::new(this))),
             );
         }
 
@@ -90,66 +149,6 @@ impl DartFutureResolver {
     fn resolve(self, val: DartValue) {
         (self.0)(val);
     }
-}
-
-/// Pointer to an extern function that resolves provided Dart `Future` with a
-/// provided [`FallibleDartFutureResolver`].
-type FallibleDartFutureResolverSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut FallibleDartFutureResolver);
-
-/// Stores pointer to the [`FallibleDartFutureResolverSpawnerFunction`] extern
-/// function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
-    FallibleDartFutureResolverSpawnerFunction,
-> = None;
-
-/// Registers the provided [`FallibleDartFutureResolverSpawnerFunction`] as
-/// [`FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
-    f: FallibleDartFutureResolverSpawnerFunction,
-) {
-    FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER = Some(f);
-}
-
-/// Resolves provided [`FallibleDartFutureResolver`] with a provided
-/// [`DartValue`] as `Ok` result.
-///
-/// Frees provided [`DartFutureResolver`].
-///
-/// # Safety
-///
-/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
-#[no_mangle]
-pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
-    fut: *mut FallibleDartFutureResolver,
-    val: DartValue,
-) {
-    let fut = Box::from_raw(fut);
-    fut.resolve_ok(val);
-}
-
-/// Resolves provided [`FallibleDartFutureResolver`] with a provided
-/// [`DartError`] as `Err` result.
-///
-/// Frees provided [`DartFutureResolver`].
-///
-/// # Safety
-///
-/// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
-#[no_mangle]
-pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
-    fut: *mut FallibleDartFutureResolver,
-    val: Dart_Handle,
-) {
-    let fut = Box::from_raw(fut);
-    fut.resolve_err(DartError::from(val));
 }
 
 /// Compatibility layer of the fallible Dart side Futures with a Rust side
@@ -185,7 +184,7 @@ impl FallibleDartFutureResolver {
         unsafe {
             FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
                 dart_fut,
-                Box::into_raw(Box::new(this)),
+                ptr::NonNull::from(Box::leak(Box::new(this))),
             );
         }
 

@@ -25,7 +25,8 @@ pub unsafe extern "C" fn register_Callback__callback(f: CallbackFunction) {
     CALLBACK_CREATE_FUNCTION = Some(f);
 }
 
-/// Calls the provided [`Callback`] with the provided [`DartValue`] as an argument.
+/// Calls the provided [`Callback`] with the provided [`DartValue`] as an
+/// argument.
 ///
 /// # Safety
 ///
