@@ -22,9 +22,9 @@ impl DartHandle {
     /// Takes ownership of a provided [`Dart_Handle`] so it wont get freed by
     /// Dart VM.
     pub fn new(handle: Dart_Handle) -> Self {
-        Self(Rc::new(Inner(unsafe {
+        Self(Rc::new(unsafe {
             Dart_NewPersistentHandle_DL_Trampolined(handle)
-        })))
+        }))
     }
 
     /// Returns the underlying [`Dart_Handle`].
@@ -32,7 +32,7 @@ impl DartHandle {
     pub fn get(&self) -> Dart_Handle {
         // SAFETY: We don't expose the inner `Dart_PersistentHandle` anywhere,
         //         so we're sure that it's valid at this point.
-        unsafe { Dart_HandleFromPersistent_DL_Trampolined(self.0 .0) }
+        unsafe { Dart_HandleFromPersistent_DL_Trampolined(*self.0) }
     }
 }
 

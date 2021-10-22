@@ -248,7 +248,7 @@ pub mod tests {
         .into_dart_future()
     }
 
-    type TestFutureHandleFunction = extern "C" fn(ptr::NonNull<Dart_Handle>);
+    type TestFutureHandleFunction = extern "C" fn(Dart_Handle);
 
     static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
         None;
