@@ -645,16 +645,16 @@ void main() {
     expect(testObj.val, equals(45));
   });
 
-  testWidgets('FallibleFutureResolver catches exceptions',
+  testWidgets('FutureResolver catches exceptions',
       (WidgetTester widgetTester) async {
-    final fallibleFutureCatchesException =
+    final futureCatchesException =
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__fallible_dart_future_resolver__fails');
+            'test__dart_future_resolver__fails');
 
     var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
           throw Exception('Test Exception');
         });
-    var res = await (fallibleFutureCatchesException(fut) as Future);
+    var res = await (futureCatchesException(fut) as Future);
     expect(res as int, equals(1));
   });
 }

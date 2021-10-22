@@ -46,6 +46,7 @@ pub struct Callback(Box<dyn FnOnce(DartValue)>);
 impl Callback {
     /// Returns [`Dart_Handle`] to the Dart callback which will call th provided
     /// `f` closure when it will be called on Dart side.
+    #[allow(clippy::new_ret_no_self)]
     pub fn new<F, T>(f: F) -> Dart_Handle
     where
         F: FnOnce(DartValueArg<T>) + 'static,
