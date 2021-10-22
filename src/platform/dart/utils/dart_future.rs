@@ -211,8 +211,6 @@ impl FallibleDartFutureResolver {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    use std::ptr;
-
     use dart_sys::Dart_Handle;
 
     use crate::{
@@ -251,7 +249,7 @@ pub mod tests {
         .into_dart_future()
     }
 
-    type TestFutureHandleFunction = extern "C" fn(ptr::NonNull<Dart_Handle>);
+    type TestFutureHandleFunction = extern "C" fn(Dart_Handle);
 
     static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
         None;
@@ -269,11 +267,9 @@ pub mod tests {
     ) -> DartFuture<Result<(), FormatException>> {
         let fut = DartHandle::new(fut);
         async move {
-            let val = DartFutureResolver::execute::<ptr::NonNull<Dart_Handle>>(
-                fut.get(),
-            )
-            .await;
-            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val) }
+            let val =
+                DartFutureResolver::execute::<DartHandle>(fut.get()).await;
+            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get().into()) }
             Ok(())
         }
         .into_dart_future()

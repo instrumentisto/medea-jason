@@ -55,7 +55,7 @@ pub unsafe extern "C" fn Callback__call(cb: *mut Callback, val: DartValue) {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    use std::{convert::TryInto, ptr};
+    use std::convert::TryInto;
 
     use dart_sys::Dart_Handle;
 
@@ -107,7 +107,7 @@ pub mod tests {
         })
     }
 
-    type TestCallbackHandleFunction = extern "C" fn(ptr::NonNull<Dart_Handle>);
+    type TestCallbackHandleFunction = extern "C" fn(Dart_Handle);
 
     static mut TEST_CALLBACK_HANDLE_FUNCTION: Option<
         TestCallbackHandleFunction,
@@ -124,11 +124,8 @@ pub mod tests {
     pub unsafe extern "C" fn test__callback_listener__dart_handle(
     ) -> Dart_Handle {
         Callback::callback(move |val: DartValueArg<Dart_Handle>| {
-            unsafe {
-                (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(
-                    val.try_into().unwrap(),
-                )
-            };
+            let val: Dart_Handle = val.try_into().unwrap();
+            unsafe { (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val) };
         })
     }
 }

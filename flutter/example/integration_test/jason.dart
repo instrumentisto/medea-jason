@@ -451,7 +451,7 @@ void main() {
     var fvN = ForeignValue.none();
     var fvI = ForeignValue.fromInt(145);
     var fvS = ForeignValue.fromString('my string');
-    var fvH = ForeignValue.fromHandle(TestObj(x: 333));
+    var fvH = ForeignValue.fromHandle(TestObj(333));
     var fvR = ForeignValue.fromPtr(NullablePointer(rustPtr1));
 
     expect(fvN.ref.toDart(), null);
@@ -471,7 +471,7 @@ void main() {
     var fvN2 = ForeignValue.fromDart(null);
     var fvI2 = ForeignValue.fromDart(555);
     var fvS2 = ForeignValue.fromDart('my string');
-    var fvH2 = ForeignValue.fromDart(TestObj(x: 666));
+    var fvH2 = ForeignValue.fromDart(TestObj(666));
     var fvR2 = ForeignValue.fromDart(NullablePointer(rustPtr2));
 
     expect(fvN2.ref.toDart(), null);
@@ -600,7 +600,7 @@ void main() {
         dl.lookupFunction<Handle Function(), Object Function()>(
             'test__callback_listener__dart_handle');
 
-    var obj = TestObj();
+    var obj = TestObj(0);
 
     (dartHandleListener() as Function)(obj);
     expect(obj.val, equals(45));
@@ -637,7 +637,7 @@ void main() {
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
             'test__dart_future_resolver__handle');
 
-    var testObj = TestObj();
+    var testObj = TestObj(0);
     var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
           return testObj;
         });
@@ -660,11 +660,12 @@ void main() {
 }
 
 class TestObj {
-  TestObj({x});
+  TestObj(this.val);
 
-  int val = 0;
+  int val;
 }
 
 void testObjMutator(Object o) {
-  (o as TestObj).val = 45;
+  o as TestObj;
+  o.val = 45;
 }

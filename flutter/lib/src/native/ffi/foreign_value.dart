@@ -36,7 +36,7 @@ class ForeignValue extends Struct {
       case 2:
         return unboxDartHandle(_payload.handlePtr);
       case 3:
-        return _payload.string.nativeStringToDartString();
+        return _payload.string.toDartString();
       case 4:
         return _payload.number;
       default:
@@ -78,7 +78,6 @@ class ForeignValue extends Struct {
   static Pointer<ForeignValue> fromHandle(Object obj) {
     var fVal = calloc<ForeignValue>();
     fVal.ref._tag = 2;
-    // TODO: а как мы конвертим Handle в Pointer<Handle>
     fVal.ref._payload.handlePtr = boxDartHandle(obj);
     return fVal;
   }
