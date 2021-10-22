@@ -4,7 +4,7 @@ import 'package:ffi/ffi.dart';
 
 import '../../util/move_semantic.dart';
 import 'nullable_pointer.dart';
-import 'unbox_handle.dart';
+import 'box_handle.dart';
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.
 class ForeignValue extends Struct {
@@ -74,6 +74,8 @@ class ForeignValue extends Struct {
     return fVal;
   }
 
+  /// Allocates a new [ForeignValue] with the provided [Object] converting it
+  /// to a [Handle].
   static Pointer<ForeignValue> fromHandle(Object obj) {
     var fVal = calloc<ForeignValue>();
     fVal.ref._tag = 2;

@@ -1,7 +1,7 @@
 //! Definitions and implementation of the Rust side representation of the Dart
 //! Futures.
 
-use std::future::Future;
+use std::{convert::TryInto, fmt::Debug, future::Future, ptr};
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
@@ -10,18 +10,30 @@ use crate::{
     api::{DartValue, DartValueArg},
     platform::dart::error::Error,
 };
-use std::{convert::TryInto, fmt::Debug};
 
 /// Pointer to an extern function that resolves provided Dart `Future` with a
 /// provided [`DartFutureResolver`].
 type DartFutureResolverSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut DartFutureResolver);
+    extern "C" fn(Dart_Handle, ptr::NonNull<DartFutureResolver>);
+
+/// Pointer to an extern function that resolves provided Dart `Future` with a
+/// provided [`FallibleDartFutureResolver`].
+type FallibleDartFutureResolverSpawnerFunction =
+    extern "C" fn(Dart_Handle, ptr::NonNull<FallibleDartFutureResolver>);
 
 /// Stores pointer to the [`DartFutureResolverSpawnerFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut DART_FUTURE_RESOLVER_SPAWNER: Option<
     DartFutureResolverSpawnerFunction,
+> = None;
+
+/// Stores pointer to the [`FallibleDartFutureResolverSpawnerFunction`] extern
+/// function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
+    FallibleDartFutureResolverSpawnerFunction,
 > = None;
 
 /// Registers the provided [`DartFutureResolverSpawnerFunction`] as
@@ -46,64 +58,12 @@ pub unsafe extern "C" fn register_DartFutureResolver__spawner(
 /// Provided [`DartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn DartFutureResolver__resolve(
-    fut: *mut DartFutureResolver,
+    resolver: ptr::NonNull<DartFutureResolver>,
     val: DartValue,
 ) {
-    let fut = Box::from_raw(fut);
-    fut.resolve(val);
+    let resolver = Box::from_raw(resolver.as_ptr());
+    resolver.resolve(val);
 }
-
-/// Compatibility layer of the infallible Dart side Futures with a Rust side
-/// [`Future`].
-pub struct DartFutureResolver(Box<dyn FnOnce(DartValue)>);
-
-impl DartFutureResolver {
-    /// Converts infallible Dart side Future to the Rust's [`Future`].
-    ///
-    /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
-    /// result on Dart side Future resolve.
-    pub fn execute<T>(dart_fut: Dart_Handle) -> impl Future<Output = T>
-    where
-        DartValueArg<T>: TryInto<T>,
-        <DartValueArg<T> as TryInto<T>>::Error: Debug,
-        T: 'static,
-    {
-        let (tx, rx) = oneshot::channel();
-        let this = Self(Box::new(|val| {
-            drop(tx.send(DartValueArg::<T>::from(val).try_into().unwrap()));
-        }));
-
-        unsafe {
-            DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
-                dart_fut,
-                Box::into_raw(Box::new(this)),
-            );
-        }
-
-        async move { rx.await.unwrap() }
-    }
-
-    /// Resolves this [`DartFutureResolver`] with a provided [`DartValue`] as a
-    /// result.
-    ///
-    /// __Should be only called by Dart side.__
-    fn resolve(self, val: DartValue) {
-        (self.0)(val);
-    }
-}
-
-/// Pointer to an extern function that resolves provided Dart `Future` with a
-/// provided [`FallibleDartFutureResolver`].
-type FallibleDartFutureResolverSpawnerFunction =
-    extern "C" fn(Dart_Handle, *mut FallibleDartFutureResolver);
-
-/// Stores pointer to the [`FallibleDartFutureResolverSpawnerFunction`] extern
-/// function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER: Option<
-    FallibleDartFutureResolverSpawnerFunction,
-> = None;
 
 /// Registers the provided [`FallibleDartFutureResolverSpawnerFunction`] as
 /// [`FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER`].
@@ -128,11 +88,11 @@ pub unsafe extern "C" fn register_FallibleDartFutureResolver__spawner(
 /// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
-    fut: *mut FallibleDartFutureResolver,
+    fut: ptr::NonNull<FallibleDartFutureResolver>,
     val: DartValue,
 ) {
-    let fut = Box::from_raw(fut);
-    fut.resolve_ok(val);
+    let resolver = Box::from_raw(fut.as_ptr());
+    resolver.resolve_ok(val);
 }
 
 /// Resolves provided [`FallibleDartFutureResolver`] with a provided
@@ -145,11 +105,50 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
 /// Provided [`FallibleDartFutureResolver`] shouldn't be freed.
 #[no_mangle]
 pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
-    fut: *mut FallibleDartFutureResolver,
+    resolver: ptr::NonNull<FallibleDartFutureResolver>,
     val: Dart_Handle,
 ) {
-    let fut = Box::from_raw(fut);
+    let fut = Box::from_raw(resolver.as_ptr());
     fut.resolve_err(Error::from(val));
+}
+
+/// Compatibility layer of the infallible Dart side Futures with a Rust side
+/// [`Future`].
+pub struct DartFutureResolver(Box<dyn FnOnce(DartValue)>);
+
+impl DartFutureResolver {
+    /// Converts infallible Dart side Future to the Rust's [`Future`].
+    ///
+    /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
+    /// result on Dart side Future resolve.
+    pub fn execute<T>(dart_fut: Dart_Handle) -> impl Future<Output = T>
+        where
+            DartValueArg<T>: TryInto<T>,
+            <DartValueArg<T> as TryInto<T>>::Error: Debug,
+            T: 'static,
+    {
+        let (tx, rx) = oneshot::channel();
+        let this = Self(Box::new(|val| {
+            drop(tx.send(DartValueArg::<T>::from(val).try_into().unwrap()));
+        }));
+
+        unsafe {
+            DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
+                dart_fut,
+                ptr::NonNull::from(Box::leak(Box::new(this))),
+            );
+        }
+
+        async move { rx.await.unwrap() }
+    }
+
+    /// Resolves this [`DartFutureResolver`] with a provided [`DartValue`] as a
+    /// result.
+    ///
+    /// __Should be only called by Dart side.__
+    fn resolve(self, val: DartValue) {
+        (self.0)(val);
+    }
 }
 
 /// Compatibility layer of the fallible Dart side Futures with a Rust side
@@ -185,7 +184,7 @@ impl FallibleDartFutureResolver {
         unsafe {
             FALLIBLE_DART_FUTURE_RESOLVER_SPAWNER.unwrap()(
                 dart_fut,
-                Box::into_raw(Box::new(this)),
+                ptr::NonNull::from(Box::leak(Box::new(this))),
             );
         }
 
@@ -249,7 +248,7 @@ pub mod tests {
         .into_dart_future()
     }
 
-    type TestFutureHandleFunction = extern "C" fn(Dart_Handle);
+    type TestFutureHandleFunction = extern "C" fn(ptr::NonNull<Dart_Handle>);
 
     static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
         None;

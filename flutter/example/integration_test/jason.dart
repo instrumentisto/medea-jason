@@ -565,15 +565,15 @@ void main() {
   testWidgets('Primitive arguments Callback validation',
       (WidgetTester widgetTester) async {
     final intListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test__callback_listener__int');
+        Object Function(ForeignValue)>('test_callback_listener_int');
     final stringListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test__callback_listener__string');
+        Object Function(ForeignValue)>('test_callback_listener_string');
     final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue),
-        Object Function(ForeignValue)>('test__callback_listener__optional_int');
+        Object Function(ForeignValue)>('test_callback_listener_optional_int');
     final optionalStringListener = dl.lookupFunction<
         Handle Function(ForeignValue),
         Object Function(
-            ForeignValue)>('test__callback_listener__optional_string');
+            ForeignValue)>('test_callback_listener_optional_string');
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
@@ -598,7 +598,7 @@ void main() {
         Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
     final dartHandleListener =
         dl.lookupFunction<Handle Function(), Object Function()>(
-            'test__callback_listener__dart_handle');
+            'test_callback_listener_dart_handle');
 
     var obj = TestObj(0);
 
