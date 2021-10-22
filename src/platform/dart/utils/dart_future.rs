@@ -8,7 +8,7 @@ use futures::channel::oneshot;
 
 use crate::{
     api::{DartValue, DartValueArg},
-    platform::dart::error::DartError,
+    platform::dart::error::Error,
 };
 use std::{convert::TryInto, fmt::Debug};
 
@@ -136,7 +136,7 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_ok(
 }
 
 /// Resolves provided [`FallibleDartFutureResolver`] with a provided
-/// [`DartError`] as `Err` result.
+/// [`Error`] as `Err` result.
 ///
 /// Frees provided [`DartFutureResolver`].
 ///
@@ -149,13 +149,13 @@ pub unsafe extern "C" fn FallibleDartFutureResolver__resolve_err(
     val: Dart_Handle,
 ) {
     let fut = Box::from_raw(fut);
-    fut.resolve_err(DartError::from(val));
+    fut.resolve_err(Error::from(val));
 }
 
 /// Compatibility layer of the fallible Dart side Futures with a Rust side
 /// [`Future`].
 pub struct FallibleDartFutureResolver(
-    Box<dyn FnOnce(Result<DartValue, DartError>)>,
+    Box<dyn FnOnce(Result<DartValue, Error>)>,
 );
 
 impl FallibleDartFutureResolver {
@@ -166,10 +166,10 @@ impl FallibleDartFutureResolver {
     ///
     /// # Errors
     ///
-    /// Errors with a [`DartError`] if Dart side thrown exception.
+    /// Errors with a [`Error`] if Dart side thrown exception.
     pub fn execute<T>(
         dart_fut: Dart_Handle,
-    ) -> impl Future<Output = Result<T, DartError>>
+    ) -> impl Future<Output = Result<T, Error>>
     where
         DartValueArg<T>: TryInto<T>,
         <DartValueArg<T> as TryInto<T>>::Error: Debug,
@@ -201,10 +201,10 @@ impl FallibleDartFutureResolver {
     }
 
     /// Resolves this [`FallibleDartFutureResolver`] with a provided
-    /// [`DartError`] as `Err` result.
+    /// [`Error`] as `Err` result.
     ///
     /// __Should be only called by Dart side.__
-    fn resolve_err(self, err: DartError) {
+    fn resolve_err(self, err: Error) {
         (self.0)(Err(err));
     }
 }

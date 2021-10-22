@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../../util/move_semantic.dart';
-import 'native_string.dart';
 import 'nullable_pointer.dart';
 import 'unbox_handle.dart';
 
