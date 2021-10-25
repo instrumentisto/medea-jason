@@ -16,7 +16,7 @@ use crate::{
     media::track::local,
     platform,
     platform::{
-        dart::utils::{dart_future::DartFutureResolver, handle::DartHandle},
+        dart::utils::{dart_future::FutureFromDart, handle::DartHandle},
         TransceiverDirection,
     },
 };
@@ -244,14 +244,14 @@ impl Transceiver {
         &self,
         direction: TransceiverDirection,
     ) -> LocalBoxFuture<'static, ()> {
-        let fut = DartFutureResolver::execute::<()>(unsafe {
+        let fut = FutureFromDart::execute::<()>(unsafe {
             SET_DIRECTION_FUNCTION.unwrap()(
                 self.transceiver.get(),
                 direction.into(),
             )
         });
         Box::pin(async move {
-            fut.await;
+            fut.await.unwrap();
         })
     }
 
@@ -301,13 +301,14 @@ impl Transceiver {
         &self,
         new_sender: Rc<local::Track>,
     ) -> Result<(), platform::Error> {
-        DartFutureResolver::execute::<()>(unsafe {
+        FutureFromDart::execute::<()>(unsafe {
             REPLACE_TRACK_FUNCTION.unwrap()(
                 self.transceiver.get(),
                 new_sender.platform_track().handle(),
             )
         })
-        .await;
+        .await
+        .unwrap();
         self.send_track.replace(Some(new_sender));
         Ok(())
     }
@@ -358,10 +359,11 @@ impl Transceiver {
     ) -> impl Future<Output = TransceiverDirection> {
         let handle = self.transceiver.get();
         async move {
-            DartFutureResolver::execute::<i32>(unsafe {
+            FutureFromDart::execute::<i32>(unsafe {
                 GET_CURRENT_DIRECTION_FUNCTION.unwrap()(handle)
             })
             .await
+            .unwrap()
             .into()
         }
     }

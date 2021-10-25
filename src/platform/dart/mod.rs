@@ -30,7 +30,7 @@ use crate::{
     api::string_into_c_str,
     platform::dart::utils::{
         dart_api::Dart_PropagateError_DL_Trampolined,
-        dart_future::DartFutureResolver,
+        dart_future::FutureFromDart,
     },
 };
 
@@ -113,5 +113,5 @@ pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
     let dart_fut = unsafe { DELAYED_FUTURE_FUNCTION.unwrap()(delay) };
-    DartFutureResolver::execute::<()>(dart_fut).await;
+    FutureFromDart::execute::<()>(dart_fut).await.unwrap();
 }

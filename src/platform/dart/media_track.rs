@@ -14,7 +14,7 @@ use derive_more::From;
 use crate::{
     api::{c_str_into_string, DartValueArg},
     media::{track::MediaStreamTrackState, FacingMode, MediaKind},
-    platform::dart::utils::{callback_listener::Callback, handle::DartHandle},
+    platform::dart::utils::{callback::Callback, handle::DartHandle},
 };
 
 /// Pointer to an extern function that returns ID of the provided
@@ -395,8 +395,8 @@ impl MediaStreamTrack {
         F: 'static + FnOnce(),
     {
         if let Some(cb) = f {
-            let cb = Callback::callback(|_: ()| cb());
-            unsafe { ON_ENDED_FUNCTION.unwrap()(self.0.get(), cb) };
+            let cb = Callback::from_once(|_: ()| cb());
+            unsafe { ON_ENDED_FUNCTION.unwrap()(self.0.get(), cb.into_dart()) };
         }
     }
 }

@@ -101,6 +101,16 @@ class ForeignValue extends Struct {
 }
 
 extension ForeignValuePointer on Pointer<ForeignValue> {
+  Pointer intoBoxed() {
+    var out = boxed();
+    free();
+    return out;
+  }
+
+  Pointer boxed() {
+    return boxDartHandle(ref);
+  }
+
   /// Releases the memory allocated on a native heap.
   @moveSemantics
   void free() {

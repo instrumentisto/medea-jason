@@ -288,22 +288,6 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<c_void>> {
     }
 }
 
-impl TryFrom<DartValueArg<DartHandle>> for DartHandle {
-    type Error = DartValueCastError;
-
-    fn try_from(value: DartValueArg<DartHandle>) -> Result<Self, Self::Error> {
-        match value.0 {
-            DartValue::Handle(handle) => {
-                Ok(DartHandle::new(unsafe { *handle.as_ptr() }))
-            }
-            _ => Err(DartValueCastError {
-                expectation: "DartHandle",
-                value: value.0,
-            }),
-        }
-    }
-}
-
 impl TryFrom<DartValueArg<String>> for String {
     type Error = DartValueCastError;
 

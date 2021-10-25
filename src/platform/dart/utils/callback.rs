@@ -1,11 +1,54 @@
 //! Functionality for converting Rust closures into callbacks that can be
 //! passed to Dart and called by Dart.
 
-use std::ptr;
+use std::{convert::TryInto, fmt::Debug, ptr};
 
 use dart_sys::Dart_Handle;
 
 use crate::api::{DartValue, DartValueArg};
+
+/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
+/// created Dart callback that will proxy calls to the Rust callback.
+type CallbackCallTwoArgProxyFunction =
+    extern "C" fn(ptr::NonNull<Callback>) -> Dart_Handle;
+
+/// Stores pointer to the [`CallbackCallTwoArgProxyFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION: Option<
+    CallbackCallTwoArgProxyFunction,
+> = None;
+
+/// Registers the provided [`CallbackCallTwoArgProxyFunction`] as
+/// [`CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
+#[no_mangle]
+pub unsafe extern "C" fn register_Callback__call_two_arg_proxy(
+    f: CallbackCallTwoArgProxyFunction,
+) {
+    CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION = Some(f);
+}
+
+/// Calls the provided [`Callback`] with the provided two [`DartValue`]s as an
+/// argument.
+///
+/// # Safety
+///
+/// Provided [`Callback`] should be a valid [Callback] pointer.
+#[no_mangle]
+pub unsafe extern "C" fn Callback__call_two_arg(
+    mut cb: ptr::NonNull<Callback>,
+    first: DartValue,
+    second: DartValue,
+) {
+    match &mut cb.as_mut().0 {
+        Kind::TwoArgFnMut(func) => (func)(first, second),
+        _ => unreachable!(),
+    }
+}
 
 /// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
 /// created Dart callback that will proxy calls to the Rust callback.
@@ -55,7 +98,7 @@ pub unsafe extern "C" fn Callback__call(
             Kind::Fn(func) => {
                 (func)(val);
             }
-            Kind::FnOnce(_) => {
+            Kind::FnOnce(_) | Kind::TwoArgFnMut(_) => {
                 unreachable!();
             }
         }
@@ -74,6 +117,7 @@ enum Kind {
     FnOnce(Box<dyn FnOnce(DartValue)>),
     FnMut(Box<dyn FnMut(DartValue)>),
     Fn(Box<dyn Fn(DartValue)>),
+    TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
 }
 
 impl Callback {
@@ -82,11 +126,14 @@ impl Callback {
     #[allow(clippy::new_ret_no_self)]
     pub fn from_once<F, T>(f: F) -> Self
     where
-        F: FnOnce(DartValueArg<T>) + 'static,
+        F: FnOnce(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         Self(Kind::FnOnce(Box::new(move |val: DartValue| {
             let arg = DartValueArg::<T>::from(val);
-            (f)(arg);
+            (f)(arg.try_into().unwrap());
         })))
     }
 
@@ -94,11 +141,14 @@ impl Callback {
     /// converted to [`Dart_Handle`] and passed to Dart.
     pub fn from_fn_mut<F, T>(mut f: F) -> Self
     where
-        F: FnMut(DartValueArg<T>) + 'static,
+        F: FnMut(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         Self(Kind::FnMut(Box::new(move |val: DartValue| {
             let arg = DartValueArg::<T>::from(val);
-            (f)(arg);
+            (f)(arg.try_into().unwrap());
         })))
     }
 
@@ -106,12 +156,36 @@ impl Callback {
     /// converted to [`Dart_Handle`] and passed to Dart.
     pub fn from_fn<F, T>(f: F) -> Self
     where
-        F: Fn(DartValueArg<T>) + 'static,
+        F: Fn(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         Self(Kind::Fn(Box::new(move |val: DartValue| {
             let arg = DartValueArg::<T>::from(val);
-            (f)(arg);
+            (f)(arg.try_into().unwrap());
         })))
+    }
+
+    /// Returns [`Callback`] that wraps the provided [`FnMut`] with two
+    /// arguments and can be converted to [`Dart_Handle`] and passed to Dart.
+    pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
+    where
+        F: FnMut(T, S) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+        DartValueArg<S>: TryInto<S>,
+        <DartValueArg<S> as TryInto<S>>::Error: Debug,
+        S: 'static,
+    {
+        Self(Kind::TwoArgFnMut(Box::new(
+            move |first: DartValue, second: DartValue| {
+                let first = DartValueArg::<T>::from(first);
+                let second = DartValueArg::<S>::from(second);
+                (f)(first.try_into().unwrap(), second.try_into().unwrap());
+            },
+        )))
     }
 
     /// Converts this [`Callback`] to [`Dart_Handle`] so it can be passed to
@@ -121,9 +195,17 @@ impl Callback {
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
         unsafe {
-            CALLBACK_CALL_PROXY_FUNCTION.unwrap()(ptr::NonNull::from(
-                Box::leak(Box::new(self)),
-            ))
+            match &self.0 {
+                Kind::TwoArgFnMut(_) => CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION
+                    .unwrap()(
+                    ptr::NonNull::from(Box::leak(Box::new(self))),
+                ),
+                Kind::Fn(_) | Kind::FnOnce(_) | Kind::FnMut(_) => {
+                    CALLBACK_CALL_PROXY_FUNCTION.unwrap()(ptr::NonNull::from(
+                        Box::leak(Box::new(self)),
+                    ))
+                }
+            }
         }
     }
 }
