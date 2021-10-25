@@ -1,17 +1,17 @@
 //! Definition and implementation of the wrapper around [`Dart_Handle`] which
 //! manages lifetimes of the [`Dart_PersistentHandle`].
 
-use std::rc::Rc;
-use std::{os::raw::c_char, ptr};
-use std::fmt;
+use std::{fmt, os::raw::c_char, ptr, rc::Rc};
 
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 
-use crate::api::{c_str_into_string, free_dart_native_string};
-use crate::platform::dart::utils::dart_api::{
-    Dart_DeletePersistentHandle_DL_Trampolined,
-    Dart_HandleFromPersistent_DL_Trampolined,
-    Dart_NewPersistentHandle_DL_Trampolined,
+use crate::{
+    api::{c_str_into_string, free_dart_native_string},
+    platform::dart::utils::dart_api::{
+        Dart_DeletePersistentHandle_DL_Trampolined,
+        Dart_HandleFromPersistent_DL_Trampolined,
+        Dart_NewPersistentHandle_DL_Trampolined,
+    },
 };
 
 /// Pointer to an extern function that returns string representation
@@ -78,6 +78,7 @@ impl DartHandle {
     }
 
     /// Returns runtime Dart type of this [`DartHandle`].
+    #[must_use]
     pub fn name(&self) -> String {
         unsafe {
             let raw = RUNTIME_TYPE_FUNCTION.unwrap()(self.get());
