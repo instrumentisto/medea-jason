@@ -12,7 +12,7 @@ use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 
 use crate::{
-    api::dart::DartValueArg,
+    api::DartValueArg,
     media::track::local,
     platform,
     platform::{
@@ -41,10 +41,6 @@ impl From<DartHandle> for Transceiver {
 /// Pointer to an extern function that request that returns current direction of
 /// the provided [`Transceiver`].
 type GetCurrentDirectionFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
-
-// TODO: maybe remove it
-type CurrentDirectionFunction =
-    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<i32>>;
 
 /// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
@@ -88,11 +84,6 @@ type SetDirectionFunction = extern "C" fn(Dart_Handle, i32) -> Dart_Handle;
 /// Must be initialized by Dart during FFI initialization phase.
 static mut GET_CURRENT_DIRECTION_FUNCTION: Option<GetCurrentDirectionFunction> =
     None;
-
-/// Stores pointer to the [`CurrentDirectionFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CURRENT_DIRECTION_FUNCTION: Option<CurrentDirectionFunction> = None;
 
 /// Stores pointer to the [`GetSendTrackFunction`] extern function.
 ///
@@ -147,19 +138,6 @@ pub unsafe extern "C" fn register_Transceiver__get_current_direction(
     f: GetCurrentDirectionFunction,
 ) {
     GET_CURRENT_DIRECTION_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`CurrentDirectionFunction`] as
-/// [`CURRENT_DIRECTION_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Transceiver__current_direction(
-    f: CurrentDirectionFunction,
-) {
-    CURRENT_DIRECTION_FUNCTION = Some(f);
 }
 
 /// Registers the provided [`GetSendTrackFunction`] as
@@ -262,16 +240,6 @@ pub unsafe extern "C" fn register_Transceiver__set_direction(
 }
 
 impl Transceiver {
-    /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn current_direction(&self) -> TransceiverDirection {
-        let val = unsafe {
-            let res =
-                CURRENT_DIRECTION_FUNCTION.unwrap()(self.transceiver.get());
-            *Box::from_raw(res.as_ptr())
-        };
-        i32::try_from(val).unwrap().into()
-    }
-
     fn set_direction(
         &self,
         direction: TransceiverDirection,
@@ -317,8 +285,8 @@ impl Transceiver {
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
-    pub fn has_direction(&self, direction: TransceiverDirection) -> bool {
-        self.current_direction().contains(direction)
+    pub async fn has_direction(self, direction: TransceiverDirection) -> bool {
+        self.get_current_direction().await.contains(direction)
     }
 
     /// Replaces [`TransceiverDirection::SEND`] [`local::Track`] of this

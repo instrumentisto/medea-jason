@@ -2,17 +2,20 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::{os::raw::c_char, ptr};
+use std::{
+    convert::{TryFrom, TryInto},
+    os::raw::c_char,
+    ptr,
+};
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
 
 use crate::{
-    api::dart::{utils::c_str_into_string, DartValueArg},
+    api::{c_str_into_string, DartValueArg},
     media::{track::MediaStreamTrackState, FacingMode, MediaKind},
     platform::dart::utils::{callback_listener::Callback, handle::DartHandle},
 };
-use std::convert::{TryFrom, TryInto};
 
 /// Pointer to an extern function that returns ID of the provided
 /// [`MediaStreamTrack`].

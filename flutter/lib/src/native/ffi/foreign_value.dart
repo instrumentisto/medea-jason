@@ -11,7 +11,9 @@ import '../jason.dart';
 typedef _boxForeignValue_C = Pointer Function(ForeignValue);
 typedef _boxForeignValue_Dart = Pointer Function(ForeignValue);
 
-final _boxForeignValue_Dart _boxForeignValue = dl.lookupFunction<_boxForeignValue_C, _boxForeignValue_Dart>('box_foreign_value');
+final _boxForeignValue_Dart _boxForeignValue =
+    dl.lookupFunction<_boxForeignValue_C, _boxForeignValue_Dart>(
+        'box_foreign_value');
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.
 class ForeignValue extends Struct {

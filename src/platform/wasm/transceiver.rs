@@ -62,8 +62,7 @@ impl Transceiver {
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
     #[inline]
-    #[must_use]
-    pub fn has_direction(&self, direction: TransceiverDirection) -> bool {
+    pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.current_direction().contains(direction)
     }
 

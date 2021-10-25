@@ -5,9 +5,6 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Transceiver__current_direction')(
-      Pointer.fromFunction<Pointer Function(Handle)>(currentDirection));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__get_current_direction')(
       Pointer.fromFunction<Handle Function(Handle)>(getCurrentDirection));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
@@ -37,24 +34,15 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 Object setDirection(RTCRtpTransceiver transceiver, int direction) {
-    return transceiver.setDirection(TransceiverDirection.values[direction]);
+  return transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
 Object getCurrentDirection(RTCRtpTransceiver transceiver) {
   return transceiver.getCurrentDirection().then((d) => d?.index);
 }
 
-Pointer currentDirection(RTCRtpTransceiver transceiver) {
-  if (transceiver.currentDirection != null) {
-    var curDir = transceiver.currentDirection!;
-    return ForeignValue.fromInt(curDir.index).intoBoxed();
-  } else {
-    return ForeignValue.none().intoBoxed();
-  }
-}
-
 Pointer mid(RTCRtpTransceiver transceiver) {
-  if (transceiver.mid != null) {
+  if (transceiver.mid.isNotEmpty) {
     return ForeignValue.fromString(transceiver.mid).intoBoxed();
   } else {
     return ForeignValue.none().intoBoxed();
@@ -86,7 +74,8 @@ int hasSendTrack(RTCRtpTransceiver transceiver) {
   }
 }
 
-Object replaceSendTrack(RTCRtpTransceiver transceiver, MediaStreamTrack track) async {
+Object replaceSendTrack(
+    RTCRtpTransceiver transceiver, MediaStreamTrack track) async {
   await transceiver.sender.setTrack(track);
   return ForeignValue.none().ref;
 }
@@ -107,7 +96,8 @@ void dropSender(Object transceiver) {
 Pointer isStopped(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null &&
       transceiver.sender.track!.muted != null) {
-    return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0).intoBoxed();
+    return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0)
+        .intoBoxed();
   } else {
     return ForeignValue.none().intoBoxed();
   }

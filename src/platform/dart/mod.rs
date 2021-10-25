@@ -27,7 +27,7 @@ use std::{os::raw::c_char, panic, ptr, time::Duration};
 use dart_sys::Dart_Handle;
 
 use crate::{
-    api::dart::string_into_c_str,
+    api::string_into_c_str,
     platform::dart::utils::{
         dart_api::Dart_PropagateError_DL_Trampolined,
         dart_future::DartFutureResolver,

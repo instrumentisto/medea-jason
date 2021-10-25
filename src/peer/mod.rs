@@ -12,6 +12,7 @@ use std::{
     cell::{Cell, RefCell},
     collections::{hash_map::DefaultHasher, HashMap},
     convert::TryFrom as _,
+    future::Future,
     hash::{Hash, Hasher},
     rc::Rc,
 };
@@ -383,11 +384,14 @@ impl PeerConnection {
         // Bind to `track` event.
         let media_connections = Rc::clone(&peer.media_connections);
         peer.peer.on_track(Some(move |track, transceiver| {
-            if let Err(mid) =
-                media_connections.add_remote_track(track, transceiver)
-            {
-                log::error!("Cannot add new remote track with mid={}", mid);
-            };
+            let media_connections = Rc::clone(&media_connections);
+            crate::platform::spawn(async move {
+                if let Err(mid) =
+                    media_connections.add_remote_track(track, transceiver).await
+                {
+                    log::error!("Cannot add new remote track with mid={}", mid);
+                };
+            });
         }));
 
         Ok(Rc::new(peer))
@@ -639,7 +643,9 @@ impl PeerConnection {
     /// [`MediaConnections`].
     ///
     /// [`Sender`]: sender::Sender
-    fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
+    fn get_transceivers_statuses(
+        &self,
+    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
         self.media_connections.get_transceivers_statuses()
     }
 

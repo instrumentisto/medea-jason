@@ -8,7 +8,7 @@ use medea_client_api_proto::{
 use tracerr::Traced;
 
 use crate::{
-    api::dart::{string_into_c_str, DartValueArg},
+    api::{string_into_c_str, DartValueArg},
     media::MediaKind,
     platform::{
         dart::{

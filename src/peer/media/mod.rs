@@ -445,17 +445,32 @@ impl MediaConnections {
 
     /// Returns activity statuses of the all the [`Sender`]s and [`Receiver`]s
     /// from these [`MediaConnections`].
-    pub fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
+    pub fn get_transceivers_statuses(
+        &self,
+    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
         let inner = self.0.borrow();
+        let senders: Vec<_> = inner
+            .senders
+            .iter()
+            .map(|(track_id, sender)| (*track_id, sender.obj()))
+            .collect();
+        let receivers: Vec<_> = inner
+            .receivers
+            .iter()
+            .map(|(track_id, receiver)| (*track_id, receiver.obj()))
+            .collect();
+        drop(inner);
 
-        let mut out = HashMap::new();
-        for (track_id, sender) in &inner.senders {
-            out.insert(*track_id, sender.is_publishing());
+        async move {
+            let mut out = HashMap::new();
+            for (track_id, sender) in senders {
+                out.insert(track_id, sender.is_publishing().await);
+            }
+            for (track_id, receiver) in receivers {
+                out.insert(track_id, receiver.is_receiving().await);
+            }
+            out
         }
-        for (track_id, receiver) in &inner.receivers {
-            out.insert(*track_id, receiver.is_receiving());
-        }
-        out
     }
 
     /// Returns [`Rc`] to [`TransceiverSide`] with a provided [`TrackId`].
@@ -599,21 +614,25 @@ impl MediaConnections {
         &self,
         track: platform::MediaStreamTrack,
         transceiver: platform::Transceiver,
-    ) -> Result<(), String> {
+    ) -> impl Future<Output = Result<(), String>> + 'static {
         let inner = self.0.borrow();
         // Cannot fail, since transceiver is guaranteed to be negotiated at this
         // point.
         let mid = transceiver.mid().unwrap();
-
-        for receiver in inner.receivers.values() {
-            if let Some(recv_mid) = &receiver.mid() {
-                if recv_mid == &mid {
-                    receiver.set_remote_track(transceiver, track);
-                    return Ok(());
+        let receivers: Vec<_> =
+            inner.receivers.values().map(Component::obj).collect();
+        drop(inner);
+        async move {
+            for receiver in receivers {
+                if let Some(recv_mid) = &receiver.mid() {
+                    if recv_mid == &mid {
+                        receiver.set_remote_track(transceiver, track).await;
+                        return Ok(());
+                    }
                 }
             }
+            Err(mid)
         }
-        Err(mid)
     }
 
     /// Iterates over all [`Receiver`]s with [`mid`] and without

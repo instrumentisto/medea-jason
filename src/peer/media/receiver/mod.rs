@@ -2,7 +2,10 @@
 
 mod component;
 
-use std::cell::{Cell, RefCell};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+};
 
 use futures::channel::mpsc;
 use medea_client_api_proto::{self as proto, MediaType, MemberId};
@@ -155,12 +158,15 @@ impl Receiver {
     }
 
     /// Indicates whether this [`Receiver`] receives media data.
-    #[must_use]
-    pub fn is_receiving(&self) -> bool {
-        let is_recv_direction =
-            self.transceiver.borrow().as_ref().map_or(false, |trnsvr| {
-                trnsvr.has_direction(platform::TransceiverDirection::RECV)
-            });
+    pub async fn is_receiving(self: Rc<Self>) -> bool {
+        let transceiver = self.transceiver.borrow().clone();
+        let is_recv_direction = if let Some(transceiver) = transceiver {
+            transceiver
+                .has_direction(platform::TransceiverDirection::RECV)
+                .await
+        } else {
+            false
+        };
 
         self.enabled_individual.get() && is_recv_direction
     }
@@ -187,8 +193,8 @@ impl Receiver {
     ///
     /// Sets [`platform::MediaStreamTrack::enabled`] same as
     /// `enabled_individual` of this [`Receiver`].
-    pub fn set_remote_track(
-        &self,
+    pub async fn set_remote_track(
+        self: Rc<Self>,
         transceiver: platform::Transceiver,
         new_track: platform::MediaStreamTrack,
     ) {
@@ -226,7 +232,7 @@ impl Receiver {
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop();
         };
-        self.maybe_notify_track();
+        self.maybe_notify_track().await;
     }
 
     /// Replaces [`Receiver`]'s [`platform::Transceiver`] with the provided
@@ -254,11 +260,11 @@ impl Receiver {
 
     /// Emits [`PeerEvent::NewRemoteTrack`] if [`Receiver`] is receiving media
     /// and has not notified yet.
-    fn maybe_notify_track(&self) {
+    async fn maybe_notify_track(self: Rc<Self>) {
         if self.is_track_notified.get() {
             return;
         }
-        if !self.is_receiving() {
+        if !Rc::clone(&self).is_receiving().await {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {

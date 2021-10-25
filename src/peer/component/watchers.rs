@@ -265,7 +265,8 @@ impl Component {
                                 peer_id: peer.id(),
                                 sdp_offer: sdp,
                                 transceivers_statuses: peer
-                                    .get_transceivers_statuses(),
+                                    .get_transceivers_statuses()
+                                    .await,
                                 mids,
                             })
                             .ok();
@@ -284,7 +285,8 @@ impl Component {
                                 peer_id: peer.id(),
                                 sdp_answer: sdp,
                                 transceivers_statuses: peer
-                                    .get_transceivers_statuses(),
+                                    .get_transceivers_statuses()
+                                    .await,
                             })
                             .ok();
                         state

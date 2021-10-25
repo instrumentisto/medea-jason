@@ -305,7 +305,7 @@ impl Component {
                 }
             }
         }
-        receiver.maybe_notify_track();
+        receiver.maybe_notify_track().await;
 
         Ok(())
     }

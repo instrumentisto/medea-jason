@@ -1,5 +1,4 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import '../ffi/foreign_value.dart';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
@@ -37,8 +36,8 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 Pointer<Utf8> id(Object track) {
-    track = track as MediaStreamTrack;
-    return track.id!.toNativeUtf8();
+  track = track as MediaStreamTrack;
+  return track.id!.toNativeUtf8();
 }
 
 int kind(MediaStreamTrack track) {

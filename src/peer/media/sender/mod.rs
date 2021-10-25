@@ -2,7 +2,7 @@
 
 mod component;
 
-use std::{cell::Cell, rc::Rc};
+use std::{cell::Cell, future::Future, rc::Rc};
 
 use derive_more::{Display, From};
 use futures::channel::mpsc;
@@ -164,10 +164,13 @@ impl Sender {
 
     /// Indicates whether this [`Sender`] is publishing media traffic.
     #[inline]
-    #[must_use]
-    pub fn is_publishing(&self) -> bool {
-        self.transceiver
-            .has_direction(platform::TransceiverDirection::SEND)
+    pub fn is_publishing(&self) -> impl Future<Output = bool> + 'static {
+        let transceiver = self.transceiver.clone();
+        async move {
+            transceiver
+                .has_direction(platform::TransceiverDirection::SEND)
+                .await
+        }
     }
 
     /// Drops [`local::Track`] used by this [`Sender`]. Sets track used by

@@ -5,9 +5,7 @@ use std::convert::{TryFrom, TryInto};
 use dart_sys::Dart_Handle;
 use derive_more::From;
 
-use crate::{
-    api::dart::DartValueArg, platform::dart::utils::handle::DartHandle,
-};
+use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
 
 /// Pointer to an extern function that creates new [`IceCandidate`] with a
 /// provided parameters.

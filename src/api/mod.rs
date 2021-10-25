@@ -4,7 +4,7 @@ pub mod err;
 
 cfg_if::cfg_if! {
     if #[cfg(target_os = "android")] {
-        pub mod dart;
+        mod dart;
         pub use self::dart::*;
     } else {
         mod wasm;
