@@ -225,8 +225,7 @@ pub mod tests {
         expects: DartValueArg<i64>,
     ) -> Dart_Handle {
         let expects: i64 = expects.try_into().unwrap();
-        Callback::from_once(move |i: DartValueArg<i64>| {
-            let val: i64 = i.try_into().unwrap();
+        Callback::from_once(move |val: i64| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -237,8 +236,7 @@ pub mod tests {
         expects: DartValueArg<String>,
     ) -> Dart_Handle {
         let expects: String = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<String>| {
-            let val: String = val.try_into().unwrap();
+        Callback::from_once(move |val: String| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -249,8 +247,7 @@ pub mod tests {
         expects: DartValueArg<Option<i64>>,
     ) -> Dart_Handle {
         let expects: Option<i64> = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<Option<i64>>| {
-            let val: Option<i64> = val.try_into().unwrap();
+        Callback::from_once(move |val: Option<i64>| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -261,8 +258,7 @@ pub mod tests {
         expects: DartValueArg<Option<String>>,
     ) -> Dart_Handle {
         let expects: Option<String> = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<Option<String>>| {
-            let val: Option<String> = val.try_into().unwrap();
+        Callback::from_once(move |val: Option<String>| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -284,8 +280,7 @@ pub mod tests {
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
-        Callback::from_once(move |val: DartValueArg<Dart_Handle>| {
-            let val: Dart_Handle = val.try_into().unwrap();
+        Callback::from_once(move |val: Dart_Handle| {
             unsafe { (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val) };
         })
         .into_dart()

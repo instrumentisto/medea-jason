@@ -829,7 +829,7 @@ impl MediaConnections {
 
     /// Creates new [`receiver::Component`] with the provided data.
     #[must_use]
-    pub fn create_receiver(
+    pub async fn create_receiver(
         &self,
         id: TrackId,
         media_type: MediaType,
@@ -848,7 +848,8 @@ impl MediaConnections {
             &self,
             mpsc::unbounded().0,
             recv_constraints,
-        );
+        )
+        .await;
 
         receiver::Component::new(Rc::new(receiver), Rc::new(state))
     }
@@ -877,13 +878,15 @@ impl MediaConnections {
                     self.0.borrow_mut().senders.insert(track.id, component);
                 }
                 Direction::Recv { mid, sender } => {
-                    let component = self.create_receiver(
-                        track.id,
-                        track.media_type,
-                        mid,
-                        sender,
-                        recv_constraints,
-                    );
+                    let component = self
+                        .create_receiver(
+                            track.id,
+                            track.media_type,
+                            mid,
+                            sender,
+                            recv_constraints,
+                        )
+                        .await;
                     self.0.borrow_mut().receivers.insert(track.id, component);
                 }
             }

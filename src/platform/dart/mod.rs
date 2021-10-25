@@ -81,6 +81,17 @@ pub fn set_panic_hook() {
     }));
 }
 
+/// Initialize [`android_logger`] as default application logger with min log
+/// level set to [`log::Level::Debug`].
+///
+/// [`android_logger`]: https://docs.rs/android_logger
+pub fn init_logger() {
+    // TODO: `android_logger::init_once()` should be called only once.
+    android_logger::init_once(
+        android_logger::Config::default().with_min_level(log::Level::Debug),
+    );
+}
+
 /// Pointer to an extern function that returns [`Dart_Handle`] to the Dart
 /// `Future` which will wait for the provided amount of time.
 type DelayedFutureFunction = extern "C" fn(i32) -> Dart_Handle;
