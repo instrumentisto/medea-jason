@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ffi';
 
 import 'foreign_value.dart';
-import 'unbox_handle.dart';
+import 'box_handle.dart';
 
 /// Registers functions that allow Rust to manage [Completer]s.
 void registerFunctions(DynamicLibrary dl) {

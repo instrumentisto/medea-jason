@@ -5,7 +5,7 @@ import 'package:ffi/ffi.dart';
 import '/src/interface/exceptions.dart';
 import 'foreign_value.dart';
 import 'native_string.dart';
-import 'unbox_handle.dart';
+import 'box_handle.dart';
 
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {

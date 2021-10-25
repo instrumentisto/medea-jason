@@ -3,17 +3,8 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../../util/move_semantic.dart';
-import 'native_string.dart';
 import 'nullable_pointer.dart';
-import 'unbox_handle.dart';
-import '../jason.dart';
-
-typedef _boxForeignValue_C = Pointer Function(ForeignValue);
-typedef _boxForeignValue_Dart = Pointer Function(ForeignValue);
-
-final _boxForeignValue_Dart _boxForeignValue =
-    dl.lookupFunction<_boxForeignValue_C, _boxForeignValue_Dart>(
-        'box_foreign_value');
+import 'box_handle.dart';
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.
 class ForeignValue extends Struct {
@@ -44,11 +35,26 @@ class ForeignValue extends Struct {
       case 2:
         return unboxDartHandle(_payload.handlePtr);
       case 3:
-        return _payload.string.nativeStringToDartString();
+        return _payload.string.toDartString();
       case 4:
         return _payload.number;
       default:
         throw TypeError();
+    }
+  }
+
+  /// Allocates a new [ForeignValue] guessing the provided [val] type.
+  static Pointer<ForeignValue> fromDart(Object? val) {
+    if (val == null) {
+      return ForeignValue.none();
+    } else if (val is int) {
+      return ForeignValue.fromInt(val);
+    } else if (val is String) {
+      return ForeignValue.fromString(val);
+    } else if (val is NullablePointer) {
+      return ForeignValue.fromPtr(val);
+    } else {
+      return ForeignValue.fromHandle(val);
     }
   }
 
@@ -68,6 +74,8 @@ class ForeignValue extends Struct {
     return fVal;
   }
 
+  /// Allocates a new [ForeignValue] with the provided [Object] converting it
+  /// to a [Handle].
   static Pointer<ForeignValue> fromHandle(Object obj) {
     var fVal = calloc<ForeignValue>();
     fVal.ref._tag = 2;
@@ -93,16 +101,6 @@ class ForeignValue extends Struct {
 }
 
 extension ForeignValuePointer on Pointer<ForeignValue> {
-  Pointer intoBoxed() {
-    var out = boxed();
-    free();
-    return out;
-  }
-
-  Pointer boxed() {
-    return _boxForeignValue(ref);
-  }
-
   /// Releases the memory allocated on a native heap.
   @moveSemantics
   void free() {

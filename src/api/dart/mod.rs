@@ -24,7 +24,7 @@ pub mod utils;
 
 use std::{convert::TryFrom, ffi::c_void, marker::PhantomData, ptr};
 
-use dart_sys::Dart_Handle;
+use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
 use libc::c_char;
 
@@ -49,7 +49,10 @@ pub use self::{
     remote_media_track::RemoteMediaTrack,
     room_close_reason::RoomCloseReason,
     room_handle::RoomHandle,
-    utils::{c_str_into_string, string_into_c_str, DartError as Error},
+    utils::{
+        c_str_into_string, free_dart_native_string, string_into_c_str,
+        DartError as Error,
+    },
 };
 
 /// Rust structure having wrapper class in Dart.
@@ -163,6 +166,21 @@ impl From<Option<i64>> for DartValue {
         match val {
             None => Self::None,
             Some(i) => Self::from(i),
+        }
+    }
+}
+
+impl From<ptr::NonNull<Dart_Handle>> for DartValue {
+    fn from(handle: ptr::NonNull<*mut _Dart_Handle>) -> Self {
+        Self::Handle(handle)
+    }
+}
+
+impl From<Option<ptr::NonNull<Dart_Handle>>> for DartValue {
+    fn from(val: Option<ptr::NonNull<Dart_Handle>>) -> Self {
+        match val {
+            None => Self::None,
+            Some(handle) => Self::from(handle),
         }
     }
 }
@@ -346,6 +364,36 @@ impl TryFrom<DartValueArg<Option<String>>> for Option<String> {
             },
             _ => Err(DartValueCastError {
                 expectation: "Option<String>",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl<T> TryFrom<DartValueArg<T>> for Dart_Handle {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<T>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::Handle(c_ptr) => Ok(unsafe { unbox_dart_handle(c_ptr) }),
+            _ => Err(DartValueCastError {
+                expectation: "Dart_Handle",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<DartHandle>> for DartHandle {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<DartHandle>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::Handle(handle) => {
+                Ok(DartHandle::new(unsafe { unbox_dart_handle(handle) }))
+            }
+            _ => Err(DartValueCastError {
+                expectation: "DartHandle",
                 value: value.0,
             }),
         }
@@ -553,10 +601,13 @@ pub unsafe extern "C" fn unbox_dart_handle(
     *Box::from_raw(val.as_ptr())
 }
 
-/// Just returns a provided [`Dart_Handle`].
+/// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
+/// [`Dart_Handle`].
 #[no_mangle]
-pub unsafe extern "C" fn box_dart_handle(val: Dart_Handle) -> Dart_Handle {
-    val
+pub unsafe extern "C" fn box_dart_handle(
+    val: Dart_Handle,
+) -> ptr::NonNull<Dart_Handle> {
+    ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 
 #[cfg(feature = "mockable")]
