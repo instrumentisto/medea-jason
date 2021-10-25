@@ -2,14 +2,56 @@
 //! manages lifetimes of the [`Dart_PersistentHandle`].
 
 use std::rc::Rc;
+use std::{os::raw::c_char, ptr};
+use std::fmt;
 
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 
+use crate::api::{c_str_into_string, free_dart_native_string};
 use crate::platform::dart::utils::dart_api::{
     Dart_DeletePersistentHandle_DL_Trampolined,
     Dart_HandleFromPersistent_DL_Trampolined,
     Dart_NewPersistentHandle_DL_Trampolined,
 };
+
+/// Pointer to an extern function that returns string representation
+type RuntimeTypeFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
+
+/// Pointer to an extern function that returns message of the provided Dart
+/// error.
+type ToStringFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
+
+/// Stores pointer to the [`RuntimeTypeFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut RUNTIME_TYPE_FUNCTION: Option<RuntimeTypeFunction> = None;
+
+/// Stores pointer to the [`ToStringFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut TO_STRING_FUNCTION: Option<ToStringFunction> = None;
+
+/// Registers the provided [`RuntimeTypeFunction`] as [`RUNTIME_TYPE_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
+#[no_mangle]
+pub unsafe extern "C" fn register_Object__runtimeType__toString(
+    f: RuntimeTypeFunction,
+) {
+    RUNTIME_TYPE_FUNCTION = Some(f);
+}
+
+/// Registers the provided [`ToStringFunction`] as [`TO_STRING_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
+#[no_mangle]
+pub unsafe extern "C" fn register_Object__toString(f: ToStringFunction) {
+    TO_STRING_FUNCTION = Some(f);
+}
 
 /// Reference-counting based [`Dart_Handle`] wrapper that takes care of its
 /// lifetime management.
@@ -33,6 +75,29 @@ impl DartHandle {
         // SAFETY: We don't expose the inner `Dart_PersistentHandle` anywhere,
         //         so we're sure that it's valid at this point.
         unsafe { Dart_HandleFromPersistent_DL_Trampolined(*self.0) }
+    }
+
+    /// Returns runtime Dart type of this [`DartHandle`].
+    pub fn name(&self) -> String {
+        unsafe {
+            let raw = RUNTIME_TYPE_FUNCTION.unwrap()(self.get());
+            let name = c_str_into_string(raw);
+            free_dart_native_string(raw);
+
+            name
+        }
+    }
+}
+
+impl fmt::Display for DartHandle {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        unsafe {
+            let raw = TO_STRING_FUNCTION.unwrap()(self.get());
+            let to_string = c_str_into_string(raw);
+            free_dart_native_string(raw);
+
+            write!(f, "{}", to_string)
+        }
     }
 }
 

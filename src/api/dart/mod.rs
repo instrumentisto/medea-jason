@@ -48,7 +48,10 @@ pub use self::{
     remote_media_track::RemoteMediaTrack,
     room_close_reason::RoomCloseReason,
     room_handle::RoomHandle,
-    utils::{c_str_into_string, string_into_c_str, free_dart_native_string, DartError as Error},
+    utils::{
+        c_str_into_string, free_dart_native_string, string_into_c_str,
+        DartError as Error,
+    },
 };
 
 /// Rust structure having wrapper class in Dart.

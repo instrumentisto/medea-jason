@@ -20,14 +20,13 @@ impl Error {
     /// Returns name of the underlying Dart exception.
     #[must_use]
     pub fn name(&self) -> String {
-        unimplemented!()
-
+        self.0.name()
     }
 
     /// Returns message of the underlying Dart exception.
     #[must_use]
     pub fn message(&self) -> String {
-        unimplemented!()
+        self.0.to_string()
     }
 }
 

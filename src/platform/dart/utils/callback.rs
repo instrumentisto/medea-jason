@@ -146,7 +146,8 @@ pub mod tests {
         Callback::from_once(move |i: DartValueArg<i64>| {
             let val: i64 = i.try_into().unwrap();
             assert_eq!(val, expects);
-        }).into_dart()
+        })
+        .into_dart()
     }
 
     #[no_mangle]
@@ -157,7 +158,8 @@ pub mod tests {
         Callback::from_once(move |val: DartValueArg<String>| {
             let val: String = val.try_into().unwrap();
             assert_eq!(val, expects);
-        }).into_dart()
+        })
+        .into_dart()
     }
 
     #[no_mangle]
@@ -168,7 +170,8 @@ pub mod tests {
         Callback::from_once(move |val: DartValueArg<Option<i64>>| {
             let val: Option<i64> = val.try_into().unwrap();
             assert_eq!(val, expects);
-        }).into_dart()
+        })
+        .into_dart()
     }
 
     #[no_mangle]
@@ -179,7 +182,8 @@ pub mod tests {
         Callback::from_once(move |val: DartValueArg<Option<String>>| {
             let val: Option<String> = val.try_into().unwrap();
             assert_eq!(val, expects);
-        }).into_dart()
+        })
+        .into_dart()
     }
 
     type TestCallbackHandleFunction = extern "C" fn(Dart_Handle);
@@ -201,6 +205,7 @@ pub mod tests {
         Callback::from_once(move |val: DartValueArg<Dart_Handle>| {
             let val: Dart_Handle = val.try_into().unwrap();
             unsafe { (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val) };
-        }).into_dart()
+        })
+        .into_dart()
     }
 }

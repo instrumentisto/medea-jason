@@ -55,13 +55,16 @@ pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
     CString::from_raw(s.as_ptr());
 }
 
-/// Registers the provided [`FreeDartNativeStringFunction`] as [`FREE_DART_NATIVE_STRING`].
+/// Registers the provided [`FreeDartNativeStringFunction`] as
+/// [`FREE_DART_NATIVE_STRING`].
 ///
 /// # Safety
 ///
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
-pub unsafe extern "C" fn register_free_dart_native_string(f: FreeDartNativeStringFunction) {
+pub unsafe extern "C" fn register_free_dart_native_string(
+    f: FreeDartNativeStringFunction,
+) {
     FREE_DART_NATIVE_STRING = Some(f);
 }
 

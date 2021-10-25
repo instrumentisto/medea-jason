@@ -20,7 +20,6 @@ pub mod rtc_stats;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;
-mod object;
 
 use std::time::Duration;
 
