@@ -22,3 +22,14 @@ extension RustStringPointer on Pointer<Utf8> {
     }
   }
 }
+
+void registerFunctions(DynamicLibrary dl) {
+  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+      'register_free_dart_native_string')(
+      Pointer.fromFunction<Void Function(Pointer<Utf8>)>(_freeDartNativeString));
+}
+
+/// Releases native heap memory for the given [string].
+void _freeDartNativeString(Pointer<Utf8> string) {
+  calloc.free(string);
+}

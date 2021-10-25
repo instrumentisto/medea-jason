@@ -9,8 +9,9 @@ import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
+import 'ffi/future.dart' as future;
 import 'ffi/exceptions.dart' as exceptions;
-import 'platform/utils/functions_registerer.dart' as platform_utils_registerer;
+import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'ffi/executor.dart';
 import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
@@ -76,6 +77,7 @@ DynamicLibrary _dl_load() {
   callback.registerFunctions(dl);
   completer.registerFunctions(dl);
   exceptions.registerFunctions(dl);
+  future.registerFunctions(dl);
   platform_utils_registerer.registerFunctions(dl);
 
   executor = Executor(dl);

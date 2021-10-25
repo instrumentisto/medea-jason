@@ -609,10 +609,10 @@ void main() {
   testWidgets('FutureResolver primitives', (WidgetTester widgetTester) async {
     final intResolver =
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__dart_future_resolver__int');
+            'test__future_from_dart__int');
     final stringResolver =
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__dart_future_resolver__string');
+            'test__future_from_dart__string');
 
     var intVal = await (intResolver(
         () => Future.delayed(Duration(milliseconds: 500), () async {
@@ -630,12 +630,12 @@ void main() {
   testWidgets('DartHandle argument Future validation',
       (WidgetTester widgetTester) async {
     dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-            'register__test__dart_future_resolver_handle_fn')(
+            'register__test__future_from_dart_handle_fn')(
         Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
 
     final handleResolver =
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__dart_future_resolver__handle');
+            'test__future_from_dart__handle');
 
     var testObj = TestObj(0);
     var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
@@ -649,7 +649,7 @@ void main() {
       (WidgetTester widgetTester) async {
     final futureCatchesException =
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-            'test__dart_future_resolver__fails');
+            'test__future_from_dart__fails');
 
     var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
           throw Exception('Test Exception');
