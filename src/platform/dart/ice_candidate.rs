@@ -114,7 +114,7 @@ impl IceCandidate {
             NEW_FUNCTION.unwrap()(
                 candidate.to_string().into(),
                 sdp_mid.clone().into(),
-                sdp_m_line_index.clone().map(|i| i as i64).into(),
+                sdp_m_line_index.map(i64::from).into(),
             )
         };
         Self(DartHandle::new(handle))

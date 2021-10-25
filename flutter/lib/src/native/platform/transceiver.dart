@@ -6,7 +6,7 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__current_direction')(
-      Pointer.fromFunction<ForeignValue Function(Handle)>(currentDirection));
+      Pointer.fromFunction<Pointer Function(Handle)>(currentDirection));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__get_current_direction')(
       Pointer.fromFunction<Handle Function(Handle)>(getCurrentDirection));
@@ -15,7 +15,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Handle Function(Handle, Handle)>(replaceSendTrack));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__get_send_track')(
-      Pointer.fromFunction<ForeignValue Function(Handle)>(getSendTrack));
+      Pointer.fromFunction<Pointer Function(Handle)>(getSendTrack));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__set_send_track_enabled')(
       Pointer.fromFunction<Handle Function(Handle, Int8)>(setSendTrackEnabled));
@@ -24,13 +24,10 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Void Function(Handle)>(dropSender));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__is_stopped')(
-      Pointer.fromFunction<ForeignValue Function(Handle)>(isStopped));
+      Pointer.fromFunction<Pointer Function(Handle)>(isStopped));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__mid')(
-      Pointer.fromFunction<ForeignValue Function(Handle)>(mid));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Transceiver__send_track')(
-      Pointer.fromFunction<ForeignValue Function(Handle)>(sendTrack));
+      Pointer.fromFunction<Pointer Function(Handle)>(mid));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__has_send_track')(
       Pointer.fromFunction<Int8 Function(Handle)>(hasSendTrack, 0));
@@ -44,40 +41,40 @@ Object setDirection(RTCRtpTransceiver transceiver, int direction) {
 }
 
 Object getCurrentDirection(RTCRtpTransceiver transceiver) {
-  return transceiver.getCurrentDirection().then((d) => ForeignValue.fromInt(d!.index).ref);
+  return transceiver.getCurrentDirection().then((d) => d?.index);
 }
 
-ForeignValue currentDirection(RTCRtpTransceiver transceiver) {
+Pointer currentDirection(RTCRtpTransceiver transceiver) {
   if (transceiver.currentDirection != null) {
     var curDir = transceiver.currentDirection!;
-    return ForeignValue.fromInt(curDir.index).ref;
+    return ForeignValue.fromInt(curDir.index).intoBoxed();
   } else {
-    return ForeignValue.none().ref;
+    return ForeignValue.none().intoBoxed();
   }
 }
 
-ForeignValue mid(RTCRtpTransceiver transceiver) {
+Pointer mid(RTCRtpTransceiver transceiver) {
   if (transceiver.mid != null) {
-    return ForeignValue.fromString(transceiver.mid).ref;
+    return ForeignValue.fromString(transceiver.mid).intoBoxed();
   } else {
-    return ForeignValue.none().ref;
+    return ForeignValue.none().intoBoxed();
   }
 }
 
-ForeignValue sendTrack(RTCRtpTransceiver transceiver) {
+Pointer sendTrack(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null) {
-    return ForeignValue.fromHandle(transceiver.sender.track!).ref;
+    return ForeignValue.fromHandle(transceiver.sender.track!).intoBoxed();
   } else {
-    return ForeignValue.none().ref;
+    return ForeignValue.none().intoBoxed();
   }
 }
 
-ForeignValue getSendTrack(Object transceiver) {
+Pointer getSendTrack(Object transceiver) {
   transceiver = transceiver as RTCRtpTransceiver;
   if (transceiver.sender.track != null) {
-    return ForeignValue.fromHandle(transceiver.sender.track!).ref;
+    return ForeignValue.fromHandle(transceiver.sender.track!).intoBoxed();
   } else {
-    return ForeignValue.none().ref;
+    return ForeignValue.none().intoBoxed();
   }
 }
 
@@ -107,11 +104,11 @@ void dropSender(Object transceiver) {
   }
 }
 
-ForeignValue isStopped(RTCRtpTransceiver transceiver) {
+Pointer isStopped(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null &&
       transceiver.sender.track!.muted != null) {
-    return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0).ref;
+    return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0).intoBoxed();
   } else {
-    return ForeignValue.none().ref;
+    return ForeignValue.none().intoBoxed();
   }
 }

@@ -6,8 +6,6 @@ pub mod constraints;
 mod manager;
 pub mod track;
 
-use std::str::FromStr;
-
 use derive_more::Display;
 
 #[doc(inline)]
@@ -41,6 +39,18 @@ pub enum MediaKind {
     Video = 1,
 }
 
+impl MediaKind {
+    /// Returns string representation of a [`MediaKind`].
+    #[inline]
+    #[must_use]
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Audio => "audio",
+            Self::Video => "video",
+        }
+    }
+}
+
 impl From<&TrackConstraints> for MediaKind {
     fn from(media_type: &TrackConstraints) -> Self {
         match media_type {
@@ -56,30 +66,6 @@ impl From<i32> for MediaKind {
             0 => Self::Audio,
             1 => Self::Video,
             _ => unreachable!(),
-        }
-    }
-}
-
-impl FromStr for MediaKind {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "audio" => Ok(Self::Audio),
-            "video" => Ok(Self::Video),
-            _ => Err(()),
-        }
-    }
-}
-
-impl MediaKind {
-    /// Returns string representation of a [`MediaKind`].
-    #[inline]
-    #[must_use]
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Audio => "audio",
-            Self::Video => "video",
         }
     }
 }

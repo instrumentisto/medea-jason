@@ -275,10 +275,8 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn ready_state(&self) -> MediaStreamTrackState {
-        // MediaStreamTrackState::from(unsafe {
-        //     READY_STATE_FUNCTION.unwrap()(self.0.get())
-        // })
-        // TODO: this is temporary implementation for debugging purpose
+        // TODO (evdokimovs): return real MediaStreamTrackState when
+        // flutter_webrtc will be reworked
         MediaStreamTrackState::Live
     }
 
@@ -288,11 +286,9 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        unsafe {
-            DEVICE_ID_FUNCTION.unwrap()(self.0.get())
-                .try_into()
-                .unwrap()
-        }
+        unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) }
+            .try_into()
+            .unwrap()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].
@@ -301,11 +297,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
-        unsafe {
-            Option::<i32>::try_from(FACING_MODE_FUNCTION.unwrap()(self.0.get()))
-                .unwrap()
-                .map(FacingMode::from)
-        }
+        Option::<i32>::try_from(unsafe {
+            FACING_MODE_FUNCTION.unwrap()(self.0.get())
+        })
+        .unwrap()
+        .map(FacingMode::from)
     }
 
     /// Returns a [`height`][1] of the underlying [MediaStreamTrack][2].
@@ -314,9 +310,8 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        unsafe {
-            Option::try_from(HEIGHT_FUNCTION.unwrap()(self.0.get())).unwrap()
-        }
+        Option::try_from(unsafe { HEIGHT_FUNCTION.unwrap()(self.0.get()) })
+            .unwrap()
     }
 
     /// Return a [`width`][1] of the underlying [MediaStreamTrack][2].
@@ -325,9 +320,8 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        unsafe {
-            Option::try_from(WIDTH_FUNCTION.unwrap()(self.0.get())).unwrap()
-        }
+        Option::try_from(unsafe { WIDTH_FUNCTION.unwrap()(self.0.get()) })
+            .unwrap()
     }
 
     /// Changes an [`enabled`][1] attribute in the underlying
@@ -372,6 +366,8 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
+        // TODO (evdokimovs): add real implementation when flutter_webrtc will
+        // be reworked
         false
     }
 

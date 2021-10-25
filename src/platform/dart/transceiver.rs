@@ -4,6 +4,7 @@ use std::{
     cell::RefCell,
     convert::{TryFrom, TryInto},
     future::Future,
+    ptr,
     rc::Rc,
 };
 
@@ -42,12 +43,15 @@ impl From<DartHandle> for Transceiver {
 type GetCurrentDirectionFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
 // TODO: maybe remove it
-type CurrentDirectionFunction = extern "C" fn(Dart_Handle) -> i32;
+type CurrentDirectionFunction =
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<i32>>;
 
 /// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
 type GetSendTrackFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<DartHandle>>;
+    extern "C" fn(
+        Dart_Handle,
+    ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
 
 /// Pointer to an extern function that replaces `Send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
@@ -60,7 +64,8 @@ type DropSenderFunction = extern "C" fn(Dart_Handle);
 
 /// Pointer to an extern function that returns stopped status of the provided
 /// [`Transceiver`].
-type IsStoppedFunction = extern "C" fn(Dart_Handle) -> bool;
+type IsStoppedFunction =
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<i8>>;
 
 /// Pointer to an extern function that sets `enabled` field of `Send`
 /// [`MediaStreamTrack`] of the provided [`Transceiver`].
@@ -68,7 +73,8 @@ type SetSendTrackEnabledFunction = extern "C" fn(Dart_Handle, bool);
 
 /// Pointer to an extern function that returns MID of the provided
 /// [`Transceiver`].
-type MidFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+type MidFunction =
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
 /// Pointer to an extern function that returns `1` if provided [`Transceiver`]
 /// has `Send` [`MediaStreamTrack`].
@@ -258,9 +264,12 @@ pub unsafe extern "C" fn register_Transceiver__set_direction(
 impl Transceiver {
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     pub fn current_direction(&self) -> TransceiverDirection {
-        unsafe {
-            CURRENT_DIRECTION_FUNCTION.unwrap()(self.transceiver.get()).into()
-        }
+        let val = unsafe {
+            let res =
+                CURRENT_DIRECTION_FUNCTION.unwrap()(self.transceiver.get());
+            *Box::from_raw(res.as_ptr())
+        };
+        i32::try_from(val).unwrap().into()
     }
 
     fn set_direction(
@@ -324,13 +333,13 @@ impl Transceiver {
         &self,
         new_sender: Rc<local::Track>,
     ) -> Result<(), platform::Error> {
-        unsafe {
-            DartFutureResolver::execute::<()>(REPLACE_TRACK_FUNCTION.unwrap()(
+        DartFutureResolver::execute::<()>(unsafe {
+            REPLACE_TRACK_FUNCTION.unwrap()(
                 self.transceiver.get(),
                 new_sender.platform_track().handle(),
-            ))
-            .await;
-        }
+            )
+        })
+        .await;
         self.send_track.replace(Some(new_sender));
         Ok(())
     }
@@ -346,10 +355,12 @@ impl Transceiver {
     /// [WebAPI docs]: https://tinyurl.com/7pnszaa8
     pub fn drop_send_track(&self) -> impl Future<Output = ()> {
         unsafe {
-            if let Some(sender) = Option::<DartHandle>::try_from(
-                GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()),
-            )
-            .unwrap()
+            if let Some(sender) =
+                Option::<DartHandle>::try_from(*Box::from_raw(
+                    GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get())
+                        .as_ptr(),
+                ))
+                .unwrap()
             {
                 DROP_SENDER_FUNCTION.unwrap()(sender.get());
             }
@@ -361,10 +372,12 @@ impl Transceiver {
     /// value, if any.
     pub fn set_send_track_enabled(&self, enabled: bool) {
         unsafe {
-            if let Some(sender) = Option::<DartHandle>::try_from(
-                GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()),
-            )
-            .unwrap()
+            if let Some(sender) =
+                Option::<DartHandle>::try_from(*Box::from_raw(
+                    GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get())
+                        .as_ptr(),
+                ))
+                .unwrap()
             {
                 SET_SEND_TRACK_ENABLED_FUNCTION.unwrap()(sender.get(), enabled);
             }
@@ -376,20 +389,22 @@ impl Transceiver {
         &self,
     ) -> impl Future<Output = TransceiverDirection> {
         let handle = self.transceiver.get();
-        unsafe {
-            async move {
-                DartFutureResolver::execute::<i32>(
-                    GET_CURRENT_DIRECTION_FUNCTION.unwrap()(handle),
-                )
-                .await
-                .into()
-            }
+        async move {
+            DartFutureResolver::execute::<i32>(unsafe {
+                GET_CURRENT_DIRECTION_FUNCTION.unwrap()(handle)
+            })
+            .await
+            .into()
         }
     }
 
     /// Indicates whether the underlying [`RtcRtpTransceiver`] is stopped.
     pub fn is_stopped(&self) -> bool {
-        unsafe { IS_STOPPED_FUNCTION.unwrap()(self.transceiver.get()) }
+        let val = unsafe {
+            let p = IS_STOPPED_FUNCTION.unwrap()(self.transceiver.get());
+            *Box::from_raw(p.as_ptr())
+        };
+        i8::try_from(val).unwrap() == 1
     }
 
     /// Returns [`mid`] of this [`Transceiver`].
@@ -397,9 +412,8 @@ impl Transceiver {
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
     pub fn mid(&self) -> Option<String> {
         unsafe {
-            MID_FUNCTION.unwrap()(self.transceiver.get())
-                .try_into()
-                .unwrap()
+            let p = MID_FUNCTION.unwrap()(self.transceiver.get());
+            (*Box::from_raw(p.as_ptr())).try_into().unwrap()
         }
     }
 

@@ -78,7 +78,7 @@ pub trait ForeignClass: Sized {
 }
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[repr(u8)]
 pub enum DartValue {
     /// No value. It can mean `()`, `void` or [`Option::None`] basing on the
@@ -536,6 +536,13 @@ impl TryFrom<i64> for MediaSourceKind {
             _ => Err(value),
         }
     }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn box_foreign_value(
+    val: DartValue,
+) -> ptr::NonNull<DartValue> {
+    ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 
 /// Returns a [`Dart_Handle`] dereferenced from the provided pointer.

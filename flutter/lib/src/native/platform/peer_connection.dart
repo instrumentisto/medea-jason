@@ -25,7 +25,7 @@ void registerFunctions(DynamicLibrary dl) {
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__connection_state')(
-      Pointer.fromFunction<ForeignValue Function(Handle)>(connectionState));
+      Pointer.fromFunction<Pointer Function(Handle)>(connectionState));
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__restart_ice')(
@@ -33,7 +33,7 @@ void registerFunctions(DynamicLibrary dl) {
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__rollback')(
-      Pointer.fromFunction<Void Function(Handle)>(rollback));
+      Pointer.fromFunction<Handle Function(Handle)>(rollback));
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__on_track')(
@@ -150,11 +150,11 @@ Object addIceCandidate(RTCPeerConnection conn, RTCIceCandidate candidate) {
   return conn.addCandidate(candidate);
 }
 
-ForeignValue connectionState(RTCPeerConnection conn) {
+Pointer connectionState(RTCPeerConnection conn) {
   if (conn.connectionState != null) {
-    return ForeignValue.fromInt(conn.connectionState!.index).ref;
+    return ForeignValue.fromInt(conn.connectionState!.index).intoBoxed();
   } else {
-    return ForeignValue.none().ref;
+    return ForeignValue.none().intoBoxed();
   }
 }
 
@@ -166,8 +166,8 @@ ForeignValue iceConnectionState(RTCPeerConnection conn) {
   }
 }
 
-void rollback(RTCPeerConnection conn) {
-  conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
+Object rollback(RTCPeerConnection conn) {
+  return conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 Object getTransceivers(RTCPeerConnection conn) {

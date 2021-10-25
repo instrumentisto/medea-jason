@@ -1,3 +1,13 @@
+//! Multiplatform Dart runtime specific functionality.
+
+// TODO: Remove allows when implementing platform code.
+#![allow(
+    unused_variables,
+    clippy::missing_panics_doc,
+    clippy::unused_self,
+    clippy::needless_pass_by_value
+)]
+
 pub mod constraints;
 pub mod error;
 pub mod executor;
