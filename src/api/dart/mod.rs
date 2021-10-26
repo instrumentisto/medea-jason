@@ -570,6 +570,7 @@ impl TryFrom<i64> for MediaSourceKind {
     }
 }
 
+/// Returns boxed pointer to a provided [`DartValue`].
 #[no_mangle]
 pub unsafe extern "C" fn box_foreign_value(
     val: DartValue,

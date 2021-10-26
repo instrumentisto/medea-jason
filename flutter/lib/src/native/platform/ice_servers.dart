@@ -14,10 +14,12 @@ void registerFunctions(DynamicLibrary dl) {
       addIceServer));
 }
 
+/// Returns new empty `IceServer`s [List].
 Object newIceServers() {
   return List.empty(growable: true);
 }
 
+/// Adds `IceServer` with a provided data to the provided [List].
 void addIceServer(Object servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
   servers as List;
