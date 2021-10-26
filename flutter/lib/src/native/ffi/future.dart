@@ -22,7 +22,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Void Function(Handle, Pointer)>(completeProxy));
 }
 
-/// Registers callbacks on the provided [Future] that complete Rust's
+/// Registers callbacks on the provided [Future] completing Rust's
 /// `FutureFromDart`.
 void completeProxy(Object f, Pointer rustFuture) {
   f as Function;

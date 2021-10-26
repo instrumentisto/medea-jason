@@ -9,7 +9,7 @@ use std::{
 /// Pointer to an extern function that frees the provided Dart native string.
 type FreeDartNativeStringFunction = extern "C" fn(ptr::NonNull<c_char>);
 
-/// Stores pointer to the [`FreeDartNativeStringFunction`] extern function.
+/// Stores a pointer to the [`FreeDartNativeStringFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut FREE_DART_NATIVE_STRING: Option<FreeDartNativeStringFunction> = None;
@@ -70,8 +70,8 @@ pub unsafe extern "C" fn register_free_dart_native_string(
 
 /// Calls Dart to release memory allocated for the provided native string.
 ///
-/// Should be used when Dart can not release memory in place, e.g when Rust
-/// calls Dart function that returns native string.
+/// Should be used when Dart cannot release memory in place, e.g when Rust calls
+/// a Dart function returning a native string.
 ///
 /// # Safety
 ///

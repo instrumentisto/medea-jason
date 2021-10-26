@@ -1,5 +1,6 @@
-//! Definitions and implementation of the Rust side representation of the Dart
-//! Futures.
+//! Rust-side representation of a [Dart `Future`][0].
+//!
+//! [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 
 use std::{convert::TryInto, fmt::Debug, future::Future, ptr};
 
@@ -11,13 +12,14 @@ use crate::{
     platform::dart::error::Error,
 };
 
-/// Pointer to an extern function that resolves provided Dart `Future` with a
-/// provided [`FutureFromDart`].
+/// Pointer to an extern function resolving the provided [Dart `Future`][0] with
+/// the provided [`FutureFromDart`].
+///
+/// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 type FutureFromDartCompleteProxyFunction =
     extern "C" fn(Dart_Handle, ptr::NonNull<FutureFromDart>);
 
-/// Stores pointer to the [`FutureFromDartSpawnerFunction`] extern
-/// function.
+/// Stores a pointer to the [`FutureFromDartSpawnerFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut FUTURE_FROM_DART_COMPLETE_PROXY: Option<
@@ -37,14 +39,14 @@ pub unsafe extern "C" fn register_FutureFromDart__complete_proxy(
     FUTURE_FROM_DART_COMPLETE_PROXY = Some(f);
 }
 
-/// Resolves provided [`FutureFromDart`] with a provided
-/// [`DartValue`] as `Ok` result.
+/// Resolves the provided [`FutureFromDart`] with the given [`DartValue`] as
+/// [`Ok`] result.
 ///
-/// Frees provided [`FutureFromDart`].
+/// Frees the provided [`FutureFromDart`].
 ///
 /// # Safety
 ///
-/// Provided [`FutureFromDart`] shouldn't be freed.
+/// The provided [`FutureFromDart`] shouldn't be previously freed.
 #[no_mangle]
 pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     future: ptr::NonNull<FutureFromDart>,
@@ -54,14 +56,14 @@ pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     future.resolve_ok(val);
 }
 
-/// Resolves provided [`FutureFromDart`] with a provided
-/// [`Error`] as `Err` result.
+/// Resolves the provided [`FutureFromDart`] with the given [`Error`] as [`Err`]
+/// result.
 ///
-/// Frees provided [`FutureFromDart`].
+/// Frees the provided [`FutureFromDart`].
 ///
 /// # Safety
 ///
-/// Provided [`FutureFromDart`] shouldn't be freed.
+/// The provided [`FutureFromDart`] shouldn't be previously freed.
 #[no_mangle]
 pub unsafe extern "C" fn FutureFromDart__resolve_err(
     future: ptr::NonNull<FutureFromDart>,
@@ -71,18 +73,22 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
     future.resolve_err(Error::from(val));
 }
 
-/// Compatibility layer for polling Dart futures in Rust.
+/// Compatibility layer for polling [Dart `Future`s][0] in Rust.
+///
+/// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 pub struct FutureFromDart(Box<dyn FnOnce(Result<DartValue, Error>)>);
 
 impl FutureFromDart {
-    /// Converts fallible Dart side Future to the Rust's [`Future`].
+    /// Converts a fallible[Dart `Future`s][0] into the Rust [`Future`].
     ///
     /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
-    /// result on Dart side Future resolve.
+    /// result on a Dart side.
     ///
     /// # Errors
     ///
-    /// Errors with a [`Error`] if Dart side thrown exception.
+    /// Errors with an [`Error`] if Dart side thrown an exception.
+    ///
+    /// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
     pub fn execute<T>(
         dart_fut: Dart_Handle,
     ) -> impl Future<Output = Result<T, Error>>
@@ -108,16 +114,16 @@ impl FutureFromDart {
         async move { rx.await.unwrap() }
     }
 
-    /// Resolves this [`FutureFromDart`] with a provided
-    /// [`DartValue`] as `Ok` result.
+    /// Resolves this [`FutureFromDart`] with the provided [`DartValue`] as
+    /// [`Ok`] result.
     ///
     /// __Should be only called by Dart side.__
     fn resolve_ok(self, val: DartValue) {
         (self.0)(Ok(val));
     }
 
-    /// Resolves this [`FutureFromDart`] with a provided
-    /// [`Error`] as `Err` result.
+    /// Resolves this [`FutureFromDart`] with the provided [`Error`] as [`Err`]
+    /// result.
     ///
     /// __Should be only called by Dart side.__
     fn resolve_err(self, err: Error) {
