@@ -158,7 +158,9 @@ impl From<RtcRtpTransceiver> for Transceiver {
 
 #[cfg(test)]
 mod tests {
-    use super::{RtcRtpTransceiverDirection, TransceiverDirection};
+    use web_sys::RtcRtpTransceiverDirection;
+
+    use super::TransceiverDirection;
 
     #[test]
     fn enable_works_correctly() {
