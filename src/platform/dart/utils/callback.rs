@@ -168,7 +168,9 @@ impl Callback {
         })))
     }
 
-    /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two arguments, that can be converted to a [`Dart_Handle`] and passed to Dart.
+    /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two
+    /// arguments, that can be converted to a [`Dart_Handle`] and passed to
+    /// Dart.
     pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
     where
         F: FnMut(T, S) + 'static,
