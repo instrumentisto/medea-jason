@@ -2,6 +2,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
+/// Registers [MediaStreamTrack] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__id')(
@@ -35,11 +36,12 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Void Function(Handle, Handle)>(onEnded));
 }
 
-Pointer<Utf8> id(Object track) {
-  track = track as MediaStreamTrack;
+/// Returns ID of the provided [MediaStreamTrack].
+Pointer<Utf8> id(MediaStreamTrack track) {
   return track.id!.toNativeUtf8();
 }
 
+/// Returns kind of the provided [MediaStreamTrack].
 int kind(MediaStreamTrack track) {
   if (track.kind == 'audio') {
     return 0;
@@ -48,43 +50,48 @@ int kind(MediaStreamTrack track) {
   }
 }
 
-void onEnded(Object track, Object f) {
-  if (track is MediaStreamTrack) {
-    if (f is Function) {
-      track.onEnded = () {
-        f();
-      };
-    }
-  }
+/// Subscribes on the [MediaStreamTrack.onEnded] of the provided [MediaStreamTrack].
+void onEnded(MediaStreamTrack track, Function f) {
+    track.onEnded = () {
+      f();
+    };
 }
 
+/// Returns device ID of the provided [MediaStreamTrack].
 Pointer<Utf8> deviceId(MediaStreamTrack track) {
+  // TODO: add correct implementation when flutter_webrtc will be reworked.
   return id(track);
 }
 
+/// Returns facingMode of the provided [MediaStreamTrack].
 Pointer<Utf8> facingMode(MediaStreamTrack track) {
   // TODO: remove this dummy implementation when flutter_webrtc will be reworked
   return 'user'.toNativeUtf8();
 }
 
+/// Returns height of the video of the provided [MediaStreamTrack].
 int height(MediaStreamTrack track) {
   // TODO: remove this dummy implementation when flutter_webrtc will be reworked
   return 1600;
 }
 
+/// Returns width of the video of the provided [MediaStreamTrack].
 int width(MediaStreamTrack track) {
   // TODO: remove this dummy implementation when flutter_webrtc will be reworked
   return 1300;
 }
 
+/// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].
 void setEnabled(MediaStreamTrack track, int enabled) {
   track.enabled = enabled == 1;
 }
 
+/// Stops provided [MediaStreamTrack].
 void stop(MediaStreamTrack track) {
   track.stop();
 }
 
+/// Returns `1` if the provided [MediaStreamTrack] is enabled and `0` otherwise.
 int enabled(MediaStreamTrack track) {
   return track.enabled ? 1 : 0;
 }

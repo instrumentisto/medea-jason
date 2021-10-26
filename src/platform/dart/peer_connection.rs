@@ -12,6 +12,7 @@ use crate::{
     media::MediaKind,
     platform::{
         dart::{
+            ice_server::RtcIceServers,
             transceiver::Transceiver,
             utils::{
                 callback::Callback, dart_future::FutureFromDart,
@@ -93,8 +94,10 @@ type OnIceConnectionStateChangeFunction =
 
 /// Pointer to an extern function that returns [`Dart_Handle`] to a newly
 /// created [`PeerConnection`].
-type NewPeerFunction = extern "C" fn() -> Dart_Handle;
+type NewPeerFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
+/// Pointer to an extern function that creates new `Transceiver` in the provided
+/// `PeerConnection`.
 type AddTransceiverFunction =
     extern "C" fn(Dart_Handle, i32, i32) -> Dart_Handle;
 
@@ -447,19 +450,19 @@ impl RtcPeerConnection {
     ///
     /// Errors with [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`SysRtcPeerConnection`] creation fails.
-    pub async fn new<I>(
-        _ice_servers: I,
-        _is_force_relayed: bool,
-    ) -> Result<Self>
+    pub async fn new<I>(ice_servers: I, is_force_relayed: bool) -> Result<Self>
     where
         I: IntoIterator<Item = IceServer>,
     {
+        let ice_servers = RtcIceServers::from(ice_servers);
         Ok(Self {
-            handle: FutureFromDart::execute(unsafe { NEW_PEER.unwrap()() })
-                .await
-                .map_err(|e| {
-                    tracerr::new!(RtcPeerConnectionError::PeerCreationError(e))
-                })?,
+            handle: FutureFromDart::execute(unsafe {
+                NEW_PEER.unwrap()(ice_servers.get_handle())
+            })
+            .await
+            .map_err(|e| {
+                tracerr::new!(RtcPeerConnectionError::PeerCreationError(e))
+            })?,
         })
     }
 
