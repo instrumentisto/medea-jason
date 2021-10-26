@@ -23,7 +23,7 @@ wasm_bindgen_test_configure!(run_in_browser);
 async fn sendrecv_works() {
     let (tx, _rx) = mpsc::unbounded();
     let media_connections = MediaConnections::new(
-        Rc::new(RtcPeerConnection::new(Vec::new(), false).unwrap()),
+        Rc::new(RtcPeerConnection::new(Vec::new(), false).await.unwrap()),
         tx,
     );
     let send_audio_track = Track {
@@ -48,6 +48,7 @@ async fn sendrecv_works() {
             &get_media_stream_settings(true, false).into(),
             &RecvConstraints::default(),
         )
+        .await
         .unwrap();
     let request = media_connections
         .get_tracks_request(LocalStreamUpdateCriteria::all())
@@ -68,13 +69,24 @@ async fn sendrecv_works() {
     let video_receiver =
         media_connections.get_receiver_by_id(TrackId(2)).unwrap();
 
-    assert!(video_sender.is_publishing());
-    assert!(video_receiver.is_receiving());
+    assert!(video_sender.clone().is_publishing().await);
+    assert!(video_receiver.clone().is_receiving().await);
 
-    assert!(video_sender.transceiver().has_direction(
-        TransceiverDirection::SEND | TransceiverDirection::RECV
-    ));
-    assert!(video_receiver.transceiver().unwrap().has_direction(
-        TransceiverDirection::SEND | TransceiverDirection::RECV
-    ));
+    assert!(
+        video_sender
+            .transceiver()
+            .has_direction(
+                TransceiverDirection::SEND | TransceiverDirection::RECV
+            )
+            .await
+    );
+    assert!(
+        video_receiver
+            .transceiver()
+            .unwrap()
+            .has_direction(
+                TransceiverDirection::SEND | TransceiverDirection::RECV
+            )
+            .await
+    );
 }
