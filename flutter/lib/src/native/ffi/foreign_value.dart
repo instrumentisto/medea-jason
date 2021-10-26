@@ -3,9 +3,8 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../../util/move_semantic.dart';
-import 'native_string.dart';
 import 'nullable_pointer.dart';
-import 'unbox_handle.dart';
+import 'box_handle.dart';
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.
 class ForeignValue extends Struct {
@@ -36,11 +35,26 @@ class ForeignValue extends Struct {
       case 2:
         return unboxDartHandle(_payload.handlePtr);
       case 3:
-        return _payload.string.nativeStringToDartString();
+        return _payload.string.toDartString();
       case 4:
         return _payload.number;
       default:
         throw TypeError();
+    }
+  }
+
+  /// Allocates a new [ForeignValue] guessing the provided [val] type.
+  static Pointer<ForeignValue> fromDart(Object? val) {
+    if (val == null) {
+      return ForeignValue.none();
+    } else if (val is int) {
+      return ForeignValue.fromInt(val);
+    } else if (val is String) {
+      return ForeignValue.fromString(val);
+    } else if (val is NullablePointer) {
+      return ForeignValue.fromPtr(val);
+    } else {
+      return ForeignValue.fromHandle(val);
     }
   }
 
@@ -57,6 +71,15 @@ class ForeignValue extends Struct {
     var fVal = calloc<ForeignValue>();
     fVal.ref._tag = 1;
     fVal.ref._payload.ptr = ptr.getInnerPtr();
+    return fVal;
+  }
+
+  /// Allocates a new [ForeignValue] with the provided [Object] converting it
+  /// to a [Handle].
+  static Pointer<ForeignValue> fromHandle(Object obj) {
+    var fVal = calloc<ForeignValue>();
+    fVal.ref._tag = 2;
+    fVal.ref._payload.handlePtr = boxDartHandle(obj);
     return fVal;
   }
 

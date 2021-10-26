@@ -1,13 +1,11 @@
 //! Multiplatform Dart runtime specific utility structs and functions.
 
+pub mod callback;
 pub mod completer;
 pub mod dart_api;
-mod event_listener;
+pub mod dart_future;
 pub mod function;
+pub mod handle;
 
 #[doc(inline)]
-pub use self::{
-    completer::Completer,
-    event_listener::{EventListener, EventListenerBindError},
-    function::Function,
-};
+pub use self::{completer::Completer, function::Function};

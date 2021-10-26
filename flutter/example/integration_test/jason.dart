@@ -445,33 +445,73 @@ void main() {
       dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
           'returns_input_device_info_ptr');
 
-  testWidgets('ForeignValue Rust => Dart', (WidgetTester tester) async {
-    final returnsNone =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_none');
-    final returnsHandlePtr = dl.lookupFunction<ForeignValue Function(Handle),
-        ForeignValue Function(Object?)>('returns_handle_ptr');
-    final returnsString =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_string');
-    final returnsInt =
-        dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-            'returns_int');
+  testWidgets('ForeignValue', (WidgetTester tester) async {
+    Pointer rustPtr1 = returnsInputDevicePtr().toDart();
 
-    expect(returnsNone().toDart(), equals(null));
+    var fvN = ForeignValue.none();
+    var fvI = ForeignValue.fromInt(145);
+    var fvS = ForeignValue.fromString('my string');
+    var fvH = ForeignValue.fromHandle(TestObj(333));
+    var fvR = ForeignValue.fromPtr(NullablePointer(rustPtr1));
 
-    var inputDevice = NativeInputDeviceInfo(
-        NullablePointer(returnsInputDevicePtr().toDart()));
-    expect(inputDevice.deviceId(), equals('InputDeviceInfo.device_id'));
-    inputDevice.free();
+    expect(fvN.ref.toDart(), null);
+    expect(fvI.ref.toDart(), 145);
+    expect(fvS.ref.toDart(), 'my string');
+    expect((fvH.ref.toDart() as TestObj).val, 333);
+    expect((fvR.ref.toDart() as Pointer).address, rustPtr1.address);
 
-    expect(returnsHandlePtr('asd').toDart(), equals('asd'));
-    expect(returnsHandlePtr(111).toDart(), equals(111));
-    expect(returnsHandlePtr(null).toDart(), equals(null));
+    fvN.free();
+    fvI.free();
+    fvS.free();
+    fvH.free();
+    fvR.free();
 
-    expect(returnsString().toDart(), equals('QWERTY'));
+    Pointer rustPtr2 = returnsInputDevicePtr().toDart();
 
-    expect(returnsInt().toDart(), equals(333));
+    var fvN2 = ForeignValue.fromDart(null);
+    var fvI2 = ForeignValue.fromDart(555);
+    var fvS2 = ForeignValue.fromDart('my string');
+    var fvH2 = ForeignValue.fromDart(TestObj(666));
+    var fvR2 = ForeignValue.fromDart(NullablePointer(rustPtr2));
+
+    expect(fvN2.ref.toDart(), null);
+    expect(fvI2.ref.toDart(), 555);
+    expect(fvS2.ref.toDart(), 'my string');
+    expect((fvH2.ref.toDart() as TestObj).val, 666);
+    expect((fvR2.ref.toDart() as Pointer).address, rustPtr2.address);
+
+    fvN2.free();
+    fvI2.free();
+    fvS2.free();
+    fvH2.free();
+    fvR2.free();
+  });
+
+  testWidgets('ForeignValue Dart => Rust', (WidgetTester tester) async {
+    final acceptsNone = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_none');
+    final acceptsPtr = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_input_device_info_pointer');
+    final acceptsString = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_string');
+    final acceptsInt = dl.lookupFunction<Void Function(ForeignValue),
+        void Function(ForeignValue)>('accepts_int');
+
+    var none = ForeignValue.none();
+    var ptr =
+        ForeignValue.fromPtr(NullablePointer(returnsInputDevicePtr().toDart()));
+    var str = ForeignValue.fromString('my string');
+    var num = ForeignValue.fromInt(235);
+
+    acceptsNone(none.ref);
+    acceptsPtr(ptr.ref);
+    acceptsString(str.ref);
+    acceptsInt(num.ref);
+
+    none.free();
+    ptr.free();
+    str.free();
+    num.free();
   });
 
   testWidgets('ForeignValue Dart => Rust', (WidgetTester tester) async {
@@ -521,4 +561,111 @@ void main() {
     expect(err.invalidValue, equals(123));
     expect(err.name, 'kind');
   });
+
+  testWidgets('Primitive arguments Callback validation',
+      (WidgetTester widgetTester) async {
+    final intListener = dl.lookupFunction<Handle Function(ForeignValue),
+        Object Function(ForeignValue)>('test_callback_listener_int');
+    final stringListener = dl.lookupFunction<Handle Function(ForeignValue),
+        Object Function(ForeignValue)>('test_callback_listener_string');
+    final optionalIntListener = dl.lookupFunction<Handle Function(ForeignValue),
+        Object Function(ForeignValue)>('test_callback_listener_optional_int');
+    final optionalStringListener = dl.lookupFunction<
+        Handle Function(ForeignValue),
+        Object Function(
+            ForeignValue)>('test_callback_listener_optional_string');
+
+    var intVal = ForeignValue.fromInt(45);
+    var stringVal = ForeignValue.fromString('test string');
+    var noneVal = ForeignValue.none();
+
+    (intListener(intVal.ref) as Function)(45);
+    (stringListener(stringVal.ref) as Function)('test string');
+    (optionalIntListener(intVal.ref) as Function)(45);
+    (optionalIntListener(noneVal.ref) as Function)(null);
+    (optionalStringListener(stringVal.ref) as Function)('test string');
+    (optionalStringListener(noneVal.ref) as Function)(null);
+
+    intVal.free();
+    stringVal.free();
+    noneVal.free();
+  });
+
+  testWidgets('DartHandle argument Callback validation',
+      (WidgetTester widgetTester) async {
+    dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+            'register__test__test_callback_handle_function')(
+        Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
+    final dartHandleListener =
+        dl.lookupFunction<Handle Function(), Object Function()>(
+            'test_callback_listener_dart_handle');
+
+    var obj = TestObj(0);
+
+    (dartHandleListener() as Function)(obj);
+    expect(obj.val, equals(45));
+  });
+
+  testWidgets('FutureResolver primitives', (WidgetTester widgetTester) async {
+    final intResolver =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__future_from_dart__int');
+    final stringResolver =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__future_from_dart__string');
+
+    var intVal = await (intResolver(
+        () => Future.delayed(Duration(milliseconds: 500), () async {
+              return 45;
+            })) as Future);
+    var stringVal = await (stringResolver(
+        () => Future.delayed(Duration(milliseconds: 500), () async {
+              return 'test string';
+            })) as Future);
+
+    expect(intVal as int, equals(45));
+    expect(stringVal as String, 'test string');
+  });
+
+  testWidgets('DartHandle argument Future validation',
+      (WidgetTester widgetTester) async {
+    dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+            'register__test__future_from_dart_handle_fn')(
+        Pointer.fromFunction<Void Function(Handle)>(testObjMutator));
+
+    final handleResolver =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__future_from_dart__handle');
+
+    var testObj = TestObj(0);
+    var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
+          return testObj;
+        });
+    await (handleResolver(fut) as Future);
+    expect(testObj.val, equals(45));
+  });
+
+  testWidgets('FutureResolver catches exceptions',
+      (WidgetTester widgetTester) async {
+    final futureCatchesException =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'test__future_from_dart__fails');
+
+    var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
+          throw Exception('Test Exception');
+        });
+    var res = await (futureCatchesException(fut) as Future);
+    expect(res as int, equals(1));
+  });
+}
+
+class TestObj {
+  TestObj(this.val);
+
+  int val;
+}
+
+void testObjMutator(Object o) {
+  o as TestObj;
+  o.val = 45;
 }

@@ -16,7 +16,7 @@ pub use self::{
     arrays::PtrArray,
     err::{ArgumentError, DartError},
     result::DartResult,
-    string::{c_str_into_string, string_into_c_str},
+    string::{c_str_into_string, free_dart_native_string, string_into_c_str},
 };
 
 /// Rust representation of a Dart [`Future`].
