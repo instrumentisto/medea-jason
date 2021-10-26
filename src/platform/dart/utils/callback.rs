@@ -1,5 +1,5 @@
-//! Functionality for converting Rust closures into callbacks that can be
-//! passed to Dart and called by Dart.
+//! Functionality for converting Rust closures into callbacks that can be passed
+//! to Dart and called by Dart.
 
 use std::{convert::TryInto, fmt::Debug, ptr};
 
@@ -50,12 +50,12 @@ pub unsafe extern "C" fn Callback__call_two_arg(
     }
 }
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback that will proxy calls to the Rust callback.
+/// Pointer to an extern function returning a [`Dart_Handle`] to a newly created
+/// Dart callback that will proxy calls to the associated Rust callback.
 type CallbackCallProxyFunction =
     extern "C" fn(ptr::NonNull<Callback>) -> Dart_Handle;
 
-/// Stores pointer to the [`CallbackCallProxyFunction`] extern function.
+/// Stores pointer to a [`CallbackCallProxyFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut CALLBACK_CALL_PROXY_FUNCTION: Option<CallbackCallProxyFunction> =
@@ -79,7 +79,7 @@ pub unsafe extern "C" fn register_Callback__call_proxy(
 ///
 /// # Safety
 ///
-/// Provided [`Callback`] should pe a valid [Callback] pointer.
+/// Provided [`Callback`] should be a valid [`Callback`] pointer.
 #[no_mangle]
 pub unsafe extern "C" fn Callback__call(
     mut cb: ptr::NonNull<Callback>,
@@ -105,14 +105,7 @@ pub unsafe extern "C" fn Callback__call(
     }
 }
 
-// TODO: Fix in #10:
-//       1. Requires additional parametrization or(and) wrapping.
-//       2. FnOnce semantics should be reflected on Dart side somehow.
-//       3. Kind::FnMut && Kind::Fn arent dropped anywhere right now.
-/// Rust closure that can be called by Dart.
-pub struct Callback(Kind);
-
-/// Underlying [`Callback`] function to be called.
+/// Possible kinds of an underlying [`Callback`] function to be called.
 enum Kind {
     FnOnce(Box<dyn FnOnce(DartValue)>),
     FnMut(Box<dyn FnMut(DartValue)>),
@@ -120,9 +113,17 @@ enum Kind {
     TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
 }
 
+// TODO: Fix in #10:
+//       1. Requires additional parametrization or(and) wrapping.
+//       2. FnOnce semantics should be reflected on Dart side somehow.
+//       3. Kind::FnMut && Kind::Fn arent dropped anywhere right now.
+/// Rust closure that can be called by Dart.
+#[must_use]
+pub struct Callback(Kind);
+
 impl Callback {
-    /// Returns [`Callback`] that wraps the provided [`FnOnce`] and can be
-    /// converted to [`Dart_Handle`] and passed to Dart.
+    /// Returns a [`Callback`] wrapping the provided [`FnOnce`], that can be
+    /// converted to a [`Dart_Handle`] and passed to Dart.
     #[allow(clippy::new_ret_no_self)]
     pub fn from_once<F, T>(f: F) -> Self
     where
@@ -137,8 +138,8 @@ impl Callback {
         })))
     }
 
-    /// Returns [`Callback`] that wraps the provided [`FnMut`] and can be
-    /// converted to [`Dart_Handle`] and passed to Dart.
+    /// Returns a [`Callback`] wrapping the provided [`FnMut`], that can be
+    /// converted to a [`Dart_Handle`] and passed to Dart.
     pub fn from_fn_mut<F, T>(mut f: F) -> Self
     where
         F: FnMut(T) + 'static,
@@ -152,8 +153,8 @@ impl Callback {
         })))
     }
 
-    /// Returns [`Callback`] that wraps the provided [`FnOnce`] and can be
-    /// converted to [`Dart_Handle`] and passed to Dart.
+    /// Returns a [`Callback`] wrapping the provided [`Fn`], that can be
+    /// converted to a [`Dart_Handle`] and passed to Dart.
     pub fn from_fn<F, T>(f: F) -> Self
     where
         F: Fn(T) + 'static,
@@ -167,8 +168,7 @@ impl Callback {
         })))
     }
 
-    /// Returns [`Callback`] that wraps the provided [`FnMut`] with two
-    /// arguments and can be converted to [`Dart_Handle`] and passed to Dart.
+    /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two arguments, that can be converted to a [`Dart_Handle`] and passed to Dart.
     pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
     where
         F: FnMut(T, S) + 'static,
@@ -188,8 +188,8 @@ impl Callback {
         )))
     }
 
-    /// Converts this [`Callback`] to [`Dart_Handle`] so it can be passed to
-    /// Dart.
+    /// Converts this [`Callback`] into a [`Dart_Handle`], so it can be passed
+    /// to Dart.
     ///
     /// [`Callback`] object is leaked and should be freed manually.
     #[must_use]

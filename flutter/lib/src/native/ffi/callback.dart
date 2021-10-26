@@ -31,7 +31,7 @@ void _callFn(void Function(dynamic) fn, ForeignValue value) {
   }
 }
 
-/// Returns closure that calls the provided Rust function pointer [cb].
+/// Returns a closure calling the provided Rust function [Pointer].
 Object callback(Pointer cb) {
   return (val) {
     var arg = ForeignValue.fromDart(val);

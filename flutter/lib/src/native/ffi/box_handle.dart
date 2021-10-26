@@ -18,7 +18,7 @@ Object unboxDartHandle(Pointer<Handle> ptr) {
   return _unboxDartHandle(ptr);
 }
 
-/// Converts a [Object] to an [`Pointer<Handle>`] using a Rust trampoline.
+/// Converts an [Object] into a [`Pointer<Handle>`] using a Rust trampoline.
 Pointer<Handle> boxDartHandle(Object ptr) {
   return _boxDartHandle(ptr);
 }

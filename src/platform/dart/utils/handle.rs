@@ -1,5 +1,5 @@
-//! Definition and implementation of the wrapper around [`Dart_Handle`] which
-//! manages lifetimes of the [`Dart_PersistentHandle`].
+//! Wrapper around [`Dart_Handle`] managing lifetimes of a
+//! [`Dart_PersistentHandle`].
 
 use std::{fmt, os::raw::c_char, ptr, rc::Rc};
 
@@ -14,10 +14,11 @@ use crate::{
     },
 };
 
-/// Pointer to an extern function that returns string representation
+/// Pointer to an extern function returning a string representation of a Dart
+/// type behind the provided [`Dart_Handle`].
 type RuntimeTypeFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 
-/// Pointer to an extern function that returns message of the provided Dart
+/// Pointer to an extern function returning a message of the provided Dart
 /// error.
 type ToStringFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 
@@ -53,16 +54,17 @@ pub unsafe extern "C" fn register_Object__toString(f: ToStringFunction) {
     TO_STRING_FUNCTION = Some(f);
 }
 
-/// Reference-counting based [`Dart_Handle`] wrapper that takes care of its
+/// Reference-counting based [`Dart_Handle`] wrapper taking care of its
 /// lifetime management.
 #[derive(Clone, Debug, PartialEq)]
 pub struct DartHandle(Rc<Dart_PersistentHandle>);
 
 impl DartHandle {
-    /// Wraps provided [`Dart_Handle`] into this [`DartHandle`].
+    /// Wraps the provided [`Dart_Handle`].
     ///
-    /// Takes ownership of a provided [`Dart_Handle`] so it wont get freed by
+    /// Takes ownership of the provided [`Dart_Handle`] so it won't get freed by
     /// Dart VM.
+    #[must_use]
     pub fn new(handle: Dart_Handle) -> Self {
         Self(Rc::new(unsafe {
             Dart_NewPersistentHandle_DL_Trampolined(handle)
@@ -77,7 +79,8 @@ impl DartHandle {
         unsafe { Dart_HandleFromPersistent_DL_Trampolined(*self.0) }
     }
 
-    /// Returns runtime Dart type of this [`DartHandle`].
+    /// Returns string representation of a runtime Dart type behind this
+    /// [`DartHandle`].
     #[must_use]
     pub fn name(&self) -> String {
         unsafe {
@@ -91,7 +94,7 @@ impl DartHandle {
 }
 
 impl fmt::Display for DartHandle {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         unsafe {
             let raw = TO_STRING_FUNCTION.unwrap()(self.get());
             let to_string = c_str_into_string(raw);
@@ -109,11 +112,10 @@ impl From<Dart_Handle> for DartHandle {
 }
 
 impl Drop for DartHandle {
-    #[inline]
     fn drop(&mut self) {
-        if Rc::strong_count(&self.0) == 1 {
+        if let Some(handle) = Rc::get_mut(&mut self.0) {
             unsafe {
-                Dart_DeletePersistentHandle_DL_Trampolined(*self.0);
+                Dart_DeletePersistentHandle_DL_Trampolined(*handle);
             }
         }
     }

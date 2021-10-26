@@ -81,7 +81,7 @@ pub trait ForeignClass: Sized {
 }
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 #[repr(u8)]
 pub enum DartValue {
     /// No value. It can mean `()`, `void` or [`Option::None`] basing on the

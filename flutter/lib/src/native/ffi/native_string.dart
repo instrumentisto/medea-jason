@@ -23,7 +23,7 @@ extension RustStringPointer on Pointer<Utf8> {
   }
 }
 
-/// Registers functions required for Dart allocated strings support in Rust.
+/// Registers functions required for supporting Dart allocated strings in Rust.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_free_dart_native_string')(

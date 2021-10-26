@@ -2,7 +2,7 @@ import 'package:ffi/ffi.dart';
 
 import 'dart:ffi';
 
-/// Registers [Object] related functions in Rust.
+/// Registers [Object]-related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Object__runtimeType__toString')(
