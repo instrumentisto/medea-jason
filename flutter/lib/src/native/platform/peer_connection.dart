@@ -85,10 +85,8 @@ Object addTransceiver(RTCPeerConnection peer, int kind, int direction) {
 
 /// Returns newly created [RTCPeerConnection] with a provided `iceServers` [List].
 Object newPeer(Object iceServers) {
-  return createPeerConnection({
-    'iceServers': iceServers,
-    'sdpSemantics': 'unified-plan'
-  });
+  return createPeerConnection(
+      {'iceServers': iceServers, 'sdpSemantics': 'unified-plan'});
 }
 
 /// Adds subscription on [RTCPeerConnection.onTrack] to the provided [RTCPeerConnection].

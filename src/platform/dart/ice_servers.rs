@@ -62,6 +62,7 @@ pub struct RtcIceServers(DartHandle);
 
 impl RtcIceServers {
     /// Returns [`Dart_Handle`] of this [`RtcIceServers`].
+    #[must_use]
     pub fn get_handle(&self) -> Dart_Handle {
         self.0.get()
     }

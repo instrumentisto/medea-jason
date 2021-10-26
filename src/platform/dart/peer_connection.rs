@@ -12,7 +12,7 @@ use crate::{
     media::MediaKind,
     platform::{
         dart::{
-            ice_server::RtcIceServers,
+            ice_servers::RtcIceServers,
             transceiver::Transceiver,
             utils::{
                 callback::Callback, dart_future::FutureFromDart,

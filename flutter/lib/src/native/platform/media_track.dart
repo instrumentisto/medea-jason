@@ -12,7 +12,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(deviceId));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__facing_mode')(
-      Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(facingMode));
+      Pointer.fromFunction<Int32 Function(Handle)>(facingMode, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__kind')(
       Pointer.fromFunction<Int32 Function(Handle)>(kind, 0));
@@ -52,9 +52,9 @@ int kind(MediaStreamTrack track) {
 
 /// Subscribes on the [MediaStreamTrack.onEnded] of the provided [MediaStreamTrack].
 void onEnded(MediaStreamTrack track, Function f) {
-    track.onEnded = () {
-      f();
-    };
+  track.onEnded = () {
+    f();
+  };
 }
 
 /// Returns device ID of the provided [MediaStreamTrack].
@@ -64,9 +64,9 @@ Pointer<Utf8> deviceId(MediaStreamTrack track) {
 }
 
 /// Returns facingMode of the provided [MediaStreamTrack].
-Pointer<Utf8> facingMode(MediaStreamTrack track) {
+int facingMode(MediaStreamTrack track) {
   // TODO: remove this dummy implementation when flutter_webrtc will be reworked
-  return 'user'.toNativeUtf8();
+  return 0;
 }
 
 /// Returns height of the video of the provided [MediaStreamTrack].
