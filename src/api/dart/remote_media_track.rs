@@ -16,6 +16,13 @@ pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
 
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__get_track(
+    this: ptr::NonNull<RemoteMediaTrack>,
+) -> Dart_Handle {
+    this.as_ref().get_track().get_handle()
+}
+
 /// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__on_enabled(

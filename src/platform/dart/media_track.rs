@@ -24,20 +24,22 @@ type IdFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 /// Pointer to an extern function that returns device ID of the provided
 /// [`MediaStreamTrack`].
 type DeviceIdFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
 /// Pointer to an extern function that returns facing mode of the provided
 /// [`MediaStreamTrack`].
 type FacingModeFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i32>>;
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<i32>>>;
 
 /// Pointer to an extern function that returns height of the provided
 /// [`MediaStreamTrack`].
-type HeightFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
+type HeightFunction =
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<u32>>>;
 
 /// Pointer to an extern function that returns width of the provided
 /// [`MediaStreamTrack`].
-type WidthFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
+type WidthFunction =
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<u32>>>;
 
 /// Pointer to an extern function that sets `enabled` field of the provided
 /// [`MediaStreamTrack`] to the provided [`bool`].
@@ -289,9 +291,11 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) }
-            .try_into()
-            .unwrap()
+        unsafe {
+            *Box::from_raw(DEVICE_ID_FUNCTION.unwrap()(self.0.get()).as_ptr())
+        }
+        .try_into()
+        .unwrap()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].
@@ -301,7 +305,7 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         Option::<i32>::try_from(unsafe {
-            FACING_MODE_FUNCTION.unwrap()(self.0.get())
+            *Box::from_raw(FACING_MODE_FUNCTION.unwrap()(self.0.get()).as_ptr())
         })
         .unwrap()
         .map(FacingMode::from)
@@ -313,8 +317,10 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        Option::try_from(unsafe { HEIGHT_FUNCTION.unwrap()(self.0.get()) })
-            .unwrap()
+        Option::try_from(unsafe {
+            *Box::from_raw(HEIGHT_FUNCTION.unwrap()(self.0.get()).as_ptr())
+        })
+        .unwrap()
     }
 
     /// Return a [`width`][1] of the underlying [MediaStreamTrack][2].
@@ -323,8 +329,10 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        Option::try_from(unsafe { WIDTH_FUNCTION.unwrap()(self.0.get()) })
-            .unwrap()
+        Option::try_from(unsafe {
+            *Box::from_raw(WIDTH_FUNCTION.unwrap()(self.0.get()).as_ptr())
+        })
+        .unwrap()
     }
 
     /// Changes an [`enabled`][1] attribute in the underlying
@@ -372,6 +380,12 @@ impl MediaStreamTrack {
         // TODO (evdokimovs): add real implementation when flutter_webrtc will
         // be reworked
         false
+    }
+
+    /// Returns underlying [`Dart_Handle`] of this [`MediaStreamTrack`].
+    #[must_use]
+    pub fn get_handle(&self) -> Dart_Handle {
+        self.0.get()
     }
 
     /// Forks this [`MediaStreamTrack`].

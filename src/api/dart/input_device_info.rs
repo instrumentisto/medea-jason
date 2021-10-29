@@ -67,7 +67,7 @@ pub unsafe extern "C" fn InputDeviceInfo__group_id(
 pub unsafe extern "C" fn InputDeviceInfo__free(
     this: ptr::NonNull<InputDeviceInfo>,
 ) {
-    let _ = InputDeviceInfo::from_ptr(this);
+    drop(InputDeviceInfo::from_ptr(this));
 }
 
 #[cfg(feature = "mockable")]

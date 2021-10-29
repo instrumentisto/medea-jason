@@ -31,7 +31,13 @@ use libc::c_char;
 use crate::{
     api::dart::utils::{DartError, PtrArray},
     media::MediaSourceKind,
-    platform::utils::handle::DartHandle,
+    platform::utils::{
+        dart_api::{
+            Dart_DeletePersistentHandle_DL_Trampolined,
+            Dart_NewPersistentHandle_DL_Trampolined,
+        },
+        handle::DartHandle,
+    },
     utils::PrimitiveEnum,
 };
 
@@ -325,7 +331,7 @@ impl TryFrom<DartValueArg<Option<DartHandle>>> for Option<DartHandle> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(handle) => {
-                Ok(Some(DartHandle::new(unsafe { *handle.as_ptr() })))
+                Ok(Some(DartHandle::new(unsafe { unbox_dart_handle(handle) })))
             }
             _ => Err(DartValueCastError {
                 expectation: "Option<DartHandle>",
@@ -583,7 +589,15 @@ pub unsafe extern "C" fn box_foreign_value(
 pub unsafe extern "C" fn unbox_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) -> Dart_Handle {
-    *Box::from_raw(val.as_ptr())
+    *val.as_ptr()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free_boxed_dart_handle(
+    val: ptr::NonNull<Dart_Handle>,
+) {
+    let handle = Box::from_raw(val.as_ptr());
+    Dart_DeletePersistentHandle_DL_Trampolined(*handle);
 }
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
@@ -592,6 +606,7 @@ pub unsafe extern "C" fn unbox_dart_handle(
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
+    let val = Dart_NewPersistentHandle_DL_Trampolined(val);
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 

@@ -1,6 +1,9 @@
 //! Entity for the ICE candidate from the `RTCPeerConnection`'s SDP offer.
 
-use std::convert::{TryFrom, TryInto};
+use std::{
+    convert::{TryFrom, TryInto},
+    ptr,
+};
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
@@ -18,17 +21,17 @@ type NewFunction = extern "C" fn(
 /// Pointer to an extern function that returns candidate of the provided
 /// [`IceCandidate`].
 type CandidateFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
 /// Pointer to an extern function that returns SDP line index of the provided
 /// [`IceCandidate`].
 type SdpMLineIndexFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<u16>>;
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<u16>>>;
 
 /// Pointer to an extern function that returns SDP MID of the provided
 /// [`IceCandidate`].
 type SdpMidFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
 /// Stores pointer to the [`NewFunction`] extern function.
 ///
@@ -128,9 +131,11 @@ impl IceCandidate {
     #[must_use]
     pub fn candidate(&self) -> String {
         unsafe {
-            Option::try_from(CANDIDATE_FUNCTION.unwrap()(self.0.get()))
-                .unwrap()
-                .unwrap()
+            Option::try_from(*Box::from_raw(
+                CANDIDATE_FUNCTION.unwrap()(self.0.get()).as_ptr(),
+            ))
+            .unwrap()
+            .unwrap()
         }
     }
 
@@ -138,15 +143,21 @@ impl IceCandidate {
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         unsafe {
-            SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get())
-                .try_into()
-                .unwrap()
+            (*Box::from_raw(
+                SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get()).as_ptr(),
+            ))
+            .try_into()
+            .unwrap()
         }
     }
 
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        unsafe { SDP_MID_FUNCTION.unwrap()(self.0.get()).try_into().unwrap() }
+        unsafe {
+            (*Box::from_raw(SDP_MID_FUNCTION.unwrap()(self.0.get()).as_ptr()))
+                .try_into()
+                .unwrap()
+        }
     }
 }

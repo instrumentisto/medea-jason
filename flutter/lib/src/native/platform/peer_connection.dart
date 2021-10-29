@@ -77,7 +77,7 @@ void registerFunctions(DynamicLibrary dl) {
 ///
 /// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
 Object addTransceiver(RTCPeerConnection peer, int kind, int direction) {
-  return peer.addTransceiver(
+  return () => peer.addTransceiver(
     kind: RTCRtpMediaType.values[kind],
     init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
   );
@@ -85,8 +85,7 @@ Object addTransceiver(RTCPeerConnection peer, int kind, int direction) {
 
 /// Returns newly created [RTCPeerConnection] with a provided `iceServers` [List].
 Object newPeer(Object iceServers) {
-  return createPeerConnection(
-      {'iceServers': iceServers, 'sdpSemantics': 'unified-plan'});
+  return () => createPeerConnection({ 'iceServers': iceServers, 'sdpSemantics': 'unified-plan' });
 }
 
 /// Adds subscription on [RTCPeerConnection.onTrack] to the provided [RTCPeerConnection].
@@ -119,7 +118,7 @@ void onConnectionStateChange(RTCPeerConnection conn, Function f) {
 
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the provided [String].
 Object getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
-  return peer.getTransceivers().then((transceivers) {
+  return () => peer.getTransceivers().then((transceivers) {
     var mMid = mid.toDartString();
     for (var transceiver in transceivers) {
       if (transceiver.mid == mMid) {
@@ -133,24 +132,24 @@ Object getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
 Object setRemoteDescription(
     RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var desc = RTCSessionDescription(sdp.toDartString(), type.toDartString());
-  return conn.setRemoteDescription(desc);
+  return () => conn.setRemoteDescription(desc);
 }
 
 /// Sets local SDP offer in the provided [RTCPeerConnection].
 Object setLocalDescription(
     RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  return conn.setLocalDescription(
+  return () => conn.setLocalDescription(
       RTCSessionDescription(sdp.toDartString(), type.toDartString()));
 }
 
 /// Creates new SDP offer for the provided [RTCPeerConnection].
 Object createOffer(RTCPeerConnection conn) {
-  return conn.createOffer({}).then((val) => val.sdp);
+  return () => conn.createOffer({}).then((val) => val.sdp);
 }
 
 /// Creates new SDP answer for the provided [RTCPeerConnection].
 Object createAnswer(RTCPeerConnection conn) {
-  return conn.createAnswer({}).then((val) => val.sdp);
+  return () => conn.createAnswer({}).then((val) => val.sdp);
 }
 
 /// Restarts ICE on the provided [RTCPeerConnection].
@@ -160,7 +159,7 @@ void restartIce(RTCPeerConnection conn) {
 
 /// Adds provided [RTCIceCandidate] to the provided [RTCPeerConnection].
 Object addIceCandidate(RTCPeerConnection conn, RTCIceCandidate candidate) {
-  return conn.addCandidate(candidate);
+  return () => conn.addCandidate(candidate);
 }
 
 /// Returns current [RTCPeerConnection.connectionState] of the provided [RTCPeerConnection].
@@ -183,10 +182,10 @@ ForeignValue iceConnectionState(RTCPeerConnection conn) {
 
 /// Rollbacks local SDP offer of the provided [RTCPeerConnection].
 Object rollback(RTCPeerConnection conn) {
-  return conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
+  return () => conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 /// Returns all [RTCRtpTransceiver]s of this [RTCPeerConnection].
 Object getTransceivers(RTCPeerConnection conn) {
-  return conn.getTransceivers();
+  return () => conn.getTransceivers();
 }

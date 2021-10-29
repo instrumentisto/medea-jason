@@ -9,6 +9,11 @@ typedef _callbackCall_Dart = void Function(Pointer, ForeignValue);
 final _callbackCall =
     dl.lookupFunction<_callbackCall_C, _callbackCall_Dart>('Callback__call');
 
+typedef _callbackTwoArgCall_C = Void Function(Pointer, ForeignValue, ForeignValue);
+typedef _callbackTwoArgCall_Dart = void Function(Pointer, ForeignValue, ForeignValue);
+
+final _callbackTwoArgCall = dl.lookupFunction<_callbackTwoArgCall_C, _callbackTwoArgCall_Dart>('Callback__call_two_arg');
+
 /// Registers the closure callers functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
@@ -18,6 +23,10 @@ void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Callback__call_proxy')(
       Pointer.fromFunction<Handle Function(Pointer)>(callback));
+
+  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+      'register_Callback__call_two_arg_proxy')(
+      Pointer.fromFunction<Handle Function(Pointer)>(callbackTwoArg));
 }
 
 /// Function used by Rust to call closures with a single [ForeignValue]
@@ -37,5 +46,16 @@ Object callback(Pointer cb) {
     var arg = ForeignValue.fromDart(val);
     _callbackCall(cb, arg.ref);
     arg.free();
+  };
+}
+
+/// Returns a closure calling the provided Rust function [Pointer].
+Object callbackTwoArg(Pointer cb) {
+  return (first, second) {
+    var firstArg = ForeignValue.fromDart(first);
+    var secondArg = ForeignValue.fromDart(second);
+    _callbackTwoArgCall(cb, firstArg.ref, secondArg.ref);
+    firstArg.free();
+    secondArg.free();
   };
 }

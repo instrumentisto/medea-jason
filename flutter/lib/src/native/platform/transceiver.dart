@@ -36,18 +36,18 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the provided one.
 Object setDirection(RTCRtpTransceiver transceiver, int direction) {
-  return transceiver.setDirection(TransceiverDirection.values[direction]);
+  return () => transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
 /// Returns current [TransceiverDirection] of the provided [RTCRtpTransceiver].
 Object getCurrentDirection(RTCRtpTransceiver transceiver) {
-  return transceiver.getCurrentDirection().then((d) => d?.index);
+  return () => transceiver.getCurrentDirection().then((d) => d.index);
 }
 
 /// Returns current mID of the provided [RTCRtpTransceiver].
 Pointer mid(RTCRtpTransceiver transceiver) {
-  if (transceiver.mid.isNotEmpty) {
-    return ForeignValue.fromString(transceiver.mid).intoBoxed();
+  if (transceiver.mid != null) {
+    return ForeignValue.fromString(transceiver.mid!).intoBoxed();
   } else {
     return ForeignValue.none().intoBoxed();
   }
@@ -72,10 +72,10 @@ int hasSendTrack(RTCRtpTransceiver transceiver) {
 }
 
 /// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided [RTCRtpTransceiver] with a provided [MediaStreamTrack].
-Object replaceSendTrack(
-    RTCRtpTransceiver transceiver, MediaStreamTrack track) async {
-  await transceiver.sender.setTrack(track);
-  return ForeignValue.none().ref;
+Object replaceSendTrack(RTCRtpTransceiver transceiver, MediaStreamTrack track) {
+  return () async {
+    await transceiver.sender.setTrack(track);
+  };
 }
 
 /// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
