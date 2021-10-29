@@ -62,9 +62,12 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
-    use crate::media::{
-        track::local::LocalMediaTrack as CoreLocalMediaTrack, MediaKind,
-        MediaSourceKind,
+    use crate::{
+        media::{
+            track::local::LocalMediaTrack as CoreLocalMediaTrack, MediaKind,
+            MediaSourceKind,
+        },
+        platform::MediaStreamTrack,
     };
 
     pub struct LocalMediaTrack(pub u8);
@@ -84,6 +87,8 @@ mod mock {
             MediaSourceKind::Display
         }
 
-        // pub fn get_track(&self) -> sys::MediaStreamTrack
+        pub fn get_track(&self) -> MediaStreamTrack {
+            unreachable!()
+        }
     }
 }
