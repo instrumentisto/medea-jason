@@ -67,7 +67,7 @@ mod mock {
             track::local::LocalMediaTrack as CoreLocalMediaTrack, MediaKind,
             MediaSourceKind,
         },
-        platform::MediaStreamTrack,
+        platform,
     };
 
     pub struct LocalMediaTrack(pub u8);
@@ -87,7 +87,7 @@ mod mock {
             MediaSourceKind::Display
         }
 
-        pub fn get_track(&self) -> MediaStreamTrack {
+        pub fn get_track(&self) -> platform::MediaStreamTrack {
             unreachable!()
         }
     }

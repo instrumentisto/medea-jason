@@ -148,8 +148,6 @@ mod mock {
             false
         }
 
-        // pub fn get_track(&self) -> sys::MediaStreamTrack
-
         pub fn on_enabled(&self, cb: platform::Function<()>) {
             cb.call0();
         }
@@ -168,6 +166,10 @@ mod mock {
 
         pub fn on_stopped(&self, cb: platform::Function<()>) {
             cb.call0();
+        }
+
+        pub fn get_track(&self) -> platform::MediaStreamTrack {
+            unreachable!()
         }
     }
 }
