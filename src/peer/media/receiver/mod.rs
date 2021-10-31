@@ -211,21 +211,14 @@ impl Receiver {
             self.muted.get(),
         );
 
-        {
-            let transceiver = transceiver.clone();
-            if self.enabled_individual.get() {
-                platform::spawn(async move {
-                    transceiver
-                        .add_direction(platform::TransceiverDirection::RECV)
-                        .await;
-                });
-            } else {
-                platform::spawn(async move {
-                    transceiver
-                        .sub_direction(platform::TransceiverDirection::RECV)
-                        .await;
-                });
-            }
+        if self.enabled_individual.get() {
+            transceiver
+                .add_direction(platform::TransceiverDirection::RECV)
+                .await;
+        } else {
+            transceiver
+                .sub_direction(platform::TransceiverDirection::RECV)
+                .await;
         }
 
         self.transceiver.replace(Some(transceiver));
