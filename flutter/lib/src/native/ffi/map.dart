@@ -8,7 +8,8 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Handle Function()>(construct));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_DartMap__set')(
-      Pointer.fromFunction<Void Function(Handle, Pointer<Utf8>, ForeignValue)>(set));
+      Pointer.fromFunction<Void Function(Handle, Pointer<Utf8>, ForeignValue)>(
+          set));
 }
 
 Object construct() {
@@ -20,5 +21,5 @@ void set(Map map, Pointer<Utf8> key, ForeignValue value) {
 }
 
 void remove(Map map, Pointer<Utf8> key) {
-    map.remove(key.toDartString());
+  map.remove(key.toDartString());
 }

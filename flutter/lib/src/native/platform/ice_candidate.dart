@@ -5,9 +5,10 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_IceCandidate__new')(Pointer.fromFunction<
-          Handle Function(ForeignValue, ForeignValue, ForeignValue)>(
-      newRtcIceCandidate));
+          'register_IceCandidate__new')(
+      Pointer.fromFunction<
+          Handle Function(
+              ForeignValue, ForeignValue, ForeignValue)>(newRtcIceCandidate));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_IceCandidate__candidate')(
       Pointer.fromFunction<Pointer Function(Handle)>(candidate));
@@ -43,7 +44,8 @@ Pointer sdpMid(RTCIceCandidate iceCandidate) {
   }
 }
 
-Object newRtcIceCandidate(ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
+Object newRtcIceCandidate(
+    ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();
   var sdpMLineIndexArg = sdpMlineIndex.toDart();

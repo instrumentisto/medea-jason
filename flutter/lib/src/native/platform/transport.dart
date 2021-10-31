@@ -6,15 +6,15 @@ import '../jason.dart';
 
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_WebSocketRpcTransport__new')(
+          'register_WebSocketRpcTransport__new')(
       Pointer.fromFunction<Handle Function(Pointer<Utf8>)>(newWs));
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_WebSocketRpcTransport__on_message')(
+          'register_WebSocketRpcTransport__on_message')(
       Pointer.fromFunction<Void Function(Handle, Handle)>(listenWs));
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_WebSocketRpcTransport__send')(
+          'register_WebSocketRpcTransport__send')(
       Pointer.fromFunction<Void Function(Handle, Pointer<Utf8>)>(sendWsMsg));
 
   // dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
@@ -27,8 +27,8 @@ Object newWs(Pointer<Utf8> addr) {
 }
 
 final _callMessageListenerDart _callMessageListener =
-dl.lookupFunction<_callMessageListenerC, _callMessageListenerDart>(
-    'StringCallback__call');
+    dl.lookupFunction<_callMessageListenerC, _callMessageListenerDart>(
+        'StringCallback__call');
 typedef _callMessageListenerC = Pointer<Utf8> Function(Pointer, Pointer<Utf8>);
 typedef _callMessageListenerDart = Pointer<Utf8> Function(
     Pointer, Pointer<Utf8>);

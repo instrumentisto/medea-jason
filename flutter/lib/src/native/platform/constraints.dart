@@ -3,13 +3,13 @@ import 'dart:ffi';
 
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_MediaStreamConstraints__new')(
+          'register_MediaStreamConstraints__new')(
       Pointer.fromFunction<Handle Function()>(constructor));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_MediaStreamConstraints__set_audio')(
+          'register_MediaStreamConstraints__set_audio')(
       Pointer.fromFunction<Void Function(Handle, Handle)>(setAudio));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_MediaStreamConstraints__set_video')(
+          'register_MediaStreamConstraints__set_video')(
       Pointer.fromFunction<Void Function(Handle, Handle)>(setVideo));
 }
 

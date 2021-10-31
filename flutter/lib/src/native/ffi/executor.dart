@@ -27,11 +27,11 @@ class Executor {
   /// accepts commands to poll Rust futures.
   Executor(DynamicLibrary dylib)
       : _loopInit = dylib
-      .lookup<NativeFunction<_executorInit_C>>('rust_executor_init')
-      .asFunction(),
+            .lookup<NativeFunction<_executorInit_C>>('rust_executor_init')
+            .asFunction(),
         _taskPoll = dylib
             .lookup<NativeFunction<_executorPollTask_C>>(
-            'rust_executor_poll_task')
+                'rust_executor_poll_task')
             .asFunction() {
     _wakePort = ReceivePort()..listen(_pollTask);
     _loopInit(_wakePort.sendPort.nativePort);

@@ -78,14 +78,15 @@ void registerFunctions(DynamicLibrary dl) {
 /// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
 Object addTransceiver(RTCPeerConnection peer, int kind, int direction) {
   return () => peer.addTransceiver(
-    kind: RTCRtpMediaType.values[kind],
-    init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
-  );
+        kind: RTCRtpMediaType.values[kind],
+        init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
+      );
 }
 
 /// Returns newly created [RTCPeerConnection] with a provided `iceServers` [List].
 Object newPeer(Object iceServers) {
-  return () => createPeerConnection({ 'iceServers': iceServers, 'sdpSemantics': 'unified-plan' });
+  return () => createPeerConnection(
+      {'iceServers': iceServers, 'sdpSemantics': 'unified-plan'});
 }
 
 /// Adds subscription on [RTCPeerConnection.onTrack] to the provided [RTCPeerConnection].
@@ -119,13 +120,13 @@ void onConnectionStateChange(RTCPeerConnection conn, Function f) {
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the provided [String].
 Object getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
-    var mMid = mid.toDartString();
-    for (var transceiver in transceivers) {
-      if (transceiver.mid == mMid) {
-        return transceiver;
-      }
-    }
-  });
+        var mMid = mid.toDartString();
+        for (var transceiver in transceivers) {
+          if (transceiver.mid == mMid) {
+            return transceiver;
+          }
+        }
+      });
 }
 
 /// Sets remote SDP offer in the provided [RTCPeerConnection].
@@ -182,7 +183,8 @@ ForeignValue iceConnectionState(RTCPeerConnection conn) {
 
 /// Rollbacks local SDP offer of the provided [RTCPeerConnection].
 Object rollback(RTCPeerConnection conn) {
-  return () => conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
+  return () =>
+      conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 /// Returns all [RTCRtpTransceiver]s of this [RTCPeerConnection].

@@ -15,14 +15,15 @@ final _unboxDartHandle =
     dl.lookupFunction<_unboxDartHandle_C, _unboxDartHandle_Dart>(
         'unbox_dart_handle');
 final _freeBoxedDartHandle =
-  dl.lookupFunction<_freeBoxedDartHandle_C, _freeBoxedDartHandle_Dart>(
-      'free_boxed_dart_handle');
+    dl.lookupFunction<_freeBoxedDartHandle_C, _freeBoxedDartHandle_Dart>(
+        'free_boxed_dart_handle');
 
 /// Converts a [`Pointer<Handle>`] to an [Object] using a Rust trampoline.
 Object unboxDartHandle(Pointer<Handle> ptr) {
   return _unboxDartHandle(ptr);
 }
 
+/// Frees provided [`Pointer<Handle`].
 void freeBoxedDartHandle(Pointer<Handle> ptr) {
   _freeBoxedDartHandle(ptr);
 }
