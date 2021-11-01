@@ -13,6 +13,7 @@ pub use crate::media::track::local::LocalMediaTrack;
 
 impl ForeignClass for LocalMediaTrack {}
 
+/// Returns underlying `MediaStreamTrack` [`Dart_Handle`].
 #[no_mangle]
 pub unsafe extern "C" fn LocalMediaTrack__get_track(
     this: ptr::NonNull<LocalMediaTrack>,

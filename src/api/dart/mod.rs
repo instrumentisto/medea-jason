@@ -592,6 +592,7 @@ pub unsafe extern "C" fn unbox_dart_handle(
     *val.as_ptr()
 }
 
+/// Frees provided [`ptr::NonNull`] pointer to the [`Dart_Handle`].
 #[no_mangle]
 pub unsafe extern "C" fn free_boxed_dart_handle(
     val: ptr::NonNull<Dart_Handle>,

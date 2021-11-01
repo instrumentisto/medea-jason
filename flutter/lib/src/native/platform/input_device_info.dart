@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+/// Registers functions allowing Rust to create Dart [MediaDeviceInfo]s.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_InputDeviceInfo__device_id')(
@@ -18,16 +19,17 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Pointer Function(Handle)>(kind));
 }
 
-// TODO: can be just String, because device_id is always Some.
+/// Returns `deviceId` field of the provided [MediaDeviceInfo].
 Pointer deviceId(MediaDeviceInfo deviceInfo) {
   return ForeignValue.fromString(deviceInfo.deviceId).intoBoxed();
 }
 
-// TODO: can be just String, because label is always Some.
+/// Returns `label` field of the provided [MediaDeviceInfo].
 Pointer label(MediaDeviceInfo deviceInfo) {
   return ForeignValue.fromString(deviceInfo.label).intoBoxed();
 }
 
+/// Returns `groupId` field of the provided [MediaDeviceInfo].
 Pointer groupId(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.groupId != null) {
     return ForeignValue.fromString(deviceInfo.groupId!).intoBoxed();
@@ -36,6 +38,7 @@ Pointer groupId(MediaDeviceInfo deviceInfo) {
   }
 }
 
+/// Returns `kind` field of the provided [MediaDeviceInfo].
 Pointer kind(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.kind != null) {
     return ForeignValue.fromString(deviceInfo.kind!).intoBoxed();

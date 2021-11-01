@@ -7,7 +7,8 @@ use std::{
 
 use dart_sys::Dart_Handle;
 use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
-use medea_client_api_proto::{ClientMsg, ServerMsg};
+use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
+use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
@@ -16,7 +17,7 @@ use crate::{
         dart::utils::{callback::Callback, handle::DartHandle},
         RpcTransport, TransportError, TransportState,
     },
-    rpc::{ApiUrl, ClientDisconnect},
+    rpc::{ApiUrl, ClientDisconnect, CloseMsg},
 };
 
 type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
@@ -27,7 +28,7 @@ type SendFunction = extern "C" fn(Dart_Handle, ptr::NonNull<c_char>);
 
 type CloseFunction = extern "C" fn(Dart_Handle, i32, ptr::NonNull<c_char>);
 
-type OnMessageFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+type ListenWsFunction = extern "C" fn(Dart_Handle, Dart_Handle, Dart_Handle);
 
 /// Stores pointer to the [`NewFunction`] extern function.
 ///
@@ -44,10 +45,10 @@ static mut SEND_FUNCTION: Option<SendFunction> = None;
 /// Must be initialized by Dart during FFI initialization phase.
 static mut CLOSE_FUNCTION: Option<CloseFunction> = None;
 
-/// Stores pointer to the [`OnMessageFunction`] extern function.
+/// Stores pointer to the [`ListenWsFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
-static mut ON_MESSAGE_FUNCTION: Option<OnMessageFunction> = None;
+static mut LISTEN_WS_FUNCTION: Option<ListenWsFunction> = None;
 
 /// Registers the provided [`NewFunction`] as [`NEW_FUNCTION`].
 ///
@@ -87,8 +88,10 @@ pub struct WebSocketRpcTransport {
     handle: DartHandle,
     on_message_listeners: OnMessageListeners,
     close_reason: Cell<ClientDisconnect>,
+    socket_state: Rc<ObservableCell<TransportState>>,
 }
 
+/// Notifies all [`OnMessageListeners`] about new received WS message.
 #[no_mangle]
 pub unsafe extern "C" fn WebSocketRpcTransport__on_message(
     listeners: *const OnMessageListeners,
@@ -148,7 +151,9 @@ impl WebSocketRpcTransport {
                 url.as_ref().to_string(),
             ));
             let on_message_listeners = OnMessageListeners::new();
-            ON_MESSAGE_FUNCTION.unwrap()(
+            let socket_state =
+                Rc::new(ObservableCell::new(TransportState::Open));
+            LISTEN_WS_FUNCTION.unwrap()(
                 handle,
                 Callback::from_fn_mut({
                     let on_message_listeners = on_message_listeners.clone();
@@ -157,10 +162,20 @@ impl WebSocketRpcTransport {
                     }
                 })
                 .into_dart(),
+                Callback::from_fn_mut({
+                    let socket_state = Rc::clone(&socket_state);
+                    move |msg: ()| {
+                        socket_state.set(TransportState::Closed(
+                            CloseMsg::Normal(1000, CloseReason::Finished),
+                        ));
+                    }
+                })
+                .into_dart(),
             );
             Ok(Self {
                 handle: DartHandle::new(handle),
                 on_message_listeners,
+                socket_state,
                 close_reason: Cell::new(
                     ClientDisconnect::RpcTransportUnexpectedlyDropped,
                 ),
@@ -169,11 +184,16 @@ impl WebSocketRpcTransport {
     }
 }
 
+/// Registers the provided [`ListenWsFunction`] as [`LISTEN_WS_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
-pub unsafe extern "C" fn register_WebSocketRpcTransport__on_message(
-    f: OnMessageFunction,
+pub unsafe extern "C" fn register_WebSocketRpcTransport__listen_ws(
+    f: ListenWsFunction,
 ) {
-    ON_MESSAGE_FUNCTION = Some(f);
+    LISTEN_WS_FUNCTION = Some(f);
 }
 
 impl RpcTransport for WebSocketRpcTransport {
@@ -194,7 +214,7 @@ impl RpcTransport for WebSocketRpcTransport {
     }
 
     fn on_state_change(&self) -> LocalBoxStream<'static, TransportState> {
-        Box::pin(futures::stream::once(async { TransportState::Open }))
+        self.socket_state.subscribe()
     }
 }
 
