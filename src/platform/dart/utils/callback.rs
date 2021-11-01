@@ -1,11 +1,14 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::ptr;
+use std::{mem, os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
 
-use crate::api::{DartValue, DartValueArg};
+use crate::{
+    api::{DartValue, DartValueArg},
+    platform::dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Trampolined,
+};
 
 /// Pointer to an extern function returning a [`Dart_Handle`] to a newly created
 /// Dart callback that will proxy calls to the associated Rust callback.
@@ -118,14 +121,33 @@ impl Callback {
     /// to Dart.
     ///
     /// [`Callback`] object is leaked and should be freed manually.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
+        let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
         unsafe {
-            CALLBACK_CALL_PROXY_FUNCTION.unwrap()(ptr::NonNull::from(
-                Box::leak(Box::new(self)),
-            ))
+            let f = ptr::NonNull::from(Box::leak(Box::new(self)));
+            let handle = CALLBACK_CALL_PROXY_FUNCTION.unwrap()(f);
+
+            if is_finalizable {
+                Dart_NewFinalizableHandle_DL_Trampolined(
+                    handle,
+                    f.as_ptr().cast::<c_void>(),
+                    mem::size_of::<*mut c_void>() as i32,
+                    callback_finalizer,
+                );
+            }
+
+            handle
         }
     }
+}
+
+/// Finalizer for the not [`Kind::FnOnce`] [`Callback`].
+///
+/// Cleans finalized [`Callback`] memory.
+extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
+    drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
 }
 
 #[cfg(feature = "mockable")]
@@ -143,7 +165,7 @@ pub mod tests {
         expects: DartValueArg<i64>,
     ) -> Dart_Handle {
         let expects: i64 = expects.try_into().unwrap();
-        Callback::from_once(move |i: DartValueArg<i64>| {
+        Callback::from_fn_mut(move |i: DartValueArg<i64>| {
             let val: i64 = i.try_into().unwrap();
             assert_eq!(val, expects);
         })
@@ -155,7 +177,7 @@ pub mod tests {
         expects: DartValueArg<String>,
     ) -> Dart_Handle {
         let expects: String = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<String>| {
+        Callback::from_fn_mut(move |val: DartValueArg<String>| {
             let val: String = val.try_into().unwrap();
             assert_eq!(val, expects);
         })
@@ -167,7 +189,7 @@ pub mod tests {
         expects: DartValueArg<Option<i64>>,
     ) -> Dart_Handle {
         let expects: Option<i64> = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<Option<i64>>| {
+        Callback::from_fn_mut(move |val: DartValueArg<Option<i64>>| {
             let val: Option<i64> = val.try_into().unwrap();
             assert_eq!(val, expects);
         })
@@ -179,7 +201,7 @@ pub mod tests {
         expects: DartValueArg<Option<String>>,
     ) -> Dart_Handle {
         let expects: Option<String> = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<Option<String>>| {
+        Callback::from_fn_mut(move |val: DartValueArg<Option<String>>| {
             let val: Option<String> = val.try_into().unwrap();
             assert_eq!(val, expects);
         })
@@ -202,7 +224,7 @@ pub mod tests {
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
-        Callback::from_once(move |val: DartValueArg<Dart_Handle>| {
+        Callback::from_fn_mut(move |val: DartValueArg<Dart_Handle>| {
             let val: Dart_Handle = val.try_into().unwrap();
             unsafe { (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val) };
         })
