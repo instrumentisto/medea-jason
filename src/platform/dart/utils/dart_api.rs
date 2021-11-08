@@ -38,9 +38,6 @@ extern "C" {
         object: Dart_PersistentHandle,
     );
 
-    /// Propagates provided Dart error to the Dart side.
-    pub fn Dart_PropagateError_DL_Trampolined(object: Dart_Handle);
-
     /// Posts a `message` on some port. It will contain a [`Dart_CObject`]
     /// object graph rooted in the `message`.
     ///

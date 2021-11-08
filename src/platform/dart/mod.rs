@@ -22,17 +22,11 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{os::raw::c_char, panic, ptr, time::Duration};
+use std::time::Duration;
 
 use dart_sys::Dart_Handle;
 
-use crate::{
-    api::string_into_c_str,
-    platform::dart::utils::{
-        dart_api::Dart_PropagateError_DL_Trampolined,
-        dart_future::FutureFromDart,
-    },
-};
+use crate::platform::dart::utils::dart_future::FutureFromDart;
 
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
@@ -48,39 +42,8 @@ pub use self::{
     utils::Function,
 };
 
-/// Pointer to an extern function that returns [`Dart_Handle`] to the newly
-/// created Dart exception
-type NewExceptionFunction = extern "C" fn(ptr::NonNull<c_char>) -> Dart_Handle;
-
-/// Stores pointer to the [`NewExceptionFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_EXCEPTION_FUNCTION: Option<NewExceptionFunction> = None;
-
-/// Registers the provided [`NewExceptionFunction`] as
-/// [`NEW_EXCEPTION_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_exception_function(
-    f: NewExceptionFunction,
-) {
-    NEW_EXCEPTION_FUNCTION = Some(f);
-}
-
-/// Sets hook for all Jason panics, which will convert this panic to the Dart
-/// exception and throw it to the Dart side.
-pub fn set_panic_hook() {
-    panic::set_hook(Box::new(|s| {
-        let exception = unsafe {
-            NEW_EXCEPTION_FUNCTION.unwrap()(string_into_c_str(s.to_string()))
-        };
-        // TODO: Remove this for now.
-        unsafe { Dart_PropagateError_DL_Trampolined(exception) };
-    }));
-}
+/// TODO: Implement panic hook.
+pub fn set_panic_hook() {}
 
 /// Initialize [`android_logger`] as default application logger with min log
 /// level set to [`log::Level::Debug`].
