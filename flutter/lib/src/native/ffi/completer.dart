@@ -23,6 +23,15 @@ void registerFunctions(DynamicLibrary dl) {
           'register_completer_complete_error_caller')(
       Pointer.fromFunction<Void Function(Handle, Pointer<Handle>)>(
           _Completer_completeError_Pointer));
+
+  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+          'register_delayed_future_function')(
+      Pointer.fromFunction<Handle Function(Int32)>(delayedFuture));
+}
+
+/// Returns closure which returns [`Future.delayed`] with a provided amount of milliseconds.
+Object delayedFuture(int delayMs) {
+  return () => Future.delayed(Duration(milliseconds: delayMs));
 }
 
 /// Returns a new [Completer].
