@@ -445,33 +445,31 @@ impl MediaConnections {
 
     /// Returns activity statuses of the all the [`Sender`]s and [`Receiver`]s
     /// from these [`MediaConnections`].
-    pub async fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
-        let senders: Vec<_> = self
-            .0
-            .borrow()
-            .senders
-            .iter()
-            .map(|(track_id, sender)| (*track_id, sender.obj()))
-            .collect();
-        let receivers: Vec<_> = self
-            .0
-            .borrow()
-            .receivers
-            .iter()
-            .map(|(track_id, receiver)| (*track_id, receiver.obj()))
-            .collect();
-
-        // TODO: can we parallel this somehow?
-        async move {
-            let mut out = HashMap::new();
-            for (track_id, sender) in senders {
-                out.insert(track_id, sender.is_publishing().await);
-            }
-            for (track_id, receiver) in receivers {
-                out.insert(track_id, receiver.is_receiving().await);
-            }
-            out
+    pub fn get_transceivers_statuses(
+        &self,
+    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
+        return {
+            let inner = self.0.borrow();
+            future::join_all(
+                inner
+                    .senders
+                    .iter()
+                    .map(|(track_id, sender)| {
+                        let track_id = *track_id;
+                        let sender = sender.obj();
+                        async move { (track_id, sender.is_publishing().await) }
+                            .boxed_local()
+                    })
+                    .chain(inner.receivers.iter().map(|(track_id, receiver)| {
+                        let track_id = *track_id;
+                        let receiver = receiver.obj();
+                        async move { (track_id, receiver.is_receiving().await) }
+                            .boxed_local()
+                    }))
+                    .collect::<Vec<_>>(),
+            )
         }
+        .map(|r| r.into_iter().collect());
     }
 
     /// Returns [`Rc`] to [`TransceiverSide`] with a provided [`TrackId`].
@@ -641,25 +639,34 @@ impl MediaConnections {
     /// insert it into the [`Receiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
-    pub async fn sync_receivers(&self) {
-        let receivers: Vec<_> = self
-            .0
-            .borrow()
-            .receivers
-            .values()
-            .filter(|rcvr| rcvr.transceiver().is_none())
-            .filter_map(|receiver| {
-                receiver.mid().map(|mid| (mid, Component::obj(receiver)))
-            })
-            .collect();
-
-        // TODO: Can we parallel this somehow?
-        for (mid, receiver) in receivers {
-            let fut = { self.0.borrow().peer.get_transceiver_by_mid(mid) };
-            if let Some(trnscvr) = fut.await {
-                receiver.replace_transceiver(trnscvr);
-            }
-        }
+    pub fn sync_receivers(&self) -> impl Future<Output = ()> + 'static {
+        future::join_all({
+            self.0
+                .borrow()
+                .receivers
+                .values()
+                .filter_map(|receiver| {
+                    // Suppress Clippy warn because this impl more
+                    // understandable
+                    #[allow(clippy::question_mark)]
+                    if receiver.transceiver().is_none() {
+                        return None;
+                    }
+                    receiver.mid().map(|mid| {
+                        let fut = {
+                            self.0.borrow().peer.get_transceiver_by_mid(mid)
+                        };
+                        let receiver = Component::obj(receiver);
+                        async move {
+                            if let Some(t) = fut.await {
+                                receiver.replace_transceiver(t);
+                            }
+                        }
+                    })
+                })
+                .collect::<Vec<_>>()
+        })
+        .map(|_| ())
     }
 
     /// Returns all [`Sender`]s which are matches provided
