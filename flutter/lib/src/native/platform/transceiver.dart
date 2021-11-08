@@ -31,7 +31,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Int8 Function(Handle)>(hasSendTrack, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__set_direction')(
-      Pointer.fromFunction<Handle Function(Handle, Int32)>(setDirection));
+      Pointer.fromFunction<Handle Function(Handle, Int64)>(setDirection));
 }
 
 /// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the provided one.

@@ -99,7 +99,7 @@ type NewPeerFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 /// Pointer to an extern function that creates new `Transceiver` in the provided
 /// `PeerConnection`.
 type AddTransceiverFunction =
-    extern "C" fn(Dart_Handle, i32, i32) -> Dart_Handle;
+    extern "C" fn(Dart_Handle, i64, i64) -> Dart_Handle;
 
 /// Pointer to an extern function that returns newly created SDP offer of this
 /// [`PeerConnection`].
@@ -805,7 +805,7 @@ impl RtcPeerConnection {
                 let trnsvr: DartHandle =
                     FutureFromDart::execute(ADD_TRANSCEIVER_FUNCTION.unwrap()(
                         handle,
-                        kind as i32,
+                        kind as i64,
                         direction.into(),
                     ))
                     .await

@@ -58,7 +58,7 @@ void registerFunctions(DynamicLibrary dl) {
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__add_transceiver')(
-      Pointer.fromFunction<Handle Function(Handle, Int32, Int32)>(
+      Pointer.fromFunction<Handle Function(Handle, Int64, Int64)>(
           addTransceiver));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__get_transceiver_by_mid')(

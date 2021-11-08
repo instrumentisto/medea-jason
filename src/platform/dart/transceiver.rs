@@ -77,7 +77,7 @@ type MidFunction =
 type HasSendTrackFunction = extern "C" fn(Dart_Handle) -> i8;
 
 /// Pointer to an extern function that sets `direction` this [`Transceiver`].
-type SetDirectionFunction = extern "C" fn(Dart_Handle, i32) -> Dart_Handle;
+type SetDirectionFunction = extern "C" fn(Dart_Handle, i64) -> Dart_Handle;
 
 /// Stores pointer to the [`GetCurrentDirectionFunction`] extern function.
 ///

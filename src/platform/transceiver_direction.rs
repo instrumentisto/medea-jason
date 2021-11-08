@@ -34,8 +34,8 @@ bitflags! {
     }
 }
 
-impl From<TransceiverDirection> for i32 {
-    fn from(from: TransceiverDirection) -> i32 {
+impl From<TransceiverDirection> for i64 {
+    fn from(from: TransceiverDirection) -> i64 {
         use TransceiverDirection as D;
 
         if from.is_all() {
