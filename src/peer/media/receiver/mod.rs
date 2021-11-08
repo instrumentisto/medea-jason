@@ -281,7 +281,7 @@ impl Drop for Receiver {
     fn drop(&mut self) {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             if !transceiver.is_stopped() {
-                crate::platform::spawn(async move {
+                platform::spawn(async move {
                     transceiver
                         .sub_direction(platform::TransceiverDirection::RECV)
                         .await;

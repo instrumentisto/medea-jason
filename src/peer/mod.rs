@@ -384,7 +384,7 @@ impl PeerConnection {
         let media_connections = Rc::clone(&peer.media_connections);
         peer.peer.on_track(Some(move |track, transceiver| {
             let media_connections = Rc::clone(&media_connections);
-            crate::platform::spawn(async move {
+            platform::spawn(async move {
                 if let Err(mid) =
                     media_connections.add_remote_track(track, transceiver).await
                 {
