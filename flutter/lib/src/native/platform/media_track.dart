@@ -12,16 +12,16 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(deviceId));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__facing_mode')(
-      Pointer.fromFunction<Int32 Function(Handle)>(facingMode, 0));
+      Pointer.fromFunction<Int64 Function(Handle)>(facingMode, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__kind')(
-      Pointer.fromFunction<Int32 Function(Handle)>(kind, 0));
+      Pointer.fromFunction<Int64 Function(Handle)>(kind, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__height')(
-      Pointer.fromFunction<Int32 Function(Handle)>(height, 0));
+      Pointer.fromFunction<Int64 Function(Handle)>(height, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__width')(
-      Pointer.fromFunction<Int32 Function(Handle)>(width, 0));
+      Pointer.fromFunction<Int64 Function(Handle)>(width, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__set_enabled')(
       Pointer.fromFunction<Void Function(Handle, Int8)>(setEnabled));
@@ -59,25 +59,25 @@ void onEnded(MediaStreamTrack track, Function f) {
 
 /// Returns device ID of the provided [MediaStreamTrack].
 Pointer<Utf8> deviceId(MediaStreamTrack track) {
-  // TODO: add correct implementation when flutter_webrtc will be reworked.
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return id(track);
 }
 
 /// Returns facingMode of the provided [MediaStreamTrack].
 int facingMode(MediaStreamTrack track) {
-  // TODO: remove this dummy implementation when flutter_webrtc will be reworked
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return 0;
 }
 
 /// Returns height of the video of the provided [MediaStreamTrack].
 int height(MediaStreamTrack track) {
-  // TODO: remove this dummy implementation when flutter_webrtc will be reworked
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return 1600;
 }
 
 /// Returns width of the video of the provided [MediaStreamTrack].
 int width(MediaStreamTrack track) {
-  // TODO: remove this dummy implementation when flutter_webrtc will be reworked
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return 1300;
 }
 

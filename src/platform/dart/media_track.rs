@@ -29,7 +29,7 @@ type DeviceIdFunction =
 /// Pointer to an extern function that returns facing mode of the provided
 /// [`MediaStreamTrack`].
 type FacingModeFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i32>>;
+    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Pointer to an extern function that returns height of the provided
 /// [`MediaStreamTrack`].
@@ -52,11 +52,11 @@ type EnabledFunction = extern "C" fn(Dart_Handle) -> bool;
 
 /// Pointer to an extern function that returns kind of the provided
 /// [`MediaStreamTrack`].
-type KindFunction = extern "C" fn(Dart_Handle) -> i32;
+type KindFunction = extern "C" fn(Dart_Handle) -> i64;
 
 /// Pointer to an extern function that returns readiness state of the provided
 /// [`MediaStreamTrack`].
-type ReadyStateFunction = extern "C" fn(Dart_Handle) -> i32;
+type ReadyStateFunction = extern "C" fn(Dart_Handle) -> i64;
 
 // Pointer to an extern function that sets `on_ended` callback of the provided
 // [`MediaStreamTrack`].
@@ -267,7 +267,8 @@ impl MediaStreamTrack {
     /// Returns this [`MediaStreamTrack`]'s kind (audio/video).
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        MediaKind::from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
+        MediaKind::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
+            .unwrap()
     }
 
     /// Returns [MediaStreamTrackState][1] of the underlying
@@ -278,8 +279,7 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn ready_state(&self) -> MediaStreamTrackState {
-        // TODO (evdokimovs): return real MediaStreamTrackState when
-        // flutter_webrtc will be reworked
+        // TODO: Correct implementation requires flutter_webrtc-side fixes.
         MediaStreamTrackState::Live
     }
 
@@ -300,11 +300,13 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
-        Option::<i32>::try_from(unsafe {
+        Option::<i64>::try_from(unsafe {
             FACING_MODE_FUNCTION.unwrap()(self.0.get())
         })
         .unwrap()
-        .map(FacingMode::from)
+        .map(FacingMode::try_from)
+        .transpose()
+        .unwrap()
     }
 
     /// Returns a [`height`][1] of the underlying [MediaStreamTrack][2].
@@ -369,8 +371,7 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
-        // TODO (evdokimovs): add real implementation when flutter_webrtc will
-        // be reworked
+        // TODO: Correct implementation requires flutter_webrtc-side fixes.
         false
     }
 

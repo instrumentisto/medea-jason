@@ -445,22 +445,23 @@ impl MediaConnections {
 
     /// Returns activity statuses of the all the [`Sender`]s and [`Receiver`]s
     /// from these [`MediaConnections`].
-    pub fn get_transceivers_statuses(
-        &self,
-    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
-        let inner = self.0.borrow();
-        let senders: Vec<_> = inner
+    pub async fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
+        let senders: Vec<_> = self
+            .0
+            .borrow()
             .senders
             .iter()
             .map(|(track_id, sender)| (*track_id, sender.obj()))
             .collect();
-        let receivers: Vec<_> = inner
+        let receivers: Vec<_> = self
+            .0
+            .borrow()
             .receivers
             .iter()
             .map(|(track_id, receiver)| (*track_id, receiver.obj()))
             .collect();
-        drop(inner);
 
+        // TODO: can we parallel this somehow?
         async move {
             let mut out = HashMap::new();
             for (track_id, sender) in senders {
@@ -610,27 +611,26 @@ impl MediaConnections {
     /// when a [`platform::Transceiver`] is negotiated, thus have a [`mid`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
-    pub fn add_remote_track(
+    pub async fn add_remote_track(
         &self,
         track: platform::MediaStreamTrack,
         transceiver: platform::Transceiver,
-    ) -> impl Future<Output = Result<(), String>> + 'static {
-        let inner = self.0.borrow();
+    ) -> Result<(), String> {
         // Cannot fail, since transceiver is guaranteed to be negotiated at this
         // point.
         let mid = transceiver.mid().unwrap();
-        let receivers: Vec<_> =
-            inner.receivers.values().map(Component::obj).collect();
-        drop(inner);
-        async move {
-            for receiver in receivers {
-                if let Some(recv_mid) = &receiver.mid() {
-                    if recv_mid == &mid {
-                        receiver.set_remote_track(transceiver, track).await;
-                        return Ok(());
-                    }
-                }
-            }
+        let receiver = self
+            .0
+            .borrow()
+            .receivers
+            .values()
+            .find(|rcvr| rcvr.mid().as_ref() == Some(&mid))
+            .map(Component::obj);
+
+        if let Some(receiver) = receiver {
+            receiver.set_remote_track(transceiver, track).await;
+            Ok(())
+        } else {
             Err(mid)
         }
     }
@@ -648,14 +648,16 @@ impl MediaConnections {
             .receivers
             .values()
             .filter(|rcvr| rcvr.transceiver().is_none())
-            .map(Component::obj)
+            .filter_map(|receiver| {
+                receiver.mid().map(|mid| (mid, Component::obj(receiver)))
+            })
             .collect();
-        for receiver in receivers {
-            if let Some(mid) = receiver.mid() {
-                let fut = { self.0.borrow().peer.get_transceiver_by_mid(mid) };
-                if let Some(trnscvr) = fut.await {
-                    receiver.replace_transceiver(trnscvr);
-                }
+
+        // TODO: Can we parallel this somehow?
+        for (mid, receiver) in receivers {
+            let fut = { self.0.borrow().peer.get_transceiver_by_mid(mid) };
+            if let Some(trnscvr) = fut.await {
+                receiver.replace_transceiver(trnscvr);
             }
         }
     }

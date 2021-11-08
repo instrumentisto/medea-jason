@@ -59,13 +59,3 @@ impl From<&TrackConstraints> for MediaKind {
         }
     }
 }
-
-impl From<i32> for MediaKind {
-    fn from(from: i32) -> Self {
-        match from {
-            0 => Self::Audio,
-            1 => Self::Video,
-            _ => unreachable!(),
-        }
-    }
-}

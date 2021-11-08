@@ -2,7 +2,7 @@
 
 mod component;
 
-use std::{cell::Cell, future::Future, rc::Rc};
+use std::{cell::Cell, rc::Rc};
 
 use derive_more::{Display, From};
 use futures::channel::mpsc;
@@ -94,10 +94,10 @@ impl Sender {
 
         let caps = TrackConstraints::from(state.media_type().clone());
         let kind = MediaKind::from(&caps);
-
         let transceiver = match state.mid() {
+            // Try to find rcvr transceiver that can be used as sendrecv.
             None => {
-                let trnsvr = media_connections
+                let transceiver = media_connections
                     .0
                     .borrow()
                     .receivers
@@ -108,22 +108,24 @@ impl Sender {
                                 == caps.media_source_kind()
                     })
                     .and_then(|rcvr| rcvr.transceiver());
-                if let Some(transceiver) = trnsvr {
+                if let Some(transceiver) = transceiver {
                     transceiver
                 } else {
-                    let fut = media_connections.0.borrow().add_transceiver(
-                        kind,
-                        platform::TransceiverDirection::INACTIVE,
-                    );
-                    fut.await
+                    let add_transceiver =
+                        media_connections.0.borrow().add_transceiver(
+                            kind,
+                            platform::TransceiverDirection::INACTIVE,
+                        );
+                    add_transceiver.await
                 }
             }
             Some(mid) => {
-                let fut = media_connections
+                let get_transceiver = media_connections
                     .0
                     .borrow()
                     .get_transceiver_by_mid(mid.to_string());
-                fut.await
+                get_transceiver
+                    .await
                     .ok_or_else(|| {
                         CreateError::TransceiverNotFound(mid.to_string())
                     })
@@ -164,13 +166,10 @@ impl Sender {
 
     /// Indicates whether this [`Sender`] is publishing media traffic.
     #[inline]
-    pub fn is_publishing(&self) -> impl Future<Output = bool> + 'static {
-        let transceiver = self.transceiver.clone();
-        async move {
-            transceiver
-                .has_direction(platform::TransceiverDirection::SEND)
-                .await
-        }
+    pub async fn is_publishing(&self) -> bool {
+        self.transceiver
+            .has_direction(platform::TransceiverDirection::SEND)
+            .await
     }
 
     /// Drops [`local::Track`] used by this [`Sender`]. Sets track used by
@@ -312,8 +311,8 @@ impl Drop for Sender {
                 transceiver
                     .sub_direction(platform::TransceiverDirection::SEND)
                     .await;
+                transceiver.drop_send_track().await;
             });
-            platform::spawn(self.transceiver.drop_send_track());
         }
     }
 }

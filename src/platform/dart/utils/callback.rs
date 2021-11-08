@@ -113,11 +113,11 @@ enum Kind {
     TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
 }
 
-// TODO: Fix in #10:
+// TODO: Fix in #13:
 //       1. Requires additional parametrization or(and) wrapping.
-//       2. FnOnce semantics should be reflected on Dart side somehow.
-//       3. Kind::FnMut && Kind::Fn arent dropped anywhere right now.
-/// Rust closure that can be called by Dart.
+//       2. `FnOnce` semantics should be reflected on Dart side somehow.
+//       3. `Kind::FnMut` and `Kind::Fn` aren't dropped anywhere right now.
+/// Rust closure which can be called by Dart.s
 #[must_use]
 pub struct Callback(Kind);
 

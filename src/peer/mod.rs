@@ -12,7 +12,6 @@ use std::{
     cell::{Cell, RefCell},
     collections::{hash_map::DefaultHasher, HashMap},
     convert::TryFrom as _,
-    future::Future,
     hash::{Hash, Hasher},
     rc::Rc,
 };
@@ -643,10 +642,8 @@ impl PeerConnection {
     /// [`MediaConnections`].
     ///
     /// [`Sender`]: sender::Sender
-    fn get_transceivers_statuses(
-        &self,
-    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
-        self.media_connections.get_transceivers_statuses()
+    async fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
+        self.media_connections.get_transceivers_statuses().await
     }
 
     /// Updates [`local::Track`]s being used in [`PeerConnection`]s [`Sender`]s.

@@ -16,7 +16,6 @@ use crate::{
         media_exchange_state, mute_state, LocalStreamUpdateCriteria, MediaState,
     },
     platform,
-    utils::PrimitiveEnum,
 };
 
 /// Describes directions that a camera can face, as seen from a user's
@@ -39,20 +38,6 @@ pub enum FacingMode {
 
     /// Facing to the right of a user.
     Right = 3,
-}
-
-impl PrimitiveEnum for FacingMode {}
-
-impl From<i32> for FacingMode {
-    fn from(from: i32) -> Self {
-        match from {
-            0 => Self::User,
-            1 => Self::Environment,
-            2 => Self::Left,
-            3 => Self::Right,
-            _ => unreachable!("Unknown FacingMode enum variant"),
-        }
-    }
 }
 
 /// Local media stream for injecting into new created [`PeerConnection`]s.
