@@ -56,7 +56,7 @@ type ReplaceTrackFunction =
 
 /// Pointer to an extern function that drops `Send` [`MediaStreamTrack`] of the
 /// provided [`Transceiver`].
-type DropSenderFunction = extern "C" fn(Dart_Handle);
+type DropSenderFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
 /// Pointer to an extern function that returns stopped status of the provided
 /// [`Transceiver`].
@@ -323,20 +323,15 @@ impl Transceiver {
     ///
     /// [WebAPI docs]: https://tinyurl.com/7pnszaa8
     pub fn drop_send_track(&self) -> impl Future<Output = ()> {
-        unsafe {
-            if let Some(sender) =
-                Option::<DartHandle>::try_from(*Box::from_raw(
-                    GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get())
-                        .as_ptr(),
-                ))
-                .unwrap()
-            {
-                // TODO: почему DROP_SENDER? replace_track(null) же должны
-                //       дернуть? ну и this.send_track().take() сделать.
-                DROP_SENDER_FUNCTION.unwrap()(sender.get());
-            }
+        drop(self.send_track.borrow_mut().take());
+        let transceiver = self.transceiver.get();
+        async move {
+            FutureFromDart::execute::<()>(unsafe {
+                DROP_SENDER_FUNCTION.unwrap()(transceiver)
+            })
+            .await
+            .unwrap();
         }
-        async {}
     }
 
     /// Sets the underlying [`local::Track`]'s `enabled` field to the provided

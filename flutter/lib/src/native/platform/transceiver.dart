@@ -19,7 +19,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Handle Function(Handle, Int8)>(setSendTrackEnabled));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__drop_sender')(
-      Pointer.fromFunction<Void Function(Handle)>(dropSender));
+      Pointer.fromFunction<Handle Function(Handle)>(dropSender));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__is_stopped')(
       Pointer.fromFunction<Pointer Function(Handle)>(isStopped));
@@ -91,8 +91,12 @@ void setSendTrackEnabled(RTCRtpTransceiver transceiver, int enabled) {
 }
 
 /// Drops [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
-void dropSender(RTCRtpTransceiver transceiver) {
-  throw UnimplementedError();
+Object dropSender(RTCRtpTransceiver transceiver) {
+  if (transceiver.sender.track == null) {
+    return () => Future.value();
+  } else {
+    return () => transceiver.sender.track!.stop();
+  }
 }
 
 /// Returns `1` if [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is stopped.
