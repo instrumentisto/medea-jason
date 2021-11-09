@@ -20,7 +20,6 @@ pub enum Stable {
 
 impl Stable {
     /// Returns the opposite value to this [`Stable`].
-    #[inline]
     #[must_use]
     pub fn opposite(self) -> Self {
         match self {
@@ -41,7 +40,6 @@ impl InStable for Stable {
     ///
     /// [`Stable::Disabled`] =>
     /// [`Transition::Enabling`].
-    #[inline]
     fn start_transition(self) -> Self::Transition {
         match self {
             Self::Enabled => Transition::Disabling(self),
@@ -51,7 +49,6 @@ impl InStable for Stable {
 }
 
 impl From<bool> for Stable {
-    #[inline]
     fn from(enabled: bool) -> Self {
         if enabled {
             Self::Enabled
@@ -88,7 +85,6 @@ impl InTransition for Transition {
     type Stable = Stable;
 
     /// Returns intention which this [`Transition`] indicates.
-    #[inline]
     fn intended(self) -> Self::Stable {
         match self {
             Self::Enabling(_) => Stable::Enabled,
@@ -97,7 +93,6 @@ impl InTransition for Transition {
     }
 
     /// Sets inner [`Stable`].
-    #[inline]
     fn set_inner(self, inner: Self::Stable) -> Self {
         match self {
             Self::Enabling(_) => Self::Enabling(inner),
@@ -106,7 +101,6 @@ impl InTransition for Transition {
     }
 
     /// Returns inner [`Stable`].
-    #[inline]
     fn into_inner(self) -> Self::Stable {
         match self {
             Self::Enabling(s) | Self::Disabling(s) => s,
@@ -115,7 +109,6 @@ impl InTransition for Transition {
 
     /// Converts [`Transition`] to the opposite [`Transition`] with the same
     /// inner [`Stable`].
-    #[inline]
     fn opposite(self) -> Self {
         match self {
             Self::Enabling(stable) => Self::Disabling(stable),

@@ -41,7 +41,6 @@ pub unsafe extern "C" fn register_fn_caller(f: FnCaller) {
 impl<A: Into<DartValue>> Callback<A> {
     /// Invokes the underlying [`Function`] (if any) passing the single provided
     /// argument to it.
-    #[inline]
     pub fn call1<T: Into<A>>(&self, arg: T) {
         if let Some(f) = self.0.borrow().as_ref() {
             f.call1(arg.into());
@@ -63,7 +62,6 @@ impl<T> Function<T> {
     /// Creates a new [`Function`] from the provided [`Dart_Handle`] to a Dart
     /// closure, and persists the provided [`Dart_Handle`] so it won't be moved
     /// by the Dart VM GC.
-    #[inline]
     #[must_use]
     pub fn new(cb: Dart_Handle) -> Self {
         Self {
@@ -75,7 +73,6 @@ impl<T> Function<T> {
 
 impl Function<()> {
     /// Calls the underlying Dart closure.
-    #[inline]
     pub fn call0(&self) {
         self.call1(());
     }
@@ -83,7 +80,6 @@ impl Function<()> {
 
 impl<T: Into<DartValue>> Function<T> {
     /// Calls the underlying Dart closure with the provided argument.
-    #[inline]
     pub fn call1(&self, arg: T) {
         unsafe {
             let fn_handle =

@@ -84,7 +84,6 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`IceConnectionState`] of this [`RtcPeerConnection`].
-    #[inline]
     #[must_use]
     pub fn ice_connection_state(&self) -> IceConnectionState {
         unimplemented!()
@@ -93,7 +92,6 @@ impl RtcPeerConnection {
     /// Returns [`PeerConnectionState`] of this [`RtcPeerConnection`].
     ///
     /// Returns [`None`] if failed to parse a [`PeerConnectionState`].
-    #[inline]
     #[must_use]
     pub fn connection_state(&self) -> Option<PeerConnectionState> {
         unimplemented!()
@@ -144,7 +142,6 @@ impl RtcPeerConnection {
     /// After this function returns, the offer returned by the next call to
     /// [`RtcPeerConnection::create_offer`] is automatically configured
     /// to trigger ICE restart.
-    #[inline]
     pub fn restart_ice(&self) {
         unimplemented!()
     }

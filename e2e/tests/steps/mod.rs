@@ -8,7 +8,7 @@ mod websocket;
 use std::{convert::Infallible, str::FromStr};
 
 use async_recursion::async_recursion;
-use cucumber_rust::given;
+use cucumber::given;
 use medea_e2e::object::{
     room::ParsingFailedError, AwaitCompletion, MediaKind, MediaSourceKind,
 };
@@ -165,7 +165,6 @@ struct Matched(pub bool);
 impl FromStr for Matched {
     type Err = Infallible;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self(!s.is_empty()))
     }
@@ -182,7 +181,6 @@ enum MediaSettings {
 impl FromStr for MediaSettings {
     type Err = Infallible;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(if s.contains("no WebRTC endpoints") {
             Self::NoWebRtcEndpoint
@@ -207,7 +205,6 @@ enum DisabledMediaType {
 impl FromStr for DisabledMediaType {
     type Err = Infallible;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(if s.contains("audio") {
             Self::Audio
@@ -231,7 +228,6 @@ enum Direction {
 impl FromStr for Direction {
     type Err = Infallible;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(if s.contains("publishing") {
             Self::Publish
@@ -248,7 +244,6 @@ impl FromStr for Direction {
 /// If `audio` or `video` found, then [`Some`] [`MediaKind`] will be returned.
 /// If `all` found, then [`None`] will be returned.
 /// Otherwise, this function will panic.
-#[must_use]
 fn parse_media_kind(text: &str) -> Option<MediaKind> {
     match text {
         "audio" => Some(MediaKind::Audio),

@@ -35,7 +35,6 @@ pub enum MediaSourceKind {
 }
 
 impl From<MediaSourceKind> for proto::MediaSourceKind {
-    #[inline]
     fn from(val: MediaSourceKind) -> Self {
         match val {
             MediaSourceKind::Device => Self::Device,
@@ -45,7 +44,6 @@ impl From<MediaSourceKind> for proto::MediaSourceKind {
 }
 
 impl From<proto::MediaSourceKind> for MediaSourceKind {
-    #[inline]
     fn from(val: proto::MediaSourceKind) -> Self {
         match val {
             proto::MediaSourceKind::Device => Self::Device,

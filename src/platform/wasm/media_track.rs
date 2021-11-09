@@ -19,8 +19,15 @@ use crate::{
 /// [3]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(AsRef, Debug)]
 pub struct MediaStreamTrack {
+    /// Underlying [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[as_ref]
     sys_track: Rc<web_sys::MediaStreamTrack>,
+
+    /// Kind of the underlying [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     kind: MediaKind,
 
     /// Listener for an [ended][1] event.
@@ -35,15 +42,14 @@ impl<T> From<T> for MediaStreamTrack
 where
     web_sys::MediaStreamTrack: From<T>,
 {
-    #[inline]
-    fn from(from: T) -> MediaStreamTrack {
+    fn from(from: T) -> Self {
         let sys_track = web_sys::MediaStreamTrack::from(from);
         let kind = match sys_track.kind().as_ref() {
             "audio" => MediaKind::Audio,
             "video" => MediaKind::Video,
             _ => unreachable!(),
         };
-        MediaStreamTrack {
+        Self {
             sys_track: Rc::new(sys_track),
             kind,
             on_ended: RefCell::new(None),
@@ -56,14 +62,12 @@ impl MediaStreamTrack {
     ///
     /// [`id`]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn id(&self) -> String {
         self.sys_track.id()
     }
 
     /// Returns this [`MediaStreamTrack`]'s kind (audio/video).
-    #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.kind
@@ -98,7 +102,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
         get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
@@ -133,7 +136,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
@@ -146,7 +148,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediatracksettings-width
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
@@ -160,7 +161,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         self.sys_track.set_enabled(enabled);
     }
@@ -171,7 +171,6 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    #[inline]
     pub fn stop(&self) {
         self.sys_track.stop();
     }
@@ -181,7 +180,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
         self.sys_track.enabled()
@@ -243,10 +241,8 @@ impl MediaStreamTrack {
         F: 'static + FnOnce(),
     {
         let mut on_ended = self.on_ended.borrow_mut();
-        match f {
-            None => {
-                on_ended.take();
-            }
+        drop(match f {
+            None => on_ended.take(),
             Some(f) => {
                 on_ended.replace(
                     // Unwrapping is OK here, because this function shouldn't
@@ -259,8 +255,8 @@ impl MediaStreamTrack {
                         },
                     )
                     .unwrap(),
-                );
+                )
             }
-        }
+        });
     }
 }

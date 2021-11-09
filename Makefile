@@ -309,13 +309,12 @@ endif
 #	make cargo.lint
 
 cargo.lint:
-	cargo clippy --workspace -- -D clippy::pedantic -D warnings
+	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
 		$(call cargo.lint.medea-jason.android,$(target)))
 define cargo.lint.medea-jason.android
 	$(eval target := $(strip $(1)))
-	cargo clippy --manifest-path Cargo.toml --target=$(target) -- \
-		-D clippy::pedantic -D warnings
+	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
 endef
 
 

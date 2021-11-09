@@ -22,7 +22,6 @@ pub enum MediaKind {
 impl FromStr for MediaKind {
     type Err = ParsingFailedError;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains("audio") {
             Ok(Self::Audio)
@@ -36,7 +35,6 @@ impl FromStr for MediaKind {
 
 impl MediaKind {
     /// Converts this [`MediaKind`] to the JS code for this enum variant.
-    #[inline]
     #[must_use]
     pub fn as_js(self) -> &'static str {
         match self {
@@ -56,7 +54,6 @@ pub enum MediaSourceKind {
 impl FromStr for MediaSourceKind {
     type Err = ParsingFailedError;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains("device") {
             Ok(Self::Device)
@@ -70,7 +67,6 @@ impl FromStr for MediaSourceKind {
 
 impl MediaSourceKind {
     /// Converts this [`MediaSourceKind`] to a JS code for this enum variant.
-    #[inline]
     #[must_use]
     pub fn as_js(self) -> &'static str {
         match self {

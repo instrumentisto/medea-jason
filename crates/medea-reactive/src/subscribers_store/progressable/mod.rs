@@ -5,7 +5,7 @@ pub mod processed;
 
 use std::{cell::RefCell, rc::Rc};
 
-use futures::{channel::mpsc, stream::LocalBoxStream};
+use futures::{channel::mpsc, stream::LocalBoxStream, FutureExt as _};
 
 use crate::{subscribers_store::SubscribersStore, ObservableCell};
 
@@ -33,7 +33,6 @@ pub struct SubStore<T> {
 }
 
 impl<T> Default for SubStore<T> {
-    #[inline]
     fn default() -> Self {
         Self {
             store: RefCell::new(Vec::new()),
@@ -50,9 +49,7 @@ impl<T> SubStore<T> {
         let counter = Rc::clone(&self.counter);
         Processed::new(Box::new(move || {
             let counter = Rc::clone(&counter);
-            Box::pin(async move {
-                let _ = counter.when_eq(0).await;
-            })
+            counter.when_eq(0).map(|_| ()).boxed_local()
         }))
     }
 }
@@ -73,7 +70,6 @@ where
         Box::pin(rx)
     }
 
-    #[inline]
     fn wrap(&self, value: T) -> Guarded<T> {
         Guarded::wrap(value, Rc::clone(&self.counter))
     }

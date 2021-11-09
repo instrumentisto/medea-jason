@@ -19,6 +19,7 @@ use crate::{
     utils::{resettable_delay_for, ResettableDelayHandle},
 };
 
+/// Timeout for a [`LocalSdp`] being approved by the Media Server.
 const DESCRIPTION_APPROVE_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Local session description wrapper.
@@ -30,7 +31,6 @@ pub struct LocalSdp(Rc<Inner>);
 
 impl LocalSdp {
     /// Returns new empty [`LocalSdp`].
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -38,7 +38,6 @@ impl LocalSdp {
 
     /// Returns [`LocalBoxStream`] into which all current SDP offer updates will
     /// be sent.
-    #[inline]
     pub fn subscribe(&self) -> LocalBoxStream<'static, Option<String>> {
         self.0.current_sdp.subscribe()
     }
@@ -58,15 +57,16 @@ impl LocalSdp {
     /// approve.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn on_approve(&self) -> LocalBoxStream<'static, ()> {
-        Box::pin(self.0.approved.subscribe().filter_map(|approved| {
-            future::ready(if approved { Some(()) } else { None })
-        }))
+        Box::pin(
+            self.0
+                .approved
+                .subscribe()
+                .filter_map(|approved| future::ready(approved.then(|| ()))),
+        )
     }
 
     /// Rollbacks [`LocalSdp`] to the previous one.
-    #[inline]
     pub fn rollback(&self) {
         self.0.current_sdp.set(self.0.prev_sdp.borrow().clone());
         self.0.approved.set(true);
@@ -76,7 +76,7 @@ impl LocalSdp {
     /// schedules task to wait for a SDP approval.
     pub fn unapproved_set(&self, sdp: String) {
         let prev_sdp = self.0.current_sdp.replace(Some(sdp));
-        self.0.prev_sdp.replace(prev_sdp);
+        drop(self.0.prev_sdp.replace(prev_sdp));
         self.0.approved.set(false);
         self.spawn_rollback_task();
     }
@@ -97,13 +97,12 @@ impl LocalSdp {
             if is_restart_needed {
                 self.0.restart_needed.set(true);
             }
-            self.0.current_sdp.replace(Some(sdp));
+            drop(self.0.current_sdp.replace(Some(sdp)));
         }
         self.0.approved.set(true);
     }
 
     /// Returns the current SDP offer.
-    #[inline]
     #[must_use]
     pub fn current(&self) -> Option<String> {
         self.0.current_sdp.get()
@@ -128,7 +127,6 @@ impl LocalSdp {
     }
 
     /// Stops the current SDP rollback task countdown, if any.
-    #[inline]
     pub fn stop_timeout(&self) {
         self.0.is_rollback_timeout_stopped.set(true);
         if let Some(handle) = self.0.rollback_task_handle.borrow().as_ref() {
@@ -137,7 +135,6 @@ impl LocalSdp {
     }
 
     /// Resets the current SDP rollback task countdown, if any.
-    #[inline]
     pub fn resume_timeout(&self) {
         self.0.is_rollback_timeout_stopped.set(false);
         if let Some(handle) = self.0.rollback_task_handle.borrow().as_ref() {
@@ -164,17 +161,17 @@ impl LocalSdp {
             }
         });
 
-        self.0.rollback_task_handle.replace(Some(rollback_task));
+        drop(self.0.rollback_task_handle.replace(Some(rollback_task)));
     }
 
     /// Indicates whether a new SDP offer is needed after rollback's completion.
-    #[inline]
     #[must_use]
     pub fn is_restart_needed(&self) -> bool {
         self.0.restart_needed.get()
     }
 }
 
+/// Inner data of a [`LocalSdp`].
 #[derive(Debug)]
 struct Inner {
     /// Currently applied session description.
@@ -203,7 +200,6 @@ struct Inner {
 }
 
 impl Default for Inner {
-    #[inline]
     fn default() -> Self {
         Self {
             prev_sdp: RefCell::new(None),

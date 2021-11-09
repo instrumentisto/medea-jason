@@ -24,10 +24,10 @@ impl Error {
 impl From<JsValue> for Error {
     fn from(val: JsValue) -> Self {
         match val.dyn_into::<js_sys::Error>() {
-            Ok(err) => Error(err),
+            Ok(err) => Self(err),
             Err(val) => match val.as_string() {
-                Some(msg) => Error(js_sys::Error::new(&msg)),
-                None => Error(js_sys::Error::new(&format!("{:?}", val))),
+                Some(msg) => Self(js_sys::Error::new(&msg)),
+                None => Self(js_sys::Error::new(&format!("{:?}", val))),
             },
         }
     }

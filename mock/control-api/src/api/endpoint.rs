@@ -13,7 +13,6 @@ pub enum P2pMode {
 }
 
 impl From<P2pMode> for proto::web_rtc_publish_endpoint::P2p {
-    #[inline]
     fn from(mode: P2pMode) -> Self {
         match mode {
             P2pMode::Always => Self::Always,

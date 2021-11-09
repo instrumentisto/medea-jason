@@ -47,12 +47,10 @@ impl WebSocketRpcTransport {
 }
 
 impl RpcTransport for WebSocketRpcTransport {
-    #[inline]
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg> {
         unimplemented!()
     }
 
-    #[inline]
     fn set_close_reason(&self, close_reason: ClientDisconnect) {
         unimplemented!()
     }
@@ -61,7 +59,6 @@ impl RpcTransport for WebSocketRpcTransport {
         unimplemented!()
     }
 
-    #[inline]
     fn on_state_change(&self) -> LocalBoxStream<'static, TransportState> {
         unimplemented!()
     }

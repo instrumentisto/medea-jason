@@ -10,6 +10,7 @@ use crate::{
 /// Representation of [RTCSdpType].
 ///
 /// [RTCSdpType]: https://w3.org/TR/webrtc/#dom-rtcsdptype
+#[derive(Debug)]
 pub enum SdpType {
     /// [`offer` type][1] of SDP.
     ///
@@ -25,6 +26,7 @@ pub enum SdpType {
 /// [RTCIceCandidate][1] representation.
 ///
 /// [1]: https://w3.org/TR/webrtc/#rtcicecandidate-interface
+#[derive(Debug)]
 pub struct IceCandidate {
     /// [`candidate` field][2] of the discovered [RTCIceCandidate][1].
     ///

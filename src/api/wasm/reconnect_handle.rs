@@ -20,7 +20,7 @@ use super::Error;
 ///
 /// [`RoomHandle.on_connection_loss`]: crate::api::RoomHandle.on_connection_loss
 #[wasm_bindgen]
-#[derive(Clone, From)]
+#[derive(Clone, Debug, From)]
 pub struct ReconnectHandle(rpc::ReconnectHandle);
 
 #[wasm_bindgen]

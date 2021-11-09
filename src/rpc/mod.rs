@@ -53,14 +53,12 @@ pub struct ConnectionInfo {
 
 impl ConnectionInfo {
     /// Returns [`ApiUrl`] to which transport layer will connect.
-    #[inline]
     #[must_use]
     pub fn url(&self) -> &ApiUrl {
         &self.url
     }
 
     /// Returns [`RoomId`] of the `Room` for which [`RpcSession`] is created.
-    #[inline]
     #[must_use]
     pub fn room_id(&self) -> &RoomId {
         &self.room_id
@@ -68,14 +66,12 @@ impl ConnectionInfo {
 
     /// Returns [`MemberId`] of the `Member` for which [`RpcSession`] is
     /// created.
-    #[inline]
     #[must_use]
     pub fn member_id(&self) -> &MemberId {
         &self.member_id
     }
 
     /// Returns [`Credential`] for connecting [`RpcSession`].
-    #[inline]
     #[must_use]
     pub fn credential(&self) -> &Credential {
         &self.credential
@@ -83,7 +79,7 @@ impl ConnectionInfo {
 }
 
 /// Errors which can occur while [`ConnectionInfo`] parsing from the [`str`].
-#[derive(Caused, Clone, Debug, Display)]
+#[derive(Caused, Clone, Copy, Debug, Display)]
 #[cause(error = "platform::Error")]
 pub enum ConnectionInfoParseError {
     /// [`Url::parse`] returned error.
@@ -134,11 +130,12 @@ impl FromStr for ConnectionInfo {
             .to_owned()
             .into();
 
-        // Remove last two segments. Safe to unwrap cause we already made all
-        // necessary checks.
-        url.path_segments_mut().unwrap().pop().pop();
+        // Removes last two segments.
+        if let Ok(mut s) = url.path_segments_mut() {
+            let _ = s.pop().pop();
+        }
 
-        Ok(ConnectionInfo {
+        Ok(Self {
             url: url.into(),
             room_id,
             member_id,
@@ -148,7 +145,7 @@ impl FromStr for ConnectionInfo {
 }
 
 /// Reasons of closing by client side and server side.
-#[derive(Copy, Clone, Display, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Display, Eq, PartialEq)]
 pub enum CloseReason {
     /// Closed by server.
     ByServer(CloseByServerReason),

@@ -13,7 +13,7 @@ use tracerr::Traced;
 use crate::{api, media::track::remote, platform, utils::Caused};
 
 /// Service which manages [`Connection`]s with remote `Member`s.
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct Connections {
     /// Local [`PeerId`] to remote [`MemberId`].
     peer_members: RefCell<HashMap<PeerId, HashSet<MemberId>>>,
@@ -47,10 +47,13 @@ impl Connections {
         if is_new {
             let con = Connection::new(remote_member_id.clone());
             self.on_new_connection.call1(con.new_handle());
-            self.connections
-                .borrow_mut()
-                .insert(remote_member_id.clone(), con);
-            self.peer_members
+            drop(
+                self.connections
+                    .borrow_mut()
+                    .insert(remote_member_id.clone(), con),
+            );
+            let _ = self
+                .peer_members
                 .borrow_mut()
                 .entry(local_peer_id)
                 .or_default()
@@ -93,11 +96,13 @@ pub struct HandleDetachedError;
 /// External handler to a [`Connection`] with a remote `Member`.
 ///
 /// Actually, represents a [`Weak`]-based handle to `InnerConnection`.
+#[derive(Debug)]
 pub struct ConnectionHandle(Weak<InnerConnection>);
 
 /// Actual data of a connection with a specific remote `Member`.
 ///
 /// Shared between external [`ConnectionHandle`] and Rust side [`Connection`].
+#[derive(Debug)]
 struct InnerConnection {
     /// Remote `Member` ID.
     remote_id: MemberId,
@@ -179,12 +184,11 @@ impl ConnectionHandle {
 }
 
 /// Connection with a specific remote `Member`, that is used on Rust side.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Connection(Rc<InnerConnection>);
 
 impl Connection {
     /// Instantiates new [`Connection`] for a given `Member`.
-    #[inline]
     #[must_use]
     pub fn new(remote_id: MemberId) -> Self {
         Self(Rc::new(InnerConnection {
@@ -203,7 +207,6 @@ impl Connection {
     }
 
     /// Creates a new external handle to this [`Connection`].
-    #[inline]
     #[must_use]
     pub fn new_handle(&self) -> ConnectionHandle {
         ConnectionHandle(Rc::downgrade(&self.0))

@@ -17,9 +17,11 @@ use crate::{
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
+#[derive(Debug)]
 pub struct Jason(Rc<RefCell<Inner>>);
 
 /// Inner representation if a [`Jason`].
+#[derive(Debug)]
 struct Inner {
     /// [`Jason`]s [`MediaManager`].
     ///
@@ -53,7 +55,6 @@ impl Jason {
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
-    #[inline]
     #[must_use]
     pub fn init_room(&self) -> RoomHandle {
         let rpc = Rc::clone(&self.0.borrow().rpc);
@@ -61,7 +62,6 @@ impl Jason {
     }
 
     /// Returns a [`MediaManagerHandle`].
-    #[inline]
     #[must_use]
     pub fn media_manager(&self) -> MediaManagerHandle {
         self.0.borrow().media_manager.new_handle()
@@ -91,7 +91,6 @@ impl Jason {
     }
 
     /// Returns a new [`Jason`] with the provided [`WebSocketRpcClient`].
-    #[inline]
     pub fn with_rpc_client(rpc: Rc<WebSocketRpcClient>) -> Self {
         Self(Rc::new(RefCell::new(Inner {
             rpc,
@@ -108,7 +107,7 @@ impl Jason {
         let weak_room = room.downgrade();
         let weak_inner = Rc::downgrade(&self.0);
         platform::spawn(on_normal_close.map(move |reason| {
-            (|| {
+            let _ = (|| {
                 let room = weak_room.upgrade()?;
                 let inner = weak_inner.upgrade()?;
                 let mut inner = inner.borrow_mut();
@@ -131,7 +130,6 @@ impl Jason {
 }
 
 impl Default for Jason {
-    #[inline]
     fn default() -> Self {
         Self::new()
     }

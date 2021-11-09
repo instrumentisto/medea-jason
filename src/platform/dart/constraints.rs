@@ -16,7 +16,6 @@ pub struct MediaStreamConstraints;
 impl MediaStreamConstraints {
     /// Creates a new [`MediaStreamConstraints`] with none constraints
     /// configured.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         unimplemented!()
@@ -25,7 +24,6 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    #[inline]
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
         unimplemented!()
     }
@@ -33,14 +31,12 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    #[inline]
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
         unimplemented!()
     }
 }
 
 impl Default for MediaStreamConstraints {
-    #[inline]
     fn default() -> Self {
         Self::new()
     }
@@ -53,7 +49,6 @@ impl Default for MediaStreamConstraints {
 pub struct DisplayMediaStreamConstraints();
 
 impl Default for DisplayMediaStreamConstraints {
-    #[inline]
     fn default() -> Self {
         unimplemented!()
     }
@@ -62,7 +57,6 @@ impl Default for DisplayMediaStreamConstraints {
 impl DisplayMediaStreamConstraints {
     /// Creates a new [`DisplayMediaStreamConstraints`] with none constraints
     /// configured.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         unimplemented!()
@@ -71,7 +65,6 @@ impl DisplayMediaStreamConstraints {
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
-    #[inline]
     pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
         unimplemented!()
     }

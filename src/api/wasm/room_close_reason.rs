@@ -14,7 +14,7 @@ use crate::room;
 /// [`Room`]: room::Room
 /// [`RoomHandle::on_close`]: crate::api::RoomHandle::on_close
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct RoomCloseReason(room::RoomCloseReason);
 
 #[wasm_bindgen]

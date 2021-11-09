@@ -1,6 +1,6 @@
 //! Reconnection for [`RpcSession`].
 
-use std::{rc::Weak, time::Duration};
+use std::{fmt, rc::Weak, time::Duration};
 
 use derive_more::{Display, From};
 use tracerr::Traced;
@@ -29,10 +29,15 @@ pub enum ReconnectError {
 #[derive(Clone)]
 pub struct ReconnectHandle(Weak<dyn RpcSession>);
 
+impl fmt::Debug for ReconnectHandle {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("ReconnectHandle").finish()
+    }
+}
+
 impl ReconnectHandle {
     /// Instantiates new [`ReconnectHandle`] from the given [`RpcSession`]
     /// reference.
-    #[inline]
     #[must_use]
     pub fn new(rpc: Weak<dyn RpcSession>) -> Self {
         Self(rpc)

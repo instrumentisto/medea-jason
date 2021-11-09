@@ -81,7 +81,6 @@ pub enum GetUserMediaError {
 }
 
 impl From<LocalTrackIsEndedError> for GetUserMediaError {
-    #[inline]
     fn from(err: LocalTrackIsEndedError) -> Self {
         Self::LocalTrackIsEnded(err.0)
     }
@@ -110,7 +109,6 @@ pub enum GetDisplayMediaError {
 }
 
 impl From<LocalTrackIsEndedError> for GetDisplayMediaError {
-    #[inline]
     fn from(err: LocalTrackIsEndedError) -> Self {
         Self::LocalTrackIsEnded(err.0)
     }
@@ -126,11 +124,11 @@ impl From<LocalTrackIsEndedError> for GetDisplayMediaError {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct MediaManager(Rc<InnerMediaManager>);
 
 /// Actual data of [`MediaManager`].
-#[derive(Default)]
+#[derive(Debug, Default)]
 struct InnerMediaManager {
     /// Obtained tracks storage
     tracks: Rc<RefCell<HashMap<String, Weak<local::Track>>>>,
@@ -138,7 +136,6 @@ struct InnerMediaManager {
 
 impl InnerMediaManager {
     /// Returns a list of [`platform::InputDeviceInfo`] objects.
-    #[inline]
     async fn enumerate_devices(
     ) -> Result<Vec<platform::InputDeviceInfo>, Traced<platform::Error>> {
         platform::enumerate_devices()
@@ -339,7 +336,7 @@ impl InnerMediaManager {
             .into_iter()
             .map(|tr| Rc::new(local::Track::new(tr, kind)))
             .inspect(|track| {
-                storage.insert(track.id(), Rc::downgrade(track));
+                drop(storage.insert(track.id(), Rc::downgrade(track)));
             })
             .collect();
 
@@ -374,7 +371,6 @@ impl MediaManager {
     }
 
     /// Instantiates a new [`MediaManagerHandle`] for external usage.
-    #[inline]
     #[must_use]
     pub fn new_handle(&self) -> MediaManagerHandle {
         MediaManagerHandle(Rc::downgrade(&self.0))
@@ -393,7 +389,7 @@ impl MediaManager {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct MediaManagerHandle(Weak<InnerMediaManager>);
 
 impl MediaManagerHandle {

@@ -1,4 +1,4 @@
-use std::{convert::TryFrom as _, ptr};
+use std::ptr;
 
 use crate::api::dart::{
     utils::{ArgumentError, DartFuture, IntoDartFuture},

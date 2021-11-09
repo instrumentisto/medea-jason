@@ -32,7 +32,7 @@ use super::Error;
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct MediaManagerHandle(media::MediaManagerHandle);
 
 #[wasm_bindgen]
@@ -63,7 +63,7 @@ impl MediaManagerHandle {
                     devices
                         .into_iter()
                         .fold(js_sys::Array::new(), |devices_info, info| {
-                            devices_info.push(&JsValue::from(
+                            let _ = devices_info.push(&JsValue::from(
                                 InputDeviceInfo::from(info),
                             ));
                             devices_info
@@ -101,9 +101,9 @@ impl MediaManagerHandle {
                     tracks
                         .into_iter()
                         .fold(js_sys::Array::new(), |tracks, track| {
-                            tracks.push(&JsValue::from(LocalMediaTrack::from(
-                                track,
-                            )));
+                            let _ = tracks.push(&JsValue::from(
+                                LocalMediaTrack::from(track),
+                            ));
                             tracks
                         })
                         .into()

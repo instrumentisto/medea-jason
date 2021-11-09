@@ -6,6 +6,27 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.5.0] · ????-??-?? · To-be-done
+[0.5.0]: /../../tree/medea-control-api-proto-0.5.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.4.0...medea-control-api-proto-0.5.0)
+
+### Upgraded
+
+- Dependencies: ([rev])
+    - [`prost`] to `0.9`;
+    - [`tonic`] to `0.6`.
+
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([rev]).
+
+[rev]: https://github.com/instrumentisto/medea-jason/commit/full-rev
+[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+
+
+
+
 ## [0.4.0] · 2021-08-25
 [0.4.0]: /../../tree/medea-control-api-proto-0.4.0/proto/control-api
 

@@ -1,11 +1,10 @@
-medea-reactive
-==============
+`medea-reactive`
+================
 
-[![Crates.io](https://img.shields.io/crates/v/medea-reactive)](https://crates.io/crates/medea-reactive)
-![Crates.io downloads](https://img.shields.io/crates/d/medea-reactive)
-![Crates.io license](https://img.shields.io/crates/l/medea-reactive)
-![Unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)
-[![Rust docs](https://docs.rs/medea-reactive/badge.svg)](https://docs.rs/medea-reactive)
+[![Latest version](https://img.shields.io/crates/v/medea-reactive "Latest version")](https://crates.io/crates/medea-reactive)
+[![Rust 1.56+](https://img.shields.io/badge/rustc-1.56+-lightgray.svg "Rust 1.56+")](https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html)
+[![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
+[![Rust docs](https://docs.rs/medea-reactive/badge.svg "Rust docs")](https://docs.rs/medea-reactive)
 
 [API Docs](https://docs.rs/medea-reactive) |
 [Changelog](https://github.com/instrumentisto/medea-jason/blob/master/crates/medea-reactive/CHANGELOG.md)

@@ -1,4 +1,4 @@
-use std::{convert::TryFrom as _, os::raw::c_char, ptr};
+use std::{os::raw::c_char, ptr};
 
 use crate::media::FacingMode;
 

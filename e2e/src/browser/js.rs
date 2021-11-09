@@ -50,7 +50,6 @@ impl Statement {
     ///     return "foobar";
     /// }
     /// ```
-    #[inline]
     #[must_use]
     pub fn new<A: Into<Vec<Json>>>(expression: &str, args: A) -> Self {
         Self {
@@ -63,7 +62,6 @@ impl Statement {
 
     /// Returns a new [`Statement`] with the provided JS code, arguments and
     /// objects.
-    #[inline]
     #[must_use]
     pub fn with_objs<A: Into<Vec<Json>>, O: Into<Vec<ObjectPtr>>>(
         expression: &str,
@@ -84,7 +82,6 @@ impl Statement {
     /// The success value is passed to the next [`Statement`] as a JS lambda
     /// argument.
     #[allow(clippy::option_if_let_else)] // due to moving `another` value
-    #[inline]
     #[must_use]
     pub fn and_then(mut self, another: Self) -> Self {
         self.and_then = Some(Box::new(if let Some(e) = self.and_then {
@@ -97,7 +94,6 @@ impl Statement {
 
     /// Returns a JS code which should be executed in a browser and [`Json`]
     /// arguments for this code.
-    #[must_use]
     pub(super) fn prepare(self) -> (String, Vec<Json>) {
         // language=JavaScript
         let mut final_js = r#"
@@ -134,7 +130,6 @@ impl Statement {
     /// Returns a JS code for this [`Statement`].
     ///
     /// Doesn't generates code for the [`Statement::and_then`].
-    #[must_use]
     fn step_js(&self, i: usize) -> String {
         // language=JavaScript
         format!(

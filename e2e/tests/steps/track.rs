@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use cucumber_rust::then;
+use cucumber::then;
 use medea_e2e::object::{MediaKind, MediaSourceKind};
 use tokio::time::sleep;
 

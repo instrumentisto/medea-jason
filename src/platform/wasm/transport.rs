@@ -2,7 +2,7 @@
 //!
 //! [WebSocket]: https://developer.mozilla.org/ru/docs/WebSockets
 
-use std::{cell::RefCell, convert::TryFrom, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 use derive_more::{From, Into};
 use futures::{channel::mpsc, stream::LocalBoxStream, StreamExt};
@@ -39,8 +39,13 @@ impl TryFrom<&MessageEvent> for ServerMessage {
     }
 }
 
+/// Shortcut for a [`Result`] containing a [`Traced`] [`TransportError`].
+///
+/// [`Result`]: std::result::Result
 type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
 
+/// Inner data of a [`WebSocketRpcTransport`].
+#[derive(Debug)]
 struct InnerSocket {
     /// JS side [WebSocket].
     ///
@@ -79,6 +84,7 @@ struct InnerSocket {
 }
 
 impl InnerSocket {
+    /// Establishes a new [`WebSocketRpcTransport`] on the given `url`.
     fn new(url: &str) -> Result<Self> {
         let socket = SysWebSocket::new(url)
             .map_err(Into::into)
@@ -117,6 +123,7 @@ impl Drop for InnerSocket {
 ///
 /// If you're adding new cyclic dependencies, then don't forget to drop them in
 /// the [`Drop`].
+#[derive(Debug)]
 pub struct WebSocketRpcTransport(Rc<RefCell<InnerSocket>>);
 
 impl WebSocketRpcTransport {
@@ -235,7 +242,6 @@ impl WebSocketRpcTransport {
 }
 
 impl RpcTransport for WebSocketRpcTransport {
-    #[inline]
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg> {
         let (tx, rx) = mpsc::unbounded();
         self.0.borrow_mut().on_message_subs.push(tx);
@@ -243,7 +249,6 @@ impl RpcTransport for WebSocketRpcTransport {
         Box::pin(rx)
     }
 
-    #[inline]
     fn set_close_reason(&self, close_reason: ClientDisconnect) {
         self.0.borrow_mut().close_reason = close_reason;
     }
@@ -262,11 +267,14 @@ impl RpcTransport for WebSocketRpcTransport {
                 .map_err(Into::into)
                 .map_err(TransportError::SendMessage)
                 .map_err(tracerr::wrap!()),
-            _ => Err(tracerr::new!(TransportError::ClosedSocket)),
+            TransportState::Connecting
+            | TransportState::Closing
+            | TransportState::Closed(_) => {
+                Err(tracerr::new!(TransportError::ClosedSocket))
+            }
         }
     }
 
-    #[inline]
     fn on_state_change(&self) -> LocalBoxStream<'static, TransportState> {
         self.0.borrow().socket_state.subscribe()
     }
@@ -277,9 +285,9 @@ impl Drop for WebSocketRpcTransport {
     /// [`Drop`] implementation will be called on each drop of its references.
     fn drop(&mut self) {
         let mut inner = self.0.borrow_mut();
-        inner.on_open_listener.take();
-        inner.on_message_listener.take();
-        inner.on_close_listener.take();
+        drop(inner.on_open_listener.take());
+        drop(inner.on_message_listener.take());
+        drop(inner.on_close_listener.take());
     }
 }
 

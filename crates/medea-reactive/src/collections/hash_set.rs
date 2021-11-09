@@ -120,7 +120,6 @@ where
     /// [`HashSet::on_insert()`] subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_insert_processed(&self) -> Processed<'static> {
         self.on_insert_subs.when_all_processed()
     }
@@ -129,7 +128,6 @@ where
     /// by [`HashSet::on_remove()`] subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_remove_processed(&self) -> Processed<'static> {
         self.on_remove_subs.when_all_processed()
     }
@@ -138,7 +136,6 @@ where
     /// processed by subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         crate::when_all_processed(vec![
             self.when_remove_processed().into(),
@@ -149,14 +146,12 @@ where
 
 impl<T, S: SubscribersStore<T, O>, O> HashSet<T, S, O> {
     /// Creates new empty [`HashSet`].
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Returns [`Iterator`] visiting all values in an arbitrary order.
-    #[inline]
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.into_iter()
     }
@@ -164,7 +159,6 @@ impl<T, S: SubscribersStore<T, O>, O> HashSet<T, S, O> {
     /// Returns [`Stream`] yielding inserted values to this [`HashSet`].
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     #[must_use]
     pub fn on_insert(&self) -> LocalBoxStream<'static, O> {
         self.on_insert_subs.subscribe()
@@ -176,7 +170,6 @@ impl<T, S: SubscribersStore<T, O>, O> HashSet<T, S, O> {
     /// [`Drop`].
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     #[must_use]
     pub fn on_remove(&self) -> LocalBoxStream<'static, O> {
         self.on_remove_subs.subscribe()
@@ -197,7 +190,6 @@ where
     /// values and values that will be inserted.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn replay_on_insert(&self) -> LocalBoxStream<'static, O> {
         Box::pin(futures::stream::iter(
             self.store
@@ -266,7 +258,6 @@ where
     }
 
     /// Indicates whether this [`HashSet`] contains the `value`.
-    #[inline]
     #[must_use]
     pub fn contains(&self, value: &T) -> bool {
         self.store.contains(value)
@@ -277,7 +268,6 @@ impl<T, S, O> Default for HashSet<T, S, O>
 where
     S: SubscribersStore<T, O>,
 {
-    #[inline]
     fn default() -> Self {
         Self {
             store: std::collections::HashSet::new(),
@@ -294,7 +284,6 @@ impl<'a, T, S: SubscribersStore<T, O>, O> IntoIterator
     type IntoIter = Iter<'a, T>;
     type Item = &'a T;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         self.store.iter()
     }
@@ -317,7 +306,6 @@ impl<T, S, O> From<std::collections::HashSet<T>> for HashSet<T, S, O>
 where
     S: SubscribersStore<T, O>,
 {
-    #[inline]
     fn from(from: std::collections::HashSet<T>) -> Self {
         Self {
             store: from,

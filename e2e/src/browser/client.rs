@@ -7,12 +7,11 @@ use std::{
     time::Duration,
 };
 
-use fantoccini::{Client, ClientBuilder, Locator};
+use fantoccini::{Capabilities, Client, ClientBuilder, Locator, WindowHandle};
 use futures::lock::Mutex;
 use serde::Deserialize;
 use serde_json::{json, Value as Json};
 use tokio::task;
-use webdriver::{capabilities::Capabilities, common::WebWindow};
 
 use super::{js::Statement, Error, Result};
 
@@ -40,7 +39,6 @@ enum JsResult {
 }
 
 impl From<JsResult> for Result<Json> {
-    #[inline]
     fn from(from: JsResult) -> Self {
         match from {
             JsResult::Ok(ok) => Self::Ok(ok),
@@ -64,9 +62,8 @@ impl WebDriverClient {
     ///
     /// # Errors
     ///
-    /// If failed to create or switch to a new [`WebWindow`].
-    #[inline]
-    pub async fn new_window(&self) -> Result<WebWindow> {
+    /// If failed to create or switch to a new browser window.
+    pub async fn new_window(&self) -> Result<WindowHandle> {
         self.inner
             .lock()
             .await
@@ -74,17 +71,16 @@ impl WebDriverClient {
             .await
     }
 
-    /// Switches to the provided [`WebWindow`] and executes the provided
+    /// Switches to the provided browser window and executes the provided
     /// [`Statement`] in it.
     ///
     /// # Errors
     ///
-    /// - If failed to switch to the provided [`WebWindow`].
+    /// - If failed to switch to the provided browser window.
     /// - If failed to execute JS statement.
-    #[inline]
     pub async fn switch_to_window_and_execute(
         &self,
-        window: WebWindow,
+        window: WindowHandle,
         exec: Statement,
     ) -> Result<Json> {
         self.inner
@@ -114,12 +110,12 @@ impl WebDriverClient {
         });
     }
 
-    /// Synchronously closes the provided [`WebWindow`].
+    /// Synchronously closes the provided browser window.
     ///
     /// # Panics
     ///
     /// If [`tokio::spawn()`] panics.
-    pub fn blocking_window_close(&self, window: WebWindow) {
+    pub fn blocking_window_close(&self, window: WindowHandle) {
         let (tx, rx) = mpsc::channel();
         let client = self.inner.clone();
         tokio::spawn(async move {
@@ -216,7 +212,7 @@ impl Inner {
         ))
     }
 
-    /// Executes the provided [`Statement`] in the current [`WebWindow`].
+    /// Executes the provided [`Statement`] in the current browser window.
     ///
     /// # Errors
     ///
@@ -258,19 +254,19 @@ impl Inner {
         serde_json::from_value::<JsResult>(res)?.into()
     }
 
-    /// Creates a new [`WebWindow`] and returns it's ID.
+    /// Creates a new browser window and returns its ID.
     ///
-    /// Creates a `registry` in the created [`WebWindow`].
+    /// Creates a `registry` in the created browser window.
     ///
     /// # Errors
     ///
-    /// - If failed to create new [`WebWindow`].
+    /// - If failed to create a new browser window.
     /// - If `index.html` wasn't found at `file_server_host`.
     pub async fn new_window(
         &mut self,
         file_server_host: &str,
-    ) -> Result<WebWindow> {
-        let window = WebWindow(self.0.new_window(true).await?.handle);
+    ) -> Result<WindowHandle> {
+        let window = self.0.new_window(true).await?.handle;
         self.0.switch_to_window(window.clone()).await?;
         self.0
             .goto(&format!("http://{}/index.html", file_server_host))
@@ -295,19 +291,19 @@ impl Inner {
         Ok(window)
     }
 
-    /// Switches to the provided [`WebWindow`] and executes the provided
+    /// Switches to the provided browser window and executes the provided
     /// [`Statement`].
     pub async fn switch_to_window_and_execute(
         &mut self,
-        window: WebWindow,
+        window: WindowHandle,
         exec: Statement,
     ) -> Result<Json> {
         self.0.switch_to_window(window).await?;
         self.execute(exec).await
     }
 
-    /// Closes the provided [`WebWindow`].
-    pub async fn close_window(&mut self, window: WebWindow) {
+    /// Closes the provided browser window.
+    pub async fn close_window(&mut self, window: WindowHandle) {
         if self.0.switch_to_window(window).await.is_ok() {
             drop(self.0.close_window().await);
         }

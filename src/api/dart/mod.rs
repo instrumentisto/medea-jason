@@ -22,7 +22,7 @@ pub mod room_close_reason;
 pub mod room_handle;
 pub mod utils;
 
-use std::{convert::TryFrom, ffi::c_void, marker::PhantomData, ptr};
+use std::{ffi::c_void, marker::PhantomData, ptr};
 
 use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
@@ -60,7 +60,6 @@ pub use self::{
 pub trait ForeignClass: Sized {
     /// Consumes itself returning a wrapped raw pointer obtained via
     /// [`Box::into_raw()`].
-    #[inline]
     #[must_use]
     fn into_ptr(self) -> ptr::NonNull<Self> {
         ptr::NonNull::from(Box::leak(Box::new(self)))
@@ -72,7 +71,6 @@ pub trait ForeignClass: Sized {
     /// # Safety
     ///
     /// Same as for [`Box::from_raw()`].
-    #[inline]
     #[must_use]
     unsafe fn from_ptr(this: ptr::NonNull<Self>) -> Self {
         *Box::from_raw(this.as_ptr())
@@ -103,21 +101,18 @@ pub enum DartValue {
 }
 
 impl From<()> for DartValue {
-    #[inline]
     fn from(_: ()) -> Self {
         Self::None
     }
 }
 
 impl<T: ForeignClass> From<T> for DartValue {
-    #[inline]
     fn from(val: T) -> Self {
         Self::Ptr(val.into_ptr().cast())
     }
 }
 
 impl<T: ForeignClass> From<Option<T>> for DartValue {
-    #[inline]
     fn from(val: Option<T>) -> Self {
         match val {
             None => Self::None,
@@ -127,14 +122,12 @@ impl<T: ForeignClass> From<Option<T>> for DartValue {
 }
 
 impl<T> From<PtrArray<T>> for DartValue {
-    #[inline]
     fn from(val: PtrArray<T>) -> Self {
         Self::Ptr(ptr::NonNull::from(Box::leak(Box::new(val))).cast())
     }
 }
 
 impl<T> From<Option<PtrArray<T>>> for DartValue {
-    #[inline]
     fn from(val: Option<PtrArray<T>>) -> Self {
         match val {
             None => Self::None,
@@ -144,14 +137,12 @@ impl<T> From<Option<PtrArray<T>>> for DartValue {
 }
 
 impl From<String> for DartValue {
-    #[inline]
     fn from(string: String) -> Self {
         Self::String(string_into_c_str(string))
     }
 }
 
 impl From<Option<String>> for DartValue {
-    #[inline]
     fn from(val: Option<String>) -> Self {
         match val {
             None => Self::None,
@@ -176,14 +167,12 @@ impl From<Option<ptr::NonNull<Dart_Handle>>> for DartValue {
 }
 
 impl From<Dart_Handle> for DartValue {
-    #[inline]
     fn from(handle: Dart_Handle) -> Self {
         Self::Handle(ptr::NonNull::from(Box::leak(Box::new(handle))))
     }
 }
 
 impl From<Option<Dart_Handle>> for DartValue {
-    #[inline]
     fn from(val: Option<Dart_Handle>) -> Self {
         match val {
             None => Self::None,
@@ -193,14 +182,12 @@ impl From<Option<Dart_Handle>> for DartValue {
 }
 
 impl From<DartError> for DartValue {
-    #[inline]
     fn from(err: DartError) -> Self {
         Self::Handle(err.into())
     }
 }
 
 impl From<Option<DartError>> for DartValue {
-    #[inline]
     fn from(val: Option<DartError>) -> Self {
         match val {
             None => Self::None,
@@ -214,7 +201,6 @@ impl From<Option<DartError>> for DartValue {
 macro_rules! impl_from_num_for_dart_value {
     ($arg:ty) => {
         impl From<$arg> for DartValue {
-            #[inline]
             fn from(val: $arg) -> Self {
                 DartValue::Int(i64::from(val))
             }
@@ -243,7 +229,6 @@ impl<F, T> From<F> for DartValueArg<T>
 where
     DartValue: From<F>,
 {
-    #[inline]
     fn from(from: F) -> Self {
         Self(DartValue::from(from), PhantomData)
     }
@@ -420,7 +405,6 @@ impl DartValueCastError {
 impl TryFrom<i64> for MediaSourceKind {
     type Error = i64;
 
-    #[inline]
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         match value {
             0 => Ok(Self::Device),
@@ -449,8 +433,6 @@ pub unsafe extern "C" fn box_dart_handle(
 
 #[cfg(feature = "mockable")]
 mod dart_value_extern_tests_helpers {
-    use std::convert::TryInto;
-
     use super::*;
 
     #[no_mangle]

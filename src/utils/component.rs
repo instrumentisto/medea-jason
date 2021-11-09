@@ -59,24 +59,27 @@ pub trait Updatable {
 /// It consists of two parts: state and object. Object is listening to its state
 /// changes and updates accordingly, so all mutations are meant to be applied to
 /// the state.
-#[derive(Deref)]
+#[derive(Debug, Deref)]
 pub struct Component<S, O> {
+    /// Object holding the state.
     #[deref]
     obj: Rc<O>,
+
+    /// State being reactively listened.
     state: Rc<S>,
+
+    /// All the spawned watchers of the state.
     _spawned_watchers: Vec<TaskHandle>,
 }
 
 impl<S, O> Component<S, O> {
     /// Returns [`Rc`] to the object managed by this [`Component`].
-    #[inline]
     #[must_use]
     pub fn obj(&self) -> Rc<O> {
         Rc::clone(&self.obj)
     }
 
     /// Returns reference to the state of this [`Component`].
-    #[inline]
     #[must_use]
     pub fn state(&self) -> Rc<S> {
         Rc::clone(&self.state)
@@ -101,9 +104,15 @@ impl<S: ComponentState<O> + 'static, O: 'static> Component<S, O> {
 }
 
 /// Spawner for the [`Component`]'s watchers.
+#[derive(Debug)]
 pub struct WatchersSpawner<S, O> {
+    /// State being watched.
     state: Rc<S>,
+
+    /// Object holding the state.
     obj: Rc<O>,
+
+    /// All the spawned watchers of the state.
     spawned_watchers: Vec<TaskHandle>,
 }
 
@@ -139,8 +148,6 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
     }
 
     /// Creates new [`WatchersSpawner`] for the provided object and state.
-    #[inline]
-    #[must_use]
     fn new(state: Rc<S>, obj: Rc<O>) -> Self {
         Self {
             state,
@@ -151,8 +158,6 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
 
     /// Returns [`TaskHandle`]s for the watchers spawned by this
     /// [`WatchersSpawner`].
-    #[inline]
-    #[must_use]
     fn finish(self) -> Vec<TaskHandle> {
         self.spawned_watchers
     }

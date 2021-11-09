@@ -48,6 +48,7 @@ pub enum CreateError {
 pub struct InsertTrackError(platform::Error);
 
 /// Representation of a [`local::Track`] that is being sent to some remote peer.
+#[derive(Debug)]
 pub struct Sender {
     track_id: TrackId,
     caps: TrackConstraints,
@@ -93,7 +94,7 @@ impl Sender {
         }
 
         let connections = media_connections.0.borrow();
-        let caps = TrackConstraints::from(state.media_type().clone());
+        let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
         let transceiver = match state.mid() {
             // Try to find rcvr transceiver that can be used as sendrecv.
@@ -114,13 +115,11 @@ impl Sender {
                 }),
             Some(mid) => connections
                 .get_transceiver_by_mid(mid)
-                .ok_or_else(|| {
-                    CreateError::TransceiverNotFound(mid.to_string())
-                })
+                .ok_or_else(|| CreateError::TransceiverNotFound(mid.into()))
                 .map_err(tracerr::wrap!())?,
         };
 
-        let this = Rc::new(Sender {
+        let this = Rc::new(Self {
             track_id: state.id(),
             caps,
             transceiver,
@@ -146,13 +145,11 @@ impl Sender {
     }
 
     /// Returns [`TrackConstraints`] of this [`Sender`].
-    #[inline]
     pub fn caps(&self) -> &TrackConstraints {
         &self.caps
     }
 
     /// Indicates whether this [`Sender`] is publishing media traffic.
-    #[inline]
     #[must_use]
     pub fn is_publishing(&self) -> bool {
         self.transceiver
@@ -170,13 +167,11 @@ impl Sender {
     ///
     /// [1]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
     /// [2]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
-    #[inline]
     pub async fn remove_track(&self) {
         self.transceiver.drop_send_track().await;
     }
 
     /// Indicates whether this [`Sender`] has [`local::Track`].
-    #[inline]
     #[must_use]
     pub fn has_track(&self) -> bool {
         self.transceiver.has_send_track()
@@ -210,7 +205,6 @@ impl Sender {
     }
 
     /// Returns [`platform::Transceiver`] of this [`Sender`].
-    #[inline]
     #[must_use]
     pub fn transceiver(&self) -> platform::Transceiver {
         self.transceiver.clone()
@@ -219,7 +213,6 @@ impl Sender {
     /// Returns [`mid`] of this [`Sender`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
-    #[inline]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         self.transceiver.mid()
@@ -236,7 +229,6 @@ impl Sender {
 
     /// Sends [`TrackEvent::MediaExchangeIntention`] with the provided
     /// [`media_exchange_state`].
-    #[inline]
     pub fn send_media_exchange_state_intention(
         &self,
         state: media_exchange_state::Transition,
@@ -254,7 +246,6 @@ impl Sender {
 
     /// Sends [`TrackEvent::MuteUpdateIntention`] with the provided
     /// [`mute_state`].
-    #[inline]
     pub fn send_mute_state_intention(&self, state: mute_state::Transition) {
         let _ = self.track_events_sender.unbounded_send(
             TrackEvent::MuteUpdateIntention {
@@ -269,21 +260,18 @@ impl Sender {
 impl Sender {
     /// Indicates whether general media exchange state of this [`Sender`] is in
     /// [`StableMediaExchangeState::Disabled`].
-    #[inline]
     #[must_use]
     pub fn general_disabled(&self) -> bool {
         !self.enabled_general.get()
     }
 
     /// Indicates whether this [`Sender`] is disabled.
-    #[inline]
     #[must_use]
     pub fn disabled(&self) -> bool {
         !self.enabled_individual.get()
     }
 
     /// Indicates whether this [`Sender`] is muted.
-    #[inline]
     #[must_use]
     pub fn muted(&self) -> bool {
         self.muted.get()

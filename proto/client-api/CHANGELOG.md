@@ -6,6 +6,27 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.4.0] · ????-??-?? · To-be-done
+[0.4.0]: /../../tree/medea-client-api-proto-0.4.0/proto/client-api
+
+### BC Breaks
+
+- Cargo features: ([rev])
+    - Renamed `jason` to `client`.
+    - Renamed `medea` to `server`.
+    - Made only `client` enabled by default.
+- Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([rev]).
+
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([rev]).
+
+[rev]: https://github.com/instrumentisto/medea-jason/commit/full-rev
+[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+
+
+
+
 ## [0.3.0] · 2021-04-09
 [0.3.0]: https://github.com/instrumentisto/medea/tree/medea-client-api-proto-0.3.0/proto/client-api
 

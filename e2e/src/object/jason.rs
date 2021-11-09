@@ -11,8 +11,6 @@ use super::Error;
 pub struct Jason;
 
 impl Builder for Jason {
-    #[inline]
-    #[must_use]
     fn build(self) -> Statement {
         Statement::new(
             // language=JavaScript

@@ -93,7 +93,6 @@ impl Task {
     /// Pretty much a copy of [`std::task::Wake`] implementation but for
     /// `Rc<?Send + ?Sync>` instead of `Arc<Send + Sync>` since we are sure
     /// that everything will run on a single thread.
-    #[inline(always)]
     fn into_raw_waker(this: Rc<Self>) -> RawWaker {
         // Refer to `RawWakerVTable::new()` documentation for better
         // understanding of what following functions do.

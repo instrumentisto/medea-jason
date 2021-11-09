@@ -188,7 +188,6 @@ impl<T, E> Completer<T, E> {
 }
 
 impl<T, E> Default for Completer<T, E> {
-    #[inline]
     fn default() -> Self {
         Completer::new()
     }

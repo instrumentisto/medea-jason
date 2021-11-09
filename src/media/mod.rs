@@ -41,7 +41,6 @@ pub enum MediaKind {
 
 impl MediaKind {
     /// Returns string representation of a [`MediaKind`].
-    #[inline]
     #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {

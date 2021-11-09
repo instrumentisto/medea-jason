@@ -1,11 +1,86 @@
-//! Macros for [Medea] media server project.
-//!
-//! This crate is indented for inner use only by [Medea] media server.
-//!
-//! [Medea]: https://github.com/instrumentisto/medea
-
-#![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
+#![doc = include_str!("../README.md")]
+#![deny(
+    macro_use_extern_crate,
+    nonstandard_style,
+    rust_2018_idioms,
+    rustdoc::broken_intra_doc_links,
+    rustdoc::private_intra_doc_links,
+    trivial_casts,
+    trivial_numeric_casts
+)]
 #![forbid(non_ascii_idents, unsafe_code)]
+#![warn(
+    clippy::as_conversions,
+    clippy::branches_sharing_code,
+    clippy::clone_on_ref_ptr,
+    clippy::create_dir,
+    clippy::dbg_macro,
+    clippy::debug_assert_with_mut_call,
+    clippy::decimal_literal_representation,
+    clippy::else_if_without_else,
+    clippy::empty_line_after_outer_attr,
+    clippy::exit,
+    clippy::expect_used,
+    clippy::fallible_impl_from,
+    clippy::filetype_is_file,
+    clippy::float_cmp_const,
+    clippy::fn_to_numeric_cast,
+    clippy::get_unwrap,
+    clippy::if_then_some_else_none,
+    clippy::imprecise_flops,
+    clippy::let_underscore_must_use,
+    clippy::lossy_float_literal,
+    clippy::map_err_ignore,
+    clippy::mem_forget,
+    clippy::missing_const_for_fn,
+    clippy::missing_docs_in_private_items,
+    clippy::multiple_inherent_impl,
+    clippy::mutex_integer,
+    clippy::nonstandard_macro_braces,
+    clippy::option_if_let_else,
+    clippy::panic_in_result_fn,
+    clippy::pedantic,
+    clippy::print_stderr,
+    clippy::print_stdout,
+    clippy::rc_buffer,
+    clippy::rc_mutex,
+    clippy::rest_pat_in_fully_bound_structs,
+    clippy::shadow_unrelated,
+    clippy::str_to_string,
+    clippy::string_add,
+    clippy::string_lit_as_bytes,
+    clippy::string_to_string,
+    clippy::suboptimal_flops,
+    clippy::suspicious_operation_groupings,
+    clippy::todo,
+    clippy::trivial_regex,
+    clippy::unimplemented,
+    clippy::unnecessary_self_imports,
+    clippy::unneeded_field_pattern,
+    clippy::unwrap_in_result,
+    clippy::unwrap_used,
+    clippy::use_debug,
+    clippy::use_self,
+    clippy::useless_let_if_seq,
+    clippy::verbose_file_reads,
+    clippy::wildcard_enum_match_arm,
+    future_incompatible,
+    meta_variable_misuse,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    missing_docs,
+    noop_method_call,
+    semicolon_in_expressions_from_macros,
+    unreachable_pub,
+    unused_crate_dependencies,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_labels,
+    unused_lifetimes,
+    unused_qualifications,
+    unused_results,
+    variant_size_differences
+)]
 
 mod caused;
 mod dispatchable;
@@ -20,7 +95,7 @@ use synstructure::decl_derive;
 ///
 /// # How to use
 ///
-/// ```
+/// ```rust
 /// use medea_macro::enum_delegate;
 ///
 /// #[enum_delegate(pub fn as_str(&self) -> &str)]
@@ -37,7 +112,7 @@ use synstructure::decl_derive;
 ///
 /// # Extended example
 ///
-/// ```
+/// ```rust
 /// use medea_macro::enum_delegate;
 ///
 /// struct SomeState;
@@ -103,7 +178,8 @@ pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
 /// # How to use
 ///
 /// ### 1. Declare `enum` for event variants and a `struct` to handle them.
-/// ```
+///
+/// ```rust
 /// use medea_macro::dispatchable;
 ///
 /// #[dispatchable]
@@ -128,7 +204,7 @@ pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
 /// `type Output` is a type which will be returned from all functions of
 /// `EventHandler` trait.
 ///
-/// ```
+/// ```rust
 /// # use medea_macro::dispatchable;
 /// #
 /// # #[dispatchable]
@@ -169,7 +245,7 @@ pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
 /// For the given `enum` macro generates `dispatch_with()` method to dispatch
 /// `enum` with a given handler.
 ///
-/// ```
+/// ```rust
 /// # use medea_macro::dispatchable;
 /// #
 /// # #[dispatchable]
@@ -231,7 +307,7 @@ pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
 /// `&mut self`, `self: Box<Self>`, `self: Rc<Self>`, `self: Arc<Self>`, or
 /// `self: Pin<P>` (where P is one of the previous, except `Self`).
 ///
-/// ```
+/// ```rust
 /// # use std::rc::Rc;
 /// use medea_macro::dispatchable;
 ///
@@ -257,7 +333,7 @@ pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
 /// It's possible to make handler methods `async`. Rust doesn't support `async`
 /// trait methods at the moment, that's why [`async_trait`] is used.
 ///
-/// ```
+/// ```rust
 /// use async_trait::async_trait;
 /// use medea_macro::dispatchable;
 ///
@@ -291,7 +367,7 @@ pub fn dispatchable(args: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// # Usage
 ///
-/// ```ignore
+/// ```rust,ignore
 /// use std::rc::Rc;
 ///
 /// use medea_jason::utils::Component;
@@ -330,7 +406,7 @@ pub fn dispatchable(args: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// ## `SenderComponent` implementation after macro expansion
 ///
-/// ```ignore
+/// ```rust,ignore
 /// impl SenderComponent {
 ///     async fn muted_change_watcher(
 ///         sender: Rc<Sender>,
@@ -363,8 +439,8 @@ pub fn dispatchable(args: TokenStream, input: TokenStream) -> TokenStream {
 /// }
 /// ```
 ///
-/// __Note__, that `ComponentState` implementation is simplified in this example
-/// for better readability.
+/// __Note__: `ComponentState` implementation is simplified in this example
+///           for better readability.
 ///
 /// In reality object and state types will be obtained by casting
 /// `SenderComponent` to the `ComponentTypes` trait and getting types from it.
@@ -385,7 +461,7 @@ decl_derive!([Caused, attributes(cause)] =>
 /// as an argument of the attribute `#[cause(error = "path::to::Error")]` or
 /// the error type is assumed to be imported as `Error`.
 ///
-/// ```
+/// ```rust
 /// use medea_jason::utils::Caused;
 ///
 /// struct MyError;
@@ -407,7 +483,7 @@ decl_derive!([Caused, attributes(cause)] =>
 /// If enum variant has attribute `#[cause]` it will call the `cause()`
 /// method on nested error.
 ///
-/// ```
+/// ```rust
 /// # use medea_jason::utils::Caused;
 /// #
 /// # struct MyError;

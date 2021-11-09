@@ -1,6 +1,6 @@
 //! Connection loss detection via ping/pong mechanism.
 
-use std::{cell::RefCell, rc::Rc, time::Duration};
+use std::{cell::RefCell, fmt, rc::Rc, time::Duration};
 
 use derive_more::Mul;
 use futures::{channel::mpsc, future, stream::LocalBoxStream, StreamExt as _};
@@ -17,7 +17,7 @@ pub struct IdleTimeout(pub Duration);
 /// Ping interval of [`WebSocketRpcClient`].
 ///
 /// [`WebSocketRpcClient`]: super::WebSocketRpcClient
-#[derive(Debug, Copy, Clone, Mul)]
+#[derive(Clone, Copy, Debug, Mul)]
 pub struct PingInterval(pub Duration);
 
 /// Inner data of [`Heartbeat`].
@@ -47,6 +47,19 @@ struct Inner {
     on_idle_subs: Vec<mpsc::UnboundedSender<()>>,
 }
 
+impl fmt::Debug for Inner {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Inner")
+            .field("idle_timeout", &self.idle_timeout)
+            .field("ping_interval", &self.ping_interval)
+            .field("handle_ping_task", &self.handle_ping_task)
+            .field("idle_watchdog_task", &self.idle_watchdog_task)
+            .field("last_ping_num", &self.last_ping_num)
+            .field("on_idle_subs", &self.on_idle_subs)
+            .finish_non_exhaustive()
+    }
+}
+
 impl Inner {
     /// Sends [`ClientMsg::Pong`] to a server.
     ///
@@ -56,11 +69,12 @@ impl Inner {
             .send(&ClientMsg::Pong(n))
             .map_err(tracerr::wrap!(=> platform::TransportError))
             .map_err(|e| log::error!("Failed to send pong: {}", e))
-            .ok();
+            .map_or((), drop);
     }
 }
 
 /// Detector of connection loss via ping/pong mechanism.
+#[derive(Debug)]
 pub struct Heartbeat(Rc<RefCell<Inner>>);
 
 impl Heartbeat {
@@ -136,7 +150,7 @@ fn spawn_idle_watchdog_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
         });
 
     platform::spawn(async move {
-        idle_watchdog_fut.await.ok();
+        let _ = idle_watchdog_fut.await.ok();
     });
 
     idle_watchdog_handle.into()
@@ -161,7 +175,7 @@ fn spawn_ping_handle_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
         }
     });
     platform::spawn(async move {
-        handle_ping_fut.await.ok();
+        let _ = handle_ping_fut.await.ok();
     });
     handle_ping_task.into()
 }
@@ -169,7 +183,7 @@ fn spawn_ping_handle_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
 impl Drop for Heartbeat {
     fn drop(&mut self) {
         let mut inner = self.0.borrow_mut();
-        inner.handle_ping_task.take();
-        inner.idle_watchdog_task.take();
+        drop(inner.handle_ping_task.take());
+        drop(inner.idle_watchdog_task.take());
     }
 }

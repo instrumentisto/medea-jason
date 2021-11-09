@@ -15,7 +15,7 @@ use crate::api::err::{
 };
 
 /// Wrapper around [`JsValue`] which represents a JS error.
-#[derive(Into, From)]
+#[derive(Debug, From, Into)]
 pub struct Error(JsValue);
 
 /// This implementation allows us to use [`Error`] as a return type in functions
@@ -48,7 +48,6 @@ impl FromWasmAbi for Error {
 macro_rules! impl_from_into_jsval_for_error {
     ($arg:ty) => {
         impl From<$arg> for Error {
-            #[inline]
             fn from(err: $arg) -> Self {
                 Error(err.into())
             }

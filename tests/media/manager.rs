@@ -1,7 +1,5 @@
 #![cfg(target_arch = "wasm32")]
 
-use std::iter::FromIterator;
-
 use js_sys::Array as JsArray;
 use wasm_bindgen_futures::JsFuture;
 use wasm_bindgen_test::*;

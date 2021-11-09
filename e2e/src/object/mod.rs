@@ -93,7 +93,6 @@ impl<T> Drop for Object<T> {
 
 impl<T> Object<T> {
     /// Returns a new [`Object`] with the provided ID and [`browser::Window`].
-    #[inline]
     #[must_use]
     pub fn new(id: String, window: browser::Window) -> Self {
         Self {
@@ -104,7 +103,6 @@ impl<T> Object<T> {
     }
 
     /// Returns an [`ObjectPtr`] to this [`Object`].
-    #[inline]
     #[must_use]
     pub fn ptr(&self) -> ObjectPtr {
         self.ptr.clone()
@@ -157,7 +155,6 @@ impl<T> Object<T> {
     ///
     /// JS object representing this [`Object`] will be passed to the provided
     /// [`Statement`] as a lambda argument.
-    #[inline]
     async fn execute(&self, js: Statement) -> Result<Json, Error> {
         self.window
             .execute(self.get_obj().and_then(js))

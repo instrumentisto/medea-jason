@@ -20,14 +20,12 @@ impl MediaStreamTrack {
     ///
     /// [`id`]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn id(&self) -> String {
         unimplemented!()
     }
 
     /// Returns this [`MediaStreamTrack`]'s kind (audio/video).
-    #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         unimplemented!()
@@ -47,7 +45,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
         unimplemented!()
@@ -66,7 +63,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         unimplemented!()
@@ -76,7 +72,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediatracksettings-width
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         unimplemented!()
@@ -87,7 +82,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         unimplemented!()
     }
@@ -98,7 +92,6 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    #[inline]
     pub fn stop(&self) {
         unimplemented!()
     }
@@ -108,7 +101,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
         unimplemented!()

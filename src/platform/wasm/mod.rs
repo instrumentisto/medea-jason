@@ -12,7 +12,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{convert::TryInto as _, time::Duration};
+use std::time::Duration;
 
 use futures::Future;
 use js_sys::{Promise, Reflect};
@@ -33,11 +33,11 @@ pub use self::{
     utils::Function,
 };
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
 #[cfg(feature = "wee_alloc")]
+/// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+/// allocator.
 #[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then
@@ -56,7 +56,6 @@ pub fn init_logger() {
 }
 
 /// Runs a Rust [`Future`] on the current thread.
-#[inline]
 pub fn spawn<F>(task: F)
 where
     F: Future<Output = ()> + 'static,
@@ -74,13 +73,14 @@ where
 pub async fn delay_for(delay: Duration) {
     let delay_ms = delay.as_millis().try_into().unwrap_or(i32::MAX);
     JsFuture::from(Promise::new(&mut |yes, _| {
-        window()
+        let _ = window()
             .set_timeout_with_callback_and_timeout_and_arguments_0(
                 &yes, delay_ms,
             )
             .unwrap();
     }))
     .await
+    .map(drop)
     .unwrap();
 }
 
@@ -92,8 +92,8 @@ pub fn get_property_by_name<T, F, U>(
     into: F,
 ) -> Option<U>
 where
-    T: AsRef<wasm_bindgen::JsValue>,
-    F: Fn(wasm_bindgen::JsValue) -> Option<U>,
+    T: AsRef<JsValue>,
+    F: Fn(JsValue) -> Option<U>,
 {
     Reflect::get(value.as_ref(), &JsValue::from_str(name))
         .ok()
@@ -113,6 +113,7 @@ pub fn window() -> Window {
 }
 
 /// Wrapper around interval timer ID.
+#[derive(Debug)]
 pub struct IntervalHandle(pub i32);
 
 impl Drop for IntervalHandle {

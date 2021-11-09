@@ -113,41 +113,35 @@ impl fmt::Debug for Member {
 
 impl Member {
     /// Returns ID of this [`Member`] on a media server.
-    #[inline]
     #[must_use]
     pub fn id(&self) -> &str {
         &self.id
     }
 
     /// Indicates whether this [`Member`] should publish media.
-    #[inline]
     #[must_use]
     pub fn is_send(&self) -> bool {
         self.is_send
     }
 
     /// Indicator whether this [`Member`] should receive media.
-    #[inline]
     #[must_use]
     pub fn is_recv(&self) -> bool {
         self.is_recv
     }
 
     /// Updates flag indicating that this [`Member`] should publish media.
-    #[inline]
     pub fn set_is_send(&mut self, is_send: bool) {
         self.is_send = is_send;
     }
 
     /// Updates flag indicating that this [`Member`] should receive media.
-    #[inline]
     pub fn set_is_recv(&mut self, is_recv: bool) {
         self.is_recv = is_recv;
     }
 
     /// Indicates whether this [`Member`] is joined a [`Room`] on a media
     /// server.
-    #[inline]
     #[must_use]
     pub fn is_joined(&self) -> bool {
         self.is_joined
@@ -333,14 +327,12 @@ impl Member {
     /// [`Member`]'s [`Room`].
     ///
     /// [`Connection`]: object::connection::Connection
-    #[inline]
     #[must_use]
     pub fn connections(&self) -> &Object<ConnectionStore> {
         &self.connection_store
     }
 
     /// Returns reference to the [`Room`] of this [`Member`].
-    #[inline]
     #[must_use]
     pub fn room(&self) -> &Object<Room> {
         &self.room
@@ -348,7 +340,6 @@ impl Member {
 
     /// Returns WebAPI `WebSocket` mock object for [`Window`] of this
     /// [`Member`].
-    #[inline]
     #[must_use]
     pub fn ws_mock(&self) -> mock::WebSocket {
         self.window.websocket_mock()
@@ -358,7 +349,6 @@ impl Member {
     /// [`Member`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-    #[inline]
     #[must_use]
     pub fn media_devices_mock(&self) -> mock::MediaDevices {
         self.window.media_devices_mock()
@@ -367,7 +357,6 @@ impl Member {
 
 /// Returns list of [`MediaKind`]s and [`MediaSourceKind`] based on the provided
 /// [`Option`]s.
-#[must_use]
 fn kinds_combinations(
     kind: Option<MediaKind>,
     source_kind: Option<MediaSourceKind>,

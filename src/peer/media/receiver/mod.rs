@@ -27,6 +27,7 @@ pub use self::component::{Component, State};
 ///
 /// We can save related [`platform::Transceiver`] and the actual
 /// [`remote::Track`] only when [`remote::Track`] data arrives.
+#[derive(Debug)]
 pub struct Receiver {
     track_id: TrackId,
     caps: TrackConstraints,
@@ -63,7 +64,7 @@ impl Receiver {
         recv_constraints: &RecvConstraints,
     ) -> Self {
         let connections = media_connections.0.borrow();
-        let caps = TrackConstraints::from(state.media_type().clone());
+        let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
         let transceiver_direction = if state.enabled_individual() {
             platform::TransceiverDirection::RECV
@@ -71,7 +72,7 @@ impl Receiver {
             platform::TransceiverDirection::INACTIVE
         };
 
-        let transceiver = if state.mid().is_none() {
+        let transceiver = state.mid().is_none().then(|| {
             // Try to find send transceiver that can be used as sendrecv.
             let mut senders = connections.senders.values();
             let sender = senders.find(|sndr| {
@@ -79,7 +80,7 @@ impl Receiver {
                     && sndr.caps().media_source_kind()
                         == caps.media_source_kind()
             });
-            Some(sender.map_or_else(
+            sender.map_or_else(
                 || connections.add_transceiver(kind, transceiver_direction),
                 |sender| {
                     let trnsvr = sender.transceiver();
@@ -87,10 +88,8 @@ impl Receiver {
 
                     trnsvr
                 },
-            ))
-        } else {
-            None
-        };
+            )
+        });
 
         let this = Self {
             track_id: state.track_id(),
@@ -121,7 +120,6 @@ impl Receiver {
     }
 
     /// Returns [`TrackConstraints`] of this [`Receiver`].
-    #[inline]
     #[must_use]
     pub fn caps(&self) -> &TrackConstraints {
         &self.caps
@@ -136,7 +134,7 @@ impl Receiver {
             if let Some(transceiver) =
                 self.transceiver.borrow().as_ref().cloned()
             {
-                self.mid.replace(Some(transceiver.mid()?));
+                drop(self.mid.replace(Some(transceiver.mid()?)));
             }
         }
         self.mid.borrow().clone()
@@ -199,7 +197,7 @@ impl Receiver {
             transceiver.sub_direction(platform::TransceiverDirection::RECV);
         }
 
-        self.transceiver.replace(Some(transceiver));
+        drop(self.transceiver.replace(Some(transceiver)));
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop();
         };
@@ -216,7 +214,7 @@ impl Receiver {
     /// exists in this [`Receiver`].
     pub fn replace_transceiver(&self, transceiver: platform::Transceiver) {
         if self.mid.borrow().as_ref() == transceiver.mid().as_ref() {
-            self.transceiver.replace(Some(transceiver));
+            drop(self.transceiver.replace(Some(transceiver)));
         }
     }
 
@@ -224,7 +222,6 @@ impl Receiver {
     ///
     /// Returns [`None`] if this [`Receiver`] doesn't have a
     /// [`platform::Transceiver`].
-    #[inline]
     pub fn transceiver(&self) -> Option<platform::Transceiver> {
         self.transceiver.borrow().clone()
     }
@@ -253,7 +250,6 @@ impl Receiver {
 #[cfg(feature = "mockable")]
 impl Receiver {
     /// Returns current `enabled_general` status of the [`Receiver`].
-    #[inline]
     #[must_use]
     pub fn enabled_general(&self) -> bool {
         self.enabled_general.get()

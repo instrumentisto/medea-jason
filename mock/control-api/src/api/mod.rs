@@ -310,7 +310,6 @@ pub struct ErrorResponse {
 }
 
 impl From<proto::Error> for ErrorResponse {
-    #[inline]
     fn from(e: proto::Error) -> Self {
         Self {
             code: e.code,

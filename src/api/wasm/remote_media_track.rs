@@ -14,7 +14,7 @@ use crate::{
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
 #[wasm_bindgen]
-#[derive(Clone, From, Into)]
+#[derive(Clone, Debug, From, Into)]
 pub struct RemoteMediaTrack(remote::Track);
 
 #[wasm_bindgen]

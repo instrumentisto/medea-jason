@@ -23,7 +23,6 @@ static mut FREE_DART_NATIVE_STRING: Option<FreeDartNativeStringFunction> = None;
 /// # Safety
 ///
 /// Same as for [`CStr::from_ptr()`].
-#[inline]
 #[must_use]
 pub unsafe fn c_str_into_string(string: ptr::NonNull<c_char>) -> String {
     CStr::from_ptr(string.as_ptr()).to_str().unwrap().to_owned()
@@ -38,7 +37,6 @@ pub unsafe fn c_str_into_string(string: ptr::NonNull<c_char>) -> String {
 /// # Panics
 ///
 /// If the provided [`String`] contains an internal `0x0` byte.
-#[inline]
 #[must_use]
 pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
     ptr::NonNull::new(CString::new(string).unwrap().into_raw()).unwrap()

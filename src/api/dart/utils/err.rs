@@ -279,15 +279,12 @@ pub struct DartError(ptr::NonNull<Dart_Handle>);
 
 impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
-    #[inline]
-    #[must_use]
     fn new(handle: Dart_Handle) -> DartError {
         DartError(ptr::NonNull::from(Box::leak(Box::new(handle))))
     }
 }
 
 impl From<platform::Error> for DartError {
-    #[inline]
     fn from(err: platform::Error) -> Self {
         Self::new(err.get_handle())
     }
@@ -311,7 +308,6 @@ pub struct ArgumentError<T> {
 impl<T> ArgumentError<T> {
     /// Creates a new [`ArgumentError`] from the provided invalid argument, its
     /// `name` and error `message` describing the problem.
-    #[inline]
     #[must_use]
     pub fn new<V>(val: T, name: &'static str, message: V) -> Self
     where
@@ -326,7 +322,6 @@ impl<T> ArgumentError<T> {
 }
 
 impl<T: Into<DartValue>> From<ArgumentError<T>> for DartError {
-    #[inline]
     fn from(err: ArgumentError<T>) -> Self {
         unsafe {
             Self::new(NEW_ARGUMENT_ERROR_CALLER.unwrap()(
@@ -339,7 +334,6 @@ impl<T: Into<DartValue>> From<ArgumentError<T>> for DartError {
 }
 
 impl From<StateError> for DartError {
-    #[inline]
     fn from(err: StateError) -> Self {
         unsafe {
             Self::new(NEW_STATE_ERROR_CALLER.unwrap()(string_into_c_str(
@@ -350,7 +344,6 @@ impl From<StateError> for DartError {
 }
 
 impl From<LocalMediaInitException> for DartError {
-    #[inline]
     fn from(err: LocalMediaInitException) -> Self {
         unsafe {
             Self::new(NEW_LOCAL_MEDIA_INIT_EXCEPTION_CALLER.unwrap()(
@@ -364,7 +357,6 @@ impl From<LocalMediaInitException> for DartError {
 }
 
 impl From<EnumerateDevicesException> for DartError {
-    #[inline]
     fn from(err: EnumerateDevicesException) -> Self {
         unsafe {
             Self::new(NEW_ENUMERATE_DEVICES_EXCEPTION_CALLER.unwrap()(
@@ -376,7 +368,6 @@ impl From<EnumerateDevicesException> for DartError {
 }
 
 impl From<FormatException> for DartError {
-    #[inline]
     fn from(err: FormatException) -> Self {
         unsafe {
             Self::new(NEW_FORMAT_EXCEPTION_CALLER.unwrap()(string_into_c_str(
@@ -387,7 +378,6 @@ impl From<FormatException> for DartError {
 }
 
 impl From<RpcClientException> for DartError {
-    #[inline]
     fn from(err: RpcClientException) -> Self {
         unsafe {
             Self::new(NEW_RPC_CLIENT_EXCEPTION_CALLER.unwrap()(
@@ -401,7 +391,6 @@ impl From<RpcClientException> for DartError {
 }
 
 impl From<MediaStateTransitionException> for DartError {
-    #[inline]
     fn from(err: MediaStateTransitionException) -> Self {
         unsafe {
             Self::new(NEW_MEDIA_STATE_TRANSITION_EXCEPTION_CALLER.unwrap()(
@@ -413,7 +402,6 @@ impl From<MediaStateTransitionException> for DartError {
 }
 
 impl From<InternalException> for DartError {
-    #[inline]
     fn from(err: InternalException) -> Self {
         unsafe {
             Self::new(NEW_INTERNAL_EXCEPTION_CALLER.unwrap()(
@@ -426,7 +414,6 @@ impl From<InternalException> for DartError {
 }
 
 impl From<MediaSettingsUpdateException> for DartError {
-    #[inline]
     fn from(err: MediaSettingsUpdateException) -> Self {
         unsafe {
             Self::new(NEW_MEDIA_SETTINGS_UPDATE_EXCEPTION_CALLER.unwrap()(

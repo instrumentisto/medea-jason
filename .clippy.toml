@@ -35,3 +35,17 @@ doc-valid-idents = [
     "VideoFacingModeEnum",
     "WebAPI", "WebDriver", "WebRTC", "WebSocket",
 ]
+
+standard-macro-braces = [
+    { name = "assert", brace = "(" },
+    { name = "assert_eq", brace = "(" },
+    { name = "assert_ne", brace = "(" },
+    { name = "format", brace = "(" },
+    { name = "format_ident", brace = "(" },
+    { name = "json", brace = "(" },
+    { name = "matches", brace = "(" },
+    { name = "parse_quote", brace = "{" },
+    { name = "quote", brace = "{" },
+    { name = "Token", brace = "[" },
+    { name = "vec", brace = "[" },
+]

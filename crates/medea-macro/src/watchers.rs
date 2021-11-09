@@ -21,7 +21,7 @@ use syn::{
 ///    `WatchersSpawner::spawn()` method calls.
 ///
 /// 5. Appends the generated `ComponentState` implementation to the input.
-pub fn expand(mut input: ItemImpl) -> Result<TokenStream> {
+pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
     let component_ty = input.self_ty.clone();
 
     let watchers = input
@@ -41,12 +41,12 @@ pub fn expand(mut input: ItemImpl) -> Result<TokenStream> {
                 .iter()
                 .enumerate()
                 .find_map(|(i, attr)| {
-                    if attr.path.get_ident().map_or(false, |p| *p == "watch") {
-                        watch_attr_index = Some(i);
-                        Some(attr)
-                    } else {
-                        None
-                    }
+                    attr.path.get_ident().map_or(false, |p| *p == "watch").then(
+                        || {
+                            watch_attr_index = Some(i);
+                            attr
+                        },
+                    )
                 })
                 .ok_or_else(|| {
                     Error::new(
@@ -56,7 +56,7 @@ pub fn expand(mut input: ItemImpl) -> Result<TokenStream> {
                 })?
                 .parse_args::<ExprMethodCall>()?;
             if let Some(index) = watch_attr_index {
-                method.attrs.remove(index);
+                drop(method.attrs.remove(index));
             }
             let watcher_ident = &method.sig.ident;
 

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use cucumber_rust::{then, when};
+use cucumber::{then, when};
 use medea_control_api_mock::proto::{
     self as proto, AudioSettings, VideoSettings,
 };

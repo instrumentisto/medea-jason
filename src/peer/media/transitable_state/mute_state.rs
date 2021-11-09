@@ -20,7 +20,6 @@ pub enum Stable {
 
 impl Stable {
     /// Returns the opposite value to this [`Stable`].
-    #[inline]
     #[must_use]
     pub fn opposite(self) -> Self {
         match self {
@@ -31,7 +30,6 @@ impl Stable {
 }
 
 impl From<bool> for Stable {
-    #[inline]
     fn from(muted: bool) -> Self {
         if muted {
             Self::Muted
@@ -44,7 +42,6 @@ impl From<bool> for Stable {
 impl InStable for Stable {
     type Transition = Transition;
 
-    #[inline]
     fn start_transition(self) -> Self::Transition {
         match self {
             Self::Unmuted => Transition::Muting(self),
@@ -79,7 +76,6 @@ pub enum Transition {
 impl InTransition for Transition {
     type Stable = Stable;
 
-    #[inline]
     fn intended(self) -> Self::Stable {
         match self {
             Self::Unmuting(_) => Stable::Unmuted,
@@ -87,7 +83,6 @@ impl InTransition for Transition {
         }
     }
 
-    #[inline]
     fn set_inner(self, inner: Self::Stable) -> Self {
         match self {
             Self::Unmuting(_) => Self::Unmuting(inner),
@@ -95,14 +90,12 @@ impl InTransition for Transition {
         }
     }
 
-    #[inline]
     fn into_inner(self) -> Self::Stable {
         match self {
             Self::Unmuting(s) | Self::Muting(s) => s,
         }
     }
 
-    #[inline]
     fn opposite(self) -> Self {
         match self {
             Self::Unmuting(stable) => Self::Muting(stable),

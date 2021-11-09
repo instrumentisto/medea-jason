@@ -5,11 +5,11 @@ mod control;
 mod steps;
 mod world;
 
-use cucumber_rust::{World as _, WorldInit as _};
+use cucumber::{World as _, WorldInit as _};
 use regex::Regex;
 use structopt::StructOpt;
 
-use self::world::World;
+pub use self::world::World;
 
 #[derive(StructOpt)]
 struct Conf {

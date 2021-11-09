@@ -1,6 +1,6 @@
-use cucumber_rust::{then, when};
+use cucumber::{then, when};
 
-use crate::world::World;
+use crate::World;
 
 #[when(regex = r"^(\S+) loses WS connection$")]
 async fn ws_connection_loss(world: &mut World, id: String) {

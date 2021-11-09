@@ -38,8 +38,6 @@ use crate::{
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-#[inline]
-#[must_use]
 fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
     TrackPatchEvent {
         id,
