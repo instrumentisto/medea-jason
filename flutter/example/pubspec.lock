@@ -104,11 +104,11 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: tracks-fix
-      resolved-ref: "4cfaff667a409f3b83a4379f4a3671421aa6a29e"
-      url: "https://github.com/evdokimovs/flutter-webrtc.git"
+      ref: HEAD
+      resolved-ref: "1cf5f5919eb1a8dde62a8fd84d640078b6ed8e59"
+      url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
-    version: "0.6.3"
+    version: "0.7.0+hotfix.2"
   fuchsia_remote_debug_protocol:
     dependency: transitive
     description: flutter
@@ -292,13 +292,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.1.1"
-  web_socket_channel:
-    dependency: transitive
-    description:
-      name: web_socket_channel
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0"
   webdriver:
     dependency: transitive
     description:

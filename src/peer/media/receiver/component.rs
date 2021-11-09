@@ -280,28 +280,28 @@ impl Component {
                 if let Some(track) = receiver.track.borrow().as_ref() {
                     track.set_enabled(false);
                 }
-                let fut = {
+                let sub_direction = {
                     receiver.transceiver.borrow().as_ref().map(|trnscvr| {
                         trnscvr
                             .sub_direction(platform::TransceiverDirection::RECV)
                     })
                 };
-                if let Some(fut) = fut {
-                    fut.await;
+                if let Some(sub_direction) = sub_direction {
+                    sub_direction.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
                 if let Some(track) = receiver.track.borrow().as_ref() {
                     track.set_enabled(true);
                 }
-                let fut = {
+                let add_direction =
                     receiver.transceiver.borrow().as_ref().map(|trnscvr| {
                         trnscvr
                             .add_direction(platform::TransceiverDirection::RECV)
-                    })
-                };
-                if let Some(fut) = fut {
-                    fut.await;
+                    });
+
+                if let Some(add_direction) = add_direction {
+                    add_direction.await;
                 }
             }
         }

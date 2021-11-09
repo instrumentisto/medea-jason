@@ -196,21 +196,20 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) -> Result<(), Infallible> {
-        let ((_, receiver), _guard) = val.into_parts();
+        let ((_, rcvr_state), _guard) = val.into_parts();
         peer.connections
-            .create_connection(state.id, receiver.sender_id());
+            .create_connection(state.id, rcvr_state.sender_id());
+        let receiver = receiver::Receiver::new(
+            &rcvr_state,
+            &peer.media_connections,
+            peer.track_events_sender.clone(),
+            &peer.recv_constraints,
+        )
+        .await;
         peer.media_connections
             .insert_receiver(receiver::Component::new(
-                Rc::new(
-                    receiver::Receiver::new(
-                        &receiver,
-                        &peer.media_connections,
-                        peer.track_events_sender.clone(),
-                        &peer.recv_constraints,
-                    )
-                    .await,
-                ),
-                receiver,
+                Rc::new(receiver),
+                rcvr_state,
             ));
         Ok(())
     }

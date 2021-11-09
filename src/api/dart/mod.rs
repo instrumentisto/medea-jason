@@ -30,7 +30,7 @@ use libc::c_char;
 
 use crate::{
     api::dart::utils::{DartError, PtrArray},
-    media::MediaSourceKind,
+    media::{FacingMode, MediaKind, MediaSourceKind},
     platform::utils::{
         dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
@@ -85,6 +85,10 @@ pub trait ForeignClass: Sized {
         *Box::from_raw(this.as_ptr())
     }
 }
+
+/// Marker trait which indicates that implementor is C-style enum which can be
+/// converted from the number primitives.
+pub trait PrimitiveEnum: TryFrom<i64> {}
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
 #[derive(Debug)]
@@ -331,7 +335,7 @@ impl TryFrom<DartValueArg<Option<DartHandle>>> for Option<DartHandle> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(handle) => {
-                Ok(Some(DartHandle::new(unsafe { unbox_dart_handle(handle) })))
+                Ok(Some(DartHandle::new(unsafe { *handle.as_ptr() })))
             }
             _ => Err(DartValueCastError {
                 expectation: "Option<DartHandle>",
@@ -477,14 +481,9 @@ macro_rules! impl_primitive_dart_value_try_from {
     }
 }
 
-impl_primitive_dart_value_try_from![
-    i8, i16, i32, i128, u8, u16, u32, u64, u128
-];
+impl_primitive_dart_value_try_from![i8, i16, i32, i64, u8, u16, u32];
 
-impl<T> TryFrom<DartValueArg<T>> for i64
-where
-    T: PrimitiveEnum,
-{
+impl<T: PrimitiveEnum> TryFrom<DartValueArg<T>> for i64 {
     type Error = DartValueCastError;
 
     fn try_from(value: DartValueArg<T>) -> Result<Self, Self::Error> {
@@ -498,45 +497,19 @@ where
     }
 }
 
-impl TryFrom<DartValueArg<i64>> for i64 {
-    type Error = DartValueCastError;
-
-    fn try_from(value: DartValueArg<i64>) -> Result<Self, Self::Error> {
-        match value.0 {
-            DartValue::Int(num) => Ok(num),
-            _ => Err(DartValueCastError {
-                expectation: "i64",
-                value: value.0,
-            }),
-        }
-    }
-}
-
-impl<T> TryFrom<DartValueArg<Option<T>>> for Option<i64>
-where
-    T: PrimitiveEnum,
-{
+impl<T: PrimitiveEnum> TryFrom<DartValueArg<Option<T>>> for Option<T> {
     type Error = DartValueCastError;
 
     fn try_from(value: DartValueArg<Option<T>>) -> Result<Self, Self::Error> {
         match value.0 {
             DartValue::None => Ok(None),
-            DartValue::Int(num) => Ok(Some(num)),
-            _ => Err(DartValueCastError {
-                expectation: "Option<i64>",
-                value: value.0,
-            }),
-        }
-    }
-}
-
-impl TryFrom<DartValueArg<Option<i64>>> for Option<i64> {
-    type Error = DartValueCastError;
-
-    fn try_from(value: DartValueArg<Option<i64>>) -> Result<Self, Self::Error> {
-        match value.0 {
-            DartValue::None => Ok(None),
-            DartValue::Int(num) => Ok(Some(num)),
+            DartValue::Int(num) => match T::try_from(num) {
+                Ok(variant) => Ok(Some(variant)),
+                Err(_) => Err(DartValueCastError {
+                    expectation: "Option<i64>",
+                    value: value.0,
+                }),
+            },
             _ => Err(DartValueCastError {
                 expectation: "Option<i64>",
                 value: value.0,
@@ -563,6 +536,9 @@ impl DartValueCastError {
     }
 }
 
+impl PrimitiveEnum for MediaSourceKind {}
+impl PrimitiveEnum for FacingMode {}
+
 impl TryFrom<i64> for MediaSourceKind {
     type Error = i64;
 
@@ -576,12 +552,31 @@ impl TryFrom<i64> for MediaSourceKind {
     }
 }
 
-/// Returns boxed pointer to a provided [`DartValue`].
-#[no_mangle]
-pub unsafe extern "C" fn box_foreign_value(
-    val: DartValue,
-) -> ptr::NonNull<DartValue> {
-    ptr::NonNull::from(Box::leak(Box::new(val)))
+impl TryFrom<i64> for FacingMode {
+    type Error = i64;
+
+    #[inline]
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::User),
+            1 => Ok(Self::Environment),
+            2 => Ok(Self::Left),
+            3 => Ok(Self::Right),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for MediaKind {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Audio),
+            1 => Ok(Self::Video),
+            _ => Err(value),
+        }
+    }
 }
 
 /// Returns a [`Dart_Handle`] dereferenced from the provided pointer.
@@ -608,6 +603,14 @@ pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
     let val = Dart_NewPersistentHandle_DL_Trampolined(val);
+    ptr::NonNull::from(Box::leak(Box::new(val)))
+}
+
+/// Returns boxed pointer to a provided [`DartValue`].
+#[no_mangle]
+pub unsafe extern "C" fn box_foreign_value(
+    val: DartValue,
+) -> ptr::NonNull<DartValue> {
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 

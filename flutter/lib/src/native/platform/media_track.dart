@@ -16,7 +16,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Pointer Function(Handle)>(facingMode));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__kind')(
-      Pointer.fromFunction<Int32 Function(Handle)>(kind, 0));
+      Pointer.fromFunction<Int64 Function(Handle)>(kind, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_MediaStreamTrack__height')(
       Pointer.fromFunction<Pointer Function(Handle)>(height));
@@ -60,7 +60,7 @@ void onEnded(MediaStreamTrack track, Function f) {
 
 /// Returns device ID of the provided [MediaStreamTrack].
 Pointer deviceId(MediaStreamTrack track) {
-  // TODO: add correct implementation when flutter_webrtc will be reworked.
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   final id = track.id;
   if (id == null) {
     return ForeignValue.none().intoBoxed();
@@ -71,19 +71,19 @@ Pointer deviceId(MediaStreamTrack track) {
 
 /// Returns facingMode of the provided [MediaStreamTrack].
 Pointer facingMode(MediaStreamTrack track) {
-  // TODO: remove this dummy implementation when flutter_webrtc will be reworked
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(0).intoBoxed();
 }
 
 /// Returns height of the video of the provided [MediaStreamTrack].
 Pointer height(MediaStreamTrack track) {
-  // TODO: remove this dummy implementation when flutter_webrtc will be reworked
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(1600).intoBoxed();
 }
 
 /// Returns width of the video of the provided [MediaStreamTrack].
 Pointer width(MediaStreamTrack track) {
-  // TODO: remove this dummy implementation when flutter_webrtc will be reworked
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(1300).intoBoxed();
 }
 

@@ -1,4 +1,6 @@
-//! [`RtcRtpTransceiver`] wrapper.
+//! [RTCRtpTransceiver] wrapper.
+//!
+//! [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
 
 use std::{
     cell::RefCell,
@@ -21,8 +23,10 @@ use crate::{
     },
 };
 
-/// Wrapper around `RTCRtpTransceiver`'s [`DartHandle`] which provides handy
-/// methods for direction changes.
+/// Wrapper around [RTCRtpTransceiver] which provides handy methods for
+/// direction changes.
+///
+/// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
 #[derive(Clone, Debug)]
 pub struct Transceiver {
     transceiver: DartHandle,
@@ -56,7 +60,7 @@ type ReplaceTrackFunction =
 
 /// Pointer to an extern function that drops `Send` [`MediaStreamTrack`] of the
 /// provided [`Transceiver`].
-type DropSenderFunction = extern "C" fn(Dart_Handle);
+type DropSenderFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
 /// Pointer to an extern function that returns stopped status of the provided
 /// [`Transceiver`].
@@ -77,7 +81,7 @@ type MidFunction =
 type HasSendTrackFunction = extern "C" fn(Dart_Handle) -> i8;
 
 /// Pointer to an extern function that sets `direction` this [`Transceiver`].
-type SetDirectionFunction = extern "C" fn(Dart_Handle, i32) -> Dart_Handle;
+type SetDirectionFunction = extern "C" fn(Dart_Handle, i64) -> Dart_Handle;
 
 /// Stores pointer to the [`GetCurrentDirectionFunction`] extern function.
 ///
@@ -240,21 +244,6 @@ pub unsafe extern "C" fn register_Transceiver__set_direction(
 }
 
 impl Transceiver {
-    fn set_direction(
-        &self,
-        direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let fut = FutureFromDart::execute::<()>(unsafe {
-            SET_DIRECTION_FUNCTION.unwrap()(
-                self.transceiver.get(),
-                direction.into(),
-            )
-        });
-        Box::pin(async move {
-            fut.await.unwrap();
-        })
-    }
-
     /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
     pub fn sub_direction(
         &self,
@@ -263,7 +252,7 @@ impl Transceiver {
         let this = self.clone();
         Box::pin(async move {
             this.set_direction(
-                this.get_current_direction().await - disabled_direction,
+                this.current_direction().await - disabled_direction,
             )
             .await;
         })
@@ -277,7 +266,7 @@ impl Transceiver {
         let this = self.clone();
         Box::pin(async move {
             this.set_direction(
-                this.get_current_direction().await | enabled_direction,
+                this.current_direction().await | enabled_direction,
             )
             .await;
         })
@@ -285,8 +274,8 @@ impl Transceiver {
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
-    pub async fn has_direction(self, direction: TransceiverDirection) -> bool {
-        self.get_current_direction().await.contains(direction)
+    pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
+        self.current_direction().await.contains(direction)
     }
 
     /// Replaces [`TransceiverDirection::SEND`] [`local::Track`] of this
@@ -294,7 +283,7 @@ impl Transceiver {
     ///
     /// # Errors
     ///
-    /// Errors with JS error if the underlying [`replaceTrack`][1] call fails.
+    /// Errors with [`Error`] if the underlying [`replaceTrack`][1] call fails.
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
     pub async fn set_send_track(
@@ -315,26 +304,39 @@ impl Transceiver {
 
     /// Sets a [`TransceiverDirection::SEND`] [`local::Track`] of this
     /// [`Transceiver`] to [`None`].
-    ///
-    /// # Panics
-    ///
-    /// If [`local::Track`] replacement with [`None`] fails on JS side, but
-    /// basing on [WebAPI docs] it should never happen.
-    ///
-    /// [WebAPI docs]: https://tinyurl.com/7pnszaa8
     pub fn drop_send_track(&self) -> impl Future<Output = ()> {
-        unsafe {
-            if let Some(sender) =
-                Option::<DartHandle>::try_from(*Box::from_raw(
-                    GET_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get())
-                        .as_ptr(),
-                ))
-                .unwrap()
-            {
-                DROP_SENDER_FUNCTION.unwrap()(sender.get());
-            }
+        drop(self.send_track.borrow_mut().take());
+        let transceiver = self.transceiver.get();
+        async move {
+            FutureFromDart::execute::<()>(unsafe {
+                DROP_SENDER_FUNCTION.unwrap()(transceiver)
+            })
+            .await
+            .unwrap();
         }
-        async {}
+    }
+
+    /// Returns [`mid`] of this [`Transceiver`].
+    ///
+    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    #[inline]
+    pub fn mid(&self) -> Option<String> {
+        unsafe {
+            let mid = MID_FUNCTION.unwrap()(self.transceiver.get());
+            (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
+        }
+    }
+
+    /// Returns [`local::Track`] that is being send to remote, if any.
+    #[inline]
+    pub fn send_track(&self) -> Option<Rc<local::Track>> {
+        self.send_track.borrow().as_ref().cloned()
+    }
+
+    /// Indicates whether this [`Transceiver`] has [`local::Track`].
+    #[inline]
+    pub fn has_send_track(&self) -> bool {
+        unsafe { HAS_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()) == 1 }
     }
 
     /// Sets the underlying [`local::Track`]'s `enabled` field to the provided
@@ -353,10 +355,17 @@ impl Transceiver {
         }
     }
 
+    /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
+    pub fn is_stopped(&self) -> bool {
+        let val = unsafe {
+            let p = IS_STOPPED_FUNCTION.unwrap()(self.transceiver.get());
+            *Box::from_raw(p.as_ptr())
+        };
+        i8::try_from(val).unwrap() == 1
+    }
+
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn get_current_direction(
-        &self,
-    ) -> impl Future<Output = TransceiverDirection> {
+    fn current_direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.transceiver.get();
         async move {
             FutureFromDart::execute::<i32>(unsafe {
@@ -368,32 +377,18 @@ impl Transceiver {
         }
     }
 
-    /// Indicates whether the underlying [`RtcRtpTransceiver`] is stopped.
-    pub fn is_stopped(&self) -> bool {
-        let val = unsafe {
-            let p = IS_STOPPED_FUNCTION.unwrap()(self.transceiver.get());
-            *Box::from_raw(p.as_ptr())
-        };
-        i8::try_from(val).unwrap() == 1
-    }
-
-    /// Returns [`mid`] of this [`Transceiver`].
-    ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
-    pub fn mid(&self) -> Option<String> {
-        unsafe {
-            let p = MID_FUNCTION.unwrap()(self.transceiver.get());
-            (*Box::from_raw(p.as_ptr())).try_into().unwrap()
-        }
-    }
-
-    /// Returns [`local::Track`] that is being send to remote, if any.
-    pub fn send_track(&self) -> Option<Rc<local::Track>> {
-        self.send_track.borrow().as_ref().cloned()
-    }
-
-    /// Indicates whether this [`Transceiver`] has [`local::Track`].
-    pub fn has_send_track(&self) -> bool {
-        unsafe { HAS_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()) == 1 }
+    /// Sets [`Transceiver`] to the provided [`TransceiverDirection`].
+    fn set_direction(
+        &self,
+        direction: TransceiverDirection,
+    ) -> LocalBoxFuture<'static, ()> {
+        let handle = self.transceiver.get();
+        Box::pin(async move {
+            FutureFromDart::execute::<()>(unsafe {
+                SET_DIRECTION_FUNCTION.unwrap()(handle, direction.into())
+            })
+            .await
+            .unwrap();
+        })
     }
 }

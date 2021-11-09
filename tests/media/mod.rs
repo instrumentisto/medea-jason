@@ -69,8 +69,8 @@ async fn sendrecv_works() {
     let video_receiver =
         media_connections.get_receiver_by_id(TrackId(2)).unwrap();
 
-    assert!(video_sender.clone().is_publishing().await);
-    assert!(video_receiver.clone().is_receiving().await);
+    assert!(video_sender.is_publishing().await);
+    assert!(video_receiver.is_receiving().await);
 
     assert!(
         video_sender

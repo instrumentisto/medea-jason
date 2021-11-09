@@ -24,27 +24,27 @@ void registerFunctions(DynamicLibrary dl) {
 /// Returns provided [RTCIceCandidate] [String].
 Pointer candidate(RTCIceCandidate iceCandidate) {
   if (iceCandidate.candidate != null) {
-    return ForeignValue.fromString(iceCandidate.candidate!).intoBoxed();
+    return ForeignValue.fromString(iceCandidate.candidate!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
 /// Returns SDP M line index of the provided [RTCIceCandidate].
 Pointer sdpMLineIndex(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMlineIndex != null) {
-    return ForeignValue.fromInt(iceCandidate.sdpMlineIndex!).intoBoxed();
+    return ForeignValue.fromInt(iceCandidate.sdpMlineIndex!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
 /// Returns SDP mID of the provided [RTCIceCandidate].
 Pointer sdpMid(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMid != null) {
-    return ForeignValue.fromString(iceCandidate.sdpMid!).intoBoxed();
+    return ForeignValue.fromString(iceCandidate.sdpMid!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 

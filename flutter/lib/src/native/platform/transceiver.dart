@@ -19,7 +19,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Handle Function(Handle, Int8)>(setSendTrackEnabled));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__drop_sender')(
-      Pointer.fromFunction<Void Function(Handle)>(dropSender));
+      Pointer.fromFunction<Handle Function(Handle)>(dropSender));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__is_stopped')(
       Pointer.fromFunction<Pointer Function(Handle)>(isStopped));
@@ -31,10 +31,11 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Int8 Function(Handle)>(hasSendTrack, 0));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_Transceiver__set_direction')(
-      Pointer.fromFunction<Handle Function(Handle, Int32)>(setDirection));
+      Pointer.fromFunction<Handle Function(Handle, Int64)>(setDirection));
 }
 
-/// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the provided one.
+/// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the
+/// provided one.
 Object setDirection(RTCRtpTransceiver transceiver, int direction) {
   return () => transceiver.setDirection(TransceiverDirection.values[direction]);
 }
@@ -46,23 +47,25 @@ Object getCurrentDirection(RTCRtpTransceiver transceiver) {
 
 /// Returns current mID of the provided [RTCRtpTransceiver].
 Pointer mid(RTCRtpTransceiver transceiver) {
-  if (transceiver.mid != null) {
-    return ForeignValue.fromString(transceiver.mid!).intoBoxed();
+  if (transceiver.mid.isNotEmpty) {
+    return ForeignValue.fromString(transceiver.mid).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
-/// Returns current [RTCRtpTransceiver.sender]'s track of the provided [RTCRtpTransceiver].
+/// Returns current [RTCRtpTransceiver.sender]'s track of the provided
+/// [RTCRtpTransceiver].
 Pointer getSendTrack(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null) {
-    return ForeignValue.fromHandle(transceiver.sender.track!).intoBoxed();
+    return ForeignValue.fromHandle(transceiver.sender.track!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
-/// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender] has some [MediaStreamTrack].
+/// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender]
+/// has some [MediaStreamTrack].
 int hasSendTrack(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track == null) {
     return 0;
@@ -71,14 +74,16 @@ int hasSendTrack(RTCRtpTransceiver transceiver) {
   }
 }
 
-/// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided [RTCRtpTransceiver] with a provided [MediaStreamTrack].
+/// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
+/// [RTCRtpTransceiver] with a provided [MediaStreamTrack].
 Object replaceSendTrack(RTCRtpTransceiver transceiver, MediaStreamTrack track) {
   return () async {
     await transceiver.sender.setTrack(track);
   };
 }
 
-/// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
+/// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of
+/// the provided [RTCRtpTransceiver].
 void setSendTrackEnabled(RTCRtpTransceiver transceiver, int enabled) {
   if (transceiver.sender.track != null) {
     transceiver.sender.track!.enabled = enabled == 1;
@@ -86,8 +91,13 @@ void setSendTrackEnabled(RTCRtpTransceiver transceiver, int enabled) {
 }
 
 /// Drops [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
-void dropSender(RTCRtpTransceiver transceiver) {
-  throw UnimplementedError();
+Object dropSender(RTCRtpTransceiver transceiver) {
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
+  if (transceiver.sender.track == null) {
+    return () => Future.value();
+  } else {
+    return () => transceiver.sender.track!.stop();
+  }
 }
 
 /// Returns `1` if [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is stopped.
@@ -97,8 +107,8 @@ Pointer isStopped(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null &&
       transceiver.sender.track!.muted != null) {
     return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0)
-        .intoBoxed();
+        .intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }

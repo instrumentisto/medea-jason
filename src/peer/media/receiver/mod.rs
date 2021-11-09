@@ -2,10 +2,7 @@
 
 mod component;
 
-use std::{
-    cell::{Cell, RefCell},
-    rc::Rc,
-};
+use std::cell::{Cell, RefCell};
 
 use futures::channel::mpsc;
 use medea_client_api_proto::{self as proto, MediaType, MemberId};
@@ -75,18 +72,18 @@ impl Receiver {
 
         let transceiver = if state.mid().is_none() {
             // Try to find send transceiver that can be used as sendrecv.
-            let senders: Vec<_> = media_connections
+            let sender = media_connections
                 .0
                 .borrow()
                 .senders
                 .values()
-                .map(utils::component::Component::obj)
-                .collect();
-            let sender = senders.iter().find(|sndr| {
-                sndr.caps().media_kind() == caps.media_kind()
-                    && sndr.caps().media_source_kind()
-                        == caps.media_source_kind()
-            });
+                .find(|sndr| {
+                    sndr.caps().media_kind() == caps.media_kind()
+                        && sndr.caps().media_source_kind()
+                            == caps.media_source_kind()
+                })
+                .map(utils::component::Component::obj);
+
             if let Some(sender) = sender {
                 let trnsvr = sender.transceiver();
                 trnsvr.add_direction(transceiver_direction).await;
@@ -103,6 +100,8 @@ impl Receiver {
             None
         };
 
+        let peer_events_sender =
+            media_connections.0.borrow().peer_events_sender.clone();
         let this = Self {
             track_id: state.track_id(),
             caps,
@@ -111,11 +110,7 @@ impl Receiver {
             mid: RefCell::new(state.mid().map(ToString::to_string)),
             track: RefCell::new(None),
             is_track_notified: Cell::new(false),
-            peer_events_sender: media_connections
-                .0
-                .borrow()
-                .peer_events_sender
-                .clone(),
+            peer_events_sender,
             enabled_general: Cell::new(state.enabled_individual()),
             enabled_individual: Cell::new(state.enabled_general()),
             muted: Cell::new(state.muted()),
@@ -158,7 +153,7 @@ impl Receiver {
     }
 
     /// Indicates whether this [`Receiver`] receives media data.
-    pub async fn is_receiving(self: Rc<Self>) -> bool {
+    pub async fn is_receiving(&self) -> bool {
         let transceiver = self.transceiver.borrow().clone();
         let is_recv_direction = if let Some(transceiver) = transceiver {
             transceiver
@@ -194,7 +189,7 @@ impl Receiver {
     /// Sets [`platform::MediaStreamTrack::enabled`] same as
     /// `enabled_individual` of this [`Receiver`].
     pub async fn set_remote_track(
-        self: Rc<Self>,
+        &self,
         transceiver: platform::Transceiver,
         new_track: platform::MediaStreamTrack,
     ) {
@@ -253,11 +248,11 @@ impl Receiver {
 
     /// Emits [`PeerEvent::NewRemoteTrack`] if [`Receiver`] is receiving media
     /// and has not notified yet.
-    async fn maybe_notify_track(self: Rc<Self>) {
+    async fn maybe_notify_track(&self) {
         if self.is_track_notified.get() {
             return;
         }
-        if !Rc::clone(&self).is_receiving().await {
+        if !self.is_receiving().await {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {
@@ -286,7 +281,7 @@ impl Drop for Receiver {
     fn drop(&mut self) {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             if !transceiver.is_stopped() {
-                crate::platform::spawn(async move {
+                platform::spawn(async move {
                     transceiver
                         .sub_direction(platform::TransceiverDirection::RECV)
                         .await;
