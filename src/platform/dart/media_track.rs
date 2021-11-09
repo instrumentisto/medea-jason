@@ -259,12 +259,14 @@ impl MediaStreamTrack {
     ///
     /// [`id`]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[inline]
     #[must_use]
     pub fn id(&self) -> String {
         unsafe { c_str_into_string(ID_FUNCTION.unwrap()(self.0.get())) }
     }
 
     /// Returns this [`MediaStreamTrack`]'s kind (audio/video).
+    #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         MediaKind::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
@@ -287,6 +289,7 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
         unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) }
@@ -313,6 +316,7 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[inline]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         Option::try_from(unsafe { HEIGHT_FUNCTION.unwrap()(self.0.get()) })
@@ -323,6 +327,7 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediatracksettings-width
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[inline]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         Option::try_from(unsafe { WIDTH_FUNCTION.unwrap()(self.0.get()) })
@@ -334,6 +339,7 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         unsafe {
             SET_ENABLED_FUNCTION.unwrap()(self.0.get(), enabled);
@@ -346,6 +352,7 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
+    #[inline]
     pub fn stop(&self) {
         unsafe {
             STOP_FUNCTION.unwrap()(self.0.get());
@@ -357,6 +364,7 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
         unsafe { ENABLED_FUNCTION.unwrap()(self.0.get()) }
@@ -384,6 +392,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     #[must_use]
     pub fn fork(&self) -> Self {
+        // TODO: Correct implementation requires flutter_webrtc-side fixes.
         self.clone()
     }
 

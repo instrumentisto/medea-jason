@@ -1,3 +1,7 @@
+//! Wrapper around [RTCPeerConnection][1].
+//!
+//! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+
 use std::{convert::TryFrom, future::Future, os::raw::c_char, ptr};
 
 use dart_sys::Dart_Handle;
@@ -31,7 +35,6 @@ use super::{
 };
 
 /// Representation of the Dart SDP type.
-// to_string
 #[derive(Display)]
 pub enum RtcSdpType {
     /// The description is the initial proposal in an offer/answer exchange.
@@ -449,7 +452,7 @@ impl RtcPeerConnection {
     /// # Errors
     ///
     /// Errors with [`RtcPeerConnectionError::PeerCreationError`] if
-    /// [`SysRtcPeerConnection`] creation fails.
+    /// [`RtcPeerConnection`] creation fails.
     pub async fn new<I>(ice_servers: I, is_force_relayed: bool) -> Result<Self>
     where
         I: IntoIterator<Item = IceServer>,
@@ -467,17 +470,13 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
-    ///
-    /// # Errors
-    ///
-    /// This functions currently has dummy implementation, so it never fails
-    /// atm.
+    #[allow(clippy::missing_errors_doc)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
+        // TODO: Correct implementation requires flutter_webrtc-side rework.
         Ok(RtcStats(Vec::new()))
     }
 
-    /// Sets handler for a [`RtcTrackEvent`] (see [RTCTrackEvent][1] and
-    /// [`ontrack` callback][2]).
+    /// Sets handler for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
     ///
     /// [1]: https://w3.org/TR/webrtc/#rtctrackevent
     /// [2]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-ontrack
@@ -503,8 +502,8 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Sets handler for a [`RtcPeerConnectionIceEvent`] (see
-    /// [RTCPeerConnectionIceEvent][1] and [`onicecandidate` callback][2]).
+    /// Sets handler for a [RTCPeerConnectionIceEvent][1] (see
+    /// [`onicecandidate` callback][2]).
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent
     /// [2]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-onicecandidate
@@ -530,7 +529,7 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Returns [`RtcIceConnectionState`] of this [`RtcPeerConnection`].
+    /// Returns [`IceConnectionState`] of this [`RtcPeerConnection`].
     #[must_use]
     pub fn ice_connection_state(&self) -> IceConnectionState {
         let ice_connection_state = unsafe {
@@ -601,9 +600,9 @@ impl RtcPeerConnection {
     /// With [`RtcPeerConnectionError::AddIceCandidateFailed`] if
     /// [RtcPeerConnection.addIceCandidate()][3] fails.
     ///
-    ///
     /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
     /// [2]: https://tools.ietf.org/html/rfc5245#section-2
+    /// [3]: https://w3.org/TR/webrtc/#dom-peerconnection-addicecandidate
     pub async fn add_ice_candidate(
         &self,
         candidate: &str,
@@ -660,31 +659,69 @@ impl RtcPeerConnection {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Sets local description to the provided one [`RtcSdpType`].
-    async fn set_local_description(
-        &self,
-        sdp_type: RtcSdpType,
-        sdp: String,
-    ) -> Result<()> {
-        unsafe {
-            FutureFromDart::execute(SET_LOCAL_DESCRIPTION_FUNCTION.unwrap()(
-                self.handle.get(),
-                string_into_c_str(sdp_type.to_string()),
-                string_into_c_str(sdp),
-            ))
-            .await
-            .map_err(|e| {
-                tracerr::new!(
-                    RtcPeerConnectionError::SetLocalDescriptionFailed(e)
-                )
-            })?;
-        }
+    /// Obtains [SDP answer][`SdpType::Answer`] from the [`RtcPeerConnection`].
+    ///
+    /// Should be called whenever remote description has been changed.
+    ///
+    /// # Errors
+    ///
+    /// With [`RtcPeerConnectionError::CreateAnswerFailed`] if
+    /// [RtcPeerConnection.createAnswer()][1] fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createanswer
+    pub async fn create_answer(&self) -> Result<String> {
+        FutureFromDart::execute(unsafe {
+            CREATE_ANSWER.unwrap()(self.handle.get())
+        })
+        .await
+        .map_err(|e| {
+            tracerr::new!(RtcPeerConnectionError::CreateAnswerFailed(e))
+        })
+    }
+
+    /// Rollbacks the [`RtcPeerConnection`] to the previous stable state.
+    ///
+    /// # Errors
+    ///
+    /// With [`RtcPeerConnectionError::SetLocalDescriptionFailed`] if
+    /// [RtcPeerConnection.setLocalDescription()][1] fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
+    pub async fn rollback(&self) -> Result<()> {
+        FutureFromDart::execute(unsafe {
+            ROLLBACK_FUNCTION.unwrap()(self.handle.get())
+        })
+        .await
+        .map_err(|e| {
+            tracerr::new!(RtcPeerConnectionError::SetLocalDescriptionFailed(e))
+        })?;
         Ok(())
     }
 
-    /// Instructs the underlying [RTCPeerConnection][`SysRtcPeerConnection`]
-    /// to apply the supplied [SDP][`SdpType`] as the remote
-    /// [offer][`SdpType::Offer`] or [answer][`SdpType::Answer`].
+    /// Obtains [SDP offer][`SdpType::Offer`] from the [`RtcPeerConnection`].
+    ///
+    /// Should be called after local tracks changes, which require
+    /// (re)negotiation.
+    ///
+    /// # Errors
+    ///
+    /// With [`RtcPeerConnectionError::CreateOfferFailed`] if
+    /// [RtcPeerConnection.createOffer()][1] fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createoffer
+    pub async fn create_offer(&self) -> Result<String> {
+        FutureFromDart::execute(unsafe {
+            CREATE_OFFER.unwrap()(self.handle.get())
+        })
+        .await
+        .map_err(|e| {
+            tracerr::new!(RtcPeerConnectionError::CreateOfferFailed(e))
+        })
+    }
+
+    /// Instructs the [`RtcPeerConnection`] to apply the supplied
+    /// [SDP][`SdpType`] as the remote [offer][`SdpType::Offer`] or
+    /// [answer][`SdpType::Answer`].
     ///
     /// Changes the local media state.
     ///
@@ -692,6 +729,8 @@ impl RtcPeerConnection {
     ///
     /// With [`RtcPeerConnectionError::SetRemoteDescriptionFailed`] if
     /// [RTCPeerConnection.setRemoteDescription()][1] fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setremotedescription
     pub async fn set_remote_description(&self, sdp: SdpType) -> Result<()> {
         match sdp {
             SdpType::Offer(sdp) => unsafe {
@@ -726,71 +765,8 @@ impl RtcPeerConnection {
         Ok(())
     }
 
-    /// Obtains [SDP answer][`SdpType::Answer`] from the underlying
-    /// [RTCPeerConnection][`SysRtcPeerConnection`].
-    ///
-    /// Should be called whenever remote description has been changed.
-    ///
-    /// # Errors
-    ///
-    /// With [`RtcPeerConnectionError::CreateAnswerFailed`] if
-    /// [RtcPeerConnection.createAnswer()][1] fails.
-    ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createanswer
-    pub async fn create_answer(&self) -> Result<String> {
-        FutureFromDart::execute(unsafe {
-            CREATE_ANSWER.unwrap()(self.handle.get())
-        })
-        .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::CreateAnswerFailed(e))
-        })
-    }
-
-    /// Obtains [SDP offer][`SdpType::Offer`] from the underlying
-    /// [RTCPeerConnection][`SysRtcPeerConnection`].
-    ///
-    /// Should be called after local tracks changes, which require
-    /// (re)negotiation.
-    ///
-    /// # Errors
-    ///
-    /// With [`RtcPeerConnectionError::CreateOfferFailed`] if
-    /// [RtcPeerConnection.createOffer()][1] fails.
-    ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createoffer
-    pub async fn create_offer(&self) -> Result<String> {
-        FutureFromDart::execute(unsafe {
-            CREATE_OFFER.unwrap()(self.handle.get())
-        })
-        .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::CreateOfferFailed(e))
-        })
-    }
-
-    /// Rollbacks the underlying [RTCPeerConnection][`SysRtcPeerConnection`] to
-    /// the previous stable state.
-    ///
-    /// # Errors
-    ///
-    /// With [`RtcPeerConnectionError::SetLocalDescriptionFailed`] if
-    /// [RtcPeerConnection.setLocalDescription()][1] fails.
-    ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
-    pub async fn rollback(&self) -> Result<()> {
-        FutureFromDart::execute(unsafe {
-            ROLLBACK_FUNCTION.unwrap()(self.handle.get())
-        })
-        .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::SetLocalDescriptionFailed(e))
-        })?;
-        Ok(())
-    }
-
-    /// Creates new [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1])
-    /// and adds it to the [set of this RTCPeerConnection's transceivers][2].
+    /// Creates a new [`Transceiver`] (see [RTCRtpTransceiver][1]) and adds it
+    /// to the [set of this RTCPeerConnection's transceivers][2].
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
@@ -815,7 +791,7 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a
+    /// Returns [`Transceiver`] (see [RTCRtpTransceiver][1]) from a
     /// [set of this RTCPeerConnection's transceivers][2] by provided `mid`.
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
@@ -838,5 +814,27 @@ impl RtcPeerConnection {
                 transceiver.map(Transceiver::from)
             }
         }
+    }
+
+    /// Sets local description to the provided one [`RtcSdpType`].
+    async fn set_local_description(
+        &self,
+        sdp_type: RtcSdpType,
+        sdp: String,
+    ) -> Result<()> {
+        unsafe {
+            FutureFromDart::execute(SET_LOCAL_DESCRIPTION_FUNCTION.unwrap()(
+                self.handle.get(),
+                string_into_c_str(sdp_type.to_string()),
+                string_into_c_str(sdp),
+            ))
+            .await
+            .map_err(|e| {
+                tracerr::new!(
+                    RtcPeerConnectionError::SetLocalDescriptionFailed(e)
+                )
+            })?;
+        }
+        Ok(())
     }
 }

@@ -123,11 +123,11 @@ impl Sender {
                 let get_transceiver = media_connections
                     .0
                     .borrow()
-                    .get_transceiver_by_mid(mid.to_string());
+                    .get_transceiver_by_mid(mid.to_owned());
                 get_transceiver
                     .await
                     .ok_or_else(|| {
-                        CreateError::TransceiverNotFound(mid.to_string())
+                        CreateError::TransceiverNotFound(mid.to_owned())
                     })
                     .map_err(tracerr::wrap!())?
             }

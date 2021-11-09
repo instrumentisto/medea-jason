@@ -92,6 +92,7 @@ void setSendTrackEnabled(RTCRtpTransceiver transceiver, int enabled) {
 
 /// Drops [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
 Object dropSender(RTCRtpTransceiver transceiver) {
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   if (transceiver.sender.track == null) {
     return () => Future.value();
   } else {

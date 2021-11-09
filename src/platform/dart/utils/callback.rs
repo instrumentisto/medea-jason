@@ -117,14 +117,13 @@ enum Kind {
 //       1. Requires additional parametrization or(and) wrapping.
 //       2. `FnOnce` semantics should be reflected on Dart side somehow.
 //       3. `Kind::FnMut` and `Kind::Fn` aren't dropped anywhere right now.
-/// Rust closure which can be called by Dart.s
+/// Rust closure which can be called by Dart.
 #[must_use]
 pub struct Callback(Kind);
 
 impl Callback {
     /// Returns a [`Callback`] wrapping the provided [`FnOnce`], that can be
     /// converted to a [`Dart_Handle`] and passed to Dart.
-    #[allow(clippy::new_ret_no_self)]
     pub fn from_once<F, T>(f: F) -> Self
     where
         F: FnOnce(T) + 'static,

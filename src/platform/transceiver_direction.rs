@@ -34,16 +34,17 @@ bitflags! {
     }
 }
 
+#[cfg(target_os = "android")]
 impl From<TransceiverDirection> for i64 {
     fn from(from: TransceiverDirection) -> i64 {
         use TransceiverDirection as D;
 
         if from.is_all() {
             0
-        } else if from.contains(D::RECV) {
-            2
         } else if from.contains(D::SEND) {
             1
+        } else if from.contains(D::RECV) {
+            2
         } else {
             3
         }

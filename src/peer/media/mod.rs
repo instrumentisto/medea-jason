@@ -448,28 +448,23 @@ impl MediaConnections {
     pub fn get_transceivers_statuses(
         &self,
     ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
-        return {
-            let inner = self.0.borrow();
-            future::join_all(
-                inner
-                    .senders
-                    .iter()
-                    .map(|(track_id, sender)| {
-                        let track_id = *track_id;
-                        let sender = sender.obj();
-                        async move { (track_id, sender.is_publishing().await) }
-                            .boxed_local()
-                    })
-                    .chain(inner.receivers.iter().map(|(track_id, receiver)| {
-                        let track_id = *track_id;
-                        let receiver = receiver.obj();
-                        async move { (track_id, receiver.is_receiving().await) }
-                            .boxed_local()
-                    }))
-                    .collect::<Vec<_>>(),
-            )
-        }
-        .map(|r| r.into_iter().collect());
+        let inner = self.0.borrow();
+        let transceivers = inner
+            .senders
+            .iter()
+            .map(|(&track_id, sender)| {
+                let sender = sender.obj();
+                async move { (track_id, sender.is_publishing().await) }
+                    .boxed_local()
+            })
+            .chain(inner.receivers.iter().map(|(&track_id, receiver)| {
+                let receiver = receiver.obj();
+                async move { (track_id, receiver.is_receiving().await) }
+                    .boxed_local()
+            }))
+            .collect::<Vec<_>>();
+
+        future::join_all(transceivers).map(|r| r.into_iter().collect())
     }
 
     /// Returns [`Rc`] to [`TransceiverSide`] with a provided [`TrackId`].
@@ -646,8 +641,8 @@ impl MediaConnections {
                 .receivers
                 .values()
                 .filter_map(|receiver| {
-                    // Suppress Clippy warn because this impl more
-                    // understandable
+                    // Suppress Clippy warn because this impl is easier to
+                    // follow
                     #[allow(clippy::question_mark)]
                     if receiver.transceiver().is_none() {
                         return None;
