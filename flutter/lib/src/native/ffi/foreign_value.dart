@@ -109,18 +109,13 @@ class ForeignValue extends Struct {
 }
 
 extension ForeignValuePointer on Pointer<ForeignValue> {
-  /// Converts [ForeignValue] to the boxed Rust Pointer to [ForeignValue].
+  /// Transfers [ForeignValue] ownership to Rust.
   ///
   /// Frees Dart side [ForeignValue].
-  Pointer intoBoxed() {
-    var out = boxed();
+  Pointer intoRustOwned() {
+    var out = _boxForeignValue(ref);;
     free();
     return out;
-  }
-
-  /// Returns [Pointer] to this [ForeignValue].
-  Pointer boxed() {
-    return _boxForeignValue(ref);
   }
 
   /// Releases the memory allocated on a native heap.

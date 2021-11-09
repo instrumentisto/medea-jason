@@ -83,41 +83,47 @@ Object addTransceiver(RTCPeerConnection peer, int kind, int direction) {
   );
 }
 
-/// Returns newly created [RTCPeerConnection] with a provided `iceServers` [List].
+/// Returns newly created [RTCPeerConnection] with a provided `iceServers`
+/// [List].
 Object newPeer(Object iceServers) {
   return createPeerConnection(
       {'iceServers': iceServers, 'sdpSemantics': 'unified-plan'});
 }
 
-/// Adds subscription on [RTCPeerConnection.onTrack] to the provided [RTCPeerConnection].
+/// Adds subscription on [RTCPeerConnection.onTrack] to the provided
+/// [RTCPeerConnection].
 void onTrack(RTCPeerConnection conn, Function f) {
   conn.onTrack = (e) {
     f(e.track, e.transceiver);
   };
 }
 
-/// Add subscription on [RTCPeerConnection.onIceCandidate] to the provided [RTCPeerConnection].
+/// Add subscription on [RTCPeerConnection.onIceCandidate] to the provided
+/// [RTCPeerConnection].
 void onIceCandidate(RTCPeerConnection conn, Function f) {
   conn.onIceCandidate = (e) {
     f(e);
   };
 }
 
-/// Adds subscription on [RTCPeerConnection.onIceConnectionState] to the provided [RTCPeerConnection].
+/// Adds subscription on [RTCPeerConnection.onIceConnectionState] to the
+/// provided [RTCPeerConnection].
 void onIceConnectionStateChange(RTCPeerConnection conn, Function f) {
   conn.onIceConnectionState = (e) {
     f(e.index);
   };
 }
 
-/// Adds subscription on [RTCPeerConnection.onConnectionState] to the provided [RTCPeerConnection].
+/// Adds subscription on [RTCPeerConnection.onConnectionState] to the
+/// provided [RTCPeerConnection].
 void onConnectionStateChange(RTCPeerConnection conn, Function f) {
   conn.onConnectionState = (e) {
     f(e.index);
   };
 }
 
-/// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the provided [String].
+/// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the
+/// provided [String].
 Object getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
   return peer.getTransceivers().then((transceivers) {
     var mMid = mid.toDartString();
@@ -163,16 +169,18 @@ Object addIceCandidate(RTCPeerConnection conn, RTCIceCandidate candidate) {
   return conn.addCandidate(candidate);
 }
 
-/// Returns current [RTCPeerConnection.connectionState] of the provided [RTCPeerConnection].
+/// Returns current [RTCPeerConnection.connectionState] of the provided
+/// [RTCPeerConnection].
 Pointer connectionState(RTCPeerConnection conn) {
   if (conn.connectionState != null) {
-    return ForeignValue.fromInt(conn.connectionState!.index).intoBoxed();
+    return ForeignValue.fromInt(conn.connectionState!.index).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
-/// Returns current [RTCPeerConnection.iceConnectionState] of the provided [RTCPeerConnection].
+/// Returns current [RTCPeerConnection.iceConnectionState] of the provided
+/// [RTCPeerConnection].
 ForeignValue iceConnectionState(RTCPeerConnection conn) {
   if (conn.iceConnectionState != null) {
     return ForeignValue.fromInt(conn.iceConnectionState!.index).ref;

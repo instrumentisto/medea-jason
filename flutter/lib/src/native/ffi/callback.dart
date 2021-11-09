@@ -5,15 +5,13 @@ import 'foreign_value.dart';
 
 typedef _callbackCall_C = Void Function(Pointer, ForeignValue);
 typedef _callbackCall_Dart = void Function(Pointer, ForeignValue);
-
-final _callbackCall =
-    dl.lookupFunction<_callbackCall_C, _callbackCall_Dart>('Callback__call');
-
 typedef _callbackTwoArgCall_C = Void Function(
     Pointer, ForeignValue, ForeignValue);
 typedef _callbackTwoArgCall_Dart = void Function(
     Pointer, ForeignValue, ForeignValue);
 
+final _callbackCall =
+    dl.lookupFunction<_callbackCall_C, _callbackCall_Dart>('Callback__call');
 final _callbackTwoArgCall =
     dl.lookupFunction<_callbackTwoArgCall_C, _callbackTwoArgCall_Dart>(
         'Callback__call_two_arg');

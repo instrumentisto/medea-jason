@@ -331,6 +331,8 @@ impl Transceiver {
                 ))
                 .unwrap()
             {
+                // TODO: почему DROP_SENDER? replace_track(null) же должны
+                //       дернуть? ну и this.send_track().take() сделать.
                 DROP_SENDER_FUNCTION.unwrap()(sender.get());
             }
         }

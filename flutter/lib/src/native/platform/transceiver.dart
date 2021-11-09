@@ -34,7 +34,8 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Handle Function(Handle, Int64)>(setDirection));
 }
 
-/// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the provided one.
+/// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the
+/// provided one.
 Object setDirection(RTCRtpTransceiver transceiver, int direction) {
   return transceiver.setDirection(TransceiverDirection.values[direction]);
 }
@@ -47,22 +48,24 @@ Object getCurrentDirection(RTCRtpTransceiver transceiver) {
 /// Returns current mID of the provided [RTCRtpTransceiver].
 Pointer mid(RTCRtpTransceiver transceiver) {
   if (transceiver.mid.isNotEmpty) {
-    return ForeignValue.fromString(transceiver.mid).intoBoxed();
+    return ForeignValue.fromString(transceiver.mid).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
-/// Returns current [RTCRtpTransceiver.sender]'s track of the provided [RTCRtpTransceiver].
+/// Returns current [RTCRtpTransceiver.sender]'s track of the provided
+/// [RTCRtpTransceiver].
 Pointer getSendTrack(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null) {
-    return ForeignValue.fromHandle(transceiver.sender.track!).intoBoxed();
+    return ForeignValue.fromHandle(transceiver.sender.track!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
-/// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender] has some [MediaStreamTrack].
+/// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender]
+/// has some [MediaStreamTrack].
 int hasSendTrack(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track == null) {
     return 0;
@@ -71,14 +74,16 @@ int hasSendTrack(RTCRtpTransceiver transceiver) {
   }
 }
 
-/// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided [RTCRtpTransceiver] with a provided [MediaStreamTrack].
+/// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
+/// [RTCRtpTransceiver] with a provided [MediaStreamTrack].
 Object replaceSendTrack(
     RTCRtpTransceiver transceiver, MediaStreamTrack track) async {
   await transceiver.sender.setTrack(track);
   return ForeignValue.none().ref;
 }
 
-/// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
+/// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of
+/// the provided [RTCRtpTransceiver].
 void setSendTrackEnabled(RTCRtpTransceiver transceiver, int enabled) {
   if (transceiver.sender.track != null) {
     transceiver.sender.track!.enabled = enabled == 1;
@@ -97,8 +102,8 @@ Pointer isStopped(RTCRtpTransceiver transceiver) {
   if (transceiver.sender.track != null &&
       transceiver.sender.track!.muted != null) {
     return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0)
-        .intoBoxed();
+        .intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
