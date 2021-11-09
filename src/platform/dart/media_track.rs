@@ -17,49 +17,49 @@ use crate::{
     platform::dart::utils::{callback::Callback, handle::DartHandle},
 };
 
-/// Pointer to an extern function that returns ID of the provided
+/// Pointer to an extern function returning ID of the provided
 /// [`MediaStreamTrack`].
 type IdFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
 
-/// Pointer to an extern function that returns device ID of the provided
+/// Pointer to an extern function returning device ID of the provided
 /// [`MediaStreamTrack`].
 type DeviceIdFunction =
     extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 
-/// Pointer to an extern function that returns facing mode of the provided
+/// Pointer to an extern function returning facing mode of the provided
 /// [`MediaStreamTrack`].
 type FacingModeFunction =
     extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
-/// Pointer to an extern function that returns height of the provided
+/// Pointer to an extern function returning height of the provided
 /// [`MediaStreamTrack`].
 type HeightFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
 
-/// Pointer to an extern function that returns width of the provided
+/// Pointer to an extern function returning width of the provided
 /// [`MediaStreamTrack`].
 type WidthFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
 
-/// Pointer to an extern function that sets `enabled` field of the provided
+/// Pointer to an extern function setting `enabled` field of the provided
 /// [`MediaStreamTrack`] to the provided [`bool`].
 type SetEnabledFunction = extern "C" fn(Dart_Handle, bool);
 
-/// Pointer to an extern function that stops provided [`MediaStreamTrack`].
+/// Pointer to an extern function stopping the provided [`MediaStreamTrack`].
 type StopFunction = extern "C" fn(Dart_Handle);
 
-/// Pointer to an extern function that returns `enabled` field of the provided
+/// Pointer to an extern function returning `enabled` field of the provided
 /// [`MediaStreamTrack`].
 type EnabledFunction = extern "C" fn(Dart_Handle) -> bool;
 
-/// Pointer to an extern function that returns kind of the provided
+/// Pointer to an extern function returning kind of the provided
 /// [`MediaStreamTrack`].
 type KindFunction = extern "C" fn(Dart_Handle) -> i64;
 
-/// Pointer to an extern function that returns readiness state of the provided
+/// Pointer to an extern function returning readiness state of the provided
 /// [`MediaStreamTrack`].
 type ReadyStateFunction = extern "C" fn(Dart_Handle) -> i64;
 
-// Pointer to an extern function that sets `on_ended` callback of the provided
-// [`MediaStreamTrack`].
+/// Pointer to an extern function setting `on_ended` callback of the provided
+/// [`MediaStreamTrack`].
 type OnEndedFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
 /// Stores pointer to the [`IdFunction`] extern function.
@@ -116,15 +116,6 @@ static mut READY_STATE_FUNCTION: Option<ReadyStateFunction> = None;
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut ON_ENDED_FUNCTION: Option<OnEndedFunction> = None;
-
-/// Wrapper around [MediaStreamTrack][1] received from a
-/// [getUserMedia()][2]/[getDisplayMedia()][3] request.
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-/// [2]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
-/// [3]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Clone, From, Debug)]
-pub struct MediaStreamTrack(DartHandle);
 
 /// Registers the provided [`IdFunction`] as [`ID_FUNCTION`].
 ///
@@ -248,8 +239,17 @@ pub unsafe extern "C" fn register_MediaStreamTrack__on_ended(
     ON_ENDED_FUNCTION = Some(f);
 }
 
+/// Wrapper around [MediaStreamTrack][1] received from a
+/// [getUserMedia()][2]/[getDisplayMedia()][3] request.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+/// [2]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+/// [3]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+#[derive(Clone, From, Debug)]
+pub struct MediaStreamTrack(DartHandle);
+
 impl MediaStreamTrack {
-    /// Returns underlying [`Dart_Handle`] of this [`MediaStreamTrack`].
+    /// Returns the underlying [`Dart_Handle`] of this [`MediaStreamTrack`].
     #[must_use]
     pub fn handle(&self) -> Dart_Handle {
         self.0.get()
@@ -281,7 +281,7 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn ready_state(&self) -> MediaStreamTrackState {
-        // TODO: Correct implementation requires flutter_webrtc-side fixes.
+        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
         MediaStreamTrackState::Live
     }
 
@@ -379,7 +379,7 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
-        // TODO: Correct implementation requires flutter_webrtc-side fixes.
+        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
         false
     }
 
@@ -392,14 +392,15 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     #[must_use]
     pub fn fork(&self) -> Self {
-        // TODO: Correct implementation requires flutter_webrtc-side fixes.
+        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
         self.clone()
     }
 
-    /// Sets handler for the [`ended`][1] event on underlying
-    /// [`web_sys::MediaStreamTrack`].
+    /// Sets handler for the [`ended`][1] event on the underlying
+    /// [MediaStreamTrack][2].
     ///
     /// [1]: https://tinyurl.com/w3-streams#event-mediastreamtrack-ended
+    /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn on_ended<F>(&self, f: Option<F>)
     where
         F: 'static + FnOnce(),

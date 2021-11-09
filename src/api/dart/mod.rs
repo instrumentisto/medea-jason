@@ -79,8 +79,8 @@ pub trait ForeignClass: Sized {
     }
 }
 
-/// Marker trait which indicates that implementor is C-style enum which can be
-/// converted from the number primitives.
+/// Marker indicating a C-style enum which can be converted from number
+/// primitives.
 pub trait PrimitiveEnum: TryFrom<i64> {}
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
@@ -535,7 +535,6 @@ impl PrimitiveEnum for FacingMode {}
 impl TryFrom<i64> for MediaSourceKind {
     type Error = i64;
 
-    #[inline]
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         match value {
             0 => Ok(Self::Device),
@@ -548,7 +547,6 @@ impl TryFrom<i64> for MediaSourceKind {
 impl TryFrom<i64> for FacingMode {
     type Error = i64;
 
-    #[inline]
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         match value {
             0 => Ok(Self::User),
@@ -589,7 +587,7 @@ pub unsafe extern "C" fn box_dart_handle(
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 
-/// Returns boxed pointer to a provided [`DartValue`].
+/// Returns a boxed pointer to the provided [`DartValue`].
 #[no_mangle]
 pub unsafe extern "C" fn box_foreign_value(
     val: DartValue,

@@ -28,7 +28,6 @@ impl Transceiver {
     }
 
     /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
-    #[inline]
     pub fn sub_direction(
         &self,
         disabled_direction: TransceiverDirection,
@@ -44,7 +43,6 @@ impl Transceiver {
     }
 
     /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
-    #[inline]
     pub fn add_direction(
         &self,
         enabled_direction: TransceiverDirection,
@@ -61,7 +59,6 @@ impl Transceiver {
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
-    #[inline]
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.current_direction().contains(direction)
     }

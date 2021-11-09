@@ -1,4 +1,4 @@
-//! Collection of [`RtcIceServer`][1]s.
+//! Collection of [RTCIceServer][1]s.
 //!
 //! [1]: https://w3.org/TR/webrtc/#rtciceserver-dictionary
 
@@ -12,8 +12,8 @@ use crate::{
     platform::utils::handle::DartHandle,
 };
 
-/// Pointer to an extern function which returns [`Dart_Handle`] to the newly
-/// created empty `List` with `IceServer`s.
+/// Pointer to an extern function returning a [`Dart_Handle`] to a newly created
+/// empty list of `IceServer`s.
 type NewFunction = extern "C" fn() -> Dart_Handle;
 
 /// Stores pointer to the [`NewFunction`] extern function.
@@ -31,7 +31,8 @@ pub unsafe extern "C" fn register_IceServers__new(f: NewFunction) {
     NEW_FUNCTION = Some(f);
 }
 
-/// Pointer to an extern function which adds `IceServer` to the provided `List`.
+/// Pointer to an extern function which adds an `IceServer` to the provided
+/// `list`.
 type AddFunction = extern "C" fn(
     list: Dart_Handle,
     url: ptr::NonNull<c_char>,
@@ -61,7 +62,7 @@ pub unsafe extern "C" fn register_IceServers__add(f: AddFunction) {
 pub struct RtcIceServers(DartHandle);
 
 impl RtcIceServers {
-    /// Returns [`Dart_Handle`] of this [`RtcIceServers`].
+    /// Returns [`Dart_Handle`] of these [`RtcIceServers`].
     #[must_use]
     pub fn get_handle(&self) -> Dart_Handle {
         self.0.get()
@@ -74,19 +75,18 @@ where
 {
     fn from(servers: I) -> Self {
         let ice_servers = DartHandle::new(unsafe { NEW_FUNCTION.unwrap()() });
-        for server in servers {
-            for url in server.urls {
+        for srv in servers {
+            for url in srv.urls {
                 unsafe {
                     ADD_FUNCTION.unwrap()(
                         ice_servers.get(),
                         string_into_c_str(url),
-                        server.username.clone().into(),
-                        server.credential.clone().into(),
+                        srv.username.clone().into(),
+                        srv.credential.clone().into(),
                     );
                 }
             }
         }
-
         Self(ice_servers)
     }
 }

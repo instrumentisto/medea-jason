@@ -29,7 +29,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Handle Function(Int32)>(delayedFuture));
 }
 
-/// Returns closure which returns [`Future.delayed`] with a provided amount of
+/// Returns closure returning a [Future.delayed] with the provided amount of
 /// milliseconds.
 Object delayedFuture(int delayMs) {
   return () => Future.delayed(Duration(milliseconds: delayMs));

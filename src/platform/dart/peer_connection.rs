@@ -34,50 +34,38 @@ use super::{
     media_track::MediaStreamTrack,
 };
 
-/// Representation of the Dart SDP type.
-#[derive(Display)]
-pub enum RtcSdpType {
-    /// The description is the initial proposal in an offer/answer exchange.
-    #[display(fmt = "offer")]
-    Offer,
-
-    /// The description is the definitive choice in an offer/answer exchange
-    #[display(fmt = "answer")]
-    Answer,
-}
-
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
 
-/// Pointer to an extern function that returns [`IceConnectionState`] of the
+/// Pointer to an extern function returning an [`IceConnectionState`] of the
 /// provided [`PeerConnection`].
 type IceConnectionStateFunction = extern "C" fn(Dart_Handle) -> i32;
 
-/// Pointer to an extern function that sets provided callback to the
+/// Pointer to an extern function setting the provided callback to the
 /// `PeerConnection.on_connection_state_change`.
 type OnConnectionStateChangeFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
-/// Pointer to an extern function that returns [`ConnectionState`] of the
+/// Pointer to an extern function returning a [`ConnectionState`] of the
 /// provided [`PeerConnection`].
 type ConnectionStateFunction =
     extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<i32>>>;
 
-/// Pointer to an extern function that request that ICE candidate gathering be
-/// redone on both ends of the connection.
+/// Pointer to an extern function requesting an ICE candidate gathering redoing
+/// on both ends of the connection.
 type RestartIceFunction = extern "C" fn(Dart_Handle);
 
-/// Pointer to an extern function that rollbacks SDP offer of the provided
+/// Pointer to an extern function rolling back SDP offer of the provided
 /// [`PeerConnection`].
 type RollbackFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that sets `onTrack` callback of the provided
+/// Pointer to an extern function setting `onTrack` callback of the provided
 /// [`PeerConnection`].
 type OnTrackFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
-/// Pointer to an extern function that sets `onIceCandidate` callback of the
+/// Pointer to an extern function that setting `onIceCandidate` callback of the
 /// provided [`PeerConnection`].
 type OnIceCandidateFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
-/// Pointer to an extern function that lookups transceiver in provided
+/// Pointer to an extern function looking up transceiver in the provided
 /// [`PeerConnection`] by provided [`String`].
 type GetTransceiverByMid =
     extern "C" fn(Dart_Handle, ptr::NonNull<c_char>) -> Dart_Handle;
@@ -447,7 +435,7 @@ pub struct RtcPeerConnection {
 }
 
 impl RtcPeerConnection {
-    /// Instantiates new [`RtcPeerConnection`].
+    /// Instantiates a new [`RtcPeerConnection`].
     ///
     /// # Errors
     ///
@@ -463,16 +451,15 @@ impl RtcPeerConnection {
                 NEW_PEER.unwrap()(ice_servers.get_handle())
             })
             .await
-            .map_err(|e| {
-                tracerr::new!(RtcPeerConnectionError::PeerCreationError(e))
-            })?,
+            .map_err(RtcPeerConnectionError::PeerCreationError)
+            .map_err(tracerr::wrap!())?,
         })
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
-        // TODO: Correct implementation requires flutter_webrtc-side rework.
+        // TODO: Correct implementation requires `flutter_webrtc`-side rework.
         Ok(RtcStats(Vec::new()))
     }
 
@@ -645,7 +632,7 @@ impl RtcPeerConnection {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Sets provided [SDP answer][`SdpType::Answer`] as local description.
+    /// Sets the provided [SDP answer][`SdpType::Answer`] as local description.
     ///
     /// # Errors
     ///
@@ -674,9 +661,8 @@ impl RtcPeerConnection {
             CREATE_ANSWER.unwrap()(self.handle.get())
         })
         .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::CreateAnswerFailed(e))
-        })
+        .map_err(RtcPeerConnectionError::CreateAnswerFailed)
+        .map_err(tracerr::wrap!())
     }
 
     /// Rollbacks the [`RtcPeerConnection`] to the previous stable state.
@@ -692,10 +678,9 @@ impl RtcPeerConnection {
             ROLLBACK_FUNCTION.unwrap()(self.handle.get())
         })
         .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::SetLocalDescriptionFailed(e))
-        })?;
-        Ok(())
+        .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
+        .map_err(tracerr::wrap!())
+        .map(drop)
     }
 
     /// Obtains [SDP offer][`SdpType::Offer`] from the [`RtcPeerConnection`].
@@ -714,9 +699,8 @@ impl RtcPeerConnection {
             CREATE_OFFER.unwrap()(self.handle.get())
         })
         .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::CreateOfferFailed(e))
-        })
+        .map_err(RtcPeerConnectionError::CreateOfferFailed)
+        .map_err(tracerr::wrap!())
     }
 
     /// Instructs the [`RtcPeerConnection`] to apply the supplied
@@ -741,11 +725,8 @@ impl RtcPeerConnection {
                     string_into_c_str(sdp),
                 ))
                 .await
-                .map_err(|e| {
-                    tracerr::new!(
-                        RtcPeerConnectionError::SetRemoteDescriptionFailed(e)
-                    )
-                })?;
+                .map_err(RtcPeerConnectionError::SetRemoteDescriptionFailed)
+                .map_err(tracerr::wrap!())
             },
             SdpType::Answer(sdp) => unsafe {
                 FutureFromDart::execute::<()>(SET_REMOTE_DESCRIPTION_FUNCTION
@@ -755,14 +736,10 @@ impl RtcPeerConnection {
                     string_into_c_str(sdp),
                 ))
                 .await
-                .map_err(|e| {
-                    tracerr::new!(
-                        RtcPeerConnectionError::SetRemoteDescriptionFailed(e)
-                    )
-                })?;
+                .map_err(RtcPeerConnectionError::SetRemoteDescriptionFailed)
+                .map_err(tracerr::wrap!())
             },
         }
-        Ok(())
     }
 
     /// Creates a new [`Transceiver`] (see [RTCRtpTransceiver][1]) and adds it
@@ -816,7 +793,7 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Sets local description to the provided one [`RtcSdpType`].
+    /// Sets local description to the provided [`RtcSdpType`].
     async fn set_local_description(
         &self,
         sdp_type: RtcSdpType,
@@ -829,12 +806,20 @@ impl RtcPeerConnection {
                 string_into_c_str(sdp),
             ))
             .await
-            .map_err(|e| {
-                tracerr::new!(
-                    RtcPeerConnectionError::SetLocalDescriptionFailed(e)
-                )
-            })?;
+            .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
+            .map_err(tracerr::wrap!())
         }
-        Ok(())
     }
+}
+
+/// Representation of a Dart SDP type.
+#[derive(Display)]
+pub enum RtcSdpType {
+    /// Description is an initial proposal in an offer/answer exchange.
+    #[display(fmt = "offer")]
+    Offer,
+
+    /// Description is a definitive choice in an offer/answer exchange.
+    #[display(fmt = "answer")]
+    Answer,
 }

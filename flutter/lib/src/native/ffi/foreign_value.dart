@@ -114,7 +114,6 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
   /// Frees Dart side [ForeignValue].
   Pointer intoRustOwned() {
     var out = _boxForeignValue(ref);
-    ;
     free();
     return out;
   }
