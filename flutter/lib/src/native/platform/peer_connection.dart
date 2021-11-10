@@ -194,7 +194,7 @@ Object rollback(RTCPeerConnection conn) {
   return conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
-/// Returns all [RTCRtpTransceiver]s of this [RTCPeerConnection].
+/// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].
 Object getTransceivers(RTCPeerConnection conn) {
   return conn.getTransceivers();
 }

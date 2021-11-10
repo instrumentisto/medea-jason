@@ -50,7 +50,8 @@ int kind(MediaStreamTrack track) {
   }
 }
 
-/// Subscribes on the [MediaStreamTrack.onEnded] of the provided [MediaStreamTrack].
+/// Subscribes on the [MediaStreamTrack.onEnded] of the provided
+/// [MediaStreamTrack].
 void onEnded(MediaStreamTrack track, Function f) {
   track.onEnded = () {
     f();

@@ -14,7 +14,7 @@ use crate::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,
     },
-    platform,
+    platform, utils,
 };
 
 use super::TransceiverSide;
@@ -82,7 +82,7 @@ impl Receiver {
                         && sndr.caps().media_source_kind()
                             == caps.media_source_kind()
                 })
-                .map(Component::obj);
+                .map(utils::component::Component::obj);
 
             if let Some(sender) = sender {
                 let trnsvr = sender.transceiver();

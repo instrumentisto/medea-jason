@@ -21,7 +21,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Pointer Function(Handle)>(sdpMid));
 }
 
-/// Returns provided [RTCIceCandidate] [String].
+/// Returns the provided [RTCIceCandidate] [String].
 Pointer candidate(RTCIceCandidate iceCandidate) {
   if (iceCandidate.candidate != null) {
     return ForeignValue.fromString(iceCandidate.candidate!).intoRustOwned();
@@ -39,7 +39,7 @@ Pointer sdpMLineIndex(RTCIceCandidate iceCandidate) {
   }
 }
 
-/// Returns SDP mID of the provided [RTCIceCandidate].
+/// Returns SDP MID of the provided [RTCIceCandidate].
 Pointer sdpMid(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMid != null) {
     return ForeignValue.fromString(iceCandidate.sdpMid!).intoRustOwned();
@@ -48,7 +48,7 @@ Pointer sdpMid(RTCIceCandidate iceCandidate) {
   }
 }
 
-/// Creates new [RTCIceCandidate] with a provided values.
+/// Creates a new [RTCIceCandidate] with the provided values.
 Object newRtcIceCandidate(
     ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
   var candidateArg = candidate.toDart();

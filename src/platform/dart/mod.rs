@@ -56,8 +56,8 @@ pub fn init_logger() {
     );
 }
 
-/// Pointer to an extern function that returns [`Dart_Handle`] to the Dart
-/// `Future` which will wait for the provided amount of time.
+/// Pointer to an extern function returning a [`Dart_Handle`] to the Dart
+/// `Future` waiting for the provided amount of time.
 type DelayedFutureFunction = extern "C" fn(i32) -> Dart_Handle;
 
 /// Stores pointer to the [`DelayedFutureFunction`] extern function.

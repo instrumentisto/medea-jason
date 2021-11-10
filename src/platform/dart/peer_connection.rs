@@ -40,8 +40,10 @@ type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
 /// provided [`PeerConnection`].
 type IceConnectionStateFunction = extern "C" fn(Dart_Handle) -> i32;
 
-/// Pointer to an extern function setting the provided callback to the
-/// `PeerConnection.on_connection_state_change`.
+/// Pointer to an extern function setting the provided callback to a
+/// [`connectionstatechange`][1] event of the provided [`PeerConnection`].
+///
+/// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
 type OnConnectionStateChangeFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
 /// Pointer to an extern function returning a [`ConnectionState`] of the
@@ -65,42 +67,46 @@ type OnTrackFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 /// provided [`PeerConnection`].
 type OnIceCandidateFunction = extern "C" fn(Dart_Handle, Dart_Handle);
 
-/// Pointer to an extern function looking up transceiver in the provided
-/// [`PeerConnection`] by provided [`String`].
+/// Pointer to an extern function looking up [`Transceiver`[ in the provided
+/// [`PeerConnection`] by the provided [`String`].
 type GetTransceiverByMid =
     extern "C" fn(Dart_Handle, ptr::NonNull<c_char>) -> Dart_Handle;
 
+/// Pointer to an extern function returning [`Transceiver`[ of the provided
+/// [`PeerConnection`].
 type GetTransceiverFunction =
     extern "C" fn(Dart_Handle, ptr::NonNull<c_char>, i32) -> Dart_Handle;
 
-/// Pointer to an extern function that adds provided [`IceCandidate`] to the
+/// Pointer to an extern function adding the provided [`IceCandidate`] to the
 /// provided [`PeerConnection`].
 type AddIceCandidateFunction =
     extern "C" fn(Dart_Handle, Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that sets `onIceConnectionStateChange`
-/// callback of the provided [`PeerConnection`].
+/// Pointer to an extern function setting a callback for an
+/// [`iceconnectionstatechange`][1] event of the provided [`PeerConnection`].
+///
+/// [1]: https://w3.org/TR/webrtc/#event-iceconnectionstatechange
 type OnIceConnectionStateChangeFunction =
     extern "C" fn(Dart_Handle, Dart_Handle);
 
-/// Pointer to an extern function that returns [`Dart_Handle`] to a newly
+/// Pointer to an extern function returning a [`Dart_Handle`] to a newly
 /// created [`PeerConnection`].
 type NewPeerFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that creates new `Transceiver` in the provided
-/// `PeerConnection`.
+/// Pointer to an extern function creating a new [`Transceiver`[ in the provided
+/// [`PeerConnection`].
 type AddTransceiverFunction =
     extern "C" fn(Dart_Handle, i64, i64) -> Dart_Handle;
 
-/// Pointer to an extern function that returns newly created SDP offer of this
-/// [`PeerConnection`].
+/// Pointer to an extern function returning a newly created SDP offer of the
+/// provided [`PeerConnection`].
 type CreateOfferFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that returns newly created SDP answer of this
-/// [`PeerConnection`].
+/// Pointer to an extern function returning a newly created SDP answer of the
+/// provided [`PeerConnection`].
 type CreateAnswerFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that sets provided SDP offer as local
+/// Pointer to an extern function setting the provided SDP offer as a local
 /// description of the provided [`PeerConnection`].
 type SetLocalDescriptionFunction = extern "C" fn(
     Dart_Handle,
@@ -108,7 +114,7 @@ type SetLocalDescriptionFunction = extern "C" fn(
     ptr::NonNull<c_char>,
 ) -> Dart_Handle;
 
-/// Pointer to an extern function that sets provided SDP offer as remote
+/// Pointer to an extern function settings the provided SDP offer as a remote
 /// description of the provided [`PeerConnection`].
 type SetRemoteDescriptionFunction = extern "C" fn(
     Dart_Handle,
@@ -680,7 +686,6 @@ impl RtcPeerConnection {
         .await
         .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
         .map_err(tracerr::wrap!())
-        .map(drop)
     }
 
     /// Obtains [SDP offer][`SdpType::Offer`] from the [`RtcPeerConnection`].

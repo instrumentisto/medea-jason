@@ -45,7 +45,7 @@ Object getCurrentDirection(RTCRtpTransceiver transceiver) {
   return transceiver.getCurrentDirection().then((d) => d?.index);
 }
 
-/// Returns current mID of the provided [RTCRtpTransceiver].
+/// Returns current MID of the provided [RTCRtpTransceiver].
 Pointer mid(RTCRtpTransceiver transceiver) {
   if (transceiver.mid.isNotEmpty) {
     return ForeignValue.fromString(transceiver.mid).intoRustOwned();

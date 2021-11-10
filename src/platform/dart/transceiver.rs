@@ -23,64 +23,45 @@ use crate::{
     },
 };
 
-/// Wrapper around [RTCRtpTransceiver] which provides handy methods for
-/// direction changes.
-///
-/// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
-#[derive(Clone, Debug)]
-pub struct Transceiver {
-    transceiver: DartHandle,
-    send_track: RefCell<Option<Rc<local::Track>>>,
-}
-
-impl From<DartHandle> for Transceiver {
-    fn from(handle: DartHandle) -> Self {
-        Self {
-            transceiver: handle,
-            send_track: RefCell::new(None),
-        }
-    }
-}
-
-/// Pointer to an extern function that request that returns current direction of
-/// the provided [`Transceiver`].
+/// Pointer to an extern function returning current direction of the provided
+/// [`Transceiver`].
 type GetCurrentDirectionFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that returns `Send` [`MediaStreamTrack`] of
+/// Pointer to an extern function that returns `send` [`MediaStreamTrack`] of
 /// the provided [`Transceiver`].
 type GetSendTrackFunction =
     extern "C" fn(
         Dart_Handle,
     ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
 
-/// Pointer to an extern function that replaces `Send` [`MediaStreamTrack`] of
-/// the provided [`Transceiver`].
+/// Pointer to an extern function replacing `send` [`MediaStreamTrack`] of the
+/// provided [`Transceiver`].
 type ReplaceTrackFunction =
     extern "C" fn(Dart_Handle, Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that drops `Send` [`MediaStreamTrack`] of the
+/// Pointer to an extern function dropping `send` [`MediaStreamTrack`] of the
 /// provided [`Transceiver`].
 type DropSenderFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that returns stopped status of the provided
+/// Pointer to an extern function returning stopped status of the provided
 /// [`Transceiver`].
 type IsStoppedFunction =
     extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<i8>>;
 
-/// Pointer to an extern function that sets `enabled` field of `Send`
+/// Pointer to an extern function setting `enabled` field of `send`
 /// [`MediaStreamTrack`] of the provided [`Transceiver`].
 type SetSendTrackEnabledFunction = extern "C" fn(Dart_Handle, bool);
 
-/// Pointer to an extern function that returns MID of the provided
-/// [`Transceiver`].
+/// Pointer to an extern function returning MID of the provided [`Transceiver`].
 type MidFunction =
     extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-/// Pointer to an extern function that returns `1` if provided [`Transceiver`]
-/// has `Send` [`MediaStreamTrack`].
+/// Pointer to an extern function indicating whether the provided
+/// [`Transceiver`] has `send` [`MediaStreamTrack`].
 type HasSendTrackFunction = extern "C" fn(Dart_Handle) -> i8;
 
-/// Pointer to an extern function that sets `direction` this [`Transceiver`].
+/// Pointer to an extern function setting `direction` of the provided
+/// [`Transceiver`].
 type SetDirectionFunction = extern "C" fn(Dart_Handle, i64) -> Dart_Handle;
 
 /// Stores pointer to the [`GetCurrentDirectionFunction`] extern function.
@@ -243,6 +224,16 @@ pub unsafe extern "C" fn register_Transceiver__set_direction(
     SET_DIRECTION_FUNCTION = Some(f);
 }
 
+/// Wrapper around [RTCRtpTransceiver] which provides handy methods for
+/// direction changes.
+///
+/// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
+#[derive(Clone, Debug)]
+pub struct Transceiver {
+    transceiver: DartHandle,
+    send_track: RefCell<Option<Rc<local::Track>>>,
+}
+
 impl Transceiver {
     /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
     pub fn sub_direction(
@@ -319,7 +310,7 @@ impl Transceiver {
     /// Returns [`mid`] of this [`Transceiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
-    #[inline]
+    #[must_use]
     pub fn mid(&self) -> Option<String> {
         unsafe {
             let mid = MID_FUNCTION.unwrap()(self.transceiver.get());
@@ -328,13 +319,13 @@ impl Transceiver {
     }
 
     /// Returns [`local::Track`] that is being send to remote, if any.
-    #[inline]
+    #[must_use]
     pub fn send_track(&self) -> Option<Rc<local::Track>> {
         self.send_track.borrow().as_ref().cloned()
     }
 
     /// Indicates whether this [`Transceiver`] has [`local::Track`].
-    #[inline]
+    #[must_use]
     pub fn has_send_track(&self) -> bool {
         unsafe { HAS_SEND_TRACK_FUNCTION.unwrap()(self.transceiver.get()) == 1 }
     }
@@ -356,6 +347,7 @@ impl Transceiver {
     }
 
     /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
+    #[must_use]
     pub fn is_stopped(&self) -> bool {
         let val = unsafe {
             let p = IS_STOPPED_FUNCTION.unwrap()(self.transceiver.get());
@@ -377,7 +369,7 @@ impl Transceiver {
         }
     }
 
-    /// Sets [`Transceiver`] to the provided [`TransceiverDirection`].
+    /// Sets this [`Transceiver`] to the provided [`TransceiverDirection`].
     fn set_direction(
         &self,
         direction: TransceiverDirection,
@@ -390,5 +382,14 @@ impl Transceiver {
             .await
             .unwrap();
         })
+    }
+}
+
+impl From<DartHandle> for Transceiver {
+    fn from(handle: DartHandle) -> Self {
+        Self {
+            transceiver: handle,
+            send_track: RefCell::new(None),
+        }
     }
 }

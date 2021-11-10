@@ -7,8 +7,8 @@ use dart_sys::Dart_Handle;
 
 use crate::api::{DartValue, DartValueArg};
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a newly
-/// created Dart callback that will proxy calls to the Rust callback.
+/// Pointer to an extern function that returning a [`Dart_Handle`] to a newly
+/// created Dart callback that will proxy calls to the given Rust callback.
 type CallbackCallTwoArgProxyFunction =
     extern "C" fn(ptr::NonNull<Callback>) -> Dart_Handle;
 
@@ -32,12 +32,12 @@ pub unsafe extern "C" fn register_Callback__call_two_arg_proxy(
     CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION = Some(f);
 }
 
-/// Calls the provided [`Callback`] with the provided two [`DartValue`]s as an
-/// argument.
+/// Calls the provided [`Callback`] with the provided two [`DartValue`]s as
+/// arguments.
 ///
 /// # Safety
 ///
-/// Provided [`Callback`] should be a valid [Callback] pointer.
+/// Provided callback should be a valid [`Callback`] pointer.
 #[no_mangle]
 pub unsafe extern "C" fn Callback__call_two_arg(
     mut cb: ptr::NonNull<Callback>,
