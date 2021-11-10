@@ -114,7 +114,7 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
   /// Frees Dart side [ForeignValue].
   Pointer intoRustOwned() {
     var out = _boxForeignValue(ref);
-    free();
+    calloc.free(this);
     return out;
   }
 

@@ -38,7 +38,6 @@ use crate::{
         },
         handle::DartHandle,
     },
-    utils::PrimitiveEnum,
 };
 
 pub use self::{

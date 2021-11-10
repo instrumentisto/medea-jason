@@ -16,9 +16,9 @@ void registerFunctions(DynamicLibrary dl) {
 Pointer get(List arr, int i) {
   final el = arr[i];
   if (el == null) {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   } else {
-    return ForeignValue.fromHandle(el).intoBoxed();
+    return ForeignValue.fromHandle(el).intoRustOwned();
   }
 }
 

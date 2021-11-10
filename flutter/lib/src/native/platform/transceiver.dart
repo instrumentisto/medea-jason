@@ -42,13 +42,13 @@ Object setDirection(RTCRtpTransceiver transceiver, int direction) {
 
 /// Returns current [TransceiverDirection] of the provided [RTCRtpTransceiver].
 Object getCurrentDirection(RTCRtpTransceiver transceiver) {
-  return () => transceiver.getCurrentDirection().then((d) => d.index);
+  return () => transceiver.getDirection().then((d) => d.index);
 }
 
 /// Returns current mID of the provided [RTCRtpTransceiver].
 Pointer mid(RTCRtpTransceiver transceiver) {
-  if (transceiver.mid.isNotEmpty) {
-    return ForeignValue.fromString(transceiver.mid).intoRustOwned();
+  if (transceiver.mid != null) {
+    return ForeignValue.fromString(transceiver.mid!).intoRustOwned();
   } else {
     return ForeignValue.none().intoRustOwned();
   }

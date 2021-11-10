@@ -21,28 +21,28 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Returns `deviceId` field of the provided [MediaDeviceInfo].
 Pointer deviceId(MediaDeviceInfo deviceInfo) {
-  return ForeignValue.fromString(deviceInfo.deviceId).intoBoxed();
+  return ForeignValue.fromString(deviceInfo.deviceId).intoRustOwned();
 }
 
 /// Returns `label` field of the provided [MediaDeviceInfo].
 Pointer label(MediaDeviceInfo deviceInfo) {
-  return ForeignValue.fromString(deviceInfo.label).intoBoxed();
+  return ForeignValue.fromString(deviceInfo.label).intoRustOwned();
 }
 
 /// Returns `groupId` field of the provided [MediaDeviceInfo].
 Pointer groupId(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.groupId != null) {
-    return ForeignValue.fromString(deviceInfo.groupId!).intoBoxed();
+    return ForeignValue.fromString(deviceInfo.groupId!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }
 
 /// Returns `kind` field of the provided [MediaDeviceInfo].
 Pointer kind(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.kind != null) {
-    return ForeignValue.fromString(deviceInfo.kind!).intoBoxed();
+    return ForeignValue.fromString(deviceInfo.kind!).intoRustOwned();
   } else {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   }
 }

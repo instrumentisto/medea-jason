@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams/#device-info
 
-use std::convert::TryFrom;
+use std::convert::{TryFrom, TryInto};
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
@@ -20,7 +20,7 @@ type LabelFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 type GroupIdFunction =
     extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
 
-type KindFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i32>>;
+type KindFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 
 /// Stores pointer to the [`DeviceIdFunction`] extern function.
 ///
@@ -110,10 +110,11 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         // Kind should be always Some
-        Option::<i32>::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
+        Option::<i64>::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
             .unwrap()
             .unwrap()
-            .into()
+            .try_into()
+            .unwrap()
     }
 
     /// Returns label describing the represented device (for example

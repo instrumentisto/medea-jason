@@ -10,7 +10,7 @@ void registerFunctions(DynamicLibrary dl) {
           'register_MediaDevices__enumerate_devices')(
       Pointer.fromFunction<Handle Function()>(enumerateDevices));
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaDevices__enumerate_devices')(
+          'register_MediaDevices__get_display_media')(
       Pointer.fromFunction<Handle Function(Handle)>(getDisplayMedia));
 }
 

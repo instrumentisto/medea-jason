@@ -104,8 +104,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "1cf5f5919eb1a8dde62a8fd84d640078b6ed8e59"
+      ref: android-refactoring
+      resolved-ref: "92a0e6d21b85fe4f1290ba327178cbc30556648c"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.7.0+hotfix.2"
@@ -292,6 +292,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.1.1"
+  web_socket_channel:
+    dependency: transitive
+    description:
+      name: web_socket_channel
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   webdriver:
     dependency: transitive
     description:

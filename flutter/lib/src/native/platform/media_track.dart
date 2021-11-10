@@ -63,28 +63,28 @@ Pointer deviceId(MediaStreamTrack track) {
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
   final id = track.id;
   if (id == null) {
-    return ForeignValue.none().intoBoxed();
+    return ForeignValue.none().intoRustOwned();
   } else {
-    return ForeignValue.fromString(id).intoBoxed();
+    return ForeignValue.fromString(id).intoRustOwned();
   }
 }
 
 /// Returns facingMode of the provided [MediaStreamTrack].
 Pointer facingMode(MediaStreamTrack track) {
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  return ForeignValue.fromInt(0).intoBoxed();
+  return ForeignValue.fromInt(0).intoRustOwned();
 }
 
 /// Returns height of the video of the provided [MediaStreamTrack].
 Pointer height(MediaStreamTrack track) {
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  return ForeignValue.fromInt(1600).intoBoxed();
+  return ForeignValue.fromInt(1600).intoRustOwned();
 }
 
 /// Returns width of the video of the provided [MediaStreamTrack].
 Pointer width(MediaStreamTrack track) {
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  return ForeignValue.fromInt(1300).intoBoxed();
+  return ForeignValue.fromInt(1300).intoRustOwned();
 }
 
 /// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].

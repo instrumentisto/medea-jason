@@ -16,15 +16,6 @@ final _callbackTwoArgCall =
     dl.lookupFunction<_callbackTwoArgCall_C, _callbackTwoArgCall_Dart>(
         'Callback__call_two_arg');
 
-typedef _callbackTwoArgCall_C = Void Function(
-    Pointer, ForeignValue, ForeignValue);
-typedef _callbackTwoArgCall_Dart = void Function(
-    Pointer, ForeignValue, ForeignValue);
-
-final _callbackTwoArgCall =
-    dl.lookupFunction<_callbackTwoArgCall_C, _callbackTwoArgCall_Dart>(
-        'Callback__call_two_arg');
-
 /// Registers the closure callers functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
