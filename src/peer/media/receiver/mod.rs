@@ -14,7 +14,7 @@ use crate::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,
     },
-    platform,
+    platform, utils,
 };
 
 use super::TransceiverSide;
@@ -56,13 +56,12 @@ impl Receiver {
     /// arrives.
     ///
     /// [1]: platform::TransceiverDirection::INACTIVE
-    pub fn new(
+    pub async fn new(
         state: &State,
         media_connections: &MediaConnections,
         track_events_sender: mpsc::UnboundedSender<TrackEvent>,
         recv_constraints: &RecvConstraints,
     ) -> Self {
-        let connections = media_connections.0.borrow();
         let caps = TrackConstraints::from(state.media_type().clone());
         let kind = MediaKind::from(&caps);
         let transceiver_direction = if state.enabled_individual() {
@@ -73,25 +72,36 @@ impl Receiver {
 
         let transceiver = if state.mid().is_none() {
             // Try to find send transceiver that can be used as sendrecv.
-            let mut senders = connections.senders.values();
-            let sender = senders.find(|sndr| {
-                sndr.caps().media_kind() == caps.media_kind()
-                    && sndr.caps().media_source_kind()
-                        == caps.media_source_kind()
-            });
-            Some(sender.map_or_else(
-                || connections.add_transceiver(kind, transceiver_direction),
-                |sender| {
-                    let trnsvr = sender.transceiver();
-                    trnsvr.add_direction(transceiver_direction);
+            let sender = media_connections
+                .0
+                .borrow()
+                .senders
+                .values()
+                .find(|sndr| {
+                    sndr.caps().media_kind() == caps.media_kind()
+                        && sndr.caps().media_source_kind()
+                            == caps.media_source_kind()
+                })
+                .map(utils::component::Component::obj);
 
-                    trnsvr
-                },
-            ))
+            if let Some(sender) = sender {
+                let trnsvr = sender.transceiver();
+                trnsvr.add_direction(transceiver_direction).await;
+
+                Some(trnsvr)
+            } else {
+                let fut = media_connections
+                    .0
+                    .borrow()
+                    .add_transceiver(kind, transceiver_direction);
+                Some(fut.await)
+            }
         } else {
             None
         };
 
+        let peer_events_sender =
+            media_connections.0.borrow().peer_events_sender.clone();
         let this = Self {
             track_id: state.track_id(),
             caps,
@@ -100,7 +110,7 @@ impl Receiver {
             mid: RefCell::new(state.mid().map(ToString::to_string)),
             track: RefCell::new(None),
             is_track_notified: Cell::new(false),
-            peer_events_sender: connections.peer_events_sender.clone(),
+            peer_events_sender,
             enabled_general: Cell::new(state.enabled_individual()),
             enabled_individual: Cell::new(state.enabled_general()),
             muted: Cell::new(state.muted()),
@@ -143,12 +153,14 @@ impl Receiver {
     }
 
     /// Indicates whether this [`Receiver`] receives media data.
-    #[must_use]
-    pub fn is_receiving(&self) -> bool {
-        let is_recv_direction =
-            self.transceiver.borrow().as_ref().map_or(false, |trnsvr| {
-                trnsvr.has_direction(platform::TransceiverDirection::RECV)
-            });
+    pub async fn is_receiving(&self) -> bool {
+        let transceiver = self.transceiver.borrow().clone();
+        let is_recv_direction = if let Some(trcv) = transceiver {
+            trcv.has_direction(platform::TransceiverDirection::RECV)
+                .await
+        } else {
+            false
+        };
 
         self.enabled_individual.get() && is_recv_direction
     }
@@ -175,7 +187,7 @@ impl Receiver {
     ///
     /// Sets [`platform::MediaStreamTrack::enabled`] same as
     /// `enabled_individual` of this [`Receiver`].
-    pub fn set_remote_track(
+    pub async fn set_remote_track(
         &self,
         transceiver: platform::Transceiver,
         new_track: platform::MediaStreamTrack,
@@ -194,16 +206,20 @@ impl Receiver {
         );
 
         if self.enabled_individual.get() {
-            transceiver.add_direction(platform::TransceiverDirection::RECV);
+            transceiver
+                .add_direction(platform::TransceiverDirection::RECV)
+                .await;
         } else {
-            transceiver.sub_direction(platform::TransceiverDirection::RECV);
+            transceiver
+                .sub_direction(platform::TransceiverDirection::RECV)
+                .await;
         }
 
         self.transceiver.replace(Some(transceiver));
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop();
         };
-        self.maybe_notify_track();
+        self.maybe_notify_track().await;
     }
 
     /// Replaces [`Receiver`]'s [`platform::Transceiver`] with the provided
@@ -231,11 +247,11 @@ impl Receiver {
 
     /// Emits [`PeerEvent::NewRemoteTrack`] if [`Receiver`] is receiving media
     /// and has not notified yet.
-    fn maybe_notify_track(&self) {
+    async fn maybe_notify_track(&self) {
         if self.is_track_notified.get() {
             return;
         }
-        if !self.is_receiving() {
+        if !self.is_receiving().await {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {
@@ -262,9 +278,13 @@ impl Receiver {
 
 impl Drop for Receiver {
     fn drop(&mut self) {
-        if let Some(transceiver) = self.transceiver.borrow().as_ref() {
+        if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             if !transceiver.is_stopped() {
-                transceiver.sub_direction(platform::TransceiverDirection::RECV);
+                platform::spawn(async move {
+                    transceiver
+                        .sub_direction(platform::TransceiverDirection::RECV)
+                        .await;
+                });
             }
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {

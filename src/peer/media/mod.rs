@@ -6,7 +6,7 @@ pub mod receiver;
 pub mod sender;
 mod transitable_state;
 
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
 
 use derive_more::{Display, From};
 use futures::{
@@ -25,7 +25,7 @@ use crate::{
     media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
-    utils::Caused,
+    utils::{Caused, Component},
 };
 
 use super::tracks_request::TracksRequest;
@@ -320,7 +320,7 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         direction: platform::TransceiverDirection,
-    ) -> platform::Transceiver {
+    ) -> impl Future<Output = platform::Transceiver> + 'static {
         self.peer.add_transceiver(kind, direction)
     }
 
@@ -329,8 +329,8 @@ impl InnerMediaConnections {
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     fn get_transceiver_by_mid(
         &self,
-        mid: &str,
-    ) -> Option<platform::Transceiver> {
+        mid: String,
+    ) -> impl Future<Output = Option<platform::Transceiver>> + 'static {
         self.peer.get_transceiver_by_mid(mid)
     }
 }
@@ -445,17 +445,26 @@ impl MediaConnections {
 
     /// Returns activity statuses of the all the [`Sender`]s and [`Receiver`]s
     /// from these [`MediaConnections`].
-    pub fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
+    pub fn get_transceivers_statuses(
+        &self,
+    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
         let inner = self.0.borrow();
+        let transceivers = inner
+            .senders
+            .iter()
+            .map(|(&track_id, sender)| {
+                let sender = sender.obj();
+                async move { (track_id, sender.is_publishing().await) }
+                    .boxed_local()
+            })
+            .chain(inner.receivers.iter().map(|(&track_id, receiver)| {
+                let receiver = receiver.obj();
+                async move { (track_id, receiver.is_receiving().await) }
+                    .boxed_local()
+            }))
+            .collect::<Vec<_>>();
 
-        let mut out = HashMap::new();
-        for (track_id, sender) in &inner.senders {
-            out.insert(*track_id, sender.is_publishing());
-        }
-        for (track_id, receiver) in &inner.receivers {
-            out.insert(*track_id, receiver.is_receiving());
-        }
-        out
+        future::join_all(transceivers).map(|r| r.into_iter().collect())
     }
 
     /// Returns [`Rc`] to [`TransceiverSide`] with a provided [`TrackId`].
@@ -595,25 +604,28 @@ impl MediaConnections {
     /// when a [`platform::Transceiver`] is negotiated, thus have a [`mid`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
-    pub fn add_remote_track(
+    pub async fn add_remote_track(
         &self,
         track: platform::MediaStreamTrack,
         transceiver: platform::Transceiver,
     ) -> Result<(), String> {
-        let inner = self.0.borrow();
         // Cannot fail, since transceiver is guaranteed to be negotiated at this
         // point.
         let mid = transceiver.mid().unwrap();
+        let receiver = self
+            .0
+            .borrow()
+            .receivers
+            .values()
+            .find(|rcvr| rcvr.mid().as_ref() == Some(&mid))
+            .map(Component::obj);
 
-        for receiver in inner.receivers.values() {
-            if let Some(recv_mid) = &receiver.mid() {
-                if recv_mid == &mid {
-                    receiver.set_remote_track(transceiver, track);
-                    return Ok(());
-                }
-            }
+        if let Some(rcvr) = receiver {
+            rcvr.set_remote_track(transceiver, track).await;
+            Ok(())
+        } else {
+            Err(mid)
         }
-        Err(mid)
     }
 
     /// Iterates over all [`Receiver`]s with [`mid`] and without
@@ -622,19 +634,34 @@ impl MediaConnections {
     /// insert it into the [`Receiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
-    pub fn sync_receivers(&self) {
-        let inner = self.0.borrow();
-        for receiver in inner
-            .receivers
-            .values()
-            .filter(|rcvr| rcvr.transceiver().is_none())
-        {
-            if let Some(mid) = receiver.mid() {
-                if let Some(trnscvr) = inner.peer.get_transceiver_by_mid(&mid) {
-                    receiver.replace_transceiver(trnscvr);
-                }
-            }
-        }
+    pub fn sync_receivers(&self) -> impl Future<Output = ()> + 'static {
+        future::join_all({
+            self.0
+                .borrow()
+                .receivers
+                .values()
+                .filter_map(|receiver| {
+                    // Suppress Clippy warn because this impl is easier to
+                    // follow.
+                    #[allow(clippy::question_mark)]
+                    if receiver.transceiver().is_none() {
+                        return None;
+                    }
+                    receiver.mid().map(|mid| {
+                        let fut = {
+                            self.0.borrow().peer.get_transceiver_by_mid(mid)
+                        };
+                        let receiver = Component::obj(receiver);
+                        async move {
+                            if let Some(t) = fut.await {
+                                receiver.replace_transceiver(t);
+                            }
+                        }
+                    })
+                })
+                .collect::<Vec<_>>()
+        })
+        .map(drop)
     }
 
     /// Returns all [`Sender`]s which are matches provided
@@ -778,7 +805,7 @@ impl MediaConnections {
     }
 
     /// Creates new [`sender::Component`] with the provided data.
-    pub fn create_sender(
+    pub async fn create_sender(
         &self,
         id: TrackId,
         media_type: MediaType,
@@ -798,14 +825,15 @@ impl MediaConnections {
             &self,
             send_constraints.clone(),
             mpsc::unbounded().0,
-        )?;
+        )
+        .await?;
 
         Ok(sender::Component::new(sender, Rc::new(sender_state)))
     }
 
     /// Creates new [`receiver::Component`] with the provided data.
     #[must_use]
-    pub fn create_receiver(
+    pub async fn create_receiver(
         &self,
         id: TrackId,
         media_type: MediaType,
@@ -824,14 +852,15 @@ impl MediaConnections {
             &self,
             mpsc::unbounded().0,
             recv_constraints,
-        );
+        )
+        .await;
 
         receiver::Component::new(Rc::new(receiver), Rc::new(state))
     }
 
     /// Creates new [`sender::Component`]s/[`receiver::Component`]s from the
     /// provided [`proto::Track`]s.
-    pub fn create_tracks(
+    pub async fn create_tracks(
         &self,
         tracks: Vec<proto::Track>,
         send_constraints: &LocalTracksConstraints,
@@ -841,23 +870,27 @@ impl MediaConnections {
         for track in tracks {
             match track.direction {
                 Direction::Send { mid, receivers } => {
-                    let component = self.create_sender(
-                        track.id,
-                        track.media_type,
-                        mid,
-                        receivers,
-                        send_constraints,
-                    )?;
+                    let component = self
+                        .create_sender(
+                            track.id,
+                            track.media_type,
+                            mid,
+                            receivers,
+                            send_constraints,
+                        )
+                        .await?;
                     self.0.borrow_mut().senders.insert(track.id, component);
                 }
                 Direction::Recv { mid, sender } => {
-                    let component = self.create_receiver(
-                        track.id,
-                        track.media_type,
-                        mid,
-                        sender,
-                        recv_constraints,
-                    );
+                    let component = self
+                        .create_receiver(
+                            track.id,
+                            track.media_type,
+                            mid,
+                            sender,
+                            recv_constraints,
+                        )
+                        .await;
                     self.0.borrow_mut().receivers.insert(track.id, component);
                 }
             }

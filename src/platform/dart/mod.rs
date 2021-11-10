@@ -11,6 +11,7 @@
 pub mod constraints;
 pub mod error;
 pub mod executor;
+pub mod ice_candidate;
 pub mod ice_server;
 pub mod input_device_info;
 pub mod media_devices;
@@ -22,6 +23,10 @@ pub mod transport;
 pub mod utils;
 
 use std::time::Duration;
+
+use dart_sys::Dart_Handle;
+
+use crate::platform::dart::utils::dart_future::FutureFromDart;
 
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
@@ -51,10 +56,37 @@ pub fn init_logger() {
     );
 }
 
+/// Pointer to an extern function returning a [`Dart_Handle`] to the Dart
+/// `Future` waiting for the provided amount of time.
+type DelayedFutureFunction = extern "C" fn(i32) -> Dart_Handle;
+
+/// Stores pointer to the [`DelayedFutureFunction`] extern function.
+///
+/// Must be initialized by Dart during FFI initialization phase.
+static mut DELAYED_FUTURE_FUNCTION: Option<DelayedFutureFunction> = None;
+
+/// Registers the provided [`DelayedFutureFunction`] as
+/// [`DELAYED_FUTURE_FUNCTION`].
+///
+/// # Safety
+///
+/// Must ONLY be called by Dart during FFI initialization.
+#[no_mangle]
+pub unsafe extern "C" fn register_delayed_future_function(
+    f: DelayedFutureFunction,
+) {
+    DELAYED_FUTURE_FUNCTION = Some(f);
+}
+
 /// [`Future`] which resolves after the provided [`Duration`].
 ///
-/// [`Future`]: std::future::Future
-#[allow(clippy::unused_async)]
+/// # Panics
+///
+/// Panics if [`DELAYED_FUTURE_FUNCTION`] isn't set by Dart side. This is should
+/// be impossible case.
 pub async fn delay_for(delay: Duration) {
-    unimplemented!();
+    #[allow(clippy::cast_possible_truncation)]
+    let delay = delay.as_millis() as i32;
+    let dart_fut = unsafe { DELAYED_FUTURE_FUNCTION.unwrap()(delay) };
+    FutureFromDart::execute::<()>(dart_fut).await.unwrap();
 }
