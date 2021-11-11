@@ -12,7 +12,7 @@ ARG rust_ver=latest
 FROM ghcr.io/instrumentisto/rust:${rust_ver} AS dist
 ARG debug=no
 
-RUN cargo install wasm-pack \
+RUN cargo install wasm-pack --version 0.9.1 \
  && rustup target add wasm32-unknown-unknown
 
 COPY / /src/
