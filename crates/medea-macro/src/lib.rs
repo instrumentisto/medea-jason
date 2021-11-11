@@ -10,6 +10,7 @@
 mod caused;
 mod dispatchable;
 mod enum_delegate;
+mod extern_dart;
 mod watchers;
 
 use proc_macro::TokenStream;
@@ -432,3 +433,9 @@ decl_derive!([Caused, attributes(cause)] =>
 /// assert!(err.cause().is_some());
 /// ```
 caused::derive);
+
+#[proc_macro]
+pub fn extern_dart(input: TokenStream) -> TokenStream {
+    extern_dart::expand(syn::parse_macro_input!(input))
+        .unwrap_or_else(|e| e.to_compile_error().into())
+}
