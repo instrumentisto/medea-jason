@@ -434,6 +434,75 @@ decl_derive!([Caused, attributes(cause)] =>
 /// ```
 caused::derive);
 
+/// Generates code for the Dart functions registration and calling.
+///
+/// # Usage
+///
+/// ## Macro call
+///
+/// ```ignore
+/// extern_dart! {
+///     // Code will be generated in the 'sys' module, also you can
+///     // control visibility of this module with visibility
+///     // modifier ('pub').
+///     mod sys {
+///         use std::ptr;
+///
+///         use dart_sys::Dart_Handle;
+///
+///         // Required line of code which sets prefix of the
+///         // registering function which should be called by
+///         // Dart side for registration.
+///         //
+///         // In this case, extern_dart! macro will generate
+///         // extern "C" functions with
+///         // "register_PeerConnection__create_offer" name.
+///         extern_prefix!(PeerConnection);
+///
+///         // This documentation will be injected to the generated
+///         // extern function caller:
+///
+///         /// Creates new offer in the provided `PeerConnection`
+///         ///
+///         /// Returns created SDP offer.
+///         unsafe fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///
+///         /// Creates new answer in the provided `PeerConnection`
+///         ///
+///         /// Returns created SDP answer.
+///         unsafe fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///     }
+/// }
+/// ```
+///
+/// ## Generated code usage
+///
+/// ```
+/// struct PeerConnection(Dart_Handle);
+///
+/// impl PeerConnection {
+///     pub fn create_offer(&self) -> String {
+///         c_str_into_string(sys::create_offer(self.0))
+///     }
+///
+///     pub fn create_answer(&self) -> String {
+///         c_str_into_string(sys::create_answer(self.0))
+///     }
+/// }
+/// ```
+///
+/// ## Dart side code
+///
+/// Also, you need to call registration functions on Dart side:
+///
+/// ```dart
+/// dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+///        'register_PeerConnection__create_offer')(
+///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createOffer));
+///  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+///        'register_PeerConnection__create_answer')(
+///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer));
+/// ```
 #[proc_macro]
 pub fn extern_dart(input: TokenStream) -> TokenStream {
     extern_dart::expand(syn::parse_macro_input!(input))
