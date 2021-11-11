@@ -1,6 +1,11 @@
 name: CI
 
-on: push
+on:
+  push:
+    branches: ["master"]
+    tags: ["medea-*"]
+  pull_request:
+    branches: ["master"]
 
 env:
   RUST_BACKTRACE: 1
