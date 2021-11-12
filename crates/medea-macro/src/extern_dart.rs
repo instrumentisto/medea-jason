@@ -104,6 +104,8 @@ impl ModExpander {
 
 mod mod_parser {
     //! Parser utils for the [`ModExpander`].
+    //!
+    //! [`ModExpander`]: super::ModExpander
 
     use proc_macro2::{Span, TokenStream as TokenStream2};
     use syn::{
@@ -305,6 +307,8 @@ impl<'a> IdentGenerator<'a> {
 
 mod fn_parser {
     //! Parser utils for the [`FnExpander`].
+    //!
+    //! [`FnExpander`]: super::FnExpander
 
     use syn::{
         spanned::Spanned as _, Attribute, Error, FnArg, Ident, Pat, Result,

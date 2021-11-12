@@ -477,7 +477,7 @@ caused::derive);
 ///
 /// ## Generated code usage
 ///
-/// ```
+/// ```ignore
 /// struct PeerConnection(Dart_Handle);
 ///
 /// impl PeerConnection {
