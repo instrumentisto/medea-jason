@@ -251,21 +251,24 @@ mod fn_parser {
     //! [`FnExpander`]: super::FnExpander
 
     use syn::{
-        spanned::Spanned as _, Attribute, Error, FnArg, Ident, Pat, Result,
+        punctuated::Punctuated, spanned::Spanned as _, Attribute, Error, FnArg,
+        Ident, Pat, Result, Token,
     };
 
-    /// Returns [`Ident`]s of the all provided [`FnArg`]s.
+    /// Returns [`Punctuated`] [`Ident`]s of the all provided [`FnArg`]s.
     ///
     /// # Errors
     ///
     /// If some [`FnArg`] is something like `self`.
     ///
     /// If some [`FnArg`] doesn't have [`Ident`].
-    pub fn get_input_idents<'a, I>(args: I) -> Result<Vec<Ident>>
+    pub fn get_input_idents<'a, I>(
+        args: I,
+    ) -> Result<Punctuated<Ident, Token![,]>>
     where
         I: IntoIterator<Item = &'a FnArg>,
     {
-        let mut out = Vec::new();
+        let mut out = Punctuated::new();
         for item in args {
             match item {
                 FnArg::Typed(item) => {
@@ -332,8 +335,9 @@ struct FnExpander {
     /// [`FnArg`]s of extern Dart function.
     inputs: Punctuated<FnArg, Token![,]>,
 
-    /// [`Ident`]s of the all [`FnArg`]s of extern Dart function.
-    input_idents: Vec<Ident>,
+    /// [`Punctuated`] [`Ident`]s of the all [`FnArg`]s of extern Dart
+    /// function.
+    input_idents: Punctuated<Ident, Token![,]>,
 
     /// [`ReturnType`] of the extern Dart function.
     out_type: ReturnType,
@@ -424,13 +428,13 @@ impl FnExpander {
         let inputs = &self.inputs;
         let out_type = &self.out_type;
         let static_mut_ident = &self.fn_static_mut_ident;
-        let input_idents = self.input_idents.iter();
+        let input_idents = &self.input_idents;
         let doc_attrs = self.doc_attrs.iter();
 
         quote::quote! {
             #(#doc_attrs)*
             pub unsafe fn #ident(#inputs) #out_type {
-                (#static_mut_ident.unwrap())(#(#input_idents)*,)
+                (#static_mut_ident.unwrap())(#input_idents)
             }
         }
     }
