@@ -7,12 +7,24 @@ use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::TokenStreamExt;
 use syn::{
-    parse::{Error, Result},
+    parse::{Error, Parse, Parser, Result},
     punctuated::Punctuated,
     spanned::Spanned as _,
-    Attribute, FnArg, Ident, Item, ItemMod, ItemUse, ReturnType, Token,
-    TraitItemMethod, Visibility,
+    Attribute, ExprAssign, FnArg, Ident, Item, ItemMod, ItemUse, ReturnType,
+    Token, TraitItemMethod, Visibility,
 };
+
+/// Creates a [`Ident`] using interpolation of runtime expressions.
+///
+/// Works same as [`format`] macro, but generated [`Ident`].
+macro_rules! format_ident {
+    ($($arg:tt)*) => {{
+        Ident::new(
+            &format!($($arg)*),
+            Span::call_site(),
+        )
+    }}
+}
 
 /// Expander of the `extern_dart!` macro.
 ///
@@ -54,11 +66,23 @@ impl ModExpander {
 
     /// Expands Dart functions registerers of all [`ModExpander::fn_expanders`].
     fn expand_register_fns(&self) -> TokenStream2 {
-        let mut out = TokenStream2::new();
+        let mut inputs: Punctuated<FnArg, Token![,]> = Punctuated::new();
+        let mut assigns: Vec<ExprAssign> = Vec::new();
+        let name: Ident = format_ident!("register_{}", self.ident);
+
         for f in &self.fn_expanders {
-            out.append_all(f.expand_register_fn());
+            inputs.push(f.expand_register_fn_input());
+            assigns.push(f.expand_register_fn_assign());
         }
-        out
+
+        quote::quote! {
+            #[no_mangle]
+            pub unsafe extern "C" fn #name(
+                #inputs
+            ) {
+                #(#assigns;)*
+            }
+        }
     }
 
     /// Expands Dart functions of all [`ModExpander::fn_expanders`].
@@ -184,18 +208,6 @@ impl TryFrom<ItemMod> for ModExpander {
     }
 }
 
-/// Creates a [`Ident`] using interpolation of runtime expressions.
-///
-/// Works same as [`format`] macro, but generated [`Ident`].
-macro_rules! format_ident {
-    ($($arg:tt)*) => {{
-        Ident::new(
-            &format!($($arg)*),
-            Span::call_site(),
-        )
-    }}
-}
-
 /// Generator of the [`Ident`]s for the [`FnExpander`].
 struct IdentGenerator<'a> {
     /// Prefix which will be used in generated [`Ident`]s.
@@ -219,17 +231,6 @@ impl<'a> IdentGenerator<'a> {
             "{}{}Function",
             self.prefix.to_string().to_class_case(),
             self.name.to_string().to_class_case(),
-        )
-    }
-
-    /// Returns [`Ident`] for the [`FnExpander`]'s registerer function.
-    ///
-    /// Generates something like `register_peer_connection__create_offer`.
-    fn registerer_fn(&self) -> Ident {
-        format_ident!(
-            "register_{}__{}",
-            self.prefix.to_string(),
-            self.name.to_string(),
         )
     }
 
@@ -326,9 +327,6 @@ struct FnExpander {
     /// [`Ident`] of the type alias for the extern Dart function.
     fn_type_alias_ident: Ident,
 
-    /// [`Ident`] of the registerer function for the extern Dart function.
-    register_fn_ident: Ident,
-
     /// [`Ident`] of the `static mut` which stores extern Dart function.
     fn_static_mut_ident: Ident,
 
@@ -361,7 +359,6 @@ impl FnExpander {
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
         Ok(Self {
             fn_type_alias_ident: ident_generator.type_alias(),
-            register_fn_ident: ident_generator.registerer_fn(),
             fn_static_mut_ident: ident_generator.static_mut(),
             input_idents: parser::get_input_idents(&item.sig.inputs)?,
             ident: item.sig.ident,
@@ -369,6 +366,41 @@ impl FnExpander {
             out_type: item.sig.output,
             doc_attrs: parser::filter_doc_attributes(item.attrs)?,
         })
+    }
+
+    /// Generates [`FnArg`] of this [`FnExpander`] for the registerer function.
+    ///
+    /// # Example of the generated code
+    ///
+    /// ```ignore
+    /// create_offer: PeerConnectionCreateOfferFunction
+    /// ```
+    fn expand_register_fn_input(&self) -> FnArg {
+        let ident = &self.ident;
+        let fn_type_alias = &self.fn_type_alias_ident;
+        FnArg::parse
+            .parse2(quote::quote! {
+                #ident: #fn_type_alias
+            })
+            .unwrap()
+    }
+
+    /// Generates [`ExprAssign`] of this [`FnExpander`] for the registerer
+    /// function.
+    ///
+    /// # Example of the generated code
+    ///
+    /// ```ignore
+    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION = Some(create_offer)
+    /// ```
+    fn expand_register_fn_assign(&self) -> ExprAssign {
+        let fn_static_mut = &self.fn_static_mut_ident;
+        let ident = &self.ident;
+        ExprAssign::parse
+            .parse2(quote::quote! {
+                #fn_static_mut = Some(#ident)
+            })
+            .unwrap()
     }
 
     /// Generates type alias of the extern Dart function.
@@ -404,21 +436,6 @@ impl FnExpander {
 
         quote::quote! {
             static mut #name: Option<#type_alias_ident> = None;
-        }
-    }
-
-    /// Generates `extern "C"` function which should be called by Dart side for
-    /// Dart function registering.
-    fn expand_register_fn(&self) -> TokenStream2 {
-        let name = &self.register_fn_ident;
-        let type_alias_ident = &self.fn_type_alias_ident;
-        let static_mut_ident = &self.fn_static_mut_ident;
-
-        quote::quote! {
-            #[no_mangle]
-            unsafe extern "C" fn #name(f: #type_alias_ident) {
-                #static_mut_ident = Some(f);
-            }
         }
     }
 
