@@ -10,7 +10,7 @@ use syn::{
     parse::{Error, Parse, Parser, Result},
     punctuated::Punctuated,
     spanned::Spanned as _,
-    Attribute, ExprAssign, FnArg, ForeignItemFn, Ident, Item, ItemMod, ItemUse,
+    Attribute, Expr, FnArg, ForeignItemFn, Ident, Item, ItemMod, ItemUse,
     ReturnType, Token, Visibility,
 };
 
@@ -67,12 +67,12 @@ impl ModExpander {
     /// Expands Dart functions registerers of all [`ModExpander::fn_expanders`].
     fn expand_register_fns(&self) -> TokenStream2 {
         let mut inputs: Punctuated<FnArg, Token![,]> = Punctuated::new();
-        let mut assigns: Vec<ExprAssign> = Vec::new();
+        let mut assigns: Vec<Expr> = Vec::new();
         let name: Ident = format_ident!("register_{}", self.ident);
 
         for f in &self.fn_expanders {
             inputs.push(f.expand_register_fn_input());
-            assigns.push(f.expand_register_fn_assign());
+            assigns.push(f.expand_register_fn_expr());
         }
 
         quote::quote! {
@@ -386,20 +386,19 @@ impl FnExpander {
             .unwrap()
     }
 
-    /// Generates [`ExprAssign`] of this [`FnExpander`] for the registerer
-    /// function.
+    /// Generates [`Expr`] of this [`FnExpander`] for the registerer function.
     ///
     /// # Example of the generated code
     ///
     /// ```ignore
-    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION = Some(create_offer)
+    /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer)
     /// ```
-    fn expand_register_fn_assign(&self) -> ExprAssign {
+    fn expand_register_fn_expr(&self) -> Expr {
         let fn_static_mut = &self.fn_static_mut_ident;
         let ident = &self.ident;
-        ExprAssign::parse
+        Expr::parse
             .parse2(quote::quote! {
-                #fn_static_mut = Some(#ident)
+                #fn_static_mut.write(#ident)
             })
             .unwrap()
     }
@@ -427,16 +426,17 @@ impl FnExpander {
     /// # Example of generated code
     ///
     /// ```ignore
-    /// static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION: Option<
-    ///     PeerConnectionCreateOfferFunction,
-    /// > = None;
+    /// static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+    ///     std::mem::MaybeUninit<PeerConnectionCreateOfferFunction> =
+    ///     std::mem::MaybeUninit::uninit();
     /// ```
     fn expand_fn_static_mut(&self) -> TokenStream2 {
         let name = &self.fn_static_mut_ident;
         let type_alias_ident = &self.fn_type_alias_ident;
 
         quote::quote! {
-            static mut #name: Option<#type_alias_ident> = None;
+            static mut #name: std::mem::MaybeUninit<#type_alias_ident> =
+                std::mem::MaybeUninit::uninit();
         }
     }
 
@@ -452,7 +452,7 @@ impl FnExpander {
         quote::quote! {
             #(#doc_attrs)*
             pub unsafe fn #ident(#inputs) #out_type {
-                (#static_mut_ident.unwrap())(#input_idents)
+                (#static_mut_ident.assume_init_ref())(#input_idents)
             }
         }
     }

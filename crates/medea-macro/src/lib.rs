@@ -476,10 +476,7 @@ caused::derive);
 ///
 /// ```ignore
 /// mod peer_connection {
-///     use std::{
-///         ptr,
-///         os::raw::c_char,
-///     };
+///     use std::{ptr, os::raw::c_char};
 ///
 ///     use dart_sys::Dart_Handle;
 ///
@@ -488,39 +485,37 @@ caused::derive);
 ///     type PeerConnectionCreateAnswerFunction =
 ///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
 ///
-///     static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION: Option<
-///         PeerConnectionCreateOfferFunction,
-///     > = None;
-///     static mut PEER_CONNECTION__CREATE_ANSWER__FUNCTION: Option<
-///         PeerConnectionCreateAnswerFunction,
-///     > = None;
+///     static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+///         std::mem::MaybeUninit<
+///             PeerConnectionCreateOfferFunction,
+///         > = std::mem::MaybeUninit::uninit();
+///
+///     static mut PEER_CONNECTION__CREATE_ANSWER__FUNCTION:
+///         std::mem::MaybeUninit<
+///             PeerConnectionCreateAnswerFunction,
+///         > = std::mem::MaybeUninit::uninit();
 ///
 ///     #[no_mangle]
-///     unsafe extern "C" fn register_peer_connection__create_offer(
-///         f: PeerConnectionCreateOfferFunction,
+///     pub unsafe extern "C" fn register_peer_connection(
+///         create_offer: PeerConnectionCreateOfferFunction,
+///         create_answer: PeerConnectionCreateAnswerFunction,
 ///     ) {
-///         PEER_CONNECTION__CREATE_OFFER__FUNCTION = Some(f);
-///     }
-///
-///     #[no_mangle]
-///     unsafe extern "C" fn register_peer_connection__create_answer(
-///         f: PeerConnectionCreateAnswerFunction,
-///     ) {
-///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION = Some(f);
+///         PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer);
+///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION.write(create_answer);
 ///     }
 ///
 ///     #[doc = " Creates new offer in the provided `PeerConnection`"]
 ///     #[doc = ""]
 ///     #[doc = " Returns created SDP offer."]
 ///     pub unsafe fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
-///         (PEER_CONNECTION__CREATE_OFFER__FUNCTION.unwrap())(peer)
+///         (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer)
 ///     }
 ///
 ///     #[doc = " Creates new answer in the provided `PeerConnection`"]
 ///     #[doc = ""]
 ///     #[doc = " Returns created SDP answer."]
 ///     pub unsafe fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
-///         (PEER_CONNECTION__CREATE_ANSWER__FUNCTION.unwrap())(peer)
+///         (PEER_CONNECTION__CREATE_ANSWER__FUNCTION.assume_init_ref())(peer)
 ///     }
 /// }
 /// ```
@@ -547,11 +542,10 @@ caused::derive);
 ///
 /// ```dart
 /// dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-///        'register_peer_connection__create_offer')(
-///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createOffer));
-///  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-///        'register_peer_connection__create_answer')(
-///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer));
+///         'register_peer_connection')(
+///     Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createOffer),
+///     Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer),
+/// );
 /// ```
 #[proc_macro_attribute]
 pub fn extern_dart(_: TokenStream, input: TokenStream) -> TokenStream {
