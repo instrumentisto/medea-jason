@@ -18,7 +18,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `extern_dart!` macro for for generating code of Dart functions registration ([#14]).
+- `#[extern_dart]` macro for for generating code of Dart functions registration ([#14]).
 
 [#4]: /../../pull/4
 [#14]: /../../pull/14

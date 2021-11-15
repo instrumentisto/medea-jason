@@ -441,32 +441,33 @@ caused::derive);
 /// ## Macro call
 ///
 /// ```ignore
-/// extern_dart! {
-///     // Code will be generated in the 'peer_connection' module, also you can
-///     // control visibility of this module with visibility
-///     // modifier ('pub').
-///     //
-///     // Module name will be used as a prefix for register functions.
-///     mod peer_connection {
-///         use std::{
-///             ptr,
-///             os::raw::c_char,
-///         };
+/// // Code will be generated in the 'peer_connection' module, also you can
+/// // control visibility of this module with visibility
+/// // modifier ('pub').
+/// //
+/// // Module name will be used as a prefix for register functions.
+/// #[extern_dart]
+/// mod peer_connection {
+///     use std::{
+///         ptr,
+///         os::raw::c_char,
+///     };
 ///
-///         use dart_sys::Dart_Handle;
+///     use dart_sys::Dart_Handle;
 ///
+///     extern "C" {
 ///         // This documentation will be injected to the generated
 ///         // extern function caller:
 ///
 ///         /// Creates new offer in the provided `PeerConnection`
 ///         ///
 ///         /// Returns created SDP offer.
-///         unsafe fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///         fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
 ///
 ///         /// Creates new answer in the provided `PeerConnection`
 ///         ///
 ///         /// Returns created SDP answer.
-///         unsafe fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///         fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
 ///     }
 /// }
 /// ```
@@ -552,8 +553,8 @@ caused::derive);
 ///        'register_peer_connection__create_answer')(
 ///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer));
 /// ```
-#[proc_macro]
-pub fn extern_dart(input: TokenStream) -> TokenStream {
+#[proc_macro_attribute]
+pub fn extern_dart(_: TokenStream, input: TokenStream) -> TokenStream {
     extern_dart::expand(syn::parse_macro_input!(input))
         .unwrap_or_else(|e| e.to_compile_error().into())
 }

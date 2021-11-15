@@ -1,4 +1,4 @@
-//! `extern_dart!` macro implementation.
+//! `#[extern_dart]` macro implementation.
 
 use std::convert::TryFrom;
 
@@ -10,8 +10,8 @@ use syn::{
     parse::{Error, Parse, Parser, Result},
     punctuated::Punctuated,
     spanned::Spanned as _,
-    Attribute, ExprAssign, FnArg, Ident, Item, ItemMod, ItemUse, ReturnType,
-    Token, TraitItemMethod, Visibility,
+    Attribute, ExprAssign, FnArg, ForeignItemFn, Ident, Item, ItemMod, ItemUse,
+    ReturnType, Token, Visibility,
 };
 
 /// Creates a [`Ident`] using interpolation of runtime expressions.
@@ -26,7 +26,7 @@ macro_rules! format_ident {
     }}
 }
 
-/// Expander of the `extern_dart!` macro.
+/// Expander of the `#[extern_dart]` macro.
 ///
 /// Expands to module with a registerers of the Dart functions and it's callers.
 #[derive(Debug)]
@@ -94,7 +94,7 @@ impl ModExpander {
         out
     }
 
-    /// Fully expands `extern_dart!` macro.
+    /// Fully expands `#[extern_dart]` macro.
     fn expand(&self) -> TokenStream2 {
         let type_aliases = self.expand_type_aliases();
         let static_muts = self.expand_static_muts();
@@ -125,10 +125,10 @@ mod mod_parser {
     //!
     //! [`ModExpander`]: super::ModExpander
 
-    use proc_macro2::{Span, TokenStream as TokenStream2};
+    use proc_macro2::Span;
     use syn::{
-        spanned::Spanned as _, token, Error, Item, Result, TraitItem,
-        TraitItemMethod,
+        spanned::Spanned as _, token, Error, ForeignItem, ForeignItemFn, Item,
+        Result,
     };
 
     /// Tries to parse [`TraitItemMethod`] from the provided [`TokenStream2`].
@@ -136,9 +136,8 @@ mod mod_parser {
     /// # Errors
     ///
     /// If provided [`TokenStream2`] can't be parsed as [`TraitItemMethod`].
-    pub fn get_extern_fn(item: TokenStream2) -> Result<TraitItemMethod> {
-        let item = syn::parse2(item)?;
-        if let TraitItem::Method(item) = item {
+    pub fn get_extern_fn(item: ForeignItem) -> Result<ForeignItemFn> {
+        if let ForeignItem::Fn(item) = item {
             Ok(item)
         } else {
             Err(Error::new(item.span(), "Unsupported item"))
@@ -174,11 +173,13 @@ impl TryFrom<ItemMod> for ModExpander {
         let register_prefix = &item.ident;
         for item in parser::try_unwrap_mod_content(item.content)? {
             match item {
-                Item::Verbatim(item) => {
-                    extern_functions.push(FnExpander::parse(
-                        parser::get_extern_fn(item)?,
-                        register_prefix,
-                    )?);
+                Item::ForeignMod(item) => {
+                    for item in item.items {
+                        extern_functions.push(FnExpander::parse(
+                            parser::get_extern_fn(item)?,
+                            register_prefix,
+                        )?);
+                    }
                 }
                 Item::Use(item) => {
                     use_items.push(item);
@@ -195,7 +196,7 @@ impl TryFrom<ItemMod> for ModExpander {
         if extern_functions.is_empty() {
             return Err(Error::new(
                 mod_item_span,
-                "At least one extern fn required",
+                "At least one extern \"C\" mod required",
             ));
         }
 
@@ -353,7 +354,7 @@ impl FnExpander {
     ///
     /// If provided [`TraitItemMethod`] can't be parsed as data for the
     /// [`FnExpander`].
-    fn parse(item: TraitItemMethod, prefix: &Ident) -> Result<Self> {
+    fn parse(item: ForeignItemFn, prefix: &Ident) -> Result<Self> {
         use fn_parser as parser;
 
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
@@ -457,7 +458,7 @@ impl FnExpander {
     }
 }
 
-/// Expands `extern_dart!` macro based on the provided [`ItemMod`].
+/// Expands `#[extern_dart]` macro based on the provided [`ItemMod`].
 pub fn expand(item: ItemMod) -> Result<TokenStream> {
     Ok(ModExpander::try_from(item)?.expand().into())
 }
