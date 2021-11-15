@@ -81,7 +81,7 @@ impl ModExpander {
         let uses = self.uses.iter();
 
         quote::quote! {
-            pub use self::sys::registerers::*;
+            pub use self::#mod_ident::registerers::*;
 
             #mod_vis mod #mod_ident {
                 #(#uses)*
@@ -109,36 +109,9 @@ mod mod_parser {
 
     use proc_macro2::{Span, TokenStream as TokenStream2};
     use syn::{
-        spanned::Spanned as _, token, Error, Ident, Item, ItemMacro, Result,
-        TraitItem, TraitItemMethod,
+        spanned::Spanned as _, token, Error, Item, Result, TraitItem,
+        TraitItemMethod,
     };
-
-    /// Tries to parse prefix for the Dart functions registerers.
-    ///
-    /// Expects to receive `extern_prefix!(PrefixName)` macro as argument.
-    ///
-    /// ## Errors
-    ///
-    /// If identifier of the provided macro isn't `extern_prefix`.
-    ///
-    /// If macro's body not contains valid prefix.
-    pub fn get_prefix(item: ItemMacro) -> Result<Ident> {
-        let is_valid_ident = item
-            .mac
-            .path
-            .segments
-            .last()
-            .as_ref()
-            .map_or(false, |i| i.ident == "extern_prefix");
-        if !is_valid_ident {
-            return Err(Error::new(
-                item.span(),
-                "Only extern_prefix! macro supported here",
-            ));
-        }
-
-        syn::parse2(item.mac.tokens)
-    }
 
     /// Tries to parse [`TraitItemMethod`] from the provided [`TokenStream2`].
     ///
@@ -152,22 +125,6 @@ mod mod_parser {
         } else {
             Err(Error::new(item.span(), "Unsupported item"))
         }
-    }
-
-    /// Tries to unwrap provided `prefix`.
-    ///
-    /// # Errors
-    ///
-    /// If provided `prefix` is `None`.
-    pub fn try_unwrap_register_prefix(
-        prefix: &Option<Ident>,
-    ) -> Result<&Ident> {
-        prefix.as_ref().ok_or_else(|| {
-            Error::new(
-                Span::call_site(),
-                "extern_prefix! should be declared before extern functions",
-            )
-        })
     }
 
     /// Tries to unwrap provided [`ItemMod::content`].
@@ -194,23 +151,12 @@ impl TryFrom<ItemMod> for ModExpander {
 
         let mod_item_span = item.span();
 
-        let mut register_prefix: Option<Ident> = None;
         let mut extern_functions: Vec<FnExpander> = Vec::new();
         let mut use_items = Vec::new();
+        let register_prefix = &item.ident;
         for item in parser::try_unwrap_mod_content(item.content)? {
             match item {
-                Item::Macro(item) => {
-                    if register_prefix.is_some() {
-                        return Err(Error::new(
-                            item.span(),
-                            "Duplicating extern_prefix! macro",
-                        ));
-                    }
-                    register_prefix = Some(parser::get_prefix(item)?);
-                }
                 Item::Verbatim(item) => {
-                    let register_prefix =
-                        parser::try_unwrap_register_prefix(&register_prefix)?;
                     extern_functions.push(FnExpander::parse(
                         parser::get_extern_fn(item)?,
                         register_prefix,
@@ -277,14 +223,14 @@ impl<'a> IdentGenerator<'a> {
     fn type_alias(&self) -> Ident {
         format_ident!(
             "{}{}Function",
-            self.prefix,
+            self.prefix.to_string().to_class_case(),
             self.name.to_string().to_class_case(),
         )
     }
 
     /// Returns [`Ident`] for the [`FnExpander`]'s registerer function.
     ///
-    /// Generates something like `register_PeerConnection__create_offer`.
+    /// Generates something like `register_peer_connection__create_offer`.
     fn registerer_fn(&self) -> Ident {
         format_ident!(
             "register_{}__{}",

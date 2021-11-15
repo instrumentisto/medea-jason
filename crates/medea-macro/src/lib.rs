@@ -442,22 +442,18 @@ caused::derive);
 ///
 /// ```ignore
 /// extern_dart! {
-///     // Code will be generated in the 'sys' module, also you can
+///     // Code will be generated in the 'peer_connection' module, also you can
 ///     // control visibility of this module with visibility
 ///     // modifier ('pub').
-///     mod sys {
-///         use std::ptr;
+///     //
+///     // Module name will be used as a prefix for register functions.
+///     mod peer_connection {
+///         use std::{
+///             ptr,
+///             os::raw::c_char,
+///         };
 ///
 ///         use dart_sys::Dart_Handle;
-///
-///         // Required line of code which sets prefix of the
-///         // registering function which should be called by
-///         // Dart side for registration.
-///         //
-///         // In this case, extern_dart! macro will generate
-///         // extern "C" functions with
-///         // "register_PeerConnection__create_offer" name.
-///         extern_prefix!(PeerConnection);
 ///
 ///         // This documentation will be injected to the generated
 ///         // extern function caller:
@@ -475,6 +471,63 @@ caused::derive);
 /// }
 /// ```
 ///
+/// ## Example of generated code
+///
+/// ```ignore
+/// pub use self::peer_connection::registerers::*;
+///
+/// mod peer_connection {
+///     use std::{
+///         ptr,
+///         os::raw::c_char,
+///     };
+///
+///     use dart_sys::Dart_Handle;
+///
+///     type PeerConnectionCreateOfferFunction =
+///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///     type PeerConnectionCreateAnswerFunction =
+///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///
+///     static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION: Option<
+///         PeerConnectionCreateOfferFunction,
+///     > = None;
+///     static mut PEER_CONNECTION__CREATE_ANSWER__FUNCTION: Option<
+///         PeerConnectionCreateAnswerFunction,
+///     > = None;
+///
+///     pub mod registerers {
+///         use super::*;
+///
+///         pub unsafe extern "C" fn register_peer_connection__create_offer(
+///             f: PeerConnectionCreateOfferFunction,
+///         ) {
+///             PEER_CONNECTION__CREATE_OFFER__FUNCTION = Some(f);
+///         }
+///
+///         pub unsafe extern "C" fn register_peer_connection__create_answer(
+///             f: PeerConnectionCreateAnswerFunction,
+///         ) {
+///             PEER_CONNECTION__CREATE_ANSWER__FUNCTION = Some(f);
+///         }
+///     }
+///
+///     #[doc = " Creates new offer in the provided `PeerConnection`"]
+///     #[doc = ""]
+///     #[doc = " Returns created SDP offer."]
+///     pub unsafe fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
+///         (PEER_CONNECTION__CREATE_OFFER__FUNCTION.unwrap())(peer)
+///     }
+///
+///     #[doc = " Creates new answer in the provided `PeerConnection`"]
+///     #[doc = ""]
+///     #[doc = " Returns created SDP answer."]
+///     pub unsafe fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
+///         (PEER_CONNECTION__CREATE_ANSWER__FUNCTION.unwrap())(peer)
+///     }
+/// }
+/// ```
+///
 /// ## Generated code usage
 ///
 /// ```ignore
@@ -482,11 +535,11 @@ caused::derive);
 ///
 /// impl PeerConnection {
 ///     pub fn create_offer(&self) -> String {
-///         c_str_into_string(sys::create_offer(self.0))
+///         c_str_into_string(peer_connection::create_offer(self.0))
 ///     }
 ///
 ///     pub fn create_answer(&self) -> String {
-///         c_str_into_string(sys::create_answer(self.0))
+///         c_str_into_string(peer_connection::create_answer(self.0))
 ///     }
 /// }
 /// ```
@@ -497,10 +550,10 @@ caused::derive);
 ///
 /// ```dart
 /// dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-///        'register_PeerConnection__create_offer')(
+///        'register_peer_connection__create_offer')(
 ///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createOffer));
 ///  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-///        'register_PeerConnection__create_answer')(
+///        'register_peer_connection__create_answer')(
 ///    Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer));
 /// ```
 #[proc_macro]
