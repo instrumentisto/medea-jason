@@ -474,8 +474,6 @@ caused::derive);
 /// ## Example of generated code
 ///
 /// ```ignore
-/// pub use self::peer_connection::registerers::*;
-///
 /// mod peer_connection {
 ///     use std::{
 ///         ptr,
@@ -496,20 +494,18 @@ caused::derive);
 ///         PeerConnectionCreateAnswerFunction,
 ///     > = None;
 ///
-///     pub mod registerers {
-///         use super::*;
+///     #[no_mangle]
+///     unsafe extern "C" fn register_peer_connection__create_offer(
+///         f: PeerConnectionCreateOfferFunction,
+///     ) {
+///         PEER_CONNECTION__CREATE_OFFER__FUNCTION = Some(f);
+///     }
 ///
-///         pub unsafe extern "C" fn register_peer_connection__create_offer(
-///             f: PeerConnectionCreateOfferFunction,
-///         ) {
-///             PEER_CONNECTION__CREATE_OFFER__FUNCTION = Some(f);
-///         }
-///
-///         pub unsafe extern "C" fn register_peer_connection__create_answer(
-///             f: PeerConnectionCreateAnswerFunction,
-///         ) {
-///             PEER_CONNECTION__CREATE_ANSWER__FUNCTION = Some(f);
-///         }
+///     #[no_mangle]
+///     unsafe extern "C" fn register_peer_connection__create_answer(
+///         f: PeerConnectionCreateAnswerFunction,
+///     ) {
+///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION = Some(f);
 ///     }
 ///
 ///     #[doc = " Creates new offer in the provided `PeerConnection`"]

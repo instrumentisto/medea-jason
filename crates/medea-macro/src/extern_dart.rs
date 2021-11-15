@@ -81,8 +81,6 @@ impl ModExpander {
         let uses = self.uses.iter();
 
         quote::quote! {
-            pub use self::#mod_ident::registerers::*;
-
             #mod_vis mod #mod_ident {
                 #(#uses)*
 
@@ -90,11 +88,7 @@ impl ModExpander {
 
                 #static_muts
 
-                pub mod registerers {
-                    use super::*;
-
-                    #register_fns
-                }
+                #register_fns
 
                 #fns
             }
@@ -417,7 +411,8 @@ impl FnExpander {
         let static_mut_ident = &self.fn_static_mut_ident;
 
         quote::quote! {
-            pub unsafe extern "C" fn #name(f: #type_alias_ident) {
+            #[no_mangle]
+            unsafe extern "C" fn #name(f: #type_alias_ident) {
                 #static_mut_ident = Some(f);
             }
         }
