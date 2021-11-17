@@ -8,6 +8,7 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 
 mod caused;
+mod dart_codegen;
 mod dispatchable;
 mod enum_delegate;
 mod extern_dart;
@@ -548,7 +549,10 @@ caused::derive);
 /// );
 /// ```
 #[proc_macro_attribute]
-pub fn extern_dart(_: TokenStream, input: TokenStream) -> TokenStream {
-    extern_dart::expand(syn::parse_macro_input!(input))
-        .unwrap_or_else(|e| e.to_compile_error().into())
+pub fn dart_bridge(args: TokenStream, input: TokenStream) -> TokenStream {
+    extern_dart::expand(
+        syn::parse_macro_input!(args),
+        syn::parse_macro_input!(input),
+    )
+    .unwrap_or_else(|e| e.to_compile_error().into())
 }

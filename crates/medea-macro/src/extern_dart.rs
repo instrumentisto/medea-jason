@@ -1,7 +1,12 @@
 //! `#[extern_dart]` macro implementation.
 
-use std::convert::TryFrom;
+use std::{
+    convert::TryFrom,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
+use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 use inflector::Inflector;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
@@ -10,8 +15,8 @@ use syn::{
     parse::{Error, Parse, Parser, Result},
     punctuated::Punctuated,
     spanned::Spanned as _,
-    Attribute, Expr, FnArg, ForeignItemFn, Ident, Item, ItemMod, ItemUse,
-    ReturnType, Token, Visibility,
+    Attribute, Expr, ExprLit, FnArg, ForeignItemFn, Ident, Item, ItemMod,
+    ItemUse, Lit, ReturnType, Token, Visibility,
 };
 
 /// Creates a [`Ident`] using interpolation of runtime expressions.
@@ -42,6 +47,8 @@ struct ModExpander {
 
     /// [`FnExpander`]s of the all functions which this module should contain.
     fn_expanders: Vec<FnExpander>,
+
+    register_fn_name: Ident,
 }
 
 impl ModExpander {
@@ -68,7 +75,7 @@ impl ModExpander {
     fn expand_register_fns(&self) -> TokenStream2 {
         let mut inputs: Punctuated<FnArg, Token![,]> = Punctuated::new();
         let mut assigns: Vec<Expr> = Vec::new();
-        let name: Ident = format_ident!("register_{}", self.ident);
+        let name = &self.register_fn_name;
 
         for f in &self.fn_expanders {
             inputs.push(f.expand_register_fn_input());
@@ -117,6 +124,28 @@ impl ModExpander {
                 #fns
             }
         }
+    }
+
+    fn generate_dart(&self, relative_path: String) {
+        let mut registerers = Vec::new();
+        for f in &self.fn_expanders {
+            let registerer = FnRegistrationBuilder {
+                inputs: f.inputs.iter().cloned().collect(),
+                output: f.out_type.clone(),
+                name: f.ident.clone(),
+            };
+            registerers.push(registerer);
+        }
+
+        let codegen =
+            DartCodegen::new(self.register_fn_name.clone(), registerers)
+                .unwrap();
+        let generate = codegen.generate();
+        let root_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+        let mut path = PathBuf::from(root_path);
+        path.push(relative_path);
+        let mut f = std::fs::File::create(path).unwrap();
+        f.write_all(generate.as_bytes());
     }
 }
 
@@ -201,6 +230,7 @@ impl TryFrom<ItemMod> for ModExpander {
         }
 
         Ok(Self {
+            register_fn_name: format_ident!("register_{}", item.ident),
             ident: item.ident,
             vis: item.vis,
             uses: use_items,
@@ -253,8 +283,8 @@ mod fn_parser {
     //! [`FnExpander`]: super::FnExpander
 
     use syn::{
-        punctuated::Punctuated, spanned::Spanned as _, Attribute, Error, FnArg,
-        Ident, Pat, Result, Token,
+        punctuated::Punctuated, spanned::Spanned as _, Attribute, Error,
+        ExprLit, FnArg, Ident, Lit, Pat, Result, Token,
     };
 
     /// Returns [`Punctuated`] [`Ident`]s of the all provided [`FnArg`]s.
@@ -458,7 +488,20 @@ impl FnExpander {
     }
 }
 
+pub fn get_path_arg(arg: ExprLit) -> Result<String> {
+    if let Lit::Str(arg) = arg.lit {
+        Ok(arg.value())
+    } else {
+        Err(Error::new(
+            Span::call_site(),
+            "Expected str literal with a Dart file path",
+        ))
+    }
+}
+
 /// Expands `#[extern_dart]` macro based on the provided [`ItemMod`].
-pub fn expand(item: ItemMod) -> Result<TokenStream> {
-    Ok(ModExpander::try_from(item)?.expand().into())
+pub fn expand(path: ExprLit, item: ItemMod) -> Result<TokenStream> {
+    let expander = ModExpander::try_from(item)?;
+    expander.generate_dart(get_path_arg(path)?);
+    Ok(expander.expand().into())
 }
