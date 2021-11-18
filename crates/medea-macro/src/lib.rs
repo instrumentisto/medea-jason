@@ -8,10 +8,10 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 
 mod caused;
+mod dart_bridge;
 mod dart_codegen;
 mod dispatchable;
 mod enum_delegate;
-mod extern_dart;
 mod watchers;
 
 use proc_macro::TokenStream;
@@ -447,7 +447,7 @@ caused::derive);
 /// // modifier ('pub').
 /// //
 /// // Module name will be used as a prefix for register functions.
-/// #[extern_dart]
+/// #[dart_bridge]
 /// mod peer_connection {
 ///     use std::{
 ///         ptr,
@@ -550,8 +550,8 @@ caused::derive);
 /// ```
 #[proc_macro_attribute]
 pub fn dart_bridge(args: TokenStream, input: TokenStream) -> TokenStream {
-    extern_dart::expand(
-        syn::parse_macro_input!(args),
+    dart_bridge::expand(
+        &syn::parse_macro_input!(args),
         syn::parse_macro_input!(input),
     )
     .unwrap_or_else(|e| e.to_compile_error().into())

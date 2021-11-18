@@ -3,15 +3,15 @@ import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+import 'ice_servers.g.dart' as bridge;
+
 /// Registers [RTCPeerConnection] ICE servers related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceServers__new')(
-      Pointer.fromFunction<Handle Function()>(newIceServers));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_IceServers__add')(Pointer.fromFunction<
-          Void Function(Handle, Pointer<Utf8>, ForeignValue, ForeignValue)>(
-      addIceServer));
+  bridge.registerFunction(
+      dl,
+      constructNew: newIceServers,
+      add: addIceServer,
+  );
 }
 
 /// Returns a new empty `IceServer`s [List].

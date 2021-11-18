@@ -1,17 +1,15 @@
 import 'package:ffi/ffi.dart';
 
 import 'dart:ffi';
+import 'object.g.dart' as bridge;
 
 /// Registers [Object]-related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Object__runtimeType__toString')(
-      Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(
-          runtimeTypeToString));
-
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Object__toString')(
-      Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(toString));
+  bridge.registerFunction(
+    dl,
+    runtimeType: runtimeTypeToString,
+    toString: toString,
+  );
 }
 
 /// Returns string representation of the [Type] of the provided [Object].

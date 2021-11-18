@@ -8,6 +8,7 @@ import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import 'ffi/callback.dart' as callback;
+import 'ffi/function.dart' as function;
 import 'ffi/completer.dart' as completer;
 import 'ffi/future.dart' as future;
 import 'ffi/exceptions.dart' as exceptions;
@@ -78,6 +79,7 @@ DynamicLibrary _dl_load() {
   completer.registerFunctions(dl);
   exceptions.registerFunctions(dl);
   future.registerFunctions(dl);
+  function.registerFunctions(dl);
   platform_utils_registerer.registerFunctions(dl);
 
   executor = Executor(dl);

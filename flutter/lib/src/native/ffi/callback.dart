@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import '../jason.dart';
 import 'foreign_value.dart';
+import 'callback.g.dart' as bridge;
 
 typedef _callbackCall_C = Void Function(Pointer, ForeignValue);
 typedef _callbackCall_Dart = void Function(Pointer, ForeignValue);
@@ -18,28 +19,11 @@ final _callbackTwoArgCall =
 
 /// Registers the closure callers functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_fn_caller')(
-      Pointer.fromFunction<Void Function(Handle, ForeignValue)>(_callFn));
-
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Callback__call_proxy')(
-      Pointer.fromFunction<Handle Function(Pointer)>(callback));
-
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Callback__call_two_arg_proxy')(
-      Pointer.fromFunction<Handle Function(Pointer)>(callbackTwoArg));
-}
-
-/// Function used by Rust to call closures with a single [ForeignValue]
-/// argument.
-void _callFn(void Function(dynamic) fn, ForeignValue value) {
-  var arg = value.toDart();
-  if (arg != null) {
-    fn(arg);
-  } else {
-    (fn as void Function())();
-  }
+  bridge.registerFunction(
+    dl,
+    callProxy: callback,
+    callTwoArgProxy: callbackTwoArg,
+  );
 }
 
 /// Returns a closure calling the provided Rust function [Pointer].

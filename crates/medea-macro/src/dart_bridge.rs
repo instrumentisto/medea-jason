@@ -1,12 +1,8 @@
-//! `#[extern_dart]` macro implementation.
+//! `#[dart_bridge]` macro implementation.
 
-use std::{
-    convert::TryFrom,
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::{convert::TryFrom, io::Write, path::PathBuf};
+use std::fs::File;
 
-use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 use inflector::Inflector;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
@@ -18,6 +14,8 @@ use syn::{
     Attribute, Expr, ExprLit, FnArg, ForeignItemFn, Ident, Item, ItemMod,
     ItemUse, Lit, ReturnType, Token, Visibility,
 };
+
+use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
 /// Creates a [`Ident`] using interpolation of runtime expressions.
 ///
@@ -31,7 +29,23 @@ macro_rules! format_ident {
     }}
 }
 
-/// Expander of the `#[extern_dart]` macro.
+/// Returns [`String`] from the provided [`ExprLit`].
+///
+/// # Errors
+///
+/// If provided [`ExprLit`] isn't [`Lit::Str`].
+pub fn get_path_arg(arg: &ExprLit) -> Result<String> {
+    if let Lit::Str(arg) = &arg.lit {
+        Ok(arg.value())
+    } else {
+        Err(Error::new(
+            Span::call_site(),
+            "Expected str literal with a Dart file path",
+        ))
+    }
+}
+
+/// Expander of the `#[dart_bridge]` macro.
 ///
 /// Expands to module with a registerers of the Dart functions and it's callers.
 #[derive(Debug)]
@@ -101,7 +115,7 @@ impl ModExpander {
         out
     }
 
-    /// Fully expands `#[extern_dart]` macro.
+    /// Fully expands `#[dart_bridge]` macro.
     fn expand(&self) -> TokenStream2 {
         let type_aliases = self.expand_type_aliases();
         let static_muts = self.expand_static_muts();
@@ -126,7 +140,19 @@ impl ModExpander {
         }
     }
 
-    fn generate_dart(&self, relative_path: String) {
+    /// Generates all required Dart code at the provided `relative_path`.
+    fn generate_dart(&self, relative_path: &ExprLit) -> Result<()> {
+        let root_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+        let mut path = PathBuf::from(root_path);
+        path.push(get_path_arg(relative_path)?);
+
+        let mut f = File::create(path).map_err(|e| {
+            Error::new(
+                relative_path.span(),
+                format!("Failed to create file at the provided path: {:?}", e),
+            )
+        })?;
+
         let mut registerers = Vec::new();
         for f in &self.fn_expanders {
             let registerer = FnRegistrationBuilder {
@@ -136,16 +162,21 @@ impl ModExpander {
             };
             registerers.push(registerer);
         }
+        let generated_code =
+            DartCodegen::new(&self.register_fn_name, registerers)?.generate();
 
-        let codegen =
-            DartCodegen::new(self.register_fn_name.clone(), registerers)
-                .unwrap();
-        let generate = codegen.generate();
-        let root_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-        let mut path = PathBuf::from(root_path);
-        path.push(relative_path);
-        let mut f = std::fs::File::create(path).unwrap();
-        f.write_all(generate.as_bytes());
+        f.write_all(generated_code.as_bytes()).map_err(|e| {
+            Error::new(
+                relative_path.span(),
+                format!(
+                    "Failed to write generated Dart \
+        code at the provided path: {:?}",
+                    e
+                ),
+            )
+        })?;
+
+        Ok(())
     }
 }
 
@@ -283,8 +314,8 @@ mod fn_parser {
     //! [`FnExpander`]: super::FnExpander
 
     use syn::{
-        punctuated::Punctuated, spanned::Spanned as _, Attribute, Error,
-        ExprLit, FnArg, Ident, Lit, Pat, Result, Token,
+        punctuated::Punctuated, spanned::Spanned as _, Attribute, Error, FnArg,
+        Ident, Pat, Result, Token,
     };
 
     /// Returns [`Punctuated`] [`Ident`]s of the all provided [`FnArg`]s.
@@ -488,20 +519,9 @@ impl FnExpander {
     }
 }
 
-pub fn get_path_arg(arg: ExprLit) -> Result<String> {
-    if let Lit::Str(arg) = arg.lit {
-        Ok(arg.value())
-    } else {
-        Err(Error::new(
-            Span::call_site(),
-            "Expected str literal with a Dart file path",
-        ))
-    }
-}
-
-/// Expands `#[extern_dart]` macro based on the provided [`ItemMod`].
-pub fn expand(path: ExprLit, item: ItemMod) -> Result<TokenStream> {
+/// Expands `#[dart_bridge]` macro based on the provided [`ItemMod`].
+pub fn expand(path: &ExprLit, item: ItemMod) -> Result<TokenStream> {
     let expander = ModExpander::try_from(item)?;
-    expander.generate_dart(get_path_arg(path)?);
+    expander.generate_dart(path)?;
     Ok(expander.expand().into())
 }

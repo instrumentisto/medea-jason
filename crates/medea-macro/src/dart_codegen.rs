@@ -1,119 +1,217 @@
-use std::{
-    convert::{Infallible, TryFrom},
-    fmt,
-    fmt::Formatter,
-    hint::unreachable_unchecked,
-};
+//! Implementation of the Dart side register functions generator based on
+//! `#[dart_bridge]` macro.
 
+use std::convert::TryFrom;
+
+use inflector::Inflector;
 use syn::{
-    Error, FnArg, GenericArgument, Ident, PathArguments, ReturnType, Type,
+    spanned::Spanned, Error, FnArg, GenericArgument, Ident, PathArguments,
+    ReturnType, Type,
 };
 
+/// All supported types in the Dart functions.
 #[derive(Debug, Clone, Copy)]
 pub enum DartType {
+    /// Pointer to the Dart `Object`.
+    ///
+    /// Represents [Handle] on the Dart side.
+    ///
+    /// [Handle]: https://api.dart.dev/stable/2.14.4/dart-ffi/Handle-class.html
     Handle,
+
+    /// [`c_char`] pointer.
+    ///
+    /// Represents [Pointer<Utf8>] on the Dart side.
+    ///
+    /// [Pointer<Utf8>]:
+    /// https://pub.dev/documentation/ffi/latest/ffi/Utf8-class.html
     StringPointer,
+
+    /// Pointer to the boxed Dart `Object`.
+    ///
+    /// Represents [Pointer<Handle>] on the Dart side.
+    ///
+    /// [Pointer<Handle>]:
+    /// https://api.dart.dev/stable/2.14.4/dart-ffi/Pointer-class.html
+    HandlePointer,
+
+    /// 8-bit integer.
+    ///
+    /// Represents [Int8] on the Dart side.
+    ///
+    /// [Int8]: https://api.dart.dev/stable/2.14.4/dart-ffi/Int8-class.html
     Int8,
+
+    /// 32-bit integer.
+    ///
+    /// Represents [Int32] on the Dart side.
+    ///
+    /// [Int32]: https://api.dart.dev/stable/2.14.4/dart-ffi/Int32-class.html
     Int32,
+
+    /// 64-bit integer.
+    ///
+    /// Represents [Int64] on the Dart side.
+    ///
+    /// [Int64]: https://api.dart.dev/stable/2.14.4/dart-ffi/Int64-class.html
+    Int64,
+
+    /// Pointer to the Rust structure.
+    ///
+    /// Represents [Pointer] on the Dart side.
+    ///
+    /// [Pointer]:
+    /// https://api.dart.dev/stable/2.14.4/dart-ffi/Pointer-class.html
     Pointer,
+
+    /// Type which indicates that function doesn't returns enything.
+    ///
+    /// `void` keyword in Dart.
     Void,
+
+    /// `DartValue` FFI structure which adds ability to cast more complex
+    /// types.
+    ForeignValue,
 }
 
 impl DartType {
-    pub fn is_int(&self) -> bool {
-        match self {
-            Self::Int8 | Self::Int32 => true,
-            _ => false,
-        }
+    /// Returns `true` if this [`DartType`] represents integer type.
+    pub fn is_int(self) -> bool {
+        matches!(self, Self::Int8 | Self::Int32 | Self::Int64)
     }
 
-    pub fn to_ffi_type(&self) -> &'static str {
+    /// Converts this [`DartType`] to the Dart side FFI type.
+    pub fn to_ffi_type(self) -> &'static str {
         match self {
-            Self::Handle => "handle",
+            Self::Handle => "Handle",
             Self::StringPointer => "Pointer<Utf8>",
+            Self::HandlePointer => "Pointer<Handle>",
             Self::Int8 => "Int8",
             Self::Int32 => "Int32",
+            Self::Int64 => "Int64",
             Self::Pointer => "Pointer",
             Self::Void => "Void",
+            Self::ForeignValue => "ForeignValue",
         }
     }
 
-    pub fn to_dart_type(&self) -> &'static str {
+    /// Converts this [`DartType`] to the Dart side type.
+    pub fn to_dart_type(self) -> &'static str {
         match self {
             Self::Handle => "Object",
             Self::StringPointer => "Pointer<Utf8>",
-            Self::Int8 | Self::Int32 => "int",
+            Self::HandlePointer => "Pointer<Handle>",
+            Self::Int8 | Self::Int32 | Self::Int64 => "int",
             Self::Pointer => "Pointer",
             Self::Void => "void",
+            Self::ForeignValue => "ForeignValue",
+        }
+    }
+
+    /// Parses [`ptr::NonNull`] [`DartType`] from the provided
+    /// [`PathArguments`].
+    ///
+    /// [`ptr::NonNull`]: std::ptr::NonNull
+    pub fn from_non_null_generic(args: &PathArguments) -> Result<Self, Error> {
+        if let PathArguments::AngleBracketed(args) = args {
+            match args
+                .args
+                .last()
+                .ok_or_else(|| Error::new(args.span(), "Empty generics list"))?
+            {
+                GenericArgument::Type(Type::Path(path)) => {
+                    let segment =
+                        path.path.segments.last().ok_or_else(|| {
+                            Error::new(path.span(), "Empty generic path")
+                        })?;
+                    Ok(if segment.ident.to_string().as_str() == "c_char" {
+                        Self::StringPointer
+                    } else {
+                        Self::Pointer
+                    })
+                }
+                _ => {
+                    Err(Error::new(args.span(), "Unsupported generic argument"))
+                }
+            }
+        } else {
+            Err(Error::new(
+                args.span(),
+                "Unsupported NonNull path arguments",
+            ))
         }
     }
 }
 
 impl TryFrom<Type> for DartType {
-    type Error = Infallible;
+    type Error = Error;
 
     fn try_from(value: Type) -> Result<Self, Self::Error> {
         let res = match value {
             Type::Path(path) => {
-                let ty = path.path.segments.last().unwrap();
-                let stringified_ty = ty.ident.to_string();
-                match stringified_ty.as_str() {
+                let ty = path
+                    .path
+                    .segments
+                    .last()
+                    .ok_or_else(|| Error::new(path.span(), "Empty path"))?;
+                match ty.ident.to_string().as_str() {
                     "Dart_Handle" => Self::Handle,
-                    "NonNull" => match &ty.arguments {
-                        PathArguments::AngleBracketed(args) => {
-                            let ty = args.args.last().unwrap();
-                            match ty {
-                                GenericArgument::Type(ty) => match ty {
-                                    Type::Path(path) => {
-                                        let ty =
-                                            path.path.segments.last().unwrap();
-                                        match ty.ident.to_string().as_str() {
-                                            "c_char" => Self::StringPointer,
-                                            _ => Self::Pointer,
-                                        }
-                                    }
-                                    _ => unreachable!("1"),
-                                },
-                                _ => unreachable!("2"),
-                            }
-                        }
-                        _ => unreachable!("3"),
-                    },
+                    "NonNull" => Self::from_non_null_generic(&ty.arguments)?,
+                    "DartValueArg" | "DartValue" => Self::ForeignValue,
+                    "DartError" => Self::HandlePointer,
                     "i32" => Self::Int32,
+                    "i64" => Self::Int64,
                     "i8" => Self::Int8,
-                    _ => unreachable!("{}", stringified_ty),
+                    _ => {
+                        return Err(Error::new(
+                            ty.ident.span(),
+                            "Unsupported type",
+                        ));
+                    }
                 }
             }
-            _ => unreachable!("5"),
+            _ => {
+                return Err(Error::new(value.span(), "Unsupported type"));
+            }
         };
 
         Ok(res)
     }
 }
 
+/// Generator for the fn registration Dart code.
 #[derive(Debug)]
 struct FnRegistration {
+    /// Inputs of the registering function.
     inputs: Vec<DartType>,
+
+    /// Output of the registering function.
     output: DartType,
+
+    /// Name of the registering function.
     name: String,
 }
 
-impl FnRegistration {
-    fn is_returns_int(&self) -> bool {
-        self.output.is_int()
-    }
-}
-
+/// Generator for the functions regiterer Dart code.
 #[derive(Debug)]
 pub struct DartCodegen {
+    /// FFI name of the registerer function.
     register_fn_name: String,
+
+    /// All generators of the registration Dart code.
     registrators: Vec<FnRegistration>,
 }
 
+/// Builder for the [`FnRegistration`].
 #[derive(Debug)]
 pub struct FnRegistrationBuilder {
+    /// Inputs of the registering function.
     pub inputs: Vec<FnArg>,
+
+    /// Output of the registering function.
     pub output: ReturnType,
+
+    /// Name of the registering function.
     pub name: Ident,
 }
 
@@ -123,16 +221,18 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
     fn try_from(from: FnRegistrationBuilder) -> Result<Self, Self::Error> {
         let mut inputs = Vec::new();
         for input in from.inputs {
-            match input {
-                FnArg::Typed(input) => {
-                    inputs.push(DartType::try_from(*input.ty).unwrap());
-                }
-                _ => unreachable!("6"),
+            if let FnArg::Typed(input) = input {
+                inputs.push(DartType::try_from(*input.ty)?);
+            } else {
+                return Err(Error::new(
+                    input.span(),
+                    "Self types are unsupported here",
+                ));
             }
         }
         let output = match from.output {
             ReturnType::Default => DartType::Void,
-            ReturnType::Type(_, ty) => DartType::try_from(*ty).unwrap(),
+            ReturnType::Type(_, ty) => DartType::try_from(*ty)?,
         };
         let name = from.name.to_string();
 
@@ -144,12 +244,21 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
     }
 }
 
+/// Line-to-line generator for the Dart code, which supports setting
+/// indentation.
 struct FormattedGenerator {
+    /// Buffer of the resulting code.
     generated: String,
+
+    /// Current space level.
+    ///
+    /// This count of spaces will be added at the start of line on every
+    /// [`FormattedGenerator::push_line`] call.
     space_count: u32,
 }
 
 impl FormattedGenerator {
+    /// Returns new empty [`FormattedGenerator`].
     pub fn new() -> Self {
         Self {
             generated: String::new(),
@@ -157,6 +266,8 @@ impl FormattedGenerator {
         }
     }
 
+    /// Pushes line to the buffer and adds required amount of spaces at the
+    /// start of line.
     pub fn push_line(&mut self, line: &str) {
         for _ in 0..self.space_count {
             self.generated.push(' ');
@@ -165,10 +276,12 @@ impl FormattedGenerator {
         self.generated.push('\n');
     }
 
+    /// Indents next lines with 4 more spaces.
     pub fn tab(&mut self) {
         self.space_count += 4;
     }
 
+    /// Removes one level of indentation (4 spaces).
     pub fn untab(&mut self) {
         if self.space_count >= 4 {
             self.space_count -= 4;
@@ -179,13 +292,14 @@ impl FormattedGenerator {
 }
 
 impl DartCodegen {
+    /// Creates new [`DartCodegen`] for the provided inputs.
     pub fn new(
-        register_fn_name: Ident,
+        register_fn_name: &Ident,
         builders: Vec<FnRegistrationBuilder>,
     ) -> Result<Self, Error> {
         let mut registrators = Vec::new();
         for f in builders {
-            registrators.push(FnRegistration::try_from(f).unwrap());
+            registrators.push(FnRegistration::try_from(f)?);
         }
 
         let this = Self {
@@ -196,37 +310,44 @@ impl DartCodegen {
         Ok(this)
     }
 
+    /// Generates arguments of the register function.
     fn generate_args(&self, g: &mut FormattedGenerator) {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
                 inputs.push_str(&format!("{}, ", i.to_dart_type()));
             }
-            inputs.truncate(inputs.len() - 2);
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+            }
             g.push_line(&format!(
                 "required {ret_ty} Function({inputs}) {name},",
                 ret_ty = f.output.to_dart_type(),
                 inputs = inputs,
-                name = f.name,
+                name = f.name.to_camel_case(),
             ));
         }
     }
 
+    /// Generates fn lookup code.
     fn generate_lookup(&self, g: &mut FormattedGenerator) {
         let mut inputs = String::new();
         for _ in 0..self.registrators.len() {
             inputs.push_str("Pointer, ");
         }
-        inputs.truncate(inputs.len() - 2);
-        g.push_line(
-            &format!(
-                "dl.lookupFunction<Void Function({inputs}), void Function({inputs})>('{f_name}')(",
-                inputs=inputs,
-                f_name=self.register_fn_name,
-            )
-        );
+        if !inputs.is_empty() {
+            inputs.truncate(inputs.len() - 2);
+        }
+        g.push_line(&format!(
+            "dl.lookupFunction<\
+                Void Function({inputs}), \
+                void Function({inputs})>('{f_name}')(",
+            inputs = inputs,
+            f_name = self.register_fn_name,
+        ));
     }
 
+    /// Generates functions registration code.
     fn generate_functions_registration(&self, g: &mut FormattedGenerator) {
         for f in &self.registrators {
             let out_type = f.output.to_ffi_type();
@@ -234,21 +355,30 @@ impl DartCodegen {
             for i in &f.inputs {
                 inputs.push_str(&format!("{}, ", i.to_ffi_type()));
             }
-            inputs.truncate(inputs.len() - 2);
-            let name = f.name.to_string();
+            if !inputs.is_empty() {
+                inputs.truncate(inputs.len() - 2);
+            }
+            let name = f.name.to_string().to_camel_case();
+            let default_val = if f.output.is_int() { ", 0" } else { "" };
             g.push_line(&format!(
-                "Pointer.fromFunction<{out_ty} Function({inputs})>({name}),",
+                "Pointer.fromFunction<{out_ty} Function({inputs})>(\
+                {name}{default_val}),",
                 out_ty = out_type,
                 inputs = inputs,
                 name = name,
+                default_val = default_val,
             ));
         }
     }
 
+    /// Generates all needed Dart code of this [`DartCodegen`].
     pub fn generate(&self) -> String {
         let mut g = FormattedGenerator::new();
         g.push_line("import 'dart:ffi';");
         g.push_line("import 'package:ffi/ffi.dart';");
+        g.push_line(
+            "import 'package:medea_jason/src/native/ffi/foreign_value.dart';",
+        );
         g.push_line("");
         g.push_line("void registerFunction(");
         g.tab();
