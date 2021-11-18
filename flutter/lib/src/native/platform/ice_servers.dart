@@ -8,9 +8,9 @@ import 'ice_servers.g.dart' as bridge;
 /// Registers [RTCPeerConnection] ICE servers related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
-      dl,
-      constructNew: newIceServers,
-      add: addIceServer,
+    dl,
+    constructNew: newIceServers,
+    add: addIceServer,
   );
 }
 

@@ -5,8 +5,8 @@ import 'function.g.dart' as bridge;
 
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
-      dl,
-      caller: _callFn,
+    dl,
+    caller: _callFn,
   );
 }
 

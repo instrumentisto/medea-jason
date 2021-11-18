@@ -68,8 +68,7 @@ int hasSendTrack(Object transceiver) {
 
 /// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
 /// [RTCRtpTransceiver] with a provided [MediaStreamTrack].
-Object replaceSendTrack(
-    Object transceiver, Object track) async {
+Object replaceSendTrack(Object transceiver, Object track) async {
   transceiver as RTCRtpTransceiver;
   track as MediaStreamTrack;
   await transceiver.sender.setTrack(track);

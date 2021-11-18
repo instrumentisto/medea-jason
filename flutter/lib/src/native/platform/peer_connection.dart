@@ -109,8 +109,7 @@ Object setRemoteDescription(
 }
 
 /// Sets local SDP offer in the provided [RTCPeerConnection].
-Object setLocalDescription(
-    Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
+Object setLocalDescription(Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   conn as RTCPeerConnection;
   return conn.setLocalDescription(
       RTCSessionDescription(sdp.toDartString(), type.toDartString()));
