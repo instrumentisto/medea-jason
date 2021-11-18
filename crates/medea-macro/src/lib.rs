@@ -9,6 +9,7 @@
 
 mod caused;
 mod dart_bridge;
+#[cfg(feature = "dart-codegen")]
 mod dart_codegen;
 mod dispatchable;
 mod enum_delegate;

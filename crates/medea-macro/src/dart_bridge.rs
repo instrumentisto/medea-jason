@@ -1,20 +1,24 @@
 //! `#[dart_bridge]` macro implementation.
 
-use std::{convert::TryFrom, io::Write, path::PathBuf};
-use std::fs::File;
+use std::convert::TryFrom;
+#[cfg(feature = "dart-codegen")]
+use std::{fs::File, io::Write, path::PathBuf};
 
 use inflector::Inflector;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::TokenStreamExt;
+#[cfg(feature = "dart-codegen")]
+use syn::Lit;
 use syn::{
     parse::{Error, Parse, Parser, Result},
     punctuated::Punctuated,
     spanned::Spanned as _,
     Attribute, Expr, ExprLit, FnArg, ForeignItemFn, Ident, Item, ItemMod,
-    ItemUse, Lit, ReturnType, Token, Visibility,
+    ItemUse, ReturnType, Token, Visibility,
 };
 
+#[cfg(feature = "dart-codegen")]
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
 /// Creates a [`Ident`] using interpolation of runtime expressions.
@@ -34,6 +38,7 @@ macro_rules! format_ident {
 /// # Errors
 ///
 /// If provided [`ExprLit`] isn't [`Lit::Str`].
+#[cfg(feature = "dart-codegen")]
 pub fn get_path_arg(arg: &ExprLit) -> Result<String> {
     if let Lit::Str(arg) = &arg.lit {
         Ok(arg.value())
@@ -141,6 +146,7 @@ impl ModExpander {
     }
 
     /// Generates all required Dart code at the provided `relative_path`.
+    #[cfg(feature = "dart-codegen")]
     fn generate_dart(&self, relative_path: &ExprLit) -> Result<()> {
         let root_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
         let mut path = PathBuf::from(root_path);
@@ -520,8 +526,10 @@ impl FnExpander {
 }
 
 /// Expands `#[dart_bridge]` macro based on the provided [`ItemMod`].
+#[allow(unused_variables)]
 pub fn expand(path: &ExprLit, item: ItemMod) -> Result<TokenStream> {
     let expander = ModExpander::try_from(item)?;
+    #[cfg(feature = "dart-codegen")]
     expander.generate_dart(path)?;
     Ok(expander.expand().into())
 }
