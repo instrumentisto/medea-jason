@@ -29,16 +29,16 @@ Object _new() {
 }
 
 /// Returns a [Future] that is completed by the provided [Completer].
-Object _future(Object completer) {
-  return (completer as Completer).future;
+Object _future(Completer completer) {
+  return completer.future;
 }
 
 /// Completes the provided [Completer] with the provided [ForeignValue].
-void _complete(Object completer, ForeignValue arg) {
-  (completer as Completer).complete(arg.toDart());
+void _complete(Completer completer, ForeignValue arg) {
+  completer.complete(arg.toDart());
 }
 
 /// Complete the provided [Completer] with an error.
-void _completeError(Object completer, Pointer<Handle> err) {
-  (completer as Completer).completeError(unboxDartHandle(err));
+void _completeError(Completer completer, Pointer<Handle> err) {
+  completer.completeError(unboxDartHandle(err));
 }

@@ -17,8 +17,7 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns the provided [RTCIceCandidate] [String].
-Pointer _candidate(Object iceCandidate) {
-  iceCandidate as RTCIceCandidate;
+Pointer _candidate(RTCIceCandidate iceCandidate) {
   if (iceCandidate.candidate != null) {
     return ForeignValue.fromString(iceCandidate.candidate!).intoRustOwned();
   } else {
@@ -27,8 +26,7 @@ Pointer _candidate(Object iceCandidate) {
 }
 
 /// Returns SDP M line index of the provided [RTCIceCandidate].
-Pointer _sdpMLineIndex(Object iceCandidate) {
-  iceCandidate as RTCIceCandidate;
+Pointer _sdpMLineIndex(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMlineIndex != null) {
     return ForeignValue.fromInt(iceCandidate.sdpMlineIndex!).intoRustOwned();
   } else {
@@ -37,8 +35,7 @@ Pointer _sdpMLineIndex(Object iceCandidate) {
 }
 
 /// Returns SDP MID of the provided [RTCIceCandidate].
-Pointer _sdpMid(Object iceCandidate) {
-  iceCandidate as RTCIceCandidate;
+Pointer _sdpMid(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMid != null) {
     return ForeignValue.fromString(iceCandidate.sdpMid!).intoRustOwned();
   } else {

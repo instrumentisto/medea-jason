@@ -20,9 +20,8 @@ Object _new() {
 }
 
 /// Adds an `IceServer` with the provided data to the provided [List].
-void _add(Object servers, Pointer<Utf8> url, ForeignValue username,
+void _add(List servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
-  servers as List;
   var iceServer = {'url': url.toDartString()};
   username = username.toDart();
   if (username is String) {

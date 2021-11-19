@@ -32,8 +32,7 @@ void registerFunctions(DynamicLibrary dl) {
 /// Adds [RTCRtpTransceiver] to the provided [RTCPeerConnection].
 ///
 /// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
-Object _addTransceiver(Object peer, int kind, int direction) {
-  peer as RTCPeerConnection;
+Object _addTransceiver(RTCPeerConnection peer, int kind, int direction) {
   return peer.addTransceiver(
     kind: RTCRtpMediaType.values[kind],
     init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
@@ -49,9 +48,7 @@ Object _newPeer(Object iceServers) {
 
 /// Adds subscription on [RTCPeerConnection.onTrack] to the provided
 /// [RTCPeerConnection].
-void _onTrack(Object conn, Object f) {
-  conn as RTCPeerConnection;
-  f as Function;
+void _onTrack(RTCPeerConnection conn, Function f) {
   conn.onTrack = (e) {
     f(e.track, e.transceiver);
   };
@@ -59,9 +56,7 @@ void _onTrack(Object conn, Object f) {
 
 /// Add subscription on [RTCPeerConnection.onIceCandidate] to the provided
 /// [RTCPeerConnection].
-void _onIceCandidate(Object conn, Object f) {
-  conn as RTCPeerConnection;
-  f as Function;
+void _onIceCandidate(RTCPeerConnection conn, Function f) {
   conn.onIceCandidate = (e) {
     f(e);
   };
@@ -69,9 +64,7 @@ void _onIceCandidate(Object conn, Object f) {
 
 /// Adds subscription on [RTCPeerConnection.onIceConnectionState] to the
 /// provided [RTCPeerConnection].
-void _onIceConnectionStateChange(Object conn, Object f) {
-  conn as RTCPeerConnection;
-  f as Function;
+void _onIceConnectionStateChange(RTCPeerConnection conn, Function f) {
   conn.onIceConnectionState = (e) {
     f(e.index);
   };
@@ -79,9 +72,7 @@ void _onIceConnectionStateChange(Object conn, Object f) {
 
 /// Adds subscription on [RTCPeerConnection.onConnectionState] to the
 /// provided [RTCPeerConnection].
-void _onConnectionStateChange(Object conn, Object f) {
-  conn as RTCPeerConnection;
-  f as Function;
+void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
   conn.onConnectionState = (e) {
     f(e.index);
   };
@@ -89,8 +80,7 @@ void _onConnectionStateChange(Object conn, Object f) {
 
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the
 /// provided [String].
-Object _getTransceiverByMid(Object peer, Pointer<Utf8> mid) {
-  peer as RTCPeerConnection;
+Object _getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
   return peer.getTransceivers().then((transceivers) {
     var mMid = mid.toDartString();
     for (var transceiver in transceivers) {
@@ -103,49 +93,41 @@ Object _getTransceiverByMid(Object peer, Pointer<Utf8> mid) {
 
 /// Sets remote SDP offer in the provided [RTCPeerConnection].
 Object _setRemoteDescription(
-    Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  conn as RTCPeerConnection;
+    RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var desc = RTCSessionDescription(sdp.toDartString(), type.toDartString());
   return conn.setRemoteDescription(desc);
 }
 
 /// Sets local SDP offer in the provided [RTCPeerConnection].
 Object _setLocalDescription(
-    Object conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  conn as RTCPeerConnection;
+    RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   return conn.setLocalDescription(
       RTCSessionDescription(sdp.toDartString(), type.toDartString()));
 }
 
 /// Creates new SDP offer for the provided [RTCPeerConnection].
-Object _createOffer(Object conn) {
-  conn as RTCPeerConnection;
+Object _createOffer(RTCPeerConnection conn) {
   return conn.createOffer({}).then((val) => val.sdp);
 }
 
 /// Creates new SDP answer for the provided [RTCPeerConnection].
-Object _createAnswer(Object conn) {
-  conn as RTCPeerConnection;
+Object _createAnswer(RTCPeerConnection conn) {
   return conn.createAnswer({}).then((val) => val.sdp);
 }
 
 /// Restarts ICE on the provided [RTCPeerConnection].
-void _restartIce(Object conn) {
-  conn as RTCPeerConnection;
+void _restartIce(RTCPeerConnection conn) {
   throw UnimplementedError('PeerConnection.restartIce');
 }
 
 /// Adds provided [RTCIceCandidate] to the provided [RTCPeerConnection].
-Object _addIceCandidate(Object conn, Object candidate) {
-  conn as RTCPeerConnection;
-  candidate as RTCIceCandidate;
+Object _addIceCandidate(RTCPeerConnection conn, RTCIceCandidate candidate) {
   return conn.addCandidate(candidate);
 }
 
 /// Returns current [RTCPeerConnection.connectionState] of the provided
 /// [RTCPeerConnection].
-Pointer _connectionState(Object conn) {
-  conn as RTCPeerConnection;
+Pointer _connectionState(RTCPeerConnection conn) {
   if (conn.connectionState != null) {
     return ForeignValue.fromInt(conn.connectionState!.index).intoRustOwned();
   } else {
@@ -155,8 +137,7 @@ Pointer _connectionState(Object conn) {
 
 /// Returns current [RTCPeerConnection.iceConnectionState] of the provided
 /// [RTCPeerConnection].
-int _iceConnectionState(Object conn) {
-  conn as RTCPeerConnection;
+int _iceConnectionState(RTCPeerConnection conn) {
   if (conn.iceConnectionState != null) {
     return conn.iceConnectionState!.index;
   } else {
@@ -165,13 +146,11 @@ int _iceConnectionState(Object conn) {
 }
 
 /// Rollbacks local SDP offer of the provided [RTCPeerConnection].
-Object _rollback(Object conn) {
-  conn as RTCPeerConnection;
+Object _rollback(RTCPeerConnection conn) {
   return conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 /// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].
-Object getTransceivers(Object conn) {
-  conn as RTCPeerConnection;
+Object getTransceivers(RTCPeerConnection conn) {
   return conn.getTransceivers();
 }
