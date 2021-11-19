@@ -4,13 +4,15 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunction(
   DynamicLibrary dl, {
-  required Object Function() init,
-  required void Function(Object, Pointer<Utf8>, ForeignValue, ForeignValue) add,
+  required Pointer<NativeFunction<Handle Function()>> init,
+  required Pointer<
+          NativeFunction<
+              Void Function(Handle, Pointer<Utf8>, ForeignValue, ForeignValue)>>
+      add,
 }) {
   dl.lookupFunction<Void Function(Pointer, Pointer),
       void Function(Pointer, Pointer)>('register_ice_servers')(
-    Pointer.fromFunction<Handle Function()>(init),
-    Pointer.fromFunction<
-        Void Function(Handle, Pointer<Utf8>, ForeignValue, ForeignValue)>(add),
+    init,
+    add,
   );
 }

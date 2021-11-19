@@ -9,8 +9,8 @@ import 'ice_servers.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: _new,
-    add: _add,
+    init: Pointer.fromFunction(_new),
+    add: Pointer.fromFunction(_add),
   );
 }
 

@@ -7,8 +7,8 @@ import 'object.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    runtimeType: _runtimeType,
-    toString: _toString,
+    runtimeType: Pointer.fromFunction(_runtimeType),
+    toString: Pointer.fromFunction(_toString),
   );
 }
 

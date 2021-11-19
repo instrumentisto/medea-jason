@@ -9,10 +9,10 @@ import 'ice_candidate.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: _new,
-    candidate: _candidate,
-    sdpMLineIndex: _sdpMLineIndex,
-    sdpMid: _sdpMid,
+    init: Pointer.fromFunction(_new),
+    candidate: Pointer.fromFunction(_candidate),
+    sdpMLineIndex: Pointer.fromFunction(_sdpMLineIndex),
+    sdpMid: Pointer.fromFunction(_sdpMid),
   );
 }
 

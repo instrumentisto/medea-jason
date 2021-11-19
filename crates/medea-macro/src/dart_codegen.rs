@@ -74,11 +74,6 @@ pub enum DartType {
 }
 
 impl DartType {
-    /// Returns `true` if this [`DartType`] represents integer type.
-    pub fn is_int(self) -> bool {
-        matches!(self, Self::Int8 | Self::Int32 | Self::Int64)
-    }
-
     /// Converts this [`DartType`] to the Dart side FFI type.
     pub fn to_ffi_type(self) -> &'static str {
         match self {
@@ -90,19 +85,6 @@ impl DartType {
             Self::Int64 => "Int64",
             Self::Pointer => "Pointer",
             Self::Void => "Void",
-            Self::ForeignValue => "ForeignValue",
-        }
-    }
-
-    /// Converts this [`DartType`] to the Dart side type.
-    pub fn to_dart_type(self) -> &'static str {
-        match self {
-            Self::Handle => "Object",
-            Self::StringPointer => "Pointer<Utf8>",
-            Self::HandlePointer => "Pointer<Handle>",
-            Self::Int8 | Self::Int32 | Self::Int64 => "int",
-            Self::Pointer => "Pointer",
-            Self::Void => "void",
             Self::ForeignValue => "ForeignValue",
         }
     }
@@ -314,14 +296,15 @@ impl DartCodegen {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
-                inputs.push_str(&format!("{}, ", i.to_dart_type()));
+                inputs.push_str(&format!("{}, ", i.to_ffi_type()));
             }
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);
             }
             g.push_line(&format!(
-                "required {ret_ty} Function({inputs}) {name},",
-                ret_ty = f.output.to_dart_type(),
+                "required Pointer<NativeFunction<{ret_ty} Function({inputs})>> \
+                {name},",
+                ret_ty = f.output.to_ffi_type(),
                 inputs = inputs,
                 name = f.name.to_camel_case(),
             ));
@@ -349,24 +332,8 @@ impl DartCodegen {
     /// Generates functions registration code.
     fn generate_functions_registration(&self, g: &mut FormattedGenerator) {
         for f in &self.registrators {
-            let out_type = f.output.to_ffi_type();
-            let mut inputs = String::new();
-            for i in &f.inputs {
-                inputs.push_str(&format!("{}, ", i.to_ffi_type()));
-            }
-            if !inputs.is_empty() {
-                inputs.truncate(inputs.len() - 2);
-            }
             let name = f.name.to_string().to_camel_case();
-            let default_val = if f.output.is_int() { ", 0" } else { "" };
-            g.push_line(&format!(
-                "Pointer.fromFunction<{out_ty} Function({inputs})>(\
-                {name}{default_val}),",
-                out_ty = out_type,
-                inputs = inputs,
-                name = name,
-                default_val = default_val,
-            ));
+            g.push_line(&format!("{},", name));
         }
     }
 

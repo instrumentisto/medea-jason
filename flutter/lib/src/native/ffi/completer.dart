@@ -9,11 +9,11 @@ import 'completer.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: _new,
-    future: _future,
-    complete: _complete,
-    completeError: _completeError,
-    delayed: _delayed,
+    init: Pointer.fromFunction(_new),
+    future: Pointer.fromFunction(_future),
+    complete: Pointer.fromFunction(_complete),
+    completeError: Pointer.fromFunction(_completeError),
+    delayed: Pointer.fromFunction(_delayed),
   );
 }
 

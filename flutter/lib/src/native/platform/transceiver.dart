@@ -9,15 +9,15 @@ import 'transceiver.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    getCurrentDirection: _getCurrentDirection,
-    replaceTrack: _replaceSendTrack,
-    getSendTrack: _getSendTrack,
-    setSendTrackEnabled: _setSendTrackEnabled,
-    dropSender: _dropSender,
-    isStopped: _isStopped,
-    mid: _mid,
-    hasSendTrack: _hasSendTrack,
-    setDirection: _setDirection,
+    getCurrentDirection: Pointer.fromFunction(_getCurrentDirection),
+    replaceTrack: Pointer.fromFunction(_replaceSendTrack),
+    getSendTrack: Pointer.fromFunction(_getSendTrack),
+    setSendTrackEnabled: Pointer.fromFunction(_setSendTrackEnabled),
+    dropSender: Pointer.fromFunction(_dropSender),
+    isStopped: Pointer.fromFunction(_isStopped),
+    mid: Pointer.fromFunction(_mid),
+    hasSendTrack: Pointer.fromFunction(_hasSendTrack, 0),
+    setDirection: Pointer.fromFunction(_setDirection),
   );
 }
 
@@ -37,8 +37,8 @@ Object _getCurrentDirection(Object transceiver) {
 /// Returns current MID of the provided [RTCRtpTransceiver].
 Pointer _mid(Object transceiver) {
   transceiver as RTCRtpTransceiver;
-  if (transceiver.mid.isNotEmpty) {
-    return ForeignValue.fromString(transceiver.mid).intoRustOwned();
+  if (transceiver.mid != null) {
+    return ForeignValue.fromString(transceiver.mid!).intoRustOwned();
   } else {
     return ForeignValue.none().intoRustOwned();
   }

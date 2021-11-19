@@ -9,17 +9,17 @@ import 'media_track.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    id: _id,
-    deviceId: _deviceId,
-    facingMode: _facingMode,
-    kind: _kind,
-    height: _height,
-    width: _width,
-    setEnabled: _setEnabled,
-    enabled: _enabled,
-    stop: _stop,
-    onEnded: _onEnded,
-    readyState: _readyState,
+    id: Pointer.fromFunction(_id),
+    deviceId: Pointer.fromFunction(_deviceId),
+    facingMode: Pointer.fromFunction(_facingMode),
+    kind: Pointer.fromFunction(_kind, 0),
+    height: Pointer.fromFunction(_height),
+    width: Pointer.fromFunction(_width),
+    setEnabled: Pointer.fromFunction(_setEnabled),
+    enabled: Pointer.fromFunction(_enabled, 0),
+    stop: Pointer.fromFunction(_stop),
+    onEnded: Pointer.fromFunction(_onEnded),
+    readyState: Pointer.fromFunction(_readyState, 0),
   );
 }
 

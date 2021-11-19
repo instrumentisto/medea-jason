@@ -29,9 +29,7 @@ mod media_stream_track {
         pub fn id(track: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns device ID of the provided [`MediaStreamTrack`].
-        pub fn device_id(
-            track: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        pub fn device_id(track: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns facing mode of the provided [`MediaStreamTrack`].
         pub fn facing_mode(
@@ -122,9 +120,11 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        unsafe { media_stream_track::device_id(self.0.get()).unbox() }
-            .try_into()
-            .unwrap()
+        unsafe {
+            c_str_into_string(media_stream_track::device_id(self.0.get()))
+        }
+        .try_into()
+        .unwrap()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].

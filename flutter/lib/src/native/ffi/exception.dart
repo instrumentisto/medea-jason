@@ -11,15 +11,19 @@ import 'native_string.dart';
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(dl,
-      newArgumentError: _newArgumentError,
-      newStateError: _newStateError,
-      newFormatException: _newFormatException,
-      newLocalMediaInitException: _newLocalMediaInitException,
-      newEnumerateDevicesException: _newEnumerateDevicesException,
-      newRpcClientException: _newRpcClientException,
-      newMediaStateTransitionException: _newMediaStateTransitionException,
-      newInternalException: _newInternalException,
-      newMediaSettingsUpdateException: _newMediaSettingsUpdateException);
+      newArgumentError: Pointer.fromFunction(_newArgumentError),
+      newStateError: Pointer.fromFunction(_newStateError),
+      newFormatException: Pointer.fromFunction(_newFormatException),
+      newLocalMediaInitException:
+          Pointer.fromFunction(_newLocalMediaInitException),
+      newEnumerateDevicesException:
+          Pointer.fromFunction(_newEnumerateDevicesException),
+      newRpcClientException: Pointer.fromFunction(_newRpcClientException),
+      newMediaStateTransitionException:
+          Pointer.fromFunction(_newMediaStateTransitionException),
+      newInternalException: Pointer.fromFunction(_newInternalException),
+      newMediaSettingsUpdateException:
+          Pointer.fromFunction(_newMediaSettingsUpdateException));
 }
 
 /// Creates a new [ArgumentError] from the provided invalid [value], its [name]

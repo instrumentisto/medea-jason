@@ -4,12 +4,12 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunction(
   DynamicLibrary dl, {
-  required Object Function(Pointer) callTwoArgProxy,
-  required Object Function(Pointer) callProxy,
+  required Pointer<NativeFunction<Handle Function(Pointer)>> callTwoArgProxy,
+  required Pointer<NativeFunction<Handle Function(Pointer)>> callProxy,
 }) {
   dl.lookupFunction<Void Function(Pointer, Pointer),
       void Function(Pointer, Pointer)>('register_callback')(
-    Pointer.fromFunction<Handle Function(Pointer)>(callTwoArgProxy),
-    Pointer.fromFunction<Handle Function(Pointer)>(callProxy),
+    callTwoArgProxy,
+    callProxy,
   );
 }

@@ -20,7 +20,7 @@ final _futureResolveErr =
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    completeProxy: _completeProxy,
+    completeProxy: Pointer.fromFunction(_completeProxy),
   );
 }
 
