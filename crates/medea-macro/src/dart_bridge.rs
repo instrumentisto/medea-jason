@@ -170,7 +170,9 @@ impl ModExpander {
             registerers.push(registerer);
         }
         let generated_code =
-            DartCodegen::new(&self.register_fn_name, registerers)?.generate();
+            DartCodegen::new(&self.register_fn_name, registerers)?
+                .generate()
+                .unwrap();
 
         f.write_all(generated_code.as_bytes()).map_err(|e| {
             Error::new(

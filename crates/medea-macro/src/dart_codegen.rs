@@ -1,7 +1,10 @@
 //! Implementation of the Dart side register functions generator based on
 //! `#[dart_bridge]` macro.
 
-use std::convert::TryFrom;
+use std::{
+    convert::TryFrom,
+    fmt::{self, Write},
+};
 
 use inflector::Inflector;
 use syn::{
@@ -225,53 +228,6 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
     }
 }
 
-/// Line-to-line generator for the Dart code, which supports setting
-/// indentation.
-struct FormattedGenerator {
-    /// Buffer of the resulting code.
-    generated: String,
-
-    /// Current space level.
-    ///
-    /// This count of spaces will be added at the start of line on every
-    /// [`FormattedGenerator::push_line`] call.
-    space_count: u32,
-}
-
-impl FormattedGenerator {
-    /// Returns new empty [`FormattedGenerator`].
-    pub fn new() -> Self {
-        Self {
-            generated: String::new(),
-            space_count: 0,
-        }
-    }
-
-    /// Pushes line to the buffer and adds required amount of spaces at the
-    /// start of line.
-    pub fn push_line(&mut self, line: &str) {
-        for _ in 0..self.space_count {
-            self.generated.push(' ');
-        }
-        self.generated.push_str(line);
-        self.generated.push('\n');
-    }
-
-    /// Indents next lines with 4 more spaces.
-    pub fn tab(&mut self) {
-        self.space_count += 4;
-    }
-
-    /// Removes one level of indentation (4 spaces).
-    pub fn untab(&mut self) {
-        if self.space_count >= 4 {
-            self.space_count -= 4;
-        } else {
-            self.space_count = 0;
-        }
-    }
-}
-
 impl DartCodegen {
     /// Creates new [`DartCodegen`] for the provided inputs.
     pub fn new(
@@ -291,8 +247,28 @@ impl DartCodegen {
         Ok(this)
     }
 
+    /// Generates all needed Dart code of this [`DartCodegen`].
+    pub fn generate(&self) -> Result<String, fmt::Error> {
+        let mut out = String::new();
+
+        writeln!(&mut out, "import 'dart:ffi';")?;
+        writeln!(&mut out, "import 'package:ffi/ffi.dart';")?;
+        writeln!(
+            &mut out,
+            "import 'package:medea_jason/src/native/ffi/foreign_value.dart';"
+        )?;
+        writeln!(&mut out, "void registerFunction(DynamicLibrary dl, {{")?;
+        self.generate_args(&mut out)?;
+        writeln!(&mut out, "}} ) {{")?;
+        self.generate_lookup(&mut out)?;
+        self.generate_functions_registration(&mut out)?;
+        writeln!(&mut out, ");}}")?;
+
+        Ok(out)
+    }
+
     /// Generates arguments of the register function.
-    fn generate_args(&self, g: &mut FormattedGenerator) {
+    fn generate_args<T: Write>(&self, out: &mut T) -> fmt::Result {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
@@ -301,18 +277,21 @@ impl DartCodegen {
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);
             }
-            g.push_line(&format!(
-                "required Pointer<NativeFunction<{ret_ty} Function({inputs})>> \
-                {name},",
+            writeln!(
+                out,
+                "required Pointer<NativeFunction<{ret_ty} \
+                Function({inputs})>> {name},",
                 ret_ty = f.output.to_ffi_type(),
                 inputs = inputs,
-                name = f.name.to_camel_case(),
-            ));
+                name = f.name.to_camel_case()
+            )?;
         }
+
+        Ok(())
     }
 
     /// Generates fn lookup code.
-    fn generate_lookup(&self, g: &mut FormattedGenerator) {
+    fn generate_lookup<T: Write>(&self, out: &mut T) -> fmt::Result {
         let mut inputs = String::new();
         for _ in 0..self.registrators.len() {
             inputs.push_str("Pointer, ");
@@ -320,51 +299,26 @@ impl DartCodegen {
         if !inputs.is_empty() {
             inputs.truncate(inputs.len() - 2);
         }
-        g.push_line(&format!(
+        writeln!(
+            out,
             "dl.lookupFunction<\
                 Void Function({inputs}), \
                 void Function({inputs})>('{f_name}')(",
             inputs = inputs,
             f_name = self.register_fn_name,
-        ));
+        )
     }
 
     /// Generates functions registration code.
-    fn generate_functions_registration(&self, g: &mut FormattedGenerator) {
+    fn generate_functions_registration<T: Write>(
+        &self,
+        out: &mut T,
+    ) -> fmt::Result {
         for f in &self.registrators {
             let name = f.name.to_string().to_camel_case();
-            g.push_line(&format!("{},", name));
+            writeln!(out, "{},", name)?;
         }
-    }
 
-    /// Generates all needed Dart code of this [`DartCodegen`].
-    pub fn generate(&self) -> String {
-        let mut g = FormattedGenerator::new();
-        g.push_line("import 'dart:ffi';");
-        g.push_line("import 'package:ffi/ffi.dart';");
-        g.push_line(
-            "import 'package:medea_jason/src/native/ffi/foreign_value.dart';",
-        );
-        g.push_line("");
-        g.push_line("void registerFunction(");
-        g.tab();
-        g.push_line("DynamicLibrary dl,");
-        g.push_line("{");
-        g.tab();
-        self.generate_args(&mut g);
-        g.untab();
-        g.push_line("}");
-        g.untab();
-        g.push_line(") {");
-        g.tab();
-        self.generate_lookup(&mut g);
-        g.tab();
-        self.generate_functions_registration(&mut g);
-        g.untab();
-        g.push_line(");");
-        g.untab();
-        g.push_line("}");
-
-        g.generated
+        Ok(())
     }
 }
