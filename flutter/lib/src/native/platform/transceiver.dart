@@ -37,8 +37,8 @@ Object _getCurrentDirection(Object transceiver) {
 /// Returns current MID of the provided [RTCRtpTransceiver].
 Pointer _mid(Object transceiver) {
   transceiver as RTCRtpTransceiver;
-  if (transceiver.mid != null) {
-    return ForeignValue.fromString(transceiver.mid!).intoRustOwned();
+  if (transceiver.mid.isNotEmpty) {
+    return ForeignValue.fromString(transceiver.mid).intoRustOwned();
   } else {
     return ForeignValue.none().intoRustOwned();
   }
