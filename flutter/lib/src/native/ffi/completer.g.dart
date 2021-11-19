@@ -4,7 +4,7 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunction(
   DynamicLibrary dl, {
-  required Object Function() constructNew,
+  required Object Function() init,
   required void Function(Object, ForeignValue) complete,
   required void Function(Object, Pointer<Handle>) completeError,
   required Object Function(Object) future,
@@ -14,7 +14,7 @@ void registerFunction(
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(
           Pointer, Pointer, Pointer, Pointer, Pointer)>('register_completer')(
-    Pointer.fromFunction<Handle Function()>(constructNew),
+    Pointer.fromFunction<Handle Function()>(init),
     Pointer.fromFunction<Void Function(Handle, ForeignValue)>(complete),
     Pointer.fromFunction<Void Function(Handle, Pointer<Handle>)>(completeError),
     Pointer.fromFunction<Handle Function(Handle)>(future),

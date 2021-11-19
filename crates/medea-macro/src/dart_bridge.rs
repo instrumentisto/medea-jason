@@ -67,6 +67,7 @@ struct ModExpander {
     /// [`FnExpander`]s of the all functions which this module should contain.
     fn_expanders: Vec<FnExpander>,
 
+    /// Name of the `register_*` function.
     register_fn_name: Ident,
 }
 
@@ -175,8 +176,8 @@ impl ModExpander {
             Error::new(
                 relative_path.span(),
                 format!(
-                    "Failed to write generated Dart \
-        code at the provided path: {:?}",
+                    "Failed to write generated Dart code at the provided path: \
+                    {:?}",
                     e
                 ),
             )
@@ -529,7 +530,9 @@ impl FnExpander {
 #[allow(unused_variables)]
 pub fn expand(path: &ExprLit, item: ItemMod) -> Result<TokenStream> {
     let expander = ModExpander::try_from(item)?;
+
     #[cfg(feature = "dart-codegen")]
     expander.generate_dart(path)?;
+
     Ok(expander.expand().into())
 }

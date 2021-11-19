@@ -43,7 +43,7 @@ mod completer {
         /// Returns a [`Dart_Handle`] to a new Dart [Completer].
         ///
         /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-        pub fn construct_new() -> Dart_Handle;
+        pub fn init() -> Dart_Handle;
 
         /// Pointer to an extern function that invokes the [complete()] method
         /// with the provided [`DartValue`] on the provided
@@ -123,7 +123,7 @@ impl<T, E> Completer<T, E> {
     #[must_use]
     pub fn new() -> Self {
         let handle = unsafe {
-            let completer = completer::construct_new();
+            let completer = completer::init();
             Dart_NewPersistentHandle_DL_Trampolined(completer)
         };
         Self {

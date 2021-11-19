@@ -7,17 +7,17 @@ import 'object.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    runtimeType: runtimeTypeToString,
-    toString: toString,
+    runtimeType: _runtimeType,
+    toString: _toString,
   );
 }
 
 /// Returns string representation of the [Type] of the provided [Object].
-Pointer<Utf8> runtimeTypeToString(Object obj) {
+Pointer<Utf8> _runtimeType(Object obj) {
   return obj.runtimeType.toString().toNativeUtf8();
 }
 
 /// Returns a string representation of the provided [Object].
-Pointer<Utf8> toString(Object obj) {
+Pointer<Utf8> _toString(Object obj) {
   return obj.toString().toNativeUtf8();
 }

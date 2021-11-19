@@ -9,14 +9,14 @@ use syn::{
     ReturnType, Type,
 };
 
-/// All supported types in the Dart functions.
+/// Types that can be passed through FFI.
 #[derive(Debug, Clone, Copy)]
 pub enum DartType {
     /// Pointer to the Dart `Object`.
     ///
     /// Represents [Handle] on the Dart side.
     ///
-    /// [Handle]: https://api.dart.dev/stable/2.14.4/dart-ffi/Handle-class.html
+    /// [Handle]: https://api.dart.dev/stable/dart-ffi/Handle-class.html
     Handle,
 
     /// [`c_char`] pointer.
@@ -32,36 +32,35 @@ pub enum DartType {
     /// Represents [Pointer<Handle>] on the Dart side.
     ///
     /// [Pointer<Handle>]:
-    /// https://api.dart.dev/stable/2.14.4/dart-ffi/Pointer-class.html
+    /// https://api.dart.dev/stable/dart-ffi/Pointer-class.html
     HandlePointer,
 
     /// 8-bit integer.
     ///
     /// Represents [Int8] on the Dart side.
     ///
-    /// [Int8]: https://api.dart.dev/stable/2.14.4/dart-ffi/Int8-class.html
+    /// [Int8]: https://api.dart.dev/stable/dart-ffi/Int8-class.html
     Int8,
 
     /// 32-bit integer.
     ///
     /// Represents [Int32] on the Dart side.
     ///
-    /// [Int32]: https://api.dart.dev/stable/2.14.4/dart-ffi/Int32-class.html
+    /// [Int32]: https://api.dart.dev/stable/dart-ffi/Int32-class.html
     Int32,
 
     /// 64-bit integer.
     ///
     /// Represents [Int64] on the Dart side.
     ///
-    /// [Int64]: https://api.dart.dev/stable/2.14.4/dart-ffi/Int64-class.html
+    /// [Int64]: https://api.dart.dev/stable/dart-ffi/Int64-class.html
     Int64,
 
     /// Pointer to the Rust structure.
     ///
     /// Represents [Pointer] on the Dart side.
     ///
-    /// [Pointer]:
-    /// https://api.dart.dev/stable/2.14.4/dart-ffi/Pointer-class.html
+    /// [Pointer]: https://api.dart.dev/stable/dart-ffi/Pointer-class.html
     Pointer,
 
     /// Type which indicates that function doesn't returns enything.

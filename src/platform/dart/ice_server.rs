@@ -19,7 +19,7 @@ mod ice_servers {
     extern "C" {
         /// Returns [`Dart_Handle`] to the newly created empty `List` with
         /// `IceServer`s.
-        pub fn construct_new() -> Dart_Handle;
+        pub fn init() -> Dart_Handle;
 
         /// Adds `IceServer` to the provided `List`.
         pub fn add(
@@ -50,8 +50,7 @@ where
     I: IntoIterator<Item = IceServer>,
 {
     fn from(servers: I) -> Self {
-        let ice_servers =
-            DartHandle::new(unsafe { ice_servers::construct_new() });
+        let ice_servers = DartHandle::new(unsafe { ice_servers::init() });
         for srv in servers {
             for url in srv.urls {
                 unsafe {

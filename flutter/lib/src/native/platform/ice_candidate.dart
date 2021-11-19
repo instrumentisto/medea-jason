@@ -9,29 +9,15 @@ import 'ice_candidate.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    constructNew: newRtcIceCandidate,
-    candidate: candidate,
-    sdpMLineIndex: sdpMLineIndex,
-    sdpMid: sdpMid,
+    init: _new,
+    candidate: _candidate,
+    sdpMLineIndex: _sdpMLineIndex,
+    sdpMid: _sdpMid,
   );
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__new')(
-      Pointer.fromFunction<
-          Handle Function(
-              ForeignValue, ForeignValue, ForeignValue)>(newRtcIceCandidate));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__candidate')(
-      Pointer.fromFunction<Pointer Function(Handle)>(candidate));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__sdp_m_line_index')(
-      Pointer.fromFunction<Pointer Function(Handle)>(sdpMLineIndex));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__sdp_mid')(
-      Pointer.fromFunction<Pointer Function(Handle)>(sdpMid));
 }
 
 /// Returns the provided [RTCIceCandidate] [String].
-Pointer candidate(Object iceCandidate) {
+Pointer _candidate(Object iceCandidate) {
   iceCandidate as RTCIceCandidate;
   if (iceCandidate.candidate != null) {
     return ForeignValue.fromString(iceCandidate.candidate!).intoRustOwned();
@@ -41,7 +27,7 @@ Pointer candidate(Object iceCandidate) {
 }
 
 /// Returns SDP M line index of the provided [RTCIceCandidate].
-Pointer sdpMLineIndex(Object iceCandidate) {
+Pointer _sdpMLineIndex(Object iceCandidate) {
   iceCandidate as RTCIceCandidate;
   if (iceCandidate.sdpMlineIndex != null) {
     return ForeignValue.fromInt(iceCandidate.sdpMlineIndex!).intoRustOwned();
@@ -51,7 +37,7 @@ Pointer sdpMLineIndex(Object iceCandidate) {
 }
 
 /// Returns SDP MID of the provided [RTCIceCandidate].
-Pointer sdpMid(Object iceCandidate) {
+Pointer _sdpMid(Object iceCandidate) {
   iceCandidate as RTCIceCandidate;
   if (iceCandidate.sdpMid != null) {
     return ForeignValue.fromString(iceCandidate.sdpMid!).intoRustOwned();
@@ -61,7 +47,7 @@ Pointer sdpMid(Object iceCandidate) {
 }
 
 /// Creates a new [RTCIceCandidate] with the provided values.
-Object newRtcIceCandidate(
+Object _new(
     ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();

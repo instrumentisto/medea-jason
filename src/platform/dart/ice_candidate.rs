@@ -22,7 +22,7 @@ mod ice_candidate {
 
     extern "C" {
         /// Creates new [`IceCandidate`] with a provided parameters.
-        pub fn construct_new(
+        pub fn init(
             candidate: DartValueArg<String>,
             sdp_mid: DartValueArg<Option<String>>,
             sdp_m_line_index: DartValueArg<Option<u16>>,
@@ -61,7 +61,7 @@ impl IceCandidate {
         sdp_mid: &Option<String>,
     ) -> Self {
         let handle = unsafe {
-            ice_candidate::construct_new(
+            ice_candidate::init(
                 candidate.to_string().into(),
                 sdp_mid.clone().into(),
                 sdp_m_line_index.map(i64::from).into(),

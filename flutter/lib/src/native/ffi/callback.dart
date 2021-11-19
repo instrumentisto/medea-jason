@@ -21,13 +21,13 @@ final _callbackTwoArgCall =
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    callProxy: callback,
-    callTwoArgProxy: callbackTwoArg,
+    callProxy: _callProxy,
+    callTwoArgProxy: _callTwoArgProxy,
   );
 }
 
 /// Returns a closure calling the provided Rust function [Pointer].
-Object callback(Pointer cb) {
+Object _callProxy(Pointer cb) {
   return (val) {
     var arg = ForeignValue.fromDart(val);
     _callbackCall(cb, arg.ref);
@@ -36,7 +36,7 @@ Object callback(Pointer cb) {
 }
 
 /// Returns a two args closure calling the provided Rust function [Pointer].
-Object callbackTwoArg(Pointer cb) {
+Object _callTwoArgProxy(Pointer cb) {
   return (first, second) {
     var firstArg = ForeignValue.fromDart(first);
     var secondArg = ForeignValue.fromDart(second);

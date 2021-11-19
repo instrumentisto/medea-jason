@@ -9,18 +9,18 @@ import 'ice_servers.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    constructNew: newIceServers,
-    add: addIceServer,
+    init: _new,
+    add: _add,
   );
 }
 
 /// Returns a new empty `IceServer`s [List].
-Object newIceServers() {
+Object _new() {
   return List.empty(growable: true);
 }
 
 /// Adds an `IceServer` with the provided data to the provided [List].
-void addIceServer(Object servers, Pointer<Utf8> url, ForeignValue username,
+void _add(Object servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
   servers as List;
   var iceServer = {'url': url.toDartString()};

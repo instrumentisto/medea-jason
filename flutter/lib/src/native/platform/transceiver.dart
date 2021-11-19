@@ -9,33 +9,33 @@ import 'transceiver.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    getCurrentDirection: getCurrentDirection,
-    replaceTrack: replaceSendTrack,
-    getSendTrack: getSendTrack,
-    setSendTrackEnabled: setSendTrackEnabled,
-    dropSender: dropSender,
-    isStopped: isStopped,
-    mid: mid,
-    hasSendTrack: hasSendTrack,
-    setDirection: setDirection,
+    getCurrentDirection: _getCurrentDirection,
+    replaceTrack: _replaceSendTrack,
+    getSendTrack: _getSendTrack,
+    setSendTrackEnabled: _setSendTrackEnabled,
+    dropSender: _dropSender,
+    isStopped: _isStopped,
+    mid: _mid,
+    hasSendTrack: _hasSendTrack,
+    setDirection: _setDirection,
   );
 }
 
 /// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the
 /// provided one.
-Object setDirection(Object transceiver, int direction) {
+Object _setDirection(Object transceiver, int direction) {
   transceiver as RTCRtpTransceiver;
   return transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
 /// Returns current [TransceiverDirection] of the provided [RTCRtpTransceiver].
-Object getCurrentDirection(Object transceiver) {
+Object _getCurrentDirection(Object transceiver) {
   transceiver as RTCRtpTransceiver;
   return transceiver.getCurrentDirection().then((d) => d?.index);
 }
 
 /// Returns current MID of the provided [RTCRtpTransceiver].
-Pointer mid(Object transceiver) {
+Pointer _mid(Object transceiver) {
   transceiver as RTCRtpTransceiver;
   if (transceiver.mid.isNotEmpty) {
     return ForeignValue.fromString(transceiver.mid).intoRustOwned();
@@ -46,7 +46,7 @@ Pointer mid(Object transceiver) {
 
 /// Returns current [RTCRtpTransceiver.sender]'s track of the provided
 /// [RTCRtpTransceiver].
-Pointer getSendTrack(Object transceiver) {
+Pointer _getSendTrack(Object transceiver) {
   transceiver as RTCRtpTransceiver;
   if (transceiver.sender.track != null) {
     return ForeignValue.fromHandle(transceiver.sender.track!).intoRustOwned();
@@ -57,7 +57,7 @@ Pointer getSendTrack(Object transceiver) {
 
 /// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender]
 /// has some [MediaStreamTrack].
-int hasSendTrack(Object transceiver) {
+int _hasSendTrack(Object transceiver) {
   transceiver as RTCRtpTransceiver;
   if (transceiver.sender.track == null) {
     return 0;
@@ -68,7 +68,7 @@ int hasSendTrack(Object transceiver) {
 
 /// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
 /// [RTCRtpTransceiver] with a provided [MediaStreamTrack].
-Object replaceSendTrack(Object transceiver, Object track) async {
+Object _replaceSendTrack(Object transceiver, Object track) async {
   transceiver as RTCRtpTransceiver;
   track as MediaStreamTrack;
   await transceiver.sender.setTrack(track);
@@ -77,7 +77,7 @@ Object replaceSendTrack(Object transceiver, Object track) async {
 
 /// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of
 /// the provided [RTCRtpTransceiver].
-void setSendTrackEnabled(Object transceiver, int enabled) {
+void _setSendTrackEnabled(Object transceiver, int enabled) {
   transceiver as RTCRtpTransceiver;
   if (transceiver.sender.track != null) {
     transceiver.sender.track!.enabled = enabled == 1;
@@ -85,7 +85,7 @@ void setSendTrackEnabled(Object transceiver, int enabled) {
 }
 
 /// Drops [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
-Object dropSender(Object transceiver) {
+Object _dropSender(Object transceiver) {
   // TODO: Correct implementation requires flutter_webrtc-side fixes.
   transceiver as RTCRtpTransceiver;
   if (transceiver.sender.track == null) {
@@ -98,7 +98,7 @@ Object dropSender(Object transceiver) {
 /// Returns `1` if [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is stopped.
 ///
 /// Returns [ForeignValue.none] if [RTCRtpTransceiver.sender] is `null`.
-Pointer isStopped(Object transceiver) {
+Pointer _isStopped(Object transceiver) {
   transceiver as RTCRtpTransceiver;
   if (transceiver.sender.track != null &&
       transceiver.sender.track!.muted != null) {

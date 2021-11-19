@@ -9,36 +9,36 @@ import 'completer.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    constructNew: _Completer_new,
-    future: _Completer_future,
-    complete: _Completer_complete,
-    completeError: _Completer_completeError_Pointer,
-    delayed: delayedFuture,
+    init: _new,
+    future: _future,
+    complete: _complete,
+    completeError: _completeError,
+    delayed: _delayed,
   );
 }
 
 /// Returns closure returning a [Future.delayed] with the provided amount of
 /// milliseconds.
-Object delayedFuture(int delayMs) {
+Object _delayed(int delayMs) {
   return () => Future.delayed(Duration(milliseconds: delayMs));
 }
 
 /// Returns a new [Completer].
-Object _Completer_new() {
+Object _new() {
   return Completer();
 }
 
 /// Returns a [Future] that is completed by the provided [Completer].
-Object _Completer_future(Object completer) {
+Object _future(Object completer) {
   return (completer as Completer).future;
 }
 
 /// Completes the provided [Completer] with the provided [ForeignValue].
-void _Completer_complete(Object completer, ForeignValue arg) {
+void _complete(Object completer, ForeignValue arg) {
   (completer as Completer).complete(arg.toDart());
 }
 
 /// Complete the provided [Completer] with an error.
-void _Completer_completeError_Pointer(Object completer, Pointer<Handle> err) {
+void _completeError(Object completer, Pointer<Handle> err) {
   (completer as Completer).completeError(unboxDartHandle(err));
 }

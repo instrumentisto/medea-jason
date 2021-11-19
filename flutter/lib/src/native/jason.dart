@@ -11,7 +11,7 @@ import 'ffi/callback.dart' as callback;
 import 'ffi/function.dart' as function;
 import 'ffi/completer.dart' as completer;
 import 'ffi/future.dart' as future;
-import 'ffi/exceptions.dart' as exceptions;
+import 'ffi/exception.dart' as exceptions;
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'ffi/executor.dart';
 import 'ffi/nullable_pointer.dart';

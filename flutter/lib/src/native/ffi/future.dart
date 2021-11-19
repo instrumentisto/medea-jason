@@ -20,13 +20,13 @@ final _futureResolveErr =
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    completeProxy: completeProxy,
+    completeProxy: _completeProxy,
   );
 }
 
 /// Registers callbacks on the provided [Future] completing Rust's
 /// `FutureFromDart`.
-void completeProxy(Object f, Pointer rustFuture) {
+void _completeProxy(Object f, Pointer rustFuture) {
   f as Function;
   Future fut = f();
   fut.then((val) {
