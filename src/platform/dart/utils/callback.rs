@@ -17,8 +17,8 @@ mod callback {
     use crate::platform::dart::utils::callback::Callback;
 
     extern "C" {
-        /// Returns a [`Dart_Handle`] to a newly created Dart callback that will
-        /// proxy calls to the given Rust callback.
+        /// Returns a [`Dart_Handle`] to a newly created Dart callback accepting
+        /// 2 arguments that will proxy calls to the given Rust callback.
         pub fn call_two_arg_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
 
         /// Returns a [`Dart_Handle`] to a newly created Dart callback that will

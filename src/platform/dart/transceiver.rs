@@ -65,7 +65,7 @@ mod transceiver {
             transceiver: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-        /// Returns `1` if provided [`Transceiver`] has `Send`
+        /// Returns `1` if the provided [`Transceiver`] has `Send`
         /// [`MediaStreamTrack`].
         pub fn has_send_track(transceiver: Dart_Handle) -> i8;
 

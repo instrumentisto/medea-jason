@@ -28,8 +28,8 @@ members = [
 crate-type = ["cdylib", "rlib"]
 
 [features]
-dart-codegen = ["medea-macro/dart-codegen"]
 default = ["console_error_panic_hook", "wee_alloc"]
+dart-codegen = ["medea-macro/dart-codegen"]
 mockable = ["downcast", "fragile", "mockall", "predicates-tree"]
 
 [dependencies]

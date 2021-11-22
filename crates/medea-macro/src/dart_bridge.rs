@@ -2,190 +2,219 @@
 
 use std::convert::TryFrom;
 #[cfg(feature = "dart-codegen")]
-use std::{fs::File, io::Write, path::PathBuf};
+use std::{env, fs::File, io::Write as _, path::PathBuf};
 
 use inflector::Inflector;
-use proc_macro::TokenStream;
-use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::TokenStreamExt;
-#[cfg(feature = "dart-codegen")]
-use syn::Lit;
-use syn::{
-    parse::{Error, Parse, Parser, Result},
-    punctuated::Punctuated,
-    spanned::Spanned as _,
-    Attribute, Expr, ExprLit, FnArg, ForeignItemFn, Ident, Item, ItemMod,
-    ItemUse, ReturnType, Token, Visibility,
-};
+use proc_macro2::TokenStream;
+use quote::{format_ident, quote};
+use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
 
 #[cfg(feature = "dart-codegen")]
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
-/// Creates a [`Ident`] using interpolation of runtime expressions.
-///
-/// Works same as [`format`] macro, but generated [`Ident`].
-macro_rules! format_ident {
-    ($($arg:tt)*) => {{
-        Ident::new(
-            &format!($($arg)*),
-            Span::call_site(),
-        )
-    }}
+/// Expands `#[dart_bridge]` attribute placed on a Rust module declaration.
+#[allow(clippy::needless_pass_by_value)] // due to feature
+pub(crate) fn expand(
+    #[cfg(feature = "dart-codegen")] args: TokenStream,
+    #[cfg(not(feature = "dart-codegen"))] _: TokenStream,
+    input: TokenStream,
+) -> syn::Result<TokenStream> {
+    let expander = ModExpander::try_from(syn::parse2::<syn::ItemMod>(input)?)?;
+
+    #[cfg(feature = "dart-codegen")]
+    expander.generate_dart_code(&syn::parse2(args)?)?;
+
+    Ok(expander.expand())
 }
 
-/// Returns [`String`] from the provided [`ExprLit`].
+/// Expander of the `#[dart_bridge]` attribute.
 ///
-/// # Errors
-///
-/// If provided [`ExprLit`] isn't [`Lit::Str`].
-#[cfg(feature = "dart-codegen")]
-pub fn get_path_arg(arg: &ExprLit) -> Result<String> {
-    if let Lit::Str(arg) = &arg.lit {
-        Ok(arg.value())
-    } else {
-        Err(Error::new(
-            Span::call_site(),
-            "Expected str literal with a Dart file path",
-        ))
-    }
-}
-
-/// Expander of the `#[dart_bridge]` macro.
-///
-/// Expands to module with a registerers of the Dart functions and it's callers.
+/// Expands to a module registering Dart functions and generating glue code
+/// to call them.
 #[derive(Debug)]
 struct ModExpander {
     /// Visibility of the expanded module.
-    vis: Visibility,
+    vis: syn::Visibility,
 
     /// Identifier of the expanded module.
-    ident: Ident,
+    ident: syn::Ident,
+
+    /// Attributes placed on the expanded module by user.
+    attrs: Vec<syn::Attribute>,
 
     /// Uses (`use foo::bar::baz`) of the expanded module.
-    uses: Vec<ItemUse>,
+    uses: Vec<syn::ItemUse>,
 
-    /// [`FnExpander`]s of the all functions which this module should contain.
+    /// [`FnExpander`]s of the all the functions this module should contain.
     fn_expanders: Vec<FnExpander>,
 
-    /// Name of the `register_*` function.
-    register_fn_name: Ident,
+    /// Name of the `register_*` extern function, registering all the module
+    /// functions.
+    register_fn_name: syn::Ident,
+}
+
+impl TryFrom<syn::ItemMod> for ModExpander {
+    type Error = syn::Error;
+
+    fn try_from(item: syn::ItemMod) -> syn::Result<Self> {
+        use self::mod_parser as parser;
+
+        let mod_span = item.span();
+
+        let mut extern_fns: Vec<FnExpander> = Vec::new();
+        let mut use_items = Vec::new();
+        let register_prefix = &item.ident;
+        for item in parser::try_unwrap_mod_content(item.content)? {
+            match item {
+                syn::Item::ForeignMod(item) => {
+                    for item in item.items {
+                        extern_fns.push(FnExpander::parse(
+                            parser::get_extern_fn(item)?,
+                            register_prefix,
+                        )?);
+                    }
+                }
+                syn::Item::Use(item) => {
+                    use_items.push(item);
+                }
+                _ => {
+                    return Err(syn::Error::new(
+                        item.span(),
+                        "Module contains unsupported content",
+                    ));
+                }
+            }
+        }
+
+        if extern_fns.is_empty() {
+            return Err(syn::Error::new(
+                mod_span,
+                "At least one `extern \"C\"` block is required",
+            ));
+        }
+
+        Ok(Self {
+            register_fn_name: format_ident!("register_{}", item.ident),
+            vis: item.vis,
+            ident: item.ident,
+            attrs: item.attrs,
+            uses: use_items,
+            fn_expanders: extern_fns,
+        })
+    }
 }
 
 impl ModExpander {
-    /// Expands Dart functions type aliases of all
-    /// [`ModExpander::fn_expanders`].
-    fn expand_type_aliases(&self) -> TokenStream2 {
-        let mut out = TokenStream2::new();
-        for f in &self.fn_expanders {
-            out.append_all(f.expand_fn_type());
-        }
-        out
-    }
+    /// Fully expands a module under the `#[dart_bridge]` attribute.
+    fn expand(&self) -> TokenStream {
+        let (vis, ident) = (&self.vis, &self.ident);
+        let attrs = &self.attrs;
+        let uses = &self.uses;
 
-    /// Expands `static mut`s of all [`ModExpander::fn_expanders`]
-    fn expand_static_muts(&self) -> TokenStream2 {
-        let mut out = TokenStream2::new();
-        for f in &self.fn_expanders {
-            out.append_all(f.expand_fn_static_mut());
-        }
-        out
-    }
+        let type_aliases =
+            self.fn_expanders.iter().map(FnExpander::gen_fn_type);
 
-    /// Expands Dart functions registerers of all [`ModExpander::fn_expanders`].
-    fn expand_register_fns(&self) -> TokenStream2 {
-        let mut inputs: Punctuated<FnArg, Token![,]> = Punctuated::new();
-        let mut assigns: Vec<Expr> = Vec::new();
-        let name = &self.register_fn_name;
+        let static_muts =
+            self.fn_expanders.iter().map(FnExpander::gen_fn_static_mut);
 
-        for f in &self.fn_expanders {
-            inputs.push(f.expand_register_fn_input());
-            assigns.push(f.expand_register_fn_expr());
-        }
+        let register_fn_name = &self.register_fn_name;
+        let register_fn_inputs = self
+            .fn_expanders
+            .iter()
+            .map(FnExpander::gen_register_fn_input);
+        let register_fn_assigns = self
+            .fn_expanders
+            .iter()
+            .map(FnExpander::gen_register_fn_expr);
 
-        quote::quote! {
-            #[no_mangle]
-            pub unsafe extern "C" fn #name(
-                #inputs
-            ) {
-                #(#assigns;)*
+        let caller_fns =
+            self.fn_expanders.iter().map(FnExpander::gen_caller_fn);
+
+        quote! {
+            #[automatically_derived]
+            #( #attrs )*
+            #vis mod #ident {
+                #( #uses )*
+
+                #( #type_aliases )*
+
+                #( #static_muts )*
+
+                #[no_mangle]
+                pub unsafe extern "C" fn #register_fn_name(
+                    #( #register_fn_inputs, )*
+                ) {
+                    #( #register_fn_assigns; )*
+                }
+
+                #( #caller_fns )*
             }
         }
     }
 
-    /// Expands Dart functions of all [`ModExpander::fn_expanders`].
-    fn expand_fns(&self) -> TokenStream2 {
-        let mut out = TokenStream2::new();
-        for f in &self.fn_expanders {
-            out.append_all(f.expand_fn());
-        }
-        out
-    }
-
-    /// Fully expands `#[dart_bridge]` macro.
-    fn expand(&self) -> TokenStream2 {
-        let type_aliases = self.expand_type_aliases();
-        let static_muts = self.expand_static_muts();
-        let register_fns = self.expand_register_fns();
-        let fns = self.expand_fns();
-        let mod_ident = &self.ident;
-        let mod_vis = &self.vis;
-        let uses = self.uses.iter();
-
-        quote::quote! {
-            #mod_vis mod #mod_ident {
-                #(#uses)*
-
-                #type_aliases
-
-                #static_muts
-
-                #register_fns
-
-                #fns
-            }
-        }
-    }
-
-    /// Generates all required Dart code at the provided `relative_path`.
     #[cfg(feature = "dart-codegen")]
-    fn generate_dart(&self, relative_path: &ExprLit) -> Result<()> {
-        let root_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    /// Generates all the required Dart code at the provided `relative_path`.
+    fn generate_dart_code(
+        &self,
+        relative_path: &syn::ExprLit,
+    ) -> syn::Result<()> {
+        let root_path = env::var("CARGO_MANIFEST_DIR").unwrap();
         let mut path = PathBuf::from(root_path);
         path.push(get_path_arg(relative_path)?);
 
         let mut f = File::create(path).map_err(|e| {
-            Error::new(
+            syn::Error::new(
                 relative_path.span(),
-                format!("Failed to create file at the provided path: {:?}", e),
+                format!("Failed to create file at the provided path: {}", e),
             )
         })?;
 
-        let mut registerers = Vec::new();
-        for f in &self.fn_expanders {
-            let registerer = FnRegistrationBuilder {
-                inputs: f.inputs.iter().cloned().collect(),
-                output: f.out_type.clone(),
+        let registerers = self
+            .fn_expanders
+            .iter()
+            .map(|f| FnRegistrationBuilder {
+                inputs: f.input_args.iter().cloned().collect(),
+                output: f.ret_ty.clone(),
                 name: f.ident.clone(),
-            };
-            registerers.push(registerer);
-        }
+            })
+            .collect::<Vec<_>>();
         let generated_code =
             DartCodegen::new(&self.register_fn_name, registerers)?
                 .generate()
-                .unwrap();
+                .map_err(|e| {
+                    syn::Error::new(
+                        relative_path.span(),
+                        format!("Failed to generate Dart code: {}", e),
+                    )
+                })?;
 
         f.write_all(generated_code.as_bytes()).map_err(|e| {
-            Error::new(
-                relative_path.span(),
-                format!(
-                    "Failed to write generated Dart code at the provided path: \
-                    {:?}",
-                    e
-                ),
-            )
-        })?;
+            let msg = format!(
+                "Failed to write generated Dart code to the file: {}",
+                e,
+            );
+            syn::Error::new(relative_path.span(), msg)
+        })
+    }
+}
 
-        Ok(())
+#[cfg(feature = "dart-codegen")]
+/// Returns a [`String`] from the provided [`syn::Lit::Str`].
+///
+/// # Errors
+///
+/// If the provided [`syn::ExprLit`] isn't a [`syn::Lit::Str`].
+pub fn get_path_arg(arg: &syn::ExprLit) -> syn::Result<String> {
+    use proc_macro2::Span;
+
+    if let syn::Lit::Str(arg) = &arg.lit {
+        Ok(arg.value())
+    } else {
+        let msg = format!(
+            "Expected a str literal with a Dart file path, got: {:?}",
+            arg,
+        );
+        Err(syn::Error::new(Span::call_site(), msg))
     }
 }
 
@@ -195,109 +224,60 @@ mod mod_parser {
     //! [`ModExpander`]: super::ModExpander
 
     use proc_macro2::Span;
-    use syn::{
-        spanned::Spanned as _, token, Error, ForeignItem, ForeignItemFn, Item,
-        Result,
-    };
+    use syn::{spanned::Spanned as _, token};
 
-    /// Tries to parse [`TraitItemMethod`] from the provided [`TokenStream2`].
+    /// Tries to parse a [`syn::TraitItemMethod`] from the provided
+    /// [`syn::ForeignItem`].
     ///
     /// # Errors
     ///
-    /// If provided [`TokenStream2`] can't be parsed as [`TraitItemMethod`].
-    pub fn get_extern_fn(item: ForeignItem) -> Result<ForeignItemFn> {
-        if let ForeignItem::Fn(item) = item {
+    /// If provided [`syn::ForeignItem`] cannot be parsed as a
+    /// [`syn::TraitItemMethod`].
+    pub fn get_extern_fn(
+        item: syn::ForeignItem,
+    ) -> syn::Result<syn::ForeignItemFn> {
+        if let syn::ForeignItem::Fn(item) = item {
             Ok(item)
         } else {
-            Err(Error::new(item.span(), "Unsupported item"))
+            Err(syn::Error::new(item.span(), "Unsupported item"))
         }
     }
 
-    /// Tries to unwrap provided [`ItemMod::content`].
+    /// Tries to unwrap the provided [`ItemMod::content`].
     ///
     /// # Errors
     ///
-    /// If [`ItemMod::content`] is `None`.
+    /// If the [`ItemMod::content`] is [`None`].
     pub fn try_unwrap_mod_content(
-        item: Option<(token::Brace, Vec<Item>)>,
-    ) -> Result<Vec<Item>> {
+        item: Option<(token::Brace, Vec<syn::Item>)>,
+    ) -> syn::Result<Vec<syn::Item>> {
         if let Some((_, items)) = item {
             Ok(items)
         } else {
-            Err(Error::new(Span::call_site(), "Empty module provided"))
+            Err(syn::Error::new(Span::call_site(), "Empty module provided"))
         }
     }
 }
 
-impl TryFrom<ItemMod> for ModExpander {
-    type Error = Error;
-
-    fn try_from(item: ItemMod) -> Result<Self> {
-        use mod_parser as parser;
-
-        let mod_item_span = item.span();
-
-        let mut extern_functions: Vec<FnExpander> = Vec::new();
-        let mut use_items = Vec::new();
-        let register_prefix = &item.ident;
-        for item in parser::try_unwrap_mod_content(item.content)? {
-            match item {
-                Item::ForeignMod(item) => {
-                    for item in item.items {
-                        extern_functions.push(FnExpander::parse(
-                            parser::get_extern_fn(item)?,
-                            register_prefix,
-                        )?);
-                    }
-                }
-                Item::Use(item) => {
-                    use_items.push(item);
-                }
-                _ => {
-                    return Err(Error::new(
-                        item.span(),
-                        "Module contains unsupported content",
-                    ));
-                }
-            }
-        }
-
-        if extern_functions.is_empty() {
-            return Err(Error::new(
-                mod_item_span,
-                "At least one extern \"C\" mod required",
-            ));
-        }
-
-        Ok(Self {
-            register_fn_name: format_ident!("register_{}", item.ident),
-            ident: item.ident,
-            vis: item.vis,
-            uses: use_items,
-            fn_expanders: extern_functions,
-        })
-    }
-}
-
-/// Generator of the [`Ident`]s for the [`FnExpander`].
+/// Generator of [`Ident`]s for a [`FnExpander`].
 struct IdentGenerator<'a> {
-    /// Prefix which will be used in generated [`Ident`]s.
-    prefix: &'a Ident,
+    /// Prefix to use in the generated [`Ident`]s.
+    prefix: &'a syn::Ident,
 
-    /// Name which will be concatenated with a [`IdentGenerator::prefix`].
-    name: &'a Ident,
+    /// Name to concatenate with an [`IdentGenerator::prefix`].
+    name: &'a syn::Ident,
 }
 
 impl<'a> IdentGenerator<'a> {
-    /// Returns new [`IdentGenerator`] with a provided `prefix` and `name`.
-    fn new(prefix: &'a Ident, name: &'a Ident) -> Self {
+    /// Returns a new [`IdentGenerator`] with the provided `prefix` and `name`.
+    fn new(prefix: &'a syn::Ident, name: &'a syn::Ident) -> Self {
         Self { prefix, name }
     }
 
-    /// Returns [`Ident`] for the [`FnExpander`]'s type alias.
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s type alias.
     ///
     /// Generates something like `PeerConnectionCreateOfferFunction`.
-    fn type_alias(&self) -> Ident {
+    fn type_alias(&self) -> syn::Ident {
         format_ident!(
             "{}{}Function",
             self.prefix.to_string().to_class_case(),
@@ -305,10 +285,10 @@ impl<'a> IdentGenerator<'a> {
         )
     }
 
-    /// Returns [`Ident`] for the [`FnExpander`]'s `static mut`s.
+    /// Returns a [`syn::Ident`] for the [`FnExpander`]'s `static mut`.
     ///
     /// Generates something like `PEER_CONNECTION__CREATE_OFFER__FUNCTION`
-    fn static_mut(&self) -> Ident {
+    fn static_mut(&self) -> syn::Ident {
         format_ident!(
             "{}__{}__FUNCTION",
             self.prefix.to_string().to_screaming_snake_case(),
@@ -317,160 +297,120 @@ impl<'a> IdentGenerator<'a> {
     }
 }
 
-mod fn_parser {
-    //! Parser utils for the [`FnExpander`].
-    //!
-    //! [`FnExpander`]: super::FnExpander
+/// Expander of the Dart functions declarations.
+///
+/// Expands `unsafe fn create_offer(peer: Dart_Handle) -> Dart_Handle` to the
+/// Dart function registerer, caller and pointer store.
+#[derive(Debug)]
+struct FnExpander {
+    /// [`syn::Ident`] of the Dart function.
+    ident: syn::Ident,
 
-    use syn::{
-        punctuated::Punctuated, spanned::Spanned as _, Attribute, Error, FnArg,
-        Ident, Pat, Result, Token,
-    };
+    /// [`syn::Ident`] of the type alias for the extern Dart function pointer.
+    type_alias_ident: syn::Ident,
 
-    /// Returns [`Punctuated`] [`Ident`]s of the all provided [`FnArg`]s.
+    /// [`syn::Ident`] of the `static mut` storing extern Dart function
+    /// pointer.
+    static_mut_ident: syn::Ident,
+
+    /// [`syn::FnArg`]s of extern Dart function.
+    input_args: Punctuated<syn::FnArg, token::Comma>,
+
+    /// [`syn::ReturnType`] of the extern Dart function.
+    ret_ty: syn::ReturnType,
+
+    /// `#[doc = "..."]` [`syn::Attribute`]s injected to the generated extern
+    /// Dart function caller.
+    doc_attrs: Vec<syn::Attribute>,
+}
+
+impl FnExpander {
+    /// Parses the all data needed for a [`FnExpander`] to expand from the
+    /// provided [`TraitItemMethod`].
     ///
     /// # Errors
     ///
-    /// If some [`FnArg`] is something like `self`.
-    ///
-    /// If some [`FnArg`] doesn't have [`Ident`].
-    pub fn get_input_idents<'a, I>(
-        args: I,
-    ) -> Result<Punctuated<Ident, Token![,]>>
-    where
-        I: IntoIterator<Item = &'a FnArg>,
-    {
-        let mut out = Punctuated::new();
-        for item in args {
+    /// If provided the [`TraitItemMethod`] cannot be parsed as a [`FnExpander`]
+    /// data.
+    fn parse(
+        item: syn::ForeignItemFn,
+        prefix: &syn::Ident,
+    ) -> syn::Result<Self> {
+        for item in &item.sig.inputs {
             match item {
-                FnArg::Typed(item) => {
-                    if let Pat::Ident(item) = item.pat.as_ref() {
-                        out.push(item.ident.clone());
-                    } else {
-                        return Err(Error::new(
+                syn::FnArg::Typed(item) => {
+                    if !matches!(&*item.pat, syn::Pat::Ident(_)) {
+                        return Err(syn::Error::new(
                             item.span(),
                             "Incorrect argument identifier",
                         ));
                     }
                 }
-                FnArg::Receiver(_) => {
-                    return Err(Error::new(
+                syn::FnArg::Receiver(_) => {
+                    return Err(syn::Error::new(
                         item.span(),
-                        "self argument is invalid here",
+                        "`self` argument is invalid here",
                     ));
                 }
             }
         }
 
-        Ok(out)
-    }
-
-    /// Removes all [`Attribute`]s which are not `#[doc = "..."]`.
-    pub fn filter_doc_attributes<I>(attrs: I) -> Result<Vec<Attribute>>
-    where
-        I: IntoIterator<Item = Attribute>,
-    {
-        let mut out = Vec::new();
-        for attr in attrs {
-            if attr.path.get_ident().map_or(false, |i| i == "doc") {
-                out.push(attr);
-            } else {
-                return Err(Error::new(
-                    attr.span(),
-                    "Only #[doc] attributes supported on extern fns",
-                ));
-            }
-        }
-
-        Ok(out)
-    }
-}
-
-/// Expander of the Dart functions declarations.
-///
-/// Expands `unsafe fn create_offer(peer: Dart_Handle) -> Dart_Handle` to the
-/// Dart function registerer, caller and store.
-#[derive(Debug)]
-struct FnExpander {
-    /// [`Ident`] of the Dart function.
-    ident: Ident,
-
-    /// [`Ident`] of the type alias for the extern Dart function.
-    fn_type_alias_ident: Ident,
-
-    /// [`Ident`] of the `static mut` which stores extern Dart function.
-    fn_static_mut_ident: Ident,
-
-    /// [`FnArg`]s of extern Dart function.
-    inputs: Punctuated<FnArg, Token![,]>,
-
-    /// [`Punctuated`] [`Ident`]s of the all [`FnArg`]s of extern Dart
-    /// function.
-    input_idents: Punctuated<Ident, Token![,]>,
-
-    /// [`ReturnType`] of the extern Dart function.
-    out_type: ReturnType,
-
-    /// `#[doc = "..."]` [`Attribute`]s which will be injected to the generated
-    /// extern Dart function caller.
-    doc_attrs: Vec<Attribute>,
-}
-
-impl FnExpander {
-    /// Parses all data needed for [`FnExpander`] expanding from the provided
-    /// [`TraitItemMethod`].
-    ///
-    /// # Errors
-    ///
-    /// If provided [`TraitItemMethod`] can't be parsed as data for the
-    /// [`FnExpander`].
-    fn parse(item: ForeignItemFn, prefix: &Ident) -> Result<Self> {
-        use fn_parser as parser;
-
         let ident_generator = IdentGenerator::new(prefix, &item.sig.ident);
         Ok(Self {
-            fn_type_alias_ident: ident_generator.type_alias(),
-            fn_static_mut_ident: ident_generator.static_mut(),
-            input_idents: parser::get_input_idents(&item.sig.inputs)?,
+            type_alias_ident: ident_generator.type_alias(),
+            static_mut_ident: ident_generator.static_mut(),
             ident: item.sig.ident,
-            inputs: item.sig.inputs,
-            out_type: item.sig.output,
-            doc_attrs: parser::filter_doc_attributes(item.attrs)?,
+            input_args: item.sig.inputs,
+            ret_ty: item.sig.output,
+            doc_attrs: item
+                .attrs
+                .into_iter()
+                .map(|attr| {
+                    if attr.path.get_ident().map_or(false, |i| i == "doc") {
+                        Ok(attr)
+                    } else {
+                        Err(syn::Error::new(
+                        attr.span(),
+                        "Only #[doc] attributes supported on extern functions",
+                    ))
+                    }
+                })
+                .collect::<syn::Result<_>>()?,
         })
     }
 
-    /// Generates [`FnArg`] of this [`FnExpander`] for the registerer function.
+    /// Generates a [`syn::FnArg`] of this [`FnExpander`] for the registerer
+    /// function.
     ///
     /// # Example of the generated code
     ///
     /// ```ignore
     /// create_offer: PeerConnectionCreateOfferFunction
     /// ```
-    fn expand_register_fn_input(&self) -> FnArg {
+    fn gen_register_fn_input(&self) -> syn::FnArg {
         let ident = &self.ident;
-        let fn_type_alias = &self.fn_type_alias_ident;
-        FnArg::parse
-            .parse2(quote::quote! {
-                #ident: #fn_type_alias
-            })
-            .unwrap()
+        let fn_type_alias = &self.type_alias_ident;
+
+        parse_quote! {
+            #ident: #fn_type_alias
+        }
     }
 
-    /// Generates [`Expr`] of this [`FnExpander`] for the registerer function.
+    /// Generates a [`syn Expr`] of this [`FnExpander`] for the registerer
+    /// function.
     ///
     /// # Example of the generated code
     ///
     /// ```ignore
     /// PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer)
     /// ```
-    fn expand_register_fn_expr(&self) -> Expr {
-        let fn_static_mut = &self.fn_static_mut_ident;
+    fn gen_register_fn_expr(&self) -> syn::Expr {
+        let fn_static_mut = &self.static_mut_ident;
         let ident = &self.ident;
-        Expr::parse
-            .parse2(quote::quote! {
-                #fn_static_mut.write(#ident)
-            })
-            .unwrap()
+
+        parse_quote! {
+            #fn_static_mut.write(#ident)
+        }
     }
 
     /// Generates type alias of the extern Dart function.
@@ -481,17 +421,17 @@ impl FnExpander {
     /// type PeerConnectionCreateOfferFunction =
     ///     extern "C" fn(peer: Dart_Handle) -> Dart_Handle;
     /// ```
-    fn expand_fn_type(&self) -> TokenStream2 {
-        let name = &self.fn_type_alias_ident;
-        let out_type = &self.out_type;
-        let inputs = &self.inputs;
+    fn gen_fn_type(&self) -> TokenStream {
+        let name = &self.type_alias_ident;
+        let ret_ty = &self.ret_ty;
+        let args = &self.input_args;
 
-        quote::quote! {
-            type #name = extern "C" fn (#inputs) #out_type;
+        quote! {
+            type #name = extern "C" fn (#args) #ret_ty;
         }
     }
 
-    /// Generates `static mut` for extern Dart function storing.
+    /// Generates `static mut` for the extern Dart function pointer storing.
     ///
     /// # Example of generated code
     ///
@@ -500,41 +440,40 @@ impl FnExpander {
     ///     std::mem::MaybeUninit<PeerConnectionCreateOfferFunction> =
     ///     std::mem::MaybeUninit::uninit();
     /// ```
-    fn expand_fn_static_mut(&self) -> TokenStream2 {
-        let name = &self.fn_static_mut_ident;
-        let type_alias_ident = &self.fn_type_alias_ident;
+    fn gen_fn_static_mut(&self) -> TokenStream {
+        let name = &self.static_mut_ident;
+        let type_alias = &self.type_alias_ident;
 
-        quote::quote! {
-            static mut #name: std::mem::MaybeUninit<#type_alias_ident> =
-                std::mem::MaybeUninit::uninit();
+        quote! {
+            static mut #name: ::std::mem::MaybeUninit<#type_alias> =
+                ::std::mem::MaybeUninit::uninit();
         }
     }
 
-    /// Generates Dart function caller.
-    fn expand_fn(&self) -> TokenStream2 {
-        let ident = &self.ident;
-        let inputs = &self.inputs;
-        let out_type = &self.out_type;
-        let static_mut_ident = &self.fn_static_mut_ident;
-        let input_idents = &self.input_idents;
-        let doc_attrs = self.doc_attrs.iter();
+    /// Generates Dart function caller for Rust.
+    fn gen_caller_fn(&self) -> TokenStream {
+        let doc_attrs = &self.doc_attrs;
+        let name = &self.ident;
 
-        quote::quote! {
-            #(#doc_attrs)*
-            pub unsafe fn #ident(#inputs) #out_type {
-                (#static_mut_ident.assume_init_ref())(#input_idents)
+        let args = &self.input_args;
+        let args_idents = self.input_args.iter().filter_map(|arg| {
+            if let syn::FnArg::Typed(arg) = arg {
+                if let syn::Pat::Ident(pat) = &*arg.pat {
+                    return Some(&pat.ident);
+                }
+            }
+            None
+        });
+
+        let ret_ty = &self.ret_ty;
+
+        let static_mut = &self.static_mut_ident;
+
+        quote! {
+            #( #doc_attrs )*
+            pub unsafe fn #name(#args) #ret_ty {
+                (#static_mut.assume_init_ref())(#( #args_idents ),*)
             }
         }
     }
-}
-
-/// Expands `#[dart_bridge]` macro based on the provided [`ItemMod`].
-#[allow(unused_variables)]
-pub fn expand(path: &ExprLit, item: ItemMod) -> Result<TokenStream> {
-    let expander = ModExpander::try_from(item)?;
-
-    #[cfg(feature = "dart-codegen")]
-    expander.generate_dart(path)?;
-
-    Ok(expander.expand().into())
 }

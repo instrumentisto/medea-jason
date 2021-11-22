@@ -17,12 +17,17 @@ pub use self::{completer::Completer, function::Function};
 /// Extension for the [`ptr::NonNull`] for unboxing it to the underlying value.
 pub trait NonNullDartValueArgExt<T> {
     /// Unboxes [`ptr::NonNull`] to the underlying `T`.
-    fn unbox(&self) -> T;
+    ///
+    /// # Safety
+    ///
+    /// Caller must guarantee that the [`ptr::NonNull`] points to a [`Box`]ed
+    /// value.
+    unsafe fn unbox(&self) -> T;
 }
 
 impl<T> NonNullDartValueArgExt<T> for ptr::NonNull<T> {
-    fn unbox(&self) -> T {
-        unsafe { *Box::from_raw(self.as_ptr()) }
+    unsafe fn unbox(&self) -> T {
+        *Box::from_raw(self.as_ptr())
     }
 }
 

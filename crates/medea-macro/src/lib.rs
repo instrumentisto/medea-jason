@@ -436,24 +436,20 @@ decl_derive!([Caused, attributes(cause)] =>
 /// ```
 caused::derive);
 
-/// Generates code for the Dart functions registration and calling.
+/// Generates code for `extern` Dart functions registration and calling.
 ///
 /// # Usage
 ///
 /// ## Macro call
 ///
 /// ```ignore
-/// // Code will be generated in the 'peer_connection' module, also you can
-/// // control visibility of this module with visibility
-/// // modifier ('pub').
+/// // Code will be generated in the `peer_connection` module, also you can
+/// // control visibility of this module with a visibility modifier (`pub`).
 /// //
-/// // Module name will be used as a prefix for register functions.
+/// // Module name will be used as a prefix for a registration function.
 /// #[dart_bridge]
 /// mod peer_connection {
-///     use std::{
-///         ptr,
-///         os::raw::c_char,
-///     };
+///     use std::{os::raw::c_char, ptr};
 ///
 ///     use dart_sys::Dart_Handle;
 ///
@@ -461,20 +457,20 @@ caused::derive);
 ///         // This documentation will be injected to the generated
 ///         // extern function caller:
 ///
-///         /// Creates new offer in the provided `PeerConnection`
+///         /// Creates a new offer in the provided `PeerConnection`.
 ///         ///
-///         /// Returns created SDP offer.
+///         /// Returns the created SDP offer.
 ///         fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
 ///
-///         /// Creates new answer in the provided `PeerConnection`
+///         /// Creates a new answer in the provided `PeerConnection`.
 ///         ///
-///         /// Returns created SDP answer.
+///         /// Returns the created SDP answer.
 ///         fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
 ///     }
 /// }
 /// ```
 ///
-/// ## Example of generated code
+/// ## Example of the generated code
 ///
 /// ```ignore
 /// mod peer_connection {
@@ -551,9 +547,6 @@ caused::derive);
 /// ```
 #[proc_macro_attribute]
 pub fn dart_bridge(args: TokenStream, input: TokenStream) -> TokenStream {
-    dart_bridge::expand(
-        &syn::parse_macro_input!(args),
-        syn::parse_macro_input!(input),
-    )
-    .unwrap_or_else(|e| e.to_compile_error().into())
+    dart_bridge::expand(args.into(), input.into())
+        .map_or_else(|e| e.to_compile_error().into(), Into::into)
 }

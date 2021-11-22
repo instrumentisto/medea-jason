@@ -31,7 +31,6 @@ mod exception {
 
     /// Invokes other Dart closures that accept a [`DartValue`] argument.
     extern "C" {
-
         /// Returns a new Dart [`ArgumentError`] with the provided invalid
         /// argument, its `name` and error `message` describing the problem.
         ///

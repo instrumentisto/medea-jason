@@ -13,11 +13,11 @@ readme = "README.md"
 keywords = ["medea", "macro", "derive", "codegen"]
 categories = ["development-tools::build-utils"]
 
-[features]
-dart-codegen = []
-
 [lib]
 proc-macro = true
+
+[features]
+dart-codegen = []
 
 [dependencies]
 Inflector = "0.11"

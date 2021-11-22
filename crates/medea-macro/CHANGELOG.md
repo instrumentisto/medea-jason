@@ -18,7 +18,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `#[dart_bridge]` macro for for generating code of Dart functions registration ([#14]).
+- `#[dart_bridge]` macro for generating code glue for `extern` Dart functions ([#14]).
 
 [#4]: /../../pull/4
 [#14]: /../../pull/14

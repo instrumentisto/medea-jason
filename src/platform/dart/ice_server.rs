@@ -17,11 +17,11 @@ mod ice_servers {
     use crate::api::DartValueArg;
 
     extern "C" {
-        /// Returns [`Dart_Handle`] to the newly created empty `List` with
+        /// Returns a [`Dart_Handle`] to the newly created empty `List` with
         /// `IceServer`s.
         pub fn init() -> Dart_Handle;
 
-        /// Adds `IceServer` to the provided `List`.
+        /// Adds an `IceServer` to the provided `List`.
         pub fn add(
             list: Dart_Handle,
             url: ptr::NonNull<c_char>,

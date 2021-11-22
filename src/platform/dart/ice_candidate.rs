@@ -21,7 +21,7 @@ mod ice_candidate {
     use crate::api::DartValueArg;
 
     extern "C" {
-        /// Creates new [`IceCandidate`] with a provided parameters.
+        /// Creates a new [`IceCandidate`] with the provided parameters.
         pub fn init(
             candidate: DartValueArg<String>,
             sdp_mid: DartValueArg<Option<String>>,

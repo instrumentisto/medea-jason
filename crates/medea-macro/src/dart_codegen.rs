@@ -1,5 +1,4 @@
-//! Implementation of the Dart side register functions generator based on
-//! `#[dart_bridge]` macro.
+//! Dart side register functions generator of `#[dart_bridge]` macro.
 
 use std::{
     convert::TryFrom,
@@ -7,35 +6,30 @@ use std::{
 };
 
 use inflector::Inflector;
-use syn::{
-    spanned::Spanned, Error, FnArg, GenericArgument, Ident, PathArguments,
-    ReturnType, Type,
-};
+use syn::spanned::Spanned as _;
 
 /// Types that can be passed through FFI.
 #[derive(Debug, Clone, Copy)]
-pub enum DartType {
+pub(crate) enum DartType {
     /// Pointer to the Dart `Object`.
     ///
-    /// Represents [Handle] on the Dart side.
+    /// Represents a [Handle] on the Dart side.
     ///
     /// [Handle]: https://api.dart.dev/stable/dart-ffi/Handle-class.html
     Handle,
 
     /// [`c_char`] pointer.
     ///
-    /// Represents [Pointer<Utf8>] on the Dart side.
+    /// Represents [Pointer<Utf8>][0] on the Dart side.
     ///
-    /// [Pointer<Utf8>]:
-    /// https://pub.dev/documentation/ffi/latest/ffi/Utf8-class.html
+    /// [0]: https://pub.dev/documentation/ffi/latest/ffi/Utf8-class.html
     StringPointer,
 
-    /// Pointer to the boxed Dart `Object`.
+    /// Pointer to a boxed Dart `Object`.
     ///
-    /// Represents [Pointer<Handle>] on the Dart side.
+    /// Represents [Pointer<Handle>][0] on the Dart side.
     ///
-    /// [Pointer<Handle>]:
-    /// https://api.dart.dev/stable/dart-ffi/Pointer-class.html
+    /// [0]: https://api.dart.dev/stable/dart-ffi/Pointer-class.html
     HandlePointer,
 
     /// 8-bit integer.
@@ -66,7 +60,7 @@ pub enum DartType {
     /// [Pointer]: https://api.dart.dev/stable/dart-ffi/Pointer-class.html
     Pointer,
 
-    /// Type which indicates that function doesn't returns enything.
+    /// Type which indicates that function doesn't return anything.
     ///
     /// `void` keyword in Dart.
     Void,
@@ -78,7 +72,7 @@ pub enum DartType {
 
 impl DartType {
     /// Converts this [`DartType`] to the Dart side FFI type.
-    pub fn to_ffi_type(self) -> &'static str {
+    pub(crate) fn to_ffi_type(self) -> &'static str {
         match self {
             Self::Handle => "Handle",
             Self::StringPointer => "Pointer<Utf8>",
@@ -96,48 +90,47 @@ impl DartType {
     /// [`PathArguments`].
     ///
     /// [`ptr::NonNull`]: std::ptr::NonNull
-    pub fn from_non_null_generic(args: &PathArguments) -> Result<Self, Error> {
-        if let PathArguments::AngleBracketed(args) = args {
-            match args
-                .args
-                .last()
-                .ok_or_else(|| Error::new(args.span(), "Empty generics list"))?
-            {
-                GenericArgument::Type(Type::Path(path)) => {
-                    let segment =
-                        path.path.segments.last().ok_or_else(|| {
-                            Error::new(path.span(), "Empty generic path")
-                        })?;
+    pub(crate) fn from_non_null_generic(
+        args: &syn::PathArguments,
+    ) -> syn::Result<Self> {
+        if let syn::PathArguments::AngleBracketed(bracketed) = args {
+            match bracketed.args.last().ok_or_else(|| {
+                syn::Error::new(bracketed.span(), "Empty generics list")
+            })? {
+                syn::GenericArgument::Type(syn::Type::Path(p)) => {
+                    let segment = p.path.segments.last().ok_or_else(|| {
+                        syn::Error::new(p.span(), "Empty generic path")
+                    })?;
                     Ok(if segment.ident.to_string().as_str() == "c_char" {
                         Self::StringPointer
                     } else {
                         Self::Pointer
                     })
                 }
-                _ => {
-                    Err(Error::new(args.span(), "Unsupported generic argument"))
-                }
+                _ => Err(syn::Error::new(
+                    bracketed.span(),
+                    "Unsupported generic argument",
+                )),
             }
         } else {
-            Err(Error::new(
+            Err(syn::Error::new(
                 args.span(),
-                "Unsupported NonNull path arguments",
+                "Unsupported `NonNull` path arguments",
             ))
         }
     }
 }
 
-impl TryFrom<Type> for DartType {
-    type Error = Error;
+impl TryFrom<syn::Type> for DartType {
+    type Error = syn::Error;
 
-    fn try_from(value: Type) -> Result<Self, Self::Error> {
-        let res = match value {
-            Type::Path(path) => {
-                let ty = path
-                    .path
-                    .segments
-                    .last()
-                    .ok_or_else(|| Error::new(path.span(), "Empty path"))?;
+    fn try_from(value: syn::Type) -> syn::Result<Self> {
+        Ok(match value {
+            syn::Type::Path(p) => {
+                let ty =
+                    p.path.segments.last().ok_or_else(|| {
+                        syn::Error::new(p.span(), "Empty path")
+                    })?;
                 match ty.ident.to_string().as_str() {
                     "Dart_Handle" => Self::Handle,
                     "NonNull" => Self::from_non_null_generic(&ty.arguments)?,
@@ -147,7 +140,7 @@ impl TryFrom<Type> for DartType {
                     "i64" => Self::Int64,
                     "i8" => Self::Int8,
                     _ => {
-                        return Err(Error::new(
+                        return Err(syn::Error::new(
                             ty.ident.span(),
                             "Unsupported type",
                         ));
@@ -155,15 +148,13 @@ impl TryFrom<Type> for DartType {
                 }
             }
             _ => {
-                return Err(Error::new(value.span(), "Unsupported type"));
+                return Err(syn::Error::new(value.span(), "Unsupported type"));
             }
-        };
-
-        Ok(res)
+        })
     }
 }
 
-/// Generator for the fn registration Dart code.
+/// Generator for the function registration Dart code.
 #[derive(Debug)]
 struct FnRegistration {
     /// Inputs of the registering function.
@@ -176,7 +167,52 @@ struct FnRegistration {
     name: String,
 }
 
-/// Generator for the functions regiterer Dart code.
+impl TryFrom<FnRegistrationBuilder> for FnRegistration {
+    type Error = syn::Error;
+
+    fn try_from(from: FnRegistrationBuilder) -> syn::Result<Self> {
+        let inputs = from
+            .inputs
+            .into_iter()
+            .map(|input| {
+                if let syn::FnArg::Typed(input) = input {
+                    DartType::try_from(*input.ty)
+                } else {
+                    Err(syn::Error::new(
+                        input.span(),
+                        "Self types are unsupported here",
+                    ))
+                }
+            })
+            .collect::<syn::Result<_>>()?;
+
+        let output = match from.output {
+            syn::ReturnType::Default => DartType::Void,
+            syn::ReturnType::Type(_, ty) => DartType::try_from(*ty)?,
+        };
+
+        Ok(Self {
+            inputs,
+            output,
+            name: from.name.to_string(),
+        })
+    }
+}
+
+/// Builder for a [`FnRegistration`].
+#[derive(Debug)]
+pub struct FnRegistrationBuilder {
+    /// Inputs of the registering function.
+    pub inputs: Vec<syn::FnArg>,
+
+    /// Output of the registering function.
+    pub output: syn::ReturnType,
+
+    /// Name of the registering function.
+    pub name: syn::Ident,
+}
+
+/// Generator of the Dart code registering functions.
 #[derive(Debug)]
 pub struct DartCodegen {
     /// FFI name of the registerer function.
@@ -186,68 +222,22 @@ pub struct DartCodegen {
     registrators: Vec<FnRegistration>,
 }
 
-/// Builder for the [`FnRegistration`].
-#[derive(Debug)]
-pub struct FnRegistrationBuilder {
-    /// Inputs of the registering function.
-    pub inputs: Vec<FnArg>,
-
-    /// Output of the registering function.
-    pub output: ReturnType,
-
-    /// Name of the registering function.
-    pub name: Ident,
-}
-
-impl TryFrom<FnRegistrationBuilder> for FnRegistration {
-    type Error = Error;
-
-    fn try_from(from: FnRegistrationBuilder) -> Result<Self, Self::Error> {
-        let mut inputs = Vec::new();
-        for input in from.inputs {
-            if let FnArg::Typed(input) = input {
-                inputs.push(DartType::try_from(*input.ty)?);
-            } else {
-                return Err(Error::new(
-                    input.span(),
-                    "Self types are unsupported here",
-                ));
-            }
-        }
-        let output = match from.output {
-            ReturnType::Default => DartType::Void,
-            ReturnType::Type(_, ty) => DartType::try_from(*ty)?,
-        };
-        let name = from.name.to_string();
-
+impl DartCodegen {
+    /// Creates a new [`DartCodegen`] for the provided inputs.
+    pub fn new(
+        register_fn_name: &syn::Ident,
+        builders: Vec<FnRegistrationBuilder>,
+    ) -> syn::Result<Self> {
         Ok(Self {
-            inputs,
-            output,
-            name,
+            register_fn_name: register_fn_name.to_string(),
+            registrators: builders
+                .into_iter()
+                .map(FnRegistration::try_from)
+                .collect::<syn::Result<_>>()?,
         })
     }
-}
 
-impl DartCodegen {
-    /// Creates new [`DartCodegen`] for the provided inputs.
-    pub fn new(
-        register_fn_name: &Ident,
-        builders: Vec<FnRegistrationBuilder>,
-    ) -> Result<Self, Error> {
-        let mut registrators = Vec::new();
-        for f in builders {
-            registrators.push(FnRegistration::try_from(f)?);
-        }
-
-        let this = Self {
-            register_fn_name: register_fn_name.to_string(),
-            registrators,
-        };
-
-        Ok(this)
-    }
-
-    /// Generates all needed Dart code of this [`DartCodegen`].
+    /// Generates all the needed Dart code of this [`DartCodegen`].
     pub fn generate(&self) -> Result<String, fmt::Error> {
         let mut out = String::new();
 
@@ -290,7 +280,7 @@ impl DartCodegen {
         Ok(())
     }
 
-    /// Generates fn lookup code.
+    /// Generates function lookup code.
     fn generate_lookup<T: Write>(&self, out: &mut T) -> fmt::Result {
         let mut inputs = String::new();
         for _ in 0..self.registrators.len() {
