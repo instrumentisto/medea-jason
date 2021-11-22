@@ -6,95 +6,43 @@ use std::convert::{TryFrom, TryInto};
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
+use medea_macro::dart_bridge;
 
-use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
+use crate::platform::dart::utils::{
+    handle::DartHandle, NonNullDartValueArgExt,
+};
 
-/// Pointer to an extern function creating a new [`IceCandidate`] with the
-/// provided parameters.
-type NewFunction = extern "C" fn(
-    DartValueArg<String>,
-    DartValueArg<Option<String>>,
-    DartValueArg<Option<u16>>,
-) -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/platform/ice_candidate.g.dart")]
+mod ice_candidate {
+    use std::ptr;
 
-/// Pointer to an extern function returning candidate of the provided
-/// [`IceCandidate`].
-type CandidateFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+    use dart_sys::Dart_Handle;
 
-/// Pointer to an extern function returning SDP M line index of the provided
-/// [`IceCandidate`].
-type SdpMLineIndexFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<u16>>;
+    use crate::api::DartValueArg;
 
-/// Pointer to an extern function returning SDP MID of the provided
-/// [`IceCandidate`].
-type SdpMidFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+    extern "C" {
+        /// Creates a new [`IceCandidate`] with the provided parameters.
+        pub fn init(
+            candidate: DartValueArg<String>,
+            sdp_mid: DartValueArg<Option<String>>,
+            sdp_m_line_index: DartValueArg<Option<u16>>,
+        ) -> Dart_Handle;
 
-/// Stores pointer to the [`NewFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_FUNCTION: Option<NewFunction> = None;
+        /// Returns candidate of the provided [`IceCandidate`].
+        pub fn candidate(
+            ice_candidate: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-/// Stores pointer to the [`CandidateFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CANDIDATE_FUNCTION: Option<CandidateFunction> = None;
+        /// Returns SDP line index of the provided [`IceCandidate`].
+        pub fn sdp_m_line_index(
+            ice_candidate: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<u16>>>;
 
-/// Stores pointer to the [`SdpMLineIndexFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SDP_M_LINE_INDEX_FUNCTION: Option<SdpMLineIndexFunction> = None;
-
-/// Stores pointer to the [`SdpMidFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SDP_MID_FUNCTION: Option<SdpMidFunction> = None;
-
-/// Registers the provided [`NewFunction`] as [`NEW_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_IceCandidate__new(f: NewFunction) {
-    NEW_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`CandidateFunction`] as [`CANDIDATE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_IceCandidate__candidate(
-    f: CandidateFunction,
-) {
-    CANDIDATE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SdpMLineIndexFunction`] as
-/// [`SDP_M_LINE_INDEX_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_IceCandidate__sdp_m_line_index(
-    f: SdpMLineIndexFunction,
-) {
-    SDP_M_LINE_INDEX_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SdpMidFunction`] as [`SDP_MID_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_IceCandidate__sdp_mid(f: SdpMidFunction) {
-    SDP_MID_FUNCTION = Some(f);
+        /// Returns SDP MID of the provided [`IceCandidate`].
+        pub fn sdp_mid(
+            ice_candidate: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+    }
 }
 
 /// Wrapper around a [`DartHandle`] representing an ICE candidate of a
@@ -113,7 +61,7 @@ impl IceCandidate {
         sdp_mid: &Option<String>,
     ) -> Self {
         let handle = unsafe {
-            NEW_FUNCTION.unwrap()(
+            ice_candidate::init(
                 candidate.to_string().into(),
                 sdp_mid.clone().into(),
                 sdp_m_line_index.map(i64::from).into(),
@@ -132,7 +80,7 @@ impl IceCandidate {
     #[must_use]
     pub fn candidate(&self) -> String {
         unsafe {
-            Option::try_from(CANDIDATE_FUNCTION.unwrap()(self.0.get()))
+            Option::try_from(ice_candidate::candidate(self.0.get()).unbox())
                 .unwrap()
                 .unwrap()
         }
@@ -142,7 +90,8 @@ impl IceCandidate {
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         unsafe {
-            SDP_M_LINE_INDEX_FUNCTION.unwrap()(self.0.get())
+            ice_candidate::sdp_m_line_index(self.0.get())
+                .unbox()
                 .try_into()
                 .unwrap()
         }
@@ -151,6 +100,11 @@ impl IceCandidate {
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        unsafe { SDP_MID_FUNCTION.unwrap()(self.0.get()).try_into().unwrap() }
+        unsafe {
+            ice_candidate::sdp_mid(self.0.get())
+                .unbox()
+                .try_into()
+                .unwrap()
+        }
     }
 }

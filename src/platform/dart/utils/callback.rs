@@ -4,32 +4,27 @@
 use std::{convert::TryInto, fmt::Debug, ptr};
 
 use dart_sys::Dart_Handle;
+use medea_macro::dart_bridge;
 
 use crate::api::{DartValue, DartValueArg};
 
-/// Pointer to an extern function that returning a [`Dart_Handle`] to a newly
-/// created Dart callback that will proxy calls to the given Rust callback.
-type CallbackCallTwoArgProxyFunction =
-    extern "C" fn(ptr::NonNull<Callback>) -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
+mod callback {
+    use std::ptr;
 
-/// Stores pointer to the [`CallbackCallTwoArgProxyFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION: Option<
-    CallbackCallTwoArgProxyFunction,
-> = None;
+    use dart_sys::Dart_Handle;
 
-/// Registers the provided [`CallbackCallTwoArgProxyFunction`] as
-/// [`CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Callback__call_two_arg_proxy(
-    f: CallbackCallTwoArgProxyFunction,
-) {
-    CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION = Some(f);
+    use crate::platform::dart::utils::callback::Callback;
+
+    extern "C" {
+        /// Returns a [`Dart_Handle`] to a newly created Dart callback accepting
+        /// 2 arguments that will proxy calls to the given Rust callback.
+        pub fn call_two_arg_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
+
+        /// Returns a [`Dart_Handle`] to a newly created Dart callback that will
+        /// proxy calls to the associated Rust callback.
+        pub fn call_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
+    }
 }
 
 /// Calls the provided [`Callback`] with the provided two [`DartValue`]s as
@@ -48,30 +43,6 @@ pub unsafe extern "C" fn Callback__call_two_arg(
         Kind::TwoArgFnMut(func) => (func)(first, second),
         _ => unreachable!(),
     }
-}
-
-/// Pointer to an extern function returning a [`Dart_Handle`] to a newly created
-/// Dart callback that will proxy calls to the associated Rust callback.
-type CallbackCallProxyFunction =
-    extern "C" fn(ptr::NonNull<Callback>) -> Dart_Handle;
-
-/// Stores pointer to a [`CallbackCallProxyFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CALLBACK_CALL_PROXY_FUNCTION: Option<CallbackCallProxyFunction> =
-    None;
-
-/// Registers the provided [`CallbackCallProxyFunction`] as
-/// [`CALLBACK_CALL_PROXY_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Callback__call_proxy(
-    f: CallbackCallProxyFunction,
-) {
-    CALLBACK_CALL_PROXY_FUNCTION = Some(f);
 }
 
 /// Calls the provided [`Callback`] with the provided [`DartValue`] as an
@@ -197,14 +168,13 @@ impl Callback {
     pub fn into_dart(self) -> Dart_Handle {
         unsafe {
             match &self.0 {
-                Kind::TwoArgFnMut(_) => CALLBACK_CALL_TWO_ARG_PROXY_FUNCTION
-                    .unwrap()(
+                Kind::TwoArgFnMut(_) => callback::call_two_arg_proxy(
                     ptr::NonNull::from(Box::leak(Box::new(self))),
                 ),
                 Kind::Fn(_) | Kind::FnOnce(_) | Kind::FnMut(_) => {
-                    CALLBACK_CALL_PROXY_FUNCTION.unwrap()(ptr::NonNull::from(
-                        Box::leak(Box::new(self)),
-                    ))
+                    callback::call_proxy(ptr::NonNull::from(Box::leak(
+                        Box::new(self),
+                    )))
                 }
             }
         }

@@ -3,26 +3,25 @@ import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+import 'ice_servers.g.dart' as bridge;
+
 /// Registers [RTCPeerConnection] ICE servers related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceServers__new')(
-      Pointer.fromFunction<Handle Function()>(newIceServers));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_IceServers__add')(Pointer.fromFunction<
-          Void Function(Handle, Pointer<Utf8>, ForeignValue, ForeignValue)>(
-      addIceServer));
+  bridge.registerFunction(
+    dl,
+    init: Pointer.fromFunction(_new),
+    add: Pointer.fromFunction(_add),
+  );
 }
 
 /// Returns a new empty `IceServer`s [List].
-Object newIceServers() {
+Object _new() {
   return List.empty(growable: true);
 }
 
 /// Adds an `IceServer` with the provided data to the provided [List].
-void addIceServer(Object servers, Pointer<Utf8> url, ForeignValue username,
+void _add(List servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
-  servers as List;
   var iceServer = {'url': url.toDartString()};
   username = username.toDart();
   if (username is String) {

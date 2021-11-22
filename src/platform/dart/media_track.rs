@@ -2,241 +2,69 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::{
-    convert::{TryFrom, TryInto},
-    os::raw::c_char,
-    ptr,
-};
+use std::convert::{TryFrom, TryInto};
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
+use medea_macro::dart_bridge;
 
 use crate::{
-    api::{c_str_into_string, DartValueArg},
+    api::c_str_into_string,
     media::{track::MediaStreamTrackState, FacingMode, MediaKind},
-    platform::dart::utils::{callback::Callback, handle::DartHandle},
+    platform::dart::utils::{
+        callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
+    },
 };
 
-/// Pointer to an extern function returning ID of the provided
-/// [`MediaStreamTrack`].
-type IdFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
+#[dart_bridge("flutter/lib/src/native/platform/media_track.g.dart")]
+mod media_stream_track {
+    use std::{os::raw::c_char, ptr};
 
-/// Pointer to an extern function returning device ID of the provided
-/// [`MediaStreamTrack`].
-type DeviceIdFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+    use dart_sys::Dart_Handle;
 
-/// Pointer to an extern function returning facing mode of the provided
-/// [`MediaStreamTrack`].
-type FacingModeFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+    use crate::api::DartValueArg;
 
-/// Pointer to an extern function returning height of the provided
-/// [`MediaStreamTrack`].
-type HeightFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
+    extern "C" {
+        /// Returns ID of the provided [`MediaStreamTrack`].
+        pub fn id(track: Dart_Handle) -> ptr::NonNull<c_char>;
 
-/// Pointer to an extern function returning width of the provided
-/// [`MediaStreamTrack`].
-type WidthFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<u32>>;
+        /// Returns device ID of the provided [`MediaStreamTrack`].
+        pub fn device_id(track: Dart_Handle) -> ptr::NonNull<c_char>;
 
-/// Pointer to an extern function setting `enabled` field of the provided
-/// [`MediaStreamTrack`] to the provided [`bool`].
-type SetEnabledFunction = extern "C" fn(Dart_Handle, bool);
+        /// Returns facing mode of the provided [`MediaStreamTrack`].
+        pub fn facing_mode(
+            track: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<i64>>>;
 
-/// Pointer to an extern function stopping the provided [`MediaStreamTrack`].
-type StopFunction = extern "C" fn(Dart_Handle);
+        /// Returns height of the provided [`MediaStreamTrack`].
+        pub fn height(
+            track: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
 
-/// Pointer to an extern function returning `enabled` field of the provided
-/// [`MediaStreamTrack`].
-type EnabledFunction = extern "C" fn(Dart_Handle) -> bool;
+        /// Returns width of the provided [`MediaStreamTrack`].
+        pub fn width(
+            track: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
 
-/// Pointer to an extern function returning kind of the provided
-/// [`MediaStreamTrack`].
-type KindFunction = extern "C" fn(Dart_Handle) -> i64;
+        /// Sets `enabled` field of the provided [`MediaStreamTrack`] to the
+        /// provided [`bool`].
+        pub fn set_enabled(track: Dart_Handle, is_enabled: i32);
 
-/// Pointer to an extern function returning readiness state of the provided
-/// [`MediaStreamTrack`].
-type ReadyStateFunction = extern "C" fn(Dart_Handle) -> i64;
+        /// Stops provided [`MediaStreamTrack`].
+        pub fn stop(track: Dart_Handle);
 
-/// Pointer to an extern function setting `on_ended` callback of the provided
-/// [`MediaStreamTrack`].
-type OnEndedFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+        /// Returns `enabled` field of the provided [`MediaStreamTrack`].
+        pub fn enabled(track: Dart_Handle) -> i64;
 
-/// Stores pointer to the [`IdFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ID_FUNCTION: Option<IdFunction> = None;
+        /// Returns kind of the provided [`MediaStreamTrack`].
+        pub fn kind(track: Dart_Handle) -> i64;
 
-/// Stores pointer to the [`DeviceIdFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut DEVICE_ID_FUNCTION: Option<DeviceIdFunction> = None;
+        /// Returns readiness state of the provided [`MediaStreamTrack`].
+        pub fn ready_state(track: Dart_Handle) -> i64;
 
-/// Stores pointer to the [`FacingModeFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut FACING_MODE_FUNCTION: Option<FacingModeFunction> = None;
-
-/// Stores pointer to the [`HeightFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut HEIGHT_FUNCTION: Option<HeightFunction> = None;
-
-/// Stores pointer to the [`WidthFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut WIDTH_FUNCTION: Option<WidthFunction> = None;
-
-/// Stores pointer to the [`SetEnabledFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SET_ENABLED_FUNCTION: Option<SetEnabledFunction> = None;
-
-/// Stores pointer to the [`StopFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut STOP_FUNCTION: Option<StopFunction> = None;
-
-/// Stores pointer to the [`EnabledFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ENABLED_FUNCTION: Option<EnabledFunction> = None;
-
-/// Stores pointer to the [`KindFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut KIND_FUNCTION: Option<KindFunction> = None;
-
-/// Stores pointer to the [`ReadyStateFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut READY_STATE_FUNCTION: Option<ReadyStateFunction> = None;
-
-/// Stores pointer to the [`OnEndedFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ON_ENDED_FUNCTION: Option<OnEndedFunction> = None;
-
-/// Registers the provided [`IdFunction`] as [`ID_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__id(f: IdFunction) {
-    ID_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`DeviceIdFunction`] as [`DEVICE_ID_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__device_id(
-    f: DeviceIdFunction,
-) {
-    DEVICE_ID_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`FacingModeFunction`] as [`FACING_MODE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__facing_mode(
-    f: FacingModeFunction,
-) {
-    FACING_MODE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`HeightFunction`] as [`HEIGHT_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__height(f: HeightFunction) {
-    HEIGHT_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`WidthFunction`] as [`WIDTH_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__width(f: WidthFunction) {
-    WIDTH_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SetEnabledFunction`] as [`SET_ENABLED_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__set_enabled(
-    f: SetEnabledFunction,
-) {
-    SET_ENABLED_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`StopFunction`] as [`STOP_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__stop(f: StopFunction) {
-    STOP_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`EnabledFunction`] as [`ENABLED_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__enabled(
-    f: EnabledFunction,
-) {
-    ENABLED_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`KindFunction`] as [`KIND_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__kind(f: KindFunction) {
-    KIND_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`ReadyStateFunction`] as [`READY_STATE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__ready_state(
-    f: ReadyStateFunction,
-) {
-    READY_STATE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`OnEndedFunction`] as [`ON_ENDED_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamTrack__on_ended(
-    f: OnEndedFunction,
-) {
-    ON_ENDED_FUNCTION = Some(f);
+        /// Sets `on_ended` callback of the provided [`MediaStreamTrack`].
+        pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
+    }
 }
 
 /// Wrapper around [MediaStreamTrack][1] received from a
@@ -262,14 +90,14 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn id(&self) -> String {
-        unsafe { c_str_into_string(ID_FUNCTION.unwrap()(self.0.get())) }
+        unsafe { c_str_into_string(media_stream_track::id(self.0.get())) }
     }
 
     /// Returns this [`MediaStreamTrack`]'s kind (audio/video).
     #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        MediaKind::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
+        MediaKind::try_from(unsafe { media_stream_track::kind(self.0.get()) })
             .unwrap()
     }
 
@@ -292,9 +120,11 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
-        unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) }
-            .try_into()
-            .unwrap()
+        unsafe {
+            c_str_into_string(media_stream_track::device_id(self.0.get()))
+        }
+        .try_into()
+        .unwrap()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].
@@ -304,7 +134,7 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         Option::<i64>::try_from(unsafe {
-            FACING_MODE_FUNCTION.unwrap()(self.0.get())
+            media_stream_track::facing_mode(self.0.get()).unbox()
         })
         .unwrap()
         .map(FacingMode::try_from)
@@ -319,8 +149,10 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        Option::try_from(unsafe { HEIGHT_FUNCTION.unwrap()(self.0.get()) })
-            .unwrap()
+        Option::try_from(unsafe {
+            media_stream_track::height(self.0.get()).unbox()
+        })
+        .unwrap()
     }
 
     /// Return a [`width`][1] of the underlying [MediaStreamTrack][2].
@@ -330,8 +162,10 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        Option::try_from(unsafe { WIDTH_FUNCTION.unwrap()(self.0.get()) })
-            .unwrap()
+        Option::try_from(unsafe {
+            media_stream_track::width(self.0.get()).unbox()
+        })
+        .unwrap()
     }
 
     /// Changes an [`enabled`][1] attribute in the underlying
@@ -342,7 +176,7 @@ impl MediaStreamTrack {
     #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         unsafe {
-            SET_ENABLED_FUNCTION.unwrap()(self.0.get(), enabled);
+            media_stream_track::set_enabled(self.0.get(), enabled as i32);
         }
     }
 
@@ -355,7 +189,7 @@ impl MediaStreamTrack {
     #[inline]
     pub fn stop(&self) {
         unsafe {
-            STOP_FUNCTION.unwrap()(self.0.get());
+            media_stream_track::stop(self.0.get());
         }
     }
 
@@ -367,7 +201,7 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
-        unsafe { ENABLED_FUNCTION.unwrap()(self.0.get()) }
+        unsafe { media_stream_track::enabled(self.0.get()) == 1 }
     }
 
     /// Detects whether a video track captured from display searching
@@ -407,7 +241,9 @@ impl MediaStreamTrack {
     {
         if let Some(cb) = f {
             let cb = Callback::from_once(|_: ()| cb());
-            unsafe { ON_ENDED_FUNCTION.unwrap()(self.0.get(), cb.into_dart()) };
+            unsafe {
+                media_stream_track::on_ended(self.0.get(), cb.into_dart());
+            };
         }
     }
 }
