@@ -12,7 +12,7 @@ use std::sync::{
 };
 
 use derive_more::{Display, Error, From};
-use fantoccini::WindowHandle;
+use fantoccini::wd::WindowHandle;
 use serde_json::Value as Json;
 
 pub use self::client::{WebDriverClient, WebDriverClientBuilder};

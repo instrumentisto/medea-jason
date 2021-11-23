@@ -858,7 +858,7 @@ impl MediaConnections {
     /// # Errors
     ///
     /// See [`sender::CreateError`] for details.
-    pub fn create_tracks(
+    pub async fn create_tracks(
         &self,
         tracks: Vec<proto::Track>,
         send_constraints: &LocalTracksConstraints,

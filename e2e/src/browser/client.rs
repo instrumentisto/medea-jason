@@ -7,7 +7,10 @@ use std::{
     time::Duration,
 };
 
-use fantoccini::{Capabilities, Client, ClientBuilder, Locator, WindowHandle};
+use fantoccini::{
+    wd::{Capabilities, WindowHandle},
+    Client, ClientBuilder, Locator,
+};
 use futures::lock::Mutex;
 use serde::Deserialize;
 use serde_json::{json, Value as Json};

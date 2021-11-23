@@ -65,6 +65,8 @@ impl TryFrom<syn::ItemMod> for ModExpander {
         let mut use_items = Vec::new();
         let register_prefix = &item.ident;
         for item in parser::try_unwrap_mod_content(item.content)? {
+            // false positive: non_exhaustive
+            #[allow(clippy::wildcard_enum_match_arm)]
             match item {
                 syn::Item::ForeignMod(item) => {
                     for item in item.items {
@@ -158,7 +160,12 @@ impl ModExpander {
         &self,
         relative_path: &syn::ExprLit,
     ) -> syn::Result<()> {
-        let root_path = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let root_path = env::var("CARGO_MANIFEST_DIR").map_err(|e| {
+            syn::Error::new(
+                relative_path.span(),
+                format!("Cannot read `CARGO_MANIFEST_DIR` env var: {}", e),
+            )
+        })?;
         let mut path = PathBuf::from(root_path);
         path.push(get_path_arg(relative_path)?);
 
@@ -204,7 +211,7 @@ impl ModExpander {
 /// # Errors
 ///
 /// If the provided [`syn::ExprLit`] isn't a [`syn::Lit::Str`].
-pub fn get_path_arg(arg: &syn::ExprLit) -> syn::Result<String> {
+fn get_path_arg(arg: &syn::ExprLit) -> syn::Result<String> {
     use proc_macro2::Span;
 
     if let syn::Lit::Str(arg) = &arg.lit {
@@ -233,7 +240,7 @@ mod mod_parser {
     ///
     /// If provided [`syn::ForeignItem`] cannot be parsed as a
     /// [`syn::TraitItemMethod`].
-    pub fn get_extern_fn(
+    pub(super) fn get_extern_fn(
         item: syn::ForeignItem,
     ) -> syn::Result<syn::ForeignItemFn> {
         if let syn::ForeignItem::Fn(item) = item {
@@ -248,7 +255,7 @@ mod mod_parser {
     /// # Errors
     ///
     /// If the [`ItemMod::content`] is [`None`].
-    pub fn try_unwrap_mod_content(
+    pub(super) fn try_unwrap_mod_content(
         item: Option<(token::Brace, Vec<syn::Item>)>,
     ) -> syn::Result<Vec<syn::Item>> {
         if let Some((_, items)) = item {
@@ -270,7 +277,7 @@ struct IdentGenerator<'a> {
 
 impl<'a> IdentGenerator<'a> {
     /// Returns a new [`IdentGenerator`] with the provided `prefix` and `name`.
-    fn new(prefix: &'a syn::Ident, name: &'a syn::Ident) -> Self {
+    const fn new(prefix: &'a syn::Ident, name: &'a syn::Ident) -> Self {
         Self { prefix, name }
     }
 
