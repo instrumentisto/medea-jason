@@ -6,17 +6,19 @@ use tracerr::Traced;
 use crate::{
     api::dart::{
         utils::{
-            c_str_into_string, ArgumentError, DartFuture, DartResult,
-            IntoDartFuture as _,
+            c_str_into_string, DartFuture, DartResult, IntoDartFuture as _,
         },
-        DartValueArg, ForeignClass,
+        DartValueArg, DartValueCastError, ForeignClass,
     },
     media::MediaSourceKind,
     platform,
     room::{ChangeMediaStateError, ConstraintsUpdateError, RoomJoinError},
 };
 
-use super::{utils::DartError, MediaStreamSettings};
+use super::{
+    utils::{ArgumentError, DartError},
+    MediaStreamSettings,
+};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::RoomHandle;
@@ -168,7 +170,12 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
     let this = this.as_ref().clone();
 
     async move {
-        this.mute_video(source_kind.try_into()?).await?;
+        this.mute_video(source_kind.try_into().map_err(
+            |err: DartValueCastError| {
+                ArgumentError::new(err.value, "kind", err.expectation)
+            },
+        )?)
+        .await?;
         Ok(())
     }
     .into_dart_future()
@@ -187,7 +194,12 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
     let this = this.as_ref().clone();
 
     async move {
-        this.unmute_video(source_kind.try_into()?).await?;
+        this.unmute_video(source_kind.try_into().map_err(
+            |err: DartValueCastError| {
+                ArgumentError::new(err.value, "kind", err.expectation)
+            },
+        )?)
+        .await?;
         Ok(())
     }
     .into_dart_future()
@@ -204,7 +216,12 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
     let this = this.as_ref().clone();
 
     async move {
-        this.enable_video(source_kind.try_into()?).await?;
+        this.enable_video(source_kind.try_into().map_err(
+            |err: DartValueCastError| {
+                ArgumentError::new(err.value, "kind", err.expectation)
+            },
+        )?)
+        .await?;
         Ok(())
     }
     .into_dart_future()
@@ -221,7 +238,12 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
     let this = this.as_ref().clone();
 
     async move {
-        this.disable_video(source_kind.try_into()?).await?;
+        this.disable_video(source_kind.try_into().map_err(
+            |err: DartValueCastError| {
+                ArgumentError::new(err.value, "kind", err.expectation)
+            },
+        )?)
+        .await?;
         Ok(())
     }
     .into_dart_future()
@@ -382,33 +404,6 @@ pub unsafe extern "C" fn RoomHandle__on_failed_local_media(
 #[no_mangle]
 pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
     drop(RoomHandle::from_ptr(this));
-}
-
-impl TryFrom<DartValueArg<Option<MediaSourceKind>>>
-    for Option<MediaSourceKind>
-{
-    type Error = DartError;
-
-    fn try_from(
-        source_kind: DartValueArg<Option<MediaSourceKind>>,
-    ) -> Result<Self, Self::Error> {
-        Option::<i64>::try_from(source_kind)
-            .map_err(|err| {
-                let message = err.to_string();
-                ArgumentError::new(err.into_value(), "kind", message)
-            })?
-            .map(MediaSourceKind::try_from)
-            .transpose()
-            .map_err(|err| {
-                ArgumentError::new(
-                    err,
-                    "kind",
-                    "could not build `MediaSourceKind` enum from the \
-                    provided value",
-                )
-                .into()
-            })
-    }
 }
 
 #[cfg(feature = "mockable")]

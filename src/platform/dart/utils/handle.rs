@@ -1,9 +1,10 @@
 //! Wrapper around [`Dart_Handle`] managing lifetimes of a
 //! [`Dart_PersistentHandle`].
 
-use std::{fmt, os::raw::c_char, ptr, rc::Rc};
+use std::{fmt, rc::Rc};
 
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use medea_macro::dart_bridge;
 
 use crate::{
     api::{c_str_into_string, free_dart_native_string},
@@ -14,44 +15,20 @@ use crate::{
     },
 };
 
-/// Pointer to an extern function returning a string representation of a Dart
-/// type behind the provided [`Dart_Handle`].
-type RuntimeTypeFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
+#[dart_bridge("flutter/lib/src/native/platform/object.g.dart")]
+mod handle {
+    use std::{os::raw::c_char, ptr};
 
-/// Pointer to an extern function returning a message of the provided Dart
-/// error.
-type ToStringFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<c_char>;
+    use dart_sys::Dart_Handle;
 
-/// Stores pointer to the [`RuntimeTypeFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut RUNTIME_TYPE_FUNCTION: Option<RuntimeTypeFunction> = None;
+    extern "C" {
+        /// Returns a string representation of a Dart type behind the provided
+        /// [`Dart_Handle`].
+        pub fn runtime_type(handle: Dart_Handle) -> ptr::NonNull<c_char>;
 
-/// Stores pointer to the [`ToStringFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut TO_STRING_FUNCTION: Option<ToStringFunction> = None;
-
-/// Registers the provided [`RuntimeTypeFunction`] as [`RUNTIME_TYPE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Object__runtimeType__toString(
-    f: RuntimeTypeFunction,
-) {
-    RUNTIME_TYPE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`ToStringFunction`] as [`TO_STRING_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Object__toString(f: ToStringFunction) {
-    TO_STRING_FUNCTION = Some(f);
+        /// Returns a message of the provided Dart error.
+        pub fn to_string(handle: Dart_Handle) -> ptr::NonNull<c_char>;
+    }
 }
 
 /// Reference-counting based [`Dart_Handle`] wrapper taking care of its
@@ -84,7 +61,7 @@ impl DartHandle {
     #[must_use]
     pub fn name(&self) -> String {
         unsafe {
-            let raw = RUNTIME_TYPE_FUNCTION.unwrap()(self.get());
+            let raw = handle::runtime_type(self.get());
             let name = c_str_into_string(raw);
             free_dart_native_string(raw);
 
@@ -96,7 +73,7 @@ impl DartHandle {
 impl fmt::Display for DartHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         unsafe {
-            let raw = TO_STRING_FUNCTION.unwrap()(self.get());
+            let raw = handle::to_string(self.get());
             let to_string = c_str_into_string(raw);
             free_dart_native_string(raw);
 

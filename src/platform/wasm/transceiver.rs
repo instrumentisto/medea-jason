@@ -1,15 +1,14 @@
 //! [`RtcRtpTransceiver`] wrapper.
 
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, future::Future, rc::Rc};
 
 use futures::future::LocalBoxFuture;
-use medea_client_api_proto::Direction as DirectionProto;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{RtcRtpTransceiver, RtcRtpTransceiverDirection};
+use web_sys::RtcRtpTransceiver;
 
 use crate::{
     media::track::local,
-    platform::{transceiver::TransceiverDirection, Error},
+    platform::{transceiver_direction::TransceiverDirection, Error},
 };
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
@@ -29,23 +28,38 @@ impl Transceiver {
     }
 
     /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn sub_direction(&self, disabled_direction: TransceiverDirection) {
-        self.transceiver.set_direction(
-            (self.current_direction() - disabled_direction).into(),
-        );
+    pub fn sub_direction(
+        &self,
+        disabled_direction: TransceiverDirection,
+    ) -> impl Future<Output = ()> + 'static {
+        let transceiver = self.transceiver.clone();
+        async move {
+            transceiver.set_direction(
+                (TransceiverDirection::from(transceiver.direction())
+                    - disabled_direction)
+                    .into(),
+            );
+        }
     }
 
     /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn add_direction(&self, enabled_direction: TransceiverDirection) {
-        self.transceiver.set_direction(
-            (self.current_direction() | enabled_direction).into(),
-        );
+    pub fn add_direction(
+        &self,
+        enabled_direction: TransceiverDirection,
+    ) -> impl Future<Output = ()> + 'static {
+        let transceiver = self.transceiver.clone();
+        async move {
+            transceiver.set_direction(
+                (TransceiverDirection::from(transceiver.direction())
+                    | enabled_direction)
+                    .into(),
+            );
+        }
     }
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
-    #[must_use]
-    pub fn has_direction(&self, direction: TransceiverDirection) -> bool {
+    pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.current_direction().contains(direction)
     }
 
@@ -135,50 +149,11 @@ impl From<RtcRtpTransceiver> for Transceiver {
     }
 }
 
-impl From<RtcRtpTransceiverDirection> for TransceiverDirection {
-    fn from(direction: RtcRtpTransceiverDirection) -> Self {
-        use RtcRtpTransceiverDirection as D;
-
-        match direction {
-            D::Sendonly => Self::SEND,
-            D::Recvonly => Self::RECV,
-            D::Inactive => Self::INACTIVE,
-            D::Sendrecv => Self::SEND | Self::RECV,
-            D::__Nonexhaustive => {
-                unreachable!("unexpected transceiver direction")
-            }
-        }
-    }
-}
-
-impl From<TransceiverDirection> for RtcRtpTransceiverDirection {
-    fn from(direction: TransceiverDirection) -> Self {
-        use TransceiverDirection as D;
-
-        if direction.is_all() {
-            Self::Sendrecv
-        } else if direction.contains(D::RECV) {
-            Self::Recvonly
-        } else if direction.contains(D::SEND) {
-            Self::Sendonly
-        } else {
-            Self::Inactive
-        }
-    }
-}
-
-impl From<&DirectionProto> for TransceiverDirection {
-    fn from(proto: &DirectionProto) -> Self {
-        match proto {
-            DirectionProto::Recv { .. } => Self::RECV,
-            DirectionProto::Send { .. } => Self::SEND,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{RtcRtpTransceiverDirection, TransceiverDirection};
+    use web_sys::RtcRtpTransceiverDirection;
+
+    use super::TransceiverDirection;
 
     #[test]
     fn enable_works_correctly() {

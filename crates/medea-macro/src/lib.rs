@@ -83,6 +83,9 @@
 )]
 
 mod caused;
+mod dart_bridge;
+#[cfg(feature = "dart-codegen")]
+mod dart_codegen;
 mod dispatchable;
 mod enum_delegate;
 mod watchers;
@@ -508,3 +511,118 @@ decl_derive!([Caused, attributes(cause)] =>
 /// assert!(err.cause().is_some());
 /// ```
 caused::derive);
+
+/// Generates code for `extern` Dart functions registration and calling.
+///
+/// # Usage
+///
+/// ## Macro call
+///
+/// ```ignore
+/// // Code will be generated in the `peer_connection` module, also you can
+/// // control visibility of this module with a visibility modifier (`pub`).
+/// //
+/// // Module name will be used as a prefix for a registration function.
+/// #[dart_bridge]
+/// mod peer_connection {
+///     use std::{os::raw::c_char, ptr};
+///
+///     use dart_sys::Dart_Handle;
+///
+///     extern "C" {
+///         // This documentation will be injected to the generated
+///         // extern function caller:
+///
+///         /// Creates a new offer in the provided `PeerConnection`.
+///         ///
+///         /// Returns the created SDP offer.
+///         fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///
+///         /// Creates a new answer in the provided `PeerConnection`.
+///         ///
+///         /// Returns the created SDP answer.
+///         fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///     }
+/// }
+/// ```
+///
+/// ## Example of the generated code
+///
+/// ```ignore
+/// mod peer_connection {
+///     use std::{ptr, os::raw::c_char};
+///
+///     use dart_sys::Dart_Handle;
+///
+///     type PeerConnectionCreateOfferFunction =
+///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///     type PeerConnectionCreateAnswerFunction =
+///         extern "C" fn(peer: Dart_Handle) -> ptr::NonNull<c_char>;
+///
+///     static mut PEER_CONNECTION__CREATE_OFFER__FUNCTION:
+///         std::mem::MaybeUninit<
+///             PeerConnectionCreateOfferFunction,
+///         > = std::mem::MaybeUninit::uninit();
+///
+///     static mut PEER_CONNECTION__CREATE_ANSWER__FUNCTION:
+///         std::mem::MaybeUninit<
+///             PeerConnectionCreateAnswerFunction,
+///         > = std::mem::MaybeUninit::uninit();
+///
+///     #[no_mangle]
+///     pub unsafe extern "C" fn register_peer_connection(
+///         create_offer: PeerConnectionCreateOfferFunction,
+///         create_answer: PeerConnectionCreateAnswerFunction,
+///     ) {
+///         PEER_CONNECTION__CREATE_OFFER__FUNCTION.write(create_offer);
+///         PEER_CONNECTION__CREATE_ANSWER__FUNCTION.write(create_answer);
+///     }
+///
+///     #[doc = " Creates new offer in the provided `PeerConnection`"]
+///     #[doc = ""]
+///     #[doc = " Returns created SDP offer."]
+///     pub unsafe fn create_offer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
+///         (PEER_CONNECTION__CREATE_OFFER__FUNCTION.assume_init_ref())(peer)
+///     }
+///
+///     #[doc = " Creates new answer in the provided `PeerConnection`"]
+///     #[doc = ""]
+///     #[doc = " Returns created SDP answer."]
+///     pub unsafe fn create_answer(peer: Dart_Handle) -> ptr::NonNull<c_char> {
+///         (PEER_CONNECTION__CREATE_ANSWER__FUNCTION.assume_init_ref())(peer)
+///     }
+/// }
+/// ```
+///
+/// ## Generated code usage
+///
+/// ```ignore
+/// struct PeerConnection(Dart_Handle);
+///
+/// impl PeerConnection {
+///     pub fn create_offer(&self) -> String {
+///         c_str_into_string(peer_connection::create_offer(self.0))
+///     }
+///
+///     pub fn create_answer(&self) -> String {
+///         c_str_into_string(peer_connection::create_answer(self.0))
+///     }
+/// }
+/// ```
+///
+/// ## Dart side code
+///
+/// Also, you need to call registration functions on Dart side:
+///
+/// ```dart
+/// dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+///         'register_peer_connection')(
+///     Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createOffer),
+///     Pointer.fromFunction<Pointer<Utf8> Function(Handle)>(createAnswer),
+/// );
+/// ```
+#[proc_macro_attribute]
+pub fn dart_bridge(args: TokenStream, input: TokenStream) -> TokenStream {
+    dart_bridge::expand(args.into(), input.into())
+        .map_or_else(|e| e.to_compile_error().into(), Into::into)
+}

@@ -1,34 +1,48 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::ptr;
+use std::{convert::TryInto, fmt::Debug, ptr};
 
 use dart_sys::Dart_Handle;
+use medea_macro::dart_bridge;
 
 use crate::api::{DartValue, DartValueArg};
 
-/// Pointer to an extern function returning a [`Dart_Handle`] to a newly created
-/// Dart callback that will proxy calls to the associated Rust callback.
-type CallbackCallProxyFunction =
-    extern "C" fn(ptr::NonNull<Callback>) -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
+mod callback {
+    use std::ptr;
 
-/// Stores pointer to a [`CallbackCallProxyFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CALLBACK_CALL_PROXY_FUNCTION: Option<CallbackCallProxyFunction> =
-    None;
+    use dart_sys::Dart_Handle;
 
-/// Registers the provided [`CallbackCallProxyFunction`] as
-/// [`CALLBACK_CALL_PROXY_FUNCTION`].
+    use crate::platform::dart::utils::callback::Callback;
+
+    extern "C" {
+        /// Returns a [`Dart_Handle`] to a newly created Dart callback accepting
+        /// 2 arguments that will proxy calls to the given Rust callback.
+        pub fn call_two_arg_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
+
+        /// Returns a [`Dart_Handle`] to a newly created Dart callback that will
+        /// proxy calls to the associated Rust callback.
+        pub fn call_proxy(cb: ptr::NonNull<Callback>) -> Dart_Handle;
+    }
+}
+
+/// Calls the provided [`Callback`] with the provided two [`DartValue`]s as
+/// arguments.
 ///
 /// # Safety
 ///
-/// Must ONLY be called by Dart during FFI initialization.
+/// Provided callback should be a valid [`Callback`] pointer.
 #[no_mangle]
-pub unsafe extern "C" fn register_Callback__call_proxy(
-    f: CallbackCallProxyFunction,
+pub unsafe extern "C" fn Callback__call_two_arg(
+    mut cb: ptr::NonNull<Callback>,
+    first: DartValue,
+    second: DartValue,
 ) {
-    CALLBACK_CALL_PROXY_FUNCTION = Some(f);
+    match &mut cb.as_mut().0 {
+        Kind::TwoArgFnMut(func) => (func)(first, second),
+        _ => unreachable!(),
+    }
 }
 
 /// Calls the provided [`Callback`] with the provided [`DartValue`] as an
@@ -55,7 +69,7 @@ pub unsafe extern "C" fn Callback__call(
             Kind::Fn(func) => {
                 (func)(val);
             }
-            Kind::FnOnce(_) => {
+            Kind::FnOnce(_) | Kind::TwoArgFnMut(_) => {
                 unreachable!();
             }
         }
@@ -67,9 +81,10 @@ enum Kind {
     FnOnce(Box<dyn FnOnce(DartValue)>),
     FnMut(Box<dyn FnMut(DartValue)>),
     Fn(Box<dyn Fn(DartValue)>),
+    TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
 }
 
-// TODO: Fix in #10:
+// TODO: Fix in #13:
 //       1. Requires additional parametrization or(and) wrapping.
 //       2. `FnOnce` semantics should be reflected on Dart side somehow.
 //       3. `Kind::FnMut` and `Kind::Fn` aren't dropped anywhere right now.
@@ -82,11 +97,14 @@ impl Callback {
     /// converted to a [`Dart_Handle`] and passed to Dart.
     pub fn from_once<F, T>(f: F) -> Self
     where
-        F: FnOnce(DartValueArg<T>) + 'static,
+        F: FnOnce(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         Self(Kind::FnOnce(Box::new(move |val: DartValue| {
             let arg = DartValueArg::<T>::from(val);
-            (f)(arg);
+            (f)(arg.try_into().unwrap());
         })))
     }
 
@@ -94,11 +112,14 @@ impl Callback {
     /// converted to a [`Dart_Handle`] and passed to Dart.
     pub fn from_fn_mut<F, T>(mut f: F) -> Self
     where
-        F: FnMut(DartValueArg<T>) + 'static,
+        F: FnMut(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         Self(Kind::FnMut(Box::new(move |val: DartValue| {
             let arg = DartValueArg::<T>::from(val);
-            (f)(arg);
+            (f)(arg.try_into().unwrap());
         })))
     }
 
@@ -106,12 +127,37 @@ impl Callback {
     /// converted to a [`Dart_Handle`] and passed to Dart.
     pub fn from_fn<F, T>(f: F) -> Self
     where
-        F: Fn(DartValueArg<T>) + 'static,
+        F: Fn(T) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
     {
         Self(Kind::Fn(Box::new(move |val: DartValue| {
             let arg = DartValueArg::<T>::from(val);
-            (f)(arg);
+            (f)(arg.try_into().unwrap());
         })))
+    }
+
+    /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two
+    /// arguments, that can be converted to a [`Dart_Handle`] and passed to
+    /// Dart.
+    pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
+    where
+        F: FnMut(T, S) + 'static,
+        DartValueArg<T>: TryInto<T>,
+        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        T: 'static,
+        DartValueArg<S>: TryInto<S>,
+        <DartValueArg<S> as TryInto<S>>::Error: Debug,
+        S: 'static,
+    {
+        Self(Kind::TwoArgFnMut(Box::new(
+            move |first: DartValue, second: DartValue| {
+                let first = DartValueArg::<T>::from(first);
+                let second = DartValueArg::<S>::from(second);
+                (f)(first.try_into().unwrap(), second.try_into().unwrap());
+            },
+        )))
     }
 
     /// Converts this [`Callback`] into a [`Dart_Handle`], so it can be passed
@@ -121,9 +167,16 @@ impl Callback {
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
         unsafe {
-            CALLBACK_CALL_PROXY_FUNCTION.unwrap()(ptr::NonNull::from(
-                Box::leak(Box::new(self)),
-            ))
+            match &self.0 {
+                Kind::TwoArgFnMut(_) => callback::call_two_arg_proxy(
+                    ptr::NonNull::from(Box::leak(Box::new(self))),
+                ),
+                Kind::Fn(_) | Kind::FnOnce(_) | Kind::FnMut(_) => {
+                    callback::call_proxy(ptr::NonNull::from(Box::leak(
+                        Box::new(self),
+                    )))
+                }
+            }
         }
     }
 }
@@ -143,8 +196,7 @@ pub mod tests {
         expects: DartValueArg<i64>,
     ) -> Dart_Handle {
         let expects: i64 = expects.try_into().unwrap();
-        Callback::from_once(move |i: DartValueArg<i64>| {
-            let val: i64 = i.try_into().unwrap();
+        Callback::from_once(move |val: i64| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -155,8 +207,7 @@ pub mod tests {
         expects: DartValueArg<String>,
     ) -> Dart_Handle {
         let expects: String = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<String>| {
-            let val: String = val.try_into().unwrap();
+        Callback::from_once(move |val: String| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -167,8 +218,7 @@ pub mod tests {
         expects: DartValueArg<Option<i64>>,
     ) -> Dart_Handle {
         let expects: Option<i64> = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<Option<i64>>| {
-            let val: Option<i64> = val.try_into().unwrap();
+        Callback::from_once(move |val: Option<i64>| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -179,8 +229,7 @@ pub mod tests {
         expects: DartValueArg<Option<String>>,
     ) -> Dart_Handle {
         let expects: Option<String> = expects.try_into().unwrap();
-        Callback::from_once(move |val: DartValueArg<Option<String>>| {
-            let val: Option<String> = val.try_into().unwrap();
+        Callback::from_once(move |val: Option<String>| {
             assert_eq!(val, expects);
         })
         .into_dart()
@@ -202,8 +251,7 @@ pub mod tests {
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
-        Callback::from_once(move |val: DartValueArg<Dart_Handle>| {
-            let val: Dart_Handle = val.try_into().unwrap();
+        Callback::from_once(move |val: Dart_Handle| {
             unsafe { (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val) };
         })
         .into_dart()

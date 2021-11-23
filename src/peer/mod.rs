@@ -299,7 +299,7 @@ impl PeerConnection {
     ///
     /// Errors with an [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`platform::RtcPeerConnection`] creating fails.
-    pub fn new(
+    pub async fn new(
         state: &State,
         peer_events_sender: mpsc::UnboundedSender<PeerEvent>,
         media_manager: Rc<MediaManager>,
@@ -312,6 +312,7 @@ impl PeerConnection {
                 state.ice_servers().clone(),
                 state.force_relay(),
             )
+            .await
             .map_err(tracerr::map_from_and_wrap!())?,
         );
         let (track_events_sender, mut track_events_rx) = mpsc::unbounded();
@@ -382,11 +383,14 @@ impl PeerConnection {
         // Bind to `track` event.
         let media_connections = Rc::clone(&peer.media_connections);
         peer.peer.on_track(Some(move |track, transceiver| {
-            if let Err(mid) =
-                media_connections.add_remote_track(track, transceiver)
-            {
-                log::error!("Cannot add new remote track with mid={}", mid);
-            };
+            let media_connections = Rc::clone(&media_connections);
+            platform::spawn(async move {
+                if let Err(mid) =
+                    media_connections.add_remote_track(track, transceiver).await
+                {
+                    log::error!("Cannot add new remote track with mid={}", mid);
+                };
+            });
         }));
 
         Ok(Rc::new(peer))
@@ -631,8 +635,8 @@ impl PeerConnection {
     /// [`MediaConnections`].
     ///
     /// [`Sender`]: sender::Sender
-    fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
-        self.media_connections.get_transceivers_statuses()
+    async fn get_transceivers_statuses(&self) -> HashMap<TrackId, bool> {
+        self.media_connections.get_transceivers_statuses().await
     }
 
     /// Updates [`local::Track`]s being used in [`PeerConnection`]s [`Sender`]s.
@@ -866,7 +870,7 @@ impl PeerConnection {
             .await
             .map_err(tracerr::map_from_and_wrap!())?;
         self.has_remote_description.set(true);
-        self.media_connections.sync_receivers();
+        self.media_connections.sync_receivers().await;
 
         let ice_candidates_buffer_flush_fut = future::try_join_all(
             self.ice_candidates_buffer.borrow_mut().drain(..).map(

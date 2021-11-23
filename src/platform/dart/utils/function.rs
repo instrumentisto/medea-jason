@@ -11,6 +11,7 @@
 use std::marker::PhantomData;
 
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use medea_macro::dart_bridge;
 
 use crate::{api::DartValue, platform::Callback};
 
@@ -20,22 +21,16 @@ use super::dart_api::{
     Dart_NewPersistentHandle_DL_Trampolined,
 };
 
-/// Pointer to an extern function that accepts a [`Dart_Handle`] and a
-/// [`DartValue`] argument.
-type FnCaller = extern "C" fn(Dart_Handle, DartValue);
+#[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
+mod function {
+    use dart_sys::Dart_Handle;
 
-/// Dart function used to invoke other Dart closures that accept a [`DartValue`]
-/// argument.
-static mut FN_CALLER: Option<FnCaller> = None;
+    use crate::api::DartValue;
 
-/// Registers the provided [`FnCaller`] as [`FN_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_fn_caller(f: FnCaller) {
-    FN_CALLER = Some(f);
+    /// Invokes other Dart closures that accept a [`DartValue`] argument.
+    extern "C" {
+        pub fn caller(f: Dart_Handle, val: DartValue);
+    }
 }
 
 impl<A: Into<DartValue>> Callback<A> {
@@ -84,7 +79,7 @@ impl<T: Into<DartValue>> Function<T> {
         unsafe {
             let fn_handle =
                 Dart_HandleFromPersistent_DL_Trampolined(self.dart_fn);
-            FN_CALLER.unwrap()(fn_handle, arg.into());
+            function::caller(fn_handle, arg.into());
         }
     }
 }

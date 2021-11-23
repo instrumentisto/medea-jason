@@ -82,7 +82,7 @@ impl Component {
                     peer.set_remote_answer(description)
                         .await
                         .map_err(tracerr::map_from_and_wrap!())?;
-                    peer.media_connections.sync_receivers();
+                    peer.media_connections.sync_receivers().await;
                     state.negotiation_state.set(NegotiationState::Stable);
                     state.negotiation_role.set(None);
                 }
@@ -90,7 +90,7 @@ impl Component {
                     peer.set_remote_offer(description)
                         .await
                         .map_err(tracerr::map_from_and_wrap!())?;
-                    peer.media_connections.sync_receivers();
+                    peer.media_connections.sync_receivers().await;
                 }
             }
         }
@@ -164,6 +164,7 @@ impl Component {
             peer.send_constraints.clone(),
             peer.track_events_sender.clone(),
         )
+        .await
         .map_err(|e| {
             drop(peer.peer_events_sender.unbounded_send(
                 PeerEvent::FailedLocalMedia {
@@ -192,18 +193,20 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) -> Result<(), Infallible> {
-        let ((_, receiver), _guard) = val.into_parts();
+        let ((_, rcvr_state), _guard) = val.into_parts();
         peer.connections
-            .create_connection(state.id, receiver.sender_id());
+            .create_connection(state.id, rcvr_state.sender_id());
+        let receiver = receiver::Receiver::new(
+            &rcvr_state,
+            &peer.media_connections,
+            peer.track_events_sender.clone(),
+            &peer.recv_constraints,
+        )
+        .await;
         peer.media_connections
             .insert_receiver(receiver::Component::new(
-                Rc::new(receiver::Receiver::new(
-                    &receiver,
-                    &peer.media_connections,
-                    peer.track_events_sender.clone(),
-                    &peer.recv_constraints,
-                )),
-                receiver,
+                Rc::new(receiver),
+                rcvr_state,
             ));
         Ok(())
     }
@@ -249,7 +252,7 @@ impl Component {
                             .set_offer(&sdp)
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        peer.media_connections.sync_receivers();
+                        peer.media_connections.sync_receivers().await;
                         let mids = peer
                             .get_mids()
                             .map_err(tracerr::map_from_and_wrap!())?;
@@ -259,7 +262,8 @@ impl Component {
                                 peer_id: peer.id(),
                                 sdp_offer: sdp,
                                 transceivers_statuses: peer
-                                    .get_transceivers_statuses(),
+                                    .get_transceivers_statuses()
+                                    .await,
                                 mids,
                             })
                             .ok();
@@ -272,14 +276,14 @@ impl Component {
                             .set_answer(&sdp)
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        peer.media_connections.sync_receivers();
-                        let _ = peer
-                            .peer_events_sender
+                        peer.media_connections.sync_receivers().await;
+                        peer.peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpAnswer {
                                 peer_id: peer.id(),
                                 sdp_answer: sdp,
                                 transceivers_statuses: peer
-                                    .get_transceivers_statuses(),
+                                    .get_transceivers_statuses()
+                                    .await,
                             })
                             .ok();
                         state

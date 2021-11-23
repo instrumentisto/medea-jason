@@ -265,20 +265,32 @@ impl Component {
                 if let Some(track) = receiver.track.borrow().as_ref() {
                     track.set_enabled(false);
                 }
-                if let Some(trnscvr) = receiver.transceiver.borrow().as_ref() {
-                    trnscvr.sub_direction(platform::TransceiverDirection::RECV);
+                let sub_direction = {
+                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
+                        trnscvr
+                            .sub_direction(platform::TransceiverDirection::RECV)
+                    })
+                };
+                if let Some(sub_direction) = sub_direction {
+                    sub_direction.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
                 if let Some(track) = receiver.track.borrow().as_ref() {
                     track.set_enabled(true);
                 }
-                if let Some(trnscvr) = receiver.transceiver.borrow().as_ref() {
-                    trnscvr.add_direction(platform::TransceiverDirection::RECV);
+                let add_direction =
+                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
+                        trnscvr
+                            .add_direction(platform::TransceiverDirection::RECV)
+                    });
+
+                if let Some(add_direction) = add_direction {
+                    add_direction.await;
                 }
             }
         }
-        receiver.maybe_notify_track();
+        receiver.maybe_notify_track().await;
 
         Ok(())
     }

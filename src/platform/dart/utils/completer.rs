@@ -18,119 +18,78 @@
 //!
 //! [Completer]: https://api.dart.dev/dart-async/Completer-class.html
 
-use std::marker::PhantomData;
+use std::{marker::PhantomData, time::Duration};
 
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use medea_macro::dart_bridge;
 
-use crate::api::{utils::DartError, DartValue};
+use crate::{
+    api::{utils::DartError, DartValue},
+    platform::dart::utils::dart_future::FutureFromDart,
+};
 
 use super::dart_api::{
     Dart_HandleFromPersistent_DL_Trampolined,
     Dart_NewPersistentHandle_DL_Trampolined,
 };
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a new Dart
-/// [Completer].
-///
-/// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-type CompleterNewCaller = extern "C" fn() -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/ffi/completer.g.dart")]
+mod completer {
+    use dart_sys::Dart_Handle;
 
-/// Pointer to an extern function that invokes the [complete()] method with the
-/// provided [`DartValue`] on the provided [`Dart_Handle`] pointing to the Dart
-/// [Completer] object.
-///
-/// [complete()]: https://api.dart.dev/dart-async/Completer/complete.html
-/// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-type CompleterCompleteCaller = extern "C" fn(Dart_Handle, DartValue);
+    use crate::api::{utils::DartError, DartValue};
 
-/// Pointer to an extern function that invokes the [completeError()][1] method
-/// with the provided [`DartError`] on the provided [`Dart_Handle`] pointing to
-/// the Dart [Completer] object.
-///
-/// [1]: https://api.dart.dev/dart-async/Completer/completeError.html
-/// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-type CompleterCompleteErrorCaller = extern "C" fn(Dart_Handle, DartError);
+    extern "C" {
+        /// Returns a [`Dart_Handle`] to a new Dart [Completer].
+        ///
+        /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
+        pub fn init() -> Dart_Handle;
 
-/// Pointer to an extern function that calls the [future] getter on the provided
-/// [`Dart_Handle`] pointing to the Dart [Completer] object.
-///
-/// This function will return [`Dart_Handle`] to the Dart [Future] which can be
-/// returned to the Dart side.
-///
-/// [future]: https://api.dart.dev/dart-async/Completer/future.html
-/// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
-/// [Future]: https://api.dart.dev/dart-async/Future-class.html
-type CompleterFutureCaller = extern "C" fn(Dart_Handle) -> Dart_Handle;
+        /// Pointer to an extern function that invokes the [complete()] method
+        /// with the provided [`DartValue`] on the provided
+        /// [`Dart_Handle`] pointing to the Dart [Completer] object.
+        ///
+        /// [complete()]:
+        /// https://api.dart.dev/dart-async/Completer/complete.html
+        /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
+        pub fn complete(fut: Dart_Handle, val: DartValue);
 
-/// Stores pointer to the [`CompleterNewCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut COMPLETER_NEW_CALLER: Option<CompleterNewCaller> = None;
+        /// Invokes the [completeError()][1] method with the provided
+        /// [`DartError`] on the provided [`Dart_Handle`] pointing to the Dart
+        /// [Completer] object.
+        ///
+        /// [1]: https://api.dart.dev/dart-async/Completer/completeError.html
+        /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
+        pub fn complete_error(fut: Dart_Handle, val: DartError);
 
-/// Stores pointer to the [`CompleterCompleteCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut COMPLETER_COMPLETE_CALLER: Option<CompleterCompleteCaller> = None;
+        /// Calls the [future] getter on the provided [`Dart_Handle`] pointing
+        /// to the Dart [Completer] object.
+        ///
+        /// This function will return [`Dart_Handle`] to the Dart [Future] which
+        /// can be returned to the Dart side.
+        ///
+        /// [future]: https://api.dart.dev/dart-async/Completer/future.html
+        /// [Completer]: https://api.dart.dev/dart-async/Completer-class.html
+        /// [Future]: https://api.dart.dev/dart-async/Future-class.html
+        pub fn future(fut: Dart_Handle) -> Dart_Handle;
 
-/// Stores pointer to the [`CompleterCompleteErrorCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut COMPLETER_COMPLETE_ERROR_CALLER: Option<
-    CompleterCompleteErrorCaller,
-> = None;
-
-/// Stores pointer to [`CompleterFutureCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut COMPLETER_FUTURE_CALLER: Option<CompleterFutureCaller> = None;
-
-/// Registers the provided [`CompleterNewCaller`] as [`COMPLETER_NEW_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_completer_caller(f: CompleterNewCaller) {
-    COMPLETER_NEW_CALLER = Some(f);
+        /// Returns a [`Dart_Handle`] to the Dart `Future` waiting for the
+        /// provided amount of time.
+        pub fn delayed(delay_ms: i32) -> Dart_Handle;
+    }
 }
 
-/// Registers the provided [`CompleterCompleteCaller`] as
-/// [`COMPLETER_COMPLETE_CALLER`].
+/// [`Future`] which resolves after the provided [`Duration`].
 ///
-/// # Safety
+/// # Panics
 ///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_completer_complete_caller(
-    f: CompleterCompleteCaller,
-) {
-    COMPLETER_COMPLETE_CALLER = Some(f);
-}
-
-/// Registers the provided [`CompleterCompleteErrorCaller`] as
-/// [`COMPLETER_COMPLETE_ERROR_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_completer_complete_error_caller(
-    f: CompleterCompleteErrorCaller,
-) {
-    COMPLETER_COMPLETE_ERROR_CALLER = Some(f);
-}
-
-/// Registers the provided [`CompleterFutureCaller`] as
-/// [`COMPLETER_FUTURE_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_completer_future_caller(
-    f: CompleterFutureCaller,
-) {
-    COMPLETER_FUTURE_CALLER = Some(f);
+/// Panics if [`DELAYED_FUTURE_FUNCTION`] isn't set by Dart side. This is should
+/// be impossible case.
+pub async fn delay_for(delay: Duration) {
+    #[allow(clippy::cast_possible_truncation)]
+    let delay = delay.as_millis() as i32;
+    let dart_fut = unsafe { completer::delayed(delay) };
+    FutureFromDart::execute::<()>(dart_fut).await.unwrap();
 }
 
 /// Dart [Future] which can be resolved from Rust.
@@ -164,7 +123,7 @@ impl<T, E> Completer<T, E> {
     #[must_use]
     pub fn new() -> Self {
         let handle = unsafe {
-            let completer = COMPLETER_NEW_CALLER.unwrap()();
+            let completer = completer::init();
             Dart_NewPersistentHandle_DL_Trampolined(completer)
         };
         Self {
@@ -182,7 +141,7 @@ impl<T, E> Completer<T, E> {
     pub fn future(&self) -> Dart_Handle {
         unsafe {
             let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
-            COMPLETER_FUTURE_CALLER.unwrap()(handle)
+            completer::future(handle)
         }
     }
 }
@@ -201,7 +160,7 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     pub fn complete(&self, arg: T) {
         unsafe {
             let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
-            COMPLETER_COMPLETE_CALLER.unwrap()(handle, arg.into());
+            completer::complete(handle, arg.into());
         }
     }
 }
@@ -213,7 +172,7 @@ impl<T> Completer<T, DartError> {
     pub fn complete_error(&self, e: DartError) {
         unsafe {
             let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
-            COMPLETER_COMPLETE_ERROR_CALLER.unwrap()(handle, e);
+            completer::complete_error(handle, e);
         }
     }
 }

@@ -3,49 +3,27 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '/src/interface/exceptions.dart';
+import 'box_handle.dart';
+import 'exception.g.dart' as bridge;
 import 'foreign_value.dart';
 import 'native_string.dart';
-import 'box_handle.dart';
 
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_new_argument_error_caller')(
-      Pointer.fromFunction<
-          Handle Function(
-              ForeignValue, Pointer<Utf8>, Pointer<Utf8>)>(_newArgumentError));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_new_state_error_caller')(
-      Pointer.fromFunction<Handle Function(Pointer<Utf8>)>(_newStateError));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_new_format_exception_caller')(
-      Pointer.fromFunction<Handle Function(Pointer<Utf8>)>(
-          _newFormatException));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_new_local_media_init_exception_caller')(Pointer.fromFunction<
-          Handle Function(Uint8, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>(
-      _newLocalMediaInitException));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_new_enumerate_devices_exception_caller')(
-      Pointer.fromFunction<Handle Function(Pointer<Handle>, Pointer<Utf8>)>(
-          _newEnumerateDevicesException));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_new_rpc_client_exception_caller')(Pointer.fromFunction<
-          Handle Function(Uint8, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>(
-      _newRpcClientException));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_new_media_state_transition_exception_caller')(
-      Pointer.fromFunction<Handle Function(Pointer<Utf8>, Pointer<Utf8>)>(
-          _newMediaStateTransitionException));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_new_internal_exception_caller')(Pointer.fromFunction<
-          Handle Function(Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>(
-      _newInternalException));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_new_media_settings_update_exception_caller')(
-      Pointer.fromFunction<
-          Handle Function(Pointer<Utf8>, Pointer<Handle>,
-              Uint8)>(_newMediaSettingsUpdateException));
+  bridge.registerFunction(dl,
+      newArgumentError: Pointer.fromFunction(_newArgumentError),
+      newStateError: Pointer.fromFunction(_newStateError),
+      newFormatException: Pointer.fromFunction(_newFormatException),
+      newLocalMediaInitException:
+          Pointer.fromFunction(_newLocalMediaInitException),
+      newEnumerateDevicesException:
+          Pointer.fromFunction(_newEnumerateDevicesException),
+      newRpcClientException: Pointer.fromFunction(_newRpcClientException),
+      newMediaStateTransitionException:
+          Pointer.fromFunction(_newMediaStateTransitionException),
+      newInternalException: Pointer.fromFunction(_newInternalException),
+      newMediaSettingsUpdateException:
+          Pointer.fromFunction(_newMediaSettingsUpdateException));
 }
 
 /// Creates a new [ArgumentError] from the provided invalid [value], its [name]

@@ -16,11 +16,16 @@ All user visible changes to this project will be documented in this file. This p
     - `#[js(cause)]` renamed to `#[cause]`;
     - `#[js(error = "...")]` renamed to `#[cause(error = "...")]`.
 
+### Added
+
+- `#[dart_bridge]` macro for generating code glue for `extern` Dart functions ([#14]).
+
 ### Updated
 
 - Switch to [2021 Rust edition][012-1] ([rev]).
 
 [#4]: /../../pull/4
+[#14]: /../../pull/14
 [rev]: https://github.com/instrumentisto/medea-jason/commit/full-rev
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 

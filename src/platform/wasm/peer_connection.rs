@@ -4,6 +4,7 @@
 
 use std::{
     cell::{Cell, RefCell},
+    future::Future,
     rc::Rc,
 };
 
@@ -21,7 +22,7 @@ use web_sys::{
 };
 
 use crate::{
-    media::{MediaKind, TrackConstraints},
+    media::MediaKind,
     platform::{
         self,
         wasm::{get_property_by_name, utils::EventListener},
@@ -31,15 +32,6 @@ use crate::{
 };
 
 use super::ice_server::RtcIceServers;
-
-impl From<&TrackConstraints> for MediaKind {
-    fn from(media_type: &TrackConstraints) -> Self {
-        match media_type {
-            TrackConstraints::Audio(_) => Self::Audio,
-            TrackConstraints::Video(_) => Self::Video,
-        }
-    }
-}
 
 /// Shortcut for a [`Result`] holding a [`Traced`] [`RtcPeerConnectionError`].
 ///
@@ -114,7 +106,7 @@ impl RtcPeerConnection {
     ///
     /// Errors with [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`SysRtcPeerConnection`] creation fails.
-    pub fn new<I>(ice_servers: I, is_force_relayed: bool) -> Result<Self>
+    pub async fn new<I>(ice_servers: I, is_force_relayed: bool) -> Result<Self>
     where
         I: IntoIterator<Item = IceServer>,
     {
@@ -574,13 +566,15 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-    ) -> Transceiver {
-        let mut init = RtcRtpTransceiverInit::new();
-        let _ = init.direction(direction.into());
-        let transceiver = self
-            .peer
-            .add_transceiver_with_str_and_init(kind.as_str(), &init);
-        Transceiver::from(transceiver)
+    ) -> impl Future<Output = Transceiver> + 'static {
+        let peer = Rc::clone(&self.peer);
+        async move {
+            let mut init = RtcRtpTransceiverInit::new();
+            init.direction(direction.into());
+            let transceiver =
+                peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
+            Transceiver::from(transceiver)
+        }
     }
 
     /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a
@@ -593,24 +587,28 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    #[allow(clippy::unwrap_in_result)]
-    pub fn get_transceiver_by_mid(&self, mid: &str) -> Option<Transceiver> {
-        let mut transceiver = None;
+    pub fn get_transceiver_by_mid(
+        &self,
+        mid: String,
+    ) -> impl Future<Output = Option<Transceiver>> + 'static {
+        let peer = Rc::clone(&self.peer);
+        async move {
+            let mut transceiver = None;
 
-        let transceivers = js_sys::try_iter(&self.peer.get_transceivers())
-            .unwrap()
-            .unwrap();
-        for tr in transceivers {
-            let tr = RtcRtpTransceiver::from(tr.unwrap());
-            if let Some(tr_mid) = tr.mid() {
-                if mid.eq(&tr_mid) {
-                    transceiver = Some(tr);
-                    break;
+            let transceivers =
+                js_sys::try_iter(&peer.get_transceivers()).unwrap().unwrap();
+            for tr in transceivers {
+                let tr = RtcRtpTransceiver::from(tr.unwrap());
+                if let Some(tr_mid) = tr.mid() {
+                    if mid.eq(&tr_mid) {
+                        transceiver = Some(tr);
+                        break;
+                    }
                 }
             }
-        }
 
-        transceiver.map(Transceiver::from)
+            transceiver.map(Transceiver::from)
+        }
     }
 }
 
