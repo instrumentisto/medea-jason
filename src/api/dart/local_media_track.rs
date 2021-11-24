@@ -58,7 +58,9 @@ pub unsafe extern "C" fn LocalMediaTrack__media_source_kind(
 pub unsafe extern "C" fn LocalMediaTrack__free(
     this: ptr::NonNull<LocalMediaTrack>,
 ) {
-    drop(LocalMediaTrack::from_ptr(this));
+    let track = LocalMediaTrack::from_ptr(this);
+    track.get_track().stop();
+    drop(track);
 }
 
 #[cfg(feature = "mockable")]

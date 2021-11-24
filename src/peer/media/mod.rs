@@ -264,6 +264,12 @@ struct InnerMediaConnections {
     receivers: HashMap<TrackId, receiver::Component>,
 }
 
+impl Drop for MediaConnections {
+    fn drop(&mut self) {
+        log::debug!("Peer count: {}", Rc::strong_count(&self.0.borrow().peer));
+    }
+}
+
 impl InnerMediaConnections {
     /// Returns [`Iterator`] over [`sender::Component`]s with provided
     /// [`MediaKind`] and [`MediaSourceKind`].

@@ -362,6 +362,7 @@ impl MediaStreamTrack {
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
     #[inline]
     pub fn stop(&self) {
+        log::debug!("Stopping Track on Rust side");
         unsafe {
             STOP_FUNCTION.unwrap()(self.0.get());
         }

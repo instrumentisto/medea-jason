@@ -71,6 +71,9 @@ void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_RtcPeerConnection__create_answer')(
       Pointer.fromFunction<Handle Function(Handle)>(createAnswer));
+  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+      'register_RtcPeerConnection__dispose')(
+      Pointer.fromFunction<Handle Function(Handle)>(dispose));
 }
 
 /// Adds [RTCRtpTransceiver] to the provided [RTCPeerConnection].
@@ -120,6 +123,10 @@ void onConnectionStateChange(RTCPeerConnection conn, Function f) {
   conn.onConnectionState = (e) {
     f(e.index);
   };
+}
+
+void dispose(RTCPeerConnection conn) {
+  conn.dispose();
 }
 
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the

@@ -119,6 +119,7 @@ impl Track {
 impl Drop for Track {
     #[inline]
     fn drop(&mut self) {
+        log::debug!("Track drop");
         self.track.stop();
     }
 }

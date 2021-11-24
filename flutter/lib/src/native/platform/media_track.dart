@@ -94,6 +94,7 @@ void setEnabled(MediaStreamTrack track, int enabled) {
 
 /// Stops provided [MediaStreamTrack].
 void stop(MediaStreamTrack track) {
+  print("Stopping MediaStreamTrack");
   track.stop();
 }
 
