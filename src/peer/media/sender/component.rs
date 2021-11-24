@@ -28,7 +28,7 @@ use crate::{
 
 use super::Sender;
 
-/// State of the [`local::Track`] of the [`Sender`].
+/// State of a [`Sender`]'s [`local::Track`].
 ///
 /// [`PartialEq`] implementation of this state ignores
 /// [`LocalTrackState::Failed`] content.
@@ -74,15 +74,56 @@ pub type Component = component::Component<State, Sender>;
 /// State of the [`Component`].
 #[derive(Debug)]
 pub struct State {
+    /// ID of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     id: TrackId,
+
+    /// [MID] of the [`Sender`]'s [`Transceiver`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
+    /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
+
+    /// [`MediaType`] of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     media_type: MediaType,
+
+    /// IDs of the members the [`Sender`]'s [`local::Track`] is received by.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     receivers: Vec<MemberId>,
+
+    /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
+    /// individually.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     enabled_individual: Rc<MediaExchangeStateController>,
+
+    /// Indicator whether the [`Sender`]'s [`local::Track`] is muted.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     mute_state: Rc<MuteStateController>,
+
+    /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
+    /// generally.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
+
+    /// [MediaStreamConstraints][1] of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     send_constraints: LocalTracksConstraints,
+
+    /// State of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     local_track_state: ObservableCell<LocalTrackState>,
+
+    /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
 

@@ -50,13 +50,30 @@ pub struct InsertTrackError(platform::Error);
 /// Representation of a [`local::Track`] that is being sent to some remote peer.
 #[derive(Debug)]
 pub struct Sender {
+    /// ID of this [`local::Track`].
     track_id: TrackId,
+
+    /// Constraints of this [`local::Track`].
     caps: TrackConstraints,
+
+    /// [`Transceiver`] associated with this [`local::Track`].
     transceiver: platform::Transceiver,
+
+    /// Indicator whether this [`local::Track`] is muted.
     muted: Cell<bool>,
+
+    /// Indicator whether this [`local::Track`] is enabled individually.
     enabled_individual: Cell<bool>,
+
+    /// Indicator whether this [`local::Track`] is enabled generally.
     enabled_general: Cell<bool>,
+
+    /// [MediaStreamConstraints][1] of this [`local::Track`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     send_constraints: LocalTracksConstraints,
+
+    /// Channel for sending [`TrackEvent`]s to the actual [`local::Track`].
     track_events_sender: mpsc::UnboundedSender<TrackEvent>,
 }
 
@@ -93,7 +110,7 @@ impl Sender {
             ));
         }
 
-        let caps = TrackConstraints::from(state.media_type().clone());
+        let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
         let transceiver = match state.mid() {
             // Try to find rcvr transceiver that can be used as sendrecv.

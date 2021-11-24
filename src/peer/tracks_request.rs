@@ -79,8 +79,13 @@ pub enum TracksRequestError {
 /// [3]: https://w3.org/TR/mediacapture-streams#mediastream
 #[derive(Debug, Default)]
 pub struct TracksRequest {
+    /// [`AudioTrackConstraints`] of [`local::Track`]s to be applied.
     audio: HashMap<TrackId, AudioTrackConstraints>,
+
+    /// [`DeviceVideoTrackConstraints`] of [`local::Track`]s to be applied.
     device_video: HashMap<TrackId, DeviceVideoTrackConstraints>,
+
+    /// [`DisplayVideoTrackConstraints`] of [`local::Track`]s to be applied.
     display_video: HashMap<TrackId, DisplayVideoTrackConstraints>,
 }
 
@@ -111,8 +116,13 @@ impl TracksRequest {
 /// and must have at least one track of any kind.
 #[derive(Debug)]
 pub struct SimpleTracksRequest {
+    /// [`AudioTrackConstraints`] of a [`local::Track`] to be applied.
     audio: Option<(TrackId, AudioTrackConstraints)>,
+
+    /// [`DisplayVideoTrackConstraints`] of a [`local::Track`] to be applied.
     display_video: Option<(TrackId, DisplayVideoTrackConstraints)>,
+
+    /// [`DisplayVideoTrackConstraints`] of a [`local::Track`] to be applied.
     device_video: Option<(TrackId, DeviceVideoTrackConstraints)>,
 }
 

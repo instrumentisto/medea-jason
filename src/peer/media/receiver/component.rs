@@ -34,13 +34,45 @@ pub type Component = component::Component<State, Receiver>;
 /// State of the [`Component`].
 #[derive(Debug)]
 pub struct State {
+    /// ID of the [`Receiver`]'s [`remote::Track`].
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     id: TrackId,
+
+    /// [MID] of the [`Receiver`]'s [`Transceiver`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
+    /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
+
+    /// [`MediaType`] of the [`Receiver`]'s [`remote::Track`].
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     media_type: MediaType,
+
+    /// ID of the member sending the [`Receiver`]'s [`remote::Track`].
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     sender_id: MemberId,
+
+    /// Indicator whether the [`Receiver`]'s [`remote::Track`] is enabled
+    /// individually.
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_individual: Rc<MediaExchangeStateController>,
+
+    /// Indicator whether the [`Receiver`]'s [`remote::Track`] is enabled
+    /// generally.
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
+
+    /// Indicator whether the [`Receiver`]'s [`remote::Track`] is muted.
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     muted: ObservableCell<bool>,
+
+    /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
 

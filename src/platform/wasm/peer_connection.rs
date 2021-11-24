@@ -570,7 +570,7 @@ impl RtcPeerConnection {
         let peer = Rc::clone(&self.peer);
         async move {
             let mut init = RtcRtpTransceiverInit::new();
-            init.direction(direction.into());
+            let _ = init.direction(direction.into());
             let transceiver =
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
             Transceiver::from(transceiver)

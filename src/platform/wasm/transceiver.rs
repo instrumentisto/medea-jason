@@ -15,6 +15,7 @@ use crate::{
 /// direction changes.
 #[derive(Clone, Debug)]
 pub struct Transceiver {
+    /// [`local::Track`] associated with this [`Transceiver`].
     send_track: RefCell<Option<Rc<local::Track>>>,
 
     /// Underlying [`RtcRtpTransceiver`].

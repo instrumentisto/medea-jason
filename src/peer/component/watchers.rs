@@ -277,7 +277,8 @@ impl Component {
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
                         peer.media_connections.sync_receivers().await;
-                        peer.peer_events_sender
+                        let _ = peer
+                            .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpAnswer {
                                 peer_id: peer.id(),
                                 sdp_answer: sdp,
