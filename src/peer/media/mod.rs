@@ -556,7 +556,12 @@ impl MediaConnections {
         let mut media_exchange_state_updates = HashMap::new();
         for sender in self.0.borrow().senders.values() {
             if let Some(track) = tracks.get(&sender.state().id()).cloned() {
-                if sender.caps().satisfies(track.as_ref()) {
+                if !sender.state().enabled() {
+                    media_exchange_state_updates.insert(
+                        sender.state().id(),
+                        media_exchange_state::Stable::Disabled,
+                    );
+                } else if sender.caps().satisfies(track.as_ref()) {
                     media_exchange_state_updates.insert(
                         sender.state().id(),
                         media_exchange_state::Stable::Enabled,
