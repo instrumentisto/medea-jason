@@ -15,6 +15,14 @@ void registerFunctions(DynamicLibrary dl) {
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
           'register_WebSocketRpcTransport__send')(
       Pointer.fromFunction<Void Function(Handle, Pointer<Utf8>)>(sendWsMsg));
+
+  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
+      'register_WebSocketRpcTransport__close')(
+      Pointer.fromFunction<Void Function(Handle, Int32, Pointer<Utf8>)>(close));
+}
+
+void close(IOWebSocketChannel ws, int closeCode, Pointer<Utf8> msg) {
+  ws.sink.close(closeCode, msg.toDartString());
 }
 
 /// Connects to the provided `addr` and returns [IOWebSocketChannel] for it.
@@ -29,7 +37,7 @@ void listenWs(IOWebSocketChannel ws, Function onMessage, Function onClose) {
       onMessage(msg);
     }
   }, onDone: () {
-    onClose();
+    //onClose();
   });
 }
 

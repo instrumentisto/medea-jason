@@ -128,6 +128,8 @@ type SetRemoteDescriptionFunction = extern "C" fn(
     ptr::NonNull<c_char>,
 ) -> Dart_Handle;
 
+type DisposeFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
+
 /// Stores pointer to the [`AddTransceiver`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
@@ -221,6 +223,10 @@ static mut CREATE_OFFER: Option<CreateOfferFunction> = None;
 ///
 /// Must be initialized by Dart during FFI initialization phase.
 static mut CREATE_ANSWER: Option<CreateAnswerFunction> = None;
+
+static mut DISPOSE_FUNCTION: Option<
+    DisposeFunction,
+> = None;
 
 /// Registers the provided [`CreateOfferFunction`] as [`CREATE_OFFER`].
 ///
@@ -436,6 +442,13 @@ pub unsafe extern "C" fn register_RtcPeerConnection__add_transceiver(
     f: AddTransceiverFunction,
 ) {
     ADD_TRANSCEIVER_FUNCTION = Some(f);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn register_RtcPeerConnection__dispose(
+    f: DisposeFunction,
+) {
+    DISPOSE_FUNCTION = Some(f);
 }
 
 /// Representation of [RTCPeerConnection][1].
@@ -836,5 +849,14 @@ impl RtcPeerConnection {
             })?;
         }
         Ok(())
+    }
+}
+
+impl Drop for RtcPeerConnection {
+    fn drop(&mut self) {
+        log::debug!("Dispose Peerconnection");
+        unsafe {
+            DISPOSE_FUNCTION.unwrap()(self.handle.get());
+        }
     }
 }
