@@ -408,9 +408,11 @@ impl MediaManagerHandle {
         &self,
     ) -> Result<Vec<platform::InputDeviceInfo>, Traced<EnumerateDevicesError>>
     {
-        InnerMediaManager::enumerate_devices()
+        let foo = InnerMediaManager::enumerate_devices()
             .await
-            .map_err(tracerr::map_from_and_wrap!())
+            .map_err(tracerr::map_from_and_wrap!())?;
+        foo.iter().for_each(|i| log::debug!("{}", i.device_id()));
+        Ok(foo)
     }
 
     /// Returns [`local::LocalMediaTrack`]s objects, built from the provided

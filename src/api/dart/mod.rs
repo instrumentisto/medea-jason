@@ -24,7 +24,7 @@ pub mod utils;
 
 use std::{convert::TryFrom, ffi::c_void, marker::PhantomData, ptr};
 
-use dart_sys::{Dart_Handle, _Dart_Handle};
+use dart_sys::{Dart_Handle, _Dart_Handle, Dart_IsError};
 use derive_more::Display;
 use libc::c_char;
 
@@ -334,7 +334,7 @@ impl TryFrom<DartValueArg<Option<DartHandle>>> for Option<DartHandle> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(handle) => {
-                Ok(Some(DartHandle::new(unsafe { *handle.as_ptr() })))
+                Ok(Some(DartHandle::new(unsafe { unbox_dart_handle(handle) })))
             }
             _ => Err(DartValueCastError {
                 expectation: "Option<DartHandle>",

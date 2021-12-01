@@ -25,7 +25,7 @@ type KindFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
 /// Stores pointer to the [`DeviceIdFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
-static mut DEVICE_ID_FUNCTION: Option<DeviceIdFunction> = None;
+pub static mut DEVICE_ID_FUNCTION: Option<DeviceIdFunction> = None;
 
 /// Stores pointer to the [`LabelFunction`] extern function.
 ///
@@ -97,7 +97,10 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn device_id(&self) -> String {
         // Device ID should be always Some
-        Option::try_from(unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) })
+        log::debug!("Sys device_id 1");
+        let device_id = unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) };
+        log::debug!("Sys device_id 2");
+        Option::try_from(device_id)
             .unwrap()
             .unwrap()
     }

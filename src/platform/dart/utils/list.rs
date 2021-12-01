@@ -7,6 +7,7 @@ use dart_sys::Dart_Handle;
 use derive_more::From;
 
 use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
+use crate::platform::dart::utils::dart_api::{Dart_NewPersistentHandle_DL_Trampolined, Dart_HandleFromPersistent_DL_Trampolined};
 
 /// Pointer to an extern function that returns element with a provided index
 /// from the provided [`Dart_Handle`] `List`.
@@ -14,7 +15,7 @@ type GetFunction =
     extern "C" fn(
         Dart_Handle,
         i32,
-    ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
+    ) -> Dart_Handle;
 
 /// Stores pointer to the [`GetFunction`] extern function.
 ///
@@ -64,13 +65,22 @@ impl DartList {
     )]
     #[must_use]
     pub fn get(&self, i: usize) -> Option<DartHandle> {
-        unsafe {
-            *Box::from_raw(
-                GET_FUNCTION.unwrap()(self.0.get(), i as i32).as_ptr(),
-            )
-        }
-        .try_into()
-        .unwrap()
+        Some(DartHandle::new(unsafe {
+            GET_FUNCTION.unwrap()(self.0.get(), i as i32)
+        }))
+    }
+
+    pub fn get_raw(&self, i: usize) -> Option<Dart_Handle> {
+        let a = unsafe {
+            GET_FUNCTION.unwrap()(self.0.get(), i as i32)
+        };
+        // let a = unsafe { Dart_HandleFromPersistent_DL_Trampolined(a) };
+        let a = unsafe { Dart_NewPersistentHandle_DL_Trampolined(a) };
+        // let handle = unsafe { Dart_HandleFromPersistent_DL_Trampolined(asd) };
+        log::debug!("get_raw 1");
+        // unsafe { DEVICE_ID_FUNCTION.unwrap()(a) };
+        log::debug!("get_raw 2");
+        Some(a)
     }
 
     /// Returns length of the underlying Dart `List`.

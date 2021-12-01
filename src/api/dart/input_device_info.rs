@@ -16,7 +16,14 @@ impl ForeignClass for InputDeviceInfo {}
 pub unsafe extern "C" fn InputDeviceInfo__device_id(
     this: ptr::NonNull<InputDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
-    string_into_c_str(this.as_ref().device_id())
+    log::debug!("DeviceID 1");
+    let this = this.as_ref();
+    log::debug!("DeviceID 2");
+    let device_id = this.device_id();
+    log::debug!("DeviceID 3");
+    let s = string_into_c_str(device_id);
+    log::debug!("DeviceID 4");
+    s
 }
 
 /// Returns kind of the represented device.

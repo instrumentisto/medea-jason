@@ -31,7 +31,11 @@ Object getUserMedia(MediaStreamConstraints constraints) {
 
 /// Returns all available devices.
 Object enumerateDevices() {
-  return () => navigator.mediaDevices.enumerateDevices();
+  return () async {
+    var foo = await navigator.mediaDevices.enumerateDevices();
+    print('Arrays: ${foo}');
+    return foo;
+  };
 }
 
 /// Calls `getDisplayMedia` and returns created [MediaStreamTrack]s.

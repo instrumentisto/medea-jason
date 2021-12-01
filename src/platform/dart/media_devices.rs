@@ -17,6 +17,8 @@ use super::{
     input_device_info::InputDeviceInfo,
     media_track::MediaStreamTrack,
 };
+use crate::platform::dart::input_device_info::DEVICE_ID_FUNCTION;
+use crate::platform::dart::utils::dart_api::Dart_HandleFromPersistent_DL_Trampolined;
 
 type EnumerateDevicesFunction = extern "C" fn() -> Dart_Handle;
 
@@ -95,7 +97,27 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
     })
     .await
     .unwrap();
-    Ok(DartList::from(devices).into())
+    log::debug!("Enumerate");
+    let list = DartList::from(devices);
+    log::debug!("II 1");
+    let foo = list.get_raw(0).unwrap();
+    log::debug!("II 2");
+    unsafe { DEVICE_ID_FUNCTION.unwrap()(Dart_HandleFromPersistent_DL_Trampolined(foo)) };
+    log::debug!("II 3");
+    // let i = InputDeviceInfo::from(foo);
+    log::debug!("II 3");
+    // i.device_id();
+    log::debug!("II 4");
+    panic!();
+    let foobar: Vec<InputDeviceInfo> = DartList::from(devices).into();
+    log::debug!("Enumerate 2");
+    foobar.iter().for_each(|i| {
+        log::debug!("Before");
+        i.device_id();
+        log::debug!("Device ID successfully gotten");
+    });
+    log::debug!("Enumerate 3");
+    Ok(foobar)
 }
 
 /// Prompts a user for a permission to use a media input which produces vector
