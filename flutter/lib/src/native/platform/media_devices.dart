@@ -20,7 +20,7 @@ Object getUserMedia(MediaStreamConstraints constraints) {
     var res = await navigator.mediaDevices.getUserMedia(
       {
         'audio': constraints.audio,
-        'video': constraints.video,
+        'video': constraints.video['video'],
       },
     );
     // ignore: deprecated_member_use
