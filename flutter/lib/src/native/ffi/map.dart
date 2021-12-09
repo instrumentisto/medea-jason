@@ -20,7 +20,10 @@ Object construct() {
 
 /// Sets [ForeignValue] in the provided [Map] at the provided `key`.
 void set(Map map, Pointer<Utf8> key, ForeignValue value) {
-  map[key.toDartString()] = value.toDart();
+  var convertedKey = key.toDartString();
+  var convertedValue = value.toDart();
+  print('Setting key [$convertedKey] to value [$convertedValue] to the Map [$map]');
+  map[convertedKey] = convertedValue;
 }
 
 /// Removes value with a provided `key` from the [Map].

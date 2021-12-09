@@ -219,10 +219,10 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
         if let Some(device_id) = from.device_id {
             match device_id {
                 ConstrainString::Exact(device_id) => {
-                    ideal_cons.set("device_id".to_string(), device_id.into());
+                    ideal_cons.set("sourceId".to_string(), device_id.into());
                 }
                 ConstrainString::Ideal(device_id) => {
-                    exact_cons.set("device_id".to_string(), device_id.into());
+                    ideal_cons.set("sourceId".to_string(), device_id.into());
                 }
             }
         }
