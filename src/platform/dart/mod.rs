@@ -22,12 +22,6 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::time::Duration;
-
-use dart_sys::Dart_Handle;
-
-use crate::platform::dart::utils::dart_future::FutureFromDart;
-
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
@@ -39,7 +33,7 @@ pub use self::{
     rtc_stats::RtcStats,
     transceiver::Transceiver,
     transport::WebSocketRpcTransport,
-    utils::Function,
+    utils::{completer::delay_for, Function},
 };
 
 /// TODO: Implement panic hook.
@@ -54,39 +48,4 @@ pub fn init_logger() {
     android_logger::init_once(
         android_logger::Config::default().with_min_level(log::Level::Debug),
     );
-}
-
-/// Pointer to an extern function that returns [`Dart_Handle`] to the Dart
-/// `Future` which will wait for the provided amount of time.
-type DelayedFutureFunction = extern "C" fn(i32) -> Dart_Handle;
-
-/// Stores pointer to the [`DelayedFutureFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut DELAYED_FUTURE_FUNCTION: Option<DelayedFutureFunction> = None;
-
-/// Registers the provided [`DelayedFutureFunction`] as
-/// [`DELAYED_FUTURE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_delayed_future_function(
-    f: DelayedFutureFunction,
-) {
-    DELAYED_FUTURE_FUNCTION = Some(f);
-}
-
-/// [`Future`] which resolves after the provided [`Duration`].
-///
-/// # Panics
-///
-/// Panics if [`DELAYED_FUTURE_FUNCTION`] isn't set by Dart side. This is should
-/// be impossible case.
-pub async fn delay_for(delay: Duration) {
-    #[allow(clippy::cast_possible_truncation)]
-    let delay = delay.as_millis() as i32;
-    let dart_fut = unsafe { DELAYED_FUTURE_FUNCTION.unwrap()(delay) };
-    FutureFromDart::execute::<()>(dart_fut).await.unwrap();
 }

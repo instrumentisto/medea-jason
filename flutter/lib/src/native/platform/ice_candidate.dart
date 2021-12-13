@@ -3,26 +3,21 @@ import 'dart:ffi';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+import 'ice_candidate.g.dart' as bridge;
+
 /// Registers functions allowing Rust to create Dart [RTCIceCandidate]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__new')(
-      Pointer.fromFunction<
-          Handle Function(
-              ForeignValue, ForeignValue, ForeignValue)>(newRtcIceCandidate));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__candidate')(
-      Pointer.fromFunction<Pointer Function(Handle)>(candidate));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__sdp_m_line_index')(
-      Pointer.fromFunction<Pointer Function(Handle)>(sdpMLineIndex));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_IceCandidate__sdp_mid')(
-      Pointer.fromFunction<Pointer Function(Handle)>(sdpMid));
+  bridge.registerFunction(
+    dl,
+    init: Pointer.fromFunction(_new),
+    candidate: Pointer.fromFunction(_candidate),
+    sdpMLineIndex: Pointer.fromFunction(_sdpMLineIndex),
+    sdpMid: Pointer.fromFunction(_sdpMid),
+  );
 }
 
-/// Returns provided [RTCIceCandidate] [String].
-Pointer candidate(RTCIceCandidate iceCandidate) {
+/// Returns the provided [RTCIceCandidate] [String].
+Pointer _candidate(RTCIceCandidate iceCandidate) {
   if (iceCandidate.candidate != null) {
     return ForeignValue.fromString(iceCandidate.candidate!).intoRustOwned();
   } else {
@@ -31,7 +26,7 @@ Pointer candidate(RTCIceCandidate iceCandidate) {
 }
 
 /// Returns SDP M line index of the provided [RTCIceCandidate].
-Pointer sdpMLineIndex(RTCIceCandidate iceCandidate) {
+Pointer _sdpMLineIndex(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMlineIndex != null) {
     return ForeignValue.fromInt(iceCandidate.sdpMlineIndex!).intoRustOwned();
   } else {
@@ -39,8 +34,8 @@ Pointer sdpMLineIndex(RTCIceCandidate iceCandidate) {
   }
 }
 
-/// Returns SDP mID of the provided [RTCIceCandidate].
-Pointer sdpMid(RTCIceCandidate iceCandidate) {
+/// Returns SDP MID of the provided [RTCIceCandidate].
+Pointer _sdpMid(RTCIceCandidate iceCandidate) {
   if (iceCandidate.sdpMid != null) {
     return ForeignValue.fromString(iceCandidate.sdpMid!).intoRustOwned();
   } else {
@@ -48,8 +43,8 @@ Pointer sdpMid(RTCIceCandidate iceCandidate) {
   }
 }
 
-/// Creates new [RTCIceCandidate] with a provided values.
-Object newRtcIceCandidate(
+/// Creates a new [RTCIceCandidate] with the provided values.
+Object _new(
     ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();

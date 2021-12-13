@@ -2,17 +2,17 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
 
-use std::{convert::TryFrom, future::Future, os::raw::c_char, ptr};
+use std::{convert::TryFrom, future::Future};
 
-use dart_sys::Dart_Handle;
 use derive_more::Display;
 use medea_client_api_proto::{
     IceConnectionState, IceServer, PeerConnectionState,
 };
+use medea_macro::dart_bridge;
 use tracerr::Traced;
 
 use crate::{
-    api::{string_into_c_str, DartValueArg},
+    api::string_into_c_str,
     media::MediaKind,
     platform::{
         dart::{
@@ -34,421 +34,98 @@ use super::{
     media_track::MediaStreamTrack,
 };
 
-/// Representation of the Dart SDP type.
-#[derive(Display)]
-pub enum RtcSdpType {
-    /// The description is the initial proposal in an offer/answer exchange.
-    #[display(fmt = "offer")]
-    Offer,
-
-    /// The description is the definitive choice in an offer/answer exchange
-    #[display(fmt = "answer")]
-    Answer,
-}
-
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
 
-/// Pointer to an extern function that returns [`IceConnectionState`] of the
-/// provided [`PeerConnection`].
-type IceConnectionStateFunction = extern "C" fn(Dart_Handle) -> i32;
+#[dart_bridge("flutter/lib/src/native/platform/peer_connection.g.dart")]
+mod peer_connection {
+    use std::{os::raw::c_char, ptr};
 
-/// Pointer to an extern function that sets provided callback to the
-/// `PeerConnection.on_connection_state_change`.
-type OnConnectionStateChangeFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+    use dart_sys::Dart_Handle;
 
-/// Pointer to an extern function that returns [`ConnectionState`] of the
-/// provided [`PeerConnection`].
-type ConnectionStateFunction =
-    extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<i32>>>;
+    use crate::api::DartValueArg;
 
-/// Pointer to an extern function that request that ICE candidate gathering be
-/// redone on both ends of the connection.
-type RestartIceFunction = extern "C" fn(Dart_Handle);
+    extern "C" {
+        /// Returns [`IceConnectionState`] of the provided [`PeerConnection`].
+        pub fn ice_connection_state(peer: Dart_Handle) -> i32;
 
-/// Pointer to an extern function that rollbacks SDP offer of the provided
-/// [`PeerConnection`].
-type RollbackFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
+        /// Sets the provided callback to a [`connectionstatechange`][1] event
+        /// of the provided [`PeerConnection`].
+        ///
+        /// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
+        pub fn on_connection_state_change(peer: Dart_Handle, cb: Dart_Handle);
 
-/// Pointer to an extern function that sets `onTrack` callback of the provided
-/// [`PeerConnection`].
-type OnTrackFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+        /// Returns a [`ConnectionState`] of the provided [`PeerConnection`].
+        pub fn connection_state(
+            peer: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
 
-/// Pointer to an extern function that sets `onIceCandidate` callback of the
-/// provided [`PeerConnection`].
-type OnIceCandidateFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+        /// Requests an ICE candidate gathering redoing on both ends of the
+        /// connection.
+        pub fn restart_ice(peer: Dart_Handle);
 
-/// Pointer to an extern function that lookups transceiver in provided
-/// [`PeerConnection`] by provided [`String`].
-type GetTransceiverByMid =
-    extern "C" fn(Dart_Handle, ptr::NonNull<c_char>) -> Dart_Handle;
+        /// Rollbacks SDP offer of the provided [`PeerConnection`].
+        pub fn rollback(peer: Dart_Handle) -> Dart_Handle;
 
-type GetTransceiverFunction =
-    extern "C" fn(Dart_Handle, ptr::NonNull<c_char>, i32) -> Dart_Handle;
+        /// Sets `onTrack` callback of the provided [`PeerConnection`].
+        pub fn on_track(peer: Dart_Handle, cb: Dart_Handle);
 
-/// Pointer to an extern function that adds provided [`IceCandidate`] to the
-/// provided [`PeerConnection`].
-type AddIceCandidateFunction =
-    extern "C" fn(Dart_Handle, Dart_Handle) -> Dart_Handle;
+        /// Sets `onIceCandidate` callback of the provided [`PeerConnection`].
+        pub fn on_ice_candidate(peer: Dart_Handle, cb: Dart_Handle);
 
-/// Pointer to an extern function that sets `onIceConnectionStateChange`
-/// callback of the provided [`PeerConnection`].
-type OnIceConnectionStateChangeFunction =
-    extern "C" fn(Dart_Handle, Dart_Handle);
+        /// Looks ups [`Transceiver`] in the provided [`PeerConnection`] by the
+        /// provided [`String`].
+        pub fn get_transceiver_by_mid(
+            peer: Dart_Handle,
+            mid: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Pointer to an extern function that returns [`Dart_Handle`] to a newly
-/// created [`PeerConnection`].
-type NewPeerFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
+        /// Adds the provided [`IceCandidate`] to the provided
+        /// [`PeerConnection`].
+        pub fn add_ice_candidate(
+            peer: Dart_Handle,
+            candidate: Dart_Handle,
+        ) -> Dart_Handle;
 
-/// Pointer to an extern function that creates new `Transceiver` in the provided
-/// `PeerConnection`.
-type AddTransceiverFunction =
-    extern "C" fn(Dart_Handle, i64, i64) -> Dart_Handle;
+        /// Sets a callback for an [`iceconnectionstatechange`][1] event of the
+        /// provided [`PeerConnection`].
+        pub fn on_ice_connection_state_change(
+            peer: Dart_Handle,
+            cb: Dart_Handle,
+        );
 
-/// Pointer to an extern function that returns newly created SDP offer of this
-/// [`PeerConnection`].
-type CreateOfferFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
+        /// Returns a [`Dart_Handle`] to a newly created [`PeerConnection`].
+        pub fn new_peer(ice_servers: Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that returns newly created SDP answer of this
-/// [`PeerConnection`].
-type CreateAnswerFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
+        /// Creates a new [`Transceiver`[ in the provided [`PeerConnection`].
+        pub fn add_transceiver(
+            peer: Dart_Handle,
+            kind: i64,
+            direction: i64,
+        ) -> Dart_Handle;
 
-/// Pointer to an extern function that sets provided SDP offer as local
-/// description of the provided [`PeerConnection`].
-type SetLocalDescriptionFunction = extern "C" fn(
-    Dart_Handle,
-    ptr::NonNull<c_char>,
-    ptr::NonNull<c_char>,
-) -> Dart_Handle;
+        /// Returns newly created SDP offer of the provided [`PeerConnection`].
+        pub fn create_offer(peer: Dart_Handle) -> Dart_Handle;
 
-/// Pointer to an extern function that sets provided SDP offer as remote
-/// description of the provided [`PeerConnection`].
-type SetRemoteDescriptionFunction = extern "C" fn(
-    Dart_Handle,
-    ptr::NonNull<c_char>,
-    ptr::NonNull<c_char>,
-) -> Dart_Handle;
+        /// Returns a newly created SDP answer of the provided
+        /// [`PeerConnection`].
+        pub fn create_answer(peer: Dart_Handle) -> Dart_Handle;
 
-type DisposeFunction = extern "C" fn(Dart_Handle) -> Dart_Handle;
+        /// Sets the provided SDP offer as a local description of the provided
+        /// [`PeerConnection`].
+        pub fn set_local_description(
+            peer: Dart_Handle,
+            ty: ptr::NonNull<c_char>,
+            offer: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Stores pointer to the [`AddTransceiver`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ADD_TRANSCEIVER_FUNCTION: Option<AddTransceiverFunction> = None;
-
-/// Stores pointer to the [`ConnectionStateFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CONNECTION_STATE_FUNCTION: Option<ConnectionStateFunction> = None;
-
-/// Stores pointer to the [`AddIceCandidateFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ADD_ICE_CANDIDATE_FUNCTION: Option<AddIceCandidateFunction> = None;
-
-/// Stores pointer to the [`RestartIceFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut RESTART_ICE_FUNCTION: Option<RestartIceFunction> = None;
-
-/// Stores pointer to the [`RollbackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ROLLBACK_FUNCTION: Option<RollbackFunction> = None;
-
-/// Stores pointer to the [`GetTransceiverFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut GET_TRANSCEIVER_FUNCTION: Option<GetTransceiverFunction> = None;
-
-/// Stores pointer to the [`GetTransceiverFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut GET_TRANSCEIVER_BY_MID_FUNCTION: Option<GetTransceiverByMid> = None;
-
-/// Stores pointer to the [`SetLocalDescriptionFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SET_LOCAL_DESCRIPTION_FUNCTION: Option<SetLocalDescriptionFunction> =
-    None;
-
-/// Stores pointer to the [`SetRemoteDescriptionFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SET_REMOTE_DESCRIPTION_FUNCTION: Option<
-    SetRemoteDescriptionFunction,
-> = None;
-
-/// Stores pointer to the [`OnTrackFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ON_TRACK_FUNCTION: Option<OnTrackFunction> = None;
-
-/// Stores pointer to the [`OnIceCandidateFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ON_ICE_CANDIDATE_FUNCTION: Option<OnIceCandidateFunction> = None;
-
-/// Stores pointer to the [`OnIceConnectionStateChangeFunction`] extern
-/// function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ON_ICE_CONNECTION_STATE_CHANGE_FUNCTION: Option<
-    OnIceConnectionStateChangeFunction,
-> = None;
-
-/// Stores pointer to the [`OnConnectionStateChangeFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ON_CONNECTION_STATE_CHANGE_FUNCTION: Option<
-    OnConnectionStateChangeFunction,
-> = None;
-
-/// Stores pointer to the [`IceConnectionStateFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut ICE_CONNECTION_STATE_FUNCTION: Option<IceConnectionStateFunction> =
-    None;
-
-/// Stores pointer to the [`NewPeerFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_PEER: Option<NewPeerFunction> = None;
-
-/// Stores pointer to the [`CreateOfferFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CREATE_OFFER: Option<CreateOfferFunction> = None;
-
-/// Stores pointer to the [`CreateAnswerFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CREATE_ANSWER: Option<CreateAnswerFunction> = None;
-
-static mut DISPOSE_FUNCTION: Option<
-    DisposeFunction,
-> = None;
-
-/// Registers the provided [`CreateOfferFunction`] as [`CREATE_OFFER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__create_offer(
-    f: CreateOfferFunction,
-) {
-    CREATE_OFFER = Some(f);
-}
-
-/// Registers the provided [`CreateAnswerFunction`] as [`CREATE_ANSWER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__create_answer(
-    f: CreateAnswerFunction,
-) {
-    CREATE_ANSWER = Some(f);
-}
-
-/// Registers the provided [`IceConnectionStateFunction`] as
-/// [`ICE_CONNECTION_STATE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__ice_connection_state(
-    f: IceConnectionStateFunction,
-) {
-    ICE_CONNECTION_STATE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`ConnectionStateFunction`] as
-/// [`CONNECTION_STATE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__connection_state(
-    f: ConnectionStateFunction,
-) {
-    CONNECTION_STATE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`AddIceCandidateFunction`] as
-/// [`ADD_ICE_CANDIDATE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__add_ice_candidate(
-    f: AddIceCandidateFunction,
-) {
-    ADD_ICE_CANDIDATE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`RestartIceFunction`] as [`RESTART_ICE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__restart_ice(
-    f: RestartIceFunction,
-) {
-    RESTART_ICE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`RollbackFunction`] as [`ROLLBACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__rollback(
-    f: RollbackFunction,
-) {
-    ROLLBACK_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`GetTransceiverFunction`] as
-/// [`GET_TRANSCEIVER_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__get_transceiver(
-    f: GetTransceiverFunction,
-) {
-    GET_TRANSCEIVER_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`GetTransceiverByMid`] as
-/// [`GET_TRANSCEIVER_BY_MID`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__get_transceiver_by_mid(
-    f: GetTransceiverByMid,
-) {
-    GET_TRANSCEIVER_BY_MID_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SetLocalDescriptionFunction`] as
-/// [`SET_LOCAL_DESCRIPTION_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__set_local_description(
-    f: SetLocalDescriptionFunction,
-) {
-    SET_LOCAL_DESCRIPTION_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SetRemoteDescriptionFunction`] as
-/// [`SET_REMOTE_DESCRIPTION_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__set_remote_description(
-    f: SetRemoteDescriptionFunction,
-) {
-    SET_REMOTE_DESCRIPTION_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`OnTrackFunction`] as [`ON_TRACK_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__on_track(
-    f: OnTrackFunction,
-) {
-    ON_TRACK_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`OnIceCandidateFunction`] as
-/// [`ON_ICE_CANDIDATE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__on_ice_candidate(
-    f: OnIceCandidateFunction,
-) {
-    ON_ICE_CANDIDATE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`OnIceConnectionStateChangeFunction`] as
-/// [`ON_ICE_CONNECTION_STATE_CHANGE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[rustfmt::skip]
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__on_ice_connection_state_change(
-    f: OnIceConnectionStateChangeFunction,
-) {
-    ON_ICE_CONNECTION_STATE_CHANGE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`OnConnectionStateChangeFunction`] as
-/// [`ON_CONNECTION_STATE_CHANGE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__on_connection_state_change(
-    f: OnConnectionStateChangeFunction,
-) {
-    ON_CONNECTION_STATE_CHANGE_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`NewPeerFunction`] as [`NEW_PEER_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__new_peer(
-    f: NewPeerFunction,
-) {
-    NEW_PEER = Some(f);
-}
-
-/// Registers the provided [`AddTransceiverFunction`] as
-/// [`ADD_TRANSCEIVER_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__add_transceiver(
-    f: AddTransceiverFunction,
-) {
-    ADD_TRANSCEIVER_FUNCTION = Some(f);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn register_RtcPeerConnection__dispose(
-    f: DisposeFunction,
-) {
-    DISPOSE_FUNCTION = Some(f);
+        /// Sets the provided SDP offer as a remote description of the provided
+        /// [`PeerConnection`].
+        pub fn set_remote_description(
+            peer: Dart_Handle,
+            ty: ptr::NonNull<c_char>,
+            offer: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
+    }
 }
 
 /// Representation of [RTCPeerConnection][1].
@@ -460,7 +137,7 @@ pub struct RtcPeerConnection {
 }
 
 impl RtcPeerConnection {
-    /// Instantiates new [`RtcPeerConnection`].
+    /// Instantiates a new [`RtcPeerConnection`].
     ///
     /// # Errors
     ///
@@ -473,19 +150,18 @@ impl RtcPeerConnection {
         let ice_servers = RtcIceServers::from(ice_servers);
         Ok(Self {
             handle: FutureFromDart::execute(unsafe {
-                NEW_PEER.unwrap()(ice_servers.get_handle())
+                peer_connection::new_peer(ice_servers.get_handle())
             })
             .await
-            .map_err(|e| {
-                tracerr::new!(RtcPeerConnectionError::PeerCreationError(e))
-            })?,
+            .map_err(RtcPeerConnectionError::PeerCreationError)
+            .map_err(tracerr::wrap!())?,
         })
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
-        // TODO: Correct implementation requires flutter_webrtc-side rework.
+        // TODO: Correct implementation requires `flutter_webrtc`-side rework.
         Ok(RtcStats(Vec::new()))
     }
 
@@ -499,7 +175,7 @@ impl RtcPeerConnection {
     {
         if let Some(mut f) = f {
             unsafe {
-                ON_TRACK_FUNCTION.unwrap()(
+                peer_connection::on_track(
                     self.handle.get(),
                     Callback::from_two_arg_fn_mut(
                         move |track: DartHandle, transceiver: DartHandle| {
@@ -526,7 +202,7 @@ impl RtcPeerConnection {
     {
         if let Some(mut f) = f {
             unsafe {
-                ON_ICE_CANDIDATE_FUNCTION.unwrap()(
+                peer_connection::on_ice_candidate(
                     self.handle.get(),
                     Callback::from_fn_mut(move |handle: DartHandle| {
                         let candidate = PlatformIceCandidate::from(handle);
@@ -545,9 +221,8 @@ impl RtcPeerConnection {
     /// Returns [`IceConnectionState`] of this [`RtcPeerConnection`].
     #[must_use]
     pub fn ice_connection_state(&self) -> IceConnectionState {
-        let ice_connection_state = unsafe {
-            ICE_CONNECTION_STATE_FUNCTION.unwrap()(self.handle.get())
-        };
+        let ice_connection_state =
+            unsafe { peer_connection::ice_connection_state(self.handle.get()) };
         ice_connection_from_int(ice_connection_state)
     }
 
@@ -558,7 +233,7 @@ impl RtcPeerConnection {
     pub fn connection_state(&self) -> Option<PeerConnectionState> {
         let connection_state = Option::try_from(unsafe {
             *Box::from_raw(
-                CONNECTION_STATE_FUNCTION.unwrap()(self.handle.get()).as_ptr(),
+                peer_connection::connection_state(self.handle.get()).as_ptr(),
             )
         })
         .unwrap()?;
@@ -574,7 +249,7 @@ impl RtcPeerConnection {
     {
         if let Some(mut f) = f {
             unsafe {
-                ON_ICE_CONNECTION_STATE_CHANGE_FUNCTION.unwrap()(
+                peer_connection::on_ice_connection_state_change(
                     self.handle.get(),
                     Callback::from_fn_mut(move |v| {
                         f(ice_connection_from_int(v));
@@ -594,7 +269,7 @@ impl RtcPeerConnection {
     {
         if let Some(mut f) = f {
             unsafe {
-                ON_CONNECTION_STATE_CHANGE_FUNCTION.unwrap()(
+                peer_connection::on_connection_state_change(
                     self.handle.get(),
                     Callback::from_fn_mut(move |v| {
                         f(peer_connection_state_from_int(v));
@@ -623,7 +298,7 @@ impl RtcPeerConnection {
         sdp_mid: &Option<String>,
     ) -> Result<()> {
         unsafe {
-            let fut = ADD_ICE_CANDIDATE_FUNCTION.unwrap()(
+            let fut = peer_connection::add_ice_candidate(
                 self.handle.get(),
                 PlatformIceCandidate::new(candidate, sdp_m_line_index, sdp_mid)
                     .handle(),
@@ -641,7 +316,7 @@ impl RtcPeerConnection {
     /// [`RtcPeerConnection::create_offer`] is automatically configured
     /// to trigger ICE restart.
     pub fn restart_ice(&self) {
-        unsafe { RESTART_ICE_FUNCTION.unwrap()(self.handle.get()) };
+        unsafe { peer_connection::restart_ice(self.handle.get()) };
     }
 
     /// Sets provided [SDP offer][`SdpType::Offer`] as local description.
@@ -658,7 +333,7 @@ impl RtcPeerConnection {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Sets provided [SDP answer][`SdpType::Answer`] as local description.
+    /// Sets the provided [SDP answer][`SdpType::Answer`] as local description.
     ///
     /// # Errors
     ///
@@ -684,12 +359,11 @@ impl RtcPeerConnection {
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createanswer
     pub async fn create_answer(&self) -> Result<String> {
         FutureFromDart::execute(unsafe {
-            CREATE_ANSWER.unwrap()(self.handle.get())
+            peer_connection::create_answer(self.handle.get())
         })
         .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::CreateAnswerFailed(e))
-        })
+        .map_err(RtcPeerConnectionError::CreateAnswerFailed)
+        .map_err(tracerr::wrap!())
     }
 
     /// Rollbacks the [`RtcPeerConnection`] to the previous stable state.
@@ -702,13 +376,11 @@ impl RtcPeerConnection {
     /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
     pub async fn rollback(&self) -> Result<()> {
         FutureFromDart::execute(unsafe {
-            ROLLBACK_FUNCTION.unwrap()(self.handle.get())
+            peer_connection::rollback(self.handle.get())
         })
         .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::SetLocalDescriptionFailed(e))
-        })?;
-        Ok(())
+        .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
+        .map_err(tracerr::wrap!())
     }
 
     /// Obtains [SDP offer][`SdpType::Offer`] from the [`RtcPeerConnection`].
@@ -724,12 +396,11 @@ impl RtcPeerConnection {
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createoffer
     pub async fn create_offer(&self) -> Result<String> {
         FutureFromDart::execute(unsafe {
-            CREATE_OFFER.unwrap()(self.handle.get())
+            peer_connection::create_offer(self.handle.get())
         })
         .await
-        .map_err(|e| {
-            tracerr::new!(RtcPeerConnectionError::CreateOfferFailed(e))
-        })
+        .map_err(RtcPeerConnectionError::CreateOfferFailed)
+        .map_err(tracerr::wrap!())
     }
 
     /// Instructs the [`RtcPeerConnection`] to apply the supplied
@@ -747,35 +418,30 @@ impl RtcPeerConnection {
     pub async fn set_remote_description(&self, sdp: SdpType) -> Result<()> {
         match sdp {
             SdpType::Offer(sdp) => unsafe {
-                FutureFromDart::execute::<()>(SET_REMOTE_DESCRIPTION_FUNCTION
-                    .unwrap()(
-                    self.handle.get(),
-                    string_into_c_str(RtcSdpType::Offer.to_string()),
-                    string_into_c_str(sdp),
-                ))
+                FutureFromDart::execute::<()>(
+                    peer_connection::set_remote_description(
+                        self.handle.get(),
+                        string_into_c_str(RtcSdpType::Offer.to_string()),
+                        string_into_c_str(sdp),
+                    ),
+                )
                 .await
-                .map_err(|e| {
-                    tracerr::new!(
-                        RtcPeerConnectionError::SetRemoteDescriptionFailed(e)
-                    )
-                })?;
+                .map_err(RtcPeerConnectionError::SetRemoteDescriptionFailed)
+                .map_err(tracerr::wrap!())
             },
             SdpType::Answer(sdp) => unsafe {
-                FutureFromDart::execute::<()>(SET_REMOTE_DESCRIPTION_FUNCTION
-                    .unwrap()(
-                    self.handle.get(),
-                    string_into_c_str(RtcSdpType::Answer.to_string()),
-                    string_into_c_str(sdp),
-                ))
+                FutureFromDart::execute::<()>(
+                    peer_connection::set_remote_description(
+                        self.handle.get(),
+                        string_into_c_str(RtcSdpType::Answer.to_string()),
+                        string_into_c_str(sdp),
+                    ),
+                )
                 .await
-                .map_err(|e| {
-                    tracerr::new!(
-                        RtcPeerConnectionError::SetRemoteDescriptionFailed(e)
-                    )
-                })?;
+                .map_err(RtcPeerConnectionError::SetRemoteDescriptionFailed)
+                .map_err(tracerr::wrap!())
             },
         }
-        Ok(())
     }
 
     /// Creates a new [`Transceiver`] (see [RTCRtpTransceiver][1]) and adds it
@@ -792,7 +458,7 @@ impl RtcPeerConnection {
             let handle = self.handle.get();
             async move {
                 let trnsvr: DartHandle =
-                    FutureFromDart::execute(ADD_TRANSCEIVER_FUNCTION.unwrap()(
+                    FutureFromDart::execute(peer_connection::add_transceiver(
                         handle,
                         kind as i64,
                         direction.into(),
@@ -816,47 +482,46 @@ impl RtcPeerConnection {
         unsafe {
             let handle = self.handle.get();
             async move {
-                let transceiver: Option<DartHandle> =
-                    FutureFromDart::execute(GET_TRANSCEIVER_BY_MID_FUNCTION
-                        .unwrap()(
+                let transceiver: Option<DartHandle> = FutureFromDart::execute(
+                    peer_connection::get_transceiver_by_mid(
                         handle,
                         string_into_c_str(mid.to_string()),
-                    ))
-                    .await
-                    .unwrap();
+                    ),
+                )
+                .await
+                .unwrap();
                 transceiver.map(Transceiver::from)
             }
         }
     }
 
-    /// Sets local description to the provided one [`RtcSdpType`].
+    /// Sets local description to the provided [`RtcSdpType`].
     async fn set_local_description(
         &self,
         sdp_type: RtcSdpType,
         sdp: String,
     ) -> Result<()> {
         unsafe {
-            FutureFromDart::execute(SET_LOCAL_DESCRIPTION_FUNCTION.unwrap()(
+            FutureFromDart::execute(peer_connection::set_local_description(
                 self.handle.get(),
                 string_into_c_str(sdp_type.to_string()),
                 string_into_c_str(sdp),
             ))
             .await
-            .map_err(|e| {
-                tracerr::new!(
-                    RtcPeerConnectionError::SetLocalDescriptionFailed(e)
-                )
-            })?;
+            .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
+            .map_err(tracerr::wrap!())
         }
-        Ok(())
     }
 }
 
-impl Drop for RtcPeerConnection {
-    fn drop(&mut self) {
-        log::debug!("Dispose Peerconnection");
-        unsafe {
-            DISPOSE_FUNCTION.unwrap()(self.handle.get());
-        }
-    }
+/// Representation of a Dart SDP type.
+#[derive(Display)]
+pub enum RtcSdpType {
+    /// Description is an initial proposal in an offer/answer exchange.
+    #[display(fmt = "offer")]
+    Offer,
+
+    /// Description is a definitive choice in an offer/answer exchange.
+    #[display(fmt = "answer")]
+    Answer,
 }

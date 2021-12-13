@@ -1,5 +1,4 @@
-//! Definition and implementation of [`RTCRtpTransceiverDirection`][1]
-//! representation.
+//! Definition and implementation of [RTCRtpTransceiverDirection][1].
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiverdirection
 
@@ -99,10 +98,10 @@ impl From<&DirectionProto> for TransceiverDirection {
 impl From<i32> for TransceiverDirection {
     fn from(i: i32) -> Self {
         match i {
-            0 => TransceiverDirection::all(),
-            1 => TransceiverDirection::SEND,
-            2 => TransceiverDirection::RECV,
-            3 => TransceiverDirection::INACTIVE,
+            0 => Self::all(),
+            1 => Self::SEND,
+            2 => Self::RECV,
+            3 => Self::INACTIVE,
             _ => {
                 unreachable!("Unknown TransceiverDirection enum variant {}", i)
             }
@@ -118,6 +117,7 @@ mod tests {
     fn enable_works_correctly() {
         use TransceiverDirection as D;
 
+        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
         for (init, enable_dir, result) in &[
             (D::INACTIVE, D::SEND, D::SEND),
             (D::INACTIVE, D::RECV, D::RECV),
@@ -132,6 +132,7 @@ mod tests {
     fn disable_works_correctly() {
         use TransceiverDirection as D;
 
+        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
         for (init, disable_dir, result) in &[
             (D::SEND, D::SEND, D::INACTIVE),
             (D::RECV, D::RECV, D::INACTIVE),
@@ -147,6 +148,7 @@ mod tests {
         use RtcRtpTransceiverDirection as S;
         use TransceiverDirection as D;
 
+        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
         for (trnscvr_dir, sys_dir) in &[
             (D::SEND, S::Sendonly),
             (D::RECV, S::Recvonly),
@@ -162,6 +164,7 @@ mod tests {
         use RtcRtpTransceiverDirection as S;
         use TransceiverDirection as D;
 
+        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
         for (sys_dir, trnscvr_dir) in &[
             (S::Sendonly, D::SEND),
             (S::Recvonly, D::RECV),

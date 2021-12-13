@@ -56,7 +56,7 @@ impl Track {
         }
     }
 
-    /// Returns underlying [`platform::MediaStreamTrack`] of this [`Track`].
+    /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
     pub fn platform_track(&self) -> &platform::MediaStreamTrack {
         &self.track
@@ -119,7 +119,6 @@ impl Track {
 impl Drop for Track {
     #[inline]
     fn drop(&mut self) {
-        log::debug!("Track drop");
         self.track.stop();
     }
 }

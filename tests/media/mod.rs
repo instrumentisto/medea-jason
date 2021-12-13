@@ -78,7 +78,7 @@ async fn sendrecv_works() {
             .has_direction(
                 TransceiverDirection::SEND | TransceiverDirection::RECV
             )
-            .await
+            .await,
     );
     assert!(
         video_receiver
@@ -87,6 +87,6 @@ async fn sendrecv_works() {
             .has_direction(
                 TransceiverDirection::SEND | TransceiverDirection::RECV
             )
-            .await
+            .await,
     );
 }

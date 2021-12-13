@@ -6,37 +6,31 @@ use std::{convert::TryInto, fmt::Debug, future::Future, ptr};
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
+use medea_macro::dart_bridge;
 
 use crate::{
     api::{DartValue, DartValueArg},
     platform::dart::error::Error,
 };
 
-/// Pointer to an extern function resolving the provided [Dart `Future`][0] with
-/// the provided [`FutureFromDart`].
-///
-/// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
-type FutureFromDartCompleteProxyFunction =
-    extern "C" fn(Dart_Handle, ptr::NonNull<FutureFromDart>);
+#[dart_bridge("flutter/lib/src/native/ffi/future.g.dart")]
+mod future_from_dart {
+    use std::ptr;
 
-/// Stores a pointer to the [`FutureFromDartSpawnerFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut FUTURE_FROM_DART_COMPLETE_PROXY: Option<
-    FutureFromDartCompleteProxyFunction,
-> = None;
+    use dart_sys::Dart_Handle;
 
-/// Registers the provided [`FutureFromDartSpawnerFunction`] as
-/// [`FUTURE_FROM_DART_COMPLETE_PROXY`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_FutureFromDart__complete_proxy(
-    f: FutureFromDartCompleteProxyFunction,
-) {
-    FUTURE_FROM_DART_COMPLETE_PROXY = Some(f);
+    use crate::platform::dart::utils::dart_future::FutureFromDart;
+
+    /// Resolves the provided [Dart `Future`][0] with the provided
+    /// [`FutureFromDart`].
+    ///
+    /// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
+    extern "C" {
+        pub fn complete_proxy(
+            fut: Dart_Handle,
+            resolver: ptr::NonNull<FutureFromDart>,
+        );
+    }
 }
 
 /// Resolves the provided [`FutureFromDart`] with the given [`DartValue`] as
@@ -105,7 +99,7 @@ impl FutureFromDart {
         }));
 
         unsafe {
-            FUTURE_FROM_DART_COMPLETE_PROXY.unwrap()(
+            future_from_dart::complete_proxy(
                 dart_fut,
                 ptr::NonNull::from(Box::leak(Box::new(this))),
             );

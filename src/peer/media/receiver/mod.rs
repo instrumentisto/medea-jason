@@ -155,9 +155,8 @@ impl Receiver {
     /// Indicates whether this [`Receiver`] receives media data.
     pub async fn is_receiving(&self) -> bool {
         let transceiver = self.transceiver.borrow().clone();
-        let is_recv_direction = if let Some(transceiver) = transceiver {
-            transceiver
-                .has_direction(platform::TransceiverDirection::RECV)
+        let is_recv_direction = if let Some(trcv) = transceiver {
+            trcv.has_direction(platform::TransceiverDirection::RECV)
                 .await
         } else {
             false

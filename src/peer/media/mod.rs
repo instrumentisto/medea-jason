@@ -264,12 +264,6 @@ struct InnerMediaConnections {
     receivers: HashMap<TrackId, receiver::Component>,
 }
 
-impl Drop for MediaConnections {
-    fn drop(&mut self) {
-        log::debug!("Peer count: {}", Rc::strong_count(&self.0.borrow().peer));
-    }
-}
-
 impl InnerMediaConnections {
     /// Returns [`Iterator`] over [`sender::Component`]s with provided
     /// [`MediaKind`] and [`MediaSourceKind`].
@@ -626,8 +620,8 @@ impl MediaConnections {
             .find(|rcvr| rcvr.mid().as_ref() == Some(&mid))
             .map(Component::obj);
 
-        if let Some(receiver) = receiver {
-            receiver.set_remote_track(transceiver, track).await;
+        if let Some(rcvr) = receiver {
+            rcvr.set_remote_track(transceiver, track).await;
             Ok(())
         } else {
             Err(mid)
@@ -648,7 +642,7 @@ impl MediaConnections {
                 .values()
                 .filter_map(|receiver| {
                     // Suppress Clippy warn because this impl is easier to
-                    // follow
+                    // follow.
                     #[allow(clippy::question_mark)]
                     if receiver.transceiver().is_none() {
                         return None;
@@ -667,7 +661,7 @@ impl MediaConnections {
                 })
                 .collect::<Vec<_>>()
         })
-        .map(|_| ())
+        .map(drop)
     }
 
     /// Returns all [`Sender`]s which are matches provided

@@ -108,8 +108,8 @@ impl Sender {
                                 == caps.media_source_kind()
                     })
                     .and_then(|rcvr| rcvr.transceiver());
-                if let Some(transceiver) = transceiver {
-                    transceiver
+                if let Some(trcv) = transceiver {
+                    trcv
                 } else {
                     let add_transceiver =
                         media_connections.0.borrow().add_transceiver(
@@ -123,12 +123,10 @@ impl Sender {
                 let get_transceiver = media_connections
                     .0
                     .borrow()
-                    .get_transceiver_by_mid(mid.to_owned());
+                    .get_transceiver_by_mid(mid.into());
                 get_transceiver
                     .await
-                    .ok_or_else(|| {
-                        CreateError::TransceiverNotFound(mid.to_owned())
-                    })
+                    .ok_or_else(|| CreateError::TransceiverNotFound(mid.into()))
                     .map_err(tracerr::wrap!())?
             }
         };
@@ -165,7 +163,6 @@ impl Sender {
     }
 
     /// Indicates whether this [`Sender`] is publishing media traffic.
-    #[inline]
     pub async fn is_publishing(&self) -> bool {
         self.transceiver
             .has_direction(platform::TransceiverDirection::SEND)
