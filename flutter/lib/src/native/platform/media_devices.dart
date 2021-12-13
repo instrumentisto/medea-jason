@@ -17,10 +17,14 @@ void registerFunctions(DynamicLibrary dl) {
 /// Calls `getUserMedia` and returns created [MediaStreamTrack]s.
 Object getUserMedia(MediaStreamConstraints constraints) {
   return () async {
+    var videoConstraints = {};
+    if (constraints.video != null && constraints.video['video'] != null) {
+      videoConstraints = constraints.video['video'];
+    }
     var res = await navigator.mediaDevices.getUserMedia(
       {
         'audio': constraints.audio,
-        'video': constraints.video,
+        'video': videoConstraints,
       },
     );
     // ignore: deprecated_member_use

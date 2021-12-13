@@ -3,6 +3,7 @@
 //! [1]: https://w3.org/TR/mediacapture-streams/#device-info
 
 use std::convert::{TryFrom, TryInto};
+use std::ptr;
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
@@ -11,16 +12,17 @@ use crate::{
     api::DartValueArg, media::MediaKind,
     platform::dart::utils::handle::DartHandle,
 };
+use crate::platform::dart::utils::NonNullDartValueArgExt;
 
 type DeviceIdFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-type LabelFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+type LabelFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
 type GroupIdFunction =
-    extern "C" fn(Dart_Handle) -> DartValueArg<Option<String>>;
+extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-type KindFunction = extern "C" fn(Dart_Handle) -> DartValueArg<Option<i64>>;
+type KindFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<i64>>>;
 
 /// Stores pointer to the [`DeviceIdFunction`] extern function.
 ///
@@ -97,7 +99,7 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn device_id(&self) -> String {
         // Device ID should be always Some
-        Option::try_from(unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()) })
+        Option::try_from(unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()).unbox() })
             .unwrap()
             .unwrap()
     }
@@ -110,7 +112,7 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         // Kind should be always Some
-        Option::<i64>::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()) })
+        Option::<i64>::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()).unbox() })
             .unwrap()
             .unwrap()
             .try_into()
@@ -123,7 +125,7 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn label(&self) -> String {
         // Label should be always Some
-        Option::try_from(unsafe { LABEL_FUNCTION.unwrap()(self.0.get()) })
+        Option::try_from(unsafe { LABEL_FUNCTION.unwrap()(self.0.get()).unbox() })
             .unwrap()
             .unwrap()
     }
@@ -139,7 +141,7 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn group_id(&self) -> String {
         // Group ID should be always Some
-        Option::try_from(unsafe { GROUP_ID_FUNCTION.unwrap()(self.0.get()) })
+        Option::try_from(unsafe { GROUP_ID_FUNCTION.unwrap()(self.0.get()).unbox() })
             .unwrap()
             .unwrap()
     }

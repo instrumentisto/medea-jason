@@ -5,7 +5,7 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 void registerFunction(
   DynamicLibrary dl, {
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> id,
-  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId,
+  required Pointer<NativeFunction<Pointer Function(Handle)>> deviceId,
   required Pointer<NativeFunction<Pointer Function(Handle)>> facingMode,
   required Pointer<NativeFunction<Pointer Function(Handle)>> height,
   required Pointer<NativeFunction<Pointer Function(Handle)>> width,

@@ -6,8 +6,8 @@ typedef _unboxDartHandle_C = Handle Function(Pointer<Handle>);
 typedef _unboxDartHandle_Dart = Object Function(Pointer<Handle>);
 typedef _boxDartHandle_C = Pointer<Handle> Function(Handle);
 typedef _boxDartHandle_Dart = Pointer<Handle> Function(Object);
-typedef _freeBoxedDartHandle_C = Handle Function(Pointer<Handle>);
-typedef _freeBoxedDartHandle_Dart = Object Function(Pointer<Handle>);
+typedef _freeBoxedDartHandle_C = Void Function(Pointer<Handle>);
+typedef _freeBoxedDartHandle_Dart = void Function(Pointer<Handle>);
 
 final _boxDartHandle =
     dl.lookupFunction<_boxDartHandle_C, _boxDartHandle_Dart>('box_dart_handle');

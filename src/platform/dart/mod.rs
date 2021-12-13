@@ -37,13 +37,18 @@ pub use self::{
 };
 
 /// TODO: Implement panic hook.
-pub fn set_panic_hook() {}
+pub fn set_panic_hook() {
+    std::panic::set_hook(Box::new(|bt| {
+        log::debug!("Rust code panicked {:?}", bt);
+    }));
+}
 
 /// Initialize [`android_logger`] as default application logger with min log
 /// level set to [`log::Level::Debug`].
 ///
 /// [`android_logger`]: https://docs.rs/android_logger
 pub fn init_logger() {
+    set_panic_hook();
     // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
         android_logger::Config::default().with_min_level(log::Level::Debug),

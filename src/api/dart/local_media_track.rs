@@ -18,7 +18,7 @@ impl ForeignClass for LocalMediaTrack {}
 pub unsafe extern "C" fn LocalMediaTrack__get_track(
     this: ptr::NonNull<LocalMediaTrack>,
 ) -> Dart_Handle {
-    this.as_ref().get_track().get_handle()
+    this.as_ref().get_track().handle()
 }
 
 /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an

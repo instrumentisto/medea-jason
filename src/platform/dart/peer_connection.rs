@@ -125,6 +125,8 @@ mod peer_connection {
             ty: ptr::NonNull<c_char>,
             offer: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
+
+        pub fn dispose(peer: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -524,4 +526,12 @@ pub enum RtcSdpType {
     /// Description is a definitive choice in an offer/answer exchange.
     #[display(fmt = "answer")]
     Answer,
+}
+
+impl Drop for RtcPeerConnection {
+    fn drop(&mut self) {
+        unsafe {
+            peer_connection::dispose(self.handle.get());
+        }
+    }
 }

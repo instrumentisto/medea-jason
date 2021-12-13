@@ -7,7 +7,6 @@ import '../ffi/foreign_value.dart';
 
 /// Registers [RTCPeerConnection] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
-  // TODO(evdokimovs): implement dispose function
   bridge.registerFunction(
     dl,
     setRemoteDescription: Pointer.fromFunction(_setRemoteDescription),
@@ -27,6 +26,7 @@ void registerFunctions(DynamicLibrary dl) {
     createAnswer: Pointer.fromFunction(_createAnswer),
     getTransceiverByMid: Pointer.fromFunction(_getTransceiverByMid),
     onConnectionStateChange: Pointer.fromFunction(_onConnectionStateChange),
+    dispose: Pointer.fromFunction(_dispose),
   );
 }
 
@@ -35,9 +35,9 @@ void registerFunctions(DynamicLibrary dl) {
 /// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
 Object _addTransceiver(RTCPeerConnection peer, int kind, int direction) {
   return () => peer.addTransceiver(
-    kind: RTCRtpMediaType.values[kind],
-    init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
-  );
+        kind: RTCRtpMediaType.values[kind],
+        init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
+      );
 }
 
 /// Returns newly created [RTCPeerConnection] with a provided `iceServers`
@@ -79,21 +79,22 @@ void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
   };
 }
 
-void dispose(RTCPeerConnection conn) {
+Object _dispose(RTCPeerConnection conn) {
   conn.dispose();
+  return conn;
 }
 
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the
 /// provided [String].
 Object _getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
-    var mMid = mid.toDartString();
-    for (var transceiver in transceivers) {
-      if (transceiver.mid == mMid) {
-        return transceiver;
-      }
-    }
-  });
+        var mMid = mid.toDartString();
+        for (var transceiver in transceivers) {
+          if (transceiver.mid == mMid) {
+            return transceiver;
+          }
+        }
+      });
 }
 
 /// Sets remote SDP offer in the provided [RTCPeerConnection].
@@ -152,7 +153,8 @@ int _iceConnectionState(RTCPeerConnection conn) {
 
 /// Rollbacks local SDP offer of the provided [RTCPeerConnection].
 Object _rollback(RTCPeerConnection conn) {
-  return () => conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
+  return () =>
+      conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 /// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].

@@ -17,7 +17,7 @@ void registerFunctions(DynamicLibrary dl) {
       Pointer.fromFunction<Void Function(Handle, Pointer<Utf8>)>(sendWsMsg));
 
   dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-      'register_WebSocketRpcTransport__close')(
+          'register_WebSocketRpcTransport__close')(
       Pointer.fromFunction<Void Function(Handle, Int32, Pointer<Utf8>)>(close));
 }
 

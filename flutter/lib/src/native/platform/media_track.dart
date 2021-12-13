@@ -46,9 +46,13 @@ void _onEnded(MediaStreamTrack track, Function f) {
 }
 
 /// Returns device ID of the provided [MediaStreamTrack].
-Pointer<Utf8> _deviceId(MediaStreamTrack track) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  return _id(track);
+Pointer _deviceId(MediaStreamTrack track) {
+  final id = track.deviceId();
+  if (id == null) {
+    return ForeignValue.none().intoRustOwned();
+  } else {
+    return ForeignValue.fromString(id).intoRustOwned();
+  }
 }
 
 int _readyState(MediaStreamTrack track) {
