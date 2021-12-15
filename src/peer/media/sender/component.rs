@@ -453,13 +453,15 @@ impl Component {
                 if sender.enabled_in_cons() {
                     sender
                         .transceiver
-                        .add_direction(platform::TransceiverDirection::SEND);
+                        .add_direction(platform::TransceiverDirection::SEND)
+                        .await;
                 }
             }
             media_exchange_state::Stable::Disabled => {
                 sender
                     .transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND);
+                    .sub_direction(platform::TransceiverDirection::SEND)
+                    .await;
             }
         }
 

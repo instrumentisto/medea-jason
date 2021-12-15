@@ -5,6 +5,14 @@ import 'package:ffi/ffi.dart';
 import '../../util/move_semantic.dart';
 import 'nullable_pointer.dart';
 import 'box_handle.dart';
+import '../jason.dart';
+
+typedef _boxForeignValue_C = Pointer Function(ForeignValue);
+typedef _boxForeignValue_Dart = Pointer Function(ForeignValue);
+
+final _boxForeignValue_Dart _boxForeignValue =
+    dl.lookupFunction<_boxForeignValue_C, _boxForeignValue_Dart>(
+        'box_foreign_value');
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.
 class ForeignValue extends Struct {
@@ -101,6 +109,15 @@ class ForeignValue extends Struct {
 }
 
 extension ForeignValuePointer on Pointer<ForeignValue> {
+  /// Transfers [ForeignValue] ownership to Rust.
+  ///
+  /// Frees Dart side [ForeignValue].
+  Pointer intoRustOwned() {
+    var out = _boxForeignValue(ref);
+    free();
+    return out;
+  }
+
   /// Releases the memory allocated on a native heap.
   @moveSemantics
   void free() {

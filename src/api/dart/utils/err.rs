@@ -4,272 +4,104 @@ use std::{borrow::Cow, ptr};
 
 use dart_sys::Dart_Handle;
 use derive_more::Into;
-use libc::c_char;
+use medea_macro::dart_bridge;
 
 use crate::{
     api::{
         dart::{utils::string_into_c_str, DartValue},
         err::{
             EnumerateDevicesException, FormatException, InternalException,
-            LocalMediaInitException, LocalMediaInitExceptionKind,
-            MediaSettingsUpdateException, MediaStateTransitionException,
-            RpcClientException, RpcClientExceptionKind, StateError,
+            LocalMediaInitException, MediaSettingsUpdateException,
+            MediaStateTransitionException, RpcClientException, StateError,
         },
     },
     platform,
 };
 
-/// Pointer to an extern function that returns a new Dart [`ArgumentError`] with
-/// the provided invalid argument, its `name` and error `message` describing the
-/// problem.
-///
-/// [`ArgumentError`]: https://api.dart.dev/dart-core/ArgumentError-class.html
-type NewArgumentErrorCaller = extern "C" fn(
-    value: DartValue,
-    name: ptr::NonNull<c_char>,
-    message: ptr::NonNull<c_char>,
-) -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/ffi/exception.g.dart")]
+mod exception {
+    use std::ptr;
 
-/// Pointer to an extern function that returns a new Dart [`StateError`] with
-/// the provided message.
-///
-/// [`StateError`]: https://api.dart.dev/dart-core/StateError-class.html
-type NewStateErrorCaller = extern "C" fn(ptr::NonNull<c_char>) -> Dart_Handle;
+    use dart_sys::Dart_Handle;
+    use libc::c_char;
 
-/// Pointer to an extern function that returns a new Dart [`FormatException`][1]
-/// with the provided message.
-///
-/// [1]: https://api.dart.dev/dart-core/FormatException-class.html
-type NewFormatExceptionCaller =
-    extern "C" fn(ptr::NonNull<c_char>) -> Dart_Handle;
+    use crate::api::DartValue;
 
-/// Pointer to an extern function that returns a new Dart
-/// [`LocalMediaInitException`] with the provided error `kind`, `message`,
-/// `cause` and `stacktrace`.
-type NewLocalMediaInitExceptionCaller = extern "C" fn(
-    kind: LocalMediaInitExceptionKind,
-    message: ptr::NonNull<c_char>,
-    cause: DartValue,
-    stacktrace: ptr::NonNull<c_char>,
-) -> Dart_Handle;
+    use super::DartError;
 
-/// Pointer to an extern function that returns a new Dart
-/// [`EnumerateDevicesException`] with the provided error `cause` and
-/// `stacktrace`.
-type NewEnumerateDevicesExceptionCaller = extern "C" fn(
-    cause: DartError,
-    stacktrace: ptr::NonNull<c_char>,
-) -> Dart_Handle;
+    /// Invokes other Dart closures that accept a [`DartValue`] argument.
+    extern "C" {
+        /// Returns a new Dart [`ArgumentError`] with the provided invalid
+        /// argument, its `name` and error `message` describing the problem.
+        ///
+        /// [`ArgumentError`]:
+        /// https://api.dart.dev/dart-core/ArgumentError-class.html
+        pub fn new_argument_error(
+            value: DartValue,
+            name: ptr::NonNull<c_char>,
+            message: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Pointer to an extern function that returns a new Dart
-/// [`RpcClientException`] with the provided error `kind`, `message`,
-/// `cause` and `stacktrace`.
-type NewRpcClientExceptionCaller = extern "C" fn(
-    kind: RpcClientExceptionKind,
-    message: ptr::NonNull<c_char>,
-    cause: DartValue,
-    stacktrace: ptr::NonNull<c_char>,
-) -> Dart_Handle;
+        /// Returns a new Dart [`StateError`] with the provided message.
+        ///
+        /// [`StateError`]: https://api.dart.dev/dart-core/StateError-class.html
+        pub fn new_state_error(message: ptr::NonNull<c_char>) -> Dart_Handle;
 
-/// Pointer to an extern function that returns a new Dart
-/// [`MediaStateTransitionException`] with the provided error `message` and
-/// `stacktrace`.
-type NewMediaStateTransitionExceptionCaller = extern "C" fn(
-    message: ptr::NonNull<c_char>,
-    stacktrace: ptr::NonNull<c_char>,
-) -> Dart_Handle;
+        /// Returns a new Dart [`FormatException`][1] with the provided message.
+        ///
+        /// [1]: https://api.dart.dev/dart-core/FormatException-class.html
+        pub fn new_format_exception(
+            message: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Pointer to an extern function that returns a new Dart [`InternalException`]
-/// with the provided error `message`, `cause` and `stacktrace`.
-type NewInternalExceptionCaller = extern "C" fn(
-    message: ptr::NonNull<c_char>,
-    cause: DartValue,
-    stacktrace: ptr::NonNull<c_char>,
-) -> Dart_Handle;
+        /// Returns a new Dart [`LocalMediaInitException`] with the provided
+        /// error `kind`, `message`, `cause` and `stacktrace`.
+        pub fn new_local_media_init_exception(
+            kind: i64,
+            message: ptr::NonNull<c_char>,
+            cause: DartValue,
+            stacktrace: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Pointer to an extern function that returns a new Dart
-/// [`MediaSettingsUpdateException`] with the provided error `message`, `cause`
-/// and `rolled_back` property.
-type NewMediaSettingsUpdateExceptionCaller = extern "C" fn(
-    message: ptr::NonNull<c_char>,
-    cause: DartError,
-    rolled_back: u8,
-) -> Dart_Handle;
+        /// Returns a new Dart [`EnumerateDevicesException`] with the provided
+        /// error `cause` and `stacktrace`.
+        pub fn new_enumerate_devices_exception(
+            cause: DartError,
+            stacktrace: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Stores pointer to the [`NewArgumentErrorCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_ARGUMENT_ERROR_CALLER: Option<NewArgumentErrorCaller> = None;
+        /// Returns a new Dart [`RpcClientException`] with the provided error
+        /// `kind`, `message`, `cause` and `stacktrace`.
+        pub fn new_rpc_client_exception(
+            kind: i64,
+            message: ptr::NonNull<c_char>,
+            cause: DartValue,
+            stacktrace: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Stores pointer to the [`NewStateErrorCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_STATE_ERROR_CALLER: Option<NewStateErrorCaller> = None;
+        /// Returns a new Dart [`MediaStateTransitionException`] with the
+        /// provided error `message` and `stacktrace`.
+        pub fn new_media_state_transition_exception(
+            message: ptr::NonNull<c_char>,
+            stacktrace: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Stores pointer to the [`NewFormatExceptionCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_FORMAT_EXCEPTION_CALLER: Option<NewFormatExceptionCaller> = None;
+        /// Returns a new Dart [`InternalException`] with the provided error
+        /// `message`, `cause` and `stacktrace`.
+        pub fn new_internal_exception(
+            message: ptr::NonNull<c_char>,
+            cause: DartValue,
+            stacktrace: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
 
-/// Stores pointer to the [`NewLocalMediaInitExceptionCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_LOCAL_MEDIA_INIT_EXCEPTION_CALLER: Option<
-    NewLocalMediaInitExceptionCaller,
-> = None;
-
-/// Stores pointer to the [`NewEnumerateDevicesExceptionCaller`] extern
-/// function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_ENUMERATE_DEVICES_EXCEPTION_CALLER: Option<
-    NewEnumerateDevicesExceptionCaller,
-> = None;
-
-/// Stores pointer to the [`NewRpcClientExceptionCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_RPC_CLIENT_EXCEPTION_CALLER: Option<
-    NewRpcClientExceptionCaller,
-> = None;
-
-/// Stores pointer to the [`NewMediaStateTransitionExceptionCaller`] extern
-/// function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_MEDIA_STATE_TRANSITION_EXCEPTION_CALLER: Option<
-    NewMediaStateTransitionExceptionCaller,
-> = None;
-
-/// Stores pointer to the [`NewInternalExceptionCaller`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_INTERNAL_EXCEPTION_CALLER: Option<NewInternalExceptionCaller> =
-    None;
-
-/// Stores pointer to the [`NewMediaSettingsUpdateExceptionCaller`] extern
-/// function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_MEDIA_SETTINGS_UPDATE_EXCEPTION_CALLER: Option<
-    NewMediaSettingsUpdateExceptionCaller,
-> = None;
-
-/// Registers the provided [`NewArgumentErrorCaller`] as
-/// [`NEW_ARGUMENT_ERROR_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_argument_error_caller(
-    f: NewArgumentErrorCaller,
-) {
-    NEW_ARGUMENT_ERROR_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewStateErrorCaller`] as
-/// [`NEW_STATE_ERROR_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_state_error_caller(
-    f: NewStateErrorCaller,
-) {
-    NEW_STATE_ERROR_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewFormatExceptionCaller`] as
-/// [`NEW_FORMAT_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_format_exception_caller(
-    f: NewStateErrorCaller,
-) {
-    NEW_FORMAT_EXCEPTION_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewLocalMediaInitExceptionCaller`] as
-/// [`NEW_LOCAL_MEDIA_INIT_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_local_media_init_exception_caller(
-    f: NewLocalMediaInitExceptionCaller,
-) {
-    NEW_LOCAL_MEDIA_INIT_EXCEPTION_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewLocalMediaInitExceptionCaller`] as
-/// [`NEW_ENUMERATE_DEVICES_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_enumerate_devices_exception_caller(
-    f: NewEnumerateDevicesExceptionCaller,
-) {
-    NEW_ENUMERATE_DEVICES_EXCEPTION_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewRpcClientExceptionCaller`] as
-/// [`NEW_RPC_CLIENT_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_rpc_client_exception_caller(
-    f: NewRpcClientExceptionCaller,
-) {
-    NEW_RPC_CLIENT_EXCEPTION_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewMediaStateTransitionExceptionCaller`] as
-/// [`NEW_MEDIA_STATE_TRANSITION_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_media_state_transition_exception_caller(
-    f: NewMediaStateTransitionExceptionCaller,
-) {
-    NEW_MEDIA_STATE_TRANSITION_EXCEPTION_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewInternalExceptionCaller`] as
-/// [`NEW_INTERNAL_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_internal_exception_caller(
-    f: NewInternalExceptionCaller,
-) {
-    NEW_INTERNAL_EXCEPTION_CALLER = Some(f);
-}
-
-/// Registers the provided [`NewMediaSettingsUpdateExceptionCaller`] as
-/// [`NEW_MEDIA_SETTINGS_UPDATE_EXCEPTION_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_new_media_settings_update_exception_caller(
-    f: NewMediaSettingsUpdateExceptionCaller,
-) {
-    NEW_MEDIA_SETTINGS_UPDATE_EXCEPTION_CALLER = Some(f);
+        /// Returns a new Dart [`MediaSettingsUpdateException`] with the
+        /// provided error `message`, `cause` and `rolled_back` property.
+        pub fn new_media_settings_update_exception(
+            message: ptr::NonNull<c_char>,
+            cause: DartError,
+            rolled_back: i8,
+        ) -> Dart_Handle;
+    }
 }
 
 /// An error that can be returned from Rust to Dart.
@@ -329,7 +161,7 @@ impl<T: Into<DartValue>> From<ArgumentError<T>> for DartError {
     #[inline]
     fn from(err: ArgumentError<T>) -> Self {
         unsafe {
-            Self::new(NEW_ARGUMENT_ERROR_CALLER.unwrap()(
+            Self::new(exception::new_argument_error(
                 err.val.into(),
                 string_into_c_str(err.name.to_owned()),
                 string_into_c_str(err.message.into_owned()),
@@ -342,7 +174,7 @@ impl From<StateError> for DartError {
     #[inline]
     fn from(err: StateError) -> Self {
         unsafe {
-            Self::new(NEW_STATE_ERROR_CALLER.unwrap()(string_into_c_str(
+            Self::new(exception::new_state_error(string_into_c_str(
                 err.message(),
             )))
         }
@@ -353,8 +185,8 @@ impl From<LocalMediaInitException> for DartError {
     #[inline]
     fn from(err: LocalMediaInitException) -> Self {
         unsafe {
-            Self::new(NEW_LOCAL_MEDIA_INIT_EXCEPTION_CALLER.unwrap()(
-                err.kind(),
+            Self::new(exception::new_local_media_init_exception(
+                err.kind() as i64,
                 string_into_c_str(err.message()),
                 err.cause().map(DartError::from).into(),
                 string_into_c_str(err.trace()),
@@ -367,7 +199,7 @@ impl From<EnumerateDevicesException> for DartError {
     #[inline]
     fn from(err: EnumerateDevicesException) -> Self {
         unsafe {
-            Self::new(NEW_ENUMERATE_DEVICES_EXCEPTION_CALLER.unwrap()(
+            Self::new(exception::new_enumerate_devices_exception(
                 err.cause().into(),
                 string_into_c_str(err.trace()),
             ))
@@ -379,7 +211,7 @@ impl From<FormatException> for DartError {
     #[inline]
     fn from(err: FormatException) -> Self {
         unsafe {
-            Self::new(NEW_FORMAT_EXCEPTION_CALLER.unwrap()(string_into_c_str(
+            Self::new(exception::new_format_exception(string_into_c_str(
                 err.message(),
             )))
         }
@@ -390,8 +222,8 @@ impl From<RpcClientException> for DartError {
     #[inline]
     fn from(err: RpcClientException) -> Self {
         unsafe {
-            Self::new(NEW_RPC_CLIENT_EXCEPTION_CALLER.unwrap()(
-                err.kind(),
+            Self::new(exception::new_rpc_client_exception(
+                err.kind() as i64,
                 string_into_c_str(err.message()),
                 err.cause().map(DartError::from).into(),
                 string_into_c_str(err.trace()),
@@ -404,7 +236,7 @@ impl From<MediaStateTransitionException> for DartError {
     #[inline]
     fn from(err: MediaStateTransitionException) -> Self {
         unsafe {
-            Self::new(NEW_MEDIA_STATE_TRANSITION_EXCEPTION_CALLER.unwrap()(
+            Self::new(exception::new_media_state_transition_exception(
                 string_into_c_str(err.message()),
                 string_into_c_str(err.trace()),
             ))
@@ -416,7 +248,7 @@ impl From<InternalException> for DartError {
     #[inline]
     fn from(err: InternalException) -> Self {
         unsafe {
-            Self::new(NEW_INTERNAL_EXCEPTION_CALLER.unwrap()(
+            Self::new(exception::new_internal_exception(
                 string_into_c_str(err.message()),
                 err.cause().map(DartError::from).into(),
                 string_into_c_str(err.trace()),
@@ -429,10 +261,10 @@ impl From<MediaSettingsUpdateException> for DartError {
     #[inline]
     fn from(err: MediaSettingsUpdateException) -> Self {
         unsafe {
-            Self::new(NEW_MEDIA_SETTINGS_UPDATE_EXCEPTION_CALLER.unwrap()(
+            Self::new(exception::new_media_settings_update_exception(
                 string_into_c_str(err.message()),
                 err.cause(),
-                err.rolled_back() as u8,
+                err.rolled_back() as i8,
             ))
         }
     }

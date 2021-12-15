@@ -73,6 +73,7 @@ async fn disable_enable_audio() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -120,6 +121,7 @@ async fn disable_enable_video() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -163,6 +165,7 @@ async fn new_with_disable_audio() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -188,6 +191,7 @@ async fn new_with_disable_video() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -223,6 +227,7 @@ async fn add_candidates_to_answerer_before_offer() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -242,6 +247,7 @@ async fn add_candidates_to_answerer_before_offer() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -278,6 +284,7 @@ async fn add_candidates_to_offerer_before_answer() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -296,6 +303,7 @@ async fn add_candidates_to_offerer_before_answer() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -339,6 +347,7 @@ async fn normal_exchange_of_candidates() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -357,6 +366,7 @@ async fn normal_exchange_of_candidates() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -427,6 +437,7 @@ async fn send_event_on_new_local_stream() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -467,6 +478,7 @@ async fn ice_connection_state_changed_is_emitted() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -491,6 +503,7 @@ async fn ice_connection_state_changed_is_emitted() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -594,6 +607,7 @@ impl InterconnectedPeers {
                 Rc::new(Connections::default()),
                 Rc::new(RecvConstraints::default()),
             )
+            .await
             .unwrap(),
             Rc::new(pc1_state),
         );
@@ -618,6 +632,7 @@ impl InterconnectedPeers {
                 Rc::new(Connections::default()),
                 Rc::new(RecvConstraints::default()),
             )
+            .await
             .unwrap(),
             Rc::new(pc2_state),
         );
@@ -853,6 +868,7 @@ mod peer_stats_caching {
                 Rc::new(Connections::default()),
                 Rc::new(RecvConstraints::default()),
             )
+            .await
             .unwrap(),
             Rc::new(peer_state),
         );
@@ -903,6 +919,7 @@ mod peer_stats_caching {
                 Rc::new(Connections::default()),
                 Rc::new(RecvConstraints::default()),
             )
+            .await
             .unwrap(),
             Rc::new(peer_state),
         );
@@ -955,6 +972,7 @@ mod peer_stats_caching {
                 Rc::new(Connections::default()),
                 Rc::new(RecvConstraints::default()),
             )
+            .await
             .unwrap(),
             Rc::new(peer_state),
         );
@@ -1021,6 +1039,7 @@ async fn reset_transition_timers() {
             Rc::new(Connections::default()),
             recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -1107,6 +1126,7 @@ async fn new_remote_track() {
                 Rc::new(Connections::default()),
                 Rc::new(RecvConstraints::default()),
             )
+            .await
             .unwrap(),
             Rc::new(sender_peer_state),
         );
@@ -1141,6 +1161,7 @@ async fn new_remote_track() {
                 Rc::new(Connections::default()),
                 Rc::new(rcv_caps),
             )
+            .await
             .unwrap(),
             Rc::new(rcvr_peer_state),
         );
@@ -1405,6 +1426,7 @@ async fn disable_and_enable_all_tracks() {
             Rc::new(Connections::default()),
             Rc::new(RecvConstraints::default()),
         )
+        .await
         .unwrap(),
         Rc::new(pc_state),
     );

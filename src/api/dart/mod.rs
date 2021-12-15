@@ -30,7 +30,7 @@ use libc::c_char;
 
 use crate::{
     api::dart::utils::{DartError, PtrArray},
-    media::MediaSourceKind,
+    media::{FacingMode, MediaKind, MediaSourceKind},
     platform::utils::handle::DartHandle,
 };
 
@@ -78,6 +78,10 @@ pub trait ForeignClass: Sized {
         *Box::from_raw(this.as_ptr())
     }
 }
+
+/// Marker indicating a C-style enum which can be converted from number
+/// primitives.
+pub trait PrimitiveEnum: TryFrom<i64> {}
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
 #[derive(Debug)]
@@ -156,6 +160,15 @@ impl From<Option<String>> for DartValue {
         match val {
             None => Self::None,
             Some(string) => Self::from(string),
+        }
+    }
+}
+
+impl From<Option<i64>> for DartValue {
+    fn from(val: Option<i64>) -> Self {
+        match val {
+            None => Self::None,
+            Some(i) => Self::from(i),
         }
     }
 }
@@ -292,6 +305,39 @@ impl TryFrom<DartValueArg<String>> for String {
     }
 }
 
+impl TryFrom<DartValueArg<()>> for () {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<()>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(()),
+            _ => Err(DartValueCastError {
+                expectation: "()",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Option<DartHandle>>> for Option<DartHandle> {
+    type Error = DartValueCastError;
+
+    fn try_from(
+        value: DartValueArg<Option<DartHandle>>,
+    ) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Handle(handle) => {
+                Ok(Some(DartHandle::new(unsafe { *handle.as_ptr() })))
+            }
+            _ => Err(DartValueCastError {
+                expectation: "Option<DartHandle>",
+                value: value.0,
+            }),
+        }
+    }
+}
+
 impl TryFrom<DartValueArg<Option<String>>> for Option<String> {
     type Error = DartValueCastError;
 
@@ -370,7 +416,67 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<Dart_Handle>> {
     }
 }
 
-impl<T> TryFrom<DartValueArg<T>> for i64 {
+macro_rules! impl_primitive_dart_value_try_from {
+    ($arg:ty) => {
+        impl TryFrom<DartValueArg<$arg>> for $arg {
+            type Error = DartValueCastError;
+
+            fn try_from(
+                value: DartValueArg<$arg>,
+            ) -> Result<Self, Self::Error> {
+                match value.0 {
+                    DartValue::Int(num) => {
+                        Ok(<$arg>::try_from(num).map_err(
+                            |_| DartValueCastError {
+                                expectation: stringify!($arg),
+                                value: value.0,
+                            }
+                        )?)
+                    }
+                    _ => Err(DartValueCastError {
+                        expectation: stringify!($arg),
+                        value: value.0,
+                    }),
+                }
+            }
+        }
+
+        impl TryFrom<DartValueArg<Option<$arg>>> for Option<$arg> {
+            type Error = DartValueCastError;
+
+            fn try_from(
+                value: DartValueArg<Option<$arg>>
+            ) -> Result<Self, Self::Error> {
+                match value.0 {
+                    DartValue::None => Ok(None),
+                    DartValue::Int(num) => {
+                        Ok(Some(<$arg>::try_from(num).map_err(
+                            |_| DartValueCastError {
+                                expectation: concat!(
+                                    "Option<",
+                                    stringify!($arg),
+                                    ">"
+                                ),
+                                value: value.0,
+                            }
+                        )?))
+                    }
+                    _ => Err(DartValueCastError {
+                        expectation: concat!("Option<", stringify!($arg), ">"),
+                        value: value.0,
+                    }),
+                }
+            }
+        }
+    };
+    ($($arg:ty),*) => {
+        $(impl_primitive_dart_value_try_from!($arg);)+
+    }
+}
+
+impl_primitive_dart_value_try_from![i8, i16, i32, i64, u8, u16, u32];
+
+impl<T: PrimitiveEnum> TryFrom<DartValueArg<T>> for i64 {
     type Error = DartValueCastError;
 
     fn try_from(value: DartValueArg<T>) -> Result<Self, Self::Error> {
@@ -384,13 +490,19 @@ impl<T> TryFrom<DartValueArg<T>> for i64 {
     }
 }
 
-impl<T> TryFrom<DartValueArg<T>> for Option<i64> {
+impl<T: PrimitiveEnum> TryFrom<DartValueArg<Option<T>>> for Option<T> {
     type Error = DartValueCastError;
 
-    fn try_from(value: DartValueArg<T>) -> Result<Self, Self::Error> {
+    fn try_from(value: DartValueArg<Option<T>>) -> Result<Self, Self::Error> {
         match value.0 {
             DartValue::None => Ok(None),
-            DartValue::Int(num) => Ok(Some(num)),
+            DartValue::Int(num) => match T::try_from(num) {
+                Ok(variant) => Ok(Some(variant)),
+                Err(_) => Err(DartValueCastError {
+                    expectation: "Option<i64>",
+                    value: value.0,
+                }),
+            },
             _ => Err(DartValueCastError {
                 expectation: "Option<i64>",
                 value: value.0,
@@ -417,14 +529,42 @@ impl DartValueCastError {
     }
 }
 
+impl PrimitiveEnum for MediaSourceKind {}
+impl PrimitiveEnum for FacingMode {}
+
 impl TryFrom<i64> for MediaSourceKind {
     type Error = i64;
 
-    #[inline]
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         match value {
             0 => Ok(Self::Device),
             1 => Ok(Self::Display),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for FacingMode {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::User),
+            1 => Ok(Self::Environment),
+            2 => Ok(Self::Left),
+            3 => Ok(Self::Right),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for MediaKind {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Audio),
+            1 => Ok(Self::Video),
             _ => Err(value),
         }
     }
@@ -447,9 +587,17 @@ pub unsafe extern "C" fn box_dart_handle(
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 
+/// Returns a boxed pointer to the provided [`DartValue`].
+#[no_mangle]
+pub unsafe extern "C" fn box_foreign_value(
+    val: DartValue,
+) -> ptr::NonNull<DartValue> {
+    ptr::NonNull::from(Box::leak(Box::new(val)))
+}
+
 #[cfg(feature = "mockable")]
 mod dart_value_extern_tests_helpers {
-    use std::convert::TryInto;
+    use std::convert::TryInto as _;
 
     use super::*;
 

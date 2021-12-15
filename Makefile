@@ -290,16 +290,21 @@ cargo.fmt:
 	cargo +nightly fmt --all $(if $(call eq,$(check),yes),-- --check,)
 
 
-# Generate Rust sources with Cargo's build.rs script.
+# Generate sources using Cargo.
 #
 # Usage:
-#	make cargo.gen crate=medea-control-api-proto
+#	make cargo.gen [crate=(medea-control-api-proto|medea-jason)]
 
 cargo.gen:
 ifeq ($(crate),medea-control-api-proto)
 	@rm -rf $(crate-dir)/src/grpc/api*.rs
 	cd $(crate-dir)/ && \
 	cargo build
+endif
+ifeq ($(crate),medea-jason)
+	cargo clean -p $(crate)
+	make cargo.build.jason platform=android args="--features dart-codegen"
+	make flutter.fmt
 endif
 
 
