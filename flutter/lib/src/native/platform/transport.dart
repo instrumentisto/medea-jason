@@ -31,7 +31,7 @@ void listenWs(IOWebSocketChannel ws, Function onMessage, Function onClose) {
       onMessage(msg);
     }
   }, onDone: () {
-    //onClose();
+    onClose();
   });
 }
 
