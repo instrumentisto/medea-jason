@@ -2,23 +2,17 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:web_socket_channel/io.dart';
 
+import 'transport.g.dart' as bridge;
+
 /// Registers functions allowing Rust to manage Dart [IOWebSocketChannel]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_WebSocketRpcTransport__new')(
-      Pointer.fromFunction<Handle Function(Pointer<Utf8>)>(newWs));
-
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_WebSocketRpcTransport__listen_ws')(
-      Pointer.fromFunction<Void Function(Handle, Handle, Handle)>(listenWs));
-
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_WebSocketRpcTransport__send')(
-      Pointer.fromFunction<Void Function(Handle, Pointer<Utf8>)>(sendWsMsg));
-
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_WebSocketRpcTransport__close')(
-      Pointer.fromFunction<Void Function(Handle, Int32, Pointer<Utf8>)>(close));
+  bridge.registerFunction(
+    dl,
+    init: Pointer.fromFunction(newWs),
+    onMessage: Pointer.fromFunction(listenWs),
+    send: Pointer.fromFunction(sendWsMsg),
+    close: Pointer.fromFunction(close),
+  );
 }
 
 void close(IOWebSocketChannel ws, int closeCode, Pointer<Utf8> msg) {

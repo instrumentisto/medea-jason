@@ -1,17 +1,15 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+import 'media_devices.g.dart' as bridge;
 
 /// Registers functions allowing Rust to manage Dart [MediaDevices]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaDevices__get_user_media')(
-      Pointer.fromFunction<Handle Function(Handle)>(getUserMedia));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaDevices__enumerate_devices')(
-      Pointer.fromFunction<Handle Function()>(enumerateDevices));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaDevices__get_display_media')(
-      Pointer.fromFunction<Handle Function(Handle)>(getDisplayMedia));
+  bridge.registerFunction(
+    dl,
+    enumerateDevices: Pointer.fromFunction(enumerateDevices),
+    getUserMedia: Pointer.fromFunction(getUserMedia),
+    getDisplayMedia: Pointer.fromFunction(getDisplayMedia),
+  );
 }
 
 /// Calls `getUserMedia` and returns created [MediaStreamTrack]s.

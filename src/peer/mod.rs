@@ -1059,7 +1059,6 @@ impl Drop for PeerConnection {
     /// Drops `on_track` and `on_ice_candidate` callbacks to prevent possible
     /// leaks.
     fn drop(&mut self) {
-        log::debug!("Drop PeerConnection");
         self.peer.on_track::<Box<
             dyn FnMut(platform::MediaStreamTrack, platform::Transceiver),
         >>(None);

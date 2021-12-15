@@ -2,6 +2,7 @@
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
+use medea_macro::dart_bridge;
 
 use crate::{
     media::{
@@ -12,32 +13,28 @@ use crate::{
     platform::dart::utils::{handle::DartHandle, map::DartMap},
 };
 
-/// Pointer to an extern function that returns a [`Dart_Handle`] to a new Dart
-/// `MediaTrackConstraints`.
-type NewFunction = extern "C" fn() -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/platform/constraints.g.dart")]
+mod constraints {
+    use dart_sys::Dart_Handle;
 
-/// Pointer to an extern function that audio constraints of Dart
-/// `MediaTrackConstraints`.
-type AudioFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+    extern "C" {
+        /// Creates new [`MediaStreamConstraints`] with none constraints
+        /// configured.
+        pub fn init() -> Dart_Handle;
 
-/// Pointer to an extern function that video constraints of Dart
-/// `MediaTrackConstraints`.
-type VideoFunction = extern "C" fn(Dart_Handle, Dart_Handle);
+        /// Specifies the nature and settings of the `audio`
+        /// [MediaStreamTrack][1].
+        ///
+        /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+        pub fn audio(constraints: Dart_Handle, audio_cons: Dart_Handle);
 
-/// Stores pointer to the [`NewFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_FUNCTION: Option<NewFunction> = None;
-
-/// Stores pointer to the [`AudioFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut AUDIO_FUNCTION: Option<AudioFunction> = None;
-
-/// Stores pointer to the [`VideoFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut VIDEO_FUNCTION: Option<VideoFunction> = None;
+        /// Specifies the nature and settings of the `video`
+        /// [MediaStreamTrack][1].
+        ///
+        /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+        pub fn video(constraints: Dart_Handle, video_cons: Dart_Handle);
+    }
+}
 
 /// [MediaTrackConstraints][1] wrapper.
 ///
@@ -48,40 +45,6 @@ impl From<MediaTrackConstraints> for Dart_Handle {
     fn from(from: MediaTrackConstraints) -> Self {
         from.0.into()
     }
-}
-
-/// Registers the provided [`NewFunction`] as [`NEW_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamConstraints__new(f: NewFunction) {
-    NEW_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`AudioFunction`] as [`AUDIO_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamConstraints__set_audio(
-    f: AudioFunction,
-) {
-    AUDIO_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`VideoFunction`] as [`VIDEO_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_MediaStreamConstraints__set_video(
-    f: VideoFunction,
-) {
-    VIDEO_FUNCTION = Some(f);
 }
 
 /// [MediaStreamConstraints][1] wrapper.
@@ -100,7 +63,7 @@ impl MediaStreamConstraints {
     /// Creates new [`MediaStreamConstraints`] with none constraints configured.
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(NEW_FUNCTION.unwrap()())) }
+        unsafe { Self(DartHandle::new(constraints::init())) }
     }
 
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
@@ -108,7 +71,7 @@ impl MediaStreamConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
         unsafe {
-            AUDIO_FUNCTION.unwrap()(
+            constraints::audio(
                 self.0.get(),
                 MediaTrackConstraints::from(audio).into(),
             );
@@ -120,7 +83,7 @@ impl MediaStreamConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
         unsafe {
-            VIDEO_FUNCTION.unwrap()(
+            constraints::video(
                 self.0.get(),
                 MediaTrackConstraints::from(video).into(),
             );
@@ -160,7 +123,7 @@ impl DisplayMediaStreamConstraints {
     #[inline]
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(NEW_FUNCTION.unwrap()())) }
+        unsafe { Self(DartHandle::new(constraints::init())) }
     }
 
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
@@ -169,7 +132,7 @@ impl DisplayMediaStreamConstraints {
     #[inline]
     pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
         unsafe {
-            VIDEO_FUNCTION.unwrap()(
+            constraints::video(
                 self.0.get(),
                 MediaTrackConstraints::from(video).into(),
             );
@@ -222,7 +185,7 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                     ideal_cons.set("sourceId".to_string(), device_id.into());
                 }
                 ConstrainString::Ideal(device_id) => {
-                    ideal_cons.set("sourceId".to_string(), device_id.into());
+                    exact_cons.set("sourceId".to_string(), device_id.into());
                 }
             }
         }

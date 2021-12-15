@@ -31,12 +31,12 @@ use libc::c_char;
 use crate::{
     api::dart::utils::{DartError, PtrArray},
     media::{FacingMode, MediaKind, MediaSourceKind},
-    platform::utils::handle::DartHandle,
     platform::utils::{
         dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
             Dart_NewPersistentHandle_DL_Trampolined,
         },
+        handle::DartHandle,
     },
 };
 

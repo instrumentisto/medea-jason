@@ -2,90 +2,47 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams/#device-info
 
-use std::convert::{TryFrom, TryInto};
-use std::ptr;
-
-use dart_sys::Dart_Handle;
 use derive_more::From;
+use medea_macro::dart_bridge;
+use std::convert::{TryFrom, TryInto};
 
 use crate::{
-    api::DartValueArg, media::MediaKind,
-    platform::dart::utils::handle::DartHandle,
+    media::MediaKind,
+    platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
-use crate::platform::dart::utils::NonNullDartValueArgExt;
 
-type DeviceIdFunction =
-extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
+#[dart_bridge("flutter/lib/src/native/platform/input_device_info.g.dart")]
+mod input_device_info {
+    use std::ptr;
 
-type LabelFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
+    use dart_sys::Dart_Handle;
 
-type GroupIdFunction =
-extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<String>>>;
+    use crate::api::DartValueArg;
 
-type KindFunction = extern "C" fn(Dart_Handle) -> ptr::NonNull<DartValueArg<Option<i64>>>;
+    extern "C" {
+        /// Returns unique identifier for the provided device.
+        pub fn device_id(
+            info: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-/// Stores pointer to the [`DeviceIdFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut DEVICE_ID_FUNCTION: Option<DeviceIdFunction> = None;
+        /// Returns kind of the provided device.
+        pub fn kind(
+            info: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<i64>>>;
 
-/// Stores pointer to the [`LabelFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut LABEL_FUNCTION: Option<LabelFunction> = None;
+        /// Returns label describing the provided device (for example
+        /// "External USB Webcam").
+        ///
+        /// If the device has no associated label, then returns an empty string.
+        pub fn label(
+            info: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-/// Stores pointer to the [`GroupIdFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut GROUP_ID_FUNCTION: Option<GroupIdFunction> = None;
-
-/// Stores pointer to the [`KindFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut KIND_FUNCTION: Option<KindFunction> = None;
-
-/// Registers the provided [`DeviceIdFunction`] as [`DEVICE_ID_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_InputDeviceInfo__device_id(
-    f: DeviceIdFunction,
-) {
-    DEVICE_ID_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`LabelFunction`] as [`LABEL_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_InputDeviceInfo__label(f: LabelFunction) {
-    LABEL_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`GroupIdFunction`] as [`GROUP_ID_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_InputDeviceInfo__group_id(
-    f: GroupIdFunction,
-) {
-    GROUP_ID_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`KindFunction`] as [`KIND_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_InputDeviceInfo__kind(f: KindFunction) {
-    KIND_FUNCTION = Some(f);
+        /// Returns group identifier of the provided device.
+        pub fn group_id(
+            info: Dart_Handle,
+        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+    }
 }
 
 /// Representation of [MediaDeviceInfo][1].
@@ -99,9 +56,11 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn device_id(&self) -> String {
         // Device ID should be always Some
-        Option::try_from(unsafe { DEVICE_ID_FUNCTION.unwrap()(self.0.get()).unbox() })
-            .unwrap()
-            .unwrap()
+        Option::try_from(unsafe {
+            input_device_info::device_id(self.0.get()).unbox()
+        })
+        .unwrap()
+        .unwrap()
     }
 
     /// Returns kind of the represented device.
@@ -112,11 +71,13 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         // Kind should be always Some
-        Option::<i64>::try_from(unsafe { KIND_FUNCTION.unwrap()(self.0.get()).unbox() })
-            .unwrap()
-            .unwrap()
-            .try_into()
-            .unwrap()
+        Option::<i64>::try_from(unsafe {
+            input_device_info::kind(self.0.get()).unbox()
+        })
+        .unwrap()
+        .unwrap()
+        .try_into()
+        .unwrap()
     }
 
     /// Returns label describing the represented device (for example
@@ -125,9 +86,11 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn label(&self) -> String {
         // Label should be always Some
-        Option::try_from(unsafe { LABEL_FUNCTION.unwrap()(self.0.get()).unbox() })
-            .unwrap()
-            .unwrap()
+        Option::try_from(unsafe {
+            input_device_info::label(self.0.get()).unbox()
+        })
+        .unwrap()
+        .unwrap()
     }
 
     /// Returns group identifier of the represented device.
@@ -141,8 +104,10 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn group_id(&self) -> String {
         // Group ID should be always Some
-        Option::try_from(unsafe { GROUP_ID_FUNCTION.unwrap()(self.0.get()).unbox() })
-            .unwrap()
-            .unwrap()
+        Option::try_from(unsafe {
+            input_device_info::group_id(self.0.get()).unbox()
+        })
+        .unwrap()
+        .unwrap()
     }
 }

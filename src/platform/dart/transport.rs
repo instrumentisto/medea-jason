@@ -5,9 +5,9 @@ use std::{
     rc::Rc,
 };
 
-use dart_sys::Dart_Handle;
 use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
+use medea_macro::dart_bridge;
 use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
@@ -22,64 +22,29 @@ use crate::{
 
 type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
 
-type NewFunction = extern "C" fn(ptr::NonNull<c_char>) -> Dart_Handle;
+#[dart_bridge("flutter/lib/src/native/platform/transport.g.dart")]
+mod transport {
+    use std::{os::raw::c_char, ptr};
 
-type SendFunction = extern "C" fn(Dart_Handle, ptr::NonNull<c_char>);
+    use dart_sys::Dart_Handle;
 
-type CloseFunction = extern "C" fn(Dart_Handle, i32, ptr::NonNull<c_char>);
+    extern "C" {
+        pub fn init(url: ptr::NonNull<c_char>) -> Dart_Handle;
 
-type ListenWsFunction = extern "C" fn(Dart_Handle, Dart_Handle, Dart_Handle);
+        pub fn send(transport: Dart_Handle, msg: ptr::NonNull<c_char>);
 
-/// Stores pointer to the [`NewFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut NEW_FUNCTION: Option<NewFunction> = None;
+        pub fn close(
+            transport: Dart_Handle,
+            close_code: i32,
+            msg: ptr::NonNull<c_char>,
+        );
 
-/// Stores pointer to the [`SendFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut SEND_FUNCTION: Option<SendFunction> = None;
-
-/// Stores pointer to the [`CloseFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut CLOSE_FUNCTION: Option<CloseFunction> = None;
-
-/// Stores pointer to the [`ListenWsFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut LISTEN_WS_FUNCTION: Option<ListenWsFunction> = None;
-
-/// Registers the provided [`NewFunction`] as [`NEW_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_WebSocketRpcTransport__new(f: NewFunction) {
-    NEW_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`SendFunction`] as [`SEND_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_WebSocketRpcTransport__send(f: SendFunction) {
-    SEND_FUNCTION = Some(f);
-}
-
-/// Registers the provided [`CloseFunction`] as [`CLOSE_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_WebSocketRpcTransport__close(
-    f: CloseFunction,
-) {
-    CLOSE_FUNCTION = Some(f);
+        pub fn on_message(
+            transport: Dart_Handle,
+            on_message: Dart_Handle,
+            on_close: Dart_Handle,
+        );
+    }
 }
 
 /// WebSocket [`RpcTransport`] between a client and a server.
@@ -147,13 +112,12 @@ impl WebSocketRpcTransport {
     /// fired before [WebSocket.onopen][2] callback.
     pub async fn new(url: ApiUrl) -> Result<Self> {
         unsafe {
-            let handle = NEW_FUNCTION.unwrap()(string_into_c_str(
-                url.as_ref().to_string(),
-            ));
+            let handle =
+                transport::init(string_into_c_str(url.as_ref().to_string()));
             let on_message_listeners = OnMessageListeners::new();
             let socket_state =
                 Rc::new(ObservableCell::new(TransportState::Open));
-            LISTEN_WS_FUNCTION.unwrap()(
+            transport::on_message(
                 handle,
                 Callback::from_fn_mut({
                     let on_message_listeners = on_message_listeners.clone();
@@ -184,18 +148,6 @@ impl WebSocketRpcTransport {
     }
 }
 
-/// Registers the provided [`ListenWsFunction`] as [`LISTEN_WS_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_WebSocketRpcTransport__listen_ws(
-    f: ListenWsFunction,
-) {
-    LISTEN_WS_FUNCTION = Some(f);
-}
-
 impl RpcTransport for WebSocketRpcTransport {
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg> {
         self.on_message_listeners.new_subscriber()
@@ -208,7 +160,7 @@ impl RpcTransport for WebSocketRpcTransport {
     fn send(&self, msg: &ClientMsg) -> Result<(), Traced<TransportError>> {
         let msg = serde_json::to_string(msg).unwrap();
         unsafe {
-            SEND_FUNCTION.unwrap()(self.handle.get(), string_into_c_str(msg));
+            transport::send(self.handle.get(), string_into_c_str(msg));
         }
         Ok(())
     }
@@ -223,11 +175,7 @@ impl Drop for WebSocketRpcTransport {
         let rsn = serde_json::to_string(&self.close_reason.get())
             .expect("Could not serialize close message");
         unsafe {
-            CLOSE_FUNCTION.unwrap()(
-                self.handle.get(),
-                1000,
-                string_into_c_str(rsn),
-            );
+            transport::close(self.handle.get(), 1000, string_into_c_str(rsn));
         }
     }
 }

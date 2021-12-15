@@ -3,20 +3,17 @@ import 'dart:ffi';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+import 'input_device_info.g.dart' as bridge;
+
 /// Registers functions allowing Rust to create Dart [MediaDeviceInfo]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_InputDeviceInfo__device_id')(
-      Pointer.fromFunction<Pointer Function(Handle)>(deviceId));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_InputDeviceInfo__label')(
-      Pointer.fromFunction<Pointer Function(Handle)>(label));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_InputDeviceInfo__group_id')(
-      Pointer.fromFunction<Pointer Function(Handle)>(groupId));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_InputDeviceInfo__kind')(
-      Pointer.fromFunction<Pointer Function(Handle)>(kind));
+  bridge.registerFunction(
+    dl,
+    deviceId: Pointer.fromFunction(deviceId),
+    label: Pointer.fromFunction(label),
+    groupId: Pointer.fromFunction(groupId),
+    kind: Pointer.fromFunction(kind),
+  );
 }
 
 /// Returns `deviceId` field of the provided [MediaDeviceInfo].

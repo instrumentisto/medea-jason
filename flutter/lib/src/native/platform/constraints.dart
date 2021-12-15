@@ -1,17 +1,15 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+import 'constraints.g.dart' as bridge;
 
 /// Registers functions allowing Rust to create Dart [MediaStreamConstraints]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaStreamConstraints__new')(
-      Pointer.fromFunction<Handle Function()>(constructor));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaStreamConstraints__set_audio')(
-      Pointer.fromFunction<Void Function(Handle, Handle)>(setAudio));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_MediaStreamConstraints__set_video')(
-      Pointer.fromFunction<Void Function(Handle, Handle)>(setVideo));
+  bridge.registerFunction(
+    dl,
+    init: Pointer.fromFunction(constructor),
+    audio: Pointer.fromFunction(setAudio),
+    video: Pointer.fromFunction(setVideo),
+  );
 }
 
 /// Returns empty [MediaStreamConstraints].

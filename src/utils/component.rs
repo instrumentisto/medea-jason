@@ -83,12 +83,6 @@ impl<S, O> Component<S, O> {
     }
 }
 
-impl<S, O> Drop for Component<S, O> {
-    fn drop(&mut self) {
-        log::debug!("Drop component");
-    }
-}
-
 impl<S: ComponentState<O> + 'static, O: 'static> Component<S, O> {
     /// Returns new [`Component`] with a provided object and state.
     ///
@@ -160,7 +154,6 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
     #[inline]
     #[must_use]
     fn finish(self) -> Vec<TaskHandle> {
-        log::debug!("Finish called");
         self.spawned_watchers
     }
 }

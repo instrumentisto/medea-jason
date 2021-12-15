@@ -39,7 +39,7 @@ pub use self::{
 /// TODO: Implement panic hook.
 pub fn set_panic_hook() {
     std::panic::set_hook(Box::new(|bt| {
-        log::debug!("Rust code panicked {:?}", bt);
+        log::error!("Rust code panicked {:?}", bt);
     }));
 }
 
