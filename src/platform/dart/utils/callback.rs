@@ -1,8 +1,7 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::{convert::TryInto, fmt::Debug, ptr};
-use std::{mem, os::raw::c_void, ptr};
+use std::{convert::TryInto, fmt::Debug, mem, os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
@@ -10,7 +9,7 @@ use medea_macro::dart_bridge;
 use crate::{
     api::{DartValue, DartValueArg},
     platform::dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Trampolined,
-}
+};
 
 #[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
 mod callback {
@@ -172,13 +171,13 @@ impl Callback {
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
         let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
+        let is_two_arg = matches!(&self.0, Kind::TwoArgFnMut(_));
         unsafe {
             let f = ptr::NonNull::from(Box::leak(Box::new(self)));
-            let handle = match &self.0 {
-                Kind::TwoArgFnMut(_) => callback::call_two_arg_proxy(f),
-                Kind::Fn(_) | Kind::FnOnce(_) | Kind::FnMut(_) => {
-                    callback::call_proxy(f)
-                }
+            let handle = if is_two_arg {
+                callback::call_two_arg_proxy(f)
+            } else {
+                callback::call_proxy(f)
             };
             if is_finalizable {
                 Dart_NewFinalizableHandle_DL_Trampolined(
