@@ -79,5 +79,7 @@ mod mock {
         }
 
         pub fn close_room(&self, _: RoomHandle) {}
+
+        pub fn dispose(self) {}
     }
 }
