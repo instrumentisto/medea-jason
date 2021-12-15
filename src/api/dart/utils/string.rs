@@ -52,7 +52,7 @@ pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
 /// Same as for [`CString::from_raw()`].
 #[no_mangle]
 pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
-    CString::from_raw(s.as_ptr());
+    drop(CString::from_raw(s.as_ptr()));
 }
 
 /// Registers the provided [`FreeDartNativeStringFunction`] as
