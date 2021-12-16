@@ -165,9 +165,7 @@ impl Callback {
 
     /// Converts this [`Callback`] into a [`Dart_Handle`], so it can be passed
     /// to Dart.
-    ///
-    /// [`Callback`] object is leaked and should be freed manually.
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    #[allow(clippy::cast_possible_wrap)]
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
         let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
@@ -183,7 +181,7 @@ impl Callback {
                 Dart_NewFinalizableHandle_DL_Trampolined(
                     handle,
                     f.as_ptr().cast::<c_void>(),
-                    mem::size_of::<*mut c_void>() as i32,
+                    mem::size_of::<Callback>() as libc::intptr_t,
                     callback_finalizer,
                 );
             }

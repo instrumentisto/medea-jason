@@ -76,7 +76,7 @@ extern "C" {
     pub fn Dart_NewFinalizableHandle_DL_Trampolined(
         object: Dart_Handle,
         peer: *mut c_void,
-        external_allocation_size: i32,
+        external_allocation_size: libc::intptr_t,
         callback: extern "C" fn(*mut c_void, *mut c_void),
     ) -> Dart_Handle;
 }
