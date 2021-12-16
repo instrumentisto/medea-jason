@@ -137,7 +137,6 @@ impl WebDriverClient {
 #[derive(Clone, Debug)]
 pub struct WebDriverClientBuilder<'a> {
     webdriver_address: &'a str,
-    file_server_host: String,
     headless_firefox: bool,
     headless_chrome: bool,
 }
@@ -145,10 +144,9 @@ pub struct WebDriverClientBuilder<'a> {
 impl<'a> WebDriverClientBuilder<'a> {
     /// Creates new [`WebDriverClientBuilder`].
     #[must_use]
-    pub fn new(webdriver_address: &'a str, file_server_host: &str) -> Self {
+    pub fn new(webdriver_address: &'a str) -> Self {
         Self {
             webdriver_address,
-            file_server_host: file_server_host.to_owned(),
             headless_firefox: false,
             headless_chrome: false,
         }
