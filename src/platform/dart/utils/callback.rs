@@ -177,6 +177,7 @@ impl Callback {
             } else {
                 callback::call_proxy(f)
             };
+
             if is_finalizable {
                 Dart_NewFinalizableHandle_DL_Trampolined(
                     handle,
