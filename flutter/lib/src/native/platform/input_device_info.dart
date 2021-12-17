@@ -38,10 +38,9 @@ Pointer _groupId(MediaDeviceInfo deviceInfo) {
 /// Returns `kind` field of the provided [MediaDeviceInfo].
 Pointer _kind(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.kind != null) {
-    if (deviceInfo.kind!.contains('audio')) {
-      // TODO: audioinput / audiooutput?
+    if (deviceInfo.kind == 'audioinput') {
       return ForeignValue.fromInt(0).intoRustOwned();
-    } else if (deviceInfo.kind!.contains('video')) {
+    } else if (deviceInfo.kind == 'videoinput') {
       return ForeignValue.fromInt(1).intoRustOwned();
     } else {
       throw Exception('Unknown MediaKind: ${deviceInfo.kind}');
