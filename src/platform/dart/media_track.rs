@@ -50,13 +50,13 @@ mod media_stream_track {
 
         /// Sets `enabled` field of the provided [`MediaStreamTrack`] to the
         /// provided [`bool`].
-        pub fn set_enabled(track: Dart_Handle, is_enabled: i32);
+        pub fn set_enabled(track: Dart_Handle, is_enabled: bool);
 
         /// Stops provided [`MediaStreamTrack`].
         pub fn stop(track: Dart_Handle);
 
         /// Returns `enabled` field of the provided [`MediaStreamTrack`].
-        pub fn enabled(track: Dart_Handle) -> i64;
+        pub fn enabled(track: Dart_Handle) -> bool;
 
         /// Returns kind of the provided [`MediaStreamTrack`].
         pub fn kind(track: Dart_Handle) -> i64;
@@ -176,7 +176,7 @@ impl MediaStreamTrack {
     #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         unsafe {
-            media_stream_track::set_enabled(self.0.get(), enabled as i32);
+            media_stream_track::set_enabled(self.0.get(), enabled);
         }
     }
 
@@ -201,7 +201,7 @@ impl MediaStreamTrack {
     #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
-        unsafe { media_stream_track::enabled(self.0.get()) == 1 }
+        unsafe { media_stream_track::enabled(self.0.get()) }
     }
 
     /// Detects whether a video track captured from display searching

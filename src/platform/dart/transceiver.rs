@@ -53,8 +53,9 @@ mod transceiver {
 
         /// Returns stopped status of the provided [`Transceiver`].
         pub fn is_stopped(
+            // TODO: remove is_stopped
             transceiver: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<i8>>;
+        ) -> ptr::NonNull<DartValueArg<bool>>;
 
         /// Sets `enabled` field of `Send` [`MediaStreamTrack`] of the provided
         /// [`Transceiver`].
@@ -67,7 +68,7 @@ mod transceiver {
 
         /// Returns `1` if the provided [`Transceiver`] has `Send`
         /// [`MediaStreamTrack`].
-        pub fn has_send_track(transceiver: Dart_Handle) -> i8;
+        pub fn has_send_track(transceiver: Dart_Handle) -> bool;
 
         /// Sets `direction` of this [`Transceiver`].
         pub fn set_direction(
@@ -180,7 +181,7 @@ impl Transceiver {
     /// Indicates whether this [`Transceiver`] has [`local::Track`].
     #[must_use]
     pub fn has_send_track(&self) -> bool {
-        unsafe { transceiver::has_send_track(self.transceiver.get()) == 1 }
+        unsafe { transceiver::has_send_track(self.transceiver.get()) }
     }
 
     /// Sets the underlying [`local::Track`]'s `enabled` field to the provided
@@ -205,9 +206,9 @@ impl Transceiver {
     /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        let val =
-            unsafe { transceiver::is_stopped(self.transceiver.get()).unbox() };
-        i8::try_from(val).unwrap() == 1
+        // TODO: stopped is deprecated, remove
+        unsafe { transceiver::is_stopped(self.transceiver.get()).unbox() }
+            .unwrap()
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].

@@ -53,6 +53,13 @@ pub(crate) enum DartType {
     /// [Int64]: https://api.dart.dev/stable/dart-ffi/Int64-class.html
     Int64,
 
+    /// Boolean value.
+    ///
+    /// Represents [Bool] on the Dart side.
+    ///
+    /// [Bool]: https://api.dart.dev/stable/dart-ffi/Bool-class.html
+    Bool,
+
     /// Pointer to the Rust structure.
     ///
     /// Represents [Pointer] on the Dart side.

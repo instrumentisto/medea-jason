@@ -303,6 +303,7 @@ impl Sender {
 impl Drop for Sender {
     fn drop(&mut self) {
         if !self.transceiver.is_stopped() {
+            // TODO: sub SEND if has SEND
             let transceiver = self.transceiver.clone();
             platform::spawn(async move {
                 transceiver

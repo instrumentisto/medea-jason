@@ -9,25 +9,25 @@ import 'input_device_info.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    deviceId: Pointer.fromFunction(deviceId),
-    label: Pointer.fromFunction(label),
-    groupId: Pointer.fromFunction(groupId),
-    kind: Pointer.fromFunction(kind),
+    deviceId: Pointer.fromFunction(_deviceId),
+    label: Pointer.fromFunction(_label),
+    groupId: Pointer.fromFunction(_groupId),
+    kind: Pointer.fromFunction(_kind),
   );
 }
 
 /// Returns `deviceId` field of the provided [MediaDeviceInfo].
-Pointer deviceId(MediaDeviceInfo deviceInfo) {
+Pointer _deviceId(MediaDeviceInfo deviceInfo) {
   return ForeignValue.fromString(deviceInfo.deviceId).intoRustOwned();
 }
 
 /// Returns `label` field of the provided [MediaDeviceInfo].
-Pointer label(MediaDeviceInfo deviceInfo) {
+Pointer _label(MediaDeviceInfo deviceInfo) {
   return ForeignValue.fromString(deviceInfo.label).intoRustOwned();
 }
 
 /// Returns `groupId` field of the provided [MediaDeviceInfo].
-Pointer groupId(MediaDeviceInfo deviceInfo) {
+Pointer _groupId(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.groupId != null) {
     return ForeignValue.fromString(deviceInfo.groupId!).intoRustOwned();
   } else {
@@ -36,9 +36,9 @@ Pointer groupId(MediaDeviceInfo deviceInfo) {
 }
 
 /// Returns `kind` field of the provided [MediaDeviceInfo].
-Pointer kind(MediaDeviceInfo deviceInfo) {
+Pointer _kind(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.kind != null) {
-    if (deviceInfo.kind!.contains('audio')) {
+    if (deviceInfo.kind!.contains('audio')) { // TODO: audioinput / audiooutput?
       return ForeignValue.fromInt(0).intoRustOwned();
     } else if (deviceInfo.kind!.contains('video')) {
       return ForeignValue.fromInt(1).intoRustOwned();

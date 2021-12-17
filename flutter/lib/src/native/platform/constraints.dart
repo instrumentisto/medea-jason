@@ -6,23 +6,23 @@ import 'constraints.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(constructor),
-    audio: Pointer.fromFunction(setAudio),
-    video: Pointer.fromFunction(setVideo),
+    init: Pointer.fromFunction(_new),
+    audio: Pointer.fromFunction(_setAudio),
+    video: Pointer.fromFunction(_setVideo),
   );
 }
 
 /// Returns empty [MediaStreamConstraints].
-Object constructor() {
+Object _new() {
   return MediaStreamConstraints();
 }
 
 /// Sets `audio` field of the provided [MediaStreamConstraints].
-void setAudio(MediaStreamConstraints cons, Object val) {
+void _setAudio(MediaStreamConstraints cons, Object val) {
   cons.audio = val;
 }
 
 /// Sets `video` field of the provided [MediaStreamConstraints].
-void setVideo(MediaStreamConstraints cons, Object val) {
+void _setVideo(MediaStreamConstraints cons, Object val) {
   cons.video = val;
 }

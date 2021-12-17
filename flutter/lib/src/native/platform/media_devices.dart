@@ -6,14 +6,14 @@ import 'media_devices.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    enumerateDevices: Pointer.fromFunction(enumerateDevices),
-    getUserMedia: Pointer.fromFunction(getUserMedia),
-    getDisplayMedia: Pointer.fromFunction(getDisplayMedia),
+    enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+    getUserMedia: Pointer.fromFunction(_getUserMedia),
+    getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
   );
 }
 
 /// Calls `getUserMedia` and returns created [MediaStreamTrack]s.
-Object getUserMedia(MediaStreamConstraints constraints) {
+Object _getUserMedia(MediaStreamConstraints constraints) {
   return () async {
     var videoConstraints = {};
     if (constraints.video != null && constraints.video['video'] != null) {
@@ -32,11 +32,11 @@ Object getUserMedia(MediaStreamConstraints constraints) {
 }
 
 /// Returns all available devices.
-Object enumerateDevices() {
+Object _enumerateDevices() {
   return () => navigator.mediaDevices.enumerateDevices();
 }
 
 /// Calls `getDisplayMedia` and returns created [MediaStreamTrack]s.
-Object getDisplayMedia(Map<String, dynamic> constraints) {
+Object _getDisplayMedia(Map<String, dynamic> constraints) {
   return () => navigator.mediaDevices.getDisplayMedia(constraints);
 }

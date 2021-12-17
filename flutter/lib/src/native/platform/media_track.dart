@@ -47,7 +47,7 @@ void _onEnded(MediaStreamTrack track, Function f) {
 
 /// Returns device ID of the provided [MediaStreamTrack].
 Pointer _deviceId(MediaStreamTrack track) {
-  final id = track.deviceId();
+  final id = track.deviceId(); // TODO: return String instead of String?
   if (id == null) {
     return ForeignValue.none().intoRustOwned();
   } else {
@@ -79,8 +79,8 @@ Pointer _width(MediaStreamTrack track) {
 }
 
 /// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].
-void _setEnabled(MediaStreamTrack track, int enabled) {
-  track.enabled = enabled == 1;
+void _setEnabled(MediaStreamTrack track, bool enabled) {
+  track.enabled = enabled;
 }
 
 /// Stops provided [MediaStreamTrack].
