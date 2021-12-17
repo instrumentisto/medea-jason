@@ -14,9 +14,8 @@ void registerFunctions(DynamicLibrary dl) {
     getSendTrack: Pointer.fromFunction(_getSendTrack),
     setSendTrackEnabled: Pointer.fromFunction(_setSendTrackEnabled),
     dropSender: Pointer.fromFunction(_dropSender),
-    isStopped: Pointer.fromFunction(_isStopped),
     mid: Pointer.fromFunction(_mid),
-    hasSendTrack: Pointer.fromFunction(_hasSendTrack, 0),
+    hasSendTrack: Pointer.fromFunction(_hasSendTrack, false),
     setDirection: Pointer.fromFunction(_setDirection),
   );
 }
@@ -53,12 +52,8 @@ Pointer _getSendTrack(RTCRtpTransceiver transceiver) {
 
 /// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender]
 /// has some [MediaStreamTrack].
-int _hasSendTrack(RTCRtpTransceiver transceiver) {
-  if (transceiver.sender.track == null) {
-    return 0;
-  } else {
-    return 1;
-  }
+bool _hasSendTrack(RTCRtpTransceiver transceiver) {
+  return transceiver.sender.track != null;
 }
 
 /// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
@@ -70,9 +65,9 @@ Object _replaceSendTrack(
 
 /// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of
 /// the provided [RTCRtpTransceiver].
-void _setSendTrackEnabled(RTCRtpTransceiver transceiver, int enabled) {
+void _setSendTrackEnabled(RTCRtpTransceiver transceiver, bool enabled) {
   if (transceiver.sender.track != null) {
-    transceiver.sender.track!.enabled = enabled == 1;
+    transceiver.sender.track!.enabled = enabled;
   }
 }
 
@@ -83,18 +78,5 @@ Object _dropSender(RTCRtpTransceiver transceiver) {
     return () => Future.value();
   } else {
     return () => transceiver.sender.track!.stop();
-  }
-}
-
-/// Returns `1` if [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is stopped.
-///
-/// Returns [ForeignValue.none] if [RTCRtpTransceiver.sender] is `null`.
-Pointer _isStopped(RTCRtpTransceiver transceiver) {
-  if (transceiver.sender.track != null &&
-      transceiver.sender.track!.muted != null) {
-    return ForeignValue.fromInt(transceiver.sender.track!.muted! ? 1 : 0)
-        .intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
   }
 }

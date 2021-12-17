@@ -16,7 +16,7 @@ void registerFunctions(DynamicLibrary dl) {
     height: Pointer.fromFunction(_height),
     width: Pointer.fromFunction(_width),
     setEnabled: Pointer.fromFunction(_setEnabled),
-    enabled: Pointer.fromFunction(_enabled, 0),
+    enabled: Pointer.fromFunction(_enabled, false),
     stop: Pointer.fromFunction(_stop),
     onEnded: Pointer.fromFunction(_onEnded),
     readyState: Pointer.fromFunction(_readyState, 0),
@@ -89,6 +89,6 @@ void _stop(MediaStreamTrack track) {
 }
 
 /// Returns `1` if the provided [MediaStreamTrack] is enabled and `0` otherwise.
-int _enabled(MediaStreamTrack track) {
-  return track.enabled ? 1 : 0;
+bool _enabled(MediaStreamTrack track) {
+  return track.enabled;
 }

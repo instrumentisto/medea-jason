@@ -5,7 +5,8 @@ import 'map.g.dart' as bridge;
 
 /// Registers functions allowing Rust to create Dart [Map]s.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(dl, init: Pointer.fromFunction(_init), set: Pointer.fromFunction(_set));
+  bridge.registerFunction(dl,
+      init: Pointer.fromFunction(_init), set: Pointer.fromFunction(_set));
 }
 
 /// Returns empty [Map].

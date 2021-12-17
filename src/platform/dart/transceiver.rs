@@ -50,7 +50,7 @@ mod transceiver {
 
         /// Sets `enabled` field of `Send` [`MediaStreamTrack`] of the provided
         /// [`Transceiver`].
-        pub fn set_send_track_enabled(transceiver: Dart_Handle, enabled: i32);
+        pub fn set_send_track_enabled(transceiver: Dart_Handle, enabled: bool);
 
         /// Returns MID of the provided [`Transceiver`].
         pub fn mid(
@@ -188,7 +188,7 @@ impl Transceiver {
             {
                 transceiver::set_send_track_enabled(
                     sender.get(),
-                    enabled as i32,
+                    enabled,
                 );
             }
         }

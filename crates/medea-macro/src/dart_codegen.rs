@@ -82,6 +82,7 @@ impl DartType {
     pub(crate) fn to_ffi_type(self) -> &'static str {
         match self {
             Self::Handle => "Handle",
+            Self::Bool => "Bool",
             Self::StringPointer => "Pointer<Utf8>",
             Self::HandlePointer => "Pointer<Handle>",
             Self::Int8 => "Int8",
@@ -146,6 +147,7 @@ impl TryFrom<syn::Type> for DartType {
                     "i32" => Self::Int32,
                     "i64" => Self::Int64,
                     "i8" => Self::Int8,
+                    "bool" => Self::Bool,
                     _ => {
                         return Err(syn::Error::new(
                             ty.ident.span(),
