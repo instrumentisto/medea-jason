@@ -1,15 +1,15 @@
 import 'dart:ffi';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+import 'list.g.dart' as bridge;
 
 /// Registers functions allowing Rust to create Dart [List]s.
 void registerFunctions(DynamicLibrary dl) {
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Array__get')(
-      Pointer.fromFunction<Pointer Function(Handle, Int32)>(_get));
-  dl.lookupFunction<Void Function(Pointer), void Function(Pointer)>(
-          'register_Array__length')(
-      Pointer.fromFunction<Int32 Function(Handle)>(_len, 0));
+  bridge.registerFunction(
+      dl,
+      get: Pointer.fromFunction(_get),
+      length: Pointer.fromFunction(_len, 0)
+  );
 }
 
 /// Returns [Pointer] to an object with a provided index.

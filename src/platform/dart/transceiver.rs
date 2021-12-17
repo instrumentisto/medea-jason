@@ -16,9 +16,7 @@ use crate::{
     media::track::local,
     platform,
     platform::{
-        dart::utils::{
-            dart_future::FutureFromDart, handle::DartHandle,
-        },
+        dart::utils::{dart_future::FutureFromDart, handle::DartHandle},
         TransceiverDirection,
     },
 };

@@ -1,53 +1,34 @@
 //! Definitions and implementations of the Rust side representation of the Dart
 //! side `List`s.
 
-use std::{convert::TryInto, ptr};
+use std::convert::TryInto;
 
-use dart_sys::Dart_Handle;
 use derive_more::From;
+use medea_macro::dart_bridge;
 
-use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
+use crate::platform::dart::utils::{
+    handle::DartHandle, NonNullDartValueArgExt,
+};
 
-/// Pointer to an extern function that returns element with a provided index
-/// from the provided [`Dart_Handle`] `List`.
-type GetFunction =
-    extern "C" fn(
-        Dart_Handle,
-        i32,
-    ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
+#[dart_bridge("flutter/lib/src/native/ffi/list.g.dart")]
+mod list {
+    use std::ptr;
 
-/// Stores pointer to the [`GetFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut GET_FUNCTION: Option<GetFunction> = None;
+    use dart_sys::Dart_Handle;
 
-/// Registers the provided [`GetFunction`] as
-/// [`GET_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Array__get(f: GetFunction) {
-    GET_FUNCTION = Some(f);
-}
+    use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
 
-/// Pointer to an extern function that returns length of the Dart side `List`.
-type LengthFunction = extern "C" fn(Dart_Handle) -> i32;
+    extern "C" {
+        /// Returns element with a provided index from the provided
+        /// [`Dart_Handle`] `List`.
+        pub fn get(
+            list: Dart_Handle,
+            index: i32,
+        ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
 
-/// Stores pointer to the [`LengthFunction`] extern function.
-///
-/// Must be initialized by Dart during FFI initialization phase.
-static mut LENGTH_FUNCTION: Option<LengthFunction> = None;
-
-/// Registers the provided [`LengthFunction`] as [`LENGTH_FUNCTION`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_Array__length(f: LengthFunction) {
-    LENGTH_FUNCTION = Some(f);
+        /// Returns length of the Dart side `List`.
+        pub fn length(list: Dart_Handle) -> i32;
+    }
 }
 
 /// Rust side representation of the Dart side `List`s.
@@ -64,13 +45,9 @@ impl DartList {
     )]
     #[must_use]
     pub fn get(&self, i: usize) -> Option<DartHandle> {
-        unsafe {
-            *Box::from_raw(
-                GET_FUNCTION.unwrap()(self.0.get(), i as i32).as_ptr(),
-            )
-        }
-        .try_into()
-        .unwrap()
+        unsafe { list::get(self.0.get(), i as i32).unbox() }
+            .try_into()
+            .unwrap()
     }
 
     /// Returns length of the underlying Dart `List`.
@@ -81,7 +58,7 @@ impl DartList {
     )]
     #[must_use]
     pub fn length(&self) -> usize {
-        unsafe { LENGTH_FUNCTION.unwrap()(self.0.get()) as usize }
+        unsafe { list::length(self.0.get()) as usize }
     }
 }
 
