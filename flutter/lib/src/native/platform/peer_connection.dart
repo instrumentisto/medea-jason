@@ -79,6 +79,7 @@ void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
   };
 }
 
+/// Disposes provided [RTCPeerConnection].
 Object _dispose(RTCPeerConnection conn) {
   conn.dispose();
   return conn;

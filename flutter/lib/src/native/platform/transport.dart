@@ -8,24 +8,24 @@ import 'transport.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(newWs),
-    onMessage: Pointer.fromFunction(listenWs),
-    send: Pointer.fromFunction(sendWsMsg),
-    close: Pointer.fromFunction(close),
+    init: Pointer.fromFunction(_init),
+    onMessage: Pointer.fromFunction(_onMessage),
+    send: Pointer.fromFunction(_send),
+    close: Pointer.fromFunction(_close),
   );
 }
 
-void close(IOWebSocketChannel ws, int closeCode, Pointer<Utf8> msg) {
+void _close(IOWebSocketChannel ws, int closeCode, Pointer<Utf8> msg) {
   ws.sink.close(closeCode, msg.toDartString());
 }
 
 /// Connects to the provided `addr` and returns [IOWebSocketChannel] for it.
-Object newWs(Pointer<Utf8> addr) {
+Object _init(Pointer<Utf8> addr) {
   return IOWebSocketChannel.connect(Uri.parse(addr.toDartString()));
 }
 
 /// Subscribes on [IOWebSocketChannel.stream] with provided `onMessage` [Function] and `onClose` [Function].
-void listenWs(IOWebSocketChannel ws, Function onMessage, Function onClose) {
+void _onMessage(IOWebSocketChannel ws, Function onMessage, Function onClose) {
   ws.stream.listen((msg) {
     if (msg is String) {
       onMessage(msg);
@@ -36,7 +36,7 @@ void listenWs(IOWebSocketChannel ws, Function onMessage, Function onClose) {
 }
 
 /// Sends provided `msg` to the provided [IOWebSocketChannel].
-void sendWsMsg(IOWebSocketChannel ws, Pointer<Utf8> msg) {
+void _send(IOWebSocketChannel ws, Pointer<Utf8> msg) {
   var sendMsg = msg.toDartString();
   ws.sink.add(sendMsg);
 }
