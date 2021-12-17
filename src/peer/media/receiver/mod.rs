@@ -21,6 +21,7 @@ use super::TransceiverSide;
 
 #[doc(inline)]
 pub use self::component::{Component, State};
+use crate::platform::TransceiverDirection;
 
 /// Representation of a remote [`remote::Track`] that is being received from
 /// some remote peer. It may have two states: `waiting` and `receiving`.
@@ -279,13 +280,14 @@ impl Receiver {
 impl Drop for Receiver {
     fn drop(&mut self) {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
-            if !transceiver.is_stopped() {
-                platform::spawn(async move {
+            let transceiver = transceiver.clone();
+            platform::spawn(async move {
+                if transceiver.has_direction(TransceiverDirection::RECV).await {
                     transceiver
                         .sub_direction(platform::TransceiverDirection::RECV)
                         .await;
-                });
-            }
+                }
+            });
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {
             recv_track.stop();

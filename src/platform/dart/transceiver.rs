@@ -18,7 +18,6 @@ use crate::{
     platform::{
         dart::utils::{
             dart_future::FutureFromDart, handle::DartHandle,
-            NonNullDartValueArgExt,
         },
         TransceiverDirection,
     },
@@ -50,12 +49,6 @@ mod transceiver {
 
         /// Drops `Send` [`MediaStreamTrack`] of the provided [`Transceiver`].
         pub fn drop_sender(transceiver: Dart_Handle) -> Dart_Handle;
-
-        /// Returns stopped status of the provided [`Transceiver`].
-        pub fn is_stopped(
-            // TODO: remove is_stopped
-            transceiver: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<bool>>;
 
         /// Sets `enabled` field of `Send` [`MediaStreamTrack`] of the provided
         /// [`Transceiver`].
@@ -201,14 +194,6 @@ impl Transceiver {
                 );
             }
         }
-    }
-
-    /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
-    #[must_use]
-    pub fn is_stopped(&self) -> bool {
-        // TODO: stopped is deprecated, remove
-        unsafe { transceiver::is_stopped(self.transceiver.get()).unbox() }
-            .unwrap()
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].

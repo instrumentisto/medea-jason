@@ -24,6 +24,7 @@ use super::{
 
 #[doc(inline)]
 pub use self::component::{Component, State};
+use crate::platform::TransceiverDirection;
 
 /// Errors occurring when creating a new [`Sender`].
 #[derive(Caused, Clone, Debug, Display)]
@@ -302,15 +303,14 @@ impl Sender {
 
 impl Drop for Sender {
     fn drop(&mut self) {
-        if !self.transceiver.is_stopped() {
-            // TODO: sub SEND if has SEND
-            let transceiver = self.transceiver.clone();
-            platform::spawn(async move {
+        let transceiver = self.transceiver.clone();
+        platform::spawn(async move {
+            if transceiver.has_direction(TransceiverDirection::SEND).await {
                 transceiver
                     .sub_direction(platform::TransceiverDirection::SEND)
                     .await;
                 transceiver.drop_send_track().await;
-            });
-        }
+            }
+        });
     }
 }
