@@ -186,10 +186,7 @@ impl Transceiver {
                 ))
                 .unwrap()
             {
-                transceiver::set_send_track_enabled(
-                    sender.get(),
-                    enabled,
-                );
+                transceiver::set_send_track_enabled(sender.get(), enabled);
             }
         }
     }

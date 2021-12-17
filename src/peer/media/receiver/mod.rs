@@ -280,7 +280,6 @@ impl Receiver {
 impl Drop for Receiver {
     fn drop(&mut self) {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
-            let transceiver = transceiver.clone();
             platform::spawn(async move {
                 if transceiver.has_direction(TransceiverDirection::RECV).await {
                     transceiver
