@@ -105,15 +105,12 @@ impl cucumber_rust::World for World {
         Ok(Self {
             room_id,
             control_client,
-            window_factory: WebDriverClientBuilder::new(
-                &conf::WEBDRIVER_ADDR,
-                &conf::FILE_SERVER_HOST,
-            )
-            .headless_firefox(*conf::HEADLESS)
-            .headless_chrome(*conf::HEADLESS)
-            .connect(&conf::FILE_SERVER_HOST)
-            .await?
-            .into(),
+            window_factory: WebDriverClientBuilder::new(&conf::WEBDRIVER_ADDR)
+                .headless_firefox(*conf::HEADLESS)
+                .headless_chrome(*conf::HEADLESS)
+                .connect(&conf::FILE_SERVER_HOST)
+                .await?
+                .into(),
             members: HashMap::new(),
             jasons: HashMap::new(),
         })

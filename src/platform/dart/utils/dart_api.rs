@@ -56,6 +56,29 @@ extern "C" {
         port_id: Dart_Port,
         message: *mut Dart_CObject,
     ) -> bool;
+
+    /// Allocates a finalizable handle for an object.
+    ///
+    /// This handle has the lifetime of the current isolate group unless the
+    /// object pointed to by the handle is garbage collected, in this case the
+    /// VM automatically deletes the handle after invoking the callback
+    /// associated with the handle.
+    ///
+    /// Once finalizable handle is collected by GC, the provided `callback` is
+    /// called.
+    ///
+    /// `peer` argument will be provided to the `callback` on finalize.
+    ///
+    /// `external_allocation_size` is a size of the `peer` which can be
+    /// calculated via [`mem::size_of()`].
+    ///
+    /// [`mem::size_of()`]: std::mem::size_of
+    pub fn Dart_NewFinalizableHandle_DL_Trampolined(
+        object: Dart_Handle,
+        peer: *mut c_void,
+        external_allocation_size: libc::intptr_t,
+        callback: extern "C" fn(*mut c_void, *mut c_void),
+    ) -> Dart_Handle;
 }
 
 /// Initializes usage of Dynamically Linked Dart API.
