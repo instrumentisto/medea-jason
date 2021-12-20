@@ -46,13 +46,8 @@ void _onEnded(MediaStreamTrack track, Function f) {
 }
 
 /// Returns device ID of the provided [MediaStreamTrack].
-Pointer _deviceId(MediaStreamTrack track) {
-  final id = track.deviceId(); // TODO: return String instead of String?
-  if (id == null) {
-    return ForeignValue.none().intoRustOwned();
-  } else {
-    return ForeignValue.fromString(id).intoRustOwned();
-  }
+Pointer<Utf8> _deviceId(MediaStreamTrack track) {
+  return track.deviceId()!.toNativeUtf8();
 }
 
 int _readyState(MediaStreamTrack track) {

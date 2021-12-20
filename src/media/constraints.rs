@@ -936,7 +936,10 @@ impl AudioTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Audio)
-            && ConstrainString::satisfies(&self.device_id, &track.device_id())
+            && ConstrainString::satisfies(
+                &self.device_id,
+                &Some(track.device_id()),
+            )
         // TODO returns Result<bool, Error>
     }
 
@@ -1162,7 +1165,10 @@ impl DeviceVideoTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video)
-            && ConstrainString::satisfies(&self.device_id, &track.device_id())
+            && ConstrainString::satisfies(
+                &self.device_id,
+                &Some(track.device_id()),
+            )
             && ConstrainString::satisfies(
                 &self.facing_mode,
                 &track.facing_mode(),

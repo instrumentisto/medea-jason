@@ -96,14 +96,19 @@ impl MediaStreamTrack {
 
     /// Returns a [`deviceId`][1] of the underlying [MediaStreamTrack][2].
     ///
+    /// # Panics
+    ///
+    /// If [`web_sys::MediaStreamTrack`] doesn't have `deviceId`.
+    ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[inline]
     #[must_use]
-    pub fn device_id(&self) -> Option<String> {
+    pub fn device_id(&self) -> String {
         get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
             v.as_string()
         })
+        .unwrap()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].

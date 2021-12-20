@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
@@ -29,9 +29,7 @@ mod media_stream_track {
         pub fn id(track: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns device ID of the provided [`MediaStreamTrack`].
-        pub fn device_id(
-            track: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        pub fn device_id(track: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns facing mode of the provided [`MediaStreamTrack`].
         pub fn facing_mode(
@@ -121,10 +119,10 @@ impl MediaStreamTrack {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[inline]
     #[must_use]
-    pub fn device_id(&self) -> Option<String> {
-        unsafe { media_stream_track::device_id(self.0.get()).unbox() }
-            .try_into()
-            .unwrap()
+    pub fn device_id(&self) -> String {
+        unsafe {
+            c_str_into_string(media_stream_track::device_id(self.0.get()))
+        }
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].
