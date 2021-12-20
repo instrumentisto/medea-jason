@@ -48,6 +48,9 @@ mod transceiver {
         /// Drops `Send` [`MediaStreamTrack`] of the provided [`Transceiver`].
         pub fn drop_sender(transceiver: Dart_Handle) -> Dart_Handle;
 
+        /// Returns stopped status of the provided [`Transceiver`].
+        pub fn is_stopped(transceiver: Dart_Handle) -> bool;
+
         /// Sets `enabled` field of `Send` [`MediaStreamTrack`] of the provided
         /// [`Transceiver`].
         pub fn set_send_track_enabled(transceiver: Dart_Handle, enabled: bool);
@@ -189,6 +192,12 @@ impl Transceiver {
                 transceiver::set_send_track_enabled(sender.get(), enabled);
             }
         }
+    }
+
+    /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
+    #[must_use]
+    pub fn is_stopped(&self) -> bool {
+        unsafe { transceiver::is_stopped(self.transceiver.get()) }
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].

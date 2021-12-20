@@ -9,6 +9,7 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
       replaceTrack,
   required Pointer<NativeFunction<Handle Function(Handle)>> dropSender,
+  required Pointer<NativeFunction<Bool Function(Handle)>> isStopped,
   required Pointer<NativeFunction<Void Function(Handle, Bool)>>
       setSendTrackEnabled,
   required Pointer<NativeFunction<Pointer Function(Handle)>> mid,
@@ -17,13 +18,14 @@ void registerFunction(
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer),
+          Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer)>('register_transceiver')(
+          Pointer, Pointer, Pointer)>('register_transceiver')(
     getCurrentDirection,
     getSendTrack,
     replaceTrack,
     dropSender,
+    isStopped,
     setSendTrackEnabled,
     mid,
     hasSendTrack,

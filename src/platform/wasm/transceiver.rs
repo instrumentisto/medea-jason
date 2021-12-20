@@ -134,6 +134,13 @@ impl Transceiver {
             track.set_enabled(enabled);
         }
     }
+
+    /// Indicates whether the underlying [`RtcRtpTransceiver`] is stopped.
+    #[inline]
+    #[must_use]
+    pub fn is_stopped(&self) -> bool {
+        self.transceiver.stopped()
+    }
 }
 
 impl From<RtcRtpTransceiver> for Transceiver {

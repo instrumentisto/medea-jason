@@ -14,6 +14,7 @@ void registerFunctions(DynamicLibrary dl) {
     getSendTrack: Pointer.fromFunction(_getSendTrack),
     setSendTrackEnabled: Pointer.fromFunction(_setSendTrackEnabled),
     dropSender: Pointer.fromFunction(_dropSender),
+    isStopped: Pointer.fromFunction(_isStopped, true),
     mid: Pointer.fromFunction(_mid),
     hasSendTrack: Pointer.fromFunction(_hasSendTrack, false),
     setDirection: Pointer.fromFunction(_setDirection),
@@ -79,4 +80,11 @@ Object _dropSender(RTCRtpTransceiver transceiver) {
   } else {
     return () => transceiver.sender.track!.stop();
   }
+}
+
+/// Returns `1` if [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is stopped.
+///
+/// Returns [ForeignValue.none] if [RTCRtpTransceiver.sender] is `null`.
+bool _isStopped(RTCRtpTransceiver transceiver) {
+  return transceiver.stoped;
 }
