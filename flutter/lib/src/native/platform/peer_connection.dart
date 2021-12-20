@@ -80,9 +80,8 @@ void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
 }
 
 /// Disposes provided [RTCPeerConnection].
-Object _dispose(RTCPeerConnection conn) {
+void _dispose(RTCPeerConnection conn) {
   conn.dispose();
-  return conn;
 }
 
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the

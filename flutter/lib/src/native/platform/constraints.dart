@@ -17,12 +17,12 @@ Object _new() {
   return MediaStreamConstraints();
 }
 
-/// Sets `audio` field of the provided [MediaStreamConstraints].
+/// Sets [MediaStreamConstraints.audio] for the provided [cons].
 void _setAudio(MediaStreamConstraints cons, Object val) {
   cons.audio = val;
 }
 
-/// Sets `video` field of the provided [MediaStreamConstraints].
+/// Sets [MediaStreamConstraints.video] for the provided [cons].
 void _setVideo(MediaStreamConstraints cons, Object val) {
   cons.video = val;
 }

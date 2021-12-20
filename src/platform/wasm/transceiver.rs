@@ -23,7 +23,7 @@ impl Transceiver {
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     #[inline]
     #[must_use]
-    fn current_direction(&self) -> TransceiverDirection {
+    fn current_direction(&self) -> TransceiverDirection { // TODO: rename to direction
         TransceiverDirection::from(self.transceiver.direction())
     }
 

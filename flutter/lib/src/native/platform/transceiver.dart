@@ -28,7 +28,7 @@ Object _setDirection(RTCRtpTransceiver transceiver, int direction) {
 }
 
 /// Returns current [TransceiverDirection] of the provided [RTCRtpTransceiver].
-Object _getCurrentDirection(RTCRtpTransceiver transceiver) {
+Object _getCurrentDirection(RTCRtpTransceiver transceiver) { // TODO: rename to getdirection
   return () => transceiver.getDirection().then((d) => d.index);
 }
 
@@ -51,8 +51,8 @@ Pointer _getSendTrack(RTCRtpTransceiver transceiver) {
   }
 }
 
-/// Returns `1` if provided [RTCRtpTransceiver]'s [RTCRtpTransceiver.sender]
-/// has some [MediaStreamTrack].
+/// Returns `true` if the provided [RTCRtpTransceiver]'s
+/// [RTCRtpTransceiver.sender] has some [MediaStreamTrack].
 bool _hasSendTrack(RTCRtpTransceiver transceiver) {
   return transceiver.sender.track != null;
 }
@@ -82,9 +82,8 @@ Object _dropSender(RTCRtpTransceiver transceiver) {
   }
 }
 
-/// Returns `1` if [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is stopped.
-///
-/// Returns [ForeignValue.none] if [RTCRtpTransceiver.sender] is `null`.
+/// Returns `true` if the [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is
+/// stopped.
 bool _isStopped(RTCRtpTransceiver transceiver) {
   return transceiver.stoped;
 }

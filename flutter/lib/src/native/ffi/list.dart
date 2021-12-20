@@ -5,8 +5,11 @@ import 'list.g.dart' as bridge;
 
 /// Registers functions allowing Rust to create Dart [List]s.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(dl,
-      get: Pointer.fromFunction(_get), length: Pointer.fromFunction(_len, 0));
+  bridge.registerFunction(
+    dl,
+    get: Pointer.fromFunction(_get),
+    length: Pointer.fromFunction(_len, 0),
+  );
 }
 
 /// Returns [Pointer] to an object with a provided index.

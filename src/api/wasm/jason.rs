@@ -8,7 +8,6 @@ use wasm_bindgen::prelude::*;
 use crate::{
     api::{MediaManagerHandle, RoomHandle},
     jason,
-    platform::{init_logger, set_panic_hook},
 };
 
 /// General JS side library interface.
@@ -25,9 +24,6 @@ impl Jason {
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        set_panic_hook();
-        init_logger();
-
         Self(jason::Jason::new())
     }
 

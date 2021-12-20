@@ -599,11 +599,11 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
-    let val = Dart_NewPersistentHandle_DL_Trampolined(val);
-    ptr::NonNull::from(Box::leak(Box::new(val)))
+    let persisted = Dart_NewPersistentHandle_DL_Trampolined(val);
+    ptr::NonNull::from(Box::leak(Box::new(persisted)))
 }
 
-/// Returns boxed pointer to a provided [`DartValue`].
+/// Returns a boxed pointer to the provided [`DartValue`].
 #[no_mangle]
 pub unsafe extern "C" fn box_foreign_value(
     val: DartValue,

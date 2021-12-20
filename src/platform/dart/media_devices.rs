@@ -56,6 +56,7 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
     })
     .await
     .unwrap();
+
     Ok(DartList::from(devices).into())
 }
 
@@ -78,6 +79,7 @@ pub async fn get_user_media(
     })
     .await
     .unwrap();
+
     Ok(DartList::from(tracks).into())
 }
 
@@ -101,5 +103,6 @@ pub async fn get_display_media(
     })
     .await
     .unwrap();
+
     Ok(DartList::from(tracks).into())
 }

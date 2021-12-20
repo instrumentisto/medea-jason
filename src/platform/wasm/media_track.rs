@@ -108,7 +108,7 @@ impl MediaStreamTrack {
         get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
             v.as_string()
         })
-        .unwrap()
+        .unwrap() // TODO: is it ok to unwrap on remote tracks?
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].

@@ -7,13 +7,14 @@ use medea_macro::dart_bridge;
 use std::convert::{TryFrom, TryInto};
 
 use crate::{
+    api::c_str_into_string,
     media::MediaKind,
     platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/input_device_info.g.dart")]
 mod input_device_info {
-    use std::ptr;
+    use std::{os::raw::c_char, ptr};
 
     use dart_sys::Dart_Handle;
 
@@ -21,9 +22,7 @@ mod input_device_info {
 
     extern "C" {
         /// Returns unique identifier for the provided device.
-        pub fn device_id(
-            info: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        pub fn device_id(info: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns kind of the provided device.
         pub fn kind(
@@ -34,9 +33,7 @@ mod input_device_info {
         /// "External USB Webcam").
         ///
         /// If the device has no associated label, then returns an empty string.
-        pub fn label(
-            info: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        pub fn label(info: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns group identifier of the provided device.
         pub fn group_id(
@@ -55,12 +52,7 @@ impl InputDeviceInfo {
     /// Returns unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {
-        // Device ID should be always Some
-        Option::try_from(unsafe {
-            input_device_info::device_id(self.0.get()).unbox()
-        })
-        .unwrap()
-        .unwrap()
+        unsafe { c_str_into_string(input_device_info::device_id(self.0.get())) }
     }
 
     /// Returns kind of the represented device.
@@ -85,12 +77,7 @@ impl InputDeviceInfo {
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
-        // Label should be always Some
-        Option::try_from(unsafe {
-            input_device_info::label(self.0.get()).unbox()
-        })
-        .unwrap()
-        .unwrap()
+        unsafe { c_str_into_string(input_device_info::label(self.0.get())) }
     }
 
     /// Returns group identifier of the represented device.
@@ -103,7 +90,7 @@ impl InputDeviceInfo {
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
     #[must_use]
     pub fn group_id(&self) -> String {
-        // Group ID should be always Some
+        // Group ID should be always Some TODO: can be None
         Option::try_from(unsafe {
             input_device_info::group_id(self.0.get()).unbox()
         })

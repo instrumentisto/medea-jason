@@ -16,6 +16,7 @@ use self::task::Task;
 
 /// Runs a Rust [`Future`] on the current thread.
 pub fn spawn(future: impl Future<Output = ()> + 'static) {
+    // TODO: revert executor
     let task = Task::new(Box::pin(future));
 
     // Task is leaked and will be freed by Dart calling the

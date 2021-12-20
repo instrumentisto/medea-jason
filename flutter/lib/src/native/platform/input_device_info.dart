@@ -1,5 +1,6 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+import 'package:ffi/ffi.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
@@ -17,13 +18,13 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns `deviceId` field of the provided [MediaDeviceInfo].
-Pointer _deviceId(MediaDeviceInfo deviceInfo) {
-  return ForeignValue.fromString(deviceInfo.deviceId).intoRustOwned();
+Pointer<Utf8> _deviceId(MediaDeviceInfo deviceInfo) {
+  return deviceInfo.deviceId.toNativeUtf8();
 }
 
 /// Returns `label` field of the provided [MediaDeviceInfo].
-Pointer _label(MediaDeviceInfo deviceInfo) {
-  return ForeignValue.fromString(deviceInfo.label).intoRustOwned();
+Pointer<Utf8> _label(MediaDeviceInfo deviceInfo) {
+  return deviceInfo.label.toNativeUtf8();
 }
 
 /// Returns `groupId` field of the provided [MediaDeviceInfo].
@@ -37,12 +38,14 @@ Pointer _groupId(MediaDeviceInfo deviceInfo) {
 
 /// Returns `kind` field of the provided [MediaDeviceInfo].
 Pointer _kind(MediaDeviceInfo deviceInfo) {
+  // TODO: Why kind is nullable?
   if (deviceInfo.kind != null) {
     if (deviceInfo.kind == 'audioinput') {
       return ForeignValue.fromInt(0).intoRustOwned();
     } else if (deviceInfo.kind == 'videoinput') {
       return ForeignValue.fromInt(1).intoRustOwned();
     } else {
+      // TODO: Handle audiooutput?
       throw Exception('Unknown MediaKind: ${deviceInfo.kind}');
     }
   } else {

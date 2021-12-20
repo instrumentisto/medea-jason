@@ -24,7 +24,8 @@ Object _init(Pointer<Utf8> addr) {
   return IOWebSocketChannel.connect(Uri.parse(addr.toDartString()));
 }
 
-/// Subscribes on [IOWebSocketChannel.stream] with provided `onMessage` [Function] and `onClose` [Function].
+/// Subscribes on [IOWebSocketChannel.stream] with provided `onMessage`
+/// [Function] and `onClose` [Function].
 void _onMessage(IOWebSocketChannel ws, Function onMessage, Function onClose) {
   ws.stream.listen((msg) {
     if (msg is String) {
