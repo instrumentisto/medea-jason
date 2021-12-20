@@ -18,3 +18,9 @@ Feature: `getUserMedia()` requests
     And Alice's `getUserMedia()` errors
     When Alice enables video and audio in local media settings
     Then Alice doesn't have live local tracks
+
+  Scenario: Latency in gUM request
+    Given room with joined member Alice and Bob
+    When Alice switches device with latency
+    And Alice disables video and awaits it completes
+    Then `on_disabled` callback fires 1 time on Bob's remote device video track from Alice
