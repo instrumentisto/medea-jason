@@ -207,7 +207,6 @@ impl RoomHandle {
             )
             .await
             .map_err(|e| {
-                panic!("Error: {:?}", e);
                 Error::from(e)
             })?;
             Ok(JsValue::UNDEFINED)
