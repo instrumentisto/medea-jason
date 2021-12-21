@@ -29,7 +29,7 @@ abstract class InputDeviceInfo {
   /// same [`groupId`][1].
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
-  String groupId();
+  String? groupId();
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics

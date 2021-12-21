@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import '../interface/input_device_info.dart';
 import '../interface/track_kinds.dart';
@@ -18,8 +19,8 @@ typedef _label_Dart = Pointer<Utf8> Function(Pointer);
 typedef _kind_C = Uint8 Function(Pointer);
 typedef _kind_Dart = int Function(Pointer);
 
-typedef _nativeGroupId_C = Pointer<Utf8> Function(Pointer);
-typedef _nativeGroupId_Dart = Pointer<Utf8> Function(Pointer);
+typedef _nativeGroupId_C = ForeignValue Function(Pointer);
+typedef _nativeGroupId_Dart = ForeignValue Function(Pointer);
 
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
@@ -62,8 +63,8 @@ class NativeInputDeviceInfo extends InputDeviceInfo {
   }
 
   @override
-  String groupId() {
-    return _nativeGroupId(ptr.getInnerPtr()).nativeStringToDartString();
+  String? groupId() {
+    return _nativeGroupId(ptr.getInnerPtr()).toDart();
   }
 
   @moveSemantics

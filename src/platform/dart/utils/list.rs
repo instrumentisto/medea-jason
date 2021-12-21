@@ -6,8 +6,9 @@ use std::convert::TryInto;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::{
-    handle::DartHandle, NonNullDartValueArgExt,
+use crate::platform::dart::{
+    utils::{handle::DartHandle, NonNullDartValueArgExt},
+    InputDeviceInfo,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/list.g.dart")]
@@ -72,6 +73,20 @@ where
         for i in 0..len {
             let val = list.get(i).unwrap();
             out.push(val.into());
+        }
+        out
+    }
+}
+
+impl From<DartList> for Vec<InputDeviceInfo> {
+    fn from(list: DartList) -> Self {
+        let len = list.length();
+        let mut out = Vec::with_capacity(len);
+        for i in 0..len {
+            let val = list.get(i).unwrap();
+            if let Ok(val) = val.try_into() {
+                out.push(val);
+            }
         }
         out
     }

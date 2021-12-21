@@ -126,7 +126,7 @@ mod peer_connection {
             offer: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        // TODO: docs?
+        /// Disposes provided [`PeerConnection`].
         pub fn dispose(peer: Dart_Handle);
     }
 }

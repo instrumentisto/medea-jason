@@ -31,7 +31,7 @@ mod transceiver {
 
     extern "C" {
         /// Returns current direction of the provided [`Transceiver`].
-        pub fn get_current_direction(transceiver: Dart_Handle) -> Dart_Handle;
+        pub fn get_direction(transceiver: Dart_Handle) -> Dart_Handle;
 
         /// Returns `Send` [`MediaStreamTrack`] of the provided [`Transceiver`].
         pub fn get_send_track(
@@ -90,10 +90,8 @@ impl Transceiver {
     ) -> LocalBoxFuture<'static, ()> {
         let this = self.clone();
         Box::pin(async move {
-            this.set_direction(
-                this.current_direction().await - disabled_direction,
-            )
-            .await;
+            this.set_direction(this.direction().await - disabled_direction)
+                .await;
         })
     }
 
@@ -104,17 +102,15 @@ impl Transceiver {
     ) -> LocalBoxFuture<'static, ()> {
         let this = self.clone();
         Box::pin(async move {
-            this.set_direction(
-                this.current_direction().await | enabled_direction,
-            )
-            .await;
+            this.set_direction(this.direction().await | enabled_direction)
+                .await;
         })
     }
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
-        self.current_direction().await.contains(direction)
+        self.direction().await.contains(direction)
     }
 
     /// Replaces [`TransceiverDirection::SEND`] [`local::Track`] of this
@@ -201,11 +197,11 @@ impl Transceiver {
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    fn current_direction(&self) -> impl Future<Output = TransceiverDirection> {
+    fn direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.transceiver.get();
         async move {
             FutureFromDart::execute::<i32>(unsafe {
-                transceiver::get_current_direction(handle)
+                transceiver::get_direction(handle)
             })
             .await
             .unwrap()

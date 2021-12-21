@@ -13,7 +13,7 @@ void registerFunctions(DynamicLibrary dl) {
     deviceId: Pointer.fromFunction(_deviceId),
     label: Pointer.fromFunction(_label),
     groupId: Pointer.fromFunction(_groupId),
-    kind: Pointer.fromFunction(_kind),
+    kind: Pointer.fromFunction(_kind, 2),
   );
 }
 
@@ -37,18 +37,14 @@ Pointer _groupId(MediaDeviceInfo deviceInfo) {
 }
 
 /// Returns `kind` field of the provided [MediaDeviceInfo].
-Pointer _kind(MediaDeviceInfo deviceInfo) {
-  // TODO: Why kind is nullable?
-  if (deviceInfo.kind != null) {
-    if (deviceInfo.kind == 'audioinput') {
-      return ForeignValue.fromInt(0).intoRustOwned();
-    } else if (deviceInfo.kind == 'videoinput') {
-      return ForeignValue.fromInt(1).intoRustOwned();
-    } else {
-      // TODO: Handle audiooutput?
-      throw Exception('Unknown MediaKind: ${deviceInfo.kind}');
-    }
+int _kind(MediaDeviceInfo deviceInfo) {
+  if (deviceInfo.kind == 'audioinput') {
+    return 0;
+  } else if (deviceInfo.kind == 'videoinput') {
+    return 1;
+  } else if (deviceInfo.kind == 'audiooutput') {
+    return 2;
   } else {
-    return ForeignValue.none().intoRustOwned();
+    throw Exception('Unknown MediaKind: ${deviceInfo.kind}');
   }
 }

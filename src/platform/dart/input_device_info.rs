@@ -2,7 +2,6 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams/#device-info
 
-use derive_more::From;
 use medea_macro::dart_bridge;
 use std::convert::{TryFrom, TryInto};
 
@@ -25,9 +24,7 @@ mod input_device_info {
         pub fn device_id(info: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns kind of the provided device.
-        pub fn kind(
-            info: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<i64>>>;
+        pub fn kind(info: Dart_Handle) -> i64;
 
         /// Returns label describing the provided device (for example
         /// "External USB Webcam").
@@ -45,14 +42,41 @@ mod input_device_info {
 /// Representation of [MediaDeviceInfo][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-#[derive(Clone, Debug, From)]
-pub struct InputDeviceInfo(DartHandle);
+#[derive(Clone, Debug)]
+pub struct InputDeviceInfo {
+    /// Pointer to the `InputDeviceInfo` [`DartHandle`].
+    handle: DartHandle,
+
+    /// [`MediaKind`] of this [`InputDeviceInfo`].
+    kind: MediaKind,
+}
+
+/// Error which indicates that you're trying to convert not `InputDeviceInfo`
+/// [`DartHandle`] to [`InputDeviceInfo`].
+pub struct NotInputDeviceInfo;
+
+impl TryFrom<DartHandle> for InputDeviceInfo {
+    type Error = NotInputDeviceInfo;
+
+    fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
+        let kind = unsafe { input_device_info::kind(value.get()) }
+            .try_into()
+            .map_err(|_| NotInputDeviceInfo)?;
+
+        Ok(Self {
+            handle: value,
+            kind,
+        })
+    }
+}
 
 impl InputDeviceInfo {
     /// Returns unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {
-        unsafe { c_str_into_string(input_device_info::device_id(self.0.get())) }
+        unsafe {
+            c_str_into_string(input_device_info::device_id(self.handle.get()))
+        }
     }
 
     /// Returns kind of the represented device.
@@ -62,14 +86,7 @@ impl InputDeviceInfo {
     /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        // Kind should be always Some
-        Option::<i64>::try_from(unsafe {
-            input_device_info::kind(self.0.get()).unbox()
-        })
-        .unwrap()
-        .unwrap()
-        .try_into()
-        .unwrap()
+        self.kind
     }
 
     /// Returns label describing the represented device (for example
@@ -77,7 +94,9 @@ impl InputDeviceInfo {
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
-        unsafe { c_str_into_string(input_device_info::label(self.0.get())) }
+        unsafe {
+            c_str_into_string(input_device_info::label(self.handle.get()))
+        }
     }
 
     /// Returns group identifier of the represented device.
@@ -89,12 +108,10 @@ impl InputDeviceInfo {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
     #[must_use]
-    pub fn group_id(&self) -> String {
-        // Group ID should be always Some TODO: can be None
+    pub fn group_id(&self) -> Option<String> {
         Option::try_from(unsafe {
-            input_device_info::group_id(self.0.get()).unbox()
+            input_device_info::group_id(self.handle.get()).unbox()
         })
-        .unwrap()
         .unwrap()
     }
 }

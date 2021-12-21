@@ -4,7 +4,7 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunction(
   DynamicLibrary dl, {
-  required Pointer<NativeFunction<Handle Function(Handle)>> getCurrentDirection,
+  required Pointer<NativeFunction<Handle Function(Handle)>> getDirection,
   required Pointer<NativeFunction<Pointer Function(Handle)>> getSendTrack,
   required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
       replaceTrack,
@@ -21,7 +21,7 @@ void registerFunction(
           Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
           Pointer, Pointer, Pointer)>('register_transceiver')(
-    getCurrentDirection,
+    getDirection,
     getSendTrack,
     replaceTrack,
     dropSender,

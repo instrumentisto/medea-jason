@@ -9,7 +9,7 @@ import 'transceiver.g.dart' as bridge;
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    getCurrentDirection: Pointer.fromFunction(_getCurrentDirection),
+    getDirection: Pointer.fromFunction(_getDirection),
     replaceTrack: Pointer.fromFunction(_replaceSendTrack),
     getSendTrack: Pointer.fromFunction(_getSendTrack),
     setSendTrackEnabled: Pointer.fromFunction(_setSendTrackEnabled),
@@ -28,7 +28,7 @@ Object _setDirection(RTCRtpTransceiver transceiver, int direction) {
 }
 
 /// Returns current [TransceiverDirection] of the provided [RTCRtpTransceiver].
-Object _getCurrentDirection(RTCRtpTransceiver transceiver) { // TODO: rename to getdirection
+Object _getDirection(RTCRtpTransceiver transceiver) {
   return () => transceiver.getDirection().then((d) => d.index);
 }
 
