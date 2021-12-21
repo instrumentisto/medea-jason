@@ -2381,6 +2381,7 @@ mod set_local_media_settings {
             .unwrap();
         delay_for(10).await;
 
+        use medea_jason::api::err::MediaSettingsUpdateException;
         spawn_local(async move {
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_stream_settings(true, true),
@@ -2389,8 +2390,9 @@ mod set_local_media_settings {
             ))
             .await
                 .map_err(|e| {
-                    panic!("{}", e);
-                    e
+                    let err: MediaSettingsUpdateException =
+                        unchecked_jsval_cast(e.into());
+                    panic!("{}", err.message());
                 })
             .unwrap();
         });
