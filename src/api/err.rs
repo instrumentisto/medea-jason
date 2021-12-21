@@ -421,7 +421,7 @@ impl MediaSettingsUpdateException {
     /// Returns an error message describing the problem.
     #[must_use]
     pub fn message(&self) -> String {
-        self.message.to_string()
+        self.cause.to_string()
     }
 
     /// Returns the original [`ChangeMediaStateError`] that was encountered
