@@ -1963,7 +1963,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
 /// Tests that [`Room::set_media_state`] will call gUM/gDM before doing anything
 /// with a [`MediaState`]s and doesn't updates [`MediaState`]s if gUM/gDM
 /// request fails.
-// #[wasm_bindgen_test]
+#[wasm_bindgen_test]
 async fn send_enabling_holds_local_tracks() {
     let mut rpc = MockRpcSession::new();
 

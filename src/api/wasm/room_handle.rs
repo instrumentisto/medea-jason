@@ -206,9 +206,7 @@ impl RoomHandle {
                 rollback_on_fail,
             )
             .await
-            .map_err(|e| {
-                Error::from(e)
-            })?;
+            .map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }

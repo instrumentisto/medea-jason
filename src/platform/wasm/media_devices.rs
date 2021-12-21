@@ -92,10 +92,6 @@ pub async fn get_user_media(
     .await
     .map(web_sys::MediaStream::from)
     .map_err(Error::from)
-        .map_err(|e| {
-            panic!("Error: {}", e.message());
-            e
-        })
     .map_err(tracerr::wrap!())?;
 
     Ok(js_sys::try_iter(&stream.get_tracks())
