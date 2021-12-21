@@ -26,7 +26,7 @@ void registerFunctions(DynamicLibrary dl) {
     createAnswer: Pointer.fromFunction(_createAnswer),
     getTransceiverByMid: Pointer.fromFunction(_getTransceiverByMid),
     onConnectionStateChange: Pointer.fromFunction(_onConnectionStateChange),
-    dispose: Pointer.fromFunction(_dispose),
+    close: Pointer.fromFunction(_close),
   );
 }
 
@@ -77,11 +77,6 @@ void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
   conn.onConnectionState = (e) {
     f(e.index);
   };
-}
-
-/// Disposes provided [RTCPeerConnection].
-void _dispose(RTCPeerConnection conn) {
-  conn.dispose();
 }
 
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the
@@ -160,4 +155,9 @@ Object _rollback(RTCPeerConnection conn) {
 /// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].
 Object getTransceivers(RTCPeerConnection conn) {
   return () => conn.getTransceivers();
+}
+
+/// Closes provided [RTCPeerConnection].
+void _close(RTCPeerConnection conn) {
+  conn.dispose();
 }

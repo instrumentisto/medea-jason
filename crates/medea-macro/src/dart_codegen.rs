@@ -53,6 +53,27 @@ pub(crate) enum DartType {
     /// [Int64]: https://api.dart.dev/stable/dart-ffi/Int64-class.html
     Int64,
 
+    /// 8-bit unsigned integer.
+    ///
+    /// Represents [Uint8] on the Dart side.
+    ///
+    /// [Uint8]: https://api.dart.dev/stable/dart-ffi/Uint8-class.html
+    Uint8,
+
+    /// 32-bit unsigned integer.
+    ///
+    /// Represents [Uint32] on the Dart side.
+    ///
+    /// [Uint32]: https://api.dart.dev/stable/dart-ffi/Uint32-class.html
+    Uint32,
+
+    /// 64-bit unsigned integer.
+    ///
+    /// Represents [Uint64] on the Dart side.
+    ///
+    /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Uint64-class.html
+    Uint64,
+
     /// Boolean value.
     ///
     /// Represents [Bool] on the Dart side.
@@ -82,12 +103,15 @@ impl DartType {
     pub(crate) fn to_ffi_type(self) -> &'static str {
         match self {
             Self::Handle => "Handle",
-            Self::Bool => "Bool",
             Self::StringPointer => "Pointer<Utf8>",
             Self::HandlePointer => "Pointer<Handle>",
             Self::Int8 => "Int8",
             Self::Int32 => "Int32",
             Self::Int64 => "Int64",
+            Self::Uint8 => "Uint8",
+            Self::Uint32 => "Uint32",
+            Self::Uint64 => "Uint64",
+            Self::Bool => "Bool",
             Self::Pointer => "Pointer",
             Self::Void => "Void",
             Self::ForeignValue => "ForeignValue",
@@ -144,9 +168,12 @@ impl TryFrom<syn::Type> for DartType {
                     "NonNull" => Self::from_non_null_generic(&ty.arguments)?,
                     "DartValueArg" | "DartValue" => Self::ForeignValue,
                     "DartError" => Self::HandlePointer,
+                    "i8" => Self::Int8,
                     "i32" => Self::Int32,
                     "i64" => Self::Int64,
-                    "i8" => Self::Int8,
+                    "u8" => Self::Uint8,
+                    "u32" => Self::Uint32,
+                    "u64" => Self::Uint64,
                     "bool" => Self::Bool,
                     _ => {
                         return Err(syn::Error::new(

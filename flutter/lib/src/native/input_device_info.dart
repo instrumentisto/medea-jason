@@ -1,11 +1,11 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import '../interface/input_device_info.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
+import 'ffi/foreign_value.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';

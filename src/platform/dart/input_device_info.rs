@@ -51,25 +51,6 @@ pub struct InputDeviceInfo {
     kind: MediaKind,
 }
 
-/// Error which indicates that you're trying to convert not `InputDeviceInfo`
-/// [`DartHandle`] to [`InputDeviceInfo`].
-pub struct NotInputDeviceInfo;
-
-impl TryFrom<DartHandle> for InputDeviceInfo {
-    type Error = NotInputDeviceInfo;
-
-    fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
-        let kind = unsafe { input_device_info::kind(value.get()) }
-            .try_into()
-            .map_err(|_| NotInputDeviceInfo)?;
-
-        Ok(Self {
-            handle: value,
-            kind,
-        })
-    }
-}
-
 impl InputDeviceInfo {
     /// Returns unique identifier for the represented device.
     #[must_use]
@@ -113,5 +94,23 @@ impl InputDeviceInfo {
             input_device_info::group_id(self.handle.get()).unbox()
         })
         .unwrap()
+    }
+}
+
+/// The provided `MediaDeviceInfo` is not an input device.
+pub struct NotInput;
+
+impl TryFrom<DartHandle> for InputDeviceInfo {
+    type Error = NotInput;
+
+    fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
+        let kind = unsafe { input_device_info::kind(value.get()) }
+            .try_into()
+            .map_err(|_| NotInput)?;
+
+        Ok(Self {
+            handle: value,
+            kind,
+        })
     }
 }

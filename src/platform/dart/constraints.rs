@@ -155,26 +155,21 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
         if let Some(device_id) = from.device_id {
             match device_id {
                 ConstrainString::Exact(device_id) => {
-                    exact_cons.set("device_id".to_string(), device_id.into());
+                    exact_cons.set("device_id".to_owned(), device_id.into());
                 }
                 ConstrainString::Ideal(device_id) => {
-                    ideal_cons.set("device_id".to_string(), device_id.into());
+                    ideal_cons.set("device_id".to_owned(), device_id.into());
                 }
             }
         }
-        audio_cons.set("mandatory".to_string(), exact_cons.as_handle().into());
-        audio_cons.set("optional".to_string(), ideal_cons.as_handle().into());
-        cons.set("audio".to_string(), audio_cons.as_handle().into());
+        audio_cons.set("mandatory".to_owned(), exact_cons.as_handle().into());
+        audio_cons.set("optional".to_owned(), ideal_cons.as_handle().into());
+        cons.set("audio".to_owned(), audio_cons.as_handle().into());
         MediaTrackConstraints(cons)
     }
 }
 
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
-    #[allow(
-        clippy::cast_possible_truncation,
-        clippy::cast_sign_loss,
-        clippy::cast_possible_wrap
-    )]
     fn from(from: DeviceVideoTrackConstraints) -> Self {
         let video_cons = DartMap::new();
         let ideal_cons = DartMap::new();
@@ -182,42 +177,38 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
         if let Some(device_id) = from.device_id {
             match device_id {
                 ConstrainString::Exact(device_id) => {
-                    ideal_cons.set("sourceId".to_string(), device_id.into());
+                    ideal_cons.set("sourceId".to_owned(), device_id.into());
                 }
                 ConstrainString::Ideal(device_id) => {
-                    exact_cons.set("sourceId".to_string(), device_id.into());
+                    exact_cons.set("sourceId".to_owned(), device_id.into());
                 }
             }
         }
         if let Some(height) = from.height {
             match height {
                 ConstrainU32::Ideal(height) => {
-                    ideal_cons
-                        .set("height".to_string(), (height as i32).into());
+                    ideal_cons.set("height".to_owned(), height.into());
                 }
                 ConstrainU32::Exact(height) => {
-                    exact_cons
-                        .set("height".to_string(), (height as i32).into());
+                    exact_cons.set("height".to_owned(), height.into());
                 }
                 ConstrainU32::Range(min, max) => {
-                    exact_cons
-                        .set("minHeight".to_string(), (min as i32).into());
-                    exact_cons
-                        .set("maxHeight".to_string(), (max as i32).into());
+                    exact_cons.set("minHeight".to_owned(), min.into());
+                    exact_cons.set("maxHeight".to_owned(), max.into());
                 }
             }
         }
         if let Some(width) = from.width {
             match width {
                 ConstrainU32::Ideal(width) => {
-                    ideal_cons.set("width".to_string(), (width as i32).into());
+                    ideal_cons.set("width".to_owned(), width.into());
                 }
                 ConstrainU32::Exact(width) => {
-                    exact_cons.set("width".to_string(), (width as i32).into());
+                    exact_cons.set("width".to_owned(), width.into());
                 }
                 ConstrainU32::Range(min, max) => {
-                    exact_cons.set("minWidth".to_string(), (min as i32).into());
-                    exact_cons.set("maxWidth".to_string(), (max as i32).into());
+                    exact_cons.set("minWidth".to_owned(), min.into());
+                    exact_cons.set("maxWidth".to_owned(), max.into());
                 }
             }
         }
@@ -225,22 +216,22 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
             match facing_mode {
                 ConstrainString::Exact(facing_mode) => {
                     exact_cons.set(
-                        "facing_mode".to_string(),
+                        "facing_mode".to_owned(),
                         facing_mode.to_string().into(),
                     );
                 }
                 ConstrainString::Ideal(facing_mode) => {
                     ideal_cons.set(
-                        "facing_mode".to_string(),
+                        "facing_mode".to_owned(),
                         facing_mode.to_string().into(),
                     );
                 }
             }
         }
-        video_cons.set("mandatory".to_string(), exact_cons.as_handle().into());
-        video_cons.set("optional".to_string(), ideal_cons.as_handle().into());
+        video_cons.set("mandatory".to_owned(), exact_cons.as_handle().into());
+        video_cons.set("optional".to_owned(), ideal_cons.as_handle().into());
         let cons = DartMap::new();
-        cons.set("video".to_string(), video_cons.as_handle().into());
+        cons.set("video".to_owned(), video_cons.as_handle().into());
 
         MediaTrackConstraints(cons)
     }

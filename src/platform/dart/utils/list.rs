@@ -6,9 +6,8 @@ use std::convert::TryInto;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::{
-    utils::{handle::DartHandle, NonNullDartValueArgExt},
-    InputDeviceInfo,
+use crate::platform::dart::utils::{
+    handle::DartHandle, NonNullDartValueArgExt,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/list.g.dart")]
@@ -24,11 +23,11 @@ mod list {
         /// [`Dart_Handle`] `List`.
         pub fn get(
             list: Dart_Handle,
-            index: i32,
+            index: u32,
         ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
 
         /// Returns length of the Dart side `List`.
-        pub fn length(list: Dart_Handle) -> i32;
+        pub fn length(list: Dart_Handle) -> u32;
     }
 }
 
@@ -39,24 +38,15 @@ pub struct DartList(DartHandle);
 impl DartList {
     /// Gets [`DartHandle`] from the underlying Dart `List` with a provided
     /// index.
-    #[allow(
-        clippy::cast_possible_truncation,
-        clippy::cast_sign_loss,
-        clippy::cast_possible_wrap
-    )]
     #[must_use]
     pub fn get(&self, i: usize) -> Option<DartHandle> {
-        unsafe { list::get(self.0.get(), i as i32).unbox() }
+        #[allow(clippy::cast_possible_truncation)]
+        unsafe { list::get(self.0.get(), i as u32).unbox() }
             .try_into()
             .unwrap()
     }
 
     /// Returns length of the underlying Dart `List`.
-    #[allow(
-        clippy::cast_possible_truncation,
-        clippy::cast_sign_loss,
-        clippy::cast_possible_wrap
-    )]
     #[must_use]
     pub fn length(&self) -> usize {
         unsafe { list::length(self.0.get()) as usize }
@@ -73,20 +63,6 @@ where
         for i in 0..len {
             let val = list.get(i).unwrap();
             out.push(val.into());
-        }
-        out
-    }
-}
-
-impl From<DartList> for Vec<InputDeviceInfo> {
-    fn from(list: DartList) -> Self {
-        let len = list.length();
-        let mut out = Vec::with_capacity(len);
-        for i in 0..len {
-            let val = list.get(i).unwrap();
-            if let Ok(val) = val.try_into() {
-                out.push(val);
-            }
         }
         out
     }

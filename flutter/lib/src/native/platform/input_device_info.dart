@@ -17,17 +17,17 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns `deviceId` field of the provided [MediaDeviceInfo].
+/// Returns [MediaDeviceInfo.deviceId] value.
 Pointer<Utf8> _deviceId(MediaDeviceInfo deviceInfo) {
   return deviceInfo.deviceId.toNativeUtf8();
 }
 
-/// Returns `label` field of the provided [MediaDeviceInfo].
+/// Returns [MediaDeviceInfo.label] value.
 Pointer<Utf8> _label(MediaDeviceInfo deviceInfo) {
   return deviceInfo.label.toNativeUtf8();
 }
 
-/// Returns `groupId` field of the provided [MediaDeviceInfo].
+/// Returns [MediaDeviceInfo.groupId] value.
 Pointer _groupId(MediaDeviceInfo deviceInfo) {
   if (deviceInfo.groupId != null) {
     return ForeignValue.fromString(deviceInfo.groupId!).intoRustOwned();
@@ -36,8 +36,9 @@ Pointer _groupId(MediaDeviceInfo deviceInfo) {
   }
 }
 
-/// Returns `kind` field of the provided [MediaDeviceInfo].
+/// Returns [MediaDeviceInfo.kind] value.
 int _kind(MediaDeviceInfo deviceInfo) {
+  // TODO: Refactor flutter-webrtc to use enum instead of String.
   if (deviceInfo.kind == 'audioinput') {
     return 0;
   } else if (deviceInfo.kind == 'videoinput') {
@@ -45,6 +46,7 @@ int _kind(MediaDeviceInfo deviceInfo) {
   } else if (deviceInfo.kind == 'audiooutput') {
     return 2;
   } else {
-    throw Exception('Unknown MediaKind: ${deviceInfo.kind}');
+    // Not supposed to ever happen.
+    throw StateError('Unknown MediaKind: ${deviceInfo.kind}');
   }
 }

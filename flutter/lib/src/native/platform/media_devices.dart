@@ -12,7 +12,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Calls `getUserMedia` and returns created [MediaStreamTrack]s.
+/// Request media input access and returns the created [MediaStreamTrack]s.
 Object _getUserMedia(MediaStreamConstraints constraints) {
   return () async {
     var videoConstraints = {};
@@ -31,12 +31,13 @@ Object _getUserMedia(MediaStreamConstraints constraints) {
   };
 }
 
-/// Returns all available devices.
+/// Returns all available media devices.
 Object _enumerateDevices() {
   return () => navigator.mediaDevices.enumerateDevices();
 }
 
-/// Calls `getDisplayMedia` and returns created [MediaStreamTrack]s.
+/// Starts capturing the contents of a display and returns the created
+/// [MediaStreamTrack]s.
 Object _getDisplayMedia(Map<String, dynamic> constraints) {
   return () => navigator.mediaDevices.getDisplayMedia(constraints);
 }

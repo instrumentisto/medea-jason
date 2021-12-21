@@ -126,8 +126,8 @@ mod peer_connection {
             offer: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Disposes provided [`PeerConnection`].
-        pub fn dispose(peer: Dart_Handle);
+        /// Closes the provided [`PeerConnection`].
+        pub fn close(peer: Dart_Handle);
     }
 }
 
@@ -532,7 +532,7 @@ pub enum RtcSdpType {
 impl Drop for RtcPeerConnection {
     fn drop(&mut self) {
         unsafe {
-            peer_connection::dispose(self.handle.get());
+            peer_connection::close(self.handle.get());
         }
     }
 }

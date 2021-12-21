@@ -2,6 +2,8 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
+use std::convert::TryInto as _;
+
 use medea_macro::dart_bridge;
 use tracerr::Traced;
 
@@ -55,9 +57,20 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
         media_devices::enumerate_devices()
     })
     .await
+    .map(DartList::from)
     .unwrap();
 
-    Ok(DartList::from(devices).into())
+    let len = devices.length();
+    let mut result = Vec::with_capacity(len);
+
+    for i in 0..len {
+        let val = devices.get(i).unwrap();
+        if let Ok(val) = val.try_into() {
+            result.push(val);
+        }
+    }
+
+    Ok(result)
 }
 
 /// Prompts a user for a permission to use a media input which produces vector

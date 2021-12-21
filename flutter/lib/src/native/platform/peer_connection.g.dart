@@ -30,7 +30,7 @@ void registerFunction(
   required Pointer<
           NativeFunction<Handle Function(Handle, Pointer<Utf8>, Pointer<Utf8>)>>
       setRemoteDescription,
-  required Pointer<NativeFunction<Void Function(Handle)>> dispose,
+  required Pointer<NativeFunction<Void Function(Handle)>> close,
 }) {
   dl.lookupFunction<
       Void Function(
@@ -85,6 +85,6 @@ void registerFunction(
     createAnswer,
     setLocalDescription,
     setRemoteDescription,
-    dispose,
+    close,
   );
 }
