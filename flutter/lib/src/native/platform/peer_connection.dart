@@ -36,7 +36,8 @@ void registerFunctions(DynamicLibrary dl) {
 Object _addTransceiver(RTCPeerConnection peer, int kind, int direction) {
   return () => peer.addTransceiver(
         kind: RTCRtpMediaType.values[kind],
-        init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
+        init: RTCRtpTransceiverInit(
+            direction: TransceiverDirection.values[direction]),
       );
 }
 
