@@ -9,7 +9,7 @@ use wasm_bindgen::{
 
 /// Wrapper for JS value which returned from JS side as error.
 #[derive(Clone, Debug, Display, PartialEq)]
-#[display(fmt = "Error: {}", "self.message()")]
+#[display(fmt = "{}", "String::from(_0.to_string())")]
 pub struct Error(js_sys::Error);
 
 impl Error {

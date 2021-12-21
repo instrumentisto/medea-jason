@@ -2388,6 +2388,10 @@ mod set_local_media_settings {
                 false,
             ))
             .await
+                .map_err(|e| {
+                    panic!("{}", e);
+                    e
+                })
             .unwrap();
         });
 
