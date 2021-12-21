@@ -61,6 +61,7 @@ impl From<MediaStreamConstraints> for Dart_Handle {
 
 impl MediaStreamConstraints {
     /// Creates new [`MediaStreamConstraints`] with none constraints configured.
+    #[inline]
     #[must_use]
     pub fn new() -> Self {
         unsafe { Self(DartHandle::new(constraints::init())) }
@@ -69,6 +70,7 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `audio` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+    #[inline]
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
         unsafe {
             constraints::audio(
@@ -81,6 +83,7 @@ impl MediaStreamConstraints {
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
+    #[inline]
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
         unsafe {
             constraints::video(
