@@ -90,7 +90,7 @@ mod mock {
         }
 
         pub fn group_id(&self) -> Option<String> {
-            String::from("InputDeviceInfo.group_id")
+            Some(String::from("InputDeviceInfo.group_id"))
         }
     }
 }
