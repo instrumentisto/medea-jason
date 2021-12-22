@@ -2385,12 +2385,14 @@ mod set_local_media_settings {
         delay_for(10).await;
 
         spawn_local(async move {
-            JsFuture::from(room_handle.set_local_media_settings(
-                &media_stream_settings(false, false),
-                false,
-                false,
-            ))
-            .await;
+            drop(
+                JsFuture::from(room_handle.set_local_media_settings(
+                    &media_stream_settings(false, false),
+                    false,
+                    false,
+                ))
+                .await,
+            );
         });
 
         let mut expected_track_ids = HashSet::from([TrackId(1), TrackId(2)]);
