@@ -106,22 +106,23 @@ impl WebSocketRpcTransport {
             let on_message_subs = Rc::new(RefCell::new(Vec::new()));
             let socket_state =
                 Rc::new(ObservableCell::new(TransportState::Open));
-            let handle = FutureFromDart::execute::<DartHandle>(
-                transport::connect(
+            let handle =
+                FutureFromDart::execute::<DartHandle>(transport::connect(
                     string_into_c_str(url.as_ref().to_string()),
                     Callback::from_fn_mut({
                         let subs = Rc::clone(&on_message_subs);
                         move |msg: String| {
-                            let msg = match serde_json::from_str::<ServerMsg>(&msg)
-                            {
-                                Ok(parsed) => parsed,
-                                Err(e) => {
-                                    // TODO: Protocol versions mismatch? should drop
-                                    //       connection if so.
-                                    log::error!("{}", tracerr::new!(e));
-                                    return;
-                                }
-                            };
+                            let msg =
+                                match serde_json::from_str::<ServerMsg>(&msg) {
+                                    Ok(parsed) => parsed,
+                                    Err(e) => {
+                                        // TODO: Protocol versions mismatch?
+                                        // should drop
+                                        //       connection if so.
+                                        log::error!("{}", tracerr::new!(e));
+                                        return;
+                                    }
+                                };
 
                             subs.borrow_mut().retain(
                                 |sub: &UnboundedSender<ServerMsg>| {
@@ -130,7 +131,7 @@ impl WebSocketRpcTransport {
                             );
                         }
                     })
-                        .into_dart(),
+                    .into_dart(),
                     Callback::from_fn_mut({
                         let socket_state = Rc::clone(&socket_state);
                         move |msg: ()| {
@@ -139,11 +140,10 @@ impl WebSocketRpcTransport {
                             ));
                         }
                     })
-                        .into_dart(),
-                ),
-            )
-            .await
-            .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
+                    .into_dart(),
+                ))
+                .await
+                .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
 
             Ok(Self {
                 handle,
