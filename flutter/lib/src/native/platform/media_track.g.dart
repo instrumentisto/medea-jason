@@ -6,14 +6,14 @@ void registerFunction(
   DynamicLibrary dl, {
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> id,
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId,
+  required Pointer<NativeFunction<Int64 Function(Handle)>> kind,
   required Pointer<NativeFunction<Pointer Function(Handle)>> facingMode,
   required Pointer<NativeFunction<Pointer Function(Handle)>> height,
   required Pointer<NativeFunction<Pointer Function(Handle)>> width,
-  required Pointer<NativeFunction<Void Function(Handle, Bool)>> setEnabled,
-  required Pointer<NativeFunction<Void Function(Handle)>> stop,
   required Pointer<NativeFunction<Bool Function(Handle)>> enabled,
-  required Pointer<NativeFunction<Int64 Function(Handle)>> kind,
+  required Pointer<NativeFunction<Void Function(Handle, Bool)>> setEnabled,
   required Pointer<NativeFunction<Int64 Function(Handle)>> readyState,
+  required Pointer<NativeFunction<Void Function(Handle)>> stop,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
 }) {
   dl.lookupFunction<
@@ -33,14 +33,14 @@ void registerFunction(
           Pointer)>('register_media_stream_track')(
     id,
     deviceId,
+    kind,
     facingMode,
     height,
     width,
-    setEnabled,
-    stop,
     enabled,
-    kind,
+    setEnabled,
     readyState,
+    stop,
     onEnded,
   );
 }

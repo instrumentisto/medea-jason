@@ -63,7 +63,7 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
     })
     .await
     .map(DartList::from)
-    .unwrap();
+    .map_err(tracerr::wrap!())?;
 
     let len = devices.length();
     let mut result = Vec::with_capacity(len);
@@ -95,7 +95,7 @@ pub async fn get_user_media(
         media_devices::get_user_media(caps.into())
     })
     .await
-    .unwrap();
+    .map_err(tracerr::wrap!())?;
 
     Ok(DartList::from(tracks).into())
 }
@@ -120,7 +120,7 @@ pub async fn get_display_media(
         media_devices::get_display_media(caps.into())
     })
     .await
-    .unwrap();
+    .map_err(tracerr::wrap!())?;
 
     Ok(DartList::from(tracks).into())
 }

@@ -15,7 +15,9 @@ use tracerr::Traced;
 use crate::{
     api::string_into_c_str,
     platform::{
-        dart::utils::{callback::Callback, handle::DartHandle},
+        dart::utils::{
+            callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
+        },
         RpcTransport, TransportError, TransportState,
     },
     rpc::{ApiUrl, ClientDisconnect, CloseMsg},
@@ -108,14 +110,17 @@ impl WebSocketRpcTransport {
     /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
     pub async fn new(url: ApiUrl) -> Result<Self> {
         unsafe {
-            let handle =
-                transport::connect(string_into_c_str(url.as_ref().to_string()));
+            let handle = FutureFromDart::execute::<DartHandle>(
+                transport::connect(string_into_c_str(url.as_ref().to_string())),
+            )
+            .await
+            .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
             let on_message_subs = Rc::new(RefCell::new(Vec::new()));
             let socket_state =
                 Rc::new(ObservableCell::new(TransportState::Open));
 
             transport::listen(
-                handle,
+                handle.get(),
                 Callback::from_fn_mut({
                     let subs = Rc::clone(&on_message_subs);
                     move |msg: String| {
@@ -150,7 +155,7 @@ impl WebSocketRpcTransport {
             );
 
             Ok(Self {
-                handle: DartHandle::new(handle),
+                handle,
                 on_message_subs,
                 socket_state,
                 close_reason: Cell::new(
