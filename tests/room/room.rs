@@ -2362,7 +2362,7 @@ mod set_local_media_settings {
             .on_failed_local_media(js_sys::Function::new_no_args(""))
             .unwrap();
         JsFuture::from(room_handle.set_local_media_settings(
-            &media_stream_settings(true, false),
+            &media_stream_settings(true, true),
             false,
             false,
         ))
@@ -2384,20 +2384,15 @@ mod set_local_media_settings {
         use medea_jason::api::err::MediaSettingsUpdateException;
         spawn_local(async move {
             JsFuture::from(room_handle.set_local_media_settings(
-                &media_stream_settings(true, true),
+                &media_stream_settings(false, false),
                 false,
                 false,
             ))
             .await
-                .map_err(|e| {
-                    let err: MediaSettingsUpdateException =
-                        unchecked_jsval_cast(e.into());
-                    panic!("{}", err.message());
-                })
             .unwrap();
         });
 
-        let mut commands_rx = commands_rx.skip(1);
+        let mut expected_track_ids = HashSet::from([TrackId(1), TrackId(2)]);
         while let Some(update_tracks_cmd) = commands_rx.next().await {
             if let Command::UpdateTracks {
                 peer_id,
@@ -2406,9 +2401,11 @@ mod set_local_media_settings {
             {
                 assert_eq!(peer_id, PeerId(1));
                 let track_patch = tracks_patches.pop().unwrap();
-                assert_eq!(track_patch.enabled, Some(true));
-                assert!(tracks_patches.is_empty());
-                break;
+                assert_eq!(track_patch.enabled, Some(false));
+                assert!(expected_track_ids.remove(&track_patch.id));
+                if expected_track_ids.is_empty() {
+                    break;
+                }
             }
         }
     }
