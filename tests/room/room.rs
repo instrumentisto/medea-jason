@@ -2390,8 +2390,7 @@ mod set_local_media_settings {
                 false,
                 false,
             ))
-            .await
-            .unwrap();
+            .await;
         });
 
         let mut expected_track_ids = HashSet::from([TrackId(1), TrackId(2)]);
