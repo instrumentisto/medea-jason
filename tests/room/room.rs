@@ -1,6 +1,9 @@
 #![cfg(target_arch = "wasm32")]
 
-use std::{collections::HashMap, rc::Rc};
+use std::{
+    collections::{HashMap, HashSet},
+    rc::Rc,
+};
 
 use futures::{
     channel::{
@@ -2356,7 +2359,7 @@ mod set_local_media_settings {
     #[wasm_bindgen_test]
     async fn set_local_media_stream_settings_updates_media_exchange_state() {
         let (event_tx, event_rx) = mpsc::unbounded();
-        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
         let room_handle = api::RoomHandle::from(room.new_handle());
         room_handle
             .on_failed_local_media(js_sys::Function::new_no_args(""))
@@ -2381,7 +2384,6 @@ mod set_local_media_settings {
             .unwrap();
         delay_for(10).await;
 
-        use medea_jason::api::err::MediaSettingsUpdateException;
         spawn_local(async move {
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_stream_settings(false, false),
