@@ -2,7 +2,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
 import 'media_devices.g.dart' as bridge;
 
-/// Registers functions allowing Rust to manage Dart [MediaDevices]s.
+/// Registers functions allowing Rust to operate Dart [MediaDevices].
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -12,7 +12,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Request media input access and returns the created [MediaStreamTrack]s.
+/// Requests media input access and returns the created [MediaStreamTrack]s.
 Object _getUserMedia(MediaStreamConstraints constraints) {
   return () async {
     var videoConstraints = {};
@@ -31,7 +31,7 @@ Object _getUserMedia(MediaStreamConstraints constraints) {
   };
 }
 
-/// Returns all available media devices.
+/// Returns all the available media devices.
 Object _enumerateDevices() {
   return () => navigator.mediaDevices.enumerateDevices();
 }

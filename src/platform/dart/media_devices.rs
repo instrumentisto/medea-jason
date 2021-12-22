@@ -1,6 +1,6 @@
-//! [MediaDevices][1] functionality.
+//! Representation of [MediaDevices][0].
 //!
-//! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
+//! [0]: https://w3.org/TR/mediacapture-streams#mediadevices
 
 use std::convert::TryInto as _;
 
@@ -25,32 +25,37 @@ mod media_devices {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Returns information about the User Agent's available media input
-        /// devices.
+        /// Returns information about available media input devices.
         pub fn enumerate_devices() -> Dart_Handle;
 
-        /// Prompts a user for a permission to use a media input which produces
-        /// vector of [`MediaStreamTrack`]s containing the requested
-        /// types of media.
+        /// Prompts a user for permissions to use a media input device,
+        /// producing a vector of [MediaStreamTrack][1]s containing the
+        /// requested types of media.
+        ///
+        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn get_user_media(constraints: Dart_Handle) -> Dart_Handle;
 
-        /// Prompts a user to select and grant a permission to capture contents
-        /// of a display or portion thereof (such as a single window) as
-        /// vector of [`MediaStreamTrack`].
+        /// Prompts a user to select and grant permissions to capture contents
+        /// of a display or portion thereof (such as a single window), producing
+        /// a vector of [MediaStreamTrack][1]s containing the requested types
+        /// of media.
+        ///
+        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn get_display_media(constraints: Dart_Handle) -> Dart_Handle;
     }
 }
 
-/// Collects information about the User Agent's available media input devices.
+/// Collects information about available media input devices.
 ///
 /// Adapter for a [MediaDevices.enumerateDevices()][1] function.
 ///
 /// # Errors
 ///
-/// With [`Error`] if [MediaDevices.enumerateDevices()][1] returns error or
-/// cannot get [MediaDevices][2].
+/// If [MediaDevices.enumerateDevices()][1] errors itself or unable to get
+/// [MediaDevices][2].
 ///
 /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-enumeratedevices
+/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
 pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
 {
     let devices = FutureFromDart::execute::<DartHandle>(unsafe {
@@ -62,28 +67,27 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
 
     let len = devices.length();
     let mut result = Vec::with_capacity(len);
-
     for i in 0..len {
         let val = devices.get(i).unwrap();
-        if let Ok(val) = val.try_into() {
-            result.push(val);
+        if let Ok(v) = val.try_into() {
+            result.push(v);
         }
     }
-
     Ok(result)
 }
 
-/// Prompts a user for a permission to use a media input which produces vector
-/// of [`MediaStreamTrack`]s containing the requested types of media.
+/// Prompts a user for permissions to use a media input device, producing a
+/// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of media.
 ///
 /// Adapter for a [MediaDevices.getUserMedia()][1] function.
 ///
 /// # Errors
 ///
-/// With [`Error`] if [MediaDevices.getUserMedia()][1] returns error or cannot
-/// get [MediaDevices][2].
+/// If [MediaDevices.getUserMedia()][1] errors itself or unable to get
+/// [MediaDevices][2].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
 pub async fn get_user_media(
     caps: MediaStreamConstraints,
 ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
@@ -96,18 +100,19 @@ pub async fn get_user_media(
     Ok(DartList::from(tracks).into())
 }
 
-/// Prompts a user to select and grant a permission to capture contents of a
-/// display or portion thereof (such as a single window) as vector of
-/// [`MediaStreamTrack`].
+/// Prompts a user to select and grant permissions to capture contents of a
+/// display or portion thereof (such as a single window), producing a [`Vec`] of
+/// [`MediaStreamTrack`]s containing the requested types of media.
 ///
 /// Adapter for a [MediaDevices.getDisplayMedia()][1] function.
 ///
 /// # Errors
 ///
-/// With [`Error`] if [MediaDevices.getDisplayMedia()][1] returns error or
-/// cannot get [MediaDevices][2].
+/// If [MediaDevices.getDisplayMedia()][1] errors itself or unable to get
+/// [MediaDevices][2].
 ///
 /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
 pub async fn get_display_media(
     caps: DisplayMediaStreamConstraints,
 ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {

@@ -83,7 +83,7 @@ void _stop(MediaStreamTrack track) {
   track.stop();
 }
 
-/// Returns `1` if the provided [MediaStreamTrack] is enabled and `0` otherwise.
+/// Indicates whether the provided [MediaStreamTrack] is enabled.
 bool _enabled(MediaStreamTrack track) {
   return track.enabled;
 }

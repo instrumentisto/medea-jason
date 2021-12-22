@@ -517,6 +517,14 @@ impl RtcPeerConnection {
     }
 }
 
+impl Drop for RtcPeerConnection {
+    fn drop(&mut self) {
+        unsafe {
+            peer_connection::close(self.handle.get());
+        }
+    }
+}
+
 /// Representation of a Dart SDP type.
 #[derive(Display)]
 pub enum RtcSdpType {
@@ -527,12 +535,4 @@ pub enum RtcSdpType {
     /// Description is a definitive choice in an offer/answer exchange.
     #[display(fmt = "answer")]
     Answer,
-}
-
-impl Drop for RtcPeerConnection {
-    fn drop(&mut self) {
-        unsafe {
-            peer_connection::close(self.handle.get());
-        }
-    }
 }

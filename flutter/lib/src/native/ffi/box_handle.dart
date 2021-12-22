@@ -23,7 +23,7 @@ Object unboxDartHandle(Pointer<Handle> ptr) {
   return _unboxDartHandle(ptr);
 }
 
-/// Frees provided [`Pointer<Handle`].
+/// Frees the provided [`Pointer<Handle`].
 void freeBoxedDartHandle(Pointer<Handle> ptr) {
   _freeBoxedDartHandle(ptr);
 }

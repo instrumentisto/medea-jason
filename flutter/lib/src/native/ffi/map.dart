@@ -9,12 +9,12 @@ void registerFunctions(DynamicLibrary dl) {
       init: Pointer.fromFunction(_init), set: Pointer.fromFunction(_set));
 }
 
-/// Returns empty [Map].
+/// Returns an empty [Map].
 Object _init() {
   return {};
 }
 
-/// Sets [ForeignValue] in the provided [Map] at the provided `key`.
+/// Sets the given [value] under the given [key] in the provided [Map].
 void _set(Map<String, dynamic> map, Pointer<Utf8> key, ForeignValue value) {
   map[key.toDartString()] = value.toDart();
 }

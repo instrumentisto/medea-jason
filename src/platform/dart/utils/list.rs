@@ -1,5 +1,6 @@
-//! Definitions and implementations of the Rust side representation of the Dart
-//! side `List`s.
+//! Rust side representation of a Dart side [`List`].
+//!
+//! [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
 
 use std::convert::TryInto;
 
@@ -19,44 +20,49 @@ mod list {
     use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
 
     extern "C" {
-        /// Returns element with a provided index from the provided
-        /// [`Dart_Handle`] `List`.
+        /// Returns an element by the provided `index` from the provided
+        /// [`List`].
+        ///
+        /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn get(
             list: Dart_Handle,
             index: u32,
         ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
 
-        /// Returns length of the Dart side `List`.
+        /// Returns [`length`] of the provided [`List`].
+        ///
+        /// [`length`]: https://api.dart.dev/stable/dart-core/List/length.html
+        /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn length(list: Dart_Handle) -> u32;
     }
 }
 
-/// Rust side representation of the Dart side `List`s.
+/// Rust side representation of a Dart side [`List`].
+///
+/// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
 #[derive(From)]
 pub struct DartList(DartHandle);
 
 impl DartList {
-    /// Gets [`DartHandle`] from the underlying Dart `List` with a provided
-    /// index.
+    /// Returns an element by the provided `index` from this [`DartList`].
     #[must_use]
-    pub fn get(&self, i: usize) -> Option<DartHandle> {
+    pub fn get(&self, index: usize) -> Option<DartHandle> {
         #[allow(clippy::cast_possible_truncation)]
-        unsafe { list::get(self.0.get(), i as u32).unbox() }
+        unsafe { list::get(self.0.get(), index as u32).unbox() }
             .try_into()
             .unwrap()
     }
 
-    /// Returns length of the underlying Dart `List`.
+    /// Returns [`length`] of this [`DartList`].
+    ///
+    /// [`length`]: https://api.dart.dev/stable/dart-core/List/length.html
     #[must_use]
     pub fn length(&self) -> usize {
         unsafe { list::length(self.0.get()) as usize }
     }
 }
 
-impl<T> From<DartList> for Vec<T>
-where
-    T: From<DartHandle>,
-{
+impl<T: From<DartHandle>> From<DartList> for Vec<T> {
     fn from(list: DartList) -> Self {
         let len = list.length();
         let mut out = Vec::with_capacity(len);

@@ -4,7 +4,7 @@ import 'package:web_socket_channel/io.dart';
 
 import 'transport.g.dart' as bridge;
 
-/// Registers functions allowing Rust to manage Dart [IOWebSocketChannel]s.
+/// Registers functions allowing Rust to operate Dart [IOWebSocketChannel]s.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -32,9 +32,9 @@ void _listen(IOWebSocketChannel ws, Function onMessage, Function onClose) {
   });
 }
 
-/// Sends the provided [msg] to the provided [IOWebSocketChannel].
-void _send(IOWebSocketChannel ws, Pointer<Utf8> msg) {
-  var sendMsg = msg.toDartString();
+/// Sends the provided [message] to the provided [IOWebSocketChannel].
+void _send(IOWebSocketChannel ws, Pointer<Utf8> message) {
+  var sendMsg = message.toDartString();
   ws.sink.add(sendMsg);
 }
 

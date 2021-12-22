@@ -12,9 +12,9 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns [Pointer] to an object with a provided index.
-Pointer _get(List arr, int i) {
-  final el = arr[i];
+/// Returns a [Pointer] to a [List] element with the provided [index].
+Pointer _get(List arr, int index) {
+  final el = arr[index];
   if (el == null) {
     return ForeignValue.none().intoRustOwned();
   } else {

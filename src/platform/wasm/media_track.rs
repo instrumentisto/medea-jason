@@ -98,7 +98,7 @@ impl MediaStreamTrack {
     ///
     /// # Panics
     ///
-    /// If [`web_sys::MediaStreamTrack`] doesn't have `deviceId`.
+    /// If the underlying [MediaStreamTrack][2] doesn't have [`deviceId`][1].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack

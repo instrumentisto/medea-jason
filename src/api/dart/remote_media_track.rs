@@ -16,7 +16,10 @@ pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
 
-/// Returns [`Dart_Handle`] to the underlying `MediaStreamTrack`.
+/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
+/// [`RemoteMediaTrack`].
+///
+/// [`MediaStreamTrack`]: platform::MediaStreamTrack
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     this: ptr::NonNull<RemoteMediaTrack>,

@@ -51,7 +51,7 @@ Pointer _getSendTrack(RTCRtpTransceiver transceiver) {
   }
 }
 
-/// Returns `true` if the provided [RTCRtpTransceiver]'s
+/// Indicates whether the provided [RTCRtpTransceiver]'s
 /// [RTCRtpTransceiver.sender] has some [MediaStreamTrack].
 bool _hasSendTrack(RTCRtpTransceiver transceiver) {
   return transceiver.sender.track != null;
@@ -82,7 +82,7 @@ Object _dropSender(RTCRtpTransceiver transceiver) {
   }
 }
 
-/// Returns `true` if the [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is
+/// Indicates whether the [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is
 /// stopped.
 bool _isStopped(RTCRtpTransceiver transceiver) {
   return transceiver.stoped;

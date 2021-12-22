@@ -158,7 +158,7 @@ Object getTransceivers(RTCPeerConnection conn) {
   return () => conn.getTransceivers();
 }
 
-/// Closes provided [RTCPeerConnection].
+/// Closes the provided [RTCPeerConnection].
 void _close(RTCPeerConnection conn) {
   conn.dispose();
 }

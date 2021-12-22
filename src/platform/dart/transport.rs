@@ -30,22 +30,34 @@ mod transport {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Connects to the provided `url` and returns `Dart_Handle` to the
-        /// created `WebSocket`.
+        /// [Connects][1] to the provided `url` and returns the created
+        /// [`WebSocket`][0].
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/connect.html
         pub fn connect(url: ptr::NonNull<c_char>) -> Dart_Handle;
 
-        /// Sends the provided message via underlying `WebSocket`.
-        pub fn send(transport: Dart_Handle, msg: ptr::NonNull<c_char>);
+        /// [Sends][1] the provided `message` via the provided [`WebSocket`][0].
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/add.html
+        pub fn send(transport: Dart_Handle, message: ptr::NonNull<c_char>);
 
-        /// Closes the provided `WebSocket` connection.
+        /// [Closes][1] the provided [`WebSocket`][0] connection.
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/close.html
         pub fn close(
             transport: Dart_Handle,
             close_code: i32,
             close_msg: ptr::NonNull<c_char>,
         );
 
-        /// Subscribes to the provided `WebSocket` passing `on_message` and
-        /// `on_close` callbacks.
+        /// [Subscribes][1] to the provided [`WebSocket`][0] passing the given
+        /// `on_message` and `on_close` callbacks.
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+        /// [1]: https://api.dart.dev/stable/dart-async/Stream/listen.html
         pub fn listen(
             transport: Dart_Handle,
             on_message: Dart_Handle,
@@ -54,17 +66,22 @@ mod transport {
     }
 }
 
-/// WebSocket [`RpcTransport`] between a client and a server.
+/// [`RpcTransport`] implementation of a Dart side [`WebSocket`][0].
+///
+/// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
 #[derive(Clone, Debug)]
 pub struct WebSocketRpcTransport {
-    /// Underlying Dart-side `WebSocket`.
+    /// Handle to the Dart side [`WebSocket`][0].
+    ///
+    /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
     handle: DartHandle,
 
     /// Subscribers to the messages received by this transport.
     on_message_subs: Rc<RefCell<Vec<mpsc::UnboundedSender<ServerMsg>>>>,
 
     /// Reason of [`WebSocketRpcTransport`] closing.
-    /// Will be sent in [WebSocket close frame][1].
+    ///
+    /// Is sent in a [WebSocket close frame][1].
     ///
     /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
     close_reason: Cell<ClientDisconnect>,
@@ -74,16 +91,21 @@ pub struct WebSocketRpcTransport {
 }
 
 impl WebSocketRpcTransport {
-    /// Initiates a new [`WebSocketRpcTransport`] connection. Resolves only once
-    /// an underlying connection becomes active.
+    /// Initiates a new [`WebSocketRpcTransport`] connection.
+    ///
+    /// Only resolves once the underlying connection becomes active.
     ///
     /// # Errors
     ///
-    /// With [`TransportError::CreateSocket`] if cannot establish WebSocket to
-    /// specified URL.
+    /// With [`TransportError::CreateSocket`] if cannot establish
+    /// [`WebSocket`][0] to the specified `url`.
     ///
     /// With [`TransportError::InitSocket`] if [WebSocket.onclose][1] callback
     /// fired before [WebSocket.onopen][2] callback.
+    ///
+    /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+    /// [1]: https://developer.mozilla.org/docs/Web/API/WebSocket/onclose
+    /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
     pub async fn new(url: ApiUrl) -> Result<Self> {
         unsafe {
             let handle =
@@ -101,8 +123,8 @@ impl WebSocketRpcTransport {
                         {
                             Ok(parsed) => parsed,
                             Err(e) => {
-                                // TODO: protocol versions mismatch? should drop
-                                //       connection if so
+                                // TODO: Protocol versions mismatch? should drop
+                                //       connection if so.
                                 log::error!("{}", tracerr::new!(e));
                                 return;
                             }

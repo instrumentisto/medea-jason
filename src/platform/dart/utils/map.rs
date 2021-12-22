@@ -1,5 +1,6 @@
-//! Definitions and implementation of the Rust side representation of the Dart
-//! side Map.
+//! Rust side representation of a Dart side [`Map`].
+//!
+//! [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
 
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
@@ -18,11 +19,15 @@ mod map {
     use crate::api::DartValue;
 
     extern "C" {
-        /// Returns [`Dart_Handle`] to the newly created Dart `Map`.
+        /// Initializes a new empty [`Map`].
+        ///
+        /// [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
         pub fn init() -> Dart_Handle;
 
-        /// Sets provided [`Dart_Handle`] with a provided [`c_char`] key to the
-        /// provided [`Dart_Handle`] `Map`.
+        /// Sets the provided `value` under the provided `key` to the provided
+        /// [`Map`].
+        ///
+        /// [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
         pub fn set(
             map: Dart_Handle,
             key: ptr::NonNull<c_char>,
@@ -31,7 +36,9 @@ mod map {
     }
 }
 
-/// Rust representation of the Dart side Map.
+/// Rust representation of a Dart side [`Map`].
+///
+/// [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
 pub struct DartMap(DartHandle);
 
 impl From<DartMap> for Dart_Handle {
@@ -47,20 +54,20 @@ impl Default for DartMap {
 }
 
 impl DartMap {
-    /// Returns new Dart `Map`.
+    /// Creates a new empty [`DartMap`].
     #[must_use]
     pub fn new() -> Self {
         Self(DartHandle::new(unsafe { map::init() }))
     }
 
-    /// Sets provided [`Value`] to the provided `key`.
-    pub fn set(&self, key: String, value: DartValue) {
+    /// Sets the provided `value` under the provided `key` to this [`DartMap`].
+    pub fn set(&mut self, key: String, value: DartValue) {
         unsafe {
             map::set(self.0.get(), string_into_c_str(key), value);
         }
     }
 
-    /// Returns underlying [`Dart_Handle`] of this [`DartMap`].
+    /// Returns the underlying [`Dart_Handle`] of this [`DartMap`].
     #[must_use]
     pub fn as_handle(&self) -> Dart_Handle {
         self.0.get()
