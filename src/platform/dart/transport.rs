@@ -37,7 +37,11 @@ mod transport {
         ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
         /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/connect.html
-        pub fn connect(url: ptr::NonNull<c_char>) -> Dart_Handle;
+        pub fn connect(
+            url: ptr::NonNull<c_char>,
+            on_message: Dart_Handle,
+            on_close: Dart_Handle,
+        ) -> Dart_Handle;
 
         /// [Sends][1] the provided `message` via the provided [`WebSocket`][0].
         ///
@@ -53,17 +57,6 @@ mod transport {
             transport: Dart_Handle,
             close_code: i32,
             close_msg: ptr::NonNull<c_char>,
-        );
-
-        /// [Subscribes][1] to the provided [`WebSocket`][0] passing the given
-        /// `on_message` and `on_close` callbacks.
-        ///
-        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
-        /// [1]: https://api.dart.dev/stable/dart-async/Stream/listen.html
-        pub fn listen(
-            transport: Dart_Handle,
-            on_message: Dart_Handle,
-            on_close: Dart_Handle,
         );
     }
 }
@@ -110,49 +103,47 @@ impl WebSocketRpcTransport {
     /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
     pub async fn new(url: ApiUrl) -> Result<Self> {
         unsafe {
-            let handle = FutureFromDart::execute::<DartHandle>(
-                transport::connect(string_into_c_str(url.as_ref().to_string())),
-            )
-            .await
-            .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
             let on_message_subs = Rc::new(RefCell::new(Vec::new()));
             let socket_state =
                 Rc::new(ObservableCell::new(TransportState::Open));
+            let handle = FutureFromDart::execute::<DartHandle>(
+                transport::connect(
+                    string_into_c_str(url.as_ref().to_string()),
+                    Callback::from_fn_mut({
+                        let subs = Rc::clone(&on_message_subs);
+                        move |msg: String| {
+                            let msg = match serde_json::from_str::<ServerMsg>(&msg)
+                            {
+                                Ok(parsed) => parsed,
+                                Err(e) => {
+                                    // TODO: Protocol versions mismatch? should drop
+                                    //       connection if so.
+                                    log::error!("{}", tracerr::new!(e));
+                                    return;
+                                }
+                            };
 
-            transport::listen(
-                handle.get(),
-                Callback::from_fn_mut({
-                    let subs = Rc::clone(&on_message_subs);
-                    move |msg: String| {
-                        let msg = match serde_json::from_str::<ServerMsg>(&msg)
-                        {
-                            Ok(parsed) => parsed,
-                            Err(e) => {
-                                // TODO: Protocol versions mismatch? should drop
-                                //       connection if so.
-                                log::error!("{}", tracerr::new!(e));
-                                return;
-                            }
-                        };
-
-                        subs.borrow_mut().retain(
-                            |sub: &UnboundedSender<ServerMsg>| {
-                                sub.unbounded_send(msg.clone()).is_ok()
-                            },
-                        );
-                    }
-                })
-                .into_dart(),
-                Callback::from_fn_mut({
-                    let socket_state = Rc::clone(&socket_state);
-                    move |msg: ()| {
-                        socket_state.set(TransportState::Closed(
-                            CloseMsg::Normal(1000, CloseReason::Finished),
-                        ));
-                    }
-                })
-                .into_dart(),
-            );
+                            subs.borrow_mut().retain(
+                                |sub: &UnboundedSender<ServerMsg>| {
+                                    sub.unbounded_send(msg.clone()).is_ok()
+                                },
+                            );
+                        }
+                    })
+                        .into_dart(),
+                    Callback::from_fn_mut({
+                        let socket_state = Rc::clone(&socket_state);
+                        move |msg: ()| {
+                            socket_state.set(TransportState::Closed(
+                                CloseMsg::Normal(1000, CloseReason::Finished),
+                            ));
+                        }
+                    })
+                        .into_dart(),
+                ),
+            )
+            .await
+            .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
 
             Ok(Self {
                 handle,
