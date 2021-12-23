@@ -117,8 +117,7 @@ impl WebSocketRpcTransport {
                                     Ok(parsed) => parsed,
                                     Err(e) => {
                                         // TODO: Protocol versions mismatch?
-                                        // should drop
-                                        //       connection if so.
+                                        //       should drop connection if so.
                                         log::error!("{}", tracerr::new!(e));
                                         return;
                                     }
