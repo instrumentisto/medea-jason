@@ -17,8 +17,8 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Connects to the provided [addr] and returns [WebSocket] for it.
 ///
-/// Subscribes on WebSocket messages with provided [WebSocket] and
-/// [onClose] callbacks.
+/// Subscribes to the created [WebSocket] messages with the given [onMessage]
+/// and [onClose] callbacks.
 Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
   return () async {
     var ws = await WebSocket.connect(addr.toDartString());

@@ -35,8 +35,12 @@ mod transport {
         /// [Connects][1] to the provided `url` and returns the created
         /// [`WebSocket`][0].
         ///
+        /// [Subscribes][2] to the created [`WebSocket`][0] passing the given
+        /// `on_message` and `on_close` callbacks.
+        ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
         /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/connect.html
+        /// [2]: https://api.dart.dev/stable/dart-async/Stream/listen.html
         pub fn connect(
             url: ptr::NonNull<c_char>,
             on_message: Dart_Handle,
