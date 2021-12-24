@@ -41,7 +41,7 @@ class Executor {
             .asFunction(),
         _taskDrop = dylib
             .lookup<NativeFunction<_executorDropTask_C>>(
-                'rust_executor_drop_task')
+                'rust_executor_drop_task') // TODO: remove
             .asFunction() {
     _wakePort = ReceivePort()..listen(_pollTask);
     _loopInit(_wakePort.sendPort.nativePort);
@@ -52,8 +52,6 @@ class Executor {
   void _pollTask(dynamic message) {
     final task = Pointer.fromAddress(message);
 
-    if (_taskPoll(task) == 0) {
-      _taskDrop(task);
-    }
+    _taskPoll(task);
   }
 }

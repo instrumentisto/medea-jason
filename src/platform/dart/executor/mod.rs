@@ -2,7 +2,8 @@
 
 mod task;
 
-use std::{future::Future, ptr, rc::Rc};
+use std::{future::Future, ptr};
+use std::rc::{Rc, Weak};
 
 use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 
@@ -51,8 +52,12 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_poll_task(
     mut task: ptr::NonNull<Task>,
-) -> bool {
-    task.as_mut().poll().is_pending()
+) -> bool { // TODO: return void
+    let ready = task.as_mut().poll().is_ready();
+    if ready {
+        drop(Rc::from_raw(task.as_ptr()))
+    }
+    ready
 }
 
 /// Drops a [`Task`].
@@ -68,7 +73,9 @@ pub unsafe extern "C" fn rust_executor_poll_task(
 /// specific [`Task`].
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_drop_task(task: ptr::NonNull<Task>) {
-    drop(Rc::from_raw(task.as_ptr()));
+    // TODO: remove
+    // log::error!("DART_DROP {:p}", task.as_ptr());
+    // drop(Rc::from_raw(task.as_ptr()));
 }
 
 /// Commands an external Dart executor to poll the provided [`Task`].
@@ -76,22 +83,24 @@ pub unsafe extern "C" fn rust_executor_drop_task(task: ptr::NonNull<Task>) {
 /// Sends command that contains the provided [`Task`] to the configured
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
-fn task_wake(task: ptr::NonNull<Task>) {
+fn task_wake(task: Rc<Task>) {
     let wake_port = unsafe { WAKE_PORT }.unwrap();
+    let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
         type_: Dart_CObject_Type::Int64,
         value: Dart_CObjectValue {
-            as_int64: task.as_ptr() as i64,
+            as_int64: task as i64,
         },
     };
 
+    log::error!("DART_ENQUEUE {:p}", task);
     let enqueued =
         unsafe { Dart_PostCObject_DL_Trampolined(wake_port, &mut task_addr) };
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {
-            rust_executor_drop_task(task);
+            drop(Rc::from_raw(task));
         }
     }
 }
