@@ -26,6 +26,7 @@ void registerFunctions(DynamicLibrary dl) {
     createAnswer: Pointer.fromFunction(_createAnswer),
     getTransceiverByMid: Pointer.fromFunction(_getTransceiverByMid),
     onConnectionStateChange: Pointer.fromFunction(_onConnectionStateChange),
+    close: Pointer.fromFunction(_close),
   );
 }
 
@@ -33,16 +34,17 @@ void registerFunctions(DynamicLibrary dl) {
 ///
 /// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
 Object _addTransceiver(RTCPeerConnection peer, int kind, int direction) {
-  return peer.addTransceiver(
-    kind: RTCRtpMediaType.values[kind],
-    init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendRecv),
-  );
+  return () => peer.addTransceiver(
+        kind: RTCRtpMediaType.values[kind],
+        init: RTCRtpTransceiverInit(
+            direction: TransceiverDirection.values[direction]),
+      );
 }
 
 /// Returns newly created [RTCPeerConnection] with a provided `iceServers`
 /// [List].
 Object _newPeer(Object iceServers) {
-  return createPeerConnection(
+  return () => createPeerConnection(
       {'iceServers': iceServers, 'sdpSemantics': 'unified-plan'});
 }
 
@@ -81,38 +83,38 @@ void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
 /// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the
 /// provided [String].
 Object _getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
-  return peer.getTransceivers().then((transceivers) {
-    var mMid = mid.toDartString();
-    for (var transceiver in transceivers) {
-      if (transceiver.mid == mMid) {
-        return transceiver;
-      }
-    }
-  });
+  return () => peer.getTransceivers().then((transceivers) {
+        var mMid = mid.toDartString();
+        for (var transceiver in transceivers) {
+          if (transceiver.mid == mMid) {
+            return transceiver;
+          }
+        }
+      });
 }
 
 /// Sets remote SDP offer in the provided [RTCPeerConnection].
 Object _setRemoteDescription(
     RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var desc = RTCSessionDescription(sdp.toDartString(), type.toDartString());
-  return conn.setRemoteDescription(desc);
+  return () => conn.setRemoteDescription(desc);
 }
 
 /// Sets local SDP offer in the provided [RTCPeerConnection].
 Object _setLocalDescription(
     RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  return conn.setLocalDescription(
+  return () => conn.setLocalDescription(
       RTCSessionDescription(sdp.toDartString(), type.toDartString()));
 }
 
 /// Creates new SDP offer for the provided [RTCPeerConnection].
 Object _createOffer(RTCPeerConnection conn) {
-  return conn.createOffer({}).then((val) => val.sdp);
+  return () => conn.createOffer({}).then((val) => val.sdp);
 }
 
 /// Creates new SDP answer for the provided [RTCPeerConnection].
 Object _createAnswer(RTCPeerConnection conn) {
-  return conn.createAnswer({}).then((val) => val.sdp);
+  return () => conn.createAnswer({}).then((val) => val.sdp);
 }
 
 /// Restarts ICE on the provided [RTCPeerConnection].
@@ -122,7 +124,7 @@ void _restartIce(RTCPeerConnection conn) {
 
 /// Adds provided [RTCIceCandidate] to the provided [RTCPeerConnection].
 Object _addIceCandidate(RTCPeerConnection conn, RTCIceCandidate candidate) {
-  return conn.addCandidate(candidate);
+  return () => conn.addCandidate(candidate);
 }
 
 /// Returns current [RTCPeerConnection.connectionState] of the provided
@@ -147,10 +149,16 @@ int _iceConnectionState(RTCPeerConnection conn) {
 
 /// Rollbacks local SDP offer of the provided [RTCPeerConnection].
 Object _rollback(RTCPeerConnection conn) {
-  return conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
+  return () =>
+      conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
 }
 
 /// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].
 Object getTransceivers(RTCPeerConnection conn) {
-  return conn.getTransceivers();
+  return () => conn.getTransceivers();
+}
+
+/// Closes the provided [RTCPeerConnection].
+void _close(RTCPeerConnection conn) {
+  conn.dispose();
 }

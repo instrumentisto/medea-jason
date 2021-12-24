@@ -1,5 +1,7 @@
 use std::ptr;
 
+use dart_sys::Dart_Handle;
+
 use super::ForeignClass;
 
 use crate::media::{MediaKind, MediaSourceKind};
@@ -10,6 +12,17 @@ pub use self::mock::LocalMediaTrack;
 pub use crate::media::track::local::LocalMediaTrack;
 
 impl ForeignClass for LocalMediaTrack {}
+
+/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
+/// [`LocalMediaTrack`].
+///
+/// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
+#[no_mangle]
+pub unsafe extern "C" fn LocalMediaTrack__get_track(
+    this: ptr::NonNull<LocalMediaTrack>,
+) -> Dart_Handle {
+    this.as_ref().get_track().handle()
+}
 
 /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
 /// audio track, or a [`MediaKind::Video`] if it represents a video track.
@@ -53,9 +66,12 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
-    use crate::media::{
-        track::local::LocalMediaTrack as CoreLocalMediaTrack, MediaKind,
-        MediaSourceKind,
+    use crate::{
+        media::{
+            track::local::LocalMediaTrack as CoreLocalMediaTrack, MediaKind,
+            MediaSourceKind,
+        },
+        platform,
     };
 
     pub struct LocalMediaTrack(pub u8);
@@ -75,6 +91,8 @@ mod mock {
             MediaSourceKind::Display
         }
 
-        // pub fn get_track(&self) -> sys::MediaStreamTrack
+        pub fn get_track(&self) -> platform::MediaStreamTrack {
+            unreachable!()
+        }
     }
 }

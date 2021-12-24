@@ -23,13 +23,9 @@ Object _new() {
 void _add(List servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
   var iceServer = {'url': url.toDartString()};
-  username = username.toDart();
-  if (username is String) {
-    iceServer['username'] = username as String;
-  }
-  credentials = credentials.toDart();
-  if (credentials is String) {
-    iceServer['credentials'] = credentials as String;
-  }
+
+  iceServer['username'] = username.toDart();
+  iceServer['credential'] = credentials.toDart();
+
   servers.add(iceServer);
 }

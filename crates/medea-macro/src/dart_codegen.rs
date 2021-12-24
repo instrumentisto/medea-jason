@@ -11,26 +11,17 @@ use syn::spanned::Spanned as _;
 /// Types that can be passed through FFI.
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum DartType {
-    /// Pointer to the Dart `Object`.
+    /// Type which indicates that function doesn't return anything.
     ///
-    /// Represents a [Handle] on the Dart side.
-    ///
-    /// [Handle]: https://api.dart.dev/stable/dart-ffi/Handle-class.html
-    Handle,
+    /// `void` keyword in Dart.
+    Void,
 
-    /// [`c_char`] pointer.
+    /// Boolean value.
     ///
-    /// Represents [Pointer<Utf8>][0] on the Dart side.
+    /// Represents [Bool] on the Dart side.
     ///
-    /// [0]: https://pub.dev/documentation/ffi/latest/ffi/Utf8-class.html
-    StringPointer,
-
-    /// Pointer to a boxed Dart `Object`.
-    ///
-    /// Represents [Pointer<Handle>][0] on the Dart side.
-    ///
-    /// [0]: https://api.dart.dev/stable/dart-ffi/Pointer-class.html
-    HandlePointer,
+    /// [Bool]: https://api.dart.dev/stable/dart-ffi/Bool-class.html
+    Bool,
 
     /// 8-bit integer.
     ///
@@ -39,12 +30,26 @@ pub(crate) enum DartType {
     /// [Int8]: https://api.dart.dev/stable/dart-ffi/Int8-class.html
     Int8,
 
+    /// 8-bit unsigned integer.
+    ///
+    /// Represents [Uint8] on the Dart side.
+    ///
+    /// [Uint8]: https://api.dart.dev/stable/dart-ffi/Uint8-class.html
+    Uint8,
+
     /// 32-bit integer.
     ///
     /// Represents [Int32] on the Dart side.
     ///
     /// [Int32]: https://api.dart.dev/stable/dart-ffi/Int32-class.html
     Int32,
+
+    /// 32-bit unsigned integer.
+    ///
+    /// Represents [Uint32] on the Dart side.
+    ///
+    /// [Uint32]: https://api.dart.dev/stable/dart-ffi/Uint32-class.html
+    Uint32,
 
     /// 64-bit integer.
     ///
@@ -53,6 +58,20 @@ pub(crate) enum DartType {
     /// [Int64]: https://api.dart.dev/stable/dart-ffi/Int64-class.html
     Int64,
 
+    /// 64-bit unsigned integer.
+    ///
+    /// Represents [Uint64] on the Dart side.
+    ///
+    /// [Uint64]: https://api.dart.dev/stable/dart-ffi/Uint64-class.html
+    Uint64,
+
+    /// Pointer to the Dart `Object`.
+    ///
+    /// Represents a [Handle] on the Dart side.
+    ///
+    /// [Handle]: https://api.dart.dev/stable/dart-ffi/Handle-class.html
+    Handle,
+
     /// Pointer to the Rust structure.
     ///
     /// Represents [Pointer] on the Dart side.
@@ -60,10 +79,19 @@ pub(crate) enum DartType {
     /// [Pointer]: https://api.dart.dev/stable/dart-ffi/Pointer-class.html
     Pointer,
 
-    /// Type which indicates that function doesn't return anything.
+    /// Pointer to a boxed Dart `Object`.
     ///
-    /// `void` keyword in Dart.
-    Void,
+    /// Represents [Pointer<Handle>][0] on the Dart side.
+    ///
+    /// [0]: https://api.dart.dev/stable/dart-ffi/Pointer-class.html
+    HandlePointer,
+
+    /// [`c_char`] pointer.
+    ///
+    /// Represents [Pointer<Utf8>][0] on the Dart side.
+    ///
+    /// [0]: https://pub.dev/documentation/ffi/latest/ffi/Utf8-class.html
+    StringPointer,
 
     /// `DartValue` FFI structure which adds ability to cast more complex
     /// types.
@@ -74,14 +102,18 @@ impl DartType {
     /// Converts this [`DartType`] to the Dart side FFI type.
     pub(crate) fn to_ffi_type(self) -> &'static str {
         match self {
-            Self::Handle => "Handle",
-            Self::StringPointer => "Pointer<Utf8>",
-            Self::HandlePointer => "Pointer<Handle>",
-            Self::Int8 => "Int8",
-            Self::Int32 => "Int32",
-            Self::Int64 => "Int64",
-            Self::Pointer => "Pointer",
             Self::Void => "Void",
+            Self::Bool => "Bool",
+            Self::Int8 => "Int8",
+            Self::Uint8 => "Uint8",
+            Self::Int32 => "Int32",
+            Self::Uint32 => "Uint32",
+            Self::Int64 => "Int64",
+            Self::Uint64 => "Uint64",
+            Self::Handle => "Handle",
+            Self::Pointer => "Pointer",
+            Self::HandlePointer => "Pointer<Handle>",
+            Self::StringPointer => "Pointer<Utf8>",
             Self::ForeignValue => "ForeignValue",
         }
     }
@@ -132,13 +164,17 @@ impl TryFrom<syn::Type> for DartType {
                         syn::Error::new(p.span(), "Empty path")
                     })?;
                 match ty.ident.to_string().as_str() {
+                    "bool" => Self::Bool,
+                    "i8" => Self::Int8,
+                    "u8" => Self::Uint8,
+                    "i32" => Self::Int32,
+                    "u32" => Self::Uint32,
+                    "i64" => Self::Int64,
+                    "u64" => Self::Uint64,
                     "Dart_Handle" => Self::Handle,
                     "NonNull" => Self::from_non_null_generic(&ty.arguments)?,
                     "DartValueArg" | "DartValue" => Self::ForeignValue,
                     "DartError" => Self::HandlePointer,
-                    "i32" => Self::Int32,
-                    "i64" => Self::Int64,
-                    "i8" => Self::Int8,
                     _ => {
                         return Err(syn::Error::new(
                             ty.ident.span(),

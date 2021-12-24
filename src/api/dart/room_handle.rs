@@ -119,7 +119,7 @@ pub unsafe extern "C" fn RoomHandle__unmute_audio(
     let this = this.as_ref().clone();
 
     async move {
-        this.mute_audio().await?;
+        this.unmute_audio().await?;
         Ok(())
     }
     .into_dart_future()
