@@ -2,8 +2,7 @@
 
 mod task;
 
-use std::{future::Future, ptr};
-use std::rc::{Rc};
+use std::{future::Future, ptr, rc::Rc};
 
 use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 
@@ -38,10 +37,6 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 
 /// Polls an incomplete [`Task`].
 ///
-/// This function returns `true` if the [`Task`] is still [`Pending`], and
-/// `false` once the [`Task`] is [`Ready`]. In this latter case it should be
-/// dropped with the [`rust_executor_drop_task()`] function.
-///
 /// # Safety
 ///
 /// Valid [`Task`] pointer must be provided. Must not be called if the provided
@@ -50,13 +45,8 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 /// [`Pending`]: std::task::Poll::Pending
 /// [`Ready`]: std::task::Poll::Ready
 #[no_mangle]
-pub unsafe extern "C" fn rust_executor_poll_task(
-    mut task: ptr::NonNull<Task>,
-) {
-    let ready = task.as_mut().poll().is_ready();
-    if ready {
-        drop(Rc::from_raw(task.as_ptr()))
-    }
+pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
+    let task = Rc::from_raw(task.as_ptr()).poll();
 }
 
 /// Commands an external Dart executor to poll the provided [`Task`].
@@ -75,7 +65,6 @@ fn task_wake(task: Rc<Task>) {
         },
     };
 
-    log::error!("DART_ENQUEUE {:p}", task);
     let enqueued =
         unsafe { Dart_PostCObject_DL_Trampolined(wake_port, &mut task_addr) };
     if !enqueued {

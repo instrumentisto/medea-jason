@@ -42,10 +42,7 @@ impl Task {
 
         let waker =
             unsafe { Waker::from_raw(Task::into_raw_waker(Rc::clone(&this))) };
-        this.inner.borrow_mut().replace(Inner {
-            future,
-            waker,
-        });
+        this.inner.borrow_mut().replace(Inner { future, waker });
 
         // Task is leaked and must be freed manually by the external executor.
         task_wake(this);
@@ -60,9 +57,7 @@ impl Task {
         // Just ignore poll request if the `Future` is completed.
         let inner = match borrow.as_mut() {
             Some(inner) => inner,
-            None => {
-                return Poll::Ready(())
-            },
+            None => return Poll::Ready(()),
         };
         let poll = {
             let mut cx = Context::from_waker(&inner.waker);
@@ -83,7 +78,7 @@ impl Task {
     fn wake_by_ref(this: &Rc<Self>) {
         if !this.is_scheduled.get() {
             this.is_scheduled.set(true);
-            task_wake(Rc::clone(&this));
+            task_wake(Rc::clone(this));
         }
     }
 
