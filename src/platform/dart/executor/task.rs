@@ -44,8 +44,7 @@ impl Task {
             unsafe { Waker::from_raw(Task::into_raw_waker(Rc::clone(&this))) };
         this.inner.borrow_mut().replace(Inner { future, waker });
 
-        // Task is leaked and must be freed manually by the external executor.
-        task_wake(this);
+        Task::wake_by_ref(&this);
     }
 
     /// Polls the underlying [`Future`].
@@ -76,8 +75,7 @@ impl Task {
     /// [`Task`] s incomplete and there are no [`Poll::Pending`] awake requests
     /// already.
     fn wake_by_ref(this: &Rc<Self>) {
-        if !this.is_scheduled.get() {
-            this.is_scheduled.set(true);
+        if !this.is_scheduled.replace(true) {
             task_wake(Rc::clone(this));
         }
     }
@@ -96,7 +94,6 @@ impl Task {
 
         unsafe fn raw_wake(ptr: *const ()) {
             let ptr = Rc::from_raw(ptr.cast::<Task>());
-
             Task::wake_by_ref(&ptr);
         }
 
@@ -106,8 +103,7 @@ impl Task {
         }
 
         unsafe fn raw_drop(ptr: *const ()) {
-            let rc = Rc::from_raw(ptr.cast::<Task>());
-            drop(rc);
+            drop(Rc::from_raw(ptr.cast::<Task>()));
         }
 
         const VTABLE: RawWakerVTable =
