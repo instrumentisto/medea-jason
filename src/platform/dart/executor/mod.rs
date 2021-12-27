@@ -53,11 +53,9 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 pub unsafe extern "C" fn rust_executor_poll_task(
     mut task: ptr::NonNull<Task>,
 ) -> bool { // TODO: return void
-    let ready = task.as_mut().poll().is_ready();
-    if ready {
-        drop(Rc::from_raw(task.as_ptr()))
-    }
-    ready
+    let task = Rc::from_raw(task.as_ptr());
+
+    task.poll().is_ready()
 }
 
 /// Drops a [`Task`].
