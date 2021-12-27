@@ -31,7 +31,13 @@ use libc::c_char;
 use crate::{
     api::dart::utils::{DartError, PtrArray},
     media::{FacingMode, MediaKind, MediaSourceKind},
-    platform::utils::handle::DartHandle,
+    platform::utils::{
+        dart_api::{
+            Dart_DeletePersistentHandle_DL_Trampolined,
+            Dart_NewPersistentHandle_DL_Trampolined,
+        },
+        handle::DartHandle,
+    },
 };
 
 pub use self::{
@@ -575,7 +581,16 @@ impl TryFrom<i64> for MediaKind {
 pub unsafe extern "C" fn unbox_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) -> Dart_Handle {
-    *Box::from_raw(val.as_ptr())
+    *val.as_ptr()
+}
+
+/// Frees the provided [`ptr::NonNull`] pointer to a [`Dart_Handle`].
+#[no_mangle]
+pub unsafe extern "C" fn free_boxed_dart_handle(
+    val: ptr::NonNull<Dart_Handle>,
+) {
+    let handle = Box::from_raw(val.as_ptr());
+    Dart_DeletePersistentHandle_DL_Trampolined(*handle);
 }
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
@@ -584,7 +599,8 @@ pub unsafe extern "C" fn unbox_dart_handle(
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
-    ptr::NonNull::from(Box::leak(Box::new(val)))
+    let persisted = Dart_NewPersistentHandle_DL_Trampolined(val);
+    ptr::NonNull::from(Box::leak(Box::new(persisted)))
 }
 
 /// Returns a boxed pointer to the provided [`DartValue`].

@@ -16,6 +16,17 @@ pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
 
+/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
+/// [`RemoteMediaTrack`].
+///
+/// [`MediaStreamTrack`]: platform::MediaStreamTrack
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__get_track(
+    this: ptr::NonNull<RemoteMediaTrack>,
+) -> Dart_Handle {
+    this.as_ref().get_track().handle()
+}
+
 /// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__on_enabled(
@@ -141,8 +152,6 @@ mod mock {
             false
         }
 
-        // pub fn get_track(&self) -> sys::MediaStreamTrack
-
         pub fn on_enabled(&self, cb: platform::Function<()>) {
             cb.call0();
         }
@@ -161,6 +170,10 @@ mod mock {
 
         pub fn on_stopped(&self, cb: platform::Function<()>) {
             cb.call0();
+        }
+
+        pub fn get_track(&self) -> platform::MediaStreamTrack {
+            unreachable!()
         }
     }
 }

@@ -33,7 +33,7 @@ void registerFunction(
               Handle Function(Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>>
       newInternalException,
   required Pointer<
-          NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Handle>, Int8)>>
+          NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Handle>, Bool)>>
       newMediaSettingsUpdateException,
 }) {
   dl.lookupFunction<

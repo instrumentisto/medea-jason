@@ -93,9 +93,9 @@ Object _newInternalException(
 /// Creates a new [NativeMediaSettingsUpdateException] with the provided error
 /// [message], error [cause] and [rolledBack] property.
 Object _newMediaSettingsUpdateException(
-    Pointer<Utf8> message, Pointer<Handle> cause, int rolledBack) {
-  return NativeMediaSettingsUpdateException(message.nativeStringToDartString(),
-      unboxDartHandle(cause), rolledBack > 0);
+    Pointer<Utf8> message, Pointer<Handle> cause, bool rolledBack) {
+  return NativeMediaSettingsUpdateException(
+      message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
 }
 
 /// Exception thrown when local media acquisition fails.

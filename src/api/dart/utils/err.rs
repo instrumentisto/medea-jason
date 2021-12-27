@@ -99,7 +99,7 @@ mod exception {
         pub fn new_media_settings_update_exception(
             message: ptr::NonNull<c_char>,
             cause: DartError,
-            rolled_back: i8,
+            rolled_back: bool,
         ) -> Dart_Handle;
     }
 }
@@ -264,7 +264,7 @@ impl From<MediaSettingsUpdateException> for DartError {
             Self::new(exception::new_media_settings_update_exception(
                 string_into_c_str(err.message()),
                 err.cause(),
-                err.rolled_back() as i8,
+                err.rolled_back(),
             ))
         }
     }

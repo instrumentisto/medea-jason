@@ -32,7 +32,6 @@ class _CallState extends State {
       var renderer = RTCVideoRenderer();
       await renderer.initialize();
       renderer.srcObject = stream;
-      renderer.muted = false;
       setState(() {
         _videos.add(RTCVideoView(renderer));
       });

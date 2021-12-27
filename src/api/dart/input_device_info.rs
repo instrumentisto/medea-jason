@@ -2,7 +2,7 @@ use std::{os::raw::c_char, ptr};
 
 use super::{utils::string_into_c_str, ForeignClass};
 
-use crate::media::MediaKind;
+use crate::{api::DartValueArg, media::MediaKind};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::InputDeviceInfo;
@@ -53,8 +53,8 @@ pub unsafe extern "C" fn InputDeviceInfo__label(
 #[no_mangle]
 pub unsafe extern "C" fn InputDeviceInfo__group_id(
     this: ptr::NonNull<InputDeviceInfo>,
-) -> ptr::NonNull<c_char> {
-    string_into_c_str(this.as_ref().group_id())
+) -> DartValueArg<Option<String>> {
+    DartValueArg::from(this.as_ref().group_id())
 }
 
 /// Frees the data behind the provided pointer.
@@ -67,7 +67,7 @@ pub unsafe extern "C" fn InputDeviceInfo__group_id(
 pub unsafe extern "C" fn InputDeviceInfo__free(
     this: ptr::NonNull<InputDeviceInfo>,
 ) {
-    let _ = InputDeviceInfo::from_ptr(this);
+    drop(InputDeviceInfo::from_ptr(this));
 }
 
 #[cfg(feature = "mockable")]
@@ -89,8 +89,8 @@ mod mock {
             String::from("InputDeviceInfo.label")
         }
 
-        pub fn group_id(&self) -> String {
-            String::from("InputDeviceInfo.group_id")
+        pub fn group_id(&self) -> Option<String> {
+            Some(String::from("InputDeviceInfo.group_id"))
         }
     }
 }

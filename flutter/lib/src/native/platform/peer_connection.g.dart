@@ -30,9 +30,11 @@ void registerFunction(
   required Pointer<
           NativeFunction<Handle Function(Handle, Pointer<Utf8>, Pointer<Utf8>)>>
       setRemoteDescription,
+  required Pointer<NativeFunction<Void Function(Handle)>> close,
 }) {
   dl.lookupFunction<
       Void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -65,6 +67,7 @@ void registerFunction(
           Pointer,
           Pointer,
           Pointer,
+          Pointer,
           Pointer)>('register_peer_connection')(
     iceConnectionState,
     onConnectionStateChange,
@@ -82,5 +85,6 @@ void registerFunction(
     createAnswer,
     setLocalDescription,
     setRemoteDescription,
+    close,
   );
 }
