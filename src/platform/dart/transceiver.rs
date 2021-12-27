@@ -125,15 +125,17 @@ impl Transceiver {
         &self,
         new_sender: Rc<local::Track>,
     ) -> Result<(), platform::Error> {
-        FutureFromDart::execute::<()>(unsafe {
+        let is_track_replaced = FutureFromDart::execute::<()>(unsafe {
             transceiver::replace_track(
                 self.transceiver.get(),
                 new_sender.platform_track().handle(),
             )
         })
         .await
-        .unwrap();
-        self.send_track.replace(Some(new_sender));
+        .is_ok();
+        if is_track_replaced {
+            self.send_track.replace(Some(new_sender));
+        }
         Ok(())
     }
 
