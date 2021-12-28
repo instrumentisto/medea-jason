@@ -25,7 +25,7 @@ class WebInputDeviceInfo extends InputDeviceInfo {
   }
 
   @override
-  String groupId() {
+  String? groupId() {
     return fallibleFunction(() => obj.group_id());
   }
 

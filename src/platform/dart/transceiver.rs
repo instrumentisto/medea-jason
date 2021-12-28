@@ -16,10 +16,7 @@ use crate::{
     media::track::local,
     platform,
     platform::{
-        dart::utils::{
-            dart_future::FutureFromDart, handle::DartHandle,
-            NonNullDartValueArgExt,
-        },
+        dart::utils::{dart_future::FutureFromDart, handle::DartHandle},
         TransceiverDirection,
     },
 };
@@ -34,7 +31,7 @@ mod transceiver {
 
     extern "C" {
         /// Returns current direction of the provided [`Transceiver`].
-        pub fn get_current_direction(transceiver: Dart_Handle) -> Dart_Handle;
+        pub fn get_direction(transceiver: Dart_Handle) -> Dart_Handle;
 
         /// Returns `Send` [`MediaStreamTrack`] of the provided [`Transceiver`].
         pub fn get_send_track(
@@ -52,13 +49,11 @@ mod transceiver {
         pub fn drop_sender(transceiver: Dart_Handle) -> Dart_Handle;
 
         /// Returns stopped status of the provided [`Transceiver`].
-        pub fn is_stopped(
-            transceiver: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<i8>>;
+        pub fn is_stopped(transceiver: Dart_Handle) -> bool;
 
         /// Sets `enabled` field of `Send` [`MediaStreamTrack`] of the provided
         /// [`Transceiver`].
-        pub fn set_send_track_enabled(transceiver: Dart_Handle, enabled: i32);
+        pub fn set_send_track_enabled(transceiver: Dart_Handle, enabled: bool);
 
         /// Returns MID of the provided [`Transceiver`].
         pub fn mid(
@@ -67,7 +62,7 @@ mod transceiver {
 
         /// Returns `1` if the provided [`Transceiver`] has `Send`
         /// [`MediaStreamTrack`].
-        pub fn has_send_track(transceiver: Dart_Handle) -> i8;
+        pub fn has_send_track(transceiver: Dart_Handle) -> bool;
 
         /// Sets `direction` of this [`Transceiver`].
         pub fn set_direction(
@@ -95,10 +90,8 @@ impl Transceiver {
     ) -> LocalBoxFuture<'static, ()> {
         let this = self.clone();
         Box::pin(async move {
-            this.set_direction(
-                this.current_direction().await - disabled_direction,
-            )
-            .await;
+            this.set_direction(this.direction().await - disabled_direction)
+                .await;
         })
     }
 
@@ -109,17 +102,15 @@ impl Transceiver {
     ) -> LocalBoxFuture<'static, ()> {
         let this = self.clone();
         Box::pin(async move {
-            this.set_direction(
-                this.current_direction().await | enabled_direction,
-            )
-            .await;
+            this.set_direction(this.direction().await | enabled_direction)
+                .await;
         })
     }
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
-        self.current_direction().await.contains(direction)
+        self.direction().await.contains(direction)
     }
 
     /// Replaces [`TransceiverDirection::SEND`] [`local::Track`] of this
@@ -180,7 +171,7 @@ impl Transceiver {
     /// Indicates whether this [`Transceiver`] has [`local::Track`].
     #[must_use]
     pub fn has_send_track(&self) -> bool {
-        unsafe { transceiver::has_send_track(self.transceiver.get()) == 1 }
+        unsafe { transceiver::has_send_track(self.transceiver.get()) }
     }
 
     /// Sets the underlying [`local::Track`]'s `enabled` field to the provided
@@ -194,10 +185,7 @@ impl Transceiver {
                 ))
                 .unwrap()
             {
-                transceiver::set_send_track_enabled(
-                    sender.get(),
-                    enabled as i32,
-                );
+                transceiver::set_send_track_enabled(sender.get(), enabled);
             }
         }
     }
@@ -207,17 +195,15 @@ impl Transceiver {
     /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        let val =
-            unsafe { transceiver::is_stopped(self.transceiver.get()).unbox() };
-        i8::try_from(val).unwrap() == 1
+        unsafe { transceiver::is_stopped(self.transceiver.get()) }
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    fn current_direction(&self) -> impl Future<Output = TransceiverDirection> {
+    fn direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.transceiver.get();
         async move {
             FutureFromDart::execute::<i32>(unsafe {
-                transceiver::get_current_direction(handle)
+                transceiver::get_direction(handle)
             })
             .await
             .unwrap()

@@ -3,7 +3,6 @@
 use std::{
     cell::{Cell, RefCell},
     mem::ManuallyDrop,
-    ptr,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
 };
@@ -19,10 +18,6 @@ struct Inner {
 
     /// Handle for waking up this [`Task`].
     waker: Waker,
-
-    /// Indicates whether there is a [`Poll::Pending`] awake request of this
-    /// [`Task`].
-    is_scheduled: Cell<bool>,
 }
 
 /// Wrapper for a [`Future`] that can be polled by an external single threaded
@@ -31,6 +26,10 @@ pub struct Task {
     /// [`Task`]'s inner data containing an actual [`Future`] and its
     /// [`Waker`]. Dropped on the [`Task`] completion.
     inner: RefCell<Option<Inner>>,
+
+    /// Indicates whether there is a [`Poll::Pending`] awake request of this
+    /// [`Task`].
+    is_scheduled: Cell<bool>,
 }
 
 impl Task {
@@ -38,18 +37,14 @@ impl Task {
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Rc::new(Self {
             inner: RefCell::new(None),
+            is_scheduled: Cell::new(false),
         });
 
         let waker =
             unsafe { Waker::from_raw(Task::into_raw_waker(Rc::clone(&this))) };
-        this.inner.borrow_mut().replace(Inner {
-            future,
-            waker,
-            is_scheduled: Cell::new(true),
-        });
+        this.inner.borrow_mut().replace(Inner { future, waker });
 
-        // Task is leaked and must be freed manually by the external executor.
-        task_wake(ptr::NonNull::from(ManuallyDrop::new(this).as_ref()));
+        Task::wake_by_ref(&this);
     }
 
     /// Polls the underlying [`Future`].
@@ -68,7 +63,7 @@ impl Task {
             let mut cx = Context::from_waker(&inner.waker);
             inner.future.as_mut().poll(&mut cx)
         };
-        inner.is_scheduled.set(false);
+        self.is_scheduled.set(false);
 
         // Cleanup resources if future is ready.
         if poll.is_ready() {
@@ -82,11 +77,8 @@ impl Task {
     /// [`Task`] s incomplete and there are no [`Poll::Pending`] awake requests
     /// already.
     fn wake_by_ref(this: &Rc<Self>) {
-        if let Some(inner) = this.inner.borrow().as_ref() {
-            if !inner.is_scheduled.get() {
-                inner.is_scheduled.set(true);
-                task_wake(ptr::NonNull::from(Rc::as_ref(this)));
-            }
+        if !this.is_scheduled.replace(true) {
+            task_wake(Rc::clone(this));
         }
     }
 

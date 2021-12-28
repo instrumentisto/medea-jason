@@ -16,7 +16,7 @@ void registerFunctions(DynamicLibrary dl) {
     height: Pointer.fromFunction(_height),
     width: Pointer.fromFunction(_width),
     setEnabled: Pointer.fromFunction(_setEnabled),
-    enabled: Pointer.fromFunction(_enabled, 0),
+    enabled: Pointer.fromFunction(_enabled, false),
     stop: Pointer.fromFunction(_stop),
     onEnded: Pointer.fromFunction(_onEnded),
     readyState: Pointer.fromFunction(_readyState, 0),
@@ -47,8 +47,7 @@ void _onEnded(MediaStreamTrack track, Function f) {
 
 /// Returns device ID of the provided [MediaStreamTrack].
 Pointer<Utf8> _deviceId(MediaStreamTrack track) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  return _id(track);
+  return track.deviceId()!.toNativeUtf8();
 }
 
 int _readyState(MediaStreamTrack track) {
@@ -75,8 +74,8 @@ Pointer _width(MediaStreamTrack track) {
 }
 
 /// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].
-void _setEnabled(MediaStreamTrack track, int enabled) {
-  track.enabled = enabled == 1;
+void _setEnabled(MediaStreamTrack track, bool enabled) {
+  track.enabled = enabled;
 }
 
 /// Stops provided [MediaStreamTrack].
@@ -84,7 +83,7 @@ void _stop(MediaStreamTrack track) {
   track.stop();
 }
 
-/// Returns `1` if the provided [MediaStreamTrack] is enabled and `0` otherwise.
-int _enabled(MediaStreamTrack track) {
-  return track.enabled ? 1 : 0;
+/// Indicates whether the provided [MediaStreamTrack] is enabled.
+bool _enabled(MediaStreamTrack track) {
+  return track.enabled;
 }

@@ -79,8 +79,8 @@ impl InputDeviceInfo {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
     #[must_use]
-    pub fn group_id(&self) -> String {
-        self.info.group_id()
+    pub fn group_id(&self) -> Option<String> {
+        Some(self.info.group_id())
     }
 }
 

@@ -24,7 +24,7 @@ pub struct Transceiver {
 
 impl Transceiver {
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
-    fn current_direction(&self) -> TransceiverDirection {
+    fn direction(&self) -> TransceiverDirection {
         TransceiverDirection::from(self.transceiver.direction())
     }
 
@@ -61,7 +61,7 @@ impl Transceiver {
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
-        self.current_direction().contains(direction)
+        self.direction().contains(direction)
     }
 
     /// Replaces [`TransceiverDirection::SEND`] [`local::Track`] of this

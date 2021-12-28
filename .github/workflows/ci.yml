@@ -248,7 +248,7 @@ jobs:
           use-tool-cache: true
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: 2.5.1
+          flutter-version: 2.8.0
 
       - name: Parse Android NDK versions
         id: ndk-version

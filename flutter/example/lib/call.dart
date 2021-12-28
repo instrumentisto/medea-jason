@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -54,6 +55,9 @@ class Call {
     _room.onNewConnection((conn) {
       var remoteMemberId = conn.getRemoteMemberId();
       conn.onRemoteTrackAdded((track) async {
+        if (track.kind() == MediaKind.Audio && !kIsWeb) {
+          return;
+        }
         var sysTrack = track.getTrack();
         var remoteStream = await createLocalMediaStream(remoteMemberId);
         await remoteStream.addTrack(sysTrack);

@@ -6,6 +6,8 @@ pub mod dart_api;
 pub mod dart_future;
 pub mod function;
 pub mod handle;
+pub mod list;
+pub mod map;
 
 use std::ptr;
 

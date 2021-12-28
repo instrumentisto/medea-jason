@@ -9,6 +9,8 @@ import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/function.dart' as function;
+import 'ffi/list.dart' as list;
+import 'ffi/map.dart' as map;
 import 'ffi/completer.dart' as completer;
 import 'ffi/future.dart' as future;
 import 'ffi/exception.dart' as exceptions;
@@ -81,6 +83,8 @@ DynamicLibrary _dl_load() {
   future.registerFunctions(dl);
   function.registerFunctions(dl);
   platform_utils_registerer.registerFunctions(dl);
+  list.registerFunctions(dl);
+  map.registerFunctions(dl);
 
   executor = Executor(dl);
 

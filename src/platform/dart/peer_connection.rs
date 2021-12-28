@@ -125,6 +125,9 @@ mod peer_connection {
             ty: ptr::NonNull<c_char>,
             offer: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
+
+        /// Closes the provided [`PeerConnection`].
+        pub fn close(peer: Dart_Handle);
     }
 }
 
@@ -510,6 +513,14 @@ impl RtcPeerConnection {
             .await
             .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
             .map_err(tracerr::wrap!())
+        }
+    }
+}
+
+impl Drop for RtcPeerConnection {
+    fn drop(&mut self) {
+        unsafe {
+            peer_connection::close(self.handle.get());
         }
     }
 }

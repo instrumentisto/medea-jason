@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -33,7 +32,6 @@ class _CallState extends State {
       var renderer = RTCVideoRenderer();
       await renderer.initialize();
       renderer.srcObject = stream;
-      renderer.muted = false;
       setState(() {
         _videos.add(RTCVideoView(renderer));
       });

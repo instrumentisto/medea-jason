@@ -114,7 +114,7 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
   /// Frees Dart side [ForeignValue].
   Pointer intoRustOwned() {
     var out = _boxForeignValue(ref);
-    free();
+    calloc.free(this);
     return out;
   }
 
@@ -123,6 +123,9 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
   void free() {
     if (ref._tag == 3) {
       calloc.free(ref._payload.string);
+    }
+    if (ref._tag == 2) {
+      freeBoxedDartHandle(ref._payload.handlePtr);
     }
     calloc.free(this);
   }
