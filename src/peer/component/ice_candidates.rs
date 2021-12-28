@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, collections::HashSet};
 
-use futures::stream::LocalBoxStream;
+use futures::{stream, stream::LocalBoxStream};
 use medea_client_api_proto::IceCandidate;
 use medea_reactive::ObservableHashSet;
 
@@ -31,10 +31,12 @@ impl IceCandidates {
         self.0.borrow_mut().insert(candidate);
     }
 
-    /// Returns [`LocalBoxStream`] streaming all the added [`IceCandidate`]s.
+    /// Returns [`LocalBoxStream`] with all already added [`IceCandidate`]s and
+    /// [`IceCandidate`]s which will be added in the future.
     #[inline]
     pub fn on_add(&self) -> LocalBoxStream<'static, IceCandidate> {
-        self.0.borrow().on_insert()
+        let this = self.0.borrow();
+        Box::pin(stream::select(this.replay_on_insert(), this.on_insert()))
     }
 }
 
