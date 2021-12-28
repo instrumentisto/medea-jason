@@ -41,7 +41,7 @@ int _kind(MediaStreamTrack track) {
 /// [MediaStreamTrack].
 void _onEnded(MediaStreamTrack track, Function f) {
   track.onEnded = () {
-    f();
+    f(null);
   };
 }
 

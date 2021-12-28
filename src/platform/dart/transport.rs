@@ -135,7 +135,7 @@ impl WebSocketRpcTransport {
                         }
                     })
                     .into_dart(),
-                    Callback::from_fn_mut({
+                    Callback::from_once({
                         let socket_state = Rc::clone(&socket_state);
                         move |msg: ()| {
                             socket_state.set(TransportState::Closed(
