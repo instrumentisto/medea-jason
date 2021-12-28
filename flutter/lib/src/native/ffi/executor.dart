@@ -37,8 +37,7 @@ class Executor {
     _loopInit(_wakePort.sendPort.nativePort);
   }
 
-  /// Polls a Rust future basing on the provided [message]. Drops that future if
-  /// it's completed.
+  /// Polls a Rust future basing on the provided [message].
   void _pollTask(dynamic message) {
     final task = Pointer.fromAddress(message);
     _taskPoll(task);

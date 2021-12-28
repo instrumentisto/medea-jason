@@ -37,7 +37,7 @@ impl Task {
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Rc::new(Self {
             inner: RefCell::new(None),
-            is_scheduled: Cell::new(true),
+            is_scheduled: Cell::new(false),
         });
 
         let waker =
@@ -58,11 +58,13 @@ impl Task {
             Some(inner) => inner,
             None => return Poll::Ready(()),
         };
+
         let poll = {
             let mut cx = Context::from_waker(&inner.waker);
             inner.future.as_mut().poll(&mut cx)
         };
         self.is_scheduled.set(false);
+
         // Cleanup resources if future is ready.
         if poll.is_ready() {
             *borrow = None;
