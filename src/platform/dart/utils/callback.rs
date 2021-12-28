@@ -90,7 +90,6 @@ enum Kind {
 // TODO: Fix in #13:
 //       1. Requires additional parametrization or(and) wrapping.
 //       2. `FnOnce` semantics should be reflected on Dart side somehow.
-//       3. `Kind::FnMut` and `Kind::Fn` aren't dropped anywhere right now.
 /// Rust closure which can be called by Dart.
 #[must_use]
 pub struct Callback(Kind);
