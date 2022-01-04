@@ -337,11 +337,10 @@ impl Member {
         self.room
             .set_local_media_settings(true, true, false)
             .await?;
-
         Ok(())
     }
 
-    /// Emulates provided latency for the gUM requests.
+    /// Emulates the provided `latency` for `getUserMedia()` requests.
     pub async fn add_gum_latency(&self, latency: Duration) {
         self.window
             .execute(Statement::new(

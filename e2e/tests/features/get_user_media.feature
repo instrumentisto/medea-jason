@@ -19,7 +19,7 @@ Feature: `getUserMedia()` requests
     When Alice enables video and audio in local media settings
     Then Alice doesn't have live local tracks
 
-  Scenario: Latency in gUM request
+  Scenario: Latency in `getUserMedia()` request
     Given room with joined member Alice and Bob
     When Alice switches device with latency
     And Alice disables video and awaits it completes
