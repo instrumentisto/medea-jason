@@ -56,7 +56,7 @@ async fn when_member_enables_via_local_media_settings(
     let audio = kind.contains("audio");
     member
         .room()
-        .set_local_media_settings(video, audio)
+        .set_local_media_settings(video, audio, true)
         .await
         .unwrap();
 }

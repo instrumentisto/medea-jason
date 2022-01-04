@@ -1387,7 +1387,7 @@ impl InnerRoom {
     /// callback.
     ///
     /// Will update [`media_exchange_state::Stable`]s of the [`Sender`]s that
-    /// should be enabled or disabled.
+    /// should be disabled.
     ///
     /// If `stop_first` set to `true` then affected [`local::Track`]s will be
     /// dropped before new [`MediaStreamSettings`] is applied. This is usually

@@ -537,13 +537,14 @@ impl Object<Room> {
         &self,
         video: bool,
         audio: bool,
+        should_wait: bool,
     ) -> Result<(), Error> {
         self.forget_local_tracks().await;
         self.execute(Statement::new(
             // language=JavaScript
             r#"
                 async (room) => {
-                    const [video, audio] = args;
+                    const [video, audio, shouldWait] = args;
                     let constraints = new rust.MediaStreamSettings();
                     if (video) {
                         let video =
@@ -554,14 +555,17 @@ impl Object<Room> {
                         let audio = new window.rust.AudioTrackConstraints();
                         constraints.audio(audio);
                     }
-                    await room.room.set_local_media_settings(
+                    let promise = room.room.set_local_media_settings(
                         constraints,
                         true,
                         false
                     );
+                    if (shouldWait) {
+                        await promise;
+                    }
                 }
             "#,
-            [video.into(), audio.into()],
+            [video.into(), audio.into(), should_wait.into()],
         ))
         .await
         .map(drop)

@@ -276,6 +276,7 @@ impl<C> VideoTrackConstraints<C> {
     /// Constraints these [`VideoTrackConstraints`] with a provided `other`
     /// [`VideoTrackConstraints`].
     fn constrain(&mut self, other: Self) {
+        self.enabled &= other.enabled;
         self.constraints = other.constraints;
     }
 }
