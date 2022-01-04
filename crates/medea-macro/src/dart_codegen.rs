@@ -216,8 +216,8 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
             .inputs
             .into_iter()
             .map(|input| {
-                if let syn::FnArg::Typed(input) = input {
-                    DartType::try_from(*input.ty)
+                if let syn::FnArg::Typed(arg) = input {
+                    DartType::try_from(*arg.ty)
                 } else {
                     Err(syn::Error::new(
                         input.span(),

@@ -169,7 +169,7 @@ impl ModExpander {
         let mut path = PathBuf::from(root_path);
         path.push(get_path_arg(relative_path)?);
 
-        let mut f = File::create(path).map_err(|e| {
+        let mut file = File::create(path).map_err(|e| {
             syn::Error::new(
                 relative_path.span(),
                 format!("Failed to create file at the provided path: {}", e),
@@ -195,7 +195,7 @@ impl ModExpander {
                     )
                 })?;
 
-        f.write_all(generated_code.as_bytes()).map_err(|e| {
+        file.write_all(generated_code.as_bytes()).map_err(|e| {
             let msg = format!(
                 "Failed to write generated Dart code to the file: {}",
                 e,
@@ -214,8 +214,8 @@ impl ModExpander {
 fn get_path_arg(arg: &syn::ExprLit) -> syn::Result<String> {
     use proc_macro2::Span;
 
-    if let syn::Lit::Str(arg) = &arg.lit {
-        Ok(arg.value())
+    if let syn::Lit::Str(lit) = &arg.lit {
+        Ok(lit.value())
     } else {
         let msg = format!(
             "Expected a str literal with a Dart file path, got: {:?}",
