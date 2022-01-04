@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
 
-use std::{convert::TryFrom, future::Future};
+use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{

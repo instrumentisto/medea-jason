@@ -151,38 +151,45 @@ impl WebSocketRpcTransport {
         let socket = Rc::new(RefCell::new(InnerSocket::new(url.as_ref())?));
         {
             let mut socket_mut = socket.borrow_mut();
-            let inner = Rc::clone(&socket);
-            socket_mut.on_close_listener = Some(
-                EventListener::new_once(
-                    Rc::clone(&socket_mut.socket),
-                    "close",
-                    move |msg: CloseEvent| {
-                        inner
-                            .borrow()
-                            .socket_state
-                            .set(TransportState::Closed(CloseMsg::from(&msg)));
-                    },
-                )
-                .unwrap(),
-            );
 
-            let inner = Rc::clone(&socket);
-            socket_mut.on_open_listener = Some(
-                EventListener::new_once(
-                    Rc::clone(&socket_mut.socket),
-                    "open",
-                    move |_| {
-                        inner.borrow().socket_state.set(TransportState::Open);
-                    },
-                )
-                .unwrap(),
-            );
+            {
+                let inner = Rc::clone(&socket);
+                socket_mut.on_close_listener = Some(
+                    EventListener::new_once(
+                        Rc::clone(&socket_mut.socket),
+                        "close",
+                        move |msg: CloseEvent| {
+                            inner.borrow().socket_state.set(
+                                TransportState::Closed(CloseMsg::from(&msg)),
+                            );
+                        },
+                    )
+                    .unwrap(),
+                );
+            }
+
+            {
+                let inner = Rc::clone(&socket);
+                socket_mut.on_open_listener = Some(
+                    EventListener::new_once(
+                        Rc::clone(&socket_mut.socket),
+                        "open",
+                        move |_| {
+                            inner
+                                .borrow()
+                                .socket_state
+                                .set(TransportState::Open);
+                        },
+                    )
+                    .unwrap(),
+                );
+            }
         }
 
         let state_updates_rx = socket.borrow().socket_state.subscribe();
         let state = state_updates_rx.skip(1).next().await;
 
-        if let Some(TransportState::Open) = state {
+        if state == Some(TransportState::Open) {
             let this = Self(socket);
             this.set_on_close_listener();
             this.set_on_message_listener();

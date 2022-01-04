@@ -1,7 +1,7 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::{convert::TryInto, fmt::Debug, mem, os::raw::c_void, ptr};
+use std::{fmt::Debug, mem, os::raw::c_void, ptr};
 
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
@@ -200,8 +200,6 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    use std::convert::TryInto;
-
     use dart_sys::Dart_Handle;
 
     use crate::api::DartValueArg;

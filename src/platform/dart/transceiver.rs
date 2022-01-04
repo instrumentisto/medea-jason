@@ -2,12 +2,7 @@
 //!
 //! [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
 
-use std::{
-    cell::RefCell,
-    convert::{TryFrom, TryInto},
-    future::Future,
-    rc::Rc,
-};
+use std::{cell::RefCell, future::Future, rc::Rc};
 
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;

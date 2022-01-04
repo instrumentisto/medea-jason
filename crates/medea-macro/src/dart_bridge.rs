@@ -1,6 +1,5 @@
 //! `#[dart_bridge]` macro implementation.
 
-use std::convert::TryFrom;
 #[cfg(feature = "dart-codegen")]
 use std::{env, fs::File, io::Write as _, path::PathBuf};
 

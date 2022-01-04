@@ -450,7 +450,7 @@ impl Component {
         _: Rc<State>,
         sync_state: SyncState,
     ) -> Result<(), Infallible> {
-        if let SyncState::Synced = sync_state {
+        if sync_state == SyncState::Synced {
             peer.send_current_connection_states();
         }
         Ok(())

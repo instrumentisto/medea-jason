@@ -34,7 +34,7 @@ impl TryFrom<&JsValue> for RtcStats {
             .map_err(|e| tracerr::new!(Platform(platform::Error::from(e))))?
             .unchecked_into::<JsIterator>();
 
-        let mut stats = Vec::new();
+        let mut out = Vec::new();
 
         for stat in iterator {
             let stat = stat.map_err(|e| {
@@ -52,10 +52,10 @@ impl TryFrom<&JsValue> for RtcStats {
                 continue;
             }
 
-            stats.push(stat);
+            out.push(stat);
         }
 
-        Ok(Self(stats))
+        Ok(Self(out))
     }
 }
 /// Entry of a JS RTC stats dictionary.

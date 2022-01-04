@@ -348,11 +348,11 @@ impl WebSocketRpcClient {
             }
             ServerMsg::Ping(_) => None,
         };
-        if let Some(msg) = msg {
+        if let Some(m) = msg {
             self.0
                 .borrow_mut()
                 .subs
-                .retain(|sub| sub.unbounded_send(msg.clone()).is_ok());
+                .retain(|sub| sub.unbounded_send(m.clone()).is_ok());
         }
     }
 
@@ -434,28 +434,32 @@ impl WebSocketRpcClient {
         }
 
         // subscribe to transport close
-        let mut transport_state_changes = transport.on_state_change();
-        let weak_this = Rc::downgrade(&self);
-        platform::spawn(async move {
-            while let Some(state) = transport_state_changes.next().await {
-                if let Some(this) = weak_this.upgrade() {
-                    if let platform::TransportState::Closed(msg) = state {
-                        this.handle_close_message(msg);
+        {
+            let mut transport_state_changes = transport.on_state_change();
+            let weak_this = Rc::downgrade(&self);
+            platform::spawn(async move {
+                while let Some(state) = transport_state_changes.next().await {
+                    if let Some(this) = weak_this.upgrade() {
+                        if let platform::TransportState::Closed(msg) = state {
+                            this.handle_close_message(msg);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
         // subscribe to transport message received
-        let weak_this = Rc::downgrade(&self);
-        let mut on_socket_message = transport.on_message();
-        platform::spawn(async move {
-            while let Some(msg) = on_socket_message.next().await {
-                if let Some(this) = weak_this.upgrade() {
-                    this.on_transport_message(msg);
+        {
+            let weak_this = Rc::downgrade(&self);
+            let mut on_socket_message = transport.on_message();
+            platform::spawn(async move {
+                while let Some(msg) = on_socket_message.next().await {
+                    if let Some(this) = weak_this.upgrade() {
+                        this.on_transport_message(msg);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         drop(self.0.borrow_mut().sock.replace(transport));
         self.0.borrow().state.set(ClientState::Open);

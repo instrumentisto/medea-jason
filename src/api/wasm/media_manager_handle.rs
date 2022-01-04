@@ -100,12 +100,8 @@ impl MediaManagerHandle {
                 .map(|tracks| {
                     tracks
                         .into_iter()
-                        .fold(js_sys::Array::new(), |tracks, track| {
-                            let _ = tracks.push(&JsValue::from(
-                                LocalMediaTrack::from(track),
-                            ));
-                            tracks
-                        })
+                        .map(|t| JsValue::from(LocalMediaTrack::from(t)))
+                        .collect::<js_sys::Array>()
                         .into()
                 })
                 .map_err(Error::from)

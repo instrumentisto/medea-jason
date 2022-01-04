@@ -98,11 +98,11 @@ pub enum ConnectionInfoParseError {
 impl FromStr for ConnectionInfo {
     type Err = Traced<ConnectionInfoParseError>;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(string: &str) -> Result<Self, Self::Err> {
         use ConnectionInfoParseError as E;
 
-        let mut url =
-            Url::parse(s).map_err(|err| tracerr::new!(E::UrlParse(err)))?;
+        let mut url = Url::parse(string)
+            .map_err(|err| tracerr::new!(E::UrlParse(err)))?;
 
         let credential = url
             .query_pairs()

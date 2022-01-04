@@ -114,8 +114,8 @@ impl Receiver {
                 })
                 .map(utils::component::Component::obj);
 
-            if let Some(sender) = sender {
-                let trnsvr = sender.transceiver();
+            if let Some(s) = sender {
+                let trnsvr = s.transceiver();
                 trnsvr.add_direction(transceiver_direction).await;
 
                 Some(trnsvr)

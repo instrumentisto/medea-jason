@@ -125,13 +125,13 @@ impl MediaStreamTrack {
             "facingMode",
             |v| v.as_string(),
         );
-        facing_mode.and_then(|facing_mode| match facing_mode.as_ref() {
+        facing_mode.and_then(|fm| match fm.as_ref() {
             "user" => Some(FacingMode::User),
             "environment" => Some(FacingMode::Environment),
             "left" => Some(FacingMode::Left),
             "right" => Some(FacingMode::Right),
             _ => {
-                log::error!("Unknown FacingMode: {}", facing_mode);
+                log::error!("Unknown FacingMode: {}", fm);
                 None
             }
         })
@@ -144,8 +144,8 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        get_property_by_name(&self.sys_track.get_settings(), "height", |v| {
-            v.as_f64().map(|v| v as u32)
+        get_property_by_name(&self.sys_track.get_settings(), "height", |h| {
+            h.as_f64().map(|v| v as u32)
         })
     }
 
@@ -156,8 +156,8 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        get_property_by_name(&self.sys_track.get_settings(), "width", |v| {
-            v.as_f64().map(|v| v as u32)
+        get_property_by_name(&self.sys_track.get_settings(), "width", |w| {
+            w.as_f64().map(|v| v as u32)
         })
     }
 

@@ -2,8 +2,6 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::convert::TryFrom;
-
 use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;

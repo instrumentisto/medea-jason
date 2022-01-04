@@ -122,31 +122,31 @@ impl Track {
             async move {
                 loop {
                     let event = futures::select! {
-                        enabled = enabled_changes.select_next_some() => {
-                            TrackChange::Enabled(enabled)
+                        is_enabled = enabled_changes.select_next_some() => {
+                            TrackChange::Enabled(is_enabled)
                         },
-                        muted = muted_changes.select_next_some() => {
-                            TrackChange::Muted(muted)
+                        is_muted = muted_changes.select_next_some() => {
+                            TrackChange::Muted(is_muted)
                         },
                         complete => break,
                     };
-                    if let Some(track) = weak_inner.upgrade() {
-                        track.track.set_enabled(
-                            track.enabled.get() && !track.muted.get(),
+                    if let Some(inner) = weak_inner.upgrade() {
+                        inner.track.set_enabled(
+                            inner.enabled.get() && !inner.muted.get(),
                         );
                         match event {
-                            TrackChange::Enabled(enabled) => {
-                                if enabled {
-                                    track.on_enabled.call0();
+                            TrackChange::Enabled(yes) => {
+                                if yes {
+                                    inner.on_enabled.call0();
                                 } else {
-                                    track.on_disabled.call0();
+                                    inner.on_disabled.call0();
                                 }
                             }
-                            TrackChange::Muted(muted) => {
-                                if muted {
-                                    track.on_muted.call0();
+                            TrackChange::Muted(yes) => {
+                                if yes {
+                                    inner.on_muted.call0();
                                 } else {
-                                    track.on_unmuted.call0();
+                                    inner.on_unmuted.call0();
                                 }
                             }
                         }

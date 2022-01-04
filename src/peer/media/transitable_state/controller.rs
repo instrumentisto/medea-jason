@@ -84,11 +84,11 @@ where
         // We don't care about initial state, be cause transceiver is inactive
         // at that moment.
         let mut state_changes = self.state.subscribe().skip(1);
-        let weak_this = Rc::downgrade(&self);
+        let weak_self = Rc::downgrade(&self);
         platform::spawn(async move {
             while let Some(state) = state_changes.next().await {
                 let (state, _guard) = state.into_parts();
-                if let Some(this) = weak_this.upgrade() {
+                if let Some(this) = weak_self.upgrade() {
                     if let TransitableState::Transition(_) = state {
                         let weak_this = Rc::downgrade(&this);
                         platform::spawn(async move {
@@ -111,6 +111,7 @@ where
                             {
                                 Either::Left(_) => (),
                                 Either::Right(_) => {
+                                    #[allow(clippy::shadow_unrelated)]
                                     if let Some(this) = weak_this.upgrade() {
                                         let stable = this
                                             .state

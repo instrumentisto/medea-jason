@@ -827,7 +827,7 @@ impl Room {
             .fuse();
 
         let room = Rc::new(InnerRoom::new(rpc, media_manager, tx));
-        let inner = Rc::downgrade(&room);
+        let weak_room = Rc::downgrade(&room);
 
         platform::spawn(async move {
             loop {
@@ -839,11 +839,11 @@ impl Room {
                     complete => break,
                 };
 
-                if let Some(inner) = inner.upgrade() {
+                if let Some(this_room) = weak_room.upgrade() {
                     match event {
                         RoomEvent::RpcEvent(event) => {
                             if let Err(e) = event
-                                .dispatch_with(&*inner)
+                                .dispatch_with(&*this_room)
                                 .await
                                 .map_err(tracerr::wrap!(=> UnknownPeerIdError))
                             {
@@ -852,7 +852,7 @@ impl Room {
                         }
                         RoomEvent::PeerEvent(event) => {
                             if let Err(e) =
-                                event.dispatch_with(&*inner).await.map_err(
+                                event.dispatch_with(&*this_room).await.map_err(
                                     tracerr::wrap!(=> UnknownRemoteMemberError),
                                 )
                             {
@@ -860,10 +860,10 @@ impl Room {
                             };
                         }
                         RoomEvent::RpcClientLostConnection => {
-                            inner.handle_rpc_connection_lost();
+                            this_room.handle_rpc_connection_lost();
                         }
                         RoomEvent::RpcClientReconnected => {
-                            inner.handle_rpc_connection_recovered();
+                            this_room.handle_rpc_connection_recovered();
                         }
                     }
                 } else {
@@ -1206,19 +1206,19 @@ impl InnerRoom {
     ) -> Result<(), Traced<ChangeMediaStateError>> {
         let stream_upd_sub: HashMap<PeerId, HashSet<TrackId>> = desired_states
             .iter()
-            .map(|(id, states)| {
+            .map(|(peer_id, states)| {
                 (
-                    *id,
+                    *peer_id,
                     states
                         .iter()
-                        .filter_map(|(id, state)| {
+                        .filter_map(|(track_id, state)| {
                             matches!(
                                 state,
                                 MediaState::MediaExchange(
                                     media_exchange_state::Stable::Enabled
                                 )
                             )
-                            .then(|| *id)
+                            .then(|| *track_id)
                         })
                         .collect(),
                 )
@@ -1227,11 +1227,11 @@ impl InnerRoom {
         future::try_join_all(
             desired_states
                 .into_iter()
-                .filter_map(|(peer_id, desired_states)| {
-                    self.peers.get(peer_id).map(|peer| (peer, desired_states))
+                .filter_map(|(peer_id, states)| {
+                    self.peers.get(peer_id).map(|peer| (peer, states))
                 })
-                .map(|(peer, desired_states)| {
-                    let transitions_futs: Vec<_> = desired_states
+                .map(|(peer, states)| {
+                    let transitions_futs: Vec<_> = states
                         .into_iter()
                         .filter_map(move |(track_id, desired_state)| {
                             peer.get_transceiver_side_by_id(track_id)
@@ -1645,8 +1645,8 @@ impl EventHandler for InnerRoom {
                 }
             }
         }
-        if let Some(negotiation_role) = negotiation_role {
-            peer_state.set_negotiation_role(negotiation_role).await;
+        if let Some(role) = negotiation_role {
+            peer_state.set_negotiation_role(role).await;
         }
 
         Ok(())
@@ -1774,7 +1774,7 @@ impl PeerEventHandler for InnerRoom {
             metrics: PeerMetrics::PeerConnectionState(peer_connection_state),
         });
 
-        if let PeerConnectionState::Connected = peer_connection_state {
+        if peer_connection_state == PeerConnectionState::Connected {
             if let Some(peer) = self.peers.get(peer_id) {
                 peer.scrape_and_send_peer_stats().await;
             }

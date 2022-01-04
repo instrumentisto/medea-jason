@@ -515,7 +515,6 @@ impl From<Traced<ReconnectError>> for Error {
 }
 
 impl From<Traced<SessionError>> for Error {
-    #[allow(clippy::option_if_let_else)]
     fn from(err: Traced<SessionError>) -> Self {
         use ConnectionLostReason as Reason;
         use RpcClientExceptionKind as Kind;
@@ -530,14 +529,14 @@ impl From<Traced<SessionError>> for Error {
             SE::NoCredentials
             | SE::SessionUnexpectedlyDropped
             | SE::NewConnectionInfo => None,
-            SE::RpcClient(err) => {
-                cause = err.cause();
+            SE::RpcClient(e) => {
+                cause = e.cause();
                 None
             }
             SE::AuthorizationFailed => Some(Kind::AuthorizationFailed),
             SE::ConnectionLost(reason) => {
-                if let Reason::ConnectError(err) = reason {
-                    cause = err.into_inner().cause();
+                if let Reason::ConnectError(e) = reason {
+                    cause = e.into_inner().cause();
                 };
                 Some(Kind::ConnectionLost)
             }

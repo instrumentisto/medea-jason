@@ -117,14 +117,13 @@ mod tests {
     fn enable_works_correctly() {
         use TransceiverDirection as D;
 
-        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
-        for (init, enable_dir, result) in &[
+        for (init, enable_dir, result) in [
             (D::INACTIVE, D::SEND, D::SEND),
             (D::INACTIVE, D::RECV, D::RECV),
             (D::SEND, D::RECV, D::all()),
             (D::RECV, D::SEND, D::all()),
         ] {
-            assert_eq!(*init | *enable_dir, *result);
+            assert_eq!(init | enable_dir, result);
         }
     }
 
@@ -132,14 +131,13 @@ mod tests {
     fn disable_works_correctly() {
         use TransceiverDirection as D;
 
-        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
-        for (init, disable_dir, result) in &[
+        for (init, disable_dir, result) in [
             (D::SEND, D::SEND, D::INACTIVE),
             (D::RECV, D::RECV, D::INACTIVE),
             (D::all(), D::SEND, D::RECV),
             (D::all(), D::RECV, D::SEND),
         ] {
-            assert_eq!(*init - *disable_dir, *result);
+            assert_eq!(init - disable_dir, result);
         }
     }
 
@@ -148,14 +146,13 @@ mod tests {
         use RtcRtpTransceiverDirection as S;
         use TransceiverDirection as D;
 
-        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
-        for (trnscvr_dir, sys_dir) in &[
+        for (trnscvr_dir, sys_dir) in [
             (D::SEND, S::Sendonly),
             (D::RECV, S::Recvonly),
             (D::all(), S::Sendrecv),
             (D::INACTIVE, S::Inactive),
         ] {
-            assert_eq!(S::from(*trnscvr_dir), *sys_dir);
+            assert_eq!(S::from(trnscvr_dir), sys_dir);
         }
     }
 
@@ -164,14 +161,13 @@ mod tests {
         use RtcRtpTransceiverDirection as S;
         use TransceiverDirection as D;
 
-        // TODO: Use `Array::into_iter()` in 2021 Rust edition.
-        for (sys_dir, trnscvr_dir) in &[
+        for (sys_dir, trnscvr_dir) in [
             (S::Sendonly, D::SEND),
             (S::Recvonly, D::RECV),
             (S::Sendrecv, D::all()),
             (S::Inactive, D::INACTIVE),
         ] {
-            assert_eq!(D::from(*sys_dir), *trnscvr_dir);
+            assert_eq!(D::from(sys_dir), trnscvr_dir);
         }
     }
 }

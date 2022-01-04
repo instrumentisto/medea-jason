@@ -348,50 +348,61 @@ impl PeerConnection {
         };
 
         // Bind to `icecandidate` event.
-        let id = peer.id;
-        let sender = peer.peer_events_sender.clone();
-        peer.peer.on_ice_candidate(Some(move |candidate| {
-            Self::on_ice_candidate(id, &sender, candidate);
-        }));
+        {
+            let id = peer.id;
+            let sender = peer.peer_events_sender.clone();
+            peer.peer.on_ice_candidate(Some(move |candidate| {
+                Self::on_ice_candidate(id, &sender, candidate);
+            }));
+        }
 
         // Bind to `iceconnectionstatechange` event.
-        let id = peer.id;
-        let sender = peer.peer_events_sender.clone();
-        peer.peer.on_ice_connection_state_change(Some(
-            move |ice_connection_state| {
-                Self::on_ice_connection_state_changed(
-                    id,
-                    &sender,
-                    ice_connection_state,
-                );
-            },
-        ));
+        {
+            let id = peer.id;
+            let sender = peer.peer_events_sender.clone();
+            peer.peer.on_ice_connection_state_change(Some(
+                move |ice_connection_state| {
+                    Self::on_ice_connection_state_changed(
+                        id,
+                        &sender,
+                        ice_connection_state,
+                    );
+                },
+            ));
+        }
 
         // Bind to `connectionstatechange` event.
-        let id = peer.id;
-        let sender = peer.peer_events_sender.clone();
-        peer.peer.on_connection_state_change(Some(
-            move |peer_connection_state| {
-                Self::on_connection_state_changed(
-                    id,
-                    &sender,
-                    peer_connection_state,
-                );
-            },
-        ));
+        {
+            let id = peer.id;
+            let sender = peer.peer_events_sender.clone();
+            peer.peer.on_connection_state_change(Some(
+                move |peer_connection_state| {
+                    Self::on_connection_state_changed(
+                        id,
+                        &sender,
+                        peer_connection_state,
+                    );
+                },
+            ));
+        }
 
         // Bind to `track` event.
-        let media_connections = Rc::clone(&peer.media_connections);
-        peer.peer.on_track(Some(move |track, transceiver| {
-            let media_connections = Rc::clone(&media_connections);
-            platform::spawn(async move {
-                if let Err(mid) =
-                    media_connections.add_remote_track(track, transceiver).await
-                {
-                    log::error!("Cannot add new remote track with mid={}", mid);
-                };
-            });
-        }));
+        {
+            let media_conns = Rc::clone(&peer.media_connections);
+            peer.peer.on_track(Some(move |track, transceiver| {
+                let media_conns = Rc::clone(&media_conns);
+                platform::spawn(async move {
+                    if let Err(mid) =
+                        media_conns.add_remote_track(track, transceiver).await
+                    {
+                        log::error!(
+                            "Cannot add new remote track with mid={}",
+                            mid,
+                        );
+                    };
+                });
+            }));
+        }
 
         Ok(Rc::new(peer))
     }
@@ -714,8 +725,8 @@ impl PeerConnection {
         source_kind: Option<MediaSourceKind>,
     ) -> Result<Option<MediaStreamSettings>, Traced<TracksRequestError>> {
         let mut criteria = LocalStreamUpdateCriteria::empty();
-        if let Some(source_kind) = source_kind {
-            criteria.add(kind, source_kind);
+        if let Some(msk) = source_kind {
+            criteria.add(kind, msk);
         } else {
             criteria.add(kind, MediaSourceKind::Device);
             criteria.add(kind, MediaSourceKind::Display);
@@ -723,7 +734,7 @@ impl PeerConnection {
 
         self.get_simple_tracks_request(criteria)
             .map_err(tracerr::map_from_and_wrap!())
-            .map(|s| s.map(|s| MediaStreamSettings::from(&s)))
+            .map(|opt| opt.map(|s| MediaStreamSettings::from(&s)))
     }
 
     /// Returns [`SimpleTracksRequest`] for the provided

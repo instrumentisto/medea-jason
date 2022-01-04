@@ -1,9 +1,6 @@
 //! Dart side register functions generator of `#[dart_bridge]` macro.
 
-use std::{
-    convert::TryFrom,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
 use inflector::Inflector;
 use syn::spanned::Spanned as _;

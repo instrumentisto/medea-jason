@@ -2,8 +2,6 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
 
-use std::convert::{TryFrom, TryInto};
-
 use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;

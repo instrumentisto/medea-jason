@@ -111,12 +111,13 @@ impl Jason {
         let weak_inner = Rc::downgrade(&self.0);
         platform::spawn(on_normal_close.map(move |reason| {
             let _ = (|| {
-                let room = weak_room.upgrade()?;
+                let this_room = weak_room.upgrade()?;
                 let inner = weak_inner.upgrade()?;
                 let mut inner = inner.borrow_mut();
-                let index = inner.rooms.iter().position(|r| r.ptr_eq(&room));
-                if let Some(index) = index {
-                    inner.rooms.remove(index).close(reason);
+                let index =
+                    inner.rooms.iter().position(|r| r.ptr_eq(&this_room));
+                if let Some(i) = index {
+                    inner.rooms.remove(i).close(reason);
                 }
                 if inner.rooms.is_empty() {
                     inner.media_manager = Rc::default();

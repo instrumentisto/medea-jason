@@ -2,7 +2,7 @@
 //!
 //! [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 
-use std::{convert::TryInto, fmt::Debug, future::Future, ptr};
+use std::{fmt::Debug, future::Future, ptr};
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;

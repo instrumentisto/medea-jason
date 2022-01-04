@@ -2,8 +2,6 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#device-info
 
-use std::convert::{TryFrom, TryInto};
-
 use medea_macro::dart_bridge;
 
 use crate::{

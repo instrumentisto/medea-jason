@@ -2,8 +2,6 @@
 //!
 //! [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
 
-use std::convert::TryInto;
-
 use derive_more::From;
 use medea_macro::dart_bridge;
 

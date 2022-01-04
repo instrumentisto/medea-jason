@@ -67,8 +67,8 @@ impl Component {
 
         for (id, peer_state) in new_state.peers {
             let peer = state.0.borrow().get(&id).cloned();
-            if let Some(peer) = peer {
-                peer.apply(peer_state, send_cons);
+            if let Some(p) = peer {
+                p.apply(peer_state, send_cons);
             } else {
                 drop(state.0.borrow_mut().insert(
                     id,

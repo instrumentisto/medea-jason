@@ -303,8 +303,8 @@ impl Component {
                             .sub_direction(platform::TransceiverDirection::RECV)
                     })
                 };
-                if let Some(sub_direction) = sub_direction {
-                    sub_direction.await;
+                if let Some(fut) = sub_direction {
+                    fut.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
@@ -317,8 +317,8 @@ impl Component {
                             .add_direction(platform::TransceiverDirection::RECV)
                     });
 
-                if let Some(add_direction) = add_direction {
-                    add_direction.await;
+                if let Some(fut) = add_direction {
+                    fut.await;
                 }
             }
         }

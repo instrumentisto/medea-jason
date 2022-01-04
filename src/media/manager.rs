@@ -244,9 +244,9 @@ impl InnerMediaManager {
                 .find(|&track| caps.get_audio().satisfies(track.as_ref()))
                 .cloned();
 
-            if let Some(track) = track {
+            if let Some(t) = track {
                 caps.set_audio_publish(false);
-                tracks.push(track);
+                tracks.push(t);
             }
         }
 
