@@ -275,9 +275,8 @@ where
     /// this [`HashMap`].
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
         let removed_value = self.store.insert(key.clone(), value.clone());
-        if let Some(removed_value) = &removed_value {
-            self.on_remove_subs
-                .send_update((key.clone(), removed_value.clone()));
+        if let Some(val) = &removed_value {
+            self.on_remove_subs.send_update((key.clone(), val.clone()));
         }
 
         self.on_insert_subs.send_update((key, value));

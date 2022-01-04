@@ -228,8 +228,8 @@ where
     pub fn remove(&mut self, value: &T) -> Option<T> {
         let value = self.store.take(value);
 
-        if let Some(value) = &value {
-            self.on_remove_subs.send_update(value.clone());
+        if let Some(val) = &value {
+            self.on_remove_subs.send_update(val.clone());
         }
 
         value
