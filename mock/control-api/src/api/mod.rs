@@ -64,10 +64,7 @@ pub struct AppContext {
 /// If the given `args` don't contain an expected `medea_addr` value.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-pub async fn run(
-    args: &ArgMatches<'static>,
-    callback_server: Addr<GrpcCallbackServer>,
-) {
+pub async fn run(args: &ArgMatches, callback_server: Addr<GrpcCallbackServer>) {
     let medea_addr: String = args.value_of("medea_addr").unwrap().to_string();
     let subscribers = Arc::new(Mutex::new(HashMap::new()));
     let client = ControlClient::new(medea_addr, Arc::clone(&subscribers))

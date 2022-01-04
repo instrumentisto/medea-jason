@@ -87,7 +87,7 @@ impl Handler<GetCallbackItems> for GrpcCallbackServer {
 ///
 /// If the given `args` don't contain expected `callback_host` and
 /// `callback_port` values.
-pub async fn run(args: &ArgMatches<'static>) -> Addr<GrpcCallbackServer> {
+pub async fn run(args: &ArgMatches) -> Addr<GrpcCallbackServer> {
     let host = args.value_of("callback_host").unwrap();
     let port: u32 = args.value_of("callback_port").unwrap().parse().unwrap();
 
