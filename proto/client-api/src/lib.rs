@@ -111,15 +111,17 @@ pub struct RoomId(pub String);
 pub struct MemberId(pub String);
 
 /// ID of a `Peer`.
-#[cfg_attr(feature = "client", derive(Serialize))]
-#[cfg_attr(feature = "server", derive(Default, Deserialize, Eq, PartialEq))]
-#[derive(Clone, Copy, Debug, Display, Hash)]
+#[cfg_attr(feature = "server", derive(Default))]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 pub struct PeerId(pub u32);
 
 /// ID of a `MediaTrack`.
-#[cfg_attr(feature = "client", derive(Serialize))]
-#[cfg_attr(feature = "server", derive(Default, Deserialize, Eq, PartialEq))]
-#[derive(Clone, Copy, Debug, Display, Hash)]
+#[cfg_attr(feature = "server", derive(Default))]
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, Hash, PartialEq, Serialize,
+)]
 pub struct TrackId(pub u32);
 
 /// Credential used for a `Member` authentication.
@@ -469,8 +471,8 @@ pub struct CloseDescription {
 /// Possible WebSocket messages sent from Media Server to Web Client.
 #[dispatchable(self: & Self, async_trait(? Send))]
 #[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 #[serde(tag = "event", content = "data")]
 pub enum Event {
     /// Media Server notifies Web Client that a `Member` joined a `Room`.
@@ -580,9 +582,7 @@ pub enum Event {
 /// - If [`Event`] contains [`NegotiationRole::Answerer`], then `Peer` is
 ///   expected to apply provided SDP Offer and provide its SDP Answer in a
 ///   [`Command::MakeSdpAnswer`].
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum NegotiationRole {
     /// [`Command::MakeSdpOffer`] should be sent by client.
     Offerer,
@@ -594,8 +594,8 @@ pub enum NegotiationRole {
 /// [`Track`] update which should be applied to the `Peer`.
 #[allow(variant_size_differences)]
 #[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum PeerUpdate {
     /// New [`Track`] should be added to the `Peer`.
     Added(Track),
@@ -640,8 +640,8 @@ pub struct IceCandidate {
 
 /// Track with a [`Direction`].
 #[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Track {
     /// ID of this [`Track`].
     pub id: TrackId,
@@ -663,8 +663,8 @@ impl Track {
 
 /// Patch of a [`Track`] which Web Client can request with a
 /// [`Command::UpdateTracks`].
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Serialize))]
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct TrackPatchCommand {
     /// ID of the [`Track`] this patch is intended for.
@@ -683,8 +683,8 @@ pub struct TrackPatchCommand {
 /// Patch of a [`Track`] which Media Server can send with an
 /// [`Event::PeerUpdated`].
 #[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct TrackPatchEvent {
     /// ID of the [`Track`] which should be patched.
     pub id: TrackId,
@@ -762,9 +762,7 @@ impl TrackPatchEvent {
 ///
 /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer
 /// [2]: https://developer.mozilla.org/en-US/docs/Web/API/RTCConfiguration
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct IceServer {
     /// URLs of this [`IceServer`].
     pub urls: Vec<String>,
@@ -780,8 +778,8 @@ pub struct IceServer {
 
 /// Possible directions of a [`Track`].
 #[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 // TODO: Use different struct without mids in PeerUpdated event.
 pub enum Direction {
     /// Outgoing direction.
@@ -808,9 +806,7 @@ pub enum Direction {
 }
 
 /// Possible media types of a [`Track`].
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MediaType {
     /// Audio [`Track`].
     Audio(AudioSettings),
@@ -831,9 +827,7 @@ impl MediaType {
 }
 
 /// Settings of an audio [`Track`].
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct AudioSettings {
     /// Importance of the audio.
     ///
@@ -842,9 +836,7 @@ pub struct AudioSettings {
 }
 
 /// Settings of a video [`Track`].
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct VideoSettings {
     /// Importance of the video.
     ///
@@ -856,9 +848,7 @@ pub struct VideoSettings {
 }
 
 /// Possible media sources of a video [`Track`].
-#[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MediaSourceKind {
     /// Media is sourced by some media device (webcam or microphone).
     Device,
@@ -869,11 +859,8 @@ pub enum MediaSourceKind {
 
 /// Estimated connection quality.
 #[cfg_attr(feature = "client", derive(Deserialize))]
-#[cfg_attr(
-    feature = "server",
-    derive(Eq, Ord, PartialEq, PartialOrd, Serialize)
-)]
-#[derive(Clone, Copy, Debug, Display)]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Copy, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
 pub enum ConnectionQualityScore {
     /// Nearly all users dissatisfied.
     Poor = 1,
