@@ -20,6 +20,7 @@
     clippy::decimal_literal_representation,
     clippy::else_if_without_else,
     clippy::empty_line_after_outer_attr,
+    clippy::equatable_if_let,
     clippy::exit,
     clippy::expect_used,
     clippy::fallible_impl_from,
@@ -46,6 +47,7 @@
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::rest_pat_in_fully_bound_structs,
+    clippy::same_name_method,
     clippy::shadow_unrelated,
     clippy::str_to_string,
     clippy::string_add,
@@ -85,6 +87,8 @@
 
 pub mod state;
 pub mod stats;
+
+use std::collections::HashMap;
 
 use derive_more::{Constructor, Display, From};
 use medea_macro::dispatchable;
@@ -150,44 +154,31 @@ impl_incrementable!(PeerId);
 #[cfg(feature = "server")]
 impl_incrementable!(TrackId);
 
-/// Temporary hack to overcome [`serde` lint bug][0].
-///
-/// TODO: Remove once [serde-rs/serde#2116][0] merged and released.
-///
-/// [0]: https://github.com/serde-rs/serde/pull/2116
-#[allow(unused_results)]
-mod server_msg {
-    use super::{Deserialize, Event, RoomId, RpcSettings, Serialize};
+#[allow(variant_size_differences)]
+#[cfg_attr(feature = "client", derive(Deserialize))]
+#[cfg_attr(feature = "server", derive(Serialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[serde(tag = "msg", content = "data")]
+/// Message sent by Media Server to Web Client.
+pub enum ServerMsg {
+    /// `ping` message that Media Server is expected to send to Web Client
+    /// periodically for probing its aliveness.
+    Ping(u32),
 
-    #[allow(variant_size_differences)]
-    #[cfg_attr(feature = "client", derive(Deserialize))]
-    #[cfg_attr(feature = "server", derive(Serialize))]
-    #[derive(Clone, Debug, Eq, PartialEq)]
-    #[serde(tag = "msg", content = "data")]
-    /// Message sent by Media Server to Web Client.
-    pub enum ServerMsg {
-        /// `ping` message that Media Server is expected to send to Web Client
-        /// periodically for probing its aliveness.
-        Ping(u32),
+    /// Media Server notifies Web Client about happened facts and it reacts on
+    /// them to reach the proper state.
+    Event {
+        /// ID of the `Room` that this [`Event`] is associated with.
+        room_id: RoomId,
 
-        /// Media Server notifies Web Client about happened facts and it reacts
-        /// on them to reach the proper state.
-        Event {
-            /// ID of the `Room` that this [`Event`] is associated with.
-            room_id: RoomId,
+        /// Actual [`Event`] sent to Web Client.
+        event: Event,
+    },
 
-            /// Actual [`Event`] sent to Web Client.
-            event: Event,
-        },
-
-        /// Media Server notifies Web Client about necessity to update its RPC
-        /// settings.
-        RpcSettings(RpcSettings),
-    }
+    /// Media Server notifies Web Client about necessity to update its RPC
+    /// settings.
+    RpcSettings(RpcSettings),
 }
-
-#[doc(inline)]
-pub use self::server_msg::ServerMsg;
 
 #[allow(variant_size_differences)]
 #[cfg_attr(feature = "client", derive(Serialize))]
@@ -224,115 +215,97 @@ pub struct RpcSettings {
     pub ping_interval_ms: u32,
 }
 
-/// Temporary hack to overcome [`serde` lint bug][0].
-///
-/// TODO: Remove once [serde-rs/serde#2116][0] merged and released.
-///
-/// [0]: https://github.com/serde-rs/serde/pull/2116
-#[allow(unused_results)]
-mod command {
-    use std::collections::HashMap;
+/// Possible commands sent by Web Client to Media Server.
+#[dispatchable]
+#[allow(unused_results)] // false positive: on `Deserialize`
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, PartialEq)]
+#[serde(tag = "command", content = "data")]
+pub enum Command {
+    /// Request to join a `Room`.
+    JoinRoom {
+        /// ID of the `Member` who joins the `Room`.
+        member_id: MemberId,
 
-    use super::{
-        dispatchable, state, Credential, Deserialize, IceCandidate, MemberId,
-        PeerId, PeerMetrics, Serialize, TrackId, TrackPatchCommand,
-    };
+        /// [`Credential`] of the `Member` to authenticate with.
+        credential: Credential,
+    },
 
-    /// Possible commands sent by Web Client to Media Server.
-    #[dispatchable]
-    #[allow(unused_results)] // false positive: on `Deserialize`
-    #[cfg_attr(feature = "client", derive(Serialize))]
-    #[cfg_attr(feature = "server", derive(Deserialize))]
-    #[derive(Clone, Debug, PartialEq)]
-    #[serde(tag = "command", content = "data")]
-    pub enum Command {
-        /// Request to join a `Room`.
-        JoinRoom {
-            /// ID of the `Member` who joins the `Room`.
-            member_id: MemberId,
+    /// Request to leave a `Room`.
+    LeaveRoom {
+        /// ID of the `Member` who leaves the `Room`.
+        member_id: MemberId,
+    },
 
-            /// [`Credential`] of the `Member` to authenticate with.
-            credential: Credential,
-        },
+    /// Web Client sends SDP Offer.
+    MakeSdpOffer {
+        /// ID of the `Peer` SDP Offer is sent for.
+        peer_id: PeerId,
 
-        /// Request to leave a `Room`.
-        LeaveRoom {
-            /// ID of the `Member` who leaves the `Room`.
-            member_id: MemberId,
-        },
+        /// SDP Offer of the `Peer`.
+        sdp_offer: String,
 
-        /// Web Client sends SDP Offer.
-        MakeSdpOffer {
-            /// ID of the `Peer` SDP Offer is sent for.
-            peer_id: PeerId,
+        /// Associations between [`Track`] and transceiver's
+        /// [media description][1].
+        ///
+        /// `mid` is basically an ID of [`m=<media>` section][1] in SDP.
+        ///
+        /// [1]: https://tools.ietf.org/html/rfc4566#section-5.14
+        mids: HashMap<TrackId, String>,
 
-            /// SDP Offer of the `Peer`.
-            sdp_offer: String,
+        /// Statuses of the `Peer` transceivers.
+        transceivers_statuses: HashMap<TrackId, bool>,
+    },
 
-            /// Associations between [`Track`] and transceiver's
-            /// [media description][1].
-            ///
-            /// `mid` is basically an ID of [`m=<media>` section][1] in SDP.
-            ///
-            /// [1]: https://tools.ietf.org/html/rfc4566#section-5.14
-            mids: HashMap<TrackId, String>,
+    /// Web Client sends SDP Answer.
+    MakeSdpAnswer {
+        /// ID of the `Peer` SDP Answer is sent for.
+        peer_id: PeerId,
 
-            /// Statuses of the `Peer` transceivers.
-            transceivers_statuses: HashMap<TrackId, bool>,
-        },
+        /// SDP Answer of the `Peer`.
+        sdp_answer: String,
 
-        /// Web Client sends SDP Answer.
-        MakeSdpAnswer {
-            /// ID of the `Peer` SDP Answer is sent for.
-            peer_id: PeerId,
+        /// Statuses of the `Peer` transceivers.
+        transceivers_statuses: HashMap<TrackId, bool>,
+    },
 
-            /// SDP Answer of the `Peer`.
-            sdp_answer: String,
+    /// Web Client sends an Ice Candidate.
+    SetIceCandidate {
+        /// ID of the `Peer` the Ice Candidate is sent for.
+        peer_id: PeerId,
 
-            /// Statuses of the `Peer` transceivers.
-            transceivers_statuses: HashMap<TrackId, bool>,
-        },
+        /// [`IceCandidate`] sent by the `Peer`.
+        candidate: IceCandidate,
+    },
 
-        /// Web Client sends an Ice Candidate.
-        SetIceCandidate {
-            /// ID of the `Peer` the Ice Candidate is sent for.
-            peer_id: PeerId,
+    /// Web Client sends Peer Connection metrics.
+    AddPeerConnectionMetrics {
+        /// ID of the `Peer` metrics are sent for.
+        peer_id: PeerId,
 
-            /// [`IceCandidate`] sent by the `Peer`.
-            candidate: IceCandidate,
-        },
+        /// Metrics of the `Peer`.
+        metrics: PeerMetrics,
+    },
 
-        /// Web Client sends Peer Connection metrics.
-        AddPeerConnectionMetrics {
-            /// ID of the `Peer` metrics are sent for.
-            peer_id: PeerId,
+    /// Web Client asks permission to update [`Track`]s in the specified
+    /// `Peer`. Media Server gives permission by sending
+    /// [`Event::PeerUpdated`].
+    UpdateTracks {
+        /// ID of the `Peer` to update [`Track`]s in.
+        peer_id: PeerId,
 
-            /// Metrics of the `Peer`.
-            metrics: PeerMetrics,
-        },
+        /// Patches for updating the [`Track`]s.
+        tracks_patches: Vec<TrackPatchCommand>,
+    },
 
-        /// Web Client asks permission to update [`Track`]s in the specified
-        /// `Peer`. Media Server gives permission by sending
-        /// [`Event::PeerUpdated`].
-        UpdateTracks {
-            /// ID of the `Peer` to update [`Track`]s in.
-            peer_id: PeerId,
-
-            /// Patches for updating the [`Track`]s.
-            tracks_patches: Vec<TrackPatchCommand>,
-        },
-
-        /// Web Client asks Media Server to synchronize Client State with a
-        /// Server State.
-        SynchronizeMe {
-            /// Whole Client State of the `Room`.
-            state: state::Room,
-        },
-    }
+    /// Web Client asks Media Server to synchronize Client State with a
+    /// Server State.
+    SynchronizeMe {
+        /// Whole Client State of the `Room`.
+        state: state::Room,
+    },
 }
-
-#[doc(inline)]
-pub use self::command::{Command, CommandHandler};
 
 /// Web Client's `PeerConnection` metrics.
 #[allow(variant_size_differences)]
@@ -493,130 +466,111 @@ pub struct CloseDescription {
     pub reason: CloseReason,
 }
 
-/// Temporary hack to overcome [`serde` lint bug][0].
-///
-/// TODO: Remove once [serde-rs/serde#2116][0] merged and released.
-///
-/// [0]: https://github.com/serde-rs/serde/pull/2116
-#[allow(unused_results)]
-mod event {
-    use super::{
-        dispatchable, state, CloseReason, ConnectionQualityScore, Deserialize,
-        IceCandidate, IceServer, MemberId, NegotiationRole, PeerId, PeerUpdate,
-        Serialize, Track,
-    };
+/// Possible WebSocket messages sent from Media Server to Web Client.
+#[dispatchable(self: & Self, async_trait(? Send))]
+#[cfg_attr(feature = "client", derive(Deserialize))]
+#[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
+#[derive(Clone, Debug)]
+#[serde(tag = "event", content = "data")]
+pub enum Event {
+    /// Media Server notifies Web Client that a `Member` joined a `Room`.
+    RoomJoined {
+        /// ID of the `Member` who joined the `Room`.
+        member_id: MemberId,
+    },
 
-    /// Possible WebSocket messages sent from Media Server to Web Client.
-    #[dispatchable(self: & Self, async_trait(? Send))]
-    #[cfg_attr(feature = "client", derive(Deserialize))]
-    #[cfg_attr(feature = "server", derive(Eq, PartialEq, Serialize))]
-    #[derive(Clone, Debug)]
-    #[serde(tag = "event", content = "data")]
-    pub enum Event {
-        /// Media Server notifies Web Client that a `Member` joined a `Room`.
-        RoomJoined {
-            /// ID of the `Member` who joined the `Room`.
-            member_id: MemberId,
-        },
+    /// Media Server notifies Web Client that a `Member` left a `Room`.
+    RoomLeft {
+        /// [`CloseReason`] with which the `Member` left the `Room`.
+        close_reason: CloseReason,
+    },
 
-        /// Media Server notifies Web Client that a `Member` left a `Room`.
-        RoomLeft {
-            /// [`CloseReason`] with which the `Member` left the `Room`.
-            close_reason: CloseReason,
-        },
+    /// Media Server notifies Web Client about necessity of RTCPeerConnection
+    /// creation.
+    PeerCreated {
+        /// ID of the `Peer` to create RTCPeerConnection for.
+        peer_id: PeerId,
 
-        /// Media Server notifies Web Client about necessity of
-        /// RTCPeerConnection creation.
-        PeerCreated {
-            /// ID of the `Peer` to create RTCPeerConnection for.
-            peer_id: PeerId,
+        /// [`NegotiationRole`] of the `Peer`.
+        negotiation_role: NegotiationRole,
 
-            /// [`NegotiationRole`] of the `Peer`.
-            negotiation_role: NegotiationRole,
+        /// [`Track`]s to create RTCPeerConnection with.
+        tracks: Vec<Track>,
 
-            /// [`Track`]s to create RTCPeerConnection with.
-            tracks: Vec<Track>,
+        /// [`IceServer`]s to create RTCPeerConnection with.
+        ice_servers: Vec<IceServer>,
 
-            /// [`IceServer`]s to create RTCPeerConnection with.
-            ice_servers: Vec<IceServer>,
+        /// Indicator whether the created RTCPeerConnection should be forced to
+        /// use relay [`IceServer`]s only.
+        force_relay: bool,
+    },
 
-            /// Indicator whether the created RTCPeerConnection should be
-            /// forced to use relay [`IceServer`]s only.
-            force_relay: bool,
-        },
+    /// Media Server notifies Web Client about necessity to apply the specified
+    /// SDP Answer to Web Client's RTCPeerConnection.
+    SdpAnswerMade {
+        /// ID of the `Peer` to apply SDP Answer to.
+        peer_id: PeerId,
 
-        /// Media Server notifies Web Client about necessity to apply the
-        /// specified SDP Answer to Web Client's RTCPeerConnection.
-        SdpAnswerMade {
-            /// ID of the `Peer` to apply SDP Answer to.
-            peer_id: PeerId,
+        /// SDP Answer to be applied.
+        sdp_answer: String,
+    },
 
-            /// SDP Answer to be applied.
-            sdp_answer: String,
-        },
+    /// Media Server notifies Web Client that his SDP offer was applied.
+    LocalDescriptionApplied {
+        /// ID of the `Peer` which SDP offer was applied.
+        peer_id: PeerId,
 
-        /// Media Server notifies Web Client that his SDP offer was applied.
-        LocalDescriptionApplied {
-            /// ID of the `Peer` which SDP offer was applied.
-            peer_id: PeerId,
+        /// SDP offer that was applied.
+        sdp_offer: String,
+    },
 
-            /// SDP offer that was applied.
-            sdp_offer: String,
-        },
+    /// Media Server notifies Web Client about necessity to apply the specified
+    /// ICE Candidate.
+    IceCandidateDiscovered {
+        /// ID of the `Peer` to apply ICE Candidate to.
+        peer_id: PeerId,
 
-        /// Media Server notifies Web Client about necessity to apply the
-        /// specified ICE Candidate.
-        IceCandidateDiscovered {
-            /// ID of the `Peer` to apply ICE Candidate to.
-            peer_id: PeerId,
+        /// ICE Candidate to be applied.
+        candidate: IceCandidate,
+    },
 
-            /// ICE Candidate to be applied.
-            candidate: IceCandidate,
-        },
+    /// Media Server notifies Web Client about necessity of RTCPeerConnection
+    /// close.
+    PeersRemoved {
+        /// IDs of `Peer`s to be removed.
+        peer_ids: Vec<PeerId>,
+    },
 
-        /// Media Server notifies Web Client about necessity of
-        /// RTCPeerConnection close.
-        PeersRemoved {
-            /// IDs of `Peer`s to be removed.
-            peer_ids: Vec<PeerId>,
-        },
+    /// Media Server notifies about necessity to update [`Track`]s in a `Peer`.
+    PeerUpdated {
+        /// ID of the `Peer` to update [`Track`]s in.
+        peer_id: PeerId,
 
-        /// Media Server notifies about necessity to update [`Track`]s in a
-        /// `Peer`.
-        PeerUpdated {
-            /// ID of the `Peer` to update [`Track`]s in.
-            peer_id: PeerId,
+        /// List of [`PeerUpdate`]s which should be applied.
+        updates: Vec<PeerUpdate>,
 
-            /// List of [`PeerUpdate`]s which should be applied.
-            updates: Vec<PeerUpdate>,
+        /// Negotiation role basing on which should be sent
+        /// [`Command::MakeSdpOffer`] or [`Command::MakeSdpAnswer`].
+        ///
+        /// If [`None`] then no (re)negotiation should be done.
+        negotiation_role: Option<NegotiationRole>,
+    },
 
-            /// Negotiation role basing on which should be sent
-            /// [`Command::MakeSdpOffer`] or [`Command::MakeSdpAnswer`].
-            ///
-            /// If [`None`] then no (re)negotiation should be done.
-            negotiation_role: Option<NegotiationRole>,
-        },
+    /// Media Server notifies about connection quality score update.
+    ConnectionQualityUpdated {
+        /// Partner [`MemberId`] of the `Peer`.
+        partner_member_id: MemberId,
 
-        /// Media Server notifies about connection quality score update.
-        ConnectionQualityUpdated {
-            /// Partner [`MemberId`] of the `Peer`.
-            partner_member_id: MemberId,
+        /// Estimated connection quality.
+        quality_score: ConnectionQualityScore,
+    },
 
-            /// Estimated connection quality.
-            quality_score: ConnectionQualityScore,
-        },
-
-        /// Media Server synchronizes Web Client state and reports the proper
-        /// one.
-        StateSynchronized {
-            /// Proper state that should be assumed by Web Client.
-            state: state::Room,
-        },
-    }
+    /// Media Server synchronizes Web Client state and reports the proper one.
+    StateSynchronized {
+        /// Proper state that should be assumed by Web Client.
+        state: state::Room,
+    },
 }
-
-#[doc(inline)]
-pub use self::event::{Event, EventHandler};
 
 /// `Peer`'s negotiation role.
 ///

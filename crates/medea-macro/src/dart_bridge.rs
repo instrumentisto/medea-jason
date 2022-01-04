@@ -56,28 +56,28 @@ struct ModExpander {
 impl TryFrom<syn::ItemMod> for ModExpander {
     type Error = syn::Error;
 
-    fn try_from(item: syn::ItemMod) -> syn::Result<Self> {
+    fn try_from(module: syn::ItemMod) -> syn::Result<Self> {
         use self::mod_parser as parser;
 
-        let mod_span = item.span();
+        let mod_span = module.span();
 
         let mut extern_fns: Vec<FnExpander> = Vec::new();
         let mut use_items = Vec::new();
-        let register_prefix = &item.ident;
-        for item in parser::try_unwrap_mod_content(item.content)? {
+        let register_prefix = &module.ident;
+        for item in parser::try_unwrap_mod_content(module.content)? {
             // false positive: non_exhaustive
             #[allow(clippy::wildcard_enum_match_arm)]
             match item {
-                syn::Item::ForeignMod(item) => {
-                    for item in item.items {
+                syn::Item::ForeignMod(r#mod) => {
+                    for i in r#mod.items {
                         extern_fns.push(FnExpander::parse(
-                            parser::get_extern_fn(item)?,
+                            parser::get_extern_fn(i)?,
                             register_prefix,
                         )?);
                     }
                 }
-                syn::Item::Use(item) => {
-                    use_items.push(item);
+                syn::Item::Use(r#use) => {
+                    use_items.push(r#use);
                 }
                 _ => {
                     return Err(syn::Error::new(
@@ -96,10 +96,10 @@ impl TryFrom<syn::ItemMod> for ModExpander {
         }
 
         Ok(Self {
-            register_fn_name: format_ident!("register_{}", item.ident),
-            vis: item.vis,
-            ident: item.ident,
-            attrs: item.attrs,
+            register_fn_name: format_ident!("register_{}", module.ident),
+            vis: module.vis,
+            ident: module.ident,
+            attrs: module.attrs,
             uses: use_items,
             fn_expanders: extern_fns,
         })
@@ -243,8 +243,8 @@ mod mod_parser {
     pub(super) fn get_extern_fn(
         item: syn::ForeignItem,
     ) -> syn::Result<syn::ForeignItemFn> {
-        if let syn::ForeignItem::Fn(item) = item {
-            Ok(item)
+        if let syn::ForeignItem::Fn(func) = item {
+            Ok(func)
         } else {
             Err(syn::Error::new(item.span(), "Unsupported item"))
         }
@@ -343,19 +343,19 @@ impl FnExpander {
         item: syn::ForeignItemFn,
         prefix: &syn::Ident,
     ) -> syn::Result<Self> {
-        for item in &item.sig.inputs {
-            match item {
-                syn::FnArg::Typed(item) => {
-                    if !matches!(&*item.pat, syn::Pat::Ident(_)) {
+        for arg in &item.sig.inputs {
+            match arg {
+                syn::FnArg::Typed(a) => {
+                    if !matches!(&*a.pat, syn::Pat::Ident(_)) {
                         return Err(syn::Error::new(
-                            item.span(),
+                            a.span(),
                             "Incorrect argument identifier",
                         ));
                     }
                 }
                 syn::FnArg::Receiver(_) => {
                     return Err(syn::Error::new(
-                        item.span(),
+                        arg.span(),
                         "`self` argument is invalid here",
                     ));
                 }
@@ -464,8 +464,8 @@ impl FnExpander {
 
         let args = &self.input_args;
         let args_idents = self.input_args.iter().filter_map(|arg| {
-            if let syn::FnArg::Typed(arg) = arg {
-                if let syn::Pat::Ident(pat) = &*arg.pat {
+            if let syn::FnArg::Typed(a) = arg {
+                if let syn::Pat::Ident(pat) = &*a.pat {
                     return Some(&pat.ident);
                 }
             }
