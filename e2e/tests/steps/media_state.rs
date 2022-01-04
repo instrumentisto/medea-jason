@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use cucumber_rust::{then, when};
 use medea_e2e::object::AwaitCompletion;
 
@@ -111,6 +113,17 @@ async fn when_enables_or_mutes(
             result.unwrap();
         }
     }
+}
+
+#[when(regex = "^(\\S+) switches device with latency$")]
+async fn when_member_switches_device_with_latency(
+    world: &mut World,
+    id: String,
+) {
+    let member = world.get_member(&id).unwrap();
+
+    member.add_gum_latency(Duration::from_secs(3)).await;
+    member.switch_video_device().await.unwrap();
 }
 
 #[when(regex = "^(\\S+) (enables|disables) remote \

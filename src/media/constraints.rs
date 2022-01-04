@@ -294,6 +294,7 @@ impl<C> VideoTrackConstraints<C> {
     /// [`VideoTrackConstraints`].
     #[inline]
     fn constrain(&mut self, other: Self) {
+        self.enabled &= other.enabled;
         self.constraints = other.constraints;
     }
 }

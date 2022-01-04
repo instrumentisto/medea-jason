@@ -1,10 +1,10 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap, fmt};
+use std::{cell::RefCell, collections::HashMap, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
-    browser::{mock, Window},
+    browser::{mock, Statement, Window},
     object::{
         self, connections_store::ConnectionStore, AwaitCompletion, MediaKind,
         MediaSourceKind, Object, Room,
@@ -327,6 +327,41 @@ impl Member {
                 .await?;
         }
         Ok(())
+    }
+
+    /// Emulates video device switching.
+    pub async fn switch_video_device(&self) -> Result<()> {
+        self.room
+            .set_local_media_settings(false, true, true)
+            .await?;
+        self.room
+            .set_local_media_settings(true, true, false)
+            .await?;
+        Ok(())
+    }
+
+    /// Emulates the provided `latency` for `getUserMedia()` requests.
+    pub async fn add_gum_latency(&self, latency: Duration) {
+        self.window
+            .execute(Statement::new(
+                r#"
+                    async () => {
+                        const [duration] = args;
+
+                        var gUM = navigator.mediaDevices.getUserMedia.bind(
+                            navigator.mediaDevices
+                        );
+                        navigator.mediaDevices.getUserMedia =
+                            async function (cons) {
+                                await new Promise(r => setTimeout(r, duration));
+                                return await gUM(cons);
+                            };
+                    }
+                "#,
+                [(latency.as_millis() as u64).into()],
+            ))
+            .await
+            .unwrap();
     }
 
     /// Returns reference to the Storage of [`Connection`]s thrown by this
