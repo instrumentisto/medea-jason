@@ -58,7 +58,7 @@ fn id_request(ids: Vec<String>) -> proto::IdRequest {
 ///
 /// [Medea]: https://github.com/instrumentisto/medea
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ControlClient {
     /// Map of subscribers to [`Notification`]s.
     subscribers: Subscribers,

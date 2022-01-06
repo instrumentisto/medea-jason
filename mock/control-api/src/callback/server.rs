@@ -8,7 +8,6 @@ use std::{
 };
 
 use actix::{Actor, Addr, Arbiter, Context, Handler, Message};
-use clap::ArgMatches;
 use medea_control_api_proto::grpc::callback::{
     self as proto,
     callback_server::{
@@ -17,7 +16,7 @@ use medea_control_api_proto::grpc::callback::{
 };
 use tonic::transport::Server;
 
-use crate::{callback::CallbackItem, prelude::*};
+use crate::{callback::CallbackItem, prelude::*, Cli};
 
 /// Type which used in [`GrpcCallbackServer`] for [`CallbackItem`] storing.
 type CallbackItems = Arc<Mutex<Vec<CallbackItem>>>;
@@ -26,6 +25,7 @@ type CallbackItems = Arc<Mutex<Vec<CallbackItem>>>;
 ///
 /// Also this [`Actor`] can return all received callbacks
 /// with [`GetCallbackItems`] [`Message`].
+#[derive(Debug)]
 pub struct GrpcCallbackServer {
     /// All [`CallbackItem`]s which this server received.
     events: CallbackItems,
@@ -36,7 +36,7 @@ impl Actor for GrpcCallbackServer {
 }
 
 /// Implementation for [`CallbackService`] gRPC service.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct GrpcCallbackService {
     /// All [`CallbackItem`]s which this server received.
     events: CallbackItems,
@@ -65,7 +65,7 @@ impl CallbackService for GrpcCallbackService {
 
 /// [`Message`] which returns all [`CallbackItem`]s received by this
 /// [`GrpcCallbackServer`].
-#[derive(Message)]
+#[derive(Clone, Copy, Debug, Message)]
 #[rtype(result = "Result<Vec<CallbackItem>, Infallible>")]
 pub struct GetCallbackItems;
 
@@ -85,19 +85,17 @@ impl Handler<GetCallbackItems> for GrpcCallbackServer {
 ///
 /// # Panics
 ///
-/// If the given `args` don't contain expected `callback_host` and
-/// `callback_port` values.
-pub async fn run(args: &ArgMatches) -> Addr<GrpcCallbackServer> {
-    let host = args.value_of("callback_host").unwrap();
-    let port: u32 = args.value_of("callback_port").unwrap().parse().unwrap();
-
+/// If cannot bind and run gRPC server.
+pub async fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
     let events = Arc::new(Mutex::new(Vec::new()));
 
     let service =
         TonicCallbackServer::new(GrpcCallbackService::new(Arc::clone(&events)));
-    let addr = format!("{}:{}", host, port).parse().unwrap();
+    let addr = format!("{}:{}", opts.callback_host, opts.callback_port)
+        .parse()
+        .unwrap();
 
-    Arbiter::current().spawn(async move {
+    let _ = Arbiter::current().spawn(async move {
         Server::builder()
             .add_service(service)
             .serve(addr)

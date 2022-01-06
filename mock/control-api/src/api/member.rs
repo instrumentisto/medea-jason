@@ -52,7 +52,7 @@ pub struct Member {
 impl Member {
     /// Converts [`Member`] into protobuf [`proto::Member`].
     #[must_use]
-    pub fn into_proto(self, id: String) -> proto::Member {
+    pub fn into_proto(self, member_id: String) -> proto::Member {
         let member_elements = self
             .pipeline
             .into_iter()
@@ -61,7 +61,7 @@ impl Member {
 
         proto::Member {
             pipeline: member_elements,
-            id,
+            id: member_id,
             credentials: self.credentials.map(Into::into),
             on_join: self.on_join.unwrap_or_default(),
             on_leave: self.on_leave.unwrap_or_default(),

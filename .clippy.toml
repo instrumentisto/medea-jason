@@ -18,6 +18,7 @@ doc-valid-idents = [
     "MediaStreamTrack", "MediaStreamTrackState",
     "MediaTrackConstraints",
     "MessageEvent",
+    "RESTful",
     "RTCAudioSenderStats", "RTCSenderAudioTrackAttachmentStats",
     "RTCConfiguration",
     "RTCDataChannel",

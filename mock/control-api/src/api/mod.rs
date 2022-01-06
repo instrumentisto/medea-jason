@@ -20,7 +20,6 @@ use actix_web::{
     web::{self, Data, Json, Path},
     App, HttpResponse, HttpServer,
 };
-use clap::ArgMatches;
 use derive_more::From;
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
@@ -30,6 +29,7 @@ use crate::{
     callback::server::{GetCallbackItems, GrpcCallbackServer},
     client::{ControlClient, Fid},
     prelude::*,
+    Cli,
 };
 
 use self::{
@@ -43,6 +43,7 @@ pub type Subscribers =
     Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>;
 
 /// Context of [`actix_web`] server.
+#[derive(Debug)]
 pub struct AppContext {
     /// Client for [Medea]'s [Control API].
     ///
@@ -61,15 +62,15 @@ pub struct AppContext {
 ///
 /// # Panics
 ///
-/// If the given `args` don't contain an expected `medea_addr` value.
+/// If cannot bind and run HTTP server.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-pub async fn run(args: &ArgMatches, callback_server: Addr<GrpcCallbackServer>) {
-    let medea_addr: String = args.value_of("medea_addr").unwrap().to_string();
+pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
     let subscribers = Arc::new(Mutex::new(HashMap::new()));
-    let client = ControlClient::new(medea_addr, Arc::clone(&subscribers))
-        .await
-        .unwrap();
+    let client =
+        ControlClient::new(opts.medea_addr.clone(), Arc::clone(&subscribers))
+            .await
+            .unwrap();
     let app_data = Data::new(AppContext {
         client,
         subscribers,
@@ -110,7 +111,7 @@ pub async fn run(args: &ArgMatches, callback_server: Addr<GrpcCallbackServer>) {
                 web::resource("/callbacks").route(web::get().to(get_callbacks)),
             )
     })
-    .bind(args.value_of("addr").unwrap())
+    .bind(&opts.addr)
     .unwrap()
     .run()
     .await
@@ -212,6 +213,8 @@ mod create {
         HttpResponse, InternalError, Json, Path,
     };
 
+    /// Creates the given [`Element`] under the given FID represented as
+    /// one-segment `path`.
     pub async fn create1(
         path: Path<String>,
         state: Data<AppContext>,
@@ -225,6 +228,8 @@ mod create {
             .map(|r| CreateResponse::from(r).into())
     }
 
+    /// Creates the given [`Element`] under the given FID represented as
+    /// two-segments `path`.
     pub async fn create2(
         path: Path<(String, String)>,
         state: Data<AppContext>,
@@ -239,6 +244,8 @@ mod create {
             .map(|r| CreateResponse::from(r).into())
     }
 
+    /// Creates the given [`Element`] under the given FID represented as
+    /// three-segments `path`.
     pub async fn create3(
         path: Path<(String, String, String)>,
         state: Data<AppContext>,
@@ -263,6 +270,7 @@ mod apply {
         HttpResponse, InternalError, Json, Path,
     };
 
+    /// Renews the [`Element`] by its FID represented as one-segment `path`.
     pub async fn apply1(
         path: Path<String>,
         state: Data<AppContext>,
@@ -276,6 +284,7 @@ mod apply {
             .map(|r| CreateResponse::from(r).into())
     }
 
+    /// Renews the [`Element`] by its FID represented as two-segments `path`.
     pub async fn apply2(
         path: Path<(String, String)>,
         state: Data<AppContext>,
@@ -399,9 +408,16 @@ impl From<proto::CreateResponse> for CreateResponse {
 #[derive(Debug, Deserialize, From, Serialize)]
 #[serde(tag = "kind")]
 pub enum Element {
+    /// [`Member`] element.
     Member(Member),
+
+    /// [`WebRtcPublishEndpoint`] element.
     WebRtcPublishEndpoint(WebRtcPublishEndpoint),
+
+    /// [`WebRtcPlayEndpoint`] element.
     WebRtcPlayEndpoint(WebRtcPlayEndpoint),
+
+    /// [`Room`] element.
     Room(Room),
 }
 
@@ -417,12 +433,15 @@ impl Element {
             Self::Member(m) => {
                 proto::room::element::El::Member(m.into_proto(id))
             }
-            _ => unimplemented!(),
+            Self::WebRtcPublishEndpoint(_)
+            | Self::WebRtcPlayEndpoint(_)
+            | Self::Room(_) => unimplemented!(),
         };
         proto::room::Element { el: Some(el) }
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<proto::Element> for Element {
     fn from(proto: proto::Element) -> Self {
         use proto::element::El;
@@ -440,13 +459,15 @@ impl From<proto::Element> for Element {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<proto::room::Element> for Element {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {
             proto::room::element::El::Member(member) => {
                 Self::Member(member.into())
             }
-            _ => unimplemented!(
+            proto::room::element::El::WebrtcPlay(_)
+            | proto::room::element::El::WebrtcPub(_) => unimplemented!(
                 "Currently Control API mock server supports only Member \
                  element in Room pipeline."
             ),

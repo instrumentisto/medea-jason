@@ -14,9 +14,9 @@ publish = false
 [dependencies]
 actix = "0.12"
 actix-cors = "=0.6.0-beta.8"
-actix-web = "=4.0.0-beta.18"
-actix-web-actors = "=4.0.0-beta.9"
-clap = "3.0"
+actix-web = "=4.0.0-beta.19"
+actix-web-actors = "=4.0.0-beta.10"
+clap = { version = "3.0", features = ["derive"] }
 derive_more = "0.99"
 dotenv = "0.15"
 humantime-serde = "1.0"
