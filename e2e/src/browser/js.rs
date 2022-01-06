@@ -18,6 +18,7 @@ use crate::object::ObjectPtr;
 ///     return "foobar";
 /// }
 /// ```
+#[derive(Debug)]
 pub struct Statement {
     /// Actual JS code to be executed.
     expression: String,
@@ -134,9 +135,9 @@ impl Statement {
         // language=JavaScript
         format!(
             r#"
-                args = arguments[{i}];
-                {objs_js}
-                lastResult = await ({expr})(lastResult);
+            args = arguments[{i}];
+            {objs_js}
+            lastResult = await ({expr})(lastResult);
             "#,
             i = i,
             objs_js = self.objects_injection_js(),

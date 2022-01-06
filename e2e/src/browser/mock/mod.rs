@@ -16,13 +16,13 @@ pub async fn instantiate_mocks(window: &Window) {
 impl Window {
     /// Returns a `WebSocket` object mock for this [`Window`].
     #[must_use]
-    pub fn websocket_mock(&self) -> WebSocket {
+    pub fn websocket_mock(&self) -> WebSocket<'_> {
         WebSocket(self)
     }
 
     /// Returns `MediaDevices` interface mock for this [`Window`].
     #[must_use]
-    pub fn media_devices_mock(&self) -> MediaDevices {
+    pub fn media_devices_mock(&self) -> MediaDevices<'_> {
         MediaDevices(self)
     }
 }

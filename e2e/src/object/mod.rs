@@ -33,7 +33,7 @@ pub enum Error {
 }
 
 /// Policy applied to [`Object`]'s functions spawning promises.
-#[derive(Clone, Copy, Display, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Display, Eq, Hash, PartialEq)]
 pub enum AwaitCompletion {
     /// Wait for the spawned promise to complete completion.
     #[display(fmt = "await")]
@@ -52,6 +52,7 @@ pub struct ObjectPtr(String);
 /// Representation of some JS object on a browser's side.
 ///
 /// JS object on browser's side will be removed on this [`Object`]'s [`Drop`].
+#[derive(Debug)]
 pub struct Object<T> {
     /// Pointer to the JS object on a browser's side.
     ptr: ObjectPtr,
@@ -69,22 +70,23 @@ impl<T> Drop for Object<T> {
         let ptr = self.ptr.clone();
         let window = self.window.clone();
         let (tx, rx) = mpsc::channel();
-        tokio::spawn(async move {
+        drop(tokio::spawn(async move {
             window
                 .execute(Statement::new(
                     // language=JavaScript
                     r#"
-                        async () => {
-                            const [id] = args;
-                            window.registry.delete(id);
-                        }
+                    async () => {
+                        const [id] = args;
+                        window.registry.delete(id);
+                    }
                     "#,
                     [ptr.to_string().into()],
                 ))
                 .await
+                .map(drop)
                 .unwrap();
             tx.send(()).unwrap();
-        });
+        }));
         task::block_in_place(move || {
             rx.recv().unwrap();
         });
@@ -122,14 +124,15 @@ impl<T> Object<T> {
         self.execute(statement.and_then(Statement::new(
             // language=JavaScript
             r#"
-                async (obj) => {
-                    const [id] = args;
-                    window.registry.set(id, obj);
-                }
+            async (obj) => {
+                const [id] = args;
+                window.registry.set(id, obj);
+            }
             "#,
             [id.clone().into()],
         )))
-        .await?;
+        .await
+        .map(drop)?;
 
         Ok(Object::new(id, self.window.clone()))
     }
@@ -167,10 +170,10 @@ impl<T> Object<T> {
         Statement::new(
             // language=JavaScript
             r#"
-                async () => {
-                    const [id] = args;
-                    return window.registry.get(id);
-                }
+            async () => {
+                const [id] = args;
+                return window.registry.get(id);
+            }
             "#,
             [self.ptr.to_string().into()],
         )
@@ -183,25 +186,23 @@ impl<T: Builder> Object<T> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
-    pub async fn spawn(
-        obj: T,
-        window: browser::Window,
-    ) -> Result<Object<T>, Error> {
+    pub async fn spawn(obj: T, window: browser::Window) -> Result<Self, Error> {
         let id = Uuid::new_v4().to_string();
         window
             .execute(obj.build().and_then(Statement::new(
                 // language=JavaScript
                 r#"
-                    async (obj) => {
-                        const [id] = args;
-                        window.registry.set(id, obj);
-                    }
+                async (obj) => {
+                    const [id] = args;
+                    window.registry.set(id, obj);
+                }
                 "#,
                 [id.clone().into()],
             )))
-            .await?;
+            .await
+            .map(drop)?;
 
-        Ok(Object::new(id, window))
+        Ok(Self::new(id, window))
     }
 }
 

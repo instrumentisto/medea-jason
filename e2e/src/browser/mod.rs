@@ -56,6 +56,7 @@ type Result<T> = std::result::Result<T, Error>;
 /// Window is closed once all [`WindowHandle`]s for this window are [`Drop`]ped.
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
+#[derive(Debug)]
 pub struct Window {
     /// Client for interacting with a browser through [WebDriver].
     ///
@@ -74,7 +75,7 @@ pub struct Window {
 
 impl Clone for Window {
     fn clone(&self) -> Self {
-        self.rc.fetch_add(1, Ordering::SeqCst);
+        let _ = self.rc.fetch_add(1, Ordering::SeqCst);
         Self {
             client: self.client.clone(),
             window: self.window.clone(),
@@ -125,7 +126,7 @@ impl Window {
 /// [WebDriver] session will be closed on this object's [`Drop`].
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct WindowFactory(WebDriverClient);
 
 impl WindowFactory {

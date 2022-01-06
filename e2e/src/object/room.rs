@@ -10,12 +10,16 @@ use crate::{
 use super::{AwaitCompletion, Error};
 
 /// Representation of a `Room` JS object.
+#[derive(Clone, Copy, Debug)]
 pub struct Room;
 
 /// Representation of a `MediaKind` JS enum.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MediaKind {
+    /// Audio media.
     Audio,
+
+    /// Video media.
     Video,
 }
 
@@ -47,7 +51,10 @@ impl MediaKind {
 /// Representation of a `MediaSourceKind` JS enum.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MediaSourceKind {
+    /// Device source of media (camera, mic, etc).
     Device,
+
+    /// Display source of media (screen sharing, etc).
     Display,
 }
 
@@ -114,7 +121,7 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<_> = match kind {
+        let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_audio()".into(),
             MediaKind::Video => {
                 format!("r.room.disable_video({})", media_source_kind).into()
@@ -124,9 +131,9 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {} {};
+                }}
                 "#,
                 maybe_await, disable,
             ),
@@ -153,7 +160,7 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<_> = match kind {
+        let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_audio()".into(),
             MediaKind::Video => {
                 format!("r.room.enable_video({})", media_source_kind).into()
@@ -191,7 +198,7 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<_> = match kind {
+        let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_remote_audio()".into(),
             MediaKind::Video => {
                 format!("r.room.disable_remote_video({})", media_source_kind)
@@ -230,7 +237,7 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<_> = match kind {
+        let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_remote_audio()".into(),
             MediaKind::Video => {
                 format!("r.room.enable_remote_video({})", media_source_kind)
@@ -270,7 +277,7 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let mute: Cow<_> = match kind {
+        let mute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.mute_audio()".into(),
             MediaKind::Video => {
                 format!("r.room.mute_video({})", media_source_kind).into()
@@ -309,7 +316,7 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let unmute: Cow<_> = match kind {
+        let unmute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.unmute_audio()".into(),
             MediaKind::Video => {
                 format!("r.room.unmute_video({})", media_source_kind).into()
@@ -543,27 +550,27 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    const [video, audio, shouldWait] = args;
-                    let constraints = new rust.MediaStreamSettings();
-                    if (video) {
-                        let video =
-                            new window.rust.DeviceVideoTrackConstraints();
-                        constraints.device_video(video);
-                    }
-                    if (audio) {
-                        let audio = new window.rust.AudioTrackConstraints();
-                        constraints.audio(audio);
-                    }
-                    let promise = room.room.set_local_media_settings(
-                        constraints,
-                        true,
-                        false
-                    );
-                    if (shouldWait) {
-                        await promise;
-                    }
+            async (room) => {
+                const [video, audio, shouldWait] = args;
+                let constraints = new rust.MediaStreamSettings();
+                if (video) {
+                    let video =
+                        new window.rust.DeviceVideoTrackConstraints();
+                    constraints.device_video(video);
                 }
+                if (audio) {
+                    let audio = new window.rust.AudioTrackConstraints();
+                    constraints.audio(audio);
+                }
+                let promise = room.room.set_local_media_settings(
+                    constraints,
+                    true,
+                    false
+                );
+                if (shouldWait) {
+                    await promise;
+                }
+            }
             "#,
             [video.into(), audio.into(), should_wait.into()],
         ))
@@ -581,29 +588,30 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    const [count] = args;
-                    return await new Promise((resolve) => {
-                        if (room.onFailedLocalStreamListener.count === count) {
-                            resolve();
-                        } else {
-                            room.onFailedLocalStreamListener.subs.push(() => {
-                                let failCount =
-                                    room.onFailedLocalStreamListener.count;
-                                if (failCount === count) {
-                                    resolve();
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            });
-                        }
-                    });
-                }
+            async (room) => {
+                const [count] = args;
+                return await new Promise((resolve) => {
+                    if (room.onFailedLocalStreamListener.count === count) {
+                        resolve();
+                    } else {
+                        room.onFailedLocalStreamListener.subs.push(() => {
+                            let failCount =
+                                room.onFailedLocalStreamListener.count;
+                            if (failCount === count) {
+                                resolve();
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        });
+                    }
+                });
+            }
             "#,
             [count.into()],
         ))
         .await
+        .map(drop)
         .unwrap();
     }
 
@@ -616,17 +624,18 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    room.localTracksStore.tracks = [];
-                }
+            async (room) => {
+                room.localTracksStore.tracks = [];
+            }
             "#,
             [],
         ))
         .await
+        .map(drop)
         .unwrap();
     }
 }
 
 /// Error of parsing a [`MediaKind`] or a [`MediaSourceKind`].
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ParsingFailedError;

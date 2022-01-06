@@ -22,6 +22,7 @@ pub type Local = TracksStore<LocalTrack>;
 pub type Remote = TracksStore<RemoteTrack>;
 
 /// Store for [`LocalTrack`]s or [`RemoteTrack`]s.
+#[derive(Debug)]
 pub struct TracksStore<T>(PhantomData<T>);
 
 impl<T> Object<TracksStore<T>> {

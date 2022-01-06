@@ -8,6 +8,7 @@ use crate::{
 use super::Error;
 
 /// Representation of a `Connection` JS object.
+#[derive(Clone, Copy, Debug)]
 pub struct Connection;
 
 impl Object<Connection> {
@@ -39,15 +40,15 @@ impl Object<Connection> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (conn) => {
-                    await new Promise((resolve) => {
-                        if (!conn.closeListener.isClosed) {
-                            conn.closeListener.subs.push(resolve);
-                        } else {
-                            resolve();
-                        }
-                    });
-                }
+            async (conn) => {
+                await new Promise((resolve) => {
+                    if (!conn.closeListener.isClosed) {
+                        conn.closeListener.subs.push(resolve);
+                    } else {
+                        resolve();
+                    }
+                });
+            }
             "#,
             [],
         ))

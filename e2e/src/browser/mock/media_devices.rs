@@ -7,6 +7,7 @@ use crate::browser::{Statement, Window};
 /// Mock of a [MediaDevices][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#mediadevices
+#[derive(Debug)]
 pub struct MediaDevices<'a>(pub(super) &'a Window);
 
 impl<'a> MediaDevices<'a> {
@@ -19,15 +20,16 @@ impl<'a> MediaDevices<'a> {
             .execute(Statement::new(
                 // language=JavaScript
                 r#"
-                    async () => {
-                        window.gumMock = {
-                            original: navigator.mediaDevices.getUserMedia
-                        };
-                    }
+                async () => {
+                    window.gumMock = {
+                        original: navigator.mediaDevices.getUserMedia
+                    };
+                }
                 "#,
                 [],
             ))
             .await
+            .map(drop)
             .unwrap();
     }
 
@@ -44,22 +46,23 @@ impl<'a> MediaDevices<'a> {
             .execute(Statement::new(
                 // language=JavaScript
                 r#"
-                    async () => {
-                        const [isVideoBroken, isAudioBroken] = args;
-                        navigator.mediaDevices.getUserMedia = async (cons) => {
-                            if (isAudioBroken && cons.audio != null) {
-                                throw new NotFoundError();
-                            }
-                            if (isVideoBroken && cons.video != null) {
-                                throw new NotFoundError();
-                            }
-                            return await window.gumMock.original(cons);
+                async () => {
+                    const [isVideoBroken, isAudioBroken] = args;
+                    navigator.mediaDevices.getUserMedia = async (cons) => {
+                        if (isAudioBroken && cons.audio != null) {
+                            throw new NotFoundError();
                         }
+                        if (isVideoBroken && cons.video != null) {
+                            throw new NotFoundError();
+                        }
+                        return await window.gumMock.original(cons);
                     }
+                }
                 "#,
                 [video.into(), audio.into()],
             ))
             .await
+            .map(drop)
             .unwrap();
     }
 }

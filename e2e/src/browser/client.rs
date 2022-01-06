@@ -56,7 +56,10 @@ impl From<JsResult> for Result<Json> {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, Debug)]
 pub struct WebDriverClient {
+    /// Inner implementation of this [`WebDriverClient`].
     inner: Arc<Mutex<Inner>>,
+
+    /// Host of the file server to load `index.html` page from.
     file_server_host: String,
 }
 
@@ -102,12 +105,12 @@ impl WebDriverClient {
     /// If [`tokio::spawn()`] panics.
     pub fn blocking_close(&self) {
         let (tx, rx) = mpsc::channel();
-        let client = self.inner.clone();
-        tokio::spawn(async move {
+        let client = Arc::clone(&self.inner);
+        drop(tokio::spawn(async move {
             let mut inner = client.lock().await;
             inner.0.close().await.map_err(|e| dbg!("{:?}", e)).unwrap();
             tx.send(()).unwrap();
-        });
+        }));
         task::block_in_place(move || {
             rx.recv().unwrap();
         });
@@ -120,12 +123,12 @@ impl WebDriverClient {
     /// If [`tokio::spawn()`] panics.
     pub fn blocking_window_close(&self, window: WindowHandle) {
         let (tx, rx) = mpsc::channel();
-        let client = self.inner.clone();
-        tokio::spawn(async move {
+        let client = Arc::clone(&self.inner);
+        drop(tokio::spawn(async move {
             let mut client = client.lock().await;
             client.close_window(window).await;
             tx.send(()).unwrap();
-        });
+        }));
         task::block_in_place(move || {
             rx.recv().unwrap();
         });
@@ -135,8 +138,17 @@ impl WebDriverClient {
 /// Builder for [`WebDriverClientBuilder`].
 #[derive(Clone, Debug)]
 pub struct WebDriverClientBuilder<'a> {
+    /// Address of a [WebDriver] server.
+    ///
+    /// [WebDriver]: https://w3.org/TR/webdriver
     webdriver_address: &'a str,
+
+    /// Indicator whether [`WebDriverClient`] will run against headless Firefox
+    /// browser.
     headless_firefox: bool,
+
+    /// Indicator whether [`WebDriverClient`] will run against headless Chrome
+    /// browser.
     headless_chrome: bool,
 }
 
@@ -276,18 +288,20 @@ impl Inner {
             .wait()
             .at_most(Duration::from_secs(120))
             .for_element(Locator::Id("loaded"))
-            .await?;
+            .await
+            .map(drop)?;
 
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async () => {
-                    window.registry = new Map();
-                }
+            async () => {
+                window.registry = new Map();
+            }
             "#,
             vec![],
         ))
-        .await?;
+        .await
+        .map(drop)?;
 
         Ok(window)
     }
@@ -346,14 +360,14 @@ impl Inner {
         headless_chrome: bool,
     ) -> Capabilities {
         let mut caps = Capabilities::new();
-        caps.insert(
+        drop(caps.insert(
             "moz:firefoxOptions".to_owned(),
             Self::get_firefox_caps(headless_firefox),
-        );
-        caps.insert(
+        ));
+        drop(caps.insert(
             "goog:chromeOptions".to_owned(),
             Self::get_chrome_caps(headless_chrome),
-        );
+        ));
         caps
     }
 }
