@@ -168,21 +168,21 @@ impl RtcPeerConnection {
         Ok(RtcStats(Vec::new()))
     }
 
-    /// Sets handler for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
+    /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
     ///
     /// [1]: https://w3.org/TR/webrtc/#rtctrackevent
     /// [2]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-ontrack
-    pub fn on_track<F>(&self, f: Option<F>)
+    pub fn on_track<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(MediaStreamTrack, Transceiver),
     {
-        if let Some(mut f) = f {
+        if let Some(mut h) = handler {
             unsafe {
                 peer_connection::on_track(
                     self.handle.get(),
                     Callback::from_two_arg_fn_mut(
                         move |track: DartHandle, transceiver: DartHandle| {
-                            f(
+                            h(
                                 MediaStreamTrack::from(track),
                                 Transceiver::from(transceiver),
                             );
@@ -194,22 +194,22 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Sets handler for a [RTCPeerConnectionIceEvent][1] (see
+    /// Sets `handler` for a [RTCPeerConnectionIceEvent][1] (see
     /// [`onicecandidate` callback][2]).
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent
     /// [2]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-onicecandidate
-    pub fn on_ice_candidate<F>(&self, f: Option<F>)
+    pub fn on_ice_candidate<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(IceCandidate),
     {
-        if let Some(mut f) = f {
+        if let Some(mut h) = handler {
             unsafe {
                 peer_connection::on_ice_candidate(
                     self.handle.get(),
                     Callback::from_fn_mut(move |handle: DartHandle| {
                         let candidate = PlatformIceCandidate::from(handle);
-                        f(IceCandidate {
+                        h(IceCandidate {
                             candidate: candidate.candidate(),
                             sdp_m_line_index: candidate.sdp_m_line_index(),
                             sdp_mid: candidate.sdp_mid(),
@@ -243,19 +243,19 @@ impl RtcPeerConnection {
         Some(peer_connection_state_from_int(connection_state))
     }
 
-    /// Sets handler for an [`iceconnectionstatechange`][1] event.
+    /// Sets `handler` for an [`iceconnectionstatechange`][1] event.
     ///
     /// [1]: https://w3.org/TR/webrtc/#event-iceconnectionstatechange
-    pub fn on_ice_connection_state_change<F>(&self, f: Option<F>)
+    pub fn on_ice_connection_state_change<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(IceConnectionState),
     {
-        if let Some(mut f) = f {
+        if let Some(mut h) = handler {
             unsafe {
                 peer_connection::on_ice_connection_state_change(
                     self.handle.get(),
                     Callback::from_fn_mut(move |v| {
-                        f(ice_connection_from_int(v));
+                        h(ice_connection_from_int(v));
                     })
                     .into_dart(),
                 );
@@ -263,19 +263,19 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Sets handler for a [`connectionstatechange`][1] event.
+    /// Sets `handler` for a [`connectionstatechange`][1] event.
     ///
     /// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
-    pub fn on_connection_state_change<F>(&self, f: Option<F>)
+    pub fn on_connection_state_change<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(PeerConnectionState),
     {
-        if let Some(mut f) = f {
+        if let Some(mut h) = handler {
             unsafe {
                 peer_connection::on_connection_state_change(
                     self.handle.get(),
                     Callback::from_fn_mut(move |v| {
-                        f(peer_connection_state_from_int(v));
+                        h(peer_connection_state_from_int(v));
                     })
                     .into_dart(),
                 );
@@ -331,7 +331,7 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
     pub async fn set_offer(&self, offer: &str) -> Result<()> {
-        self.set_local_description(RtcSdpType::Offer, offer.to_string())
+        self.set_local_description(RtcSdpType::Offer, offer.into())
             .await
             .map_err(tracerr::map_from_and_wrap!())
     }
@@ -345,7 +345,7 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
     pub async fn set_answer(&self, answer: &str) -> Result<()> {
-        self.set_local_description(RtcSdpType::Answer, answer.to_string())
+        self.set_local_description(RtcSdpType::Answer, answer.into())
             .await
             .map_err(tracerr::map_from_and_wrap!())
     }
@@ -488,7 +488,7 @@ impl RtcPeerConnection {
                 let transceiver: Option<DartHandle> = FutureFromDart::execute(
                     peer_connection::get_transceiver_by_mid(
                         handle,
-                        string_into_c_str(mid.to_string()),
+                        string_into_c_str(mid),
                     ),
                 )
                 .await

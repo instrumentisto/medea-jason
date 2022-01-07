@@ -3,10 +3,7 @@ use std::{
     rc::Rc,
 };
 
-use futures::{
-    channel::{mpsc, mpsc::UnboundedSender},
-    prelude::stream::LocalBoxStream,
-};
+use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
 use medea_macro::dart_bridge;
 use medea_reactive::ObservableCell;
@@ -112,7 +109,7 @@ impl WebSocketRpcTransport {
                 Rc::new(ObservableCell::new(TransportState::Open));
             let handle =
                 FutureFromDart::execute::<DartHandle>(transport::connect(
-                    string_into_c_str(url.as_ref().to_string()),
+                    string_into_c_str(url.as_ref().to_owned()),
                     Callback::from_fn_mut({
                         let subs = Rc::clone(&on_message_subs);
                         move |msg: String| {
@@ -128,7 +125,7 @@ impl WebSocketRpcTransport {
                                 };
 
                             subs.borrow_mut().retain(
-                                |sub: &UnboundedSender<ServerMsg>| {
+                                |sub: &mpsc::UnboundedSender<ServerMsg>| {
                                     sub.unbounded_send(msg.clone()).is_ok()
                                 },
                             );

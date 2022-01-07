@@ -95,6 +95,7 @@ pub async fn delay_for(delay: Duration) {
 /// Dart [Future] which can be resolved from Rust.
 ///
 /// [Future]: https://api.dart.dev/dart-async/Future-class.html
+#[derive(Debug)]
 pub struct Completer<T, E> {
     /// [`Dart_PersistentHandle`] to the Dart [Completer][1] backing this
     /// [`Completer`].
@@ -148,7 +149,7 @@ impl<T, E> Completer<T, E> {
 
 impl<T, E> Default for Completer<T, E> {
     fn default() -> Self {
-        Completer::new()
+        Self::new()
     }
 }
 

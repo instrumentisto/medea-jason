@@ -38,7 +38,7 @@ mod list {
 /// Rust side representation of a Dart side [`List`].
 ///
 /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct DartList(DartHandle);
 
 impl DartList {
@@ -63,7 +63,7 @@ impl DartList {
 impl<T: From<DartHandle>> From<DartList> for Vec<T> {
     fn from(list: DartList) -> Self {
         let len = list.length();
-        let mut out = Vec::with_capacity(len);
+        let mut out = Self::with_capacity(len);
         for i in 0..len {
             let val = list.get(i).unwrap();
             out.push(val.into());

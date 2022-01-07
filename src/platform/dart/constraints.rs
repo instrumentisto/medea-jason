@@ -46,6 +46,7 @@ mod constraints {
 /// Dart side representation of [MediaTrackConstraints][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#media-track-constraints
+#[derive(Debug)]
 pub struct MediaTrackConstraints(DartMap);
 
 impl From<MediaTrackConstraints> for Dart_Handle {

@@ -22,6 +22,7 @@ pub use self::{
 /// Rust representation of a Dart [`Future`].
 ///
 /// [`Future`]: https://api.dart.dev/dart-async/Future-class.html
+#[derive(Debug)]
 #[repr(transparent)]
 pub struct DartFuture<O>(Dart_Handle, PhantomData<*const O>);
 

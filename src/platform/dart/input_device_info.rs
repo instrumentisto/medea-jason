@@ -100,6 +100,7 @@ impl TryFrom<DartHandle> for InputDeviceInfo {
     type Error = NotInput;
 
     fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
+        #[allow(clippy::map_err_ignore)]
         let kind = unsafe { input_device_info::kind(value.get()) }
             .try_into()
             .map_err(|_| NotInput)?;
@@ -114,4 +115,5 @@ impl TryFrom<DartHandle> for InputDeviceInfo {
 /// Error of a [MediaDeviceInfo][0] representing not an input device.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
+#[derive(Clone, Copy, Debug)]
 pub struct NotInput;

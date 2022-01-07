@@ -105,14 +105,15 @@ mod exception {
 }
 
 /// An error that can be returned from Rust to Dart.
-#[derive(Into)]
+#[allow(missing_copy_implementations)] // not trivially copyable
+#[derive(Debug, Into)]
 #[repr(transparent)]
 pub struct DartError(ptr::NonNull<Dart_Handle>);
 
 impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
-    fn new(handle: Dart_Handle) -> DartError {
-        DartError(ptr::NonNull::from(Box::leak(Box::new(handle))))
+    fn new(handle: Dart_Handle) -> Self {
+        Self(ptr::NonNull::from(Box::leak(Box::new(handle))))
     }
 }
 
@@ -126,6 +127,7 @@ impl From<platform::Error> for DartError {
 /// function through FFI.
 ///
 /// It can be converted into a [`DartError`] and passed to Dart.
+#[derive(Debug)]
 pub struct ArgumentError<T> {
     /// Invalid value of the argument.
     val: T,
@@ -181,7 +183,7 @@ impl From<LocalMediaInitException> for DartError {
             Self::new(exception::new_local_media_init_exception(
                 err.kind() as i64,
                 string_into_c_str(err.message()),
-                err.cause().map(DartError::from).into(),
+                err.cause().map(Self::from).into(),
                 string_into_c_str(err.trace()),
             ))
         }
@@ -215,7 +217,7 @@ impl From<RpcClientException> for DartError {
             Self::new(exception::new_rpc_client_exception(
                 err.kind() as i64,
                 string_into_c_str(err.message()),
-                err.cause().map(DartError::from).into(),
+                err.cause().map(Self::from).into(),
                 string_into_c_str(err.trace()),
             ))
         }
@@ -238,7 +240,7 @@ impl From<InternalException> for DartError {
         unsafe {
             Self::new(exception::new_internal_exception(
                 string_into_c_str(err.message()),
-                err.cause().map(DartError::from).into(),
+                err.cause().map(Self::from).into(),
                 string_into_c_str(err.trace()),
             ))
         }

@@ -128,7 +128,7 @@ impl Transceiver {
         })
         .await
         .unwrap();
-        self.send_track.replace(Some(new_sender));
+        drop(self.send_track.replace(Some(new_sender)));
         Ok(())
     }
 

@@ -39,6 +39,7 @@ mod map {
 /// Rust representation of a Dart side [`Map`].
 ///
 /// [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
+#[derive(Debug)]
 pub struct DartMap(DartHandle);
 
 impl From<DartMap> for Dart_Handle {

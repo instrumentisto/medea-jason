@@ -8,6 +8,7 @@ use crate::api::ForeignClass;
 ///
 /// Can be safely returned from extern functions. Foreign code must manually
 /// free this array by calling [`PtrArray_free()`].
+#[derive(Debug)]
 #[repr(C)]
 pub struct PtrArray<T = ()> {
     /// Pointer to the first element.
@@ -48,11 +49,11 @@ impl<T> Drop for PtrArray<T> {
     #[allow(clippy::cast_possible_truncation)]
     fn drop(&mut self) {
         unsafe {
-            Box::from_raw(slice::from_raw_parts_mut(
+            drop(Box::from_raw(slice::from_raw_parts_mut(
                 self.ptr.as_ptr(),
                 self.len as usize,
-            ));
-        };
+            )));
+        }
     }
 }
 

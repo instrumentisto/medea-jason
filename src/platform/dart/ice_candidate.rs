@@ -47,7 +47,7 @@ mod ice_candidate {
 /// [RTCPeerConnection][1].
 ///
 /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct IceCandidate(DartHandle);
 
 impl IceCandidate {
@@ -60,7 +60,7 @@ impl IceCandidate {
     ) -> Self {
         let handle = unsafe {
             ice_candidate::init(
-                candidate.to_string().into(),
+                candidate.to_owned().into(),
                 sdp_mid.clone().into(),
                 sdp_m_line_index.map(i64::from).into(),
             )

@@ -35,7 +35,7 @@ bitflags! {
 
 #[cfg(target_os = "android")]
 impl From<TransceiverDirection> for i64 {
-    fn from(from: TransceiverDirection) -> i64 {
+    fn from(from: TransceiverDirection) -> Self {
         use TransceiverDirection as D;
 
         if from.is_all() {
