@@ -107,6 +107,9 @@ impl WebSocketRpcTransport {
             let on_message_subs = Rc::new(RefCell::new(Vec::new()));
             let socket_state =
                 Rc::new(ObservableCell::new(TransportState::Open));
+
+            // TODO: Propagate execution error.
+            #[allow(clippy::map_err_ignore)]
             let handle =
                 FutureFromDart::execute::<DartHandle>(transport::connect(
                     string_into_c_str(url.as_ref().to_owned()),
@@ -168,6 +171,7 @@ impl RpcTransport for WebSocketRpcTransport {
         self.close_reason.set(reason);
     }
 
+    #[allow(clippy::unwrap_in_result)]
     fn send(&self, msg: &ClientMsg) -> Result<(), Traced<TransportError>> {
         let msg = serde_json::to_string(msg).unwrap();
         unsafe {

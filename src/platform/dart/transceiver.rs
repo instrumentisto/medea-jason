@@ -149,6 +149,7 @@ impl Transceiver {
     /// Returns [`mid`] of this [`Transceiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         unsafe {

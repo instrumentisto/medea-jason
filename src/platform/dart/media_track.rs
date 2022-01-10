@@ -146,6 +146,7 @@ impl MediaStreamTrack {
     /// Returns [facing mode][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-facingmode
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         Option::<i64>::try_from(unsafe {
@@ -160,6 +161,7 @@ impl MediaStreamTrack {
     /// Returns [height][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         Option::try_from(unsafe {
@@ -171,6 +173,7 @@ impl MediaStreamTrack {
     /// Returns [width][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-width
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         Option::try_from(unsafe {

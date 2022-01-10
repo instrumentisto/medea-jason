@@ -43,6 +43,7 @@ pub struct DartList(DartHandle);
 
 impl DartList {
     /// Returns an element by the provided `index` from this [`DartList`].
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn get(&self, index: usize) -> Option<DartHandle> {
         #[allow(clippy::cast_possible_truncation)]
@@ -65,8 +66,9 @@ impl<T: From<DartHandle>> From<DartList> for Vec<T> {
         let len = list.length();
         let mut out = Self::with_capacity(len);
         for i in 0..len {
-            let val = list.get(i).unwrap();
-            out.push(val.into());
+            if let Some(v) = list.get(i) {
+                out.push(v.into());
+            }
         }
         out
     }

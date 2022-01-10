@@ -2,10 +2,11 @@
 
 // TODO: Remove allows when implementing platform code.
 #![allow(
-    unused_variables,
+    clippy::missing_docs_in_private_items,
     clippy::missing_panics_doc,
     clippy::unused_self,
-    clippy::needless_pass_by_value
+    clippy::needless_pass_by_value,
+    unused_variables
 )]
 
 pub mod constraints;

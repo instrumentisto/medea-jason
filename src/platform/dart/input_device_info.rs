@@ -87,6 +87,7 @@ impl InputDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         Option::try_from(unsafe {

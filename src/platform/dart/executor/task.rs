@@ -96,8 +96,11 @@ impl Task {
     /// `Rc<?Send + ?Sync>` instead of `Arc<Send + Sync>` since we are sure
     /// that everything will run on a single thread.
     fn into_raw_waker(this: Rc<Self>) -> RawWaker {
+        #![allow(clippy::missing_docs_in_private_items)]
+
         // Refer to `RawWakerVTable::new()` documentation for better
-        // understanding of what following functions do.
+        // understanding of what the following functions do.
+
         unsafe fn raw_clone(ptr: *const ()) -> RawWaker {
             let ptr = ManuallyDrop::new(Rc::from_raw(ptr.cast::<Task>()));
             Task::into_raw_waker(Rc::clone(&(*ptr)))

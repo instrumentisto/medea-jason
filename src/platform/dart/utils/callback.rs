@@ -196,7 +196,7 @@ impl Callback {
             };
 
             if is_finalizable {
-                Dart_NewFinalizableHandle_DL_Trampolined(
+                let _ = Dart_NewFinalizableHandle_DL_Trampolined(
                     handle,
                     f.as_ptr().cast::<c_void>(),
                     mem::size_of::<Self>() as libc::intptr_t,

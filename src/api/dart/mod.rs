@@ -5,7 +5,12 @@
 //! [Flutter]: https://flutter.dev
 
 // TODO: Improve documentation in this module.
-#![allow(clippy::missing_safety_doc, clippy::missing_panics_doc, missing_docs)]
+#![allow(
+    clippy::missing_docs_in_private_items,
+    clippy::missing_safety_doc,
+    clippy::missing_panics_doc,
+    missing_docs
+)]
 
 pub mod audio_track_constraints;
 pub mod connection_handle;
@@ -457,11 +462,11 @@ macro_rules! impl_primitive_dart_value_try_from {
             }
         }
 
-        impl TryFrom<DartValueArg<Option<$arg>>> for Option<$arg> {
+        impl TryFrom<DartValueArg<Self>> for Option<$arg> {
             type Error = DartValueCastError;
 
             fn try_from(
-                value: DartValueArg<Option<$arg>>
+                value: DartValueArg<Self>
             ) -> Result<Self, Self::Error> {
                 match value.0 {
                     DartValue::None => Ok(None),

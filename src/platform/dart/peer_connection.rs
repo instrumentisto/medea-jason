@@ -232,6 +232,7 @@ impl RtcPeerConnection {
     /// Returns [`PeerConnectionState`] of this [`RtcPeerConnection`].
     ///
     /// Returns [`None`] if failed to parse a [`PeerConnectionState`].
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn connection_state(&self) -> Option<PeerConnectionState> {
         let connection_state = Option::try_from(unsafe {
