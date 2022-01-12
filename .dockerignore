@@ -4,6 +4,7 @@
 !Cargo.toml
 !Cargo.lock
 !src/
+!README.md
 
 # Project sub-crates.
 !crates/
