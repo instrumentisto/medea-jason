@@ -87,7 +87,7 @@ docs: docs.rust
 down: down.dev
 
 
-fmt: cargo.fmt
+fmt: cargo.fmt flutter.fmt
 
 
 lint: cargo.lint
@@ -523,8 +523,7 @@ else
 	@make docker.down.webdriver browser=$(browser)
 endif
 else
-	cd $(crate-dir)/ && \
-	cargo test --all-features
+	cargo test -p $(crate) --all-features
 endif
 endif
 

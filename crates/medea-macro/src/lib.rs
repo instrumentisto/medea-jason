@@ -95,6 +95,11 @@ mod watchers;
 use proc_macro::TokenStream;
 use synstructure::decl_derive;
 
+#[cfg(test)]
+use async_trait as _;
+#[cfg(test)]
+use medea_jason as _;
+
 /// Delegates function calls to enum variants field.
 /// Variants are expected to have only one field.
 ///

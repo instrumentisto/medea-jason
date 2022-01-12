@@ -378,6 +378,8 @@ mod to_handler_fn_name_spec {
     }
 
     mod parse_args {
+        use syn::parse::Parser as _;
+
         use super::*;
 
         #[test]
