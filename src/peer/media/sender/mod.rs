@@ -57,6 +57,8 @@ pub struct Sender {
     caps: TrackConstraints,
 
     /// [`Transceiver`] associated with this [`local::Track`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
     transceiver: platform::Transceiver,
 
     /// Indicator whether this [`local::Track`] is muted.

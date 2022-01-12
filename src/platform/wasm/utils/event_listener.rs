@@ -28,6 +28,8 @@ where
     event_name: &'static str,
 
     /// [`EventTarget`] of to listen browser events on.
+    ///
+    /// [`EventTarget`]: web_sys::EventTarget
     target: Rc<T>, // TODO: Get rid of `Rc`?
 
     /// Function to be executed when the listened browser event fires.

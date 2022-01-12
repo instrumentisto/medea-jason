@@ -95,6 +95,7 @@ mod rtc_stats_type {
     /// [List of all RTCStats types on W3C][1].
     ///
     /// [1]: https://w3.org/TR/webrtc-stats/#rtctatstype-%2A
+    /// [`RtcStat`]: super::RtcStat
     #[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
     #[serde(tag = "type", rename_all = "kebab-case")]
     pub enum RtcStatsType {
