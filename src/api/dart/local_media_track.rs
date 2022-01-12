@@ -74,6 +74,7 @@ mod mock {
         platform,
     };
 
+    #[derive(Clone, Copy, Debug)]
     pub struct LocalMediaTrack(pub u8);
 
     impl From<CoreLocalMediaTrack> for LocalMediaTrack {

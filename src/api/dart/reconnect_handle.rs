@@ -132,6 +132,7 @@ pub unsafe extern "C" fn ReconnectHandle__free(
 #[cfg(feature = "mockable")]
 mod mock {
     use dart_sys::Dart_Handle;
+    use futures::future;
     use tracerr::{Trace, Traced};
 
     use crate::{
@@ -145,7 +146,7 @@ mod mock {
         rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
     };
 
-    #[derive(Clone)]
+    #[derive(Clone, Copy, Debug)]
     pub struct ReconnectHandle(pub u8);
 
     impl From<CoreReconnectHandle> for ReconnectHandle {
@@ -198,6 +199,6 @@ mod mock {
             Trace::new(vec![tracerr::new_frame!()]),
         );
 
-        async move { Result::<(), _>::Err(err.into()) }.into_dart_future()
+        future::err(err.into()).into_dart_future()
     }
 }

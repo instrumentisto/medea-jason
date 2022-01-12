@@ -5,7 +5,7 @@ pub mod processed;
 
 use std::{cell::RefCell, rc::Rc};
 
-use futures::{channel::mpsc, stream::LocalBoxStream, FutureExt as _};
+use futures::{channel::mpsc, stream::LocalBoxStream};
 
 use crate::{subscribers_store::SubscribersStore, ObservableCell};
 
@@ -49,7 +49,12 @@ impl<T> SubStore<T> {
         let counter = Rc::clone(&self.counter);
         Processed::new(Box::new(move || {
             let counter = Rc::clone(&counter);
-            counter.when_eq(0).map(|_| ()).boxed_local()
+            // `async move` required to capture `Rc` into the created `Future`,
+            // avoiding dropping it in-place.
+            Box::pin(async move {
+                #[allow(clippy::let_underscore_must_use)]
+                let _ = counter.when_eq(0).await;
+            })
         }))
     }
 }

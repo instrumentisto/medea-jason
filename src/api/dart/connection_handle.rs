@@ -93,6 +93,7 @@ mod mock {
         platform,
     };
 
+    #[derive(Clone, Copy, Debug)]
     pub struct ConnectionHandle(pub u8);
 
     impl From<CoreConnectionHandle> for ConnectionHandle {

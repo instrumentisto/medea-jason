@@ -20,7 +20,7 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.54
+RUST_VER := 1.57
 CHROME_VERSION := 94.0
 FIREFOX_VERSION := 92.0-driver0.29.1
 
