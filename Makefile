@@ -532,7 +532,7 @@ endif
 # Run E2E tests of project.
 #
 # Usage:
-#	make test.e2e [only=<regex>]
+#	make test.e2e [(only=<regex>|only-tags=<tag-expression>)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -553,7 +553,9 @@ endif
 	@make wait.port port=4444
 endif
 	cargo test -p medea-e2e --test e2e \
-		$(if $(call eq,$(only),),,-- --scenario '$(only)')
+		$(if $(call eq,$(only),),\
+			$(if $(call eq,$(only-tags),),,-- --tags '$(only-tags)'),\
+			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
