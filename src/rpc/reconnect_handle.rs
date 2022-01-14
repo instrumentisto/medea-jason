@@ -115,7 +115,7 @@ impl ReconnectHandle {
                 .reconnect()
                 .await
                 .map_err(tracerr::map_from_and_wrap!())
-                .map_err(backoff::Error::transient)
+                .map_err(backoff::Error::Transient)
         })
         .await
     }
