@@ -53,7 +53,7 @@ pub(crate) fn derive(
         ));
     }
 
-    let arg_function = format!("{} {{ }}", args.to_string());
+    let arg_function = format!("{} {{ }}", args);
     let mut function: syn::ItemFn = syn::parse_str(&arg_function)?;
 
     let selfs_count = function

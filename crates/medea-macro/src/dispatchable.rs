@@ -176,8 +176,7 @@ impl Item {
                 };
                 let doc = format!(
                     "Handles [`{0}::{1}`] variant of [`{0}`].",
-                    self.orig_enum.ident,
-                    v.ident.to_string(),
+                    self.orig_enum.ident, v.ident,
                 );
 
                 quote! {
