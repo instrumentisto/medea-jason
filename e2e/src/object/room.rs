@@ -124,7 +124,7 @@ impl Object<Room> {
         let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.disable_video({})", media_source_kind).into()
+                format!("r.room.disable_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
@@ -132,10 +132,9 @@ impl Object<Room> {
             &format!(
                 r#"
                 async (r) => {{
-                    {} {};
+                    {maybe_await} {disable};
                 }}
                 "#,
-                maybe_await, disable,
             ),
             [],
         ))
@@ -163,18 +162,17 @@ impl Object<Room> {
         let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.enable_video({})", media_source_kind).into()
+                format!("r.room.enable_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {enable};
+                }}
                 "#,
-                maybe_await, enable,
             ),
             [],
         ))
@@ -201,7 +199,7 @@ impl Object<Room> {
         let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_remote_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.disable_remote_video({})", media_source_kind)
+                format!("r.room.disable_remote_video({media_source_kind})")
                     .into()
             }
         };
@@ -209,11 +207,10 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        await {};
-                    }}
+                async (r) => {{
+                    await {disable};
+                }}
                 "#,
-                disable,
             ),
             [],
         ))
@@ -240,7 +237,7 @@ impl Object<Room> {
         let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_remote_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.enable_remote_video({})", media_source_kind)
+                format!("r.room.enable_remote_video({media_source_kind})")
                     .into()
             }
         };
@@ -248,11 +245,10 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        await {};
-                    }}
+                async (r) => {{
+                    await {enable};
+                }}
                 "#,
-                enable,
             ),
             [],
         ))
@@ -280,18 +276,17 @@ impl Object<Room> {
         let mute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.mute_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.mute_video({})", media_source_kind).into()
+                format!("r.room.mute_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {mute};
+                }}
                 "#,
-                maybe_await, mute,
             ),
             [],
         ))
@@ -319,18 +314,17 @@ impl Object<Room> {
         let unmute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.unmute_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.unmute_video({})", media_source_kind).into()
+                format!("r.room.unmute_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {unmute};
+                }}
                 "#,
-                maybe_await, unmute,
             ),
             [],
         ))

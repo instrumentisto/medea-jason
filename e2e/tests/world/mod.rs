@@ -196,10 +196,9 @@ impl World {
                     m.is_recv().then(|| {
                         let endpoint_id = format!("play-{}", builder.id);
                         let id = format!(
-                            "{}/{}/{}",
+                            "{}/{}/{endpoint_id}",
                             self.room_id,
                             m.id(),
-                            endpoint_id,
                         );
                         let elem = proto::Element::WebRtcPlayEndpoint(
                             proto::WebRtcPlayEndpoint {
@@ -539,7 +538,7 @@ impl World {
     pub async fn delete_publish_endpoint(&mut self, member_id: &str) {
         let resp = self
             .control_client
-            .delete(&format!("{}/{}/publish", self.room_id, member_id))
+            .delete(&format!("{}/{member_id}/publish", self.room_id))
             .await
             .unwrap();
         assert!(resp.error.is_none());
@@ -552,13 +551,12 @@ impl World {
         member_id: &str,
         partner_member_id: &str,
     ) {
-        let play_endpoint_id = format!("play-{}", partner_member_id);
+        let play_endpoint_id = format!("play-{partner_member_id}");
         let resp = self
             .control_client
-            .delete(&format!(
-                "{}/{}/{}",
-                self.room_id, member_id, play_endpoint_id
-            ))
+            .delete(
+                &format!("{}/{member_id}/{play_endpoint_id}", self.room_id,),
+            )
             .await
             .unwrap();
         assert!(resp.error.is_none());
@@ -568,7 +566,7 @@ impl World {
     pub async fn delete_member_element(&mut self, member_id: &str) {
         let resposne = self
             .control_client
-            .delete(&format!("{}/{}", self.room_id, member_id))
+            .delete(&format!("{}/{member_id}", self.room_id))
             .await
             .unwrap();
         assert!(resposne.error.is_none());
@@ -688,7 +686,7 @@ impl PairedMember {
     ) -> Option<proto::WebRtcPlayEndpoint> {
         self.recv.then(|| proto::WebRtcPlayEndpoint {
             id: format!("play-{}", publisher.id),
-            src: format!("local://{}/{}/{}", room_id, publisher.id, "publish"),
+            src: format!("local://{room_id}/{}/publish", publisher.id),
             force_relay: false,
         })
     }

@@ -2,7 +2,7 @@
 name = "medea-macro"
 version = "0.3.0-dev"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.58"
 description = "Internal macros and codegen for Medea media server project."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"

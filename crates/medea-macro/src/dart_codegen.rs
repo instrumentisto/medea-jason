@@ -310,7 +310,6 @@ impl DartCodegen {
                 "required Pointer<NativeFunction<{ret_ty} \
                 Function({inputs})>> {name},",
                 ret_ty = f.output.to_ffi_type(),
-                inputs = inputs,
                 name = f.name.to_camel_case()
             )?;
         }
@@ -332,7 +331,6 @@ impl DartCodegen {
             "dl.lookupFunction<\
                 Void Function({inputs}), \
                 void Function({inputs})>('{f_name}')(",
-            inputs = inputs,
             f_name = self.register_fn_name,
         )
     }
@@ -344,7 +342,7 @@ impl DartCodegen {
     ) -> fmt::Result {
         for f in &self.registrators {
             let name = f.name.to_camel_case();
-            writeln!(out, "{},", name)?;
+            writeln!(out, "{name},")?;
         }
 
         Ok(())

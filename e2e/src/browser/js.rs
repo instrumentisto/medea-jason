@@ -122,9 +122,11 @@ impl Statement {
     fn objects_injection_js(&self) -> String {
         // language=JavaScript
         iter::once("objs = [];\n".to_owned())
-            .chain(self.objs.iter().map(|id| {
-                format!("objs.push(window.registry.get('{}'));\n", id)
-            }))
+            .chain(
+                self.objs.iter().map(|id| {
+                    format!("objs.push(window.registry.get('{id}'));\n")
+                }),
+            )
             .collect()
     }
 
@@ -139,7 +141,6 @@ impl Statement {
             {objs_js}
             lastResult = await ({expr})(lastResult);
             "#,
-            i = i,
             objs_js = self.objects_injection_js(),
             expr = self.expression,
         )

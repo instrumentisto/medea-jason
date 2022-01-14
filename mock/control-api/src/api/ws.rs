@@ -208,19 +208,18 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                         }
                         Err(err) => error!(
                             "Received broadcast message but it is not a valid \
-                             JSON: {:?}",
-                            err,
+                             JSON: {err:?}",
                         ),
                     }
                 }
                 ws::Message::Binary(_)
                 | ws::Message::Continuation(_)
                 | ws::Message::Nop => {
-                    error!("Unsupported client message: {:?}", msg);
+                    error!("Unsupported client message: {msg:?}");
                 }
             },
-            Err(err) => {
-                error!("WS StreamHandler error {}", err);
+            Err(e) => {
+                error!("WS StreamHandler error: {e}");
             }
         };
     }

@@ -151,9 +151,8 @@ impl Member {
     pub async fn join_room(&mut self, room_id: &str) -> Result<()> {
         self.room
             .join(format!(
-                "{}/{}/{}?token=test",
+                "{}/{room_id}/{}?token=test",
                 *conf::CLIENT_API_ADDR,
-                room_id,
                 self.id,
             ))
             .await?;

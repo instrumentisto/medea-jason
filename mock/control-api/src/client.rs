@@ -26,6 +26,7 @@ impl Fid {
     fn room_id(&self) -> &str {
         match self.0.find('/') {
             None => self.0.as_str(),
+            #[allow(clippy::string_slice)] // index taken from the source
             Some(i) => &self.0[..i],
         }
     }

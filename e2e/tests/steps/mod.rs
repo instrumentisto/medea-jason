@@ -250,7 +250,7 @@ fn parse_media_kind(text: &str) -> Option<MediaKind> {
         "video" => Some(MediaKind::Video),
         "all" => None,
         _ => {
-            panic!("Unknown media kind: {}", text)
+            panic!("Unknown media kind: {text}")
         }
     }
 }

@@ -162,7 +162,7 @@ impl ModExpander {
         let root_path = env::var("CARGO_MANIFEST_DIR").map_err(|e| {
             syn::Error::new(
                 relative_path.span(),
-                format!("Cannot read `CARGO_MANIFEST_DIR` env var: {}", e),
+                format!("Cannot read `CARGO_MANIFEST_DIR` env var: {e}"),
             )
         })?;
         let mut path = PathBuf::from(root_path);
@@ -171,7 +171,7 @@ impl ModExpander {
         let mut file = File::create(path).map_err(|e| {
             syn::Error::new(
                 relative_path.span(),
-                format!("Failed to create file at the provided path: {}", e),
+                format!("Failed to create file at the provided path: {e}"),
             )
         })?;
 
@@ -190,14 +190,13 @@ impl ModExpander {
                 .map_err(|e| {
                     syn::Error::new(
                         relative_path.span(),
-                        format!("Failed to generate Dart code: {}", e),
+                        format!("Failed to generate Dart code: {e}"),
                     )
                 })?;
 
         file.write_all(generated_code.as_bytes()).map_err(|e| {
             let msg = format!(
-                "Failed to write generated Dart code to the file: {}",
-                e,
+                "Failed to write generated Dart code to the file: {e}",
             );
             syn::Error::new(relative_path.span(), msg)
         })
@@ -217,8 +216,7 @@ fn get_path_arg(arg: &syn::ExprLit) -> syn::Result<String> {
         Ok(lit.value())
     } else {
         let msg = format!(
-            "Expected a str literal with a Dart file path, got: {:?}",
-            arg,
+            "Expected a str literal with a Dart file path, got: {arg:?}",
         );
         Err(syn::Error::new(Span::call_site(), msg))
     }

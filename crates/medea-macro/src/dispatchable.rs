@@ -45,7 +45,7 @@ pub(crate) fn expand(item: Item, args: &Args) -> TokenStream {
                 .enumerate()
                 .map(|(i, f)| {
                     f.ident.clone().unwrap_or_else(|| {
-                        syn::Ident::new(&format!("f{}", i), Span::call_site())
+                        syn::Ident::new(&format!("f{i}"), Span::call_site())
                     })
                 })
                 .collect();
@@ -386,12 +386,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
 
@@ -400,12 +400,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {self: &Self}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &T}).unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &Self}).unwrap(),
             );
         }
 
@@ -418,14 +418,14 @@ mod to_handler_fn_name_spec {
                 args.dispatch_with_handler_arg(),
                 FnArg::parse
                     .parse2(quote! {handler: std::rc::Rc<T>})
-                    .unwrap()
+                    .unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Typed(args.self_kind),
                 FnArg::parse
                     .parse2(quote! {self: std::rc::Rc<Self>})
-                    .unwrap()
+                    .unwrap(),
             );
         }
 
@@ -434,12 +434,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {async_trait}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap(),
             );
             assert!(!args.async_trait.unwrap().0);
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
 
@@ -448,12 +448,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {async_trait(?Send)}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap(),
             );
             assert!(args.async_trait.unwrap().0);
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
 
@@ -464,12 +464,12 @@ mod to_handler_fn_name_spec {
                 .unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: Arc<T>}).unwrap()
+                FnArg::parse.parse2(quote! {handler: Arc<T>}).unwrap(),
             );
             assert!(!args.async_trait.unwrap().0);
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: Arc<Self>}).unwrap()
+                FnArg::parse.parse2(quote! {self: Arc<Self>}).unwrap(),
             );
         }
     }

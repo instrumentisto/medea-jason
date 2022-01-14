@@ -57,7 +57,7 @@ impl CallbackService for GrpcCallbackService {
         &self,
         req: tonic::Request<proto::Request>,
     ) -> Result<tonic::Response<proto::Response>, tonic::Status> {
-        info!("Callback request received: [{:?}]", req);
+        info!("Callback request received: [{req:?}]");
         self.events.lock().unwrap().push(req.into_inner().into());
         Ok(tonic::Response::new(proto::Response {}))
     }

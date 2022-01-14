@@ -241,7 +241,7 @@ impl Inner {
                 async () => {{
                     let callback = arguments[arguments.length - 1];
                     try {{
-                        {executable_js}
+                        {inner_js}
                         callback({{ ok: lastResult }});
                     }} catch (e) {{
                         if (e.ptr != undefined) {{
@@ -260,7 +260,6 @@ impl Inner {
                 }}
             )();
             "#,
-            executable_js = inner_js,
         );
         let res = self.0.execute_async(&js, args).await?;
 
@@ -282,7 +281,7 @@ impl Inner {
         let window = self.0.new_window(true).await?.handle;
         self.0.switch_to_window(window.clone()).await?;
         self.0
-            .goto(&format!("http://{}/index.html", file_server_host))
+            .goto(&format!("http://{file_server_host}/index.html"))
             .await?;
         self.0
             .wait()

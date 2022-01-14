@@ -143,10 +143,9 @@ macro_rules! gen_request_macro {
                         .$call_fn(path.into_inner().into())
                         .await
                         .map_err(|e| {
-                            actix_web::error::ErrorInternalServerError(format!(
-                                "{:?}",
-                                e
-                            ))
+                            actix_web::error::ErrorInternalServerError(
+                                e.to_string(),
+                            )
                         })
                         .map(|r| <$resp>::from(r).into())
                 }
@@ -170,7 +169,7 @@ pub async fn get_callbacks(
         .send(GetCallbackItems)
         .await
         .map_err(|e| {
-            InternalError(format!("GrpcCallbackServer mailbox error. {:?}", e))
+            InternalError(format!("GrpcCallbackServer mailbox error. {e}"))
         })
         .map(|callbacks| HttpResponse::Ok().json(&callbacks.unwrap()))
 }
@@ -224,7 +223,7 @@ mod create {
             .client
             .create(path.into_inner(), Fid::from(()), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 
@@ -240,7 +239,7 @@ mod create {
             .client
             .create(uri.1, Fid::from(uri.0), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 
@@ -256,7 +255,7 @@ mod create {
             .client
             .create(uri.2, Fid::from((uri.0, uri.1)), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 }
@@ -280,7 +279,7 @@ mod apply {
             .client
             .apply(path.clone(), Fid::from(path.into_inner()), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 
@@ -295,7 +294,7 @@ mod apply {
             .client
             .apply(uri.1.clone(), Fid::from((uri.0, uri.1)), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 }
@@ -469,7 +468,7 @@ impl From<proto::room::Element> for Element {
             proto::room::element::El::WebrtcPlay(_)
             | proto::room::element::El::WebrtcPub(_) => unimplemented!(
                 "Currently Control API mock server supports only Member \
-                 element in Room pipeline."
+                 element in Room pipeline.",
             ),
         }
     }

@@ -104,5 +104,5 @@ impl Client {
 
 /// Returns URL of a media [`Element`] identified by the provided `path`.
 fn get_url(control_api_address: &str, path: &str) -> String {
-    format!("{}/control-api/{}", control_api_address, path)
+    format!("{control_api_address}/control-api/{path}")
 }

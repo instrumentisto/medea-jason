@@ -130,8 +130,7 @@ async fn then_callback_fires_on_remote_track(
         }
         _ => {
             unreachable!(
-                "unknown RemoteMediaTrack callback: `on_{}`",
-                callback_kind,
+                "unknown RemoteMediaTrack callback: `on_{callback_kind}`",
             );
         }
     }

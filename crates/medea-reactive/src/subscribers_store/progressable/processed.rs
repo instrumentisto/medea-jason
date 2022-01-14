@@ -171,7 +171,7 @@ mod tests {
                             updatable_cell_rx
                                 .select_next_some()
                                 .await
-                                .into_inner()
+                                .into_inner(),
                         );
 
                         updatable_cell.set(DELAYED_PROCESSED_UPDATE);
@@ -181,7 +181,7 @@ mod tests {
                             updatable_cell_rx
                                 .select_next_some()
                                 .await
-                                .into_inner()
+                                .into_inner(),
                         );
                     }
                 });
@@ -197,7 +197,7 @@ mod tests {
                         Poll::Ready(_),
                     ),
                     "ProgressableCell is not processed, but `join_all` \
-                     resolved."
+                     resolved.",
                 );
             })
             .await;
