@@ -4,6 +4,7 @@
 #![allow(
     clippy::missing_docs_in_private_items,
     clippy::missing_panics_doc,
+    clippy::undocumented_unsafe_blocks,
     clippy::unused_self,
     clippy::needless_pass_by_value,
     unused_variables
@@ -40,7 +41,7 @@ pub use self::{
 /// TODO: Implement panic hook.
 pub fn set_panic_hook() {
     std::panic::set_hook(Box::new(|bt| {
-        log::error!("Rust code panicked {:?}", bt);
+        log::error!("Rust code panicked {bt:?}");
     }));
 }
 

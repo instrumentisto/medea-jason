@@ -849,7 +849,7 @@ impl Room {
                                 .await
                                 .map_err(tracerr::wrap!(=> UnknownPeerIdError))
                             {
-                                log::error!("{}", e);
+                                log::error!("{e}");
                             };
                         }
                         RoomEvent::PeerEvent(event) => {
@@ -858,7 +858,7 @@ impl Room {
                                     tracerr::wrap!(=> UnknownRemoteMemberError),
                                 )
                             {
-                                log::error!("{}", e);
+                                log::error!("{e}");
                             };
                         }
                         RoomEvent::RpcClientLostConnection => {

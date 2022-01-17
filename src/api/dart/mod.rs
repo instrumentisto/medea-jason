@@ -9,6 +9,7 @@
     clippy::missing_docs_in_private_items,
     clippy::missing_safety_doc,
     clippy::missing_panics_doc,
+    clippy::undocumented_unsafe_blocks,
     missing_docs
 )]
 

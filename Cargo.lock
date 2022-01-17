@@ -118,9 +118,9 @@ dependencies = [
 
 [[package]]
 name = "actix-router"
-version = "0.5.0-beta.4"
+version = "0.5.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b53c1deabdbf3a8a8b9a949123edd3cafb873abd75da96b5933a8b590f9d6dc2"
+checksum = "4bdca166b1041184e2108ef05bd9909ec18cc6abc41152d31d30224cebfaac75"
 dependencies = [
  "bytestring",
  "firestorm",
@@ -182,9 +182,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web"
-version = "4.0.0-beta.19"
+version = "4.0.0-beta.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "229d0d2c11d6c734327cf1fbc15dd644b351b440bcb4608349258f5e00605bdc"
+checksum = "aa8ba5081e9f8d0016cf34df516c699198158fd8c77990aa284115b055ead61b"
 dependencies = [
  "actix-codec",
  "actix-http",
@@ -962,9 +962,9 @@ dependencies = [
 
 [[package]]
 name = "fragile"
-version = "1.0.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69a039c3498dc930fe810151a34ba0c1c70b02b8625035592e74432f678591f2"
+checksum = "8da1b8f89c5b5a5b7e59405cfcf0bb9588e5ed19f0b57a4cd542bbba3f164a6d"
 
 [[package]]
 name = "futures"
@@ -2261,9 +2261,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework"
-version = "2.4.2"
+version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "525bc1abfda2e1998d152c45cf13e696f76d0a4972310b22fac1658b05df7c87"
+checksum = "d09d3c15d814eda1d6a836f2f2b56a6abc1446c8a34351cb3180d3db92ffe4ce"
 dependencies = [
  "bitflags",
  "core-foundation",
@@ -2274,9 +2274,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework-sys"
-version = "2.4.2"
+version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9dd14d83160b528b7bfd66439110573efcfbe281b17fc2ca9f39f550d619c7e"
+checksum = "e90dd10c41c6bfc633da6e0c659bd25d31e0791e5974ac42970267d59eba87f7"
 dependencies = [
  "core-foundation-sys",
  "libc",
@@ -2310,9 +2310,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.74"
+version = "1.0.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee2bb9cd061c5865d345bb02ca49fcef1391741b672b54a0bf7b679badec3142"
+checksum = "c059c05b48c5c0067d4b4b2b4f0732dd65feb52daf7e0ea09cd87e7dadc1af79"
 dependencies = [
  "itoa 1.0.1",
  "ryu",
@@ -2321,12 +2321,12 @@ dependencies = [
 
 [[package]]
 name = "serde_urlencoded"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edfa57a7f8d9c1d260a549e7224100f6c43d43f9103e06dd8b4095a9b2b43ce9"
+checksum = "d3491c14715ca2294c4d6a88f15e84739788c1d030eed8c110436aafdaa2f3fd"
 dependencies = [
  "form_urlencoded",
- "itoa 0.4.8",
+ "itoa 1.0.1",
  "ryu",
  "serde",
 ]

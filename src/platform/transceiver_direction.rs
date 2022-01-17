@@ -103,7 +103,7 @@ impl From<i32> for TransceiverDirection {
             2 => Self::RECV,
             3 => Self::INACTIVE,
             _ => {
-                unreachable!("Unknown TransceiverDirection enum variant {}", i)
+                unreachable!("Unknown TransceiverDirection enum variant {i}")
             }
         }
     }

@@ -14,7 +14,7 @@ publish = false
 [dependencies]
 actix = "0.12"
 actix-cors = "=0.6.0-beta.8"
-actix-web = "=4.0.0-beta.19"
+actix-web = "=4.0.0-beta.20"
 actix-web-actors = "=4.0.0-beta.10"
 clap = { version = "3.0", features = ["derive"] }
 derive_more = "0.99"

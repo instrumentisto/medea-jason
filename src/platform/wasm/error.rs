@@ -27,7 +27,7 @@ impl From<JsValue> for Error {
             Ok(err) => Self(err),
             Err(val) => match val.as_string() {
                 Some(msg) => Self(js_sys::Error::new(&msg)),
-                None => Self(js_sys::Error::new(&format!("{:?}", val))),
+                None => Self(js_sys::Error::new(&format!("{val:?}"))),
             },
         }
     }

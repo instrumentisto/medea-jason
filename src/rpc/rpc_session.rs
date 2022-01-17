@@ -406,7 +406,7 @@ impl RpcSession for WebSocketRpcSession {
                 if info.as_ref() != &connection_info {
                     unimplemented!(
                         "Changing `ConnectionInfo` with active or pending \
-                         authorization is not supported"
+                         authorization is not supported",
                     );
                 }
             }

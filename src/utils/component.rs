@@ -138,7 +138,7 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
                 if let Err(e) =
                     (handle)(Rc::clone(&obj), Rc::clone(&state), value).await
                 {
-                    log::error!("{}", e);
+                    log::error!("{e}");
                 }
             }
         });

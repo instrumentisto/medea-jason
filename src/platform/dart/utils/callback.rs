@@ -96,10 +96,10 @@ impl Debug for Kind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Kind::")?;
         match self {
-            Self::FnOnce(p) => write!(f, "FnOnce({:p})", p),
-            Self::FnMut(p) => write!(f, "FnMut({:p})", p),
-            Self::Fn(p) => write!(f, "Fn({:p})", p),
-            Self::TwoArgFnMut(p) => write!(f, "TwoArgFnMut({:p})", p),
+            Self::FnOnce(p) => write!(f, "FnOnce({p:p})"),
+            Self::FnMut(p) => write!(f, "FnMut({p:p})"),
+            Self::Fn(p) => write!(f, "Fn({p:p})"),
+            Self::TwoArgFnMut(p) => write!(f, "TwoArgFnMut({p:p})"),
         }
     }
 }

@@ -545,7 +545,7 @@ impl WebSocketRpcClient {
                 .send(&ClientMsg::Command { room_id, command })
                 .map_err(tracerr::map_from_and_wrap!(=> RpcClientError))
             {
-                log::error!("{}", e);
+                log::error!("{e}");
             }
         }
     }

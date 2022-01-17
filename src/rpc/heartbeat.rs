@@ -68,7 +68,7 @@ impl Inner {
         self.transport
             .send(&ClientMsg::Pong(n))
             .map_err(tracerr::wrap!(=> platform::TransportError))
-            .map_err(|e| log::error!("Failed to send pong: {}", e))
+            .map_err(|e| log::error!("Failed to send pong: {e}"))
             .map_or((), drop);
     }
 }

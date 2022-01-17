@@ -93,7 +93,7 @@ impl MediaStreamTrack {
                 MediaStreamTrackState::Ended
             }
             web_sys::MediaStreamTrackState::__Nonexhaustive => {
-                unreachable!("Unknown MediaStreamTrackState::{:?}", state)
+                unreachable!("Unknown MediaStreamTrackState::{state:?}")
             }
         }
     }
@@ -131,7 +131,7 @@ impl MediaStreamTrack {
             "left" => Some(FacingMode::Left),
             "right" => Some(FacingMode::Right),
             _ => {
-                log::error!("Unknown FacingMode: {}", fm);
+                log::error!("Unknown FacingMode: {fm}");
                 None
             }
         })

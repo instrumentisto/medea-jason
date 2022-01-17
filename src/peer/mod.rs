@@ -396,8 +396,7 @@ impl PeerConnection {
                         media_conns.add_remote_track(track, transceiver).await
                     {
                         log::error!(
-                            "Cannot add new remote track with mid={}",
-                            mid,
+                            "Cannot add new remote track with mid={mid}",
                         );
                     };
                 });
@@ -511,7 +510,7 @@ impl PeerConnection {
     pub async fn scrape_and_send_peer_stats(&self) {
         match self.peer.get_stats().await {
             Ok(stats) => self.send_peer_stats(stats),
-            Err(e) => log::error!("{}", e),
+            Err(e) => log::error!("{e}"),
         };
     }
 

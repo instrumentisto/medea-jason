@@ -117,7 +117,7 @@ where
                 self.closure.as_ref().unchecked_ref(),
             )
         {
-            log::error!("Failed to remove EventListener: {:?}", err);
+            log::error!("Failed to remove EventListener: {err:?}");
         }
     }
 }

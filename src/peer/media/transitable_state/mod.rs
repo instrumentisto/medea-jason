@@ -223,60 +223,60 @@ mod test {
     fn transition_to() {
         assert_eq!(
             DISABLED.transition_to(media_exchange_state::Stable::Disabled),
-            DISABLED
+            DISABLED,
         );
         assert_eq!(
             DISABLED.transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_DISABLED
+            ENABLING_DISABLED,
         );
         assert_eq!(
             ENABLED.transition_to(media_exchange_state::Stable::Enabled),
-            ENABLED
+            ENABLED,
         );
         assert_eq!(
             ENABLED.transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_ENABLED
+            DISABLING_ENABLED,
         );
 
         assert_eq!(
             ENABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_DISABLED
+            DISABLING_DISABLED,
         );
         assert_eq!(
             ENABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_DISABLED
+            ENABLING_DISABLED,
         );
         assert_eq!(
             DISABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_ENABLED
+            DISABLING_ENABLED,
         );
         assert_eq!(
             DISABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_ENABLED
+            ENABLING_ENABLED,
         );
         assert_eq!(
             DISABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_DISABLED
+            DISABLING_DISABLED,
         );
         assert_eq!(
             DISABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_DISABLED
+            ENABLING_DISABLED,
         );
         assert_eq!(
             ENABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_ENABLED
+            DISABLING_ENABLED,
         );
         assert_eq!(
             ENABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_ENABLED
+            ENABLING_ENABLED,
         );
     }
 

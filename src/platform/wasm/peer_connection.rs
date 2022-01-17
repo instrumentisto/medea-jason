@@ -324,8 +324,7 @@ impl RtcPeerConnection {
                                 Some(Err(state)) => {
                                     log::error!(
                                         "Unknown RTCPeerConnection connection \
-                                         state: {}.",
-                                        state,
+                                         state: {state}",
                                     );
                                 }
                                 None => {
@@ -665,7 +664,7 @@ fn parse_ice_connection_state(
         S::Disconnected => IceConnectionState::Disconnected,
         S::Closed => IceConnectionState::Closed,
         S::__Nonexhaustive => {
-            unreachable!("Unknown ICE connection state {:?}", state);
+            unreachable!("Unknown ICE connection state {state:?}");
         }
     }
 }
