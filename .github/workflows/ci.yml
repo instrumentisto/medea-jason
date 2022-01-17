@@ -7,7 +7,12 @@ on:
   pull_request:
     branches: ["master"]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
+  MEDEA_BRANCH: edge  # for E2E tests only
   RUST_BACKTRACE: 1
 
 jobs:
@@ -166,7 +171,7 @@ jobs:
 
   test-e2e:
     name: E2E tests
-    needs: ['docker']
+    needs: ["docker"]
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
@@ -203,11 +208,6 @@ jobs:
         run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
                           -p ${{ secrets.MEDEA_DOCKER_PASS }}
                           hub.instrumentisto.com
-
-      - name: Set Medea branch name env var
-        run: echo "MEDEA_BRANCH=$(echo ${{ github.event.head_commit.message }}
-                                  | sed -n -e "s/.*\[medea_branch = \(.*\)\]/\1/p"
-                                  | grep .  || echo "edge")" >> $GITHUB_ENV
 
       - name: Pull edge Medea Docker image
         run: docker pull hub.instrumentisto.com/streaming/medea:edge
@@ -434,7 +434,7 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ['clippy', 'rustfmt', 'rustdoc', 'test-e2e', 'test-unit']
+    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit"]
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
@@ -444,7 +444,7 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         with:
           text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+          regex: "^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$"
 
       - name: Verify release version matches Cargo manifest
         run: >-
@@ -477,7 +477,7 @@ jobs:
 
   release-cargo:
     name: Release on crates.io
-    needs: ['release-github']
+    needs: ["release-github"]
     if: ${{ startsWith(github.ref, 'refs/tags/medea-')
             && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
             && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
@@ -489,7 +489,7 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         with:
           text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+          regex: "^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$"
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -505,7 +505,7 @@ jobs:
 
   release-npm:
     name: Release on NPM
-    needs: ['release-github']
+    needs: ["release-github"]
     if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
     runs-on: ubuntu-latest
     steps:
@@ -515,11 +515,11 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         with:
           text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$'
+          regex: "^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$"
 
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v2
         with:
-          node-version: '15'
+          node-version: "17"
       - name: Create NPM authorization
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_TOKEN }}"
              > ~/.npmrc
@@ -540,7 +540,7 @@ jobs:
 
   release-helm:
     name: Release Helm chart
-    needs: ['helm-lint']
+    needs: ["helm-lint"]
     if: ${{ github.ref == 'refs/heads/master' }}
     strategy:
       matrix:
@@ -573,7 +573,7 @@ jobs:
 
   release-docker:
     name: Release Docker image
-    needs: ['docker']
+    needs: ["docker"]
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
@@ -640,7 +640,7 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         with:
           text: ${{ github.ref }}
-          regex: '^refs/tags/medea[a-z-]*-((([0-9]+)\.[0-9]+)\.[0-9]+(-.+)?)$'
+          regex: "^refs/tags/medea[a-z-]*-((([0-9]+)\.[0-9]+)\.[0-9]+(-.+)?)$"
         if: ${{ matrix.if && contains(matrix.tags, '@versions')
                 && startsWith(github.ref, 'refs/tags/medea-') }}
       - name: Form Docker version tags
@@ -680,7 +680,7 @@ jobs:
         uses: bluwy/substitute-string-action@v1
         with:
           _input-text: ${{ matrix.image }}
-          -edge: ''
+          -edge: ""
         if: ${{ matrix.if }}
       # On GitHub Container Registry README is automatically updated on pushes.
       - name: Update README on Quay.io

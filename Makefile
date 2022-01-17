@@ -21,10 +21,10 @@ IMAGE_NAME := $(strip \
 	$(or $(image),medea-control-api-mock)))
 
 RUST_VER := 1.58
-CHROME_VERSION := 94.0
+CHROME_VERSION := 97.0
 FIREFOX_VERSION := 92.0-driver0.29.1
 
-CARGO_NDK_VER := 2.4.1-ndkr23-rust$(RUST_VER)
+CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -293,7 +293,8 @@ cargo.fmt:
 # Generate sources using Cargo.
 #
 # Usage:
-#	make cargo.gen [crate=(medea-control-api-proto|medea-jason)]
+#	make cargo.gen [( crate=medea-control-api-proto
+#	                | crate=medea-jason [dockerized=(no|yes) )]
 
 cargo.gen:
 ifeq ($(crate),medea-control-api-proto)
@@ -303,7 +304,8 @@ ifeq ($(crate),medea-control-api-proto)
 endif
 ifeq ($(crate),medea-jason)
 	cargo clean -p $(crate)
-	make cargo.build.jason platform=android args="--features dart-codegen"
+	make cargo.build.jason platform=android args="--features dart-codegen" \
+	     dockerized=$(dockerized)
 	make flutter.fmt
 endif
 
