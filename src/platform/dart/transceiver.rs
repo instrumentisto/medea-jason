@@ -2,12 +2,7 @@
 //!
 //! [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
 
-use std::{
-    cell::RefCell,
-    convert::{TryFrom, TryInto},
-    future::Future,
-    rc::Rc,
-};
+use std::{cell::RefCell, future::Future, rc::Rc};
 
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
@@ -133,7 +128,7 @@ impl Transceiver {
         })
         .await
         .unwrap();
-        self.send_track.replace(Some(new_sender));
+        drop(self.send_track.replace(Some(new_sender)));
         Ok(())
     }
 
@@ -154,6 +149,7 @@ impl Transceiver {
     /// Returns [`mid`] of this [`Transceiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         unsafe {
@@ -191,6 +187,8 @@ impl Transceiver {
     }
 
     /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
+    ///
+    /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
         unsafe { transceiver::is_stopped(self.transceiver.get()) }

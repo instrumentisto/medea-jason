@@ -1,9 +1,6 @@
 //! Dart side register functions generator of `#[dart_bridge]` macro.
 
-use std::{
-    convert::TryFrom,
-    fmt::{self, Write},
-};
+use std::fmt::{self, Write};
 
 use inflector::Inflector;
 use syn::spanned::Spanned as _;
@@ -100,7 +97,7 @@ pub(crate) enum DartType {
 
 impl DartType {
     /// Converts this [`DartType`] to the Dart side FFI type.
-    pub(crate) fn to_ffi_type(self) -> &'static str {
+    pub(crate) const fn to_ffi_type(self) -> &'static str {
         match self {
             Self::Void => "Void",
             Self::Bool => "Bool",
@@ -139,7 +136,11 @@ impl DartType {
                         Self::Pointer
                     })
                 }
-                _ => Err(syn::Error::new(
+                syn::GenericArgument::Lifetime(_)
+                | syn::GenericArgument::Type(_)
+                | syn::GenericArgument::Binding(_)
+                | syn::GenericArgument::Constraint(_)
+                | syn::GenericArgument::Const(_) => Err(syn::Error::new(
                     bracketed.span(),
                     "Unsupported generic argument",
                 )),
@@ -156,6 +157,7 @@ impl DartType {
 impl TryFrom<syn::Type> for DartType {
     type Error = syn::Error;
 
+    #[allow(clippy::wildcard_enum_match_arm)] // false positive: non_exhaustive
     fn try_from(value: syn::Type) -> syn::Result<Self> {
         Ok(match value {
             syn::Type::Path(p) => {
@@ -211,8 +213,8 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
             .inputs
             .into_iter()
             .map(|input| {
-                if let syn::FnArg::Typed(input) = input {
-                    DartType::try_from(*input.ty)
+                if let syn::FnArg::Typed(arg) = input {
+                    DartType::try_from(*arg.ty)
                 } else {
                     Err(syn::Error::new(
                         input.span(),
@@ -237,20 +239,20 @@ impl TryFrom<FnRegistrationBuilder> for FnRegistration {
 
 /// Builder for a [`FnRegistration`].
 #[derive(Debug)]
-pub struct FnRegistrationBuilder {
+pub(crate) struct FnRegistrationBuilder {
     /// Inputs of the registering function.
-    pub inputs: Vec<syn::FnArg>,
+    pub(crate) inputs: Vec<syn::FnArg>,
 
     /// Output of the registering function.
-    pub output: syn::ReturnType,
+    pub(crate) output: syn::ReturnType,
 
     /// Name of the registering function.
-    pub name: syn::Ident,
+    pub(crate) name: syn::Ident,
 }
 
 /// Generator of the Dart code registering functions.
 #[derive(Debug)]
-pub struct DartCodegen {
+pub(crate) struct DartCodegen {
     /// FFI name of the registerer function.
     register_fn_name: String,
 
@@ -260,7 +262,7 @@ pub struct DartCodegen {
 
 impl DartCodegen {
     /// Creates a new [`DartCodegen`] for the provided inputs.
-    pub fn new(
+    pub(crate) fn new(
         register_fn_name: &syn::Ident,
         builders: Vec<FnRegistrationBuilder>,
     ) -> syn::Result<Self> {
@@ -274,7 +276,7 @@ impl DartCodegen {
     }
 
     /// Generates all the needed Dart code of this [`DartCodegen`].
-    pub fn generate(&self) -> Result<String, fmt::Error> {
+    pub(crate) fn generate(&self) -> Result<String, fmt::Error> {
         let mut out = String::new();
 
         writeln!(&mut out, "import 'dart:ffi';")?;
@@ -308,7 +310,6 @@ impl DartCodegen {
                 "required Pointer<NativeFunction<{ret_ty} \
                 Function({inputs})>> {name},",
                 ret_ty = f.output.to_ffi_type(),
-                inputs = inputs,
                 name = f.name.to_camel_case()
             )?;
         }
@@ -330,7 +331,6 @@ impl DartCodegen {
             "dl.lookupFunction<\
                 Void Function({inputs}), \
                 void Function({inputs})>('{f_name}')(",
-            inputs = inputs,
             f_name = self.register_fn_name,
         )
     }
@@ -341,8 +341,8 @@ impl DartCodegen {
         out: &mut T,
     ) -> fmt::Result {
         for f in &self.registrators {
-            let name = f.name.to_string().to_camel_case();
-            writeln!(out, "{},", name)?;
+            let name = f.name.to_camel_case();
+            writeln!(out, "{name},")?;
         }
 
         Ok(())

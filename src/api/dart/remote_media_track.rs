@@ -127,6 +127,7 @@ mod mock {
         platform,
     };
 
+    #[derive(Clone, Copy, Debug)]
     pub struct RemoteMediaTrack(pub u8);
 
     impl From<CoreRemoteMediaTrack> for RemoteMediaTrack {

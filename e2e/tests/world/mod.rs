@@ -1,13 +1,12 @@
 //! E2E tests [`World`][1].
 //!
-//! [1]: cucumber_rust::World
+//! [1]: cucumber::World
 
 pub mod member;
 
 use std::{collections::HashMap, fmt, time::Duration};
 
 use async_trait::async_trait;
-use cucumber_rust::WorldInit;
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
     callback::{CallbackEvent, CallbackItem},
@@ -53,8 +52,8 @@ type Result<T> = std::result::Result<T, Error>;
 
 /// [`World`][1] used by all E2E tests.
 ///
-/// [1]: cucumber_rust::World
-#[derive(WorldInit)]
+/// [1]: cucumber::World
+#[derive(cucumber::WorldInit)]
 pub struct World {
     /// ID of the `Room` created for this [`World`].
     room_id: String,
@@ -85,7 +84,7 @@ impl fmt::Debug for World {
 }
 
 #[async_trait(?Send)]
-impl cucumber_rust::World for World {
+impl cucumber::World for World {
     type Error = Error;
 
     async fn new() -> Result<Self> {
@@ -197,10 +196,9 @@ impl World {
                     m.is_recv().then(|| {
                         let endpoint_id = format!("play-{}", builder.id);
                         let id = format!(
-                            "{}/{}/{}",
+                            "{}/{}/{endpoint_id}",
                             self.room_id,
                             m.id(),
-                            endpoint_id,
                         );
                         let elem = proto::Element::WebRtcPlayEndpoint(
                             proto::WebRtcPlayEndpoint {
@@ -235,7 +233,6 @@ impl World {
     /// Returns reference to a [`Member`] with the provided ID.
     ///
     /// Returns [`None`] if a [`Member`] with the provided ID doesn't exist.
-    #[inline]
     #[must_use]
     pub fn get_member(&self, member_id: &str) -> Option<&Member> {
         self.members.get(member_id)
@@ -541,7 +538,7 @@ impl World {
     pub async fn delete_publish_endpoint(&mut self, member_id: &str) {
         let resp = self
             .control_client
-            .delete(&format!("{}/{}/publish", self.room_id, member_id))
+            .delete(&format!("{}/{member_id}/publish", self.room_id))
             .await
             .unwrap();
         assert!(resp.error.is_none());
@@ -554,13 +551,12 @@ impl World {
         member_id: &str,
         partner_member_id: &str,
     ) {
-        let play_endpoint_id = format!("play-{}", partner_member_id);
+        let play_endpoint_id = format!("play-{partner_member_id}");
         let resp = self
             .control_client
-            .delete(&format!(
-                "{}/{}/{}",
-                self.room_id, member_id, play_endpoint_id
-            ))
+            .delete(
+                &format!("{}/{member_id}/{play_endpoint_id}", self.room_id,),
+            )
             .await
             .unwrap();
         assert!(resp.error.is_none());
@@ -570,7 +566,7 @@ impl World {
     pub async fn delete_member_element(&mut self, member_id: &str) {
         let resposne = self
             .control_client
-            .delete(&format!("{}/{}", self.room_id, member_id))
+            .delete(&format!("{}/{member_id}", self.room_id))
             .await
             .unwrap();
         assert!(resposne.error.is_none());
@@ -656,15 +652,12 @@ pub struct PairedMember {
 
 impl PairedMember {
     /// Indicates whether this [`PairedMember`] should publish media.
-    #[inline]
-    #[must_use]
     fn is_send(&self) -> bool {
         self.send_audio.is_some() || self.send_video.is_some()
     }
 
     /// Returns a [`proto::WebRtcPublishEndpoint`] for this [`PairedMember`] if
     /// publishing is enabled.
-    #[must_use]
     fn publish_endpoint(&self) -> Option<proto::WebRtcPublishEndpoint> {
         self.is_send().then(|| proto::WebRtcPublishEndpoint {
             id: "publish".to_owned(),
@@ -686,7 +679,6 @@ impl PairedMember {
     /// Returns a [`proto::WebRtcPlayEndpoint`] for this [`PairedMember`] which
     /// will receive media from the provided [`PairedMember`] if receiving is
     /// enabled.
-    #[must_use]
     fn play_endpoint_for(
         &self,
         room_id: &str,
@@ -694,7 +686,7 @@ impl PairedMember {
     ) -> Option<proto::WebRtcPlayEndpoint> {
         self.recv.then(|| proto::WebRtcPlayEndpoint {
             id: format!("play-{}", publisher.id),
-            src: format!("local://{}/{}/{}", room_id, publisher.id, "publish"),
+            src: format!("local://{room_id}/{}/publish", publisher.id),
             force_relay: false,
         })
     }

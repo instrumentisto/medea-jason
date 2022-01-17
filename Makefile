@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.54
-CHROME_VERSION := 94.0
+RUST_VER := 1.58
+CHROME_VERSION := 97.0
 FIREFOX_VERSION := 92.0-driver0.29.1
 
-CARGO_NDK_VER := 2.4.1-ndkr23-rust$(RUST_VER)
+CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -87,7 +87,7 @@ docs: docs.rust
 down: down.dev
 
 
-fmt: cargo.fmt
+fmt: cargo.fmt flutter.fmt
 
 
 lint: cargo.lint
@@ -293,7 +293,8 @@ cargo.fmt:
 # Generate sources using Cargo.
 #
 # Usage:
-#	make cargo.gen [crate=(medea-control-api-proto|medea-jason)]
+#	make cargo.gen [( crate=medea-control-api-proto
+#	                | crate=medea-jason [dockerized=(no|yes) )]
 
 cargo.gen:
 ifeq ($(crate),medea-control-api-proto)
@@ -303,7 +304,8 @@ ifeq ($(crate),medea-control-api-proto)
 endif
 ifeq ($(crate),medea-jason)
 	cargo clean -p $(crate)
-	make cargo.build.jason platform=android args="--features dart-codegen"
+	make cargo.build.jason platform=android args="--features dart-codegen" \
+	     dockerized=$(dockerized)
 	make flutter.fmt
 endif
 
@@ -314,13 +316,12 @@ endif
 #	make cargo.lint
 
 cargo.lint:
-	cargo clippy --workspace -- -D clippy::pedantic -D warnings
+	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
 		$(call cargo.lint.medea-jason.android,$(target)))
 define cargo.lint.medea-jason.android
 	$(eval target := $(strip $(1)))
-	cargo clippy --manifest-path Cargo.toml --target=$(target) -- \
-		-D clippy::pedantic -D warnings
+	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
 endef
 
 
@@ -524,8 +525,7 @@ else
 	@make docker.down.webdriver browser=$(browser)
 endif
 else
-	cd $(crate-dir)/ && \
-	cargo test --all-features
+	cargo test -p $(crate) --all-features
 endif
 endif
 
@@ -533,7 +533,7 @@ endif
 # Run E2E tests of project.
 #
 # Usage:
-#	make test.e2e [only=<regex>]
+#	make test.e2e [(only=<regex>|only-tags=<tag-expression>)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -554,7 +554,9 @@ endif
 	@make wait.port port=4444
 endif
 	cargo test -p medea-e2e --test e2e \
-		$(if $(call eq,$(only),),,-- --scenario '$(only)')
+		$(if $(call eq,$(only),),\
+			$(if $(call eq,$(only-tags),),,-- --tags '$(only-tags)'),\
+			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif

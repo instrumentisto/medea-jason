@@ -13,7 +13,7 @@ use crate::{api::FacingMode, media};
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 #[wasm_bindgen]
-#[derive(Clone, From, Into)]
+#[derive(Clone, Debug, From, Into)]
 pub struct MediaStreamSettings(media::MediaStreamSettings);
 
 #[wasm_bindgen]
@@ -47,7 +47,7 @@ impl MediaStreamSettings {
 
 /// Constraints applicable to audio tracks.
 #[wasm_bindgen]
-#[derive(From, Into)]
+#[derive(Debug, From, Into)]
 pub struct AudioTrackConstraints(media::AudioTrackConstraints);
 
 #[wasm_bindgen]
@@ -70,7 +70,7 @@ impl AudioTrackConstraints {
 /// Constraints applicable to video tracks that are sourced from some media
 /// device.
 #[wasm_bindgen]
-#[derive(From, Into)]
+#[derive(Debug, From, Into)]
 pub struct DeviceVideoTrackConstraints(media::DeviceVideoTrackConstraints);
 
 /// Constraints applicable to video tracks that are sourced from a screen
@@ -151,7 +151,7 @@ impl DeviceVideoTrackConstraints {
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
 #[wasm_bindgen]
-#[derive(From, Into)]
+#[derive(Clone, Copy, Debug, From, Into)]
 pub struct DisplayVideoTrackConstraints(media::DisplayVideoTrackConstraints);
 
 #[wasm_bindgen]

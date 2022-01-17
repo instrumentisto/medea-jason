@@ -11,7 +11,7 @@ use crate::{api::MediaKind, platform};
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct InputDeviceInfo(platform::InputDeviceInfo);
 
 #[wasm_bindgen]

@@ -1,7 +1,12 @@
 //! Functionality for converting Rust closures into callbacks that can be passed
 //! to Dart and called by Dart.
 
-use std::{convert::TryInto, fmt::Debug, mem, os::raw::c_void, ptr};
+use std::{
+    fmt::{self, Debug},
+    mem,
+    os::raw::c_void,
+    ptr,
+};
 
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
@@ -44,7 +49,7 @@ pub unsafe extern "C" fn Callback__call_two_arg(
 ) {
     match &mut cb.as_mut().0 {
         Kind::TwoArgFnMut(func) => (func)(first, second),
-        _ => unreachable!(),
+        Kind::FnOnce(_) | Kind::FnMut(_) | Kind::Fn(_) => unreachable!(),
     }
 }
 
@@ -87,10 +92,23 @@ enum Kind {
     TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
 }
 
+impl Debug for Kind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Kind::")?;
+        match self {
+            Self::FnOnce(p) => write!(f, "FnOnce({p:p})"),
+            Self::FnMut(p) => write!(f, "FnMut({p:p})"),
+            Self::Fn(p) => write!(f, "Fn({p:p})"),
+            Self::TwoArgFnMut(p) => write!(f, "TwoArgFnMut({p:p})"),
+        }
+    }
+}
+
 // TODO: Fix in #13:
 //       1. Requires additional parametrization or(and) wrapping.
 //       2. `FnOnce` semantics should be reflected on Dart side somehow.
 /// Rust closure which can be called by Dart.
+#[derive(Debug)]
 #[must_use]
 pub struct Callback(Kind);
 
@@ -178,10 +196,10 @@ impl Callback {
             };
 
             if is_finalizable {
-                Dart_NewFinalizableHandle_DL_Trampolined(
+                let _ = Dart_NewFinalizableHandle_DL_Trampolined(
                     handle,
                     f.as_ptr().cast::<c_void>(),
-                    mem::size_of::<Callback>() as libc::intptr_t,
+                    mem::size_of::<Self>() as libc::intptr_t,
                     callback_finalizer,
                 );
             }
@@ -200,8 +218,6 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    use std::convert::TryInto;
-
     use dart_sys::Dart_Handle;
 
     use crate::api::DartValueArg;

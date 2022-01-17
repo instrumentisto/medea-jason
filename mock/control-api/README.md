@@ -1,13 +1,18 @@
 Medea's Control API mock server
 ===============================
 
+[![Rust 1.58+](https://img.shields.io/badge/rustc-1.58+-lightgray.svg "Rust 1.58+")](https://blog.rust-lang.org/2022/01/13/Rust-1.58.0.html)
+[![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
+
 [Docker Hub](https://hub.docker.com/r/instrumentisto/medea-control-api-mock)
 | [GitHub Container Registry](https://github.com/orgs/instrumentisto/packages/container/package/medea-control-api-mock)
 | [Quay.io](https://quay.io/repository/instrumentisto/medea-control-api-mock)
 
 [Changelog](https://github.com/instrumentisto/medea-jason/blob/master/mock/control-api/CHANGELOG.md)
 
-This app is used for E2E tests and for debugging purposes of [Medea]'s [Control API].
+[RESTful] mock server for gRPC [Medea]'s [Control API].
+
+Used for E2E tests and for debugging purposes of [Medea]'s [Control API].
 
 
 
@@ -135,4 +140,5 @@ This software is subject to the terms of the [Blue Oak Model License 1.0.0](http
 
 [Medea]: https://github.com/instrumentisto/medea
 [Control API]: https://github.com/instrumentisto/medea/blob/master/docs/rfc/0001-control-api.md
+[RESTful]: https://en.wikipedia.org/wiki/Representational_state_transfer
 [WebSocket]: https://en.wikipedia.org/wiki/WebSocket

@@ -67,6 +67,7 @@ pub unsafe extern "C" fn MediaManagerHandle__free(
 #[cfg(feature = "mockable")]
 mod mock {
     use dart_sys::Dart_Handle;
+    use futures::future;
     use tracerr::Traced;
 
     use crate::{
@@ -130,7 +131,7 @@ mod mock {
             cause.into()
         ));
 
-        async move { Result::<(), _>::Err(err) }.into_dart_future()
+        future::err(err).into_dart_future()
     }
 
     #[no_mangle]
@@ -149,6 +150,6 @@ mod mock {
         let cause = platform::Error::from(cause);
         let err = tracerr::new!(EnumerateDevicesError::from(cause));
 
-        async move { Result::<(), _>::Err(err) }.into_dart_future()
+        future::err(err).into_dart_future()
     }
 }

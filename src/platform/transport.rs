@@ -32,7 +32,6 @@ pub enum TransportState {
 
 impl TransportState {
     /// Indicates whether the socket can be closed.
-    #[inline]
     #[must_use]
     pub fn can_close(self) -> bool {
         matches!(self, Self::Connecting | Self::Open)
@@ -41,6 +40,7 @@ impl TransportState {
 
 /// RPC transport between a client and a server.
 #[cfg_attr(feature = "mockable", mockall::automock)]
+#[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcTransport {
     /// Returns [`LocalBoxStream`] of all messages received by this transport.
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg>;

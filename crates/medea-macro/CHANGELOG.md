@@ -7,7 +7,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 ## [0.3.0] · ????-??-?? · To-be-done
-[0.3.0]: /../../tree/medea-jason-0.3.0/crates/medea-macro
+[0.3.0]: /../../tree/medea-macro-0.3.0/crates/medea-macro
 
 ### BC Breaks
 
@@ -20,8 +20,14 @@ All user visible changes to this project will be documented in this file. This p
 
 - `#[dart_bridge]` macro for generating code glue for `extern` Dart functions ([#14]).
 
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([rev]).
+
 [#4]: /../../pull/4
 [#14]: /../../pull/14
+[rev]: https://github.com/instrumentisto/medea-jason/commit/full-rev
+[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 
 

@@ -5,6 +5,7 @@ use crate::{browser::Statement, object::Object};
 use super::Error;
 
 /// Representation of a `RemoteMediaTrack` object.
+#[derive(Clone, Copy, Debug)]
 pub struct RemoteTrack;
 
 impl Object<RemoteTrack> {
@@ -17,14 +18,14 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    if (!track.track.enabled()) {
-                        let waiter = new Promise((resolve) => {
-                            track.onEnabledSubs.push(resolve);
-                        });
-                        await waiter;
-                    }
+            async (track) => {
+                if (!track.track.enabled()) {
+                    let waiter = new Promise((resolve) => {
+                        track.onEnabledSubs.push(resolve);
+                    });
+                    await waiter;
                 }
+            }
             "#,
             [],
         ))
@@ -42,14 +43,14 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    if (track.track.enabled()) {
-                        let waiter = new Promise((resolve) => {
-                            track.onDisabledSubs.push(resolve);
-                        });
-                        await waiter;
-                    }
+            async (track) => {
+                if (track.track.enabled()) {
+                    let waiter = new Promise((resolve) => {
+                        track.onDisabledSubs.push(resolve);
+                    });
+                    await waiter;
                 }
+            }
             "#,
             [],
         ))

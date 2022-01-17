@@ -11,14 +11,14 @@ use crate::{
 };
 
 /// State of a `Room` element.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Room {
     /// All [`Peer`]s of this [`Room`].
     pub peers: HashMap<PeerId, Peer>,
 }
 
 /// State of a `Peer` element.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Peer {
     /// ID of this [`Peer`].
     pub id: PeerId,
@@ -53,7 +53,7 @@ pub struct Peer {
 }
 
 /// State of `MediaTrack`s with a `Send` direction.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Sender {
     /// ID of this [`Sender`].
     pub id: TrackId,
@@ -80,7 +80,7 @@ pub struct Sender {
 }
 
 /// State of `MediaTrack`s with a `Recv` direction.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Receiver {
     /// ID of this [`Receiver`].
     pub id: TrackId,

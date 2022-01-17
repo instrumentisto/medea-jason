@@ -26,19 +26,19 @@ where
 
             let urls = JsArray::new();
             for url in ice_server.urls {
-                urls.push(&JsValue::from(url));
+                let _ = urls.push(&JsValue::from(url));
             }
 
-            server.urls(&urls);
+            let _ = server.urls(&urls);
 
             if let Some(credential) = ice_server.credential {
-                server.credential(&credential);
+                let _ = server.credential(&credential);
             }
             if let Some(username) = ice_server.username {
-                server.username(&username);
+                let _ = server.username(&username);
             }
 
-            inner.push(&server.into());
+            let _ = inner.push(&server.into());
         }
 
         Self(inner)

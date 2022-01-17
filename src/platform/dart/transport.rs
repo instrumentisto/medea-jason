@@ -3,10 +3,7 @@ use std::{
     rc::Rc,
 };
 
-use futures::{
-    channel::{mpsc, mpsc::UnboundedSender},
-    prelude::stream::LocalBoxStream,
-};
+use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
 use medea_macro::dart_bridge;
 use medea_reactive::ObservableCell;
@@ -110,9 +107,12 @@ impl WebSocketRpcTransport {
             let on_message_subs = Rc::new(RefCell::new(Vec::new()));
             let socket_state =
                 Rc::new(ObservableCell::new(TransportState::Open));
+
+            // TODO: Propagate execution error.
+            #[allow(clippy::map_err_ignore)]
             let handle =
                 FutureFromDart::execute::<DartHandle>(transport::connect(
-                    string_into_c_str(url.as_ref().to_string()),
+                    string_into_c_str(url.as_ref().to_owned()),
                     Callback::from_fn_mut({
                         let subs = Rc::clone(&on_message_subs);
                         move |msg: String| {
@@ -128,7 +128,7 @@ impl WebSocketRpcTransport {
                                 };
 
                             subs.borrow_mut().retain(
-                                |sub: &UnboundedSender<ServerMsg>| {
+                                |sub: &mpsc::UnboundedSender<ServerMsg>| {
                                     sub.unbounded_send(msg.clone()).is_ok()
                                 },
                             );
@@ -161,18 +161,17 @@ impl WebSocketRpcTransport {
 }
 
 impl RpcTransport for WebSocketRpcTransport {
-    #[inline]
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg> {
         let (tx, rx) = mpsc::unbounded();
         self.on_message_subs.borrow_mut().push(tx);
         Box::pin(rx)
     }
 
-    #[inline]
     fn set_close_reason(&self, reason: ClientDisconnect) {
         self.close_reason.set(reason);
     }
 
+    #[allow(clippy::unwrap_in_result)]
     fn send(&self, msg: &ClientMsg) -> Result<(), Traced<TransportError>> {
         let msg = serde_json::to_string(msg).unwrap();
         unsafe {
@@ -181,7 +180,6 @@ impl RpcTransport for WebSocketRpcTransport {
         Ok(())
     }
 
-    #[inline]
     fn on_state_change(&self) -> LocalBoxStream<'static, TransportState> {
         self.socket_state.subscribe()
     }

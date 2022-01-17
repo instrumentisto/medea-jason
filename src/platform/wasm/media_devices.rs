@@ -2,7 +2,6 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
-use std::convert::TryFrom as _;
 use wasm_bindgen_futures::JsFuture;
 
 use tracerr::Traced;

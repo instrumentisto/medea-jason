@@ -105,21 +105,19 @@ mod exception {
 }
 
 /// An error that can be returned from Rust to Dart.
-#[derive(Into)]
+#[allow(missing_copy_implementations)] // not trivially copyable
+#[derive(Debug, Into)]
 #[repr(transparent)]
 pub struct DartError(ptr::NonNull<Dart_Handle>);
 
 impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
-    #[inline]
-    #[must_use]
-    fn new(handle: Dart_Handle) -> DartError {
-        DartError(ptr::NonNull::from(Box::leak(Box::new(handle))))
+    fn new(handle: Dart_Handle) -> Self {
+        Self(ptr::NonNull::from(Box::leak(Box::new(handle))))
     }
 }
 
 impl From<platform::Error> for DartError {
-    #[inline]
     fn from(err: platform::Error) -> Self {
         Self::new(err.get_handle())
     }
@@ -129,6 +127,7 @@ impl From<platform::Error> for DartError {
 /// function through FFI.
 ///
 /// It can be converted into a [`DartError`] and passed to Dart.
+#[derive(Debug)]
 pub struct ArgumentError<T> {
     /// Invalid value of the argument.
     val: T,
@@ -143,7 +142,6 @@ pub struct ArgumentError<T> {
 impl<T> ArgumentError<T> {
     /// Creates a new [`ArgumentError`] from the provided invalid argument, its
     /// `name` and error `message` describing the problem.
-    #[inline]
     #[must_use]
     pub fn new<V>(val: T, name: &'static str, message: V) -> Self
     where
@@ -158,7 +156,6 @@ impl<T> ArgumentError<T> {
 }
 
 impl<T: Into<DartValue>> From<ArgumentError<T>> for DartError {
-    #[inline]
     fn from(err: ArgumentError<T>) -> Self {
         unsafe {
             Self::new(exception::new_argument_error(
@@ -171,7 +168,6 @@ impl<T: Into<DartValue>> From<ArgumentError<T>> for DartError {
 }
 
 impl From<StateError> for DartError {
-    #[inline]
     fn from(err: StateError) -> Self {
         unsafe {
             Self::new(exception::new_state_error(string_into_c_str(
@@ -182,13 +178,12 @@ impl From<StateError> for DartError {
 }
 
 impl From<LocalMediaInitException> for DartError {
-    #[inline]
     fn from(err: LocalMediaInitException) -> Self {
         unsafe {
             Self::new(exception::new_local_media_init_exception(
                 err.kind() as i64,
                 string_into_c_str(err.message()),
-                err.cause().map(DartError::from).into(),
+                err.cause().map(Self::from).into(),
                 string_into_c_str(err.trace()),
             ))
         }
@@ -196,7 +191,6 @@ impl From<LocalMediaInitException> for DartError {
 }
 
 impl From<EnumerateDevicesException> for DartError {
-    #[inline]
     fn from(err: EnumerateDevicesException) -> Self {
         unsafe {
             Self::new(exception::new_enumerate_devices_exception(
@@ -208,7 +202,6 @@ impl From<EnumerateDevicesException> for DartError {
 }
 
 impl From<FormatException> for DartError {
-    #[inline]
     fn from(err: FormatException) -> Self {
         unsafe {
             Self::new(exception::new_format_exception(string_into_c_str(
@@ -219,13 +212,12 @@ impl From<FormatException> for DartError {
 }
 
 impl From<RpcClientException> for DartError {
-    #[inline]
     fn from(err: RpcClientException) -> Self {
         unsafe {
             Self::new(exception::new_rpc_client_exception(
                 err.kind() as i64,
                 string_into_c_str(err.message()),
-                err.cause().map(DartError::from).into(),
+                err.cause().map(Self::from).into(),
                 string_into_c_str(err.trace()),
             ))
         }
@@ -233,7 +225,6 @@ impl From<RpcClientException> for DartError {
 }
 
 impl From<MediaStateTransitionException> for DartError {
-    #[inline]
     fn from(err: MediaStateTransitionException) -> Self {
         unsafe {
             Self::new(exception::new_media_state_transition_exception(
@@ -245,12 +236,11 @@ impl From<MediaStateTransitionException> for DartError {
 }
 
 impl From<InternalException> for DartError {
-    #[inline]
     fn from(err: InternalException) -> Self {
         unsafe {
             Self::new(exception::new_internal_exception(
                 string_into_c_str(err.message()),
-                err.cause().map(DartError::from).into(),
+                err.cause().map(Self::from).into(),
                 string_into_c_str(err.trace()),
             ))
         }
@@ -258,7 +248,6 @@ impl From<InternalException> for DartError {
 }
 
 impl From<MediaSettingsUpdateException> for DartError {
-    #[inline]
     fn from(err: MediaSettingsUpdateException) -> Self {
         unsafe {
             Self::new(exception::new_media_settings_update_exception(

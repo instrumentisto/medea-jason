@@ -1,6 +1,6 @@
-use cucumber_rust::then;
+use cucumber::then;
 
-use crate::world::World;
+use crate::World;
 
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
 async fn then_member_receives_connection(

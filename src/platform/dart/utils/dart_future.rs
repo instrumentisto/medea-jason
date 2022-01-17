@@ -2,7 +2,7 @@
 //!
 //! [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 
-use std::{convert::TryInto, fmt::Debug, future::Future, ptr};
+use std::{fmt, future::Future, ptr};
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
@@ -72,6 +72,14 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
 /// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 pub struct FutureFromDart(Box<dyn FnOnce(Result<DartValue, Error>)>);
 
+impl fmt::Debug for FutureFromDart {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("FutureFromDart")
+            .field(&format!("{:p}", self.0))
+            .finish()
+    }
+}
+
 impl FutureFromDart {
     /// Converts a fallible[Dart `Future`s][0] into the Rust [`Future`].
     ///
@@ -88,7 +96,7 @@ impl FutureFromDart {
     ) -> impl Future<Output = Result<T, Error>>
     where
         DartValueArg<T>: TryInto<T>,
-        <DartValueArg<T> as TryInto<T>>::Error: Debug,
+        <DartValueArg<T> as TryInto<T>>::Error: fmt::Debug,
         T: 'static,
     {
         let (tx, rx) = oneshot::channel();

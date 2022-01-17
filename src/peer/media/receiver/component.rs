@@ -34,25 +34,56 @@ pub type Component = component::Component<State, Receiver>;
 /// State of the [`Component`].
 #[derive(Debug)]
 pub struct State {
+    /// ID of the [`Receiver`]'s [`remote::Track`].
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     id: TrackId,
+
+    /// [MID] of the [`Receiver`]'s [`Transceiver`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
+    /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
+
+    /// [`MediaType`] of the [`Receiver`]'s [`remote::Track`].
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     media_type: MediaType,
+
+    /// ID of the member sending the [`Receiver`]'s [`remote::Track`].
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     sender_id: MemberId,
+
+    /// Indicator whether the [`Receiver`]'s [`remote::Track`] is enabled
+    /// individually.
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_individual: Rc<MediaExchangeStateController>,
+
+    /// Indicator whether the [`Receiver`]'s [`remote::Track`] is enabled
+    /// generally.
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
+
+    /// Indicator whether the [`Receiver`]'s [`remote::Track`] is muted.
+    ///
+    /// [`remote::Track`]: crate::media::track::remote::Track
     muted: ObservableCell<bool>,
+
+    /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
 
 impl AsProtoState for State {
     type Output = proto::state::Receiver;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
             mid: self.mid.clone(),
-            media_type: self.media_type.clone(),
+            media_type: self.media_type,
             sender_id: self.sender_id.clone(),
             enabled_individual: self.enabled_individual(),
             enabled_general: self.enabled_general(),
@@ -64,7 +95,6 @@ impl AsProtoState for State {
 impl SynchronizableState for State {
     type Input = proto::state::Receiver;
 
-    #[inline]
     fn from_proto(input: Self::Input, _: &LocalTracksConstraints) -> Self {
         Self {
             id: input.id,
@@ -109,7 +139,6 @@ impl Updatable for State {
     /// stabilized.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_stabilized(&self) -> AllProcessed<'static> {
         let controller = Rc::clone(&self.enabled_individual);
         when_all_processed(std::iter::once(
@@ -127,34 +156,30 @@ impl Updatable for State {
     /// the [`Receiver`].
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_updated(&self) -> AllProcessed<'static> {
-        medea_reactive::when_all_processed(vec![
+        when_all_processed(vec![
             self.enabled_individual.when_processed().into(),
             self.enabled_general.when_all_processed().into(),
         ])
     }
 
     /// Notifies [`State`] about a RPC connection loss.
-    #[inline]
     fn connection_lost(&self) {
         self.sync_state.set(SyncState::Desynced);
     }
 
     /// Notifies [`State`] about a RPC connection restore.
-    #[inline]
     fn connection_recovered(&self) {
         self.sync_state.set(SyncState::Syncing);
     }
 }
 
 impl From<&State> for proto::state::Receiver {
-    #[inline]
     fn from(from: &State) -> Self {
         Self {
             id: from.id,
             mid: from.mid.clone(),
-            media_type: from.media_type.clone(),
+            media_type: from.media_type,
             sender_id: from.sender_id.clone(),
             enabled_individual: from.enabled_individual(),
             enabled_general: from.enabled_general(),
@@ -165,7 +190,6 @@ impl From<&State> for proto::state::Receiver {
 
 impl State {
     /// Returns [`State`] with a provided data.
-    #[inline]
     #[must_use]
     pub fn new(
         id: TrackId,
@@ -190,50 +214,43 @@ impl State {
     }
 
     /// Returns [`TrackId`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn id(&self) -> TrackId {
         self.id
     }
 
     /// Returns current `mid` of this [`State`].
-    #[inline]
     #[must_use]
     pub fn mid(&self) -> Option<&str> {
         self.mid.as_deref()
     }
 
     /// Returns current [`MediaType`] of this [`State`].
-    #[inline]
     #[must_use]
-    pub fn media_type(&self) -> &MediaType {
-        &self.media_type
+    pub fn media_type(&self) -> MediaType {
+        self.media_type
     }
 
     /// Returns current [`MemberId`] of the `Member` from which this
     /// [`State`] should receive media data.
-    #[inline]
     #[must_use]
     pub fn sender_id(&self) -> &MemberId {
         &self.sender_id
     }
 
     /// Returns current individual media exchange state of this [`State`].
-    #[inline]
     #[must_use]
     pub fn enabled_individual(&self) -> bool {
         self.enabled_individual.enabled()
     }
 
     /// Returns current general media exchange state of this [`State`].
-    #[inline]
     #[must_use]
     pub fn enabled_general(&self) -> bool {
         self.enabled_general.get() == media_exchange_state::Stable::Enabled
     }
 
     /// Returns current mute state of this [`State`].
-    #[inline]
     #[must_use]
     pub fn muted(&self) -> bool {
         self.muted.get()
@@ -286,8 +303,8 @@ impl Component {
                             .sub_direction(platform::TransceiverDirection::RECV)
                     })
                 };
-                if let Some(sub_direction) = sub_direction {
-                    sub_direction.await;
+                if let Some(fut) = sub_direction {
+                    fut.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
@@ -300,8 +317,8 @@ impl Component {
                             .add_direction(platform::TransceiverDirection::RECV)
                     });
 
-                if let Some(add_direction) = add_direction {
-                    add_direction.await;
+                if let Some(fut) = add_direction {
+                    fut.await;
                 }
             }
         }
@@ -314,7 +331,6 @@ impl Component {
     /// updates.
     ///
     /// Updates [`Receiver::enabled_individual`] to the new state.
-    #[inline]
     #[watch(self.enabled_individual.subscribe_stable())]
     async fn enabled_individual_stable_state_changed(
         receiver: Rc<Receiver>,
@@ -334,7 +350,6 @@ impl Component {
     /// [`media_exchange_state`].
     ///
     /// [1]: crate::peer::TrackEvent::MediaExchangeIntention
-    #[inline]
     #[watch(self.enabled_individual.subscribe_transition())]
     async fn enabled_individual_transition_started(
         receiver: Rc<Receiver>,
@@ -349,7 +364,6 @@ impl Component {
     ///
     /// Propagates command to the associated [`Receiver`] and updates its media
     /// track (if any).
-    #[inline]
     #[watch(self.muted.subscribe())]
     async fn mute_state_changed(
         receiver: Rc<Receiver>,
@@ -392,14 +406,12 @@ impl Component {
 }
 
 impl MediaStateControllable for State {
-    #[inline]
     fn media_exchange_state_controller(
         &self,
     ) -> Rc<MediaExchangeStateController> {
         Rc::clone(&self.enabled_individual)
     }
 
-    #[inline]
     fn mute_state_controller(&self) -> Rc<MuteStateController> {
         // Receivers can be muted, but currently they are muted directly by
         // server events.
@@ -417,12 +429,10 @@ impl MediaStateControllable for State {
 }
 
 impl TransceiverSide for State {
-    #[inline]
     fn track_id(&self) -> TrackId {
         self.id
     }
 
-    #[inline]
     fn kind(&self) -> MediaKind {
         match &self.media_type {
             MediaType::Audio(_) => MediaKind::Audio,
@@ -430,7 +440,6 @@ impl TransceiverSide for State {
         }
     }
 
-    #[inline]
     fn source_kind(&self) -> MediaSourceKind {
         match &self.media_type {
             MediaType::Audio(_) => MediaSourceKind::Device,
@@ -438,7 +447,6 @@ impl TransceiverSide for State {
         }
     }
 
-    #[inline]
     fn is_transitable(&self) -> bool {
         true
     }
@@ -457,7 +465,6 @@ impl State {
     }
 
     /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
-    #[inline]
     pub fn synced(&self) {
         self.sync_state.set(SyncState::Synced);
     }

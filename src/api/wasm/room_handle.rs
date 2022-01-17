@@ -21,7 +21,7 @@ use super::Error;
 ///
 /// [`Room`]: room::Room
 #[wasm_bindgen]
-#[derive(From, Into)]
+#[derive(Debug, From, Into)]
 pub struct RoomHandle(room::RoomHandle);
 
 #[wasm_bindgen]

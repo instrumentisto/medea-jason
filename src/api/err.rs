@@ -1,5 +1,8 @@
 //! External API errors.
 
+// TODO: See https://github.com/rustwasm/wasm-bindgen/pull/2719
+#![allow(clippy::use_self)]
+
 use std::borrow::Cow;
 
 #[cfg(not(target_os = "android"))]
@@ -29,6 +32,7 @@ use crate::{
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct StateError {
     /// Message describing the problem.
     message: Cow<'static, str>,
@@ -89,6 +93,7 @@ pub enum LocalMediaInitExceptionKind {
 
 /// Exception thrown when accessing media devices.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct LocalMediaInitException {
     /// Concrete error kind of this [`LocalMediaInitException`].
     kind: LocalMediaInitExceptionKind,
@@ -151,6 +156,7 @@ impl LocalMediaInitException {
 
 /// Exception thrown when cannot get info of available media devices.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct EnumerateDevicesException {
     /// [`platform::Error`] causing this [`EnumerateDevicesException`].
     cause: platform::Error,
@@ -207,6 +213,7 @@ pub enum RpcClientExceptionKind {
 /// Exceptions thrown from a RPC client that implements messaging with media
 /// server.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct RpcClientException {
     /// Concrete error kind of this [`RpcClientException`].
     kind: RpcClientExceptionKind,
@@ -272,6 +279,7 @@ impl RpcClientException {
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct InternalException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
@@ -324,6 +332,7 @@ impl InternalException {
 /// Exception thrown when a string or some other data doesn't have an expected
 /// format and cannot be parsed or processed.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct FormatException(Cow<'static, str>);
 
 impl FormatException {
@@ -347,6 +356,7 @@ impl FormatException {
 /// Exception thrown when the requested media state transition could not be
 /// performed.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct MediaStateTransitionException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
@@ -386,6 +396,7 @@ impl MediaStateTransitionException {
 ///
 /// [1]: crate::api::RoomHandle::set_local_media_settings
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
 pub struct MediaSettingsUpdateException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
@@ -441,23 +452,21 @@ impl MediaSettingsUpdateException {
 
 impl From<Traced<connection::HandleDetachedError>> for Error {
     fn from(err: Traced<connection::HandleDetachedError>) -> Self {
-        let (err, trace) = err.into_parts();
-
+        let (err, trace) = err.split();
         StateError::new(err.to_string(), trace).into()
     }
 }
 
 impl From<Traced<room::HandleDetachedError>> for Error {
     fn from(err: Traced<room::HandleDetachedError>) -> Self {
-        let (err, trace) = err.into_parts();
-
+        let (err, trace) = err.split();
         StateError::new(err.to_string(), trace).into()
     }
 }
 
 impl From<Traced<EnumerateDevicesError>> for Error {
     fn from(err: Traced<EnumerateDevicesError>) -> Self {
-        let (err, stacktrace) = err.into_parts();
+        let (err, stacktrace) = err.split();
         EnumerateDevicesException::new(err.into(), stacktrace).into()
     }
 }
@@ -469,7 +478,7 @@ impl From<Traced<InitLocalTracksError>> for Error {
         use InitLocalTracksError as Err;
         use LocalMediaInitExceptionKind as Kind;
 
-        let (err, stacktrace) = err.into_parts();
+        let (err, stacktrace) = err.split();
         let message = err.to_string();
 
         let (kind, cause) = match err {
@@ -494,27 +503,24 @@ impl From<Traced<InitLocalTracksError>> for Error {
 
 impl From<Traced<ReconnectError>> for Error {
     fn from(err: Traced<ReconnectError>) -> Self {
-        let (err, trace) = err.into_parts();
+        let (err, trace) = err.split();
 
         match err {
             ReconnectError::Detached => {
                 StateError::new(err.to_string(), trace).into()
             }
-            ReconnectError::Session(err) => {
-                Traced::from_parts(err, trace).into()
-            }
+            ReconnectError::Session(err) => Traced::compose(err, trace).into(),
         }
     }
 }
 
 impl From<Traced<SessionError>> for Error {
-    #[allow(clippy::option_if_let_else)]
     fn from(err: Traced<SessionError>) -> Self {
         use ConnectionLostReason as Reason;
         use RpcClientExceptionKind as Kind;
         use SessionError as SE;
 
-        let (err, trace) = err.into_parts();
+        let (err, trace) = err.split();
         let message = err.to_string();
 
         let mut cause = None;
@@ -523,14 +529,14 @@ impl From<Traced<SessionError>> for Error {
             SE::NoCredentials
             | SE::SessionUnexpectedlyDropped
             | SE::NewConnectionInfo => None,
-            SE::RpcClient(err) => {
-                cause = err.cause();
+            SE::RpcClient(e) => {
+                cause = e.cause();
                 None
             }
             SE::AuthorizationFailed => Some(Kind::AuthorizationFailed),
             SE::ConnectionLost(reason) => {
-                if let Reason::ConnectError(err) = reason {
-                    cause = err.into_inner().cause();
+                if let Reason::ConnectError(e) = reason {
+                    cause = e.into_inner().cause();
                 };
                 Some(Kind::ConnectionLost)
             }
@@ -546,7 +552,7 @@ impl From<Traced<SessionError>> for Error {
 
 impl From<Traced<RoomJoinError>> for Error {
     fn from(err: Traced<RoomJoinError>) -> Self {
-        let (err, trace) = err.into_parts();
+        let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
@@ -557,7 +563,7 @@ impl From<Traced<RoomJoinError>> for Error {
                 FormatException::new(message).into()
             }
             RoomJoinError::SessionError(err) => {
-                Traced::from_parts(err, trace).into()
+                Traced::compose(err, trace).into()
             }
         }
     }
@@ -565,7 +571,7 @@ impl From<Traced<RoomJoinError>> for Error {
 
 impl From<Traced<ChangeMediaStateError>> for Error {
     fn from(err: Traced<ChangeMediaStateError>) -> Self {
-        let (err, trace) = err.into_parts();
+        let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
@@ -573,7 +579,7 @@ impl From<Traced<ChangeMediaStateError>> for Error {
                 StateError::new(err.to_string(), trace).into()
             }
             ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
-                Traced::from_parts(err, trace).into()
+                Traced::compose(err, trace).into()
             }
             ChangeMediaStateError::ProhibitedState(_)
             | ChangeMediaStateError::TransitionIntoOppositeState(_)
@@ -609,13 +615,13 @@ impl From<Traced<LocalMediaError>> for Error {
         use LocalMediaError as ME;
         use UpdateLocalStreamError as UE;
 
-        let (err, trace) = err.into_parts();
+        let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
             ME::UpdateLocalStreamError(err) => match err {
                 UE::CouldNotGetLocalMedia(err) => {
-                    Traced::from_parts(err, trace).into()
+                    Traced::compose(err, trace).into()
                 }
                 UE::InvalidLocalTracks(_)
                 | UE::InsertLocalTracksError(

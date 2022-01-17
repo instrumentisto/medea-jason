@@ -5,34 +5,22 @@ mod control;
 mod steps;
 mod world;
 
-use cucumber_rust::{World as _, WorldInit as _};
-use regex::Regex;
-use structopt::StructOpt;
+use cucumber::{World as _, WorldInit as _};
 
-use self::world::World;
-
-#[derive(StructOpt)]
-struct Conf {
-    #[structopt(long)]
-    scenario: Option<String>,
-}
+pub use self::world::World;
 
 #[tokio::main]
 async fn main() {
-    let conf: Conf = Conf::from_args();
-
     let concurrent = supports_multiple_webdriver_clients()
         .await
         .then(|| 10)
         .unwrap_or(1);
 
-    let filter = conf.scenario.as_ref().map(|s| Regex::new(s).unwrap());
     World::cucumber()
+        .repeat_failed()
         .fail_on_skipped()
         .max_concurrent_scenarios(concurrent)
-        .filter_run_and_exit(conf::FEATURES_PATH.as_str(), move |_, _, s| {
-            filter.as_ref().map_or(true, |f| f.find(&s.name).is_some())
-        })
+        .run_and_exit(conf::FEATURES_PATH.as_str())
         .await;
 }
 

@@ -2,8 +2,6 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams/#device-info
 
-use std::convert::TryFrom;
-
 use derive_more::Display;
 use web_sys as sys;
 
@@ -12,7 +10,7 @@ use crate::media::MediaKind;
 /// Errors that may occur when parsing [MediaDeviceInfo][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-#[derive(Debug, Display)]
+#[derive(Clone, Copy, Debug, Display)]
 pub enum Error {
     /// Occurs when kind of media device is not an input device.
     #[display(fmt = "Not an input device")]
@@ -22,7 +20,9 @@ pub enum Error {
 /// Representation of [MediaDeviceInfo][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
+#[derive(Debug)]
 pub struct InputDeviceInfo {
+    /// Kind of the represented media device.
     media_kind: MediaKind,
 
     /// Actual underlying [MediaDeviceInfo][1] object.
@@ -34,8 +34,9 @@ pub struct InputDeviceInfo {
 impl TryFrom<sys::MediaDeviceKind> for MediaKind {
     type Error = Error;
 
-    #[inline]
     fn try_from(value: sys::MediaDeviceKind) -> Result<Self, Self::Error> {
+        // False positive on `#[non_exhaustive]`.
+        #[allow(clippy::wildcard_enum_match_arm)]
         match value {
             sys::MediaDeviceKind::Audioinput => Ok(Self::Audio),
             sys::MediaDeviceKind::Videoinput => Ok(Self::Video),
@@ -46,7 +47,6 @@ impl TryFrom<sys::MediaDeviceKind> for MediaKind {
 
 impl InputDeviceInfo {
     /// Returns unique identifier for the represented device.
-    #[inline]
     #[must_use]
     pub fn device_id(&self) -> String {
         self.info.device_id()
@@ -57,7 +57,6 @@ impl InputDeviceInfo {
     /// This representation of [MediaDeviceInfo][1] ONLY for input device.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-    #[inline]
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.media_kind
@@ -66,7 +65,6 @@ impl InputDeviceInfo {
     /// Returns label describing the represented device (for example
     /// "External USB Webcam").
     /// If the device has no associated label, then returns an empty string.
-    #[inline]
     #[must_use]
     pub fn label(&self) -> String {
         self.info.label()
@@ -80,7 +78,6 @@ impl InputDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
-    #[inline]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         Some(self.info.group_id())
@@ -90,7 +87,6 @@ impl InputDeviceInfo {
 impl TryFrom<sys::MediaDeviceInfo> for InputDeviceInfo {
     type Error = Error;
 
-    #[inline]
     fn try_from(info: sys::MediaDeviceInfo) -> Result<Self, Self::Error> {
         Ok(Self {
             media_kind: MediaKind::try_from(info.kind())?,

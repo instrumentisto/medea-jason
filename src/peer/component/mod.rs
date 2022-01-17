@@ -137,7 +137,6 @@ pub struct State {
 
 impl State {
     /// Creates a new [`State`] with the provided data.
-    #[inline]
     #[must_use]
     pub fn new(
         id: Id,
@@ -163,34 +162,29 @@ impl State {
     }
 
     /// Returns [`Id`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn id(&self) -> Id {
         self.id
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
-    #[inline]
     #[must_use]
     pub fn ice_servers(&self) -> &Vec<IceServer> {
         &self.ice_servers
     }
 
     /// Indicates whether [`PeerConnection`] should be relayed forcibly.
-    #[inline]
     #[must_use]
     pub fn force_relay(&self) -> bool {
         self.force_relay
     }
 
     /// Inserts a new [`sender::State`] into this [`State`].
-    #[inline]
     pub fn insert_sender(&self, track_id: TrackId, sender: Rc<sender::State>) {
         self.senders.insert(track_id, sender);
     }
 
     /// Inserts a new [`receiver::State`] into this [`State`].
-    #[inline]
     pub fn insert_receiver(
         &self,
         track_id: TrackId,
@@ -200,14 +194,12 @@ impl State {
     }
 
     /// Returns [`Rc`] to the [`sender::State`] with the provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_sender(&self, track_id: TrackId) -> Option<Rc<sender::State>> {
         self.senders.get(track_id)
     }
 
     /// Returns [`Rc`] to the [`receiver::State`] with the provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_receiver(
         &self,
@@ -217,7 +209,6 @@ impl State {
     }
 
     /// Sets [`NegotiationRole`] of this [`State`] to the provided one.
-    #[inline]
     pub async fn set_negotiation_role(
         &self,
         negotiation_role: NegotiationRole,
@@ -227,34 +218,29 @@ impl State {
     }
 
     /// Sets [`State::restart_ice`] to `true`.
-    #[inline]
     pub fn restart_ice(&self) {
         self.restart_ice.set(true);
     }
 
     /// Removes [`sender::State`] or [`receiver::State`] with the provided
     /// [`TrackId`].
-    #[inline]
     pub fn remove_track(&self, track_id: TrackId) {
         if !self.receivers.remove(track_id) {
-            self.senders.remove(track_id);
+            let _ = self.senders.remove(track_id);
         }
     }
 
     /// Sets remote SDP offer to the provided value.
-    #[inline]
     pub fn set_remote_sdp(&self, sdp: String) {
         self.remote_sdp.set(Some(sdp));
     }
 
     /// Adds [`IceCandidate`] for the [`State`].
-    #[inline]
     pub fn add_ice_candidate(&self, ice_candidate: IceCandidate) {
         self.ice_candidates.add(ice_candidate);
     }
 
     /// Marks current local SDP as approved by server.
-    #[inline]
     pub fn apply_local_sdp(&self, sdp: String) {
         self.local_sdp.approved_set(sdp);
     }
@@ -262,7 +248,6 @@ impl State {
     /// Stops all timeouts of the [`State`].
     ///
     /// Stops local SDP rollback timeout.
-    #[inline]
     pub fn stop_timeouts(&self) {
         self.local_sdp.stop_timeout();
     }
@@ -270,7 +255,6 @@ impl State {
     /// Resumes all timeouts of the [`State`].
     ///
     /// Resumes local SDP rollback timeout.
-    #[inline]
     pub fn resume_timeouts(&self) {
         self.local_sdp.resume_timeout();
     }
@@ -305,7 +289,6 @@ impl State {
     /// [`receiver::State`]'s updates will be applied.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_all_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.senders.when_updated().into(),
@@ -354,7 +337,7 @@ impl State {
                     Rc::new(sender::State::new(
                         track.id,
                         mid.clone(),
-                        track.media_type.clone(),
+                        track.media_type,
                         receivers.clone(),
                         send_constraints,
                     )),
@@ -366,7 +349,7 @@ impl State {
                     Rc::new(receiver::State::new(
                         track.id,
                         mid.clone(),
-                        track.media_type.clone(),
+                        track.media_type,
                         sender.clone(),
                     )),
                 );
@@ -378,7 +361,6 @@ impl State {
     /// removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_all_senders_processed(&self) -> AllProcessed<'static> {
         self.senders.when_all_processed()
     }
@@ -387,7 +369,6 @@ impl State {
     /// removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_all_receivers_processed(&self) -> AllProcessed<'static> {
         self.receivers.when_all_processed()
     }
@@ -406,7 +387,6 @@ impl State {
     }
 
     /// Returns the current SDP offer of this [`State`].
-    #[inline]
     #[must_use]
     pub fn current_sdp_offer(&self) -> Option<String> {
         self.local_sdp.current()
@@ -419,7 +399,6 @@ pub type Component = component::Component<State, PeerConnection>;
 impl AsProtoState for State {
     type Output = proto::state::Peer;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
@@ -489,7 +468,6 @@ impl SynchronizableState for State {
 }
 
 impl Updatable for State {
-    #[inline]
     fn when_stabilized(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.senders.when_stabilized().into(),
@@ -497,7 +475,6 @@ impl Updatable for State {
         ])
     }
 
-    #[inline]
     fn when_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.receivers.when_updated().into(),
@@ -505,14 +482,12 @@ impl Updatable for State {
         ])
     }
 
-    #[inline]
     fn connection_lost(&self) {
         self.sync_state.set(SyncState::Desynced);
         self.senders.connection_lost();
         self.receivers.connection_lost();
     }
 
-    #[inline]
     fn connection_recovered(&self) {
         self.sync_state.set(SyncState::Syncing);
         self.senders.connection_recovered();
@@ -523,27 +498,23 @@ impl Updatable for State {
 #[cfg(feature = "mockable")]
 impl State {
     /// Waits for a [`State::remote_sdp`] change to be applied.
-    #[inline]
     pub async fn when_remote_sdp_processed(&self) {
         self.remote_sdp.when_all_processed().await;
     }
 
     /// Resets a [`NegotiationRole`] of this [`State`] to [`None`].
-    #[inline]
     pub fn reset_negotiation_role(&self) {
         self.negotiation_state.set(NegotiationState::Stable);
         self.negotiation_role.set(None);
     }
 
     /// Returns the current [`NegotiationRole`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn negotiation_role(&self) -> Option<NegotiationRole> {
         self.negotiation_role.get()
     }
 
     /// Returns [`Future`] resolving once local SDP approve is needed.
-    #[inline]
     pub fn when_local_sdp_approve_needed(
         &self,
     ) -> impl std::future::Future<Output = ()> {
@@ -554,24 +525,20 @@ impl State {
     }
 
     /// Stabilizes all [`receiver::State`]s of this [`State`].
-    #[inline]
     pub fn stabilize_all(&self) {
         self.receivers.stabilize_all();
     }
 
     /// Waits until a [`State::local_sdp`] is resolved and returns its new
     /// value.
-    #[inline]
-    #[must_use]
     pub async fn when_local_sdp_updated(&self) -> Option<String> {
         use futures::StreamExt as _;
 
-        self.local_sdp.subscribe().skip(1).next().await.unwrap()
+        self.local_sdp.subscribe().skip(1).next().await.flatten()
     }
 
     /// Waits until all [`State::senders`]' and [`State::receivers`]' inserts
     /// are processed.
-    #[inline]
     pub async fn when_all_tracks_created(&self) {
         medea_reactive::when_all_processed(vec![
             self.senders.when_insert_processed().into(),
@@ -581,7 +548,6 @@ impl State {
     }
 
     /// Sets [`State::sync_state`] to the [`SyncState::Synced`].
-    #[inline]
     pub fn synced(&self) {
         self.senders.synced();
         self.receivers.synced();

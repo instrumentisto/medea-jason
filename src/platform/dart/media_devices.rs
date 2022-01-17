@@ -2,8 +2,6 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#mediadevices
 
-use std::convert::TryInto as _;
-
 use medea_macro::dart_bridge;
 use tracerr::Traced;
 

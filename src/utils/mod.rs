@@ -48,7 +48,6 @@ macro_rules! upgrade_or_break {
 /// Intended for use in [`StreamExt::filter_map()`].
 ///
 /// [`StreamExt::filter_map()`]: futures::StreamExt::filter_map
-#[inline]
 pub fn transpose_guarded<T>(
     val: Guarded<Option<T>>,
 ) -> impl Future<Output = Option<Guarded<T>>> {

@@ -15,7 +15,7 @@ use crate::{
 /// Responsible for managing shared transports, local media and room
 /// initialization.
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct Jason(jason::Jason);
 
 #[wasm_bindgen]

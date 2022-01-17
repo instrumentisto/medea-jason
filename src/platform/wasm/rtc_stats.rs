@@ -2,7 +2,7 @@
 //!
 //! [`SysRtcStats`]: web_sys::RtcStats
 
-use std::{convert::TryFrom, rc::Rc};
+use std::rc::Rc;
 
 use js_sys::{
     Array as JsArray, Function as JsFunction, Iterator as JsIterator, JsString,
@@ -34,7 +34,7 @@ impl TryFrom<&JsValue> for RtcStats {
             .map_err(|e| tracerr::new!(Platform(platform::Error::from(e))))?
             .unchecked_into::<JsIterator>();
 
-        let mut stats = Vec::new();
+        let mut out = Vec::new();
 
         for stat in iterator {
             let stat = stat.map_err(|e| {
@@ -52,10 +52,10 @@ impl TryFrom<&JsValue> for RtcStats {
                 continue;
             }
 
-            stats.push(stat);
+            out.push(stat);
         }
 
-        Ok(RtcStats(stats))
+        Ok(Self(out))
     }
 }
 /// Entry of a JS RTC stats dictionary.
@@ -85,6 +85,6 @@ impl TryFrom<JsArray> for RtcStatsReportEntry {
             .dyn_into::<JsValue>()
             .map_err(|e| tracerr::new!(Platform(platform::Error::from(e))))?;
 
-        Ok(RtcStatsReportEntry(id, stats))
+        Ok(Self(id, stats))
     }
 }

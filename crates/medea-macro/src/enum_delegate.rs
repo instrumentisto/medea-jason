@@ -6,6 +6,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
     parse::{Error, Result},
+    parse_quote,
     spanned::Spanned as _,
 };
 
@@ -24,23 +25,26 @@ use syn::{
 /// # Limitations
 ///
 /// - Cannot delegate static methods.
-pub fn derive(args: &TokenStream, input: TokenStream) -> Result<TokenStream> {
+pub(crate) fn derive(
+    args: &TokenStream,
+    input: TokenStream,
+) -> Result<TokenStream> {
     let mut output = input.clone();
     let inp: syn::DeriveInput = syn::parse(input)?;
 
-    let mut enum_name_iter = iter::repeat(inp.ident.clone());
-    let enum_name = enum_name_iter.next().unwrap();
+    let enum_name = inp.ident.clone();
+    let enum_name_iter = iter::repeat(enum_name.clone());
 
-    let variants: Vec<syn::Ident> = match &inp.data {
-        syn::Data::Enum(ref data) => {
-            data.variants.iter().map(|c| c.ident.clone()).collect()
-        }
-        _ => {
-            return Err(Error::new(
-                inp.span(),
-                "This macro can be used on enums only",
-            ))
-        }
+    let variants = if let syn::Data::Enum(ref data) = &inp.data {
+        data.variants
+            .iter()
+            .map(|c| c.ident.clone())
+            .collect::<Vec<_>>()
+    } else {
+        return Err(Error::new(
+            inp.span(),
+            "This macro can be used on enums only",
+        ));
     };
     if variants.is_empty() {
         return Err(Error::new(
@@ -49,7 +53,7 @@ pub fn derive(args: &TokenStream, input: TokenStream) -> Result<TokenStream> {
         ));
     }
 
-    let arg_function = format!("{} {{ }}", args.to_string());
+    let arg_function = format!("{args} {{ }}");
     let mut function: syn::ItemFn = syn::parse_str(&arg_function)?;
 
     let selfs_count = function
@@ -80,29 +84,26 @@ pub fn derive(args: &TokenStream, input: TokenStream) -> Result<TokenStream> {
     );
 
     let enum_output = quote! {
-        #(#enum_name_iter::#variants(inner) => {
-            inner.#function_ident(#(#function_args,)*)
-        },)*
+        #(
+            #enum_name_iter::#variants(inner) => {
+                inner.#function_ident(#(#function_args,)*)
+            },
+        )*
     };
 
-    // This used for easy **body** generation by quote.
-    let generated_fn: syn::ItemFn = syn::parse(
-        quote! {
-            pub fn a(&self) {
-                match self {
-                    #enum_output
-                }
+    // This used for easy **body** generation by `quote`.
+    let generated_fn: syn::ItemFn = parse_quote! {
+        pub fn a(&self) {
+            match self {
+                #enum_output
             }
         }
-        .into(),
-    )
-    .unwrap();
+    };
     function.block = generated_fn.block;
 
     let impl_output = quote! {
         #[automatically_derived]
         impl #enum_name {
-            #[inline]
             #function
         }
     };

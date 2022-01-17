@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use cucumber_rust::{then, when};
+use cucumber::{then, when};
 use medea_control_api_mock::proto::{
     self as proto, AudioSettings, VideoSettings,
 };
@@ -13,7 +13,7 @@ async fn when_control_api_removes_member(world: &mut World, id: String) {
     world.delete_member_element(&id).await;
 }
 
-#[when(regex = r"^Control API removes the room$")]
+#[when("Control API removes the room")]
 async fn when_control_api_removes_room(world: &mut World) {
     world.delete_room_element().await;
 }

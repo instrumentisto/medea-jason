@@ -11,7 +11,7 @@ use crate::{api, connection};
 /// managed by Rust, so its methods will fail if a weak reference could not be
 /// upgraded.
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct ConnectionHandle(connection::ConnectionHandle);
 
 #[wasm_bindgen]

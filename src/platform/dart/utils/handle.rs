@@ -77,7 +77,7 @@ impl fmt::Display for DartHandle {
             let to_string = c_str_into_string(raw);
             free_dart_native_string(raw);
 
-            write!(f, "{}", to_string)
+            write!(f, "{to_string}")
         }
     }
 }

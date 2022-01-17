@@ -23,14 +23,12 @@ pub struct LocalStreamUpdateCriteria(Inner);
 impl LocalStreamUpdateCriteria {
     /// Creates [`LocalStreamUpdateCriteria`] with all possible [`MediaKind`] +
     /// [`MediaSourceKind`] combinations.
-    #[inline]
     #[must_use]
     pub fn all() -> Self {
         Self(Inner::all())
     }
 
     /// Creates empty [`LocalStreamUpdateCriteria`].
-    #[inline]
     #[must_use]
     pub fn empty() -> Self {
         Self(Inner::empty())
@@ -41,7 +39,6 @@ impl LocalStreamUpdateCriteria {
     ///
     /// [`None`] `source_kind` means both
     /// [`MediaSourceKind`]s.
-    #[inline]
     #[must_use]
     pub fn from_kinds(
         media_kind: MediaKind,
@@ -84,7 +81,6 @@ impl LocalStreamUpdateCriteria {
 
     /// Adds the given [`MediaKind`] + [`MediaSourceKind`] pair to this
     /// [`LocalStreamUpdateCriteria`].
-    #[inline]
     pub fn add(&mut self, media_kind: MediaKind, source_kind: MediaSourceKind) {
         self.0
             .bitor_assign(Self::from_kinds(media_kind, Some(source_kind)).0);
@@ -92,7 +88,6 @@ impl LocalStreamUpdateCriteria {
 
     /// Checks whether this [`LocalStreamUpdateCriteria`] contains the provided
     /// [`MediaKind`] + [`MediaSourceKind`] pair.
-    #[inline]
     #[must_use]
     pub fn has(
         self,

@@ -1,52 +1,75 @@
-//! REST mock server for gRPC [Medea]'s [Control API].
-//!
-//! [Medea]: https://github.com/instrumentisto/medea
-//! [Control API]: https://tinyurl.com/yxsqplq7
-
-use clap::{
-    app_from_crate, crate_authors, crate_description, crate_name,
-    crate_version, Arg,
-};
-use medea_control_api_mock::{api, callback, init_logger};
+#![doc = include_str!("../README.md")]
+#![deny(
+    macro_use_extern_crate,
+    nonstandard_style,
+    rust_2018_idioms,
+    rustdoc::broken_intra_doc_links,
+    rustdoc::private_intra_doc_links,
+    trivial_numeric_casts
+)]
+#![forbid(non_ascii_idents)]
+#![warn(
+    clippy::branches_sharing_code,
+    clippy::clone_on_ref_ptr,
+    clippy::create_dir,
+    clippy::dbg_macro,
+    clippy::debug_assert_with_mut_call,
+    clippy::decimal_literal_representation,
+    clippy::empty_line_after_outer_attr,
+    clippy::equatable_if_let,
+    clippy::exit,
+    clippy::fallible_impl_from,
+    clippy::filetype_is_file,
+    clippy::float_cmp_const,
+    clippy::fn_to_numeric_cast,
+    clippy::get_unwrap,
+    clippy::if_then_some_else_none,
+    clippy::imprecise_flops,
+    clippy::lossy_float_literal,
+    clippy::map_err_ignore,
+    clippy::mem_forget,
+    clippy::missing_docs_in_private_items,
+    clippy::mutex_integer,
+    clippy::nonstandard_macro_braces,
+    clippy::option_if_let_else,
+    clippy::pedantic,
+    clippy::print_stderr,
+    clippy::print_stdout,
+    clippy::rc_buffer,
+    clippy::rc_mutex,
+    clippy::rest_pat_in_fully_bound_structs,
+    clippy::same_name_method,
+    clippy::shadow_unrelated,
+    clippy::str_to_string,
+    clippy::string_add,
+    clippy::string_lit_as_bytes,
+    clippy::string_to_string,
+    clippy::suboptimal_flops,
+    clippy::suspicious_operation_groupings,
+    clippy::trivial_regex,
+    clippy::unnecessary_self_imports,
+    clippy::unneeded_field_pattern,
+    clippy::unwrap_in_result,
+    clippy::use_debug,
+    clippy::use_self,
+    clippy::useless_let_if_seq,
+    clippy::verbose_file_reads,
+    clippy::wildcard_enum_match_arm,
+    future_incompatible,
+    meta_variable_misuse,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    missing_docs,
+    noop_method_call,
+    semicolon_in_expressions_from_macros,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_labels,
+    unused_lifetimes,
+    unused_qualifications,
+    unused_results
+)]
 
 fn main() {
-    dotenv::dotenv().ok();
-
-    let opts = app_from_crate!()
-        .arg(
-            Arg::with_name("addr")
-                .help("Address to host medea-control-api-mock-server on.")
-                .default_value("0.0.0.0:8000")
-                .long("addr")
-                .short("a"),
-        )
-        .arg(
-            Arg::with_name("medea_addr")
-                .help("Address to Medea's gRPC control API.")
-                .default_value("http://0.0.0.0:6565")
-                .long("medea-addr")
-                .short("m"),
-        )
-        .arg(
-            Arg::with_name("callback_port")
-                .help("Port to listen by gRPC Control API Callback service.")
-                .default_value("9099")
-                .long("callback-port")
-                .short("p"),
-        )
-        .arg(
-            Arg::with_name("callback_host")
-                .help("Address to host gRPC Control API Callback service on.")
-                .default_value("0.0.0.0")
-                .long("callback-host")
-                .short("c"),
-        )
-        .get_matches();
-
-    let _log_guard = init_logger();
-
-    actix_web::rt::System::new().block_on(async move {
-        let callback_server = callback::server::run(&opts).await;
-        api::run(&opts, callback_server).await;
-    });
+    medea_control_api_mock::run();
 }

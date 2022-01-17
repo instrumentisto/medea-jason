@@ -5,19 +5,98 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2, TokenTree};
 use quote::{quote, ToTokens};
 use syn::{
-    parse::{Parse, ParseStream, Parser, Result},
+    parse::{Parse, ParseStream, Result},
+    parse_quote,
+    spanned::Spanned as _,
     FnArg, ItemEnum, Pat, PatIdent, PatType, Token,
 };
 
+/// Additional keywords to be parsed by [`syn`].
 mod kw {
     syn::custom_keyword!(async_trait);
     syn::custom_keyword!(Send);
 }
 
+/// Generates the actual code for `#[dispatchable]` macro.
+///
+/// # Algorithm
+///
+/// 1. Generate dispatching `match`-arms for each `enum` variant.
+/// 2. Generate trait methods signatures by transforming `enum` variant name
+///    from `camelCase` to `snake_case` and add `on_` prefix.
+/// 3. Generate trait `{enum_name}Handler` with generated methods from step 1.
+/// 4. Generate method `dispatch_with()` with a dispatching generated on step 2.
+pub(crate) fn expand(item: Item, args: &Args) -> TokenStream {
+    let enum_ident = item.orig_enum.ident.clone();
+
+    let dispatch_variants: Vec<_> = item
+        .orig_enum
+        .variants
+        .iter()
+        .map(|v| {
+            let variant_ident = v.ident.clone();
+            let handler_fn_ident = syn::Ident::new(
+                &to_handler_fn_name(&variant_ident.to_string()),
+                Span::call_site(),
+            );
+            let fields: &Vec<_> = &v
+                .fields
+                .iter()
+                .enumerate()
+                .map(|(i, f)| {
+                    f.ident.clone().unwrap_or_else(|| {
+                        syn::Ident::new(&format!("f{i}"), Span::call_site())
+                    })
+                })
+                .collect();
+            match v.fields {
+                syn::Fields::Named(_) => quote! {
+                    #enum_ident::#variant_ident {#(#fields),*} => {
+                        handler.#handler_fn_ident(#(#fields),*)
+                    },
+                },
+                syn::Fields::Unnamed(_) => quote! {
+                    #enum_ident::#variant_ident(#(#fields),*) => {
+                        handler.#handler_fn_ident((#(#fields),*))
+                    },
+                },
+                syn::Fields::Unit => quote! {
+                    #enum_ident::#variant_ident => handler.#handler_fn_ident(),
+                },
+            }
+        })
+        .collect();
+
+    let handler_kind = args.dispatch_with_handler_arg();
+    let method_doc = item.dispatch_with_method_doc();
+    let handler_trait = item.handler_trait(args);
+    let maybe_async = args.maybe_async_token();
+    let maybe_await = args.maybe_await_token();
+    let orig_enum = item.orig_enum;
+    let handler_trait_ident = item.handler_trait_ident;
+    TokenStream::from(quote! {
+        #orig_enum
+
+        #handler_trait
+
+        #[automatically_derived]
+        impl #enum_ident {
+            #[doc = #method_doc]
+            pub #maybe_async fn dispatch_with<T: #handler_trait_ident>(
+                self, #handler_kind,
+            ) -> <T as #handler_trait_ident>::Output {
+                match self {
+                    #(#dispatch_variants)*
+                }#maybe_await
+            }
+        }
+    })
+}
+
 /// [`ItemEnum`] that `#[dispatchable]` macro is applied to, plus some misc
 /// helpers.
 #[derive(Debug)]
-pub struct Item {
+pub(crate) struct Item {
     /// Original enum definition to be dispatched.
     orig_enum: ItemEnum,
 
@@ -27,7 +106,7 @@ pub struct Item {
 }
 
 impl Parse for Item {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let orig_enum = ItemEnum::parse(input)?;
         let handler_trait_ident = Ident::new(
             &format!("{}Handler", orig_enum.ident),
@@ -77,10 +156,10 @@ impl Item {
                         let handler_fn_args: Vec<_> = fields
                             .named
                             .iter()
-                            .map(|f| {
-                                let ident = f.ident.as_ref().unwrap();
+                            .filter_map(|f| {
+                                let ident = f.ident.as_ref()?;
                                 let ty = &f.ty;
-                                quote! { #ident: #ty }
+                                Some(quote! { #ident: #ty })
                             })
                             .collect();
                         quote! { #(#handler_fn_args),* }
@@ -97,8 +176,7 @@ impl Item {
                 };
                 let doc = format!(
                     "Handles [`{0}::{1}`] variant of [`{0}`].",
-                    self.orig_enum.ident,
-                    v.ident.to_string(),
+                    self.orig_enum.ident, v.ident,
                 );
 
                 quote! {
@@ -139,62 +217,57 @@ impl Item {
 struct IsLocal(bool);
 
 impl Parse for IsLocal {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         if input.is_empty() {
             Ok(Self(false))
         } else {
             let inner;
             syn::parenthesized!(inner in input);
-            inner.parse::<Token![?]>()?;
-            inner.parse::<kw::Send>()?;
+            let _ = inner.parse::<Token![?]>()?;
+            let _ = inner.parse::<kw::Send>()?;
             Ok(Self(true))
         }
     }
 }
 
+/// Arguments of `#[dispatchable]` attribute.
 #[derive(Debug, PartialEq)]
-pub struct Args {
+pub(crate) struct Args {
     /// `self` type that will be consumed by handler trait functions.
     self_kind: PatType,
+
     /// Whether to use [`async_trait`](https://crates.io/crates/async-trait)
     /// or not.
     async_trait: Option<IsLocal>,
 }
 
 impl Args {
-    fn maybe_async_trait_macro(&self) -> TokenStream2 {
-        match &self.async_trait {
-            None => {
-                quote! {}
-            }
-            Some(is_local) => {
-                if is_local.0 {
-                    quote! {
-                        #[async_trait::async_trait(?Send)]
-                    }
-                } else {
-                    quote! {
-                        #[async_trait::async_trait]
-                    }
+    /// Generates `#[async_trait]` attribute depending of whether it's required
+    /// by these [`Args`].
+    fn maybe_async_trait_macro(&self) -> Option<TokenStream2> {
+        self.async_trait.as_ref().map(|is_local| {
+            if is_local.0 {
+                quote! {
+                    #[async_trait::async_trait(?Send)]
+                }
+            } else {
+                quote! {
+                    #[async_trait::async_trait]
                 }
             }
-        }
+        })
     }
 
-    fn maybe_await_token(&self) -> TokenStream2 {
-        if self.async_trait.is_some() {
-            quote! {.await}
-        } else {
-            quote! {}
-        }
+    /// Generates `.await` token depending of whether it's required by these
+    /// [`Args`].
+    fn maybe_await_token(&self) -> Option<TokenStream2> {
+        self.async_trait.as_ref().map(|_| quote! { .await })
     }
 
-    fn maybe_async_token(&self) -> TokenStream2 {
-        if self.async_trait.is_some() {
-            quote! {async}
-        } else {
-            quote! {}
-        }
+    /// Generates `async` token depending of whether it's required by these
+    /// [`Args`].
+    fn maybe_async_token(&self) -> Option<TokenStream2> {
+        self.async_trait.as_ref().map(|_| quote! { async })
     }
 
     /// Transforms `self: &mut Self` to `handler: &mut T`.
@@ -210,28 +283,26 @@ impl Args {
         let handler_arg: TokenStream2 = handler_arg
             .to_token_stream()
             .into_iter()
-            .map(|token| match &token {
-                TokenTree::Ident(ident) => {
+            .map(|token| {
+                if let TokenTree::Ident(ident) = &token {
                     if *ident == "Self" {
-                        TokenTree::Ident(proc_macro2::Ident::new(
+                        return TokenTree::Ident(proc_macro2::Ident::new(
                             "T",
                             ident.span(),
-                        ))
-                    } else {
-                        token
+                        ));
                     }
                 }
-                _ => token,
+                token
             })
             .collect();
-        FnArg::parse.parse2(quote! {#handler_arg}).unwrap()
+        parse_quote! { #handler_arg }
     }
 }
 
 /// Defaults are: `Args {self_kind: "self: &mut Self", async_trait: None}`.
 impl Default for Args {
     fn default() -> Self {
-        let self_kind = FnArg::parse.parse2(quote! {self: &mut Self}).unwrap();
+        let self_kind = parse_quote! { self: &mut Self };
         let self_kind = match self_kind {
             FnArg::Typed(self_kind) => self_kind,
             FnArg::Receiver(_) => unreachable!(),
@@ -244,8 +315,8 @@ impl Default for Args {
 }
 
 impl Parse for Args {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let mut args = Args::default();
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        let mut args = Self::default();
         if input.is_empty() {
             return Ok(args);
         }
@@ -253,16 +324,21 @@ impl Parse for Args {
         if input.peek(Token![self]) && input.peek2(Token![:]) {
             let self_kind = FnArg::parse(input)?;
             let self_kind = match self_kind {
-                FnArg::Typed(self_kind) => self_kind,
-                FnArg::Receiver(_) => unreachable!(),
+                FnArg::Typed(k) => k,
+                FnArg::Receiver(_) => {
+                    return Err(syn::Error::new(
+                        self_kind.span(),
+                        "Invalid argument",
+                    ));
+                }
             };
             args.self_kind = self_kind;
         }
         if input.peek(Token![,]) {
-            input.parse::<Token![,]>()?;
+            let _ = input.parse::<Token![,]>()?;
         }
         if input.peek(kw::async_trait) {
-            input.parse::<kw::async_trait>()?;
+            let _ = input.parse::<kw::async_trait>()?;
             args.async_trait = Some(IsLocal::parse(input)?);
         }
 
@@ -276,82 +352,6 @@ fn to_handler_fn_name(name: &str) -> String {
     let mut snake_case = name.to_snake_case();
     snake_case.insert_str(0, "on_");
     snake_case
-}
-
-/// Generates the actual code for `#[dispatchable]` macro.
-///
-/// # Algorithm
-///
-/// 1. Generate dispatching `match`-arms for each `enum` variant.
-/// 2. Generate trait methods signatures by transforming `enum` variant name
-///    from `camelCase` to `snake_case` and add `on_` prefix.
-/// 3. Generate trait `{enum_name}Handler` with generated methods from step 1.
-/// 4. Generate method `dispatch_with()` with a dispatching generated on step 2.
-pub fn expand(item: Item, args: &Args) -> TokenStream {
-    let enum_ident = item.orig_enum.ident.clone();
-
-    let dispatch_variants: Vec<_> = item
-        .orig_enum
-        .variants
-        .iter()
-        .map(|v| {
-            let variant_ident = v.ident.clone();
-            let handler_fn_ident = syn::Ident::new(
-                &to_handler_fn_name(&variant_ident.to_string()),
-                Span::call_site(),
-            );
-            let fields: &Vec<_> = &v
-                .fields
-                .iter()
-                .enumerate()
-                .map(|(i, f)| {
-                    f.ident.clone().unwrap_or_else(|| {
-                        syn::Ident::new(&format!("f{}", i), Span::call_site())
-                    })
-                })
-                .collect();
-            match v.fields {
-                syn::Fields::Named(_) => quote! {
-                    #enum_ident::#variant_ident {#(#fields),*} => {
-                        handler.#handler_fn_ident(#(#fields),*)
-                    },
-                },
-                syn::Fields::Unnamed(_) => quote! {
-                    #enum_ident::#variant_ident(#(#fields),*) => {
-                        handler.#handler_fn_ident((#(#fields),*))
-                    },
-                },
-                syn::Fields::Unit => quote! {
-                    #enum_ident::#variant_ident => handler.#handler_fn_ident(),
-                },
-            }
-        })
-        .collect();
-
-    let handler_kind = args.dispatch_with_handler_arg();
-    let method_doc = item.dispatch_with_method_doc();
-    let handler_trait = item.handler_trait(args);
-    let maybe_async = args.maybe_async_token();
-    let maybe_await = args.maybe_await_token();
-    let orig_enum = item.orig_enum;
-    let handler_trait_ident = item.handler_trait_ident;
-    TokenStream::from(quote! {
-        #orig_enum
-
-        #handler_trait
-
-        #[automatically_derived]
-        impl #enum_ident {
-            #[doc = #method_doc]
-            pub #maybe_async fn dispatch_with<T: #handler_trait_ident>(
-                self, #handler_kind,
-            ) -> <T as #handler_trait_ident>::Output {
-                match self {
-                    #(#dispatch_variants)*
-                }#maybe_await
-            }
-        }
-    })
 }
 
 #[cfg(test)]
@@ -377,6 +377,8 @@ mod to_handler_fn_name_spec {
     }
 
     mod parse_args {
+        use syn::parse::Parser as _;
+
         use super::*;
 
         #[test]
@@ -384,12 +386,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
 
@@ -398,12 +400,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {self: &Self}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &T}).unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &Self}).unwrap(),
             );
         }
 
@@ -416,14 +418,14 @@ mod to_handler_fn_name_spec {
                 args.dispatch_with_handler_arg(),
                 FnArg::parse
                     .parse2(quote! {handler: std::rc::Rc<T>})
-                    .unwrap()
+                    .unwrap(),
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
                 FnArg::Typed(args.self_kind),
                 FnArg::parse
                     .parse2(quote! {self: std::rc::Rc<Self>})
-                    .unwrap()
+                    .unwrap(),
             );
         }
 
@@ -432,12 +434,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {async_trait}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap(),
             );
             assert!(!args.async_trait.unwrap().0);
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
 
@@ -446,12 +448,12 @@ mod to_handler_fn_name_spec {
             let args = Args::parse.parse2(quote! {async_trait(?Send)}).unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap()
+                FnArg::parse.parse2(quote! {handler: &mut T}).unwrap(),
             );
             assert!(args.async_trait.unwrap().0);
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap()
+                FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
 
@@ -462,12 +464,12 @@ mod to_handler_fn_name_spec {
                 .unwrap();
             assert_eq!(
                 args.dispatch_with_handler_arg(),
-                FnArg::parse.parse2(quote! {handler: Arc<T>}).unwrap()
+                FnArg::parse.parse2(quote! {handler: Arc<T>}).unwrap(),
             );
             assert!(!args.async_trait.unwrap().0);
             assert_eq!(
                 FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: Arc<Self>}).unwrap()
+                FnArg::parse.parse2(quote! {self: Arc<Self>}).unwrap(),
             );
         }
     }

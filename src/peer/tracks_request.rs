@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 
-use std::{collections::HashMap, convert::TryFrom, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
 use derive_more::Display;
 use medea_client_api_proto::{MediaSourceKind, TrackId};
@@ -20,7 +20,7 @@ use crate::{
 
 /// Errors that may occur when validating [`TracksRequest`] or
 /// parsing [`local::Track`]s.
-#[derive(Caused, Clone, Debug, Display, Eq, PartialEq)]
+#[derive(Caused, Clone, Copy, Debug, Display, Eq, PartialEq)]
 #[cause(error = "platform::Error")]
 pub enum TracksRequestError {
     /// [`TracksRequest`] contains multiple [`AudioTrackConstraints`].
@@ -79,8 +79,13 @@ pub enum TracksRequestError {
 /// [3]: https://w3.org/TR/mediacapture-streams#mediastream
 #[derive(Debug, Default)]
 pub struct TracksRequest {
+    /// [`AudioTrackConstraints`] of [`local::Track`]s to be applied.
     audio: HashMap<TrackId, AudioTrackConstraints>,
+
+    /// [`DeviceVideoTrackConstraints`] of [`local::Track`]s to be applied.
     device_video: HashMap<TrackId, DeviceVideoTrackConstraints>,
+
+    /// [`DisplayVideoTrackConstraints`] of [`local::Track`]s to be applied.
     display_video: HashMap<TrackId, DisplayVideoTrackConstraints>,
 }
 
@@ -93,14 +98,14 @@ impl TracksRequest {
     ) {
         match caps.into() {
             TrackConstraints::Audio(audio) => {
-                self.audio.insert(track_id, audio);
+                drop(self.audio.insert(track_id, audio));
             }
             TrackConstraints::Video(video) => match video {
                 VideoSource::Device(device) => {
-                    self.device_video.insert(track_id, device);
+                    drop(self.device_video.insert(track_id, device));
                 }
                 VideoSource::Display(display) => {
-                    self.display_video.insert(track_id, display);
+                    let _ = self.display_video.insert(track_id, display);
                 }
             },
         }
@@ -111,8 +116,13 @@ impl TracksRequest {
 /// and must have at least one track of any kind.
 #[derive(Debug)]
 pub struct SimpleTracksRequest {
+    /// [`AudioTrackConstraints`] of a [`local::Track`] to be applied.
     audio: Option<(TrackId, AudioTrackConstraints)>,
+
+    /// [`DisplayVideoTrackConstraints`] of a [`local::Track`] to be applied.
     display_video: Option<(TrackId, DisplayVideoTrackConstraints)>,
+
+    /// [`DisplayVideoTrackConstraints`] of a [`local::Track`] to be applied.
     device_video: Option<(TrackId, DeviceVideoTrackConstraints)>,
 }
 
@@ -166,7 +176,7 @@ impl SimpleTracksRequest {
         if let Some((id, audio)) = &self.audio {
             if let Some(track) = audio_tracks.into_iter().next() {
                 if audio.satisfies(track.as_ref()) {
-                    parsed_tracks.insert(*id, track);
+                    drop(parsed_tracks.insert(*id, track));
                 } else {
                     return Err(tracerr::new!(InvalidAudioTrack));
                 }
@@ -175,7 +185,7 @@ impl SimpleTracksRequest {
         if let Some((id, device_video)) = &self.device_video {
             if let Some(track) = device_video_tracks.into_iter().next() {
                 if device_video.satisfies(track.as_ref()) {
-                    parsed_tracks.insert(*id, track);
+                    drop(parsed_tracks.insert(*id, track));
                 } else {
                     return Err(tracerr::new!(InvalidVideoTrack));
                 }
@@ -184,7 +194,7 @@ impl SimpleTracksRequest {
         if let Some((id, display_video)) = &self.display_video {
             if let Some(track) = display_video_tracks.into_iter().next() {
                 if display_video.satisfies(track.as_ref()) {
-                    parsed_tracks.insert(*id, track);
+                    drop(parsed_tracks.insert(*id, track));
                 } else {
                     return Err(tracerr::new!(InvalidVideoTrack));
                 }
@@ -227,7 +237,7 @@ impl SimpleTracksRequest {
                         TracksRequestError::ExpectedAudioTracks
                     ));
                 }
-                self.audio.take();
+                drop(self.audio.take());
             }
         }
         if let Some((_, device_video_caps)) = &self.device_video {
@@ -237,7 +247,7 @@ impl SimpleTracksRequest {
                         TracksRequestError::ExpectedDeviceVideoTracks
                     ));
                 }
-                self.device_video.take();
+                drop(self.device_video.take());
             }
         }
         if let Some((_, display_video_caps)) = &self.display_video {
@@ -247,7 +257,7 @@ impl SimpleTracksRequest {
                         TracksRequestError::ExpectedDisplayVideoTracks
                     ));
                 }
-                self.display_video.take();
+                let _ = self.display_video.take();
             }
         }
 
@@ -303,13 +313,13 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
             display_video: None,
         };
         for (id, audio) in value.audio {
-            req.audio.replace((id, audio));
+            drop(req.audio.replace((id, audio)));
         }
         for (id, device) in value.device_video {
-            req.device_video.replace((id, device));
+            drop(req.device_video.replace((id, device)));
         }
         for (id, display) in value.display_video {
-            req.display_video.replace((id, display));
+            let _ = req.display_video.replace((id, display));
         }
 
         Ok(req)
@@ -327,7 +337,7 @@ impl From<&SimpleTracksRequest> for MediaStreamSettings {
             constraints.device_video(device_video.clone());
         }
         if let Some((_, display_video)) = &request.display_video {
-            constraints.display_video(display_video.clone());
+            constraints.display_video(*display_video);
         }
 
         constraints

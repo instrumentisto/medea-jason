@@ -12,8 +12,8 @@ use std::sync::{
 };
 
 use derive_more::{Display, Error, From};
+use fantoccini::wd::WindowHandle;
 use serde_json::Value as Json;
-use webdriver::common::WebWindow;
 
 pub use self::client::{WebDriverClient, WebDriverClientBuilder};
 
@@ -53,17 +53,19 @@ type Result<T> = std::result::Result<T, Error>;
 /// All JS code executed by [`Window::execute()`] will run in the right browser
 /// window.
 ///
-/// Window is closed once all [`WebWindow`]s for this window are [`Drop`]ped.
+/// Window is closed once all [`WindowHandle`]s for this window are [`Drop`]ped.
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
+#[derive(Debug)]
 pub struct Window {
     /// Client for interacting with a browser through [WebDriver].
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
     client: WebDriverClient,
 
-    /// ID of the window in which this [`Window`] should execute everything.
-    window: WebWindow,
+    /// Handle of the browser window in which this [`Window`] should execute
+    /// everything.
+    window: WindowHandle,
 
     /// Count of this [`Window`] references.
     ///
@@ -73,7 +75,7 @@ pub struct Window {
 
 impl Clone for Window {
     fn clone(&self) -> Self {
-        self.rc.fetch_add(1, Ordering::SeqCst);
+        let _ = self.rc.fetch_add(1, Ordering::SeqCst);
         Self {
             client: self.client.clone(),
             window: self.window.clone(),
@@ -108,9 +110,8 @@ impl Window {
     ///
     /// # Errors
     ///
-    /// - If failed to switch to the provided [`WebWindow`].
+    /// - If failed to switch browser to this [`Window`].
     /// - If failed to execute JS statement.
-    #[inline]
     pub async fn execute(&self, exec: Statement) -> Result<Json> {
         self.client
             .switch_to_window_and_execute(self.window.clone(), exec)
@@ -125,25 +126,22 @@ impl Window {
 /// [WebDriver] session will be closed on this object's [`Drop`].
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct WindowFactory(WebDriverClient);
 
 impl WindowFactory {
     /// Returns a new [`WindowFactory`] from [`WebDriverClient`].
-    #[inline]
     pub async fn new(client: WebDriverClient) -> Self {
         Self(client)
     }
 
     /// Creates and returns a new [`Window`].
-    #[inline]
     pub async fn new_window(&self) -> Window {
         Window::new(self.0.clone()).await
     }
 }
 
 impl Drop for WindowFactory {
-    #[inline]
     fn drop(&mut self) {
         self.0.blocking_close();
     }

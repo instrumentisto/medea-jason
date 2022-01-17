@@ -3,6 +3,7 @@
 use crate::browser::{Statement, Window};
 
 /// Mock for a `WebSocket` WebAPI object.
+#[derive(Debug)]
 pub struct WebSocket<'a>(pub(super) &'a Window);
 
 impl<'a> WebSocket<'a> {
@@ -12,30 +13,31 @@ impl<'a> WebSocket<'a> {
             .execute(Statement::new(
                 // language=JavaScript
                 r#"
-                    async () => {
-                        let ws = {
-                            originalSend: WebSocket.prototype.send,
-                            isClosed: false,
-                            closeCode: 0,
-                            allSockets: []
-                        };
-                        window.wsMock = ws;
+                async () => {
+                    let ws = {
+                        originalSend: WebSocket.prototype.send,
+                        isClosed: false,
+                        closeCode: 0,
+                        allSockets: []
+                    };
+                    window.wsMock = ws;
 
-                        window.wsConstructor = (url) => {
-                            let createdWs = new window.originalWs(url);
-                            ws.allSockets.push(createdWs);
-                            if (ws.isClosed) {
-                                createdWs.dispatchEvent(
-                                    new CloseEvent("close", { code: ws.code })
-                                );
-                            }
-                            return createdWs;
-                        };
-                    }
+                    window.wsConstructor = (url) => {
+                        let createdWs = new window.originalWs(url);
+                        ws.allSockets.push(createdWs);
+                        if (ws.isClosed) {
+                            createdWs.dispatchEvent(
+                                new CloseEvent("close", { code: ws.code })
+                            );
+                        }
+                        return createdWs;
+                    };
+                }
                 "#,
                 [],
             ))
             .await
+            .map(drop)
             .unwrap();
     }
 
@@ -53,20 +55,21 @@ impl<'a> WebSocket<'a> {
             .execute(Statement::new(
                 // language=JavaScript
                 r#"
-                    async () => {
-                        const [code] = args;
-                        for (socket of window.wsMock.allSockets) {
-                            window.wsMock.isClosed = true;
-                            window.wsMock.closeCode = code;
-                            socket.dispatchEvent(
-                                new CloseEvent("close", { code: code })
-                            );
-                        }
+                async () => {
+                    const [code] = args;
+                    for (socket of window.wsMock.allSockets) {
+                        window.wsMock.isClosed = true;
+                        window.wsMock.closeCode = code;
+                        socket.dispatchEvent(
+                            new CloseEvent("close", { code: code })
+                        );
                     }
+                }
                 "#,
                 [code.into()],
             ))
             .await
+            .map(drop)
             .unwrap();
     }
 
@@ -83,14 +86,15 @@ impl<'a> WebSocket<'a> {
             .execute(Statement::new(
                 // language=JavaScript
                 r#"
-                    async () => {
-                        window.wsMock.isClosed = false;
-                        window.wsMock.closeCode = 0;
-                    }
+                async () => {
+                    window.wsMock.isClosed = false;
+                    window.wsMock.closeCode = 0;
+                }
                 "#,
                 [],
             ))
             .await
+            .map(drop)
             .unwrap();
     }
 }

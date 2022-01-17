@@ -2,8 +2,6 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#device-info
 
-use std::convert::{TryFrom, TryInto};
-
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -89,6 +87,7 @@ impl InputDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         Option::try_from(unsafe {
@@ -102,6 +101,7 @@ impl TryFrom<DartHandle> for InputDeviceInfo {
     type Error = NotInput;
 
     fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
+        #[allow(clippy::map_err_ignore)]
         let kind = unsafe { input_device_info::kind(value.get()) }
             .try_into()
             .map_err(|_| NotInput)?;
@@ -116,4 +116,5 @@ impl TryFrom<DartHandle> for InputDeviceInfo {
 /// Error of a [MediaDeviceInfo][0] representing not an input device.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
+#[derive(Clone, Copy, Debug)]
 pub struct NotInput;

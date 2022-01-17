@@ -22,6 +22,7 @@ pub type Local = TracksStore<LocalTrack>;
 pub type Remote = TracksStore<RemoteTrack>;
 
 /// Store for [`LocalTrack`]s or [`RemoteTrack`]s.
+#[derive(Debug)]
 pub struct TracksStore<T>(PhantomData<T>);
 
 impl<T> Object<TracksStore<T>> {
@@ -99,15 +100,14 @@ impl<T> Object<TracksStore<T>> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (store) => {{
-                        return {{
-                            store: store,
-                            kind: {kind},
-                            sourceKind: {source_kind}
-                        }};
-                    }}
+                async (store) => {{
+                    return {{
+                        store: store,
+                        kind: {kind},
+                        sourceKind: {source_kind_js}
+                    }};
+                }}
                 "#,
-                source_kind = source_kind_js,
                 kind = kind.as_js()
             ),
             [],
@@ -153,13 +153,13 @@ impl<T> Object<TracksStore<T>> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (store) => {{
-                        return {{
-                            store: store,
-                            kind: {kind},
-                            sourceKind: {source_kind}
-                        }};
-                    }}
+                async (store) => {{
+                    return {{
+                        store: store,
+                        kind: {kind},
+                        sourceKind: {source_kind}
+                    }};
+                }}
                 "#,
                 source_kind = source_kind.as_js(),
                 kind = kind.as_js()
@@ -216,21 +216,19 @@ impl<T> Object<TracksStore<T>> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (store) => {{
-                        let count = 0;
-                        for (track of store.tracks) {{
-                            let t = track.track.get_track();
-                            if (t.muted == {muted} &&
-                                track.stopped == {stopped})
-                            {{
-                                count++;
-                            }}
+                async (store) => {{
+                    let count = 0;
+                    for (track of store.tracks) {{
+                        let t = track.track.get_track();
+                        if (t.muted == {muted} &&
+                            track.stopped == {stopped})
+                        {{
+                            count++;
                         }}
-                        return count;
                     }}
+                    return count;
+                }}
                 "#,
-                muted = muted,
-                stopped = stopped
             ),
             [],
         ))

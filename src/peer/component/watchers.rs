@@ -44,7 +44,6 @@ impl Component {
     ///
     /// Calls [`PeerConnection::add_ice_candidate()`] with the pushed
     /// [`IceCandidate`].
-    #[inline]
     #[watch(self.ice_candidates.on_add())]
     async fn ice_candidate_added(
         peer: Rc<PeerConnection>,
@@ -101,7 +100,6 @@ impl Component {
     /// Watcher for the [`State::senders`] remove update.
     ///
     /// Removes a [`sender::Component`] from the [`PeerConnection`].
-    #[inline]
     #[watch(self.senders.on_remove())]
     async fn sender_removed(
         peer: Rc<PeerConnection>,
@@ -116,7 +114,6 @@ impl Component {
     /// Watcher for the [`State::receivers`] remove update.
     ///
     /// Removes a [`receiver::Component`] from the [`PeerConnection`].
-    #[inline]
     #[watch(self.receivers.on_remove())]
     async fn receiver_removed(
         peer: Rc<PeerConnection>,
@@ -259,7 +256,8 @@ impl Component {
                         let mids = peer
                             .get_mids()
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        peer.peer_events_sender
+                        let _ = peer
+                            .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpOffer {
                                 peer_id: peer.id(),
                                 sdp_offer: sdp,
@@ -279,7 +277,8 @@ impl Component {
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
                         peer.media_connections.sync_receivers().await;
-                        peer.peer_events_sender
+                        let _ = peer
+                            .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpAnswer {
                                 peer_id: peer.id(),
                                 sdp_answer: sdp,
@@ -381,7 +380,8 @@ impl Component {
                     }
                 }
             }
-            _ => (),
+            NegotiationState::WaitLocalSdpApprove
+            | NegotiationState::WaitRemoteSdp => (),
         }
         Ok(())
     }
@@ -444,14 +444,13 @@ impl Component {
     ///
     /// Sends [`PeerConnection`]'s connection state and ICE connection state to
     /// the server.
-    #[inline]
     #[watch(self.sync_state.subscribe().skip(1))]
     async fn sync_state_changed(
         peer: Rc<PeerConnection>,
         _: Rc<State>,
         sync_state: SyncState,
     ) -> Result<(), Infallible> {
-        if let SyncState::Synced = sync_state {
+        if sync_state == SyncState::Synced {
             peer.send_current_connection_states();
         }
         Ok(())

@@ -22,23 +22,53 @@ use super::TransceiverSide;
 #[doc(inline)]
 pub use self::component::{Component, State};
 
-/// Representation of a remote [`remote::Track`] that is being received from
-/// some remote peer. It may have two states: `waiting` and `receiving`.
+/// Representation of a [`remote::Track`] that is being received from some
+/// remote peer. It may have two states: `waiting` and `receiving`.
 ///
 /// We can save related [`platform::Transceiver`] and the actual
 /// [`remote::Track`] only when [`remote::Track`] data arrives.
+#[derive(Debug)]
 pub struct Receiver {
+    /// ID of this [`remote::Track`].
     track_id: TrackId,
+
+    /// Constraints of this [`remote::Track`].
     caps: TrackConstraints,
+
+    /// ID of the member sending this [`remote::Track`].
     sender_id: MemberId,
+
+    /// [`Transceiver`] associated with this [`remote::Track`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
     transceiver: RefCell<Option<platform::Transceiver>>,
+
+    /// [MID] of the associated [`Transceiver`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
+    /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: RefCell<Option<String>>,
+
+    /// Actual [`remote::Track`] represented by this [`Receiver`].
     track: RefCell<Option<remote::Track>>,
+
+    /// Indicator whether the actual [`remote::Track`] is updated with the
+    /// current [`Receiver`]'s state.
     is_track_notified: Cell<bool>,
+
+    /// Indicator whether this [`remote::Track`] is enabled generally.
     enabled_general: Cell<bool>,
+
+    /// Indicator whether this [`remote::Track`] is enabled individually.
     enabled_individual: Cell<bool>,
+
+    /// Indicator whether this [`remote::Track`] is muted.
     muted: Cell<bool>,
+
+    /// Channel for sending [`PeerEvent`]s to the remote peer.
     peer_events_sender: mpsc::UnboundedSender<PeerEvent>,
+
+    /// Channel for sending [`TrackEvent`]s to the actual [`remote::Track`].
     track_events_sender: mpsc::UnboundedSender<TrackEvent>,
 }
 
@@ -62,7 +92,7 @@ impl Receiver {
         track_events_sender: mpsc::UnboundedSender<TrackEvent>,
         recv_constraints: &RecvConstraints,
     ) -> Self {
-        let caps = TrackConstraints::from(state.media_type().clone());
+        let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
         let transceiver_direction = if state.enabled_individual() {
             platform::TransceiverDirection::RECV
@@ -84,8 +114,8 @@ impl Receiver {
                 })
                 .map(utils::component::Component::obj);
 
-            if let Some(sender) = sender {
-                let trnsvr = sender.transceiver();
+            if let Some(s) = sender {
+                let trnsvr = s.transceiver();
                 trnsvr.add_direction(transceiver_direction).await;
 
                 Some(trnsvr)
@@ -131,7 +161,6 @@ impl Receiver {
     }
 
     /// Returns [`TrackConstraints`] of this [`Receiver`].
-    #[inline]
     #[must_use]
     pub fn caps(&self) -> &TrackConstraints {
         &self.caps
@@ -146,7 +175,7 @@ impl Receiver {
             if let Some(transceiver) =
                 self.transceiver.borrow().as_ref().cloned()
             {
-                self.mid.replace(Some(transceiver.mid()?));
+                drop(self.mid.replace(Some(transceiver.mid()?)));
             }
         }
         self.mid.borrow().clone()
@@ -215,7 +244,7 @@ impl Receiver {
                 .await;
         }
 
-        self.transceiver.replace(Some(transceiver));
+        drop(self.transceiver.replace(Some(transceiver)));
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop();
         };
@@ -232,7 +261,7 @@ impl Receiver {
     /// exists in this [`Receiver`].
     pub fn replace_transceiver(&self, transceiver: platform::Transceiver) {
         if self.mid.borrow().as_ref() == transceiver.mid().as_ref() {
-            self.transceiver.replace(Some(transceiver));
+            drop(self.transceiver.replace(Some(transceiver)));
         }
     }
 
@@ -240,7 +269,6 @@ impl Receiver {
     ///
     /// Returns [`None`] if this [`Receiver`] doesn't have a
     /// [`platform::Transceiver`].
-    #[inline]
     pub fn transceiver(&self) -> Option<platform::Transceiver> {
         self.transceiver.borrow().clone()
     }
@@ -269,7 +297,6 @@ impl Receiver {
 #[cfg(feature = "mockable")]
 impl Receiver {
     /// Returns current `enabled_general` status of the [`Receiver`].
-    #[inline]
     #[must_use]
     pub fn enabled_general(&self) -> bool {
         self.enabled_general.get()

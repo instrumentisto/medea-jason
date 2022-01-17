@@ -1,9 +1,9 @@
 use std::time::Duration;
 
-use cucumber_rust::{then, when};
+use cucumber::{then, when};
 use medea_e2e::object::AwaitCompletion;
 
-use crate::world::World;
+use crate::World;
 
 use super::{parse_media_kind, parse_media_kinds};
 

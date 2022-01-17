@@ -5,6 +5,7 @@ use crate::{browser::Statement, object::Object};
 use super::Error;
 
 /// Representation of a `LocalMediaTrack` object.
+#[derive(Clone, Copy, Debug)]
 pub struct LocalTrack;
 
 impl Object<LocalTrack> {
@@ -18,11 +19,11 @@ impl Object<LocalTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    let sysTrack = track.track.get_track();
-                    track.track.free();
-                    return sysTrack.readyState === "ended";
-                }
+            async (track) => {
+                let sysTrack = track.track.get_track();
+                track.track.free();
+                return sysTrack.readyState === "ended";
+            }
             "#,
             [],
         ))

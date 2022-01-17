@@ -2,8 +2,6 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::convert::TryFrom;
-
 use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
@@ -119,7 +117,6 @@ impl MediaStreamTrack {
     /// Returns [ID][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
-    #[inline]
     #[must_use]
     pub fn id(&self) -> String {
         unsafe { c_str_into_string(media_stream_track::id(self.0.get())) }
@@ -149,6 +146,7 @@ impl MediaStreamTrack {
     /// Returns [facing mode][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-facingmode
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
         Option::<i64>::try_from(unsafe {
@@ -163,7 +161,7 @@ impl MediaStreamTrack {
     /// Returns [height][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
-    #[inline]
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
         Option::try_from(unsafe {
@@ -175,7 +173,7 @@ impl MediaStreamTrack {
     /// Returns [width][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-width
-    #[inline]
+    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
         Option::try_from(unsafe {
@@ -196,7 +194,6 @@ impl MediaStreamTrack {
     /// Sets [enabled][1] field of this [`MediaStreamTrack`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
-    #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         unsafe {
             media_stream_track::set_enabled(self.0.get(), enabled);

@@ -1,9 +1,9 @@
 [package]
 name = "medea-reactive"
 version = "0.1.2-dev"
-edition = "2018"
-resolver = "2"
-description = "Reactive mutable data containers"
+edition = "2021"
+rust-version = "1.56"
+description = "Reactive mutable data containers."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"
 documentation = "https://docs.rs/medea-reactive"
@@ -16,6 +16,5 @@ categories = ["asynchronous", "data-structures"]
 [dependencies]
 futures = "0.3"
 
-[dev-dependencies.tokio]
-    version = "1.5"
-    features = ["macros", "rt", "test-util", "time"]
+[dev-dependencies]
+tokio = { version = "1.5", features = ["macros", "rt", "test-util", "time"] }

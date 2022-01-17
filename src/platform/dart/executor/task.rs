@@ -2,6 +2,7 @@
 
 use std::{
     cell::{Cell, RefCell},
+    fmt,
     mem::ManuallyDrop,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
@@ -20,8 +21,17 @@ struct Inner {
     waker: Waker,
 }
 
+impl fmt::Debug for Inner {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Inner")
+            .field("waker", &self.waker)
+            .finish_non_exhaustive()
+    }
+}
+
 /// Wrapper for a [`Future`] that can be polled by an external single threaded
 /// Dart executor.
+#[derive(Debug)]
 pub struct Task {
     /// [`Task`]'s inner data containing an actual [`Future`] and its
     /// [`Waker`]. Dropped on the [`Task`] completion.
@@ -41,10 +51,10 @@ impl Task {
         });
 
         let waker =
-            unsafe { Waker::from_raw(Task::into_raw_waker(Rc::clone(&this))) };
-        this.inner.borrow_mut().replace(Inner { future, waker });
+            unsafe { Waker::from_raw(Self::into_raw_waker(Rc::clone(&this))) };
+        drop(this.inner.borrow_mut().replace(Inner { future, waker }));
 
-        Task::wake_by_ref(&this);
+        Self::wake_by_ref(&this);
     }
 
     /// Polls the underlying [`Future`].
@@ -85,10 +95,12 @@ impl Task {
     /// Pretty much a copy of [`std::task::Wake`] implementation but for
     /// `Rc<?Send + ?Sync>` instead of `Arc<Send + Sync>` since we are sure
     /// that everything will run on a single thread.
-    #[inline(always)]
     fn into_raw_waker(this: Rc<Self>) -> RawWaker {
+        #![allow(clippy::missing_docs_in_private_items)]
+
         // Refer to `RawWakerVTable::new()` documentation for better
-        // understanding of what following functions do.
+        // understanding of what the following functions do.
+
         unsafe fn raw_clone(ptr: *const ()) -> RawWaker {
             let ptr = ManuallyDrop::new(Rc::from_raw(ptr.cast::<Task>()));
             Task::into_raw_waker(Rc::clone(&(*ptr)))

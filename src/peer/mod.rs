@@ -11,7 +11,6 @@ mod tracks_request;
 use std::{
     cell::{Cell, RefCell},
     collections::{hash_map::DefaultHasher, HashMap},
-    convert::TryFrom as _,
     hash::{Hash, Hasher},
     rc::Rc,
 };
@@ -69,7 +68,7 @@ pub enum UpdateLocalStreamError {
 ///
 /// [`Receiver`]: crate::peer::receiver::Receiver
 /// [`Sender`]: crate::peer::sender::Sender
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum TrackEvent {
     /// Intention of the `MediaTrack` to mute/unmute himself.
     MuteUpdateIntention {
@@ -106,7 +105,7 @@ pub enum LocalMediaError {
 
 /// Events emitted from [`platform::RtcPeerConnection`].
 #[dispatchable(self: &Self, async_trait(?Send))]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum PeerEvent {
     /// [`platform::RtcPeerConnection`] discovered new ICE candidate.
     ///
@@ -237,6 +236,7 @@ pub enum PeerEvent {
 }
 
 /// High-level wrapper around a [`platform::RtcPeerConnection`].
+#[derive(Debug)]
 pub struct PeerConnection {
     /// Unique ID of [`PeerConnection`].
     id: Id,
@@ -327,7 +327,7 @@ impl PeerConnection {
 
             async move {
                 while let Some(e) = track_events_rx.next().await {
-                    Self::handle_track_event(peer_id, &peer_events_sender, &e);
+                    Self::handle_track_event(peer_id, &peer_events_sender, e);
                 }
             }
         });
@@ -348,50 +348,60 @@ impl PeerConnection {
         };
 
         // Bind to `icecandidate` event.
-        let id = peer.id;
-        let sender = peer.peer_events_sender.clone();
-        peer.peer.on_ice_candidate(Some(move |candidate| {
-            Self::on_ice_candidate(id, &sender, candidate);
-        }));
+        {
+            let id = peer.id;
+            let sender = peer.peer_events_sender.clone();
+            peer.peer.on_ice_candidate(Some(move |candidate| {
+                Self::on_ice_candidate(id, &sender, candidate);
+            }));
+        }
 
         // Bind to `iceconnectionstatechange` event.
-        let id = peer.id;
-        let sender = peer.peer_events_sender.clone();
-        peer.peer.on_ice_connection_state_change(Some(
-            move |ice_connection_state| {
-                Self::on_ice_connection_state_changed(
-                    id,
-                    &sender,
-                    ice_connection_state,
-                );
-            },
-        ));
+        {
+            let id = peer.id;
+            let sender = peer.peer_events_sender.clone();
+            peer.peer.on_ice_connection_state_change(Some(
+                move |ice_connection_state| {
+                    Self::on_ice_connection_state_changed(
+                        id,
+                        &sender,
+                        ice_connection_state,
+                    );
+                },
+            ));
+        }
 
         // Bind to `connectionstatechange` event.
-        let id = peer.id;
-        let sender = peer.peer_events_sender.clone();
-        peer.peer.on_connection_state_change(Some(
-            move |peer_connection_state| {
-                Self::on_connection_state_changed(
-                    id,
-                    &sender,
-                    peer_connection_state,
-                );
-            },
-        ));
+        {
+            let id = peer.id;
+            let sender = peer.peer_events_sender.clone();
+            peer.peer.on_connection_state_change(Some(
+                move |peer_connection_state| {
+                    Self::on_connection_state_changed(
+                        id,
+                        &sender,
+                        peer_connection_state,
+                    );
+                },
+            ));
+        }
 
         // Bind to `track` event.
-        let media_connections = Rc::clone(&peer.media_connections);
-        peer.peer.on_track(Some(move |track, transceiver| {
-            let media_connections = Rc::clone(&media_connections);
-            platform::spawn(async move {
-                if let Err(mid) =
-                    media_connections.add_remote_track(track, transceiver).await
-                {
-                    log::error!("Cannot add new remote track with mid={}", mid);
-                };
-            });
-        }));
+        {
+            let media_conns = Rc::clone(&peer.media_connections);
+            peer.peer.on_track(Some(move |track, transceiver| {
+                let media_conns = Rc::clone(&media_conns);
+                platform::spawn(async move {
+                    if let Err(mid) =
+                        media_conns.add_remote_track(track, transceiver).await
+                    {
+                        log::error!(
+                            "Cannot add new remote track with mid={mid}",
+                        );
+                    };
+                });
+            }));
+        }
 
         Ok(Rc::new(peer))
     }
@@ -407,26 +417,26 @@ impl PeerConnection {
     fn handle_track_event(
         peer_id: PeerId,
         peer_events_sender: &mpsc::UnboundedSender<PeerEvent>,
-        event: &TrackEvent,
+        event: TrackEvent,
     ) {
         let patch = match event {
             TrackEvent::MediaExchangeIntention { id, enabled } => {
                 TrackPatchCommand {
-                    id: *id,
+                    id,
                     muted: None,
-                    enabled: Some(*enabled),
+                    enabled: Some(enabled),
                 }
             }
             TrackEvent::MuteUpdateIntention { id, muted } => {
                 TrackPatchCommand {
-                    id: *id,
-                    muted: Some(*muted),
+                    id,
+                    muted: Some(muted),
                     enabled: None,
                 }
             }
         };
 
-        peer_events_sender
+        let _ = peer_events_sender
             .unbounded_send(PeerEvent::MediaUpdateCommand {
                 command: Command::UpdateTracks {
                     peer_id,
@@ -440,7 +450,6 @@ impl PeerConnection {
     /// [`LocalStreamUpdateCriteria`] and don't have [`local::Track`].
     ///
     /// [`Sender`]: sender::Sender
-    #[inline]
     #[must_use]
     pub fn get_senders_without_tracks_ids(
         &self,
@@ -453,7 +462,6 @@ impl PeerConnection {
     /// [`LocalStreamUpdateCriteria`].
     ///
     /// [`Sender`]: sender::Sender
-    #[inline]
     pub async fn drop_send_tracks(&self, kinds: LocalStreamUpdateCriteria) {
         self.media_connections.drop_send_tracks(kinds).await;
     }
@@ -480,7 +488,7 @@ impl PeerConnection {
                             true
                         }
                     } else {
-                        stats_cache.insert(stat.id.clone(), stat_hash);
+                        let _ = stats_cache.insert(stat.id.clone(), stat_hash);
                         true
                     }
                 })
@@ -502,14 +510,13 @@ impl PeerConnection {
     pub async fn scrape_and_send_peer_stats(&self) {
         match self.peer.get_stats().await {
             Ok(stats) => self.send_peer_stats(stats),
-            Err(e) => log::error!("{}", e),
+            Err(e) => log::error!("{e}"),
         };
     }
 
     /// Indicates whether all [`TransceiverSide`]s with the provided
     /// [`MediaKind`], [`TrackDirection`] and [`MediaSourceKind`] are in the
     /// provided [`MediaState`].
-    #[inline]
     #[must_use]
     pub fn is_all_transceiver_sides_in_media_state(
         &self,
@@ -527,7 +534,6 @@ impl PeerConnection {
     }
 
     /// Returns [`PeerId`] of this [`PeerConnection`].
-    #[inline]
     pub fn id(&self) -> PeerId {
         self.id
     }
@@ -565,7 +571,6 @@ impl PeerConnection {
     /// Handles `connectionstatechange` event from the underlying peer emitting
     /// [`PeerEvent::ConnectionStateChanged`] event into this peers
     /// `peer_events_sender`.
-    #[inline]
     fn on_connection_state_changed(
         peer_id: Id,
         sender: &mpsc::UnboundedSender<PeerEvent>,
@@ -605,7 +610,6 @@ impl PeerConnection {
 
     /// Returns all [`TransceiverSide`]s from this [`PeerConnection`] with
     /// provided [`MediaKind`], [`TrackDirection`] and [`MediaSourceKind`].
-    #[inline]
     pub fn get_transceivers_sides(
         &self,
         kind: MediaKind,
@@ -631,7 +635,6 @@ impl PeerConnection {
     ///
     /// [1]: https://tools.ietf.org/html/rfc4566#section-5.14
     /// [2]: https://w3.org/TR/webrtc/#rtcrtptransceiver-interface
-    #[inline]
     fn get_mids(
         &self,
     ) -> Result<HashMap<TrackId, String>, Traced<GetMidsError>> {
@@ -721,8 +724,8 @@ impl PeerConnection {
         source_kind: Option<MediaSourceKind>,
     ) -> Result<Option<MediaStreamSettings>, Traced<TracksRequestError>> {
         let mut criteria = LocalStreamUpdateCriteria::empty();
-        if let Some(source_kind) = source_kind {
-            criteria.add(kind, source_kind);
+        if let Some(msk) = source_kind {
+            criteria.add(kind, msk);
         } else {
             criteria.add(kind, MediaSourceKind::Device);
             criteria.add(kind, MediaSourceKind::Display);
@@ -730,7 +733,7 @@ impl PeerConnection {
 
         self.get_simple_tracks_request(criteria)
             .map_err(tracerr::map_from_and_wrap!())
-            .map(|s| s.map(|s| MediaStreamSettings::from(&s)))
+            .map(|opt| opt.map(|s| MediaStreamSettings::from(&s)))
     }
 
     /// Returns [`SimpleTracksRequest`] for the provided
@@ -896,6 +899,7 @@ impl PeerConnection {
         );
         ice_candidates_buffer_flush_fut
             .await
+            .map(drop)
             .map_err(tracerr::map_from_and_wrap!())?;
 
         Ok(())
@@ -937,7 +941,6 @@ impl PeerConnection {
 
     /// Removes a [`sender::Component`] and a [`receiver::Component`] with the
     /// provided [`TrackId`] from this [`PeerConnection`].
-    #[inline]
     pub fn remove_track(&self, track_id: TrackId) {
         self.media_connections.remove_track(track_id);
     }
@@ -958,28 +961,24 @@ impl PeerConnection {
     }
 
     /// Indicates whether all [`Receiver`]s audio tracks are enabled.
-    #[inline]
     #[must_use]
     pub fn is_recv_audio_enabled(&self) -> bool {
         self.media_connections.is_recv_audio_enabled()
     }
 
     /// Indicates whether all [`Receiver`]s video tracks are enabled.
-    #[inline]
     #[must_use]
     pub fn is_recv_video_enabled(&self) -> bool {
         self.media_connections.is_recv_video_enabled()
     }
 
     /// Returns inner [`IceCandidate`]'s buffer length. Used in tests.
-    #[inline]
     #[must_use]
     pub fn candidates_buffer_len(&self) -> usize {
         self.ice_candidates_buffer.borrow().len()
     }
 
     /// Lookups [`Sender`] by provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_sender_by_id(
         &self,
@@ -989,7 +988,6 @@ impl PeerConnection {
     }
 
     /// Lookups [`media::sender::State`] by the provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_sender_state_by_id(
         &self,
@@ -999,14 +997,12 @@ impl PeerConnection {
     }
 
     /// Indicates whether all [`Sender`]s audio tracks are enabled.
-    #[inline]
     #[must_use]
     pub fn is_send_audio_enabled(&self) -> bool {
         self.media_connections.is_send_audio_enabled()
     }
 
     /// Indicates whether all [`Sender`]s video tracks are enabled.
-    #[inline]
     #[must_use]
     pub fn is_send_video_enabled(
         &self,
@@ -1016,7 +1012,6 @@ impl PeerConnection {
     }
 
     /// Indicates whether all [`Sender`]s video tracks are unmuted.
-    #[inline]
     #[must_use]
     pub fn is_send_video_unmuted(
         &self,
@@ -1026,7 +1021,6 @@ impl PeerConnection {
     }
 
     /// Indicates whether all [`Sender`]s audio tracks are unmuted.
-    #[inline]
     #[must_use]
     pub fn is_send_audio_unmuted(&self) -> bool {
         self.media_connections.is_send_audio_unmuted()
@@ -1034,7 +1028,6 @@ impl PeerConnection {
 
     /// Returns all [`local::Track`]s from [`PeerConnection`]'s
     /// [`Transceiver`]s.
-    #[inline]
     #[must_use]
     pub fn get_send_tracks(&self) -> Vec<Rc<local::Track>> {
         self.media_connections
@@ -1045,7 +1038,6 @@ impl PeerConnection {
     }
 
     /// Returns [`Rc`] to the [`Receiver`] with the provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_receiver_by_id(
         &self,

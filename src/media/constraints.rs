@@ -53,6 +53,7 @@ pub struct LocalTracksConstraints(Rc<RefCell<MediaStreamSettings>>);
 
 /// Constraints to the media received from remote. Used to disable or enable
 /// media receiving.
+#[derive(Debug)]
 pub struct RecvConstraints {
     /// Is audio receiving enabled.
     is_audio_enabled: Cell<bool>,
@@ -84,13 +85,11 @@ impl RecvConstraints {
     }
 
     /// Returns is audio receiving enabled.
-    #[inline]
     pub fn is_audio_enabled(&self) -> bool {
         self.is_audio_enabled.get()
     }
 
     /// Returns is video receiving enabled.
-    #[inline]
     pub fn is_video_enabled(&self) -> bool {
         self.is_video_enabled.get()
     }
@@ -98,7 +97,6 @@ impl RecvConstraints {
 
 #[cfg(feature = "mockable")]
 impl From<MediaStreamSettings> for LocalTracksConstraints {
-    #[inline]
     fn from(from: MediaStreamSettings) -> Self {
         Self(Rc::new(RefCell::new(from)))
     }
@@ -108,7 +106,6 @@ impl LocalTracksConstraints {
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided
     /// [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
     pub fn calculate_kinds_diff(
         &self,
@@ -119,13 +116,11 @@ impl LocalTracksConstraints {
 
     /// Constrains the underlying [`MediaStreamSettings`] with the given `other`
     /// [`MediaStreamSettings`].
-    #[inline]
     pub fn constrain(&self, other: MediaStreamSettings) {
         self.0.borrow_mut().constrain(other);
     }
 
     /// Clones the underlying [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
     pub fn inner(&self) -> MediaStreamSettings {
         self.0.borrow().clone()
@@ -133,7 +128,6 @@ impl LocalTracksConstraints {
 
     /// Changes the underlying [`MediaStreamSettings`] basing on the provided
     /// [`MediaState`].
-    #[inline]
     pub fn set_media_state(
         &self,
         state: MediaState,
@@ -147,7 +141,6 @@ impl LocalTracksConstraints {
 
     /// Enables/disables provided [`LocalStreamUpdateCriteria`] based on
     /// provided [`media_exchange_state`].
-    #[inline]
     pub fn set_media_exchange_state_by_kinds(
         &self,
         state: media_exchange_state::Stable,
@@ -160,23 +153,20 @@ impl LocalTracksConstraints {
 
     /// Indicates whether provided [`MediaType`] is enabled in the underlying
     /// [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
-    pub fn enabled(&self, kind: &MediaType) -> bool {
+    pub fn enabled(&self, kind: MediaType) -> bool {
         self.0.borrow().enabled(kind)
     }
 
     /// Indicates whether provided [`MediaType`] is muted in the underlying
     /// [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
-    pub fn muted(&self, kind: &MediaType) -> bool {
+    pub fn muted(&self, kind: MediaType) -> bool {
         self.0.borrow().muted(kind)
     }
 
     /// Indicates whether provided [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`LocalTracksConstraints`].
-    #[inline]
     #[must_use]
     pub fn is_track_enabled(
         &self,
@@ -204,7 +194,6 @@ pub struct AudioMediaTracksSettings {
 }
 
 impl Default for AudioMediaTracksSettings {
-    #[inline]
     fn default() -> Self {
         Self {
             constraints: AudioTrackConstraints::default(),
@@ -216,8 +205,6 @@ impl Default for AudioMediaTracksSettings {
 
 /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies any
 /// constraints with the provided [`MediaKind`].
-#[inline]
-#[must_use]
 fn satisfies_track(
     track: &platform::MediaStreamTrack,
     kind: MediaKind,
@@ -265,34 +252,29 @@ impl<C> VideoTrackConstraints<C> {
     /// [`Room`] and constrained with [`VideoTrackConstraints::constraints`].
     ///
     /// [`Room`]: crate::room::Room
-    #[inline]
     fn enabled(&self) -> bool {
         self.enabled && self.is_constrained()
     }
 
     /// Sets these [`VideoTrackConstraints::constraints`] to the provided
     /// `cons`.
-    #[inline]
     fn set(&mut self, cons: C) {
         self.constraints = Some(cons);
     }
 
     /// Resets these [`VideoTrackConstraints::constraints`] to [`None`].
-    #[inline]
     fn unconstrain(&mut self) {
-        self.constraints.take();
+        drop(self.constraints.take());
     }
 
     /// Returns `true` if these [`VideoTrackConstraints::constraints`] are set
     /// to [`Some`] value.
-    #[inline]
     fn is_constrained(&self) -> bool {
         self.constraints.is_some()
     }
 
     /// Constraints these [`VideoTrackConstraints`] with a provided `other`
     /// [`VideoTrackConstraints`].
-    #[inline]
     fn constrain(&mut self, other: Self) {
         self.enabled &= other.enabled;
         self.constraints = other.constraints;
@@ -305,7 +287,6 @@ impl VideoTrackConstraints<DeviceVideoTrackConstraints> {
     ///
     /// Returns `false` if these [`VideoTrackConstraints`] don't have any
     /// constraints configured.
-    #[inline]
     #[must_use]
     pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -324,7 +305,6 @@ impl VideoTrackConstraints<DisplayVideoTrackConstraints> {
     ///
     /// Returns `false` if these [`VideoTrackConstraints`] don't have any
     /// constraints configured.
-    #[inline]
     #[must_use]
     pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -360,7 +340,6 @@ pub struct MediaStreamSettings {
 
 impl MediaStreamSettings {
     /// Creates new [`MediaStreamSettings`] with none constraints configured.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -384,7 +363,6 @@ impl MediaStreamSettings {
 
     /// Specifies the nature and settings of the audio
     /// [`platform::MediaStreamTrack`].
-    #[inline]
     pub fn audio(&mut self, constraints: AudioTrackConstraints) {
         self.audio.enabled = true;
         self.audio.constraints = constraints;
@@ -392,14 +370,12 @@ impl MediaStreamSettings {
 
     /// Set constraints that will be used to obtain local video sourced from
     /// media device.
-    #[inline]
     pub fn device_video(&mut self, constraints: DeviceVideoTrackConstraints) {
         self.device_video.set(constraints);
     }
 
     /// Set constraints that will be used to capture local video from user
     /// display.
-    #[inline]
     pub fn display_video(&mut self, constraints: DisplayVideoTrackConstraints) {
         self.display_video.set(constraints);
     }
@@ -450,7 +426,6 @@ impl MediaStreamSettings {
     }
 
     /// Returns only audio constraints.
-    #[inline]
     #[must_use]
     pub fn get_audio(&self) -> &AudioTrackConstraints {
         &self.audio.constraints
@@ -460,7 +435,6 @@ impl MediaStreamSettings {
     /// [`MediaStreamSettings`].
     ///
     /// Returns [`None`] if [`DisplayVideoTrackConstraints`] is unconstrained.
-    #[inline]
     #[must_use]
     pub fn get_display_video(&self) -> Option<&DisplayVideoTrackConstraints> {
         self.display_video.constraints.as_ref()
@@ -470,7 +444,6 @@ impl MediaStreamSettings {
     /// [`MediaStreamSettings`].
     ///
     /// Returns [`None`] if [`DeviceVideoTrackConstraints`] is unconstrained.
-    #[inline]
     #[must_use]
     pub fn get_device_video(&self) -> Option<&DeviceVideoTrackConstraints> {
         self.device_video.constraints.as_ref()
@@ -481,7 +454,6 @@ impl MediaStreamSettings {
     ///
     /// If some type of the [`MediaStreamSettings`] is disabled, then this kind
     /// of media won't be published.
-    #[inline]
     pub fn set_track_media_state(
         &mut self,
         state: MediaState,
@@ -518,7 +490,6 @@ impl MediaStreamSettings {
 
     /// Enables/disables provided [`LocalStreamUpdateCriteria`] based on
     /// provided [`media_exchange_state`].
-    #[inline]
     pub fn set_media_exchange_state_by_kinds(
         &mut self,
         state: media_exchange_state::Stable,
@@ -565,14 +536,12 @@ impl MediaStreamSettings {
 
     /// Sets the underlying `enabled` field of these
     /// [`AudioMediaTracksSettings`] to the given value.
-    #[inline]
     pub fn set_audio_publish(&mut self, enabled: bool) {
         self.audio.enabled = enabled;
     }
 
     /// Sets the underlying [`VideoTrackConstraints`] basing on the provided
     /// [`MediaSourceKind`] to the given value.
-    #[inline]
     pub fn set_video_publish(
         &mut self,
         enabled: bool,
@@ -593,7 +562,6 @@ impl MediaStreamSettings {
     }
 
     /// Indicates whether audio is enabled in this [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
     pub fn is_audio_enabled(&self) -> bool {
         self.audio.enabled
@@ -601,7 +569,6 @@ impl MediaStreamSettings {
 
     /// Returns `true` if [`DeviceVideoTrackConstraints`] are currently
     /// constrained and enabled.
-    #[inline]
     #[must_use]
     pub fn is_device_video_enabled(&self) -> bool {
         self.device_video.enabled()
@@ -609,7 +576,6 @@ impl MediaStreamSettings {
 
     /// Returns `true` if [`DisplayVideoTrackConstraints`] are currently
     /// constrained and enabled.
-    #[inline]
     #[must_use]
     pub fn is_display_video_enabled(&self) -> bool {
         self.display_video.enabled()
@@ -617,9 +583,8 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
-    pub fn enabled(&self, kind: &MediaType) -> bool {
+    pub fn enabled(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => {
                 self.is_track_enabled(MediaKind::Video, video.source_kind)
@@ -632,9 +597,8 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
-    pub fn muted(&self, kind: &MediaType) -> bool {
+    pub fn muted(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => match video.source_kind {
                 MediaSourceKind::Device => self.device_video.muted,
@@ -646,7 +610,6 @@ impl MediaStreamSettings {
 
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`MediaStreamSettings`].
-    #[inline]
     #[must_use]
     pub fn is_track_enabled(
         &self,
@@ -666,7 +629,6 @@ impl MediaStreamSettings {
 
     /// Constrains this [`MediaStreamSettings`] with the given `other`
     /// [`MediaStreamSettings`].
-    #[inline]
     fn constrain(&mut self, other: Self) {
         // `&=` cause we should not enable disabled Room, but we can disable
         // enabled room.
@@ -778,7 +740,6 @@ impl VideoSource {
     ///
     /// If this [`VideoSource`] is important then without this [`VideoSource`]
     /// call session can't be started.
-    #[inline]
     #[must_use]
     pub fn required(&self) -> bool {
         match self {
@@ -789,7 +750,6 @@ impl VideoSource {
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// this [`VideoSource`].
-    #[inline]
     #[must_use]
     pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -806,7 +766,7 @@ impl From<VideoSettings> for VideoSource {
     fn from(settings: VideoSettings) -> Self {
         match settings.source_kind {
             MediaSourceKind::Device => {
-                VideoSource::Device(DeviceVideoTrackConstraints {
+                Self::Device(DeviceVideoTrackConstraints {
                     device_id: None,
                     facing_mode: None,
                     width: None,
@@ -815,7 +775,7 @@ impl From<VideoSettings> for VideoSource {
                 })
             }
             MediaSourceKind::Display => {
-                VideoSource::Display(DisplayVideoTrackConstraints {
+                Self::Display(DisplayVideoTrackConstraints {
                     required: settings.required,
                 })
             }
@@ -826,10 +786,11 @@ impl From<VideoSettings> for VideoSource {
 /// Wrapper around [MediaTrackConstraints][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#media-track-constraints
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum TrackConstraints {
     /// Audio constraints.
     Audio(AudioTrackConstraints),
+
     /// Video constraints.
     Video(VideoSource),
 }
@@ -837,7 +798,6 @@ pub enum TrackConstraints {
 impl TrackConstraints {
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// these [`TrackConstraints`].
-    #[inline]
     #[must_use]
     pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -853,7 +813,6 @@ impl TrackConstraints {
     ///
     /// If these [`TrackConstraints`] are important then without them a session
     /// call can't be started.
-    #[inline]
     #[must_use]
     pub fn required(&self) -> bool {
         match self {
@@ -863,7 +822,6 @@ impl TrackConstraints {
     }
 
     /// Returns these [`TrackConstraints`] media source kind.
-    #[inline]
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         match &self {
@@ -878,7 +836,6 @@ impl TrackConstraints {
     }
 
     /// Returns [`MediaKind`] of these [`TrackConstraints`].
-    #[inline]
     #[must_use]
     pub fn media_kind(&self) -> MediaKind {
         match &self {
@@ -889,7 +846,6 @@ impl TrackConstraints {
 }
 
 impl From<ProtoTrackConstraints> for TrackConstraints {
-    #[inline]
     fn from(caps: ProtoTrackConstraints) -> Self {
         match caps {
             ProtoTrackConstraints::Audio(audio) => Self::Audio(audio.into()),
@@ -913,7 +869,6 @@ pub struct AudioTrackConstraints {
 
 impl AudioTrackConstraints {
     /// Creates new [`AudioTrackConstraints`] with none constraints configured.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -922,14 +877,12 @@ impl AudioTrackConstraints {
     /// Sets an exact [deviceId][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
-    #[inline]
     pub fn device_id(&mut self, device_id: String) {
         self.device_id = Some(ConstrainString::Exact(device_id));
     }
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// contained constraints.
-    #[inline]
     #[must_use]
     pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -947,8 +900,7 @@ impl AudioTrackConstraints {
     /// Merges these [`AudioTrackConstraints`] with `another` ones, meaning that
     /// if some constraints are not set on these ones, then they will be applied
     /// from `another`.
-    #[inline]
-    pub fn merge(&mut self, another: AudioTrackConstraints) {
+    pub fn merge(&mut self, another: Self) {
         if self.device_id.is_none() && another.device_id.is_some() {
             self.device_id = another.device_id;
         }
@@ -961,7 +913,6 @@ impl AudioTrackConstraints {
     ///
     /// If these [`AudioTrackConstraints`] are important then without them a
     /// session call can't be started.
-    #[inline]
     #[must_use]
     pub fn required(&self) -> bool {
         self.required
@@ -969,7 +920,6 @@ impl AudioTrackConstraints {
 }
 
 impl From<ProtoAudioConstraints> for AudioTrackConstraints {
-    #[inline]
     fn from(caps: ProtoAudioConstraints) -> Self {
         Self {
             required: caps.required,
@@ -979,7 +929,6 @@ impl From<ProtoAudioConstraints> for AudioTrackConstraints {
 }
 
 impl AsRef<str> for FacingMode {
-    #[inline]
     fn as_ref(&self) -> &str {
         match self {
             FacingMode::User => "user",
@@ -1008,10 +957,11 @@ pub enum ConstrainU32 {
 }
 
 impl ConstrainU32 {
-    // It's up to `<T as Constraint>::TRACK_SETTINGS_FIELD_NAME` to guarantee
-    // that such casts are safe.
-    #[must_use]
+    /// Checks whether `this` [`ConstrainU32`] is satisfied with the given
+    /// `setting`.
     fn satisfies(this: Option<Self>, setting: Option<u32>) -> bool {
+        // It's up to `<T as Constraint>::TRACK_SETTINGS_FIELD_NAME` to
+        // guarantee that such casts are safe.
         match this {
             None | Some(ConstrainU32::Ideal(_)) => true,
             Some(ConstrainU32::Exact(exact)) => {
@@ -1040,7 +990,8 @@ pub enum ConstrainString<T> {
 }
 
 impl<T: AsRef<str>> ConstrainString<T> {
-    #[must_use]
+    /// Checks whether `this` [`ConstrainString`] is satisfied with the given
+    /// `setting`.
     fn satisfies(this: &Option<Self>, setting: &Option<T>) -> bool {
         match this {
             None | Some(ConstrainString::Ideal(_)) => true,
@@ -1079,7 +1030,6 @@ pub struct DeviceVideoTrackConstraints {
 impl DeviceVideoTrackConstraints {
     /// Creates new [`DeviceVideoTrackConstraints`] with none constraints
     /// configured.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -1088,7 +1038,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets exact [deviceId][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
-    #[inline]
     pub fn device_id(&mut self, device_id: String) {
         self.device_id = Some(ConstrainString::Exact(device_id));
     }
@@ -1096,7 +1045,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets exact [facingMode][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
-    #[inline]
     pub fn exact_facing_mode(&mut self, facing_mode: FacingMode) {
         self.facing_mode = Some(ConstrainString::Exact(facing_mode));
     }
@@ -1104,7 +1052,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets ideal [facingMode][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
-    #[inline]
     pub fn ideal_facing_mode(&mut self, facing_mode: FacingMode) {
         self.facing_mode = Some(ConstrainString::Ideal(facing_mode));
     }
@@ -1112,7 +1059,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets exact [`height`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    #[inline]
     pub fn exact_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Exact(height));
     }
@@ -1120,7 +1066,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets ideal [`height`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    #[inline]
     pub fn ideal_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Ideal(height));
     }
@@ -1128,7 +1073,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets range of [`height`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    #[inline]
     pub fn height_in_range(&mut self, min: u32, max: u32) {
         self.height = Some(ConstrainU32::Range(min, max));
     }
@@ -1136,7 +1080,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets exact [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    #[inline]
     pub fn exact_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Exact(width));
     }
@@ -1144,7 +1087,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets ideal [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    #[inline]
     pub fn ideal_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Ideal(width));
     }
@@ -1152,7 +1094,6 @@ impl DeviceVideoTrackConstraints {
     /// Sets range of [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    #[inline]
     pub fn width_in_range(&mut self, min: u32, max: u32) {
         self.width = Some(ConstrainU32::Range(min, max));
     }
@@ -1182,7 +1123,7 @@ impl DeviceVideoTrackConstraints {
     /// Merges these [`DeviceVideoTrackConstraints`] with `another` ones,
     /// meaning that if some constraints are not set on these ones, then they
     /// will be applied from `another`.
-    pub fn merge(&mut self, another: DeviceVideoTrackConstraints) {
+    pub fn merge(&mut self, another: Self) {
         if self.device_id.is_none() && another.device_id.is_some() {
             self.device_id = another.device_id;
         }
@@ -1204,7 +1145,6 @@ impl DeviceVideoTrackConstraints {
     ///
     /// If these [`DeviceVideoTrackConstraints`] are important then without them
     /// a session call can't be started.
-    #[inline]
     #[must_use]
     pub fn required(&self) -> bool {
         self.required
@@ -1212,7 +1152,7 @@ impl DeviceVideoTrackConstraints {
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct DisplayVideoTrackConstraints {
     /// Importance of this [`DisplayVideoTrackConstraints`].
     ///
@@ -1224,7 +1164,6 @@ pub struct DisplayVideoTrackConstraints {
 impl DisplayVideoTrackConstraints {
     /// Creates new [`DisplayVideoTrackConstraints`] with none constraints
     /// configured.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -1233,7 +1172,6 @@ impl DisplayVideoTrackConstraints {
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// contained [`DisplayVideoTrackConstraints`].
     #[allow(clippy::unused_self)]
-    #[inline]
     #[must_use]
     pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
@@ -1247,7 +1185,6 @@ impl DisplayVideoTrackConstraints {
     /// Merges these [`DisplayVideoTrackConstraints`] with `another` ones,
     /// meaning that if some constraints are not set on these ones, then they
     /// will be applied from `another`.
-    #[inline]
     pub fn merge(&mut self, another: &Self) {
         if !self.required && another.required {
             self.required = another.required;
@@ -1258,7 +1195,6 @@ impl DisplayVideoTrackConstraints {
     ///
     /// If these [`DisplayVideoTrackConstraints`] are important then without
     /// them a session call can't be started.
-    #[inline]
     #[must_use]
     pub fn required(&self) -> bool {
         self.required

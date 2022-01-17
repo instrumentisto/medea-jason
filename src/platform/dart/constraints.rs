@@ -46,6 +46,7 @@ mod constraints {
 /// Dart side representation of [MediaTrackConstraints][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#media-track-constraints
+#[derive(Debug)]
 pub struct MediaTrackConstraints(DartMap);
 
 impl From<MediaTrackConstraints> for Dart_Handle {
@@ -83,7 +84,6 @@ impl MediaStreamConstraints {
     /// [MediaStreamTrack][1] to these [`MediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
         unsafe {
             constraints::audio(
@@ -96,8 +96,7 @@ impl MediaStreamConstraints {
     /// Specifies the provided nature and settings of a `video`
     /// [MediaStreamTrack][1] to these [`MediaStreamConstraints`].
     ///
-    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
+    /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
         unsafe {
             constraints::video(
@@ -137,7 +136,6 @@ impl DisplayMediaStreamConstraints {
     /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
         unsafe {
             constraints::video(

@@ -28,7 +28,7 @@ use crate::{
 
 use super::Sender;
 
-/// State of the [`local::Track`] of the [`Sender`].
+/// State of a [`Sender`]'s [`local::Track`].
 ///
 /// [`PartialEq`] implementation of this state ignores
 /// [`LocalTrackState::Failed`] content.
@@ -58,7 +58,6 @@ enum LocalTrackState {
 }
 
 impl PartialEq for LocalTrackState {
-    #[inline]
     fn eq(&self, other: &Self) -> bool {
         match self {
             Self::NeedUpdate => matches!(other, Self::NeedUpdate),
@@ -75,27 +74,67 @@ pub type Component = component::Component<State, Sender>;
 /// State of the [`Component`].
 #[derive(Debug)]
 pub struct State {
+    /// ID of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     id: TrackId,
+
+    /// [MID] of the [`Sender`]'s [`Transceiver`].
+    ///
+    /// [`Transceiver`]: platform::Transceiver
+    /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
+
+    /// [`MediaType`] of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     media_type: MediaType,
+
+    /// IDs of the members the [`Sender`]'s [`local::Track`] is received by.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     receivers: Vec<MemberId>,
+
+    /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
+    /// individually.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     enabled_individual: Rc<MediaExchangeStateController>,
+
+    /// Indicator whether the [`Sender`]'s [`local::Track`] is muted.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     mute_state: Rc<MuteStateController>,
+
+    /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
+    /// generally.
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
+
+    /// [MediaStreamConstraints][1] of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     send_constraints: LocalTracksConstraints,
+
+    /// State of the [`Sender`]'s [`local::Track`].
+    ///
+    /// [`local::Track`]: crate::media::track::local::Track
     local_track_state: ObservableCell<LocalTrackState>,
+
+    /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
 
 impl AsProtoState for State {
     type Output = proto::state::Sender;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
             mid: self.mid.clone(),
-            media_type: self.media_type.clone(),
+            media_type: self.media_type,
             receivers: self.receivers.clone(),
             enabled_individual: self.enabled_individual.enabled(),
             enabled_general: self.enabled_general.get()
@@ -108,7 +147,6 @@ impl AsProtoState for State {
 impl SynchronizableState for State {
     type Input = proto::state::Sender;
 
-    #[inline]
     fn from_proto(
         input: Self::Input,
         send_constraints: &LocalTracksConstraints,
@@ -169,7 +207,6 @@ impl Updatable for State {
     /// [`mute_state`] are stabilized.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_stabilized(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             Rc::clone(&self.enabled_individual).when_stabilized().into(),
@@ -181,7 +218,6 @@ impl Updatable for State {
     /// [`Sender`].
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.enabled_individual.when_processed().into(),
@@ -191,25 +227,22 @@ impl Updatable for State {
     }
 
     /// Notifies [`State`] about a RPC connection loss.
-    #[inline]
     fn connection_lost(&self) {
         self.sync_state.set(SyncState::Desynced);
     }
 
     /// Notifies [`State`] about a RPC connection restore.
-    #[inline]
     fn connection_recovered(&self) {
         self.sync_state.set(SyncState::Syncing);
     }
 }
 
 impl From<&State> for proto::state::Sender {
-    #[inline]
     fn from(state: &State) -> Self {
         Self {
             id: state.id,
             mid: state.mid.clone(),
-            media_type: state.media_type.clone(),
+            media_type: state.media_type,
             receivers: state.receivers.clone(),
             enabled_individual: state.enabled_individual.enabled(),
             enabled_general: state.enabled_general.get()
@@ -251,57 +284,49 @@ impl State {
 
     /// Indicates whether this [`Sender`]'s media exchange state is in
     /// [`media_exchange_state::Stable::Enabled`].
-    #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
         self.enabled_individual.enabled()
     }
 
     /// Returns [`TrackId`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn id(&self) -> TrackId {
         self.id
     }
 
     /// Returns current `mid` of this [`State`].
-    #[inline]
     #[must_use]
     pub fn mid(&self) -> Option<&str> {
         self.mid.as_deref()
     }
 
     /// Returns current [`MediaType`] of this [`State`].
-    #[inline]
     #[must_use]
-    pub fn media_type(&self) -> &MediaType {
-        &self.media_type
+    pub fn media_type(&self) -> MediaType {
+        self.media_type
     }
 
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
     /// should send media data to.
-    #[inline]
     #[must_use]
     pub fn receivers(&self) -> &Vec<MemberId> {
         &self.receivers
     }
 
     /// Returns current individual media exchange state of this [`State`].
-    #[inline]
     #[must_use]
     pub fn is_enabled_individual(&self) -> bool {
         self.enabled_individual.enabled()
     }
 
     /// Returns current general media exchange state of this [`State`].
-    #[inline]
     #[must_use]
     pub fn is_enabled_general(&self) -> bool {
         self.enabled_general.get() == media_exchange_state::Stable::Enabled
     }
 
     /// Returns current mute state of this [`State`].
-    #[inline]
     #[must_use]
     pub fn is_muted(&self) -> bool {
         self.mute_state.muted()
@@ -353,7 +378,6 @@ impl State {
     }
 
     /// Indicates whether local `MediaStream` update needed for this [`State`].
-    #[inline]
     #[must_use]
     pub fn is_local_stream_update_needed(&self) -> bool {
         matches!(self.local_track_state.get(), LocalTrackState::NeedUpdate)
@@ -361,7 +385,6 @@ impl State {
 
     /// Marks an inner `local_track_state` of this [`State`] as failed with the
     /// provided `error`.
-    #[inline]
     pub fn failed_local_stream_update(
         &self,
         error: Traced<UpdateLocalStreamError>,
@@ -370,13 +393,11 @@ impl State {
     }
 
     /// Marks an inner `local_track_state` of this [`State`] as stable.
-    #[inline]
     pub fn local_stream_updated(&self) {
         self.local_track_state.set(LocalTrackState::Stable);
     }
 
     /// Returns [`MediaKind`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn media_kind(&self) -> MediaKind {
         match &self.media_type {
@@ -386,7 +407,6 @@ impl State {
     }
 
     /// Returns [`MediaSourceKind`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn media_source(&self) -> MediaSourceKind {
         match &self.media_type {
@@ -558,23 +578,20 @@ impl Component {
 }
 
 impl TransceiverSide for State {
-    #[inline]
     fn track_id(&self) -> TrackId {
         self.id
     }
 
-    #[inline]
     fn kind(&self) -> MediaKind {
         self.media_kind()
     }
 
-    #[inline]
     fn source_kind(&self) -> MediaSourceKind {
         self.media_source()
     }
 
     fn is_transitable(&self) -> bool {
-        let caps = TrackConstraints::from(self.media_type.clone());
+        let caps = TrackConstraints::from(self.media_type);
         match &caps {
             TrackConstraints::Video(VideoSource::Device(_)) => {
                 self.send_constraints.inner().get_device_video().is_some()
@@ -588,14 +605,12 @@ impl TransceiverSide for State {
 }
 
 impl MediaStateControllable for State {
-    #[inline]
     fn media_exchange_state_controller(
         &self,
     ) -> Rc<MediaExchangeStateController> {
         Rc::clone(&self.enabled_individual)
     }
 
-    #[inline]
     fn mute_state_controller(&self) -> Rc<MuteStateController> {
         Rc::clone(&self.mute_state)
     }
@@ -634,7 +649,6 @@ impl MediaStateControllable for State {
 #[cfg(feature = "mockable")]
 impl State {
     /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
-    #[inline]
     pub fn synced(&self) {
         self.sync_state.set(SyncState::Synced);
     }

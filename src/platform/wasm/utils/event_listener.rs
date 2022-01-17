@@ -1,3 +1,5 @@
+//! Handy listener implementation for browser events dispatched by their names.
+
 use std::{ops::Deref, rc::Rc};
 
 use derive_more::{Display, From};
@@ -22,8 +24,15 @@ pub struct EventListener<T, A>
 where
     T: Deref<Target = web_sys::EventTarget>,
 {
+    /// Name of the browser event this [`EventListener`] listens to.
     event_name: &'static str,
-    target: Rc<T>, // TODO: Get rid of Rc?
+
+    /// [`EventTarget`] of to listen browser events on.
+    ///
+    /// [`EventTarget`]: web_sys::EventTarget
+    target: Rc<T>, // TODO: Get rid of `Rc`?
+
+    /// Function to be executed when the listened browser event fires.
     closure: Closure<dyn FnMut(A)>,
 }
 
@@ -32,7 +41,7 @@ where
     T: Deref<Target = web_sys::EventTarget>,
     A: FromWasmAbi + 'static,
 {
-    /// Creates new [`EventListener`] from a given [`FnMut`] `closure`.
+    /// Creates a new [`EventListener`] from the given [`FnMut`] `closure`.
     ///
     /// # Errors
     ///
@@ -108,7 +117,7 @@ where
                 self.closure.as_ref().unchecked_ref(),
             )
         {
-            log::error!("Failed to remove EventListener: {:?}", err);
+            log::error!("Failed to remove EventListener: {err:?}");
         }
     }
 }

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use cucumber_rust::then;
+use cucumber::then;
 use medea_e2e::object::{MediaKind, MediaSourceKind};
 use tokio::time::sleep;
 
@@ -130,8 +130,7 @@ async fn then_callback_fires_on_remote_track(
         }
         _ => {
             unreachable!(
-                "unknown RemoteMediaTrack callback: `on_{}`",
-                callback_kind,
+                "unknown RemoteMediaTrack callback: `on_{callback_kind}`",
             );
         }
     }

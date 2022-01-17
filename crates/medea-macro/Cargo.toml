@@ -1,9 +1,9 @@
 [package]
 name = "medea-macro"
 version = "0.3.0-dev"
-edition = "2018"
-resolver = "2"
-description = "Internal macros and codegen for Medea media server project"
+edition = "2021"
+rust-version = "1.58"
+description = "Internal macros and codegen for Medea media server project."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"
 documentation = "https://docs.rs/medea-macro"
@@ -12,6 +12,7 @@ repository = "https://github.com/instrumentisto/medea-jason"
 readme = "README.md"
 keywords = ["medea", "macro", "derive", "codegen"]
 categories = ["development-tools::build-utils"]
+exclude = ["/tests/"]
 
 [lib]
 proc-macro = true

@@ -10,19 +10,22 @@ use crate::{
 use super::{AwaitCompletion, Error};
 
 /// Representation of a `Room` JS object.
+#[derive(Clone, Copy, Debug)]
 pub struct Room;
 
 /// Representation of a `MediaKind` JS enum.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MediaKind {
+    /// Audio media.
     Audio,
+
+    /// Video media.
     Video,
 }
 
 impl FromStr for MediaKind {
     type Err = ParsingFailedError;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains("audio") {
             Ok(Self::Audio)
@@ -36,7 +39,6 @@ impl FromStr for MediaKind {
 
 impl MediaKind {
     /// Converts this [`MediaKind`] to the JS code for this enum variant.
-    #[inline]
     #[must_use]
     pub fn as_js(self) -> &'static str {
         match self {
@@ -49,14 +51,16 @@ impl MediaKind {
 /// Representation of a `MediaSourceKind` JS enum.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MediaSourceKind {
+    /// Device source of media (camera, mic, etc).
     Device,
+
+    /// Display source of media (screen sharing, etc).
     Display,
 }
 
 impl FromStr for MediaSourceKind {
     type Err = ParsingFailedError;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains("device") {
             Ok(Self::Device)
@@ -70,7 +74,6 @@ impl FromStr for MediaSourceKind {
 
 impl MediaSourceKind {
     /// Converts this [`MediaSourceKind`] to a JS code for this enum variant.
-    #[inline]
     #[must_use]
     pub fn as_js(self) -> &'static str {
         match self {
@@ -118,21 +121,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<_> = match kind {
+        let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.disable_video({})", media_source_kind).into()
+                format!("r.room.disable_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {disable};
+                }}
                 "#,
-                maybe_await, disable,
             ),
             [],
         ))
@@ -157,21 +159,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<_> = match kind {
+        let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.enable_video({})", media_source_kind).into()
+                format!("r.room.enable_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {enable};
+                }}
                 "#,
-                maybe_await, enable,
             ),
             [],
         ))
@@ -195,10 +196,10 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<_> = match kind {
+        let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_remote_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.disable_remote_video({})", media_source_kind)
+                format!("r.room.disable_remote_video({media_source_kind})")
                     .into()
             }
         };
@@ -206,11 +207,10 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        await {};
-                    }}
+                async (r) => {{
+                    await {disable};
+                }}
                 "#,
-                disable,
             ),
             [],
         ))
@@ -234,10 +234,10 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<_> = match kind {
+        let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_remote_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.enable_remote_video({})", media_source_kind)
+                format!("r.room.enable_remote_video({media_source_kind})")
                     .into()
             }
         };
@@ -245,11 +245,10 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        await {};
-                    }}
+                async (r) => {{
+                    await {enable};
+                }}
                 "#,
-                enable,
             ),
             [],
         ))
@@ -274,21 +273,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let mute: Cow<_> = match kind {
+        let mute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.mute_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.mute_video({})", media_source_kind).into()
+                format!("r.room.mute_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {mute};
+                }}
                 "#,
-                maybe_await, mute,
             ),
             [],
         ))
@@ -313,21 +311,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let unmute: Cow<_> = match kind {
+        let unmute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.unmute_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.unmute_video({})", media_source_kind).into()
+                format!("r.room.unmute_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {unmute};
+                }}
                 "#,
-                maybe_await, unmute,
             ),
             [],
         ))
@@ -547,27 +544,27 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    const [video, audio, shouldWait] = args;
-                    let constraints = new rust.MediaStreamSettings();
-                    if (video) {
-                        let video =
-                            new window.rust.DeviceVideoTrackConstraints();
-                        constraints.device_video(video);
-                    }
-                    if (audio) {
-                        let audio = new window.rust.AudioTrackConstraints();
-                        constraints.audio(audio);
-                    }
-                    let promise = room.room.set_local_media_settings(
-                        constraints,
-                        true,
-                        false
-                    );
-                    if (shouldWait) {
-                        await promise;
-                    }
+            async (room) => {
+                const [video, audio, shouldWait] = args;
+                let constraints = new rust.MediaStreamSettings();
+                if (video) {
+                    let video =
+                        new window.rust.DeviceVideoTrackConstraints();
+                    constraints.device_video(video);
                 }
+                if (audio) {
+                    let audio = new window.rust.AudioTrackConstraints();
+                    constraints.audio(audio);
+                }
+                let promise = room.room.set_local_media_settings(
+                    constraints,
+                    true,
+                    false
+                );
+                if (shouldWait) {
+                    await promise;
+                }
+            }
             "#,
             [video.into(), audio.into(), should_wait.into()],
         ))
@@ -585,29 +582,30 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    const [count] = args;
-                    return await new Promise((resolve) => {
-                        if (room.onFailedLocalStreamListener.count === count) {
-                            resolve();
-                        } else {
-                            room.onFailedLocalStreamListener.subs.push(() => {
-                                let failCount =
-                                    room.onFailedLocalStreamListener.count;
-                                if (failCount === count) {
-                                    resolve();
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            });
-                        }
-                    });
-                }
+            async (room) => {
+                const [count] = args;
+                return await new Promise((resolve) => {
+                    if (room.onFailedLocalStreamListener.count === count) {
+                        resolve();
+                    } else {
+                        room.onFailedLocalStreamListener.subs.push(() => {
+                            let failCount =
+                                room.onFailedLocalStreamListener.count;
+                            if (failCount === count) {
+                                resolve();
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        });
+                    }
+                });
+            }
             "#,
             [count.into()],
         ))
         .await
+        .map(drop)
         .unwrap();
     }
 
@@ -620,17 +618,18 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    room.localTracksStore.tracks = [];
-                }
+            async (room) => {
+                room.localTracksStore.tracks = [];
+            }
             "#,
             [],
         ))
         .await
+        .map(drop)
         .unwrap();
     }
 }
 
 /// Error of parsing a [`MediaKind`] or a [`MediaSourceKind`].
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ParsingFailedError;

@@ -26,6 +26,7 @@ impl Fid {
     fn room_id(&self) -> &str {
         match self.0.find('/') {
             None => self.0.as_str(),
+            #[allow(clippy::string_slice)] // index taken from the source
             Some(i) => &self.0[..i],
         }
     }
@@ -58,7 +59,7 @@ fn id_request(ids: Vec<String>) -> proto::IdRequest {
 ///
 /// [Medea]: https://github.com/instrumentisto/medea
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ControlClient {
     /// Map of subscribers to [`Notification`]s.
     subscribers: Subscribers,

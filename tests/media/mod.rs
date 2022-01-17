@@ -2,7 +2,7 @@ mod constraints;
 mod manager;
 mod track;
 
-use std::{convert::TryFrom, rc::Rc};
+use std::rc::Rc;
 
 use futures::channel::mpsc;
 use medea_client_api_proto::{

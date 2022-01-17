@@ -11,7 +11,6 @@ use super::SubscribersStore;
 pub struct SubStore<T>(RefCell<Vec<mpsc::UnboundedSender<T>>>);
 
 impl<T> Default for SubStore<T> {
-    #[inline]
     fn default() -> Self {
         Self(RefCell::new(Vec::new()))
     }
@@ -33,7 +32,6 @@ where
         Box::pin(rx)
     }
 
-    #[inline]
     fn wrap(&self, value: T) -> T {
         value
     }

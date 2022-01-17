@@ -2,7 +2,7 @@
 
 mod transitable_state;
 
-use std::{convert::TryFrom, mem, rc::Rc};
+use std::{mem, rc::Rc};
 
 use futures::channel::mpsc;
 use medea_client_api_proto::{TrackId, TrackPatchEvent};

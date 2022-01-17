@@ -1,9 +1,9 @@
 [package]
 name = "medea-jason"
 version = "0.3.0-dev"
-edition = "2018"
-resolver = "2"
-description = "Client library for Medea media server"
+edition = "2021"
+rust-version = "1.58"
+description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
 documentation = "https://docs.rs/medea-jason"
@@ -30,28 +30,25 @@ crate-type = ["cdylib", "rlib"]
 [features]
 default = ["console_error_panic_hook", "wee_alloc"]
 dart-codegen = ["medea-macro/dart-codegen"]
-mockable = ["downcast", "fragile", "mockall", "predicates-tree"]
+mockable = ["mockall"]
 
 [dependencies]
-async-recursion = "0.3"
+async-recursion = "1.0"
 async-trait = "0.1"
-backoff = { version = "0.3", features = ["futures"] }
+backoff = { version = "0.4", features = ["futures"] }
 bitflags = "1.2"
 cfg-if = "1.0"
 derivative = "2.1"
 derive_more = "0.99"
-downcast = { version = "0.10", optional = true }
-fragile = { version = "1.0", optional = true }
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.3", features = ["jason"] }
+medea-client-api-proto = { version = "0.4.0-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3.0-dev", path = "crates/medea-macro" }
 medea-reactive = "0.1"
-mockall = { version = "0.10", optional = true }
-predicates-tree = { version = "1.0", optional = true }
+mockall = { version = "0.11", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tracerr = "0.2"
+tracerr = "0.3"
 url = "2.1"
 
 [target.'cfg(target_os = "android")'.dependencies]
@@ -60,7 +57,7 @@ dart-sys = "2.0"
 libc = "0.2"
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-backoff = { version = "0.3", features = ["wasm-bindgen"] }
+backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 js-sys = "0.3"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
