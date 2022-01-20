@@ -1,6 +1,7 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
 import 'constraints.g.dart' as bridge;
+
+import 'package:flutter_webrtc/src/model/constraints.dart';
 
 /// Registers functions allowing Rust to operate Dart [MediaStreamConstraints].
 void registerFunctions(DynamicLibrary dl) {
@@ -14,15 +15,17 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Returns empty [MediaStreamConstraints].
 Object _new() {
-  return MediaStreamConstraints();
+  return Constraints();
 }
 
+// TODO(evdokimovs): fix audio constraints setting
 /// Sets [MediaStreamConstraints.audio] for the provided [cons].
-void _setAudio(MediaStreamConstraints cons, Object val) {
-  cons.audio = val;
+void _setAudio(Constraints cons, Object val) {
+  // cons.audio = val;
 }
 
+// TODO(evdokimovs): fix video constraints setting
 /// Sets [MediaStreamConstraints.video] for the provided [cons].
-void _setVideo(MediaStreamConstraints cons, Object val) {
-  cons.video = val;
+void _setVideo(Constraints cons, Object val) {
+  // cons.video = val;
 }
