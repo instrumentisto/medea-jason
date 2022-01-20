@@ -19,9 +19,9 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Updated
 
-- Switch to [2021 Rust edition][012-1] ([rev]).
+- Switch to [2021 Rust edition][012-1] ([#16]).
 
-[rev]: https://github.com/instrumentisto/medea-jason/commit/full-rev
+[#16]: /../../pull/16
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 

@@ -14,7 +14,7 @@ All user visible changes to this project will be documented in this file. This p
 ### BC Breaks
 
 - Library API:
-    - `ReconnectHandle.reconnect_with_backoff()` performs first reconnect attempt immediately now ([#206]).
+    - `ReconnectHandle.reconnect_with_backoff()` performs first reconnect attempt immediately now ([instrumentisto/medea#206]).
     - Remove `JasonError` and change thrown exceptions kind ([#4]):
         - `ConnectionHandle`:
             - `on_close` - `StateError`;
@@ -58,8 +58,13 @@ All user visible changes to this project will be documented in this file. This p
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
 
-[#206]: https://github.com/instrumentisto/medea/pull/206
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([#16]).
+
+[instrumentisto/medea#206]: https://github.com/instrumentisto/medea/pull/206
 [#4]: /../../pull/4
+[#16]: /../../pull/16
 
 
 
