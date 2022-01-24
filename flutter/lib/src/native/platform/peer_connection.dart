@@ -41,13 +41,16 @@ void registerFunctions(DynamicLibrary dl) {
 ///
 /// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
 Object _addTransceiver(PeerConnection peer, int kind, int direction) {
-  return () => peer.addTransceiver(MediaType.values[kind], RtpTransceiverInit(TransceiverDirection.values[direction]));
+  return () => peer.addTransceiver(MediaType.values[kind],
+      RtpTransceiverInit(TransceiverDirection.values[direction]));
 }
 
 /// Returns newly created [RTCPeerConnection] with a provided `iceServers`
 /// [List].
 Object _newPeer(Object iceServers) {
-  return () => PeerConnection.create(IceTransportType.all, iceServers as List<IceServer>);
+  var servers = iceServers as List<dynamic>;
+  return () => PeerConnection.create(
+      IceTransportType.all, servers.map((e) => e as IceServer).toList());
 }
 
 /// Adds subscription on [RTCPeerConnection.onTrack] to the provided
@@ -99,7 +102,7 @@ Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
-  if (sdp.toDartString() == 'offer') {
+  if (type.toDartString() == 'offer') {
     sdpType = SessionDescriptionType.offer;
   } else {
     sdpType = SessionDescriptionType.answer;
@@ -112,13 +115,13 @@ Object _setRemoteDescription(
 Object _setLocalDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
-  if (sdp.toDartString() == 'offer') {
+  if (type.toDartString() == 'offer') {
     sdpType = SessionDescriptionType.offer;
   } else {
     sdpType = SessionDescriptionType.answer;
   }
-  return () => conn.setLocalDescription(
-      SessionDescription(sdpType, sdp.toDartString()));
+  return () =>
+      conn.setLocalDescription(SessionDescription(sdpType, sdp.toDartString()));
 }
 
 /// Creates new SDP offer for the provided [RTCPeerConnection].
@@ -163,8 +166,8 @@ int _iceConnectionState(PeerConnection conn) {
 
 /// Rollbacks local SDP offer of the provided [RTCPeerConnection].
 Object _rollback(PeerConnection conn) {
-  return () =>
-      conn.setLocalDescription(SessionDescription(SessionDescriptionType.rollback, ''));
+  return () => conn.setLocalDescription(
+      SessionDescription(SessionDescriptionType.rollback, ''));
 }
 
 /// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].
