@@ -21,7 +21,7 @@ IMAGE_NAME := $(strip \
 	$(or $(image),medea-control-api-mock)))
 
 RUST_VER := 1.58
-CHROME_VERSION := 94.0
+CHROME_VERSION := 97.0
 FIREFOX_VERSION := 92.0-driver0.29.1
 
 CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
