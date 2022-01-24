@@ -27,7 +27,7 @@ async fn then_member_has_remote_track(
     kind: String,
     remote_id: String,
 ) {
-    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    // tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     let member = world.get_member(&id).unwrap();
     let connection = member
         .connections()
@@ -48,7 +48,7 @@ async fn then_member_has_remote_track(
             .await
             .is_ok());
     }
-    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    // tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 }
 
 #[then(regex = r"^(\S+) has local (audio|(?:device |display )?video)$")]
