@@ -177,6 +177,5 @@ Object getTransceivers(PeerConnection conn) {
 
 /// Closes the provided [RTCPeerConnection].
 void _close(PeerConnection conn) {
-  // TODO(evdokimovs): Implement closing
-  // conn.dispose();
+  conn.close();
 }
