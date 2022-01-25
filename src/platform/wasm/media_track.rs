@@ -3,6 +3,7 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
 use std::{cell::RefCell, rc::Rc};
+use std::future::Future;
 
 use derive_more::AsRef;
 
@@ -223,14 +224,14 @@ impl MediaStreamTrack {
     /// callbacks.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    pub fn fork(&self) -> Self {
-        Self {
+    pub fn fork(&self) -> impl Future<Output = Self> + 'static {
+        futures::future::ready(Self {
             sys_track: Rc::new(web_sys::MediaStreamTrack::clone(
                 &self.sys_track,
             )),
             kind: self.kind,
             on_ended: RefCell::new(None),
-        }
+        })
     }
 
     /// Sets handler for the [`ended`][1] event on underlying

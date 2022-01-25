@@ -223,7 +223,7 @@ impl Sender {
             }
         }
 
-        let new_track = new_track.fork();
+        let new_track = new_track.fork().await;
 
         new_track.set_enabled(!self.muted.get());
 

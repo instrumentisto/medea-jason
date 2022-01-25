@@ -60,8 +60,7 @@ bool _hasSendTrack(RtpTransceiver transceiver) {
 
 /// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
 /// [RTCRtpTransceiver] with a provided [MediaStreamTrack].
-Object _replaceSendTrack(
-    RtpTransceiver transceiver, MediaStreamTrack track) {
+Object _replaceSendTrack(RtpTransceiver transceiver, MediaStreamTrack track) {
   return () => transceiver.sender.setTrack(track);
 }
 

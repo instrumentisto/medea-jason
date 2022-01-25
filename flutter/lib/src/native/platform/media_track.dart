@@ -20,6 +20,7 @@ void registerFunctions(DynamicLibrary dl) {
     enabled: Pointer.fromFunction(_enabled, false),
     stop: Pointer.fromFunction(_stop),
     onEnded: Pointer.fromFunction(_onEnded),
+    clone: Pointer.fromFunction(_clone),
     readyState: Pointer.fromFunction(_readyState, 0),
   );
 }
@@ -89,4 +90,8 @@ void _stop(MediaStreamTrack track) {
 /// Indicates whether the provided [MediaStreamTrack] is enabled.
 bool _enabled(MediaStreamTrack track) {
   return track.isEnabled();
+}
+
+Object _clone(MediaStreamTrack track) {
+  return () => track.clone();
 }

@@ -38,6 +38,7 @@ Object _enumerateDevices() {
 /// Starts capturing the contents of a display and returns the created
 /// [MediaStreamTrack]s.
 Object _getDisplayMedia(Map<String, dynamic> constraints) {
-  throw UnimplementedError("getDisplayMedia currently isn't supported by flutter_webrtc");
+  throw UnimplementedError(
+      "getDisplayMedia currently isn't supported by flutter_webrtc");
   // return () => navigator.mediaDevices.getDisplayMedia(constraints);
 }

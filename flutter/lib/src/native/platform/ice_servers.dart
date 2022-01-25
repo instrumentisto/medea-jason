@@ -23,6 +23,7 @@ Object _new() {
 /// Adds an `IceServer` with the provided data to the provided [List].
 void _add(List servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
-  var iceServer = IceServer([url.toDartString()], username.toDart(), credentials.toDart());
+  var iceServer =
+      IceServer([url.toDartString()], username.toDart(), credentials.toDart());
   servers.add(iceServer);
 }

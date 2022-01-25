@@ -33,7 +33,7 @@ Pointer _groupId(MediaDeviceInfo deviceInfo) {
   // if (deviceInfo.groupId != null) {
   //   return ForeignValue.fromString(deviceInfo.groupId!).intoRustOwned();
   // } else {
-    return ForeignValue.none().intoRustOwned();
+  return ForeignValue.none().intoRustOwned();
   // }
 }
 
