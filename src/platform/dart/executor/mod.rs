@@ -35,14 +35,40 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
     WAKE_PORT = Some(wake_port);
 }
 
-/// Polls the provided [`Task`].
+/// Polls an incomplete [`Task`].
+///
+/// This function returns `true` if the [`Task`] is still [`Pending`], and
+/// `false` once the [`Task`] is [`Ready`]. In this latter case it should be
+/// dropped with the [`rust_executor_drop_task()`] function.
 ///
 /// # Safety
 ///
-/// Valid [`Task`] pointer must be provided.
+/// Valid [`Task`] pointer must be provided. Must not be called if the provided
+/// [`Task`] has been dropped (with the [`rust_executor_drop_task()`] function).
+///
+/// [`Pending`]: std::task::Poll::Pending
+/// [`Ready`]: std::task::Poll::Ready
 #[no_mangle]
-pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
-    let _ = Rc::from_raw(task.as_ptr()).poll();
+pub unsafe extern "C" fn rust_executor_poll_task(
+    mut task: ptr::NonNull<Task>,
+) -> bool {
+    task.as_mut().poll().is_pending()
+}
+
+/// Drops a [`Task`].
+///
+/// Completed [`Task`]s should be dropped to avoid leaks.
+///
+/// In some unusual cases (say on emergency shutdown or when executed too long)
+/// [`Task`]s may be deleted before completion.
+///
+/// # Safety
+///
+/// Valid [`Task`] pointer must be provided. Must be called only once for a
+/// specific [`Task`].
+#[no_mangle]
+pub unsafe extern "C" fn rust_executor_drop_task(task: ptr::NonNull<Task>) {
+    drop(Rc::from_raw(task.as_ptr()));
 }
 
 /// Commands an external Dart executor to poll the provided [`Task`].
@@ -50,14 +76,13 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// Sends command that contains the provided [`Task`] to the configured
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
-fn task_wake(task: Rc<Task>) {
+fn task_wake(task: ptr::NonNull<Task>) {
     let wake_port = unsafe { WAKE_PORT }.unwrap();
-    let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
         type_: Dart_CObject_Type::Int64,
         value: Dart_CObjectValue {
-            as_int64: task as i64,
+            as_int64: task.as_ptr() as i64,
         },
     };
 
@@ -66,7 +91,7 @@ fn task_wake(task: Rc<Task>) {
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {
-            drop(Rc::from_raw(task));
+            rust_executor_drop_task(task);
         }
     }
 }

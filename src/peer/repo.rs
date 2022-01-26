@@ -261,6 +261,7 @@ impl Component {
         _: Rc<State>,
         (peer_id, _): (PeerId, Rc<peer::State>),
     ) -> Result<(), Infallible> {
+        log::debug!("Peer removed");
         drop(peers.peers.borrow_mut().remove(&peer_id));
         peers.connections.close_connection(peer_id);
         Ok(())

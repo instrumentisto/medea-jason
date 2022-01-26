@@ -520,6 +520,7 @@ impl RtcPeerConnection {
 
 impl Drop for RtcPeerConnection {
     fn drop(&mut self) {
+        log::debug!("RtcPeerConnection drop");
         unsafe {
             peer_connection::close(self.handle.get());
         }

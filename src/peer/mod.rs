@@ -388,18 +388,19 @@ impl PeerConnection {
 
         // Bind to `track` event.
         {
-            let media_conns = Rc::clone(&peer.media_connections);
+            let media_conns = Rc::downgrade(&peer.media_connections);
             peer.peer.on_track(Some(move |track, transceiver| {
-                let media_conns = Rc::clone(&media_conns);
-                platform::spawn(async move {
-                    if let Err(mid) =
+                if let Some(media_conns) = media_conns.upgrade() {
+                    platform::spawn(async move {
+                        if let Err(mid) =
                         media_conns.add_remote_track(track, transceiver).await
-                    {
-                        log::error!(
+                        {
+                            log::error!(
                             "Cannot add new remote track with mid={mid}",
                         );
-                    };
-                });
+                        };
+                    });
+                }
             }));
         }
 
