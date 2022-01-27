@@ -136,7 +136,7 @@ Object _createAnswer(PeerConnection conn) {
 
 /// Restarts ICE on the provided [RTCPeerConnection].
 void _restartIce(PeerConnection conn) {
-  throw UnimplementedError('PeerConnection.restartIce');
+  conn.restartIce();
 }
 
 /// Adds provided [RTCIceCandidate] to the provided [RTCPeerConnection].
