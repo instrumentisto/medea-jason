@@ -294,6 +294,7 @@ impl Component {
                 }
             }
         }
+        log::debug!("watcher 4 resolved");
         Ok(())
     }
 
@@ -352,9 +353,6 @@ impl Component {
         .await;
 
         match negotiation_state {
-            NegotiationState::Stable => {
-                state.negotiation_role.set(None);
-            }
             NegotiationState::WaitLocalSdp => {
                 if let Some(negotiation_role) = state.negotiation_role.get() {
                     match negotiation_role {
@@ -381,8 +379,9 @@ impl Component {
                 }
             }
             NegotiationState::WaitLocalSdpApprove
-            | NegotiationState::WaitRemoteSdp => (),
+            | NegotiationState::WaitRemoteSdp | NegotiationState::Stable => (),
         }
+        log::debug!("watcher 6 resolved");
         Ok(())
     }
 
