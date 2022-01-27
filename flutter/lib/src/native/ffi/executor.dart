@@ -4,8 +4,8 @@ import 'dart:isolate';
 typedef _executorInit_C = Void Function(Int64);
 typedef _executorInit_Dart = void Function(int);
 
-typedef _executorPollTask_C = Uint8 Function(Pointer);
-typedef _executorPollTask_Dart = int Function(Pointer);
+typedef _executorPollTask_C = Void Function(Pointer);
+typedef _executorPollTask_Dart = void Function(Pointer);
 
 /// Executor used to drive Rust futures.
 ///
@@ -37,11 +37,9 @@ class Executor {
     _loopInit(_wakePort.sendPort.nativePort);
   }
 
-  /// Polls a Rust future basing on the provided [message]. Drops that future if
-  /// it's completed.
+  /// Polls a Rust future basing on the provided [message].
   void _pollTask(dynamic message) {
     final task = Pointer.fromAddress(message);
-
     _taskPoll(task);
   }
 }

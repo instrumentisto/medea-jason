@@ -67,9 +67,12 @@ Object _replaceSendTrack(RtpTransceiver transceiver, MediaStreamTrack track) {
 /// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of
 /// the provided [RTCRtpTransceiver].
 void _setSendTrackEnabled(RtpTransceiver transceiver, bool enabled) {
-  if (transceiver.sender.track != null) {
-    transceiver.sender.track!.setEnabled(enabled);
-  }
+  (() async {
+    if (transceiver.sender.track != null) {
+      var track = transceiver.sender.track!;
+      await track.setEnabled(enabled);
+    }
+  });
 }
 
 /// Drops [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].

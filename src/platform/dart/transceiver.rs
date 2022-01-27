@@ -174,15 +174,15 @@ impl Transceiver {
     /// value, if any.
     pub fn set_send_track_enabled(&self, enabled: bool) {
         unsafe {
-            if let Some(sender) =
-                Option::<DartHandle>::try_from(*Box::from_raw(
-                    transceiver::get_send_track(self.transceiver.get())
-                        .as_ptr(),
-                ))
-                .unwrap()
-            {
-                transceiver::set_send_track_enabled(sender.get(), enabled);
-            }
+            // if let Some(sender) =
+            //     Option::<DartHandle>::try_from(*Box::from_raw(
+            //         transceiver::get_send_track(self.transceiver.get())
+            //             .as_ptr(),
+            //     ))
+            //     .unwrap()
+            // {
+                transceiver::set_send_track_enabled(self.transceiver.get(), enabled);
+            // }
         }
     }
 
