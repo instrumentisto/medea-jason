@@ -428,13 +428,21 @@ impl RoomHandle {
         // messaging.
         // Hold tracks through all process, to ensure that they will be reused
         // without additional requests.
-        let _tracks_handles = if direction_send && enabling {
-            inner
+        let _tracks_handles;
+        if direction_send && enabling {
+            _tracks_handles = inner
                 .get_local_tracks(kind, source_kind)
                 .await
-                .map_err(tracerr::map_from_and_wrap!())?
+                .map_err(tracerr::map_from_and_wrap!())?;
+            if !inner.send_constraints.is_track_enabled(kind, source_kind) {
+                return Err(tracerr::new!(
+                    ChangeMediaStateError::TransitionIntoOppositeState(
+                        media_exchange_state::Stable::Disabled.into()
+                    )
+                ));
+            }
         } else {
-            Vec::new()
+            _tracks_handles = Vec::new()
         };
 
         while !inner.is_all_peers_in_media_state(

@@ -171,7 +171,7 @@ impl LocalTracksConstraints {
     pub fn is_track_enabled(
         &self,
         kind: MediaKind,
-        source: MediaSourceKind,
+        source: Option<MediaSourceKind>,
     ) -> bool {
         self.0.borrow().is_track_enabled(kind, source)
     }
@@ -587,10 +587,10 @@ impl MediaStreamSettings {
     pub fn enabled(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => {
-                self.is_track_enabled(MediaKind::Video, video.source_kind)
+                self.is_track_enabled(MediaKind::Video, Some(video.source_kind))
             }
             MediaType::Audio(_) => {
-                self.is_track_enabled(MediaKind::Audio, MediaSourceKind::Device)
+                self.is_track_enabled(MediaKind::Audio, Some(MediaSourceKind::Device))
             }
         }
     }
@@ -614,14 +614,17 @@ impl MediaStreamSettings {
     pub fn is_track_enabled(
         &self,
         kind: MediaKind,
-        source: MediaSourceKind,
+        source: Option<MediaSourceKind>,
     ) -> bool {
         match (kind, source) {
-            (MediaKind::Video, MediaSourceKind::Device) => {
+            (MediaKind::Video, Some(MediaSourceKind::Device)) => {
                 self.device_video.enabled()
             }
-            (MediaKind::Video, MediaSourceKind::Display) => {
+            (MediaKind::Video, Some(MediaSourceKind::Display)) => {
                 self.display_video.enabled()
+            }
+            (MediaKind::Video, None) => {
+                self.display_video.enabled() && self.device_video.enabled()
             }
             (MediaKind::Audio, _) => self.audio.enabled,
         }

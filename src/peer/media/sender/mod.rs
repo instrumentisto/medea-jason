@@ -255,7 +255,7 @@ impl Sender {
     fn enabled_in_cons(&self) -> bool {
         self.send_constraints.is_track_enabled(
             self.caps.media_kind(),
-            self.caps.media_source_kind(),
+            Some(self.caps.media_source_kind()),
         )
     }
 
