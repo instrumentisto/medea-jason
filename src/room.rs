@@ -4,13 +4,17 @@ use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
     fmt,
+    future::Future,
     rc::{Rc, Weak},
 };
 
 use async_recursion::async_recursion;
 use async_trait::async_trait;
 use derive_more::{Display, From};
-use futures::{channel::mpsc, future, FutureExt as _, StreamExt as _};
+use futures::{
+    channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
+    StreamExt as _, TryFutureExt,
+};
 use medea_client_api_proto::{
     self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
     EventHandler, IceCandidate, IceConnectionState, IceServer, MemberId,
@@ -40,6 +44,9 @@ use crate::{
     },
     utils::{AsProtoState, Caused},
 };
+
+/// Typedef for [`Result`]s related to the [`MediaState`] update functions.
+type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
 /// Reason of why [`Room`] has been closed.
 ///
@@ -393,19 +400,23 @@ impl RoomHandle {
     ///
     /// Helper function for all the exported mute/unmute/enable/disable
     /// audio/video send/receive methods.
-    async fn change_media_state<S>(
+    fn change_media_state<S>(
         &self,
         new_state: S,
         kind: MediaKind,
         direction: TrackDirection,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>>
+    ) -> LocalBoxFuture<'static, ChangeMediaStateResult>
     where
         S: Into<MediaState> + 'static,
     {
         let inner = (self.0)
             .upgrade()
-            .ok_or_else(|| tracerr::new!(ChangeMediaStateError::Detached))?;
+            .ok_or_else(|| tracerr::new!(ChangeMediaStateError::Detached));
+        let inner = match inner {
+            Ok(inner) => inner,
+            Err(e) => return Box::pin(future::err(e)),
+        };
 
         let new_state = new_state.into();
         let source_kind = source_kind.map(Into::into);
@@ -417,67 +428,71 @@ impl RoomHandle {
             source_kind,
         );
 
-        let direction_send = matches!(direction, TrackDirection::Send);
-        let enabling = matches!(
-            new_state,
-            MediaState::MediaExchange(media_exchange_state::Stable::Enabled)
-        );
+        Box::pin(async move {
+            let direction_send = matches!(direction, TrackDirection::Send);
+            let enabling = matches!(
+                new_state,
+                MediaState::MediaExchange(
+                    media_exchange_state::Stable::Enabled
+                )
+            );
 
-        // Perform `getUserMedia()`/`getDisplayMedia()` right away, so we can
-        // fail fast without touching senders states and starting all required
-        // messaging.
-        // Hold tracks through all process, to ensure that they will be reused
-        // without additional requests.
-        let _tracks_handles;
-        if direction_send && enabling {
-            _tracks_handles = inner
-                .get_local_tracks(kind, source_kind)
-                .await
-                .map_err(tracerr::map_from_and_wrap!())?;
-            if !inner.send_constraints.is_track_enabled(kind, source_kind) {
-                return Err(tracerr::new!(
-                    ChangeMediaStateError::TransitionIntoOppositeState(
-                        media_exchange_state::Stable::Disabled.into()
-                    )
-                ));
-            }
-        } else {
-            _tracks_handles = Vec::new()
-        };
+            // Perform `getUserMedia()`/`getDisplayMedia()` right away, so we
+            // can fail fast without touching senders states and
+            // starting all required messaging.
+            // Hold tracks through all process, to ensure that they will be
+            // reused without additional requests.
+            let _tracks_handles;
+            if direction_send && enabling {
+                _tracks_handles = inner
+                    .get_local_tracks(kind, source_kind)
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())?;
+                if !inner.send_constraints.is_track_enabled(kind, source_kind) {
+                    return Err(tracerr::new!(
+                        ChangeMediaStateError::TransitionIntoOppositeState(
+                            media_exchange_state::Stable::Disabled.into()
+                        )
+                    ));
+                }
+            } else {
+                _tracks_handles = Vec::new();
+            };
 
-        while !inner.is_all_peers_in_media_state(
-            kind,
-            direction,
-            source_kind,
-            new_state,
-        ) {
-            if let Err(e) = inner
-                .toggle_media_state(new_state, kind, direction, source_kind)
-                .await
-                .map_err(tracerr::map_from_and_wrap!())
-            {
-                if direction_send && enabling {
-                    inner.set_constraints_media_state(
-                        new_state.opposite(),
-                        kind,
-                        direction,
-                        source_kind,
-                    );
-                    inner
-                        .toggle_media_state(
+            while !inner.is_all_peers_in_media_state(
+                kind,
+                direction,
+                source_kind,
+                new_state,
+            ) {
+                if let Err(e) = inner
+                    .toggle_media_state(new_state, kind, direction, source_kind)
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())
+                {
+                    if direction_send && enabling {
+                        inner.set_constraints_media_state(
                             new_state.opposite(),
                             kind,
                             direction,
                             source_kind,
-                        )
-                        .await
-                        .map_err(tracerr::map_from_and_wrap!())?;
+                        );
+                        inner
+                            .toggle_media_state(
+                                new_state.opposite(),
+                                kind,
+                                direction,
+                                source_kind,
+                            )
+                            .await
+                            .map_err(tracerr::map_from_and_wrap!())?;
+                    }
+                    return Err(e);
                 }
-                return Err(e);
             }
-        }
 
-        Ok(())
+            Ok(())
+        })
     }
 
     /// Mutes outbound audio in this [`Room`].
@@ -490,16 +505,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::unmute_audio()`] was called while muting or a media server
     /// didn't approve this state transition.
-    pub async fn mute_audio(
+    pub fn mute_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -513,16 +527,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::mute_audio()`] was called while muting or a media server
     /// didn't approve this state transition.
-    pub async fn unmute_audio(
+    pub fn unmute_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -536,17 +549,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::unmute_video()`] was called while muting or a media server
     /// didn't approve this state transition.
-    pub async fn mute_video(
+    pub fn mute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -560,17 +572,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::mute_video()`] was called while muting or a media server
     /// didn't approve this state transition.
-    pub async fn unmute_video(
+    pub fn unmute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -587,16 +598,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_audio()`] was called while disabling or a media
     /// server didn't approve this state transition.
-    pub async fn disable_audio(
+    pub fn disable_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -613,16 +623,15 @@ impl RoomHandle {
     ///
     /// With [`ChangeMediaStateError::CouldNotGetLocalMedia`] if media
     /// acquisition request failed.
-    pub async fn enable_audio(
+    pub fn enable_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -641,17 +650,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_video()`] was called while disabling or a media
     /// server didn't approve this state transition.
-    pub async fn disable_video(
+    pub fn disable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -670,17 +678,16 @@ impl RoomHandle {
     ///
     /// With [`ChangeMediaStateError::CouldNotGetLocalMedia`] if media
     /// acquisition request failed.
-    pub async fn enable_video(
+    pub fn enable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -694,16 +701,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_remote_audio()`] was called while disabling or a
     /// media server didn't approve this state transition.
-    pub async fn disable_remote_audio(
+    pub fn disable_remote_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
             TrackDirection::Recv,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -717,16 +723,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_remote_video()`] was called while disabling or a
     /// media server didn't approve this state transition.
-    pub async fn disable_remote_video(
+    pub fn disable_remote_video(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Video,
             TrackDirection::Recv,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -740,16 +745,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::disable_remote_audio()`] was called while enabling or a
     /// media server didn't approve this state transition.
-    pub async fn enable_remote_audio(
+    pub fn enable_remote_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
             TrackDirection::Recv,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -763,16 +767,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::disable_remote_video()`] was called while enabling or a
     /// media server didn't approve this state transition.
-    pub async fn enable_remote_video(
+    pub fn enable_remote_video(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
             TrackDirection::Recv,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 }
