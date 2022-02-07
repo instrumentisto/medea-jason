@@ -7,7 +7,7 @@ use crate::World;
 
 use super::{parse_media_kind, parse_media_kinds};
 
-#[given(regex = "^(\\S+) has gUM delay")]
+#[given(regex = "^(\\S+)'s `getUserMedia()` request has added latency")]
 async fn given_gum_delay(world: &mut World, id: String) {
     let member = world.get_member(&id).unwrap();
     member.add_gum_latency(Duration::from_millis(500)).await;

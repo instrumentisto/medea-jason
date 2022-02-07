@@ -52,7 +52,7 @@ Feature: Media enabling/disabling
 
   Scenario: Member starts enabling video and instantly disables it
     Given room with joined members Alice and Bob
-    And Bob has gUM delay
+    And Bob's `getUserMedia()` request has added latency
     When Bob disables video
     And Bob frees all local tracks
     And Bob enables video

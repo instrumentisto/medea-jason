@@ -13,7 +13,7 @@ use async_trait::async_trait;
 use derive_more::{Display, From};
 use futures::{
     channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
-    StreamExt as _, TryFutureExt,
+    StreamExt as _, TryFutureExt as _,
 };
 use medea_client_api_proto::{
     self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
