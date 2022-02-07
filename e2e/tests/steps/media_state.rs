@@ -1,13 +1,13 @@
 use std::time::Duration;
 
 use cucumber::{given, then, when};
-use medea_e2e::object::{AwaitCompletion, MediaSourceKind};
+use medea_e2e::object::{AwaitCompletion};
 
 use crate::World;
 
 use super::{parse_media_kind, parse_media_kinds};
 
-#[given(regex = "^(\\S+)'s `getUserMedia()` request has added latency")]
+#[given(regex = "^(\\S+)'s `getUserMedia\\(\\)` request has added latency")]
 async fn given_gum_delay(world: &mut World, id: String) {
     let member = world.get_member(&id).unwrap();
     member.add_gum_latency(Duration::from_millis(500)).await;
