@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use cucumber::{given, then, when};
-use medea_e2e::object::{AwaitCompletion};
+use medea_e2e::object::AwaitCompletion;
 
 use crate::World;
 
