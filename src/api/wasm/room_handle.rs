@@ -227,8 +227,9 @@ impl RoomHandle {
     pub fn mute_audio(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.mute_audio();
         future_to_promise(async move {
-            this.mute_audio().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -249,8 +250,9 @@ impl RoomHandle {
     pub fn unmute_audio(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.unmute_audio();
         future_to_promise(async move {
-            this.unmute_audio().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -271,10 +273,9 @@ impl RoomHandle {
     pub fn mute_video(&self, source_kind: Option<MediaSourceKind>) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.mute_video(source_kind.map(Into::into));
         future_to_promise(async move {
-            this.mute_video(source_kind.map(Into::into))
-                .await
-                .map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -298,10 +299,9 @@ impl RoomHandle {
     ) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.unmute_video(source_kind.map(Into::into));
         future_to_promise(async move {
-            this.unmute_video(source_kind.map(Into::into))
-                .await
-                .map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -322,8 +322,9 @@ impl RoomHandle {
     pub fn disable_audio(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.disable_audio();
         future_to_promise(async move {
-            this.disable_audio().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -348,8 +349,9 @@ impl RoomHandle {
     pub fn enable_audio(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.enable_audio();
         future_to_promise(async move {
-            this.enable_audio().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -374,10 +376,9 @@ impl RoomHandle {
     ) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.disable_video(source_kind.map(Into::into));
         future_to_promise(async move {
-            this.disable_video(source_kind.map(Into::into))
-                .await
-                .map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -406,10 +407,9 @@ impl RoomHandle {
     ) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.enable_video(source_kind.map(Into::into));
         future_to_promise(async move {
-            this.enable_video(source_kind.map(Into::into))
-                .await
-                .map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -430,8 +430,9 @@ impl RoomHandle {
     pub fn disable_remote_audio(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.disable_remote_audio();
         future_to_promise(async move {
-            this.disable_remote_audio().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -452,8 +453,9 @@ impl RoomHandle {
     pub fn disable_remote_video(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.disable_remote_video();
         future_to_promise(async move {
-            this.disable_remote_video().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -474,8 +476,9 @@ impl RoomHandle {
     pub fn enable_remote_audio(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.enable_remote_audio();
         future_to_promise(async move {
-            this.enable_remote_audio().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }
@@ -496,8 +499,9 @@ impl RoomHandle {
     pub fn enable_remote_video(&self) -> Promise {
         let this = self.0.clone();
 
+        let fut = this.enable_remote_video();
         future_to_promise(async move {
-            this.enable_remote_video().await.map_err(Error::from)?;
+            fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
         })
     }

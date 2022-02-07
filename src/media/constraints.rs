@@ -166,12 +166,25 @@ impl LocalTracksConstraints {
     }
 
     /// Indicates whether provided [`MediaKind`] and [`MediaSourceKind`] are
-    /// enabled in this [`LocalTracksConstraints`].
+    /// enabled and constrained in this [`LocalTracksConstraints`].
+    #[must_use]
+    pub fn is_track_enabled_and_constrained(
+        &self,
+        kind: MediaKind,
+        source: Option<MediaSourceKind>,
+    ) -> bool {
+        self.0
+            .borrow()
+            .is_track_enabled_and_constrained(kind, source)
+    }
+
+    /// Indicates whether provided [`MediaKind`] and [`MediaSourceKind`] are
+    /// enabled and constrained in this [`LocalTracksConstraints`].
     #[must_use]
     pub fn is_track_enabled(
         &self,
         kind: MediaKind,
-        source: MediaSourceKind,
+        source: Option<MediaSourceKind>,
     ) -> bool {
         self.0.borrow().is_track_enabled(kind, source)
     }
@@ -586,12 +599,14 @@ impl MediaStreamSettings {
     #[must_use]
     pub fn enabled(&self, kind: MediaType) -> bool {
         match kind {
-            MediaType::Video(video) => {
-                self.is_track_enabled(MediaKind::Video, video.source_kind)
-            }
-            MediaType::Audio(_) => {
-                self.is_track_enabled(MediaKind::Audio, MediaSourceKind::Device)
-            }
+            MediaType::Video(video) => self.is_track_enabled_and_constrained(
+                MediaKind::Video,
+                Some(video.source_kind),
+            ),
+            MediaType::Audio(_) => self.is_track_enabled_and_constrained(
+                MediaKind::Audio,
+                Some(MediaSourceKind::Device),
+            ),
         }
     }
 
@@ -609,19 +624,44 @@ impl MediaStreamSettings {
     }
 
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
+    /// enabled and constrained in this [`MediaStreamSettings`].
+    #[must_use]
+    pub fn is_track_enabled_and_constrained(
+        &self,
+        kind: MediaKind,
+        source: Option<MediaSourceKind>,
+    ) -> bool {
+        match (kind, source) {
+            (MediaKind::Video, Some(MediaSourceKind::Device)) => {
+                self.device_video.enabled()
+            }
+            (MediaKind::Video, Some(MediaSourceKind::Display)) => {
+                self.display_video.enabled()
+            }
+            (MediaKind::Video, None) => {
+                self.display_video.enabled() && self.device_video.enabled()
+            }
+            (MediaKind::Audio, _) => self.audio.enabled,
+        }
+    }
+
+    /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`MediaStreamSettings`].
     #[must_use]
     pub fn is_track_enabled(
         &self,
         kind: MediaKind,
-        source: MediaSourceKind,
+        source: Option<MediaSourceKind>,
     ) -> bool {
         match (kind, source) {
-            (MediaKind::Video, MediaSourceKind::Device) => {
-                self.device_video.enabled()
+            (MediaKind::Video, Some(MediaSourceKind::Device)) => {
+                self.device_video.enabled
             }
-            (MediaKind::Video, MediaSourceKind::Display) => {
-                self.display_video.enabled()
+            (MediaKind::Video, Some(MediaSourceKind::Display)) => {
+                self.display_video.enabled
+            }
+            (MediaKind::Video, None) => {
+                self.display_video.enabled && self.device_video.enabled
             }
             (MediaKind::Audio, _) => self.audio.enabled,
         }
