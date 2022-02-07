@@ -27,6 +27,20 @@ pub use crate::room::RoomHandle;
 
 impl ForeignClass for RoomHandle {}
 
+/// Tries to convert provided [`DartValueArg`] to the [`MediaSourceKind`].
+///
+/// If convertation fails, then returns [`ArgumentError`] as a [`DartFuture`].
+macro_rules! try_into_source_kind {
+    ($k:expr) => {
+        match $k.try_into().map_err(|err: DartValueCastError| {
+            ArgumentError::new(err.value, "kind", err.expectation)
+        }) {
+            Ok(s) => s,
+            Err(e) => return futures::future::err(e.into()).into_dart_future(),
+        }
+    };
+}
+
 /// Connects to a media server and joins the [`Room`] with the provided
 /// authorization `token`.
 ///
@@ -102,8 +116,9 @@ pub unsafe extern "C" fn RoomHandle__mute_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.mute_audio();
     async move {
-        this.mute_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -118,8 +133,9 @@ pub unsafe extern "C" fn RoomHandle__unmute_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.unmute_audio();
     async move {
-        this.unmute_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -134,8 +150,9 @@ pub unsafe extern "C" fn RoomHandle__enable_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_audio();
     async move {
-        this.enable_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -150,8 +167,9 @@ pub unsafe extern "C" fn RoomHandle__disable_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_audio();
     async move {
-        this.disable_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -169,13 +187,9 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.mute_video(try_into_source_kind!(source_kind));
     async move {
-        this.mute_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -193,13 +207,9 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.unmute_video(try_into_source_kind!(source_kind));
     async move {
-        this.unmute_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -215,13 +225,9 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_video(try_into_source_kind!(source_kind));
     async move {
-        this.enable_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -237,13 +243,9 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_video(try_into_source_kind!(source_kind));
     async move {
-        this.disable_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -258,8 +260,9 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_remote_audio();
     async move {
-        this.enable_remote_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -274,8 +277,9 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_remote_audio();
     async move {
-        this.disable_remote_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -290,8 +294,9 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_remote_video();
     async move {
-        this.enable_remote_video().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -306,8 +311,9 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_video(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_remote_video();
     async move {
-        this.disable_remote_video().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
