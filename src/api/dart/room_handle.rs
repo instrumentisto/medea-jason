@@ -414,6 +414,9 @@ pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
 
 #[cfg(feature = "mockable")]
 mod mock {
+    use std::future::Future;
+
+    use futures::future;
     use tracerr::Traced;
 
     use crate::{
@@ -430,6 +433,9 @@ mod mock {
         },
         rpc::{ClientDisconnect, CloseReason, ConnectionInfo},
     };
+
+    /// Typedef for [`Result`]s related to the [`MediaState`] update functions.
+    type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
     #[derive(Clone)]
     pub struct RoomHandle(pub u8);
@@ -505,84 +511,84 @@ mod mock {
             Ok(())
         }
 
-        pub async fn mute_audio(
+        pub fn mute_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn unmute_audio(
+        pub fn unmute_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn enable_audio(
+        pub fn enable_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn disable_audio(
+        pub fn disable_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn mute_video(
+        pub fn mute_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, None);
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn unmute_video(
+        pub fn unmute_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, Some(MediaSourceKind::Display));
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn enable_video(
+        pub fn enable_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, Some(MediaSourceKind::Device));
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn disable_video(
+        pub fn disable_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, Some(MediaSourceKind::Display));
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn enable_remote_audio(
+        pub fn enable_remote_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn disable_remote_audio(
+        pub fn disable_remote_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn enable_remote_video(
+        pub fn enable_remote_video(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Err(tracerr::new!(ChangeMediaStateError::Detached).into())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::err(tracerr::new!(ChangeMediaStateError::Detached).into())
         }
 
-        pub async fn disable_remote_video(
+        pub fn disable_remote_video(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
     }
 }
