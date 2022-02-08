@@ -36,7 +36,7 @@ macro_rules! try_into_source_kind {
             ArgumentError::new(err.value, "kind", err.expectation)
         }) {
             Ok(s) => s,
-            Err(e) => return futures::future::err(e.into()).into_dart_future(),
+            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
         }
     };
 }
