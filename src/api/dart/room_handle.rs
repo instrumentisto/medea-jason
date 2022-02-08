@@ -27,9 +27,10 @@ pub use crate::room::RoomHandle;
 
 impl ForeignClass for RoomHandle {}
 
-/// Tries to convert provided [`DartValueArg`] to the [`MediaSourceKind`].
+/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
 ///
-/// If convertation fails, then returns [`ArgumentError`] as a [`DartFuture`].
+/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
+/// [`DartFuture`].
 macro_rules! try_into_source_kind {
     ($k:expr) => {
         match $k.try_into().map_err(|err: DartValueCastError| {
@@ -434,7 +435,7 @@ mod mock {
         rpc::{ClientDisconnect, CloseReason, ConnectionInfo},
     };
 
-    /// Typedef for [`Result`]s related to the [`MediaState`] update functions.
+    /// Alias for a [`Result`] related to [`MediaState`] update functions.
     type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
     #[derive(Clone)]

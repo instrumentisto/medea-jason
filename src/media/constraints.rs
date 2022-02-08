@@ -165,7 +165,7 @@ impl LocalTracksConstraints {
         self.0.borrow().muted(kind)
     }
 
-    /// Indicates whether provided [`MediaKind`] and [`MediaSourceKind`] are
+    /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled and constrained in this [`LocalTracksConstraints`].
     #[must_use]
     pub fn is_track_enabled_and_constrained(
@@ -178,8 +178,8 @@ impl LocalTracksConstraints {
             .is_track_enabled_and_constrained(kind, source)
     }
 
-    /// Indicates whether provided [`MediaKind`] and [`MediaSourceKind`] are
-    /// enabled and constrained in this [`LocalTracksConstraints`].
+    /// Indicates whether the provided [`MediaKind`] and [`MediaSourceKind`] are
+    /// enabled in this [`LocalTracksConstraints`].
     #[must_use]
     pub fn is_track_enabled(
         &self,

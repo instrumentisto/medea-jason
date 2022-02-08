@@ -45,7 +45,7 @@ use crate::{
     utils::{AsProtoState, Caused},
 };
 
-/// Typedef for [`Result`]s related to the [`MediaState`] update functions.
+/// Alias of [`Result`]s related to [`MediaState`] update functions.
 type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
 /// Reason of why [`Room`] has been closed.
@@ -438,8 +438,8 @@ impl RoomHandle {
             );
 
             // Perform `getUserMedia()`/`getDisplayMedia()` right away, so we
-            // can fail fast without touching senders states and
-            // starting all required messaging.
+            // can fail fast without touching senders states and starting all
+            // required messaging.
             // Hold tracks through all process, to ensure that they will be
             // reused without additional requests.
             let _tracks_handles;
