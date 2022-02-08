@@ -1,11 +1,23 @@
 use std::time::Duration;
 
-use cucumber::{then, when};
+use cucumber::{given, then, when};
 use medea_e2e::object::AwaitCompletion;
 
 use crate::World;
 
 use super::{parse_media_kind, parse_media_kinds};
+
+#[given(regex = r"^(\S+)'s `getUserMedia\(\)` request has added latency$")]
+async fn given_gum_delay(world: &mut World, id: String) {
+    let member = world.get_member(&id).unwrap();
+    member.add_gum_latency(Duration::from_millis(500)).await;
+}
+
+#[when(regex = r"^(\S+) frees all local tracks$")]
+async fn when_member_frees_all_local_tracks(world: &mut World, id: String) {
+    let member = world.get_member(&id).unwrap();
+    member.room().forget_local_tracks().await;
+}
 
 #[then(regex = "^(\\S+)'s (audio|(?:device|display) video) local track is \
                  (not )?muted$")]
