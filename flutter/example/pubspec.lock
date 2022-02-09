@@ -104,8 +104,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: add-missing-apis
-      resolved-ref: "8a15db8688c0ddb34edb076f9b0bfcb43ec27b1d"
+      ref: radical-android-refactoring
+      resolved-ref: "094278376878b0b467e72b5d8d744cf8ada1a987"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.7.0+hotfix.2"

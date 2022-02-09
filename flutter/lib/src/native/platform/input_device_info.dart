@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import 'package:flutter_webrtc/src/model/media_device_info.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'input_device_info.g.dart' as bridge;
@@ -29,24 +29,20 @@ Pointer<Utf8> _label(MediaDeviceInfo deviceInfo) {
 
 /// Returns [MediaDeviceInfo.groupId] value.
 Pointer _groupId(MediaDeviceInfo deviceInfo) {
-  if (deviceInfo.groupId != null) {
-    return ForeignValue.fromString(deviceInfo.groupId!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
+  return ForeignValue.none().intoRustOwned();
 }
 
 /// Returns [MediaDeviceInfo.kind] value.
 int _kind(MediaDeviceInfo deviceInfo) {
-  // TODO: Refactor flutter-webrtc to use enum instead of String.
-  if (deviceInfo.kind == 'audioinput') {
-    return 0;
-  } else if (deviceInfo.kind == 'videoinput') {
-    return 1;
-  } else if (deviceInfo.kind == 'audiooutput') {
-    return 2;
-  } else {
-    // Not supposed to ever happen.
-    throw StateError('Unknown MediaKind: ${deviceInfo.kind}');
+  switch (deviceInfo.kind) {
+    case MediaDeviceKind.audioinput:
+      return 0;
+    case MediaDeviceKind.videoinput:
+      return 1;
+    case MediaDeviceKind.audiooutput:
+      return 2;
+    default:
+      // Not supposed to ever happen.
+      throw StateError('Unknown MediaKind: ${deviceInfo.kind}');
   }
 }

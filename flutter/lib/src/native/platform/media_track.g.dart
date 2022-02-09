@@ -15,11 +15,13 @@ void registerFunction(
   required Pointer<NativeFunction<Int64 Function(Handle)>> readyState,
   required Pointer<NativeFunction<Void Function(Handle)>> stop,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
+  required Pointer<NativeFunction<Handle Function(Handle)>> clone,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer),
+          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -42,5 +44,6 @@ void registerFunction(
     readyState,
     stop,
     onEnded,
+    clone,
   );
 }

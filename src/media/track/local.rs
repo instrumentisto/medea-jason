@@ -99,10 +99,9 @@ impl Track {
     /// Forked [`Track`] will hold a strong reference to this [`Track`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    #[must_use]
-    pub fn fork(self: &Rc<Self>) -> Self {
+    pub async fn fork(self: &Rc<Self>) -> Self {
         let parent = Rc::clone(self);
-        let track = self.track.fork();
+        let track = self.track.fork().await;
         Self {
             track,
             source_kind: self.source_kind,

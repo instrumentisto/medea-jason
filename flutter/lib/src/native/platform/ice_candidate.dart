@@ -1,53 +1,42 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:ffi/ffi.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+import 'package:flutter_webrtc/src/model/ice_candidate.dart';
 
 import 'ice_candidate.g.dart' as bridge;
 
-/// Registers functions allowing Rust to create Dart [RTCIceCandidate]s.
+/// Registers functions allowing Rust to create Dart [IceCandidate]s.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
     init: Pointer.fromFunction(_new),
     candidate: Pointer.fromFunction(_candidate),
-    sdpMLineIndex: Pointer.fromFunction(_sdpMLineIndex),
+    sdpMLineIndex: Pointer.fromFunction(_sdpMLineIndex, 0),
     sdpMid: Pointer.fromFunction(_sdpMid),
   );
 }
 
-/// Returns the provided [RTCIceCandidate] [String].
-Pointer _candidate(RTCIceCandidate iceCandidate) {
-  if (iceCandidate.candidate != null) {
-    return ForeignValue.fromString(iceCandidate.candidate!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
+/// Returns the provided [IceCandidate] [String].
+Pointer<Utf8> _candidate(IceCandidate iceCandidate) {
+  return iceCandidate.sdp.toNativeUtf8();
 }
 
-/// Returns SDP M line index of the provided [RTCIceCandidate].
-Pointer _sdpMLineIndex(RTCIceCandidate iceCandidate) {
-  if (iceCandidate.sdpMlineIndex != null) {
-    return ForeignValue.fromInt(iceCandidate.sdpMlineIndex!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
+/// Returns SDP M line index of the provided [IceCandidate].
+int _sdpMLineIndex(IceCandidate iceCandidate) {
+  return iceCandidate.sdpMLineIndex;
 }
 
-/// Returns SDP MID of the provided [RTCIceCandidate].
-Pointer _sdpMid(RTCIceCandidate iceCandidate) {
-  if (iceCandidate.sdpMid != null) {
-    return ForeignValue.fromString(iceCandidate.sdpMid!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
+/// Returns SDP MID of the provided [IceCandidate].
+Pointer<Utf8> _sdpMid(IceCandidate iceCandidate) {
+  return iceCandidate.sdpMid.toNativeUtf8();
 }
 
-/// Creates a new [RTCIceCandidate] with the provided values.
+/// Creates a new [IceCandidate] with the provided values.
 Object _new(
     ForeignValue candidate, ForeignValue sdpMid, ForeignValue sdpMlineIndex) {
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();
   var sdpMLineIndexArg = sdpMlineIndex.toDart();
-  return RTCIceCandidate(candidateArg, sdpMidArg, sdpMLineIndexArg);
+  return IceCandidate(sdpMidArg, sdpMLineIndexArg, candidateArg);
 }
