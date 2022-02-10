@@ -27,7 +27,12 @@ mod constraints {
         /// Initializes new empty [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
-        pub fn init() -> Dart_Handle;
+        pub fn init_device_constraints() -> Dart_Handle;
+
+        /// Initializes new empty [MediaStreamConstraints][0] for display.
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
+        pub fn init_display_constraints() -> Dart_Handle;
 
         /// Initializes new empty [MediaStreamConstraints.video][0].
         ///
@@ -147,7 +152,7 @@ impl MediaStreamConstraints {
     /// Creates new empty [`MediaStreamConstraints`].
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(constraints::init())) }
+        unsafe { Self(DartHandle::new(constraints::init_device_constraints())) }
     }
 
     /// Specifies the provided nature and settings of an `audio`
@@ -213,23 +218,16 @@ impl DisplayMediaStreamConstraints {
     /// Creates new empty [`DisplayMediaStreamConstraints`] .
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(constraints::init())) }
+        unsafe {
+            Self(DartHandle::new(constraints::init_display_constraints()))
+        }
     }
 
     /// Specifies the provided nature and settings of a `video`
     /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
-        unimplemented!("Display media currently is not supported.")
-    }
-}
-
-#[allow(clippy::fallible_impl_from)]
-impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
-    fn from(_: DisplayVideoTrackConstraints) -> Self {
-        unimplemented!("Display media currently is not supported.")
-    }
+    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {}
 }
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {

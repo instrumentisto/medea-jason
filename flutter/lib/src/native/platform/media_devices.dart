@@ -1,11 +1,12 @@
 import 'dart:ffi';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:flutter_webrtc/src/model/constraints.dart';
+import 'package:flutter_webrtc/src/model/device_constraints.dart';
+import 'package:flutter_webrtc/src/model/display_constraints.dart';
 
 import 'media_devices.g.dart' as bridge;
 
-/// Registers functions allowing Rust to operate Dart [MediaDevices].
+/// Registers functions allowing Rust to operate Dart media devices.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -16,7 +17,7 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Requests media input access and returns the created [MediaStreamTrack]s.
-Object _getUserMedia(Constraints constraints) {
+Object _getUserMedia(DeviceConstraints constraints) {
   return () => getUserMedia(constraints);
 }
 
@@ -27,7 +28,6 @@ Object _enumerateDevices() {
 
 /// Starts capturing the contents of a display and returns the created
 /// [MediaStreamTrack]s.
-Object _getDisplayMedia(Map<String, dynamic> constraints) {
-  throw UnimplementedError(
-      "getDisplayMedia currently isn't supported by flutter_webrtc");
+Object _getDisplayMedia(DisplayConstraints constraints) {
+  return () => getDisplayMedia(constraints);
 }

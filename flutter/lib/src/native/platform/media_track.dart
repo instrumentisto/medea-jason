@@ -2,7 +2,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:flutter_webrtc/src/model/media_kind.dart';
+import 'package:flutter_webrtc/src/model/media_stream_track_state.dart';
 
 import 'media_track.g.dart' as bridge;
 
@@ -32,7 +32,7 @@ Pointer<Utf8> _id(MediaStreamTrack track) {
 
 /// Returns kind of the provided [MediaStreamTrack].
 int _kind(MediaStreamTrack track) {
-  if (track.kind() == MediaKind.Audio) {
+  if (track.kind() == MediaKind.audio) {
     return 0;
   } else {
     return 1;

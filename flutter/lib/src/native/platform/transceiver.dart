@@ -6,7 +6,7 @@ import 'package:flutter_webrtc/src/model/transceiver_direction.dart';
 
 import 'transceiver.g.dart' as bridge;
 
-/// Registers [RTCRtpTransceiver] related functions in Rust.
+/// Registers [RtpTransceiver] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -22,18 +22,18 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Sets [TransceiverDirection] of the provided [RTCRtpTransceiver] to the
+/// Sets [TransceiverDirection] of the provided [RtpTransceiver] to the
 /// provided one.
 Object _setDirection(RtpTransceiver transceiver, int direction) {
   return () => transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
-/// Returns current [TransceiverDirection] of the provided [RTCRtpTransceiver].
+/// Returns current [TransceiverDirection] of the provided [RtpTransceiver].
 Object _getDirection(RtpTransceiver transceiver) {
   return () => transceiver.getDirection().then((d) => d.index);
 }
 
-/// Returns current MID of the provided [RTCRtpTransceiver].
+/// Returns current MID of the provided [RtpTransceiver].
 Pointer _mid(RtpTransceiver transceiver) {
   if (transceiver.mid != null) {
     return ForeignValue.fromString(transceiver.mid!).intoRustOwned();
@@ -42,8 +42,8 @@ Pointer _mid(RtpTransceiver transceiver) {
   }
 }
 
-/// Returns current [RTCRtpTransceiver.sender]'s track of the provided
-/// [RTCRtpTransceiver].
+/// Returns current [RtpTransceiver.sender]'s track of the provided
+/// [RtpTransceiver].
 Pointer _getSendTrack(RtpTransceiver transceiver) {
   if (transceiver.sender.track != null) {
     return ForeignValue.fromHandle(transceiver.sender.track!).intoRustOwned();
@@ -52,29 +52,28 @@ Pointer _getSendTrack(RtpTransceiver transceiver) {
   }
 }
 
-/// Indicates whether the provided [RTCRtpTransceiver]'s
-/// [RTCRtpTransceiver.sender] has some [MediaStreamTrack].
+/// Indicates whether the provided [RtpTransceiver]'s
+/// [RtpTransceiver.sender] has some [MediaStreamTrack].
 bool _hasSendTrack(RtpTransceiver transceiver) {
   return transceiver.sender.track != null;
 }
 
-/// Replaces [RTCRtpTransceiver.sender]'s [MediaStreamTrack] of the provided
-/// [RTCRtpTransceiver] with a provided [MediaStreamTrack].
+/// Replaces [RtpTransceiver.sender]'s [MediaStreamTrack] of the provided
+/// [RtpTransceiver] with a provided [MediaStreamTrack].
 Object _replaceSendTrack(RtpTransceiver transceiver, MediaStreamTrack track) {
-  return () => transceiver.sender.setTrack(track);
+  return () => transceiver.sender.replaceTrack(track);
 }
 
-/// Sets [MediaStreamTrack.enabled] status in the [RTCRtpTransceiver.sender] of
-/// the provided [RTCRtpTransceiver].
+/// Sets [MediaStreamTrack.enabled] status in the [RtpTransceiver.sender] of
+/// the provided [RtpTransceiver].
 void _setSendTrackEnabled(RtpTransceiver transceiver, bool enabled) {
   if (transceiver.sender.track != null) {
     transceiver.sender.track!.setEnabled(enabled);
   }
 }
 
-/// Drops [RTCRtpTransceiver.sender] of the provided [RTCRtpTransceiver].
+/// Drops [RtpTransceiver.sender] of the provided [RtpTransceiver].
 Object _dropSender(RtpTransceiver transceiver) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   if (transceiver.sender.track == null) {
     return () => Future.value();
   } else {
@@ -82,7 +81,7 @@ Object _dropSender(RtpTransceiver transceiver) {
   }
 }
 
-/// Indicates whether the [RTCRtpTransceiver.sender]'s [MediaStreamTrack] is
+/// Indicates whether the [RtpTransceiver.sender]'s [MediaStreamTrack] is
 /// stopped.
 bool _isStopped(RtpTransceiver transceiver) {
   return transceiver.isStopped();

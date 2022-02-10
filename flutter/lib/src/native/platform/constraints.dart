@@ -1,15 +1,19 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/src/model/constraints.dart';
+import 'package:flutter_webrtc/src/model/device_constraints.dart';
+import 'package:flutter_webrtc/src/model/display_constraints.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'constraints.g.dart' as bridge;
 
-/// Registers functions allowing Rust to operate Dart [MediaStreamConstraints].
+/// Registers functions allowing Rust to operate Dart [MediaStreamConstraints][0].
+///
+/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(_new),
+    initDeviceConstraints: Pointer.fromFunction(_newDeviceConstraints),
+    initDisplayConstraints: Pointer.fromFunction(_newDisplayConstaints),
     newVideoConstraints: Pointer.fromFunction(_newVideoConstraints),
     newAudioConstraints: Pointer.fromFunction(_newAudioConstraints),
     setVideoConstraintValue: Pointer.fromFunction(_setVideoConstraintValue),
@@ -42,14 +46,19 @@ enum ConstraintType {
   mandatory,
 }
 
-/// Returns empty [Constraints].
-Object _new() {
-  return Constraints();
+/// Returns empty [DeviceConstraints].
+Object _newDeviceConstraints() {
+  return DeviceConstraints();
 }
 
-/// Returns new empty [VideoConstraints].
+///Returns empty [DisplayConstraints].
+Object _newDisplayConstaints() {
+  return DisplayConstraints();
+}
+
+/// Returns new empty [DeviceVideoConstraints].
 Object _newVideoConstraints() {
-  return VideoConstraints();
+  return DeviceVideoConstraints();
 }
 
 /// Returns new empty [AudioConstraints].
@@ -61,7 +70,7 @@ Object _newAudioConstraints() {
 ///
 /// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints-video
 void _setVideoConstraintValue(
-    VideoConstraints cons, int kind, ForeignValue value) {
+    DeviceVideoConstraints cons, int kind, ForeignValue value) {
   switch (VideoConstraintKind.values[kind]) {
     case VideoConstraintKind.deviceId:
       cons.deviceId = value.toDart() as String;
@@ -84,8 +93,9 @@ void _setAudioConstraintValue(
   }
 }
 
-/// Specifies the provided nature and settings of a video track to the given [Constraints].
-void _setVideoConstraint(Constraints cons, int type, VideoConstraints video) {
+/// Specifies the provided nature and settings of a video track to the given [DeviceConstraints].
+void _setVideoConstraint(
+    DeviceConstraints cons, int type, DeviceVideoConstraints video) {
   switch (ConstraintType.values[type]) {
     case ConstraintType.optional:
       cons.video.optional = video;
@@ -96,8 +106,9 @@ void _setVideoConstraint(Constraints cons, int type, VideoConstraints video) {
   }
 }
 
-/// Specifies the provided nature and settings of a audio track to the given [Constraints].
-void _setAudioConstraint(Constraints cons, int type, AudioConstraints audio) {
+/// Specifies the provided nature and settings of a audio track to the given [DeviceConstraints].
+void _setAudioConstraint(
+    DeviceConstraints cons, int type, AudioConstraints audio) {
   switch (ConstraintType.values[type]) {
     case ConstraintType.optional:
       cons.audio.optional = audio;

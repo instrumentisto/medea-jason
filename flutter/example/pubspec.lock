@@ -105,7 +105,7 @@ packages:
     description:
       path: "."
       ref: radical-android-refactoring
-      resolved-ref: "094278376878b0b467e72b5d8d744cf8ada1a987"
+      resolved-ref: "539a644efef6cdb39804e90e05313e145d211ba3"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.7.0+hotfix.2"
