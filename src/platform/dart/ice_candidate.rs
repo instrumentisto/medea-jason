@@ -78,7 +78,13 @@ impl IceCandidate {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
-        unsafe { Some(ice_candidate::sdp_m_line_index(self.0.get()) as u16) }
+        unsafe {
+            Some(
+                ice_candidate::sdp_m_line_index(self.0.get())
+                    .try_into()
+                    .unwrap(),
+            )
+        }
     }
 
     /// Returns SDP MID of this [`IceCandidate`].

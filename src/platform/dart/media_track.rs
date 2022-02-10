@@ -253,7 +253,6 @@ impl MediaStreamTrack {
     /// not interfere with [`Clone`] trait.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    #[must_use]
     pub fn fork(&self) -> impl Future<Output = Self> + 'static {
         unsafe {
             let handle = self.0.get();
@@ -262,7 +261,7 @@ impl MediaStreamTrack {
                     FutureFromDart::execute(media_stream_track::clone(handle))
                         .await
                         .unwrap();
-                MediaStreamTrack::from(new_track)
+                Self::from(new_track)
             }
         }
     }

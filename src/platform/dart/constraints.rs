@@ -225,6 +225,7 @@ impl DisplayMediaStreamConstraints {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
     fn from(_: DisplayVideoTrackConstraints) -> Self {
         unimplemented!("Display media currently is not supported.")

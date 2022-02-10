@@ -16,7 +16,7 @@ class CallRoute extends StatefulWidget {
 class _CallState extends State {
   bool _videoEnabled = true;
   bool _audioEnabled = true;
-  final List<RTCVideoView> _videos = List.empty(growable: true);
+  final List<VideoView> _videos = List.empty(growable: true);
   final Call _call = Call();
   late String _roomId;
   late String _memberId;
@@ -28,20 +28,20 @@ class _CallState extends State {
 
   @override
   void initState() {
-    _call.onNewRemoteStream((stream) async {
-      var renderer = RTCVideoRenderer();
+    _call.onNewRemoteStream((track) async {
+      var renderer = createVideoRenderer();
       await renderer.initialize();
-      renderer.srcObject = stream;
+      renderer.srcObject = track;
       setState(() {
-        _videos.add(RTCVideoView(renderer));
+        _videos.add(VideoView(renderer));
       });
     });
-    _call.onLocalStream((stream) async {
-      var renderer = RTCVideoRenderer();
+    _call.onLocalStream((track) async {
+      var renderer = createVideoRenderer();
       await renderer.initialize();
-      renderer.srcObject = stream;
+      renderer.srcObject = track;
       setState(() {
-        _videos.add(RTCVideoView(renderer, mirror: true));
+        _videos.add(VideoView(renderer, mirror: true));
       });
     });
     _call.start(_roomId, _memberId);
