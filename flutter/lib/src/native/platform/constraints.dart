@@ -29,6 +29,8 @@ void registerFunctions(DynamicLibrary dl) {
 enum VideoConstraintKind {
   facingMode,
   deviceId,
+  width,
+  height,
 }
 
 /// Kind of [MediaStreamConstraints.audio][0] setting.
@@ -77,6 +79,12 @@ void _setVideoConstraintValue(
       break;
     case VideoConstraintKind.facingMode:
       cons.facingMode = FacingMode.values[value.toDart() as int];
+      break;
+    case VideoConstraintKind.width:
+      cons.width = value.toDart();
+      break;
+    case VideoConstraintKind.height:
+      cons.height = value.toDart();
       break;
   }
 }

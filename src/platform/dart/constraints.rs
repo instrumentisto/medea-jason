@@ -11,8 +11,9 @@ use medea_macro::dart_bridge;
 use crate::{
     api::DartValue,
     media::{
-        constraints::ConstrainString, AudioTrackConstraints,
-        DeviceVideoTrackConstraints, DisplayVideoTrackConstraints,
+        constraints::{ConstrainString, ConstrainU32},
+        AudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayVideoTrackConstraints,
     },
     platform::dart::utils::handle::DartHandle,
 };
@@ -94,6 +95,8 @@ mod constraints {
 enum VideoConstraintKind {
     FacingMode = 0,
     DeviceId = 1,
+    Width = 2,
+    Height = 3,
 }
 
 /// Kind of [MediaStreamConstraints.audio][0] setting.
@@ -305,6 +308,58 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                             optional_cons.get(),
                             VideoConstraintKind::FacingMode as i64,
                             DartValue::from(facing_mode as i64),
+                        );
+                    }
+                }
+            }
+
+            if let Some(width) = from.width {
+                match width {
+                    ConstrainU32::Ideal(width) => {
+                        constraints::set_video_constraint_value(
+                            optional_cons.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(width),
+                        );
+                    }
+                    ConstrainU32::Exact(width) => {
+                        constraints::set_video_constraint_value(
+                            mandatory_cons.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(width),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        constraints::set_video_constraint_value(
+                            mandatory_cons.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(i64::from(min)),
+                        );
+                    }
+                }
+            }
+
+            if let Some(height) = from.height {
+                match height {
+                    ConstrainU32::Ideal(height) => {
+                        constraints::set_video_constraint_value(
+                            optional_cons.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(height),
+                        );
+                    }
+                    ConstrainU32::Exact(height) => {
+                        constraints::set_video_constraint_value(
+                            mandatory_cons.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(height),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        constraints::set_video_constraint_value(
+                            mandatory_cons.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(min),
                         );
                     }
                 }
