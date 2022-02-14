@@ -19,7 +19,7 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Returns the provided [IceCandidate] [String].
 Pointer<Utf8> _candidate(IceCandidate iceCandidate) {
-  return iceCandidate.sdp.toNativeUtf8();
+  return iceCandidate.candidate.toNativeUtf8();
 }
 
 /// Returns SDP M line index of the provided [IceCandidate].

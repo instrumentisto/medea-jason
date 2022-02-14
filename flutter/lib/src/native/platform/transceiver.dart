@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:flutter_webrtc/src/model/transceiver_direction.dart';
+import 'package:flutter_webrtc/src/model/transceiver.dart';
 
 import 'transceiver.g.dart' as bridge;
 
