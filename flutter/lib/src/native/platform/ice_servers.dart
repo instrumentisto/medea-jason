@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:flutter_webrtc/src/model/peer_connection_config.dart';
+import 'package:flutter_webrtc/src/model/peer.dart';
 
 import 'ice_servers.g.dart' as bridge;
 

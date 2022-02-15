@@ -1,5 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:flutter_webrtc/src/universal/web/media_stream_track.dart';
+import 'package:flutter_webrtc/src/platform/web/media_stream_track.dart';
 import 'package:js/js.dart';
 
 import '../interface/remote_media_track.dart';

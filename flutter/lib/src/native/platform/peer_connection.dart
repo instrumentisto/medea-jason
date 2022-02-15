@@ -1,11 +1,11 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/src/model/ice_candidate.dart';
-import 'package:flutter_webrtc/src/model/media_stream_track_state.dart';
+import 'package:flutter_webrtc/src/model/ice.dart';
+import 'package:flutter_webrtc/src/model/track.dart';
 import 'package:flutter_webrtc/src/model/transceiver.dart';
-import 'package:flutter_webrtc/src/model/peer_connection_config.dart';
-import 'package:flutter_webrtc/src/model/session_description.dart';
+import 'package:flutter_webrtc/src/model/peer.dart';
+import 'package:flutter_webrtc/src/model/sdp.dart';
 
 import 'peer_connection.g.dart' as bridge;
 import '../ffi/foreign_value.dart';

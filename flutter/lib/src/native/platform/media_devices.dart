@@ -1,8 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:flutter_webrtc/src/model/device_constraints.dart';
-import 'package:flutter_webrtc/src/model/display_constraints.dart';
+import 'package:flutter_webrtc/src/model/constraints.dart';
 
 import 'media_devices.g.dart' as bridge;
 

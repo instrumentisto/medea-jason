@@ -2,7 +2,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:flutter_webrtc/src/model/media_stream_track_state.dart';
+import 'package:flutter_webrtc/src/model/track.dart';
 
 import 'media_track.g.dart' as bridge;
 
