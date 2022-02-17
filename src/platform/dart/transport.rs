@@ -111,40 +111,51 @@ impl WebSocketRpcTransport {
             // TODO: Propagate execution error.
             #[allow(clippy::map_err_ignore)]
             let handle =
-                FutureFromDart::execute::<DartHandle>(transport::connect(
-                    string_into_c_str(url.as_ref().to_owned()),
-                    Callback::from_fn_mut({
-                        let subs = Rc::clone(&on_message_subs);
-                        move |msg: String| {
-                            let msg =
-                                match serde_json::from_str::<ServerMsg>(&msg) {
-                                    Ok(parsed) => parsed,
-                                    Err(e) => {
-                                        // TODO: Protocol versions mismatch?
-                                        //       should drop connection if so.
-                                        log::error!("{}", tracerr::new!(e));
-                                        return;
-                                    }
-                                };
+                FutureFromDart::execute::<DartHandle>(
+                    transport::connect(
+                        string_into_c_str(url.as_ref().to_owned()),
+                        Callback::from_fn_mut({
+                            let weak_subs = Rc::downgrade(&on_message_subs);
+                            move |msg: String| {
+                                if let Some(subs) = weak_subs.upgrade() {
+                                    let msg = match serde_json::from_str::<
+                                        ServerMsg,
+                                    >(
+                                        &msg
+                                    ) {
+                                        Ok(parsed) => parsed,
+                                        Err(e) => {
+                                            // TODO: Protocol versions mismatch?
+                                            //       should drop connection if
+                                            // so.
+                                            log::error!("{}", tracerr::new!(e));
+                                            return;
+                                        }
+                                    };
 
-                            subs.borrow_mut().retain(
-                                |sub: &mpsc::UnboundedSender<ServerMsg>| {
-                                    sub.unbounded_send(msg.clone()).is_ok()
-                                },
-                            );
-                        }
-                    })
-                    .into_dart(),
-                    Callback::from_once({
-                        let socket_state = Rc::clone(&socket_state);
-                        move |_: ()| {
-                            socket_state.set(TransportState::Closed(
-                                CloseMsg::Normal(1000, CloseReason::Finished),
-                            ));
-                        }
-                    })
-                    .into_dart(),
-                ))
+                                    subs.borrow_mut().retain(
+                                    |sub: &mpsc::UnboundedSender<ServerMsg>| {
+                                        sub.unbounded_send(msg.clone()).is_ok()
+                                    },
+                                );
+                                }
+                            }
+                        })
+                        .into_dart(),
+                        Callback::from_once({
+                            let socket_state = Rc::clone(&socket_state);
+                            move |_: ()| {
+                                socket_state.set(TransportState::Closed(
+                                    CloseMsg::Normal(
+                                        1000,
+                                        CloseReason::Finished,
+                                    ),
+                                ));
+                            }
+                        })
+                        .into_dart(),
+                    ),
+                )
                 .await
                 .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
 
