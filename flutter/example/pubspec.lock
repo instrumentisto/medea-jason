@@ -103,11 +103,9 @@ packages:
   flutter_webrtc:
     dependency: transitive
     description:
-      path: "."
-      ref: radical-android-refactoring
-      resolved-ref: "7f1fef329ee51af52f65196a5169cca76a9f9264"
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
+      path: "../../../flutter-webrtc"
+      relative: true
+    source: path
     version: "0.7.0+hotfix.2"
   fuchsia_remote_debug_protocol:
     dependency: transitive
