@@ -33,10 +33,13 @@ use std::{ffi::c_void, marker::PhantomData, ptr};
 use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
 use libc::c_char;
+use tracerr::Trace;
+use medea_macro::dart_bridge;
 
 use crate::{
     api::dart::utils::{DartError, PtrArray},
     media::{FacingMode, MediaKind, MediaSourceKind},
+    platform,
     platform::utils::{
         dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
@@ -45,6 +48,9 @@ use crate::{
         handle::DartHandle,
     },
 };
+use crate::api::err::InternalException;
+use crate::platform::utils::dart_api::Dart_PropagateError_DL_Trampolined;
+use crate::api::utils::new_panic_error;
 
 pub use self::{
     audio_track_constraints::AudioTrackConstraints,
@@ -65,6 +71,21 @@ pub use self::{
         DartError as Error,
     },
 };
+
+/// [`platform::Function`] which will be called when Rust panic fired.
+static mut FN: Option<platform::Function<String>> = None;
+
+/// Sets provided [`Dart_Handle`] as callback for the Rust panic hook.
+#[no_mangle]
+pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
+    FN = Some(platform::Function::<String>::new(cb));
+    std::panic::set_hook(Box::new(move |bt| {
+        Dart_PropagateError_DL_Trampolined(new_panic_error(bt.to_string()));
+        if let Some(f) = FN.as_ref() {
+            f.call1(format!("{bt:?}"));
+        }
+    }));
+}
 
 /// Rust structure having wrapper class in Dart.
 ///

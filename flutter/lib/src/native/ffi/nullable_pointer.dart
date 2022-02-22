@@ -28,6 +28,11 @@ class NullablePointer {
     }
   }
 
+  /// Returns `true` if this [NullablePointer] is freed.
+  bool isFreed() {
+    return _ptr == null;
+  }
+
   /// Nulls the underlying [Pointer].
   ///
   /// This doesn't affect the pointed memory, but Dart won't be able to access

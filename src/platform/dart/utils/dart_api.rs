@@ -2,7 +2,7 @@
 //!
 //! [`Dart DL API`]: https://tinyurl.com/32e7fudh
 
-use std::{ffi::c_void, ptr};
+use std::{ffi::c_void, os::raw::c_char, ptr};
 
 use dart_sys::{Dart_CObject, Dart_Handle, Dart_PersistentHandle, Dart_Port};
 
@@ -79,6 +79,25 @@ extern "C" {
         external_allocation_size: libc::intptr_t,
         callback: extern "C" fn(*mut c_void, *mut c_void),
     ) -> Dart_Handle;
+
+    /// Is this an error handle?
+    ///
+    /// Requires there to be a current isolate.
+    pub fn Dart_IsApiError_DL_Trampolined(object: Dart_Handle) -> bool;
+
+    /// Gets the error message from an error handle.
+    ///
+    /// Requires there to be a current isolate.
+    ///
+    /// Returns a C string containing an error message if the `object` is
+    /// error. An empty C string ("") if the handle is valid.
+    pub fn Dart_GetError_DL_Trampolined(
+        object: Dart_Handle,
+    ) -> ptr::NonNull<c_char>;
+
+    pub fn Dart_PropagateError_DL_Trampolined(
+        object: Dart_Handle,
+    );
 }
 
 /// Initializes usage of Dynamically Linked Dart API.

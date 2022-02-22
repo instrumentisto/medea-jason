@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
 import 'ffi/foreign_value.dart';
@@ -33,7 +35,9 @@ class NativeReconnectHandle extends ReconnectHandle {
 
   /// Constructs a new [ReconnectHandle] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeReconnectHandle(this.ptr);
+  NativeReconnectHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {

@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
@@ -38,7 +39,9 @@ class NativeRoomCloseReason extends RoomCloseReason {
 
   /// Constructs a new [RoomCloseReason] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeRoomCloseReason(this.ptr);
+  NativeRoomCloseReason(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   String reason() {

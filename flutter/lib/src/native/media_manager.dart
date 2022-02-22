@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../interface/input_device_info.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';
@@ -38,7 +40,9 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeMediaManagerHandle(this.ptr);
+  NativeMediaManagerHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(

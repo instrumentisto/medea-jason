@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../interface/local_media_track.dart';
 import '../interface/track_kinds.dart';
@@ -37,7 +38,9 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   /// Constructs a new [LocalMediaTrack] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeLocalMediaTrack(this.ptr);
+  NativeLocalMediaTrack(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   MediaKind kind() {

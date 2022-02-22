@@ -3,6 +3,8 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
@@ -32,6 +34,9 @@ typedef _closeRoom_Dart = void Function(Pointer, Pointer);
 typedef _initRoom_C = Pointer Function(Pointer);
 typedef _initRoom_Dart = Pointer Function(Pointer);
 
+typedef _onPanic_C = Void Function(Handle);
+typedef _onPanic_Dart = void Function(Object);
+
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
@@ -55,6 +60,17 @@ final _close_room =
     dl.lookupFunction<_closeRoom_C, _closeRoom_Dart>('Jason__close_room');
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('Jason__free');
+
+/// Callback which will be fired when Rust panics.
+void Function(String)? _onPanicCallback;
+
+/// Sets callback for the Rust's panic hook.
+///
+/// After this callback call, all old handles returned from Rust SHOULD NOT
+/// be used.
+void onPanic(void Function(String)? cb) {
+  _onPanicCallback = cb;
+}
 
 DynamicLibrary _dl_load() {
   if (!Platform.isAndroid) {
@@ -88,12 +104,26 @@ DynamicLibrary _dl_load() {
 
   executor = Executor(dl);
 
+  final _onPanic = dl.lookupFunction<_onPanic_C, _onPanic_Dart>('on_panic');
+  _onPanic((msg) {
+    msg as String;
+    print("Panic message: " + msg.toString());
+    RustHandlesStorage().freeAll();
+    if (_onPanicCallback != null) {
+      _onPanicCallback!(msg);
+    }
+  });
+
   return dl;
 }
 
 class Jason extends base.Jason {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+
+  Jason() {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   MediaManagerHandle mediaManager() {

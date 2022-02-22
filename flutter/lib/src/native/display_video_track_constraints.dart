@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../interface/display_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import 'ffi/nullable_pointer.dart';
@@ -20,6 +22,10 @@ final _free_Dart _free = dl
 class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+
+  DisplayVideoTrackConstraints() {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @moveSemantics
   @override

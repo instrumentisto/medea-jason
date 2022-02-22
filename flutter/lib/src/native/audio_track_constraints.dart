@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../interface/audio_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
@@ -29,6 +30,10 @@ final _free =
 class AudioTrackConstraints extends base.AudioTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+
+  AudioTrackConstraints() {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   void deviceId(String deviceId) {

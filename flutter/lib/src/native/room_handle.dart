@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../interface/connection_handle.dart';
 import '../interface/local_media_track.dart';
@@ -157,7 +158,9 @@ class NativeRoomHandle extends RoomHandle {
 
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeRoomHandle(this.ptr);
+  NativeRoomHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   Future<void> join(String token) async {

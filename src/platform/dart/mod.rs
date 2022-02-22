@@ -38,12 +38,11 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
-/// TODO: Implement panic hook.
-pub fn set_panic_hook() {
-    std::panic::set_hook(Box::new(|bt| {
-        log::error!("Rust code panicked {bt:?}");
-    }));
-}
+/// Dummy method, which do anything.
+///
+/// Panic hook will be always set by Dart side, so this function doesn't have
+/// sense.
+pub fn set_panic_hook() {}
 
 /// Initialize [`android_logger`] as default application logger with min log
 /// level set to [`log::Level::Debug`].

@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
 import '../util/move_semantic.dart';
@@ -48,7 +50,9 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
   /// provided [Pointer].
-  NativeConnectionHandle(this.ptr);
+  NativeConnectionHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   String getRemoteMemberId() {

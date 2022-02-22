@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../interface/audio_track_constraints.dart' as base_audio;
 import '../interface/device_video_track_constraints.dart' as base_device_video;
 import '../interface/display_video_track_constraints.dart'
@@ -44,6 +46,10 @@ final _free =
 class MediaStreamSettings extends base.MediaStreamSettings {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+
+  MediaStreamSettings() {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {

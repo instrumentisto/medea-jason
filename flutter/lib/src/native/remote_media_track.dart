@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';
@@ -79,7 +80,9 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   /// Constructs a new [RemoteMediaTrack] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeRemoteMediaTrack(this.ptr);
+  NativeRemoteMediaTrack(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   bool enabled() {

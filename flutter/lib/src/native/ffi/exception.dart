@@ -23,7 +23,8 @@ void registerFunctions(DynamicLibrary dl) {
           Pointer.fromFunction(_newMediaStateTransitionException),
       newInternalException: Pointer.fromFunction(_newInternalException),
       newMediaSettingsUpdateException:
-          Pointer.fromFunction(_newMediaSettingsUpdateException));
+          Pointer.fromFunction(_newMediaSettingsUpdateException),
+      throwPanicException: Pointer.fromFunction(_throwPanicException));
 }
 
 /// Creates a new [ArgumentError] from the provided invalid [value], its [name]
@@ -96,6 +97,21 @@ Object _newMediaSettingsUpdateException(
     Pointer<Utf8> message, Pointer<Handle> cause, bool rolledBack) {
   return NativeMediaSettingsUpdateException(
       message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
+}
+
+Object _throwPanicException(Pointer<Utf8> message) {
+  throw NativePanicException(message.nativeStringToDartString());
+}
+
+class NativePanicException implements Exception {
+  final String _msg;
+
+  NativePanicException(this._msg);
+
+  @override
+  String toString() {
+    return _msg;
+  }
 }
 
 /// Exception thrown when local media acquisition fails.

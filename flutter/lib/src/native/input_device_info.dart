@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../interface/input_device_info.dart';
 import '../interface/track_kinds.dart';
@@ -44,7 +45,9 @@ class NativeInputDeviceInfo extends InputDeviceInfo {
 
   /// Constructs a new [InputDeviceInfo] backed by a Rust struct behind the
   /// provided [Pointer].
-  NativeInputDeviceInfo(this.ptr);
+  NativeInputDeviceInfo(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   String deviceId() {

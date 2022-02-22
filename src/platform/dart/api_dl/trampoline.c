@@ -39,3 +39,15 @@ Dart_FinalizableHandle Dart_NewFinalizableHandle_DL_Trampolined(
                                       external_allocation_size,
                                       callback);
 }
+
+bool Dart_IsApiError_DL_Trampolined(Dart_Handle handle) {
+  return Dart_IsApiError_DL(handle);
+}
+
+const char* Dart_GetError_DL_Trampolined(Dart_Handle handle) {
+  return Dart_GetError_DL(handle);
+}
+
+void Dart_PropagateError_DL_Trampolined(Dart_Handle handle) {
+  Dart_PropagateError_DL(handle);
+}

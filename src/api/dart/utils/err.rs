@@ -101,7 +101,15 @@ mod exception {
             cause: DartError,
             rolled_back: bool,
         ) -> Dart_Handle;
+
+        pub fn throw_panic_exception(
+            message: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
     }
+}
+
+pub unsafe fn new_panic_error(message: String) -> Dart_Handle {
+    exception::throw_panic_exception(string_into_c_str(message))
 }
 
 /// An error that can be returned from Rust to Dart.
