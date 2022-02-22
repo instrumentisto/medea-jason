@@ -1,8 +1,8 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
+import '/src/util/rust_handles_storage.dart';
 import '../interface/connection_handle.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_stream_settings.dart' as base_settings;

@@ -12,6 +12,9 @@ import '/src/native/remote_media_track.dart';
 import '/src/native/room_close_reason.dart';
 import '/src/native/room_handle.dart';
 
+/// Returns a ordering number for the provided [handle].
+///
+/// Throw [Exception] if provided unknown object.
 int getOrderForHandle(dynamic handle) {
   switch (handle.runtimeType) {
     case AudioTrackConstraints:
@@ -45,9 +48,11 @@ int getOrderForHandle(dynamic handle) {
   }
 }
 
+/// Store for the all Rust handles created returned from Rust.
 class RustHandlesStorage {
   static final RustHandlesStorage _singleton = RustHandlesStorage._internal();
 
+  /// All handles given for the Dart side from the Rust side.
   List<dynamic> _handles = [];
 
   factory RustHandlesStorage() {
@@ -56,10 +61,12 @@ class RustHandlesStorage {
 
   RustHandlesStorage._internal();
 
+  /// Insert provided [handle] to this [RustHandlesStorage].
   void insertHandle(dynamic handle) {
     _handles.add(handle);
   }
 
+  /// Disposes all Rust handles registered in this [RustHandlesStorage].
   void freeAll() {
     _handles
         .sort((a, b) => getOrderForHandle(a).compareTo(getOrderForHandle(b)));

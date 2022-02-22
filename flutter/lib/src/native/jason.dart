@@ -3,8 +3,7 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
-
+import '/src/util/rust_handles_storage.dart';
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';

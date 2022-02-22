@@ -1,8 +1,8 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
+import '/src/util/rust_handles_storage.dart';
 import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
 import 'ffi/native_string.dart';

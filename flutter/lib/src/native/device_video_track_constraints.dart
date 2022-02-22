@@ -1,8 +1,8 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
+import '/src/util/rust_handles_storage.dart';
 import '../interface/device_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import 'ffi/nullable_pointer.dart';

@@ -95,9 +95,14 @@ extern "C" {
         object: Dart_Handle,
     ) -> ptr::NonNull<c_char>;
 
-    pub fn Dart_PropagateError_DL_Trampolined(
-        object: Dart_Handle,
-    );
+    /// Propagates an error.
+    ///
+    /// If the provided handle is an unhandled exception error, this
+    /// function will cause the unhandled exception to be rethrown.  This
+    /// will proceed in the standard way, walking up Dart frames until an
+    /// appropriate 'catch' block is found, executing 'finally' blocks,
+    /// etc.
+    pub fn Dart_PropagateError_DL_Trampolined(object: Dart_Handle);
 }
 
 /// Initializes usage of Dynamically Linked Dart API.

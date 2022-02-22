@@ -33,24 +33,23 @@ use std::{ffi::c_void, marker::PhantomData, ptr};
 use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
 use libc::c_char;
-use tracerr::Trace;
-use medea_macro::dart_bridge;
 
 use crate::{
-    api::dart::utils::{DartError, PtrArray},
+    api::{
+        dart::utils::{DartError, PtrArray},
+        utils::new_panic_error,
+    },
     media::{FacingMode, MediaKind, MediaSourceKind},
     platform,
     platform::utils::{
         dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
             Dart_NewPersistentHandle_DL_Trampolined,
+            Dart_PropagateError_DL_Trampolined,
         },
         handle::DartHandle,
     },
 };
-use crate::api::err::InternalException;
-use crate::platform::utils::dart_api::Dart_PropagateError_DL_Trampolined;
-use crate::api::utils::new_panic_error;
 
 pub use self::{
     audio_track_constraints::AudioTrackConstraints,

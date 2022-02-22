@@ -1,7 +1,6 @@
 import 'dart:ffi';
 
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
-
+import '/src/util/rust_handles_storage.dart';
 import '../interface/input_device_info.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';

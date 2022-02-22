@@ -1,7 +1,6 @@
 import 'dart:ffi';
 
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
-
+import '/src/util/rust_handles_storage.dart';
 import '../interface/audio_track_constraints.dart' as base_audio;
 import '../interface/device_video_track_constraints.dart' as base_device_video;
 import '../interface/display_video_track_constraints.dart'

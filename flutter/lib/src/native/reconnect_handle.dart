@@ -1,7 +1,6 @@
 import 'dart:ffi';
 
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
-
+import '/src/util/rust_handles_storage.dart';
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
 import 'ffi/foreign_value.dart';
