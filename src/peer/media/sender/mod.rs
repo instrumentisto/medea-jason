@@ -253,9 +253,9 @@ impl Sender {
     /// Indicates whether this [`Sender`] is enabled in
     /// [`LocalTracksConstraints`].
     fn enabled_in_cons(&self) -> bool {
-        self.send_constraints.is_track_enabled(
+        self.send_constraints.is_track_enabled_and_constrained(
             self.caps.media_kind(),
-            self.caps.media_source_kind(),
+            Some(self.caps.media_source_kind()),
         )
     }
 

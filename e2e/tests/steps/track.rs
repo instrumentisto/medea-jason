@@ -160,6 +160,7 @@ async fn then_remote_media_track(
         .get_track(media_kind, source_kind)
         .await
         .unwrap();
+    sleep(Duration::from_millis(500)).await;
 
     match state.as_str() {
         "enabled" => assert!(track.wait_for_enabled().await.is_ok()),

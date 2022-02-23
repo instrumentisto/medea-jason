@@ -619,6 +619,7 @@ impl Object<Room> {
             // language=JavaScript
             r#"
             async (room) => {
+                room.localTracksStore.tracks.forEach((t) => t.track.free());
                 room.localTracksStore.tracks = [];
             }
             "#,

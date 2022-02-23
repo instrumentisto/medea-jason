@@ -27,6 +27,21 @@ pub use crate::room::RoomHandle;
 
 impl ForeignClass for RoomHandle {}
 
+/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
+///
+/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
+/// [`DartFuture`].
+macro_rules! try_into_source_kind {
+    ($k:expr) => {
+        match $k.try_into().map_err(|err: DartValueCastError| {
+            ArgumentError::new(err.value, "kind", err.expectation)
+        }) {
+            Ok(s) => s,
+            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
+        }
+    };
+}
+
 /// Connects to a media server and joins the [`Room`] with the provided
 /// authorization `token`.
 ///
@@ -102,8 +117,9 @@ pub unsafe extern "C" fn RoomHandle__mute_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.mute_audio();
     async move {
-        this.mute_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -118,8 +134,9 @@ pub unsafe extern "C" fn RoomHandle__unmute_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.unmute_audio();
     async move {
-        this.unmute_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -134,8 +151,9 @@ pub unsafe extern "C" fn RoomHandle__enable_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_audio();
     async move {
-        this.enable_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -150,8 +168,9 @@ pub unsafe extern "C" fn RoomHandle__disable_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_audio();
     async move {
-        this.disable_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -169,13 +188,9 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.mute_video(try_into_source_kind!(source_kind));
     async move {
-        this.mute_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -193,13 +208,9 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.unmute_video(try_into_source_kind!(source_kind));
     async move {
-        this.unmute_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -215,13 +226,9 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_video(try_into_source_kind!(source_kind));
     async move {
-        this.enable_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -237,13 +244,9 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
 ) -> DartFuture<Result<(), DartError>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_video(try_into_source_kind!(source_kind));
     async move {
-        this.disable_video(source_kind.try_into().map_err(
-            |err: DartValueCastError| {
-                ArgumentError::new(err.value, "kind", err.expectation)
-            },
-        )?)
-        .await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -258,8 +261,9 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_remote_audio();
     async move {
-        this.enable_remote_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -274,8 +278,9 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_remote_audio();
     async move {
-        this.disable_remote_audio().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -290,8 +295,9 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.enable_remote_video();
     async move {
-        this.enable_remote_video().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -306,8 +312,9 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_video(
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
     let this = this.as_ref().clone();
 
+    let fut = this.disable_remote_video();
     async move {
-        this.disable_remote_video().await?;
+        fut.await?;
         Ok(())
     }
     .into_dart_future()
@@ -408,6 +415,9 @@ pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
 
 #[cfg(feature = "mockable")]
 mod mock {
+    use std::future::Future;
+
+    use futures::future;
     use tracerr::Traced;
 
     use crate::{
@@ -424,6 +434,9 @@ mod mock {
         },
         rpc::{ClientDisconnect, CloseReason, ConnectionInfo},
     };
+
+    /// Alias for a [`Result`] related to [`MediaState`] update functions.
+    type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
     #[derive(Clone)]
     pub struct RoomHandle(pub u8);
@@ -499,84 +512,84 @@ mod mock {
             Ok(())
         }
 
-        pub async fn mute_audio(
+        pub fn mute_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn unmute_audio(
+        pub fn unmute_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn enable_audio(
+        pub fn enable_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn disable_audio(
+        pub fn disable_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn mute_video(
+        pub fn mute_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, None);
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn unmute_video(
+        pub fn unmute_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, Some(MediaSourceKind::Display));
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn enable_video(
+        pub fn enable_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, Some(MediaSourceKind::Device));
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn disable_video(
+        pub fn disable_video(
             &self,
             source_kind: Option<MediaSourceKind>,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             assert_eq!(source_kind, Some(MediaSourceKind::Display));
-            Ok(())
+            future::ok(())
         }
 
-        pub async fn enable_remote_audio(
+        pub fn enable_remote_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn disable_remote_audio(
+        pub fn disable_remote_audio(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
 
-        pub async fn enable_remote_video(
+        pub fn enable_remote_video(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Err(tracerr::new!(ChangeMediaStateError::Detached).into())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::err(tracerr::new!(ChangeMediaStateError::Detached).into())
         }
 
-        pub async fn disable_remote_video(
+        pub fn disable_remote_video(
             &self,
-        ) -> Result<(), Traced<ChangeMediaStateError>> {
-            Ok(())
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
     }
 }
