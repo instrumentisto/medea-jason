@@ -25,7 +25,6 @@ async fn when_interconnects_kind(
     left_member_id: String,
     right_member_id: String,
 ) {
-    // tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     let send_video = kind.contains("video").then(|| VideoSettings {
         publish_policy: proto::PublishPolicy::Optional,
     });
@@ -50,7 +49,6 @@ async fn when_interconnects_kind(
         })
         .await
         .unwrap();
-    // tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 }
 
 #[then(regex = "^Control API sends `OnLeave` callback with `(.+)` reason \
