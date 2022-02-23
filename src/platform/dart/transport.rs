@@ -127,7 +127,7 @@ impl WebSocketRpcTransport {
                                         Err(e) => {
                                             // TODO: Protocol versions mismatch?
                                             //       should drop connection if
-                                            // so.
+                                            //       so.
                                             log::error!("{}", tracerr::new!(e));
                                             return;
                                         }

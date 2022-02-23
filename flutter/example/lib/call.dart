@@ -8,7 +8,7 @@ const MEDEA_PORT = 8080;
 class Call {
   final Jason _jason = Jason();
   late RoomHandle _room;
-  late Function(MediaStreamTrack) _onLocalStream;
+  late Function(MediaStreamTrack) _onLocalTrack;
   List<LocalMediaTrack> _tracks = [];
 
   Call() {
@@ -32,7 +32,7 @@ class Call {
 
     tracks.forEach((track) async {
       if (track.kind() == MediaKind.Video) {
-        _onLocalStream(track.getTrack());
+        _onLocalTrack(track.getTrack());
       }
     });
 
@@ -46,7 +46,7 @@ class Call {
   }
 
   void onLocalStream(Function(MediaStreamTrack) f) {
-    _onLocalStream = f;
+    _onLocalTrack = f;
   }
 
   void onNewRemoteStream(Function(MediaStreamTrack) f) {
