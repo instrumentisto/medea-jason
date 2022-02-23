@@ -1,11 +1,12 @@
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:flutter_webrtc/src/model/peer.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'ice_servers.g.dart' as bridge;
 
-/// Registers PeerConnection ICE servers related functions in Rust.
+/// Registers `PeerConnection` ICE servers related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
