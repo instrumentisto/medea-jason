@@ -21,8 +21,8 @@ IMAGE_NAME := $(strip \
 	$(or $(image),medea-control-api-mock)))
 
 RUST_VER := 1.58
-CHROME_VERSION := 97.0
-FIREFOX_VERSION := 92.0-driver0.29.1
+CHROME_VERSION := 98.0
+FIREFOX_VERSION := 97.0.1-driver0.30.0
 
 CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -892,7 +892,11 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 	COMPOSE_WEBDRIVER_IMAGE_VER=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			$(FIREFOX_VERSION) ,\
-			$(CHROME_VERSION) ))
+			$(CHROME_VERSION) )) \
+	COMPOSE_WEBDRIVER_ENTRYPOINT=$(strip \
+		$(if $(call eq,$(browser),firefox),\
+			"geckodriver --binary=/opt/firefox/firefox" ,\
+			/entrypoint.sh ))
 
 docker.up.e2e: docker.down.e2e
 	@make build.jason target=web debug=$(debug) dockerized=no

@@ -36,5 +36,6 @@ services:
     depends_on: ["coturn", "frontend"]
     #ports:
     #  - "4444:4444"      # browser webdriver
+    entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
     shm_size: 512m
     network_mode: host
