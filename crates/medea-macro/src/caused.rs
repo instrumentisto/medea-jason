@@ -21,15 +21,24 @@ pub(crate) fn derive(mut s: Structure<'_>) -> Result<TokenStream> {
     let error_type = error_type(&s)?;
 
     let cause_body = s.bind_with(|_| BindStyle::Move).each_variant(|v| {
-        if let Some(caused) = v.bindings().iter().find(|&bi| is_caused(bi)) {
-            quote! { return #caused.cause() }
-        } else if let Some(error) =
-            v.bindings().iter().find(|&bi| is_error(bi, &error_type))
-        {
-            quote! { return Some(#error) }
-        } else {
-            quote! { return None }
-        }
+        v.bindings().iter().find(|&bi| is_caused(bi)).map_or_else(
+            || {
+                v.bindings()
+                    .iter()
+                    .find(|&bi| is_error(bi, &error_type))
+                    .map_or_else(
+                        || {
+                            quote! { return None }
+                        },
+                        |error| {
+                            quote! { return Some(#error) }
+                        },
+                    )
+            },
+            |caused| {
+                quote! { return #caused.cause() }
+            },
+        )
     });
 
     let caused = s.gen_impl(quote! {

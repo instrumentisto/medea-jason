@@ -77,7 +77,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
 pub unsafe extern "C" fn RemoteMediaTrack__enabled(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> u8 {
-    this.as_ref().enabled() as u8
+    u8::from(this.as_ref().enabled())
 }
 
 /// Indicate whether this [`RemoteMediaTrack`] is muted.
@@ -85,7 +85,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__enabled(
 pub unsafe extern "C" fn RemoteMediaTrack__muted(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> u8 {
-    this.as_ref().muted() as u8
+    u8::from(this.as_ref().muted())
 }
 
 /// Returns this [`RemoteMediaTrack`]'s kind (audio/video).
