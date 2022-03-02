@@ -328,6 +328,7 @@ impl WebSocketRpcClient {
                 }
             },
             ServerMsg::RpcSettings(settings) => {
+                #[allow(clippy::option_if_let_else)] // more readable this way
                 if let Some(heartbeat) = self.0.borrow_mut().heartbeat.as_ref()
                 {
                     heartbeat.update_settings(

@@ -223,6 +223,7 @@ impl MediaStreamTrack {
     /// callbacks.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
+    #[must_use]
     pub fn fork(&self) -> Self {
         Self {
             sys_track: Rc::new(web_sys::MediaStreamTrack::clone(

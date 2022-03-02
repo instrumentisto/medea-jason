@@ -378,6 +378,7 @@ impl State {
     ///
     /// Schedules a local stream update.
     pub fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
+        #[allow(clippy::option_if_let_else)] // more readable this way
         if let Some(sender) = self.get_sender(track_patch.id) {
             sender.update(track_patch);
             self.maybe_update_local_stream.set(true);
