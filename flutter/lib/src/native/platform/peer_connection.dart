@@ -44,7 +44,7 @@ Object _addTransceiver(PeerConnection peer, int kind, int direction) {
       RtpTransceiverInit(TransceiverDirection.values[direction]));
 }
 
-/// Returns newly created [PeerConnection] with a provided `iceServers`
+/// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
 Object _newPeer(Object iceServers) {
   var servers = iceServers as List<dynamic>;
@@ -52,21 +52,21 @@ Object _newPeer(Object iceServers) {
       IceTransportType.all, servers.map((e) => e as IceServer).toList());
 }
 
-/// Sets the given [f] to the [PeerConnection.onTrack] callback.
+/// Sets the provided [f] to the [PeerConnection.onTrack] callback.
 void _onTrack(PeerConnection conn, Function f) {
   conn.onTrack((track, transceiver) {
     f(track, transceiver);
   });
 }
 
-/// Sets the given [f] to the [PeerConnection.onIceCandidate] callback.
+/// Sets the provided [f] to the [PeerConnection.onIceCandidate] callback.
 void _onIceCandidate(PeerConnection conn, Function f) {
   conn.onIceCandidate((e) {
     f(e);
   });
 }
 
-/// Sets the given [f] to the [PeerConnection.onIceConnectionStateChange]
+/// Sets the provided [f] to the [PeerConnection.onIceConnectionStateChange]
 /// callback.
 void _onIceConnectionStateChange(PeerConnection conn, Function f) {
   conn.onIceConnectionStateChange((e) {
@@ -74,15 +74,16 @@ void _onIceConnectionStateChange(PeerConnection conn, Function f) {
   });
 }
 
-/// Sets the given [f] to the [PeerConnection.onConnectionStateChange] callback.
+/// Sets the provided [f] to the [PeerConnection.onConnectionStateChange]
+/// callback.
 void _onConnectionStateChange(PeerConnection conn, Function f) {
   conn.onConnectionStateChange((e) {
     f(e.index);
   });
 }
 
-/// Lookups [RtpTransceiver] in the provided [PeerConnection] by the
-/// provided [mid].
+/// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided
+/// [mid].
 Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.toDartString();
@@ -94,7 +95,7 @@ Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
       });
 }
 
-/// Sets remote SDP offer in the provided [PeerConnection].
+/// Sets a remote SDP offer in the provided [PeerConnection].
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
@@ -107,7 +108,7 @@ Object _setRemoteDescription(
   return () => conn.setRemoteDescription(desc);
 }
 
-/// Sets local SDP offer in the provided [PeerConnection].
+/// Sets a local SDP offer in the provided [PeerConnection].
 Object _setLocalDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
@@ -136,30 +137,30 @@ void _restartIce(PeerConnection conn) {
   conn.restartIce();
 }
 
-/// Adds provided [IceCandidate] to the provided [PeerConnection].
+/// Adds the specified [IceCandidate] to the provided [PeerConnection].
 Object _addIceCandidate(PeerConnection conn, IceCandidate candidate) {
   return () => conn.addIceCandidate(candidate);
 }
 
-/// Returns current [PeerConnection.connectionState] of the provided
+/// Returns the current [PeerConnection.connectionState] of the provided
 /// [PeerConnection].
 Pointer _connectionState(PeerConnection conn) {
   return ForeignValue.fromInt(conn.connectionState().index).intoRustOwned();
 }
 
-/// Returns current [PeerConnection.iceConnectionState] of the provided
+/// Returns the current [PeerConnection.iceConnectionState] of the provided
 /// [PeerConnection].
 int _iceConnectionState(PeerConnection conn) {
   return conn.iceConnectionState().index;
 }
 
-/// Rollbacks local SDP offer of the provided [PeerConnection].
+/// Rollbacks the local SDP offer of the provided [PeerConnection].
 Object _rollback(PeerConnection conn) {
   return () => conn.setLocalDescription(
       SessionDescription(SessionDescriptionType.rollback, ''));
 }
 
-/// Returns all [RtpTransceiver]s of the provided [PeerConnection].
+/// Returns all the [RtpTransceiver]s of the provided [PeerConnection].
 Object getTransceivers(PeerConnection conn) {
   return () => conn.getTransceivers();
 }

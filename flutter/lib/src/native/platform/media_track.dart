@@ -83,7 +83,7 @@ void _setEnabled(MediaStreamTrack track, bool enabled) {
   track.setEnabled(enabled);
 }
 
-/// Stops provided [MediaStreamTrack].
+/// Stops the provided [MediaStreamTrack].
 void _stop(MediaStreamTrack track) {
   track.stop();
 }
@@ -93,6 +93,7 @@ bool _enabled(MediaStreamTrack track) {
   return track.isEnabled();
 }
 
+/// Clones the provided [MediaStreamTrack] preserving the same media source.
 Object _clone(MediaStreamTrack track) {
   return () => track.clone();
 }

@@ -27,17 +27,11 @@ pub(crate) fn derive(mut s: Structure<'_>) -> Result<TokenStream> {
                     .iter()
                     .find(|&bi| is_error(bi, &error_type))
                     .map_or_else(
-                        || {
-                            quote! { return None }
-                        },
-                        |error| {
-                            quote! { return Some(#error) }
-                        },
+                        || quote! { return None },
+                        |err| quote! { return Some(#err) },
                     )
             },
-            |caused| {
-                quote! { return #caused.cause() }
-            },
+            |caused| quote! { return #caused.cause() },
         )
     });
 
