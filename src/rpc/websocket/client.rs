@@ -331,9 +331,9 @@ impl WebSocketRpcClient {
                 self.0.borrow_mut().heartbeat.as_ref().map_or_else(
                     || {
                         log::error!(
-                        "Failed to update socket settings because Heartbeat is \
-                         None",
-                    );
+                            "Failed to update socket settings because \
+                             Heartbeat is None",
+                        );
                     },
                     |heartbeat| {
                         heartbeat.update_settings(

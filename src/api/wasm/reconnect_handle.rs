@@ -23,6 +23,7 @@ use super::Error;
 #[derive(Clone, Debug, From)]
 pub struct ReconnectHandle(rpc::ReconnectHandle);
 
+#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl ReconnectHandle {
     /// Tries to reconnect after the provided delay in milliseconds.

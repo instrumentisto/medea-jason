@@ -25,6 +25,7 @@
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
+    clippy::index_refutable_slice,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
     clippy::mem_forget,

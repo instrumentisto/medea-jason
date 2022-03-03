@@ -27,7 +27,7 @@ jobs:
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -46,7 +46,7 @@ jobs:
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -66,7 +66,7 @@ jobs:
           - medea-demo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: azure/setup-helm@v1
 
       - run: make helm.lint chart=${{ matrix.chart }}
@@ -78,7 +78,7 @@ jobs:
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v1
 
       - run: make flutter.fmt check=yes
@@ -90,7 +90,7 @@ jobs:
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v1
 
       - run: make flutter
@@ -127,7 +127,7 @@ jobs:
                     || !startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ matrix.if }}
       - uses: actions-rs/toolchain@v1
         with:
@@ -175,7 +175,7 @@ jobs:
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -231,7 +231,7 @@ jobs:
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -293,7 +293,7 @@ jobs:
           - android
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -328,7 +328,7 @@ jobs:
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -387,7 +387,7 @@ jobs:
             if: ${{ !startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ matrix.if }}
       - uses: docker/setup-buildx-action@v1
         if: ${{ matrix.if }}
@@ -430,7 +430,7 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Parse crate/package name and version
         id: release
         uses: actions-ecosystem/action-regex-match@v2
@@ -475,7 +475,7 @@ jobs:
             && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Parse crate name and version
         id: crate
         uses: actions-ecosystem/action-regex-match@v2
@@ -501,7 +501,7 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Parse package name and version
         id: package
         uses: actions-ecosystem/action-regex-match@v2
@@ -540,7 +540,7 @@ jobs:
           - medea-demo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: trilom/file-changes-action@v1.2.4
         id: changed
       - id: chart
@@ -594,7 +594,7 @@ jobs:
             if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ matrix.if }}
       - uses: docker/setup-buildx-action@v1
         if: ${{ matrix.if }}
