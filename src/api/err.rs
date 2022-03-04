@@ -52,6 +52,7 @@ impl StateError {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl StateError {
     /// Returns message describing the problem.
@@ -127,6 +128,7 @@ impl LocalMediaInitException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
@@ -174,6 +176,7 @@ impl EnumerateDevicesException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl EnumerateDevicesException {
     /// Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
@@ -247,6 +250,7 @@ impl RpcClientException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
@@ -308,6 +312,7 @@ impl InternalException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl InternalException {
     /// Returns an error message describing the problem.
@@ -344,6 +349,7 @@ impl FormatException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl FormatException {
     /// Returns an error message describing of the problem.
@@ -377,6 +383,7 @@ impl MediaStateTransitionException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaStateTransitionException {
     /// Returns an error message describing the problem.
@@ -427,6 +434,7 @@ impl MediaSettingsUpdateException {
     }
 }
 
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaSettingsUpdateException {
     /// Returns an error message describing the problem.

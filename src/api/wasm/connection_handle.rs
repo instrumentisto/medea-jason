@@ -14,6 +14,7 @@ use crate::{api, connection};
 #[derive(Debug, From)]
 pub struct ConnectionHandle(connection::ConnectionHandle);
 
+#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl ConnectionHandle {
     /// Sets callback, invoked when this [`Connection`] is closed.

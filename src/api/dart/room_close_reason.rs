@@ -23,7 +23,7 @@ pub unsafe extern "C" fn RoomCloseReason__reason(
 pub unsafe extern "C" fn RoomCloseReason__is_closed_by_server(
     this: ptr::NonNull<RoomCloseReason>,
 ) -> u8 {
-    u8::from(this.as_ref().is_closed_by_server())
+    this.as_ref().is_closed_by_server().into()
 }
 
 /// Indicates whether a [`Room`]'s close reason is considered as an error.
@@ -33,7 +33,7 @@ pub unsafe extern "C" fn RoomCloseReason__is_closed_by_server(
 pub unsafe extern "C" fn RoomCloseReason__is_err(
     this: ptr::NonNull<RoomCloseReason>,
 ) -> u8 {
-    u8::from(this.as_ref().is_err())
+    this.as_ref().is_err().into()
 }
 
 /// Frees the data behind the provided pointer.

@@ -23,7 +23,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Kind of [MediaStreamConstraints.video][0] setting.
+/// Kind of a [MediaStreamConstraints.video][0] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
 enum VideoConstraintKind {
@@ -33,15 +33,14 @@ enum VideoConstraintKind {
   height,
 }
 
-/// Kind of [MediaStreamConstraints.audio][0] setting.
+/// Kind of a [MediaStreamConstraints.audio][0] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 enum AudioConstraintKind {
   deviceId,
 }
 
-/// Indicates the necessity of a [AudioConstraints] or [VideoConstraints]
-/// setting.
+/// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 enum ConstraintType {
@@ -49,17 +48,17 @@ enum ConstraintType {
   mandatory,
 }
 
-/// Returns a new empty [DeviceConstraints].
+/// Returns new empty [DeviceConstraints].
 Object _newDeviceConstraints() {
   return DeviceConstraints();
 }
 
-///Returns a new empty [DisplayConstraints].
+///Returns new empty [DisplayConstraints].
 Object _newDisplayConstaints() {
   return DisplayConstraints();
 }
 
-/// Returns a new empty [DeviceVideoConstraints].
+/// Returns new empty [DeviceVideoConstraints].
 Object _newVideoConstraints() {
   return DeviceVideoConstraints();
 }
@@ -69,7 +68,7 @@ Object _newAudioConstraints() {
   return AudioConstraints();
 }
 
-/// Specifies setting of the [MediaStreamConstraints.video][0].
+/// Specifies the provided setting of a [MediaStreamConstraints.video][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
 void _setVideoConstraintValue(
@@ -90,7 +89,7 @@ void _setVideoConstraintValue(
   }
 }
 
-/// Specifies setting of the [MediaStreamConstraints.audio][0].
+/// Specifies the provided setting of a [MediaStreamConstraints.audio][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 void _setAudioConstraintValue(

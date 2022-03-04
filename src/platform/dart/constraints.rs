@@ -25,12 +25,12 @@ mod constraints {
     use crate::api::DartValue;
 
     extern "C" {
-        /// Initializes a new empty [MediaStreamConstraints][0].
+        /// Initializes new empty [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
         pub fn init_device_constraints() -> Dart_Handle;
 
-        /// Initializes a new empty [MediaStreamConstraints][0] for display.
+        /// Initializes new empty [MediaStreamConstraints][0] for display.
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
         pub fn init_display_constraints() -> Dart_Handle;
@@ -45,8 +45,8 @@ mod constraints {
         /// [0]: https://tinyurl.com/5bmrr4w5
         pub fn new_audio_constraints() -> Dart_Handle;
 
-        /// Specifies setting of the [MediaStreamConstraints.video][0] (for
-        /// example `facingMode`).
+        /// Specifies the provided setting of a
+        /// [MediaStreamConstraints.video][0] (for example `facingMode`).
         ///
         /// [0]: https://tinyurl.com/3yvnbb9e
         pub fn set_video_constraint_value(
@@ -55,8 +55,8 @@ mod constraints {
             value: DartValue,
         );
 
-        /// Specifies setting of the [MediaStreamConstraints.audio][0] (for
-        /// example `deviceId`).
+        /// Specifies the provided setting of a
+        /// [MediaStreamConstraints.audio][0] (for example `deviceId`).
         ///
         /// [0]: https://tinyurl.com/5bmrr4w5
         pub fn set_audio_constraint_value(
@@ -89,7 +89,7 @@ mod constraints {
     }
 }
 
-/// Kind of [MediaStreamConstraints.video][0] setting.
+/// Kind of a [MediaStreamConstraints.video][0] setting.
 ///
 /// [0]: https://tinyurl.com/3yvnbb9e
 enum VideoConstraintKind {
@@ -99,23 +99,23 @@ enum VideoConstraintKind {
     Height = 3,
 }
 
-/// Kind of [MediaStreamConstraints.audio][0] setting.
+/// Kind of a [MediaStreamConstraints.audio][0] setting.
 ///
 /// [0]: https://tinyurl.com/5bmrr4w5
 enum AudioConstraintKind {
     DeviceId = 0,
 }
 
-/// Indicator of necessity of [MediaStreamConstraints] setting.
+/// Indicator of necessity of a [MediaStreamConstraints] setting.
 ///
 /// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints
 enum ConstraintType {
-    /// Setting is not necessary. So if device is not fits to the provided
-    /// constraint, it still can be used.
+    /// Not necessary, so if the device doesn't fit to the provided constraint,
+    /// it still can be used.
     Optional = 0,
 
-    /// Setting is necessary. So if device is not fits to the provided
-    /// constraint, it can't be used.
+    /// Necessary, so if the device doesn't fit to the provided constraint, it
+    /// can't be used.
     Mandatory = 1,
 }
 
@@ -124,12 +124,12 @@ enum ConstraintType {
 /// [0]: https://w3.org/TR/mediacapture-streams#media-track-constraints
 #[derive(Debug)]
 pub struct MediaTrackConstraints {
-    /// Unnecessary setting. So if device is not fits to this constraint, it
-    /// still can be used.
+    /// Optional setting, so if the device doesn't fit to the provided
+    /// constraint, it still can be used.
     optional: DartHandle,
 
-    /// Necessary setting. So if device is not fits to the provided constraint,
-    /// it can't be used.
+    /// Necessary setting, so if the device doesn't fit to the provided
+    /// constraint, it can't be used.
     mandatory: DartHandle,
 }
 

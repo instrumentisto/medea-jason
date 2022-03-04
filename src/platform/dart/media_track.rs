@@ -101,8 +101,8 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
         pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
 
-        /// Creates new instance of [`MediaStreamTrack`], which will depend on
-        /// the same media source as this [`MediaStreamTrack`].
+        /// Creates a new instance of [`MediaStreamTrack`] depending on the same
+        /// media source as this [`MediaStreamTrack`].
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
     }
 }
