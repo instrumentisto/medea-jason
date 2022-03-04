@@ -5,7 +5,6 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}-frontend
     image: nginx:stable-alpine
     ports:
-      - "4444:4444"      # browser webdriver
       - "6379:6379"      # coturn redis
       - "6565:6565"      # medea grpc
       - "8000:8000"      # control-api-mock http
@@ -50,4 +49,5 @@ services:
     image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
     depends_on: ["control-api-mock", "coturn", "frontend", "medea"]
     shm_size: 512m
-    network_mode: service:frontend
+    entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
+    network_mode: host

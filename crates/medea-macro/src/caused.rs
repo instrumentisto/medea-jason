@@ -21,16 +21,18 @@ pub(crate) fn derive(mut s: Structure<'_>) -> Result<TokenStream> {
     let error_type = error_type(&s)?;
 
     let cause_body = s.bind_with(|_| BindStyle::Move).each_variant(|v| {
-        #[allow(clippy::option_if_let_else)] // more readable this way
-        if let Some(caused) = v.bindings().iter().find(|&bi| is_caused(bi)) {
-            quote! { return #caused.cause() }
-        } else if let Some(error) =
-            v.bindings().iter().find(|&bi| is_error(bi, &error_type))
-        {
-            quote! { return Some(#error) }
-        } else {
-            quote! { return None }
-        }
+        v.bindings().iter().find(|&bi| is_caused(bi)).map_or_else(
+            || {
+                v.bindings()
+                    .iter()
+                    .find(|&bi| is_error(bi, &error_type))
+                    .map_or_else(
+                        || quote! { return None },
+                        |err| quote! { return Some(#err) },
+                    )
+            },
+            |caused| quote! { return #caused.cause() },
+        )
     });
 
     let caused = s.gen_impl(quote! {

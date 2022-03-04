@@ -1319,10 +1319,10 @@ pub struct RtcOutboundRtpStreamStats {
     pub media_type: RtcOutboundRtpStreamMediaType,
 
     /// Total number of bytes sent for this SSRC.
-    pub bytes_sent: u64,
+    pub bytes_sent: Option<u64>,
 
     /// Total number of RTP packets sent for this SSRC.
-    pub packets_sent: u64,
+    pub packets_sent: Option<u64>,
 
     /// ID of the stats object representing the track currently
     /// attached to the sender of this stream.

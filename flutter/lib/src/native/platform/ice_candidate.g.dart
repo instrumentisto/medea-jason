@@ -8,9 +8,9 @@ void registerFunction(
           NativeFunction<
               Handle Function(ForeignValue, ForeignValue, ForeignValue)>>
       init,
-  required Pointer<NativeFunction<Pointer Function(Handle)>> candidate,
-  required Pointer<NativeFunction<Pointer Function(Handle)>> sdpMLineIndex,
-  required Pointer<NativeFunction<Pointer Function(Handle)>> sdpMid,
+  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> candidate,
+  required Pointer<NativeFunction<Uint64 Function(Handle)>> sdpMLineIndex,
+  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> sdpMid,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer),

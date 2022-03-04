@@ -6,13 +6,13 @@ use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::{
-    handle::DartHandle, NonNullDartValueArgExt,
+use crate::{
+    api::c_str_into_string, platform::dart::utils::handle::DartHandle,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/ice_candidate.g.dart")]
 mod ice_candidate {
-    use std::ptr;
+    use std::{os::raw::c_char, ptr};
 
     use dart_sys::Dart_Handle;
 
@@ -27,19 +27,13 @@ mod ice_candidate {
         ) -> Dart_Handle;
 
         /// Returns candidate of the provided [`IceCandidate`].
-        pub fn candidate(
-            ice_candidate: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        pub fn candidate(ice_candidate: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Returns SDP line index of the provided [`IceCandidate`].
-        pub fn sdp_m_line_index(
-            ice_candidate: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<u16>>>;
+        pub fn sdp_m_line_index(ice_candidate: Dart_Handle) -> u64;
 
         /// Returns SDP MID of the provided [`IceCandidate`].
-        pub fn sdp_mid(
-            ice_candidate: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        pub fn sdp_mid(ice_candidate: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
 
@@ -77,11 +71,7 @@ impl IceCandidate {
     /// Returns candidate of this [`IceCandidate`].
     #[must_use]
     pub fn candidate(&self) -> String {
-        unsafe {
-            Option::try_from(ice_candidate::candidate(self.0.get()).unbox())
-                .unwrap()
-                .unwrap()
-        }
+        unsafe { c_str_into_string(ice_candidate::candidate(self.0.get())) }
     }
 
     /// Returns SDP M line index of this [`IceCandidate`].
@@ -89,22 +79,17 @@ impl IceCandidate {
     #[must_use]
     pub fn sdp_m_line_index(&self) -> Option<u16> {
         unsafe {
-            ice_candidate::sdp_m_line_index(self.0.get())
-                .unbox()
-                .try_into()
-                .unwrap()
+            Some(
+                ice_candidate::sdp_m_line_index(self.0.get())
+                    .try_into()
+                    .unwrap(),
+            )
         }
     }
 
     /// Returns SDP MID of this [`IceCandidate`].
-    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        unsafe {
-            ice_candidate::sdp_mid(self.0.get())
-                .unbox()
-                .try_into()
-                .unwrap()
-        }
+        unsafe { Some(c_str_into_string(ice_candidate::sdp_mid(self.0.get()))) }
     }
 }

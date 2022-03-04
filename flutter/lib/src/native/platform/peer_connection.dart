@@ -1,11 +1,17 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/src/model/ice.dart';
+import 'package:flutter_webrtc/src/model/peer.dart';
+import 'package:flutter_webrtc/src/model/sdp.dart';
+import 'package:flutter_webrtc/src/model/track.dart';
+import 'package:flutter_webrtc/src/model/transceiver.dart';
 
 import 'peer_connection.g.dart' as bridge;
 import '../ffi/foreign_value.dart';
 
-/// Registers [RTCPeerConnection] related functions in Rust.
+/// Registers [PeerConnection] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -30,59 +36,55 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Adds [RTCRtpTransceiver] to the provided [RTCPeerConnection].
+/// Adds an [RtpTransceiver] to the provided [PeerConnection].
 ///
-/// Returns [Future] which will be resolved into created [RTCRtpTransceiver].
-Object _addTransceiver(RTCPeerConnection peer, int kind, int direction) {
-  return () => peer.addTransceiver(
-        kind: RTCRtpMediaType.values[kind],
-        init: RTCRtpTransceiverInit(
-            direction: TransceiverDirection.values[direction]),
-      );
+/// Returns [Future] which will be resolved into created [RtpTransceiver].
+Object _addTransceiver(PeerConnection peer, int kind, int direction) {
+  return () => peer.addTransceiver(MediaKind.values[kind],
+      RtpTransceiverInit(TransceiverDirection.values[direction]));
 }
 
-/// Returns newly created [RTCPeerConnection] with a provided `iceServers`
+/// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
 Object _newPeer(Object iceServers) {
-  return () => createPeerConnection(
-      {'iceServers': iceServers, 'sdpSemantics': 'unified-plan'});
+  var servers = iceServers as List<dynamic>;
+  return () => PeerConnection.create(
+      IceTransportType.all, servers.map((e) => e as IceServer).toList());
 }
 
-/// Adds subscription on [RTCPeerConnection.onTrack] to the provided
-/// [RTCPeerConnection].
-void _onTrack(RTCPeerConnection conn, Function f) {
-  conn.onTrack = (e) {
-    f(e.track, e.transceiver);
-  };
+/// Sets the provided [f] to the [PeerConnection.onTrack] callback.
+void _onTrack(PeerConnection conn, Function f) {
+  conn.onTrack((track, transceiver) {
+    f(track, transceiver);
+  });
 }
 
-/// Add subscription on [RTCPeerConnection.onIceCandidate] to the provided
-/// [RTCPeerConnection].
-void _onIceCandidate(RTCPeerConnection conn, Function f) {
-  conn.onIceCandidate = (e) {
+/// Sets the provided [f] to the [PeerConnection.onIceCandidate] callback.
+void _onIceCandidate(PeerConnection conn, Function f) {
+  conn.onIceCandidate((e) {
     f(e);
-  };
+  });
 }
 
-/// Adds subscription on [RTCPeerConnection.onIceConnectionState] to the
-/// provided [RTCPeerConnection].
-void _onIceConnectionStateChange(RTCPeerConnection conn, Function f) {
-  conn.onIceConnectionState = (e) {
+/// Sets the provided [f] to the [PeerConnection.onIceConnectionStateChange]
+/// callback.
+void _onIceConnectionStateChange(PeerConnection conn, Function f) {
+  conn.onIceConnectionStateChange((e) {
     f(e.index);
-  };
+  });
 }
 
-/// Adds subscription on [RTCPeerConnection.onConnectionState] to the
-/// provided [RTCPeerConnection].
-void _onConnectionStateChange(RTCPeerConnection conn, Function f) {
-  conn.onConnectionState = (e) {
+/// Sets the provided [f] to the [PeerConnection.onConnectionStateChange]
+/// callback.
+void _onConnectionStateChange(PeerConnection conn, Function f) {
+  conn.onConnectionStateChange((e) {
     f(e.index);
-  };
+  });
 }
 
-/// Lookups [RTCRtpTransceiver] in the provided [RTCPeerConnection] by the
-/// provided [String].
-Object _getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
+/// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided
+/// [mid].
+Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.toDartString();
         for (var transceiver in transceivers) {
@@ -93,72 +95,77 @@ Object _getTransceiverByMid(RTCPeerConnection peer, Pointer<Utf8> mid) {
       });
 }
 
-/// Sets remote SDP offer in the provided [RTCPeerConnection].
+/// Sets a remote SDP offer in the provided [PeerConnection].
 Object _setRemoteDescription(
-    RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  var desc = RTCSessionDescription(sdp.toDartString(), type.toDartString());
+    PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
+  var sdpType;
+  if (type.toDartString() == 'offer') {
+    sdpType = SessionDescriptionType.offer;
+  } else {
+    sdpType = SessionDescriptionType.answer;
+  }
+  var desc = SessionDescription(sdpType, sdp.toDartString());
   return () => conn.setRemoteDescription(desc);
 }
 
-/// Sets local SDP offer in the provided [RTCPeerConnection].
+/// Sets a local SDP offer in the provided [PeerConnection].
 Object _setLocalDescription(
-    RTCPeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  return () => conn.setLocalDescription(
-      RTCSessionDescription(sdp.toDartString(), type.toDartString()));
-}
-
-/// Creates new SDP offer for the provided [RTCPeerConnection].
-Object _createOffer(RTCPeerConnection conn) {
-  return () => conn.createOffer({}).then((val) => val.sdp);
-}
-
-/// Creates new SDP answer for the provided [RTCPeerConnection].
-Object _createAnswer(RTCPeerConnection conn) {
-  return () => conn.createAnswer({}).then((val) => val.sdp);
-}
-
-/// Restarts ICE on the provided [RTCPeerConnection].
-void _restartIce(RTCPeerConnection conn) {
-  throw UnimplementedError('PeerConnection.restartIce');
-}
-
-/// Adds provided [RTCIceCandidate] to the provided [RTCPeerConnection].
-Object _addIceCandidate(RTCPeerConnection conn, RTCIceCandidate candidate) {
-  return () => conn.addCandidate(candidate);
-}
-
-/// Returns current [RTCPeerConnection.connectionState] of the provided
-/// [RTCPeerConnection].
-Pointer _connectionState(RTCPeerConnection conn) {
-  if (conn.connectionState != null) {
-    return ForeignValue.fromInt(conn.connectionState!.index).intoRustOwned();
+    PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
+  var sdpType;
+  if (type.toDartString() == 'offer') {
+    sdpType = SessionDescriptionType.offer;
   } else {
-    return ForeignValue.none().intoRustOwned();
+    sdpType = SessionDescriptionType.answer;
   }
-}
-
-/// Returns current [RTCPeerConnection.iceConnectionState] of the provided
-/// [RTCPeerConnection].
-int _iceConnectionState(RTCPeerConnection conn) {
-  if (conn.iceConnectionState != null) {
-    return conn.iceConnectionState!.index;
-  } else {
-    return RTCIceConnectionState.RTCIceConnectionStateNew.index;
-  }
-}
-
-/// Rollbacks local SDP offer of the provided [RTCPeerConnection].
-Object _rollback(RTCPeerConnection conn) {
   return () =>
-      conn.setLocalDescription(RTCSessionDescription(null, 'rollback'));
+      conn.setLocalDescription(SessionDescription(sdpType, sdp.toDartString()));
 }
 
-/// Returns all [RTCRtpTransceiver]s of the provided [RTCPeerConnection].
-Object getTransceivers(RTCPeerConnection conn) {
+/// Creates a new SDP offer for the provided [PeerConnection].
+Object _createOffer(PeerConnection conn) {
+  return () => conn.createOffer().then((val) => val.description);
+}
+
+/// Creates a new SDP answer for the provided [PeerConnection].
+Object _createAnswer(PeerConnection conn) {
+  return () => conn.createAnswer().then((val) => val.description);
+}
+
+/// Marks the given [PeerConnection] to create descriptions that will restart
+/// ICE on the next [PeerConnection.createOffer] call.
+void _restartIce(PeerConnection conn) {
+  conn.restartIce();
+}
+
+/// Adds the specified [IceCandidate] to the provided [PeerConnection].
+Object _addIceCandidate(PeerConnection conn, IceCandidate candidate) {
+  return () => conn.addIceCandidate(candidate);
+}
+
+/// Returns the current [PeerConnection.connectionState] of the provided
+/// [PeerConnection].
+Pointer _connectionState(PeerConnection conn) {
+  return ForeignValue.fromInt(conn.connectionState().index).intoRustOwned();
+}
+
+/// Returns the current [PeerConnection.iceConnectionState] of the provided
+/// [PeerConnection].
+int _iceConnectionState(PeerConnection conn) {
+  return conn.iceConnectionState().index;
+}
+
+/// Rollbacks the local SDP offer of the provided [PeerConnection].
+Object _rollback(PeerConnection conn) {
+  return () => conn.setLocalDescription(
+      SessionDescription(SessionDescriptionType.rollback, ''));
+}
+
+/// Returns all the [RtpTransceiver]s of the provided [PeerConnection].
+Object getTransceivers(PeerConnection conn) {
   return () => conn.getTransceivers();
 }
 
-/// Closes the provided [RTCPeerConnection].
-void _close(RTCPeerConnection conn) {
-  conn.dispose();
+/// Closes the provided [PeerConnection].
+void _close(PeerConnection conn) {
+  conn.close();
 }

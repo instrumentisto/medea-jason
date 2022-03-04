@@ -1,6 +1,8 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/src/model/track.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'media_track.g.dart' as bridge;
@@ -19,18 +21,19 @@ void registerFunctions(DynamicLibrary dl) {
     enabled: Pointer.fromFunction(_enabled, false),
     stop: Pointer.fromFunction(_stop),
     onEnded: Pointer.fromFunction(_onEnded),
+    clone: Pointer.fromFunction(_clone),
     readyState: Pointer.fromFunction(_readyState, 0),
   );
 }
 
 /// Returns ID of the provided [MediaStreamTrack].
 Pointer<Utf8> _id(MediaStreamTrack track) {
-  return track.id!.toNativeUtf8();
+  return track.id().toNativeUtf8();
 }
 
 /// Returns kind of the provided [MediaStreamTrack].
 int _kind(MediaStreamTrack track) {
-  if (track.kind == 'audio') {
+  if (track.kind() == MediaKind.audio) {
     return 0;
   } else {
     return 1;
@@ -40,15 +43,16 @@ int _kind(MediaStreamTrack track) {
 /// Subscribes on the [MediaStreamTrack.onEnded] of the provided
 /// [MediaStreamTrack].
 void _onEnded(MediaStreamTrack track, Function f) {
-  track.onEnded = () {
-    track.onEnded = null;
-    f(null);
-  };
+  // TODO(evdokimovs): Implement onEnded callback
+  // track.onEnded = () {
+  //   track.onEnded = null;
+  //   f(null);
+  // };
 }
 
 /// Returns device ID of the provided [MediaStreamTrack].
 Pointer<Utf8> _deviceId(MediaStreamTrack track) {
-  return track.deviceId()!.toNativeUtf8();
+  return track.deviceId().toNativeUtf8();
 }
 
 int _readyState(MediaStreamTrack track) {
@@ -76,15 +80,20 @@ Pointer _width(MediaStreamTrack track) {
 
 /// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].
 void _setEnabled(MediaStreamTrack track, bool enabled) {
-  track.enabled = enabled;
+  track.setEnabled(enabled);
 }
 
-/// Stops provided [MediaStreamTrack].
+/// Stops the provided [MediaStreamTrack].
 void _stop(MediaStreamTrack track) {
   track.stop();
 }
 
 /// Indicates whether the provided [MediaStreamTrack] is enabled.
 bool _enabled(MediaStreamTrack track) {
-  return track.enabled;
+  return track.isEnabled();
+}
+
+/// Clones the provided [MediaStreamTrack] preserving the same media source.
+Object _clone(MediaStreamTrack track) {
+  return () => track.clone();
 }

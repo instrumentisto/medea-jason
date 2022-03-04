@@ -9,50 +9,128 @@ use derive_more::From;
 use medea_macro::dart_bridge;
 
 use crate::{
+    api::DartValue,
     media::{
         constraints::{ConstrainString, ConstrainU32},
         AudioTrackConstraints, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints,
     },
-    platform::dart::utils::{handle::DartHandle, map::DartMap},
+    platform::dart::utils::handle::DartHandle,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/constraints.g.dart")]
 mod constraints {
     use dart_sys::Dart_Handle;
 
-    extern "C" {
-        /// Initializes new empty [MediaStreamConstraints][1].
-        ///
-        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
-        pub fn init() -> Dart_Handle;
+    use crate::api::DartValue;
 
-        /// Specifies the provided nature and settings of an `audio`
-        /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
+    extern "C" {
+        /// Initializes new empty [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
-        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn audio(constraints: Dart_Handle, audio_cons: Dart_Handle);
+        pub fn init_device_constraints() -> Dart_Handle;
+
+        /// Initializes new empty [MediaStreamConstraints][0] for display.
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
+        pub fn init_display_constraints() -> Dart_Handle;
+
+        /// Initializes a new empty [MediaStreamConstraints.video][0].
+        ///
+        /// [0]: https://tinyurl.com/3yvnbb9e
+        pub fn new_video_constraints() -> Dart_Handle;
+
+        /// Initializes a new empty [MediaStreamConstraints.audio][0].
+        ///
+        /// [0]: https://tinyurl.com/5bmrr4w5
+        pub fn new_audio_constraints() -> Dart_Handle;
+
+        /// Specifies the provided setting of a
+        /// [MediaStreamConstraints.video][0] (for example `facingMode`).
+        ///
+        /// [0]: https://tinyurl.com/3yvnbb9e
+        pub fn set_video_constraint_value(
+            constraints: Dart_Handle,
+            kind: i64,
+            value: DartValue,
+        );
+
+        /// Specifies the provided setting of a
+        /// [MediaStreamConstraints.audio][0] (for example `deviceId`).
+        ///
+        /// [0]: https://tinyurl.com/5bmrr4w5
+        pub fn set_audio_constraint_value(
+            constraints: Dart_Handle,
+            kind: i64,
+            value: DartValue,
+        );
 
         /// Specifies the provided nature and settings of a `video`
         /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
         /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        pub fn video(constraints: Dart_Handle, video_cons: Dart_Handle);
+        pub fn set_video_constraint(
+            constraints: Dart_Handle,
+            ty: i64,
+            video: Dart_Handle,
+        );
+
+        /// Specifies the provided nature and settings of an `audio`
+        /// [MediaStreamTrack][1] to the given [MediaStreamConstraints][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamconstraints
+        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+        pub fn set_audio_constraint(
+            constraints: Dart_Handle,
+            ty: i64,
+            audio: Dart_Handle,
+        );
     }
+}
+
+/// Kind of a [MediaStreamConstraints.video][0] setting.
+///
+/// [0]: https://tinyurl.com/3yvnbb9e
+enum VideoConstraintKind {
+    FacingMode = 0,
+    DeviceId = 1,
+    Width = 2,
+    Height = 3,
+}
+
+/// Kind of a [MediaStreamConstraints.audio][0] setting.
+///
+/// [0]: https://tinyurl.com/5bmrr4w5
+enum AudioConstraintKind {
+    DeviceId = 0,
+}
+
+/// Indicator of necessity of a [MediaStreamConstraints] setting.
+///
+/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints
+enum ConstraintType {
+    /// Not necessary, so if the device doesn't fit to the provided constraint,
+    /// it still can be used.
+    Optional = 0,
+
+    /// Necessary, so if the device doesn't fit to the provided constraint, it
+    /// can't be used.
+    Mandatory = 1,
 }
 
 /// Dart side representation of [MediaTrackConstraints][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#media-track-constraints
 #[derive(Debug)]
-pub struct MediaTrackConstraints(DartMap);
+pub struct MediaTrackConstraints {
+    /// Optional setting, so if the device doesn't fit to the provided
+    /// constraint, it still can be used.
+    optional: DartHandle,
 
-impl From<MediaTrackConstraints> for Dart_Handle {
-    fn from(from: MediaTrackConstraints) -> Self {
-        from.0.into()
-    }
+    /// Necessary setting, so if the device doesn't fit to the provided
+    /// constraint, it can't be used.
+    mandatory: DartHandle,
 }
 
 /// Dart side representation of [MediaStreamConstraints][0].
@@ -77,7 +155,7 @@ impl MediaStreamConstraints {
     /// Creates new empty [`MediaStreamConstraints`].
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(constraints::init())) }
+        unsafe { Self(DartHandle::new(constraints::init_device_constraints())) }
     }
 
     /// Specifies the provided nature and settings of an `audio`
@@ -86,9 +164,16 @@ impl MediaStreamConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
         unsafe {
-            constraints::audio(
+            let audio = MediaTrackConstraints::from(audio);
+            constraints::set_audio_constraint(
                 self.0.get(),
-                MediaTrackConstraints::from(audio).into(),
+                ConstraintType::Mandatory as i64,
+                audio.mandatory.get(),
+            );
+            constraints::set_audio_constraint(
+                self.0.get(),
+                ConstraintType::Optional as i64,
+                audio.optional.get(),
             );
         }
     }
@@ -99,9 +184,16 @@ impl MediaStreamConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
         unsafe {
-            constraints::video(
+            let video = MediaTrackConstraints::from(video);
+            constraints::set_video_constraint(
                 self.0.get(),
-                MediaTrackConstraints::from(video).into(),
+                ConstraintType::Mandatory as i64,
+                video.mandatory.get(),
+            );
+            constraints::set_video_constraint(
+                self.0.get(),
+                ConstraintType::Optional as i64,
+                video.optional.get(),
             );
         }
     }
@@ -129,119 +221,154 @@ impl DisplayMediaStreamConstraints {
     /// Creates new empty [`DisplayMediaStreamConstraints`] .
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(constraints::init())) }
+        unsafe {
+            Self(DartHandle::new(constraints::init_display_constraints()))
+        }
     }
 
     /// Specifies the provided nature and settings of a `video`
     /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
-        unsafe {
-            constraints::video(
-                self.0.get(),
-                MediaTrackConstraints::from(video).into(),
-            );
-        }
-    }
-}
-
-impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
-    fn from(_: DisplayVideoTrackConstraints) -> Self {
-        Self(DartMap::new())
-    }
+    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {}
 }
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(from: AudioTrackConstraints) -> Self {
-        let mut audio_cons = DartMap::new();
-        let mut ideal_cons = DartMap::new();
-        let mut exact_cons = DartMap::new();
-        if let Some(device_id) = from.device_id {
-            match device_id {
-                ConstrainString::Exact(device_id) => {
-                    exact_cons.set("device_id".to_owned(), device_id.into());
-                }
-                ConstrainString::Ideal(device_id) => {
-                    ideal_cons.set("device_id".to_owned(), device_id.into());
+        unsafe {
+            let optional =
+                DartHandle::new(constraints::new_audio_constraints());
+            let mandatory =
+                DartHandle::new(constraints::new_audio_constraints());
+            if let Some(device_id) = from.device_id {
+                match device_id {
+                    ConstrainString::Exact(device_id) => {
+                        constraints::set_audio_constraint_value(
+                            mandatory.get(),
+                            AudioConstraintKind::DeviceId as i64,
+                            DartValue::from(device_id),
+                        );
+                    }
+                    ConstrainString::Ideal(device_id) => {
+                        constraints::set_audio_constraint_value(
+                            optional.get(),
+                            AudioConstraintKind::DeviceId as i64,
+                            DartValue::from(device_id),
+                        );
+                    }
                 }
             }
+
+            Self {
+                optional,
+                mandatory,
+            }
         }
-        audio_cons.set("mandatory".to_owned(), exact_cons.as_handle().into());
-        audio_cons.set("optional".to_owned(), ideal_cons.as_handle().into());
-
-        let mut cons = DartMap::new();
-        cons.set("audio".to_owned(), audio_cons.as_handle().into());
-
-        Self(cons)
     }
 }
 
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DeviceVideoTrackConstraints) -> Self {
-        let mut video_cons = DartMap::new();
-        let mut ideal_cons = DartMap::new();
-        let mut exact_cons = DartMap::new();
-        if let Some(device_id) = from.device_id {
-            match device_id {
-                ConstrainString::Exact(device_id) => {
-                    ideal_cons.set("sourceId".to_owned(), device_id.into());
-                }
-                ConstrainString::Ideal(device_id) => {
-                    exact_cons.set("sourceId".to_owned(), device_id.into());
-                }
-            }
-        }
-        if let Some(height) = from.height {
-            match height {
-                ConstrainU32::Ideal(height) => {
-                    ideal_cons.set("height".to_owned(), height.into());
-                }
-                ConstrainU32::Exact(height) => {
-                    exact_cons.set("height".to_owned(), height.into());
-                }
-                ConstrainU32::Range(min, max) => {
-                    exact_cons.set("minHeight".to_owned(), min.into());
-                    exact_cons.set("maxHeight".to_owned(), max.into());
-                }
-            }
-        }
-        if let Some(width) = from.width {
-            match width {
-                ConstrainU32::Ideal(width) => {
-                    ideal_cons.set("width".to_owned(), width.into());
-                }
-                ConstrainU32::Exact(width) => {
-                    exact_cons.set("width".to_owned(), width.into());
-                }
-                ConstrainU32::Range(min, max) => {
-                    exact_cons.set("minWidth".to_owned(), min.into());
-                    exact_cons.set("maxWidth".to_owned(), max.into());
-                }
-            }
-        }
-        if let Some(facing_mode) = from.facing_mode {
-            match facing_mode {
-                ConstrainString::Exact(facing_mode) => {
-                    exact_cons.set(
-                        "facing_mode".to_owned(),
-                        facing_mode.to_string().into(),
-                    );
-                }
-                ConstrainString::Ideal(facing_mode) => {
-                    ideal_cons.set(
-                        "facing_mode".to_owned(),
-                        facing_mode.to_string().into(),
-                    );
-                }
-            }
-        }
-        video_cons.set("mandatory".to_owned(), exact_cons.as_handle().into());
-        video_cons.set("optional".to_owned(), ideal_cons.as_handle().into());
+        unsafe {
+            let optional =
+                DartHandle::new(constraints::new_video_constraints());
+            let mandatory =
+                DartHandle::new(constraints::new_video_constraints());
 
-        let mut cons = DartMap::new();
-        cons.set("video".to_owned(), video_cons.as_handle().into());
+            if let Some(device_id) = from.device_id {
+                match device_id {
+                    ConstrainString::Exact(device_id) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::DeviceId as i64,
+                            DartValue::from(device_id),
+                        );
+                    }
+                    ConstrainString::Ideal(device_id) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::DeviceId as i64,
+                            DartValue::from(device_id),
+                        );
+                    }
+                }
+            }
 
-        Self(cons)
+            if let Some(facing_mode) = from.facing_mode {
+                match facing_mode {
+                    ConstrainString::Exact(facing_mode) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::FacingMode as i64,
+                            DartValue::from(facing_mode as i64),
+                        );
+                    }
+                    ConstrainString::Ideal(facing_mode) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::FacingMode as i64,
+                            DartValue::from(facing_mode as i64),
+                        );
+                    }
+                }
+            }
+
+            if let Some(width) = from.width {
+                match width {
+                    ConstrainU32::Ideal(width) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(width),
+                        );
+                    }
+                    ConstrainU32::Exact(width) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(width),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(i64::from(min)),
+                        );
+                    }
+                }
+            }
+
+            if let Some(height) = from.height {
+                match height {
+                    ConstrainU32::Ideal(height) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(height),
+                        );
+                    }
+                    ConstrainU32::Exact(height) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(height),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(min),
+                        );
+                    }
+                }
+            }
+
+            Self {
+                optional,
+                mandatory,
+            }
+        }
     }
 }

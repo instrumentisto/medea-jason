@@ -1,8 +1,11 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/src/model/constraints.dart';
+
 import 'media_devices.g.dart' as bridge;
 
-/// Registers functions allowing Rust to operate Dart [MediaDevices].
+/// Registers functions allowing Rust to operate Dart media devices.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -13,31 +16,17 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Requests media input access and returns the created [MediaStreamTrack]s.
-Object _getUserMedia(MediaStreamConstraints constraints) {
-  return () async {
-    var videoConstraints = {};
-    if (constraints.video != null && constraints.video['video'] != null) {
-      videoConstraints = constraints.video['video'];
-    }
-    var res = await navigator.mediaDevices.getUserMedia(
-      {
-        'audio': constraints.audio,
-        'video': videoConstraints,
-      },
-    );
-    // ignore: deprecated_member_use
-    await res.getMediaTracks();
-    return res.getTracks();
-  };
+Object _getUserMedia(DeviceConstraints constraints) {
+  return () => getUserMedia(constraints);
 }
 
 /// Returns all the available media devices.
 Object _enumerateDevices() {
-  return () => navigator.mediaDevices.enumerateDevices();
+  return () => enumerateDevices();
 }
 
 /// Starts capturing the contents of a display and returns the created
 /// [MediaStreamTrack]s.
-Object _getDisplayMedia(Map<String, dynamic> constraints) {
-  return () => navigator.mediaDevices.getDisplayMedia(constraints);
+Object _getDisplayMedia(DisplayConstraints constraints) {
+  return () => getDisplayMedia(constraints);
 }
