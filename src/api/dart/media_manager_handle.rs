@@ -1,13 +1,18 @@
 use std::{os::raw::c_char, ptr};
 
+use dart_sys::Dart_Handle;
 use tracerr::Traced;
 
 use crate::{
-    api::c_str_into_string,
+    api::{
+        c_str_into_string,
+        utils::{DartError, DartResult},
+    },
     media::{
         EnumerateDevicesError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError,
     },
+    platform,
 };
 
 use super::{
@@ -73,6 +78,18 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
         Ok(())
     }
     .into_dart_future()
+}
+
+/// Subscribes on the [`MediaManagerHandle`]'s `devicechange` event.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
+    this: ptr::NonNull<MediaManagerHandle>,
+    cb: Dart_Handle,
+) -> DartResult {
+    let this = this.as_ref();
+    this.on_device_change(platform::Function::new(cb))
+        .map_err(DartError::from)
+        .into()
 }
 
 /// Frees the data behind the provided pointer.

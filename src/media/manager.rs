@@ -55,6 +55,11 @@ pub enum InitLocalTracksError {
 #[display(fmt = "Invalid audio device ID provided")]
 pub struct InvalidOutputAudioDeviceIdError;
 
+/// Error which indicates that [`MediaManagerHandle`] is in detached state.
+#[derive(Clone, Copy, Debug, Display)]
+#[display(fmt = "MediaManagerHandle is in detached state")]
+pub struct HandleDetachedError;
+
 /// Error occurring when [`local::Track`] was [`ended`][1] right after
 /// [getUserMedia()][2] or [getDisplayMedia()][3] request.
 ///
@@ -139,9 +144,19 @@ pub struct MediaManager(Rc<InnerMediaManager>);
 struct InnerMediaManager {
     /// Obtained tracks storage
     tracks: Rc<RefCell<HashMap<String, Weak<local::Track>>>>,
+
+    /// Media devices platform controller.
+    media_devices: platform::MediaDevices,
 }
 
 impl InnerMediaManager {
+    /// Subscribes to the `devicechange` event of this [`InnerMediaManager`].
+    pub fn on_device_change(&self, cb: platform::Function<()>) {
+        self.media_devices.on_device_change(Some(move || {
+            cb.call0();
+        }));
+    }
+
     /// Returns a list of [`platform::MediaDeviceInfo`] objects.
     async fn enumerate_devices(
     ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<platform::Error>> {
@@ -278,7 +293,9 @@ impl InnerMediaManager {
         &self,
         caps: platform::MediaStreamConstraints,
     ) -> Result<Vec<Rc<local::Track>>, Traced<GetUserMediaError>> {
-        let tracks = platform::get_user_media(caps)
+        let tracks = self
+            .media_devices
+            .get_user_media(caps)
             .await
             .map_err(tracerr::map_from_and_wrap!())?;
 
@@ -298,7 +315,9 @@ impl InnerMediaManager {
         &self,
         caps: platform::DisplayMediaStreamConstraints,
     ) -> Result<Vec<Rc<local::Track>>, Traced<GetDisplayMediaError>> {
-        let tracks = platform::get_display_media(caps)
+        let tracks = self
+            .media_devices
+            .get_display_media(caps)
             .await
             .map_err(tracerr::map_from_and_wrap!())?;
 
@@ -360,7 +379,8 @@ impl InnerMediaManager {
         &self,
         device_id: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
-        platform::set_output_audio_id(device_id)
+        self.media_devices
+            .set_output_audio_id(device_id)
             .await
             .map_err(|_e| tracerr::new!(InvalidOutputAudioDeviceIdError))
     }
@@ -476,5 +496,22 @@ impl MediaManagerHandle {
         this.set_output_audio_id(device_id)
             .await
             .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Subscribes to the `devicechange` event of this [`InnerMediaManager`].
+    ///
+    /// # Errors
+    ///
+    /// If underlying [`MediaManagerHandle`] is dropped.
+    pub fn on_device_change(
+        &self,
+        cb: platform::Function<()>,
+    ) -> Result<(), Traced<HandleDetachedError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(HandleDetachedError))?;
+        this.on_device_change(cb);
+        Ok(())
     }
 }

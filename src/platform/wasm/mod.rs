@@ -26,7 +26,7 @@ pub use self::{
     media_device_info::MediaDeviceInfo,
     media_devices::{
         enumerate_devices, get_display_media, get_user_media,
-        set_output_audio_id,
+        set_output_audio_id, MediaDevices,
     },
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,

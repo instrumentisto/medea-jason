@@ -11,6 +11,7 @@ use crate::{
         dart::utils::{
             dart_future::FutureFromDart, handle::DartHandle, list::DartList,
         },
+        utils::callback::Callback,
         Error,
     },
 };
@@ -51,6 +52,104 @@ mod media_devices {
         pub fn set_output_audio_id(
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
+
+        /// Subscribes on the `MediaDevices`'s `devicechange` event.
+        pub fn on_device_change(cb: Dart_Handle);
+    }
+}
+
+/// Media devices controller.
+#[derive(Default, Debug, Clone, Copy)]
+pub struct MediaDevices;
+
+impl MediaDevices {
+    /// Subscribes on the [`MediaDevices`]'s `devicechange` event.
+    pub fn on_device_change<F>(&self, handler: Option<F>)
+    where
+        F: 'static + FnMut(),
+    {
+        if let Some(mut h) = handler {
+            unsafe {
+                media_devices::on_device_change(
+                    Callback::from_fn_mut(move |_: ()| {
+                        h();
+                    })
+                    .into_dart(),
+                );
+            };
+        }
+    }
+
+    /// Prompts a user for permissions to use a media input device, producing a
+    /// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of
+    /// media.
+    ///
+    /// Adapter for a [MediaDevices.getUserMedia()][1] function.
+    ///
+    /// # Errors
+    ///
+    /// If [MediaDevices.getUserMedia()][1] errors itself or unable to get
+    /// [MediaDevices][2].
+    ///
+    /// [1]:
+    /// https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+    /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
+    pub async fn get_user_media(
+        &self,
+        caps: MediaStreamConstraints,
+    ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
+        let tracks = FutureFromDart::execute::<DartHandle>(unsafe {
+            media_devices::get_user_media(caps.into())
+        })
+        .await
+        .map_err(tracerr::wrap!())?;
+
+        Ok(DartList::from(tracks).into())
+    }
+
+    /// Prompts a user to select and grant permissions to capture contents of a
+    /// display or portion thereof (such as a single window), producing a
+    /// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of
+    /// media.
+    ///
+    /// Adapter for a [MediaDevices.getDisplayMedia()][1] function.
+    ///
+    /// # Errors
+    ///
+    /// If [MediaDevices.getDisplayMedia()][1] errors itself or unable to get
+    /// [MediaDevices][2].
+    ///
+    /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+    /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
+    pub async fn get_display_media(
+        &self,
+        caps: DisplayMediaStreamConstraints,
+    ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
+        let tracks = FutureFromDart::execute::<DartHandle>(unsafe {
+            media_devices::get_display_media(caps.into())
+        })
+        .await
+        .map_err(tracerr::wrap!())?;
+
+        Ok(DartList::from(tracks).into())
+    }
+
+    /// Switches output audio device to the device with a provided `device_id`.
+    ///
+    /// # Errors
+    ///
+    /// If output audio device with a provided `device_id` is not available.
+    pub async fn set_output_audio_id(
+        &self,
+        device_id: String,
+    ) -> Result<(), Traced<Error>> {
+        FutureFromDart::execute::<()>(unsafe {
+            media_devices::set_output_audio_id(string_into_c_str(device_id))
+        })
+        .await
+        .map_err(tracerr::wrap!())?;
+
+        Ok(())
     }
 }
 
@@ -83,70 +182,4 @@ pub async fn enumerate_devices() -> Result<Vec<MediaDeviceInfo>, Traced<Error>>
         }
     }
     Ok(result)
-}
-
-/// Prompts a user for permissions to use a media input device, producing a
-/// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of media.
-///
-/// Adapter for a [MediaDevices.getUserMedia()][1] function.
-///
-/// # Errors
-///
-/// If [MediaDevices.getUserMedia()][1] errors itself or unable to get
-/// [MediaDevices][2].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
-/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
-pub async fn get_user_media(
-    caps: MediaStreamConstraints,
-) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-    let tracks = FutureFromDart::execute::<DartHandle>(unsafe {
-        media_devices::get_user_media(caps.into())
-    })
-    .await
-    .map_err(tracerr::wrap!())?;
-
-    Ok(DartList::from(tracks).into())
-}
-
-/// Prompts a user to select and grant permissions to capture contents of a
-/// display or portion thereof (such as a single window), producing a [`Vec`] of
-/// [`MediaStreamTrack`]s containing the requested types of media.
-///
-/// Adapter for a [MediaDevices.getDisplayMedia()][1] function.
-///
-/// # Errors
-///
-/// If [MediaDevices.getDisplayMedia()][1] errors itself or unable to get
-/// [MediaDevices][2].
-///
-/// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
-pub async fn get_display_media(
-    caps: DisplayMediaStreamConstraints,
-) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-    let tracks = FutureFromDart::execute::<DartHandle>(unsafe {
-        media_devices::get_display_media(caps.into())
-    })
-    .await
-    .map_err(tracerr::wrap!())?;
-
-    Ok(DartList::from(tracks).into())
-}
-
-/// Switches output audio device to the device with a provided `device_id`.
-///
-/// # Errors
-///
-/// If output audio device with a provided `device_id` is not available.
-pub async fn set_output_audio_id(
-    device_id: String,
-) -> Result<(), Traced<Error>> {
-    FutureFromDart::execute::<()>(unsafe {
-        media_devices::set_output_audio_id(string_into_c_str(device_id))
-    })
-    .await
-    .map_err(tracerr::wrap!())?;
-
-    Ok(())
 }

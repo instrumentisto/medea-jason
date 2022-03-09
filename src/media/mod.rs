@@ -19,8 +19,8 @@ pub use self::{
     },
     manager::{
         EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError, InvalidOutputAudioDeviceIdError, MediaManager,
-        MediaManagerHandle,
+        HandleDetachedError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
     },
     track::MediaSourceKind,
 };

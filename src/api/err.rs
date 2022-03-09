@@ -14,8 +14,9 @@ use crate::{
     api::Error,
     connection,
     media::{
-        EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
+        self as media, EnumerateDevicesError, GetDisplayMediaError,
+        GetUserMediaError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -482,6 +483,13 @@ impl MediaSettingsUpdateException {
     #[must_use]
     pub fn rolled_back(&self) -> bool {
         self.rolled_back
+    }
+}
+
+impl From<Traced<media::HandleDetachedError>> for Error {
+    fn from(err: Traced<media::HandleDetachedError>) -> Self {
+        let (err, trace) = err.split();
+        StateError::new(err.to_string(), trace).into()
     }
 }
 
