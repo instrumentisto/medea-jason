@@ -6,9 +6,12 @@ use wasm_bindgen_futures::JsFuture;
 
 use tracerr::Traced;
 
-use crate::platform::{
-    DisplayMediaStreamConstraints, Error, InputDeviceInfo,
-    MediaStreamConstraints, MediaStreamTrack,
+use crate::{
+    media::InvalidOutputAudioDeviceIdError,
+    platform::{
+        DisplayMediaStreamConstraints, Error, MediaDeviceInfo,
+        MediaStreamConstraints, MediaStreamTrack,
+    },
 };
 
 use super::window;
@@ -29,7 +32,7 @@ use super::window;
 ///
 /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-enumeratedevices
 /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
-pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
+pub async fn enumerate_devices() -> Result<Vec<MediaDeviceInfo>, Traced<Error>>
 {
     let devices = window()
         .navigator()
@@ -51,7 +54,7 @@ pub async fn enumerate_devices() -> Result<Vec<InputDeviceInfo>, Traced<Error>>
         .into_iter()
         .filter_map(|info| {
             let info = web_sys::MediaDeviceInfo::from(info.unwrap());
-            InputDeviceInfo::try_from(info).ok()
+            MediaDeviceInfo::try_from(info).ok()
         })
         .collect())
 }
@@ -143,4 +146,24 @@ pub async fn get_display_media(
         .unwrap()
         .map(|tr| MediaStreamTrack::from(tr.unwrap()))
         .collect())
+}
+
+/// This method should be unreachable, because this functional is implemented on
+/// the Dart side of Jason.
+///
+/// # Errors
+///
+/// Never.
+///
+/// # Panics
+///
+/// In all cases.
+#[allow(clippy::unused_async)]
+pub async fn set_output_audio_id(
+    _: String,
+) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+    unreachable!(
+        "set_output_audio_id is implemented on the Dart side,\
+    so this method call is unreachable."
+    )
 }

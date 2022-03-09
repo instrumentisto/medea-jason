@@ -752,7 +752,7 @@ export class FormatException {
 *
 * [1]: https://w3.org/TR/mediacapture-streams#device-info
 */
-export class InputDeviceInfo {
+export class MediaDeviceInfo {
 
     static __wrap(ptr) {
         const obj = Object.create(InputDeviceInfo.prototype);

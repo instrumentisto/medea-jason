@@ -94,7 +94,7 @@ All user visible changes to this project will be documented in this file. This p
             - `Room.enable_audio()`;
             - `Room.disable_video()`;
             - `Room.enable_video()`.
-        - `InputDeviceInfo` class obtainable via `MediaManager.enumerate_devices()` ([#46]);
+        - `MediaDeviceInfo` class obtainable via `MediaManager.enumerate_devices()` ([#46]);
         - `MediaManager` class obtainable via `Jason.media_manager()` ([#46]):
             - `MediaManager.enumerate_devices()`;
             - `MediaManager.init_local_tracks()` ([#46], [#143]).
@@ -110,7 +110,7 @@ All user visible changes to this project will be documented in this file. This p
                 - `DeviceVideoTrackConstraints.exact_height`;
                 - `DeviceVideoTrackConstraints.height_in_range`.
             - `FacingMode` enum ([#137]).
-        - `MediaKind` enum that provides `LocalMediaTrack`/`RemoteMediaTrack` and `InputDeviceInfo` kind ([#146]);
+        - `MediaKind` enum that provides `LocalMediaTrack`/`RemoteMediaTrack` and `MediaDeviceInfo` kind ([#146]);
         - `MediaSourceKind` enum that provides `MediaTrack` media source kind (`Device` or `Display`) ([#146], [#156]);
         - Room management:
             - `Jason.init_room()` ([#46]);

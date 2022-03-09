@@ -1,10 +1,16 @@
 import '../util/move_semantic.dart';
 import 'track_kinds.dart';
 
+enum MediaDeviceKind {
+  audioinput,
+  videoinput,
+  audiooutput,
+}
+
 /// [`MediaDeviceInfo`][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-abstract class InputDeviceInfo {
+abstract class MediaDeviceInfo {
   /// Returns an unique identifier of the represented device.
   String deviceId();
 
@@ -19,7 +25,7 @@ abstract class InputDeviceInfo {
   /// This representation of a [`MediaDeviceInfo`][1] is ONLY for input devices.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-  MediaKind kind();
+  MediaDeviceKind kind();
 
   /// Returns a group identifier of the represented device.
   ///

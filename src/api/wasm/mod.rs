@@ -8,9 +8,9 @@
 
 pub mod connection_handle;
 pub mod err;
-pub mod input_device_info;
 pub mod jason;
 pub mod local_media_track;
+pub mod media_device_info;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
 pub mod reconnect_handle;
@@ -26,9 +26,9 @@ use crate::media;
 pub use self::{
     connection_handle::ConnectionHandle,
     err::Error,
-    input_device_info::InputDeviceInfo,
     jason::Jason,
     local_media_track::LocalMediaTrack,
+    media_device_info::MediaDeviceInfo,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::{
         AudioTrackConstraints, DeviceVideoTrackConstraints,

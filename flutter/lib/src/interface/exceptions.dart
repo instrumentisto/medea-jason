@@ -46,6 +46,12 @@ abstract class EnumerateDevicesException {
   String trace();
 }
 
+/// Exception thrown when cannot switch output audio device ID.
+abstract class InvalidOutputAudioDeviceIdException {
+  /// Returns stacktrace of this [InvalidOutputAudioDeviceIdException].
+  String trace();
+}
+
 /// Jason's internal exception.
 ///
 /// This is either a programmatic error or some unexpected platform component

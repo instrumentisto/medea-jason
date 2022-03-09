@@ -11,8 +11,9 @@ use crate::{
         dart::{utils::string_into_c_str, DartValue},
         err::{
             EnumerateDevicesException, FormatException, InternalException,
-            LocalMediaInitException, MediaSettingsUpdateException,
-            MediaStateTransitionException, RpcClientException, StateError,
+            InvalidOutputAudioDeviceIdException, LocalMediaInitException,
+            MediaSettingsUpdateException, MediaStateTransitionException,
+            RpcClientException, StateError,
         },
     },
     platform,
@@ -100,6 +101,12 @@ mod exception {
             message: ptr::NonNull<c_char>,
             cause: DartError,
             rolled_back: bool,
+        ) -> Dart_Handle;
+
+        /// Returns a new Dart [`InvalidOutputAudioDeviceIdException`] with
+        /// a provided `trace` property.
+        pub fn new_invalid_output_audio_device_id_exception(
+            trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
     }
 }
@@ -195,6 +202,16 @@ impl From<EnumerateDevicesException> for DartError {
         unsafe {
             Self::new(exception::new_enumerate_devices_exception(
                 err.cause().into(),
+                string_into_c_str(err.trace()),
+            ))
+        }
+    }
+}
+
+impl From<InvalidOutputAudioDeviceIdException> for DartError {
+    fn from(err: InvalidOutputAudioDeviceIdException) -> Self {
+        unsafe {
+            Self::new(exception::new_invalid_output_audio_device_id_exception(
                 string_into_c_str(err.trace()),
             ))
         }
