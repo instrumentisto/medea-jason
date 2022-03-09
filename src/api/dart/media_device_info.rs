@@ -72,7 +72,7 @@ pub unsafe extern "C" fn MediaDeviceInfo__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
-    use crate::media::{MediaDeviceKind, MediaKind};
+    use crate::media::MediaDeviceKind;
 
     pub struct MediaDeviceInfo(pub u8);
 

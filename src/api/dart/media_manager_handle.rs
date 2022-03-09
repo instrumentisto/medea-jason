@@ -102,7 +102,10 @@ mod mock {
             },
             LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings,
         },
-        media::{EnumerateDevicesError, InitLocalTracksError},
+        media::{
+            EnumerateDevicesError, InitLocalTracksError,
+            InvalidOutputAudioDeviceIdError,
+        },
         platform,
     };
 
@@ -132,6 +135,13 @@ mod mock {
                 LocalMediaTrack(0),
                 LocalMediaTrack(0),
             ])
+        }
+
+        pub async fn set_output_audio_id(
+            &self,
+            _device_id: String,
+        ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+            Ok(())
         }
     }
 
