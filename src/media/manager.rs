@@ -498,7 +498,7 @@ impl MediaManagerHandle {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Subscribes to the `devicechange` event of this [`InnerMediaManager`].
+    /// Subscribes to the `devicechange` event of this [`MediaManagerHandle`].
     ///
     /// # Errors
     ///

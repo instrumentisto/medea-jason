@@ -120,7 +120,7 @@ mod mock {
             LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings,
         },
         media::{
-            EnumerateDevicesError, InitLocalTracksError,
+            EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
             InvalidOutputAudioDeviceIdError,
         },
         platform,
@@ -158,6 +158,14 @@ mod mock {
             &self,
             _device_id: String,
         ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+            Ok(())
+        }
+
+        pub fn on_device_change(
+            &self,
+            cb: platform::Function<()>,
+        ) -> Result<(), Traced<HandleDetachedError>> {
+            cb.call0();
             Ok(())
         }
     }
