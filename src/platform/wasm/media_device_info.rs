@@ -21,7 +21,7 @@ pub enum Error {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
 #[derive(Debug)]
-pub struct InputDeviceInfo {
+pub struct MediaDeviceInfo {
     /// Kind of the represented media device.
     media_kind: MediaKind,
 
@@ -45,7 +45,7 @@ impl TryFrom<sys::MediaDeviceKind> for MediaKind {
     }
 }
 
-impl InputDeviceInfo {
+impl MediaDeviceInfo {
     /// Returns unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {
@@ -84,7 +84,7 @@ impl InputDeviceInfo {
     }
 }
 
-impl TryFrom<sys::MediaDeviceInfo> for InputDeviceInfo {
+impl TryFrom<sys::MediaDeviceInfo> for MediaDeviceInfo {
     type Error = Error;
 
     fn try_from(info: sys::MediaDeviceInfo) -> Result<Self, Self::Error> {
