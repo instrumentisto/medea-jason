@@ -1,5 +1,3 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-
 import '../interface/media_device_info.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';
