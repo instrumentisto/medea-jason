@@ -252,7 +252,7 @@ pub struct PeerConnection {
     media_manager: Rc<MediaManager>,
 
     /// [`PeerEvent`]s tx.
-    peer_events_sender: mpsc::UnboundedSender<PeerEvent>,
+    peer_events_sender: Rc<mpsc::UnboundedSender<PeerEvent>>,
 
     /// Indicator whether the underlying [`platform::RtcPeerConnection`] has a
     /// remote description.
@@ -337,7 +337,7 @@ impl PeerConnection {
             peer,
             media_connections,
             media_manager,
-            peer_events_sender,
+            peer_events_sender: Rc::new(peer_events_sender),
             sent_stats_cache: RefCell::new(HashMap::new()),
             has_remote_description: Cell::new(false),
             ice_candidates_buffer: RefCell::new(Vec::new()),
@@ -350,23 +350,27 @@ impl PeerConnection {
         // Bind to `icecandidate` event.
         {
             let id = peer.id;
-            let sender = peer.peer_events_sender.clone();
+            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
             peer.peer.on_ice_candidate(Some(move |candidate| {
-                Self::on_ice_candidate(id, &sender, candidate);
+                if let Some(sender) = weak_sender.upgrade() {
+                    Self::on_ice_candidate(id, &sender, candidate);
+                }
             }));
         }
 
         // Bind to `iceconnectionstatechange` event.
         {
             let id = peer.id;
-            let sender = peer.peer_events_sender.clone();
+            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
             peer.peer.on_ice_connection_state_change(Some(
                 move |ice_connection_state| {
-                    Self::on_ice_connection_state_changed(
-                        id,
-                        &sender,
-                        ice_connection_state,
-                    );
+                    if let Some(sender) = weak_sender.upgrade() {
+                        Self::on_ice_connection_state_changed(
+                            id,
+                            &sender,
+                            ice_connection_state,
+                        );
+                    }
                 },
             ));
         }
@@ -374,14 +378,16 @@ impl PeerConnection {
         // Bind to `connectionstatechange` event.
         {
             let id = peer.id;
-            let sender = peer.peer_events_sender.clone();
+            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
             peer.peer.on_connection_state_change(Some(
                 move |peer_connection_state| {
-                    Self::on_connection_state_changed(
-                        id,
-                        &sender,
-                        peer_connection_state,
-                    );
+                    if let Some(sender) = weak_sender.upgrade() {
+                        Self::on_connection_state_changed(
+                            id,
+                            &sender,
+                            peer_connection_state,
+                        );
+                    }
                 },
             ));
         }
@@ -469,7 +475,6 @@ impl PeerConnection {
 
     /// Filters out already sent stats, and send new stats from the provided
     /// [`platform::RtcStats`].
-    #[allow(clippy::option_if_let_else)]
     pub fn send_peer_stats(&self, stats: platform::RtcStats) {
         let mut stats_cache = self.sent_stats_cache.borrow_mut();
         let stats = platform::RtcStats(

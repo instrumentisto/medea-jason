@@ -1,6 +1,6 @@
 import 'dart:ffi';
-import 'package:ffi/ffi.dart';
 
+import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/src/model/device.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 

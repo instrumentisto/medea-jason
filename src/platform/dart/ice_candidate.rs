@@ -88,7 +88,6 @@ impl IceCandidate {
     }
 
     /// Returns SDP MID of this [`IceCandidate`].
-    #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
         unsafe { Some(c_str_into_string(ice_candidate::sdp_mid(self.0.get()))) }

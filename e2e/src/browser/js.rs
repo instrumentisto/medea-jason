@@ -82,7 +82,6 @@ impl Statement {
     ///
     /// The success value is passed to the next [`Statement`] as a JS lambda
     /// argument.
-    #[allow(clippy::option_if_let_else)] // due to moving `another` value
     #[must_use]
     pub fn and_then(mut self, another: Self) -> Self {
         self.and_then = Some(Box::new(if let Some(e) = self.and_then {

@@ -1,12 +1,12 @@
 import 'dart:ffi';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:flutter_webrtc/src/model/transceiver.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'transceiver.g.dart' as bridge;
 
-/// Registers [RtpTransceiver] related functions in Rust.
+/// Registers an [RtpTransceiver] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -22,18 +22,18 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Sets [TransceiverDirection] of the provided [RtpTransceiver] to the
-/// provided one.
+/// Sets [TransceiverDirection] of the provided [RtpTransceiver] to the provided
+/// one.
 Object _setDirection(RtpTransceiver transceiver, int direction) {
   return () => transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
-/// Returns current [TransceiverDirection] of the provided [RtpTransceiver].
+/// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].
 Object _getDirection(RtpTransceiver transceiver) {
   return () => transceiver.getDirection().then((d) => d.index);
 }
 
-/// Returns current MID of the provided [RtpTransceiver].
+/// Returns the current mID of the provided [RtpTransceiver].
 Pointer _mid(RtpTransceiver transceiver) {
   if (transceiver.mid != null) {
     return ForeignValue.fromString(transceiver.mid!).intoRustOwned();
@@ -42,7 +42,7 @@ Pointer _mid(RtpTransceiver transceiver) {
   }
 }
 
-/// Returns current [RtpTransceiver.sender]'s track of the provided
+/// Returns the current [RtpTransceiver.sender]'s track of the provided
 /// [RtpTransceiver].
 Pointer _getSendTrack(RtpTransceiver transceiver) {
   if (transceiver.sender.track != null) {
@@ -52,8 +52,8 @@ Pointer _getSendTrack(RtpTransceiver transceiver) {
   }
 }
 
-/// Indicates whether the provided [RtpTransceiver]'s
-/// [RtpTransceiver.sender] has some [MediaStreamTrack].
+/// Indicates whether the provided [RtpTransceiver]'s [RtpTransceiver.sender]
+/// has some [MediaStreamTrack].
 bool _hasSendTrack(RtpTransceiver transceiver) {
   return transceiver.sender.track != null;
 }
@@ -64,15 +64,15 @@ Object _replaceSendTrack(RtpTransceiver transceiver, MediaStreamTrack track) {
   return () => transceiver.sender.replaceTrack(track);
 }
 
-/// Sets [MediaStreamTrack.enabled] status in the [RtpTransceiver.sender] of
-/// the provided [RtpTransceiver].
+/// Sets [MediaStreamTrack.enabled] status in the [RtpTransceiver.sender] of the
+/// provided [RtpTransceiver].
 void _setSendTrackEnabled(RtpTransceiver transceiver, bool enabled) {
   if (transceiver.sender.track != null) {
     transceiver.sender.track!.setEnabled(enabled);
   }
 }
 
-/// Drops [RtpTransceiver.sender] of the provided [RtpTransceiver].
+/// Drops the [RtpTransceiver.sender] of the provided [RtpTransceiver].
 Object _dropSender(RtpTransceiver transceiver) {
   if (transceiver.sender.track == null) {
     return () => Future.value();

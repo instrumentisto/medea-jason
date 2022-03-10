@@ -1,11 +1,12 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_webrtc/src/model/ice.dart';
-import 'package:flutter_webrtc/src/model/track.dart';
-import 'package:flutter_webrtc/src/model/transceiver.dart';
 import 'package:flutter_webrtc/src/model/peer.dart';
 import 'package:flutter_webrtc/src/model/sdp.dart';
+import 'package:flutter_webrtc/src/model/track.dart';
+import 'package:flutter_webrtc/src/model/transceiver.dart';
 
 import 'peer_connection.g.dart' as bridge;
 import '../ffi/foreign_value.dart';
@@ -35,7 +36,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Adds [RtpTransceiver] to the provided [PeerConnection].
+/// Adds an [RtpTransceiver] to the provided [PeerConnection].
 ///
 /// Returns [Future] which will be resolved into created [RtpTransceiver].
 Object _addTransceiver(PeerConnection peer, int kind, int direction) {
@@ -43,7 +44,7 @@ Object _addTransceiver(PeerConnection peer, int kind, int direction) {
       RtpTransceiverInit(TransceiverDirection.values[direction]));
 }
 
-/// Returns newly created [PeerConnection] with a provided `iceServers`
+/// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
 Object _newPeer(Object iceServers) {
   var servers = iceServers as List<dynamic>;
@@ -51,40 +52,38 @@ Object _newPeer(Object iceServers) {
       IceTransportType.all, servers.map((e) => e as IceServer).toList());
 }
 
-/// Adds subscription on [PeerConnection.onTrack] to the provided
-/// [PeerConnection].
+/// Sets the provided [f] to the [PeerConnection.onTrack] callback.
 void _onTrack(PeerConnection conn, Function f) {
   conn.onTrack((track, transceiver) {
     f(track, transceiver);
   });
 }
 
-/// Add subscription on [PeerConnection.onIceCandidate] to the provided
-/// [PeerConnection].
+/// Sets the provided [f] to the [PeerConnection.onIceCandidate] callback.
 void _onIceCandidate(PeerConnection conn, Function f) {
   conn.onIceCandidate((e) {
     f(e);
   });
 }
 
-/// Adds subscription on [PeerConnection.onIceConnectionStateChange] to the
-/// provided [PeerConnection].
+/// Sets the provided [f] to the [PeerConnection.onIceConnectionStateChange]
+/// callback.
 void _onIceConnectionStateChange(PeerConnection conn, Function f) {
   conn.onIceConnectionStateChange((e) {
     f(e.index);
   });
 }
 
-/// Adds subscription on [PeerConnection.onConnectionStateChange] to the
-/// provided [PeerConnection].
+/// Sets the provided [f] to the [PeerConnection.onConnectionStateChange]
+/// callback.
 void _onConnectionStateChange(PeerConnection conn, Function f) {
   conn.onConnectionStateChange((e) {
     f(e.index);
   });
 }
 
-/// Lookups [RtpTransceiver] in the provided [PeerConnection] by the
-/// provided [String].
+/// Lookups an [RtpTransceiver] in the provided [PeerConnection] by the provided
+/// [mid].
 Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.toDartString();
@@ -96,7 +95,7 @@ Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
       });
 }
 
-/// Sets remote SDP offer in the provided [PeerConnection].
+/// Sets a remote SDP offer in the provided [PeerConnection].
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
@@ -109,7 +108,7 @@ Object _setRemoteDescription(
   return () => conn.setRemoteDescription(desc);
 }
 
-/// Sets local SDP offer in the provided [PeerConnection].
+/// Sets a local SDP offer in the provided [PeerConnection].
 Object _setLocalDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
@@ -122,45 +121,46 @@ Object _setLocalDescription(
       conn.setLocalDescription(SessionDescription(sdpType, sdp.toDartString()));
 }
 
-/// Creates new SDP offer for the provided [PeerConnection].
+/// Creates a new SDP offer for the provided [PeerConnection].
 Object _createOffer(PeerConnection conn) {
   return () => conn.createOffer().then((val) => val.description);
 }
 
-/// Creates new SDP answer for the provided [PeerConnection].
+/// Creates a new SDP answer for the provided [PeerConnection].
 Object _createAnswer(PeerConnection conn) {
   return () => conn.createAnswer().then((val) => val.description);
 }
 
-/// Restarts ICE on the provided [PeerConnection].
+/// Marks the given [PeerConnection] to create descriptions that will restart
+/// ICE on the next [PeerConnection.createOffer] call.
 void _restartIce(PeerConnection conn) {
   conn.restartIce();
 }
 
-/// Adds provided [IceCandidate] to the provided [PeerConnection].
+/// Adds the specified [IceCandidate] to the provided [PeerConnection].
 Object _addIceCandidate(PeerConnection conn, IceCandidate candidate) {
   return () => conn.addIceCandidate(candidate);
 }
 
-/// Returns current [PeerConnection.connectionState] of the provided
+/// Returns the current [PeerConnection.connectionState] of the provided
 /// [PeerConnection].
 Pointer _connectionState(PeerConnection conn) {
   return ForeignValue.fromInt(conn.connectionState().index).intoRustOwned();
 }
 
-/// Returns current [PeerConnection.iceConnectionState] of the provided
+/// Returns the current [PeerConnection.iceConnectionState] of the provided
 /// [PeerConnection].
 int _iceConnectionState(PeerConnection conn) {
   return conn.iceConnectionState().index;
 }
 
-/// Rollbacks local SDP offer of the provided [PeerConnection].
+/// Rollbacks the local SDP offer of the provided [PeerConnection].
 Object _rollback(PeerConnection conn) {
   return () => conn.setLocalDescription(
       SessionDescription(SessionDescriptionType.rollback, ''));
 }
 
-/// Returns all [RtpTransceiver]s of the provided [PeerConnection].
+/// Returns all the [RtpTransceiver]s of the provided [PeerConnection].
 Object getTransceivers(PeerConnection conn) {
   return () => conn.getTransceivers();
 }

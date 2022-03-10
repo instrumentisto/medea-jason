@@ -20,6 +20,7 @@ use crate::{
 #[derive(Debug, From)]
 pub struct LocalMediaTrack(local::LocalMediaTrack);
 
+#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl LocalMediaTrack {
     /// Returns the underlying [MediaStreamTrack][1].

@@ -1,8 +1,9 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_webrtc/src/model/track.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'media_track.g.dart' as bridge;
 
@@ -82,7 +83,7 @@ void _setEnabled(MediaStreamTrack track, bool enabled) {
   track.setEnabled(enabled);
 }
 
-/// Stops provided [MediaStreamTrack].
+/// Stops the provided [MediaStreamTrack].
 void _stop(MediaStreamTrack track) {
   track.stop();
 }
@@ -92,6 +93,7 @@ bool _enabled(MediaStreamTrack track) {
   return track.isEnabled();
 }
 
+/// Clones the provided [MediaStreamTrack] preserving the same media source.
 Object _clone(MediaStreamTrack track) {
   return () => track.clone();
 }

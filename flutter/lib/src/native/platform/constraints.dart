@@ -5,9 +5,10 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 import 'constraints.g.dart' as bridge;
 
-/// Registers functions allowing Rust to operate Dart [MediaStreamConstraints][0].
+/// Registers functions allowing Rust to operate Dart
+/// [MediaStreamConstraints][0].
 ///
-/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
@@ -22,9 +23,9 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Kind of [MediaStreamConstraints.video][0] setting.
+/// Kind of a [MediaStreamConstraints.video][0] setting.
 ///
-/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints-video
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
 enum VideoConstraintKind {
   facingMode,
   deviceId,
@@ -32,27 +33,27 @@ enum VideoConstraintKind {
   height,
 }
 
-/// Kind of [MediaStreamConstraints.audio][0] setting.
+/// Kind of a [MediaStreamConstraints.audio][0] setting.
 ///
-/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints-audio
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 enum AudioConstraintKind {
   deviceId,
 }
 
-/// Indicator of necessity of [AudioConstraints] or [VideoConstraints] setting.
+/// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
 ///
-/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 enum ConstraintType {
   optional,
   mandatory,
 }
 
-/// Returns empty [DeviceConstraints].
+/// Returns new empty [DeviceConstraints].
 Object _newDeviceConstraints() {
   return DeviceConstraints();
 }
 
-///Returns empty [DisplayConstraints].
+///Returns new empty [DisplayConstraints].
 Object _newDisplayConstaints() {
   return DisplayConstraints();
 }
@@ -67,9 +68,9 @@ Object _newAudioConstraints() {
   return AudioConstraints();
 }
 
-/// Specifies setting of the [MediaStreamConstraints.video][0] (for example `facingMode`).
+/// Specifies the provided setting of a [MediaStreamConstraints.video][0].
 ///
-/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints-video
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
 void _setVideoConstraintValue(
     DeviceVideoConstraints cons, int kind, ForeignValue value) {
   switch (VideoConstraintKind.values[kind]) {
@@ -88,9 +89,9 @@ void _setVideoConstraintValue(
   }
 }
 
-/// Specifies setting of the [MediaStreamConstraints.audio][0] (for example `deviceId`).
+/// Specifies the provided setting of a [MediaStreamConstraints.audio][0].
 ///
-/// [0]: https://www.w3.org/TR/mediacapture-streams/#dom-mediastreamconstraints-audio
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 void _setAudioConstraintValue(
     AudioConstraints cons, int kind, ForeignValue value) {
   switch (AudioConstraintKind.values[kind]) {
@@ -100,7 +101,8 @@ void _setAudioConstraintValue(
   }
 }
 
-/// Specifies the provided nature and settings of a video track to the given [DeviceConstraints].
+/// Specifies the provided nature and settings of a video track to the given
+/// [DeviceConstraints].
 void _setVideoConstraint(
     DeviceConstraints cons, int type, DeviceVideoConstraints video) {
   switch (ConstraintType.values[type]) {
@@ -113,7 +115,8 @@ void _setVideoConstraint(
   }
 }
 
-/// Specifies the provided nature and settings of a audio track to the given [DeviceConstraints].
+/// Specifies the provided nature and settings of a audio track to the given
+/// [DeviceConstraints].
 void _setAudioConstraint(
     DeviceConstraints cons, int type, AudioConstraints audio) {
   switch (ConstraintType.values[type]) {
