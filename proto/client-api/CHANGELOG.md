@@ -16,12 +16,14 @@ All user visible changes to this project will be documented in this file. This p
     - Renamed `medea` to `server`.
     - Made only `client` enabled by default.
 - Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([rev]).
+- Made `RtcOutboundRtpStreamStats::bytes_sent` and `RtcOutboundRtpStreamStats::packets_sent` optional ([#26]).
 
 ### Updated
 
 - Switch to [2021 Rust edition][012-1] ([#16]).
 
 [#16]: /../../pull/16
+[#26]: /../../pull/26
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 

@@ -1,28 +1,130 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:ffi';
+
+import 'package:flutter_webrtc/src/model/constraints.dart';
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+
 import 'constraints.g.dart' as bridge;
 
-/// Registers functions allowing Rust to operate Dart [MediaStreamConstraints].
+/// Registers functions allowing Rust to operate Dart
+/// [MediaStreamConstraints][0].
+///
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
-    init: Pointer.fromFunction(_new),
-    audio: Pointer.fromFunction(_setAudio),
-    video: Pointer.fromFunction(_setVideo),
+    initDeviceConstraints: Pointer.fromFunction(_newDeviceConstraints),
+    initDisplayConstraints: Pointer.fromFunction(_newDisplayConstaints),
+    newVideoConstraints: Pointer.fromFunction(_newVideoConstraints),
+    newAudioConstraints: Pointer.fromFunction(_newAudioConstraints),
+    setVideoConstraintValue: Pointer.fromFunction(_setVideoConstraintValue),
+    setAudioConstraintValue: Pointer.fromFunction(_setAudioConstraintValue),
+    setVideoConstraint: Pointer.fromFunction(_setVideoConstraint),
+    setAudioConstraint: Pointer.fromFunction(_setAudioConstraint),
   );
 }
 
-/// Returns empty [MediaStreamConstraints].
-Object _new() {
-  return MediaStreamConstraints();
+/// Kind of a [MediaStreamConstraints.video][0] setting.
+///
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
+enum VideoConstraintKind {
+  facingMode,
+  deviceId,
+  width,
+  height,
 }
 
-/// Sets [MediaStreamConstraints.audio] for the provided [cons].
-void _setAudio(MediaStreamConstraints cons, Object val) {
-  cons.audio = val;
+/// Kind of a [MediaStreamConstraints.audio][0] setting.
+///
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
+enum AudioConstraintKind {
+  deviceId,
 }
 
-/// Sets [MediaStreamConstraints.video] for the provided [cons].
-void _setVideo(MediaStreamConstraints cons, Object val) {
-  cons.video = val;
+/// Indicates necessity of a [AudioConstraints] or [VideoConstraints] setting.
+///
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+enum ConstraintType {
+  optional,
+  mandatory,
+}
+
+/// Returns new empty [DeviceConstraints].
+Object _newDeviceConstraints() {
+  return DeviceConstraints();
+}
+
+///Returns new empty [DisplayConstraints].
+Object _newDisplayConstaints() {
+  return DisplayConstraints();
+}
+
+/// Returns new empty [DeviceVideoConstraints].
+Object _newVideoConstraints() {
+  return DeviceVideoConstraints();
+}
+
+/// Returns new empty [AudioConstraints].
+Object _newAudioConstraints() {
+  return AudioConstraints();
+}
+
+/// Specifies the provided setting of a [MediaStreamConstraints.video][0].
+///
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
+void _setVideoConstraintValue(
+    DeviceVideoConstraints cons, int kind, ForeignValue value) {
+  switch (VideoConstraintKind.values[kind]) {
+    case VideoConstraintKind.deviceId:
+      cons.deviceId = value.toDart() as String;
+      break;
+    case VideoConstraintKind.facingMode:
+      cons.facingMode = FacingMode.values[value.toDart() as int];
+      break;
+    case VideoConstraintKind.width:
+      cons.width = value.toDart();
+      break;
+    case VideoConstraintKind.height:
+      cons.height = value.toDart();
+      break;
+  }
+}
+
+/// Specifies the provided setting of a [MediaStreamConstraints.audio][0].
+///
+/// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
+void _setAudioConstraintValue(
+    AudioConstraints cons, int kind, ForeignValue value) {
+  switch (AudioConstraintKind.values[kind]) {
+    case AudioConstraintKind.deviceId:
+      cons.deviceId = value.toDart() as String;
+      break;
+  }
+}
+
+/// Specifies the provided nature and settings of a video track to the given
+/// [DeviceConstraints].
+void _setVideoConstraint(
+    DeviceConstraints cons, int type, DeviceVideoConstraints video) {
+  switch (ConstraintType.values[type]) {
+    case ConstraintType.optional:
+      cons.video.optional = video;
+      break;
+    case ConstraintType.mandatory:
+      cons.video.mandatory = video;
+      break;
+  }
+}
+
+/// Specifies the provided nature and settings of a audio track to the given
+/// [DeviceConstraints].
+void _setAudioConstraint(
+    DeviceConstraints cons, int type, AudioConstraints audio) {
+  switch (ConstraintType.values[type]) {
+    case ConstraintType.optional:
+      cons.audio.optional = audio;
+      break;
+    case ConstraintType.mandatory:
+      cons.audio.mandatory = audio;
+      break;
+  }
 }

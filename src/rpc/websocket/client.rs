@@ -328,22 +328,24 @@ impl WebSocketRpcClient {
                 }
             },
             ServerMsg::RpcSettings(settings) => {
-                if let Some(heartbeat) = self.0.borrow_mut().heartbeat.as_ref()
-                {
-                    heartbeat.update_settings(
-                        IdleTimeout(Duration::from_millis(
-                            settings.idle_timeout_ms.into(),
-                        )),
-                        PingInterval(Duration::from_millis(
-                            settings.ping_interval_ms.into(),
-                        )),
-                    );
-                } else {
-                    log::error!(
-                        "Failed to update socket settings because Heartbeat is \
-                         None",
-                    );
-                }
+                self.0.borrow_mut().heartbeat.as_ref().map_or_else(
+                    || {
+                        log::error!(
+                            "Failed to update socket settings because \
+                             Heartbeat is None",
+                        );
+                    },
+                    |heartbeat| {
+                        heartbeat.update_settings(
+                            IdleTimeout(Duration::from_millis(
+                                settings.idle_timeout_ms.into(),
+                            )),
+                            PingInterval(Duration::from_millis(
+                                settings.ping_interval_ms.into(),
+                            )),
+                        );
+                    },
+                );
                 None
             }
             ServerMsg::Ping(_) => None,

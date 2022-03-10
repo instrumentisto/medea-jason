@@ -8,7 +8,7 @@ const MEDEA_PORT = 8080;
 class Call {
   final Jason _jason = Jason();
   late RoomHandle _room;
-  late Function(MediaStream) _onLocalStream;
+  late Function(MediaStreamTrack) _onLocalTrack;
   List<LocalMediaTrack> _tracks = [];
 
   Call() {
@@ -32,9 +32,7 @@ class Call {
 
     tracks.forEach((track) async {
       if (track.kind() == MediaKind.Video) {
-        var localStream = await createLocalMediaStream('local');
-        await localStream.addTrack(track.getTrack());
-        _onLocalStream(localStream);
+        _onLocalTrack(track.getTrack());
       }
     });
 
@@ -47,21 +45,18 @@ class Call {
     _jason.closeRoom(_room);
   }
 
-  void onLocalStream(Function(MediaStream) f) {
-    _onLocalStream = f;
+  void onLocalStream(Function(MediaStreamTrack) f) {
+    _onLocalTrack = f;
   }
 
-  void onNewRemoteStream(Function(MediaStream) f) {
+  void onNewRemoteStream(Function(MediaStreamTrack) f) {
     _room.onNewConnection((conn) {
-      var remoteMemberId = conn.getRemoteMemberId();
       conn.onRemoteTrackAdded((track) async {
         if (track.kind() == MediaKind.Audio && !kIsWeb) {
           return;
         }
         var sysTrack = track.getTrack();
-        var remoteStream = await createLocalMediaStream(remoteMemberId);
-        await remoteStream.addTrack(sysTrack);
-        f(remoteStream);
+        f(sysTrack);
       });
     });
   }

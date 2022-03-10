@@ -2,6 +2,8 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
+use std::future::Future;
+
 use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
@@ -9,8 +11,11 @@ use medea_macro::dart_bridge;
 use crate::{
     api::c_str_into_string,
     media::{track::MediaStreamTrackState, FacingMode, MediaKind},
-    platform::dart::utils::{
-        callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
+    platform::{
+        dart::utils::{
+            callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
+        },
+        utils::dart_future::FutureFromDart,
     },
 };
 
@@ -95,6 +100,10 @@ mod media_stream_track {
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
         pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
+
+        /// Creates a new instance of [`MediaStreamTrack`] depending on the same
+        /// media source as this [`MediaStreamTrack`].
+        pub fn clone(track: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -244,10 +253,17 @@ impl MediaStreamTrack {
     /// not interfere with [`Clone`] trait.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    #[must_use]
-    pub fn fork(&self) -> Self {
-        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
-        self.clone()
+    pub fn fork(&self) -> impl Future<Output = Self> + 'static {
+        unsafe {
+            let handle = self.0.get();
+            async move {
+                let new_track: DartHandle =
+                    FutureFromDart::execute(media_stream_track::clone(handle))
+                        .await
+                        .unwrap();
+                Self::from(new_track)
+            }
+        }
     }
 
     /// Sets [`onended`][1] event handler of this [`MediaStreamTrack`].

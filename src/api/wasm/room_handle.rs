@@ -24,6 +24,7 @@ use super::Error;
 #[derive(Debug, From, Into)]
 pub struct RoomHandle(room::RoomHandle);
 
+#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl RoomHandle {
     /// Connects to a media server and joins a [`Room`] with the provided

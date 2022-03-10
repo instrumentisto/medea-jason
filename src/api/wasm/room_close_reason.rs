@@ -17,6 +17,7 @@ use crate::room;
 #[derive(Debug, From)]
 pub struct RoomCloseReason(room::RoomCloseReason);
 
+#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl RoomCloseReason {
     /// Returns the [`Room`]'s close reason.

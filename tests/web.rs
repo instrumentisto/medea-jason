@@ -307,7 +307,7 @@ async fn get_video_track() -> api::RemoteMediaTrack {
     let mut settings = MediaStreamSettings::new();
     settings.device_video(DeviceVideoTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
-    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork();
+    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
     remote::Track::new(track, MediaSourceKind::Device, true, false).into()
 }
 
@@ -316,7 +316,7 @@ async fn get_audio_track() -> api::RemoteMediaTrack {
     let mut settings = MediaStreamSettings::new();
     settings.audio(AudioTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
-    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork();
+    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
     remote::Track::new(track, MediaSourceKind::Device, true, false).into()
 }
 
