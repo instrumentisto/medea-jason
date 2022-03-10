@@ -36,16 +36,16 @@ async fn then_member_has_remote_track(
     let tracks_store = connection.tracks_store().await.unwrap();
 
     if kind.contains("audio") {
-        assert!(tracks_store
+        tracks_store
             .get_track(MediaKind::Audio, MediaSourceKind::Device)
             .await
-            .is_ok());
+            .unwrap();
     }
     if kind.contains("video") {
-        assert!(tracks_store
+        tracks_store
             .get_track(MediaKind::Video, MediaSourceKind::Device)
             .await
-            .is_ok());
+            .unwrap();
     }
 }
 
@@ -66,7 +66,7 @@ async fn then_has_local_track(world: &mut World, id: String, kind: String) {
         source_kinds.push(MediaSourceKind::Device);
     }
     for source_kind in source_kinds {
-        assert!(tracks.get_track(media_kind, source_kind).await.is_ok());
+        tracks.get_track(media_kind, source_kind).await.unwrap();
     }
 }
 
@@ -117,16 +117,16 @@ async fn then_callback_fires_on_remote_track(
 
     match callback_kind.as_str() {
         "enabled" => {
-            assert!(track.wait_for_on_enabled_fire_count(times).await.is_ok());
+            track.wait_for_on_enabled_fire_count(times).await.unwrap();
         }
         "disabled" => {
-            assert!(track.wait_for_on_disabled_fire_count(times).await.is_ok());
+            track.wait_for_on_disabled_fire_count(times).await.unwrap();
         }
         "muted" => {
-            assert!(track.wait_for_on_muted_fire_count(times).await.is_ok());
+            track.wait_for_on_muted_fire_count(times).await.unwrap();
         }
         "unmuted" => {
-            assert!(track.wait_for_on_unmuted_fire_count(times).await.is_ok());
+            track.wait_for_on_unmuted_fire_count(times).await.unwrap();
         }
         _ => {
             unreachable!(
@@ -161,8 +161,8 @@ async fn then_remote_media_track(
     sleep(Duration::from_millis(500)).await;
 
     match state.as_str() {
-        "enabled" => assert!(track.wait_for_enabled().await.is_ok()),
-        "disabled" => assert!(track.wait_for_disabled().await.is_ok()),
+        "enabled" => track.wait_for_enabled().await.unwrap(),
+        "disabled" => track.wait_for_disabled().await.unwrap(),
         _ => unreachable!(),
     };
 }

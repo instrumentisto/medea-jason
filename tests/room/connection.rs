@@ -67,7 +67,7 @@ async fn tracks_are_added_to_connection() {
 
     let (tx, rx) = oneshot::channel();
     let closure = Closure::once_into_js(move |track: api::RemoteMediaTrack| {
-        assert!(tx.send(track).is_ok());
+        tx.send(track).unwrap();
     });
     con_handle.on_remote_track_added(closure.into()).unwrap();
 
@@ -77,7 +77,7 @@ async fn tracks_are_added_to_connection() {
 
     let (tx, rx) = oneshot::channel();
     let closure = Closure::once_into_js(move |track: api::RemoteMediaTrack| {
-        assert!(tx.send(track).is_ok());
+        tx.send(track).unwrap();
     });
     con_handle.on_remote_track_added(closure.into()).unwrap();
     con.add_remote_track(get_audio_track().await.into());

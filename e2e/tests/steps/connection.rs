@@ -9,11 +9,11 @@ async fn then_member_receives_connection(
     responder_id: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    assert!(member
+    member
         .connections()
         .wait_for_connection(responder_id.clone())
         .await
-        .is_ok());
+        .unwrap();
 }
 
 #[then(regex = r"^(\S+) doesn't receive connection with (\S+)$")]
@@ -40,5 +40,5 @@ async fn then_connection_closes(
     let member = world.get_member(&id).unwrap();
     let connection =
         member.connections().get(partner_id).await.unwrap().unwrap();
-    assert!(connection.wait_for_close().await.is_ok());
+    connection.wait_for_close().await.unwrap();
 }
