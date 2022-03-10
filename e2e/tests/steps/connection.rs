@@ -40,5 +40,5 @@ async fn then_connection_closes(
     let member = world.get_member(&id).unwrap();
     let connection =
         member.connections().get(partner_id).await.unwrap().unwrap();
-    assert!(connection.wait_for_close().await.is_ok());
+    connection.wait_for_close().await.unwrap();
 }

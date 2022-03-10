@@ -18,5 +18,5 @@ async fn ws_connection_restore(world: &mut World, id: String) {
 #[then(regex = r"^(\S+)'s WS connection is lost$")]
 async fn connection_is_lost(world: &mut World, id: String) {
     let member = world.get_member(&id).unwrap();
-    assert!(member.room().wait_for_connection_loss().await.is_ok());
+    member.room().wait_for_connection_loss().await.unwrap();
 }
