@@ -352,9 +352,6 @@ impl Component {
         .await;
 
         match negotiation_state {
-            NegotiationState::Stable => {
-                state.negotiation_role.set(None);
-            }
             NegotiationState::WaitLocalSdp => {
                 if let Some(negotiation_role) = state.negotiation_role.get() {
                     match negotiation_role {
@@ -380,7 +377,8 @@ impl Component {
                     }
                 }
             }
-            NegotiationState::WaitLocalSdpApprove
+            NegotiationState::Stable
+            | NegotiationState::WaitLocalSdpApprove
             | NegotiationState::WaitRemoteSdp => (),
         }
         Ok(())

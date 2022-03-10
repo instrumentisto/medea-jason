@@ -77,9 +77,9 @@ async fn then_control_api_doesnt_sends_on_leave(world: &mut World, id: String) {
 
 #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
 async fn then_control_api_sends_on_join(world: &mut World, id: String) {
-    assert!(timeout(Duration::from_secs(10), world.wait_for_on_join(id))
+    timeout(Duration::from_secs(10), world.wait_for_on_join(id))
         .await
-        .is_ok());
+        .unwrap()
 }
 
 #[when(regex = "^Control API starts (\\S+)'s (audio|video|media) publishing \

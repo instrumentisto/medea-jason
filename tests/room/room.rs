@@ -358,10 +358,10 @@ mod disable_send_tracks {
         .await;
 
         let room_handle = api::RoomHandle::from(room.new_handle());
-        assert!(JsFuture::from(room_handle.disable_audio()).await.is_ok());
+        JsFuture::from(room_handle.disable_audio()).await.unwrap();
 
         assert!(!peer.is_send_audio_enabled());
-        assert!(JsFuture::from(room_handle.enable_audio()).await.is_ok());
+        JsFuture::from(room_handle.enable_audio()).await.unwrap();
         assert!(peer.is_send_audio_enabled());
     }
 
@@ -380,7 +380,9 @@ mod disable_send_tracks {
             .is_ok());
         assert!(!peer.is_send_video_enabled(None));
 
-        assert!(JsFuture::from(room_handle.enable_video(None)).await.is_ok());
+        JsFuture::from(room_handle.enable_video(None))
+            .await
+            .unwrap();
         assert!(peer.is_send_video_enabled(None));
     }
 
@@ -1646,9 +1648,9 @@ async fn mute_unmute_audio() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    assert!(JsFuture::from(room_handle.mute_audio()).await.is_ok());
+    JsFuture::from(room_handle.mute_audio()).await.unwrap();
     assert!(!peer.is_send_audio_unmuted());
-    assert!(JsFuture::from(room_handle.unmute_audio()).await.is_ok());
+    JsFuture::from(room_handle.unmute_audio()).await.unwrap();
     assert!(peer.is_send_audio_unmuted());
 }
 
