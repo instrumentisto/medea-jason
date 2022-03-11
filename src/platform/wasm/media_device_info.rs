@@ -5,7 +5,7 @@
 use derive_more::Display;
 use web_sys as sys;
 
-use crate::media::MediaKind;
+use crate::media::MediaDeviceKind;
 
 /// Errors that may occur when parsing [MediaDeviceInfo][1].
 ///
@@ -23,7 +23,7 @@ pub enum Error {
 #[derive(Debug)]
 pub struct MediaDeviceInfo {
     /// Kind of the represented media device.
-    media_kind: MediaKind,
+    media_kind: MediaDeviceKind,
 
     /// Actual underlying [MediaDeviceInfo][1] object.
     ///
@@ -31,15 +31,16 @@ pub struct MediaDeviceInfo {
     info: sys::MediaDeviceInfo,
 }
 
-impl TryFrom<sys::MediaDeviceKind> for MediaKind {
+impl TryFrom<sys::MediaDeviceKind> for MediaDeviceKind {
     type Error = Error;
 
     fn try_from(value: sys::MediaDeviceKind) -> Result<Self, Self::Error> {
         // False positive on `#[non_exhaustive]`.
         #[allow(clippy::wildcard_enum_match_arm)]
         match value {
-            sys::MediaDeviceKind::Audioinput => Ok(Self::Audio),
-            sys::MediaDeviceKind::Videoinput => Ok(Self::Video),
+            sys::MediaDeviceKind::Audioinput => Ok(Self::AudioInput),
+            sys::MediaDeviceKind::Videoinput => Ok(Self::VideoInput),
+            sys::MediaDeviceKind::Audiooutput => Ok(Self::AudioOutput),
             _ => Err(Error::NotInputDevice),
         }
     }
@@ -58,7 +59,7 @@ impl MediaDeviceInfo {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
     #[must_use]
-    pub fn kind(&self) -> MediaKind {
+    pub fn kind(&self) -> MediaDeviceKind {
         self.media_kind
     }
 
@@ -89,7 +90,7 @@ impl TryFrom<sys::MediaDeviceInfo> for MediaDeviceInfo {
 
     fn try_from(info: sys::MediaDeviceInfo) -> Result<Self, Self::Error> {
         Ok(Self {
-            media_kind: MediaKind::try_from(info.kind())?,
+            media_kind: MediaDeviceKind::try_from(info.kind())?,
             info,
         })
     }
