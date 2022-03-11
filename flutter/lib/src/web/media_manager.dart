@@ -1,3 +1,6 @@
+import 'package:flutter_webrtc/src/platform/web/video_renderer.dart'
+    as video_renderer;
+
 import '../interface/media_device_info.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';
@@ -8,8 +11,6 @@ import 'media_device_info.dart';
 import 'jason_wasm.dart' as wasm;
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
-import 'package:flutter_webrtc/src/platform/web/video_renderer.dart'
-    as video_renderer;
 
 class WebMediaManagerHandle extends MediaManagerHandle {
   late wasm.MediaManagerHandle obj;

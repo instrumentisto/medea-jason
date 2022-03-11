@@ -58,28 +58,42 @@ mod media_devices {
     }
 }
 
+/// Collects information about available media input devices.
+///
+/// Adapter for a [MediaDevices.enumerateDevices()][1] function.
+///
+/// # Errors
+///
+/// If [MediaDevices.enumerateDevices()][1] errors itself or unable to get
+/// [MediaDevices][2].
+///
+/// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-enumeratedevices
+/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
+pub async fn enumerate_devices() -> Result<Vec<MediaDeviceInfo>, Traced<Error>>
+{
+    let devices = FutureFromDart::execute::<DartHandle>(unsafe {
+        media_devices::enumerate_devices()
+    })
+    .await
+    .map(DartList::from)
+    .map_err(tracerr::wrap!())?;
+
+    let len = devices.length();
+    let mut result = Vec::with_capacity(len);
+    for i in 0..len {
+        let val = devices.get(i).unwrap();
+        if let Ok(v) = val.try_into() {
+            result.push(v);
+        }
+    }
+    Ok(result)
+}
+
 /// Media devices controller.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct MediaDevices;
 
 impl MediaDevices {
-    /// Subscribes on the [`MediaDevices`]'s `devicechange` event.
-    pub fn on_device_change<F>(&self, handler: Option<F>)
-    where
-        F: 'static + FnMut(),
-    {
-        if let Some(mut h) = handler {
-            unsafe {
-                media_devices::on_device_change(
-                    Callback::from_fn_mut(move |_: ()| {
-                        h();
-                    })
-                    .into_dart(),
-                );
-            };
-        }
-    }
-
     /// Prompts a user for permissions to use a media input device, producing a
     /// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of
     /// media.
@@ -151,35 +165,21 @@ impl MediaDevices {
 
         Ok(())
     }
-}
 
-/// Collects information about available media input devices.
-///
-/// Adapter for a [MediaDevices.enumerateDevices()][1] function.
-///
-/// # Errors
-///
-/// If [MediaDevices.enumerateDevices()][1] errors itself or unable to get
-/// [MediaDevices][2].
-///
-/// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-enumeratedevices
-/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
-pub async fn enumerate_devices() -> Result<Vec<MediaDeviceInfo>, Traced<Error>>
-{
-    let devices = FutureFromDart::execute::<DartHandle>(unsafe {
-        media_devices::enumerate_devices()
-    })
-    .await
-    .map(DartList::from)
-    .map_err(tracerr::wrap!())?;
-
-    let len = devices.length();
-    let mut result = Vec::with_capacity(len);
-    for i in 0..len {
-        let val = devices.get(i).unwrap();
-        if let Ok(v) = val.try_into() {
-            result.push(v);
+    /// Subscribes on the [`MediaDevices`]'s `devicechange` event.
+    pub fn on_device_change<F>(&self, handler: Option<F>)
+    where
+        F: 'static + FnMut(),
+    {
+        if let Some(mut h) = handler {
+            unsafe {
+                media_devices::on_device_change(
+                    Callback::from_fn_mut(move |_: ()| {
+                        h();
+                    })
+                    .into_dart(),
+                );
+            };
         }
     }
-    Ok(result)
 }

@@ -43,6 +43,7 @@ All user visible changes to this project will be documented in this file. This p
                 - `MediaStateTransitionException`;
                 - `InternalException`;
                 - `LocalMediaInitException`.
+    - Rename `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
 
 ### Added
 
@@ -57,6 +58,7 @@ All user visible changes to this project will be documented in this file. This p
         - `FormatException`;
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
+    - `MediaManagerHandle.set_output_audio_id()` function that switches output audio device on Dart platform ([#29]).
 
 ### Updated
 
@@ -65,6 +67,7 @@ All user visible changes to this project will be documented in this file. This p
 [instrumentisto/medea#206]: https://github.com/instrumentisto/medea/pull/206
 [#4]: /../../pull/4
 [#16]: /../../pull/16
+[#29]: /../../pull/29
 
 
 

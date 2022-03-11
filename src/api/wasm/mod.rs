@@ -53,6 +53,22 @@ pub enum MediaKind {
     Video,
 }
 
+/// [MediaDeviceInfo.kind][1] representation.
+///
+/// [1]: https://www.w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-kind
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+pub enum MediaDeviceKind {
+    /// Represents an audio input device; for example a microphone.
+    AudioInput,
+
+    /// Represents a video input device; for example a webcam.
+    VideoInput,
+
+    /// Represents an audio output device; for example a pair of headphones.
+    AudioOutput,
+}
+
 /// Media source type.
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
@@ -107,6 +123,16 @@ impl From<media::MediaSourceKind> for MediaSourceKind {
         match that {
             media::MediaSourceKind::Device => Self::Device,
             media::MediaSourceKind::Display => Self::Display,
+        }
+    }
+}
+
+impl From<media::MediaDeviceKind> for MediaDeviceKind {
+    fn from(that: media::MediaDeviceKind) -> Self {
+        match that {
+            media::MediaDeviceKind::AudioInput => Self::AudioInput,
+            media::MediaDeviceKind::VideoInput => Self::VideoInput,
+            media::MediaDeviceKind::AudioOutput => Self::AudioOutput,
         }
     }
 }

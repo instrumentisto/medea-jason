@@ -1,8 +1,14 @@
 import '../util/move_semantic.dart';
 
+/// The kind of the represented media device.
 enum MediaDeviceKind {
+  /// Represents an audio input device; for example a microphone.
   audioinput,
+
+  /// Represents a video input device; for example a webcam.
   videoinput,
+
+  /// Represents an audio output device; for example a pair of headphones.
   audiooutput,
 }
 

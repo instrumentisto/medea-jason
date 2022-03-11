@@ -57,7 +57,7 @@ void main() {
 
     expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
     expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
-    expect(devices.first.kind(), equals(MediaKind.Audio));
+    expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
     expect(devices.first.label(), equals('MediaDeviceInfo.label'));
 
     devices.first.free();
