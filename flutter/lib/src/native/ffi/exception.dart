@@ -65,7 +65,8 @@ Object _newEnumerateDevicesException(
       unboxDartHandle(cause), stacktrace.nativeStringToDartString());
 }
 
-/// Creates a new [InvalidOutputAudioDeviceIdException] with the provided [trace].
+/// Creates a new [InvalidOutputAudioDeviceIdException] with the provided
+/// [trace].
 Object _newInvalidOutputAudioDeviceIdException(Pointer<Utf8> trace) {
   return NativeInvalidOutputAudioDeviceIdException(
       trace.nativeStringToDartString());
@@ -177,7 +178,7 @@ class NativeInvalidOutputAudioDeviceIdException
   /// Native stacktrace.
   late final String _nativeStackTrace;
 
-  /// Instantinates a new [NativeInvalidOutputAudioDeviceIdException].
+  /// Instantiates a new [NativeInvalidOutputAudioDeviceIdException].
   NativeInvalidOutputAudioDeviceIdException(this._nativeStackTrace);
 
   @override

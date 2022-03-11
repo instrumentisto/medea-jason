@@ -43,7 +43,7 @@ All user visible changes to this project will be documented in this file. This p
                 - `MediaStateTransitionException`;
                 - `InternalException`;
                 - `LocalMediaInitException`.
-    - Rename `InputDeviceInfo` object to the `MediaDeviceInfo` ([#29]).
+    - Rename `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
 
 ### Added
 
@@ -58,7 +58,7 @@ All user visible changes to this project will be documented in this file. This p
         - `FormatException`;
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
-    - `MediaManagerHandle.set_output_audio_id` function that switches output audio device ([#29]).
+    - `MediaManagerHandle.set_output_audio_id()` function that switches output audio device on Dart platform ([#29]).
 
 ### Updated
 
