@@ -52,10 +52,9 @@ pub async fn enumerate_devices() -> Result<Vec<MediaDeviceInfo>, Traced<Error>>
     Ok(js_sys::Array::from(&devices)
         .values()
         .into_iter()
-        .filter_map(|info| {
+        .map(|info| {
             let info = web_sys::MediaDeviceInfo::from(info.unwrap());
-            // TODO: we are filtering out all audiooutput devices here
-            MediaDeviceInfo::try_from(info).ok()
+            MediaDeviceInfo::from(info)
         })
         .collect())
 }

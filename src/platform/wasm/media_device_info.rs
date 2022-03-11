@@ -2,46 +2,26 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams/#device-info
 
-use derive_more::Display;
+use derive_more::From;
 use web_sys as sys;
 
 use crate::media::MediaDeviceKind;
 
-/// Errors that may occur when parsing [MediaDeviceInfo][1].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-#[derive(Clone, Copy, Debug, Display)]
-pub enum Error {
-    /// Occurs when kind of media device is not an input device.
-    #[display(fmt = "Not an input device")]
-    NotInputDevice,
-}
-
 /// Representation of [MediaDeviceInfo][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-#[derive(Debug)]
-pub struct MediaDeviceInfo {
-    /// Kind of the represented media device.
-    media_kind: MediaDeviceKind,
+#[derive(Debug, From)]
+pub struct MediaDeviceInfo(sys::MediaDeviceInfo);
 
-    /// Actual underlying [MediaDeviceInfo][1] object.
-    ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-    info: sys::MediaDeviceInfo,
-}
-
-impl TryFrom<sys::MediaDeviceKind> for MediaDeviceKind {
-    type Error = Error;
-
-    fn try_from(value: sys::MediaDeviceKind) -> Result<Self, Self::Error> {
-        // False positive on `#[non_exhaustive]`.
-        #[allow(clippy::wildcard_enum_match_arm)]
+impl From<sys::MediaDeviceKind> for MediaDeviceKind {
+    fn from(value: sys::MediaDeviceKind) -> Self {
         match value {
-            sys::MediaDeviceKind::Audioinput => Ok(Self::AudioInput),
-            sys::MediaDeviceKind::Videoinput => Ok(Self::VideoInput),
-            sys::MediaDeviceKind::Audiooutput => Ok(Self::AudioOutput),
-            _ => Err(Error::NotInputDevice),
+            sys::MediaDeviceKind::Audioinput => Self::AudioInput,
+            sys::MediaDeviceKind::Videoinput => Self::VideoInput,
+            sys::MediaDeviceKind::Audiooutput => Self::AudioOutput,
+            sys::MediaDeviceKind::__Nonexhaustive => {
+                unreachable!("Unknown MediaDeviceKind::{value:?}")
+            }
         }
     }
 }
@@ -50,7 +30,7 @@ impl MediaDeviceInfo {
     /// Returns unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {
-        self.info.device_id()
+        self.0.device_id()
     }
 
     /// Returns kind of the represented device.
@@ -60,7 +40,7 @@ impl MediaDeviceInfo {
     /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
     #[must_use]
     pub fn kind(&self) -> MediaDeviceKind {
-        self.media_kind
+        self.0.kind().into()
     }
 
     /// Returns label describing the represented device (for example
@@ -68,7 +48,7 @@ impl MediaDeviceInfo {
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
-        self.info.label()
+        self.0.label()
     }
 
     /// Returns group identifier of the represented device.
@@ -81,17 +61,6 @@ impl MediaDeviceInfo {
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
-        Some(self.info.group_id())
-    }
-}
-
-impl TryFrom<sys::MediaDeviceInfo> for MediaDeviceInfo {
-    type Error = Error;
-
-    fn try_from(info: sys::MediaDeviceInfo) -> Result<Self, Self::Error> {
-        Ok(Self {
-            media_kind: MediaDeviceKind::try_from(info.kind())?,
-            info,
-        })
+        Some(self.0.group_id())
     }
 }
