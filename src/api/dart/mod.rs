@@ -77,8 +77,12 @@ static mut FN: Option<platform::Function<String>> = None;
 /// Sets provided [`Dart_Handle`] as callback for the Rust panic hook.
 #[no_mangle]
 pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
+    // TODO: put to thread local?
     FN = Some(platform::Function::<String>::new(cb));
     std::panic::set_hook(Box::new(move |bt| {
+        // TODO(alexlapa): wont this return immediately?
+        //                 why this is not in the platform::set_panic_hook?
+        //                 how can this error be caught in dart?
         Dart_PropagateError_DL_Trampolined(new_panic_error(bt.to_string()));
         if let Some(f) = FN.as_ref() {
             f.call1(format!("{bt:?}"));

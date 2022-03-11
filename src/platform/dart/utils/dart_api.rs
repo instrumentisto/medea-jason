@@ -80,7 +80,7 @@ extern "C" {
         callback: extern "C" fn(*mut c_void, *mut c_void),
     ) -> Dart_Handle;
 
-    /// Is this an error handle?
+    /// Checks whether the provided `Dart_Handle` is an error.
     ///
     /// Requires there to be a current isolate.
     pub fn Dart_IsApiError_DL_Trampolined(object: Dart_Handle) -> bool;

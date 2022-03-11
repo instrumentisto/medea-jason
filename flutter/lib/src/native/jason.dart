@@ -3,22 +3,22 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
-import '/src/util/rust_handles_storage.dart';
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/callback.dart' as callback;
+import 'ffi/completer.dart' as completer;
+import 'ffi/exception.dart' as exceptions;
+import 'ffi/executor.dart';
 import 'ffi/function.dart' as function;
+import 'ffi/future.dart' as future;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
-import 'ffi/completer.dart' as completer;
-import 'ffi/future.dart' as future;
-import 'ffi/exception.dart' as exceptions;
-import 'platform/functions_registerer.dart' as platform_utils_registerer;
-import 'ffi/executor.dart';
 import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
+import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
 typedef _new_C = Pointer Function();
@@ -105,6 +105,7 @@ DynamicLibrary _dl_load() {
 
   final _onPanic = dl.lookupFunction<_onPanic_C, _onPanic_Dart>('on_panic');
   _onPanic((msg) {
+    // TODO(alexlapa): how are you passing String via ffi?
     msg as String;
     RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {

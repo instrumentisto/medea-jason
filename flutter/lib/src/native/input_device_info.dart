@@ -2,10 +2,10 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '/src/util/rust_handles_storage.dart';
 import '../interface/input_device_info.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';

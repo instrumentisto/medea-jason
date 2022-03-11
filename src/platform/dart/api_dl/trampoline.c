@@ -8,7 +8,6 @@
 // All declared methods are simply calling Dart DL API methods with same name
 // (without *_Trampolined prefix).
 
-#include <stdlib.h>
 #include "./include/dart_api_dl.c"
 
 Dart_PersistentHandle Dart_NewPersistentHandle_DL_Trampolined(

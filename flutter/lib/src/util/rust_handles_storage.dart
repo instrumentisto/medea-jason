@@ -16,6 +16,7 @@ import '/src/native/room_handle.dart';
 ///
 /// Throw [Exception] if provided unknown object.
 int getOrderForHandle(dynamic handle) {
+  // TODO(alexlapa): not sure that we need this
   switch (handle.runtimeType) {
     case AudioTrackConstraints:
       return 0;
@@ -71,6 +72,8 @@ class RustHandlesStorage {
     _handles
         .sort((a, b) => getOrderForHandle(a).compareTo(getOrderForHandle(b)));
     _handles.forEach((h) {
+      // TODO(alexlapa): this should be abstracted out so we won't need
+      //                 type checks
       switch (h.runtimeType) {
         case AudioTrackConstraints:
           h as AudioTrackConstraints;

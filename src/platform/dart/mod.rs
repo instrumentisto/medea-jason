@@ -42,7 +42,9 @@ pub use self::{
 ///
 /// Panic hook will be always set by Dart side, so this function doesn't have
 /// sense.
-pub fn set_panic_hook() {}
+pub fn set_panic_hook() {
+    // TODO(alexlapa): why dummy?
+}
 
 /// Initialize [`android_logger`] as default application logger with min log
 /// level set to [`log::Level::Debug`].

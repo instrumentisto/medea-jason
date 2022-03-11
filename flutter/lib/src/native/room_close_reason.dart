@@ -2,9 +2,9 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '/src/util/rust_handles_storage.dart';
 import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
