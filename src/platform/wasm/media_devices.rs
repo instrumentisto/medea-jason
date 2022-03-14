@@ -149,7 +149,7 @@ pub async fn get_display_media(
 }
 
 /// This method should be unreachable, because this functional is implemented on
-/// the Dart side of Jason.
+/// the Dart side of Jason only.
 ///
 /// # Errors
 ///
@@ -157,13 +157,13 @@ pub async fn get_display_media(
 ///
 /// # Panics
 ///
-/// In all cases.
+/// Always.
 #[allow(clippy::unused_async)]
 pub async fn set_output_audio_id(
     _: String,
 ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
     unreachable!(
-        "set_output_audio_id is implemented on the Dart side,\
-    so this method call is unreachable."
+        "`set_output_audio_id()` is implemented on the Dart side,\
+         so this method call is unreachable",
     )
 }

@@ -8,10 +8,10 @@
   },
   "goog:chromeOptions": {
     "args": [
-      "--use-fake-device-for-media-stream",
-      "--use-fake-ui-for-media-stream",
       "--disable-dev-shm-usage",
-      "--no-sandbox"
+      "--no-sandbox",
+      "--use-fake-device-for-media-stream",
+      "--use-fake-ui-for-media-stream"
     ]
   }
 }

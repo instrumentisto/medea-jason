@@ -201,8 +201,8 @@ pub struct InvalidOutputAudioDeviceIdException {
 }
 
 impl InvalidOutputAudioDeviceIdException {
-    /// Creates new [`InvalidOutputAudioDeviceIdException`] from the provided
-    /// error `trace`.
+    /// Creates a new [`InvalidOutputAudioDeviceIdException`] from the provided
+    /// error [`Trace`].
     #[must_use]
     pub fn new(trace: Trace) -> Self {
         Self { trace }

@@ -14,8 +14,8 @@ All user visible changes to this project will be documented in this file. This p
 ### BC Breaks
 
 - Library API:
-    - `ReconnectHandle.reconnect_with_backoff()` performs first reconnect attempt immediately now ([instrumentisto/medea#206]).
-    - Remove `JasonError` and change thrown exceptions kind ([#4]):
+    - `ReconnectHandle.reconnect_with_backoff()` now performs first reconnect attempt immediately ([instrumentisto/medea#206]).
+    - Removed `JasonError` and changed thrown exceptions kind ([#4]):
         - `ConnectionHandle`:
             - `on_close` - `StateError`;
             - `get_remote_member_id` - `StateError`;
@@ -43,7 +43,7 @@ All user visible changes to this project will be documented in this file. This p
                 - `MediaStateTransitionException`;
                 - `InternalException`;
                 - `LocalMediaInitException`.
-    - Rename `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
+    - Renamed `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
 
 ### Added
 
@@ -58,7 +58,7 @@ All user visible changes to this project will be documented in this file. This p
         - `FormatException`;
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
-    - `MediaManagerHandle.set_output_audio_id()` function that switches output audio device on Dart platform ([#29]).
+    - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]).
 
 ### Updated
 

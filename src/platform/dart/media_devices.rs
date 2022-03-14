@@ -46,8 +46,8 @@ mod media_devices {
         /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn get_display_media(constraints: Dart_Handle) -> Dart_Handle;
 
-        /// Switches output audio device to the device with a provided
-        /// `device_id`.
+        /// Switches the current output audio device to the device with the
+        /// provided `device_id`.
         pub fn set_output_audio_id(
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
@@ -134,11 +134,12 @@ pub async fn get_display_media(
     Ok(DartList::from(tracks).into())
 }
 
-/// Switches output audio device to the device with a provided `device_id`.
+/// Switches the current output audio device to the device with the provided
+/// `device_id`.
 ///
 /// # Errors
 ///
-/// If output audio device with a provided `device_id` is not available.
+/// If output audio device with the provided `device_id` is not available.
 pub async fn set_output_audio_id(
     device_id: String,
 ) -> Result<(), Traced<Error>> {
@@ -146,7 +147,5 @@ pub async fn set_output_audio_id(
         media_devices::set_output_audio_id(string_into_c_str(device_id))
     })
     .await
-    .map_err(tracerr::wrap!())?;
-
-    Ok(())
+    .map_err(tracerr::wrap!())
 }

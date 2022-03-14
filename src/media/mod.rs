@@ -40,22 +40,6 @@ pub enum MediaKind {
     Video = 1,
 }
 
-/// [MediaDeviceInfo.kind][1] representation.
-///
-/// [1]: https://www.w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-kind
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[repr(u8)]
-pub enum MediaDeviceKind {
-    /// Represents an audio input device; for example a microphone.
-    AudioInput = 0,
-
-    /// Represents a video input device; for example a webcam.
-    VideoInput = 1,
-
-    /// Represents an audio output device; for example a pair of headphones.
-    AudioOutput = 2,
-}
-
 impl MediaKind {
     /// Returns string representation of a [`MediaKind`].
     #[must_use]
@@ -74,4 +58,20 @@ impl From<&TrackConstraints> for MediaKind {
             TrackConstraints::Video(_) => Self::Video,
         }
     }
+}
+
+/// [MediaDeviceInfo.kind][1] representation.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum MediaDeviceKind {
+    /// Audio input device (for example, a microphone).
+    AudioInput = 0,
+
+    /// Video input device (for example, a webcam).
+    VideoInput = 1,
+
+    /// Audio output device (for example, a pair of headphones).
+    AudioOutput = 2,
 }

@@ -57,7 +57,8 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
         .into_dart_future()
 }
 
-/// Switches output audio device to the device with a provided `device_id`.
+/// Switches the current output audio device to the device with the provided
+/// `device_id`.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     this: ptr::NonNull<MediaManagerHandle>,

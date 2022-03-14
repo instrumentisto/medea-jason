@@ -1,20 +1,20 @@
 import '../util/move_semantic.dart';
 
-/// The kind of the represented media device.
+/// Kind of a media device.
 enum MediaDeviceKind {
-  /// Represents an audio input device; for example a microphone.
+  /// Audio input device (for example, a microphone).
   audioinput,
 
-  /// Represents a video input device; for example a webcam.
+  /// Video input device (for example, a webcam).
   videoinput,
 
-  /// Represents an audio output device; for example a pair of headphones.
+  /// Audio output device (for example, a pair of headphones).
   audiooutput,
 }
 
 /// [`MediaDeviceInfo`][1] interface.
 ///
-/// [1]: https://w3.org/TR/mediacapture-streams/#device-info
+/// [1]: https://w3.org/TR/mediacapture-streams#device-info
 abstract class MediaDeviceInfo {
   /// Returns an unique identifier of the represented device.
   String deviceId();
@@ -29,7 +29,7 @@ abstract class MediaDeviceInfo {
   ///
   /// This representation of a [`MediaDeviceInfo`][1] is ONLY for input devices.
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
+  /// [1]: https://w3.org/TR/mediacapture-streams#device-info
   MediaDeviceKind kind();
 
   /// Returns a group identifier of the represented device.
@@ -39,7 +39,7 @@ abstract class MediaDeviceInfo {
   /// representing the speaker and microphone of the same headset have the
   /// same [`groupId`][1].
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   String? groupId();
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
