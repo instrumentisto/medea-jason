@@ -953,7 +953,7 @@ ifeq ($(browser),firefox)
 			--binary=/opt/firefox/firefox
 else
 	DRIVER_ARGS="--disable-dev-shm-usage" \
-	docker run --rm -d --network=host \
+	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-chrome \
 		selenoid/chrome:$(CHROME_VERSION)
 endif
