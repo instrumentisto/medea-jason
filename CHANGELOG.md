@@ -58,7 +58,8 @@ All user visible changes to this project will be documented in this file. This p
         - `FormatException`;
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
-    - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]).
+    - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]);
+    - `MediaManagerHandle.on_device_change()` callback which fires when `MediaManagerHandle.enumerate_devices` list changed ([#30]).
 
 ### Updated
 
@@ -68,6 +69,7 @@ All user visible changes to this project will be documented in this file. This p
 [#4]: /../../pull/4
 [#16]: /../../pull/16
 [#29]: /../../pull/29
+[#30]: /../../pull/30
 
 
 
