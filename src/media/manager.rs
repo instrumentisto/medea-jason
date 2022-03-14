@@ -6,7 +6,7 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use derive_more::{Display, From, Into};
+use derive_more::{Display, From};
 use medea_client_api_proto::MediaSourceKind;
 use tracerr::Traced;
 
@@ -22,10 +22,17 @@ use crate::{
 use super::track::local;
 
 /// Errors returned from the [`MediaManagerHandle::enumerate_devices()`] method.
-#[derive(Caused, Clone, Debug, Display, From, Into)]
+#[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
-#[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
-pub struct EnumerateDevicesError(platform::Error);
+pub enum EnumerateDevicesError {
+    /// Occurs if `enumerateDevices` request fails.
+    #[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
+    Failed(platform::Error),
+
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer could not be upgraded.
+    #[display(fmt = "MediaManagerHandle is in detached state")]
+    Detached,
+}
 
 /// Errors returned from the [`MediaManagerHandle::init_local_tracks()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
@@ -159,8 +166,10 @@ impl InnerMediaManager {
 
     /// Returns a list of [`platform::MediaDeviceInfo`] objects.
     async fn enumerate_devices(
+        &self,
     ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<platform::Error>> {
-        platform::enumerate_devices()
+        self.media_devices
+            .enumerate_devices()
             .await
             .map_err(tracerr::wrap!())
     }
@@ -381,7 +390,8 @@ impl InnerMediaManager {
         device_id: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
         #[allow(clippy::map_err_ignore)]
-        self.media_devices.set_output_audio_id(device_id)
+        self.media_devices
+            .set_output_audio_id(device_id)
             .await
             .map_err(|_| tracerr::new!(InvalidOutputAudioDeviceIdError))
     }
@@ -447,7 +457,11 @@ impl MediaManagerHandle {
         &self,
     ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<EnumerateDevicesError>>
     {
-        InnerMediaManager::enumerate_devices()
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(EnumerateDevicesError::Detached))?;
+        this.enumerate_devices()
             .await
             .map_err(tracerr::map_from_and_wrap!())
     }

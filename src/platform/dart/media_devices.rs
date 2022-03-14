@@ -58,42 +58,43 @@ mod media_devices {
     }
 }
 
-/// Collects information about available media input devices.
-///
-/// Adapter for a [MediaDevices.enumerateDevices()][1] function.
-///
-/// # Errors
-///
-/// If [MediaDevices.enumerateDevices()][1] errors itself or unable to get
-/// [MediaDevices][2].
-///
-/// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-enumeratedevices
-/// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
-pub async fn enumerate_devices() -> Result<Vec<MediaDeviceInfo>, Traced<Error>>
-{
-    let devices = FutureFromDart::execute::<DartHandle>(unsafe {
-        media_devices::enumerate_devices()
-    })
-    .await
-    .map(DartList::from)
-    .map_err(tracerr::wrap!())?;
-
-    let len = devices.length();
-    let mut result = Vec::with_capacity(len);
-    for i in 0..len {
-        let val = devices.get(i).unwrap();
-        if let Ok(v) = val.try_into() {
-            result.push(v);
-        }
-    }
-    Ok(result)
-}
-
 /// Media devices controller.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct MediaDevices;
 
 impl MediaDevices {
+    /// Collects information about available media input devices.
+    ///
+    /// Adapter for a [MediaDevices.enumerateDevices()][1] function.
+    ///
+    /// # Errors
+    ///
+    /// If [MediaDevices.enumerateDevices()][1] errors itself or unable to get
+    /// [MediaDevices][2].
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-enumeratedevices
+    /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
+    pub async fn enumerate_devices(
+        &self,
+    ) -> Result<Vec<MediaDeviceInfo>, Traced<Error>> {
+        let devices = FutureFromDart::execute::<DartHandle>(unsafe {
+            media_devices::enumerate_devices()
+        })
+        .await
+        .map(DartList::from)
+        .map_err(tracerr::wrap!())?;
+
+        let len = devices.length();
+        let mut result = Vec::with_capacity(len);
+        for i in 0..len {
+            let val = devices.get(i).unwrap();
+            if let Ok(v) = val.try_into() {
+                result.push(v);
+            }
+        }
+        Ok(result)
+    }
+
     /// Prompts a user for permissions to use a media input device, producing a
     /// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of
     /// media.
@@ -148,11 +149,12 @@ impl MediaDevices {
         Ok(DartList::from(tracks).into())
     }
 
-    /// Switches output audio device to the device with a provided `device_id`.
+    /// Switches the current output audio device to the device with the provided
+    /// `device_id`.
     ///
     /// # Errors
     ///
-    /// If output audio device with a provided `device_id` is not available.
+    /// If output audio device with the provided `device_id` is not available.
     pub async fn set_output_audio_id(
         &self,
         device_id: String,
@@ -161,9 +163,7 @@ impl MediaDevices {
             media_devices::set_output_audio_id(string_into_c_str(device_id))
         })
         .await
-        .map_err(tracerr::wrap!())?;
-
-        Ok(())
+        .map_err(tracerr::wrap!())
     }
 
     /// Subscribes on the [`MediaDevices`]'s `devicechange` event.
