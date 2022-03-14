@@ -90,9 +90,9 @@ impl MediaDevices {
         Ok(js_sys::Array::from(&devices)
             .values()
             .into_iter()
-            .filter_map(|info| {
+            .map(|info| {
                 let info = web_sys::MediaDeviceInfo::from(info.unwrap());
-                MediaDeviceInfo::try_from(info).ok()
+                MediaDeviceInfo::from(info)
             })
             .collect())
     }
@@ -113,8 +113,7 @@ impl MediaDevices {
     /// If [`js_sys::Array`] returned from [MediaDevices.getUserMedia()][1]
     /// contains something that is not [`web_sys::MediaStreamTrack`].
     ///
-    /// [1]:
-    /// https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+    /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
     pub async fn get_user_media(
         &self,

@@ -952,7 +952,6 @@ ifeq ($(browser),firefox)
 		ghcr.io/instrumentisto/geckodriver:$(FIREFOX_VERSION) \
 			--binary=/opt/firefox/firefox
 else
-	DRIVER_ARGS="--disable-dev-shm-usage" \
 	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-chrome \
 		selenoid/chrome:$(CHROME_VERSION)

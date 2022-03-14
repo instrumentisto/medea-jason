@@ -53,7 +53,7 @@ mod media_devices {
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Subscribes on the `MediaDevices`'s `devicechange` event.
+        /// Subscribes to the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
     }
 }
@@ -106,8 +106,7 @@ impl MediaDevices {
     /// If [MediaDevices.getUserMedia()][1] errors itself or unable to get
     /// [MediaDevices][2].
     ///
-    /// [1]:
-    /// https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
+    /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/mediacapture-streams#mediadevices
     pub async fn get_user_media(
         &self,
