@@ -7,11 +7,16 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function()>> enumerateDevices,
   required Pointer<NativeFunction<Handle Function(Handle)>> getUserMedia,
   required Pointer<NativeFunction<Handle Function(Handle)>> getDisplayMedia,
+  required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
+      setOutputAudioId,
 }) {
-  dl.lookupFunction<Void Function(Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer)>('register_media_devices')(
+  dl.lookupFunction<
+      Void Function(Pointer, Pointer, Pointer, Pointer),
+      void Function(
+          Pointer, Pointer, Pointer, Pointer)>('register_media_devices')(
     enumerateDevices,
     getUserMedia,
     getDisplayMedia,
+    setOutputAudioId,
   );
 }

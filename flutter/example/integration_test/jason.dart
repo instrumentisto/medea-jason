@@ -7,7 +7,7 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import 'package:medea_jason/src/native/ffi/result.dart';
-import 'package:medea_jason/src/native/input_device_info.dart';
+import 'package:medea_jason/src/native/media_device_info.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
 
@@ -47,18 +47,18 @@ void main() {
     expect(tracks.length, equals(3));
 
     expect(
-        (devices.first as NativeInputDeviceInfo).ptr.getInnerPtr(),
+        (devices.first as NativeMediaDeviceInfo).ptr.getInnerPtr(),
         isNot(
-            equals((devices.last as NativeInputDeviceInfo).ptr.getInnerPtr())));
+            equals((devices.last as NativeMediaDeviceInfo).ptr.getInnerPtr())));
     expect(
         (tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
         isNot(
             equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
 
-    expect(devices.first.deviceId(), equals('InputDeviceInfo.device_id'));
-    expect(devices.first.groupId(), equals('InputDeviceInfo.group_id'));
-    expect(devices.first.kind(), equals(MediaKind.Audio));
-    expect(devices.first.label(), equals('InputDeviceInfo.label'));
+    expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
+    expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
+    expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
+    expect(devices.first.label(), equals('MediaDeviceInfo.label'));
 
     devices.first.free();
     expect(() => devices.first.label(), throwsStateError);
@@ -437,7 +437,7 @@ void main() {
 
   final returnsInputDevicePtr =
       dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-          'returns_input_device_info_ptr');
+          'returns_media_device_info_ptr');
 
   testWidgets('ForeignValue', (WidgetTester tester) async {
     Pointer rustPtr1 = returnsInputDevicePtr().toDart();
@@ -485,7 +485,7 @@ void main() {
     final acceptsNone = dl.lookupFunction<Void Function(ForeignValue),
         void Function(ForeignValue)>('accepts_none');
     final acceptsPtr = dl.lookupFunction<Void Function(ForeignValue),
-        void Function(ForeignValue)>('accepts_input_device_info_pointer');
+        void Function(ForeignValue)>('accepts_media_device_info_pointer');
     final acceptsString = dl.lookupFunction<Void Function(ForeignValue),
         void Function(ForeignValue)>('accepts_string');
     final acceptsInt = dl.lookupFunction<Void Function(ForeignValue),
@@ -512,7 +512,7 @@ void main() {
     final acceptsNone = dl.lookupFunction<Void Function(ForeignValue),
         void Function(ForeignValue)>('accepts_none');
     final acceptsPtr = dl.lookupFunction<Void Function(ForeignValue),
-        void Function(ForeignValue)>('accepts_input_device_info_pointer');
+        void Function(ForeignValue)>('accepts_media_device_info_pointer');
     final acceptsString = dl.lookupFunction<Void Function(ForeignValue),
         void Function(ForeignValue)>('accepts_string');
     final acceptsInt = dl.lookupFunction<Void Function(ForeignValue),

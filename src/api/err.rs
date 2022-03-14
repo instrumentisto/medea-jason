@@ -15,7 +15,7 @@ use crate::{
     connection,
     media::{
         EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -186,6 +186,33 @@ impl EnumerateDevicesException {
     }
 
     /// Returns stacktrace of this [`EnumerateDevicesException`].
+    #[must_use]
+    pub fn trace(&self) -> String {
+        self.trace.to_string()
+    }
+}
+
+/// Exception thrown when cannot change output audio device ID.
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Debug)]
+pub struct InvalidOutputAudioDeviceIdException {
+    /// Stacktrace of this [`InvalidOutputAudioDeviceIdException`].
+    trace: Trace,
+}
+
+impl InvalidOutputAudioDeviceIdException {
+    /// Creates a new [`InvalidOutputAudioDeviceIdException`] from the provided
+    /// error [`Trace`].
+    #[must_use]
+    pub fn new(trace: Trace) -> Self {
+        Self { trace }
+    }
+}
+
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+impl InvalidOutputAudioDeviceIdException {
+    /// Returns stacktrace of this [`InvalidOutputAudioDeviceIdException`].
     #[must_use]
     pub fn trace(&self) -> String {
         self.trace.to_string()
@@ -476,6 +503,13 @@ impl From<Traced<EnumerateDevicesError>> for Error {
     fn from(err: Traced<EnumerateDevicesError>) -> Self {
         let (err, stacktrace) = err.split();
         EnumerateDevicesException::new(err.into(), stacktrace).into()
+    }
+}
+
+impl From<Traced<InvalidOutputAudioDeviceIdError>> for Error {
+    fn from(err: Traced<InvalidOutputAudioDeviceIdError>) -> Self {
+        let (_, trace) = err.split();
+        InvalidOutputAudioDeviceIdException::new(trace).into()
     }
 }
 

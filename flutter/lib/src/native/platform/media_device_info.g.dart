@@ -12,7 +12,7 @@ void registerFunction(
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer),
       void Function(
-          Pointer, Pointer, Pointer, Pointer)>('register_input_device_info')(
+          Pointer, Pointer, Pointer, Pointer)>('register_media_device_info')(
     deviceId,
     kind,
     label,

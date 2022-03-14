@@ -8,9 +8,9 @@
 
 pub mod connection_handle;
 pub mod err;
-pub mod input_device_info;
 pub mod jason;
 pub mod local_media_track;
+pub mod media_device_info;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
 pub mod reconnect_handle;
@@ -26,9 +26,9 @@ use crate::media;
 pub use self::{
     connection_handle::ConnectionHandle,
     err::Error,
-    input_device_info::InputDeviceInfo,
     jason::Jason,
     local_media_track::LocalMediaTrack,
+    media_device_info::MediaDeviceInfo,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::{
         AudioTrackConstraints, DeviceVideoTrackConstraints,
@@ -51,6 +51,22 @@ pub enum MediaKind {
 
     /// Video track.
     Video,
+}
+
+/// [MediaDeviceInfo.kind][1] representation.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+pub enum MediaDeviceKind {
+    /// Audio input device (for example, a microphone).
+    AudioInput,
+
+    /// Video input device (for example, a webcam).
+    VideoInput,
+
+    /// Audio output device (for example, a pair of headphones).
+    AudioOutput,
 }
 
 /// Media source type.
@@ -107,6 +123,16 @@ impl From<media::MediaSourceKind> for MediaSourceKind {
         match that {
             media::MediaSourceKind::Device => Self::Device,
             media::MediaSourceKind::Display => Self::Display,
+        }
+    }
+}
+
+impl From<media::MediaDeviceKind> for MediaDeviceKind {
+    fn from(that: media::MediaDeviceKind) -> Self {
+        match that {
+            media::MediaDeviceKind::AudioInput => Self::AudioInput,
+            media::MediaDeviceKind::VideoInput => Self::VideoInput,
+            media::MediaDeviceKind::AudioOutput => Self::AudioOutput,
         }
     }
 }

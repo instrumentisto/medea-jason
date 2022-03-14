@@ -8,7 +8,7 @@ import 'ice_servers.dart' as ice_servers;
 import 'constraints.dart' as constraints;
 import 'media_devices.dart' as media_devices;
 import 'transport.dart' as transport;
-import 'input_device_info.dart' as input_device_info;
+import 'media_device_info.dart' as media_device_info;
 import 'ice_candidate.dart' as ice_candidate;
 
 /// Registers functions needed for platform utils working.
@@ -21,6 +21,6 @@ void registerFunctions(DynamicLibrary dl) {
   constraints.registerFunctions(dl);
   media_devices.registerFunctions(dl);
   transport.registerFunctions(dl);
-  input_device_info.registerFunctions(dl);
+  media_device_info.registerFunctions(dl);
   ice_candidate.registerFunctions(dl);
 }

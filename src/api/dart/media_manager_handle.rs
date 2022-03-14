@@ -1,13 +1,19 @@
-use std::ptr;
+use std::{os::raw::c_char, ptr};
 
 use tracerr::Traced;
 
-use crate::media::{EnumerateDevicesError, InitLocalTracksError};
+use crate::{
+    api::c_str_into_string,
+    media::{
+        EnumerateDevicesError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError,
+    },
+};
 
 use super::{
     media_stream_settings::MediaStreamSettings,
     utils::{DartFuture, IntoDartFuture, PtrArray},
-    ForeignClass, InputDeviceInfo, LocalMediaTrack,
+    ForeignClass, LocalMediaTrack, MediaDeviceInfo,
 };
 
 #[cfg(feature = "mockable")]
@@ -34,21 +40,40 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
         .into_dart_future()
 }
 
-/// Returns a list of [`InputDeviceInfo`] objects representing available media
+/// Returns a list of [`MediaDeviceInfo`] objects representing available media
 /// input and devices, such as microphones, cameras, and so forth.
 ///
-/// [`InputDeviceInfo`]: super::input_device_info::InputDeviceInfo
+/// [`MediaDeviceInfo`]: super::media_device_info::MediaDeviceInfo
 #[rustfmt::skip]
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
     this: ptr::NonNull<MediaManagerHandle>,
 ) -> DartFuture<
-    Result<PtrArray<InputDeviceInfo>, Traced<EnumerateDevicesError>>,
+    Result<PtrArray<MediaDeviceInfo>, Traced<EnumerateDevicesError>>,
 > {
     let this = this.as_ref().clone();
 
     async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
         .into_dart_future()
+}
+
+/// Switches the current output audio device to the device with the provided
+/// `device_id`.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
+    this: ptr::NonNull<MediaManagerHandle>,
+    device_id: ptr::NonNull<c_char>,
+) -> DartFuture<Result<(), Traced<InvalidOutputAudioDeviceIdError>>> {
+    let this = this.as_ref().clone();
+    let device_id = c_str_into_string(device_id);
+
+    async move {
+        this.set_output_audio_id(device_id)
+            .await
+            .map_err(tracerr::map_from_and_wrap!())?;
+        Ok(())
+    }
+    .into_dart_future()
 }
 
 /// Frees the data behind the provided pointer.
@@ -76,9 +101,12 @@ mod mock {
                 utils::{DartFuture, DartResult, IntoDartFuture},
                 DartError,
             },
-            InputDeviceInfo, LocalMediaTrack, MediaStreamSettings,
+            LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings,
         },
-        media::{EnumerateDevicesError, InitLocalTracksError},
+        media::{
+            EnumerateDevicesError, InitLocalTracksError,
+            InvalidOutputAudioDeviceIdError,
+        },
         platform,
     };
 
@@ -89,12 +117,12 @@ mod mock {
     impl MediaManagerHandle {
         pub async fn enumerate_devices(
             &self,
-        ) -> Result<Vec<InputDeviceInfo>, Traced<EnumerateDevicesError>>
+        ) -> Result<Vec<MediaDeviceInfo>, Traced<EnumerateDevicesError>>
         {
             Ok(vec![
-                InputDeviceInfo(0),
-                InputDeviceInfo(0),
-                InputDeviceInfo(0),
+                MediaDeviceInfo(0),
+                MediaDeviceInfo(0),
+                MediaDeviceInfo(0),
             ])
         }
 
@@ -108,6 +136,13 @@ mod mock {
                 LocalMediaTrack(0),
                 LocalMediaTrack(0),
             ])
+        }
+
+        pub async fn set_output_audio_id(
+            &self,
+            _device_id: String,
+        ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+            Ok(())
         }
     }
 

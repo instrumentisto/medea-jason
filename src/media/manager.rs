@@ -48,6 +48,13 @@ pub enum InitLocalTracksError {
     GetDisplayMediaFailed(#[cause] GetDisplayMediaError),
 }
 
+/// Error returned from the [`MediaManagerHandle::set_output_audio_id`] method.
+///
+/// Occurs if the provided audio output device ID is incorrect.
+#[derive(Clone, Copy, Debug, Display)]
+#[display(fmt = "Invalid audio device ID provided")]
+pub struct InvalidOutputAudioDeviceIdError;
+
 /// Error occurring when [`local::Track`] was [`ended`][1] right after
 /// [getUserMedia()][2] or [getDisplayMedia()][3] request.
 ///
@@ -135,9 +142,9 @@ struct InnerMediaManager {
 }
 
 impl InnerMediaManager {
-    /// Returns a list of [`platform::InputDeviceInfo`] objects.
+    /// Returns a list of [`platform::MediaDeviceInfo`] objects.
     async fn enumerate_devices(
-    ) -> Result<Vec<platform::InputDeviceInfo>, Traced<platform::Error>> {
+    ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<platform::Error>> {
         platform::enumerate_devices()
             .await
             .map_err(tracerr::wrap!())
@@ -342,6 +349,23 @@ impl InnerMediaManager {
 
         Ok(tracks)
     }
+
+    /// Switches the current audio output device to the device with the provided
+    /// `device_id`.
+    ///
+    /// # Errors
+    ///
+    /// With [`InvalidOutputAudioDeviceIdError`] if the provided `device_id` is
+    /// not available.
+    async fn set_output_audio_id(
+        &self,
+        device_id: String,
+    ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+        #[allow(clippy::map_err_ignore)]
+        platform::set_output_audio_id(device_id)
+            .await
+            .map_err(|_| tracerr::new!(InvalidOutputAudioDeviceIdError))
+    }
 }
 
 impl MediaManager {
@@ -393,7 +417,7 @@ impl MediaManager {
 pub struct MediaManagerHandle(Weak<InnerMediaManager>);
 
 impl MediaManagerHandle {
-    /// Returns a list of [`platform::InputDeviceInfo`] objects representing
+    /// Returns a list of [`platform::MediaDeviceInfo`] objects representing
     /// available media input and devices, such as microphones, cameras, and so
     /// forth.
     ///
@@ -402,7 +426,7 @@ impl MediaManagerHandle {
     /// See [`EnumerateDevicesError`] for details.
     pub async fn enumerate_devices(
         &self,
-    ) -> Result<Vec<platform::InputDeviceInfo>, Traced<EnumerateDevicesError>>
+    ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<EnumerateDevicesError>>
     {
         InnerMediaManager::enumerate_devices()
             .await
@@ -434,6 +458,26 @@ impl MediaManagerHandle {
                     .map(|(t, _)| local::LocalMediaTrack::new(t))
                     .collect::<Vec<_>>()
             })
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Switches the current audio output device to the device with the provided
+    /// `device_id`.
+    ///
+    /// # Errors
+    ///
+    /// With [`InvalidOutputAudioDeviceIdError`] if the provided `device_id` is
+    /// not available.
+    pub async fn set_output_audio_id(
+        &self,
+        device_id: String,
+    ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(InvalidOutputAudioDeviceIdError))?;
+        this.set_output_audio_id(device_id)
+            .await
             .map_err(tracerr::map_from_and_wrap!())
     }
 }

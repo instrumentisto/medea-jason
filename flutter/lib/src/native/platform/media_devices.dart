@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:ffi/ffi.dart';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_webrtc/src/model/constraints.dart';
 
@@ -12,6 +14,7 @@ void registerFunctions(DynamicLibrary dl) {
     enumerateDevices: Pointer.fromFunction(_enumerateDevices),
     getUserMedia: Pointer.fromFunction(_getUserMedia),
     getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
+    setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
   );
 }
 
@@ -29,4 +32,9 @@ Object _enumerateDevices() {
 /// [MediaStreamTrack]s.
 Object _getDisplayMedia(DisplayConstraints constraints) {
   return () => getDisplayMedia(constraints);
+}
+
+/// Switches output audio device to the device with the provided [deviceId].
+Object _setOutputAudioId(Pointer<Utf8> deviceId) {
+  return () => setOutputAudioId(deviceId.toDartString());
 }
