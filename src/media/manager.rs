@@ -50,7 +50,7 @@ pub enum InitLocalTracksError {
 
 /// Error returned from the [`MediaManagerHandle::set_output_audio_id`] method.
 ///
-/// Occurs if provided audio output device ID is incorrect.
+/// Occurs if the provided audio output device ID is incorrect.
 #[derive(Clone, Copy, Debug, Display)]
 #[display(fmt = "Invalid audio device ID provided")]
 pub struct InvalidOutputAudioDeviceIdError;
@@ -369,20 +369,21 @@ impl InnerMediaManager {
         Ok(tracks)
     }
 
-    /// Switches audio output device to the device with a provided `device_id`.
+    /// Switches the current audio output device to the device with the provided
+    /// `device_id`.
     ///
     /// # Errors
     ///
-    /// With [`InvalidOutputAudioDeviceIdError`] if provided `device_id` is not
-    /// available.
+    /// With [`InvalidOutputAudioDeviceIdError`] if the provided `device_id` is
+    /// not available.
     async fn set_output_audio_id(
         &self,
         device_id: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
-        self.media_devices
-            .set_output_audio_id(device_id)
+        #[allow(clippy::map_err_ignore)]
+        self.media_devices.set_output_audio_id(device_id)
             .await
-            .map_err(|_e| tracerr::new!(InvalidOutputAudioDeviceIdError))
+            .map_err(|_| tracerr::new!(InvalidOutputAudioDeviceIdError))
     }
 }
 
@@ -479,12 +480,13 @@ impl MediaManagerHandle {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Switches audio output device to the device with a provided `device_id`.
+    /// Switches the current audio output device to the device with the provided
+    /// `device_id`.
     ///
     /// # Errors
     ///
-    /// With [`InvalidOutputAudioDeviceIdError`] if provided `device_id` is not
-    /// available.
+    /// With [`InvalidOutputAudioDeviceIdError`] if the provided `device_id` is
+    /// not available.
     pub async fn set_output_audio_id(
         &self,
         device_id: String,

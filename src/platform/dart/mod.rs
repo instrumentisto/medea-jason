@@ -29,7 +29,9 @@ pub use self::{
     error::Error,
     executor::spawn,
     media_device_info::MediaDeviceInfo,
-    media_devices::{enumerate_devices, MediaDevices},
+    media_devices::{
+        enumerate_devices, MediaDevices,
+    },
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,

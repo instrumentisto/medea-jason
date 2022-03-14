@@ -14,9 +14,8 @@ use crate::{
     api::Error,
     connection,
     media::{
-        self as media, EnumerateDevicesError, GetDisplayMediaError,
-        GetUserMediaError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError,
+        self as media, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -202,8 +201,8 @@ pub struct InvalidOutputAudioDeviceIdException {
 }
 
 impl InvalidOutputAudioDeviceIdException {
-    /// Creates new [`InvalidOutputAudioDeviceIdException`] from the provided
-    /// error `trace`.
+    /// Creates a new [`InvalidOutputAudioDeviceIdException`] from the provided
+    /// error [`Trace`].
     #[must_use]
     pub fn new(trace: Trace) -> Self {
         Self { trace }

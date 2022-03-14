@@ -1,15 +1,15 @@
 //! [MediaDeviceInfo][1] related objects.
 //!
-//! [1]: https://w3.org/TR/mediacapture-streams/#device-info
+//! [1]: https://w3.org/TR/mediacapture-streams#device-info
 
 use derive_more::From;
 use web_sys as sys;
 
 use crate::media::MediaDeviceKind;
 
-/// Representation of [MediaDeviceInfo][1].
+/// Representation of a [MediaDeviceInfo][1].
 ///
-/// [1]: https://w3.org/TR/mediacapture-streams/#device-info
+/// [1]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug, From)]
 pub struct MediaDeviceInfo(sys::MediaDeviceInfo);
 
@@ -27,7 +27,7 @@ impl From<sys::MediaDeviceKind> for MediaDeviceKind {
 }
 
 impl MediaDeviceInfo {
-    /// Returns unique identifier for the represented device.
+    /// Returns a unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {
         self.0.device_id()
@@ -37,14 +37,15 @@ impl MediaDeviceInfo {
     ///
     /// This representation of [MediaDeviceInfo][1] ONLY for input device.
     ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
+    /// [1]: https://w3.org/TR/mediacapture-streams#device-info
     #[must_use]
     pub fn kind(&self) -> MediaDeviceKind {
         self.0.kind().into()
     }
 
-    /// Returns label describing the represented device (for example
-    /// "External USB Webcam").
+    /// Returns label describing the represented device (for example, "External
+    /// USB Webcam").
+    ///
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
@@ -58,7 +59,7 @@ impl MediaDeviceInfo {
     /// representing the speaker and microphone of the same headset have the
     /// same [groupId][1].
     ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         Some(self.0.group_id())

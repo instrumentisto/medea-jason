@@ -35,7 +35,7 @@ Object _getDisplayMedia(DisplayConstraints constraints) {
   return () => getDisplayMedia(constraints);
 }
 
-/// Switches output audio device to the device with a provided [deviceId].
+/// Switches output audio device to the device with the provided [deviceId].
 Object _setOutputAudioId(Pointer<Utf8> deviceId) {
   return () => setOutputAudioId(deviceId.toDartString());
 }

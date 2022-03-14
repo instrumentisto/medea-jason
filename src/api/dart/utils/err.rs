@@ -103,8 +103,8 @@ mod exception {
             rolled_back: bool,
         ) -> Dart_Handle;
 
-        /// Returns a new Dart [`InvalidOutputAudioDeviceIdException`] with
-        /// a provided `trace` property.
+        /// Returns a new Dart [`InvalidOutputAudioDeviceIdException`] with the
+        /// provided `trace` property.
         pub fn new_invalid_output_audio_device_id_exception(
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;

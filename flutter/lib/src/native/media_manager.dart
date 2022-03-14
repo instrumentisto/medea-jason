@@ -42,8 +42,8 @@ final _setOutputAudioId =
         'MediaManagerHandle__set_output_audio_id');
 
 final _onDeviceChange =
-    dl.lookupFunction<_onDeviceChange_C, _onDeviceChange_Dart>(
-        'MediaManagerHandle__on_device_change');
+dl.lookupFunction<_onDeviceChange_C, _onDeviceChange_Dart>(
+    'MediaManagerHandle__on_device_change');
 
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('MediaManagerHandle__free');

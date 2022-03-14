@@ -55,17 +55,17 @@ pub enum MediaKind {
 
 /// [MediaDeviceInfo.kind][1] representation.
 ///
-/// [1]: https://www.w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-kind
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
 #[wasm_bindgen]
 #[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
 pub enum MediaDeviceKind {
-    /// Represents an audio input device; for example a microphone.
+    /// Audio input device (for example, a microphone).
     AudioInput,
 
-    /// Represents a video input device; for example a webcam.
+    /// Video input device (for example, a webcam).
     VideoInput,
 
-    /// Represents an audio output device; for example a pair of headphones.
+    /// Audio output device (for example, a pair of headphones).
     AudioOutput,
 }
 
