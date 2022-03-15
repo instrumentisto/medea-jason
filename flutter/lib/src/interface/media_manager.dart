@@ -1,5 +1,4 @@
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
-
+import '/src/util/rust_handles_storage.dart';
 import 'media_device_info.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';

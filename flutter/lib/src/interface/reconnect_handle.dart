@@ -1,4 +1,4 @@
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
+import '/src/util/rust_handles_storage.dart';
 
 /// External handle used to reconnect to a media server when connection is lost.
 ///

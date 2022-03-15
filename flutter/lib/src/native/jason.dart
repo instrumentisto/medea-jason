@@ -105,7 +105,6 @@ DynamicLibrary _dl_load() {
 
   final _onPanic = dl.lookupFunction<_onPanic_C, _onPanic_Dart>('on_panic');
   _onPanic((msg) {
-    // TODO(alexlapa): how are you passing String via ffi?
     msg as String;
     RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {

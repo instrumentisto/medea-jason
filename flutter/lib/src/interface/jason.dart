@@ -1,5 +1,4 @@
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
-
+import '/src/util/rust_handles_storage.dart';
 import '../util/move_semantic.dart';
 import 'media_manager.dart';
 import 'room_handle.dart';

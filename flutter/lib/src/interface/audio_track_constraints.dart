@@ -1,4 +1,4 @@
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
+import '/src/util/rust_handles_storage.dart';
 
 /// Constraints applicable to audio tracks.
 abstract class AudioTrackConstraints implements FreeableHandle {

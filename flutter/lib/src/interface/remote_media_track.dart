@@ -1,6 +1,6 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
+import '/src/util/rust_handles_storage.dart';
 import 'track_kinds.dart';
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
