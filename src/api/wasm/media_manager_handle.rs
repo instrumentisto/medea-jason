@@ -110,7 +110,7 @@ impl MediaManagerHandle {
         })
     }
 
-    /// Subscribes on the [`MediaManagerHandle`]'s `devicechange` event.
+    /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
     pub fn on_device_change(
         &self,
         cb: js_sys::Function,

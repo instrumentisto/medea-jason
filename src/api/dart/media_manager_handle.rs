@@ -81,7 +81,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     .into_dart_future()
 }
 
-/// Subscribes on the [`MediaManagerHandle`]'s `devicechange` event.
+/// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
     this: ptr::NonNull<MediaManagerHandle>,

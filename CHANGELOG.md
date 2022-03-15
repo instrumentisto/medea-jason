@@ -59,7 +59,7 @@ All user visible changes to this project will be documented in this file. This p
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
     - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]);
-    - `MediaManagerHandle.on_device_change()` callback which fires when `MediaManagerHandle.enumerate_devices()` list changes ([#30]).
+    - `MediaManagerHandle.on_device_change()` callback firing whenever `MediaManagerHandle.enumerate_devices()` list changes ([#30]).
 
 ### Updated
 

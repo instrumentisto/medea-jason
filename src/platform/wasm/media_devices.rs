@@ -21,8 +21,7 @@ use super::window;
 /// Media devices controller.
 #[derive(Debug)]
 pub struct MediaDevices {
-    /// Reference to the [`SysMediaDevices`] which will be used for
-    /// media devices management.
+    /// Underlying [`SysMediaDevices`], used for media devices management.
     devices: Rc<SysMediaDevices>,
 
     /// [`EventListener`] for the `devicechange` event of the underlying
@@ -60,7 +59,7 @@ impl MediaDevices {
     /// Collects information about the User Agent's available media input
     /// devices.
     ///
-    /// Adapter for a [MediaDevices.enumerateDevices()][1] function.
+    /// Adapter for the [MediaDevices.enumerateDevices()][1] function.
     ///
     /// # Errors
     ///
@@ -98,10 +97,9 @@ impl MediaDevices {
     }
 
     /// Prompts a user for a permission to use a media input which produces
-    /// vector of [`MediaStreamTrack`]s containing the requested types of
-    /// media.
+    /// [`MediaStreamTrack`]s containing the requested types of media.
     ///
-    /// Adapter for a [MediaDevices.getUserMedia()][1] function.
+    /// Adapter for the [MediaDevices.getUserMedia()][1] function.
     ///
     /// # Errors
     ///
@@ -139,9 +137,9 @@ impl MediaDevices {
 
     /// Prompts a user to select and grant a permission to capture contents of a
     /// display or portion thereof (such as a single window) as vector of
-    /// [`MediaStreamTrack`].
+    /// [`MediaStreamTrack`]s.
     ///
-    /// Adapter for a [MediaDevices.getDisplayMedia()][1] function.
+    /// Adapter for the [MediaDevices.getDisplayMedia()][1] function.
     ///
     /// # Errors
     ///
@@ -204,7 +202,7 @@ impl MediaDevices {
         )
     }
 
-    /// Subscribes on the [`MediaDevices`]'s `devicechange` event.
+    /// Subscribes onto the [`MediaDevices`]'s `devicechange` event.
     ///
     /// # Panics
     ///

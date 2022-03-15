@@ -53,19 +53,19 @@ mod media_devices {
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Subscribes to the `MediaDevices`'s `devicechange` event.
+        /// Subscribes onto the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
     }
 }
 
 /// Media devices controller.
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct MediaDevices;
 
 impl MediaDevices {
     /// Collects information about available media input devices.
     ///
-    /// Adapter for a [MediaDevices.enumerateDevices()][1] function.
+    /// Adapter for the [MediaDevices.enumerateDevices()][1] function.
     ///
     /// # Errors
     ///
@@ -95,11 +95,10 @@ impl MediaDevices {
         Ok(result)
     }
 
-    /// Prompts a user for permissions to use a media input device, producing a
-    /// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of
-    /// media.
+    /// Prompts a user for permissions to use a media input device, producing
+    /// [`MediaStreamTrack`]s containing the requested types of media.
     ///
-    /// Adapter for a [MediaDevices.getUserMedia()][1] function.
+    /// Adapter for the [MediaDevices.getUserMedia()][1] function.
     ///
     /// # Errors
     ///
@@ -122,9 +121,8 @@ impl MediaDevices {
     }
 
     /// Prompts a user to select and grant permissions to capture contents of a
-    /// display or portion thereof (such as a single window), producing a
-    /// [`Vec`] of [`MediaStreamTrack`]s containing the requested types of
-    /// media.
+    /// display or portion thereof (such as a single window), producing
+    /// [`MediaStreamTrack`]s containing the requested types of media.
     ///
     /// Adapter for a [MediaDevices.getDisplayMedia()][1] function.
     ///
@@ -165,7 +163,7 @@ impl MediaDevices {
         .map_err(tracerr::wrap!())
     }
 
-    /// Subscribes on the [`MediaDevices`]'s `devicechange` event.
+    /// Subscribes onto the [`MediaDevices`]'s `devicechange` event.
     pub fn on_device_change<F>(&self, handler: Option<F>)
     where
         F: 'static + FnMut(),

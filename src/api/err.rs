@@ -14,9 +14,8 @@ use crate::{
     api::Error,
     connection,
     media::{
-        self as media, EnumerateDevicesError, GetDisplayMediaError,
-        GetUserMediaError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError,
+        self, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,

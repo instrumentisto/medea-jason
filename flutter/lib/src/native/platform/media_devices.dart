@@ -40,7 +40,7 @@ Object _setOutputAudioId(Pointer<Utf8> deviceId) {
   return () => setOutputAudioId(deviceId.toDartString());
 }
 
-/// Subscribes on the `MediaDevices`'s `devicechange` event.
+/// Subscribes onto the `MediaDevices`'s `devicechange` event.
 void _onDeviceChange(Function cb) {
   onDeviceChange(() => cb(null));
 }

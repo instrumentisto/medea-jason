@@ -25,11 +25,11 @@ use super::track::local;
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum EnumerateDevicesError {
-    /// Occurs if `enumerateDevices` request fails.
+    /// Occurs if the `enumerateDevices` request fails.
     #[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
     Failed(platform::Error),
 
-    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer could not be upgraded.
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
     #[display(fmt = "MediaManagerHandle is in detached state")]
     Detached,
 }
@@ -62,7 +62,7 @@ pub enum InitLocalTracksError {
 #[display(fmt = "Invalid audio device ID provided")]
 pub struct InvalidOutputAudioDeviceIdError;
 
-/// Error which indicates that [`MediaManagerHandle`] is in detached state.
+/// Error indicating about a [`MediaManagerHandle`] in detached state.
 #[derive(Clone, Copy, Debug, Display)]
 #[display(fmt = "MediaManagerHandle is in detached state")]
 pub struct HandleDetachedError;
@@ -157,7 +157,7 @@ struct InnerMediaManager {
 }
 
 impl InnerMediaManager {
-    /// Subscribes to the `devicechange` event of this [`InnerMediaManager`].
+    /// Subscribes onto the `devicechange` event of this [`InnerMediaManager`].
     pub fn on_device_change(&self, cb: platform::Function<()>) {
         self.media_devices.on_device_change(Some(move || {
             cb.call0();
@@ -514,11 +514,11 @@ impl MediaManagerHandle {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Subscribes to the `devicechange` event of this [`MediaManagerHandle`].
+    /// Subscribes onto the `devicechange` event of this [`MediaManagerHandle`].
     ///
     /// # Errors
     ///
-    /// If underlying [`MediaManagerHandle`] is dropped.
+    /// If the underlying [`MediaManagerHandle`] is dropped.
     pub fn on_device_change(
         &self,
         cb: platform::Function<()>,
