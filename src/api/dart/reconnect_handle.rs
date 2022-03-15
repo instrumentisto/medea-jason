@@ -5,7 +5,7 @@ use crate::api::dart::{
     DartValueArg,
 };
 
-use super::{utils::DartError, ForeignClass};
+use super::{utils::DartError, ForeignClass, panic_catcher};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::ReconnectHandle;
@@ -27,18 +27,20 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_delay(
     this: ptr::NonNull<ReconnectHandle>,
     delay_ms: i64,
 ) -> DartFuture<Result<(), DartError>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    async move {
-        #[allow(clippy::map_err_ignore)]
-        let delay_ms = u32::try_from(delay_ms).map_err(|_| {
-            ArgumentError::new(delay_ms, "delayMs", "Expected u32")
-        })?;
+        async move {
+            #[allow(clippy::map_err_ignore)]
+                let delay_ms = u32::try_from(delay_ms).map_err(|_| {
+                ArgumentError::new(delay_ms, "delayMs", "Expected u32")
+            })?;
 
-        this.reconnect_with_delay(delay_ms).await?;
-        Ok(())
-    }
-    .into_dart_future()
+            this.reconnect_with_delay(delay_ms).await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Tries to reconnect a [`Room`] in a loop with a growing backoff delay.
@@ -72,48 +74,50 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
     max_delay: i64,
     max_elapsed_time_ms: DartValueArg<Option<i64>>,
 ) -> DartFuture<Result<(), DartError>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    async move {
-        #[allow(clippy::map_err_ignore)]
-        let starting_delay = u32::try_from(starting_delay).map_err(|_| {
-            ArgumentError::new(
-                starting_delay,
-                "startingDelayMs",
-                "Expected u32",
-            )
-        })?;
-        #[allow(clippy::map_err_ignore)]
-        let max_delay = u32::try_from(max_delay).map_err(|_| {
-            ArgumentError::new(max_delay, "maxDelay", "Expected u32")
-        })?;
-        let max_elapsed_time_ms = Option::<i64>::try_from(max_elapsed_time_ms)
-            .map_err(|err| {
-                let message = err.to_string();
+        async move {
+            #[allow(clippy::map_err_ignore)]
+                let starting_delay = u32::try_from(starting_delay).map_err(|_| {
                 ArgumentError::new(
-                    err.into_value(),
-                    "maxElapsedTimeMs",
-                    message,
+                    starting_delay,
+                    "startingDelayMs",
+                    "Expected u32",
                 )
-            })?
-            .map(|v| {
-                #[allow(clippy::map_err_ignore)]
-                u32::try_from(v).map_err(|_| {
-                    ArgumentError::new(v, "maxElapsedTimeMs", "Expected u32")
+            })?;
+            #[allow(clippy::map_err_ignore)]
+                let max_delay = u32::try_from(max_delay).map_err(|_| {
+                ArgumentError::new(max_delay, "maxDelay", "Expected u32")
+            })?;
+            let max_elapsed_time_ms = Option::<i64>::try_from(max_elapsed_time_ms)
+                .map_err(|err| {
+                    let message = err.to_string();
+                    ArgumentError::new(
+                        err.into_value(),
+                        "maxElapsedTimeMs",
+                        message,
+                    )
+                })?
+                .map(|v| {
+                    #[allow(clippy::map_err_ignore)]
+                    u32::try_from(v).map_err(|_| {
+                        ArgumentError::new(v, "maxElapsedTimeMs", "Expected u32")
+                    })
                 })
-            })
-            .transpose()?;
+                .transpose()?;
 
-        this.reconnect_with_backoff(
-            starting_delay,
-            multiplier,
-            max_delay,
-            max_elapsed_time_ms,
-        )
-        .await?;
-        Ok(())
-    }
-    .into_dart_future()
+            this.reconnect_with_backoff(
+                starting_delay,
+                multiplier,
+                max_delay,
+                max_elapsed_time_ms,
+            )
+                .await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -126,7 +130,9 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
 pub unsafe extern "C" fn ReconnectHandle__free(
     this: ptr::NonNull<ReconnectHandle>,
 ) {
-    drop(ReconnectHandle::from_ptr(this));
+    panic_catcher(move || {
+        drop(ReconnectHandle::from_ptr(this));
+    })
 }
 
 #[cfg(feature = "mockable")]

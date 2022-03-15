@@ -1,3 +1,4 @@
+use std::panic::UnwindSafe;
 use std::ptr;
 
 use dart_sys::Dart_Handle;
@@ -7,6 +8,7 @@ use crate::{
     platform,
 };
 
+use super::panic_catcher;
 use super::ForeignClass;
 
 #[cfg(feature = "mockable")]
@@ -22,10 +24,12 @@ pub unsafe extern "C" fn ConnectionHandle__on_close(
     this: ptr::NonNull<ConnectionHandle>,
     f: Dart_Handle,
 ) -> DartResult {
-    this.as_ref()
-        .on_close(platform::Function::new(f))
-        .map_err(DartError::from)
-        .into()
+    panic_catcher(move || {
+        this.as_ref()
+            .on_close(platform::Function::new(f))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Sets callback, invoked when a new [`remote::Track`] is added to this
@@ -38,10 +42,12 @@ pub unsafe extern "C" fn ConnectionHandle__on_remote_track_added(
     this: ptr::NonNull<ConnectionHandle>,
     f: Dart_Handle,
 ) -> DartResult {
-    this.as_ref()
-        .on_remote_track_added(platform::Function::new(f))
-        .map_err(DartError::from)
-        .into()
+    panic_catcher(move || {
+        this.as_ref()
+            .on_remote_track_added(platform::Function::new(f))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Sets callback, invoked when a connection quality score is updated by
@@ -51,10 +57,12 @@ pub unsafe extern "C" fn ConnectionHandle__on_quality_score_update(
     this: ptr::NonNull<ConnectionHandle>,
     f: Dart_Handle,
 ) -> DartResult {
-    this.as_ref()
-        .on_quality_score_update(platform::Function::new(f))
-        .map_err(DartError::from)
-        .into()
+    panic_catcher(move || {
+        this.as_ref()
+            .on_quality_score_update(platform::Function::new(f))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Returns remote `Member` ID.
@@ -62,10 +70,12 @@ pub unsafe extern "C" fn ConnectionHandle__on_quality_score_update(
 pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
     this: ptr::NonNull<ConnectionHandle>,
 ) -> DartResult {
-    this.as_ref()
-        .get_remote_member_id()
-        .map_err(DartError::from)
-        .into()
+    panic_catcher(move || {
+        this.as_ref()
+            .get_remote_member_id()
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -78,7 +88,9 @@ pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
 pub unsafe extern "C" fn ConnectionHandle__free(
     this: ptr::NonNull<ConnectionHandle>,
 ) {
-    drop(ConnectionHandle::from_ptr(this));
+    panic_catcher(move || {
+        drop(ConnectionHandle::from_ptr(this));
+    })
 }
 
 #[cfg(feature = "mockable")]

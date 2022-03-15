@@ -24,6 +24,9 @@ members = [
     "e2e",
 ]
 
+[profile.release]
+panic = "unwind"
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 

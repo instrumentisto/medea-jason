@@ -39,8 +39,8 @@ Dart_FinalizableHandle Dart_NewFinalizableHandle_DL_Trampolined(
                                       callback);
 }
 
-bool Dart_IsApiError_DL_Trampolined(Dart_Handle handle) {
-  return Dart_IsApiError_DL(handle);
+bool Dart_IsError_DL_Trampolined(Dart_Handle handle) {
+  return Dart_IsError_DL(handle);
 }
 
 const char* Dart_GetError_DL_Trampolined(Dart_Handle handle) {

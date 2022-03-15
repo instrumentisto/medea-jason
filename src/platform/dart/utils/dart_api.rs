@@ -83,7 +83,7 @@ extern "C" {
     /// Checks whether the provided `Dart_Handle` is an error.
     ///
     /// Requires there to be a current isolate.
-    pub fn Dart_IsApiError_DL_Trampolined(object: Dart_Handle) -> bool;
+    pub fn Dart_IsError_DL_Trampolined(object: Dart_Handle) -> bool;
 
     /// Gets the error message from an error handle.
     ///

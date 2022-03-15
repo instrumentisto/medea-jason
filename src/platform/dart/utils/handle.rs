@@ -15,7 +15,7 @@ use crate::{
             Dart_NewPersistentHandle_DL_Trampolined,
         },
         utils::dart_api::{
-            Dart_GetError_DL_Trampolined, Dart_IsApiError_DL_Trampolined,
+            Dart_GetError_DL_Trampolined, Dart_IsError_DL_Trampolined,
         },
     },
 };
@@ -50,7 +50,7 @@ impl DartHandle {
     pub fn new(handle: Dart_Handle) -> Self {
         // TODO(alexlapa): not sure about Dart_IsApiError
         //                 why not Dart_IsError?
-        if unsafe { Dart_IsApiError_DL_Trampolined(handle) } {
+        if unsafe { Dart_IsError_DL_Trampolined(handle) } {
             let err_msg = unsafe {
                 c_str_into_string(Dart_GetError_DL_Trampolined(handle))
             };

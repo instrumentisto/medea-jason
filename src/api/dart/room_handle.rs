@@ -16,6 +16,7 @@ use crate::{
 };
 
 use super::{
+    panic_catcher,
     utils::{ArgumentError, DartError},
     MediaStreamSettings,
 };
@@ -55,13 +56,15 @@ pub unsafe extern "C" fn RoomHandle__join(
     this: ptr::NonNull<RoomHandle>,
     token: ptr::NonNull<libc::c_char>,
 ) -> DartFuture<Result<(), Traced<RoomJoinError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    async move {
-        this.join(c_str_into_string(token)).await?;
-        Ok(())
-    }
-    .into_dart_future()
+        async move {
+            this.join(c_str_into_string(token)).await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Updates this [`Room`]'s [`MediaStreamSettings`]. This affects all the
@@ -97,15 +100,17 @@ pub unsafe extern "C" fn RoomHandle__set_local_media_settings(
     stop_first: bool,
     rollback_on_fail: bool,
 ) -> DartFuture<Result<(), ConstraintsUpdateError>> {
-    let this = this.as_ref().clone();
-    let settings = settings.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
+        let settings = settings.as_ref().clone();
 
-    async move {
-        this.set_local_media_settings(settings, stop_first, rollback_on_fail)
-            .await?;
-        Ok(())
-    }
-    .into_dart_future()
+        async move {
+            this.set_local_media_settings(settings, stop_first, rollback_on_fail)
+                .await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Mutes outbound audio in this [`Room`].
@@ -115,14 +120,16 @@ pub unsafe extern "C" fn RoomHandle__set_local_media_settings(
 pub unsafe extern "C" fn RoomHandle__mute_audio(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.mute_audio();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.mute_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Unmutes outbound audio in this [`Room`].
@@ -132,14 +139,16 @@ pub unsafe extern "C" fn RoomHandle__mute_audio(
 pub unsafe extern "C" fn RoomHandle__unmute_audio(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.unmute_audio();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.unmute_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Enables outbound audio in this [`Room`].
@@ -149,14 +158,16 @@ pub unsafe extern "C" fn RoomHandle__unmute_audio(
 pub unsafe extern "C" fn RoomHandle__enable_audio(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.enable_audio();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.enable_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Disables outbound audio in this [`Room`].
@@ -166,14 +177,16 @@ pub unsafe extern "C" fn RoomHandle__enable_audio(
 pub unsafe extern "C" fn RoomHandle__disable_audio(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.disable_audio();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.disable_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Mutes outbound video in this [`Room`].
@@ -186,14 +199,16 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
     this: ptr::NonNull<RoomHandle>,
     source_kind: DartValueArg<Option<MediaSourceKind>>,
 ) -> DartFuture<Result<(), DartError>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.mute_video(try_into_source_kind!(source_kind));
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.mute_video(try_into_source_kind!(source_kind));
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Unmutes outbound video in this [`Room`].
@@ -206,14 +221,16 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
     this: ptr::NonNull<RoomHandle>,
     source_kind: DartValueArg<Option<MediaSourceKind>>,
 ) -> DartFuture<Result<(), DartError>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.unmute_video(try_into_source_kind!(source_kind));
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.unmute_video(try_into_source_kind!(source_kind));
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Enables outbound video.
@@ -224,14 +241,16 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
     this: ptr::NonNull<RoomHandle>,
     source_kind: DartValueArg<Option<MediaSourceKind>>,
 ) -> DartFuture<Result<(), DartError>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.enable_video(try_into_source_kind!(source_kind));
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.enable_video(try_into_source_kind!(source_kind));
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Disables outbound video.
@@ -242,14 +261,16 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
     this: ptr::NonNull<RoomHandle>,
     source_kind: DartValueArg<Option<MediaSourceKind>>,
 ) -> DartFuture<Result<(), DartError>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.disable_video(try_into_source_kind!(source_kind));
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.disable_video(try_into_source_kind!(source_kind));
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Enables inbound audio in this [`Room`].
@@ -259,14 +280,16 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
 pub unsafe extern "C" fn RoomHandle__enable_remote_audio(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.enable_remote_audio();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.enable_remote_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Disables inbound audio in this [`Room`].
@@ -276,14 +299,16 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_audio(
 pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.disable_remote_audio();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.disable_remote_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Enables inbound video in this [`Room`].
@@ -293,14 +318,16 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
 pub unsafe extern "C" fn RoomHandle__enable_remote_video(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.enable_remote_video();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.enable_remote_video();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Disables inbound video in this [`Room`].
@@ -310,14 +337,16 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
 pub unsafe extern "C" fn RoomHandle__disable_remote_video(
     this: ptr::NonNull<RoomHandle>,
 ) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    let fut = this.disable_remote_video();
-    async move {
-        fut.await?;
-        Ok(())
-    }
-    .into_dart_future()
+        let fut = this.disable_remote_video();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+            .into_dart_future()
+    })
 }
 
 /// Sets callback, invoked when a new [`Connection`] with some remote `Peer`
@@ -329,11 +358,13 @@ pub unsafe extern "C" fn RoomHandle__on_new_connection(
     this: ptr::NonNull<RoomHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
+    panic_catcher(move || {
+        let this = this.as_ref();
 
-    this.on_new_connection(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+        this.on_new_connection(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Sets callback, invoked on this [`Room`] close, providing a
@@ -346,11 +377,13 @@ pub unsafe extern "C" fn RoomHandle__on_close(
     this: ptr::NonNull<RoomHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
+    panic_catcher(move || {
+        let this = this.as_ref();
 
-    this.on_close(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+        this.on_close(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Sets callback, invoked when a new [`LocalMediaTrack`] is added to this
@@ -369,11 +402,13 @@ pub unsafe extern "C" fn RoomHandle__on_local_track(
     this: ptr::NonNull<RoomHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
+    panic_catcher(move || {
+        let this = this.as_ref();
 
-    this.on_local_track(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+        this.on_local_track(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Sets callback, invoked when a connection with server is lost.
@@ -382,11 +417,13 @@ pub unsafe extern "C" fn RoomHandle__on_connection_loss(
     this: ptr::NonNull<RoomHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
+    panic_catcher(move || {
+        let this = this.as_ref();
 
-    this.on_connection_loss(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+        this.on_connection_loss(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Sets callback, invoked on local media acquisition failures.
@@ -395,11 +432,13 @@ pub unsafe extern "C" fn RoomHandle__on_failed_local_media(
     this: ptr::NonNull<RoomHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
+    panic_catcher(move || {
+        let this = this.as_ref();
 
-    this.on_failed_local_media(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+        this.on_failed_local_media(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -410,7 +449,9 @@ pub unsafe extern "C" fn RoomHandle__on_failed_local_media(
 /// once for the same pointer is equivalent to double free.
 #[no_mangle]
 pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
-    drop(RoomHandle::from_ptr(this));
+    panic_catcher(move || {
+        drop(RoomHandle::from_ptr(this));
+    })
 }
 
 #[cfg(feature = "mockable")]

@@ -2,7 +2,7 @@ use std::ptr;
 
 use super::{
     media_manager_handle::MediaManagerHandle, room_handle::RoomHandle,
-    ForeignClass,
+    ForeignClass, panic_catcher,
 };
 
 #[cfg(feature = "mockable")]
@@ -15,7 +15,9 @@ impl ForeignClass for Jason {}
 /// Instantiates a new [`Jason`] interface to interact with this library.
 #[no_mangle]
 pub extern "C" fn Jason__new() -> ptr::NonNull<Jason> {
-    Jason::new().into_ptr()
+    panic_catcher(|| {
+        Jason::new().into_ptr()
+    })
 }
 
 /// Creates a new [`Room`] and returns its [`RoomHandle`].
@@ -25,7 +27,9 @@ pub extern "C" fn Jason__new() -> ptr::NonNull<Jason> {
 pub unsafe extern "C" fn Jason__init_room(
     this: ptr::NonNull<Jason>,
 ) -> ptr::NonNull<RoomHandle> {
-    this.as_ref().init_room().into_ptr()
+    panic_catcher(move || {
+        this.as_ref().init_room().into_ptr()
+    })
 }
 
 /// Returns a [`MediaManagerHandle`].
@@ -33,7 +37,9 @@ pub unsafe extern "C" fn Jason__init_room(
 pub unsafe extern "C" fn Jason__media_manager(
     this: ptr::NonNull<Jason>,
 ) -> ptr::NonNull<MediaManagerHandle> {
-    this.as_ref().media_manager().into_ptr()
+    panic_catcher(move || {
+        this.as_ref().media_manager().into_ptr()
+    })
 }
 
 /// Closes the provided [`RoomHandle`].
@@ -42,8 +48,10 @@ pub unsafe extern "C" fn Jason__close_room(
     this: ptr::NonNull<Jason>,
     room_to_delete: ptr::NonNull<RoomHandle>,
 ) {
-    this.as_ref()
-        .close_room(RoomHandle::from_ptr(room_to_delete));
+    panic_catcher(move || {
+        this.as_ref()
+            .close_room(RoomHandle::from_ptr(room_to_delete));
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -54,8 +62,10 @@ pub unsafe extern "C" fn Jason__close_room(
 /// once for the same pointer is equivalent to double free.
 #[no_mangle]
 pub unsafe extern "C" fn Jason__free(this: ptr::NonNull<Jason>) {
-    let jason = Jason::from_ptr(this);
-    jason.dispose();
+    panic_catcher(move || {
+        let jason = Jason::from_ptr(this);
+        jason.dispose();
+    })
 }
 
 #[cfg(feature = "mockable")]

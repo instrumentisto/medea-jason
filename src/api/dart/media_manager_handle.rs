@@ -5,6 +5,7 @@ use tracerr::Traced;
 use crate::media::{EnumerateDevicesError, InitLocalTracksError};
 
 use super::{
+    panic_catcher,
     media_stream_settings::MediaStreamSettings,
     utils::{DartFuture, IntoDartFuture, PtrArray},
     ForeignClass, InputDeviceInfo, LocalMediaTrack,
@@ -27,11 +28,13 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
     caps: ptr::NonNull<MediaStreamSettings>,
 ) -> DartFuture<Result<PtrArray<LocalMediaTrack>, Traced<InitLocalTracksError>>>
 {
-    let this = this.as_ref().clone();
-    let caps = caps.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
+        let caps = caps.as_ref().clone();
 
-    async move { Ok(PtrArray::new(this.init_local_tracks(caps).await?)) }
-        .into_dart_future()
+        async move { Ok(PtrArray::new(this.init_local_tracks(caps).await?)) }
+            .into_dart_future()
+    })
 }
 
 /// Returns a list of [`InputDeviceInfo`] objects representing available media
@@ -45,10 +48,12 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
 ) -> DartFuture<
     Result<PtrArray<InputDeviceInfo>, Traced<EnumerateDevicesError>>,
 > {
-    let this = this.as_ref().clone();
+    panic_catcher(move || {
+        let this = this.as_ref().clone();
 
-    async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
-        .into_dart_future()
+        async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
+            .into_dart_future()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -61,7 +66,9 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
 pub unsafe extern "C" fn MediaManagerHandle__free(
     this: ptr::NonNull<MediaManagerHandle>,
 ) {
-    drop(MediaManagerHandle::from_ptr(this));
+    panic_catcher(move || {
+        drop(MediaManagerHandle::from_ptr(this));
+    })
 }
 
 #[cfg(feature = "mockable")]

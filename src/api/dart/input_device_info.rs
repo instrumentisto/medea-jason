@@ -1,6 +1,7 @@
 use std::{os::raw::c_char, ptr};
 
 use super::{utils::string_into_c_str, ForeignClass};
+use super::panic_catcher;
 
 use crate::{api::DartValueArg, media::MediaKind};
 
@@ -16,7 +17,9 @@ impl ForeignClass for InputDeviceInfo {}
 pub unsafe extern "C" fn InputDeviceInfo__device_id(
     this: ptr::NonNull<InputDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
-    string_into_c_str(this.as_ref().device_id())
+    panic_catcher(move || {
+        string_into_c_str(this.as_ref().device_id())
+    })
 }
 
 /// Returns kind of the represented device.
@@ -28,7 +31,9 @@ pub unsafe extern "C" fn InputDeviceInfo__device_id(
 pub unsafe extern "C" fn InputDeviceInfo__kind(
     this: ptr::NonNull<InputDeviceInfo>,
 ) -> MediaKind {
-    this.as_ref().kind()
+    panic_catcher(move || {
+        this.as_ref().kind()
+    })
 }
 
 /// Returns label describing the represented device (for example "External USB
@@ -39,7 +44,9 @@ pub unsafe extern "C" fn InputDeviceInfo__kind(
 pub unsafe extern "C" fn InputDeviceInfo__label(
     this: ptr::NonNull<InputDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
-    string_into_c_str(this.as_ref().label())
+    panic_catcher(move || {
+        string_into_c_str(this.as_ref().label())
+    })
 }
 
 /// Returns group identifier of the represented device.
@@ -54,7 +61,9 @@ pub unsafe extern "C" fn InputDeviceInfo__label(
 pub unsafe extern "C" fn InputDeviceInfo__group_id(
     this: ptr::NonNull<InputDeviceInfo>,
 ) -> DartValueArg<Option<String>> {
-    DartValueArg::from(this.as_ref().group_id())
+    panic_catcher(move || {
+        DartValueArg::from(this.as_ref().group_id())
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -67,7 +76,9 @@ pub unsafe extern "C" fn InputDeviceInfo__group_id(
 pub unsafe extern "C" fn InputDeviceInfo__free(
     this: ptr::NonNull<InputDeviceInfo>,
 ) {
-    drop(InputDeviceInfo::from_ptr(this));
+    panic_catcher(move || {
+        drop(InputDeviceInfo::from_ptr(this));
+    })
 }
 
 #[cfg(feature = "mockable")]

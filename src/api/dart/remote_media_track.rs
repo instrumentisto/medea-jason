@@ -8,6 +8,7 @@ use crate::{
 };
 
 use super::ForeignClass;
+use super::panic_catcher;
 
 #[cfg(feature = "mockable")]
 pub use self::mock::RemoteMediaTrack;
@@ -24,7 +25,9 @@ impl ForeignClass for RemoteMediaTrack {}
 pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> Dart_Handle {
-    this.as_ref().get_track().handle()
+    panic_catcher(move || {
+        this.as_ref().get_track().handle()
+    })
 }
 
 /// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
@@ -33,7 +36,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_enabled(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    this.as_ref().on_enabled(platform::Function::new(f));
+    panic_catcher(move || {
+        this.as_ref().on_enabled(platform::Function::new(f));
+    })
 }
 
 /// Sets callback, invoked when this [`RemoteMediaTrack`] is disabled.
@@ -42,7 +47,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_disabled(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    this.as_ref().on_disabled(platform::Function::new(f));
+    panic_catcher(move || {
+        this.as_ref().on_disabled(platform::Function::new(f));
+    })
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
@@ -51,7 +58,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_muted(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    this.as_ref().on_muted(platform::Function::new(f));
+    panic_catcher(move || {
+        this.as_ref().on_muted(platform::Function::new(f));
+    })
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.
@@ -60,7 +69,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_unmuted(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    this.as_ref().on_unmuted(platform::Function::new(f));
+    panic_catcher(move || {
+        this.as_ref().on_unmuted(platform::Function::new(f));
+    })
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is stopped.
@@ -69,7 +80,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    this.as_ref().on_stopped(platform::Function::new(f));
+    panic_catcher(move || {
+        this.as_ref().on_stopped(platform::Function::new(f));
+    })
 }
 
 /// Indicates whether this [`RemoteMediaTrack`] is enabled.
@@ -77,7 +90,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
 pub unsafe extern "C" fn RemoteMediaTrack__enabled(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> u8 {
-    this.as_ref().enabled().into()
+    panic_catcher(move || {
+        this.as_ref().enabled().into()
+    })
 }
 
 /// Indicate whether this [`RemoteMediaTrack`] is muted.
@@ -85,7 +100,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__enabled(
 pub unsafe extern "C" fn RemoteMediaTrack__muted(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> u8 {
-    this.as_ref().muted().into()
+    panic_catcher(move || {
+        this.as_ref().muted().into()
+    })
 }
 
 /// Returns this [`RemoteMediaTrack`]'s kind (audio/video).
@@ -93,7 +110,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__muted(
 pub unsafe extern "C" fn RemoteMediaTrack__kind(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> MediaKind {
-    this.as_ref().kind()
+    panic_catcher(move || {
+        this.as_ref().kind()
+    })
 }
 
 /// Returns this [`RemoteMediaTrack`]'s media source kind.
@@ -101,7 +120,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__kind(
 pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> MediaSourceKind {
-    this.as_ref().media_source_kind()
+    panic_catcher(move || {
+        this.as_ref().media_source_kind()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -114,7 +135,9 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
 pub unsafe extern "C" fn RemoteMediaTrack__free(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) {
-    drop(RemoteMediaTrack::from_ptr(this));
+    panic_catcher(move || {
+        drop(RemoteMediaTrack::from_ptr(this));
+    })
 }
 
 #[cfg(feature = "mockable")]

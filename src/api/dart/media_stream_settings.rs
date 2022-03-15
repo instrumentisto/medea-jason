@@ -5,6 +5,7 @@ use super::{
     device_video_track_constraints::DeviceVideoTrackConstraints,
     display_video_track_constraints::DisplayVideoTrackConstraints,
     ForeignClass,
+    panic_catcher,
 };
 
 pub use crate::media::MediaStreamSettings;
@@ -17,7 +18,9 @@ impl ForeignClass for MediaStreamSettings {}
 pub extern "C" fn MediaStreamSettings__new()
     -> ptr::NonNull<MediaStreamSettings>
 {
-    MediaStreamSettings::new().into_ptr()
+    panic_catcher(|| {
+        MediaStreamSettings::new().into_ptr()
+    })
 }
 
 /// Specifies a nature and settings of an audio [`MediaStreamTrack`].
@@ -28,8 +31,10 @@ pub unsafe extern "C" fn MediaStreamSettings__audio(
     mut this: ptr::NonNull<MediaStreamSettings>,
     constraints: ptr::NonNull<AudioTrackConstraints>,
 ) {
-    this.as_mut()
-        .audio(AudioTrackConstraints::from_ptr(constraints));
+    panic_catcher(move || {
+        this.as_mut()
+            .audio(AudioTrackConstraints::from_ptr(constraints));
+    })
 }
 
 /// Set constraints for obtaining a local video sourced from a media device.
@@ -38,8 +43,10 @@ pub unsafe extern "C" fn MediaStreamSettings__device_video(
     mut this: ptr::NonNull<MediaStreamSettings>,
     constraints: ptr::NonNull<DeviceVideoTrackConstraints>,
 ) {
-    this.as_mut()
-        .device_video(DeviceVideoTrackConstraints::from_ptr(constraints));
+    panic_catcher(move || {
+        this.as_mut()
+            .device_video(DeviceVideoTrackConstraints::from_ptr(constraints));
+    })
 }
 
 /// Set constraints for capturing a local video from user's display.
@@ -48,8 +55,10 @@ pub unsafe extern "C" fn MediaStreamSettings__display_video(
     mut this: ptr::NonNull<MediaStreamSettings>,
     constraints: ptr::NonNull<DisplayVideoTrackConstraints>,
 ) {
-    this.as_mut()
-        .display_video(DisplayVideoTrackConstraints::from_ptr(constraints));
+    panic_catcher(move || {
+        this.as_mut()
+            .display_video(DisplayVideoTrackConstraints::from_ptr(constraints));
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -62,5 +71,7 @@ pub unsafe extern "C" fn MediaStreamSettings__display_video(
 pub unsafe extern "C" fn MediaStreamSettings__free(
     this: ptr::NonNull<MediaStreamSettings>,
 ) {
-    drop(MediaStreamSettings::from_ptr(this));
+    panic_catcher(move || {
+        drop(MediaStreamSettings::from_ptr(this));
+    })
 }

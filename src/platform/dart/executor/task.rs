@@ -7,6 +7,7 @@ use std::{
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
 };
+use std::panic::AssertUnwindSafe;
 
 use futures::future::LocalBoxFuture;
 
@@ -71,7 +72,16 @@ impl Task {
 
         let poll = {
             let mut cx = Context::from_waker(&inner.waker);
-            inner.future.as_mut().poll(&mut cx)
+            let res = std::panic::catch_unwind(AssertUnwindSafe(Box::new(|| {
+                inner.future.as_mut().poll(&mut cx)
+            })));
+            if let Ok(poll) = res {
+                poll
+            } else {
+                self.is_scheduled.set(false);
+                *borrow = None;
+                return Poll::Ready(());
+            }
         };
         self.is_scheduled.set(false);
 
