@@ -1,9 +1,11 @@
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../util/move_semantic.dart';
 
 /// External handle used to reconnect to a media server when connection is lost.
 ///
 /// This handle is passed to the `RoomHandle.onConnectionLoss()` callback.
-abstract class ReconnectHandle {
+abstract class ReconnectHandle implements FreeableHandle {
   /// Tries to reconnect a `Room` after the provided delay in milliseconds.
   ///
   /// If the `Room` is already reconnecting then new reconnection attempt won't
@@ -47,8 +49,4 @@ abstract class ReconnectHandle {
   Future<void> reconnectWithBackoff(
       int startingDelayMs, double multiplier, int maxDelay,
       [int? maxElapsedTimeMs]);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

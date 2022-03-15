@@ -1,7 +1,9 @@
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import 'remote_media_track.dart';
 
 /// External handler to a `Connection` with a remote `Member`.
-abstract class ConnectionHandle {
+abstract class ConnectionHandle implements FreeableHandle {
   /// Returns ID of the remote `Member`.
   ///
   /// Throws a [StateError] if an underlying object has been disposed, e.g.
@@ -35,7 +37,4 @@ abstract class ConnectionHandle {
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
   void onQualityScoreUpdate(void Function(int) f);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  void free();
 }

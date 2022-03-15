@@ -1,4 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
 import '../util/move_semantic.dart';
 import 'track_kinds.dart';
@@ -6,7 +7,7 @@ import 'track_kinds.dart';
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
-abstract class RemoteMediaTrack {
+abstract class RemoteMediaTrack implements FreeableHandle {
   /// Indicates whether this [RemoteMediaTrack] is enabled.
   bool enabled();
 
@@ -36,8 +37,4 @@ abstract class RemoteMediaTrack {
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is stopped.
   void onStopped(void Function() f);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

@@ -63,7 +63,7 @@ pub unsafe extern "C" fn RoomHandle__join(
             this.join(c_str_into_string(token)).await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -105,11 +105,15 @@ pub unsafe extern "C" fn RoomHandle__set_local_media_settings(
         let settings = settings.as_ref().clone();
 
         async move {
-            this.set_local_media_settings(settings, stop_first, rollback_on_fail)
-                .await?;
+            this.set_local_media_settings(
+                settings,
+                stop_first,
+                rollback_on_fail,
+            )
+            .await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -128,7 +132,7 @@ pub unsafe extern "C" fn RoomHandle__mute_audio(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -147,7 +151,7 @@ pub unsafe extern "C" fn RoomHandle__unmute_audio(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -166,7 +170,7 @@ pub unsafe extern "C" fn RoomHandle__enable_audio(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -185,7 +189,7 @@ pub unsafe extern "C" fn RoomHandle__disable_audio(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -207,7 +211,7 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -229,7 +233,7 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -249,7 +253,7 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -269,7 +273,7 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -288,7 +292,7 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_audio(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -307,7 +311,7 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -326,7 +330,7 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -345,7 +349,7 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_video(
             fut.await?;
             Ok(())
         }
-            .into_dart_future()
+        .into_dart_future()
     })
 }
 
@@ -451,7 +455,7 @@ pub unsafe extern "C" fn RoomHandle__on_failed_local_media(
 pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
     panic_catcher(move || {
         drop(RoomHandle::from_ptr(this));
-    })
+    });
 }
 
 #[cfg(feature = "mockable")]

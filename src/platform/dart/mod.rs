@@ -40,6 +40,8 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
+/// Sets Rust's panic hook which will provide backtrace of occurred panic
+/// to the Dart's function.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
         if let Some(f) = unsafe { PANIC_FN.as_ref() } {
@@ -48,9 +50,11 @@ pub fn set_panic_hook() {
     }));
 }
 
-/// [`platform::Function`] which will be called when Rust panic fired.
+/// [`Function`] which will be called when Rust panic fired.
 static mut PANIC_FN: Option<Function<String>> = None;
 
+/// Sets provided [Function] as callback which will be called when Rust
+/// code panics.
 pub fn set_panic_callback(cb: Function<String>) {
     unsafe {
         PANIC_FN = Some(cb);

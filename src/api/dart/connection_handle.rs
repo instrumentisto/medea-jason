@@ -1,4 +1,3 @@
-use std::panic::UnwindSafe;
 use std::ptr;
 
 use dart_sys::Dart_Handle;
@@ -8,8 +7,7 @@ use crate::{
     platform,
 };
 
-use super::panic_catcher;
-use super::ForeignClass;
+use super::{panic_catcher, ForeignClass};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::ConnectionHandle;
@@ -90,7 +88,7 @@ pub unsafe extern "C" fn ConnectionHandle__free(
 ) {
     panic_catcher(move || {
         drop(ConnectionHandle::from_ptr(this));
-    })
+    });
 }
 
 #[cfg(feature = "mockable")]

@@ -5,8 +5,8 @@ use tracerr::Traced;
 use crate::media::{EnumerateDevicesError, InitLocalTracksError};
 
 use super::{
-    panic_catcher,
     media_stream_settings::MediaStreamSettings,
+    panic_catcher,
     utils::{DartFuture, IntoDartFuture, PtrArray},
     ForeignClass, InputDeviceInfo, LocalMediaTrack,
 };
@@ -68,7 +68,7 @@ pub unsafe extern "C" fn MediaManagerHandle__free(
 ) {
     panic_catcher(move || {
         drop(MediaManagerHandle::from_ptr(this));
-    })
+    });
 }
 
 #[cfg(feature = "mockable")]

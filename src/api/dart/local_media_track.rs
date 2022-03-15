@@ -1,7 +1,7 @@
 use std::ptr;
 
-use dart_sys::Dart_Handle;
 use crate::api::dart::panic_catcher;
+use dart_sys::Dart_Handle;
 
 use super::ForeignClass;
 
@@ -22,9 +22,7 @@ impl ForeignClass for LocalMediaTrack {}
 pub unsafe extern "C" fn LocalMediaTrack__get_track(
     this: ptr::NonNull<LocalMediaTrack>,
 ) -> Dart_Handle {
-    panic_catcher(move || {
-        this.as_ref().get_track().handle()
-    })
+    panic_catcher(move || this.as_ref().get_track().handle())
 }
 
 /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
@@ -36,9 +34,7 @@ pub unsafe extern "C" fn LocalMediaTrack__get_track(
 pub unsafe extern "C" fn LocalMediaTrack__kind(
     this: ptr::NonNull<LocalMediaTrack>,
 ) -> MediaKind {
-    panic_catcher(move || {
-        this.as_ref().kind()
-    })
+    panic_catcher(move || this.as_ref().kind())
 }
 
 /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
@@ -53,9 +49,7 @@ pub unsafe extern "C" fn LocalMediaTrack__kind(
 pub unsafe extern "C" fn LocalMediaTrack__media_source_kind(
     this: ptr::NonNull<LocalMediaTrack>,
 ) -> MediaSourceKind {
-    panic_catcher(move || {
-        this.as_ref().media_source_kind()
-    })
+    panic_catcher(move || this.as_ref().media_source_kind())
 }
 
 /// Frees the data behind the provided pointer.
@@ -70,7 +64,7 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
 ) {
     panic_catcher(move || {
         drop(LocalMediaTrack::from_ptr(this));
-    })
+    });
 }
 
 #[cfg(feature = "mockable")]

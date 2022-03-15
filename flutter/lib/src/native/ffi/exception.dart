@@ -100,21 +100,18 @@ Object _newMediaSettingsUpdateException(
 }
 
 /// Throws a new [NativePanicException] with the provided error [message].
-Object _throwPanicException(Pointer<Utf8> message) {
-  throw NativePanicException(message.nativeStringToDartString());
+Object _throwPanicException() {
+  throw NativePanicException();
 }
 
 /// Exception thrown when Rust side panics.
 class NativePanicException implements Exception {
-  /// Error message describing the problem.
-  final String _msg;
-
   /// Instantiates a new [NativePanicException].
-  NativePanicException(this._msg);
+  NativePanicException();
 
   @override
   String toString() {
-    return _msg;
+    return 'Rust code unexpectedly panicked';
   }
 }
 

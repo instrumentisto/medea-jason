@@ -78,7 +78,9 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

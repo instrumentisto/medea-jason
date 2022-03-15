@@ -3,9 +3,9 @@ use std::{os::raw::c_char, ptr};
 use crate::media::FacingMode;
 
 use super::{
+    panic_catcher,
     utils::{c_str_into_string, ArgumentError, DartResult},
     ForeignClass,
-    panic_catcher,
 };
 
 pub use crate::media::DeviceVideoTrackConstraints;
@@ -17,9 +17,7 @@ impl ForeignClass for DeviceVideoTrackConstraints {}
 #[no_mangle]
 pub extern "C" fn DeviceVideoTrackConstraints__new(
 ) -> ptr::NonNull<DeviceVideoTrackConstraints> {
-    panic_catcher(move || {
-        DeviceVideoTrackConstraints::new().into_ptr()
-    })
+    panic_catcher(move || DeviceVideoTrackConstraints::new().into_ptr())
 }
 
 /// Sets an exact [deviceId][1] constraint.
@@ -32,7 +30,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__device_id(
 ) {
     panic_catcher(move || {
         this.as_mut().device_id(c_str_into_string(device_id));
-    })
+    });
 }
 
 /// Sets an exact [facingMode][1] constraint.
@@ -45,7 +43,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_facing_mode(
 ) {
     panic_catcher(move || {
         this.as_mut().exact_facing_mode(facing_mode);
-    })
+    });
 }
 
 /// Sets an ideal [facingMode][1] constraint.
@@ -58,7 +56,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_facing_mode(
 ) {
     panic_catcher(move || {
         this.as_mut().ideal_facing_mode(facing_mode);
-    })
+    });
 }
 
 /// Sets an exact [height][1] constraint.
@@ -73,7 +71,8 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_height(
         match u32::try_from(height) {
             Ok(h) => this.as_mut().exact_height(h),
             Err(_) => {
-                return ArgumentError::new(height, "height", "Expected u32").into();
+                return ArgumentError::new(height, "height", "Expected u32")
+                    .into();
             }
         };
         Ok(()).into()
@@ -92,7 +91,8 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_height(
         match u32::try_from(height) {
             Ok(h) => this.as_mut().ideal_height(h),
             Err(_) => {
-                return ArgumentError::new(height, "height", "Expected u32").into();
+                return ArgumentError::new(height, "height", "Expected u32")
+                    .into();
             }
         };
         Ok(()).into()
@@ -134,7 +134,8 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_width(
         match u32::try_from(width) {
             Ok(w) => this.as_mut().exact_width(w),
             Err(_) => {
-                return ArgumentError::new(width, "width", "Expected u32").into();
+                return ArgumentError::new(width, "width", "Expected u32")
+                    .into();
             }
         };
         Ok(()).into()
@@ -153,7 +154,8 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_width(
         match u32::try_from(width) {
             Ok(w) => this.as_mut().exact_width(w),
             Err(_) => {
-                return ArgumentError::new(width, "width", "Expected u32").into();
+                return ArgumentError::new(width, "width", "Expected u32")
+                    .into();
             }
         };
         Ok(()).into()
@@ -195,5 +197,5 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__free(
 ) {
     panic_catcher(move || {
         drop(DeviceVideoTrackConstraints::from_ptr(this));
-    })
+    });
 }

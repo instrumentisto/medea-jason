@@ -4,10 +4,10 @@ use std::{
     cell::{Cell, RefCell},
     fmt,
     mem::ManuallyDrop,
+    panic::AssertUnwindSafe,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
 };
-use std::panic::AssertUnwindSafe;
 
 use futures::future::LocalBoxFuture;
 
@@ -72,9 +72,10 @@ impl Task {
 
         let poll = {
             let mut cx = Context::from_waker(&inner.waker);
-            let res = std::panic::catch_unwind(AssertUnwindSafe(Box::new(|| {
-                inner.future.as_mut().poll(&mut cx)
-            })));
+            let res =
+                std::panic::catch_unwind(AssertUnwindSafe(Box::new(|| {
+                    inner.future.as_mut().poll(&mut cx)
+                })));
             if let Ok(poll) = res {
                 poll
             } else {

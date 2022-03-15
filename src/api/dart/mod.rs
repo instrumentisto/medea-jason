@@ -28,8 +28,7 @@ pub mod room_close_reason;
 pub mod room_handle;
 pub mod utils;
 
-use std::{ffi::c_void, marker::PhantomData, ptr};
-use std::panic;
+use std::{ffi::c_void, marker::PhantomData, panic, ptr};
 
 use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
@@ -72,27 +71,25 @@ pub use self::{
     },
 };
 
-static mut FN: Option<platform::Function<String>> = None;
-
 /// Sets provided [`Dart_Handle`] as callback for the Rust panic hook.
 #[no_mangle]
 pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
     platform::set_panic_callback(platform::Function::new(cb));
 }
 
-fn panic_catcher<F, T>(f: F) -> T where F: FnOnce() -> T {
-    let res = panic::catch_unwind(panic::AssertUnwindSafe(move || {
-        (f)()
-    }));
+fn panic_catcher<F, T>(f: F) -> T
+where
+    F: FnOnce() -> T,
+{
+    let res = panic::catch_unwind(panic::AssertUnwindSafe(move || (f)()));
     log::debug!("Hey");
-    match res {
-        Ok(r) => r,
-        Err(_) => {
-            unsafe {
-                Dart_PropagateError_DL_Trampolined(new_panic_error("Propagate error panicked".to_string()));
-            }
-            unreachable!("Dart_PropagateError should do early return")
+    if let Ok(r) = res {
+        r
+    } else {
+        unsafe {
+            Dart_PropagateError_DL_Trampolined(new_panic_error());
         }
+        unreachable!("Dart_PropagateError should do early return")
     }
 }
 

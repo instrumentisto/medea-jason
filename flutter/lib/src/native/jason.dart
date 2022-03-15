@@ -145,7 +145,9 @@ class Jason extends base.Jason {
   @override
   @moveSemantics
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

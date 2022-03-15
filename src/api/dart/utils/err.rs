@@ -107,9 +107,7 @@ mod exception {
         /// Returned [`Dart_Handle`] will be recognized by Dart runtime as
         /// error. So `Dart_IsError` function will return `true` for this
         /// [`Dart_Handle`].
-        pub fn throw_panic_exception(
-            message: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
+        pub fn throw_panic_exception() -> Dart_Handle;
     }
 }
 
@@ -118,8 +116,8 @@ mod exception {
 /// Returned [`Dart_Handle`] will be recognized by Dart runtime as error. So
 /// `Dart_IsError` function will return `true` for this [`Dart_Handle`].
 #[must_use]
-pub unsafe fn new_panic_error(message: String) -> Dart_Handle {
-    exception::throw_panic_exception(string_into_c_str(message))
+pub unsafe fn new_panic_error() -> Dart_Handle {
+    exception::throw_panic_exception()
 }
 
 /// An error that can be returned from Rust to Dart.

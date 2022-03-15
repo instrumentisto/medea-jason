@@ -35,8 +35,7 @@ void registerFunction(
   required Pointer<
           NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Handle>, Bool)>>
       newMediaSettingsUpdateException,
-  required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      throwPanicException,
+  required Pointer<NativeFunction<Handle Function()>> throwPanicException,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,

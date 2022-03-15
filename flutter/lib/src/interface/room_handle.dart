@@ -1,3 +1,5 @@
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../util/move_semantic.dart';
 import 'connection_handle.dart';
 import 'local_media_track.dart';
@@ -7,7 +9,7 @@ import 'room_close_reason.dart';
 import 'track_kinds.dart';
 
 /// External handle to a `Room`.
-abstract class RoomHandle {
+abstract class RoomHandle implements FreeableHandle {
   /// Connects to a media server and joins the `Room` with the provided
   /// authorization [token].
   ///
@@ -210,8 +212,4 @@ abstract class RoomHandle {
   ///
   /// Throws [StateError] if the underlying [Pointer] has been freed.
   void onFailedLocalMedia(void Function(Object) f);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

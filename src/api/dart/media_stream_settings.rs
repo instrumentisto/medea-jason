@@ -4,8 +4,7 @@ use super::{
     audio_track_constraints::AudioTrackConstraints,
     device_video_track_constraints::DeviceVideoTrackConstraints,
     display_video_track_constraints::DisplayVideoTrackConstraints,
-    ForeignClass,
-    panic_catcher,
+    panic_catcher, ForeignClass,
 };
 
 pub use crate::media::MediaStreamSettings;
@@ -34,7 +33,7 @@ pub unsafe extern "C" fn MediaStreamSettings__audio(
     panic_catcher(move || {
         this.as_mut()
             .audio(AudioTrackConstraints::from_ptr(constraints));
-    })
+    });
 }
 
 /// Set constraints for obtaining a local video sourced from a media device.
@@ -46,7 +45,7 @@ pub unsafe extern "C" fn MediaStreamSettings__device_video(
     panic_catcher(move || {
         this.as_mut()
             .device_video(DeviceVideoTrackConstraints::from_ptr(constraints));
-    })
+    });
 }
 
 /// Set constraints for capturing a local video from user's display.
@@ -58,7 +57,7 @@ pub unsafe extern "C" fn MediaStreamSettings__display_video(
     panic_catcher(move || {
         this.as_mut()
             .display_video(DisplayVideoTrackConstraints::from_ptr(constraints));
-    })
+    });
 }
 
 /// Frees the data behind the provided pointer.
@@ -73,5 +72,5 @@ pub unsafe extern "C" fn MediaStreamSettings__free(
 ) {
     panic_catcher(move || {
         drop(MediaStreamSettings::from_ptr(this));
-    })
+    });
 }

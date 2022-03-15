@@ -1,10 +1,12 @@
+import 'package:medea_jason/src/util/rust_handles_storage.dart';
+
 import '../util/move_semantic.dart';
 import 'track_kinds.dart';
 
 /// [`MediaDeviceInfo`][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-abstract class InputDeviceInfo {
+abstract class InputDeviceInfo implements FreeableHandle {
   /// Returns an unique identifier of the represented device.
   String deviceId();
 
@@ -30,8 +32,4 @@ abstract class InputDeviceInfo {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
   String? groupId();
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

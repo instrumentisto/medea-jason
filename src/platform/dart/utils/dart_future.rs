@@ -10,7 +10,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{DartValue, DartValueArg},
-    platform::dart::error::Error,
+    platform::{dart::error::Error, utils::handle::DartHandle},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/future.g.dart")]
@@ -99,6 +99,7 @@ impl FutureFromDart {
         <DartValueArg<T> as TryInto<T>>::Error: fmt::Debug,
         T: 'static,
     {
+        let dart_fut = DartHandle::new(dart_fut);
         let (tx, rx) = oneshot::channel();
         let this = Self(Box::new(|res| {
             drop(tx.send(
@@ -108,7 +109,7 @@ impl FutureFromDart {
 
         unsafe {
             future_from_dart::complete_proxy(
-                dart_fut,
+                dart_fut.get(),
                 ptr::NonNull::from(Box::leak(Box::new(this))),
             );
         }

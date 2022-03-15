@@ -79,8 +79,6 @@
 #![cfg_attr(feature = "mockable", allow(missing_docs))]
 #![allow(clippy::module_name_repetitions)]
 
-extern crate core;
-
 #[macro_use]
 pub mod utils;
 pub mod api;
