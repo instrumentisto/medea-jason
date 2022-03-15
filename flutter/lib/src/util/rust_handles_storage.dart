@@ -12,43 +12,6 @@ import '/src/native/remote_media_track.dart';
 import '/src/native/room_close_reason.dart';
 import '/src/native/room_handle.dart';
 
-/// Returns a ordering number for the provided [handle].
-///
-/// Throw [Exception] if provided unknown object.
-int getOrderForHandle(dynamic handle) {
-  // TODO(alexlapa): not sure that we need this
-  switch (handle.runtimeType) {
-    case AudioTrackConstraints:
-      return 0;
-    case NativeConnectionHandle:
-      return 0;
-    case DeviceVideoTrackConstraints:
-      return 0;
-    case DisplayVideoTrackConstraints:
-      return 0;
-    case NativeInputDeviceInfo:
-      return 0;
-    case Jason:
-      return 2;
-    case NativeLocalMediaTrack:
-      return 0;
-    case NativeMediaManagerHandle:
-      return 1;
-    case MediaStreamSettings:
-      return 0;
-    case NativeReconnectHandle:
-      return 0;
-    case NativeRemoteMediaTrack:
-      return 0;
-    case NativeRoomCloseReason:
-      return 0;
-    case NativeRoomHandle:
-      return 1;
-    default:
-      throw Exception('Unknown Handle type: ' + handle.runtimeType.toString());
-  }
-}
-
 /// Store for the all Rust handles created returned from Rust.
 class RustHandlesStorage {
   static final RustHandlesStorage _singleton = RustHandlesStorage._internal();
@@ -69,8 +32,6 @@ class RustHandlesStorage {
 
   /// Disposes all Rust handles registered in this [RustHandlesStorage].
   void freeAll() {
-    _handles
-        .sort((a, b) => getOrderForHandle(a).compareTo(getOrderForHandle(b)));
     _handles.forEach((h) {
       // TODO(alexlapa): this should be abstracted out so we won't need
       //                 type checks
