@@ -81,7 +81,7 @@ fn panic_catcher<F, T>(f: F) -> T
 where
     F: FnOnce() -> T,
 {
-    let res = panic::catch_unwind(panic::AssertUnwindSafe(move || (f)()));
+    let res = panic::catch_unwind(panic::AssertUnwindSafe(f));
     log::debug!("Hey");
     if let Ok(r) = res {
         r

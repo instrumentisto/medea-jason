@@ -37,12 +37,13 @@ void registerFunction(
       newMediaSettingsUpdateException,
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
       newInvalidOutputAudioDeviceIdException,
+  required Pointer<NativeFunction<Handle Function()>> throwPanicException,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer),
+          Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer)>('register_exception')(
+          Pointer, Pointer, Pointer, Pointer, Pointer)>('register_exception')(
     newArgumentError,
     newStateError,
     newFormatException,
@@ -53,5 +54,6 @@ void registerFunction(
     newInternalException,
     newMediaSettingsUpdateException,
     newInvalidOutputAudioDeviceIdException,
+    throwPanicException,
   );
 }
