@@ -6,12 +6,12 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::c_str_into_string,
-    media::MediaKind,
+    media::MediaDeviceKind,
     platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
 
-#[dart_bridge("flutter/lib/src/native/platform/input_device_info.g.dart")]
-mod input_device_info {
+#[dart_bridge("flutter/lib/src/native/platform/media_device_info.g.dart")]
+mod media_device_info {
     use std::{os::raw::c_char, ptr};
 
     use dart_sys::Dart_Handle;
@@ -43,43 +43,43 @@ mod input_device_info {
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Clone, Debug)]
-pub struct InputDeviceInfo {
-    /// Handle to the Dart side `InputDeviceInfo`.
+pub struct MediaDeviceInfo {
+    /// Handle to the Dart side `MediaDeviceInfo`.
     handle: DartHandle,
 
-    /// [`MediaKind`] of this [`InputDeviceInfo`].
-    kind: MediaKind,
+    /// [`MediaKind`] of this [`MediaDeviceInfo`].
+    kind: MediaDeviceKind,
 }
 
-impl InputDeviceInfo {
+impl MediaDeviceInfo {
     /// Returns a unique identifier of the device represented by this
-    /// [`InputDeviceInfo`].
+    /// [`MediaDeviceInfo`].
     #[must_use]
     pub fn device_id(&self) -> String {
         unsafe {
-            c_str_into_string(input_device_info::device_id(self.handle.get()))
+            c_str_into_string(media_device_info::device_id(self.handle.get()))
         }
     }
 
-    /// Returns a kind of the device represented by this [`InputDeviceInfo`].
+    /// Returns a kind of the device represented by this [`MediaDeviceInfo`].
     #[must_use]
-    pub fn kind(&self) -> MediaKind {
+    pub fn kind(&self) -> MediaDeviceKind {
         self.kind
     }
 
     /// Returns a label describing the device represented by this
-    /// [`InputDeviceInfo`] (for example, "External USB Webcam").
+    /// [`MediaDeviceInfo`] (for example, "External USB Webcam").
     ///
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
         unsafe {
-            c_str_into_string(input_device_info::label(self.handle.get()))
+            c_str_into_string(media_device_info::label(self.handle.get()))
         }
     }
 
     /// Returns a group identifier of the device represented by this
-    /// [`InputDeviceInfo`]
+    /// [`MediaDeviceInfo`]
     ///
     /// Two devices have the same group identifier if they belong to the same
     /// physical device. For example, the audio input and output devices
@@ -91,18 +91,18 @@ impl InputDeviceInfo {
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
         Option::try_from(unsafe {
-            input_device_info::group_id(self.handle.get()).unbox()
+            media_device_info::group_id(self.handle.get()).unbox()
         })
         .unwrap()
     }
 }
 
-impl TryFrom<DartHandle> for InputDeviceInfo {
+impl TryFrom<DartHandle> for MediaDeviceInfo {
     type Error = NotInput;
 
     fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
         #[allow(clippy::map_err_ignore)]
-        let kind = unsafe { input_device_info::kind(value.get()) }
+        let kind = unsafe { media_device_info::kind(value.get()) }
             .try_into()
             .map_err(|_| NotInput)?;
 

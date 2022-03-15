@@ -5,18 +5,18 @@
 use derive_more::From;
 use wasm_bindgen::prelude::*;
 
-use crate::{api::MediaKind, platform};
+use crate::{api::MediaDeviceKind, platform};
 
 /// Representation of a [MediaDeviceInfo][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
 #[wasm_bindgen]
 #[derive(Debug, From)]
-pub struct InputDeviceInfo(platform::InputDeviceInfo);
+pub struct MediaDeviceInfo(platform::MediaDeviceInfo);
 
 #[allow(clippy::unused_unit)]
 #[wasm_bindgen]
-impl InputDeviceInfo {
+impl MediaDeviceInfo {
     /// Returns a unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {
@@ -29,7 +29,7 @@ impl InputDeviceInfo {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#device-info
     #[must_use]
-    pub fn kind(&self) -> MediaKind {
+    pub fn kind(&self) -> MediaDeviceKind {
         self.0.kind().into()
     }
 

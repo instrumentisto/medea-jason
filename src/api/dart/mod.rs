@@ -17,9 +17,9 @@ pub mod audio_track_constraints;
 pub mod connection_handle;
 pub mod device_video_track_constraints;
 pub mod display_video_track_constraints;
-pub mod input_device_info;
 pub mod jason;
 pub mod local_media_track;
+pub mod media_device_info;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
 pub mod reconnect_handle;
@@ -39,7 +39,7 @@ use crate::{
         dart::utils::{DartError, PtrArray},
         utils::new_panic_error,
     },
-    media::{FacingMode, MediaKind, MediaSourceKind},
+    media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform,
     platform::utils::{
         dart_api::{
@@ -56,9 +56,9 @@ pub use self::{
     connection_handle::ConnectionHandle,
     device_video_track_constraints::DeviceVideoTrackConstraints,
     display_video_track_constraints::DisplayVideoTrackConstraints,
-    input_device_info::InputDeviceInfo,
     jason::Jason,
     local_media_track::LocalMediaTrack,
+    media_device_info::MediaDeviceInfo,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::MediaStreamSettings,
     reconnect_handle::ReconnectHandle,
@@ -624,6 +624,19 @@ impl TryFrom<i64> for MediaKind {
     }
 }
 
+impl TryFrom<i64> for MediaDeviceKind {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::AudioInput),
+            1 => Ok(Self::VideoInput),
+            2 => Ok(Self::AudioOutput),
+            _ => Err(value),
+        }
+    }
+}
+
 /// Returns a [`Dart_Handle`] dereferenced from the provided pointer.
 #[no_mangle]
 pub unsafe extern "C" fn unbox_dart_handle(
@@ -669,9 +682,9 @@ mod dart_value_extern_tests_helpers {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn returns_input_device_info_ptr(
-    ) -> DartValueArg<InputDeviceInfo> {
-        DartValueArg::from(InputDeviceInfo(0))
+    pub unsafe extern "C" fn returns_media_device_info_ptr(
+    ) -> DartValueArg<MediaDeviceInfo> {
+        DartValueArg::from(MediaDeviceInfo(0))
     }
 
     #[no_mangle]
@@ -697,13 +710,13 @@ mod dart_value_extern_tests_helpers {
     }
 
     #[no_mangle]
-    pub unsafe extern "C" fn accepts_input_device_info_pointer(
-        ptr: DartValueArg<InputDeviceInfo>,
+    pub unsafe extern "C" fn accepts_media_device_info_pointer(
+        ptr: DartValueArg<MediaDeviceInfo>,
     ) {
         let ptr: ptr::NonNull<c_void> = ptr.try_into().unwrap();
-        let info = InputDeviceInfo::from_ptr(ptr.cast());
+        let info = MediaDeviceInfo::from_ptr(ptr.cast());
 
-        assert_eq!(info.device_id(), "InputDeviceInfo.device_id");
+        assert_eq!(info.device_id(), "MediaDeviceInfo.device_id");
     }
 
     #[no_mangle]

@@ -102,7 +102,7 @@ async fn reconnect_with_backoff() {
     let err = handle.reconnect_with_backoff(30, 3.0, 9999, None).await;
     let elapsed = start.elapsed().as_millis();
     assert!(elapsed >= 120 && elapsed < 200); // 30 + 90
-    assert!(err.is_ok());
+    err.unwrap();
 
     // Checks that ReconnectError::Detached is fired when session is dropped.
     transport_state.set(TransportState::Closed(CloseMsg::Abnormal(999)));

@@ -1,13 +1,12 @@
-import '../interface/input_device_info.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_device_info.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class WebInputDeviceInfo extends InputDeviceInfo {
-  late wasm.InputDeviceInfo obj;
+class WebMediaDeviceInfo extends MediaDeviceInfo {
+  late wasm.MediaDeviceInfo obj;
 
-  WebInputDeviceInfo(this.obj);
+  WebMediaDeviceInfo(this.obj);
 
   @override
   String deviceId() {
@@ -20,8 +19,8 @@ class WebInputDeviceInfo extends InputDeviceInfo {
   }
 
   @override
-  MediaKind kind() {
-    return fallibleFunction(() => MediaKind.values[obj.kind().toInt()]);
+  MediaDeviceKind kind() {
+    return fallibleFunction(() => MediaDeviceKind.values[obj.kind().toInt()]);
   }
 
   @override

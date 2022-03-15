@@ -24,6 +24,8 @@ void registerFunctions(DynamicLibrary dl) {
       newInternalException: Pointer.fromFunction(_newInternalException),
       newMediaSettingsUpdateException:
           Pointer.fromFunction(_newMediaSettingsUpdateException),
+      newInvalidOutputAudioDeviceIdException:
+          Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException),
       throwPanicException: Pointer.fromFunction(_throwPanicException));
 }
 
@@ -62,6 +64,13 @@ Object _newEnumerateDevicesException(
     Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
   return NativeEnumerateDevicesException(
       unboxDartHandle(cause), stacktrace.nativeStringToDartString());
+}
+
+/// Creates a new [InvalidOutputAudioDeviceIdException] with the provided
+/// [trace].
+Object _newInvalidOutputAudioDeviceIdException(Pointer<Utf8> trace) {
+  return NativeInvalidOutputAudioDeviceIdException(
+      trace.nativeStringToDartString());
 }
 
 /// Creates a new [NativeRpcClientException] with the provided error [kind],
@@ -173,6 +182,21 @@ class NativeEnumerateDevicesException extends EnumerateDevicesException
   dynamic cause() {
     return _cause;
   }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
+}
+
+/// Exception thrown when cannot switch audio output device ID.
+class NativeInvalidOutputAudioDeviceIdException
+    extends InvalidOutputAudioDeviceIdException {
+  /// Native stacktrace.
+  late final String _nativeStackTrace;
+
+  /// Instantiates a new [NativeInvalidOutputAudioDeviceIdException].
+  NativeInvalidOutputAudioDeviceIdException(this._nativeStackTrace);
 
   @override
   String trace() {

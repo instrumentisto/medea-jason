@@ -1,6 +1,8 @@
 import 'dart:ffi';
 
-import '../interface/input_device_info.dart';
+import 'package:ffi/ffi.dart';
+
+import '../interface/media_device_info.dart';
 import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
@@ -8,7 +10,7 @@ import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/ptrarray.dart';
-import 'input_device_info.dart';
+import 'media_device_info.dart';
 import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
@@ -18,6 +20,9 @@ typedef _initLocalTracks_Dart = Object Function(Pointer, Pointer);
 
 typedef _enumerateDevices_C = Handle Function(Pointer);
 typedef _enumerateDevices_Dart = Object Function(Pointer);
+
+typedef _setOutputAudioId_C = Handle Function(Pointer, Pointer<Utf8>);
+typedef _setOutputAudioId_Dart = Object Function(Pointer, Pointer<Utf8>);
 
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
@@ -29,6 +34,10 @@ final _initLocalTracks =
 final _enumerateDevices =
     dl.lookupFunction<_enumerateDevices_C, _enumerateDevices_Dart>(
         'MediaManagerHandle__enumerate_devices');
+
+final _setOutputAudioId =
+    dl.lookupFunction<_setOutputAudioId_C, _setOutputAudioId_Dart>(
+        'MediaManagerHandle__set_output_audio_id');
 
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('MediaManagerHandle__free');
@@ -57,13 +66,19 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   }
 
   @override
-  Future<List<InputDeviceInfo>> enumerateDevices() async {
+  Future<List<MediaDeviceInfo>> enumerateDevices() async {
     Pointer pointer = await (_enumerateDevices(ptr.getInnerPtr()) as Future);
     return pointer
         .cast<PtrArray>()
         .intoPointerList()
-        .map((e) => NativeInputDeviceInfo(NullablePointer(e)))
+        .map((e) => NativeMediaDeviceInfo(NullablePointer(e)))
         .toList();
+  }
+
+  @override
+  Future<void> setOutputAudioId(String deviceId) async {
+    await (_setOutputAudioId(ptr.getInnerPtr(), deviceId.toNativeUtf8())
+        as Future);
   }
 
   @moveSemantics

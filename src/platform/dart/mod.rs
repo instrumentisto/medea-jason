@@ -15,7 +15,7 @@ pub mod error;
 pub mod executor;
 pub mod ice_candidate;
 pub mod ice_server;
-pub mod input_device_info;
+pub mod media_device_info;
 pub mod media_devices;
 pub mod media_track;
 pub mod peer_connection;
@@ -30,8 +30,11 @@ pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     executor::spawn,
-    input_device_info::InputDeviceInfo,
-    media_devices::{enumerate_devices, get_display_media, get_user_media},
+    media_device_info::MediaDeviceInfo,
+    media_devices::{
+        enumerate_devices, get_display_media, get_user_media,
+        set_output_audio_id,
+    },
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,

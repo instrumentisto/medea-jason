@@ -2,19 +2,19 @@ use std::{os::raw::c_char, ptr};
 
 use super::{panic_catcher, utils::string_into_c_str, ForeignClass};
 
-use crate::{api::DartValueArg, media::MediaKind};
+use crate::{api::DartValueArg, media::MediaDeviceKind};
 
 #[cfg(feature = "mockable")]
-pub use self::mock::InputDeviceInfo;
+pub use self::mock::MediaDeviceInfo;
 #[cfg(not(feature = "mockable"))]
-pub use crate::platform::InputDeviceInfo;
+pub use crate::platform::MediaDeviceInfo;
 
-impl ForeignClass for InputDeviceInfo {}
+impl ForeignClass for MediaDeviceInfo {}
 
 /// Returns unique identifier of the represented device.
 #[no_mangle]
-pub unsafe extern "C" fn InputDeviceInfo__device_id(
-    this: ptr::NonNull<InputDeviceInfo>,
+pub unsafe extern "C" fn MediaDeviceInfo__device_id(
+    this: ptr::NonNull<MediaDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
     panic_catcher(move || string_into_c_str(this.as_ref().device_id()))
 }
@@ -25,9 +25,9 @@ pub unsafe extern "C" fn InputDeviceInfo__device_id(
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
 #[no_mangle]
-pub unsafe extern "C" fn InputDeviceInfo__kind(
-    this: ptr::NonNull<InputDeviceInfo>,
-) -> MediaKind {
+pub unsafe extern "C" fn MediaDeviceInfo__kind(
+    this: ptr::NonNull<MediaDeviceInfo>,
+) -> MediaDeviceKind {
     panic_catcher(move || this.as_ref().kind())
 }
 
@@ -36,8 +36,8 @@ pub unsafe extern "C" fn InputDeviceInfo__kind(
 ///
 /// If the device has no associated label, then returns an empty string.
 #[no_mangle]
-pub unsafe extern "C" fn InputDeviceInfo__label(
-    this: ptr::NonNull<InputDeviceInfo>,
+pub unsafe extern "C" fn MediaDeviceInfo__label(
+    this: ptr::NonNull<MediaDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
     panic_catcher(move || string_into_c_str(this.as_ref().label()))
 }
@@ -51,8 +51,8 @@ pub unsafe extern "C" fn InputDeviceInfo__label(
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
 #[no_mangle]
-pub unsafe extern "C" fn InputDeviceInfo__group_id(
-    this: ptr::NonNull<InputDeviceInfo>,
+pub unsafe extern "C" fn MediaDeviceInfo__group_id(
+    this: ptr::NonNull<MediaDeviceInfo>,
 ) -> DartValueArg<Option<String>> {
     panic_catcher(move || DartValueArg::from(this.as_ref().group_id()))
 }
@@ -64,35 +64,35 @@ pub unsafe extern "C" fn InputDeviceInfo__group_id(
 /// Should be called when object is no longer needed. Calling this more than
 /// once for the same pointer is equivalent to double free.
 #[no_mangle]
-pub unsafe extern "C" fn InputDeviceInfo__free(
-    this: ptr::NonNull<InputDeviceInfo>,
+pub unsafe extern "C" fn MediaDeviceInfo__free(
+    this: ptr::NonNull<MediaDeviceInfo>,
 ) {
     panic_catcher(move || {
-        drop(InputDeviceInfo::from_ptr(this));
+        drop(MediaDeviceInfo::from_ptr(this));
     });
 }
 
 #[cfg(feature = "mockable")]
 mod mock {
-    use crate::media::MediaKind;
+    use crate::media::MediaDeviceKind;
 
-    pub struct InputDeviceInfo(pub u8);
+    pub struct MediaDeviceInfo(pub u8);
 
-    impl InputDeviceInfo {
+    impl MediaDeviceInfo {
         pub fn device_id(&self) -> String {
-            String::from("InputDeviceInfo.device_id")
+            String::from("MediaDeviceInfo.device_id")
         }
 
-        pub fn kind(&self) -> MediaKind {
-            MediaKind::Audio
+        pub fn kind(&self) -> MediaDeviceKind {
+            MediaDeviceKind::AudioInput
         }
 
         pub fn label(&self) -> String {
-            String::from("InputDeviceInfo.label")
+            String::from("MediaDeviceInfo.label")
         }
 
         pub fn group_id(&self) -> Option<String> {
-            Some(String::from("InputDeviceInfo.group_id"))
+            Some(String::from("MediaDeviceInfo.group_id"))
         }
     }
 }

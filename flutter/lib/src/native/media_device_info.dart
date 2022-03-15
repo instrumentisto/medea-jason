@@ -2,8 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../interface/input_device_info.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_device_info.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
@@ -27,25 +26,25 @@ typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
 final _nativeGroupId = dl.lookupFunction<_nativeGroupId_C, _nativeGroupId_Dart>(
-    'InputDeviceInfo__group_id');
+    'MediaDeviceInfo__group_id');
 
-final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('InputDeviceInfo__kind');
+final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('MediaDeviceInfo__kind');
 
 final _label =
-    dl.lookupFunction<_label_C, _label_Dart>('InputDeviceInfo__label');
+    dl.lookupFunction<_label_C, _label_Dart>('MediaDeviceInfo__label');
 
 final _deviceId = dl
-    .lookupFunction<_deviceId_C, _deviceId_Dart>('InputDeviceInfo__device_id');
+    .lookupFunction<_deviceId_C, _deviceId_Dart>('MediaDeviceInfo__device_id');
 
-final _free = dl.lookupFunction<_free_C, _free_Dart>('InputDeviceInfo__free');
+final _free = dl.lookupFunction<_free_C, _free_Dart>('MediaDeviceInfo__free');
 
-class NativeInputDeviceInfo extends InputDeviceInfo {
+class NativeMediaDeviceInfo extends MediaDeviceInfo {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 
-  /// Constructs a new [InputDeviceInfo] backed by a Rust struct behind the
+  /// Constructs a new [MediaDeviceInfo] backed by a Rust struct behind the
   /// provided [Pointer].
-  NativeInputDeviceInfo(this.ptr) {
+  NativeMediaDeviceInfo(this.ptr) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -60,9 +59,9 @@ class NativeInputDeviceInfo extends InputDeviceInfo {
   }
 
   @override
-  MediaKind kind() {
+  MediaDeviceKind kind() {
     var index = _kind(ptr.getInnerPtr());
-    return MediaKind.values[index];
+    return MediaDeviceKind.values[index];
   }
 
   @override
