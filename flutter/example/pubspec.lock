@@ -104,8 +104,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: add-on-device-change-callback
-      resolved-ref: "62b0536b0cbb64fc8fd79f3c4cb57e91cb01b012"
+      ref: HEAD
+      resolved-ref: "110841680107c1c94e1e9b508ed7dfff47562d73"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.7.0+hotfix.2"
