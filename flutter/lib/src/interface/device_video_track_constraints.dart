@@ -1,7 +1,5 @@
 import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
-import '../util/move_semantic.dart';
-
 /// Describes the directions that the camera can face, as seen from a user's
 /// perspective.
 ///

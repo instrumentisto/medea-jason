@@ -17,8 +17,4 @@ abstract class Jason implements FreeableHandle {
 
   /// Closes the `Room` by the provided [RoomHandle].
   void closeRoom(@moveSemantics RoomHandle room);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

@@ -1,7 +1,6 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
-import '../util/move_semantic.dart';
 import 'track_kinds.dart';
 
 /// Strongly referenced media track received from a
@@ -23,12 +22,4 @@ abstract class LocalMediaTrack implements FreeableHandle {
 
   /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
   MediaStreamTrack getTrack();
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  ///
-  /// Note, that this is a strong reference, so freeing it will stop underlying
-  /// track if there are no other strong references (i.e., not used in local
-  /// peer's senders).
-  @moveSemantics
-  void free();
 }

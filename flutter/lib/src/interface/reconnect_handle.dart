@@ -1,7 +1,5 @@
 import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
-import '../util/move_semantic.dart';
-
 /// External handle used to reconnect to a media server when connection is lost.
 ///
 /// This handle is passed to the `RoomHandle.onConnectionLoss()` callback.

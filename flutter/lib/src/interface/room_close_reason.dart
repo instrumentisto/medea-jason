@@ -1,7 +1,5 @@
 import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
-import '../util/move_semantic.dart';
-
 /// Reason of why a `Room` has been closed.
 ///
 /// This struct is passed into the `RoomHandle.onClose()` callback.

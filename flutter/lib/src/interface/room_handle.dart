@@ -1,6 +1,5 @@
 import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
-import '../util/move_semantic.dart';
 import 'connection_handle.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';

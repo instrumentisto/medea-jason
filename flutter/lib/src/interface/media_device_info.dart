@@ -1,7 +1,5 @@
 import 'package:medea_jason/src/util/rust_handles_storage.dart';
 
-import '../util/move_semantic.dart';
-
 /// Kind of a media device.
 enum MediaDeviceKind {
   /// Audio input device (for example, a microphone).
