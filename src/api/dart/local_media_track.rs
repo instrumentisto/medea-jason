@@ -1,11 +1,13 @@
 use std::ptr;
 
-use crate::api::dart::panic_catcher;
 use dart_sys::Dart_Handle;
 
 use super::ForeignClass;
 
-use crate::media::{MediaKind, MediaSourceKind};
+use crate::{
+    api::dart::panic_catcher,
+    media::{MediaKind, MediaSourceKind},
+};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::LocalMediaTrack;

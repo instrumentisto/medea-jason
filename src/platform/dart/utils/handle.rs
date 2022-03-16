@@ -48,17 +48,12 @@ impl DartHandle {
     /// Dart VM.
     #[must_use]
     pub fn new(handle: Dart_Handle) -> Self {
-        // TODO(alexlapa): not sure about Dart_IsApiError
-        //                 why not Dart_IsError?
-        log::debug!("Checking Dart_Handle");
         if unsafe { Dart_IsError_DL_Trampolined(handle) } {
-            log::debug!("It's error!");
             let err_msg = unsafe {
                 c_str_into_string(Dart_GetError_DL_Trampolined(handle))
             };
             panic!("Unexpected Dart error: {}", err_msg)
         }
-        log::debug!("It's not error");
         Self(Rc::new(unsafe {
             Dart_NewPersistentHandle_DL_Trampolined(handle)
         }))

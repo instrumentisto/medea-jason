@@ -4,10 +4,12 @@ mod task;
 
 use std::{future::Future, ptr, rc::Rc};
 
-use crate::api::panic_catcher;
 use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 
-use crate::platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined;
+use crate::{
+    api::panic_catcher,
+    platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined,
+};
 
 use self::task::Task;
 

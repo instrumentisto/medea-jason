@@ -84,14 +84,12 @@ where
     F: FnOnce() -> T,
 {
     let res = panic::catch_unwind(panic::AssertUnwindSafe(f));
-    log::debug!("Hey");
     if let Ok(r) = res {
         r
     } else {
         unsafe {
             Dart_PropagateError_DL_Trampolined(new_panic_error());
         }
-        unreachable!("Dart_PropagateError should do early return")
     }
 }
 
