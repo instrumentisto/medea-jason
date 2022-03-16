@@ -63,6 +63,7 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
   @override
   void free() {
     if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
     }

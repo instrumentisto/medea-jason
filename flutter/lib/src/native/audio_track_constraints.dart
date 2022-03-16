@@ -50,6 +50,7 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   @override
   void free() {
     if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
     }

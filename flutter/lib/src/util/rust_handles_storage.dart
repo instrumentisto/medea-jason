@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'move_semantic.dart';
 
 abstract class PlatformHandle {
@@ -11,7 +13,7 @@ class RustHandlesStorage {
   static final RustHandlesStorage _singleton = RustHandlesStorage._internal();
 
   /// All handles given for the Dart side from the Rust side.
-  List<PlatformHandle> _handles = [];
+  final HashSet<PlatformHandle> _handles = HashSet();
 
   factory RustHandlesStorage() {
     return _singleton;
@@ -24,11 +26,16 @@ class RustHandlesStorage {
     _handles.add(handle);
   }
 
+  /// Insert provided [handle] from this [RustHandlesStorage].
+  void removeHandle(PlatformHandle handle) {
+    _handles.remove(handle);
+  }
+
   /// Disposes all Rust handles registered in this [RustHandlesStorage].
   void freeAll() {
     _handles.forEach((h) {
       h.free();
     });
-    _handles = [];
+    _handles.clear();
   }
 }

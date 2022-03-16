@@ -97,6 +97,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   void free() {
     if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
     }
