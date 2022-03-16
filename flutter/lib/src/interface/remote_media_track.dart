@@ -6,7 +6,7 @@ import 'track_kinds.dart';
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
-abstract class RemoteMediaTrack implements FreeableHandle {
+abstract class RemoteMediaTrack implements PlatformHandle {
   /// Indicates whether this [RemoteMediaTrack] is enabled.
   bool enabled();
 

@@ -1,6 +1,6 @@
 import 'move_semantic.dart';
 
-abstract class FreeableHandle {
+abstract class PlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   void free();
@@ -11,7 +11,7 @@ class RustHandlesStorage {
   static final RustHandlesStorage _singleton = RustHandlesStorage._internal();
 
   /// All handles given for the Dart side from the Rust side.
-  List<dynamic> _handles = [];
+  List<PlatformHandle> _handles = [];
 
   factory RustHandlesStorage() {
     return _singleton;
@@ -20,14 +20,13 @@ class RustHandlesStorage {
   RustHandlesStorage._internal();
 
   /// Insert provided [handle] to this [RustHandlesStorage].
-  void insertHandle(dynamic handle) {
+  void insertHandle(PlatformHandle handle) {
     _handles.add(handle);
   }
 
   /// Disposes all Rust handles registered in this [RustHandlesStorage].
   void freeAll() {
     _handles.forEach((h) {
-      h as FreeableHandle;
       h.free();
     });
     _handles = [];

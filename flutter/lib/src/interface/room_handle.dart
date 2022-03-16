@@ -7,7 +7,7 @@ import 'room_close_reason.dart';
 import 'track_kinds.dart';
 
 /// External handle to a `Room`.
-abstract class RoomHandle implements FreeableHandle {
+abstract class RoomHandle implements PlatformHandle {
   /// Connects to a media server and joins the `Room` with the provided
   /// authorization [token].
   ///

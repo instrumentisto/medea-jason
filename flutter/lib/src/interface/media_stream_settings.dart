@@ -7,7 +7,7 @@ import 'device_video_track_constraints.dart';
 /// Representation of [`MediaStreamConstraints`][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-abstract class MediaStreamSettings implements FreeableHandle {
+abstract class MediaStreamSettings implements PlatformHandle {
   /// Specifies a nature and settings of the audio `LocalMediaTrack`.
   void audio(@moveSemantics AudioTrackConstraints constraints);
 

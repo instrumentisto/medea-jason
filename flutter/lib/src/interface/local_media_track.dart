@@ -8,7 +8,7 @@ import 'track_kinds.dart';
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-abstract class LocalMediaTrack implements FreeableHandle {
+abstract class LocalMediaTrack implements PlatformHandle {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
   /// audio track, or the [MediaKind.Video] if it represents a video track.
   MediaKind kind();
