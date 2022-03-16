@@ -136,6 +136,7 @@ class LocalMediaTrack {
 
 @JS()
 class MediaManagerHandle {
+  external void on_device_change(Function cb);
   external void free();
 }
 

@@ -24,10 +24,7 @@ pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     media_device_info::MediaDeviceInfo,
-    media_devices::{
-        enumerate_devices, get_display_media, get_user_media,
-        set_output_audio_id,
-    },
+    media_devices::MediaDevices,
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
