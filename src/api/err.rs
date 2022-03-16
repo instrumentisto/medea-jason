@@ -393,28 +393,28 @@ pub enum MediaStateTransitionExceptionKind {
     /// Media state of a [`Sender`] transits to an opposite of the requested
     /// one.
     ///
-    /// [`Sender`]: peer::media::Sender
+    /// [`Sender`]: crate::peer::media::Sender
     OppositeState,
 
     /// Requested state transition is not allowed by [`Sender`]'s settings.
     ///
-    /// [`Sender`]: peer::media::Sender
+    /// [`Sender`]: crate::peer::media::Sender
     ProhibitedState,
 
     /// Validating [`TracksRequest`] doesn't pass.
     ///
-    /// [`TracksRequest`]: peer::TracksRequest
+    /// [`TracksRequest`]: crate::peer::TracksRequest
     InvalidLocalTracks,
 
     /// Local `Track`s cannot be inserted into [`Sender`]s of some
     /// `PeerConnection` in the `Room`.
     ///
-    /// [`Sender`]: peer::media::Sender
+    /// [`Sender`]: crate::peer::media::Sender
     InsertLocalTracks,
 
     /// [`Sender`] cannot be disabled because it's marked as `required`.
     ///
-    /// [`Sender`]: peer::media::Sender
+    /// [`Sender`]: crate::peer::media::Sender
     RequiredSender,
 }
 
