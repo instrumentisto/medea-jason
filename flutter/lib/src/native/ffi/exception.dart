@@ -86,9 +86,11 @@ Object _newRpcClientException(int kind, Pointer<Utf8> message,
 /// Creates a new [NativeMediaStateTransitionException] with the provided error
 /// [message] and [stacktrace].
 Object _newMediaStateTransitionException(
-    Pointer<Utf8> message, Pointer<Utf8> stacktrace) {
-  return NativeMediaStateTransitionException(message.nativeStringToDartString(),
-      stacktrace.nativeStringToDartString());
+    Pointer<Utf8> message, Pointer<Utf8> stacktrace, int kind) {
+  return NativeMediaStateTransitionException(
+      message.nativeStringToDartString(),
+      stacktrace.nativeStringToDartString(),
+      MediaStateTransitionExceptionKind.values[kind]);
 }
 
 /// Creates a new [InternalException] with the provided error [message], error
@@ -237,8 +239,11 @@ class NativeMediaStateTransitionException extends MediaStateTransitionException
   /// Native stacktrace.
   late final String _nativeStackTrace;
 
+  late final MediaStateTransitionExceptionKind _kind;
+
   /// Instantiates a new [NativeMediaStateTransitionException].
-  NativeMediaStateTransitionException(this._message, this._nativeStackTrace);
+  NativeMediaStateTransitionException(
+      this._message, this._nativeStackTrace, this._kind);
 
   @override
   String message() {
@@ -248,6 +253,11 @@ class NativeMediaStateTransitionException extends MediaStateTransitionException
   @override
   String trace() {
     return _nativeStackTrace;
+  }
+
+  @override
+  MediaStateTransitionExceptionKind kind() {
+    return _kind;
   }
 }
 

@@ -26,7 +26,7 @@ void registerFunction(
                   Int64, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>>
       newRpcClientException,
   required Pointer<
-          NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Utf8>)>>
+          NativeFunction<Handle Function(Pointer<Utf8>, Pointer<Utf8>, Int64)>>
       newMediaStateTransitionException,
   required Pointer<
           NativeFunction<

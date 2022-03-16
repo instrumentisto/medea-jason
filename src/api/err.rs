@@ -386,6 +386,38 @@ impl FormatException {
     }
 }
 
+/// Kind of the [`MediaStateTransitionException`].
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Clone, Copy, Debug)]
+pub enum MediaStateTransitionExceptionKind {
+    /// [`MediaState`] of a [`Sender`] transits to an opposite of the requested
+    /// one.
+    ///
+    /// [`Sender`]: peer::media::Sender
+    OppositeState,
+
+    /// Requested state transition is not allowed by [`Sender`]'s settings.
+    ///
+    /// [`Sender`]: peer::media::Sender
+    ProhibitedState,
+
+    /// Validating [`TracksRequest`] doesn't pass.
+    ///
+    /// [`TracksRequest`]: peer::TracksRequest
+    InvalidLocalTracks,
+
+    /// [`local::Track`]s cannot be inserted into [`Sender`]s of some
+    /// [`PeerConnection`] in the [`Room`].
+    ///
+    /// [`Sender`]: peer::media::Sender
+    InsertLocalTracks,
+
+    /// [`Sender`] cannot be disabled because it's marked as `required`.
+    ///
+    /// [`Sender`]: peer::media::Sender
+    RequiredSender,
+}
+
 /// Exception thrown when the requested media state transition could not be
 /// performed.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
@@ -393,6 +425,9 @@ impl FormatException {
 pub struct MediaStateTransitionException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
+
+    /// Concrete error kind of this [`MediaStateTransitionException`].
+    kind: MediaStateTransitionExceptionKind,
 
     /// Stacktrace of this [`MediaStateTransitionException`].
     trace: Trace,
@@ -402,10 +437,15 @@ impl MediaStateTransitionException {
     /// Creates a new [`MediaStateTransitionException`] from the provided error
     /// `message` and `trace`.
     #[must_use]
-    pub fn new<T: Into<Cow<'static, str>>>(message: T, trace: Trace) -> Self {
+    pub fn new<T: Into<Cow<'static, str>>>(
+        message: T,
+        trace: Trace,
+        kind: MediaStateTransitionExceptionKind,
+    ) -> Self {
         Self {
             message: message.into(),
             trace,
+            kind,
         }
     }
 }
@@ -423,6 +463,12 @@ impl MediaStateTransitionException {
     #[must_use]
     pub fn trace(&self) -> String {
         self.trace.to_string()
+    }
+
+    /// Returns concrete error kind of this [`MediaStateTransitionException`].
+    #[must_use]
+    pub fn kind(&self) -> MediaStateTransitionExceptionKind {
+        self.kind
     }
 }
 
@@ -637,10 +683,29 @@ impl From<Traced<ChangeMediaStateError>> for Error {
             ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
                 Traced::compose(err, trace).into()
             }
-            ChangeMediaStateError::ProhibitedState(_)
-            | ChangeMediaStateError::TransitionIntoOppositeState(_)
-            | ChangeMediaStateError::InvalidLocalTracks(_) => {
-                MediaStateTransitionException::new(message, trace).into()
+            ChangeMediaStateError::ProhibitedState(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::ProhibitedState,
+                )
+                .into()
+            }
+            ChangeMediaStateError::TransitionIntoOppositeState(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::OppositeState,
+                )
+                .into()
+            }
+            ChangeMediaStateError::InvalidLocalTracks(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::InvalidLocalTracks,
+                )
+                .into()
             }
             ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
@@ -682,7 +747,12 @@ impl From<Traced<LocalMediaError>> for Error {
                 UE::InvalidLocalTracks(_)
                 | UE::InsertLocalTracksError(
                     IE::InvalidMediaTrack | IE::NotEnoughTracks,
-                ) => MediaStateTransitionException::new(message, trace).into(),
+                ) => MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::InvalidLocalTracks,
+                )
+                .into(),
                 UE::InsertLocalTracksError(IE::CouldNotInsertLocalTrack(_)) => {
                     InternalException::new(message, None, trace).into()
                 }
@@ -691,7 +761,12 @@ impl From<Traced<LocalMediaError>> for Error {
                 InternalException::new(message, None, trace).into()
             }
             ME::SenderCreateError(CreateError::CannotDisableRequiredSender) => {
-                MediaStateTransitionException::new(message, trace).into()
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::RequiredSender,
+                )
+                .into()
             }
         }
     }

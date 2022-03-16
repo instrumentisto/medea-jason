@@ -171,6 +171,7 @@ class MediaStateTransitionException {
   external void free();
   external String message();
   external String trace();
+  external num kind();
 }
 
 @JS()

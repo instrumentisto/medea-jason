@@ -37,6 +37,26 @@ enum RpcClientExceptionKind {
   SessionFinished,
 }
 
+/// Kind of the [MediaStateTransitionException].
+enum MediaStateTransitionExceptionKind {
+  /// Media state of a `Sender` transits to an opposite of the requested
+  /// one.
+  OppositeState,
+
+  /// Requested state transition is not allowed by `Sender`'s settings.
+  ProhibitedState,
+
+  /// Validating `TracksRequest` doesn't pass.
+  InvalidLocalTracks,
+
+  /// Local `Track`s cannot be inserted into `Sender`s of some
+  /// `PeerConnection` in the `Room`.
+  InsertLocalTracks,
+
+  /// `Sender` cannot be disabled because it's marked as `required`.
+  RequiredSender,
+}
+
 /// Exception thrown when cannot get info of available media devices.
 abstract class EnumerateDevicesException {
   /// Returns error that caused this [EnumerateDevicesException].
@@ -119,6 +139,9 @@ abstract class MediaStateTransitionException {
 
   /// Returns stacktrace of this [MediaStateTransitionException].
   String trace();
+
+  /// Returns concrete error kind of this [MediaStateTransitionException].
+  MediaStateTransitionExceptionKind kind();
 
   @override
   String toString() {
