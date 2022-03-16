@@ -390,7 +390,7 @@ impl FormatException {
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Clone, Copy, Debug)]
 pub enum MediaStateTransitionExceptionKind {
-    /// [`MediaState`] of a [`Sender`] transits to an opposite of the requested
+    /// Media state of a [`Sender`] transits to an opposite of the requested
     /// one.
     ///
     /// [`Sender`]: peer::media::Sender
@@ -406,8 +406,8 @@ pub enum MediaStateTransitionExceptionKind {
     /// [`TracksRequest`]: peer::TracksRequest
     InvalidLocalTracks,
 
-    /// [`local::Track`]s cannot be inserted into [`Sender`]s of some
-    /// [`PeerConnection`] in the [`Room`].
+    /// Local `Track`s cannot be inserted into [`Sender`]s of some
+    /// `PeerConnection` in the `Room`.
     ///
     /// [`Sender`]: peer::media::Sender
     InsertLocalTracks,
