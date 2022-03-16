@@ -77,7 +77,9 @@ pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
     platform::set_panic_callback(platform::Function::new(cb));
 }
 
-fn panic_catcher<F, T>(f: F) -> T
+/// Wrapper around provided closure, which will catch all panics and propagate
+/// error to the Dart side if panic catched.
+pub fn panic_catcher<F, T>(f: F) -> T
 where
     F: FnOnce() -> T,
 {

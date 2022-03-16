@@ -4,7 +4,6 @@ use std::{
     cell::{Cell, RefCell},
     fmt,
     mem::ManuallyDrop,
-    panic::AssertUnwindSafe,
     rc::Rc,
     task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
 };
@@ -72,16 +71,7 @@ impl Task {
 
         let poll = {
             let mut cx = Context::from_waker(&inner.waker);
-            let res = std::panic::catch_unwind(AssertUnwindSafe(|| {
-                inner.future.as_mut().poll(&mut cx)
-            }));
-            if let Ok(poll) = res {
-                poll
-            } else {
-                self.is_scheduled.set(false);
-                *borrow = None;
-                return Poll::Ready(());
-            }
+            inner.future.as_mut().poll(&mut cx)
         };
         self.is_scheduled.set(false);
 
