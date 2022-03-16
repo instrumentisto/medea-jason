@@ -78,7 +78,7 @@ pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
 }
 
 /// Wrapper around provided closure, which will catch all panics and propagate
-/// error to the Dart side if panic catched.
+/// error to the Dart side if panic catcher.
 pub fn panic_catcher<F, T>(f: F) -> T
 where
     F: FnOnce() -> T,
@@ -90,6 +90,7 @@ where
         unsafe {
             Dart_PropagateError_DL_Trampolined(new_panic_error());
         }
+        unreachable!("Dart_PropagateError should do early return")
     }
 }
 
@@ -676,6 +677,8 @@ pub unsafe extern "C" fn box_foreign_value(
 mod dart_value_extern_tests_helpers {
     use super::*;
 
+    use crate::platform::set_panic_hook;
+
     #[no_mangle]
     pub unsafe extern "C" fn returns_none() -> DartValueArg<String> {
         DartValueArg::from(())
@@ -729,5 +732,11 @@ mod dart_value_extern_tests_helpers {
     pub unsafe extern "C" fn accepts_int(int: DartValueArg<i64>) {
         let int: i64 = int.try_into().unwrap();
         assert_eq!(int, 235);
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn fire_panic() {
+        set_panic_hook();
+        panic_catcher(|| panic!("Panicking"));
     }
 }
