@@ -23,6 +23,9 @@ typedef _enumerateDevices_Dart = Object Function(Pointer);
 typedef _setOutputAudioId_C = Handle Function(Pointer, Pointer<Utf8>);
 typedef _setOutputAudioId_Dart = Object Function(Pointer, Pointer<Utf8>);
 
+typedef _onDeviceChange_C = Void Function(Pointer, Handle);
+typedef _onDeviceChange_Dart = void Function(Pointer, Object);
+
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
@@ -37,6 +40,10 @@ final _enumerateDevices =
 final _setOutputAudioId =
     dl.lookupFunction<_setOutputAudioId_C, _setOutputAudioId_Dart>(
         'MediaManagerHandle__set_output_audio_id');
+
+final _onDeviceChange =
+    dl.lookupFunction<_onDeviceChange_C, _onDeviceChange_Dart>(
+        'MediaManagerHandle__on_device_change');
 
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('MediaManagerHandle__free');
@@ -76,6 +83,11 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<void> setOutputAudioId(String deviceId) async {
     await (_setOutputAudioId(ptr.getInnerPtr(), deviceId.toNativeUtf8())
         as Future);
+  }
+
+  @override
+  void onDeviceChange(Function cb) {
+    _onDeviceChange(ptr.getInnerPtr(), cb);
   }
 
   @moveSemantics

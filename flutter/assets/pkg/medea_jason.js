@@ -21,6 +21,15 @@ function takeObject(idx) {
     return ret;
 }
 
+function addHeapObject(obj) {
+    if (heap_next === heap.length) heap.push(heap.length + 1);
+    const idx = heap_next;
+    heap_next = heap[idx];
+
+    heap[idx] = obj;
+    return idx;
+}
+
 let WASM_VECTOR_LEN = 0;
 
 let cachegetUint8Memory0 = null;
@@ -84,25 +93,16 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
+
 let cachegetInt32Memory0 = null;
 function getInt32Memory0() {
     if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
         cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
     }
     return cachegetInt32Memory0;
-}
-
-function addHeapObject(obj) {
-    if (heap_next === heap.length) heap.push(heap.length + 1);
-    const idx = heap_next;
-    heap_next = heap[idx];
-
-    heap[idx] = obj;
-    return idx;
-}
-
-function isLikeNone(x) {
-    return x === undefined || x === null;
 }
 
 let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
@@ -252,10 +252,77 @@ function handleError(f, args) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-function __wbg_adapter_343(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_344(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h506acbb810aa0090(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
+/**
+* Describes directions that a camera can face, as seen from a user's
+* perspective. Representation of a [VideoFacingModeEnum][1].
+*
+* [1]: https://w3.org/TR/mediacapture-streams#dom-videofacingmodeenum
+*/
+export const FacingMode = Object.freeze({
+/**
+* Facing towards a user (a self-view camera).
+*/
+User:0,"0":"User",
+/**
+* Facing away from a user (viewing the environment).
+*/
+Environment:1,"1":"Environment",
+/**
+* Facing to the left of a user.
+*/
+Left:2,"2":"Left",
+/**
+* Facing to the right of a user.
+*/
+Right:3,"3":"Right", });
+/**
+* Media source type.
+*/
+export const MediaSourceKind = Object.freeze({
+/**
+* Media is sourced from some media device (webcam or microphone).
+*/
+Device:0,"0":"Device",
+/**
+* Media is obtained via screen capturing.
+*/
+Display:1,"1":"Display", });
+/**
+* [MediaDeviceInfo.kind][1] representation.
+*
+* [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
+*/
+export const MediaDeviceKind = Object.freeze({
+/**
+* Audio input device (for example, a microphone).
+*/
+AudioInput:0,"0":"AudioInput",
+/**
+* Video input device (for example, a webcam).
+*/
+VideoInput:1,"1":"VideoInput",
+/**
+* Audio output device (for example, a pair of headphones).
+*/
+AudioOutput:2,"2":"AudioOutput", });
+/**
+* [MediaStreamTrack.kind][1] representation.
+*
+* [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
+*/
+export const MediaKind = Object.freeze({
+/**
+* Audio track.
+*/
+Audio:0,"0":"Audio",
+/**
+* Video track.
+*/
+Video:1,"1":"Video", });
 /**
 * Possible error kinds of a [`LocalMediaInitException`].
 */
@@ -303,73 +370,6 @@ AuthorizationFailed:1,"1":"AuthorizationFailed",
 * RPC session has been finished. This is a terminal state.
 */
 SessionFinished:2,"2":"SessionFinished", });
-/**
-* Describes directions that a camera can face, as seen from a user's
-* perspective. Representation of a [VideoFacingModeEnum][1].
-*
-* [1]: https://w3.org/TR/mediacapture-streams#dom-videofacingmodeenum
-*/
-export const FacingMode = Object.freeze({
-/**
-* Facing towards a user (a self-view camera).
-*/
-User:0,"0":"User",
-/**
-* Facing away from a user (viewing the environment).
-*/
-Environment:1,"1":"Environment",
-/**
-* Facing to the left of a user.
-*/
-Left:2,"2":"Left",
-/**
-* Facing to the right of a user.
-*/
-Right:3,"3":"Right", });
-/**
-* Media source type.
-*/
-export const MediaSourceKind = Object.freeze({
-/**
-* Media is sourced from some media device (webcam or microphone).
-*/
-Device:0,"0":"Device",
-/**
-* Media is obtained via screen capturing.
-*/
-Display:1,"1":"Display", });
-/**
-* [MediaDeviceInfo.kind][1] representation.
-*
-* [1]: https://www.w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-kind
-*/
-export const MediaDeviceKind = Object.freeze({
-/**
-* Represents an audio input device; for example a microphone.
-*/
-AudioInput:0,"0":"AudioInput",
-/**
-* Represents a video input device; for example a webcam.
-*/
-VideoInput:1,"1":"VideoInput",
-/**
-* Represents an audio output device; for example a pair of headphones.
-*/
-AudioOutput:2,"2":"AudioOutput", });
-/**
-* [MediaStreamTrack.kind][1] representation.
-*
-* [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
-*/
-export const MediaKind = Object.freeze({
-/**
-* Audio track.
-*/
-Audio:0,"0":"Audio",
-/**
-* Video track.
-*/
-Video:1,"1":"Video", });
 /**
 * Constraints applicable to audio tracks.
 */
@@ -1291,6 +1291,23 @@ export class MediaManagerHandle {
         _assertClass(caps, MediaStreamSettings);
         var ret = wasm.mediamanagerhandle_init_local_tracks(this.ptr, caps.ptr);
         return takeObject(ret);
+    }
+    /**
+    * Subscribes on the [`MediaManagerHandle`]'s `devicechange` event.
+    * @param {Function} cb
+    */
+    on_device_change(cb) {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.mediamanagerhandle_on_device_change(retptr, this.ptr, addHeapObject(cb));
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            if (r1) {
+                throw takeObject(r0);
+            }
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+        }
     }
 }
 /**
@@ -2423,20 +2440,37 @@ async function init(input) {
         var ret = LocalMediaTrack.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_is_string = function(arg0) {
-        var ret = typeof(getObject(arg0)) === 'string';
-        return ret;
+    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
+        var ret = getObject(arg0);
+        return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_json_serialize = function(arg0, arg1) {
+    imports.wbg.__wbindgen_number_new = function(arg0) {
+        var ret = arg0;
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbindgen_string_get = function(arg0, arg1) {
         const obj = getObject(arg1);
-        var ret = JSON.stringify(obj === undefined ? null : obj);
-        var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var ret = typeof(obj) === 'string' ? obj : undefined;
+        var ptr0 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
         getInt32Memory0()[arg0 / 4 + 1] = len0;
         getInt32Memory0()[arg0 / 4 + 0] = ptr0;
     };
-    imports.wbg.__wbindgen_number_new = function(arg0) {
-        var ret = arg0;
+    imports.wbg.__wbindgen_cb_drop = function(arg0) {
+        const obj = takeObject(arg0).original;
+        if (obj.cnt-- == 1) {
+            obj.a = 0;
+            return true;
+        }
+        var ret = false;
+        return ret;
+    };
+    imports.wbg.__wbg_roomclosereason_new = function(arg0) {
+        var ret = RoomCloseReason.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_mediadeviceinfo_new = function(arg0) {
+        var ret = MediaDeviceInfo.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_stateerror_new = function(arg0) {
@@ -2471,26 +2505,25 @@ async function init(input) {
         var ret = MediaSettingsUpdateException.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_string_get = function(arg0, arg1) {
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        var ret = getStringFromWasm0(arg0, arg1);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbindgen_json_serialize = function(arg0, arg1) {
         const obj = getObject(arg1);
-        var ret = typeof(obj) === 'string' ? obj : undefined;
-        var ptr0 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var ret = JSON.stringify(obj === undefined ? null : obj);
+        var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
         getInt32Memory0()[arg0 / 4 + 1] = len0;
         getInt32Memory0()[arg0 / 4 + 0] = ptr0;
     };
-    imports.wbg.__wbindgen_cb_drop = function(arg0) {
-        const obj = takeObject(arg0).original;
-        if (obj.cnt-- == 1) {
-            obj.a = 0;
-            return true;
-        }
-        var ret = false;
+    imports.wbg.__wbindgen_is_undefined = function(arg0) {
+        var ret = getObject(arg0) === undefined;
         return ret;
     };
-    imports.wbg.__wbg_roomclosereason_new = function(arg0) {
-        var ret = RoomCloseReason.__wrap(arg0);
-        return addHeapObject(ret);
+    imports.wbg.__wbindgen_is_string = function(arg0) {
+        var ret = typeof(getObject(arg0)) === 'string';
+        return ret;
     };
     imports.wbg.__wbg_remotemediatrack_new = function(arg0) {
         var ret = RemoteMediaTrack.__wrap(arg0);
@@ -2500,25 +2533,9 @@ async function init(input) {
         var ret = ReconnectHandle.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_mediadeviceinfo_new = function(arg0) {
-        var ret = MediaDeviceInfo.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbg_connectionhandle_new = function(arg0) {
         var ret = ConnectionHandle.__wrap(arg0);
         return addHeapObject(ret);
-    };
-    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
-        var ret = getObject(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
-        var ret = getStringFromWasm0(arg0, arg1);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbindgen_is_undefined = function(arg0) {
-        var ret = getObject(arg0) === undefined;
-        return ret;
     };
     imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
         const obj = getObject(arg1);
@@ -2918,7 +2935,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_343(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_344(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -2998,28 +3015,28 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2640 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 710, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper2657 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2641 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 710, __wbg_adapter_35);
+    imports.wbg.__wbindgen_closure_wrapper2658 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_35);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2642 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 710, __wbg_adapter_38);
+    imports.wbg.__wbindgen_closure_wrapper2659 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_38);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2643 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 710, __wbg_adapter_41);
+    imports.wbg.__wbindgen_closure_wrapper2660 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_41);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2651 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 710, __wbg_adapter_44);
+    imports.wbg.__wbindgen_closure_wrapper2668 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_44);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2748 = function(arg0, arg1, arg2) {
-        var ret = makeMutClosure(arg0, arg1, 777, __wbg_adapter_47);
+    imports.wbg.__wbindgen_closure_wrapper2763 = function(arg0, arg1, arg2) {
+        var ret = makeMutClosure(arg0, arg1, 781, __wbg_adapter_47);
         return addHeapObject(ret);
     };
 

@@ -37,6 +37,9 @@ abstract class MediaManagerHandle {
   /// Switches output audio device to the device with the provided [deviceId].
   Future<void> setOutputAudioId(String deviceId);
 
+  /// Subscribes onto the [MediaManagerHandle]'s `devicechange` event.
+  void onDeviceChange(Function cb);
+
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   void free();

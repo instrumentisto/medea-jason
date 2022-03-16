@@ -41,4 +41,9 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   Future<void> setOutputAudioId(String deviceId) async {
     video_renderer.setOutputAudioSinkId(deviceId);
   }
+
+  @override
+  void onDeviceChange(Function cb) {
+    obj.on_device_change(cb);
+  }
 }

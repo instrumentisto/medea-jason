@@ -109,4 +109,15 @@ impl MediaManagerHandle {
                 .map_err(Into::into)
         })
     }
+
+    /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+    pub fn on_device_change(
+        &self,
+        cb: js_sys::Function,
+    ) -> Result<(), JsValue> {
+        let this = self.0.clone();
+        this.on_device_change(cb.into())
+            .map_err(Error::from)
+            .map_err(Into::into)
+    }
 }

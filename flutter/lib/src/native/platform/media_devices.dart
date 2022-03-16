@@ -15,6 +15,7 @@ void registerFunctions(DynamicLibrary dl) {
     getUserMedia: Pointer.fromFunction(_getUserMedia),
     getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
     setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
+    onDeviceChange: Pointer.fromFunction(_onDeviceChange),
   );
 }
 
@@ -37,4 +38,9 @@ Object _getDisplayMedia(DisplayConstraints constraints) {
 /// Switches output audio device to the device with the provided [deviceId].
 Object _setOutputAudioId(Pointer<Utf8> deviceId) {
   return () => setOutputAudioId(deviceId.toDartString());
+}
+
+/// Subscribes onto the `MediaDevices`'s `devicechange` event.
+void _onDeviceChange(Function cb) {
+  onDeviceChange(() => cb(null));
 }
