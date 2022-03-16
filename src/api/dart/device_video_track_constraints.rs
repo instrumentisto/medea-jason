@@ -3,7 +3,7 @@ use std::{os::raw::c_char, ptr};
 use crate::media::FacingMode;
 
 use super::{
-    panic_catcher,
+    catch_panic,
     utils::{c_str_into_string, ArgumentError, DartResult},
     ForeignClass,
 };
@@ -17,7 +17,7 @@ impl ForeignClass for DeviceVideoTrackConstraints {}
 #[no_mangle]
 pub extern "C" fn DeviceVideoTrackConstraints__new(
 ) -> ptr::NonNull<DeviceVideoTrackConstraints> {
-    panic_catcher(move || DeviceVideoTrackConstraints::new().into_ptr())
+    catch_panic(move || DeviceVideoTrackConstraints::new().into_ptr())
 }
 
 /// Sets an exact [deviceId][1] constraint.
@@ -28,7 +28,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__device_id(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     device_id: ptr::NonNull<c_char>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         this.as_mut().device_id(c_str_into_string(device_id));
     });
 }
@@ -41,7 +41,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_facing_mode(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     facing_mode: FacingMode,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         this.as_mut().exact_facing_mode(facing_mode);
     });
 }
@@ -54,7 +54,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_facing_mode(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     facing_mode: FacingMode,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         this.as_mut().ideal_facing_mode(facing_mode);
     });
 }
@@ -67,7 +67,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_height(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     height: i64,
 ) -> DartResult {
-    panic_catcher(move || {
+    catch_panic(move || {
         match u32::try_from(height) {
             Ok(h) => this.as_mut().exact_height(h),
             Err(_) => {
@@ -87,7 +87,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_height(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     height: i64,
 ) -> DartResult {
-    panic_catcher(move || {
+    catch_panic(move || {
         match u32::try_from(height) {
             Ok(h) => this.as_mut().ideal_height(h),
             Err(_) => {
@@ -108,7 +108,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__height_in_range(
     min: i64,
     max: i64,
 ) -> DartResult {
-    panic_catcher(move || {
+    catch_panic(move || {
         match (u32::try_from(min), u32::try_from(max)) {
             (Ok(min), Ok(max)) => this.as_mut().height_in_range(min, max),
             (Err(_), _) => {
@@ -130,7 +130,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_width(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     width: i64,
 ) -> DartResult {
-    panic_catcher(move || {
+    catch_panic(move || {
         match u32::try_from(width) {
             Ok(w) => this.as_mut().exact_width(w),
             Err(_) => {
@@ -150,7 +150,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_width(
     mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
     width: i64,
 ) -> DartResult {
-    panic_catcher(|| {
+    catch_panic(|| {
         match u32::try_from(width) {
             Ok(w) => this.as_mut().exact_width(w),
             Err(_) => {
@@ -171,7 +171,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__width_in_range(
     min: i64,
     max: i64,
 ) -> DartResult {
-    panic_catcher(move || {
+    catch_panic(move || {
         match (u32::try_from(min), u32::try_from(max)) {
             (Ok(min), Ok(max)) => this.as_mut().width_in_range(min, max),
             (Err(_), _) => {
@@ -195,7 +195,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__width_in_range(
 pub unsafe extern "C" fn DeviceVideoTrackConstraints__free(
     this: ptr::NonNull<DeviceVideoTrackConstraints>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         drop(DeviceVideoTrackConstraints::from_ptr(this));
     });
 }

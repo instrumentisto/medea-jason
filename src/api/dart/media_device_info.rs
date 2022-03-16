@@ -1,6 +1,6 @@
 use std::{os::raw::c_char, ptr};
 
-use super::{panic_catcher, utils::string_into_c_str, ForeignClass};
+use super::{catch_panic, utils::string_into_c_str, ForeignClass};
 
 use crate::{api::DartValueArg, media::MediaDeviceKind};
 
@@ -16,7 +16,7 @@ impl ForeignClass for MediaDeviceInfo {}
 pub unsafe extern "C" fn MediaDeviceInfo__device_id(
     this: ptr::NonNull<MediaDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
-    panic_catcher(move || string_into_c_str(this.as_ref().device_id()))
+    catch_panic(move || string_into_c_str(this.as_ref().device_id()))
 }
 
 /// Returns kind of the represented device.
@@ -28,7 +28,7 @@ pub unsafe extern "C" fn MediaDeviceInfo__device_id(
 pub unsafe extern "C" fn MediaDeviceInfo__kind(
     this: ptr::NonNull<MediaDeviceInfo>,
 ) -> MediaDeviceKind {
-    panic_catcher(move || this.as_ref().kind())
+    catch_panic(move || this.as_ref().kind())
 }
 
 /// Returns label describing the represented device (for example "External USB
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn MediaDeviceInfo__kind(
 pub unsafe extern "C" fn MediaDeviceInfo__label(
     this: ptr::NonNull<MediaDeviceInfo>,
 ) -> ptr::NonNull<c_char> {
-    panic_catcher(move || string_into_c_str(this.as_ref().label()))
+    catch_panic(move || string_into_c_str(this.as_ref().label()))
 }
 
 /// Returns group identifier of the represented device.
@@ -54,7 +54,7 @@ pub unsafe extern "C" fn MediaDeviceInfo__label(
 pub unsafe extern "C" fn MediaDeviceInfo__group_id(
     this: ptr::NonNull<MediaDeviceInfo>,
 ) -> DartValueArg<Option<String>> {
-    panic_catcher(move || DartValueArg::from(this.as_ref().group_id()))
+    catch_panic(move || DartValueArg::from(this.as_ref().group_id()))
 }
 
 /// Frees the data behind the provided pointer.
@@ -67,7 +67,7 @@ pub unsafe extern "C" fn MediaDeviceInfo__group_id(
 pub unsafe extern "C" fn MediaDeviceInfo__free(
     this: ptr::NonNull<MediaDeviceInfo>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         drop(MediaDeviceInfo::from_ptr(this));
     });
 }

@@ -9,7 +9,7 @@ use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{DartValue, DartValueArg},
+    api::{catch_panic, DartValue, DartValueArg},
     platform::{dart::error::Error, utils::handle::DartHandle},
 };
 
@@ -46,8 +46,10 @@ pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     future: ptr::NonNull<FutureFromDart>,
     val: DartValue,
 ) {
-    let future = Box::from_raw(future.as_ptr());
-    future.resolve_ok(val);
+    catch_panic(move || {
+        let future = Box::from_raw(future.as_ptr());
+        future.resolve_ok(val);
+    });
 }
 
 /// Resolves the provided [`FutureFromDart`] with the given [`Error`] as [`Err`]
@@ -63,8 +65,10 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
     future: ptr::NonNull<FutureFromDart>,
     val: Dart_Handle,
 ) {
-    let future = Box::from_raw(future.as_ptr());
-    future.resolve_err(Error::from(val));
+    catch_panic(move || {
+        let future = Box::from_raw(future.as_ptr());
+        future.resolve_err(Error::from(val));
+    });
 }
 
 /// Compatibility layer for polling [Dart `Future`s][0] in Rust.

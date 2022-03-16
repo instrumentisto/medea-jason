@@ -79,7 +79,7 @@ pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
 
 /// Wrapper around provided closure, which will catch all panics and propagate
 /// error to the Dart side if panic catcher.
-pub fn panic_catcher<F, T>(f: F) -> T
+pub fn catch_panic<F, T>(f: F) -> T
 where
     F: FnOnce() -> T,
 {
@@ -737,6 +737,6 @@ mod dart_value_extern_tests_helpers {
     #[no_mangle]
     pub unsafe extern "C" fn fire_panic() {
         set_panic_hook();
-        panic_catcher(|| panic!("Panicking"));
+        catch_panic(|| panic!("Panicking"));
     }
 }

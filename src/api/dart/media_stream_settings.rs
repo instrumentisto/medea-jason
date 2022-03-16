@@ -1,10 +1,10 @@
 use std::ptr;
 
 use super::{
-    audio_track_constraints::AudioTrackConstraints,
+    audio_track_constraints::AudioTrackConstraints, catch_panic,
     device_video_track_constraints::DeviceVideoTrackConstraints,
     display_video_track_constraints::DisplayVideoTrackConstraints,
-    panic_catcher, ForeignClass,
+    ForeignClass,
 };
 
 pub use crate::media::MediaStreamSettings;
@@ -17,7 +17,7 @@ impl ForeignClass for MediaStreamSettings {}
 pub extern "C" fn MediaStreamSettings__new()
     -> ptr::NonNull<MediaStreamSettings>
 {
-    panic_catcher(|| {
+    catch_panic(|| {
         MediaStreamSettings::new().into_ptr()
     })
 }
@@ -30,7 +30,7 @@ pub unsafe extern "C" fn MediaStreamSettings__audio(
     mut this: ptr::NonNull<MediaStreamSettings>,
     constraints: ptr::NonNull<AudioTrackConstraints>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         this.as_mut()
             .audio(AudioTrackConstraints::from_ptr(constraints));
     });
@@ -42,7 +42,7 @@ pub unsafe extern "C" fn MediaStreamSettings__device_video(
     mut this: ptr::NonNull<MediaStreamSettings>,
     constraints: ptr::NonNull<DeviceVideoTrackConstraints>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         this.as_mut()
             .device_video(DeviceVideoTrackConstraints::from_ptr(constraints));
     });
@@ -54,7 +54,7 @@ pub unsafe extern "C" fn MediaStreamSettings__display_video(
     mut this: ptr::NonNull<MediaStreamSettings>,
     constraints: ptr::NonNull<DisplayVideoTrackConstraints>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         this.as_mut()
             .display_video(DisplayVideoTrackConstraints::from_ptr(constraints));
     });
@@ -70,7 +70,7 @@ pub unsafe extern "C" fn MediaStreamSettings__display_video(
 pub unsafe extern "C" fn MediaStreamSettings__free(
     this: ptr::NonNull<MediaStreamSettings>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         drop(MediaStreamSettings::from_ptr(this));
     });
 }

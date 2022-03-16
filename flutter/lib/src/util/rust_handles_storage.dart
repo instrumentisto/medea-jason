@@ -21,12 +21,12 @@ class RustHandlesStorage {
 
   RustHandlesStorage._internal();
 
-  /// Insert provided [handle] to this [RustHandlesStorage].
+  /// Insert the provided [handle] to this [RustHandlesStorage].
   void insertHandle(PlatformHandle handle) {
     _handles.add(handle);
   }
 
-  /// Insert provided [handle] from this [RustHandlesStorage].
+  /// Removes the provided [handle] from this [RustHandlesStorage].
   void removeHandle(PlatformHandle handle) {
     _handles.remove(handle);
   }

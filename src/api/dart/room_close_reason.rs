@@ -1,6 +1,6 @@
 use std::{os::raw::c_char, ptr};
 
-use super::{panic_catcher, utils::string_into_c_str, ForeignClass};
+use super::{catch_panic, utils::string_into_c_str, ForeignClass};
 
 pub use crate::room::RoomCloseReason;
 
@@ -13,7 +13,7 @@ impl ForeignClass for RoomCloseReason {}
 pub unsafe extern "C" fn RoomCloseReason__reason(
     this: ptr::NonNull<RoomCloseReason>,
 ) -> ptr::NonNull<c_char> {
-    panic_catcher(move || string_into_c_str(this.as_ref().reason()))
+    catch_panic(move || string_into_c_str(this.as_ref().reason()))
 }
 
 /// Indicates whether a [`Room`] was closed by server.
@@ -23,7 +23,7 @@ pub unsafe extern "C" fn RoomCloseReason__reason(
 pub unsafe extern "C" fn RoomCloseReason__is_closed_by_server(
     this: ptr::NonNull<RoomCloseReason>,
 ) -> u8 {
-    panic_catcher(move || this.as_ref().is_closed_by_server().into())
+    catch_panic(move || this.as_ref().is_closed_by_server().into())
 }
 
 /// Indicates whether a [`Room`]'s close reason is considered as an error.
@@ -33,7 +33,7 @@ pub unsafe extern "C" fn RoomCloseReason__is_closed_by_server(
 pub unsafe extern "C" fn RoomCloseReason__is_err(
     this: ptr::NonNull<RoomCloseReason>,
 ) -> u8 {
-    panic_catcher(move || this.as_ref().is_err().into())
+    catch_panic(move || this.as_ref().is_err().into())
 }
 
 /// Frees the data behind the provided pointer.
@@ -46,7 +46,7 @@ pub unsafe extern "C" fn RoomCloseReason__is_err(
 pub unsafe extern "C" fn RoomCloseReason__free(
     this: ptr::NonNull<RoomCloseReason>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         drop(RoomCloseReason::from_ptr(this));
     });
 }

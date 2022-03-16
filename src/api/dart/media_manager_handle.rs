@@ -16,8 +16,8 @@ use crate::{
 };
 
 use super::{
+    catch_panic,
     media_stream_settings::MediaStreamSettings,
-    panic_catcher,
     utils::{DartFuture, IntoDartFuture, PtrArray},
     ForeignClass, LocalMediaTrack, MediaDeviceInfo,
 };
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
     caps: ptr::NonNull<MediaStreamSettings>,
 ) -> DartFuture<Result<PtrArray<LocalMediaTrack>, Traced<InitLocalTracksError>>>
 {
-    panic_catcher(move || {
+    catch_panic(move || {
         let this = this.as_ref().clone();
         let caps = caps.as_ref().clone();
 
@@ -59,7 +59,7 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
 ) -> DartFuture<
     Result<PtrArray<MediaDeviceInfo>, Traced<EnumerateDevicesError>>,
 > {
-    panic_catcher(move || {
+    catch_panic(move || {
         let this = this.as_ref().clone();
 
         async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
@@ -74,16 +74,18 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     this: ptr::NonNull<MediaManagerHandle>,
     device_id: ptr::NonNull<c_char>,
 ) -> DartFuture<Result<(), Traced<InvalidOutputAudioDeviceIdError>>> {
-    let this = this.as_ref().clone();
-    let device_id = c_str_into_string(device_id);
+    catch_panic(move || {
+        let this = this.as_ref().clone();
+        let device_id = c_str_into_string(device_id);
 
-    async move {
-        this.set_output_audio_id(device_id)
-            .await
-            .map_err(tracerr::map_from_and_wrap!())?;
-        Ok(())
-    }
-    .into_dart_future()
+        async move {
+            this.set_output_audio_id(device_id)
+                .await
+                .map_err(tracerr::map_from_and_wrap!())?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
 }
 
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
@@ -92,10 +94,12 @@ pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
     this: ptr::NonNull<MediaManagerHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
-    this.on_device_change(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+    catch_panic(move || {
+        let this = this.as_ref();
+        this.on_device_change(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -108,7 +112,7 @@ pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
 pub unsafe extern "C" fn MediaManagerHandle__free(
     this: ptr::NonNull<MediaManagerHandle>,
 ) {
-    panic_catcher(move || {
+    catch_panic(move || {
         drop(MediaManagerHandle::from_ptr(this));
     });
 }

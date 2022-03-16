@@ -12,7 +12,7 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{DartValue, DartValueArg},
+    api::{catch_panic, DartValue, DartValueArg},
     platform::dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Trampolined,
 };
 
@@ -47,10 +47,10 @@ pub unsafe extern "C" fn Callback__call_two_arg(
     first: DartValue,
     second: DartValue,
 ) {
-    match &mut cb.as_mut().0 {
+    catch_panic(move || match &mut cb.as_mut().0 {
         Kind::TwoArgFnMut(func) => (func)(first, second),
         Kind::FnOnce(_) | Kind::FnMut(_) | Kind::Fn(_) => unreachable!(),
-    }
+    });
 }
 
 /// Calls the provided [`Callback`] with the provided [`DartValue`] as an
@@ -64,24 +64,26 @@ pub unsafe extern "C" fn Callback__call(
     mut cb: ptr::NonNull<Callback>,
     val: DartValue,
 ) {
-    if matches!(cb.as_ref().0, Kind::FnOnce(_)) {
-        let cb = Box::from_raw(cb.as_ptr());
-        if let Kind::FnOnce(func) = cb.0 {
-            (func)(val);
-        }
-    } else {
-        match &mut cb.as_mut().0 {
-            Kind::FnMut(func) => {
+    catch_panic(move || {
+        if matches!(cb.as_ref().0, Kind::FnOnce(_)) {
+            let cb = Box::from_raw(cb.as_ptr());
+            if let Kind::FnOnce(func) = cb.0 {
                 (func)(val);
             }
-            Kind::Fn(func) => {
-                (func)(val);
-            }
-            Kind::FnOnce(_) | Kind::TwoArgFnMut(_) => {
-                unreachable!();
+        } else {
+            match &mut cb.as_mut().0 {
+                Kind::FnMut(func) => {
+                    (func)(val);
+                }
+                Kind::Fn(func) => {
+                    (func)(val);
+                }
+                Kind::FnOnce(_) | Kind::TwoArgFnMut(_) => {
+                    unreachable!();
+                }
             }
         }
-    }
+    });
 }
 
 /// Possible kinds of an underlying [`Callback`] function to be called.
@@ -213,7 +215,9 @@ impl Callback {
 ///
 /// Cleans finalized [`Callback`] memory.
 extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
-    drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
+    catch_panic(move || {
+        drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
+    });
 }
 
 #[cfg(feature = "mockable")]
