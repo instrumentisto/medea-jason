@@ -80,28 +80,27 @@ extern "C" {
         callback: extern "C" fn(*mut c_void, *mut c_void),
     ) -> Dart_Handle;
 
-    /// Checks whether the provided `Dart_Handle` is an error.
+    /// Checks whether the provided [`Dart_Handle`] represents a Dart error.
     ///
-    /// Requires there to be a current isolate.
+    /// Should be called on the current isolate.
     pub fn Dart_IsError_DL_Trampolined(object: Dart_Handle) -> bool;
 
-    /// Gets the error message from an error handle.
+    /// Returns the error message from the provided Dart error handle.
     ///
-    /// Requires there to be a current isolate.
+    /// Should be called on the current isolate.
     ///
-    /// Returns a C string containing an error message if the `object` is
-    /// error. An empty C string ("") if the handle is valid.
+    /// Returns a C string containing a Dart error message if the provided
+    /// `object` represents a Dart error, or an empty C string ("") otherwise.
     pub fn Dart_GetError_DL_Trampolined(
         object: Dart_Handle,
     ) -> ptr::NonNull<c_char>;
 
-    /// Propagates an error.
+    /// Propagates the given Dart error to the Dart side.
     ///
-    /// If the provided handle is an unhandled exception error, this
-    /// function will cause the unhandled exception to be rethrown.  This
-    /// will proceed in the standard way, walking up Dart frames until an
-    /// appropriate 'catch' block is found, executing 'finally' blocks,
-    /// etc.
+    /// If the provided [`Dart_Handle`] is an unhandled exception error, then it
+    /// will be rethrown in the standard way: walking up Dart frames until an
+    /// appropriate `catch` block is found, than executing `finally` blocks, and
+    /// so on.
     pub fn Dart_PropagateError_DL_Trampolined(object: Dart_Handle);
 }
 

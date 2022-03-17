@@ -1,7 +1,7 @@
 use std::ptr;
 
 use super::{
-    catch_panic, media_manager_handle::MediaManagerHandle,
+    media_manager_handle::MediaManagerHandle, propagate_panic,
     room_handle::RoomHandle, ForeignClass,
 };
 
@@ -15,7 +15,7 @@ impl ForeignClass for Jason {}
 /// Instantiates a new [`Jason`] interface to interact with this library.
 #[no_mangle]
 pub extern "C" fn Jason__new() -> ptr::NonNull<Jason> {
-    catch_panic(|| Jason::new().into_ptr())
+    propagate_panic(|| Jason::new().into_ptr())
 }
 
 /// Creates a new [`Room`] and returns its [`RoomHandle`].
@@ -25,7 +25,7 @@ pub extern "C" fn Jason__new() -> ptr::NonNull<Jason> {
 pub unsafe extern "C" fn Jason__init_room(
     this: ptr::NonNull<Jason>,
 ) -> ptr::NonNull<RoomHandle> {
-    catch_panic(move || this.as_ref().init_room().into_ptr())
+    propagate_panic(move || this.as_ref().init_room().into_ptr())
 }
 
 /// Returns a [`MediaManagerHandle`].
@@ -33,7 +33,7 @@ pub unsafe extern "C" fn Jason__init_room(
 pub unsafe extern "C" fn Jason__media_manager(
     this: ptr::NonNull<Jason>,
 ) -> ptr::NonNull<MediaManagerHandle> {
-    catch_panic(move || this.as_ref().media_manager().into_ptr())
+    propagate_panic(move || this.as_ref().media_manager().into_ptr())
 }
 
 /// Closes the provided [`RoomHandle`].
@@ -42,7 +42,7 @@ pub unsafe extern "C" fn Jason__close_room(
     this: ptr::NonNull<Jason>,
     room_to_delete: ptr::NonNull<RoomHandle>,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref()
             .close_room(RoomHandle::from_ptr(room_to_delete));
     });
@@ -56,7 +56,7 @@ pub unsafe extern "C" fn Jason__close_room(
 /// once for the same pointer is equivalent to double free.
 #[no_mangle]
 pub unsafe extern "C" fn Jason__free(this: ptr::NonNull<Jason>) {
-    catch_panic(move || {
+    propagate_panic(move || {
         let jason = Jason::from_ptr(this);
         jason.dispose();
     });

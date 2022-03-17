@@ -5,7 +5,7 @@ use crate::api::dart::{
     DartValueArg,
 };
 
-use super::{catch_panic, utils::DartError, ForeignClass};
+use super::{propagate_panic, utils::DartError, ForeignClass};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::ReconnectHandle;
@@ -27,7 +27,7 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_delay(
     this: ptr::NonNull<ReconnectHandle>,
     delay_ms: i64,
 ) -> DartFuture<Result<(), DartError>> {
-    catch_panic(move || {
+    propagate_panic(move || {
         let this = this.as_ref().clone();
 
         async move {
@@ -74,7 +74,7 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
     max_delay: i64,
     max_elapsed_time_ms: DartValueArg<Option<i64>>,
 ) -> DartFuture<Result<(), DartError>> {
-    catch_panic(move || {
+    propagate_panic(move || {
         let this = this.as_ref().clone();
 
         async move {
@@ -136,7 +136,7 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
 pub unsafe extern "C" fn ReconnectHandle__free(
     this: ptr::NonNull<ReconnectHandle>,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         drop(ReconnectHandle::from_ptr(this));
     });
 }

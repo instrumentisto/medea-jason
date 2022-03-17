@@ -2,7 +2,7 @@
 
 use std::{ffi::c_void, marker::PhantomData, ptr, slice};
 
-use crate::api::{catch_panic, ForeignClass};
+use crate::api::{propagate_panic, ForeignClass};
 
 /// Array of pointers to [`ForeignClass`] structs.
 ///
@@ -76,7 +76,7 @@ impl<T> Drop for PtrArray<T> {
 /// leaked.
 #[no_mangle]
 pub unsafe extern "C" fn PtrArray_free(arr: ptr::NonNull<PtrArray>) {
-    catch_panic(move || {
+    propagate_panic(move || {
         drop(Box::from_raw(arr.as_ptr()));
     });
 }

@@ -12,7 +12,7 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{catch_panic, DartValue, DartValueArg},
+    api::{propagate_panic, DartValue, DartValueArg},
     platform::dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Trampolined,
 };
 
@@ -47,7 +47,7 @@ pub unsafe extern "C" fn Callback__call_two_arg(
     first: DartValue,
     second: DartValue,
 ) {
-    catch_panic(move || match &mut cb.as_mut().0 {
+    propagate_panic(move || match &mut cb.as_mut().0 {
         Kind::TwoArgFnMut(func) => (func)(first, second),
         Kind::FnOnce(_) | Kind::FnMut(_) | Kind::Fn(_) => unreachable!(),
     });
@@ -64,7 +64,7 @@ pub unsafe extern "C" fn Callback__call(
     mut cb: ptr::NonNull<Callback>,
     val: DartValue,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         if matches!(cb.as_ref().0, Kind::FnOnce(_)) {
             let cb = Box::from_raw(cb.as_ptr());
             if let Kind::FnOnce(func) = cb.0 {
@@ -215,7 +215,7 @@ impl Callback {
 ///
 /// Cleans finalized [`Callback`] memory.
 extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
-    catch_panic(move || {
+    propagate_panic(move || {
         drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
     });
 }

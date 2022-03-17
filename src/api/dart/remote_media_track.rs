@@ -7,7 +7,7 @@ use crate::{
     platform,
 };
 
-use super::{catch_panic, ForeignClass};
+use super::{propagate_panic, ForeignClass};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::RemoteMediaTrack;
@@ -24,7 +24,7 @@ impl ForeignClass for RemoteMediaTrack {}
 pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> Dart_Handle {
-    catch_panic(move || this.as_ref().get_track().handle())
+    propagate_panic(move || this.as_ref().get_track().handle())
 }
 
 /// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
@@ -33,7 +33,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_enabled(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref().on_enabled(platform::Function::new(f));
     });
 }
@@ -44,7 +44,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_disabled(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref().on_disabled(platform::Function::new(f));
     });
 }
@@ -55,7 +55,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_muted(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref().on_muted(platform::Function::new(f));
     });
 }
@@ -66,7 +66,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_unmuted(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref().on_unmuted(platform::Function::new(f));
     });
 }
@@ -77,7 +77,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
     this: ptr::NonNull<RemoteMediaTrack>,
     f: Dart_Handle,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref().on_stopped(platform::Function::new(f));
     });
 }
@@ -87,7 +87,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
 pub unsafe extern "C" fn RemoteMediaTrack__enabled(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> u8 {
-    catch_panic(move || this.as_ref().enabled().into())
+    propagate_panic(move || this.as_ref().enabled().into())
 }
 
 /// Indicate whether this [`RemoteMediaTrack`] is muted.
@@ -95,7 +95,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__enabled(
 pub unsafe extern "C" fn RemoteMediaTrack__muted(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> u8 {
-    catch_panic(move || this.as_ref().muted().into())
+    propagate_panic(move || this.as_ref().muted().into())
 }
 
 /// Returns this [`RemoteMediaTrack`]'s kind (audio/video).
@@ -103,7 +103,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__muted(
 pub unsafe extern "C" fn RemoteMediaTrack__kind(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> MediaKind {
-    catch_panic(move || this.as_ref().kind())
+    propagate_panic(move || this.as_ref().kind())
 }
 
 /// Returns this [`RemoteMediaTrack`]'s media source kind.
@@ -111,7 +111,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__kind(
 pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> MediaSourceKind {
-    catch_panic(move || this.as_ref().media_source_kind())
+    propagate_panic(move || this.as_ref().media_source_kind())
 }
 
 /// Frees the data behind the provided pointer.
@@ -124,7 +124,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
 pub unsafe extern "C" fn RemoteMediaTrack__free(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         drop(RemoteMediaTrack::from_ptr(this));
     });
 }

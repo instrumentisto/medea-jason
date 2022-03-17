@@ -2,13 +2,14 @@ import 'dart:collection';
 
 import 'move_semantic.dart';
 
+/// Abstraction of a handle to an object allocated in the Rust side.
 abstract class PlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   void free();
 }
 
-/// Store for the all Rust handles created returned from Rust.
+/// Store for all the Rust handles created and returned from the Rust side.
 class RustHandlesStorage {
   static final RustHandlesStorage _singleton = RustHandlesStorage._internal();
 
@@ -31,7 +32,7 @@ class RustHandlesStorage {
     _handles.remove(handle);
   }
 
-  /// Disposes all Rust handles registered in this [RustHandlesStorage].
+  /// Disposes all the Rust handles registered in this [RustHandlesStorage].
   void freeAll() {
     _handles.forEach((h) {
       h.free();

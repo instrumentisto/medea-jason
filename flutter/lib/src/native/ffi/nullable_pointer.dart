@@ -28,7 +28,7 @@ class NullablePointer {
     }
   }
 
-  /// Returns `true` if this [NullablePointer] is freed.
+  /// Indicates whether this [NullablePointer] is freed.
   bool isFreed() {
     return _ptr == null;
   }

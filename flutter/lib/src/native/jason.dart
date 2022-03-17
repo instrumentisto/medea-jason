@@ -60,13 +60,13 @@ final _close_room =
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('Jason__free');
 
-/// Callback which will be fired when Rust panics.
+/// Callback to be fired whenever Rust code panics.
 void Function(String)? _onPanicCallback;
 
-/// Sets callback for the Rust's panic hook.
+/// Sets callback to be fired whenever Rust code panics.
 ///
-/// After this callback call, all old handles returned from Rust SHOULD NOT
-/// be used.
+/// Once this callback is called, all the old handles returned from Rust SHOULD
+/// NOT be used.
 void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }

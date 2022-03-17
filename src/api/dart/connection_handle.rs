@@ -7,7 +7,7 @@ use crate::{
     platform,
 };
 
-use super::{catch_panic, ForeignClass};
+use super::{propagate_panic, ForeignClass};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::ConnectionHandle;
@@ -22,7 +22,7 @@ pub unsafe extern "C" fn ConnectionHandle__on_close(
     this: ptr::NonNull<ConnectionHandle>,
     f: Dart_Handle,
 ) -> DartResult {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref()
             .on_close(platform::Function::new(f))
             .map_err(DartError::from)
@@ -40,7 +40,7 @@ pub unsafe extern "C" fn ConnectionHandle__on_remote_track_added(
     this: ptr::NonNull<ConnectionHandle>,
     f: Dart_Handle,
 ) -> DartResult {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref()
             .on_remote_track_added(platform::Function::new(f))
             .map_err(DartError::from)
@@ -55,7 +55,7 @@ pub unsafe extern "C" fn ConnectionHandle__on_quality_score_update(
     this: ptr::NonNull<ConnectionHandle>,
     f: Dart_Handle,
 ) -> DartResult {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref()
             .on_quality_score_update(platform::Function::new(f))
             .map_err(DartError::from)
@@ -68,7 +68,7 @@ pub unsafe extern "C" fn ConnectionHandle__on_quality_score_update(
 pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
     this: ptr::NonNull<ConnectionHandle>,
 ) -> DartResult {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_ref()
             .get_remote_member_id()
             .map_err(DartError::from)
@@ -86,7 +86,7 @@ pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
 pub unsafe extern "C" fn ConnectionHandle__free(
     this: ptr::NonNull<ConnectionHandle>,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         drop(ConnectionHandle::from_ptr(this));
     });
 }

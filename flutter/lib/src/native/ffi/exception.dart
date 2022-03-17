@@ -108,12 +108,12 @@ Object _newMediaSettingsUpdateException(
       message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
 }
 
-/// Throws a new [NativePanicException] with the provided error [message].
+/// Throws a new [NativePanicException].
 Object _throwPanicException() {
   throw NativePanicException();
 }
 
-/// Exception thrown when Rust side panics.
+/// Exception thrown whenever Rust side panics.
 class NativePanicException implements Exception {
   /// Instantiates a new [NativePanicException].
   NativePanicException();

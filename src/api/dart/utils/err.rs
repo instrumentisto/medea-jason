@@ -109,19 +109,19 @@ mod exception {
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Returns a new Dart `NativePanicException` error [`Dart_Handle`].
+        /// Returns a new Dart `NativePanicException`.
         ///
-        /// Returned [`Dart_Handle`] will be recognized by Dart runtime as
-        /// error. So `Dart_IsError` function will return `true` for this
+        /// Returned [`Dart_Handle`] will be recognized by Dart runtime as an
+        /// error, so `Dart_IsError` function will return `true` on the returned
         /// [`Dart_Handle`].
         pub fn throw_panic_exception() -> Dart_Handle;
     }
 }
 
-/// Creates and returns new Dart `NativePanicException` error [`Dart_Handle`].
+/// Creates and returns a new Dart `NativePanicException`.
 ///
-/// Returned [`Dart_Handle`] will be recognized by Dart runtime as error. So
-/// `Dart_IsError` function will return `true` for this [`Dart_Handle`].
+/// Returned [`Dart_Handle`] will be recognized by Dart runtime as an error, so
+/// `Dart_IsError` function will return `true` on the returned [`Dart_Handle`].
 #[must_use]
 pub unsafe fn new_panic_error() -> Dart_Handle {
     exception::throw_panic_exception()

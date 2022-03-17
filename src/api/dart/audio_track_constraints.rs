@@ -2,7 +2,7 @@
 
 use std::{os::raw::c_char, ptr};
 
-use super::{catch_panic, utils::c_str_into_string, ForeignClass};
+use super::{propagate_panic, utils::c_str_into_string, ForeignClass};
 
 pub use crate::media::AudioTrackConstraints;
 
@@ -12,7 +12,7 @@ impl ForeignClass for AudioTrackConstraints {}
 #[no_mangle]
 pub extern "C" fn AudioTrackConstraints__new(
 ) -> ptr::NonNull<AudioTrackConstraints> {
-    catch_panic(|| AudioTrackConstraints::new().into_ptr())
+    propagate_panic(|| AudioTrackConstraints::new().into_ptr())
 }
 
 /// Sets an exact [deviceId][1] constraint.
@@ -23,7 +23,7 @@ pub unsafe extern "C" fn AudioTrackConstraints__device_id(
     mut this: ptr::NonNull<AudioTrackConstraints>,
     device_id: ptr::NonNull<c_char>,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         this.as_mut().device_id(c_str_into_string(device_id));
     });
 }
@@ -38,7 +38,7 @@ pub unsafe extern "C" fn AudioTrackConstraints__device_id(
 pub unsafe extern "C" fn AudioTrackConstraints__free(
     this: ptr::NonNull<AudioTrackConstraints>,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         drop(AudioTrackConstraints::from_ptr(this));
     });
 }

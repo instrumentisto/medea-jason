@@ -71,18 +71,15 @@ pub use self::{
     },
 };
 
-/// Sets provided [`Dart_Handle`] as callback for the Rust panic hook.
+/// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
 #[no_mangle]
 pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
     platform::set_panic_callback(platform::Function::new(cb));
 }
 
-/// Wrapper around provided closure, which will catch all panics and propagate
-/// error to the Dart side if panic catcher.
-pub fn catch_panic<F, T>(f: F) -> T
-where
-    F: FnOnce() -> T,
-{
+/// Wraps the provided function to catch all the Rust panics and propagate them
+/// to the Dart side.
+pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
     let res = panic::catch_unwind(panic::AssertUnwindSafe(f));
     if let Ok(r) = res {
         r
@@ -90,7 +87,7 @@ where
         unsafe {
             Dart_PropagateError_DL_Trampolined(new_panic_error());
         }
-        unreachable!("Dart_PropagateError should do early return")
+        unreachable!("`Dart_PropagateError` should do early return")
     }
 }
 
@@ -737,6 +734,6 @@ mod dart_value_extern_tests_helpers {
     #[no_mangle]
     pub unsafe extern "C" fn fire_panic() {
         set_panic_hook();
-        catch_panic(|| panic!("Panicking"));
+        propagate_panic(|| panic!("Panicking"));
     }
 }

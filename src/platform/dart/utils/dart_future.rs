@@ -9,7 +9,7 @@ use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{catch_panic, DartValue, DartValueArg},
+    api::{propagate_panic, DartValue, DartValueArg},
     platform::{dart::error::Error, utils::handle::DartHandle},
 };
 
@@ -46,7 +46,7 @@ pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     future: ptr::NonNull<FutureFromDart>,
     val: DartValue,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         let future = Box::from_raw(future.as_ptr());
         future.resolve_ok(val);
     });
@@ -65,7 +65,7 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
     future: ptr::NonNull<FutureFromDart>,
     val: Dart_Handle,
 ) {
-    catch_panic(move || {
+    propagate_panic(move || {
         let future = Box::from_raw(future.as_ptr());
         future.resolve_err(Error::from(val));
     });
