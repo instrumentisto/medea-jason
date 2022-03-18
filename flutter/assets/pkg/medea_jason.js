@@ -1293,7 +1293,7 @@ export class MediaManagerHandle {
         return takeObject(ret);
     }
     /**
-    * Subscribes on the [`MediaManagerHandle`]'s `devicechange` event.
+    * Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
     * @param {Function} cb
     */
     on_device_change(cb) {
