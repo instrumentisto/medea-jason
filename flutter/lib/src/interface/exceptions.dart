@@ -45,16 +45,6 @@ enum MediaStateTransitionExceptionKind {
 
   /// Requested state transition is not allowed by `Sender`'s settings.
   ProhibitedState,
-
-  /// Validating `TracksRequest` doesn't pass.
-  InvalidLocalTracks,
-
-  /// Local `Track`s cannot be inserted into `Sender`s of some
-  /// `PeerConnection` in the `Room`.
-  InsertLocalTracks,
-
-  /// `Sender` cannot be disabled because it's marked as `required`.
-  RequiredSender,
 }
 
 /// Exception thrown when cannot get info of available media devices.

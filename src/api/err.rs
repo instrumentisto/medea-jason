@@ -400,22 +400,6 @@ pub enum MediaStateTransitionExceptionKind {
     ///
     /// [`Sender`]: crate::peer::media::Sender
     ProhibitedState,
-
-    /// Validating [`TracksRequest`] doesn't pass.
-    ///
-    /// [`TracksRequest`]: crate::peer::TracksRequest
-    InvalidLocalTracks,
-
-    /// Local `Track`s cannot be inserted into [`Sender`]s of some
-    /// `PeerConnection` in the `Room`.
-    ///
-    /// [`Sender`]: crate::peer::media::Sender
-    InsertLocalTracks,
-
-    /// [`Sender`] cannot be disabled because it's marked as `required`.
-    ///
-    /// [`Sender`]: crate::peer::media::Sender
-    RequiredSender,
 }
 
 /// Exception thrown when the requested media state transition could not be
@@ -699,15 +683,8 @@ impl From<Traced<ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            ChangeMediaStateError::InvalidLocalTracks(_) => {
-                MediaStateTransitionException::new(
-                    message,
-                    trace,
-                    MediaStateTransitionExceptionKind::InvalidLocalTracks,
-                )
-                .into()
-            }
-            ChangeMediaStateError::InsertLocalTracksError(_) => {
+            ChangeMediaStateError::InvalidLocalTracks(_)
+            | ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
             }
         }
@@ -747,12 +724,7 @@ impl From<Traced<LocalMediaError>> for Error {
                 UE::InvalidLocalTracks(_)
                 | UE::InsertLocalTracksError(
                     IE::InvalidMediaTrack | IE::NotEnoughTracks,
-                ) => MediaStateTransitionException::new(
-                    message,
-                    trace,
-                    MediaStateTransitionExceptionKind::InvalidLocalTracks,
-                )
-                .into(),
+                ) => InternalException::new(message, None, trace).into(),
                 UE::InsertLocalTracksError(IE::CouldNotInsertLocalTrack(_)) => {
                     InternalException::new(message, None, trace).into()
                 }
@@ -764,7 +736,7 @@ impl From<Traced<LocalMediaError>> for Error {
                 MediaStateTransitionException::new(
                     message,
                     trace,
-                    MediaStateTransitionExceptionKind::RequiredSender,
+                    MediaStateTransitionExceptionKind::ProhibitedState,
                 )
                 .into()
             }

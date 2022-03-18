@@ -256,6 +256,7 @@ class NativeMediaStateTransitionException extends MediaStateTransitionException
   /// Native stacktrace.
   late final String _nativeStackTrace;
 
+  /// Concrete error kind of this [NativeMediaStateTransitionException].
   late final MediaStateTransitionExceptionKind _kind;
 
   /// Instantiates a new [NativeMediaStateTransitionException].
