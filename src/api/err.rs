@@ -386,7 +386,7 @@ impl FormatException {
     }
 }
 
-/// Kind of the [`MediaStateTransitionException`].
+/// Kind of a [`MediaStateTransitionException`].
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Clone, Copy, Debug)]
 pub enum MediaStateTransitionExceptionKind {

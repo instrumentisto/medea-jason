@@ -37,10 +37,9 @@ enum RpcClientExceptionKind {
   SessionFinished,
 }
 
-/// Kind of the [MediaStateTransitionException].
+/// Kind of a [MediaStateTransitionException].
 enum MediaStateTransitionExceptionKind {
-  /// Media state of a `Sender` transits to an opposite of the requested
-  /// one.
+  /// Media state of a `Sender` transits to an opposite of the requested one.
   OppositeState,
 
   /// Requested state transition is not allowed by `Sender`'s settings.
