@@ -252,7 +252,7 @@ function handleError(f, args) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-function __wbg_adapter_344(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_345(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h506acbb810aa0090(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -370,6 +370,23 @@ AuthorizationFailed:1,"1":"AuthorizationFailed",
 * RPC session has been finished. This is a terminal state.
 */
 SessionFinished:2,"2":"SessionFinished", });
+/**
+* Kind of a [`MediaStateTransitionException`].
+*/
+export const MediaStateTransitionExceptionKind = Object.freeze({
+/**
+* Media state of a [`Sender`] transits to an opposite of the requested
+* one.
+*
+* [`Sender`]: crate::peer::media::Sender
+*/
+OppositeState:0,"0":"OppositeState",
+/**
+* Requested state transition is not allowed by [`Sender`]'s settings.
+*
+* [`Sender`]: crate::peer::media::Sender
+*/
+ProhibitedState:1,"1":"ProhibitedState", });
 /**
 * Constraints applicable to audio tracks.
 */
@@ -1425,6 +1442,14 @@ export class MediaStateTransitionException {
             wasm.__wbindgen_add_to_stack_pointer(16);
             wasm.__wbindgen_free(r0, r1);
         }
+    }
+    /**
+    * Returns concrete error kind of this [`MediaStateTransitionException`].
+    * @returns {number}
+    */
+    kind() {
+        var ret = wasm.mediastatetransitionexception_kind(this.ptr);
+        return ret >>> 0;
     }
 }
 /**
@@ -2935,7 +2960,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_344(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_345(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -3015,27 +3040,27 @@ async function init(input) {
         var ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2657 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2660 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2658 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2661 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_35);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2659 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2662 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_38);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2660 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2663 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_41);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2668 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2671 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 713, __wbg_adapter_44);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2763 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2766 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 781, __wbg_adapter_47);
         return addHeapObject(ret);
     };
