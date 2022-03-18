@@ -8,7 +8,6 @@
 // All declared methods are simply calling Dart DL API methods with same name
 // (without *_Trampolined prefix).
 
-#include <stdlib.h>
 #include "./include/dart_api_dl.c"
 
 Dart_PersistentHandle Dart_NewPersistentHandle_DL_Trampolined(
@@ -38,4 +37,16 @@ Dart_FinalizableHandle Dart_NewFinalizableHandle_DL_Trampolined(
                                       peer,
                                       external_allocation_size,
                                       callback);
+}
+
+bool Dart_IsError_DL_Trampolined(Dart_Handle handle) {
+  return Dart_IsError_DL(handle);
+}
+
+const char* Dart_GetError_DL_Trampolined(Dart_Handle handle) {
+  return Dart_GetError_DL(handle);
+}
+
+void Dart_PropagateError_DL_Trampolined(Dart_Handle handle) {
+  Dart_PropagateError_DL(handle);
 }

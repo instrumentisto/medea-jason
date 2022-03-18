@@ -4,6 +4,7 @@ import 'package:ffi/ffi.dart';
 
 import '../interface/media_device_info.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';
@@ -43,7 +44,9 @@ class NativeMediaDeviceInfo extends MediaDeviceInfo {
 
   /// Constructs a new [MediaDeviceInfo] backed by a Rust struct behind the
   /// provided [Pointer].
-  NativeMediaDeviceInfo(this.ptr);
+  NativeMediaDeviceInfo(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   String deviceId() {
@@ -69,7 +72,10 @@ class NativeMediaDeviceInfo extends MediaDeviceInfo {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

@@ -6,7 +6,10 @@ use std::{future::Future, ptr, rc::Rc};
 
 use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 
-use crate::platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined;
+use crate::{
+    api::propagate_panic,
+    platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined,
+};
 
 use self::task::Task;
 
@@ -42,7 +45,9 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 /// Valid [`Task`] pointer must be provided.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
-    let _ = Rc::from_raw(task.as_ptr()).poll();
+    propagate_panic(move || {
+        let _ = Rc::from_raw(task.as_ptr()).poll();
+    });
 }
 
 /// Commands an external Dart executor to poll the provided [`Task`].

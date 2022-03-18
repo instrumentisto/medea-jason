@@ -24,6 +24,8 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
+use std::panic;
+
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
@@ -38,11 +40,25 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
-/// TODO: Implement panic hook.
+/// Sets Rust's [`panic`] hook providing backtrace of the occurred panic to
+/// Dart's functions.
 pub fn set_panic_hook() {
-    std::panic::set_hook(Box::new(|bt| {
-        log::error!("Rust code panicked {bt:?}");
+    panic::set_hook(Box::new(|bt| {
+        if let Some(f) = unsafe { PANIC_FN.as_ref() } {
+            f.call1(format!("{bt}"));
+        }
     }));
+}
+
+/// [`Function`] being called whenever Rust code [`panic`]s.
+static mut PANIC_FN: Option<Function<String>> = None;
+
+/// Sets the provided [`Function`] as a callback to be called whenever Rust code
+/// [`panic`]s.
+pub fn set_panic_callback(cb: Function<String>) {
+    unsafe {
+        PANIC_FN = Some(cb);
+    }
 }
 
 /// Initialize [`android_logger`] as default application logger with min log

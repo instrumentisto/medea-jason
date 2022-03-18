@@ -1,7 +1,7 @@
+import '/src/util/rust_handles_storage.dart';
 import 'media_device_info.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';
-import '../util/move_semantic.dart';
 
 /// External handle to a `MediaManager`.
 ///
@@ -11,7 +11,7 @@ import '../util/move_semantic.dart';
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class MediaManagerHandle {
+abstract class MediaManagerHandle implements PlatformHandle {
   /// Obtains [LocalMediaTrack]s objects from local media devices (or screen
   /// capture) basing on the provided [MediaStreamSettings].
   ///
@@ -39,8 +39,4 @@ abstract class MediaManagerHandle {
 
   /// Subscribes onto the [MediaManagerHandle]'s `devicechange` event.
   void onDeviceChange(Function cb);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

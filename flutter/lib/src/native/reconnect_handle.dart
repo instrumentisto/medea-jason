@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
@@ -33,7 +34,9 @@ class NativeReconnectHandle extends ReconnectHandle {
 
   /// Constructs a new [ReconnectHandle] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeReconnectHandle(this.ptr);
+  NativeReconnectHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
@@ -55,7 +58,10 @@ class NativeReconnectHandle extends ReconnectHandle {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

@@ -28,19 +28,24 @@ pub mod room_close_reason;
 pub mod room_handle;
 pub mod utils;
 
-use std::{ffi::c_void, marker::PhantomData, ptr};
+use std::{ffi::c_void, marker::PhantomData, panic, ptr};
 
 use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
 use libc::c_char;
 
 use crate::{
-    api::dart::utils::{DartError, PtrArray},
+    api::{
+        dart::utils::{DartError, PtrArray},
+        utils::new_panic_error,
+    },
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
+    platform,
     platform::utils::{
         dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
             Dart_NewPersistentHandle_DL_Trampolined,
+            Dart_PropagateError_DL_Trampolined,
         },
         handle::DartHandle,
     },
@@ -65,6 +70,26 @@ pub use self::{
         DartError as Error,
     },
 };
+
+/// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
+#[no_mangle]
+pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
+    platform::set_panic_callback(platform::Function::new(cb));
+}
+
+/// Wraps the provided function to catch all the Rust panics and propagate them
+/// to the Dart side.
+pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
+    let res = panic::catch_unwind(panic::AssertUnwindSafe(f));
+    if let Ok(r) = res {
+        r
+    } else {
+        unsafe {
+            Dart_PropagateError_DL_Trampolined(new_panic_error());
+        }
+        unreachable!("`Dart_PropagateError` should do early return")
+    }
+}
 
 /// Rust structure having wrapper class in Dart.
 ///
@@ -649,6 +674,8 @@ pub unsafe extern "C" fn box_foreign_value(
 mod dart_value_extern_tests_helpers {
     use super::*;
 
+    use crate::platform::set_panic_hook;
+
     #[no_mangle]
     pub unsafe extern "C" fn returns_none() -> DartValueArg<String> {
         DartValueArg::from(())
@@ -702,5 +729,11 @@ mod dart_value_extern_tests_helpers {
     pub unsafe extern "C" fn accepts_int(int: DartValueArg<i64>) {
         let int: i64 = int.try_into().unwrap();
         assert_eq!(int, 235);
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn fire_panic() {
+        set_panic_hook();
+        propagate_panic(|| panic!("Panicking"));
     }
 }
