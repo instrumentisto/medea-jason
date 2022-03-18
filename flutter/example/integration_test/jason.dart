@@ -151,7 +151,6 @@ void main() {
   testWidgets('DisplayVideoTrackConstraints', (WidgetTester tester) async {
     var constraints = DisplayVideoTrackConstraints();
     constraints.free();
-    expect(() => constraints.free(), throwsStateError);
 
     var constraints2 = DisplayVideoTrackConstraints();
     var settings = MediaStreamSettings();
@@ -650,6 +649,24 @@ void main() {
         });
     var res = await (futureCatchesException(fut) as Future);
     expect(res as int, equals(1));
+  });
+
+  testWidgets('Panic catcher fires callback and frees Handles',
+      (WidgetTester widgetTester) async {
+    final firePanic =
+        dl.lookupFunction<Void Function(), void Function()>('fire_panic');
+    final jason = Jason();
+    var completer = Completer();
+    onPanic((msg) => completer.complete(msg));
+    try {
+      firePanic();
+    } catch (e) {
+      var res = await completer.future;
+      expect(res as String, contains('PanicInfo'));
+      expect(jason.ptr.isFreed(), true);
+      return;
+    }
+    throw Exception('Exception not fired on panic');
   });
 }
 

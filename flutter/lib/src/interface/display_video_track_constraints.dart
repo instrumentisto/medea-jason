@@ -1,8 +1,4 @@
-import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-abstract class DisplayVideoTrackConstraints {
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
-}
+abstract class DisplayVideoTrackConstraints implements PlatformHandle {}

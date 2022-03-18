@@ -25,7 +25,8 @@ void registerFunctions(DynamicLibrary dl) {
       newMediaSettingsUpdateException:
           Pointer.fromFunction(_newMediaSettingsUpdateException),
       newInvalidOutputAudioDeviceIdException:
-          Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException));
+          Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException),
+      throwPanicException: Pointer.fromFunction(_throwPanicException));
 }
 
 /// Creates a new [ArgumentError] from the provided invalid [value], its [name]
@@ -107,6 +108,22 @@ Object _newMediaSettingsUpdateException(
     Pointer<Utf8> message, Pointer<Handle> cause, bool rolledBack) {
   return NativeMediaSettingsUpdateException(
       message.nativeStringToDartString(), unboxDartHandle(cause), rolledBack);
+}
+
+/// Throws a new [NativePanicException].
+Object _throwPanicException() {
+  throw NativePanicException();
+}
+
+/// Exception thrown whenever Rust side panics.
+class NativePanicException implements Exception {
+  /// Instantiates a new [NativePanicException].
+  NativePanicException();
+
+  @override
+  String toString() {
+    return 'Rust code unexpectedly panicked';
+  }
 }
 
 /// Exception thrown when local media acquisition fails.

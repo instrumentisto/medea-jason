@@ -6,6 +6,8 @@ use std::{
     ptr,
 };
 
+use crate::api::propagate_panic;
+
 /// Pointer to an extern function that frees the provided Dart native string.
 type FreeDartNativeStringFunction = extern "C" fn(ptr::NonNull<c_char>);
 
@@ -50,7 +52,9 @@ pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
 /// Same as for [`CString::from_raw()`].
 #[no_mangle]
 pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
-    drop(CString::from_raw(s.as_ptr()));
+    propagate_panic(move || {
+        drop(CString::from_raw(s.as_ptr()));
+    });
 }
 
 /// Registers the provided [`FreeDartNativeStringFunction`] as

@@ -4,6 +4,7 @@ import 'package:ffi/ffi.dart';
 
 import '../interface/audio_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
 
@@ -30,6 +31,10 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
+  AudioTrackConstraints() {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   void deviceId(String deviceId) {
     var deviceIdPtr = deviceId.toNativeUtf8();
@@ -44,7 +49,10 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

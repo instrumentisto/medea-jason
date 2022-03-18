@@ -1,4 +1,4 @@
-import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 
 /// Kind of a media device.
 enum MediaDeviceKind {
@@ -15,7 +15,7 @@ enum MediaDeviceKind {
 /// [`MediaDeviceInfo`][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
-abstract class MediaDeviceInfo {
+abstract class MediaDeviceInfo implements PlatformHandle {
   /// Returns an unique identifier of the represented device.
   String deviceId();
 
@@ -41,8 +41,4 @@ abstract class MediaDeviceInfo {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   String? groupId();
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

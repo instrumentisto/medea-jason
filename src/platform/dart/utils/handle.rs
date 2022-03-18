@@ -8,10 +8,15 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{c_str_into_string, free_dart_native_string},
-    platform::dart::utils::dart_api::{
-        Dart_DeletePersistentHandle_DL_Trampolined,
-        Dart_HandleFromPersistent_DL_Trampolined,
-        Dart_NewPersistentHandle_DL_Trampolined,
+    platform::{
+        dart::utils::dart_api::{
+            Dart_DeletePersistentHandle_DL_Trampolined,
+            Dart_HandleFromPersistent_DL_Trampolined,
+            Dart_NewPersistentHandle_DL_Trampolined,
+        },
+        utils::dart_api::{
+            Dart_GetError_DL_Trampolined, Dart_IsError_DL_Trampolined,
+        },
     },
 };
 
@@ -41,8 +46,19 @@ impl DartHandle {
     ///
     /// Takes ownership of the provided [`Dart_Handle`] so it won't get freed by
     /// Dart VM.
+    ///
+    /// # Panics
+    ///
+    /// If the provided [`Dart_Handle`] represents a Dart error, which is an
+    /// unexpected situation.
     #[must_use]
     pub fn new(handle: Dart_Handle) -> Self {
+        if unsafe { Dart_IsError_DL_Trampolined(handle) } {
+            let err_msg = unsafe {
+                c_str_into_string(Dart_GetError_DL_Trampolined(handle))
+            };
+            panic!("Unexpected Dart error: {err_msg}")
+        }
         Self(Rc::new(unsafe {
             Dart_NewPersistentHandle_DL_Trampolined(handle)
         }))

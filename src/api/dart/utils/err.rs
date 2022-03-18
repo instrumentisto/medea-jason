@@ -109,7 +109,23 @@ mod exception {
         pub fn new_invalid_output_audio_device_id_exception(
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
+
+        /// Returns a new Dart `NativePanicException`.
+        ///
+        /// Returned [`Dart_Handle`] will be recognized by Dart runtime as an
+        /// error, so `Dart_IsError` function will return `true` on the returned
+        /// [`Dart_Handle`].
+        pub fn throw_panic_exception() -> Dart_Handle;
     }
+}
+
+/// Creates and returns a new Dart `NativePanicException`.
+///
+/// Returned [`Dart_Handle`] will be recognized by Dart runtime as an error, so
+/// `Dart_IsError` function will return `true` on the returned [`Dart_Handle`].
+#[must_use]
+pub unsafe fn new_panic_error() -> Dart_Handle {
+    exception::throw_panic_exception()
 }
 
 /// An error that can be returned from Rust to Dart.

@@ -10,6 +10,7 @@ import '../interface/room_close_reason.dart';
 import '../interface/room_handle.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'connection_handle.dart';
 import 'ffi/foreign_value.dart';
 import 'ffi/nullable_pointer.dart';
@@ -157,7 +158,9 @@ class NativeRoomHandle extends RoomHandle {
 
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeRoomHandle(this.ptr);
+  NativeRoomHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   Future<void> join(String token) async {
@@ -301,7 +304,10 @@ class NativeRoomHandle extends RoomHandle {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

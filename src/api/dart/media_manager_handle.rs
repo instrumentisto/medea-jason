@@ -17,6 +17,7 @@ use crate::{
 
 use super::{
     media_stream_settings::MediaStreamSettings,
+    propagate_panic,
     utils::{DartFuture, IntoDartFuture, PtrArray},
     ForeignClass, LocalMediaTrack, MediaDeviceInfo,
 };
@@ -38,11 +39,13 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
     caps: ptr::NonNull<MediaStreamSettings>,
 ) -> DartFuture<Result<PtrArray<LocalMediaTrack>, Traced<InitLocalTracksError>>>
 {
-    let this = this.as_ref().clone();
-    let caps = caps.as_ref().clone();
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+        let caps = caps.as_ref().clone();
 
-    async move { Ok(PtrArray::new(this.init_local_tracks(caps).await?)) }
-        .into_dart_future()
+        async move { Ok(PtrArray::new(this.init_local_tracks(caps).await?)) }
+            .into_dart_future()
+    })
 }
 
 /// Returns a list of [`MediaDeviceInfo`] objects representing available media
@@ -56,10 +59,12 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
 ) -> DartFuture<
     Result<PtrArray<MediaDeviceInfo>, Traced<EnumerateDevicesError>>,
 > {
-    let this = this.as_ref().clone();
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
 
-    async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
-        .into_dart_future()
+        async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
+            .into_dart_future()
+    })
 }
 
 /// Switches the current output audio device to the device with the provided
@@ -69,16 +74,18 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     this: ptr::NonNull<MediaManagerHandle>,
     device_id: ptr::NonNull<c_char>,
 ) -> DartFuture<Result<(), Traced<InvalidOutputAudioDeviceIdError>>> {
-    let this = this.as_ref().clone();
-    let device_id = c_str_into_string(device_id);
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+        let device_id = c_str_into_string(device_id);
 
-    async move {
-        this.set_output_audio_id(device_id)
-            .await
-            .map_err(tracerr::map_from_and_wrap!())?;
-        Ok(())
-    }
-    .into_dart_future()
+        async move {
+            this.set_output_audio_id(device_id)
+                .await
+                .map_err(tracerr::map_from_and_wrap!())?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
 }
 
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
@@ -87,10 +94,12 @@ pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
     this: ptr::NonNull<MediaManagerHandle>,
     cb: Dart_Handle,
 ) -> DartResult {
-    let this = this.as_ref();
-    this.on_device_change(platform::Function::new(cb))
-        .map_err(DartError::from)
-        .into()
+    propagate_panic(move || {
+        let this = this.as_ref();
+        this.on_device_change(platform::Function::new(cb))
+            .map_err(DartError::from)
+            .into()
+    })
 }
 
 /// Frees the data behind the provided pointer.
@@ -103,7 +112,9 @@ pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
 pub unsafe extern "C" fn MediaManagerHandle__free(
     this: ptr::NonNull<MediaManagerHandle>,
 ) {
-    drop(MediaManagerHandle::from_ptr(this));
+    propagate_panic(move || {
+        drop(MediaManagerHandle::from_ptr(this));
+    });
 }
 
 #[cfg(feature = "mockable")]

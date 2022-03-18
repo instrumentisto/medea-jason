@@ -9,8 +9,8 @@ use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{DartValue, DartValueArg},
-    platform::dart::error::Error,
+    api::{propagate_panic, DartValue, DartValueArg},
+    platform::{dart::error::Error, utils::handle::DartHandle},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/future.g.dart")]
@@ -46,8 +46,10 @@ pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     future: ptr::NonNull<FutureFromDart>,
     val: DartValue,
 ) {
-    let future = Box::from_raw(future.as_ptr());
-    future.resolve_ok(val);
+    propagate_panic(move || {
+        let future = Box::from_raw(future.as_ptr());
+        future.resolve_ok(val);
+    });
 }
 
 /// Resolves the provided [`FutureFromDart`] with the given [`Error`] as [`Err`]
@@ -63,8 +65,10 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
     future: ptr::NonNull<FutureFromDart>,
     val: Dart_Handle,
 ) {
-    let future = Box::from_raw(future.as_ptr());
-    future.resolve_err(Error::from(val));
+    propagate_panic(move || {
+        let future = Box::from_raw(future.as_ptr());
+        future.resolve_err(Error::from(val));
+    });
 }
 
 /// Compatibility layer for polling [Dart `Future`s][0] in Rust.
@@ -99,6 +103,7 @@ impl FutureFromDart {
         <DartValueArg<T> as TryInto<T>>::Error: fmt::Debug,
         T: 'static,
     {
+        let dart_fut = DartHandle::new(dart_fut);
         let (tx, rx) = oneshot::channel();
         let this = Self(Box::new(|res| {
             drop(tx.send(
@@ -108,7 +113,7 @@ impl FutureFromDart {
 
         unsafe {
             future_from_dart::complete_proxy(
-                dart_fut,
+                dart_fut.get(),
                 ptr::NonNull::from(Box::leak(Box::new(this))),
             );
         }

@@ -1,6 +1,6 @@
 use std::ptr;
 
-use super::ForeignClass;
+use super::{propagate_panic, ForeignClass};
 
 pub use crate::media::DisplayVideoTrackConstraints;
 
@@ -11,7 +11,7 @@ impl ForeignClass for DisplayVideoTrackConstraints {}
 #[no_mangle]
 pub extern "C" fn DisplayVideoTrackConstraints__new(
 ) -> ptr::NonNull<DisplayVideoTrackConstraints> {
-    DisplayVideoTrackConstraints::new().into_ptr()
+    propagate_panic(|| DisplayVideoTrackConstraints::new().into_ptr())
 }
 
 /// Frees the data behind the provided pointer.
@@ -24,5 +24,7 @@ pub extern "C" fn DisplayVideoTrackConstraints__new(
 pub unsafe extern "C" fn DisplayVideoTrackConstraints__free(
     this: ptr::NonNull<DisplayVideoTrackConstraints>,
 ) {
-    let _ = DisplayVideoTrackConstraints::from_ptr(this);
+    propagate_panic(move || {
+        let _ = DisplayVideoTrackConstraints::from_ptr(this);
+    });
 }
