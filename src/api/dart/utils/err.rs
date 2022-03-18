@@ -85,6 +85,7 @@ mod exception {
         pub fn new_media_state_transition_exception(
             message: ptr::NonNull<c_char>,
             stacktrace: ptr::NonNull<c_char>,
+            kind: i64,
         ) -> Dart_Handle;
 
         /// Returns a new Dart [`InternalException`] with the provided error
@@ -263,6 +264,7 @@ impl From<MediaStateTransitionException> for DartError {
             Self::new(exception::new_media_state_transition_exception(
                 string_into_c_str(err.message()),
                 string_into_c_str(err.trace()),
+                err.kind() as i64,
             ))
         }
     }

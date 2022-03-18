@@ -386,6 +386,22 @@ impl FormatException {
     }
 }
 
+/// Kind of a [`MediaStateTransitionException`].
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[derive(Clone, Copy, Debug)]
+pub enum MediaStateTransitionExceptionKind {
+    /// Media state of a [`Sender`] transits to an opposite of the requested
+    /// one.
+    ///
+    /// [`Sender`]: crate::peer::media::Sender
+    OppositeState,
+
+    /// Requested state transition is not allowed by [`Sender`]'s settings.
+    ///
+    /// [`Sender`]: crate::peer::media::Sender
+    ProhibitedState,
+}
+
 /// Exception thrown when the requested media state transition could not be
 /// performed.
 #[cfg_attr(not(target_os = "android"), wasm_bindgen)]
@@ -393,6 +409,9 @@ impl FormatException {
 pub struct MediaStateTransitionException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
+
+    /// Concrete error kind of this [`MediaStateTransitionException`].
+    kind: MediaStateTransitionExceptionKind,
 
     /// Stacktrace of this [`MediaStateTransitionException`].
     trace: Trace,
@@ -402,10 +421,15 @@ impl MediaStateTransitionException {
     /// Creates a new [`MediaStateTransitionException`] from the provided error
     /// `message` and `trace`.
     #[must_use]
-    pub fn new<T: Into<Cow<'static, str>>>(message: T, trace: Trace) -> Self {
+    pub fn new<T: Into<Cow<'static, str>>>(
+        message: T,
+        trace: Trace,
+        kind: MediaStateTransitionExceptionKind,
+    ) -> Self {
         Self {
             message: message.into(),
             trace,
+            kind,
         }
     }
 }
@@ -423,6 +447,12 @@ impl MediaStateTransitionException {
     #[must_use]
     pub fn trace(&self) -> String {
         self.trace.to_string()
+    }
+
+    /// Returns concrete error kind of this [`MediaStateTransitionException`].
+    #[must_use]
+    pub fn kind(&self) -> MediaStateTransitionExceptionKind {
+        self.kind
     }
 }
 
@@ -637,12 +667,24 @@ impl From<Traced<ChangeMediaStateError>> for Error {
             ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
                 Traced::compose(err, trace).into()
             }
-            ChangeMediaStateError::ProhibitedState(_)
-            | ChangeMediaStateError::TransitionIntoOppositeState(_)
-            | ChangeMediaStateError::InvalidLocalTracks(_) => {
-                MediaStateTransitionException::new(message, trace).into()
+            ChangeMediaStateError::ProhibitedState(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::ProhibitedState,
+                )
+                .into()
             }
-            ChangeMediaStateError::InsertLocalTracksError(_) => {
+            ChangeMediaStateError::TransitionIntoOppositeState(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::OppositeState,
+                )
+                .into()
+            }
+            ChangeMediaStateError::InvalidLocalTracks(_)
+            | ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
             }
         }
@@ -682,7 +724,7 @@ impl From<Traced<LocalMediaError>> for Error {
                 UE::InvalidLocalTracks(_)
                 | UE::InsertLocalTracksError(
                     IE::InvalidMediaTrack | IE::NotEnoughTracks,
-                ) => MediaStateTransitionException::new(message, trace).into(),
+                ) => InternalException::new(message, None, trace).into(),
                 UE::InsertLocalTracksError(IE::CouldNotInsertLocalTrack(_)) => {
                     InternalException::new(message, None, trace).into()
                 }
@@ -691,7 +733,12 @@ impl From<Traced<LocalMediaError>> for Error {
                 InternalException::new(message, None, trace).into()
             }
             ME::SenderCreateError(CreateError::CannotDisableRequiredSender) => {
-                MediaStateTransitionException::new(message, trace).into()
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::ProhibitedState,
+                )
+                .into()
             }
         }
     }
