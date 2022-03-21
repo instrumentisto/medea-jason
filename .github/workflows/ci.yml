@@ -291,7 +291,10 @@ jobs:
           - web
           - android
           - windows
-    runs-on: ubuntu-latest
+    runs-on: 
+      if: ${{ matrix.platform == 'windows' }}
+      - when: windows-latest
+      - when: ubuntu-latest 
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
