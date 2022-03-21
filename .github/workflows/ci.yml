@@ -291,7 +291,7 @@ jobs:
       - uses: subosito/flutter-action@v1
       - run: make cargo.build.jason platform=windows targets=x86_64-pc-windows-msvc
                                     args="--features mockable"
-      - run: cp ./flutter/windows/jniLibs/x86_64-pc-windows-msvc/medea_jason.dll ./
+      - run: cp ./flutter/windows/jniLibs/x86_64-pc-windows-msvc/medea_jason.dll ./flutter/example
       - run: cd flutter/example/ && 
              flutter drive --driver=test_driver/integration_test.dart 
                            --target=integration_test/jason.dart -d windows &&
