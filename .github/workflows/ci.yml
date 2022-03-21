@@ -292,7 +292,7 @@ jobs:
 
         run: make cargo.build.jason platform=windows targets=x86_64
                                     args="--features mockable"
-      - script: make test.flutter
+      - run: make test.flutter
 
 
   ############
