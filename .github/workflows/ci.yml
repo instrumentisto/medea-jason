@@ -290,12 +290,8 @@ jobs:
         platform:
           - web
           - android
-          - windows
-        os:
-          - windows-latest
-          - ubuntu-latest 
           
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -322,11 +318,32 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
       - run: make rustup.android
-      
-        if: ${{ matrix.platform == 'windows' }}
-      - run: make rustup.windows
 
-        if: ${{ matrix.platform != 'web' }}
+        if: ${{ matrix.platform == 'android' }}
+      - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    dockerized=no debug=yes
+
+  crate-jason-windows:
+    name: Build medea-jason windows
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || (!startsWith(github.ref, 'refs/tags/medea-')
+                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: x86_64-pc-windows-msvc
+
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+        
+      - run: make rustup.windows
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
 
