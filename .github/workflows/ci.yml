@@ -290,17 +290,21 @@ jobs:
         platform:
           - web
           - android
+          if: ${{ matrix.os == 'windows-latest' }}
           - windows
-    runs-on: 
-      - windows-latest
-      - ubuntu-latest 
+        os:
+          - windows-latest
+          - ubuntu-latest 
+          
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
-        if: ${{ matrix.platform != 'web' }}
+        if: ${{ matrix.platform != 'web'  }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
