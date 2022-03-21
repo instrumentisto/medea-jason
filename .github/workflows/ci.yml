@@ -290,6 +290,7 @@ jobs:
         platform:
           - web
           - android
+          - windows
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -317,6 +318,9 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
       - run: make rustup.android
         if: ${{ matrix.platform == 'android' }}
+
+      - run: make rustup.windows
+        if: ${{ matrix.platform == 'windows' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
@@ -695,4 +699,3 @@ jobs:
             instrumentisto/${{ steps.image.outputs.result }}
           readme_file: ${{ matrix.readme_file }}
         if: ${{ matrix.if }}
-        
