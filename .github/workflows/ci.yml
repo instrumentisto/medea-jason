@@ -291,7 +291,7 @@ jobs:
       - uses: subosito/flutter-action@v1
       - run: make cargo.build.jason platform=windows targets=x86_64-pc-windows-msvc
                                     args="--features mockable"
-      - run: make test.flutter -d 1
+      - run: make test.flutter -d windows
 
 
   ############
