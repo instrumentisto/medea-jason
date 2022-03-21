@@ -290,7 +290,6 @@ jobs:
         platform:
           - web
           - android
-          if: ${{ matrix.os == 'windows-latest' }}
           - windows
         os:
           - windows-latest
@@ -304,7 +303,7 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-        if: ${{ matrix.platform != 'web'  }}
+        if: ${{ matrix.platform != 'web' }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -323,11 +322,11 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
       - run: make rustup.android
-        if: ${{ matrix.platform == 'android' }}
-
-      - run: make rustup.windows
+      
         if: ${{ matrix.platform == 'windows' }}
+      - run: make rustup.windows
 
+        if: ${{ matrix.platform != 'web' }}
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
 
