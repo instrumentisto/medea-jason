@@ -292,8 +292,8 @@ jobs:
           - android
           - windows
     runs-on: 
-      if: ${{ matrix.platform == 'windows' }}
-      - when: windows-latest
+      - if: ${{ matrix.platform == 'windows' }}
+        when: windows-latest
       - when: ubuntu-latest 
     steps:
       - uses: actions/checkout@v3
