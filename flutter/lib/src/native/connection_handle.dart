@@ -3,6 +3,7 @@ import 'dart:ffi';
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/result.dart';
 import 'jason.dart';
@@ -48,7 +49,9 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
   /// provided [Pointer].
-  NativeConnectionHandle(this.ptr);
+  NativeConnectionHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   String getRemoteMemberId() {
@@ -75,7 +78,10 @@ class NativeConnectionHandle extends ConnectionHandle {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

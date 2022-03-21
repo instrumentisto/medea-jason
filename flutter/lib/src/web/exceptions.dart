@@ -206,10 +206,12 @@ class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
 class WebMediaStateTransitionException extends MediaStateTransitionException {
   late String _message;
   late String _trace;
+  late MediaStateTransitionExceptionKind _kind;
 
   WebMediaStateTransitionException(wasm.MediaStateTransitionException e) {
     _message = e.message();
     _trace = e.trace();
+    _kind = MediaStateTransitionExceptionKind.values[e.kind().toInt()];
     e.free();
   }
 
@@ -223,6 +225,12 @@ class WebMediaStateTransitionException extends MediaStateTransitionException {
   @override
   String trace() {
     return _trace;
+  }
+
+  /// Returns concrete error kind of this [MediaStateTransitionException].
+  @override
+  MediaStateTransitionExceptionKind kind() {
+    return _kind;
   }
 }
 

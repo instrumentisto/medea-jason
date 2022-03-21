@@ -1,4 +1,4 @@
-import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 
 /// Describes the directions that the camera can face, as seen from a user's
 /// perspective.
@@ -20,7 +20,7 @@ enum FacingMode {
   Right,
 }
 
-abstract class DeviceVideoTrackConstraints {
+abstract class DeviceVideoTrackConstraints implements PlatformHandle {
   /// Sets an exact [`deviceId`][1] constraint.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
@@ -83,8 +83,4 @@ abstract class DeviceVideoTrackConstraints {
   ///
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
   void widthInRange(int min, int max);
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

@@ -14,7 +14,7 @@ use crate::{
 
 pub use self::{
     arrays::PtrArray,
-    err::{ArgumentError, DartError},
+    err::{new_panic_error, ArgumentError, DartError},
     result::DartResult,
     string::{c_str_into_string, free_dart_native_string, string_into_c_str},
 };

@@ -5,6 +5,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
 
@@ -79,7 +80,9 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   /// Constructs a new [RemoteMediaTrack] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeRemoteMediaTrack(this.ptr);
+  NativeRemoteMediaTrack(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   bool enabled() {
@@ -136,7 +139,10 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }

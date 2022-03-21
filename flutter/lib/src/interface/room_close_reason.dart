@@ -1,9 +1,9 @@
-import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 
 /// Reason of why a `Room` has been closed.
 ///
 /// This struct is passed into the `RoomHandle.onClose()` callback.
-abstract class RoomCloseReason {
+abstract class RoomCloseReason implements PlatformHandle {
   /// Returns a close reason of the `Room`.
   String reason();
 
@@ -12,8 +12,4 @@ abstract class RoomCloseReason {
 
   /// Indicates whether the `Room`'s close reason is considered as an error.
   bool isErr();
-
-  /// Drops the associated Rust struct and nulls the local [Pointer] to it.
-  @moveSemantics
-  void free();
 }

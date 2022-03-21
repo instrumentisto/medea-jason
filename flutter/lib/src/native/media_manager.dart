@@ -7,6 +7,7 @@ import '../interface/local_media_track.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
+import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/ptrarray.dart';
 import 'media_device_info.dart';
@@ -54,7 +55,9 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeMediaManagerHandle(this.ptr);
+  NativeMediaManagerHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
 
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
@@ -93,7 +96,10 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @moveSemantics
   @override
   void free() {
-    _free(ptr.getInnerPtr());
-    ptr.free();
+    if (!ptr.isFreed()) {
+      RustHandlesStorage().removeHandle(this);
+      _free(ptr.getInnerPtr());
+      ptr.free();
+    }
   }
 }
