@@ -343,6 +343,7 @@ jobs:
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
       - run: make rustup.windows
+      - run: choco install dart-sdk
       - run: make cargo.build.jason platform=windows
                                     dockerized=no debug=yes
 
