@@ -67,7 +67,13 @@ DynamicLibrary _dl_load() {
     throw 'You are running unsupported NativeApi version.';
   }
 
-  var dl = DynamicLibrary.open('C:/Users/human/Documents/GitHub/medea-jason/flutter/windows/jniLibs/x86_64-pc-windows-msvc/medea_jason.dll');
+  const base = 'medea_jason';
+  final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
+  late final dl = Platform.isIOS
+      ? DynamicLibrary.process()
+      : Platform.isMacOS
+          ? DynamicLibrary.executable()
+          : DynamicLibrary.open(path);
 
   var initResult = dl.lookupFunction<
       IntPtr Function(Pointer<Void>),

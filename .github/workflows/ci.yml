@@ -229,49 +229,82 @@ jobs:
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
-    runs-on: macos-latest
+    platform:
+      - android
+      - windows
+    runs-on: 
+      - if: ${{platform == 'android'}}
+        when: macos-latest
+      - if: ${{platform == 'windows'}}
+        when: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: x86_64-linux-android
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+      - if: ${{platform == 'android'}}
+        when:
+        - uses: actions-rs/toolchain@v1
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-ndk
-          use-tool-cache: true
-      - uses: subosito/flutter-action@v1
+          with:
+            profile: minimal
+            toolchain: stable
+            target: x86_64-linux-android
+        - uses: Swatinem/rust-cache@v1
+          if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - name: Parse Android NDK versions
-        id: ndk-version
-        run: |
-          echo ::set-output name=min::$(make flutter.android.version.min)
-          echo ::set-output name=target::$(make flutter.android.version.compile)
+        - uses: actions-rs/install@v0.1
+          with:
+            crate: cargo-ndk
+            use-tool-cache: true
+        - uses: subosito/flutter-action@v1
 
-      - name: Compile shared object
-        run: make cargo.build.jason platform=android targets=x86_64
-                                    args="--features mockable"
+        - name: Parse Android NDK versions
+          id: ndk-version
+          run: |
+            echo ::set-output name=min::$(make flutter.android.version.min)
+            echo ::set-output name=target::$(make flutter.android.version.compile)
 
-      - name: Test on min Android NDK version
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.ndk-version.outputs.min }}
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          script: make test.flutter
-      - name: Test on target Android NDK version
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.ndk-version.outputs.target }}
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          script: make test.flutter
+        - name: Compile shared object
+          run: make cargo.build.jason platform=android targets=x86_64
+                                      args="--features mockable"
+
+        - name: Test on min Android NDK version
+          uses: reactivecircus/android-emulator-runner@v2
+          with:
+            api-level: ${{ steps.ndk-version.outputs.min }}
+            target: google_apis
+            arch: x86_64
+            profile: Nexus 6
+            script: make test.flutter
+        - name: Test on target Android NDK version
+          uses: reactivecircus/android-emulator-runner@v2
+          with:
+            api-level: ${{ steps.ndk-version.outputs.target }}
+            target: google_apis
+            arch: x86_64
+            profile: Nexus 6
+            script: make test.flutter
+
+      - if: ${{platform == 'windows'}}
+        when:
+        - uses: actions-rs/toolchain@v1
+
+          with:
+            profile: minimal
+            toolchain: stable
+            target: x86_64-pc-windows-msvc
+        - uses: Swatinem/rust-cache@v1
+          if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+        - uses: subosito/flutter-action@v1
+
+
+        - name: Compile shared object
+          run: make cargo.build.jason platform=windows
+                                      args="--features mockable"
+
+        - name: Test on target Android NDK version
+        - script: make test.flutter
+        
+
 
 
 
@@ -291,6 +324,7 @@ jobs:
         platform:
           - web
           - android
+          - windows
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -317,7 +351,9 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
       - run: make rustup.android
-        if: ${{ matrix.platform == 'android' }}
+
+        if: ${{ matrix.platform == 'windows' }}
+      - run: make rustup.windows
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes

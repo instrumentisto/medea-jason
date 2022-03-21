@@ -24,8 +24,7 @@ RUST_VER := 1.58
 CHROME_VERSION := 99.0
 FIREFOX_VERSION := 97.0.1-driver0.30.0
 
-WINDOWS_TARGETS := x86_64-pc-windows-msvc \
-				   i686-pc-windows-msvc
+WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
 CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -258,7 +257,7 @@ ifeq ($(cargo-build-platform),windows)
 		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
 			make cargo.build.jason debug=$(debug) dockerized=no \
 			                       platform=$(platform) args="$(args)"
-			                       targets=$(WINDOWS_TARGETS)
+			                       targets=$(targets)
 endif
 else
 ifeq ($(cargo-build-platform),web)
@@ -373,6 +372,14 @@ cargo.version:
 
 rustup.android:
 	rustup target add $(ANDROID_TARGETS)
+
+# Install or upgrade project's Windows targets for Rust.
+#
+# Usage:
+#	make rustup.windows
+
+rustup.windows:
+	rustup target add $(WINDOWS_TARGETS)
 
 
 
