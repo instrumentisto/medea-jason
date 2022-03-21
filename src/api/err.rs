@@ -387,7 +387,7 @@ impl FormatException {
 }
 
 /// Kind of a [`MediaStateTransitionException`].
-#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
 #[derive(Clone, Copy, Debug)]
 pub enum MediaStateTransitionExceptionKind {
     /// Media state of a [`Sender`] transits to an opposite of the requested
