@@ -289,7 +289,7 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_close(
         &self,
         f: platform::Function<api::RoomCloseReason>,
@@ -335,7 +335,7 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_connection_loss(
         &self,
         f: platform::Function<api::ReconnectHandle>,
@@ -967,11 +967,11 @@ struct InnerRoom {
     on_failed_local_media: Rc<platform::Callback<api::Error>>,
 
     /// Callback invoked when a [`RpcSession`] loses connection.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_connection_loss: platform::Callback<api::ReconnectHandle>,
 
     /// Callback invoked when this [`Room`] is closed.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_close: Rc<platform::Callback<api::RoomCloseReason>>,
 
     /// Reason of [`Room`] closing.

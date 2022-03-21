@@ -4,7 +4,7 @@
 
 use bitflags::bitflags;
 use medea_client_api_proto::Direction as DirectionProto;
-#[cfg(not(target_os = "android"))]
+#[cfg(target_family = "wasm")]
 use web_sys::RtcRtpTransceiverDirection;
 
 bitflags! {
@@ -33,7 +33,7 @@ bitflags! {
     }
 }
 
-#[cfg(target_os = "android")]
+#[cfg(not(target_family = "wasm"))]
 impl From<TransceiverDirection> for i64 {
     fn from(from: TransceiverDirection) -> Self {
         use TransceiverDirection as D;
@@ -50,7 +50,7 @@ impl From<TransceiverDirection> for i64 {
     }
 }
 
-#[cfg(not(target_os = "android"))]
+#[cfg(target_family = "wasm")]
 impl From<RtcRtpTransceiverDirection> for TransceiverDirection {
     fn from(direction: RtcRtpTransceiverDirection) -> Self {
         use RtcRtpTransceiverDirection as D;
@@ -67,7 +67,7 @@ impl From<RtcRtpTransceiverDirection> for TransceiverDirection {
     }
 }
 
-#[cfg(not(target_os = "android"))]
+#[cfg(target_family = "wasm")]
 impl From<TransceiverDirection> for RtcRtpTransceiverDirection {
     #[inline]
     fn from(direction: TransceiverDirection) -> Self {

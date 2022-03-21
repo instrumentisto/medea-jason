@@ -57,7 +57,7 @@ final _close_room =
 final _free = dl.lookupFunction<_free_C, _free_Dart>('Jason__free');
 
 DynamicLibrary _dl_load() {
-  if (!Platform.isAndroid) {
+  if (!(Platform.isAndroid || Platform.isWindows)) {
     throw UnsupportedError('This platform is not supported.');
   }
   if (NativeApi.majorVersion != 2) {
@@ -67,7 +67,7 @@ DynamicLibrary _dl_load() {
     throw 'You are running unsupported NativeApi version.';
   }
 
-  var dl = DynamicLibrary.open('libmedea_jason.so');
+  var dl = DynamicLibrary.open('C:/Users/human/Documents/GitHub/medea-jason/flutter/windows/jniLibs/x86_64-pc-windows-msvc/medea_jason.dll');
 
   var initResult = dl.lookupFunction<
       IntPtr Function(Pointer<Void>),
