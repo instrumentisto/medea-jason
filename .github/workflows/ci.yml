@@ -344,8 +344,7 @@ jobs:
 
       - run: make rustup.windows
       - run: choco install dart-sdk
-        env: 
-          PATH: ${{ %PATH%;C:\tools\dart-sdk\bin }}
+      - run: echo "C:\tools\dart-sdk\bin" | Out-File -FilePath $env:PATH -Encoding utf8 -Append
 
       - run: make cargo.build.jason platform=windows
                                     dockerized=no debug=yes
