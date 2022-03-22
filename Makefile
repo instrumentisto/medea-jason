@@ -248,17 +248,6 @@ ifeq ($(cargo-build-platform),android)
 			                       platform=$(platform) args="$(args)"
 			                       targets=$(targets)
 endif
-ifeq ($(cargo-build-platform),windows)
-	docker run --rm --network=host -v "$(PWD)":/app -w /app \
-		-u $(shell id -u):$(shell id -g) \
-		-v "$(HOME)/.cargo/registry":/usr/local/cargo/registry \
-		-v "$(HOME):$(HOME)" \
-		-e XDG_CACHE_HOME=$(HOME) \
-		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
-			make cargo.build.jason debug=$(debug) dockerized=no \
-			                       platform=$(platform) args="$(args)"
-			                       targets=$(targets)
-endif
 else
 ifeq ($(cargo-build-platform),web)
 ifeq ($(pre-install),yes)
@@ -294,9 +283,9 @@ define cargo.build.medea-jason.windows
 	          --target $(target) \
 	          --manifest-path=./Cargo.toml \
 		      $(args)
-	@mkdir -p ./flutter/windows/jniLibs/$(target)
+	@mkdir -p ./flutter/windows/lib/$(target)
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
-	./flutter/windows/jniLibs/$(target)
+	./flutter/windows/lib/$(target)
 endef
 
 
