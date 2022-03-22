@@ -223,57 +223,76 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
-  test-flutter:
+  # test-flutter:
+  #   name: Flutter tests
+  #   if: ${{ github.ref == 'refs/heads/master'
+  #           || startsWith(github.ref, 'refs/tags/medea-jason-')
+  #           || (!startsWith(github.ref, 'refs/tags/medea-')
+  #               && !contains(github.event.head_commit.message, '[skip ci]')) }}
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         toolchain: stable
+  #         target: x86_64-linux-android
+  #     - uses: Swatinem/rust-cache@v1
+  #       if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+  #     - uses: actions-rs/install@v0.1
+  #       with:
+  #         crate: cargo-ndk
+  #         use-tool-cache: true
+  #     - uses: subosito/flutter-action@v1
+
+  #     - name: Parse Android NDK versions
+  #       id: ndk-version
+  #       run: |
+  #         echo ::set-output name=min::$(make flutter.android.version.min)
+  #         echo ::set-output name=target::$(make flutter.android.version.compile)
+  #     - name: Compile shared object
+  #       run: make cargo.build.jason platform=android targets=x86_64
+  #                                   args="--features mockable"
+
+  #     - name: Test on min Android NDK version
+  #       uses: reactivecircus/android-emulator-runner@v2
+  #       with:
+  #         api-level: ${{ steps.ndk-version.outputs.min }}
+  #         target: google_apis
+  #         arch: x86_64
+  #         profile: Nexus 6
+  #         script: make test.flutter
+  #     - name: Test on target Android NDK version
+  #       uses: reactivecircus/android-emulator-runner@v2
+  #       with:
+  #         api-level: ${{ steps.ndk-version.outputs.target }}
+  #         target: google_apis
+  #         arch: x86_64
+  #         profile: Nexus 6
+  #         script: make test.flutter
+
+  test-flutter-windows:
     name: Flutter tests
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
-          target: x86_64-linux-android
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-ndk
-          use-tool-cache: true
       - uses: subosito/flutter-action@v1
-
-      - name: Parse Android NDK versions
-        id: ndk-version
-        run: |
-          echo ::set-output name=min::$(make flutter.android.version.min)
-          echo ::set-output name=target::$(make flutter.android.version.compile)
-
-      - name: Compile shared object
-        run: make cargo.build.jason platform=android targets=x86_64
+      - run: make cargo.build.jason platform=windows targets=x86_64-pc-windows-msvc
                                     args="--features mockable"
-
-      - name: Test on min Android NDK version
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.ndk-version.outputs.min }}
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          script: make test.flutter
-      - name: Test on target Android NDK version
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.ndk-version.outputs.target }}
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          script: make test.flutter
-
-
+      - run: cp ./flutter/windows/jniLibs/x86_64-pc-windows-msvc/medea_jason.dll ./flutter/example
+      - run: make test.flutter device=windows
 
 
   ############
@@ -291,7 +310,9 @@ jobs:
         platform:
           - web
           - android
+          
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -317,9 +338,34 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
       - run: make rustup.android
-        if: ${{ matrix.platform == 'android' }}
 
+        if: ${{ matrix.platform == 'android' }}
       - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    dockerized=no debug=yes
+
+  crate-jason-windows:
+    name: Build medea-jason windows
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || (!startsWith(github.ref, 'refs/tags/medea-')
+                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - uses: dart-lang/setup-dart@v1
+      - run: make rustup.windows
+
+      - run: make cargo.build.jason platform=windows
                                     dockerized=no debug=yes
 
   rustdoc:
