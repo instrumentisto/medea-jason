@@ -72,6 +72,8 @@ pub unsafe extern "C" fn MediaDeviceInfo__free(
     });
 }
 
+#[allow(missing_copy_implementations, missing_debug_implementations)]
+#[allow(clippy::unused_self, clippy::must_use_candidate)]
 #[cfg(feature = "mockable")]
 mod mock {
     use crate::media::MediaDeviceKind;

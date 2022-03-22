@@ -82,6 +82,7 @@ pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
 ///
 /// Should be called when object is no longer needed. Calling this more than
 /// once for the same pointer is equivalent to double free.
+#[allow(clippy::drop_copy)]
 #[no_mangle]
 pub unsafe extern "C" fn ConnectionHandle__free(
     this: ptr::NonNull<ConnectionHandle>,
@@ -91,6 +92,12 @@ pub unsafe extern "C" fn ConnectionHandle__free(
     });
 }
 
+#[allow(
+    clippy::needless_pass_by_value,
+    clippy::unused_self,
+    clippy::missing_errors_doc,
+    clippy::useless_conversion
+)]
 #[cfg(feature = "mockable")]
 mod mock {
     use tracerr::Traced;

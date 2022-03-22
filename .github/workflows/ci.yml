@@ -58,7 +58,6 @@ jobs:
       - run: make rustup.windows
 
       - run: make cargo.lint platform=windows
-
   rustfmt:
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-')
@@ -760,4 +759,3 @@ jobs:
             instrumentisto/${{ steps.image.outputs.result }}
           readme_file: ${{ matrix.readme_file }}
         if: ${{ matrix.if }}
-        

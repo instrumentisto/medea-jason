@@ -82,6 +82,7 @@ DynamicLibrary _dl_load() {
     throw 'You are running unsupported NativeApi version.';
   }
 
+
   const base = 'medea_jason';
   final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
   late final dl = Platform.isIOS

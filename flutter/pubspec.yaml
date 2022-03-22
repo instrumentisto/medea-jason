@@ -27,6 +27,6 @@ flutter:
         package: com.medea.jason
         pluginClass: JasonPlugin
       windows:
-        pluginClass: JasonPlugin
+        pluginClass: MedeaJasonPlugin
   assets:
     - assets/pkg/

@@ -62,6 +62,12 @@ pub unsafe extern "C" fn Jason__free(this: ptr::NonNull<Jason>) {
     });
 }
 
+#[allow(missing_copy_implementations, missing_debug_implementations)]
+#[allow(
+    clippy::unused_self,
+    clippy::must_use_candidate,
+    clippy::new_without_default
+)]
 #[cfg(feature = "mockable")]
 mod mock {
     use crate::api::{MediaManagerHandle, RoomHandle};

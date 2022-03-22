@@ -459,6 +459,12 @@ pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(missing_copy_implementations, missing_debug_implementations)]
+#[allow(
+    clippy::unused_self,
+    clippy::useless_conversion,
+    clippy::needless_pass_by_value
+)]
 mod mock {
     use std::future::Future;
 

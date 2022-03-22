@@ -279,18 +279,18 @@ impl DartCodegen {
     pub(crate) fn generate(&self) -> Result<String, fmt::Error> {
         let mut out = String::new();
 
-        writeln!(&mut out, "import 'dart:ffi';")?;
-        writeln!(&mut out, "import 'package:ffi/ffi.dart';")?;
+        writeln!(out, "import 'dart:ffi';")?;
+        writeln!(out, "import 'package:ffi/ffi.dart';")?;
         writeln!(
-            &mut out,
+            out,
             "import 'package:medea_jason/src/native/ffi/foreign_value.dart';"
         )?;
-        writeln!(&mut out, "void registerFunction(DynamicLibrary dl, {{")?;
+        writeln!(out, "void registerFunction(DynamicLibrary dl, {{")?;
         self.generate_args(&mut out)?;
-        writeln!(&mut out, "}} ) {{")?;
+        writeln!(out, "}} ) {{")?;
         self.generate_lookup(&mut out)?;
         self.generate_functions_registration(&mut out)?;
-        writeln!(&mut out, ");}}")?;
+        writeln!(out, ");}}")?;
 
         Ok(out)
     }

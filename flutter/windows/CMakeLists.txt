@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.14)
-set(PROJECT_NAME "jason")
+set(PROJECT_NAME "medea_jason")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed
-set(PLUGIN_NAME "jason_plugin")
+set(PLUGIN_NAME "medea_jason_plugin")
 
 add_library(${PLUGIN_NAME} SHARED
-  "jason_plugin.cpp"
+  "medea_jason_plugin.cpp"
 )
 apply_standard_settings(${PLUGIN_NAME})
 set_target_properties(${PLUGIN_NAME} PROPERTIES
@@ -19,6 +19,6 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin)
 
 # List of absolute paths to libraries that should be bundled with the plugin
 set(medea_jason_bundled_libraries
-"${CMAKE_CURRENT_SOURCE_DIR}/lib/medea_jason.dll"
+  "${CMAKE_CURRENT_SOURCE_DIR}/lib/x86_64-pc-windows-msvc/medea_jason.dll"
   PARENT_SCOPE
 )

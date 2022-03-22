@@ -1,4 +1,4 @@
-#include "include/temp/jason_plugin.h"
+#include "include/medea_jason/medea_jason_plugin.h"
 
 // This must be included before many other Windows headers.
 #include <windows.h>
@@ -16,13 +16,13 @@
 
 namespace {
 
-class JasonPlugin : public flutter::Plugin {
+class MedeaJasonPlugin : public flutter::Plugin {
  public:
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
 
-  JasonPlugin();
+  MedeaJasonPlugin();
 
-  virtual ~JasonPlugin();
+  virtual ~MedeaJasonPlugin();
 
  private:
   // Called when a method is called on this plugin's channel from Dart.
@@ -32,14 +32,14 @@ class JasonPlugin : public flutter::Plugin {
 };
 
 // static
-void JasonPlugin::RegisterWithRegistrar(
+void MedeaJasonPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows *registrar) {
   auto channel =
       std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-          registrar->messenger(), "temp",
+          registrar->messenger(), "medea_jason",
           &flutter::StandardMethodCodec::GetInstance());
 
-  auto plugin = std::make_unique<JasonPlugin>();
+  auto plugin = std::make_unique<MedeaJasonPlugin>();
 
   channel->SetMethodCallHandler(
       [plugin_pointer = plugin.get()](const auto &call, auto result) {
@@ -49,11 +49,11 @@ void JasonPlugin::RegisterWithRegistrar(
   registrar->AddPlugin(std::move(plugin));
 }
 
-JasonPlugin::JasonPlugin() {}
+MedeaJasonPlugin::MedeaJasonPlugin() {}
 
-JasonPlugin::~JasonPlugin() {}
+MedeaJasonPlugin::~MedeaJasonPlugin() {}
 
-void JasonPlugin::HandleMethodCall(
+void MedeaJasonPlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
   if (method_call.method_name().compare("getPlatformVersion") == 0) {
@@ -74,9 +74,9 @@ void JasonPlugin::HandleMethodCall(
 
 }  // namespace
 
-void JasonPluginRegisterWithRegistrar(
+void MedeaJasonPluginRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar) {
-  JasonPlugin::RegisterWithRegistrar(
+  MedeaJasonPlugin::RegisterWithRegistrar(
       flutter::PluginRegistrarManager::GetInstance()
           ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
 }

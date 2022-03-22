@@ -139,6 +139,7 @@ impl FutureFromDart {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::missing_safety_doc)]
 pub mod tests {
     use dart_sys::Dart_Handle;
 
@@ -191,6 +192,7 @@ pub mod tests {
         TEST_FUTURE_HANDLE_FUNCTION = Some(f);
     }
 
+    #[allow(clippy::useless_conversion)]
     #[no_mangle]
     pub unsafe extern "C" fn test__future_from_dart__handle(
         future: Dart_Handle,

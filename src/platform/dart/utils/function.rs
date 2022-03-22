@@ -58,6 +58,7 @@ impl<T> Function<T> {
     /// Creates a new [`Function`] from the provided [`Dart_Handle`] to a Dart
     /// closure, and persists the provided [`Dart_Handle`] so it won't be moved
     /// by the Dart VM GC.
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     #[must_use]
     pub fn new(cb: Dart_Handle) -> Self {
         Self {

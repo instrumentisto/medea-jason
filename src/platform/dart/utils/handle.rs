@@ -51,6 +51,7 @@ impl DartHandle {
     ///
     /// If the provided [`Dart_Handle`] represents a Dart error, which is an
     /// unexpected situation.
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     #[must_use]
     pub fn new(handle: Dart_Handle) -> Self {
         if unsafe { Dart_IsError_DL_Trampolined(handle) } {
