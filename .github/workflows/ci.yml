@@ -273,7 +273,7 @@ jobs:
           script: make test.flutter
 
   test-flutter-windows:
-    name: Flutter tests
+    name: Flutter test windows
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
