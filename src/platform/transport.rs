@@ -7,7 +7,7 @@ use tracerr::Traced;
 
 use crate::{
     platform,
-    rpc::{ClientDisconnect, CloseMsg},
+    rpc::{ApiUrl, ClientDisconnect, CloseMsg},
     utils::{Caused, JsonParseError},
 };
 
@@ -39,9 +39,14 @@ impl TransportState {
 }
 
 /// RPC transport between a client and a server.
+#[async_trait::async_trait(?Send)]
+#[allow(unused_lifetimes)]
 #[cfg_attr(feature = "mockable", mockall::automock)]
 #[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcTransport {
+    /// Connects to the provided [`ApiUrl`].
+    async fn connect(&self, url: ApiUrl) -> Result<(), Traced<TransportError>>;
+
     /// Returns [`LocalBoxStream`] of all messages received by this transport.
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg>;
 

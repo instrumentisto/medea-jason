@@ -31,28 +31,29 @@ wasm_bindgen_test_configure!(run_in_browser);
 #[wasm_bindgen_test]
 async fn could_not_auth_err() {
     let session = WebSocketRpcSession::new(Rc::new(WebSocketRpcClient::new(
-        Box::new(move |_| {
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().returning_st(|| {
-                    Box::pin(stream::iter(vec![
-                        RPC_SETTINGS,
-                        ServerMsg::Event {
-                            room_id: "room_id".into(),
-                            event: Event::RoomLeft {
-                                close_reason: CloseReason::InternalError,
-                            },
+        Box::new(move || {
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(futures::future::ok(())));
+            transport.expect_on_message().returning_st(|| {
+                Box::pin(stream::iter(vec![
+                    RPC_SETTINGS,
+                    ServerMsg::Event {
+                        room_id: "room_id".into(),
+                        event: Event::RoomLeft {
+                            close_reason: CloseReason::InternalError,
                         },
-                    ]))
-                });
-                transport.expect_send().returning(|_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport.expect_on_state_change().return_once_st(move || {
-                    Box::pin(stream::once(async { TransportState::Open }))
-                });
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+                    },
+                ]))
+            });
+            transport.expect_send().returning(|_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport.expect_on_state_change().return_once_st(move || {
+                Box::pin(stream::once(async { TransportState::Open }))
+            });
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         }),
     )));
 
@@ -86,46 +87,44 @@ async fn concurrent_connect_requests() {
 
     let join_room_sent_clone = Rc::clone(&join_room_sent);
     let session = WebSocketRpcSession::new(Rc::new(WebSocketRpcClient::new({
-        Box::new(move |_| {
+        Box::new(move || {
             let join_room_sent = Rc::clone(&join_room_sent_clone);
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().returning_st(|| {
-                    Box::pin(stream::iter(vec![
-                        RPC_SETTINGS,
-                        ServerMsg::Event {
-                            room_id: "room_id".into(),
-                            event: Event::RoomJoined {
-                                member_id: "member_id".into(),
-                            },
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(futures::future::ok(())));
+            transport.expect_on_message().returning_st(|| {
+                Box::pin(stream::iter(vec![
+                    RPC_SETTINGS,
+                    ServerMsg::Event {
+                        room_id: "room_id".into(),
+                        event: Event::RoomJoined {
+                            member_id: "member_id".into(),
                         },
-                    ]))
-                });
-                let join_room_sent = Rc::clone(&join_room_sent);
-                transport.expect_send().returning_st(move |msg| {
-                    if matches!(
-                        msg,
-                        ClientMsg::Command {
-                            command: Command::JoinRoom { .. },
-                            ..
-                        }
-                    ) {
-                        let already_sent =
-                            join_room_sent.fetch_or(true, Ordering::Relaxed);
-                        assert!(
-                            !already_sent,
-                            "only one JoinRoom should be sent"
-                        );
+                    },
+                ]))
+            });
+            let join_room_sent = Rc::clone(&join_room_sent);
+            transport.expect_send().returning_st(move |msg| {
+                if matches!(
+                    msg,
+                    ClientMsg::Command {
+                        command: Command::JoinRoom { .. },
+                        ..
                     }
-                    Ok(())
-                });
-                transport.expect_set_close_reason().return_once(drop);
-                transport.expect_on_state_change().return_once_st(move || {
-                    Box::pin(stream::once(async { TransportState::Open }))
-                });
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+                ) {
+                    let already_sent =
+                        join_room_sent.fetch_or(true, Ordering::Relaxed);
+                    assert!(!already_sent, "only one JoinRoom should be sent");
+                }
+                Ok(())
+            });
+            transport.expect_set_close_reason().return_once(drop);
+            transport.expect_on_state_change().return_once_st(move || {
+                Box::pin(stream::once(async { TransportState::Open }))
+            });
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         })
     })));
 
@@ -149,13 +148,9 @@ async fn concurrent_connect_requests() {
 #[wasm_bindgen_test]
 async fn could_not_open_transport() {
     let session = WebSocketRpcSession::new(Rc::new(WebSocketRpcClient::new(
-        Box::new(|url| {
-            Box::pin(async move {
-                let ws = WebSocketRpcTransport::new(url)
-                    .await
-                    .map_err(|e| tracerr::new!(e))?;
-                Ok(Rc::new(ws) as Rc<dyn RpcTransport>)
-            })
+        Box::new(|| {
+            let ws = WebSocketRpcTransport::new();
+            Rc::new(ws) as Rc<dyn RpcTransport>
         }),
     )));
 
@@ -190,39 +185,41 @@ async fn reconnect_after_transport_abnormal_close() {
 
     let commands_sent_clone = Rc::clone(&commands_sent);
     let session = WebSocketRpcSession::new(Rc::new(WebSocketRpcClient::new(
-        Box::new(move |_| {
+        Box::new(move || {
             let commands_sent_clone = Rc::clone(&commands_sent_clone);
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().returning_st(|| {
-                    Box::pin(stream::iter(vec![
-                        RPC_SETTINGS,
-                        ServerMsg::Event {
-                            room_id: "room_id".into(),
-                            event: Event::RoomJoined {
-                                member_id: "member_id".into(),
-                            },
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(futures::future::ok(())));
+            transport.expect_on_message().returning_st(|| {
+                Box::pin(stream::iter(vec![
+                    RPC_SETTINGS,
+                    ServerMsg::Event {
+                        room_id: "room_id".into(),
+                        event: Event::RoomJoined {
+                            member_id: "member_id".into(),
                         },
-                    ]))
-                });
-                let commands_sent = Rc::clone(&commands_sent_clone);
-                transport.expect_send().returning_st(move |msg| {
-                    commands_sent.borrow_mut().push(msg.clone());
-                    Ok(())
-                });
-                transport.expect_set_close_reason().return_once(drop);
-                transport.expect_on_state_change().return_once_st(move || {
-                    Box::pin(
-                        stream::once(future::ready(TransportState::Open))
-                            .chain(stream::once(async {
-                                delay_for(20).await;
-                                TransportState::Closed(CloseMsg::Abnormal(999))
-                            })),
-                    )
-                });
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+                    },
+                ]))
+            });
+            let commands_sent = Rc::clone(&commands_sent_clone);
+            transport.expect_send().returning_st(move |msg| {
+                commands_sent.borrow_mut().push(msg.clone());
+                Ok(())
+            });
+            transport.expect_set_close_reason().return_once(drop);
+            transport.expect_on_state_change().return_once_st(move || {
+                Box::pin(
+                    stream::once(future::ready(TransportState::Open)).chain(
+                        stream::once(async {
+                            delay_for(20).await;
+                            TransportState::Closed(CloseMsg::Abnormal(999))
+                        }),
+                    ),
+                )
+            });
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         }),
     )));
 

@@ -31,6 +31,9 @@ async fn sends_pong_on_received_ping() {
     let mut transport = MockRpcTransport::new();
     let (on_message_tx, on_message_rx) = mpsc::unbounded();
     transport
+        .expect_connect()
+        .return_once(|_| Box::pin(futures::future::ok(())));
+    transport
         .expect_on_message()
         .return_once(|| Box::pin(on_message_rx));
     let (test_tx, test_rx) = oneshot::channel();
@@ -68,6 +71,9 @@ async fn sends_pong_on_received_ping() {
 async fn on_idle_works() {
     let mut transport = MockRpcTransport::new();
     transport
+        .expect_connect()
+        .return_once(|_| Box::pin(futures::future::ok(())));
+    transport
         .expect_on_message()
         .return_once(|| stream::pending().boxed());
     transport.expect_send().return_once(|_| Ok(()));
@@ -95,6 +101,9 @@ async fn on_idle_works() {
 #[wasm_bindgen_test]
 async fn pre_sends_pong() {
     let mut transport = MockRpcTransport::new();
+    transport
+        .expect_connect()
+        .return_once(|_| Box::pin(futures::future::ok(())));
     transport
         .expect_on_message()
         .return_once(|| stream::pending().boxed());
@@ -126,6 +135,9 @@ async fn pre_sends_pong() {
 #[wasm_bindgen_test]
 async fn transport_is_dropped_when_hearbeater_is_dropped() {
     let mut transport = MockRpcTransport::new();
+    transport
+        .expect_connect()
+        .return_once(|_| Box::pin(futures::future::ok(())));
     transport
         .expect_on_message()
         .returning(|| stream::pending().boxed());
