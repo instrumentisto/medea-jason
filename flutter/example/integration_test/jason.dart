@@ -343,7 +343,7 @@ void main() {
     expect(
         err,
         predicate((e) =>
-            e is MediaStateTransitionException &&
+            e is InternalException &&
             e.message() ==
                 'SimpleTracksRequest should have at least one track' &&
             e.trace().contains('at src')));
@@ -662,7 +662,7 @@ void main() {
       firePanic();
     } catch (e) {
       var res = await completer.future;
-      expect(res as String, contains('PanicInfo'));
+      expect(res as String, contains("panicked at 'Panicking'"));
       expect(jason.ptr.isFreed(), true);
       return;
     }
