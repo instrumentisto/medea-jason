@@ -223,54 +223,54 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
-  # test-flutter:
-  #   name: Flutter tests
-  #   if: ${{ github.ref == 'refs/heads/master'
-  #           || startsWith(github.ref, 'refs/tags/medea-jason-')
-  #           || (!startsWith(github.ref, 'refs/tags/medea-')
-  #               && !contains(github.event.head_commit.message, '[skip ci]')) }}
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #         target: x86_64-linux-android
-  #     - uses: Swatinem/rust-cache@v1
-  #       if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+  test-flutter:
+    name: Flutter tests
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || (!startsWith(github.ref, 'refs/tags/medea-')
+                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: x86_64-linux-android
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-  #     - uses: actions-rs/install@v0.1
-  #       with:
-  #         crate: cargo-ndk
-  #         use-tool-cache: true
-  #     - uses: subosito/flutter-action@v1
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+      - uses: subosito/flutter-action@v1
 
-  #     - name: Parse Android NDK versions
-  #       id: ndk-version
-  #       run: |
-  #         echo ::set-output name=min::$(make flutter.android.version.min)
-  #         echo ::set-output name=target::$(make flutter.android.version.compile)
-  #     - name: Compile shared object
-  #       run: make cargo.build.jason platform=android targets=x86_64
-  #                                   args="--features mockable"
+      - name: Parse Android NDK versions
+        id: ndk-version
+        run: |
+          echo ::set-output name=min::$(make flutter.android.version.min)
+          echo ::set-output name=target::$(make flutter.android.version.compile)
+      - name: Compile shared object
+        run: make cargo.build.jason platform=android targets=x86_64
+                                    args="--features mockable"
 
-  #     - name: Test on min Android NDK version
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ steps.ndk-version.outputs.min }}
-  #         target: google_apis
-  #         arch: x86_64
-  #         profile: Nexus 6
-  #         script: make test.flutter
-  #     - name: Test on target Android NDK version
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ steps.ndk-version.outputs.target }}
-  #         target: google_apis
-  #         arch: x86_64
-  #         profile: Nexus 6
-  #         script: make test.flutter
+      - name: Test on min Android NDK version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.ndk-version.outputs.min }}
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: make test.flutter
+      - name: Test on target Android NDK version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.ndk-version.outputs.target }}
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: make test.flutter
 
   test-flutter-windows:
     name: Flutter tests

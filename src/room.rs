@@ -447,15 +447,7 @@ impl RoomHandle {
                 _tracks_handles = inner
                     .get_local_tracks(kind, source_kind)
                     .await
-                    .map_err(|e| {
-                        inner.set_constraints_media_state(
-                            new_state.opposite(),
-                            kind,
-                            direction,
-                            source_kind,
-                        );
-                        tracerr::map_from_and_wrap!()(e)
-                    })?;
+                    .map_err(tracerr::map_from_and_wrap!())?;
                 if !inner.send_constraints.is_track_enabled(kind, source_kind) {
                     return Err(tracerr::new!(
                         ChangeMediaStateError::TransitionIntoOppositeState(
