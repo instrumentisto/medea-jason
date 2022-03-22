@@ -72,7 +72,7 @@ void onPanic(void Function(String)? cb) {
 }
 
 DynamicLibrary _dl_load() {
-  if (!Platform.isAndroid) {
+  if (!(Platform.isAndroid || Platform.isWindows)) {
     throw UnsupportedError('This platform is not supported.');
   }
   if (NativeApi.majorVersion != 2) {
@@ -82,7 +82,13 @@ DynamicLibrary _dl_load() {
     throw 'You are running unsupported NativeApi version.';
   }
 
-  var dl = DynamicLibrary.open('libmedea_jason.so');
+  const base = 'medea_jason';
+  final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
+  var dl = Platform.isIOS
+      ? DynamicLibrary.process()
+      : Platform.isMacOS
+          ? DynamicLibrary.executable()
+          : DynamicLibrary.open(path);
 
   var initResult = dl.lookupFunction<
       IntPtr Function(Pointer<Void>),

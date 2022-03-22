@@ -22,14 +22,14 @@ pub struct Connections {
     connections: RefCell<HashMap<MemberId, Connection>>,
 
     /// Callback invoked on remote `Member` media arrival.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(target_os = "windows", allow(unused_qualifications))]
     on_new_connection: platform::Callback<api::ConnectionHandle>,
 }
 
 impl Connections {
     /// Sets callback, which will be invoked when new [`Connection`] is
     /// established.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(target_os = "windows", allow(unused_qualifications))]
     pub fn on_new_connection(
         &self,
         f: platform::Function<api::ConnectionHandle>,

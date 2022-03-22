@@ -289,7 +289,7 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(target_os = "windows", allow(unused_qualifications))]
     pub fn on_close(
         &self,
         f: platform::Function<api::RoomCloseReason>,
@@ -335,7 +335,7 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(target_os = "windows", allow(unused_qualifications))]
     pub fn on_connection_loss(
         &self,
         f: platform::Function<api::ReconnectHandle>,
@@ -447,15 +447,7 @@ impl RoomHandle {
                 _tracks_handles = inner
                     .get_local_tracks(kind, source_kind)
                     .await
-                    .map_err(|e| {
-                        inner.set_constraints_media_state(
-                            new_state.opposite(),
-                            kind,
-                            direction,
-                            source_kind,
-                        );
-                        tracerr::map_from_and_wrap!()(e)
-                    })?;
+                    .map_err(tracerr::map_from_and_wrap!())?;
                 if !inner.send_constraints.is_track_enabled(kind, source_kind) {
                     return Err(tracerr::new!(
                         ChangeMediaStateError::TransitionIntoOppositeState(
@@ -975,11 +967,11 @@ struct InnerRoom {
     on_failed_local_media: Rc<platform::Callback<api::Error>>,
 
     /// Callback invoked when a [`RpcSession`] loses connection.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(target_os = "windows", allow(unused_qualifications))]
     on_connection_loss: platform::Callback<api::ReconnectHandle>,
 
     /// Callback invoked when this [`Room`] is closed.
-    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
+    #[cfg_attr(target_os = "windows", allow(unused_qualifications))]
     on_close: Rc<platform::Callback<api::RoomCloseReason>>,
 
     /// Reason of [`Room`] closing.

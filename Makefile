@@ -24,6 +24,8 @@ RUST_VER := 1.58
 CHROME_VERSION := 99.0
 FIREFOX_VERSION := 97.0.1-driver0.30.0
 
+WINDOWS_TARGETS := x86_64-pc-windows-msvc
+
 CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
@@ -210,15 +212,18 @@ cargo:
 #		[( [platform=web]
 # 		 | platform=all
 #		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )]
+#		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
 cargo-build-platform = $(or $(platform),web)
-cargo-build-targets = $(or $(targets),$(ANDROID_TARGETS))
+cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
+cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.build.jason:
 ifeq ($(platform),all)
 	@make cargo.build.jason platform=web
 	@make cargo.build.jason platform=android targets=$(targets)
+	@make cargo.build.jason platform=windows targets=$(targets)
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -243,6 +248,17 @@ ifeq ($(cargo-build-platform),android)
 			                       platform=$(platform) args="$(args)"
 			                       targets=$(targets)
 endif
+ifeq ($(cargo-build-platform),windows)
+	docker run --rm --network=host -v "$(PWD)":/app -w /app \
+		-u $(shell id -u):$(shell id -g) \
+		-v "$(HOME)/.cargo/registry":/usr/local/cargo/registry \
+		-v "$(HOME):$(HOME)" \
+		-e XDG_CACHE_HOME=$(HOME) \
+		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
+			make cargo.build.jason debug=$(debug) dockerized=no \
+			                       platform=$(platform) args="$(args)"
+			                       targets=$(targets)
+endif
 else
 ifeq ($(cargo-build-platform),web)
 ifeq ($(pre-install),yes)
@@ -254,8 +270,12 @@ endif
 		$(args)
 endif
 ifeq ($(cargo-build-platform),android)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets)),\
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-android)),\
 		$(call cargo.build.medea-jason.android,$(target),$(debug)))
+endif
+ifeq ($(cargo-build-platform),windows)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
+		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
 endif
 endif
@@ -266,6 +286,17 @@ define cargo.build.medea-jason.android
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
+endef
+define cargo.build.medea-jason.windows
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo build $(if $(call eq,$(debug),no),--release,) \
+	          --target $(target) \
+	          --manifest-path=./Cargo.toml \
+		      $(args)
+	@mkdir -p ./flutter/windows/jniLibs/$(target)
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
+	./flutter/windows/jniLibs/$(target)
 endef
 
 
@@ -341,6 +372,14 @@ cargo.version:
 
 rustup.android:
 	rustup target add $(ANDROID_TARGETS)
+
+# Install or upgrade project's Windows targets for Rust.
+#
+# Usage:
+#	make rustup.windows
+
+rustup.windows:
+	rustup target add $(WINDOWS_TARGETS)
 
 
 

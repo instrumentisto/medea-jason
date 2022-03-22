@@ -3,7 +3,7 @@
 pub mod err;
 
 cfg_if::cfg_if! {
-    if #[cfg(target_os = "android")] {
+    if #[cfg(target_os = "windows")] {
         mod dart;
         pub use self::dart::*;
     } else {

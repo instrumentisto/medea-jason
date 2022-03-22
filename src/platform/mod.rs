@@ -8,7 +8,7 @@ pub mod transceiver_direction;
 pub mod transport;
 
 cfg_if::cfg_if! {
-    if #[cfg(target_os = "android")] {
+    if #[cfg(target_os = "windows")] {
         mod dart;
         pub use self::dart::*;
     } else {
