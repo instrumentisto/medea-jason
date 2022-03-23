@@ -69,6 +69,8 @@ mod transport {
 pub struct WebSocketRpcTransport {
     /// Handle to the Dart side [`WebSocket`][0].
     ///
+    /// If [`DartHandle`] is `None`, then connection is not instantiated atm.
+    ///
     /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
     handle: RefCell<Option<DartHandle>>,
 
@@ -87,21 +89,8 @@ pub struct WebSocketRpcTransport {
 }
 
 impl WebSocketRpcTransport {
-    /// Initiates a new [`WebSocketRpcTransport`] connection.
-    ///
-    /// Only resolves once the underlying connection becomes active.
-    ///
-    /// # Errors
-    ///
-    /// With [`TransportError::CreateSocket`] if cannot establish
-    /// [`WebSocket`][0] to the specified `url`.
-    ///
-    /// With [`TransportError::InitSocket`] if [WebSocket.onclose][1] callback
-    /// fired before [WebSocket.onopen][2] callback.
-    ///
-    /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
-    /// [1]: https://developer.mozilla.org/docs/Web/API/WebSocket/onclose
-    /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
+    /// Returns new [`WebSocketRpcTransport`] which can be connected to
+    /// the server with [`RpcTransport::connect`] method call.
     #[must_use]
     pub fn new() -> Self {
         Self {

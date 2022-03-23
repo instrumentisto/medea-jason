@@ -49,6 +49,8 @@ type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
 struct InnerSocket {
     /// JS side [WebSocket].
     ///
+    /// If [`DartHandle`] is `None`, then connection is not instantiated atm.
+    ///
     /// [WebSocket]: https://developer.mozilla.org/docs/Web/API/WebSocket
     socket: RefCell<Option<SysWebSocket>>,
 
@@ -125,26 +127,8 @@ impl Drop for InnerSocket {
 pub struct WebSocketRpcTransport(Rc<RefCell<InnerSocket>>);
 
 impl WebSocketRpcTransport {
-    /// Initiates new WebSocket connection. Resolves only when underlying
-    /// connection becomes active.
-    ///
-    /// # Errors
-    ///
-    /// With [`TransportError::CreateSocket`] if cannot establish WebSocket to
-    /// specified URL.
-    ///
-    /// With [`TransportError::InitSocket`] if [WebSocket.onclose][1] callback
-    /// fired before [WebSocket.onopen][2] callback.
-    ///
-    /// # Panics
-    ///
-    /// If binding to the [`close`][3] or the [`open`][4] events fails. Not
-    /// supposed to ever happen.
-    ///
-    /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/onclose
-    /// [2]: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/onopen
-    /// [3]: https://html.spec.whatwg.org/#event-close
-    /// [4]: https://html.spec.whatwg.org/#event-open
+    /// Returns new [`WebSocketRpcTransport`] which can be connected to
+    /// the server with [`RpcTransport::connect`] method call.
     #[must_use]
     pub fn new() -> Self {
         let socket = Rc::new(RefCell::new(InnerSocket::new()));

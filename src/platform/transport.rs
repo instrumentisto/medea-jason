@@ -44,7 +44,26 @@ impl TransportState {
 #[cfg_attr(feature = "mockable", mockall::automock)]
 #[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcTransport {
-    /// Connects to the provided [`ApiUrl`].
+    /// Initiates new WebSocket connection. Resolves only when underlying
+    /// connection becomes active.
+    ///
+    /// # Errors
+    ///
+    /// With [`TransportError::CreateSocket`] if cannot establish WebSocket to
+    /// specified URL.
+    ///
+    /// With [`TransportError::InitSocket`] if [WebSocket.onclose][1] callback
+    /// fired before [WebSocket.onopen][2] callback.
+    ///
+    /// # Panics
+    ///
+    /// If binding to the [`close`][3] or the [`open`][4] events fails. Not
+    /// supposed to ever happen.
+    ///
+    /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/onclose
+    /// [2]: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/onopen
+    /// [3]: https://html.spec.whatwg.org/#event-close
+    /// [4]: https://html.spec.whatwg.org/#event-open
     async fn connect(&self, url: ApiUrl) -> Result<(), Traced<TransportError>>;
 
     /// Returns [`LocalBoxStream`] of all messages received by this transport.
