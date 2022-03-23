@@ -55,7 +55,7 @@ url = "2.1"
 android_logger = "0.10"
 
 [target.'cfg(any(target_os = "windows", target_os = "linux", target_os = "darwin"))'.dependencies]
-env_logger = "0.8.4"
+env_logger = "0.9"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "2.0"

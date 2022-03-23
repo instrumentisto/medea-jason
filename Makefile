@@ -24,8 +24,6 @@ RUST_VER := 1.58
 CHROME_VERSION := 99.0
 FIREFOX_VERSION := 97.0.1-driver0.30.0
 
-WINDOWS_TARGETS := x86_64-pc-windows-msvc
-
 CARGO_NDK_VER := 2.5.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
@@ -37,6 +35,8 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
+WINDOWS_TARGETS := x86_64-pc-windows-msvc
+LINUX_TARGETS := x86_64-unknown-linux-gnu
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -213,17 +213,20 @@ cargo:
 # 		 | platform=all
 #		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )]
 #		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
+#		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
 cargo-build-platform = $(or $(platform),web)
 cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
+cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
 
 cargo.build.jason:
 ifeq ($(platform),all)
 	@make cargo.build.jason platform=web
 	@make cargo.build.jason platform=android targets=$(targets)
 	@make cargo.build.jason platform=windows targets=$(targets)
+	@make cargo.build.jason platform=linux targets=$(targets)
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -266,6 +269,10 @@ ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
 		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
+ifeq ($(cargo-build-platform),linux)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
+		$(call cargo.build.medea-jason.linux,$(target),$(debug)))
+endif
 endif
 endif
 define cargo.build.medea-jason.android
@@ -285,7 +292,18 @@ define cargo.build.medea-jason.windows
 		      $(args)
 	@mkdir -p ./flutter/windows/lib/$(target)
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
-	./flutter/windows/lib/$(target)
+			  ./flutter/windows/lib/$(target)/medea_jason.dll
+endef
+define cargo.build.medea-jason.linux
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo build $(if $(call eq,$(debug),no),--release,) \
+	          --target $(target) \
+	          --manifest-path=./Cargo.toml \
+		      $(args)
+	@mkdir -p ./flutter/linux/lib/$(target)
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.so \
+			  ./flutter/linux/lib/$(target)/libmedea_jason.so
 endef
 
 
@@ -339,7 +357,8 @@ cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
 		$(call cargo.lint.medea-jason,$(target)))
-	$(call cargo.lint.medea-jason,x86_64-pc-windows-msvc)
+	$(call cargo.lint.medea-jason,$(WINDOWS_TARGETS))
+	$(call cargo.lint.medea-jason,$(LINUX_TARGETS))
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
 	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
@@ -371,6 +390,15 @@ rustup.android:
 
 rustup.windows:
 	rustup target add $(WINDOWS_TARGETS)
+
+
+# Install or upgrade project's Linux targets for Rust.
+#
+# Usage:
+#	make rustup.linux
+
+rustup.linux:
+	rustup target add $(LINUX_TARGETS)
 
 
 
@@ -1201,6 +1229,8 @@ endef
         minikube.boot \
         release release.crates release.helm release.npm \
         rustup.android \
+        rustup.windows \
+        rustup.linux \
         test test.e2e test.flutter test.unit \
         up up.control up.coturn up.demo up.dev up.jason up.medea \
         wait.port \
