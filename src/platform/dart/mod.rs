@@ -74,9 +74,10 @@ pub fn init_logger() {
 }
 
 /// Initialize [`env_logger`] as default application logger
+/// filter level set to [`log::LevelFilter::Debug`].
 ///
 /// [`env_logger`]: https://docs.rs/env_logger/
 #[cfg(any(target_os = "windows", target_os = "linux", target_os = "darwin"))]
 pub fn init_logger() {
-    let _ = env_logger::builder().try_init();   
+    let _ = env_logger::builder().filter_level(log::LevelFilter::Debug).try_init();
 }
