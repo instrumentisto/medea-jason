@@ -7,7 +7,7 @@ use crate::api::{propagate_panic, ForeignClass};
 /// Array of pointers to [`ForeignClass`] structs.
 ///
 /// Can be safely returned from extern functions. Foreign code must manually
-/// free this array by calling [`PtrArray_free()`].
+/// free this array by calling `PtrArray_free()`.
 #[derive(Debug)]
 #[repr(C)]
 pub struct PtrArray<T = ()> {

@@ -1,4 +1,4 @@
-//! [`Task`] for execution by a [`platform::dart::executor`].
+//! `Task` for execution by a `platform::dart::executor`.
 
 use std::{
     cell::{Cell, RefCell},

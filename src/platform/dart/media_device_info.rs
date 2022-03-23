@@ -47,7 +47,7 @@ pub struct MediaDeviceInfo {
     /// Handle to the Dart side `MediaDeviceInfo`.
     handle: DartHandle,
 
-    /// [`MediaKind`] of this [`MediaDeviceInfo`].
+    /// `MediaKind` of this [`MediaDeviceInfo`].
     kind: MediaDeviceKind,
 }
 

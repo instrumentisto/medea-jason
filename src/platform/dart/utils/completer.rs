@@ -7,10 +7,10 @@
 //! Dart side must register static functions that Rust will call to manipulate
 //! the [Completer]. This module exports function for registering those Dart
 //! functions:
-//! - [`register_new_completer_caller()`];
-//! - [`register_completer_complete_caller()`];
-//! - [`register_completer_complete_error_caller()`];
-//! - [`register_completer_future_caller()`].
+//! - `register_new_completer_caller()`;
+//! - `register_completer_complete_caller()`;
+//! - `register_completer_complete_error_caller()`;
+//! - `register_completer_future_caller()`.
 //!
 //! These functions MUST be registered by Dart during FFI initialization phase:
 //! after Dart DL API is initialized and before any other exported Rust function
@@ -79,11 +79,11 @@ mod completer {
     }
 }
 
-/// [`Future`] which resolves after the provided [`Duration`].
+/// `Future` which resolves after the provided [`Duration`].
 ///
 /// # Panics
 ///
-/// Panics if [`DELAYED_FUTURE_FUNCTION`] isn't set by Dart side. This is should
+/// Panics if `DELAYED_FUTURE_FUNCTION` isn't set by Dart side. This is should
 /// be impossible case.
 pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
