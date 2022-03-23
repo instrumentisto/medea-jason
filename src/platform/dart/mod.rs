@@ -54,7 +54,7 @@ pub fn set_panic_hook() {
 static mut PANIC_FN: Option<Function<String>> = None;
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
-/// `panic`s.
+/// [`panic!`]s.
 pub fn set_panic_callback(cb: Function<String>) {
     unsafe {
         PANIC_FN = Some(cb);

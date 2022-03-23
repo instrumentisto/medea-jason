@@ -7,10 +7,11 @@
 //! Dart side must register static functions that Rust will call to manipulate
 //! the [Completer]. This module exports function for registering those Dart
 //! functions:
-//! - `register_new_completer_caller()`;
-//! - `register_completer_complete_caller()`;
-//! - `register_completer_complete_error_caller()`;
-//! - `register_completer_future_caller()`.
+//! - `init()`;
+//! - `complete()`;
+//! - `complete_error()`;
+//! - `future()`;
+//! - `delayed()`.
 //!
 //! These functions MUST be registered by Dart during FFI initialization phase:
 //! after Dart DL API is initialized and before any other exported Rust function
