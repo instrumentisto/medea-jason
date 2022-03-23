@@ -73,8 +73,10 @@ pub fn init_logger() {
     );
 }
 
-/// TODO: documentation
+/// Initialize [`env_logger`] as default application logger
+///
+/// [`env_logger`]: https://docs.rs/env_logger/
 #[cfg(any(target_os = "windows", target_os = "linux", target_os = "darwin"))]
 pub fn init_logger() {
-    unimplemented!()
+    let _ = env_logger::builder().try_init();   
 }
