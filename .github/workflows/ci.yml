@@ -37,28 +37,10 @@ jobs:
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
       - run: make rustup.android
+      - run: make rustup.windows
 
       - run: make cargo.lint
 
-  clippy-windows:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: clippy
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-
-      - uses: dart-lang/setup-dart@v1
-      - run: make rustup.windows
-
-      - run: make cargo.lint platform=windows
   rustfmt:
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-')
@@ -270,6 +252,7 @@ jobs:
         run: |
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
+
       - name: Compile shared object
         run: make cargo.build.jason platform=android targets=x86_64
                                     args="--features mockable"
@@ -292,7 +275,7 @@ jobs:
           script: make test.flutter
 
   test-flutter-windows:
-    name: Flutter test windows
+    name: Flutter test on windows platform
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
@@ -308,7 +291,8 @@ jobs:
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
       - uses: subosito/flutter-action@v1
-      - run: make cargo.build.jason platform=windows targets=x86_64-pc-windows-msvc
+      - run: make cargo.build.jason platform=windows
+                                    targets=x86_64-pc-windows-msvc
                                     args="--features mockable"
       - run: make test.flutter device=windows
 
@@ -328,9 +312,7 @@ jobs:
         platform:
           - web
           - android
-          
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -356,8 +338,8 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
       - run: make rustup.android
-
         if: ${{ matrix.platform == 'android' }}
+
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
 

@@ -120,7 +120,6 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
 ///
 /// Should be called when object is no longer needed. Calling this more than
 /// once for the same pointer is equivalent to double free.
-#[allow(clippy::drop_copy)]
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__free(
     this: ptr::NonNull<RemoteMediaTrack>,
@@ -130,12 +129,12 @@ pub unsafe extern "C" fn RemoteMediaTrack__free(
     });
 }
 
-#[cfg(feature = "mockable")]
 #[allow(
     clippy::unused_self,
-    clippy::must_use_candidate,
-    clippy::needless_pass_by_value
+    clippy::needless_pass_by_value,
+    missing_copy_implementations
 )]
+#[cfg(feature = "mockable")]
 mod mock {
     use crate::{
         media::{
@@ -145,7 +144,7 @@ mod mock {
         platform,
     };
 
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Clone, Debug)]
     pub struct RemoteMediaTrack(pub u8);
 
     impl From<CoreRemoteMediaTrack> for RemoteMediaTrack {
@@ -155,18 +154,22 @@ mod mock {
     }
 
     impl RemoteMediaTrack {
+        #[must_use]
         pub fn enabled(&self) -> bool {
             true
         }
 
+        #[must_use]
         pub fn kind(&self) -> MediaKind {
             MediaKind::Video
         }
 
+        #[must_use]
         pub fn media_source_kind(&self) -> MediaSourceKind {
             MediaSourceKind::Device
         }
 
+        #[must_use]
         pub fn muted(&self) -> bool {
             false
         }
@@ -191,6 +194,7 @@ mod mock {
             cb.call0();
         }
 
+        #[must_use]
         pub fn get_track(&self) -> platform::MediaStreamTrack {
             unreachable!()
         }

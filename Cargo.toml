@@ -51,8 +51,10 @@ serde_json = "1.0"
 tracerr = "0.3"
 url = "2.1"
 
-[target.'cfg(not(target_family = "wasm"))'.dependencies]
+[target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.10"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "2.0"
 libc = "0.2"
 

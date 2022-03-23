@@ -40,7 +40,7 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
-/// Sets Rust's `panic` hook providing backtrace of the occurred panic to
+/// Sets Rust's [`panic!`] hook providing backtrace of the occurred panic to
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
@@ -54,7 +54,7 @@ pub fn set_panic_hook() {
 static mut PANIC_FN: Option<Function<String>> = None;
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
-/// `panic`s.
+/// [`panic!`]s.
 pub fn set_panic_callback(cb: Function<String>) {
     unsafe {
         PANIC_FN = Some(cb);
@@ -65,9 +65,16 @@ pub fn set_panic_callback(cb: Function<String>) {
 /// level set to [`log::Level::Debug`].
 ///
 /// [`android_logger`]: https://docs.rs/android_logger
+#[cfg(target_os = "android")]
 pub fn init_logger() {
     // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
         android_logger::Config::default().with_min_level(log::Level::Debug),
     );
+}
+
+/// TODO: documentation
+#[cfg(any(target_os = "windows", target_os = "linux", target_os = "darwin"))]
+pub fn init_logger() {
+    unimplemented!()
 }

@@ -11,7 +11,7 @@ use crate::{
     platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined,
 };
 
-use self::task::Task;
+pub use self::task::Task;
 
 /// Runs a Rust [`Future`] on the current thread.
 pub fn spawn(fut: impl Future<Output = ()> + 'static) {
@@ -25,9 +25,9 @@ pub fn spawn(fut: impl Future<Output = ()> + 'static) {
 /// initialization.
 static mut WAKE_PORT: Option<Dart_Port> = None;
 
-/// Initializes Dart-driven async `Task` executor.
+/// Initializes Dart-driven async [`Task`] executor.
 ///
-/// On a Dart side you should continuously read channel to get `Task`s
+/// On a Dart side you should continuously read channel to get [`Task`]s
 /// addresses for polling.
 ///
 /// # Safety
@@ -38,11 +38,11 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
     WAKE_PORT = Some(wake_port);
 }
 
-/// Polls the provided `Task`.
+/// Polls the provided [`Task`].
 ///
 /// # Safety
 ///
-/// Valid `Task` pointer must be provided.
+/// Valid [`Task`] pointer must be provided.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
     propagate_panic(move || {

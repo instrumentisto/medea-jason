@@ -60,7 +60,6 @@ pub unsafe extern "C" fn LocalMediaTrack__media_source_kind(
 ///
 /// Should be called when object is no longer needed. Calling this more than
 /// once for the same pointer is equivalent to double free.
-#[allow(clippy::drop_copy)]
 #[no_mangle]
 pub unsafe extern "C" fn LocalMediaTrack__free(
     this: ptr::NonNull<LocalMediaTrack>,
@@ -70,8 +69,8 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
     });
 }
 
+#[allow(clippy::unused_self, missing_copy_implementations)]
 #[cfg(feature = "mockable")]
-#[allow(clippy::unused_self, clippy::must_use_candidate)]
 mod mock {
     use crate::{
         media::{
@@ -81,7 +80,7 @@ mod mock {
         platform,
     };
 
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Debug)]
     pub struct LocalMediaTrack(pub u8);
 
     impl From<CoreLocalMediaTrack> for LocalMediaTrack {
@@ -91,14 +90,17 @@ mod mock {
     }
 
     impl LocalMediaTrack {
+        #[must_use]
         pub fn kind(&self) -> MediaKind {
             MediaKind::Video
         }
 
+        #[must_use]
         pub fn media_source_kind(&self) -> MediaSourceKind {
             MediaSourceKind::Display
         }
 
+        #[must_use]
         pub fn get_track(&self) -> platform::MediaStreamTrack {
             unreachable!()
         }

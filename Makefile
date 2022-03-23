@@ -334,27 +334,17 @@ endif
 #
 # Usage:
 #	make cargo.lint
-#		 [platform=android]
-#		 | platform=android
-#		 | platform=windows
-
-cargo-lint-platform = $(or $(platform),android)
 
 cargo.lint:
-ifeq ($(cargo-lint-platform),android)
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
 		$(call cargo.lint.medea-jason,$(target)))
-endif
-ifeq ($(cargo-lint-platform),windows)
-	cargo clippy --workspace --all-features -- -D warnings
-	$(foreach target,$(subst $(comma), ,$(WINDOWS_TARGETS)),\
-		$(call cargo.lint.medea-jason,$(target)))
-endif
+	$(call cargo.lint.medea-jason,x86_64-pc-windows-msvc)
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
 	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
 endef
+
 
 # Show version of project's Cargo crate.
 #
@@ -372,6 +362,7 @@ cargo.version:
 
 rustup.android:
 	rustup target add $(ANDROID_TARGETS)
+
 
 # Install or upgrade project's Windows targets for Rust.
 #

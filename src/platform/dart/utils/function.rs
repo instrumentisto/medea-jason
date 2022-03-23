@@ -1,12 +1,11 @@
 //! Functionality for calling Dart closures from Rust.
 //!
 //! Dart DL API doesn't allow calling Dart closures directly. So Dart registers
-//! a static function that accepts and invokes the provided Dart closures:
-//! `register_fn_caller`.
+//! a static function that accepts and invokes the provided Dart closures.
 //!
-//! `register_fn_caller` function MUST be registered by Dart during FFI
-//! initialization phase: after Dart DL API is initialized and before any other
-//! exported Rust function is called.
+//! Dart side must register these function to the during FFI initialization
+//! phase: after Dart DL API is initialized and before any other exported Rust
+//! function is called.
 
 use std::marker::PhantomData;
 
@@ -58,7 +57,6 @@ impl<T> Function<T> {
     /// Creates a new [`Function`] from the provided [`Dart_Handle`] to a Dart
     /// closure, and persists the provided [`Dart_Handle`] so it won't be moved
     /// by the Dart VM GC.
-    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     #[must_use]
     pub fn new(cb: Dart_Handle) -> Self {
         Self {

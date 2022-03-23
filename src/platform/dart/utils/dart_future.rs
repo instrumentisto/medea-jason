@@ -192,7 +192,6 @@ pub mod tests {
         TEST_FUTURE_HANDLE_FUNCTION = Some(f);
     }
 
-    #[allow(clippy::useless_conversion)]
     #[no_mangle]
     pub unsafe extern "C" fn test__future_from_dart__handle(
         future: Dart_Handle,
@@ -202,7 +201,7 @@ pub mod tests {
             let val = FutureFromDart::execute::<DartHandle>(future.get())
                 .await
                 .unwrap();
-            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get().into()) }
+            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get()) }
             Ok(())
         }
         .into_dart_future()

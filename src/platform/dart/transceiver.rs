@@ -113,8 +113,10 @@ impl Transceiver {
     ///
     /// # Errors
     ///
-    /// Errors with `Error` if the underlying [`replaceTrack`][1] call fails.
+    /// Errors with [`platform::Error`] if the underlying [`replaceTrack`][1]
+    /// call fails.
     ///
+    /// [`Error`]: platform::Error
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
     pub async fn set_send_track(
         &self,

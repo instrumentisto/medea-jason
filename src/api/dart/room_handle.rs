@@ -458,13 +458,12 @@ pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
     });
 }
 
-#[cfg(feature = "mockable")]
-#[allow(missing_copy_implementations, missing_debug_implementations)]
 #[allow(
+    missing_copy_implementations,
     clippy::unused_self,
-    clippy::useless_conversion,
     clippy::needless_pass_by_value
 )]
+#[cfg(feature = "mockable")]
 mod mock {
     use std::future::Future;
 
@@ -489,7 +488,7 @@ mod mock {
     /// Alias for a [`Result`] related to [`MediaState`] update functions.
     type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
-    #[derive(Clone)]
+    #[derive(Clone, Debug)]
     pub struct RoomHandle(pub u8);
 
     #[allow(clippy::missing_errors_doc)]
@@ -634,7 +633,7 @@ mod mock {
         pub fn enable_remote_video(
             &self,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
-            future::err(tracerr::new!(ChangeMediaStateError::Detached).into())
+            future::err(tracerr::new!(ChangeMediaStateError::Detached))
         }
 
         pub fn disable_remote_video(

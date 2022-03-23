@@ -21,11 +21,6 @@ impl ForeignClass for ReconnectHandle {}
 /// result and use it here..
 ///
 /// [`Room`]: crate::room::Room
-#[allow(
-    clippy::cast_sign_loss,
-    clippy::cast_possible_truncation,
-    clippy::clone_on_copy
-)]
 #[no_mangle]
 pub unsafe extern "C" fn ReconnectHandle__reconnect_with_delay(
     this: ptr::NonNull<ReconnectHandle>,
@@ -69,11 +64,6 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_delay(
 /// result and use it here.
 ///
 /// [`Room`]: crate::room::Room
-#[allow(
-    clippy::cast_sign_loss,
-    clippy::cast_possible_truncation,
-    clippy::clone_on_copy
-)]
 #[no_mangle]
 pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
     this: ptr::NonNull<ReconnectHandle>,
@@ -140,7 +130,6 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
 ///
 /// Should be called when object is no longer needed. Calling this more than
 /// once for the same pointer is equivalent to double free.
-#[allow(clippy::drop_copy)]
 #[no_mangle]
 pub unsafe extern "C" fn ReconnectHandle__free(
     this: ptr::NonNull<ReconnectHandle>,
@@ -151,7 +140,7 @@ pub unsafe extern "C" fn ReconnectHandle__free(
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::missing_errors_doc)]
+#[allow(clippy::missing_errors_doc, missing_copy_implementations)]
 mod mock {
     use dart_sys::Dart_Handle;
     use futures::future;
@@ -168,7 +157,7 @@ mod mock {
         rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
     };
 
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Clone, Debug)]
     pub struct ReconnectHandle(pub u8);
 
     impl From<CoreReconnectHandle> for ReconnectHandle {
