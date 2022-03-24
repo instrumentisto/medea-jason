@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v1
 
       - run: make flutter.fmt check=yes
 
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v1
 
       - run: make flutter
 
@@ -216,14 +216,14 @@ jobs:
         run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
         if: ${{ env.MEDEA_BRANCH != 'edge' }}
 
-      - name: Chrome
-        run: make test.e2e browser=chrome up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
-                           control-tag=build-${{ github.run_number }}
-      - name: Firefox
-        run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
-                           control-tag=build-${{ github.run_number }}
+#      - name: Chrome
+#        run: make test.e2e browser=chrome up=yes debug=no dockerized=yes
+#                           medea-tag=${{ env.MEDEA_BRANCH }}
+#                           control-tag=build-${{ github.run_number }}
+#      - name: Firefox
+#        run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
+#                           medea-tag=${{ env.MEDEA_BRANCH }}
+#                           control-tag=build-${{ github.run_number }}
 
 #  test-flutter:
 #    name: Flutter tests on Web and Android platforms
@@ -246,7 +246,7 @@ jobs:
 #        with:
 #          crate: cargo-ndk
 #          use-tool-cache: true
-#      - uses: subosito/flutter-action@v2
+#      - uses: subosito/flutter-action@v1
 #
 #      - name: Parse Android NDK versions
 #        id: ndk-version
@@ -291,8 +291,7 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - uses: subosito/flutter-action@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v1
       - run: make cargo.build.jason platform=windows
                                     args="--features mockable"
       - run: make test.flutter device=windows
@@ -313,9 +312,10 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v1
         with:
           channel: 'beta'
+
       - run: flutter config --enable-linux-desktop
 
       - name: Install Flutter Linux dependencies
