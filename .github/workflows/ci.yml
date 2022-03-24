@@ -314,6 +314,9 @@ jobs:
 
       - uses: subosito/flutter-action@v1
       - run: flutter config --enable-linux-desktop
+      - run: flutter doctor -v
+      - run: sudo apt-get install -y clang
+      - run: flutter doctor -v
       - run: make cargo.build.jason platform=linux
                                     args="--features mockable"
       - run: make test.flutter device=linux
