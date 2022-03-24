@@ -79,8 +79,8 @@ pub fn init_logger() {
 /// [`env_logger`]: https://docs.rs/simple_logger/
 #[cfg(any(target_os = "windows", target_os = "linux", target_os = "darwin"))]
 pub fn init_logger() {
-    simple_logger::SimpleLogger::new()
+    // TODO: Should be called only once.
+    let _ = simple_logger::SimpleLogger::new()
         .with_level(log::LevelFilter::Debug)
-        .init()
-        .unwrap();
+        .init();
 }
