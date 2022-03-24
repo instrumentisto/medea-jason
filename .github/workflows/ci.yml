@@ -316,14 +316,14 @@ jobs:
       - run: flutter config --enable-linux-desktop
 
       - name: Install Flutter Linux dependencies
-        run: sudo apt update && sudo apt install -y libgtk-3-dev ninja-build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev ninja-build xvfb
 
       - run: flutter doctor -v
       - run: make cargo.build.jason platform=linux
                                     args="--features mockable"
-      - run: cd flutter/example && flutter build linux
-      - run: ./flutter/example/build/linux/x64/release/bundle/medea_jason_example
-#      - run: make test.flutter device=linux
+      - run: xvfb-run -a make test.flutter device=linux
 
   ############
   # Building #
