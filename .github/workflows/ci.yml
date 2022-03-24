@@ -314,7 +314,10 @@ jobs:
 
       - uses: subosito/flutter-action@v1
       - run: flutter config --enable-linux-desktop
-      - run: sudo apt-get install -y libgtk-3-dev ninja-build
+
+      - name: Install Flutter Linux dependencies
+        run: sudo apt update && sudo apt install -y libgtk-3-dev ninja-build
+
       - run: flutter doctor -v
       - run: make cargo.build.jason platform=linux
                                     args="--features mockable"
