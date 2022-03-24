@@ -216,6 +216,7 @@ impl From<LocalMediaInitException> for DartError {
 
 impl From<EnumerateDevicesException> for DartError {
     fn from(err: EnumerateDevicesException) -> Self {
+        println!("RUST: new_enumerate_devices_exception");
         unsafe {
             Self::new(exception::new_enumerate_devices_exception(
                 err.cause().into(),

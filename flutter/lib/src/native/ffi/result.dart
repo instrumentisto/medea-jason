@@ -17,9 +17,12 @@ class Result extends Struct {
   /// Returns the underlying Dart value, which is an [Object] in case of
   /// success, or throws an [Exception] or an [Error] in case of failure.
   dynamic unwrap() {
+    print("calling unwrap 11111");
     if (_tag == 0) {
+      print("calling unwrap 22222 ${_payload.ok}");
       return _payload.ok.toDart();
     } else {
+      print("calling unwrap 33333 ${_payload.errPtr}");
       throw unboxDartHandle(_payload.errPtr);
     }
   }

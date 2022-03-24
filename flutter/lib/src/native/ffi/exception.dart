@@ -62,6 +62,7 @@ Object _newLocalMediaInitException(int kind, Pointer<Utf8> message,
 /// and [stacktrace].
 Object _newEnumerateDevicesException(
     Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
+  print("DART: _newEnumerateDevicesException");
   return NativeEnumerateDevicesException(
       unboxDartHandle(cause), stacktrace.nativeStringToDartString());
 }
