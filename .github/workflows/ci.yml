@@ -226,7 +226,7 @@ jobs:
                            control-tag=build-${{ github.run_number }}
 
   test-flutter:
-    name: Flutter tests
+    name: Flutter tests on Web and Android platforms
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
@@ -276,7 +276,7 @@ jobs:
           script: make test.flutter
 
   test-flutter-windows:
-    name: Flutter test on Windows platform
+    name: Flutter tests on Windows platform
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
@@ -297,7 +297,7 @@ jobs:
       - run: make test.flutter device=windows
 
   test-flutter-linux:
-    name: Flutter test on Linux platform
+    name: Flutter tests on Linux platform
     if: ${{ github.ref == 'refs/heads/master'
       || startsWith(github.ref, 'refs/tags/medea-jason-')
       || (!startsWith(github.ref, 'refs/tags/medea-')
@@ -314,8 +314,7 @@ jobs:
 
       - uses: subosito/flutter-action@v1
       - run: flutter config --enable-linux-desktop
-      - run: flutter doctor -v
-      - run: sudo apt-get install -y clang ninja-build
+      - run: sudo apt-get install -y libgtk-3-dev ninja-build
       - run: flutter doctor -v
       - run: make cargo.build.jason platform=linux
                                     args="--features mockable"
@@ -326,7 +325,7 @@ jobs:
   ############
 
   crate-jason:
-    name: Build medea-jason
+    name: Build medea-jason on Web, Android and Linux platforms
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || (!startsWith(github.ref, 'refs/tags/medea-')
@@ -336,6 +335,7 @@ jobs:
         platform:
           - web
           - android
+          - linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -384,30 +384,7 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - uses: dart-lang/setup-dart@v1
-
       - run: make cargo.build.jason platform=windows
-                                    dockerized=no debug=yes
-  crate-jason-linux:
-    name: Build medea-jason on Linux platform
-    if: ${{ github.ref == 'refs/heads/master'
-      || startsWith(github.ref, 'refs/tags/medea-jason-')
-      || (!startsWith(github.ref, 'refs/tags/medea-')
-      && !contains(github.event.head_commit.message, '[skip ci]')) }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-
-      - uses: dart-lang/setup-dart@v1
-
-      - run: make cargo.build.jason platform=linux
                                     dockerized=no debug=yes
 
   rustdoc:
