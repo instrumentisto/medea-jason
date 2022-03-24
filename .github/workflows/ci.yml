@@ -321,7 +321,9 @@ jobs:
       - run: flutter doctor -v
       - run: make cargo.build.jason platform=linux
                                     args="--features mockable"
-      - run: make test.flutter device=linux
+      - run: cd flutter/example && flutter build linux
+      - run: ./flutter/example/build/linux/x64/release/bundle/medea_jason_example
+#      - run: make test.flutter device=linux
 
   ############
   # Building #
