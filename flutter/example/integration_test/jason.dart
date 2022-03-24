@@ -54,21 +54,21 @@ void main() {
         (tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
         isNot(
             equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
-    //
-    // expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
-    // expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
-    // expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
-    // expect(devices.first.label(), equals('MediaDeviceInfo.label'));
-    //
-    // devices.first.free();
-    // expect(() => devices.first.label(), throwsStateError);
-    //
-    // expect(tracks.first.kind(), equals(MediaKind.Video));
-    // expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
-    //
-    // tracks.first.free();
-    // expect(() => tracks.first.kind(), throwsStateError);
-    //
+
+    expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
+    expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
+    expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
+    expect(devices.first.label(), equals('MediaDeviceInfo.label'));
+
+    devices.first.free();
+    expect(() => devices.first.label(), throwsStateError);
+
+    expect(tracks.first.kind(), equals(MediaKind.Video));
+    expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
+
+    tracks.first.free();
+    expect(() => tracks.first.kind(), throwsStateError);
+
     // expect(
     //     () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
     //     throwsA(predicate((e) =>
@@ -76,45 +76,45 @@ void main() {
     //         e.kind() == LocalMediaInitExceptionKind.GetUserMediaFailed &&
     //         e.cause() == 'Dart err cause1' &&
     //         e.trace().contains('at src'))));
-    //
-    // var err;
-    // try {
-    //   await (returnsFutureWithLocalMediaInitException('Dart err cause2')
-    //       as Future);
-    // } catch (e) {
-    //   err = e as LocalMediaInitException;
-    // }
-    // expect(
-    //     err,
-    //     predicate((e) =>
-    //         e is LocalMediaInitException &&
-    //         e.kind() == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
-    //         e.cause() == 'Dart err cause2' &&
-    //         e.trace().contains('at src')));
-    //
-    // expect(
-    //     () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
-    //     throwsA(predicate((e) =>
-    //         e is EnumerateDevicesException &&
-    //         e.cause() == 'Dart err cause3' &&
-    //         e.trace().contains('at src'))));
-    //
-    // var err2;
-    // try {
-    //   await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
-    //       as Future);
-    // } catch (e) {
-    //   err2 = e as EnumerateDevicesException;
-    // }
-    // expect(
-    //     err2,
-    //     predicate((e) =>
-    //         e is EnumerateDevicesException &&
-    //         e.cause() == 'Dart err cause4' &&
-    //         e.trace().contains('at src')));
+
+    var err;
+    try {
+      await (returnsFutureWithLocalMediaInitException('Dart err cause2')
+          as Future);
+    } catch (e) {
+      err = e as LocalMediaInitException;
+    }
+    expect(
+        err,
+        predicate((e) =>
+            e is LocalMediaInitException &&
+            e.kind() == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
+            e.cause() == 'Dart err cause2' &&
+            e.trace().contains('at src')));
+
+    expect(
+        () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
+        throwsA(predicate((e) =>
+            e is EnumerateDevicesException &&
+            e.cause() == 'Dart err cause3' &&
+            e.trace().contains('at src'))));
+
+    var err2;
+    try {
+      await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
+          as Future);
+    } catch (e) {
+      err2 = e as EnumerateDevicesException;
+    }
+    expect(
+        err2,
+        predicate((e) =>
+            e is EnumerateDevicesException &&
+            e.cause() == 'Dart err cause4' &&
+            e.trace().contains('at src')));
   });
 
-  testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
+  testWidgets('DeviceVideoTreackConstraints', (WidgetTester tester) async {
     var constraints = DeviceVideoTrackConstraints();
     constraints.deviceId('deviceId');
     constraints.exactFacingMode(FacingMode.User);
