@@ -2,7 +2,7 @@
 
 use std::{borrow::Cow, ptr};
 
-use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use dart_sys::Dart_Handle;
 use derive_more::Into;
 use medea_macro::dart_bridge;
 
@@ -16,9 +16,7 @@ use crate::{
             RpcClientException, StateError,
         },
     },
-    platform::{
-        self, utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
-    },
+    platform,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/exception.g.dart")]
@@ -134,12 +132,11 @@ pub unsafe fn new_panic_error() -> Dart_Handle {
 #[allow(missing_copy_implementations)] // not trivially copyable
 #[derive(Debug, Into)]
 #[repr(transparent)]
-pub struct DartError(ptr::NonNull<Dart_PersistentHandle>);
+pub struct DartError(ptr::NonNull<Dart_Handle>);
 
 impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
     fn new(handle: Dart_Handle) -> Self {
-        let handle = unsafe { Dart_NewPersistentHandle_DL_Trampolined(handle) };
         Self(ptr::NonNull::from(Box::leak(Box::new(handle))))
     }
 }
@@ -219,7 +216,6 @@ impl From<LocalMediaInitException> for DartError {
 
 impl From<EnumerateDevicesException> for DartError {
     fn from(err: EnumerateDevicesException) -> Self {
-        println!("RUST: new_enumerate_devices_exception");
         unsafe {
             Self::new(exception::new_enumerate_devices_exception(
                 err.cause().into(),
