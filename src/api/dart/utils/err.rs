@@ -2,7 +2,7 @@
 
 use std::{borrow::Cow, ptr};
 
-use dart_sys::Dart_Handle;
+use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 use derive_more::Into;
 use medea_macro::dart_bridge;
 
@@ -16,7 +16,11 @@ use crate::{
             RpcClientException, StateError,
         },
     },
-    platform,
+    asdasd,
+    platform::{
+        self, utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
+    },
+    utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/exception.g.dart")]
@@ -132,11 +136,12 @@ pub unsafe fn new_panic_error() -> Dart_Handle {
 #[allow(missing_copy_implementations)] // not trivially copyable
 #[derive(Debug, Into)]
 #[repr(transparent)]
-pub struct DartError(ptr::NonNull<Dart_Handle>);
+pub struct DartError(ptr::NonNull<Dart_PersistentHandle>);
 
 impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
     fn new(handle: Dart_Handle) -> Self {
+        let handle = unsafe { Dart_NewPersistentHandle_DL_Trampolined(handle) };
         Self(ptr::NonNull::from(Box::leak(Box::new(handle))))
     }
 }

@@ -640,7 +640,6 @@ impl TryFrom<i64> for MediaDeviceKind {
 pub unsafe extern "C" fn unbox_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) -> Dart_Handle {
-    println!("unbox_dart_handle {:p}", val.as_ptr());
     *val.as_ptr()
 }
 
