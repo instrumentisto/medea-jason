@@ -16,11 +16,9 @@ use crate::{
             RpcClientException, StateError,
         },
     },
-    asdasd,
     platform::{
         self, utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
     },
-    utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/exception.g.dart")]
