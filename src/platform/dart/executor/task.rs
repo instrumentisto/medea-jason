@@ -1,6 +1,6 @@
 //! [`Task`] for execution by a [`platform::dart::executor`].
 //!
-//! [`platform::dart::executor`]: crate::platform::dart::executor
+//! [`platform::dart::executor`]: crate::platform::executor
 
 use std::{
     cell::{Cell, RefCell},
