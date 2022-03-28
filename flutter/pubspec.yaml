@@ -26,9 +26,9 @@ flutter:
       android:
         package: com.medea.jason
         pluginClass: JasonPlugin
-      windows:
-        pluginClass: MedeaJasonPlugin
       linux:
+        pluginClass: MedeaJasonPlugin
+      windows:
         pluginClass: MedeaJasonPlugin
   assets:
     - assets/pkg/

@@ -91,14 +91,15 @@ pub unsafe extern "C" fn ConnectionHandle__free(
     });
 }
 
-#[allow(
-    clippy::unused_self,
-    clippy::missing_errors_doc,
-    missing_copy_implementations,
-    clippy::needless_pass_by_value
-)]
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(
+        clippy::unused_self,
+        clippy::missing_errors_doc,
+        clippy::needless_pass_by_value,
+        missing_copy_implementations
+    )]
+
     use tracerr::Traced;
 
     use crate::{

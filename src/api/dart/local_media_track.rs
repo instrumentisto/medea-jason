@@ -69,9 +69,10 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
     });
 }
 
-#[allow(clippy::unused_self, missing_copy_implementations)]
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(clippy::unused_self, missing_copy_implementations)]
+
     use crate::{
         media::{
             track::local::LocalMediaTrack as CoreLocalMediaTrack, MediaKind,

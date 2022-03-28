@@ -117,13 +117,14 @@ pub unsafe extern "C" fn MediaManagerHandle__free(
     });
 }
 
-#[allow(
-    clippy::needless_pass_by_value,
-    clippy::unused_self,
-    missing_copy_implementations
-)]
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(
+        clippy::needless_pass_by_value,
+        clippy::unused_self,
+        missing_copy_implementations
+    )]
+
     use dart_sys::Dart_Handle;
     use futures::future;
     use tracerr::Traced;

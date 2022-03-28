@@ -54,18 +54,18 @@ pub fn set_panic_hook() {
 static mut PANIC_FN: Option<Function<String>> = None;
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
-/// [`panic!`]s.
+/// [`panic`]s.
+///
+/// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
     unsafe {
         PANIC_FN = Some(cb);
     }
 }
 
-/// Initialize [`android_logger`] as default application logger with min log
-/// level set to [`log::Level::Debug`].
-///
-/// [`android_logger`]: https://docs.rs/android_logger
 #[cfg(target_os = "android")]
+/// Initializes [`android_logger`] as the default application logger with
+/// minimal log level set to [`log::Level::Debug`].
 pub fn init_logger() {
     // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
@@ -73,11 +73,9 @@ pub fn init_logger() {
     );
 }
 
-/// Initialize [`simple_logger`] as default application logger filter level set
-/// to [`log::LevelFilter::Debug`].
-///
-/// [`env_logger`]: https://docs.rs/simple_logger/
-#[cfg(any(target_os = "windows", target_os = "linux", target_os = "darwin"))]
+#[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
+/// Initializes [`simple_logger`] as the default application logger with filter
+/// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
     // TODO: Should be called only once.
     let _ = simple_logger::SimpleLogger::new()

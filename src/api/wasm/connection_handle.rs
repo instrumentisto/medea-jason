@@ -1,5 +1,8 @@
 //! Connection with a specific remote `Member` used on JS side.
 
+// TODO: Remove on next `wasm_bindgen` update.
+#![allow(clippy::unused_unit)]
+
 use derive_more::From;
 use wasm_bindgen::prelude::*;
 

@@ -62,16 +62,13 @@ pub unsafe extern "C" fn Jason__free(this: ptr::NonNull<Jason>) {
     });
 }
 
-#[allow(
-    clippy::new_without_default,
-    clippy::unused_self,
-    missing_copy_implementations
-)]
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(clippy::new_without_default, clippy::unused_self)]
+
     use crate::api::{MediaManagerHandle, RoomHandle};
 
-    #[derive(Debug)]
+    #[derive(Clone, Copy, Debug)]
     pub struct Jason(u8);
 
     impl Jason {

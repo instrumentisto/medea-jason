@@ -129,13 +129,14 @@ pub unsafe extern "C" fn RemoteMediaTrack__free(
     });
 }
 
-#[allow(
-    clippy::unused_self,
-    clippy::needless_pass_by_value,
-    missing_copy_implementations
-)]
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(
+        clippy::unused_self,
+        clippy::needless_pass_by_value,
+        missing_copy_implementations
+    )]
+
     use crate::{
         media::{
             track::remote::Track as CoreRemoteMediaTrack, MediaKind,

@@ -16,7 +16,7 @@ class RustHandlesStorage {
   /// All handles given for the Dart side from the Rust side.
   final HashSet<PlatformHandle> _handles = HashSet();
 
-  /// Indicates that [RustHandlesStorage] frees all [PlatformHandle]s.
+  /// Indicator whether this [RustHandlesStorage] frees all the [_handles].
   bool _isFreeingAll = false;
 
   factory RustHandlesStorage() {

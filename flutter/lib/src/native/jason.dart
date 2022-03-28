@@ -72,7 +72,7 @@ void onPanic(void Function(String)? cb) {
 }
 
 DynamicLibrary _dl_load() {
-  if (!(Platform.isAndroid || Platform.isWindows || Platform.isLinux)) {
+  if (!(Platform.isAndroid || Platform.isLinux || Platform.isWindows)) {
     throw UnsupportedError('This platform is not supported.');
   }
   if (NativeApi.majorVersion != 2) {

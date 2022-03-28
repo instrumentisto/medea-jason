@@ -1,5 +1,7 @@
 //! External API errors.
 
+// TODO: Remove on next `wasm_bindgen` update.
+#![allow(clippy::unused_unit)]
 // TODO: See https://github.com/rustwasm/wasm-bindgen/pull/2719
 #![allow(clippy::use_self)]
 
@@ -52,7 +54,6 @@ impl StateError {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl StateError {
     /// Returns message describing the problem.

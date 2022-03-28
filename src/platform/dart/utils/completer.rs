@@ -4,9 +4,9 @@
 //! [`Dart_PersistentHandle`] to the [Completer] instance. All manipulations
 //! happen on the Dart side.
 //!
-//! Dart side must register these function to the during FFI initialization
-//! phase: after Dart DL API is initialized and before any other exported Rust
-//! function is called.
+//! Dart side must register these function during the FFI initialization phase:
+//! after Dart DL API is initialized and before any other exported Rust function
+//! is called.
 //!
 //! [Completer]: https://api.dart.dev/dart-async/Completer-class.html
 
@@ -75,10 +75,10 @@ mod completer {
 ///
 /// # Panics
 ///
-/// Panics if `DELAYED_FUTURE_FUNCTION` isn't set by Dart side. This is should
-/// be impossible case.
+/// Panics if the `DELAYED_FUTURE_FUNCTION` isn't set by the Dart side. This is
+/// should be impossible case.
 ///
-/// [`Future`]: futures::Future
+/// [`Future`]: std::future::Future
 pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
