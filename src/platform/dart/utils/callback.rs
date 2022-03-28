@@ -222,6 +222,8 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
+    #![allow(clippy::missing_safety_doc)]
+
     use dart_sys::Dart_Handle;
 
     use crate::api::DartValueArg;

@@ -2,6 +2,9 @@
 //!
 //! [`Room`]: room::Room
 
+// TODO: Remove on next `wasm_bindgen` update.
+#![allow(clippy::unused_unit)]
+
 use derive_more::From;
 use wasm_bindgen::prelude::*;
 

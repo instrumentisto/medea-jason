@@ -93,6 +93,13 @@ pub unsafe extern "C" fn ConnectionHandle__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(
+        clippy::unused_self,
+        clippy::missing_errors_doc,
+        clippy::needless_pass_by_value,
+        missing_copy_implementations
+    )]
+
     use tracerr::Traced;
 
     use crate::{
@@ -103,7 +110,7 @@ mod mock {
         platform,
     };
 
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Debug)]
     pub struct ConnectionHandle(pub u8);
 
     impl From<CoreConnectionHandle> for ConnectionHandle {
@@ -116,7 +123,7 @@ mod mock {
         pub fn get_remote_member_id(
             &self,
         ) -> Result<String, Traced<HandleDetachedError>> {
-            Err(tracerr::new!(HandleDetachedError).into())
+            Err(tracerr::new!(HandleDetachedError))
         }
 
         pub fn on_close(

@@ -131,6 +131,12 @@ pub unsafe extern "C" fn RemoteMediaTrack__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
+    #![allow(
+        clippy::unused_self,
+        clippy::needless_pass_by_value,
+        missing_copy_implementations
+    )]
+
     use crate::{
         media::{
             track::remote::Track as CoreRemoteMediaTrack, MediaKind,
@@ -139,7 +145,7 @@ mod mock {
         platform,
     };
 
-    #[derive(Clone, Copy, Debug)]
+    #[derive(Clone, Debug)]
     pub struct RemoteMediaTrack(pub u8);
 
     impl From<CoreRemoteMediaTrack> for RemoteMediaTrack {
@@ -149,18 +155,22 @@ mod mock {
     }
 
     impl RemoteMediaTrack {
+        #[must_use]
         pub fn enabled(&self) -> bool {
             true
         }
 
+        #[must_use]
         pub fn kind(&self) -> MediaKind {
             MediaKind::Video
         }
 
+        #[must_use]
         pub fn media_source_kind(&self) -> MediaSourceKind {
             MediaSourceKind::Device
         }
 
+        #[must_use]
         pub fn muted(&self) -> bool {
             false
         }
@@ -185,6 +195,7 @@ mod mock {
             cb.call0();
         }
 
+        #[must_use]
         pub fn get_track(&self) -> platform::MediaStreamTrack {
             unreachable!()
         }
