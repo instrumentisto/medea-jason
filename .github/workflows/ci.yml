@@ -230,8 +230,8 @@ jobs:
             || (!startsWith(github.ref, 'refs/tags/medea-')
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         include:
           - platform: android
             os: macos
@@ -315,8 +315,8 @@ jobs:
             || (!startsWith(github.ref, 'refs/tags/medea-')
                 && !contains(github.event.head_commit.message, '[skip ci]')) }}
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         include:
           - platform: android
             os: ubuntu
