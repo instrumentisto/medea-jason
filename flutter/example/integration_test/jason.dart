@@ -8,6 +8,8 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import 'package:medea_jason/src/native/ffi/result.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
+import 'package:medea_jason/src/native/media_device_info.dart';
+import 'package:medea_jason/src/native/local_media_track.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
