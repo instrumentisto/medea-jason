@@ -662,7 +662,7 @@ void main() {
       firePanic();
     } catch (e) {
       var res = await completer.future;
-      expect(res as String, contains('PanicInfo'));
+      expect(res as String, contains('panicked at'));
       expect(jason.ptr.isFreed(), true);
       return;
     }
