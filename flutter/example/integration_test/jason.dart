@@ -343,7 +343,7 @@ void main() {
     expect(
         err,
         predicate((e) =>
-            e is MediaStateTransitionException &&
+            e is InternalException &&
             e.message() ==
                 'SimpleTracksRequest should have at least one track' &&
             e.trace().contains('at src')));
