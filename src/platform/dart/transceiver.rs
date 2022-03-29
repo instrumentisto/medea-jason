@@ -1,6 +1,6 @@
 //! [RTCRtpTransceiver] wrapper.
 //!
-//! [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
+//! [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
 use std::{cell::RefCell, future::Future, rc::Rc};
 
@@ -70,7 +70,7 @@ mod transceiver {
 /// Wrapper around [RTCRtpTransceiver] which provides handy methods for
 /// direction changes.
 ///
-/// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
+/// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 #[derive(Clone, Debug)]
 pub struct Transceiver {
     transceiver: DartHandle,
@@ -113,9 +113,11 @@ impl Transceiver {
     ///
     /// # Errors
     ///
-    /// Errors with [`Error`] if the underlying [`replaceTrack`][1] call fails.
+    /// Errors with [`platform::Error`] if the underlying [`replaceTrack`][1]
+    /// call fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
+    /// [`Error`]: platform::Error
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
     pub async fn set_send_track(
         &self,
         new_sender: Rc<local::Track>,
@@ -148,7 +150,7 @@ impl Transceiver {
 
     /// Returns [`mid`] of this [`Transceiver`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
@@ -183,7 +185,7 @@ impl Transceiver {
 
     /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
     ///
-    /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiver
+    /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
         unsafe { transceiver::is_stopped(self.transceiver.get()) }

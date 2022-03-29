@@ -1,12 +1,11 @@
 //! Functionality for calling Dart closures from Rust.
 //!
 //! Dart DL API doesn't allow calling Dart closures directly. So Dart registers
-//! a static function that accepts and invokes the provided Dart closures:
-//! [`register_fn_caller`].
+//! a static function that accepts and invokes the provided Dart closures.
 //!
-//! [`register_fn_caller`] function MUST be registered by Dart during FFI
-//! initialization phase: after Dart DL API is initialized and before any other
-//! exported Rust function is called.
+//! Dart side must register these function during the FFI initialization phase:
+//! after Dart DL API is initialized and before any other exported Rust function
+//! is called.
 
 use std::marker::PhantomData;
 
