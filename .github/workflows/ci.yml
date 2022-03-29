@@ -257,6 +257,9 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
 
+      - uses: dart-lang/setup-dart@v1
+        if: ${{ matrix.platform == 'windows' }}
+
       - uses: subosito/flutter-action@v1
       - run: flutter config --enable-linux-desktop
         if: ${{ matrix.platform == 'linux' }}
