@@ -8,6 +8,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{
+        box_dart_handle,
         dart::{utils::string_into_c_str, DartValue},
         err::{
             EnumerateDevicesException, FormatException, InternalException,
@@ -137,7 +138,7 @@ pub struct DartError(ptr::NonNull<Dart_Handle>);
 impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
     fn new(handle: Dart_Handle) -> Self {
-        Self(ptr::NonNull::from(Box::leak(Box::new(handle))))
+        Self(unsafe { box_dart_handle(handle) })
     }
 }
 
