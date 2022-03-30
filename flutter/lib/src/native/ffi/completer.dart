@@ -40,5 +40,7 @@ void _complete(Completer completer, ForeignValue arg) {
 
 /// Complete the provided [Completer] with an error.
 void _completeError(Completer completer, Pointer<Handle> err) {
-  completer.completeError(unboxDartHandle(err));
+  var e = unboxDartHandle(err);
+  freeBoxedDartHandle(err);
+  completer.completeError(e);
 }
