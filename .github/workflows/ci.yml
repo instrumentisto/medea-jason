@@ -247,8 +247,8 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]')
-                && matrix.platform != 'windows' }}
+        if: ${{ matrix.platform != 'windows'
+                && !contains(github.event.head_commit.message, '[fresh ci]') }}
 
       - run: make rustup.targets only=android
         if: ${{ matrix.platform == 'android' }}
