@@ -38,5 +38,5 @@ abstract class MediaManagerHandle implements PlatformHandle {
   Future<void> setOutputAudioId(String deviceId);
 
   /// Subscribes onto the [MediaManagerHandle]'s `devicechange` event.
-  void onDeviceChange(Function cb);
+  void onDeviceChange(void Function() cb);
 }
