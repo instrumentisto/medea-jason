@@ -10,6 +10,7 @@ import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/ptrarray.dart';
+import 'ffi/result.dart';
 import 'media_device_info.dart';
 import 'jason.dart';
 import 'local_media_track.dart';
@@ -24,8 +25,8 @@ typedef _enumerateDevices_Dart = Object Function(Pointer);
 typedef _setOutputAudioId_C = Handle Function(Pointer, Pointer<Utf8>);
 typedef _setOutputAudioId_Dart = Object Function(Pointer, Pointer<Utf8>);
 
-typedef _onDeviceChange_C = Void Function(Pointer, Handle);
-typedef _onDeviceChange_Dart = void Function(Pointer, Object);
+typedef _onDeviceChange_C = Result Function(Pointer, Handle);
+typedef _onDeviceChange_Dart = Result Function(Pointer, Object);
 
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
@@ -89,8 +90,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   }
 
   @override
-  void onDeviceChange(Function cb) {
-    _onDeviceChange(ptr.getInnerPtr(), cb);
+  void onDeviceChange(void Function() cb) {
+    _onDeviceChange(ptr.getInnerPtr(), cb).unwrap();
   }
 
   @moveSemantics
