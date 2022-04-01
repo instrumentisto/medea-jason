@@ -8,6 +8,8 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import 'package:medea_jason/src/native/ffi/result.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
+import 'package:medea_jason/src/native/media_device_info.dart';
+import 'package:medea_jason/src/native/local_media_track.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -21,97 +23,96 @@ void main() {
     expect(() => jason.closeRoom(room), throwsStateError);
   });
 
-  // TODO: Fix. Fails on CI when running on Linux.
-  // testWidgets('MediaManager', (WidgetTester tester) async {
-  //   final returnsLocalMediaInitException =
-  //       dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
-  //           'returns_local_media_init_exception');
-  //   final returnsFutureWithLocalMediaInitException =
-  //       dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-  //           'returns_future_with_local_media_init_exception');
-  //   final returnsEnumerateDevicesException =
-  //       dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
-  //           'returns_enumerate_devices_exception');
-  //   final returnsFutureWithEnumerateDevicesException =
-  //       dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
-  //           'returns_future_enumerate_devices_exception');
-  //
-  //   var jason = Jason();
-  //   var mediaManager = jason.mediaManager();
-  //
-  //   var devices = await mediaManager.enumerateDevices();
-  //   var tracks = await mediaManager.initLocalTracks(MediaStreamSettings());
-  //
-  //   expect(devices.length, equals(3));
-  //   expect(tracks.length, equals(3));
-  //
-  //   expect(
-  //       (devices.first as NativeMediaDeviceInfo).ptr.getInnerPtr(),
-  //       isNot(
-  //           equals((devices.last as NativeMediaDeviceInfo).ptr.getInnerPtr())));
-  //   expect(
-  //       (tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
-  //       isNot(
-  //           equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
-  //
-  //   expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
-  //   expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
-  //   expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
-  //   expect(devices.first.label(), equals('MediaDeviceInfo.label'));
-  //
-  //   devices.first.free();
-  //   expect(() => devices.first.label(), throwsStateError);
-  //
-  //   expect(tracks.first.kind(), equals(MediaKind.Video));
-  //   expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
-  //
-  //   tracks.first.free();
-  //   expect(() => tracks.first.kind(), throwsStateError);
-  //
-  //   expect(
-  //       () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
-  //       throwsA(predicate((e) =>
-  //           e is LocalMediaInitException &&
-  //           e.kind() == LocalMediaInitExceptionKind.GetUserMediaFailed &&
-  //           e.cause() == 'Dart err cause1' &&
-  //           e.trace().contains('at src'))));
-  //
-  //   var err;
-  //   try {
-  //     await (returnsFutureWithLocalMediaInitException('Dart err cause2')
-  //         as Future);
-  //   } catch (e) {
-  //     err = e as LocalMediaInitException;
-  //   }
-  //   expect(
-  //       err,
-  //       predicate((e) =>
-  //           e is LocalMediaInitException &&
-  //           e.kind() == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
-  //           e.cause() == 'Dart err cause2' &&
-  //           e.trace().contains('at src')));
-  //
-  //   expect(
-  //       () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
-  //       throwsA(predicate((e) =>
-  //           e is EnumerateDevicesException &&
-  //           e.cause() == 'Dart err cause3' &&
-  //           e.trace().contains('at src'))));
-  //
-  //   var err2;
-  //   try {
-  //     await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
-  //         as Future);
-  //   } catch (e) {
-  //     err2 = e as EnumerateDevicesException;
-  //   }
-  //   expect(
-  //       err2,
-  //       predicate((e) =>
-  //           e is EnumerateDevicesException &&
-  //           e.cause() == 'Dart err cause4' &&
-  //           e.trace().contains('at src')));
-  // });
+  testWidgets('MediaManager', (WidgetTester tester) async {
+    final returnsLocalMediaInitException =
+        dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
+            'returns_local_media_init_exception');
+    final returnsFutureWithLocalMediaInitException =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'returns_future_with_local_media_init_exception');
+    final returnsEnumerateDevicesException =
+        dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
+            'returns_enumerate_devices_exception');
+    final returnsFutureWithEnumerateDevicesException =
+        dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
+            'returns_future_enumerate_devices_exception');
+
+    var jason = Jason();
+    var mediaManager = jason.mediaManager();
+
+    var devices = await mediaManager.enumerateDevices();
+    var tracks = await mediaManager.initLocalTracks(MediaStreamSettings());
+
+    expect(devices.length, equals(3));
+    expect(tracks.length, equals(3));
+
+    expect(
+        (devices.first as NativeMediaDeviceInfo).ptr.getInnerPtr(),
+        isNot(
+            equals((devices.last as NativeMediaDeviceInfo).ptr.getInnerPtr())));
+    expect(
+        (tracks.first as NativeLocalMediaTrack).ptr.getInnerPtr(),
+        isNot(
+            equals((tracks.last as NativeLocalMediaTrack).ptr.getInnerPtr())));
+
+    expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
+    expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
+    expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
+    expect(devices.first.label(), equals('MediaDeviceInfo.label'));
+
+    devices.first.free();
+    expect(() => devices.first.label(), throwsStateError);
+
+    expect(tracks.first.kind(), equals(MediaKind.Video));
+    expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
+
+    tracks.first.free();
+    expect(() => tracks.first.kind(), throwsStateError);
+
+    expect(
+        () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
+        throwsA(predicate((e) =>
+            e is LocalMediaInitException &&
+            e.kind() == LocalMediaInitExceptionKind.GetUserMediaFailed &&
+            e.cause() == 'Dart err cause1' &&
+            e.trace().contains('at src'))));
+
+    var err;
+    try {
+      await (returnsFutureWithLocalMediaInitException('Dart err cause2')
+          as Future);
+    } catch (e) {
+      err = e as LocalMediaInitException;
+    }
+    expect(
+        err,
+        predicate((e) =>
+            e is LocalMediaInitException &&
+            e.kind() == LocalMediaInitExceptionKind.GetDisplayMediaFailed &&
+            e.cause() == 'Dart err cause2' &&
+            e.trace().contains('at src')));
+
+    expect(
+        () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
+        throwsA(predicate((e) =>
+            e is EnumerateDevicesException &&
+            e.cause() == 'Dart err cause3' &&
+            e.trace().contains('at src'))));
+
+    var err2;
+    try {
+      await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
+          as Future);
+    } catch (e) {
+      err2 = e as EnumerateDevicesException;
+    }
+    expect(
+        err2,
+        predicate((e) =>
+            e is EnumerateDevicesException &&
+            e.cause() == 'Dart err cause4' &&
+            e.trace().contains('at src')));
+  });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
     var constraints = DeviceVideoTrackConstraints();
@@ -292,62 +293,61 @@ void main() {
     expect(() => track.kind(), throwsStateError);
   });
 
-  // TODO: Fix. Fails on CI when running on Linux.
-  // testWidgets('RoomHandle', (WidgetTester tester) async {
-  //   var jason = Jason();
-  //   var room = jason.initRoom();
-  //
-  //   await room.join('wss://example.com/room/Alice?token=777');
-  //   await room.setLocalMediaSettings(MediaStreamSettings(), true, false);
-  //   await room.muteAudio();
-  //   await room.unmuteAudio();
-  //   await room.muteVideo();
-  //   await room.unmuteVideo(MediaSourceKind.Display);
-  //   await room.disableVideo(MediaSourceKind.Display);
-  //   await room.enableVideo(MediaSourceKind.Device);
-  //   await room.disableAudio();
-  //   await room.enableAudio();
-  //   await room.disableRemoteAudio();
-  //   await room.enableRemoteAudio();
-  //   await room.disableRemoteVideo();
-  //
-  //   var stateErr;
-  //   try {
-  //     await room.enableRemoteVideo();
-  //   } catch (e) {
-  //     stateErr = e;
-  //   }
-  //   expect(
-  //       stateErr,
-  //       allOf(predicate((e) =>
-  //           e is StateError &&
-  //           e.message == 'RoomHandle is in detached state')));
-  //
-  //   var formatExc;
-  //   try {
-  //     await room.join('obviously bad url');
-  //   } catch (e) {
-  //     formatExc = e;
-  //   }
-  //   expect(
-  //       formatExc,
-  //       allOf(predicate((e) =>
-  //           e is FormatException &&
-  //           e.message.contains('relative URL without a base'))));
-  //
-  //   var localMediaErr = Completer<Object>();
-  //   room.onFailedLocalMedia((err) {
-  //     localMediaErr.complete(err);
-  //   });
-  //   var err = await localMediaErr.future;
-  //   expect(
-  //       err,
-  //       predicate((e) =>
-  //           e is MediaStateTransitionException &&
-  //           e.message() ==
-  //               'SimpleTracksRequest should have at least one track' &&
-  //           e.trace().contains('at src')));
-  // });
+  testWidgets('RoomHandle', (WidgetTester tester) async {
+    var jason = Jason();
+    var room = jason.initRoom();
+
+    await room.join('wss://example.com/room/Alice?token=777');
+    await room.setLocalMediaSettings(MediaStreamSettings(), true, false);
+    await room.muteAudio();
+    await room.unmuteAudio();
+    await room.muteVideo();
+    await room.unmuteVideo(MediaSourceKind.Display);
+    await room.disableVideo(MediaSourceKind.Display);
+    await room.enableVideo(MediaSourceKind.Device);
+    await room.disableAudio();
+    await room.enableAudio();
+    await room.disableRemoteAudio();
+    await room.enableRemoteAudio();
+    await room.disableRemoteVideo();
+
+    var stateErr;
+    try {
+      await room.enableRemoteVideo();
+    } catch (e) {
+      stateErr = e;
+    }
+    expect(
+        stateErr,
+        allOf(predicate((e) =>
+            e is StateError &&
+            e.message == 'RoomHandle is in detached state')));
+
+    var formatExc;
+    try {
+      await room.join('obviously bad url');
+    } catch (e) {
+      formatExc = e;
+    }
+    expect(
+        formatExc,
+        allOf(predicate((e) =>
+            e is FormatException &&
+            e.message.contains('relative URL without a base'))));
+
+    var localMediaErr = Completer<Object>();
+    room.onFailedLocalMedia((err) {
+      localMediaErr.complete(err);
+    });
+    var err = await localMediaErr.future;
+    expect(
+        err,
+        predicate((e) =>
+            e is InternalException &&
+            e.message() ==
+                'SimpleTracksRequest should have at least one track' &&
+            e.trace().contains('at src')));
+  });
 
   testWidgets('ReconnectHandle', (WidgetTester tester) async {
     final returnsRpcClientException =
@@ -651,24 +651,23 @@ void main() {
     expect(res as int, equals(1));
   });
 
-  // TODO: Fix. Fails on CI when running on Linux.
-  // testWidgets('Panic catcher fires callback and frees Handles',
-  //     (WidgetTester widgetTester) async {
-  //   final firePanic =
-  //       dl.lookupFunction<Void Function(), void Function()>('fire_panic');
-  //   final jason = Jason();
-  //   var completer = Completer();
-  //   onPanic((msg) => completer.complete(msg));
-  //   try {
-  //     firePanic();
-  //   } catch (e) {
-  //     var res = await completer.future;
-  //     expect(res as String, contains('PanicInfo'));
-  //     expect(jason.ptr.isFreed(), true);
-  //     return;
-  //   }
-  //   throw Exception('Exception not fired on panic');
-  // });
+  testWidgets('Panic catcher fires callback and frees Handles',
+      (WidgetTester widgetTester) async {
+    final firePanic =
+        dl.lookupFunction<Void Function(), void Function()>('fire_panic');
+    final jason = Jason();
+    var completer = Completer();
+    onPanic((msg) => completer.complete(msg));
+    try {
+      firePanic();
+    } catch (e) {
+      var res = await completer.future;
+      expect(res as String, contains('panicked at'));
+      expect(jason.ptr.isFreed(), true);
+      return;
+    }
+    throw Exception('Exception not fired on panic');
+  });
 }
 
 class TestObj {

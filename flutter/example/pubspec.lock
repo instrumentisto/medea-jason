@@ -105,7 +105,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "5c4bbb3fc6041908dd5c786009aeccdfda8285de"
+      resolved-ref: "7f3a6339ee983632a6af263d1000cd7ede180985"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.7.0+hotfix.2"
