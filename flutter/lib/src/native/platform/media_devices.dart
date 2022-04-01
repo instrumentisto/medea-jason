@@ -20,7 +20,7 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
-Object _getUserMedia(DeviceConstraints constraints) {
+Object _getUserMedia(webrtc.DeviceConstraints constraints) {
   return () => webrtc.getUserMedia(constraints);
 }
 
@@ -31,7 +31,7 @@ Object _enumerateDevices() {
 
 /// Starts capturing the contents of a display and returns the created
 /// [webrtc.MediaStreamTrack]s.
-Object _getDisplayMedia(DisplayConstraints constraints) {
+Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
   return () => webrtc.getDisplayMedia(constraints);
 }
 
