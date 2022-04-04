@@ -1,5 +1,5 @@
 import 'package:flutter_webrtc/src/platform/web/media_stream_track.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import '../interface/local_media_track.dart';
 import '../interface/track_kinds.dart';
@@ -24,7 +24,7 @@ class WebLocalMediaTrack extends LocalMediaTrack {
   }
 
   @override
-  MediaStreamTrack getTrack() {
+  webrtc.MediaStreamTrack getTrack() {
     return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
   }
 
