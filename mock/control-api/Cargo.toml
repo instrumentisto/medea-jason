@@ -15,7 +15,7 @@ publish = false
 actix = "0.13"
 actix-cors = "0.6"
 actix-web = "4.0"
-actix-web-actors = "4.0.1"
+actix-web-actors = "4.1"
 clap = { version = "3.0", features = ["derive"] }
 derive_more = "0.99"
 dotenv = "0.15"
