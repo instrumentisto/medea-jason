@@ -29,29 +29,30 @@ async fn reconnect_with_backoff() {
 
     let state_clone = Rc::clone(&transport_state);
     let session = WebSocketRpcSession::new(Rc::new(WebSocketRpcClient::new(
-        Box::new(move |_| {
+        Box::new(move || {
             let state_clone = Rc::clone(&state_clone);
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().returning_st(|| {
-                    Box::pin(stream::iter(vec![
-                        RPC_SETTINGS,
-                        ServerMsg::Event {
-                            room_id: "room_id".into(),
-                            event: Event::RoomJoined {
-                                member_id: "member_id".into(),
-                            },
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(futures::future::ok(())));
+            transport.expect_on_message().returning_st(|| {
+                Box::pin(stream::iter(vec![
+                    RPC_SETTINGS,
+                    ServerMsg::Event {
+                        room_id: "room_id".into(),
+                        event: Event::RoomJoined {
+                            member_id: "member_id".into(),
                         },
-                    ]))
-                });
-                transport.expect_send().returning_st(move |_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport
-                    .expect_on_state_change()
-                    .return_once_st(move || state_clone.subscribe());
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+                    },
+                ]))
+            });
+            transport.expect_send().returning_st(move |_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport
+                .expect_on_state_change()
+                .return_once_st(move || state_clone.subscribe());
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         }),
     )));
 
