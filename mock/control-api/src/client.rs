@@ -136,7 +136,7 @@ impl ControlClient {
         if response.is_ok() {
             if let Some(subs) = self.subscribers.lock().unwrap().get(&room_id) {
                 for sub in subs {
-                    drop(sub.do_send(notification.clone()));
+                    sub.do_send(notification.clone());
                 }
             };
         }
@@ -205,7 +205,7 @@ impl ControlClient {
             {
                 let notification = Notification::deleted(&fid);
                 for sub in subs {
-                    drop(sub.do_send(notification.clone()));
+                    sub.do_send(notification.clone());
                 }
             };
         }
