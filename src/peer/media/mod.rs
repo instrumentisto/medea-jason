@@ -6,7 +6,9 @@ pub mod receiver;
 pub mod sender;
 mod transitable_state;
 
-use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
+use std::{
+    cell::RefCell, collections::HashMap, fmt::Debug, future::Future, rc::Rc,
+};
 
 use derive_more::{Display, From};
 use futures::{
@@ -43,7 +45,7 @@ pub use self::{
 };
 
 /// Transceiver's sending ([`Sender`]) or receiving ([`Receiver`]) side.
-pub trait TransceiverSide: MediaStateControllable {
+pub trait TransceiverSide: MediaStateControllable + Debug {
     /// Returns [`TrackId`] of this [`TransceiverSide`].
     fn track_id(&self) -> TrackId;
 

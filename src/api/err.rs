@@ -24,9 +24,7 @@ use crate::{
         UpdateLocalStreamError,
     },
     platform,
-    room::{
-        self, ChangeMediaStateError, ConstraintsUpdateError, RoomJoinError,
-    },
+    room::{self, ConstraintsUpdateError, RoomJoinError},
     rpc::{rpc_session::ConnectionLostReason, ReconnectError, SessionError},
     utils::Caused,
 };
@@ -466,9 +464,9 @@ pub struct MediaSettingsUpdateException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
 
-    /// Original [`ChangeMediaStateError`] that was encountered while updating
-    /// local media settings.
-    cause: Traced<ChangeMediaStateError>,
+    /// Original [`room::ChangeMediaStateError`] that was encountered while
+    /// updating local media settings.
+    cause: Traced<room::ChangeMediaStateError>,
 
     /// Whether media settings were successfully rolled back after new settings
     /// application failed.
@@ -481,7 +479,7 @@ impl MediaSettingsUpdateException {
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(
         message: T,
-        cause: Traced<ChangeMediaStateError>,
+        cause: Traced<room::ChangeMediaStateError>,
         rolled_back: bool,
     ) -> Self {
         Self {
@@ -501,8 +499,8 @@ impl MediaSettingsUpdateException {
         self.message.to_string()
     }
 
-    /// Returns the original [`ChangeMediaStateError`] that was encountered
-    /// while updating local media settings.
+    /// Returns the original [`room::ChangeMediaStateError`] that was
+    /// encountered while updating local media settings.
     #[must_use]
     pub fn cause(&self) -> Error {
         self.cause.clone().into()
@@ -656,19 +654,16 @@ impl From<Traced<RoomJoinError>> for Error {
     }
 }
 
-impl From<Traced<ChangeMediaStateError>> for Error {
-    fn from(err: Traced<ChangeMediaStateError>) -> Self {
+impl From<Traced<connection::ChangeMediaStateError>> for Error {
+    fn from(err: Traced<connection::ChangeMediaStateError>) -> Self {
         let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
-            ChangeMediaStateError::Detached => {
+            connection::ChangeMediaStateError::Detached => {
                 StateError::new(err.to_string(), trace).into()
             }
-            ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
-                Traced::compose(err, trace).into()
-            }
-            ChangeMediaStateError::ProhibitedState(_) => {
+            connection::ChangeMediaStateError::ProhibitedState(_) => {
                 MediaStateTransitionException::new(
                     message,
                     trace,
@@ -676,7 +671,39 @@ impl From<Traced<ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            ChangeMediaStateError::TransitionIntoOppositeState(_) => {
+            connection::ChangeMediaStateError::TransitionIntoOppositeState(
+                _,
+            ) => MediaStateTransitionException::new(
+                message,
+                trace,
+                MediaStateTransitionExceptionKind::OppositeState,
+            )
+            .into(),
+        }
+    }
+}
+
+impl From<Traced<room::ChangeMediaStateError>> for Error {
+    fn from(err: Traced<room::ChangeMediaStateError>) -> Self {
+        let (err, trace) = err.split();
+        let message = err.to_string();
+
+        match err {
+            room::ChangeMediaStateError::Detached => {
+                StateError::new(err.to_string(), trace).into()
+            }
+            room::ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
+                Traced::compose(err, trace).into()
+            }
+            room::ChangeMediaStateError::ProhibitedState(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::ProhibitedState,
+                )
+                .into()
+            }
+            room::ChangeMediaStateError::TransitionIntoOppositeState(_) => {
                 MediaStateTransitionException::new(
                     message,
                     trace,
@@ -684,8 +711,8 @@ impl From<Traced<ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            ChangeMediaStateError::InvalidLocalTracks(_)
-            | ChangeMediaStateError::InsertLocalTracksError(_) => {
+            room::ChangeMediaStateError::InvalidLocalTracks(_)
+            | room::ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
             }
         }
