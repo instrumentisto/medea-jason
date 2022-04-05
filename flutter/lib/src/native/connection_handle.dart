@@ -131,5 +131,5 @@ class NativeConnectionHandle extends ConnectionHandle {
   @override
   Future<void> disableRemoteVideo() async {
     await (_disableRemoteVideo(ptr.getInnerPtr()) as Future);
-
   }
+}

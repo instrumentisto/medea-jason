@@ -56,7 +56,6 @@ class ConnectionHandle {
   external void on_quality_score_update(Function cb);
 }
 
-
 @JS('ConnectionHandle')
 abstract class _ConnectionHandle {
   external Promise<dynamic> disable_remote_audio();
