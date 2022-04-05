@@ -181,15 +181,22 @@ mod mock {
         missing_copy_implementations
     )]
 
+    use std::future::Future;
+
+    use futures::future;
     use tracerr::Traced;
 
     use crate::{
         api::RemoteMediaTrack,
         connection::{
-            ConnectionHandle as CoreConnectionHandle, HandleDetachedError,
+            ChangeMediaStateError, ConnectionHandle as CoreConnectionHandle,
+            HandleDetachedError,
         },
         platform,
     };
+
+    /// Alias for a [`Result`] related to [`MediaState`] update functions.
+    type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
     #[derive(Debug)]
     pub struct ConnectionHandle(pub u8);
@@ -229,6 +236,30 @@ mod mock {
         ) -> Result<(), Traced<HandleDetachedError>> {
             f.call1(4);
             Ok(())
+        }
+
+        pub fn enable_remote_audio(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
+        }
+
+        pub fn disable_remote_audio(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
+        }
+
+        pub fn enable_remote_video(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::err(tracerr::new!(ChangeMediaStateError::Detached))
+        }
+
+        pub fn disable_remote_video(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
     }
 }
