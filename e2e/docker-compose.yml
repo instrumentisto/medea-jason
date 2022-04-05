@@ -20,7 +20,7 @@ services:
     depends_on: ["coturn"]
     environment:
       RUST_LOG: ${RUST_LOG}
-      MEDEA_SERVER__CLIENT__HTTP__BIND_PORT: 8001
+      MEDEA__SERVER__CLIENT__HTTP__BIND_PORT: 8001
     network_mode: service:frontend
   coturn:
     container_name: ${COMPOSE_PROJECT_NAME}-coturn
