@@ -25,8 +25,8 @@ use crate::{
 
 /// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
 ///
-/// [`Sender`]: peer::media::Sender
-/// [`Receiver`]: peer::media::Receiver
+/// [`Sender`]: crate::peer::media::Sender
+/// [`Receiver`]: crate::peer::media::Receiver
 #[derive(Caused, Clone, Copy, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum ChangeMediaStateError {
