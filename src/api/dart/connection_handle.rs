@@ -1,9 +1,14 @@
 use std::ptr;
 
 use dart_sys::Dart_Handle;
+use tracerr::Traced;
 
 use crate::{
-    api::dart::utils::{DartError, DartResult},
+    api::{
+        dart::utils::{DartError, DartResult},
+        utils::{DartFuture, IntoDartFuture},
+    },
+    connection::ChangeMediaStateError,
     platform,
 };
 
@@ -73,6 +78,82 @@ pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
             .get_remote_member_id()
             .map_err(DartError::from)
             .into()
+    })
+}
+
+/// Enables inbound audio in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__enable_remote_audio(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.enable_remote_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Disables inbound audio in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__disable_remote_audio(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.disable_remote_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Enables inbound video in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__enable_remote_video(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.enable_remote_video();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Disables inbound video in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__disable_remote_video(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.disable_remote_video();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
     })
 }
 

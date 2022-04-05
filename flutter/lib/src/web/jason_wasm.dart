@@ -56,6 +56,37 @@ class ConnectionHandle {
   external void on_quality_score_update(Function cb);
 }
 
+
+@JS('ConnectionHandle')
+abstract class _ConnectionHandle {
+  external Promise<dynamic> disable_remote_audio();
+  external Promise<dynamic> disable_remote_video();
+  external Promise<dynamic> enable_remote_audio();
+  external Promise<dynamic> enable_remote_video();
+}
+
+extension ConnectionHandleExtensions on ConnectionHandle {
+  Future<dynamic> disable_remote_audio() {
+    final tt = this as _ConnectionHandle;
+    return promiseToFuture(tt.disable_remote_audio());
+  }
+
+  Future<dynamic> disable_remote_video() {
+    final tt = this as _ConnectionHandle;
+    return promiseToFuture(tt.disable_remote_video());
+  }
+
+  Future<dynamic> enable_remote_audio() {
+    final tt = this as _ConnectionHandle;
+    return promiseToFuture(tt.enable_remote_audio());
+  }
+
+  Future<dynamic> enable_remote_video() {
+    final tt = this as _ConnectionHandle;
+    return promiseToFuture(tt.enable_remote_video());
+  }
+}
+
 @JS()
 class DeviceVideoTrackConstraints {
   external void free();
