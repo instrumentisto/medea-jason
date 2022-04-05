@@ -1,5 +1,6 @@
-use cucumber::then;
+use cucumber::{then, when};
 
+use crate::steps::parse_media_kind;
 use crate::World;
 
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
@@ -41,4 +42,25 @@ async fn then_connection_closes(
     let connection =
         member.connections().get(partner_id).await.unwrap().unwrap();
     connection.wait_for_close().await.unwrap();
+}
+
+#[when(regex = r"^(\S+) (enables|disables) (audio|video) receive from (\S+)")]
+async fn when_connection_changes_remote_media_state(
+    world: &mut World,
+    id: String,
+    action: String,
+    kind: String,
+    partner_id: String,
+) {
+    let kind = parse_media_kind(&kind).unwrap();
+
+    let member = world.get_member(&id).unwrap();
+    let connection =
+        member.connections().get(partner_id).await.unwrap().unwrap();
+
+    if action.contains("enables") {
+        connection.enable_remote_media(kind).await.unwrap();
+    } else {
+        connection.disable_remote_media(kind).await.unwrap();
+    }
 }
