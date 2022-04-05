@@ -4,7 +4,7 @@ use std::borrow::Cow;
 
 use crate::{
     browser::Statement,
-    object::{tracks_store, MediaKind, MediaSourceKind, Object},
+    object::{tracks_store, MediaKind, Object},
 };
 
 use super::Error;
@@ -41,7 +41,7 @@ impl Object<Connection> {
     ) -> Result<(), Error> {
         let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "c.conn.enable_remote_audio()".into(),
-            MediaKind::Video => format!("c.conn.enable_remote_video()").into(),
+            MediaKind::Video => "c.conn.enable_remote_video()".into(),
         };
         self.execute(Statement::new(
             // language=JavaScript
@@ -69,7 +69,7 @@ impl Object<Connection> {
     ) -> Result<(), Error> {
         let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "c.conn.disable_remote_audio()".into(),
-            MediaKind::Video => format!("c.conn.disable_remote_video()").into(),
+            MediaKind::Video => "c.conn.disable_remote_video()".into(),
         };
         self.execute(Statement::new(
             // language=JavaScript

@@ -1,7 +1,6 @@
 use cucumber::{then, when};
 
-use crate::steps::parse_media_kind;
-use crate::World;
+use crate::{steps::parse_media_kind, World};
 
 #[then(regex = r"^(\S+) receives connection with (\S+)$")]
 async fn then_member_receives_connection(
