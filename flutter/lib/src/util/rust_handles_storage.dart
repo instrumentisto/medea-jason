@@ -16,9 +16,6 @@ class RustHandlesStorage {
   /// All handles given for the Dart side from the Rust side.
   final HashSet<PlatformHandle> _handles = HashSet();
 
-  /// Indicator whether this [RustHandlesStorage] frees all the [_handles].
-  bool _isFreeingAll = false;
-
   factory RustHandlesStorage() {
     return _singleton;
   }
@@ -32,18 +29,14 @@ class RustHandlesStorage {
 
   /// Removes the provided [handle] from this [RustHandlesStorage].
   void removeHandle(PlatformHandle handle) {
-    if (!_isFreeingAll) {
-      _handles.remove(handle);
-    }
+    _handles.remove(handle);
   }
 
   /// Disposes all the Rust handles registered in this [RustHandlesStorage].
   void freeAll() {
-    _isFreeingAll = true;
     _handles.forEach((h) {
       h.free();
     });
     _handles.clear();
-    _isFreeingAll = false;
   }
 }

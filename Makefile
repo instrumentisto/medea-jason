@@ -35,9 +35,6 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-LINUX_TARGETS := x86_64-unknown-linux-gnu
-WEB_TARGETS := wasm32-unknown-unknown
-WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -210,25 +207,18 @@ cargo:
 #
 # Usage:
 #	make cargo.build.jason [args=<cargo-build-args>]
-#		[( [platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
-#		 | platform=all
-#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
-#		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
-#		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
+#		[( [platform=web]
+# 		 | platform=all
+#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
 cargo-build-platform = $(or $(platform),web)
-cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
-cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
-cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
-cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
+cargo-build-targets = $(or $(targets),$(ANDROID_TARGETS))
 
 cargo.build.jason:
 ifeq ($(platform),all)
-	@make cargo.build.jason platform=android
-	@make cargo.build.jason platform=linux
 	@make cargo.build.jason platform=web
-	@make cargo.build.jason platform=windows
+	@make cargo.build.jason platform=android targets=$(targets)
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -240,7 +230,6 @@ ifeq ($(cargo-build-platform),web)
 		ghcr.io/instrumentisto/rust:$(RUST_VER) \
 			make cargo.build.jason debug=$(debug) dockerized=no \
 			                       platform=web args="$(args)" \
-			                       targets=$(targets) \
 			                       pre-install=yes
 endif
 ifeq ($(cargo-build-platform),android)
@@ -251,7 +240,7 @@ ifeq ($(cargo-build-platform),android)
 		-e XDG_CACHE_HOME=$(HOME) \
 		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
 			make cargo.build.jason debug=$(debug) dockerized=no \
-			                       platform=android args="$(args)"
+			                       platform=$(platform) args="$(args)"
 			                       targets=$(targets)
 endif
 else
@@ -259,20 +248,14 @@ ifeq ($(cargo-build-platform),web)
 ifeq ($(pre-install),yes)
 	curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 endif
-	@rm -rf ./pkg/
-	wasm-pack build -t web ./ $(if $(call eq,$(debug),no),,--dev) $(args)
+	@rm -rf $(crate-dir)/pkg/
+	wasm-pack build -t web $(crate-dir) \
+		$(if $(call eq,$(debug),no),,--dev) \
+		$(args)
 endif
 ifeq ($(cargo-build-platform),android)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-android)),\
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets)),\
 		$(call cargo.build.medea-jason.android,$(target),$(debug)))
-endif
-ifeq ($(cargo-build-platform),linux)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
-		$(call cargo.build.medea-jason.linux,$(target),$(debug)))
-endif
-ifeq ($(cargo-build-platform),windows)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
-		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
 endif
 endif
@@ -283,26 +266,6 @@ define cargo.build.medea-jason.android
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
-endef
-define cargo.build.medea-jason.linux
-	$(eval target := $(strip $(1)))
-	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
-	            $(args)
-	@mkdir -p ./flutter/linux/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.so \
-	      ./flutter/linux/lib/$(target)/libmedea_jason.so
-endef
-define cargo.build.medea-jason.windows
-	$(eval target := $(strip $(1)))
-	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
-	            $(args)
-	@mkdir -p ./flutter/windows/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
-	      ./flutter/windows/lib/$(target)/medea_jason.dll
 endef
 
 
@@ -354,10 +317,9 @@ endif
 
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
-	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(WEB_TARGETS) $(WINDOWS_TARGETS)),\
-			$(call cargo.lint.medea-jason,$(target)))
-define cargo.lint.medea-jason
+	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
+		$(call cargo.lint.medea-jason.android,$(target)))
+define cargo.lint.medea-jason.android
 	$(eval target := $(strip $(1)))
 	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
 endef
@@ -372,30 +334,13 @@ cargo.version:
 	@printf "$(crate-ver)"
 
 
-# Install or upgrade all the required project's targets for Rust.
+# Install or upgrade project's Android targets for Rust.
 #
 # Usage:
-#	make rustup.targets [only=(android|linux|web|windows)]
+#	make rustup.android
 
-rustup-targets = $(ANDROID_TARGETS) \
-                 $(LINUX_TARGETS) \
-                 $(WEB_TARGETS) \
-                 $(WINDOWS_TARGETS)
-ifeq ($(only),android)
-rustup-targets = $(ANDROID_TARGETS)
-endif
-ifeq ($(only),linux)
-rustup-targets = $(LINUX_TARGETS)
-endif
-ifeq ($(only),web)
-rustup-targets = $(WEB_TARGETS)
-endif
-ifeq ($(only),windows)
-rustup-targets = $(WINDOWS_TARGETS)
-endif
-
-rustup.targets:
-	rustup target add $(rustup-targets)
+rustup.android:
+	rustup target add $(ANDROID_TARGETS)
 
 
 
@@ -1225,7 +1170,7 @@ endef
         	helm.package helm.package.release helm.up \
         minikube.boot \
         release release.crates release.helm release.npm \
-        rustup.targets \
+        rustup.android \
         test test.e2e test.flutter test.unit \
         up up.control up.coturn up.demo up.dev up.jason up.medea \
         wait.port \

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:medea_jason/medea_jason.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 const MEDEA_HOST = '127.0.0.1';
 const MEDEA_PORT = 8080;
@@ -8,7 +8,7 @@ const MEDEA_PORT = 8080;
 class Call {
   final Jason _jason = Jason();
   late RoomHandle _room;
-  late Function(webrtc.MediaStreamTrack) _onLocalTrack;
+  late Function(MediaStreamTrack) _onLocalTrack;
   List<LocalMediaTrack> _tracks = [];
 
   Call() {
@@ -45,11 +45,11 @@ class Call {
     _jason.closeRoom(_room);
   }
 
-  void onLocalStream(Function(webrtc.MediaStreamTrack) f) {
+  void onLocalStream(Function(MediaStreamTrack) f) {
     _onLocalTrack = f;
   }
 
-  void onNewRemoteStream(Function(webrtc.MediaStreamTrack) f) {
+  void onNewRemoteStream(Function(MediaStreamTrack) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
         if (track.kind() == MediaKind.Audio && !kIsWeb) {

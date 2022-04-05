@@ -140,8 +140,6 @@ impl FutureFromDart {
 
 #[cfg(feature = "mockable")]
 pub mod tests {
-    #![allow(clippy::missing_safety_doc)]
-
     use dart_sys::Dart_Handle;
 
     use crate::{
@@ -202,7 +200,7 @@ pub mod tests {
             let val = FutureFromDart::execute::<DartHandle>(future.get())
                 .await
                 .unwrap();
-            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get()) }
+            unsafe { (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get().into()) }
             Ok(())
         }
         .into_dart_future()

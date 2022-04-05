@@ -1,4 +1,4 @@
-pub mod arrays;
+mod arrays;
 mod err;
 mod result;
 mod string;

@@ -22,14 +22,14 @@ pub struct Connections {
     connections: RefCell<HashMap<MemberId, Connection>>,
 
     /// Callback invoked on remote `Member` media arrival.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
+    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
     on_new_connection: platform::Callback<api::ConnectionHandle>,
 }
 
 impl Connections {
     /// Sets callback, which will be invoked when new [`Connection`] is
     /// established.
-    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
+    #[cfg_attr(target_os = "android", allow(unused_qualifications))]
     pub fn on_new_connection(
         &self,
         f: platform::Function<api::ConnectionHandle>,
@@ -92,7 +92,7 @@ impl Connections {
 /// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display)]
 #[cause(error = "platform::Error")]
-#[display(fmt = "`ConnectionHandle` is in detached state")]
+#[display(fmt = "ConnectionHandle is in detached state")]
 pub struct HandleDetachedError;
 
 /// External handler to a [`Connection`] with a remote `Member`.

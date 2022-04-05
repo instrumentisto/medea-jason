@@ -21,6 +21,7 @@ impl ForeignClass for ReconnectHandle {}
 /// result and use it here..
 ///
 /// [`Room`]: crate::room::Room
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
 #[no_mangle]
 pub unsafe extern "C" fn ReconnectHandle__reconnect_with_delay(
     this: ptr::NonNull<ReconnectHandle>,
@@ -64,6 +65,7 @@ pub unsafe extern "C" fn ReconnectHandle__reconnect_with_delay(
 /// result and use it here.
 ///
 /// [`Room`]: crate::room::Room
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
 #[no_mangle]
 pub unsafe extern "C" fn ReconnectHandle__reconnect_with_backoff(
     this: ptr::NonNull<ReconnectHandle>,
@@ -141,8 +143,6 @@ pub unsafe extern "C" fn ReconnectHandle__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
-    #![allow(clippy::missing_errors_doc, missing_copy_implementations)]
-
     use dart_sys::Dart_Handle;
     use futures::future;
     use tracerr::{Trace, Traced};
@@ -158,7 +158,7 @@ mod mock {
         rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
     };
 
-    #[derive(Clone, Debug)]
+    #[derive(Clone, Copy, Debug)]
     pub struct ReconnectHandle(pub u8);
 
     impl From<CoreReconnectHandle> for ReconnectHandle {

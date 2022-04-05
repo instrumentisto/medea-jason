@@ -40,7 +40,7 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
-/// Sets Rust's [`panic!`] hook providing backtrace of the occurred panic to
+/// Sets Rust's [`panic`] hook providing backtrace of the occurred panic to
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
@@ -55,30 +55,19 @@ static mut PANIC_FN: Option<Function<String>> = None;
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
 /// [`panic`]s.
-///
-/// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
     unsafe {
         PANIC_FN = Some(cb);
     }
 }
 
-#[cfg(target_os = "android")]
-/// Initializes [`android_logger`] as the default application logger with
-/// minimal log level set to [`log::Level::Debug`].
+/// Initialize [`android_logger`] as default application logger with min log
+/// level set to [`log::Level::Debug`].
+///
+/// [`android_logger`]: https://docs.rs/android_logger
 pub fn init_logger() {
     // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
         android_logger::Config::default().with_min_level(log::Level::Debug),
     );
-}
-
-#[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
-/// Initializes [`simple_logger`] as the default application logger with filter
-/// level set to [`log::LevelFilter::Debug`].
-pub fn init_logger() {
-    // TODO: Should be called only once.
-    let _ = simple_logger::SimpleLogger::new()
-        .with_level(log::LevelFilter::Debug)
-        .init();
 }

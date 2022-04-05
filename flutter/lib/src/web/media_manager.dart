@@ -1,6 +1,5 @@
 import 'package:flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
-import 'package:js/js.dart';
 
 import '../interface/media_device_info.dart';
 import '../interface/local_media_track.dart';
@@ -45,6 +44,6 @@ class WebMediaManagerHandle extends MediaManagerHandle {
 
   @override
   void onDeviceChange(Function cb) {
-    obj.on_device_change(allowInterop(cb));
+    obj.on_device_change(cb);
   }
 }

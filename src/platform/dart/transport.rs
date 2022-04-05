@@ -69,7 +69,7 @@ mod transport {
 pub struct WebSocketRpcTransport {
     /// Handle to the Dart side [`WebSocket`][0].
     ///
-    /// If [`DartHandle`] is `None`, then connection is not instantiated yet.
+    /// If [`DartHandle`] is `None`, then connection is not instantiated atm.
     ///
     /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
     handle: RefCell<Option<DartHandle>>,

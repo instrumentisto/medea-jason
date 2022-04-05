@@ -198,8 +198,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                                 subs.iter()
                                     .filter(|sub| **sub != this)
                                     .for_each(|sub| {
-                                        sub.do_send(Notification::broadcast(
-                                            json.clone(),
+                                        drop(sub.do_send(
+                                            Notification::broadcast(
+                                                json.clone(),
+                                            ),
                                         ));
                                     });
                             }

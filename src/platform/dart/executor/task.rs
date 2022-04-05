@@ -1,6 +1,4 @@
 //! [`Task`] for execution by a [`platform::dart::executor`].
-//!
-//! [`platform::dart::executor`]: crate::platform::executor
 
 use std::{
     cell::{Cell, RefCell},
@@ -17,8 +15,6 @@ use crate::platform::dart::executor::task_wake;
 /// Inner [`Task`]'s data.
 struct Inner {
     /// An actual [`Future`] that this [`Task`] is driving.
-    ///
-    /// [`Future`]: std::future::Future
     future: LocalBoxFuture<'static, ()>,
 
     /// Handle for waking up this [`Task`].
@@ -35,14 +31,10 @@ impl fmt::Debug for Inner {
 
 /// Wrapper for a [`Future`] that can be polled by an external single threaded
 /// Dart executor.
-///
-/// [`Future`]: std::future::Future
 #[derive(Debug)]
 pub struct Task {
     /// [`Task`]'s inner data containing an actual [`Future`] and its
     /// [`Waker`]. Dropped on the [`Task`] completion.
-    ///
-    /// [`Future`]: std::future::Future
     inner: RefCell<Option<Inner>>,
 
     /// Indicates whether there is a [`Poll::Pending`] awake request of this
@@ -52,8 +44,6 @@ pub struct Task {
 
 impl Task {
     /// Spawns a new [`Task`] that will drive the given [`Future`].
-    ///
-    /// [`Future`]: std::future::Future
     pub fn spawn(future: LocalBoxFuture<'static, ()>) {
         let this = Rc::new(Self {
             inner: RefCell::new(None),
@@ -70,8 +60,6 @@ impl Task {
     /// Polls the underlying [`Future`].
     ///
     /// Polling after [`Future`]'s completion is no-op.
-    ///
-    /// [`Future`]: std::future::Future
     pub fn poll(&self) -> Poll<()> {
         let mut borrow = self.inner.borrow_mut();
 

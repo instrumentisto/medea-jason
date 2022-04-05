@@ -1,13 +1,11 @@
 //! External API errors.
 
-// TODO: Remove on next `wasm_bindgen` update.
-#![allow(clippy::unused_unit)]
 // TODO: See https://github.com/rustwasm/wasm-bindgen/pull/2719
 #![allow(clippy::use_self)]
 
 use std::borrow::Cow;
 
-#[cfg(target_family = "wasm")]
+#[cfg(not(target_os = "android"))]
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use tracerr::{Trace, Traced};
@@ -33,7 +31,7 @@ use crate::{
 
 /// Error thrown when the operation wasn't allowed by the current state of the
 /// object.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct StateError {
     /// Message describing the problem.
@@ -54,7 +52,8 @@ impl StateError {
     }
 }
 
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl StateError {
     /// Returns message describing the problem.
     #[must_use]
@@ -70,7 +69,7 @@ impl StateError {
 }
 
 /// Possible error kinds of a [`LocalMediaInitException`].
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum LocalMediaInitExceptionKind {
@@ -94,7 +93,7 @@ pub enum LocalMediaInitExceptionKind {
 }
 
 /// Exception thrown when accessing media devices.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct LocalMediaInitException {
     /// Concrete error kind of this [`LocalMediaInitException`].
@@ -129,8 +128,8 @@ impl LocalMediaInitException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
     #[must_use]
@@ -158,7 +157,7 @@ impl LocalMediaInitException {
 }
 
 /// Exception thrown when cannot get info of available media devices.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct EnumerateDevicesException {
     /// [`platform::Error`] causing this [`EnumerateDevicesException`].
@@ -177,8 +176,8 @@ impl EnumerateDevicesException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl EnumerateDevicesException {
     /// Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
     #[must_use]
@@ -194,7 +193,7 @@ impl EnumerateDevicesException {
 }
 
 /// Exception thrown when cannot change output audio device ID.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct InvalidOutputAudioDeviceIdException {
     /// Stacktrace of this [`InvalidOutputAudioDeviceIdException`].
@@ -210,8 +209,8 @@ impl InvalidOutputAudioDeviceIdException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl InvalidOutputAudioDeviceIdException {
     /// Returns stacktrace of this [`InvalidOutputAudioDeviceIdException`].
     #[must_use]
@@ -221,7 +220,7 @@ impl InvalidOutputAudioDeviceIdException {
 }
 
 /// Possible error kinds of a [`RpcClientException`].
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum RpcClientExceptionKind {
@@ -243,7 +242,7 @@ pub enum RpcClientExceptionKind {
 
 /// Exceptions thrown from a RPC client that implements messaging with media
 /// server.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct RpcClientException {
     /// Concrete error kind of this [`RpcClientException`].
@@ -278,8 +277,8 @@ impl RpcClientException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
     #[must_use]
@@ -310,7 +309,7 @@ impl RpcClientException {
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct InternalException {
     /// Error message describing the problem.
@@ -340,8 +339,8 @@ impl InternalException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl InternalException {
     /// Returns an error message describing the problem.
     #[must_use]
@@ -364,7 +363,7 @@ impl InternalException {
 
 /// Exception thrown when a string or some other data doesn't have an expected
 /// format and cannot be parsed or processed.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct FormatException(Cow<'static, str>);
 
@@ -377,8 +376,8 @@ impl FormatException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl FormatException {
     /// Returns an error message describing of the problem.
     #[must_use]
@@ -388,7 +387,7 @@ impl FormatException {
 }
 
 /// Kind of a [`MediaStateTransitionException`].
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Clone, Copy, Debug)]
 pub enum MediaStateTransitionExceptionKind {
     /// Media state of a [`Sender`] transits to an opposite of the requested
@@ -405,7 +404,7 @@ pub enum MediaStateTransitionExceptionKind {
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct MediaStateTransitionException {
     /// Error message describing the problem.
@@ -435,8 +434,8 @@ impl MediaStateTransitionException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaStateTransitionException {
     /// Returns an error message describing the problem.
     #[must_use]
@@ -460,7 +459,7 @@ impl MediaStateTransitionException {
 /// Errors occurring in [`RoomHandle::set_local_media_settings()`][1] method.
 ///
 /// [1]: crate::api::RoomHandle::set_local_media_settings
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 #[derive(Debug)]
 pub struct MediaSettingsUpdateException {
     /// Error message describing the problem.
@@ -492,8 +491,8 @@ impl MediaSettingsUpdateException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[cfg_attr(not(target_os = "android"), allow(clippy::unused_unit))]
+#[cfg_attr(not(target_os = "android"), wasm_bindgen)]
 impl MediaSettingsUpdateException {
     /// Returns an error message describing the problem.
     #[must_use]

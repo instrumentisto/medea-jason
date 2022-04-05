@@ -127,8 +127,8 @@ impl Drop for InnerSocket {
 pub struct WebSocketRpcTransport(Rc<RefCell<InnerSocket>>);
 
 impl WebSocketRpcTransport {
-    /// Returns a new [`WebSocketRpcTransport`] which can be connected to the
-    /// server with [`RpcTransport::connect`] method call.
+    /// Returns new [`WebSocketRpcTransport`] which can be connected to
+    /// the server with [`RpcTransport::connect`] method call.
     #[must_use]
     pub fn new() -> Self {
         let socket = Rc::new(RefCell::new(InnerSocket::new()));

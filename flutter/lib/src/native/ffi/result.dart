@@ -20,9 +20,7 @@ class Result extends Struct {
     if (_tag == 0) {
       return _payload.ok.toDart();
     } else {
-      var err = unboxDartHandle(_payload.errPtr);
-      freeBoxedDartHandle(_payload.errPtr);
-      throw err;
+      throw unboxDartHandle(_payload.errPtr);
     }
   }
 }

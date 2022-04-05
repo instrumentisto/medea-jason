@@ -7,9 +7,9 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import 'package:medea_jason/src/native/ffi/result.dart';
-import 'package:medea_jason/src/native/room_handle.dart';
 import 'package:medea_jason/src/native/media_device_info.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
+import 'package:medea_jason/src/native/room_handle.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -233,7 +233,7 @@ void main() {
         () => conn.getRemoteMemberId(),
         throwsA(predicate((e) =>
             e is StateError &&
-            e.message == '`ConnectionHandle` is in detached state')));
+            e.message == 'ConnectionHandle is in detached state')));
     var allFired = List<Completer>.generate(2, (_) => Completer());
     conn.onQualityScoreUpdate((score) {
       allFired[0].complete(score);
@@ -343,7 +343,7 @@ void main() {
     expect(
         err,
         predicate((e) =>
-            e is InternalException &&
+            e is MediaStateTransitionException &&
             e.message() ==
                 'SimpleTracksRequest should have at least one track' &&
             e.trace().contains('at src')));
@@ -662,7 +662,7 @@ void main() {
       firePanic();
     } catch (e) {
       var res = await completer.future;
-      expect(res as String, contains('panicked at'));
+      expect(res as String, contains('PanicInfo'));
       expect(jason.ptr.isFreed(), true);
       return;
     }

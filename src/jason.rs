@@ -46,7 +46,10 @@ impl Jason {
         platform::init_logger();
 
         Self::with_rpc_client(Rc::new(WebSocketRpcClient::new(Box::new(
-            || Rc::new(platform::WebSocketRpcTransport::new()),
+            || {
+                let ws = platform::WebSocketRpcTransport::new();
+                Rc::new(ws) as Rc<dyn platform::RpcTransport>
+            },
         ))))
     }
 
