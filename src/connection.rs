@@ -8,19 +8,22 @@ use std::{
 };
 
 use derive_more::{Display, From};
-use futures::{future, future::LocalBoxFuture};
+use futures::{
+    future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
+    StreamExt,
+};
 use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
 use tracerr::Traced;
 
 use crate::{
     api,
-    media::{track::remote, MediaKind},
+    media::{track::remote, MediaKind, RecvConstraints},
     peer::{
         media_exchange_state, receiver, MediaState, MediaStateControllable,
         ProhibitedStateError, TransceiverSide,
     },
     platform,
-    utils::Caused,
+    utils::{Caused, TaskHandle},
 };
 
 /// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
@@ -55,7 +58,7 @@ pub enum ChangeMediaStateError {
 type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
 /// Service which manages [`Connection`]s with remote `Member`s.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Connections {
     /// Local [`PeerId`] to remote [`MemberId`].
     peer_members: RefCell<HashMap<PeerId, HashSet<MemberId>>>,
@@ -63,12 +66,25 @@ pub struct Connections {
     /// Remote [`MemberId`] to [`Connection`] with that `Member`.
     connections: RefCell<HashMap<MemberId, Connection>>,
 
+    /// Global constraints to the [`remote::Track`]s of the Jason.
+    global_recv_constraints: Rc<RecvConstraints>,
+
     /// Callback invoked on remote `Member` media arrival.
     #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_new_connection: platform::Callback<api::ConnectionHandle>,
 }
 
 impl Connections {
+    /// Creates new [`Connections`].
+    pub fn new(global_recv_constraints: Rc<RecvConstraints>) -> Self {
+        Self {
+            peer_members: RefCell::default(),
+            connections: RefCell::default(),
+            global_recv_constraints,
+            on_new_connection: platform::Callback::default(),
+        }
+    }
+
     /// Sets callback, which will be invoked when new [`Connection`] is
     /// established.
     #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
@@ -90,7 +106,10 @@ impl Connections {
         let conn = self.connections.borrow().get(remote_member_id).cloned();
         conn.map_or_else(
             || {
-                let con = Connection::new(remote_member_id.clone());
+                let con = Connection::new(
+                    remote_member_id.clone(),
+                    &self.global_recv_constraints,
+                );
                 self.on_new_connection.call1(con.new_handle());
                 drop(
                     self.connections
@@ -161,6 +180,9 @@ struct InnerConnection {
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
 
+    /// Individual [`RecvConstraints`] of this [`Connection`].
+    individual_recv_constraints: Rc<RecvConstraints>,
+
     /// All [`receiver::State`]s related to this [`InnerConnection`].
     receivers: RefCell<Vec<Rc<receiver::State>>>,
 
@@ -169,6 +191,10 @@ struct InnerConnection {
 
     /// Callback invoked when this [`Connection`] is closed.
     on_close: platform::Callback<()>,
+
+    /// [`TaskHandle`]s for the spawned changes listeners of this
+    /// [`Connection`].
+    _task_handles: Vec<TaskHandle>,
 }
 
 impl InnerConnection {
@@ -200,10 +226,20 @@ impl InnerConnection {
             }
         }
 
-        future::try_join_all(futs)
-            .await
-            .map(drop)
-            .map_err(tracerr::from_and_wrap!())
+        drop(
+            future::try_join_all(futs)
+                .await
+                .map_err(tracerr::from_and_wrap!())?,
+        );
+
+        if let MediaState::MediaExchange(desired_state) = desired_state {
+            self.individual_recv_constraints.set_enabled(
+                desired_state == media_exchange_state::Stable::Enabled,
+                kind,
+            );
+        }
+
+        Ok(())
     }
 }
 
@@ -376,21 +412,79 @@ pub struct Connection(Rc<InnerConnection>);
 
 impl Connection {
     /// Instantiates new [`Connection`] for a given `Member`.
+    ///
+    /// Based on the provided [`RecvConstraints`] individual [`RecvConstraints`]
+    /// of this [`Connection`] will automatically synchronize.
     #[must_use]
-    pub fn new(remote_id: MemberId) -> Self {
+    pub fn new(
+        remote_id: MemberId,
+        global_recv_constraints: &Rc<RecvConstraints>,
+    ) -> Self {
+        let individual_recv_constraints =
+            Rc::new(global_recv_constraints.as_ref().clone());
+
         Self(Rc::new(InnerConnection {
+            _task_handles: vec![
+                Self::spawn_constraints_synchronizer(
+                    Rc::clone(&individual_recv_constraints),
+                    global_recv_constraints.on_video_enabled_change(),
+                    MediaKind::Video,
+                ),
+                Self::spawn_constraints_synchronizer(
+                    Rc::clone(&individual_recv_constraints),
+                    global_recv_constraints.on_audio_enabled_change(),
+                    MediaKind::Audio,
+                ),
+            ],
             remote_id,
             quality_score: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
+            individual_recv_constraints,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
             receivers: RefCell::default(),
         }))
     }
 
+    /// Spawns synchronizer for the individual [`RecvConstraints`].
+    ///
+    /// When global [`RecvConstraints`] updated, then all individual
+    /// [`RecvConstraints`] are going to the same state.
+    ///
+    /// Returns [`TaskHandle`] for the spawned changes listener.
+    fn spawn_constraints_synchronizer(
+        recv_constraints: Rc<RecvConstraints>,
+        mut changes_stream: LocalBoxStream<'static, bool>,
+        kind: MediaKind,
+    ) -> TaskHandle {
+        let (fut, abort) = future::abortable(async move {
+            while let Some(is_enabled) = changes_stream.next().await {
+                recv_constraints.set_enabled(is_enabled, kind);
+            }
+        });
+        platform::spawn(fut.map(drop));
+
+        TaskHandle::from(abort)
+    }
+
     /// Stores provided [`receiver::State`] in this [`Connection`].
-    pub fn add_receiver(&self, transceiver: Rc<receiver::State>) {
-        self.0.receivers.borrow_mut().push(transceiver);
+    ///
+    /// Updates [`MediaExchangeState`] of the provided [`receiver::State`] based
+    /// on the current individual [`RecvConstraints`] of this [`Connection`].
+    pub fn add_receiver(&self, receiver: Rc<receiver::State>) {
+        let enabled_in_cons = match &receiver.kind() {
+            MediaKind::Audio => {
+                self.0.individual_recv_constraints.is_audio_enabled()
+            }
+            MediaKind::Video => {
+                self.0.individual_recv_constraints.is_video_enabled()
+            }
+        };
+        receiver
+            .media_exchange_state_controller()
+            .transition_to(enabled_in_cons.into());
+
+        self.0.receivers.borrow_mut().push(receiver);
     }
 
     /// Invokes `on_remote_track_added` callback with the provided

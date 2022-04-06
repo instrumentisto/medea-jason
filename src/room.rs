@@ -1123,9 +1123,10 @@ impl InnerRoom {
         media_manager: Rc<MediaManager>,
         peer_event_sender: mpsc::UnboundedSender<PeerEvent>,
     ) -> Self {
-        let connections = Rc::new(Connections::default());
         let send_constraints = LocalTracksConstraints::default();
         let recv_constraints = Rc::new(RecvConstraints::default());
+        let connections =
+            Rc::new(Connections::new(Rc::clone(&recv_constraints)));
         Self {
             peers: peer::repo::Component::new(
                 Rc::new(peer::repo::Repository::new(
