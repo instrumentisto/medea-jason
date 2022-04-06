@@ -46,14 +46,7 @@ impl Jason {
         platform::init_logger();
 
         Self::with_rpc_client(Rc::new(WebSocketRpcClient::new(Box::new(
-            |url| {
-                Box::pin(async move {
-                    let ws = platform::WebSocketRpcTransport::new(url)
-                        .await
-                        .map_err(|e| tracerr::new!(e))?;
-                    Ok(Rc::new(ws) as Rc<dyn platform::RpcTransport>)
-                })
-            },
+            || Rc::new(platform::WebSocketRpcTransport::new()),
         ))))
     }
 
