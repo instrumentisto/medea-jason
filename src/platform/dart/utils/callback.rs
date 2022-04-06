@@ -220,8 +220,8 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
     propagate_panic(move || {
         // A little trick here. Since finalizers might run after isolate has
         // already been shut down, calling any Dart API functions will cause a
-        // segfault. So we schedule finalizer on the Dart executor so if the
-        // isolate has already shut down the operation won't run.
+        // segfault. We schedule finalizer on the Dart executor, so if the
+        // isolate has already shut down, the operation won't run.
         platform::spawn(async move {
             drop(unsafe { Box::from_raw(cb.cast::<Callback>()) });
         });
