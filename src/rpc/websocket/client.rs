@@ -144,17 +144,7 @@ impl fmt::Debug for Inner {
 }
 
 /// Factory closure producing a [`platform::RpcTransport`].
-pub type RpcTransportFactory = Box<
-    dyn Fn(
-        ApiUrl,
-    ) -> LocalBoxFuture<
-        'static,
-        Result<
-            Rc<dyn platform::RpcTransport>,
-            Traced<platform::TransportError>,
-        >,
-    >,
->;
+pub type RpcTransportFactory = Box<dyn Fn() -> Rc<dyn platform::RpcTransport>>;
 
 impl Inner {
     /// Instantiates new [`Inner`] state of [`WebSocketRpcClient`].
@@ -398,8 +388,9 @@ impl WebSocketRpcClient {
         self.0.borrow().state.set(ClientState::Connecting);
 
         // wait for transport open
-        let create_transport_fut = (self.0.borrow().rpc_transport_factory)(url);
-        let transport = create_transport_fut.await.map_err(|e| {
+        let transport = (self.0.borrow().rpc_transport_factory)();
+        let mut on_message = transport.on_message();
+        transport.connect(url).await.map_err(|e| {
             let transport_err = e.into_inner();
             self.0.borrow().state.set(ClientState::Closed(
                 ClosedStateReason::CouldNotEstablish(transport_err.clone()),
@@ -410,7 +401,7 @@ impl WebSocketRpcClient {
         })?;
 
         // wait for ServerMsg::RpcSettings
-        if let Some(msg) = transport.on_message().next().await {
+        if let Some(msg) = on_message.next().await {
             if let ServerMsg::RpcSettings(rpc_settings) = msg {
                 Rc::clone(&self)
                     .start_heartbeat(Rc::clone(&transport), rpc_settings)

@@ -1,5 +1,6 @@
 //! Platform-agnostic functionality of RPC transport.
 
+use async_trait::async_trait;
 use derive_more::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{ClientMsg, ServerMsg};
@@ -7,7 +8,7 @@ use tracerr::Traced;
 
 use crate::{
     platform,
-    rpc::{ClientDisconnect, CloseMsg},
+    rpc::{ApiUrl, ClientDisconnect, CloseMsg},
     utils::{Caused, JsonParseError},
 };
 
@@ -39,9 +40,35 @@ impl TransportState {
 }
 
 /// RPC transport between a client and a server.
+#[allow(unused_lifetimes)]
+#[async_trait(?Send)]
 #[cfg_attr(feature = "mockable", mockall::automock)]
 #[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcTransport {
+    /// Initiates a new [WebSocket] connection to the provided `url`.
+    ///
+    /// Resolves only when the underlying connection becomes active.
+    ///
+    /// # Errors
+    ///
+    /// With [`TransportError::CreateSocket`] if cannot establish [WebSocket] to
+    /// the provided `url`.
+    ///
+    /// With [`TransportError::InitSocket`] if [WebSocket.onclose][1] callback
+    /// fired before [WebSocket.onopen][2] callback.
+    ///
+    /// # Panics
+    ///
+    /// If the binding to [`close`][3] or [`open`][4] events fails. Not supposed
+    /// to ever happen.
+    ///
+    /// [1]: https://developer.mozilla.org/docs/Web/API/WebSocket/onclose
+    /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
+    /// [3]: https://html.spec.whatwg.org#event-close
+    /// [4]: https://html.spec.whatwg.org#event-open
+    /// [WebSocket]: https://developer.mozilla.org/docs/Web/API/WebSocket
+    async fn connect(&self, url: ApiUrl) -> Result<(), Traced<TransportError>>;
+
     /// Returns [`LocalBoxStream`] of all messages received by this transport.
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg>;
 

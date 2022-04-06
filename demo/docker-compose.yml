@@ -15,7 +15,7 @@ services:
     image: ghcr.io/instrumentisto/medea:edge
     depends_on: ["coturn-db"]
     environment:
-      MEDEA_LOG__LEVEL: "DEBUG"
+      MEDEA__LOG__LEVEL: "DEBUG"
     volumes:
       - ../_dev/specs:/specs:ro
     network_mode: service:web-client
