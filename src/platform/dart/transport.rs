@@ -3,6 +3,7 @@ use std::{
     rc::Rc,
 };
 
+use async_trait::async_trait;
 use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
 use medea_macro::dart_bridge;
@@ -69,8 +70,11 @@ mod transport {
 pub struct WebSocketRpcTransport {
     /// Handle to the Dart side [`WebSocket`][0].
     ///
+    /// If [`DartHandle`] is [`None`], then connection hasn't been instantiated
+    /// yet.
+    ///
     /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
-    handle: DartHandle,
+    handle: RefCell<Option<DartHandle>>,
 
     /// Subscribers to the messages received by this transport.
     on_message_subs: Rc<RefCell<Vec<mpsc::UnboundedSender<ServerMsg>>>>,
@@ -87,91 +91,81 @@ pub struct WebSocketRpcTransport {
 }
 
 impl WebSocketRpcTransport {
-    /// Initiates a new [`WebSocketRpcTransport`] connection.
-    ///
-    /// Only resolves once the underlying connection becomes active.
-    ///
-    /// # Errors
-    ///
-    /// With [`TransportError::CreateSocket`] if cannot establish
-    /// [`WebSocket`][0] to the specified `url`.
-    ///
-    /// With [`TransportError::InitSocket`] if [WebSocket.onclose][1] callback
-    /// fired before [WebSocket.onopen][2] callback.
-    ///
-    /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
-    /// [1]: https://developer.mozilla.org/docs/Web/API/WebSocket/onclose
-    /// [2]: https://developer.mozilla.org/docs/Web/API/WebSocket/onopen
-    pub async fn new(url: ApiUrl) -> Result<Self> {
-        unsafe {
-            let on_message_subs = Rc::new(RefCell::new(Vec::new()));
-            let socket_state =
-                Rc::new(ObservableCell::new(TransportState::Open));
-
-            // TODO: Propagate execution error.
-            #[allow(clippy::map_err_ignore)]
-            let handle =
-                FutureFromDart::execute::<DartHandle>(
-                    transport::connect(
-                        string_into_c_str(url.as_ref().to_owned()),
-                        Callback::from_fn_mut({
-                            let weak_subs = Rc::downgrade(&on_message_subs);
-                            move |msg: String| {
-                                if let Some(subs) = weak_subs.upgrade() {
-                                    let msg = match serde_json::from_str::<
-                                        ServerMsg,
-                                    >(
-                                        &msg
-                                    ) {
-                                        Ok(parsed) => parsed,
-                                        Err(e) => {
-                                            // TODO: Protocol versions mismatch?
-                                            //       should drop connection if
-                                            //       so.
-                                            log::error!("{}", tracerr::new!(e));
-                                            return;
-                                        }
-                                    };
-
-                                    subs.borrow_mut().retain(
-                                    |sub: &mpsc::UnboundedSender<ServerMsg>| {
-                                        sub.unbounded_send(msg.clone()).is_ok()
-                                    },
-                                );
-                                }
-                            }
-                        })
-                        .into_dart(),
-                        Callback::from_once({
-                            let socket_state = Rc::clone(&socket_state);
-                            move |_: ()| {
-                                socket_state.set(TransportState::Closed(
-                                    CloseMsg::Normal(
-                                        1000,
-                                        CloseReason::Finished,
-                                    ),
-                                ));
-                            }
-                        })
-                        .into_dart(),
-                    ),
-                )
-                .await
-                .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
-
-            Ok(Self {
-                handle,
-                on_message_subs,
-                socket_state,
-                close_reason: Cell::new(
-                    ClientDisconnect::RpcTransportUnexpectedlyDropped,
-                ),
-            })
+    /// Creates a new [`WebSocketRpcTransport`] which can be connected to the
+    /// server with the [`RpcTransport::connect()`] method call.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            handle: RefCell::new(None),
+            on_message_subs: Rc::new(RefCell::new(Vec::new())),
+            socket_state: Rc::new(ObservableCell::new(
+                TransportState::Connecting,
+            )),
+            close_reason: Cell::new(
+                ClientDisconnect::RpcTransportUnexpectedlyDropped,
+            ),
         }
     }
 }
 
+impl Default for WebSocketRpcTransport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
+    async fn connect(&self, url: ApiUrl) -> Result<()> {
+        // TODO: Propagate execution error.
+        #[allow(clippy::map_err_ignore)]
+        let handle = FutureFromDart::execute::<DartHandle>(unsafe {
+            transport::connect(
+                string_into_c_str(url.as_ref().to_owned()),
+                Callback::from_fn_mut({
+                    let weak_subs = Rc::downgrade(&self.on_message_subs);
+                    move |msg: String| {
+                        if let Some(subs) = weak_subs.upgrade() {
+                            let msg =
+                                match serde_json::from_str::<ServerMsg>(&msg) {
+                                    Ok(parsed) => parsed,
+                                    Err(e) => {
+                                        // TODO: Protocol versions mismatch?
+                                        //       Should drop connection if so.
+                                        log::error!("{}", tracerr::new!(e));
+                                        return;
+                                    }
+                                };
+
+                            subs.borrow_mut().retain(
+                                |sub: &mpsc::UnboundedSender<ServerMsg>| {
+                                    sub.unbounded_send(msg.clone()).is_ok()
+                                },
+                            );
+                        }
+                    }
+                })
+                .into_dart(),
+                Callback::from_once({
+                    let socket_state = Rc::clone(&self.socket_state);
+                    move |_: ()| {
+                        socket_state.set(TransportState::Closed(
+                            CloseMsg::Normal(1000, CloseReason::Finished),
+                        ));
+                    }
+                })
+                .into_dart(),
+            )
+        })
+        .await
+        .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
+
+        *self.handle.borrow_mut() = Some(handle);
+        self.socket_state.set(TransportState::Open);
+
+        Ok(())
+    }
+
     fn on_message(&self) -> LocalBoxStream<'static, ServerMsg> {
         let (tx, rx) = mpsc::unbounded();
         self.on_message_subs.borrow_mut().push(tx);
@@ -184,11 +178,25 @@ impl RpcTransport for WebSocketRpcTransport {
 
     #[allow(clippy::unwrap_in_result)]
     fn send(&self, msg: &ClientMsg) -> Result<(), Traced<TransportError>> {
-        let msg = serde_json::to_string(msg).unwrap();
-        unsafe {
-            transport::send(self.handle.get(), string_into_c_str(msg));
+        let state = self.socket_state.get();
+        let handle = self
+            .handle
+            .borrow()
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| tracerr::new!(TransportError::ClosedSocket))?;
+        match state {
+            TransportState::Open => unsafe {
+                let msg = serde_json::to_string(msg).unwrap();
+                transport::send(handle.get(), string_into_c_str(msg));
+                Ok(())
+            },
+            TransportState::Connecting
+            | TransportState::Closing
+            | TransportState::Closed(_) => {
+                Err(tracerr::new!(TransportError::ClosedSocket))
+            }
         }
-        Ok(())
     }
 
     fn on_state_change(&self) -> LocalBoxStream<'static, TransportState> {
@@ -200,8 +208,10 @@ impl Drop for WebSocketRpcTransport {
     fn drop(&mut self) {
         let rsn = serde_json::to_string(&self.close_reason.get())
             .expect("Could not serialize close message");
-        unsafe {
-            transport::close(self.handle.get(), 1000, string_into_c_str(rsn));
+        if let Some(handle) = self.handle.borrow().as_ref() {
+            unsafe {
+                transport::close(handle.get(), 1000, string_into_c_str(rsn));
+            }
         }
     }
 }

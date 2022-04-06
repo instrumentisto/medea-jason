@@ -56,13 +56,13 @@ spec:
           image: {{ printf "%s:%s" .Values.server.image.repository .Values.server.image.tag | quote }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy | quote }}
           env:
-            - name: MEDEA_CONF
+            - name: MEDEA__CONF
               value: /etc/medea.toml
-            - name: MEDEA_TURN__PORT
+            - name: MEDEA__TURN__PORT
               value: {{ index $coturn "conf" "listening-port" | quote }}
-            - name: MEDEA_TURN__DB__REDIS__PORT
+            - name: MEDEA__TURN__DB__REDIS__PORT
               value: {{ $coturnDb.conf.port | quote }}
-            - name: MEDEA_TURN__CLI__PORT
+            - name: MEDEA__TURN__CLI__PORT
               value: {{ index $coturn "conf" "cli-port" | quote }}
           envFrom:
             - secretRef:
@@ -113,10 +113,10 @@ spec:
             - --external-ip=$(EXTERNAL_IP)
             - --listening-ip=$(EXTERNAL_IP)
             - --relay-ip=$(EXTERNAL_IP)
-            - --redis-userdb=ip=127.0.0.1 port={{ $coturnDb.conf.port | int }} dbname={{ .Values.server.conf.turn.db.redis.db_number }} password=$(MEDEA_TURN__DB__REDIS__PASS)
-            - --redis-statsdb=ip=127.0.0.1 port={{ $coturnDb.conf.port | int }} dbname={{ .Values.server.conf.turn.db.redis.db_number }} password=$(MEDEA_TURN__DB__REDIS__PASS)
-            - --user={{ .Values.server.conf.turn.user }}:$(MEDEA_TURN__PASS)
-            - --cli-password=$(MEDEA_TURN__CLI__PASS)
+            - --redis-userdb=ip=127.0.0.1 port={{ $coturnDb.conf.port | int }} dbname={{ .Values.server.conf.turn.db.redis.db_number }} password=$(MEDEA__TURN__DB__REDIS__PASS)
+            - --redis-statsdb=ip=127.0.0.1 port={{ $coturnDb.conf.port | int }} dbname={{ .Values.server.conf.turn.db.redis.db_number }} password=$(MEDEA__TURN__DB__REDIS__PASS)
+            - --user={{ .Values.server.conf.turn.user }}:$(MEDEA__TURN__PASS)
+            - --cli-password=$(MEDEA__TURN__CLI__PASS)
           {{- with $coturn.extraArgs }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -129,21 +129,21 @@ spec:
                 fieldRef:
                   fieldPath: status.hostIP
             {{- end }}
-            - name: MEDEA_TURN__PASS
+            - name: MEDEA__TURN__PASS
               valueFrom:
                 secretKeyRef:
                   name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA_TURN__PASS
-            - name: MEDEA_TURN__DB__REDIS__PASS
+                  key: MEDEA__TURN__PASS
+            - name: MEDEA__TURN__DB__REDIS__PASS
               valueFrom:
                 secretKeyRef:
                   name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA_TURN__DB__REDIS__PASS
-            - name: MEDEA_TURN__CLI__PASS
+                  key: MEDEA__TURN__DB__REDIS__PASS
+            - name: MEDEA__TURN__CLI__PASS
               valueFrom:
                 secretKeyRef:
                   name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA_TURN__CLI__PASS
+                  key: MEDEA__TURN__CLI__PASS
           ports:
             - name: turn
               containerPort: {{ index $coturn "conf" "listening-port" | int }}
@@ -175,13 +175,13 @@ spec:
           args:
             - redis-server
             - /etc/redis.conf
-            - --requirepass $(MEDEA_TURN__DB__REDIS__PASS)
+            - --requirepass $(MEDEA__TURN__DB__REDIS__PASS)
           env:
-            - name: MEDEA_TURN__DB__REDIS__PASS
+            - name: MEDEA__TURN__DB__REDIS__PASS
               valueFrom:
                 secretKeyRef:
                   name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA_TURN__DB__REDIS__PASS
+                  key: MEDEA__TURN__DB__REDIS__PASS
           volumeMounts:
             - name: conf
               subPath: redis.conf
