@@ -467,6 +467,8 @@ impl Connection {
     ///
     /// Updates [`MediaExchangeState`] of the provided [`receiver::State`] based
     /// on the current individual [`RecvConstraints`] of this [`Connection`].
+    ///
+    /// [`MediaExchangeState`]: crate::peer::MediaExchangeState
     pub fn add_receiver(&self, receiver: Rc<receiver::State>) {
         let enabled_in_cons = match &receiver.kind() {
             MediaKind::Audio => {
