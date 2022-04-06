@@ -9,7 +9,7 @@ use std::{cell::Cell, collections::HashMap, rc::Rc};
 
 use futures::{
     channel::{mpsc, oneshot},
-    stream,
+    future, stream,
     stream::LocalBoxStream,
     StreamExt as _,
 };
@@ -72,7 +72,7 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
         let mut transport = MockRpcTransport::new();
         transport
             .expect_connect()
-            .return_once(|_| Box::pin(futures::future::ok(())));
+            .return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(|| {
             stream::once(async { TransportState::Open }).boxed()
         });
@@ -123,7 +123,7 @@ async fn transport_is_dropped_when_client_is_dropped() {
     let mut transport = MockRpcTransport::new();
     transport
         .expect_connect()
-        .return_once(|_| Box::pin(futures::future::ok(())));
+        .return_once(|_| Box::pin(future::ok(())));
     transport.expect_send().returning(|_| Ok(()));
     transport.expect_set_close_reason().return_const(());
     transport
@@ -161,7 +161,7 @@ async fn send_goes_to_transport() {
     let mut transport = MockRpcTransport::new();
     transport
         .expect_connect()
-        .return_once(|_| Box::pin(futures::future::ok(())));
+        .return_once(|_| Box::pin(future::ok(())));
     let (on_send_tx, mut on_send_rx) = mpsc::unbounded();
     transport
         .expect_on_state_change()
@@ -228,7 +228,7 @@ mod on_close {
         let mut transport = MockRpcTransport::new();
         transport
             .expect_connect()
-            .return_once(|_| Box::pin(futures::future::ok(())));
+            .return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(move || {
             stream::iter(vec![
                 TransportState::Open,
@@ -326,7 +326,7 @@ mod transport_close_reason_on_drop {
         let mut transport = MockRpcTransport::new();
         transport
             .expect_connect()
-            .return_once(|_| Box::pin(futures::future::ok(())));
+            .return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(|| {
             stream::once(async { TransportState::Open }).boxed()
         });
@@ -432,7 +432,7 @@ mod connect {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().times(3).returning(|| {
                 on_message_mock(RpcSettings {
                     idle_timeout_ms: 3_000,
@@ -472,7 +472,7 @@ mod connect {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().times(3).returning(|| {
                 on_message_mock(RpcSettings {
                     idle_timeout_ms: 3_000,
@@ -524,7 +524,7 @@ mod connect {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().times(3).returning(|| {
                 on_message_mock(RpcSettings {
                     idle_timeout_ms: 3_000,
@@ -564,7 +564,7 @@ mod on_connection_loss {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().times(3).returning(move || {
                 on_message_mock(RpcSettings {
                     idle_timeout_ms: idle_timeout_ms.unwrap_or(u32::MAX),
@@ -736,7 +736,7 @@ mod on_reconnected {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().times(3).returning(|| {
                 on_message_mock(RpcSettings {
                     idle_timeout_ms: 5_000,
@@ -778,7 +778,7 @@ mod on_reconnected {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport
                 .expect_on_message()
                 .times(3)

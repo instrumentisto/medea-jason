@@ -5,7 +5,7 @@ use std::{
     str::FromStr,
 };
 
-use futures::{stream, StreamExt as _};
+use futures::{future, stream, StreamExt as _};
 use medea_client_api_proto::{Event, ServerMsg};
 use medea_jason::{
     platform::{self, MockRpcTransport, RpcTransport, TransportState},
@@ -34,7 +34,7 @@ async fn reconnect_with_backoff() {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().returning_st(|| {
                 Box::pin(stream::iter(vec![
                     RPC_SETTINGS,
