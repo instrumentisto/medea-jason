@@ -95,7 +95,8 @@ impl Connections {
         self.on_new_connection.set_func(f);
     }
 
-    /// Creates new connection with remote `Member` based on its [`MemberId`].
+    /// Creates and returns new connection with remote `Member` based on its
+    /// [`MemberId`].
     ///
     /// No-op if [`Connection`] already exists.
     pub fn create_connection(
@@ -198,19 +199,14 @@ struct InnerConnection {
 }
 
 impl InnerConnection {
-    /// Changes [`MediaState`] of the provided [`MediaKind`], [`TrackDirection`]
-    /// and [`MediaSourceKind`] to the provided [`MediaState`].
+    /// Changes [`MediaState`] of the provided [`MediaKind`] to the provided
+    /// [`MediaState`].
     ///
     /// # Errors
     ///
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if this
     /// function with opposite [`MediaState`] was called or a media server
     /// didn't approve this state transition.
-    ///
-    /// With [`ChangeMediaStateError::ProhibitedState`] if requested state
-    /// transition is not allowed by [`Sender`]'s settings.
-    ///
-    /// [`Sender`]: crate::peer::media::Sender
     async fn change_media_state(
         &self,
         desired_state: MediaState,
