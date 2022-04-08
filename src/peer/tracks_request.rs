@@ -193,11 +193,12 @@ impl SimpleTracksRequest {
         }
         if let Some((id, display_video)) = &self.display_video {
             if let Some(track) = display_video_tracks.into_iter().next() {
-                if display_video.satisfies(track.as_ref()) {
-                    drop(parsed_tracks.insert(*id, track));
-                } else {
-                    return Err(tracerr::new!(InvalidVideoTrack));
-                }
+                drop(parsed_tracks.insert(*id, track));
+                // if display_video.satisfies(track.as_ref()) {
+                //     drop(parsed_tracks.insert(*id, track));
+                // } else {
+                //     return Err(tracerr::new!(InvalidVideoTrack));
+                // }
             }
         }
 

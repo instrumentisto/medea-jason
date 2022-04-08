@@ -230,7 +230,21 @@ impl DisplayMediaStreamConstraints {
     /// [MediaStreamTrack][1] to these [`DisplayMediaStreamConstraints`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {}
+    pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
+        unsafe {
+            let video = MediaTrackConstraints::from(video);
+            constraints::set_video_constraint(
+                self.0.get(),
+                ConstraintType::Mandatory as i64,
+                video.mandatory.get(),
+            );
+            constraints::set_video_constraint(
+                self.0.get(),
+                ConstraintType::Optional as i64,
+                video.optional.get(),
+            );
+        }
+    }
 }
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
@@ -364,6 +378,112 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                     }
                 }
             }
+
+            Self {
+                optional,
+                mandatory,
+            }
+        }
+    }
+}
+
+impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
+    fn from(from: DisplayVideoTrackConstraints) -> Self {
+        unsafe {
+            let optional =
+                DartHandle::new(constraints::new_video_constraints());
+            let mandatory =
+                DartHandle::new(constraints::new_video_constraints());
+
+            // if let Some(device_id) = from.device_id {
+            //     match device_id {
+            //         ConstrainString::Exact(device_id) => {
+            //             constraints::set_video_constraint_value(
+            //                 optional.get(),
+            //                 VideoConstraintKind::DeviceId as i64,
+            //                 DartValue::from(device_id),
+            //             );
+            //         }
+            //         ConstrainString::Ideal(device_id) => {
+            //             constraints::set_video_constraint_value(
+            //                 mandatory.get(),
+            //                 VideoConstraintKind::DeviceId as i64,
+            //                 DartValue::from(device_id),
+            //             );
+            //         }
+            //     }
+            // }
+
+            // if let Some(facing_mode) = from.facing_mode {
+            //     match facing_mode {
+            //         ConstrainString::Exact(facing_mode) => {
+            //             constraints::set_video_constraint_value(
+            //                 mandatory.get(),
+            //                 VideoConstraintKind::FacingMode as i64,
+            //                 DartValue::from(facing_mode as i64),
+            //             );
+            //         }
+            //         ConstrainString::Ideal(facing_mode) => {
+            //             constraints::set_video_constraint_value(
+            //                 optional.get(),
+            //                 VideoConstraintKind::FacingMode as i64,
+            //                 DartValue::from(facing_mode as i64),
+            //             );
+            //         }
+            //     }
+            // }
+
+            // if let Some(width) = from.width {
+            //     match width {
+            //         ConstrainU32::Ideal(width) => {
+            //             constraints::set_video_constraint_value(
+            //                 optional.get(),
+            //                 VideoConstraintKind::Width as i64,
+            //                 DartValue::from(width),
+            //             );
+            //         }
+            //         ConstrainU32::Exact(width) => {
+            //             constraints::set_video_constraint_value(
+            //                 mandatory.get(),
+            //                 VideoConstraintKind::Width as i64,
+            //                 DartValue::from(width),
+            //             );
+            //         }
+            //         ConstrainU32::Range(min, max) => {
+            //             constraints::set_video_constraint_value(
+            //                 mandatory.get(),
+            //                 VideoConstraintKind::Width as i64,
+            //                 DartValue::from(i64::from(min)),
+            //             );
+            //         }
+            //     }
+            // }
+
+            // if let Some(height) = from.height {
+            //     match height {
+            //         ConstrainU32::Ideal(height) => {
+            //             constraints::set_video_constraint_value(
+            //                 optional.get(),
+            //                 VideoConstraintKind::Height as i64,
+            //                 DartValue::from(height),
+            //             );
+            //         }
+            //         ConstrainU32::Exact(height) => {
+            //             constraints::set_video_constraint_value(
+            //                 mandatory.get(),
+            //                 VideoConstraintKind::Height as i64,
+            //                 DartValue::from(height),
+            //             );
+            //         }
+            //         ConstrainU32::Range(min, max) => {
+            //             constraints::set_video_constraint_value(
+            //                 mandatory.get(),
+            //                 VideoConstraintKind::Height as i64,
+            //                 DartValue::from(min),
+            //             );
+            //         }
+            //     }
+            // }
 
             Self {
                 optional,
