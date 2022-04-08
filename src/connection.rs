@@ -10,7 +10,7 @@ use std::{
 use derive_more::{Display, From};
 use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
-    StreamExt,
+    StreamExt as _,
 };
 use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
 use tracerr::Traced;
@@ -67,7 +67,7 @@ pub struct Connections {
     connections: RefCell<HashMap<MemberId, Connection>>,
 
     /// Global constraints to the [`remote::Track`]s of the Jason.
-    global_recv_constraints: Rc<RecvConstraints>,
+    room_recv_constraints: Rc<RecvConstraints>,
 
     /// Callback invoked on remote `Member` media arrival.
     #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
@@ -76,11 +76,11 @@ pub struct Connections {
 
 impl Connections {
     /// Creates new [`Connections`].
-    pub fn new(global_recv_constraints: Rc<RecvConstraints>) -> Self {
+    pub fn new(room_recv_constraints: Rc<RecvConstraints>) -> Self {
         Self {
             peer_members: RefCell::default(),
             connections: RefCell::default(),
-            global_recv_constraints,
+            room_recv_constraints,
             on_new_connection: platform::Callback::default(),
         }
     }
@@ -107,15 +107,15 @@ impl Connections {
         let conn = self.connections.borrow().get(remote_member_id).cloned();
         conn.map_or_else(
             || {
-                let con = Connection::new(
+                let connection = Connection::new(
                     remote_member_id.clone(),
-                    &self.global_recv_constraints,
+                    &self.room_recv_constraints,
                 );
-                self.on_new_connection.call1(con.new_handle());
+                self.on_new_connection.call1(connection.new_handle());
                 drop(
                     self.connections
                         .borrow_mut()
-                        .insert(remote_member_id.clone(), con.clone()),
+                        .insert(remote_member_id.clone(), connection.clone()),
                 );
                 let _ = self
                     .peer_members
@@ -123,7 +123,8 @@ impl Connections {
                     .entry(local_peer_id)
                     .or_default()
                     .insert(remote_member_id.clone());
-                con
+
+                connection
             },
             |c| c,
         )
@@ -182,7 +183,7 @@ struct InnerConnection {
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
 
     /// Individual [`RecvConstraints`] of this [`Connection`].
-    individual_recv_constraints: Rc<RecvConstraints>,
+    recv_constraints: Rc<RecvConstraints>,
 
     /// All [`receiver::State`]s related to this [`InnerConnection`].
     receivers: RefCell<Vec<Rc<receiver::State>>>,
@@ -213,23 +214,23 @@ impl InnerConnection {
         kind: MediaKind,
     ) -> ChangeMediaStateResult {
         let receivers = self.receivers.borrow().clone();
-        let mut futs = Vec::new();
+        let mut change_tasks = Vec::new();
         for r in receivers {
             if r.is_subscription_needed(desired_state) && r.kind() == kind {
                 r.media_state_transition_to(desired_state)
                     .map_err(tracerr::map_from_and_wrap!())?;
-                futs.push(r.when_media_state_stable(desired_state));
+                change_tasks.push(r.when_media_state_stable(desired_state));
             }
         }
 
         drop(
-            future::try_join_all(futs)
+            future::try_join_all(change_tasks)
                 .await
                 .map_err(tracerr::from_and_wrap!())?,
         );
 
         if let MediaState::MediaExchange(desired_state) = desired_state {
-            self.individual_recv_constraints.set_enabled(
+            self.recv_constraints.set_enabled(
                 desired_state == media_exchange_state::Stable::Enabled,
                 kind,
             );
@@ -414,28 +415,28 @@ impl Connection {
     #[must_use]
     pub fn new(
         remote_id: MemberId,
-        global_recv_constraints: &Rc<RecvConstraints>,
+        room_recv_constraints: &Rc<RecvConstraints>,
     ) -> Self {
-        let individual_recv_constraints =
-            Rc::new(global_recv_constraints.as_ref().clone());
+        // Clone initial incoming media constraints.
+        let recv_constraints = Rc::new(room_recv_constraints.as_ref().clone());
 
         Self(Rc::new(InnerConnection {
             _task_handles: vec![
                 Self::spawn_constraints_synchronizer(
-                    Rc::clone(&individual_recv_constraints),
-                    global_recv_constraints.on_video_enabled_change(),
+                    Rc::clone(&recv_constraints),
+                    room_recv_constraints.on_video_enabled_change(),
                     MediaKind::Video,
                 ),
                 Self::spawn_constraints_synchronizer(
-                    Rc::clone(&individual_recv_constraints),
-                    global_recv_constraints.on_audio_enabled_change(),
+                    Rc::clone(&recv_constraints),
+                    room_recv_constraints.on_audio_enabled_change(),
                     MediaKind::Audio,
                 ),
             ],
             remote_id,
             quality_score: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
-            individual_recv_constraints,
+            recv_constraints,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
             receivers: RefCell::default(),
@@ -471,12 +472,8 @@ impl Connection {
     /// [`MediaExchangeState`]: crate::peer::MediaExchangeState
     pub fn add_receiver(&self, receiver: Rc<receiver::State>) {
         let enabled_in_cons = match &receiver.kind() {
-            MediaKind::Audio => {
-                self.0.individual_recv_constraints.is_audio_enabled()
-            }
-            MediaKind::Video => {
-                self.0.individual_recv_constraints.is_video_enabled()
-            }
+            MediaKind::Audio => self.0.recv_constraints.is_audio_enabled(),
+            MediaKind::Video => self.0.recv_constraints.is_video_enabled(),
         };
         receiver
             .media_exchange_state_controller()

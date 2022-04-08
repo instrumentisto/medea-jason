@@ -23,8 +23,7 @@ use crate::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
         UpdateLocalStreamError,
     },
-    platform,
-    room::{self, ConstraintsUpdateError, RoomJoinError},
+    platform, room,
     rpc::{rpc_session::ConnectionLostReason, ReconnectError, SessionError},
     utils::Caused,
 };
@@ -635,19 +634,20 @@ impl From<Traced<SessionError>> for Error {
     }
 }
 
-impl From<Traced<RoomJoinError>> for Error {
-    fn from(err: Traced<RoomJoinError>) -> Self {
+impl From<Traced<room::RoomJoinError>> for Error {
+    fn from(err: Traced<room::RoomJoinError>) -> Self {
         let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
-            RoomJoinError::Detached | RoomJoinError::CallbackNotSet(_) => {
+            room::RoomJoinError::Detached
+            | room::RoomJoinError::CallbackNotSet(_) => {
                 StateError::new(message, trace).into()
             }
-            RoomJoinError::ConnectionInfoParse(_) => {
+            room::RoomJoinError::ConnectionInfoParse(_) => {
                 FormatException::new(message).into()
             }
-            RoomJoinError::SessionError(err) => {
+            room::RoomJoinError::SessionError(err) => {
                 Traced::compose(err, trace).into()
             }
         }
@@ -719,16 +719,17 @@ impl From<Traced<room::ChangeMediaStateError>> for Error {
     }
 }
 
-impl From<ConstraintsUpdateError> for Error {
-    fn from(err: ConstraintsUpdateError) -> Self {
+impl From<room::ConstraintsUpdateError> for Error {
+    fn from(err: room::ConstraintsUpdateError) -> Self {
         let message = err.to_string();
 
         let (err, rolled_back) = match err {
-            ConstraintsUpdateError::Recovered(err) => (err, true),
-            ConstraintsUpdateError::RecoverFailed {
-                recover_reason, ..
+            room::ConstraintsUpdateError::Recovered(err) => (err, true),
+            room::ConstraintsUpdateError::RecoverFailed {
+                recover_reason,
+                ..
             } => (recover_reason, false),
-            ConstraintsUpdateError::Errored(err) => (err, false),
+            room::ConstraintsUpdateError::Errored(err) => (err, false),
         };
 
         MediaSettingsUpdateException::new(message, err, rolled_back).into()

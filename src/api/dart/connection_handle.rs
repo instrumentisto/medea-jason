@@ -6,7 +6,7 @@ use tracerr::Traced;
 use crate::{
     api::{
         dart::utils::{DartError, DartResult},
-        utils::{DartFuture, IntoDartFuture},
+        utils::{DartFuture, IntoDartFuture as _},
     },
     connection::ChangeMediaStateError,
     platform,
