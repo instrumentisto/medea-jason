@@ -41,6 +41,7 @@ int _kind(MediaStreamTrack track) {
   }
 }
 
+/// Returns media source kind of the provided [MediaStreamTrack].
 int _sourceKind(MediaStreamTrack track) {
   if (track.sourceKind() == MediaSourceKind.device) {
     return 0;
