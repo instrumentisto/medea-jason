@@ -46,6 +46,9 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-kind
         pub fn kind(track: Dart_Handle) -> i64;
 
+        /// Returns media source kind of the provided [MediaStreamTrack][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn source_kind(track: Dart_Handle) -> i64;
 
         /// Returns [facing mode][1] of the provided [MediaStreamTrack][0].
