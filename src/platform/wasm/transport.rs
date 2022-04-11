@@ -4,6 +4,7 @@
 
 use std::{cell::RefCell, rc::Rc};
 
+use async_trait::async_trait;
 use derive_more::{From, Into};
 use futures::{channel::mpsc, stream::LocalBoxStream, StreamExt};
 use medea_client_api_proto::{ClientMsg, CloseDescription, ServerMsg};
@@ -49,7 +50,8 @@ type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
 struct InnerSocket {
     /// JS side [WebSocket].
     ///
-    /// If [`DartHandle`] is `None`, then connection is not instantiated atm.
+    /// If [`SysWebSocket`] is [`None`], then connection hasn't been
+    /// instantiated yet.
     ///
     /// [WebSocket]: https://developer.mozilla.org/docs/Web/API/WebSocket
     socket: RefCell<Option<SysWebSocket>>,
@@ -86,7 +88,8 @@ struct InnerSocket {
 }
 
 impl InnerSocket {
-    /// Establishes a new [`WebSocketRpcTransport`] on the given `url`.
+    /// Creates a new [`InnerSocket`] which can be connected to the server with
+    /// the [`RpcTransport::connect()`] method call.
     fn new() -> Self {
         Self {
             socket_state: ObservableCell::new(TransportState::Connecting),
@@ -127,12 +130,11 @@ impl Drop for InnerSocket {
 pub struct WebSocketRpcTransport(Rc<RefCell<InnerSocket>>);
 
 impl WebSocketRpcTransport {
-    /// Returns new [`WebSocketRpcTransport`] which can be connected to
-    /// the server with [`RpcTransport::connect`] method call.
+    /// Returns a new [`WebSocketRpcTransport`] which can be connected to the
+    /// server with the [`RpcTransport::connect()`] method call.
     #[must_use]
     pub fn new() -> Self {
-        let socket = Rc::new(RefCell::new(InnerSocket::new()));
-        Self(socket)
+        Self(Rc::new(RefCell::new(InnerSocket::new())))
     }
 
     /// Sets [`InnerSocket::on_close_listener`] which will update
@@ -186,7 +188,7 @@ impl Default for WebSocketRpcTransport {
     }
 }
 
-#[async_trait::async_trait(?Send)]
+#[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> Result<()> {
         let socket = SysWebSocket::new(url.as_ref())
@@ -235,7 +237,6 @@ impl RpcTransport for WebSocketRpcTransport {
         if state == Some(TransportState::Open) {
             self.set_on_close_listener(socket.clone());
             self.set_on_message_listener(socket);
-
             Ok(())
         } else {
             Err(tracerr::new!(TransportError::InitSocket))

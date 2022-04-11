@@ -18,7 +18,7 @@ async fn could_not_init_socket_err() {
         .await
     {
         Ok(_) => unreachable!(),
-        Err(err) => match err.into_inner() {
+        Err(e) => match e.into_inner() {
             InitSocket => {}
             _ => unreachable!(),
         },

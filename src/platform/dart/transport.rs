@@ -3,6 +3,7 @@ use std::{
     rc::Rc,
 };
 
+use async_trait::async_trait;
 use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
 use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
 use medea_macro::dart_bridge;
@@ -69,7 +70,8 @@ mod transport {
 pub struct WebSocketRpcTransport {
     /// Handle to the Dart side [`WebSocket`][0].
     ///
-    /// If [`DartHandle`] is `None`, then connection is not instantiated atm.
+    /// If [`DartHandle`] is [`None`], then connection hasn't been instantiated
+    /// yet.
     ///
     /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
     handle: RefCell<Option<DartHandle>>,
@@ -89,8 +91,8 @@ pub struct WebSocketRpcTransport {
 }
 
 impl WebSocketRpcTransport {
-    /// Returns new [`WebSocketRpcTransport`] which can be connected to
-    /// the server with [`RpcTransport::connect`] method call.
+    /// Creates a new [`WebSocketRpcTransport`] which can be connected to the
+    /// server with the [`RpcTransport::connect()`] method call.
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -112,7 +114,7 @@ impl Default for WebSocketRpcTransport {
     }
 }
 
-#[async_trait::async_trait(?Send)]
+#[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> Result<()> {
         // TODO: Propagate execution error.
@@ -129,8 +131,7 @@ impl RpcTransport for WebSocketRpcTransport {
                                     Ok(parsed) => parsed,
                                     Err(e) => {
                                         // TODO: Protocol versions mismatch?
-                                        //       should drop connection if
-                                        //       so.
+                                        //       Should drop connection if so.
                                         log::error!("{}", tracerr::new!(e));
                                         return;
                                     }

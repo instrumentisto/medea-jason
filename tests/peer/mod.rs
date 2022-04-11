@@ -795,8 +795,7 @@ async fn get_traffic_stats() {
             },
             RtcStatsType::InboundRtp(_) => {
                 unreachable!(
-                    "First Peer shouldn't have any InboundRtp
-stats."
+                    "First `Peer` shouldn't have any `InboundRtp` stats",
                 )
             }
             RtcStatsType::CandidatePair(candidate_pair) => {

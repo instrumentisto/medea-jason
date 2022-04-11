@@ -35,7 +35,7 @@ async fn could_not_auth_err() {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().returning_st(|| {
                 Box::pin(stream::iter(vec![
                     RPC_SETTINGS,
@@ -92,7 +92,7 @@ async fn concurrent_connect_requests() {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().returning_st(|| {
                 Box::pin(stream::iter(vec![
                     RPC_SETTINGS,
@@ -135,11 +135,9 @@ async fn concurrent_connect_requests() {
     let connect2 = Rc::clone(&session).connect(connection_info);
     let reconnect2 = Rc::clone(&session).reconnect();
 
-    futures::future::try_join_all(vec![
-        connect1, reconnect1, connect2, reconnect2,
-    ])
-    .await
-    .unwrap();
+    future::try_join_all(vec![connect1, reconnect1, connect2, reconnect2])
+        .await
+        .unwrap();
     assert!(join_room_sent.load(Ordering::Relaxed));
 }
 
@@ -190,7 +188,7 @@ async fn reconnect_after_transport_abnormal_close() {
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
-                .return_once(|_| Box::pin(futures::future::ok(())));
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().returning_st(|| {
                 Box::pin(stream::iter(vec![
                     RPC_SETTINGS,

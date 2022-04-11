@@ -4,7 +4,7 @@ use std::{rc::Rc, time::Duration};
 
 use futures::{
     channel::{mpsc, oneshot},
-    stream, StreamExt,
+    future, stream, StreamExt,
 };
 use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_jason::{
@@ -32,7 +32,7 @@ async fn sends_pong_on_received_ping() {
     let (on_message_tx, on_message_rx) = mpsc::unbounded();
     transport
         .expect_connect()
-        .return_once(|_| Box::pin(futures::future::ok(())));
+        .return_once(|_| Box::pin(future::ok(())));
     transport
         .expect_on_message()
         .return_once(|| Box::pin(on_message_rx));
@@ -72,7 +72,7 @@ async fn on_idle_works() {
     let mut transport = MockRpcTransport::new();
     transport
         .expect_connect()
-        .return_once(|_| Box::pin(futures::future::ok(())));
+        .return_once(|_| Box::pin(future::ok(())));
     transport
         .expect_on_message()
         .return_once(|| stream::pending().boxed());
@@ -103,7 +103,7 @@ async fn pre_sends_pong() {
     let mut transport = MockRpcTransport::new();
     transport
         .expect_connect()
-        .return_once(|_| Box::pin(futures::future::ok(())));
+        .return_once(|_| Box::pin(future::ok(())));
     transport
         .expect_on_message()
         .return_once(|| stream::pending().boxed());
@@ -137,7 +137,7 @@ async fn transport_is_dropped_when_hearbeater_is_dropped() {
     let mut transport = MockRpcTransport::new();
     transport
         .expect_connect()
-        .return_once(|_| Box::pin(futures::future::ok(())));
+        .return_once(|_| Box::pin(future::ok(())));
     transport
         .expect_on_message()
         .returning(|| stream::pending().boxed());
