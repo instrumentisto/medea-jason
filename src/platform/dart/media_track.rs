@@ -46,6 +46,8 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-kind
         pub fn kind(track: Dart_Handle) -> i64;
 
+        pub fn source_kind(track: Dart_Handle) -> i64;
+
         /// Returns [facing mode][1] of the provided [MediaStreamTrack][0].
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
@@ -238,8 +240,7 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
-        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
-        false
+        unsafe { media_stream_track::source_kind(self.0.get()) == 1 }
     }
 
     /// Forks this [`MediaStreamTrack`], by creating a new [`MediaStreamTrack`]

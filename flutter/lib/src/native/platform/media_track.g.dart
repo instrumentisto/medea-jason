@@ -5,6 +5,7 @@ void registerFunction(DynamicLibrary dl, {
 required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> id,
 required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> deviceId,
 required Pointer<NativeFunction<Int64 Function(Handle)>> kind,
+required Pointer<NativeFunction<Int64 Function(Handle)>> sourceKind,
 required Pointer<NativeFunction<Pointer Function(Handle)>> facingMode,
 required Pointer<NativeFunction<Pointer Function(Handle)>> height,
 required Pointer<NativeFunction<Pointer Function(Handle)>> width,
@@ -15,10 +16,11 @@ required Pointer<NativeFunction<Void Function(Handle)>> stop,
 required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
 required Pointer<NativeFunction<Handle Function(Handle)>> clone,
 } ) {
-dl.lookupFunction<Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer), void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer)>('register_media_stream_track')(
+dl.lookupFunction<Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer), void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer)>('register_media_stream_track')(
 id,
 deviceId,
 kind,
+sourceKind,
 facingMode,
 height,
 width,
