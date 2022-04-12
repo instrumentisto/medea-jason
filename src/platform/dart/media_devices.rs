@@ -128,7 +128,7 @@ impl MediaDevices {
 
         for track in tracks {
             media_tracks
-                .push(MediaStreamTrack::new(track, MediaSourceKind::Device))
+                .push(MediaStreamTrack::new(track, MediaSourceKind::Device));
         }
 
         Ok(media_tracks)
@@ -165,7 +165,7 @@ impl MediaDevices {
 
         for track in tracks {
             media_tracks
-                .push(MediaStreamTrack::new(track, MediaSourceKind::Display))
+                .push(MediaStreamTrack::new(track, MediaSourceKind::Display));
         }
 
         Ok(media_tracks)

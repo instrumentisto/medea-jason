@@ -116,12 +116,18 @@ mod media_stream_track {
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[derive(Clone, Debug)]
 pub struct MediaStreamTrack {
+    /// Pointer on the [MediaStreamTrack][0]
+    ///
+    /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     inner: DartHandle,
+
+    /// Media source type of this [`MediaStreamTrack`].
     source_kind: MediaSourceKind,
 }
 
 impl MediaStreamTrack {
     /// Creates a new [`MediaStreamTrack`].
+    #[must_use]
     pub fn new(inner: DartHandle, source_kind: MediaSourceKind) -> Self {
         Self { inner, source_kind }
     }
