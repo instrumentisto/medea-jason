@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
-import 'package:flutter_webrtc/src/model/constraints.dart';
 
 import 'media_devices.g.dart' as bridge;
 
