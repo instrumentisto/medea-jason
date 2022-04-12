@@ -43,7 +43,9 @@ impl Jason {
     #[must_use]
     pub fn new() -> Self {
         platform::set_panic_hook();
-        platform::init_logger();
+        if !log::logger().enabled(&log::Metadata::builder().build()) {
+            platform::init_logger();
+        }
 
         Self::with_rpc_client(Rc::new(WebSocketRpcClient::new(Box::new(
             || Rc::new(platform::WebSocketRpcTransport::new()),
