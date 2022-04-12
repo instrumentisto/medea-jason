@@ -15,7 +15,6 @@ void registerFunctions(DynamicLibrary dl) {
     deviceId: Pointer.fromFunction(_deviceId),
     facingMode: Pointer.fromFunction(_facingMode),
     kind: Pointer.fromFunction(_kind, 0),
-    sourceKind: Pointer.fromFunction(_sourceKind, 0),
     height: Pointer.fromFunction(_height),
     width: Pointer.fromFunction(_width),
     setEnabled: Pointer.fromFunction(_setEnabled),
@@ -35,15 +34,6 @@ Pointer<Utf8> _id(MediaStreamTrack track) {
 /// Returns kind of the provided [MediaStreamTrack].
 int _kind(MediaStreamTrack track) {
   if (track.kind() == MediaKind.audio) {
-    return 0;
-  } else {
-    return 1;
-  }
-}
-
-/// Returns media source kind of the provided [MediaStreamTrack].
-int _sourceKind(MediaStreamTrack track) {
-  if (track.sourceKind() == MediaSourceKind.device) {
     return 0;
   } else {
     return 1;
