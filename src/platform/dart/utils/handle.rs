@@ -47,21 +47,22 @@ impl DartHandle {
     /// Takes ownership of the provided [`Dart_Handle`] so it won't get freed by
     /// Dart VM.
     ///
+    /// # Safety
+    ///
+    /// The provided [`Dart_Handle`] should be non-`null` and correct.
+    ///
     /// # Panics
     ///
     /// If the provided [`Dart_Handle`] represents a Dart error, which is an
     /// unexpected situation.
     #[must_use]
-    pub fn new(handle: Dart_Handle) -> Self {
-        if unsafe { Dart_IsError_DL_Trampolined(handle) } {
-            let err_msg = unsafe {
-                c_str_into_string(Dart_GetError_DL_Trampolined(handle))
-            };
+    pub unsafe fn new(handle: Dart_Handle) -> Self {
+        if Dart_IsError_DL_Trampolined(handle) {
+            let err_msg =
+                c_str_into_string(Dart_GetError_DL_Trampolined(handle));
             panic!("Unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(unsafe {
-            Dart_NewPersistentHandle_DL_Trampolined(handle)
-        }))
+        Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(handle)))
     }
 
     /// Returns the underlying [`Dart_Handle`].
@@ -95,12 +96,6 @@ impl fmt::Display for DartHandle {
 
             write!(f, "{to_string}")
         }
-    }
-}
-
-impl From<Dart_Handle> for DartHandle {
-    fn from(handle: Dart_Handle) -> Self {
-        Self::new(handle)
     }
 }
 

@@ -193,7 +193,7 @@ mod mock {
         let err = RpcClientException::new(
             RpcClientExceptionKind::ConnectionLost,
             "RpcClientException::ConnectionLost",
-            Some(platform::Error::from(cause)),
+            Some(platform::Error::from_handle(cause)),
             Trace::new(vec![tracerr::new_frame!()]),
         );
 
@@ -207,7 +207,7 @@ mod mock {
         let err = RpcClientException::new(
             RpcClientExceptionKind::SessionFinished,
             "RpcClientException::SessionFinished",
-            Some(platform::Error::from(cause)),
+            Some(platform::Error::from_handle(cause)),
             Trace::new(vec![tracerr::new_frame!()]),
         );
 

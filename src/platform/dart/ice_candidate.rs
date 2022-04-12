@@ -59,7 +59,7 @@ impl IceCandidate {
                 sdp_m_line_index.map(i64::from).into(),
             )
         };
-        Self(DartHandle::new(handle))
+        Self(unsafe { DartHandle::new(handle) })
     }
 
     /// Returns the underlying [`Dart_Handle`] of this [`IceCandidate`].

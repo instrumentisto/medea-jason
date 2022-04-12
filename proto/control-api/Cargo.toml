@@ -1,8 +1,8 @@
 [package]
 name = "medea-control-api-proto"
-version = "0.5.0"
+version = "0.6.0-dev"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.60"
 description = "Control API protocol implementation for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"
@@ -15,12 +15,12 @@ categories = ["api-bindings", "network-programming"]
 
 [features]
 default = ["grpc"]
-grpc = ["prost", "prost-types", "tonic", "tonic-build"]
+grpc = ["dep:prost", "dep:prost-types", "dep:tonic", "dep:tonic-build"]
 
 [dependencies]
-prost = { version = "0.9", optional = true }
-prost-types = { version = "0.9", optional = true }
-tonic = { version = "0.6", optional = true }
+prost = { version = "0.10", optional = true }
+prost-types = { version = "0.10", optional = true }
+tonic = { version = "0.7", optional = true }
 
 [build-dependencies]
-tonic-build = { version = "0.6", optional = true }
+tonic-build = { version = "0.7", optional = true }

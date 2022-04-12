@@ -6,8 +6,6 @@ use std::{ffi::c_void, os::raw::c_char, ptr};
 
 use dart_sys::{Dart_CObject, Dart_Handle, Dart_PersistentHandle, Dart_Port};
 
-/// TODO: We should check everything returned from API with `Dart_IsError` and
-///       panic or `Dart_PropagateError`.
 #[link(name = "trampoline")]
 extern "C" {
     /// Initializes Dynamically Linked Dart API usage. Accepts
