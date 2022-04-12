@@ -192,7 +192,7 @@ mod mock {
     pub unsafe extern "C" fn returns_local_media_init_exception(
         cause: Dart_Handle,
     ) -> DartResult {
-        let cause = platform::Error::from(cause);
+        let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetUserMediaFailed(
             cause.into()
         ));
@@ -203,7 +203,7 @@ mod mock {
     pub unsafe extern "C" fn returns_future_with_local_media_init_exception(
         cause: Dart_Handle,
     ) -> DartFuture<Result<(), Traced<InitLocalTracksError>>> {
-        let cause = platform::Error::from(cause);
+        let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetDisplayMediaFailed(
             cause.into()
         ));
@@ -215,7 +215,7 @@ mod mock {
     pub unsafe extern "C" fn returns_enumerate_devices_exception(
         cause: Dart_Handle,
     ) -> DartResult {
-        let cause = platform::Error::from(cause);
+        let cause = platform::Error::from_handle(cause);
         DartError::from(tracerr::new!(EnumerateDevicesError::from(cause)))
             .into()
     }
@@ -224,7 +224,7 @@ mod mock {
     pub unsafe extern "C" fn returns_future_enumerate_devices_exception(
         cause: Dart_Handle,
     ) -> DartFuture<Result<(), Traced<EnumerateDevicesError>>> {
-        let cause = platform::Error::from(cause);
+        let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(EnumerateDevicesError::from(cause));
 
         future::err(err).into_dart_future()

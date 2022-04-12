@@ -360,7 +360,7 @@ impl TryFrom<DartValueArg<Self>> for Option<DartHandle> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(handle) => {
-                Ok(Some(DartHandle::new(unsafe { *handle.as_ptr() })))
+                Ok(Some(unsafe { DartHandle::new(*handle.as_ptr()) }))
             }
             DartValue::Ptr(_) | DartValue::String(_) | DartValue::Int(_) => {
                 Err(DartValueCastError {
@@ -414,7 +414,7 @@ impl TryFrom<DartValueArg<Self>> for DartHandle {
     fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
         match value.0 {
             DartValue::Handle(handle) => {
-                Ok(Self::new(unsafe { unbox_dart_handle(handle) }))
+                Ok(unsafe { Self::new(unbox_dart_handle(handle)) })
             }
             DartValue::None
             | DartValue::Ptr(_)

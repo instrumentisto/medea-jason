@@ -122,13 +122,13 @@ impl Transceiver {
         &self,
         new_sender: Rc<local::Track>,
     ) -> Result<(), platform::Error> {
-        FutureFromDart::execute::<()>(unsafe {
-            transceiver::replace_track(
+        unsafe {
+            FutureFromDart::execute::<()>(transceiver::replace_track(
                 self.transceiver.get(),
                 new_sender.platform_track().handle(),
-            )
-        })
-        .await
+            ))
+            .await
+        }
         .unwrap();
         drop(self.send_track.replace(Some(new_sender)));
         Ok(())
@@ -140,10 +140,12 @@ impl Transceiver {
         drop(self.send_track.borrow_mut().take());
         let transceiver = self.transceiver.get();
         async move {
-            FutureFromDart::execute::<()>(unsafe {
-                transceiver::drop_sender(transceiver)
-            })
-            .await
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::drop_sender(
+                    transceiver,
+                ))
+                .await
+            }
             .unwrap();
         }
     }
@@ -195,10 +197,12 @@ impl Transceiver {
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.transceiver.get();
         async move {
-            FutureFromDart::execute::<i32>(unsafe {
-                transceiver::get_direction(handle)
-            })
-            .await
+            unsafe {
+                FutureFromDart::execute::<i32>(transceiver::get_direction(
+                    handle,
+                ))
+                .await
+            }
             .unwrap()
             .into()
         }
@@ -211,10 +215,13 @@ impl Transceiver {
     ) -> LocalBoxFuture<'static, ()> {
         let handle = self.transceiver.get();
         Box::pin(async move {
-            FutureFromDart::execute::<()>(unsafe {
-                transceiver::set_direction(handle, direction.into())
-            })
-            .await
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::set_direction(
+                    handle,
+                    direction.into(),
+                ))
+                .await
+            }
             .unwrap();
         })
     }

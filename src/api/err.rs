@@ -1,7 +1,5 @@
 //! External API errors.
 
-// TODO: Remove on next `wasm_bindgen` update.
-#![allow(clippy::unused_unit)]
 // TODO: See https://github.com/rustwasm/wasm-bindgen/pull/2719
 #![allow(clippy::use_self)]
 

@@ -57,11 +57,14 @@ impl<T> Function<T> {
     /// Creates a new [`Function`] from the provided [`Dart_Handle`] to a Dart
     /// closure, and persists the provided [`Dart_Handle`] so it won't be moved
     /// by the Dart VM GC.
+    ///
+    /// # Safety
+    ///
+    /// The provided [`Dart_Handle`] should be non-`null` and correct.
     #[must_use]
-    #[allow(clippy::not_unsafe_ptr_arg_deref)]
-    pub fn new(cb: Dart_Handle) -> Self {
+    pub unsafe fn new(cb: Dart_Handle) -> Self {
         Self {
-            dart_fn: unsafe { Dart_NewPersistentHandle_DL_Trampolined(cb) },
+            dart_fn: Dart_NewPersistentHandle_DL_Trampolined(cb),
             _arg: PhantomData,
         }
     }

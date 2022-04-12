@@ -2,9 +2,6 @@
 //!
 //! [`Room`]: room::Room
 
-// TODO: Remove on next `wasm_bindgen` update.
-#![allow(clippy::unused_unit)]
-
 use derive_more::{From, Into};
 use js_sys::Promise;
 use wasm_bindgen::{prelude::*, JsValue};
