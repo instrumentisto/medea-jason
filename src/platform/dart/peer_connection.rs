@@ -152,10 +152,12 @@ impl RtcPeerConnection {
     {
         let ice_servers = RtcIceServers::from(ice_servers);
         Ok(Self {
-            handle: FutureFromDart::execute(unsafe {
-                peer_connection::new_peer(ice_servers.get_handle())
-            })
-            .await
+            handle: unsafe {
+                FutureFromDart::execute(peer_connection::new_peer(
+                    ice_servers.get_handle(),
+                ))
+                .await
+            }
             .map_err(RtcPeerConnectionError::PeerCreationError)
             .map_err(tracerr::wrap!())?,
         })
@@ -362,10 +364,12 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createanswer
     pub async fn create_answer(&self) -> Result<String> {
-        FutureFromDart::execute(unsafe {
-            peer_connection::create_answer(self.handle.get())
-        })
-        .await
+        unsafe {
+            FutureFromDart::execute(peer_connection::create_answer(
+                self.handle.get(),
+            ))
+            .await
+        }
         .map_err(RtcPeerConnectionError::CreateAnswerFailed)
         .map_err(tracerr::wrap!())
     }
@@ -379,10 +383,12 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
     pub async fn rollback(&self) -> Result<()> {
-        FutureFromDart::execute(unsafe {
-            peer_connection::rollback(self.handle.get())
-        })
-        .await
+        unsafe {
+            FutureFromDart::execute(peer_connection::rollback(
+                self.handle.get(),
+            ))
+            .await
+        }
         .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
         .map_err(tracerr::wrap!())
     }
@@ -399,10 +405,12 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection-createoffer
     pub async fn create_offer(&self) -> Result<String> {
-        FutureFromDart::execute(unsafe {
-            peer_connection::create_offer(self.handle.get())
-        })
-        .await
+        unsafe {
+            FutureFromDart::execute(peer_connection::create_offer(
+                self.handle.get(),
+            ))
+            .await
+        }
         .map_err(RtcPeerConnectionError::CreateOfferFailed)
         .map_err(tracerr::wrap!())
     }

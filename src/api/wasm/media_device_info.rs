@@ -2,9 +2,6 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#device-info
 
-// TODO: Remove on next `wasm_bindgen` update.
-#![allow(clippy::unused_unit)]
-
 use derive_more::From;
 use wasm_bindgen::prelude::*;
 

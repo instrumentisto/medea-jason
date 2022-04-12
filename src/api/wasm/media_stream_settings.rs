@@ -3,8 +3,6 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 
 #![allow(clippy::drop_copy, clippy::new_without_default)]
-// TODO: Remove on next `wasm_bindgen` update.
-#![allow(clippy::unused_unit)]
 
 use derive_more::{From, Into};
 use wasm_bindgen::prelude::*;

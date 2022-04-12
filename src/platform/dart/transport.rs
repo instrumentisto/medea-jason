@@ -119,8 +119,8 @@ impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> Result<()> {
         // TODO: Propagate execution error.
         #[allow(clippy::map_err_ignore)]
-        let handle = FutureFromDart::execute::<DartHandle>(unsafe {
-            transport::connect(
+        let handle = unsafe {
+            FutureFromDart::execute::<DartHandle>(transport::connect(
                 string_into_c_str(url.as_ref().to_owned()),
                 Callback::from_fn_mut({
                     let weak_subs = Rc::downgrade(&self.on_message_subs);
@@ -155,9 +155,9 @@ impl RpcTransport for WebSocketRpcTransport {
                     }
                 })
                 .into_dart(),
-            )
-        })
-        .await
+            ))
+            .await
+        }
         .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
 
         *self.handle.borrow_mut() = Some(handle);

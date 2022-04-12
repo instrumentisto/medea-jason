@@ -1,8 +1,6 @@
 //! General JS side library interface.
 
 #![allow(clippy::new_without_default)]
-// TODO: Remove on next `wasm_bindgen` update.
-#![allow(clippy::unused_unit)]
 
 use derive_more::From;
 use wasm_bindgen::prelude::*;

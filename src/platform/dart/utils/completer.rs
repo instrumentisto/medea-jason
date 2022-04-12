@@ -82,8 +82,8 @@ mod completer {
 pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
-    let dart_fut = unsafe { completer::delayed(delay) };
-    FutureFromDart::execute::<()>(dart_fut).await.unwrap();
+    unsafe { FutureFromDart::execute::<()>(completer::delayed(delay)).await }
+        .unwrap();
 }
 
 /// Dart [Future] which can be resolved from Rust.

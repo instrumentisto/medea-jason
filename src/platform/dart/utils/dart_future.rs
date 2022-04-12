@@ -67,7 +67,7 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
 ) {
     propagate_panic(move || {
         let future = Box::from_raw(future.as_ptr());
-        future.resolve_err(Error::from(val));
+        future.resolve_err(Error::from_handle(val));
     });
 }
 
@@ -85,17 +85,22 @@ impl fmt::Debug for FutureFromDart {
 }
 
 impl FutureFromDart {
-    /// Converts a fallible[Dart `Future`s][0] into the Rust [`Future`].
+    /// Converts a fallible [Dart `Future`s][0] into the Rust [`Future`].
     ///
     /// Returned [`Future`] will be resolved with a requested [`DartValueArg`]
     /// result on a Dart side.
+    ///
+    /// # Safety
+    ///
+    /// The provided [`Dart_Handle`] should be non-`null` and point to the
+    /// correct [Dart `Future`][0].
     ///
     /// # Errors
     ///
     /// Errors with an [`Error`] if Dart side thrown an exception.
     ///
     /// [0]: https://api.dart.dev/stable/dart-async/Future-class.html
-    pub fn execute<T>(
+    pub unsafe fn execute<T>(
         dart_fut: Dart_Handle,
     ) -> impl Future<Output = Result<T, Error>>
     where
@@ -111,12 +116,10 @@ impl FutureFromDart {
             ));
         }));
 
-        unsafe {
-            future_from_dart::complete_proxy(
-                dart_fut.get(),
-                ptr::NonNull::from(Box::leak(Box::new(this))),
-            );
-        }
+        future_from_dart::complete_proxy(
+            dart_fut.get(),
+            ptr::NonNull::from(Box::leak(Box::new(this))),
+        );
 
         async move { rx.await.unwrap() }
     }
