@@ -3,17 +3,62 @@
 use std::{
     cell::{Cell, RefCell},
     collections::{HashMap, HashSet},
+    future::Future,
     rc::{Rc, Weak},
 };
 
-use derive_more::Display;
+use derive_more::{Display, From};
+use futures::{
+    future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
+    StreamExt as _,
+};
 use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
 use tracerr::Traced;
 
-use crate::{api, media::track::remote, platform, utils::Caused};
+use crate::{
+    api,
+    media::{track::remote, MediaKind, RecvConstraints},
+    peer::{
+        media_exchange_state, receiver, MediaState, MediaStateControllable,
+        ProhibitedStateError, TransceiverSide,
+    },
+    platform,
+    utils::{Caused, TaskHandle},
+};
+
+/// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
+///
+/// [`Sender`]: crate::peer::media::Sender
+/// [`Receiver`]: crate::peer::media::Receiver
+#[derive(Caused, Clone, Copy, Debug, Display, From)]
+#[cause(error = "platform::Error")]
+pub enum ChangeMediaStateError {
+    /// [`ConnectionHandle`]'s [`Weak`] pointer is detached.
+    #[display(fmt = "ConnectionHandle is in detached state")]
+    Detached,
+
+    /// [`MediaState`] of a [`Sender`] transits to an opposite of the requested
+    /// one.
+    ///
+    /// [`Sender`]: crate::peer::media::Sender
+    #[display(
+        fmt = "MediaState transits to opposite ({}) of the \
+               requested MediaExchangeState",
+        _0
+    )]
+    TransitionIntoOppositeState(MediaState),
+
+    /// Requested state transition is not allowed by [`Sender`]'s settings.
+    ///
+    /// [`Sender`]: crate::peer::media::Sender
+    ProhibitedState(ProhibitedStateError),
+}
+
+/// Alias of [`Result`]s related to [`MediaState`] update functions.
+type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
 /// Service which manages [`Connection`]s with remote `Member`s.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Connections {
     /// Local [`PeerId`] to remote [`MemberId`].
     peer_members: RefCell<HashMap<PeerId, HashSet<MemberId>>>,
@@ -21,12 +66,25 @@ pub struct Connections {
     /// Remote [`MemberId`] to [`Connection`] with that `Member`.
     connections: RefCell<HashMap<MemberId, Connection>>,
 
+    /// Global constraints to the [`remote::Track`]s of the Jason.
+    room_recv_constraints: Rc<RecvConstraints>,
+
     /// Callback invoked on remote `Member` media arrival.
     #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_new_connection: platform::Callback<api::ConnectionHandle>,
 }
 
 impl Connections {
+    /// Creates new [`Connections`].
+    pub fn new(room_recv_constraints: Rc<RecvConstraints>) -> Self {
+        Self {
+            peer_members: RefCell::default(),
+            connections: RefCell::default(),
+            room_recv_constraints,
+            on_new_connection: platform::Callback::default(),
+        }
+    }
+
     /// Sets callback, which will be invoked when new [`Connection`] is
     /// established.
     #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
@@ -37,30 +95,39 @@ impl Connections {
         self.on_new_connection.set_func(f);
     }
 
-    /// Creates new connection with remote `Member` based on its [`MemberId`].
+    /// Creates and returns new connection with remote `Member` based on its
+    /// [`MemberId`].
     ///
     /// No-op if [`Connection`] already exists.
     pub fn create_connection(
         &self,
         local_peer_id: PeerId,
         remote_member_id: &MemberId,
-    ) {
-        let is_new = !self.connections.borrow().contains_key(remote_member_id);
-        if is_new {
-            let con = Connection::new(remote_member_id.clone());
-            self.on_new_connection.call1(con.new_handle());
-            drop(
-                self.connections
+    ) -> Connection {
+        let conn = self.connections.borrow().get(remote_member_id).cloned();
+        conn.map_or_else(
+            || {
+                let connection = Connection::new(
+                    remote_member_id.clone(),
+                    &self.room_recv_constraints,
+                );
+                self.on_new_connection.call1(connection.new_handle());
+                drop(
+                    self.connections
+                        .borrow_mut()
+                        .insert(remote_member_id.clone(), connection.clone()),
+                );
+                let _ = self
+                    .peer_members
                     .borrow_mut()
-                    .insert(remote_member_id.clone(), con),
-            );
-            let _ = self
-                .peer_members
-                .borrow_mut()
-                .entry(local_peer_id)
-                .or_default()
-                .insert(remote_member_id.clone());
-        }
+                    .entry(local_peer_id)
+                    .or_default()
+                    .insert(remote_member_id.clone());
+
+                connection
+            },
+            |c| c,
+        )
     }
 
     /// Lookups [`Connection`] by the given remote [`PeerId`].
@@ -115,11 +182,62 @@ struct InnerConnection {
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
 
+    /// Individual [`RecvConstraints`] of this [`Connection`].
+    recv_constraints: Rc<RecvConstraints>,
+
+    /// All [`receiver::State`]s related to this [`InnerConnection`].
+    receivers: RefCell<Vec<Rc<receiver::State>>>,
+
     /// Callback invoked when a [`ConnectionQualityScore`] is updated.
     on_quality_score_update: platform::Callback<u8>,
 
     /// Callback invoked when this [`Connection`] is closed.
     on_close: platform::Callback<()>,
+
+    /// [`TaskHandle`]s for the spawned changes listeners of this
+    /// [`Connection`].
+    _task_handles: Vec<TaskHandle>,
+}
+
+impl InnerConnection {
+    /// Changes [`MediaState`] of the provided [`MediaKind`] to the provided
+    /// [`MediaState`].
+    ///
+    /// # Errors
+    ///
+    /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if this
+    /// function with opposite [`MediaState`] was called or a media server
+    /// didn't approve this state transition.
+    async fn change_media_state(
+        &self,
+        desired_state: MediaState,
+        kind: MediaKind,
+    ) -> ChangeMediaStateResult {
+        let receivers = self.receivers.borrow().clone();
+        let mut change_tasks = Vec::new();
+        for r in receivers {
+            if r.is_subscription_needed(desired_state) && r.kind() == kind {
+                r.media_state_transition_to(desired_state)
+                    .map_err(tracerr::map_from_and_wrap!())?;
+                change_tasks.push(r.when_media_state_stable(desired_state));
+            }
+        }
+
+        drop(
+            future::try_join_all(change_tasks)
+                .await
+                .map_err(tracerr::from_and_wrap!())?,
+        );
+
+        if let MediaState::MediaExchange(desired_state) = desired_state {
+            self.recv_constraints.set_enabled(
+                desired_state == media_exchange_state::Stable::Enabled,
+                kind,
+            );
+        }
+
+        Ok(())
+    }
 }
 
 impl ConnectionHandle {
@@ -183,6 +301,106 @@ impl ConnectionHandle {
             .ok_or_else(|| tracerr::new!(HandleDetachedError))
             .map(|inner| inner.on_quality_score_update.set_func(f))
     }
+
+    /// Enables inbound video in this [`Connection`].
+    ///
+    /// # Errors
+    ///
+    /// With [`ChangeMediaStateError::Detached`] if an inner [`Weak`] pointer
+    /// upgrade fails.
+    ///
+    /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
+    /// [`ConnectionHandle::disable_remote_video()`] was called while enabling
+    /// or a media server didn't approve this state transition.
+    pub fn enable_remote_video(
+        &self,
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+        self.change_media_state(
+            media_exchange_state::Stable::Enabled.into(),
+            MediaKind::Video,
+        )
+    }
+
+    /// Disables inbound video in this [`Connection`].
+    ///
+    /// # Errors
+    ///
+    /// With [`ChangeMediaStateError::Detached`] if an inner [`Weak`] pointer
+    /// upgrade fails.
+    ///
+    /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
+    /// [`ConnectionHandle::enable_remote_video()`] was called while disabling
+    /// or a media server didn't approve this state transition.
+    pub fn disable_remote_video(
+        &self,
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+        self.change_media_state(
+            media_exchange_state::Stable::Disabled.into(),
+            MediaKind::Video,
+        )
+    }
+
+    /// Enables inbound audio in this [`Connection`].
+    ///
+    /// # Errors
+    ///
+    /// With [`ChangeMediaStateError::Detached`] if an inner [`Weak`] pointer
+    /// upgrade fails.
+    ///
+    /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
+    /// [`ConnectionHandle::disable_remote_audio()`] was called while enabling
+    /// or a media server didn't approve this state transition.
+    pub fn enable_remote_audio(
+        &self,
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+        self.change_media_state(
+            media_exchange_state::Stable::Enabled.into(),
+            MediaKind::Audio,
+        )
+    }
+
+    /// Disables inbound audio in this [`Connection`].
+    ///
+    /// # Errors
+    ///
+    /// With [`ChangeMediaStateError::Detached`] if an inner [`Weak`] pointer
+    /// upgrade fails.
+    ///
+    /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
+    /// [`ConnectionHandle::enable_remote_audio()`] was called while disabling
+    /// or a media server didn't approve this state transition.
+    pub fn disable_remote_audio(
+        &self,
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+        self.change_media_state(
+            media_exchange_state::Stable::Disabled.into(),
+            MediaKind::Audio,
+        )
+    }
+
+    /// Changes [`MediaState`] of the provided [`MediaKind`], [`TrackDirection`]
+    /// and [`MediaSourceKind`] to the provided [`MediaState`].
+    ///
+    /// Helper function for all the exported enable/disable receive audio/video
+    /// methods.
+    fn change_media_state(
+        &self,
+        desired_state: MediaState,
+        kind: MediaKind,
+    ) -> LocalBoxFuture<'static, ChangeMediaStateResult> {
+        let inner = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(ChangeMediaStateError::Detached));
+        let inner = match inner {
+            Ok(inner) => inner,
+            Err(e) => return Box::pin(future::err(e)),
+        };
+
+        Box::pin(
+            async move { inner.change_media_state(desired_state, kind).await },
+        )
+    }
 }
 
 /// Connection with a specific remote `Member`, that is used on Rust side.
@@ -190,16 +408,78 @@ impl ConnectionHandle {
 pub struct Connection(Rc<InnerConnection>);
 
 impl Connection {
-    /// Instantiates new [`Connection`] for a given `Member`.
+    /// Instantiates a new [`Connection`] for the given `Member`.
+    ///
+    /// Based on the provided [`RecvConstraints`] individual [`RecvConstraints`]
+    /// of this [`Connection`] will automatically synchronize.
     #[must_use]
-    pub fn new(remote_id: MemberId) -> Self {
+    pub fn new(
+        remote_id: MemberId,
+        room_recv_constraints: &Rc<RecvConstraints>,
+    ) -> Self {
+        // Clone initial incoming media constraints.
+        let recv_constraints = Rc::new(room_recv_constraints.as_ref().clone());
+
         Self(Rc::new(InnerConnection {
+            _task_handles: vec![
+                Self::spawn_constraints_synchronizer(
+                    Rc::clone(&recv_constraints),
+                    room_recv_constraints.on_video_enabled_change(),
+                    MediaKind::Video,
+                ),
+                Self::spawn_constraints_synchronizer(
+                    Rc::clone(&recv_constraints),
+                    room_recv_constraints.on_audio_enabled_change(),
+                    MediaKind::Audio,
+                ),
+            ],
             remote_id,
             quality_score: Cell::default(),
             on_quality_score_update: platform::Callback::default(),
+            recv_constraints,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
+            receivers: RefCell::default(),
         }))
+    }
+
+    /// Spawns synchronizer for the individual [`RecvConstraints`].
+    ///
+    /// When global [`RecvConstraints`] updated, then all individual
+    /// [`RecvConstraints`] are going to the same state.
+    ///
+    /// Returns [`TaskHandle`] for the spawned changes listener.
+    fn spawn_constraints_synchronizer(
+        recv_constraints: Rc<RecvConstraints>,
+        mut changes_stream: LocalBoxStream<'static, bool>,
+        kind: MediaKind,
+    ) -> TaskHandle {
+        let (fut, abort) = future::abortable(async move {
+            while let Some(is_enabled) = changes_stream.next().await {
+                recv_constraints.set_enabled(is_enabled, kind);
+            }
+        });
+        platform::spawn(fut.map(drop));
+
+        TaskHandle::from(abort)
+    }
+
+    /// Stores provided [`receiver::State`] in this [`Connection`].
+    ///
+    /// Updates [`MediaExchangeState`] of the provided [`receiver::State`] based
+    /// on the current individual [`RecvConstraints`] of this [`Connection`].
+    ///
+    /// [`MediaExchangeState`]: crate::peer::MediaExchangeState
+    pub fn add_receiver(&self, receiver: Rc<receiver::State>) {
+        let enabled_in_cons = match &receiver.kind() {
+            MediaKind::Audio => self.0.recv_constraints.is_audio_enabled(),
+            MediaKind::Video => self.0.recv_constraints.is_video_enabled(),
+        };
+        receiver
+            .media_exchange_state_controller()
+            .transition_to(enabled_in_cons.into());
+
+        self.0.receivers.borrow_mut().push(receiver);
     }
 
     /// Invokes `on_remote_track_added` callback with the provided

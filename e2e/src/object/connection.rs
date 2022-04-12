@@ -2,7 +2,7 @@
 
 use crate::{
     browser::Statement,
-    object::{tracks_store, Object},
+    object::{tracks_store, MediaKind, Object},
 };
 
 use super::Error;
@@ -26,6 +26,62 @@ impl Object<Connection> {
             [],
         ))
         .await
+    }
+
+    /// Enables remote media receiving for the provided [`MediaKind`].
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn enable_remote_media(
+        &self,
+        kind: MediaKind,
+    ) -> Result<(), Error> {
+        let enable = match kind {
+            MediaKind::Audio => "c.conn.enable_remote_audio()",
+            MediaKind::Video => "c.conn.enable_remote_video()",
+        };
+        self.execute(Statement::new(
+            // language=JavaScript
+            &format!(
+                r#"
+                async (c) => {{
+                    await {enable};
+                }}
+                "#,
+            ),
+            [],
+        ))
+        .await
+        .map(drop)
+    }
+
+    /// Disables remote media receiving for the provided [`MediaKind`].
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn disable_remote_media(
+        &self,
+        kind: MediaKind,
+    ) -> Result<(), Error> {
+        let disable = match kind {
+            MediaKind::Audio => "c.conn.disable_remote_audio()",
+            MediaKind::Video => "c.conn.disable_remote_video()",
+        };
+        self.execute(Statement::new(
+            // language=JavaScript
+            &format!(
+                r#"
+                async (c) => {{
+                    await {disable};
+                }}
+                "#,
+            ),
+            [],
+        ))
+        .await
+        .map(drop)
     }
 
     /// Returns a [`Future`] resolving when `Connection.on_close()` callback is

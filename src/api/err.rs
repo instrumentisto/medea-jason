@@ -21,10 +21,7 @@ use crate::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
         UpdateLocalStreamError,
     },
-    platform,
-    room::{
-        self, ChangeMediaStateError, ConstraintsUpdateError, RoomJoinError,
-    },
+    platform, room,
     rpc::{rpc_session::ConnectionLostReason, ReconnectError, SessionError},
     utils::Caused,
 };
@@ -464,9 +461,9 @@ pub struct MediaSettingsUpdateException {
     /// Error message describing the problem.
     message: Cow<'static, str>,
 
-    /// Original [`ChangeMediaStateError`] that was encountered while updating
-    /// local media settings.
-    cause: Traced<ChangeMediaStateError>,
+    /// Original [`room::ChangeMediaStateError`] that was encountered while
+    /// updating local media settings.
+    cause: Traced<room::ChangeMediaStateError>,
 
     /// Whether media settings were successfully rolled back after new settings
     /// application failed.
@@ -479,7 +476,7 @@ impl MediaSettingsUpdateException {
     #[must_use]
     pub fn new<T: Into<Cow<'static, str>>>(
         message: T,
-        cause: Traced<ChangeMediaStateError>,
+        cause: Traced<room::ChangeMediaStateError>,
         rolled_back: bool,
     ) -> Self {
         Self {
@@ -499,8 +496,8 @@ impl MediaSettingsUpdateException {
         self.message.to_string()
     }
 
-    /// Returns the original [`ChangeMediaStateError`] that was encountered
-    /// while updating local media settings.
+    /// Returns the original [`room::ChangeMediaStateError`] that was
+    /// encountered while updating local media settings.
     #[must_use]
     pub fn cause(&self) -> Error {
         self.cause.clone().into()
@@ -635,38 +632,36 @@ impl From<Traced<SessionError>> for Error {
     }
 }
 
-impl From<Traced<RoomJoinError>> for Error {
-    fn from(err: Traced<RoomJoinError>) -> Self {
+impl From<Traced<room::RoomJoinError>> for Error {
+    fn from(err: Traced<room::RoomJoinError>) -> Self {
         let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
-            RoomJoinError::Detached | RoomJoinError::CallbackNotSet(_) => {
+            room::RoomJoinError::Detached
+            | room::RoomJoinError::CallbackNotSet(_) => {
                 StateError::new(message, trace).into()
             }
-            RoomJoinError::ConnectionInfoParse(_) => {
+            room::RoomJoinError::ConnectionInfoParse(_) => {
                 FormatException::new(message).into()
             }
-            RoomJoinError::SessionError(err) => {
+            room::RoomJoinError::SessionError(err) => {
                 Traced::compose(err, trace).into()
             }
         }
     }
 }
 
-impl From<Traced<ChangeMediaStateError>> for Error {
-    fn from(err: Traced<ChangeMediaStateError>) -> Self {
+impl From<Traced<connection::ChangeMediaStateError>> for Error {
+    fn from(err: Traced<connection::ChangeMediaStateError>) -> Self {
         let (err, trace) = err.split();
         let message = err.to_string();
 
         match err {
-            ChangeMediaStateError::Detached => {
+            connection::ChangeMediaStateError::Detached => {
                 StateError::new(err.to_string(), trace).into()
             }
-            ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
-                Traced::compose(err, trace).into()
-            }
-            ChangeMediaStateError::ProhibitedState(_) => {
+            connection::ChangeMediaStateError::ProhibitedState(_) => {
                 MediaStateTransitionException::new(
                     message,
                     trace,
@@ -674,7 +669,39 @@ impl From<Traced<ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            ChangeMediaStateError::TransitionIntoOppositeState(_) => {
+            connection::ChangeMediaStateError::TransitionIntoOppositeState(
+                _,
+            ) => MediaStateTransitionException::new(
+                message,
+                trace,
+                MediaStateTransitionExceptionKind::OppositeState,
+            )
+            .into(),
+        }
+    }
+}
+
+impl From<Traced<room::ChangeMediaStateError>> for Error {
+    fn from(err: Traced<room::ChangeMediaStateError>) -> Self {
+        let (err, trace) = err.split();
+        let message = err.to_string();
+
+        match err {
+            room::ChangeMediaStateError::Detached => {
+                StateError::new(err.to_string(), trace).into()
+            }
+            room::ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
+                Traced::compose(err, trace).into()
+            }
+            room::ChangeMediaStateError::ProhibitedState(_) => {
+                MediaStateTransitionException::new(
+                    message,
+                    trace,
+                    MediaStateTransitionExceptionKind::ProhibitedState,
+                )
+                .into()
+            }
+            room::ChangeMediaStateError::TransitionIntoOppositeState(_) => {
                 MediaStateTransitionException::new(
                     message,
                     trace,
@@ -682,24 +709,25 @@ impl From<Traced<ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            ChangeMediaStateError::InvalidLocalTracks(_)
-            | ChangeMediaStateError::InsertLocalTracksError(_) => {
+            room::ChangeMediaStateError::InvalidLocalTracks(_)
+            | room::ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
             }
         }
     }
 }
 
-impl From<ConstraintsUpdateError> for Error {
-    fn from(err: ConstraintsUpdateError) -> Self {
+impl From<room::ConstraintsUpdateError> for Error {
+    fn from(err: room::ConstraintsUpdateError) -> Self {
         let message = err.to_string();
 
         let (err, rolled_back) = match err {
-            ConstraintsUpdateError::Recovered(err) => (err, true),
-            ConstraintsUpdateError::RecoverFailed {
-                recover_reason, ..
+            room::ConstraintsUpdateError::Recovered(err) => (err, true),
+            room::ConstraintsUpdateError::RecoverFailed {
+                recover_reason,
+                ..
             } => (recover_reason, false),
-            ConstraintsUpdateError::Errored(err) => (err, false),
+            room::ConstraintsUpdateError::Errored(err) => (err, false),
         };
 
         MediaSettingsUpdateException::new(message, err, rolled_back).into()

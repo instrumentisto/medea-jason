@@ -36,6 +36,26 @@ class WebConnectionHandle extends ConnectionHandle {
     fallibleFunction(() => obj.on_quality_score_update(allowInterop(f)));
   }
 
+  @override
+  Future<void> enableRemoteAudio() async {
+    await fallibleFuture(obj.enable_remote_audio());
+  }
+
+  @override
+  Future<void> disableRemoteAudio() async {
+    await fallibleFuture(obj.disable_remote_audio());
+  }
+
+  @override
+  Future<void> enableRemoteVideo() async {
+    await fallibleFuture(obj.enable_remote_video());
+  }
+
+  @override
+  Future<void> disableRemoteVideo() async {
+    await fallibleFuture(obj.disable_remote_video());
+  }
+
   @moveSemantics
   @override
   void free() {
