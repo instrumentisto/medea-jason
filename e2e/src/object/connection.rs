@@ -1,7 +1,5 @@
 //! `Connection` JS object's representation.
 
-use std::borrow::Cow;
-
 use crate::{
     browser::Statement,
     object::{tracks_store, MediaKind, Object},
@@ -39,9 +37,9 @@ impl Object<Connection> {
         &self,
         kind: MediaKind,
     ) -> Result<(), Error> {
-        let enable: Cow<'_, _> = match kind {
-            MediaKind::Audio => "c.conn.enable_remote_audio()".into(),
-            MediaKind::Video => "c.conn.enable_remote_video()".into(),
+        let enable = match kind {
+            MediaKind::Audio => "c.conn.enable_remote_audio()",
+            MediaKind::Video => "c.conn.enable_remote_video()",
         };
         self.execute(Statement::new(
             // language=JavaScript
@@ -67,9 +65,9 @@ impl Object<Connection> {
         &self,
         kind: MediaKind,
     ) -> Result<(), Error> {
-        let disable: Cow<'_, _> = match kind {
-            MediaKind::Audio => "c.conn.disable_remote_audio()".into(),
-            MediaKind::Video => "c.conn.disable_remote_video()".into(),
+        let disable = match kind {
+            MediaKind::Audio => "c.conn.disable_remote_audio()",
+            MediaKind::Video => "c.conn.disable_remote_video()",
         };
         self.execute(Statement::new(
             // language=JavaScript

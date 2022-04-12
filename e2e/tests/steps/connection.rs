@@ -43,7 +43,7 @@ async fn then_connection_closes(
     connection.wait_for_close().await.unwrap();
 }
 
-#[when(regex = r"^(\S+) (enables|disables) (audio|video) receive from (\S+)")]
+#[when(regex = r"^(\S+) (enables|disables) (audio|video) receiving from (\S+)")]
 async fn when_connection_changes_remote_media_state(
     world: &mut World,
     id: String,
@@ -57,7 +57,7 @@ async fn when_connection_changes_remote_media_state(
     let connection =
         member.connections().get(partner_id).await.unwrap().unwrap();
 
-    if action.contains("enables") {
+    if action == "enables" {
         connection.enable_remote_media(kind).await.unwrap();
     } else {
         connection.disable_remote_media(kind).await.unwrap();

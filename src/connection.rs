@@ -408,7 +408,7 @@ impl ConnectionHandle {
 pub struct Connection(Rc<InnerConnection>);
 
 impl Connection {
-    /// Instantiates new [`Connection`] for a given `Member`.
+    /// Instantiates a new [`Connection`] for the given `Member`.
     ///
     /// Based on the provided [`RecvConstraints`] individual [`RecvConstraints`]
     /// of this [`Connection`] will automatically synchronize.

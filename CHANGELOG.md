@@ -61,10 +61,10 @@ All user visible changes to this project will be documented in this file. This p
     - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]);
     - `MediaManagerHandle.on_device_change()` callback firing whenever `MediaManagerHandle.enumerate_devices()` list changes ([#30]);
     - `ConnectionHandle` methods ([#43]):
-      - `enable_remote_video`;
-      - `disable_remote_video`;
-      - `enable_remote_audio`;
-      - `disable_remote_audio`.
+        - `enable_remote_video`;
+        - `disable_remote_video`;
+        - `enable_remote_audio`;
+        - `disable_remote_audio`.
 
 ### Updated
 
