@@ -1,15 +1,14 @@
 //! Media tracks and streams constraints functionality.
 
-use std::{
-    cell::{Cell, RefCell},
-    rc::Rc,
-};
+use std::{cell::RefCell, rc::Rc};
 
 use derive_more::Display;
+use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
     AudioSettings as ProtoAudioConstraints, MediaSourceKind,
     MediaType as ProtoTrackConstraints, MediaType, VideoSettings,
 };
+use medea_reactive::ObservableCell;
 
 use crate::{
     media::{track::MediaStreamTrackState, MediaKind},
@@ -56,17 +55,26 @@ pub struct LocalTracksConstraints(Rc<RefCell<MediaStreamSettings>>);
 #[derive(Debug)]
 pub struct RecvConstraints {
     /// Is audio receiving enabled.
-    is_audio_enabled: Cell<bool>,
+    is_audio_enabled: ObservableCell<bool>,
 
     /// Is video receiving enabled.
-    is_video_enabled: Cell<bool>,
+    is_video_enabled: ObservableCell<bool>,
+}
+
+impl Clone for RecvConstraints {
+    fn clone(&self) -> Self {
+        Self {
+            is_audio_enabled: ObservableCell::new(self.is_audio_enabled.get()),
+            is_video_enabled: ObservableCell::new(self.is_video_enabled.get()),
+        }
+    }
 }
 
 impl Default for RecvConstraints {
     fn default() -> Self {
         Self {
-            is_audio_enabled: Cell::new(true),
-            is_video_enabled: Cell::new(true),
+            is_audio_enabled: ObservableCell::new(true),
+            is_video_enabled: ObservableCell::new(true),
         }
     }
 }
@@ -92,6 +100,18 @@ impl RecvConstraints {
     /// Returns is video receiving enabled.
     pub fn is_video_enabled(&self) -> bool {
         self.is_video_enabled.get()
+    }
+
+    /// Returns [`LocalBoxStream`] into which all `is_audio_enabled` updates
+    /// will be sent.
+    pub fn on_audio_enabled_change(&self) -> LocalBoxStream<'static, bool> {
+        self.is_audio_enabled.subscribe()
+    }
+
+    /// Returns [`LocalBoxStream`] into which all `is_video_enabled` updates
+    /// will be sent.
+    pub fn on_video_enabled_change(&self) -> LocalBoxStream<'static, bool> {
+        self.is_video_enabled.subscribe()
     }
 }
 

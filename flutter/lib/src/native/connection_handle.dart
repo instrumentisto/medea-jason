@@ -26,6 +26,18 @@ typedef _onQualityScoreUpdate_C = Result Function(Pointer, Handle);
 typedef _onQualityScoreUpdate_Dart = Result Function(
     Pointer, void Function(int));
 
+typedef _disableRemoteAudio_C = Handle Function(Pointer);
+typedef _disableRemoteAudio_Dart = Object Function(Pointer);
+
+typedef _enableRemoteAudio_C = Handle Function(Pointer);
+typedef _enableRemoteAudio_Dart = Object Function(Pointer);
+
+typedef _disableRemoteVideo_C = Handle Function(Pointer);
+typedef _disableRemoteVideo_Dart = Object Function(Pointer);
+
+typedef _enableRemoteVideo_C = Handle Function(Pointer);
+typedef _enableRemoteVideo_Dart = Object Function(Pointer);
+
 final _getRemoteMemberId =
     dl.lookupFunction<_getRemoteMemberId_C, _getRemoteMemberId_Dart>(
         'ConnectionHandle__get_remote_member_id');
@@ -42,6 +54,22 @@ final _onRemoteTrackAdded =
 final _onQualityScoreUpdate =
     dl.lookupFunction<_onQualityScoreUpdate_C, _onQualityScoreUpdate_Dart>(
         'ConnectionHandle__on_quality_score_update');
+
+final _disableRemoteAudio =
+    dl.lookupFunction<_disableRemoteAudio_C, _disableRemoteAudio_Dart>(
+        'ConnectionHandle__disable_remote_audio');
+
+final _enableRemoteAudio =
+    dl.lookupFunction<_enableRemoteAudio_C, _enableRemoteAudio_Dart>(
+        'ConnectionHandle__enable_remote_audio');
+
+final _disableRemoteVideo =
+    dl.lookupFunction<_disableRemoteVideo_C, _disableRemoteVideo_Dart>(
+        'ConnectionHandle__disable_remote_video');
+
+final _enableRemoteVideo =
+    dl.lookupFunction<_enableRemoteVideo_C, _enableRemoteVideo_Dart>(
+        'ConnectionHandle__enable_remote_video');
 
 class NativeConnectionHandle extends ConnectionHandle {
   /// [Pointer] to the Rust struct backing this object.
@@ -83,5 +111,25 @@ class NativeConnectionHandle extends ConnectionHandle {
       _free(ptr.getInnerPtr());
       ptr.free();
     }
+  }
+
+  @override
+  Future<void> enableRemoteAudio() async {
+    await (_enableRemoteAudio(ptr.getInnerPtr()) as Future);
+  }
+
+  @override
+  Future<void> disableRemoteAudio() async {
+    await (_disableRemoteAudio(ptr.getInnerPtr()) as Future);
+  }
+
+  @override
+  Future<void> enableRemoteVideo() async {
+    await (_enableRemoteVideo(ptr.getInnerPtr()) as Future);
+  }
+
+  @override
+  Future<void> disableRemoteVideo() async {
+    await (_disableRemoteVideo(ptr.getInnerPtr()) as Future);
   }
 }

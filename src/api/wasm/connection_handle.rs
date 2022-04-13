@@ -1,7 +1,9 @@
 //! Connection with a specific remote `Member` used on JS side.
 
 use derive_more::From;
+use js_sys::Promise;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 
 use crate::{api, connection};
 
@@ -102,5 +104,85 @@ impl ConnectionHandle {
             .on_quality_score_update(cb.into())
             .map_err(api::Error::from)
             .map_err(Into::into)
+    }
+
+    /// Enables inbound audio in this [`ConnectionHandle`].
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`ConnectionHandle::disable_remote_video()`] was called while enabling
+    /// or a media server didn't approve this state transition.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
+    pub fn enable_remote_audio(&self) -> Promise {
+        let fut = self.0.enable_remote_audio();
+        future_to_promise(async move {
+            fut.await.map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+
+    /// Disables inbound audio in this [`ConnectionHandle`].
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`ConnectionHandle::enable_remote_video()`] was called while disabling
+    /// or a media server didn't approve this state transition.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
+    pub fn disable_remote_audio(&self) -> Promise {
+        let fut = self.0.disable_remote_audio();
+        future_to_promise(async move {
+            fut.await.map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+
+    /// Enables inbound video in this [`ConnectionHandle`].
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`ConnectionHandle::disable_remote_audio()`] was called while enabling
+    /// or a media server didn't approve this state transition.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
+    pub fn enable_remote_video(&self) -> Promise {
+        let fut = self.0.enable_remote_video();
+        future_to_promise(async move {
+            fut.await.map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
+    }
+
+    /// Disables inbound video in this [`ConnectionHandle`].
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// With a [`MediaStateTransitionException`][0] if
+    /// [`ConnectionHandle::enable_remote_audio()`] was called while disabling
+    /// or a media server didn't approve this state transition.
+    ///
+    /// [`StateError`]: crate::api::err::StateError
+    /// [0]: crate::api::err::MediaStateTransitionException
+    pub fn disable_remote_video(&self) -> Promise {
+        let fut = self.0.disable_remote_video();
+        future_to_promise(async move {
+            fut.await.map_err(api::Error::from)?;
+            Ok(JsValue::UNDEFINED)
+        })
     }
 }

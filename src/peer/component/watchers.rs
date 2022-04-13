@@ -156,7 +156,7 @@ impl Component {
 
         let ((_, new_sender), _guard) = val.into_parts();
         for receiver in new_sender.receivers() {
-            peer.connections.create_connection(state.id, receiver);
+            drop(peer.connections.create_connection(state.id, receiver));
         }
         let sender = sender::Sender::new(
             &new_sender,
@@ -194,7 +194,8 @@ impl Component {
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) -> Result<(), Infallible> {
         let ((_, rcvr_state), _guard) = val.into_parts();
-        peer.connections
+        let conn = peer
+            .connections
             .create_connection(state.id, rcvr_state.sender_id());
         let receiver = receiver::Receiver::new(
             &rcvr_state,
@@ -206,8 +207,9 @@ impl Component {
         peer.media_connections
             .insert_receiver(receiver::Component::new(
                 Rc::new(receiver),
-                rcvr_state,
+                Rc::clone(&rcvr_state),
             ));
+        conn.add_receiver(rcvr_state);
         Ok(())
     }
 

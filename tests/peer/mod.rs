@@ -62,14 +62,15 @@ async fn disable_enable_audio() {
         Some(NegotiationRole::Offerer),
     );
     let send_constraints = local_constraints(true, true);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -110,14 +111,15 @@ async fn disable_enable_video() {
         Some(NegotiationRole::Offerer),
     );
     let send_constraints = local_constraints(true, true);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -154,14 +156,15 @@ async fn new_with_disable_audio() {
     let send_constraints = local_constraints(false, true);
     peer_state.insert_track(&audio_track, send_constraints.clone());
     peer_state.insert_track(&video_track, send_constraints.clone());
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -180,14 +183,15 @@ async fn new_with_disable_video() {
     let (audio_track, video_track) = get_test_unrequired_tracks();
     let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
     let send_constraints = local_constraints(true, false);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -216,14 +220,15 @@ async fn add_candidates_to_answerer_before_offer() {
         false,
         Some(NegotiationRole::Offerer),
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -236,14 +241,15 @@ async fn add_candidates_to_answerer_before_offer() {
     let pc1_offer = pc1.state().when_local_sdp_updated().await.unwrap();
 
     let pc2_state = peer::State::new(PeerId(2), Vec::new(), false, None);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -273,14 +279,15 @@ async fn add_candidates_to_offerer_before_answer() {
         false,
         Some(NegotiationRole::Offerer),
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -292,14 +299,15 @@ async fn add_candidates_to_offerer_before_answer() {
         .insert_track(&video_track, LocalTracksConstraints::default());
 
     let pc2_state = peer::State::new(PeerId(2), Vec::new(), false, None);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -336,14 +344,15 @@ async fn normal_exchange_of_candidates() {
         false,
         Some(NegotiationRole::Offerer),
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -355,14 +364,15 @@ async fn normal_exchange_of_candidates() {
         .insert_track(&video_track, LocalTracksConstraints::default());
 
     let pc2_state = peer::State::new(PeerId(2), Vec::new(), false, None);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -426,14 +436,15 @@ async fn send_event_on_new_local_stream() {
     );
     peer_state.insert_track(&audio_track, send_constraints.clone());
     peer_state.insert_track(&video_track, send_constraints.clone());
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -467,14 +478,15 @@ async fn ice_connection_state_changed_is_emitted() {
         false,
         Some(NegotiationRole::Offerer),
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             manager.clone(),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -492,14 +504,15 @@ async fn ice_connection_state_changed_is_emitted() {
         false,
         Some(NegotiationRole::Answerer(pc1_offer)),
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             manager,
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
@@ -596,14 +609,15 @@ impl InterconnectedPeers {
         for track in Self::get_peer1_tracks() {
             pc1_state.insert_track(&track, pc1_send_cons.clone());
         }
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let pc1 = peer::Component::new(
             peer::PeerConnection::new(
                 &pc1_state,
                 tx1,
                 manager.clone(),
                 pc1_send_cons,
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
             .await
             .unwrap(),
@@ -621,14 +635,15 @@ impl InterconnectedPeers {
         for track in Self::get_peer2_tracks() {
             pc2_state.insert_track(&track, pc2_send_cons.clone());
         }
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let pc2 = peer::Component::new(
             peer::PeerConnection::new(
                 &pc2_state,
                 tx2,
                 manager,
                 pc2_send_cons,
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
             .await
             .unwrap(),
@@ -856,14 +871,15 @@ mod peer_stats_caching {
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
         let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
             peer::PeerConnection::new(
                 &peer_state,
                 tx,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
             .await
             .unwrap(),
@@ -907,14 +923,15 @@ mod peer_stats_caching {
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
         let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
             peer::PeerConnection::new(
                 &peer_state,
                 tx,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
             .await
             .unwrap(),
@@ -960,14 +977,15 @@ mod peer_stats_caching {
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
         let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
             peer::PeerConnection::new(
                 &peer_state,
                 tx,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
             .await
             .unwrap(),
@@ -1033,7 +1051,7 @@ async fn reset_transition_timers() {
             tx,
             manager,
             send_constraints,
-            Rc::new(Connections::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
             recv_constraints,
         )
         .await
@@ -1114,14 +1132,15 @@ async fn new_remote_track() {
 
         let sender_peer_state =
             peer::State::new(PeerId(1), Vec::new(), false, None);
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let sender_peer = peer::Component::new(
             peer::PeerConnection::new(
                 &sender_peer_state,
                 tx1,
                 manager.clone(),
                 tx_caps.clone(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
             .await
             .unwrap(),
@@ -1143,7 +1162,7 @@ async fn new_remote_track() {
         let sender_offer =
             sender_peer.state().when_local_sdp_updated().await.unwrap();
 
-        let rcv_caps = RecvConstraints::default();
+        let rcv_caps = Rc::new(RecvConstraints::default());
         rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio);
         rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video);
 
@@ -1155,8 +1174,8 @@ async fn new_remote_track() {
                 tx2,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(rcv_caps),
+                Rc::new(Connections::new(Rc::clone(&rcv_caps))),
+                rcv_caps,
             )
             .await
             .unwrap(),
@@ -1414,14 +1433,15 @@ async fn disable_and_enable_all_tracks() {
     pc_state.insert_track(&video_track, LocalTracksConstraints::default());
 
     let (tx, _rx) = mpsc::unbounded();
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc = peer::Component::new(
         peer::PeerConnection::new(
             &pc_state,
             tx,
             Rc::new(MediaManager::default()),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
         .await
         .unwrap(),
