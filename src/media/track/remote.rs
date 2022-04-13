@@ -1,6 +1,6 @@
 //! Wrapper around a received remote [`platform::MediaStreamTrack`].
 
-use std::{borrow::Borrow, rc::Rc};
+use std::rc::Rc;
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
@@ -12,7 +12,8 @@ use crate::{
     platform,
 };
 
-/// FFI capable [`MediaDirection`] representation used for [`platform::Callback`].
+/// FFI capable [`MediaDirection`] representation used for
+/// [`platform::Callback`].
 pub type Direction = u8;
 
 /// Inner reference-counted data of a [`Track`].
@@ -39,7 +40,8 @@ struct Inner {
     /// Callback to be invoked when this [`Track`] is stopped.
     on_stopped: platform::Callback<()>,
 
-    /// Callback to be inboked when this [`Track`]'s general media exchange direction is changed.
+    /// Callback to be invoked when this [`Track`]'s general media exchange
+    /// direction is changed.
     on_media_direction_changed: platform::Callback<Direction>,
 
     /// Indicates whether this track is enabled, meaning that
@@ -87,7 +89,6 @@ impl Track {
         media_source_kind: proto::MediaSourceKind,
         enabled: bool,
         muted: bool,
-        transceiver_direction: MediaDirection,
     ) -> Self
     where
         platform::MediaStreamTrack: From<T>,
@@ -168,7 +169,6 @@ impl Track {
 
         track
     }
-
 
     /// Sets general media exchange direction of this [`Track`].
     pub fn set_media_direction(&self, direction: MediaDirection) {
@@ -273,7 +273,8 @@ impl Track {
         self.0.on_stopped.set_func(callback);
     }
 
-    /// Sets callback to invoke when this [`Track`]'s general media exchange direction is changed.
+    /// Sets callback to invoke when this [`Track`]'s general media exchange
+    /// direction is changed.
     pub fn on_media_direction_changed(
         &self,
         callback: platform::Function<Direction>,

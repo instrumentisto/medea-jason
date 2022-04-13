@@ -68,7 +68,8 @@ impl RemoteMediaTrack {
         self.0.on_stopped(cb.into());
     }
 
-    /// Sets callback to invoke when this [`RemoteMediaTrack`]'s general media exchange direction changes.
+    /// Sets callback to invoke when this [`RemoteMediaTrack`]'s general media
+    /// exchange direction changes.
     pub fn on_media_direction_changed(&self, cb: js_sys::Function) {
         self.0.on_media_direction_changed(cb.into());
     }

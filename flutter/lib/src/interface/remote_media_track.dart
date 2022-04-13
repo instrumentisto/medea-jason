@@ -52,5 +52,7 @@ abstract class RemoteMediaTrack implements PlatformHandle {
   /// Sets callback to invoke when this [RemoteMediaTrack] is stopped.
   void onStopped(void Function() f);
 
+  /// Sets callback to invoke when this [RemoteMediaTrack]'s general media
+  /// exchange direction changes.
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f);
 }

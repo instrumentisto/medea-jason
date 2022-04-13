@@ -86,8 +86,8 @@ mod utils;
 use futures::{channel::oneshot, future::Either, Future};
 use js_sys::Promise;
 use medea_client_api_proto::{
-    AudioSettings, Direction, MediaSourceKind, MediaType, MemberId, Track,
-    TrackId, VideoSettings,
+    AudioSettings, Direction, MediaDirection, MediaSourceKind, MediaType,
+    MemberId, Track, TrackId, VideoSettings,
 };
 use medea_jason::{
     api,

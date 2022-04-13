@@ -238,7 +238,6 @@ impl Receiver {
             self.caps.media_source_kind(),
             self.enabled_individual.get(),
             self.muted.get(),
-            self.media_direction.get(),
         );
 
         if self.enabled_individual.get() {
