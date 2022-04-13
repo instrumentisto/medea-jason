@@ -1,7 +1,9 @@
 use std::time::Duration;
 
 use cucumber::{given, then, when};
-use medea_e2e::object::AwaitCompletion;
+use medea_e2e::object::{
+    remote_track::MediaDirection, AwaitCompletion, MediaSourceKind,
+};
 
 use crate::World;
 
@@ -57,6 +59,41 @@ async fn then_track_is_stopped(world: &mut World, id: String, kind: String) {
         .await
         .unwrap();
     assert!(is_stopped);
+}
+
+#[then(regex = "^(\\S+)'s (audio|video) from (\\S+) has \
+             (SendRecv|SendOnly|RecvOnly|Inactive) direction$")]
+async fn then_remote_media_direction_is(
+    world: &mut World,
+    id: String,
+    kind: String,
+    remote_id: String,
+    direction: String,
+) {
+    let media_kind = kind.parse().unwrap();
+    let media_direction = match direction.as_str() {
+        "SendRecv" => MediaDirection::SendRecv,
+        "SendOnly" => MediaDirection::SendOnly,
+        "RecvOnly" => MediaDirection::RecvOnly,
+        "Inactive" => MediaDirection::Inactive,
+        _ => unreachable!(),
+    };
+
+    let member = world.get_member(&id).unwrap();
+    let connection = member
+        .connections()
+        .wait_for_connection(remote_id)
+        .await
+        .unwrap();
+    let tracks_store = connection.tracks_store().await.unwrap();
+    let track = tracks_store
+        .get_track(media_kind, MediaSourceKind::Device)
+        .await
+        .unwrap();
+    track
+        .wait_for_media_direction(media_direction)
+        .await
+        .unwrap();
 }
 
 #[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video)\

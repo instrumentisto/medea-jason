@@ -4,6 +4,22 @@ use crate::{browser::Statement, object::Object};
 
 use super::Error;
 
+/// Media exchange direction of the `Track`.
+#[derive(Clone, Copy, Debug)]
+pub enum MediaDirection {
+    /// `Track` is enabled on recv and send sides.
+    SendRecv = 0,
+
+    /// `Track` is enabled on send side.
+    SendOnly = 1,
+
+    /// `Track` is enabled on recv side.
+    RecvOnly = 2,
+
+    /// `Track` is disabled on both sides.
+    Inactive = 3,
+}
+
 /// Representation of a `RemoteMediaTrack` object.
 #[derive(Clone, Copy, Debug)]
 pub struct RemoteTrack;
@@ -198,6 +214,36 @@ impl Object<RemoteTrack> {
                 }
             "#,
             [count.into()],
+        ))
+        .await
+        .map(drop)
+    }
+
+    /// Waits for the `RemoteMediaTrack.on_media_direction` with the provided
+    /// [`MediaDirection`].
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn wait_for_media_direction(
+        &self,
+        direction: MediaDirection,
+    ) -> Result<(), Error> {
+        self.execute(Statement::new(
+            // language=JavaScript
+            r#"
+                async (track) => {
+                    return;
+                    const [direction] = args;
+                    if (track.track.media_direction() != direction) {
+                        let waiter = new Promise((resolve) => {
+                            track.onMediaDirectionChangedSubs.push(resolve);
+                        });
+                        await waiter;
+                    }
+                }
+            "#,
+            [(direction as u8).into()],
         ))
         .await
         .map(drop)

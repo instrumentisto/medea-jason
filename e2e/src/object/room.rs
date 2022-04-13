@@ -373,7 +373,8 @@ impl Object<Room> {
                                 onEnabledSubs: [],
                                 onDisabledSubs: [],
                                 onMutedSubs: [],
-                                onUnmutedSubs: []
+                                onUnmutedSubs: [],
+                                onMediaDirectionChangedSubs: []
                             };
                             track.track.on_enabled(() => {
                                 track.on_enabled_fire_count++;
@@ -405,6 +406,12 @@ impl Object<Room> {
                             });
                             track.track.on_stopped(() => {
                                 track.stopped = true;
+                            });
+                            track.track.on_media_direction_changed(() => {
+                                for (sub of track.onMediaDirectionChangedSubs) {
+                                    sub();
+                                }
+                                track.onMediaDirectionChangedSubs = [];
                             });
                             tracksStore.tracks.push(track);
                             let newStoreSubs = tracksStore.subs
