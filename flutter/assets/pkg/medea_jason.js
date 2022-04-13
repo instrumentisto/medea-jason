@@ -252,7 +252,7 @@ function handleError(f, args) {
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
-function __wbg_adapter_346(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_347(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__h82fe326f9a0bf11b(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -1735,6 +1735,15 @@ export class RemoteMediaTrack {
         var ret = wasm.remotemediatrack_media_source_kind(this.ptr);
         return ret >>> 0;
     }
+    /**
+    * Returns current general media exchange direction of this
+    * [`RemoteMediaTrack`].
+    * @returns {number}
+    */
+    media_direction() {
+        var ret = wasm.remotemediatrack_media_direction(this.ptr);
+        return ret;
+    }
 }
 /**
 * Reason of why a [`Room`] is closed.
@@ -2968,7 +2977,7 @@ async function init(input) {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_346(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_347(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -3068,7 +3077,7 @@ async function init(input) {
         var ret = makeMutClosure(arg0, arg1, 110, __wbg_adapter_44);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2782 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper2781 = function(arg0, arg1, arg2) {
         var ret = makeMutClosure(arg0, arg1, 788, __wbg_adapter_47);
         return addHeapObject(ret);
     };

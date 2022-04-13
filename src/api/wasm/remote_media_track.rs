@@ -10,7 +10,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{
     api::{MediaKind, MediaSourceKind},
-    media::track::remote,
+    media::track::{remote, remote::Direction},
 };
 
 /// Wrapper around a received remote [MediaStreamTrack][1].
@@ -91,5 +91,12 @@ impl RemoteMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()
+    }
+
+    /// Returns current general media exchange direction of this
+    /// [`RemoteMediaTrack`].
+    #[must_use]
+    pub fn media_direction(&self) -> Direction {
+        self.0.media_direction() as Direction
     }
 }

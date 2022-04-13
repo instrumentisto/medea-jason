@@ -35,6 +35,12 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
+  TrackMediaDirection mediaDirection() {
+    return fallibleFunction(
+        () => TrackMediaDirection.values[obj.media_direction().toInt()]);
+  }
+
+  @override
   MediaStreamTrack getTrack() {
     return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
   }

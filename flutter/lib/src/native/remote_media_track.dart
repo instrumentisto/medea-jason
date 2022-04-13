@@ -21,6 +21,9 @@ typedef _kind_Dart = int Function(Pointer);
 typedef _mediaSourceKind_C = Uint8 Function(Pointer);
 typedef _mediaSourceKind_Dart = int Function(Pointer);
 
+typedef _mediaDirection_C = Uint8 Function(Pointer);
+typedef _mediaDirection_Dart = int Function(Pointer);
+
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
@@ -57,6 +60,10 @@ final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('RemoteMediaTrack__kind');
 final _mediaSourceKind =
     dl.lookupFunction<_mediaSourceKind_C, _mediaSourceKind_Dart>(
         'RemoteMediaTrack__media_source_kind');
+
+final _mediaDirectionKind =
+    dl.lookupFunction<_mediaDirection_C, _mediaDirection_Dart>(
+        'RemoteMediaTrack__media_direction');
 
 final _onEnabled = dl.lookupFunction<_onEnabled_C, _onEnabled_Dart>(
     'RemoteMediaTrack__on_enabled');
@@ -112,6 +119,12 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   MediaSourceKind mediaSourceKind() {
     var index = _mediaSourceKind(ptr.getInnerPtr());
     return MediaSourceKind.values[index];
+  }
+
+  @override
+  TrackMediaDirection mediaDirection() {
+    var index = _mediaDirectionKind(ptr.getInnerPtr());
+    return TrackMediaDirection.values[index];
   }
 
   @override

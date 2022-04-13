@@ -34,8 +34,11 @@ abstract class RemoteMediaTrack implements PlatformHandle {
   /// Returns this [RemoteMediaTrack]'s media source kind (device/display).
   MediaSourceKind mediaSourceKind();
 
-  /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
+  /// Returns underlying [MediaStreamTrack] of this [RemoteMediaTrack].
   MediaStreamTrack getTrack();
+
+  /// Returns current general media exchange direction of this [RemoteMediaTrack].
+  TrackMediaDirection mediaDirection();
 
   /// Sets callback, invoked when this [RemoteMediaTrack] is enabled.
   void onEnabled(void Function() f);

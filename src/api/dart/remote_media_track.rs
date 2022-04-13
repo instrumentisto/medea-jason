@@ -3,7 +3,7 @@ use std::ptr;
 use dart_sys::Dart_Handle;
 
 use crate::{
-    media::{MediaKind, MediaSourceKind},
+    media::{track::remote::Direction, MediaKind, MediaSourceKind},
     platform,
 };
 
@@ -127,6 +127,15 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
     propagate_panic(move || this.as_ref().media_source_kind())
 }
 
+/// Returns current general media exchange direction of this
+/// [`RemoteMediaTrack`].
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__media_direction(
+    this: ptr::NonNull<RemoteMediaTrack>,
+) -> Direction {
+    propagate_panic(move || this.as_ref().media_direction() as Direction)
+}
+
 /// Frees the data behind the provided pointer.
 ///
 /// # Safety
@@ -152,8 +161,8 @@ mod mock {
 
     use crate::{
         media::{
-            track::remote::Track as CoreRemoteMediaTrack, MediaKind,
-            MediaSourceKind,
+            track::remote::{Direction, Track as CoreRemoteMediaTrack},
+            MediaKind, MediaSourceKind,
         },
         platform,
     };
@@ -206,6 +215,15 @@ mod mock {
 
         pub fn on_stopped(&self, cb: platform::Function<()>) {
             cb.call0();
+        }
+
+        pub fn on_media_direction_changed(&self, cb: platform::Function<()>) {
+            cb.call0();
+        }
+
+        #[must_use]
+        pub fn media_direction(&self) -> Direction {
+            0
         }
 
         #[must_use]

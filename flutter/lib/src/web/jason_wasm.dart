@@ -223,6 +223,7 @@ class RemoteMediaTrack {
   external void on_media_direction_changed(Function cb);
   external num kind();
   external num media_source_kind();
+  external num media_direction();
 }
 
 @JS()

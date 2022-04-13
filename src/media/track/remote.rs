@@ -44,6 +44,9 @@ struct Inner {
     /// direction is changed.
     on_media_direction_changed: platform::Callback<Direction>,
 
+    /// Current [`MediaDirection`] of this [`Track`].
+    media_direction: MediaDirection,
+
     /// Indicates whether this track is enabled, meaning that
     /// [RTCRtpTransceiver] that created this track has its direction set to
     /// [`sendrecv`][1] or [`recvonly`][2].
@@ -89,6 +92,7 @@ impl Track {
         media_source_kind: proto::MediaSourceKind,
         enabled: bool,
         muted: bool,
+        media_direction: MediaDirection,
     ) -> Self
     where
         platform::MediaStreamTrack: From<T>,
@@ -100,6 +104,7 @@ impl Track {
             enabled: ObservableCell::new(enabled),
             muted: ObservableCell::new(muted),
             on_media_direction_changed: platform::Callback::default(),
+            media_direction,
             on_enabled: platform::Callback::default(),
             on_disabled: platform::Callback::default(),
             on_stopped: platform::Callback::default(),
@@ -280,5 +285,11 @@ impl Track {
         callback: platform::Function<Direction>,
     ) {
         self.0.on_media_direction_changed.set_func(callback);
+    }
+
+    /// Returns current general media exchange direction of this [`Track`].
+    #[must_use]
+    pub fn media_direction(&self) -> MediaDirection {
+        self.0.media_direction
     }
 }
