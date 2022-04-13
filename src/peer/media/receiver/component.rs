@@ -5,7 +5,8 @@ use std::{convert::Infallible, rc::Rc};
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
 use medea_client_api_proto::{
-    MediaSourceKind, MediaType, MemberId, TrackId, TrackPatchEvent,
+    MediaDirection, MediaSourceKind, MediaType, MemberId, TrackId,
+    TrackPatchEvent,
 };
 use medea_macro::watchers;
 use medea_reactive::{
@@ -67,6 +68,9 @@ pub struct State {
     /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
 
+    /// Current general media exchange direction of this [`Receiver`].
+    media_direction: ObservableCell<MediaDirection>,
+
     /// Indicator whether the [`Receiver`]'s [`remote::Track`] is muted.
     ///
     /// [`remote::Track`]: crate::media::track::remote::Track
@@ -88,6 +92,7 @@ impl AsProtoState for State {
             enabled_individual: self.enabled_individual(),
             enabled_general: self.enabled_general(),
             muted: false,
+            media_direction: self.media_direction(),
         }
     }
 }
@@ -108,6 +113,7 @@ impl SynchronizableState for State {
                 input.enabled_general.into(),
             ),
             muted: ObservableCell::new(input.muted),
+            media_direction: ObservableCell::new(input.media_direction),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
@@ -183,6 +189,7 @@ impl From<&State> for proto::state::Receiver {
             sender_id: from.sender_id.clone(),
             enabled_individual: from.enabled_individual(),
             enabled_general: from.enabled_general(),
+            media_direction: from.media_direction(),
             muted: false,
         }
     }
@@ -210,6 +217,7 @@ impl State {
             ),
             muted: ObservableCell::new(false),
             sync_state: ObservableCell::new(SyncState::Synced),
+            media_direction: ObservableCell::new(MediaDirection::SendRecv),
         }
     }
 
@@ -256,19 +264,29 @@ impl State {
         self.muted.get()
     }
 
+    /// Returns current [`MediaDirection`] of this [`State`].
+    #[must_use]
+    pub fn media_direction(&self) -> MediaDirection {
+        self.media_direction.get()
+    }
+
     /// Updates this [`State`] with the provided [`TrackPatchEvent`].
     pub fn update(&self, track_patch: &TrackPatchEvent) {
         if self.id != track_patch.id {
             return;
         }
-        if let Some(enabled_general) = track_patch.enabled_general {
-            self.enabled_general.set(enabled_general.into());
+        if let Some(direction) = track_patch.media_direction {
+            self.enabled_general
+                .set((direction == MediaDirection::SendRecv).into());
         }
         if let Some(enabled_individual) = track_patch.enabled_individual {
             self.enabled_individual.update(enabled_individual.into());
         }
         if let Some(muted) = track_patch.muted {
             self.muted.set(muted);
+        }
+        if let Some(direction) = track_patch.media_direction {
+            self.media_direction.set(direction);
         }
     }
 }
@@ -401,6 +419,18 @@ impl Component {
             }
             SyncState::Syncing => (),
         }
+        Ok(())
+    }
+
+    /// Updates [`MediaDirection`] of the [`Receiver`].
+    #[watch(self.media_direction.subscribe())]
+    async fn direction_watcher(
+        receiver: Rc<Receiver>,
+        _: Rc<State>,
+        direction: MediaDirection,
+    ) -> Result<(), Infallible> {
+        receiver.set_media_direction(direction);
+
         Ok(())
     }
 }

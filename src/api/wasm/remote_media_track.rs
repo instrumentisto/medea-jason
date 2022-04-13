@@ -68,6 +68,11 @@ impl RemoteMediaTrack {
         self.0.on_stopped(cb.into());
     }
 
+    /// Sets callback to invoke when this [`RemoteMediaTrack`]'s general media exchange direction changes.
+    pub fn on_media_direction_changed(&self, cb: js_sys::Function) {
+        self.0.on_media_direction_changed(cb.into());
+    }
+
     /// Returns a [`MediaKind::Audio`] if this [`RemoteMediaTrack`] represents
     /// an audio track, or a [`MediaKind::Video`] if it represents a video
     /// track.

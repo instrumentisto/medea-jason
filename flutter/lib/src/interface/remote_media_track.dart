@@ -3,6 +3,21 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'track_kinds.dart';
 
+/// Media exchange direction of the `Track`.
+enum TrackMediaDirection {
+  /// `Track` is enabled on recv and send sides.
+  SendRecv,
+
+  /// `Track` is enabled on send side.
+  SendOnly,
+
+  /// `Track` is enabled on recv side.
+  RecvOnly,
+
+  /// `Track` is disabled on both sides.
+  Inactive,
+}
+
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
@@ -36,4 +51,6 @@ abstract class RemoteMediaTrack implements PlatformHandle {
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is stopped.
   void onStopped(void Function() f);
+
+  void onMediaDirectionChanged(void Function(TrackMediaDirection) f);
 }

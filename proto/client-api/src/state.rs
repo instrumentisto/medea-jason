@@ -6,8 +6,8 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    IceCandidate, IceServer, MediaType, MemberId, NegotiationRole, PeerId,
-    TrackId,
+    IceCandidate, IceServer, MediaDirection, MediaType, MemberId,
+    NegotiationRole, PeerId, TrackId,
 };
 
 /// State of a `Room` element.
@@ -104,4 +104,7 @@ pub struct Receiver {
 
     /// Indicator whether this [`Receiver`] is muted.
     pub muted: bool,
+
+    /// Current general media exchange state of this [`Receiver`].
+    pub media_direction: MediaDirection,
 }

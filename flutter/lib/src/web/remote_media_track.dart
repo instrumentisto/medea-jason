@@ -69,4 +69,10 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   void free() {
     obj.free();
   }
+
+  @override
+  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+    fallibleFunction(() => obj.on_media_direction_changed(
+        allowInterop((i) => f(TrackMediaDirection.values[i]))));
+  }
 }

@@ -39,6 +39,10 @@ typedef _onUnmuted_Dart = void Function(Pointer, void Function());
 typedef _onStopped_C = Void Function(Pointer, Handle);
 typedef _onStopped_Dart = void Function(Pointer, void Function());
 
+typedef _onMediaDirectionChanged_C = Void Function(Pointer, Handle);
+typedef _onMediaDirectionChanged_Dart = void Function(
+    Pointer, void Function(int));
+
 typedef _getTrack_C = Handle Function(Pointer);
 typedef _getTrack_Dart = Object Function(Pointer);
 
@@ -68,6 +72,10 @@ final _onUnmuted = dl.lookupFunction<_onUnmuted_C, _onUnmuted_Dart>(
 
 final _onStopped = dl.lookupFunction<_onStopped_C, _onStopped_Dart>(
     'RemoteMediaTrack__on_stopped');
+
+final _onMediaDirectionChanged = dl
+    .lookupFunction<_onMediaDirectionChanged_C, _onMediaDirectionChanged_Dart>(
+        'RemoteMediaTrack__on_media_direction_changed');
 
 final _getTrack = dl
     .lookupFunction<_getTrack_C, _getTrack_Dart>('RemoteMediaTrack__get_track');
@@ -144,5 +152,11 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
       _free(ptr.getInnerPtr());
       ptr.free();
     }
+  }
+
+  @override
+  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+    _onMediaDirectionChanged(
+        ptr.getInnerPtr(), (i) => f(TrackMediaDirection.values[i]));
   }
 }

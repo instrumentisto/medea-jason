@@ -42,7 +42,7 @@ derivative = "2.1"
 derive_more = "0.99"
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.4.0-dev", path = "proto/client-api" }
+medea-client-api-proto = { path = "proto/client-api" }
 medea-macro = { version = "0.3.0-dev", path = "crates/medea-macro" }
 medea-reactive = "0.1"
 mockall = { version = "0.11", optional = true }

@@ -1,15 +1,19 @@
 //! Wrapper around a received remote [`platform::MediaStreamTrack`].
 
-use std::rc::Rc;
+use std::{borrow::Borrow, rc::Rc};
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
+use medea_client_api_proto::MediaDirection;
 use medea_reactive::ObservableCell;
 
 use crate::{
     media::{track::MediaStreamTrackState, MediaKind, MediaSourceKind},
     platform,
 };
+
+/// FFI capable [`MediaDirection`] representation used for [`platform::Callback`].
+pub type Direction = u8;
 
 /// Inner reference-counted data of a [`Track`].
 #[derive(Debug)]
@@ -34,6 +38,9 @@ struct Inner {
 
     /// Callback to be invoked when this [`Track`] is stopped.
     on_stopped: platform::Callback<()>,
+
+    /// Callback to be inboked when this [`Track`]'s general media exchange direction is changed.
+    on_media_direction_changed: platform::Callback<Direction>,
 
     /// Indicates whether this track is enabled, meaning that
     /// [RTCRtpTransceiver] that created this track has its direction set to
@@ -80,6 +87,7 @@ impl Track {
         media_source_kind: proto::MediaSourceKind,
         enabled: bool,
         muted: bool,
+        transceiver_direction: MediaDirection,
     ) -> Self
     where
         platform::MediaStreamTrack: From<T>,
@@ -90,6 +98,7 @@ impl Track {
             media_source_kind,
             enabled: ObservableCell::new(enabled),
             muted: ObservableCell::new(muted),
+            on_media_direction_changed: platform::Callback::default(),
             on_enabled: platform::Callback::default(),
             on_disabled: platform::Callback::default(),
             on_stopped: platform::Callback::default(),
@@ -158,6 +167,14 @@ impl Track {
         });
 
         track
+    }
+
+
+    /// Sets general media exchange direction of this [`Track`].
+    pub fn set_media_direction(&self, direction: MediaDirection) {
+        self.0
+            .on_media_direction_changed
+            .call1(direction as Direction);
     }
 
     /// Sets `enabled` property on this [`Track`].
@@ -254,5 +271,13 @@ impl Track {
     /// Sets callback to invoke when this [`Track`] is stopped.
     pub fn on_stopped(&self, callback: platform::Function<()>) {
         self.0.on_stopped.set_func(callback);
+    }
+
+    /// Sets callback to invoke when this [`Track`]'s general media exchange direction is changed.
+    pub fn on_media_direction_changed(
+        &self,
+        callback: platform::Function<Direction>,
+    ) {
+        self.0.on_media_direction_changed.set_func(callback);
     }
 }

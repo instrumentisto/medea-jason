@@ -700,14 +700,8 @@ pub struct TrackPatchEvent {
     /// really disabled. This is intention of this `Member`.
     pub enabled_individual: Option<bool>,
 
-    /// Media exchange state of the connection between `Member`s.
-    ///
-    /// This state indicates real media exchange state between `Member`s. But
-    /// this state doesn't changes intention of this `Member`.
-    ///
-    /// So intention of this `Member` (`enabled_individual`) can be
-    /// `false`, but real media exchange state can be `true`.
-    pub enabled_general: Option<bool>,
+    /// General media exchange direction of the `Track`.
+    pub media_direction: Option<MediaDirection>,
 
     /// [`Track`]'s mute state.
     ///
@@ -716,13 +710,29 @@ pub struct TrackPatchEvent {
     pub muted: Option<bool>,
 }
 
+/// Media exchange direction of the `Track`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MediaDirection {
+    /// `Track` is enabled on recv and send sides.
+    SendRecv = 0,
+
+    /// `Track` is enabled on send side.
+    SendOnly = 1,
+
+    /// `Track` is enabled on recv side.
+    RecvOnly = 2,
+
+    /// `Track` is disabled on both sides.
+    Inactive = 3,
+}
+
 impl From<TrackPatchCommand> for TrackPatchEvent {
     fn from(from: TrackPatchCommand) -> Self {
         Self {
             id: from.id,
             enabled_individual: from.enabled,
-            enabled_general: None,
             muted: from.muted,
+            media_direction: None,
         }
     }
 }
@@ -733,9 +743,9 @@ impl TrackPatchEvent {
     pub const fn new(id: TrackId) -> Self {
         Self {
             id,
-            enabled_general: None,
             enabled_individual: None,
             muted: None,
+            media_direction: None,
         }
     }
 
@@ -748,16 +758,16 @@ impl TrackPatchEvent {
             return;
         }
 
-        if let Some(enabled_general) = another.enabled_general {
-            self.enabled_general = Some(enabled_general);
-        }
-
         if let Some(enabled_individual) = another.enabled_individual {
             self.enabled_individual = Some(enabled_individual);
         }
 
         if let Some(muted) = another.muted {
             self.muted = Some(muted);
+        }
+
+        if let Some(direction) = another.media_direction {
+            self.media_direction = Some(direction);
         }
     }
 }

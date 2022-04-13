@@ -5,7 +5,9 @@ mod component;
 use std::cell::{Cell, RefCell};
 
 use futures::channel::mpsc;
-use medea_client_api_proto::{self as proto, MediaType, MemberId};
+use medea_client_api_proto::{
+    self as proto, MediaDirection, MediaType, MemberId,
+};
 use proto::TrackId;
 
 use crate::{
@@ -61,6 +63,9 @@ pub struct Receiver {
 
     /// Indicator whether this [`remote::Track`] is enabled individually.
     enabled_individual: Cell<bool>,
+
+    /// General media exchange state of the [`Receiver`].
+    media_direction: Cell<MediaDirection>,
 
     /// Indicator whether this [`remote::Track`] is muted.
     muted: Cell<bool>,
@@ -144,6 +149,7 @@ impl Receiver {
             enabled_general: Cell::new(state.enabled_individual()),
             enabled_individual: Cell::new(state.enabled_general()),
             muted: Cell::new(state.muted()),
+            media_direction: Cell::new(state.media_direction()),
             track_events_sender,
         };
 
@@ -232,6 +238,7 @@ impl Receiver {
             self.caps.media_source_kind(),
             self.enabled_individual.get(),
             self.muted.get(),
+            self.media_direction.get(),
         );
 
         if self.enabled_individual.get() {
@@ -249,6 +256,14 @@ impl Receiver {
             prev_track.stop();
         };
         self.maybe_notify_track().await;
+    }
+
+    /// Updates [`MediaDirection`] of this [`Receiver`].
+    pub fn set_media_direction(&self, direction: MediaDirection) {
+        self.media_direction.set(direction);
+        if let Some(track) = self.track.borrow().as_ref().cloned() {
+            track.set_media_direction(direction);
+        }
     }
 
     /// Replaces [`Receiver`]'s [`platform::Transceiver`] with the provided

@@ -82,6 +82,18 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
     });
 }
 
+/// Sets callback to invoke when this [`RemoteMediaTrack`]'s general media exchange direction is changed.
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__on_media_direction_changed(
+    this: ptr::NonNull<RemoteMediaTrack>,
+    f: Dart_Handle,
+) {
+    propagate_panic(move || {
+        this.as_ref()
+            .on_media_direction_changed(platform::Function::new(f));
+    });
+}
+
 /// Indicates whether this [`RemoteMediaTrack`] is enabled.
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__enabled(

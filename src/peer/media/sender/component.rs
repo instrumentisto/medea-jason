@@ -4,8 +4,8 @@ use std::{convert::Infallible, rc::Rc};
 
 use futures::{future::LocalBoxFuture, StreamExt as _};
 use medea_client_api_proto::{
-    self as proto, MediaSourceKind, MediaType, MemberId, TrackId,
-    TrackPatchEvent,
+    self as proto, MediaDirection, MediaSourceKind, MediaType, MemberId,
+    TrackId, TrackPatchEvent,
 };
 use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
@@ -364,9 +364,9 @@ impl State {
         if track_patch.id != self.id {
             return;
         }
-        if let Some(enabled_general) = track_patch.enabled_general {
+        if let Some(direction) = track_patch.media_direction {
             self.enabled_general
-                .set(media_exchange_state::Stable::from(enabled_general));
+                .set((direction == MediaDirection::SendRecv).into());
         }
         if let Some(enabled_individual) = track_patch.enabled_individual {
             self.enabled_individual
