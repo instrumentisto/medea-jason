@@ -1,6 +1,6 @@
 //! Wrapper around a received remote [`platform::MediaStreamTrack`].
 
-use std::rc::Rc;
+use std::{cell::Cell, rc::Rc};
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
@@ -45,7 +45,7 @@ struct Inner {
     on_media_direction_changed: platform::Callback<Direction>,
 
     /// Current [`MediaDirection`] of this [`Track`].
-    media_direction: MediaDirection,
+    media_direction: Cell<MediaDirection>,
 
     /// Indicates whether this track is enabled, meaning that
     /// [RTCRtpTransceiver] that created this track has its direction set to
@@ -104,7 +104,7 @@ impl Track {
             enabled: ObservableCell::new(enabled),
             muted: ObservableCell::new(muted),
             on_media_direction_changed: platform::Callback::default(),
-            media_direction,
+            media_direction: Cell::new(media_direction),
             on_enabled: platform::Callback::default(),
             on_disabled: platform::Callback::default(),
             on_stopped: platform::Callback::default(),
@@ -177,6 +177,7 @@ impl Track {
 
     /// Sets general media exchange direction of this [`Track`].
     pub fn set_media_direction(&self, direction: MediaDirection) {
+        self.0.media_direction.set(direction);
         self.0
             .on_media_direction_changed
             .call1(direction as Direction);
@@ -290,6 +291,6 @@ impl Track {
     /// Returns current general media exchange direction of this [`Track`].
     #[must_use]
     pub fn media_direction(&self) -> MediaDirection {
-        self.0.media_direction
+        self.0.media_direction.get()
     }
 }
