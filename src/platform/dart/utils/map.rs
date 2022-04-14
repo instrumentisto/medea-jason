@@ -58,7 +58,7 @@ impl DartMap {
     /// Creates a new empty [`DartMap`].
     #[must_use]
     pub fn new() -> Self {
-        Self(DartHandle::new(unsafe { map::init() }))
+        Self(unsafe { DartHandle::new(map::init()) })
     }
 
     /// Sets the provided `value` under the provided `key` to this [`DartMap`].

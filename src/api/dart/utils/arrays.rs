@@ -48,9 +48,6 @@ impl<T> Drop for PtrArray<T> {
     /// doesn't matter.
     #[allow(clippy::cast_possible_truncation)]
     fn drop(&mut self) {
-        // TODO: `SAFETY:` comment below produces ICE. Fixed in 1.60 Rust.
-        #![allow(clippy::undocumented_unsafe_blocks)]
-
         // SAFETY: See `# Safety` section in the docs above.
         unsafe {
             drop(Box::from_raw(slice::from_raw_parts_mut(

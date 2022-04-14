@@ -77,10 +77,12 @@ impl MediaDevices {
     pub async fn enumerate_devices(
         &self,
     ) -> Result<Vec<MediaDeviceInfo>, Traced<Error>> {
-        let devices = FutureFromDart::execute::<DartHandle>(unsafe {
-            media_devices::enumerate_devices()
-        })
-        .await
+        let devices = unsafe {
+            FutureFromDart::execute::<DartHandle>(
+                media_devices::enumerate_devices(),
+            )
+            .await
+        }
         .map(DartList::from)
         .map_err(tracerr::wrap!())?;
 
@@ -111,10 +113,12 @@ impl MediaDevices {
         &self,
         caps: MediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-        let tracks = FutureFromDart::execute::<DartHandle>(unsafe {
-            media_devices::get_user_media(caps.into())
-        })
-        .await
+        let tracks = unsafe {
+            FutureFromDart::execute::<DartHandle>(
+                media_devices::get_user_media(caps.into()),
+            )
+            .await
+        }
         .map_err(tracerr::wrap!())?;
 
         Ok(DartList::from(tracks).into())
@@ -137,10 +141,12 @@ impl MediaDevices {
         &self,
         caps: DisplayMediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-        let tracks = FutureFromDart::execute::<DartHandle>(unsafe {
-            media_devices::get_display_media(caps.into())
-        })
-        .await
+        let tracks = unsafe {
+            FutureFromDart::execute::<DartHandle>(
+                media_devices::get_display_media(caps.into()),
+            )
+            .await
+        }
         .map_err(tracerr::wrap!())?;
 
         Ok(DartList::from(tracks).into())
@@ -156,10 +162,12 @@ impl MediaDevices {
         &self,
         device_id: String,
     ) -> Result<(), Traced<Error>> {
-        FutureFromDart::execute::<()>(unsafe {
-            media_devices::set_output_audio_id(string_into_c_str(device_id))
-        })
-        .await
+        unsafe {
+            FutureFromDart::execute::<()>(media_devices::set_output_audio_id(
+                string_into_c_str(device_id),
+            ))
+            .await
+        }
         .map_err(tracerr::wrap!())
     }
 

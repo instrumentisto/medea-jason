@@ -36,4 +36,40 @@ abstract class ConnectionHandle implements PlatformHandle {
   /// `RoomHandle` that implicitly owns native object behind this
   /// [ConnectionHandle].
   void onQualityScoreUpdate(void Function(int) f);
+
+  /// Enables inbound audio in this `Connection`.
+  ///
+  /// Throws a [StateError] if the underlying [Pointer] has been freed.
+  ///
+  /// Throws a `MediaStateTransitionException` if
+  /// [ConnectionHandle.disableRemoteAudio] was called while enabling or a
+  /// media server didn't approve this state transition.
+  Future<void> enableRemoteAudio();
+
+  /// Disables inbound audio in this `Connection`.
+  ///
+  /// Throws a [StateError] if the underlying [Pointer] has been freed.
+  ///
+  /// Throws a `MediaStateTransitionException` if
+  /// [ConnectionHandle.enableRemoteAudio] was called while disabling or a
+  /// media server didn't approve this state transition.
+  Future<void> disableRemoteAudio();
+
+  /// Enables inbound video in this `Connection`.
+  ///
+  /// Throws a [StateError] if the underlying [Pointer] has been freed.
+  ///
+  /// Throws a `MediaStateTransitionException` if
+  /// [ConnectionHandle.disableRemoteVideo] was called while enabling or a
+  /// media server didn't approve this state transition.
+  Future<void> enableRemoteVideo();
+
+  /// Disables inbound video in this `Connection`.
+  ///
+  /// Throws a [StateError] if the underlying [Pointer] has been freed.
+  ///
+  /// Throws a `MediaStateTransitionException` if
+  /// [ConnectionHandle.enableRemoteVideo] was called while disabling or a
+  /// media server didn't approve this state transition.
+  Future<void> disableRemoteVideo();
 }

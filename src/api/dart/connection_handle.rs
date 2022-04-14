@@ -1,9 +1,14 @@
 use std::ptr;
 
 use dart_sys::Dart_Handle;
+use tracerr::Traced;
 
 use crate::{
-    api::dart::utils::{DartError, DartResult},
+    api::{
+        dart::utils::{DartError, DartResult},
+        utils::{DartFuture, IntoDartFuture as _},
+    },
+    connection::ChangeMediaStateError,
     platform,
 };
 
@@ -76,6 +81,82 @@ pub unsafe extern "C" fn ConnectionHandle__get_remote_member_id(
     })
 }
 
+/// Enables inbound audio in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__enable_remote_audio(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.enable_remote_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Disables inbound audio in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__disable_remote_audio(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.disable_remote_audio();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Enables inbound video in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__enable_remote_video(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.enable_remote_video();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Disables inbound video in this [`ConnectionHandle`].
+///
+/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+#[no_mangle]
+pub unsafe extern "C" fn ConnectionHandle__disable_remote_video(
+    this: ptr::NonNull<ConnectionHandle>,
+) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref();
+
+        let fut = this.disable_remote_video();
+        async move {
+            fut.await?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
 /// Frees the data behind the provided pointer.
 ///
 /// # Safety
@@ -100,15 +181,22 @@ mod mock {
         missing_copy_implementations
     )]
 
+    use std::future::Future;
+
+    use futures::future;
     use tracerr::Traced;
 
     use crate::{
         api::RemoteMediaTrack,
         connection::{
-            ConnectionHandle as CoreConnectionHandle, HandleDetachedError,
+            ChangeMediaStateError, ConnectionHandle as CoreConnectionHandle,
+            HandleDetachedError,
         },
         platform,
     };
+
+    /// Alias for a [`Result`] related to [`MediaState`] update functions.
+    type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
     #[derive(Debug)]
     pub struct ConnectionHandle(pub u8);
@@ -148,6 +236,30 @@ mod mock {
         ) -> Result<(), Traced<HandleDetachedError>> {
             f.call1(4);
             Ok(())
+        }
+
+        pub fn enable_remote_audio(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
+        }
+
+        pub fn disable_remote_audio(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
+        }
+
+        pub fn enable_remote_video(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::err(tracerr::new!(ChangeMediaStateError::Detached))
+        }
+
+        pub fn disable_remote_video(
+            &self,
+        ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+            future::ok(())
         }
     }
 }

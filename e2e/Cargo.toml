@@ -2,7 +2,7 @@
 name = "medea-e2e"
 version = "0.0.0"
 edition = "2021"
-rust-version = "1.58"
+rust-version = "1.60"
 description = "E2E tests for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 publish = false
@@ -11,7 +11,7 @@ publish = false
 async-recursion = "1.0"
 async-trait = "0.1"
 clap = "3.0"
-cucumber = "0.12"
+cucumber = "0.13"
 derive_more = "0.99"
 fantoccini = "0.18"
 futures = "0.3"

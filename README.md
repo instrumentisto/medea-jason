@@ -5,7 +5,7 @@ Jason
 ![npm downloads](https://img.shields.io/npm/dt/medea-jason "npm downloads")
 [![Latest version](https://img.shields.io/crates/v/medea-jason "Latest version")](https://crates.io/crates/medea-jason)
 ![Crates.io downloads](https://img.shields.io/crates/d/medea-client-api-proto "Crates.io downloads")
-[![Rust 1.58+](https://img.shields.io/badge/rustc-1.58+-lightgray.svg "Rust 1.58+")](https://blog.rust-lang.org/2022/01/13/Rust-1.58.0.html)
+[![Rust 1.60+](https://img.shields.io/badge/rustc-1.60+-lightgray.svg "Rust 1.60+")](https://blog.rust-lang.org/2022/04/07/Rust-1.60.0.html)
 [![Rust docs](https://docs.rs/medea-jason/badge.svg "Rust docs")](https://docs.rs/medea-jason)
 
 [API Docs](https://docs.rs/medea-jason) |

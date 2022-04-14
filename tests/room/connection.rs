@@ -1,11 +1,15 @@
 #![cfg(target_arch = "wasm32")]
 
+use std::rc::Rc;
+
 use futures::{
     channel::{mpsc, oneshot},
     StreamExt,
 };
 use medea_client_api_proto::PeerId;
-use medea_jason::{api, connection::Connections, platform};
+use medea_jason::{
+    api, connection::Connections, media::RecvConstraints, platform,
+};
 use wasm_bindgen::{closure::Closure, JsValue};
 use wasm_bindgen_test::*;
 
@@ -17,7 +21,7 @@ wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen_test]
 async fn on_new_connection_fires() {
-    let cons = Connections::default();
+    let cons = Connections::new(Rc::new(RecvConstraints::default()));
 
     let (cb, test_result) = js_callback!(|handle: api::ConnectionHandle| {
         cb_assert_eq!(
@@ -36,7 +40,7 @@ async fn on_new_connection_fires() {
 
 #[wasm_bindgen_test]
 async fn on_remote_track_added_fires() {
-    let cons = Connections::default();
+    let cons = Connections::new(Rc::new(RecvConstraints::default()));
 
     cons.create_connection(PeerId(1), &"bob".into());
 
@@ -58,7 +62,7 @@ async fn on_remote_track_added_fires() {
 
 #[wasm_bindgen_test]
 async fn tracks_are_added_to_connection() {
-    let cons = Connections::default();
+    let cons = Connections::new(Rc::new(RecvConstraints::default()));
 
     cons.create_connection(PeerId(1), &"bob".into());
 
@@ -87,7 +91,7 @@ async fn tracks_are_added_to_connection() {
 
 #[wasm_bindgen_test]
 async fn on_closed_fires() {
-    let cons = Connections::default();
+    let cons = Connections::new(Rc::new(RecvConstraints::default()));
     cons.create_connection(PeerId(1), &"bob".into());
     let con = cons.get(&"bob".into()).unwrap();
     let con_handle = con.new_handle();
@@ -106,7 +110,7 @@ async fn on_closed_fires() {
 
 #[wasm_bindgen_test]
 async fn two_peers_in_one_connection_works() {
-    let cons = Connections::default();
+    let cons = Connections::new(Rc::new(RecvConstraints::default()));
 
     let (test_tx, mut test_rx) = mpsc::unbounded();
     let on_new_connection =
@@ -127,7 +131,7 @@ async fn two_peers_in_one_connection_works() {
 
 #[wasm_bindgen_test]
 async fn create_two_connections() {
-    let cons = Connections::default();
+    let cons = Connections::new(Rc::new(RecvConstraints::default()));
 
     let (test_tx, mut test_rx) = mpsc::unbounded();
     let on_new_connection =

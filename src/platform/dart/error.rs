@@ -11,6 +11,18 @@ use super::utils::handle::DartHandle;
 pub struct Error(DartHandle);
 
 impl Error {
+    /// Creates a Dart [`Error`] out of the provided [`Dart_Handle`] from Dart
+    /// side.
+    ///
+    /// # Safety
+    ///
+    /// The provided [`Dart_Handle`] should be non-`null` and point to the
+    /// correct Dart exception.
+    #[must_use]
+    pub unsafe fn from_handle(h: Dart_Handle) -> Self {
+        Self(DartHandle::new(h))
+    }
+
     /// Returns a [`Dart_Handle`] to the underlying error.
     #[must_use]
     pub fn get_handle(&self) -> Dart_Handle {
@@ -27,11 +39,5 @@ impl Error {
     #[must_use]
     pub fn message(&self) -> String {
         self.0.to_string()
-    }
-}
-
-impl From<Dart_Handle> for Error {
-    fn from(from: Dart_Handle) -> Self {
-        Self(DartHandle::new(from))
     }
 }

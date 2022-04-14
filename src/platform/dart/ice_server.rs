@@ -50,7 +50,7 @@ where
     I: IntoIterator<Item = IceServer>,
 {
     fn from(servers: I) -> Self {
-        let ice_servers = DartHandle::new(unsafe { ice_servers::init() });
+        let ice_servers = unsafe { DartHandle::new(ice_servers::init()) };
         for srv in servers {
             for url in srv.urls {
                 unsafe {
