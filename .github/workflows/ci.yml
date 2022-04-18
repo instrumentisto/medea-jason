@@ -299,7 +299,7 @@ jobs:
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
-      -run: ldd --version ldd
+      - run: ldd --version ldd
 
       - run: xvfb-run -a make test.flutter device=linux
         if: ${{ matrix.platform == 'linux' }}
