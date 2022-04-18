@@ -13,7 +13,7 @@ use tracerr::Traced;
 
 use crate::{
     api::string_into_c_str,
-    media::{MediaKind, MediaSourceKind},
+    media::MediaKind,
     platform::{
         dart::{
             ice_server::RtcIceServers,
@@ -185,10 +185,7 @@ impl RtcPeerConnection {
                     Callback::from_two_arg_fn_mut(
                         move |track: DartHandle, transceiver: DartHandle| {
                             h(
-                                MediaStreamTrack::new(
-                                    track,
-                                    MediaSourceKind::Device,
-                                ),
+                                MediaStreamTrack::new(track, None),
                                 Transceiver::from(transceiver),
                             );
                         },

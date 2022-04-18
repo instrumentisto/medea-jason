@@ -122,13 +122,16 @@ pub struct MediaStreamTrack {
     inner: DartHandle,
 
     /// Media source type of this [`MediaStreamTrack`].
-    source_kind: MediaSourceKind,
+    source_kind: Option<MediaSourceKind>,
 }
 
 impl MediaStreamTrack {
     /// Creates a new [`MediaStreamTrack`].
     #[must_use]
-    pub fn new(inner: DartHandle, source_kind: MediaSourceKind) -> Self {
+    pub fn new(
+        inner: DartHandle,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Self {
         Self { inner, source_kind }
     }
 
@@ -255,7 +258,7 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
-        self.source_kind == MediaSourceKind::Display
+        self.source_kind == Some(MediaSourceKind::Display)
     }
 
     /// Forks this [`MediaStreamTrack`], by creating a new [`MediaStreamTrack`]
@@ -278,7 +281,6 @@ impl MediaStreamTrack {
                     FutureFromDart::execute(media_stream_track::clone(handle))
                         .await
                         .unwrap();
-
                 Self::new(new_track, source_kind)
             }
         }

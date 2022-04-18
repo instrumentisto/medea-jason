@@ -122,16 +122,14 @@ impl MediaDevices {
         }
         .map_err(tracerr::wrap!())?;
 
-        let tracks: Vec<DartHandle> = DartList::from(tracks).into();
+        let tracks = Vec::from(DartList::from(tracks))
+            .into_iter()
+            .map(|track| {
+                MediaStreamTrack::new(track, Some(MediaSourceKind::Device))
+            })
+            .collect();
 
-        let mut media_tracks = Vec::new();
-
-        for track in tracks {
-            media_tracks
-                .push(MediaStreamTrack::new(track, MediaSourceKind::Device));
-        }
-
-        Ok(media_tracks)
+        Ok(tracks)
     }
 
     /// Prompts a user to select and grant permissions to capture contents of a
@@ -159,16 +157,14 @@ impl MediaDevices {
         }
         .map_err(tracerr::wrap!())?;
 
-        let tracks: Vec<DartHandle> = DartList::from(tracks).into();
+        let tracks = Vec::from(DartList::from(tracks))
+            .into_iter()
+            .map(|track| {
+                MediaStreamTrack::new(track, Some(MediaSourceKind::Display))
+            })
+            .collect();
 
-        let mut media_tracks = Vec::new();
-
-        for track in tracks {
-            media_tracks
-                .push(MediaStreamTrack::new(track, MediaSourceKind::Display));
-        }
-
-        Ok(media_tracks)
+        Ok(tracks)
     }
 
     /// Switches the current output audio device to the device with the provided
