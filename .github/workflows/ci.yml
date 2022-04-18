@@ -233,14 +233,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-#          - platform: android
-#            os: macos
+          - platform: android
+            os: macos
           - platform: linux
             os: ubuntu
-#          - platform: windows
-#            os: windows
+          - platform: windows
+            os: windows
     runs-on: ${{ matrix.os }}-latest
-    container: ubuntu:21.10
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -299,8 +298,6 @@ jobs:
           profile: Nexus 6
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-
-      - run: ldd --version ldd
 
       - run: xvfb-run -a make test.flutter device=linux
         if: ${{ matrix.platform == 'linux' }}
