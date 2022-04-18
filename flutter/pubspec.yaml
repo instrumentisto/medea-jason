@@ -15,7 +15,6 @@ dependencies:
   flutter_webrtc:
     git:
       url: https://github.com/instrumentisto/flutter-webrtc.git
-      ref: windows-rework
   js: ^0.6.3
 
 dev_dependencies:
