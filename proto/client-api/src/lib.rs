@@ -728,7 +728,13 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
         Self {
             id: from.id,
             muted: from.muted,
-            media_direction: None,
+            media_direction: from.enabled.map(|enabled| {
+                if enabled {
+                    MediaDirection::SendRecv
+                } else {
+                    MediaDirection::Inactive
+                }
+            }),
         }
     }
 }
