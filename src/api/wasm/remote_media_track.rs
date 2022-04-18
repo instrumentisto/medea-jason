@@ -40,11 +40,13 @@ impl RemoteMediaTrack {
         self.0.muted()
     }
 
+    // TODO(alexlapa): not sure that we need this
     /// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
     pub fn on_enabled(&self, cb: js_sys::Function) {
         self.0.on_enabled(cb.into());
     }
 
+    // TODO(alexlapa): not sure that we need this
     /// Sets callback, invoked when this [`RemoteMediaTrack`] is disabled.
     pub fn on_disabled(&self, cb: js_sys::Function) {
         self.0.on_disabled(cb.into());

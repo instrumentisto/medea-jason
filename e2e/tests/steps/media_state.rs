@@ -62,7 +62,7 @@ async fn then_track_is_stopped(world: &mut World, id: String, kind: String) {
 }
 
 #[then(regex = "^(\\S+)'s (audio|video) from (\\S+) has \
-             (SendRecv|SendOnly|RecvOnly|Inactive) direction$")]
+                 `(SendRecv|SendOnly|RecvOnly|Inactive)` direction$")]
 async fn then_remote_media_direction_is(
     world: &mut World,
     id: String,

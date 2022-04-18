@@ -14,7 +14,7 @@ use crate::{
 
 /// FFI capable [`MediaDirection`] representation used for
 /// [`platform::Callback`].
-pub type Direction = u8;
+pub type Direction = u8; // TODO: why not enum?
 
 /// Inner reference-counted data of a [`Track`].
 #[derive(Debug)]
@@ -197,7 +197,7 @@ impl Track {
 
     /// Sets `muted` property on this [`Track`].
     ///
-    /// Calls `on_muted` or `or_unmuted` callback respectively.
+    /// Calls `on_muted` or `on_unmuted` callback respectively.
     ///
     /// Updates [`muted`][1] property in the underlying
     /// [`platform::MediaStreamTrack`].

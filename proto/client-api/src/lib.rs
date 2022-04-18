@@ -697,12 +697,6 @@ pub struct TrackPatchEvent {
     /// ID of the [`Track`] which should be patched.
     pub id: TrackId,
 
-    /// Media exchange state of the concrete `Member`.
-    ///
-    /// This state doesn't indicates that connection between two `Member`s are
-    /// really disabled. This is intention of this `Member`.
-    pub enabled_individual: Option<bool>,
-
     /// General media exchange direction of the `Track`.
     pub media_direction: Option<MediaDirection>,
 
@@ -733,7 +727,6 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
     fn from(from: TrackPatchCommand) -> Self {
         Self {
             id: from.id,
-            enabled_individual: from.enabled,
             muted: from.muted,
             media_direction: None,
         }
@@ -746,7 +739,6 @@ impl TrackPatchEvent {
     pub const fn new(id: TrackId) -> Self {
         Self {
             id,
-            enabled_individual: None,
             muted: None,
             media_direction: None,
         }
@@ -759,10 +751,6 @@ impl TrackPatchEvent {
     pub fn merge(&mut self, another: &Self) {
         if self.id != another.id {
             return;
-        }
-
-        if let Some(enabled_individual) = another.enabled_individual {
-            self.enabled_individual = Some(enabled_individual);
         }
 
         if let Some(muted) = another.muted {
@@ -891,131 +879,4 @@ pub enum ConnectionQualityScore {
 
     /// Satisfied.
     High = 4,
-}
-
-#[cfg(test)]
-mod test {
-    use super::{TrackId, TrackPatchEvent};
-
-    #[test]
-    fn track_patch_merge() {
-        for (track_patches, result) in vec![
-            (
-                vec![
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: Some(true),
-                        enabled_individual: Some(true),
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: Some(false),
-                        enabled_individual: Some(false),
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: None,
-                        enabled_individual: None,
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: Some(true),
-                        enabled_individual: Some(true),
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: Some(true),
-                        enabled_individual: Some(true),
-                        muted: None,
-                    },
-                ],
-                TrackPatchEvent {
-                    id: TrackId(1),
-                    enabled_general: Some(true),
-                    enabled_individual: Some(true),
-                    muted: None,
-                },
-            ),
-            (
-                vec![
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: None,
-                        enabled_individual: None,
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: Some(true),
-                        enabled_individual: Some(true),
-                        muted: None,
-                    },
-                ],
-                TrackPatchEvent {
-                    id: TrackId(1),
-                    enabled_general: Some(true),
-                    enabled_individual: Some(true),
-                    muted: None,
-                },
-            ),
-            (
-                vec![
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: Some(true),
-                        enabled_individual: Some(true),
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: None,
-                        enabled_individual: None,
-                        muted: None,
-                    },
-                ],
-                TrackPatchEvent {
-                    id: TrackId(1),
-                    enabled_general: Some(true),
-                    enabled_individual: Some(true),
-                    muted: None,
-                },
-            ),
-            (
-                vec![
-                    TrackPatchEvent {
-                        id: TrackId(1),
-                        enabled_general: None,
-                        enabled_individual: None,
-                        muted: None,
-                    },
-                    TrackPatchEvent {
-                        id: TrackId(2),
-                        enabled_general: Some(true),
-                        enabled_individual: Some(true),
-                        muted: None,
-                    },
-                ],
-                TrackPatchEvent {
-                    id: TrackId(1),
-                    enabled_general: None,
-                    enabled_individual: None,
-                    muted: None,
-                },
-            ),
-        ] {
-            let mut merge_track_patch = TrackPatchEvent::new(TrackId(1));
-            for track_patch in &track_patches {
-                merge_track_patch.merge(track_patch);
-            }
-
-            assert_eq!(
-                result, merge_track_patch,
-                "track patches: {track_patches:?}",
-            );
-        }
-    }
 }

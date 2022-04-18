@@ -278,9 +278,14 @@ impl State {
         if let Some(direction) = track_patch.media_direction {
             self.enabled_general
                 .set((direction == MediaDirection::SendRecv).into());
-        }
-        if let Some(enabled_individual) = track_patch.enabled_individual {
-            self.enabled_individual.update(enabled_individual.into());
+
+            self.enabled_individual.update(
+                matches!(
+                    direction,
+                    MediaDirection::SendRecv | MediaDirection::RecvOnly
+                )
+                .into(),
+            );
         }
         if let Some(muted) = track_patch.muted {
             self.muted.set(muted);
