@@ -317,9 +317,6 @@ impl Component {
             .set(state == media_exchange_state::Stable::Enabled);
         match state {
             media_exchange_state::Stable::Disabled => {
-                if let Some(track) = receiver.track.borrow().as_ref() {
-                    track.set_enabled(false);
-                }
                 let sub_direction = {
                     receiver.transceiver.borrow().as_ref().map(|trnscvr| {
                         trnscvr
@@ -331,9 +328,6 @@ impl Component {
                 }
             }
             media_exchange_state::Stable::Enabled => {
-                if let Some(track) = receiver.track.borrow().as_ref() {
-                    track.set_enabled(true);
-                }
                 let add_direction =
                     receiver.transceiver.borrow().as_ref().map(|trnscvr| {
                         trnscvr

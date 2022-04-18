@@ -27,28 +27,6 @@ pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     propagate_panic(move || this.as_ref().get_track().handle())
 }
 
-/// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
-#[no_mangle]
-pub unsafe extern "C" fn RemoteMediaTrack__on_enabled(
-    this: ptr::NonNull<RemoteMediaTrack>,
-    f: Dart_Handle,
-) {
-    propagate_panic(move || {
-        this.as_ref().on_enabled(platform::Function::new(f));
-    });
-}
-
-/// Sets callback, invoked when this [`RemoteMediaTrack`] is disabled.
-#[no_mangle]
-pub unsafe extern "C" fn RemoteMediaTrack__on_disabled(
-    this: ptr::NonNull<RemoteMediaTrack>,
-    f: Dart_Handle,
-) {
-    propagate_panic(move || {
-        this.as_ref().on_disabled(platform::Function::new(f));
-    });
-}
-
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__on_muted(
@@ -93,14 +71,6 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_media_direction_changed(
         this.as_ref()
             .on_media_direction_changed(platform::Function::new(f));
     });
-}
-
-/// Indicates whether this [`RemoteMediaTrack`] is enabled.
-#[no_mangle]
-pub unsafe extern "C" fn RemoteMediaTrack__enabled(
-    this: ptr::NonNull<RemoteMediaTrack>,
-) -> u8 {
-    propagate_panic(move || this.as_ref().enabled().into())
 }
 
 /// Indicate whether this [`RemoteMediaTrack`] is muted.

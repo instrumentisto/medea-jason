@@ -236,7 +236,6 @@ impl Receiver {
         let new_track = remote::Track::new(
             new_track,
             self.caps.media_source_kind(),
-            self.enabled_individual.get(),
             self.muted.get(),
             self.media_direction.get(),
         );
