@@ -626,7 +626,7 @@ test.flutter:
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
-	              $(if $(call eq,$(device),),,-d $(device))
+	              $(if $(call eq,$(device),),,-d $(device)) -v
 
 
 
