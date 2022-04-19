@@ -87,7 +87,7 @@ impl Object<RemoteTrack> {
             // language=JavaScript
             r#"
                 async (t) => {
-                    const currentDirection = t.track.get_track().media_direction();
+                    const currentDirection = t.track.media_direction();
                     return (currentDirection == 1 || currentDirection == 3);
                 }
             "#,
