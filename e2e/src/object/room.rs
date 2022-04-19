@@ -407,7 +407,21 @@ impl Object<Room> {
                             track.track.on_stopped(() => {
                                 track.stopped = true;
                             });
-                            track.track.on_media_direction_changed(() => {
+                            track.track.on_media_direction_changed((direction) => {
+                                if (direction == 0 || direction == 2) {
+                                    track.on_enabled_fire_count++;
+                                    for (sub of track.onEnabledSubs) {
+                                        sub();
+                                    }
+                                    track.onEnabledSubs = [];
+                                } else {
+                                    track.on_disabled_fire_count++;
+                                    for (sub of track.onDisabledSubs) {
+                                        sub();
+                                    }
+                                    track.onDisabledSubs = [];
+                                }
+
                                 for (sub of track.onMediaDirectionChangedSubs) {
                                     sub();
                                 }
