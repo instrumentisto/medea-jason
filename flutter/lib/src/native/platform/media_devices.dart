@@ -2,8 +2,7 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:flutter_webrtc/src/model/constraints.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import 'media_devices.g.dart' as bridge;
 
@@ -19,28 +18,28 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Requests media input access and returns the created [MediaStreamTrack]s.
-Object _getUserMedia(DeviceConstraints constraints) {
-  return () => getUserMedia(constraints);
+/// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
+Object _getUserMedia(webrtc.DeviceConstraints constraints) {
+  return () => webrtc.getUserMedia(constraints);
 }
 
 /// Returns all the available media devices.
 Object _enumerateDevices() {
-  return () => enumerateDevices();
+  return () => webrtc.enumerateDevices();
 }
 
 /// Starts capturing the contents of a display and returns the created
-/// [MediaStreamTrack]s.
-Object _getDisplayMedia(DisplayConstraints constraints) {
-  return () => getDisplayMedia(constraints);
+/// [webrtc.MediaStreamTrack]s.
+Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
+  return () => webrtc.getDisplayMedia(constraints);
 }
 
 /// Switches output audio device to the device with the provided [deviceId].
 Object _setOutputAudioId(Pointer<Utf8> deviceId) {
-  return () => setOutputAudioId(deviceId.toDartString());
+  return () => webrtc.setOutputAudioId(deviceId.toDartString());
 }
 
 /// Subscribes onto the `MediaDevices`'s `devicechange` event.
 void _onDeviceChange(Function cb) {
-  onDeviceChange(() => cb(null));
+  webrtc.onDeviceChange(() => cb(null));
 }

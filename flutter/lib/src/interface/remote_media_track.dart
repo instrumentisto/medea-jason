@@ -1,4 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import '/src/util/rust_handles_storage.dart';
 import 'track_kinds.dart';
@@ -19,8 +19,8 @@ abstract class RemoteMediaTrack implements PlatformHandle {
   /// Returns this [RemoteMediaTrack]'s media source kind (device/display).
   MediaSourceKind mediaSourceKind();
 
-  /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
-  MediaStreamTrack getTrack();
+  /// Returns underlying [webrtc.MediaStreamTrack] of this [LocalMediaTrack].
+  webrtc.MediaStreamTrack getTrack();
 
   /// Sets callback, invoked when this [RemoteMediaTrack] is enabled.
   void onEnabled(void Function() f);

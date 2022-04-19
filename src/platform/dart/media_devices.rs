@@ -7,6 +7,7 @@ use tracerr::Traced;
 
 use crate::{
     api::string_into_c_str,
+    media::MediaSourceKind,
     platform::{
         dart::utils::{
             dart_future::FutureFromDart, handle::DartHandle, list::DartList,
@@ -121,7 +122,14 @@ impl MediaDevices {
         }
         .map_err(tracerr::wrap!())?;
 
-        Ok(DartList::from(tracks).into())
+        let tracks = Vec::from(DartList::from(tracks))
+            .into_iter()
+            .map(|track| {
+                MediaStreamTrack::new(track, Some(MediaSourceKind::Device))
+            })
+            .collect();
+
+        Ok(tracks)
     }
 
     /// Prompts a user to select and grant permissions to capture contents of a
@@ -149,7 +157,14 @@ impl MediaDevices {
         }
         .map_err(tracerr::wrap!())?;
 
-        Ok(DartList::from(tracks).into())
+        let tracks = Vec::from(DartList::from(tracks))
+            .into_iter()
+            .map(|track| {
+                MediaStreamTrack::new(track, Some(MediaSourceKind::Display))
+            })
+            .collect();
+
+        Ok(tracks)
     }
 
     /// Switches the current output audio device to the device with the provided

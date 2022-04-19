@@ -8,7 +8,9 @@ use derive_more::AsRef;
 use futures::future;
 
 use crate::{
-    media::{track::MediaStreamTrackState, FacingMode, MediaKind},
+    media::{
+        track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
+    },
     platform::wasm::{get_property_by_name, utils::EventListener},
 };
 
@@ -31,6 +33,11 @@ pub struct MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     kind: MediaKind,
 
+    /// Media source kind of this [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    source_kind: Option<MediaSourceKind>,
+
     /// Listener for an [ended][1] event.
     ///
     /// [1]: https://tinyurl.com/w3-streams#event-mediastreamtrack-ended
@@ -39,12 +46,14 @@ pub struct MediaStreamTrack {
     >,
 }
 
-impl<T> From<T> for MediaStreamTrack
-where
-    web_sys::MediaStreamTrack: From<T>,
-{
-    fn from(from: T) -> Self {
-        let sys_track = web_sys::MediaStreamTrack::from(from);
+impl MediaStreamTrack {
+    /// Creates a new [`MediaStreamTrack`].
+    #[must_use]
+    pub fn new<T>(sys_track: T, source_kind: Option<MediaSourceKind>) -> Self
+    where
+        web_sys::MediaStreamTrack: From<T>,
+    {
+        let sys_track = web_sys::MediaStreamTrack::from(sys_track);
         let kind = match sys_track.kind().as_ref() {
             "audio" => MediaKind::Audio,
             "video" => MediaKind::Video,
@@ -52,13 +61,12 @@ where
         };
         Self {
             sys_track: Rc::new(sys_track),
+            source_kind,
             kind,
             on_ended: RefCell::new(None),
         }
     }
-}
 
-impl MediaStreamTrack {
     /// Returns [`id`] of the underlying [MediaStreamTrack][2].
     ///
     /// [`id`]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
@@ -199,22 +207,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/screen-capture/#extensions-to-mediatracksettings
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
-        let settings = self.sys_track.get_settings();
-
-        let has_display_surface =
-            get_property_by_name(&settings, "displaySurface", |val| {
-                val.as_string()
-            })
-            .is_some();
-
-        if has_display_surface {
-            true
-        } else {
-            get_property_by_name(&settings, "logicalSurface", |val| {
-                val.as_string()
-            })
-            .is_some()
-        }
+        self.source_kind == Some(MediaSourceKind::Display)
     }
 
     /// Forks this [`MediaStreamTrack`].
@@ -230,6 +223,7 @@ impl MediaStreamTrack {
                 &self.sys_track,
             )),
             kind: self.kind,
+            source_kind: self.source_kind,
             on_ended: RefCell::new(None),
         })
     }

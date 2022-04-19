@@ -31,7 +31,7 @@ class _CallState extends State {
     _call.onNewRemoteStream((track) async {
       var renderer = createVideoRenderer();
       await renderer.initialize();
-      renderer.srcObject = track;
+      await renderer.setSrcObject(track);
       setState(() {
         _videos.add(VideoView(renderer));
       });
@@ -39,7 +39,7 @@ class _CallState extends State {
     _call.onLocalStream((track) async {
       var renderer = createVideoRenderer();
       await renderer.initialize();
-      renderer.srcObject = track;
+      await renderer.setSrcObject(track);
       setState(() {
         _videos.add(VideoView(renderer, mirror: true));
       });

@@ -2,11 +2,6 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:flutter_webrtc/src/model/ice.dart';
-import 'package:flutter_webrtc/src/model/peer.dart';
-import 'package:flutter_webrtc/src/model/sdp.dart';
-import 'package:flutter_webrtc/src/model/track.dart';
-import 'package:flutter_webrtc/src/model/transceiver.dart';
 
 import 'peer_connection.g.dart' as bridge;
 import '../ffi/foreign_value.dart';

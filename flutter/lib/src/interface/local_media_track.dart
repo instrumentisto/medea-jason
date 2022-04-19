@@ -1,4 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import '/src/util/rust_handles_storage.dart';
 import 'track_kinds.dart';
@@ -21,5 +21,5 @@ abstract class LocalMediaTrack implements PlatformHandle {
   MediaSourceKind mediaSourceKind();
 
   /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
-  MediaStreamTrack getTrack();
+  webrtc.MediaStreamTrack getTrack();
 }

@@ -185,7 +185,7 @@ impl RtcPeerConnection {
                     Callback::from_two_arg_fn_mut(
                         move |track: DartHandle, transceiver: DartHandle| {
                             h(
-                                MediaStreamTrack::from(track),
+                                MediaStreamTrack::new(track, None),
                                 Transceiver::from(transceiver),
                             );
                         },
