@@ -35,7 +35,8 @@ impl Object<RemoteTrack> {
             // language=JavaScript
             r#"
             async (track) => {
-                if (!track.track.enabled()) {
+                const currentDirection = track.track.media_direction()
+                if (currentDirection == 1 || currentDirection == 3) {
                     let waiter = new Promise((resolve) => {
                         track.onEnabledSubs.push(resolve);
                     });
@@ -60,7 +61,8 @@ impl Object<RemoteTrack> {
             // language=JavaScript
             r#"
             async (track) => {
-                if (track.track.enabled()) {
+                const currentDirection = track.track.media_direction()
+                if (currentDirection == 1 || currentDirection == 3) {
                     let waiter = new Promise((resolve) => {
                         track.onDisabledSubs.push(resolve);
                     });
@@ -83,7 +85,12 @@ impl Object<RemoteTrack> {
     pub async fn disabled(&self) -> Result<bool, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"async (t) => !t.track.get_track().enabled"#,
+            r#"
+                async (t) => {
+                    const currentDirection = t.track.get_track().media_direction();
+                    return (currentDirection == 1 || currentDirection == 3);
+                }
+            "#,
             [],
         ))
         .await?
