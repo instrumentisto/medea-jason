@@ -490,12 +490,11 @@ jobs:
                                     crate=${{ steps.release.outputs.group1 }}
                                     ver=${{ steps.release.outputs.group2 }})
 
-      - uses: actions/create-release@master
+      - uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
-          release_name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
+          name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
           body: |
             [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
             [Changelog](${{ steps.changelog.outputs.LINK }})
