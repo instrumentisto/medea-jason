@@ -376,20 +376,6 @@ impl Object<Room> {
                                 onUnmutedSubs: [],
                                 onMediaDirectionChangedSubs: []
                             };
-                            track.track.on_enabled(() => {
-                                track.on_enabled_fire_count++;
-                                for (sub of track.onEnabledSubs) {
-                                    sub();
-                                }
-                                track.onEnabledSubs = [];
-                            });
-                            track.track.on_disabled(() => {
-                                track.on_disabled_fire_count++;
-                                for (sub of track.onDisabledSubs) {
-                                    sub();
-                                }
-                                track.onDisabledSubs = [];
-                            });
                             track.track.on_muted(() => {
                                 track.on_muted_fire_count++;
                                 for (sub of track.onMutedSubs) {
