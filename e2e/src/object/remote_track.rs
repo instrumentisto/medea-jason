@@ -62,7 +62,7 @@ impl Object<RemoteTrack> {
             r#"
             async (track) => {
                 const currentDirection = track.track.media_direction()
-                if (currentDirection != 0) {
+                if (currentDirection == 0) {
                     let waiter = new Promise((resolve) => {
                         track.onDisabledSubs.push(resolve);
                     });
