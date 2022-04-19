@@ -36,7 +36,7 @@ impl Object<RemoteTrack> {
             r#"
             async (track) => {
                 const currentDirection = track.track.media_direction()
-                if (currentDirection == 1 || currentDirection == 3) {
+                if (currentDirection != 0) {
                     let waiter = new Promise((resolve) => {
                         track.onEnabledSubs.push(resolve);
                     });
@@ -62,7 +62,7 @@ impl Object<RemoteTrack> {
             r#"
             async (track) => {
                 const currentDirection = track.track.media_direction()
-                if (currentDirection == 1 || currentDirection == 3) {
+                if (currentDirection != 0) {
                     let waiter = new Promise((resolve) => {
                         track.onDisabledSubs.push(resolve);
                     });
@@ -88,7 +88,7 @@ impl Object<RemoteTrack> {
             r#"
                 async (t) => {
                     const currentDirection = t.track.media_direction();
-                    return (currentDirection == 1 || currentDirection == 3);
+                    return currentDirection != 0;
                 }
             "#,
             [],
