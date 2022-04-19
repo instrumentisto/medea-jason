@@ -542,12 +542,10 @@ jobs:
           text: ${{ github.ref }}
           regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$'
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "17"
-      - name: Create NPM authorization
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPMJS_TOKEN }}"
-             > ~/.npmrc
+          registry-url: https://registry.npmjs.org
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -558,10 +556,10 @@ jobs:
 
       - name: Release ${{ steps.package.outputs.group2 }} version
               of '${{ steps.package.outputs.group1 }}' package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
         run: make release.npm crate=${{ steps.package.outputs.group1 }}
                               publish=yes
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
 
   release-helm:
     name: Release Helm chart
