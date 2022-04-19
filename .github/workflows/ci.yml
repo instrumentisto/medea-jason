@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
 
       - run: make flutter.fmt check=yes
 
@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
 
       - run: make flutter
 
@@ -258,7 +258,7 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
       - run: flutter config --enable-linux-desktop
         if: ${{ matrix.platform == 'linux' }}
       - name: Install Flutter Linux dependencies
