@@ -235,8 +235,8 @@ jobs:
         include:
           - platform: android
             os: macos
-#            TODO: Flutter requires libc6 of 2.34 version for some reason.
-#                  Uncomment when github will update ubuntu-latest to 22.04.
+#            TODO: Flutter requires `libc6` of 2.34 version for some reason.
+#                  Uncomment when github will update `ubuntu-latest` to 22.04.
 #          - platform: linux
 #            os: ubuntu
           - platform: windows

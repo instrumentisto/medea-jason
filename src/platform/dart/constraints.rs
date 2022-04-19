@@ -231,8 +231,8 @@ impl DisplayMediaStreamConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
+        let video = MediaTrackConstraints::from(video);
         unsafe {
-            let video = MediaTrackConstraints::from(video);
             constraints::set_video_constraint(
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
@@ -388,13 +388,12 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
 }
 
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
-    fn from(from: DisplayVideoTrackConstraints) -> Self {
+    fn from(_: DisplayVideoTrackConstraints) -> Self {
         unsafe {
             let optional =
                 DartHandle::new(constraints::new_video_constraints());
             let mandatory =
                 DartHandle::new(constraints::new_video_constraints());
-
             Self {
                 optional,
                 mandatory,
