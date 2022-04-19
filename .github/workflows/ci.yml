@@ -196,7 +196,7 @@ jobs:
           crate: wasm-pack
           use-tool-cache: true
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
       - name: Unpack `medea-control-api-mock` Docker image
@@ -444,7 +444,7 @@ jobs:
       - run: make docker.tar to-file=image.tar
                   image=${{ matrix.image }} tags=build-${{ github.run_number }}
         if: ${{ matrix.if && matrix.export }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
           path: image.tar
@@ -633,7 +633,7 @@ jobs:
       - uses: docker/setup-buildx-action@v1
         if: ${{ matrix.if }}
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
         if: ${{ matrix.if }}
