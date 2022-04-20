@@ -13,6 +13,7 @@ use medea_reactive::{
     when_all_processed, AllProcessed, Guarded, ObservableCell, Processed,
     ProgressableCell,
 };
+use medea_client_api_proto::MediaDirection::{RecvOnly, SendRecv};
 
 use crate::{
     media::{LocalTracksConstraints, MediaKind},
@@ -89,8 +90,6 @@ impl AsProtoState for State {
             mid: self.mid.clone(),
             media_type: self.media_type,
             sender_id: self.sender_id.clone(),
-            enabled_individual: self.enabled_individual(),
-            enabled_general: self.enabled_general(),
             muted: false,
             media_direction: self.media_direction(),
         }
@@ -107,10 +106,10 @@ impl SynchronizableState for State {
             media_type: input.media_type,
             sender_id: input.sender_id,
             enabled_individual: MediaExchangeStateController::new(
-                input.enabled_individual.into(),
+                media_exchange_state::Stable::from(input.media_direction == MediaDirection::SendRecv || input.media_direction == MediaDirection::RecvOnly),
             ),
             enabled_general: ProgressableCell::new(
-                input.enabled_general.into(),
+                media_exchange_state::Stable::from(input.media_direction == MediaDirection::SendRecv),
             ),
             muted: ObservableCell::new(input.muted),
             media_direction: ObservableCell::new(input.media_direction),
@@ -120,7 +119,7 @@ impl SynchronizableState for State {
 
     fn apply(&self, input: Self::Input, _: &LocalTracksConstraints) {
         let new_media_exchange_state =
-            media_exchange_state::Stable::from(input.enabled_individual);
+            media_exchange_state::Stable::from(input.media_direction == MediaDirection::RecvOnly || input.media_direction == MediaDirection::SendRecv);
         let current_media_exchange_state = match self.enabled_individual.state()
         {
             MediaExchangeState::Transition(transition) => {
@@ -132,10 +131,7 @@ impl SynchronizableState for State {
             self.enabled_individual.update(new_media_exchange_state);
         }
 
-        let new_general_media_exchange_state =
-            media_exchange_state::Stable::from(input.enabled_general);
-        self.enabled_general.set(new_general_media_exchange_state);
-
+        self.enabled_general.set(media_exchange_state::Stable::from(input.media_direction == MediaDirection::SendRecv));
         self.media_direction.set(input.media_direction);
 
         self.sync_state.set(SyncState::Synced);
@@ -189,8 +185,6 @@ impl From<&State> for proto::state::Receiver {
             mid: from.mid.clone(),
             media_type: from.media_type,
             sender_id: from.sender_id.clone(),
-            enabled_individual: from.enabled_individual(),
-            enabled_general: from.enabled_general(),
             media_direction: from.media_direction(),
             muted: false,
         }
