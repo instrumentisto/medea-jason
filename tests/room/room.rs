@@ -768,7 +768,6 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
-                    enabled_individual: Some(false),
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
@@ -848,7 +847,6 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
-                    enabled_individual: None,
                     media_direction: None,
                     muted: Some(true),
                 })],
@@ -931,7 +929,6 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(2),
-                    enabled_individual: Some(false),
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
@@ -1254,12 +1251,6 @@ mod patches_generation {
                         peer_id: PeerId(i + 1),
                         updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                             id: audio_track_id,
-                            enabled_individual: Some(matches!(
-                                state,
-                                MediaState::MediaExchange(
-                                    media_exchange_state::Stable::Enabled
-                                )
-                            )),
                             media_direction: None,
                             muted: Some(matches!(
                                 state,
@@ -1456,7 +1447,7 @@ mod patches_generation {
         assert_eq!(
             command_rx.next().await.unwrap(),
             Command::UpdateTracks {
-                peer_id: PeerId(2),
+                peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
                     id: TrackId(0),
                     enabled: Some(false),
@@ -1714,7 +1705,6 @@ async fn disable_by_server() {
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
                 media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(false),
                 muted: None,
             })],
         })
@@ -1745,7 +1735,6 @@ async fn enable_by_server() {
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
                 media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(false),
                 muted: None,
             })],
         })
@@ -1763,8 +1752,7 @@ async fn enable_by_server() {
             )),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(true),
+                media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
             })],
         })
@@ -1800,7 +1788,6 @@ async fn only_one_gum_performed_on_enable() {
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
                 media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(false),
                 muted: None,
             })],
         })
@@ -1819,7 +1806,6 @@ async fn only_one_gum_performed_on_enable() {
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
                 media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(false),
                 muted: None,
             })],
         })
@@ -1936,7 +1922,6 @@ async fn only_one_gum_performed_on_enable_by_server() {
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
                 media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(false),
                 muted: None,
             })],
         })
@@ -1954,7 +1939,6 @@ async fn only_one_gum_performed_on_enable_by_server() {
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
                 media_direction: Some(MediaDirection::RecvOnly),
-                enabled_individual: Some(false),
                 muted: None,
             })],
         })
@@ -2014,7 +1998,6 @@ async fn send_enabling_holds_local_tracks() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: video_track_id,
-                enabled_individual: Some(false),
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -2611,8 +2594,7 @@ mod state_synchronization {
             state::Sender {
                 id: TrackId(0),
                 muted: false,
-                enabled_individual: true,
-                enabled_general: true,
+                media_direction: MediaDirection::SendRecv,
                 receivers: Vec::new(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
@@ -2624,8 +2606,6 @@ mod state_synchronization {
             state::Receiver {
                 id: TrackId(1),
                 muted: false,
-                enabled_individual: true,
-                enabled_general: true,
                 media_direction: MediaDirection::SendRecv,
                 sender_id: "".into(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),

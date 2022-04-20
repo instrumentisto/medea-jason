@@ -191,7 +191,6 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: TrackId(track_id.0 + 100),
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -205,7 +204,6 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -219,7 +217,6 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(true),
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
         });
@@ -233,7 +230,6 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -242,7 +238,6 @@ mod sender_patch {
 
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -256,7 +251,6 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: None,
             media_direction: None,
             muted: None,
         });
@@ -272,9 +266,9 @@ mod sender_patch {
         let (sender, _, _media_connections) = get_sender().await;
 
         let mut proto_state = sender.state().as_proto();
-        proto_state.enabled_general = false;
-        proto_state.enabled_individual = false;
+        proto_state.media_direction = MediaDirection::RecvOnly;
         proto_state.muted = true;
+
         sender
             .state()
             .apply(proto_state, &LocalTracksConstraints::default());
@@ -330,7 +324,6 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TrackId(TRACK_ID.0 + 100),
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -344,7 +337,6 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -358,7 +350,6 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(true),
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
         });
@@ -372,7 +363,6 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -381,7 +371,6 @@ mod receiver_patch {
 
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(false),
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -395,7 +384,6 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: None,
             media_direction: None,
             muted: None,
         });
@@ -411,8 +399,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
 
         let mut proto_state = receiver.state().as_proto();
-        proto_state.enabled_individual = false;
-        proto_state.enabled_general = false;
+        proto_state.media_direction = MediaDirection::SendOnly;
 
         receiver
             .state()

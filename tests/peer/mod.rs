@@ -46,7 +46,6 @@ fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
     };
     TrackPatchEvent {
         id,
-        enabled_individual: Some(enabled),
         media_direction: Some(media_direction),
         muted: None,
     }
@@ -1471,7 +1470,6 @@ async fn disable_and_enable_all_tracks() {
     pc.state().patch_track(&TrackPatchEvent {
         id: audio_track_id,
         media_direction: Some(MediaDirection::RecvOnly),
-        enabled_individual: Some(false),
         muted: None,
     });
     pc.state().when_updated().await;
@@ -1484,7 +1482,6 @@ async fn disable_and_enable_all_tracks() {
     pc.state().patch_track(&TrackPatchEvent {
         id: video_track_id,
         media_direction: Some(MediaDirection::RecvOnly),
-        enabled_individual: Some(false),
         muted: None,
     });
     pc.state().when_updated().await;
@@ -1496,7 +1493,6 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: audio_track_id,
-        enabled_individual: Some(true),
         media_direction: Some(MediaDirection::SendRecv),
         muted: None,
     });
@@ -1509,7 +1505,6 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: video_track_id,
-        enabled_individual: Some(true),
         media_direction: Some(MediaDirection::SendRecv),
         muted: None,
     });
