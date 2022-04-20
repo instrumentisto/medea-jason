@@ -13,7 +13,7 @@ void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
     initDeviceConstraints: Pointer.fromFunction(_newDeviceConstraints),
-    initDisplayConstraints: Pointer.fromFunction(_newDisplayConstaints),
+    initDisplayConstraints: Pointer.fromFunction(_newDisplayConstraints),
     newVideoConstraints: Pointer.fromFunction(_newVideoConstraints),
     newAudioConstraints: Pointer.fromFunction(_newAudioConstraints),
     setVideoConstraintValue: Pointer.fromFunction(_setVideoConstraintValue),
@@ -54,7 +54,7 @@ Object _newDeviceConstraints() {
 }
 
 ///Returns new empty [DisplayConstraints].
-Object _newDisplayConstaints() {
+Object _newDisplayConstraints() {
   return DisplayConstraints();
 }
 

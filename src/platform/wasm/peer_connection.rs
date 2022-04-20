@@ -182,7 +182,7 @@ impl RtcPeerConnection {
                         "track",
                         move |msg: RtcTrackEvent| {
                             f(
-                                MediaStreamTrack::from(msg.track()),
+                                MediaStreamTrack::new(msg.track(), None),
                                 Transceiver::from(msg.transceiver()),
                             );
                         },

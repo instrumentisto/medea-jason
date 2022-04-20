@@ -1,4 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:flutter_webrtc/src/platform/web/media_stream_track.dart';
 import 'package:js/js.dart';
 
@@ -41,7 +41,7 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
-  MediaStreamTrack getTrack() {
+  webrtc.MediaStreamTrack getTrack() {
     return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
   }
 

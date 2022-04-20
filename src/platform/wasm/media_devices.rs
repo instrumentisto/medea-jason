@@ -9,7 +9,7 @@ use tracerr::Traced;
 use web_sys::{Event, MediaDevices as SysMediaDevices};
 
 use crate::{
-    media::InvalidOutputAudioDeviceIdError,
+    media::{InvalidOutputAudioDeviceIdError, MediaSourceKind},
     platform::{
         utils::EventListener, DisplayMediaStreamConstraints, Error,
         MediaDeviceInfo, MediaStreamConstraints, MediaStreamTrack,
@@ -131,7 +131,12 @@ impl MediaDevices {
         Ok(js_sys::try_iter(&stream.get_tracks())
             .unwrap()
             .unwrap()
-            .map(|tr| MediaStreamTrack::from(tr.unwrap()))
+            .map(|tr| {
+                MediaStreamTrack::new(
+                    tr.unwrap(),
+                    Some(MediaSourceKind::Device),
+                )
+            })
             .collect())
     }
 
@@ -177,7 +182,12 @@ impl MediaDevices {
         Ok(js_sys::try_iter(&stream.get_tracks())
             .unwrap()
             .unwrap()
-            .map(|tr| MediaStreamTrack::from(tr.unwrap()))
+            .map(|tr| {
+                MediaStreamTrack::new(
+                    tr.unwrap(),
+                    Some(MediaSourceKind::Display),
+                )
+            })
             .collect())
     }
 

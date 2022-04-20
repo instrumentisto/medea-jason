@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';
@@ -128,8 +128,8 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
-  MediaStreamTrack getTrack() {
-    return _getTrack(ptr.getInnerPtr()) as MediaStreamTrack;
+  webrtc.MediaStreamTrack getTrack() {
+    return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
   }
 
   @override
