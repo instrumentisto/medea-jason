@@ -129,10 +129,12 @@ mod mock {
         missing_copy_implementations
     )]
 
+    use medea_client_api_proto::MediaDirection;
+
     use crate::{
         media::{
-            track::remote::{Direction, Track as CoreRemoteMediaTrack},
-            MediaKind, MediaSourceKind,
+            track::remote::Track as CoreRemoteMediaTrack, MediaKind,
+            MediaSourceKind,
         },
         platform,
     };
@@ -192,8 +194,8 @@ mod mock {
         }
 
         #[must_use]
-        pub fn media_direction(&self) -> Direction {
-            0
+        pub fn media_direction(&self) -> MediaDirection {
+            MediaDirection::SendRecv
         }
 
         #[must_use]

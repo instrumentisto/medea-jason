@@ -393,8 +393,8 @@ impl Object<Room> {
                             track.track.on_stopped(() => {
                                 track.stopped = true;
                             });
-                            track.track.on_media_direction_changed((direction) => {
-                                if (direction == 0) {
+                            track.track.on_media_direction_changed((dir) => {
+                                if (dir == 0) {
                                     track.on_enabled_fire_count++;
                                     for (sub of track.onEnabledSubs) {
                                         sub();

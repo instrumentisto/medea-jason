@@ -70,6 +70,7 @@ pub struct Sender {
     /// Indicator whether this [`Sender`] is muted.
     pub muted: bool,
 
+    /// Current general media exchange state of this [`Receiver`].
     pub media_direction: MediaDirection,
 }
 

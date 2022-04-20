@@ -1,7 +1,6 @@
 //! [`Component`] for `MediaTrack` with a `Send` direction.
 
-use std::{convert::Infallible, rc::Rc};
-use std::cell::Cell;
+use std::{cell::Cell, convert::Infallible, rc::Rc};
 
 use futures::{future::LocalBoxFuture, StreamExt as _};
 use medea_client_api_proto::{
@@ -11,7 +10,6 @@ use medea_client_api_proto::{
 use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
 use tracerr::Traced;
-use medea_client_api_proto::MediaDirection::{SendOnly, SendRecv};
 
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
@@ -114,6 +112,7 @@ pub struct State {
     /// [`local::Track`]: crate::media::track::local::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
 
+    /// Current general media exchange direction of this [`Sender`].
     media_direction: Cell<MediaDirection>,
 
     /// [MediaStreamConstraints][1] of the [`Sender`]'s [`local::Track`].
@@ -162,10 +161,14 @@ impl SynchronizableState for State {
                 input.muted,
             )),
             enabled_individual: MediaExchangeStateController::new(
-                media_exchange_state::Stable::from(input.media_direction == SendRecv || input.media_direction == SendOnly),
+                media_exchange_state::Stable::from(
+                    input.media_direction.is_send_enabled(),
+                ),
             ),
             enabled_general: ProgressableCell::new(
-                media_exchange_state::Stable::from(input.media_direction == SendRecv),
+                media_exchange_state::Stable::from(
+                    input.media_direction.is_enabled_general(),
+                ),
             ),
             media_direction: Cell::new(input.media_direction),
             send_constraints: send_constraints.clone(),
@@ -175,7 +178,9 @@ impl SynchronizableState for State {
     }
 
     fn apply(&self, input: Self::Input, _: &LocalTracksConstraints) {
-        let new_media_exchange_state = media_exchange_state::Stable::from(input.media_direction == MediaDirection::SendOnly || input.media_direction == MediaDirection::SendRecv);
+        let new_media_exchange_state = media_exchange_state::Stable::from(
+            input.media_direction.is_send_enabled(),
+        );
         let current_media_exchange_state = match self.enabled_individual.state()
         {
             MediaExchangeState::Transition(transition) => {
@@ -197,7 +202,9 @@ impl SynchronizableState for State {
         }
 
         let new_general_media_exchange_state =
-            media_exchange_state::Stable::from(input.media_direction == MediaDirection::SendRecv);
+            media_exchange_state::Stable::from(
+                input.media_direction.is_enabled_general(),
+            );
         self.enabled_general.set(new_general_media_exchange_state);
 
         self.sync_state.set(SyncState::Synced);
@@ -368,15 +375,10 @@ impl State {
         if let Some(direction) = track_patch.media_direction {
             self.media_direction.set(direction);
             self.enabled_general
-                .set((direction == MediaDirection::SendRecv).into());
+                .set((direction.is_enabled_general()).into());
 
-            self.enabled_individual.update(
-                matches!(
-                    direction,
-                    MediaDirection::SendRecv | MediaDirection::SendOnly
-                )
-                .into(),
-            );
+            self.enabled_individual
+                .update(direction.is_send_enabled().into());
         }
         if let Some(muted) = track_patch.muted {
             self.mute_state.update(mute_state::Stable::from(muted));

@@ -100,9 +100,9 @@ impl Track {
         platform::spawn({
             let weak_inner = Rc::downgrade(&track.0);
             async move {
-                while let Some(muted) = muted_changes.next().await {
+                while let Some(is_muted) = muted_changes.next().await {
                     if let Some(inner) = weak_inner.upgrade() {
-                        if muted {
+                        if is_muted {
                             inner.on_muted.call0();
                         } else {
                             inner.on_unmuted.call0();

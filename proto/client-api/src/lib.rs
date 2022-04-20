@@ -723,6 +723,26 @@ pub enum MediaDirection {
     Inactive = 3,
 }
 
+impl MediaDirection {
+    /// Returns `true` if `Track` is enabled on sender side.
+    #[must_use]
+    pub const fn is_send_enabled(self) -> bool {
+        matches!(self, MediaDirection::SendRecv | MediaDirection::SendOnly)
+    }
+
+    /// Returns `true` if `Track` is enabled on received side.
+    #[must_use]
+    pub const fn is_recv_enabled(self) -> bool {
+        matches!(self, MediaDirection::SendRecv | MediaDirection::RecvOnly)
+    }
+
+    /// Returns `true` if `Track` is enabled on both sides.
+    #[must_use]
+    pub const fn is_enabled_general(self) -> bool {
+        matches!(self, MediaDirection::SendRecv)
+    }
+}
+
 impl From<TrackPatchCommand> for TrackPatchEvent {
     fn from(from: TrackPatchCommand) -> Self {
         Self {
