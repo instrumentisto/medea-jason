@@ -22,9 +22,6 @@ enum TrackMediaDirection {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 abstract class RemoteMediaTrack implements PlatformHandle {
-  /// Indicates whether this [RemoteMediaTrack] is enabled.
-  bool enabled();
-
   /// Indicate whether this [RemoteMediaTrack] is muted.
   bool muted();
 
@@ -39,12 +36,6 @@ abstract class RemoteMediaTrack implements PlatformHandle {
 
   /// Returns current general media exchange direction of this [RemoteMediaTrack].
   TrackMediaDirection mediaDirection();
-
-  /// Sets callback, invoked when this [RemoteMediaTrack] is enabled.
-  void onEnabled(void Function() f);
-
-  /// Sets callback, invoked when this [RemoteMediaTrack] is disabled.
-  void onDisabled(void Function() f);
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is muted.
   void onMuted(void Function() f);
