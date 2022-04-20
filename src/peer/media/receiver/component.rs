@@ -136,6 +136,8 @@ impl SynchronizableState for State {
             media_exchange_state::Stable::from(input.enabled_general);
         self.enabled_general.set(new_general_media_exchange_state);
 
+        self.media_direction.set(input.media_direction);
+
         self.sync_state.set(SyncState::Synced);
     }
 }
