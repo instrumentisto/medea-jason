@@ -25,6 +25,15 @@ typedef _enumerateDevices_Dart = Object Function(Pointer);
 typedef _setOutputAudioId_C = Handle Function(Pointer, Pointer<Utf8>);
 typedef _setOutputAudioId_Dart = Object Function(Pointer, Pointer<Utf8>);
 
+typedef _setMicrophoneVolume_C = Handle Function(Pointer, Int64);
+typedef _setMicrophoneVolume_Dart = Object Function(Pointer, int);
+
+typedef _microphoneVolumeIsAvailable_C = Handle Function(Pointer);
+typedef _microphoneVolumeIsAvailable_Dart = Object Function(Pointer);
+
+typedef _microphoneVolume_C = Handle Function(Pointer);
+typedef _microphoneVolume_Dart = Object Function(Pointer);
+
 typedef _onDeviceChange_C = Result Function(Pointer, Handle);
 typedef _onDeviceChange_Dart = Result Function(Pointer, Object);
 
@@ -42,6 +51,18 @@ final _enumerateDevices =
 final _setOutputAudioId =
     dl.lookupFunction<_setOutputAudioId_C, _setOutputAudioId_Dart>(
         'MediaManagerHandle__set_output_audio_id');
+
+final _setMicrophoneVolume =
+    dl.lookupFunction<_setMicrophoneVolume_C, _setMicrophoneVolume_Dart>(
+        'MediaManagerHandle__set_microphone_volume');
+
+final _microphoneVolumeIsAvailable = dl.lookupFunction<
+        _microphoneVolumeIsAvailable_C, _microphoneVolumeIsAvailable_Dart>(
+    'MediaManagerHandle__microphone_volume_is_available');
+
+final _microphoneVolume =
+    dl.lookupFunction<_microphoneVolume_C, _microphoneVolume_Dart>(
+        'MediaManagerHandle__microphone_volume');
 
 final _onDeviceChange =
     dl.lookupFunction<_onDeviceChange_C, _onDeviceChange_Dart>(
@@ -87,6 +108,22 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<void> setOutputAudioId(String deviceId) async {
     await (_setOutputAudioId(ptr.getInnerPtr(), deviceId.toNativeUtf8())
         as Future);
+  }
+
+  @override
+  Future<void> setMicrophoneVolume(int level) async {
+    await (_setMicrophoneVolume(ptr.getInnerPtr(), level) as Future);
+  }
+
+  @override
+  Future<int> microphoneVolume() async {
+    return await (_microphoneVolume(ptr.getInnerPtr()) as Future);
+  }
+
+  @override
+  Future<bool> microphoneVolumeIsAvailable() async {
+    return await (_microphoneVolumeIsAvailable(ptr.getInnerPtr()) as Future) ==
+        1;
   }
 
   @override

@@ -47,4 +47,22 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   void onDeviceChange(Function cb) {
     obj.on_device_change(allowInterop(cb));
   }
+
+  @override
+  Future<int> microphoneVolume() {
+    // TODO(logist322): implement microphoneVolume
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> microphoneVolumeIsAvailable() {
+    // TODO(logist322): implement microphoneVolumeIsAvailable
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setMicrophoneVolume(int level) {
+    // TODO(logist322): implement setMicrophoneVolume
+    throw UnimplementedError();
+  }
 }

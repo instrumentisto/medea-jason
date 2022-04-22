@@ -16,6 +16,8 @@ use crate::{
     media::{
         self, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
         InitLocalTracksError, InvalidOutputAudioDeviceIdError,
+        MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
+        SetMicrophoneVolumeError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -209,6 +211,88 @@ impl InvalidOutputAudioDeviceIdException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl InvalidOutputAudioDeviceIdException {
     /// Returns stacktrace of this [`InvalidOutputAudioDeviceIdException`].
+    #[must_use]
+    pub fn trace(&self) -> String {
+        self.trace.to_string()
+    }
+}
+
+/// Exception thrown when cannot set the microphone volume.
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[derive(Debug)]
+pub struct SetMicrophoneVolumeException {
+    /// Stacktrace of this [`SetMicrophoneVolumeException`].
+    trace: Trace,
+}
+
+impl SetMicrophoneVolumeException {
+    /// Creates a new [`SetMicrophoneVolumeException`] from the provided
+    /// error [`Trace`].
+    #[must_use]
+    pub fn new(trace: Trace) -> Self {
+        Self { trace }
+    }
+}
+
+#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+impl SetMicrophoneVolumeException {
+    /// Returns stacktrace of this [`SetMicrophoneVolumeException`].
+    #[must_use]
+    pub fn trace(&self) -> String {
+        self.trace.to_string()
+    }
+}
+
+/// Exception thrown when cannot chech if it is possible to set the microphone
+/// volume.
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[derive(Debug)]
+pub struct MicrophoneVolumeIsAvailableException {
+    /// Stacktrace of this [`MicrophoneVolumeIsAvailableException`].
+    trace: Trace,
+}
+
+impl MicrophoneVolumeIsAvailableException {
+    /// Creates a new [`MicrophoneVolumeIsAvailableException`] from the provided
+    /// error [`Trace`].
+    #[must_use]
+    pub fn new(trace: Trace) -> Self {
+        Self { trace }
+    }
+}
+
+#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+impl MicrophoneVolumeIsAvailableException {
+    /// Returns stacktrace of this [`MicrophoneVolumeIsAvailableException`].
+    #[must_use]
+    pub fn trace(&self) -> String {
+        self.trace.to_string()
+    }
+}
+
+/// Exception thrown when cannot get the microphone volume.
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[derive(Debug)]
+pub struct MicrophoneVolumeException {
+    /// Stacktrace of this [`MicrophoneVolumeException`].
+    trace: Trace,
+}
+
+impl MicrophoneVolumeException {
+    /// Creates a new [`MicrophoneVolumeException`] from the provided
+    /// error [`Trace`].
+    #[must_use]
+    pub fn new(trace: Trace) -> Self {
+        Self { trace }
+    }
+}
+
+#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+impl MicrophoneVolumeException {
+    /// Returns stacktrace of this [`MicrophoneVolumeException`].
     #[must_use]
     pub fn trace(&self) -> String {
         self.trace.to_string()
@@ -550,6 +634,27 @@ impl From<Traced<InvalidOutputAudioDeviceIdError>> for Error {
     fn from(err: Traced<InvalidOutputAudioDeviceIdError>) -> Self {
         let (_, trace) = err.split();
         InvalidOutputAudioDeviceIdException::new(trace).into()
+    }
+}
+
+impl From<Traced<SetMicrophoneVolumeError>> for Error {
+    fn from(err: Traced<SetMicrophoneVolumeError>) -> Self {
+        let (_, trace) = err.split();
+        SetMicrophoneVolumeException::new(trace).into()
+    }
+}
+
+impl From<Traced<MicrophoneVolumeIsAvailableError>> for Error {
+    fn from(err: Traced<MicrophoneVolumeIsAvailableError>) -> Self {
+        let (_, trace) = err.split();
+        MicrophoneVolumeIsAvailableException::new(trace).into()
+    }
+}
+
+impl From<Traced<MicrophoneVolumeError>> for Error {
+    fn from(err: Traced<MicrophoneVolumeError>) -> Self {
+        let (_, trace) = err.split();
+        MicrophoneVolumeException::new(trace).into()
     }
 }
 

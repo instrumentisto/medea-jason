@@ -61,6 +61,24 @@ abstract class InvalidOutputAudioDeviceIdException {
   String trace();
 }
 
+/// Exception thrown when cannot set microphone volume.
+abstract class SetMicrophoneVolumeException {
+  /// Returns stacktrace of this [SetMicrophoneVolumeException].
+  String trace();
+}
+
+/// Exception thrown when cannot check if setting microphone volume is available.
+abstract class MicrophoneVolumeIsAvailableException {
+  /// Returns stacktrace of this [MicrophoneVolumeIsAvailableException].
+  String trace();
+}
+
+/// Exception thrown when cannot get current level of microphone volume.
+abstract class MicrophoneVolumeException {
+  /// Returns stacktrace of this [MicrophoneVolumeException].
+  String trace();
+}
+
 /// Jason's internal exception.
 ///
 /// This is either a programmatic error or some unexpected platform component

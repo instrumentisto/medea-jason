@@ -26,6 +26,12 @@ void registerFunctions(DynamicLibrary dl) {
           Pointer.fromFunction(_newMediaSettingsUpdateException),
       newInvalidOutputAudioDeviceIdException:
           Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException),
+      newSetMicrophoneVolumeException:
+          Pointer.fromFunction(_newSetMicrophoneVolumeException),
+      newMicrophoneVolumeIsAvailableException:
+          Pointer.fromFunction(_newMicrophoneVolumeIsAvailableException),
+      newMicrophoneVolumeException:
+          Pointer.fromFunction(_newMicrophoneVolumeException),
       throwPanicException: Pointer.fromFunction(_throwPanicException));
 }
 
@@ -71,6 +77,22 @@ Object _newEnumerateDevicesException(
 Object _newInvalidOutputAudioDeviceIdException(Pointer<Utf8> trace) {
   return NativeInvalidOutputAudioDeviceIdException(
       trace.nativeStringToDartString());
+}
+
+/// Creates a new [SetMicrophoneVolumeException] with the provided [trace].
+Object _newSetMicrophoneVolumeException(Pointer<Utf8> trace) {
+  return NativeSetMicrophoneVolumeException(trace.nativeStringToDartString());
+}
+
+/// Creates a new [MicrophoneVolumeIsAvailableException] with the provided [trace].
+Object _newMicrophoneVolumeIsAvailableException(Pointer<Utf8> trace) {
+  return NativeMicrophoneVolumeIsAvailableException(
+      trace.nativeStringToDartString());
+}
+
+/// Creates a new [MicrophoneVolumeIsAvailableException] with the provided [trace].
+Object _newMicrophoneVolumeException(Pointer<Utf8> trace) {
+  return NativeMicrophoneVolumeException(trace.nativeStringToDartString());
 }
 
 /// Creates a new [NativeRpcClientException] with the provided error [kind],
@@ -199,6 +221,43 @@ class NativeInvalidOutputAudioDeviceIdException
 
   /// Instantiates a new [NativeInvalidOutputAudioDeviceIdException].
   NativeInvalidOutputAudioDeviceIdException(this._nativeStackTrace);
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
+}
+
+class NativeSetMicrophoneVolumeException extends SetMicrophoneVolumeException {
+  /// Native stacktrace.
+  late final String _nativeStackTrace;
+
+  NativeSetMicrophoneVolumeException(this._nativeStackTrace);
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
+}
+
+class NativeMicrophoneVolumeIsAvailableException
+    extends MicrophoneVolumeIsAvailableException {
+  /// Native stacktrace.
+  late final String _nativeStackTrace;
+
+  NativeMicrophoneVolumeIsAvailableException(this._nativeStackTrace);
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
+}
+
+class NativeMicrophoneVolumeException extends MicrophoneVolumeException {
+  /// Native stacktrace.
+  late final String _nativeStackTrace;
+
+  NativeMicrophoneVolumeException(this._nativeStackTrace);
 
   @override
   String trace() {

@@ -10,7 +10,8 @@ use crate::{
     },
     media::{
         EnumerateDevicesError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError,
+        InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
+        MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
     },
     platform,
 };
@@ -88,6 +89,68 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     })
 }
 
+/// Sets the microphone volume level in percents.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
+    this: ptr::NonNull<MediaManagerHandle>,
+    level: i64,
+) -> DartFuture<Result<(), Traced<SetMicrophoneVolumeError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move {
+            this.set_microphone_volume(level)
+                .await
+                .map_err(tracerr::map_from_and_wrap!())?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Indicates if it is possible to set the microphone volume.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
+    this: ptr::NonNull<MediaManagerHandle>,
+) -> DartFuture<Result<i64, Traced<MicrophoneVolumeIsAvailableError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move {
+            Ok(
+                if this
+                    .microphone_volume_is_available()
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())?
+                {
+                    1
+                } else {
+                    0
+                },
+            )
+        }
+        .into_dart_future()
+    })
+}
+
+/// Gets the current microphone volume level in percents.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
+    this: ptr::NonNull<MediaManagerHandle>,
+) -> DartFuture<Result<i64, Traced<MicrophoneVolumeError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move {
+            Ok(this
+                .microphone_volume()
+                .await
+                .map_err(tracerr::map_from_and_wrap!())?)
+        }
+        .into_dart_future()
+    })
+}
+
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
@@ -139,7 +202,8 @@ mod mock {
         },
         media::{
             EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-            InvalidOutputAudioDeviceIdError,
+            InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
+            MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
         },
         platform,
     };
@@ -177,6 +241,25 @@ mod mock {
             _device_id: String,
         ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
             Ok(())
+        }
+
+        pub async fn set_microphone_volume(
+            &self,
+            _level: i64,
+        ) -> Result<(), Traced<SetMicrophoneVolumeError>> {
+            Ok(())
+        }
+
+        pub async fn microphone_volume_is_available(
+            &self,
+        ) -> Result<bool, Traced<MicrophoneVolumeIsAvailableError>> {
+            Ok(false)
+        }
+
+        pub async fn microphone_volume(
+            &self,
+        ) -> Result<i64, Traced<MicrophoneVolumeError>> {
+            Ok(0)
         }
 
         pub fn on_device_change(
