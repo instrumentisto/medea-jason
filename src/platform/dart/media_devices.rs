@@ -199,10 +199,10 @@ impl MediaDevices {
     ///
     /// # Errors
     ///
-    /// With [`SetMicrophoneVolumeError`] if there is no possibility to set the
-    /// volume for the current `audio input device` or `system`, the `Audio
-    /// Device Module` or the `Microphone` is not initialized or there is no
-    /// connected `audio input devices` at all.
+    /// If there is no possibility to set the volume for the current `audio
+    /// input device` or `system`, the `Audio Device Module` or the
+    /// `Microphone` is not initialized or there is no connected `audio
+    /// input devices` at all.
     pub async fn set_microphone_volume(
         &self,
         level: i64,
@@ -220,9 +220,8 @@ impl MediaDevices {
     ///
     /// # Errors
     ///
-    /// With [`MicrophoneVolumeIsAvailableError`] if it the `Audio Device
-    /// Module` or the `Microphone` is not initialized or there is no connected
-    /// `audio input devices` at all.
+    /// If it the `Audio Device Module` or the `Microphone` is not initialized
+    /// or there is no connected `audio input devices` at all.
     pub async fn microphone_volume_is_available(
         &self,
     ) -> Result<bool, Traced<Error>> {
@@ -240,9 +239,8 @@ impl MediaDevices {
     ///
     /// # Errors
     ///
-    /// With [`MicrophoneVolumeIsAvailableError`] if it the `Audio Device
-    /// Module` or the `Microphone` is not initialized or there is no connected
-    /// `audio input devices` at all.
+    /// If it the `Audio Device Module` or the `Microphone` is not initialized
+    /// or there is no connected `audio input devices` at all.
     pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
         unsafe {
             FutureFromDart::execute::<i64>(media_devices::microphone_volume())
