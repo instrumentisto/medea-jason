@@ -464,7 +464,7 @@ impl InnerMediaManager {
     ///
     /// # Errors
     ///
-    /// With [`MicrophoneVolumeIsAvailableError`] if it the `Audio Device
+    /// With [`MicrophoneVolumeError`] if it the `Audio Device
     /// Module` or the `Microphone` is not initialized or there is no connected
     /// `audio input devices` at all.
     async fn microphone_volume(
