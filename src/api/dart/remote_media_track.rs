@@ -3,7 +3,7 @@ use std::ptr;
 use dart_sys::Dart_Handle;
 
 use crate::{
-    media::{track::remote::Direction, MediaKind, MediaSourceKind},
+    media::{MediaDirection, MediaKind, MediaSourceKind},
     platform,
 };
 
@@ -102,8 +102,8 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__media_direction(
     this: ptr::NonNull<RemoteMediaTrack>,
-) -> Direction {
-    propagate_panic(move || this.as_ref().media_direction() as Direction)
+) -> MediaDirection {
+    propagate_panic(move || this.as_ref().media_direction())
 }
 
 /// Frees the data behind the provided pointer.
@@ -129,12 +129,10 @@ mod mock {
         missing_copy_implementations
     )]
 
-    use medea_client_api_proto::MediaDirection;
-
     use crate::{
         media::{
-            track::remote::Track as CoreRemoteMediaTrack, MediaKind,
-            MediaSourceKind,
+            track::remote::Track as CoreRemoteMediaTrack, MediaDirection,
+            MediaKind, MediaSourceKind,
         },
         platform,
     };

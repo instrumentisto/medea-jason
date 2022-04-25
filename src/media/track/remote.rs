@@ -4,17 +4,13 @@ use std::{cell::Cell, rc::Rc};
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
-use medea_client_api_proto::MediaDirection;
 use medea_reactive::ObservableCell;
 
 use crate::{
+    api,
     media::{track::MediaStreamTrackState, MediaKind, MediaSourceKind},
     platform,
 };
-
-/// FFI capable [`MediaDirection`] representation used for
-/// [`platform::Callback`].
-pub type Direction = u8; // TODO: why not enum?
 
 /// Inner reference-counted data of a [`Track`].
 #[derive(Debug)]
@@ -36,7 +32,8 @@ struct Inner {
 
     /// Callback to be invoked when this [`Track`]'s general media exchange
     /// direction is changed.
-    on_media_direction_changed: platform::Callback<Direction>,
+    #[allow(unused_qualifications)]
+    on_media_direction_changed: platform::Callback<api::MediaDirection>,
 
     /// Current [`MediaDirection`] of this [`Track`].
     media_direction: Cell<MediaDirection>,
@@ -118,9 +115,7 @@ impl Track {
     /// Sets general media exchange direction of this [`Track`].
     pub fn set_media_direction(&self, direction: MediaDirection) {
         self.0.media_direction.set(direction);
-        self.0
-            .on_media_direction_changed
-            .call1(direction as Direction);
+        self.0.on_media_direction_changed.call1(direction);
     }
 
     /// Sets `muted` property on this [`Track`].
@@ -193,9 +188,10 @@ impl Track {
 
     /// Sets callback to invoke when this [`Track`]'s general media exchange
     /// direction is changed.
+    #[allow(unused_qualifications)]
     pub fn on_media_direction_changed(
         &self,
-        callback: platform::Function<Direction>,
+        callback: platform::Function<api::MediaDirection>,
     ) {
         self.0.on_media_direction_changed.set_func(callback);
     }
@@ -204,5 +200,44 @@ impl Track {
     #[must_use]
     pub fn media_direction(&self) -> MediaDirection {
         self.0.media_direction.get()
+    }
+}
+
+/// Media exchange direction of a [`platform::MediaStreamTrack`].
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum MediaDirection {
+    /// `Track` is enabled on recv and send sides.
+    SendRecv,
+
+    /// `Track` is enabled on send side.
+    SendOnly,
+
+    /// `Track` is enabled on recv side.
+    RecvOnly,
+
+    /// `Track` is disabled on both sides.
+    Inactive,
+}
+
+impl From<MediaDirection> for proto::MediaDirection {
+    fn from(val: MediaDirection) -> Self {
+        match val {
+            MediaDirection::SendRecv => Self::SendRecv,
+            MediaDirection::SendOnly => Self::SendOnly,
+            MediaDirection::RecvOnly => Self::RecvOnly,
+            MediaDirection::Inactive => Self::Inactive,
+        }
+    }
+}
+
+impl From<proto::MediaDirection> for MediaDirection {
+    fn from(val: proto::MediaDirection) -> Self {
+        match val {
+            proto::MediaDirection::SendRecv => Self::SendRecv,
+            proto::MediaDirection::SendOnly => Self::SendOnly,
+            proto::MediaDirection::RecvOnly => Self::RecvOnly,
+            proto::MediaDirection::Inactive => Self::Inactive,
+        }
     }
 }

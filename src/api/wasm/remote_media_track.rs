@@ -6,8 +6,8 @@ use derive_more::{From, Into};
 use wasm_bindgen::prelude::*;
 
 use crate::{
-    api::{MediaKind, MediaSourceKind},
-    media::track::{remote, remote::Direction},
+    api::{MediaDirection, MediaKind, MediaSourceKind},
+    media::track::remote,
 };
 
 /// Wrapper around a received remote [MediaStreamTrack][1].
@@ -77,7 +77,7 @@ impl RemoteMediaTrack {
     /// Returns current general media exchange direction of this
     /// [`RemoteMediaTrack`].
     #[must_use]
-    pub fn media_direction(&self) -> Direction {
-        self.0.media_direction() as Direction
+    pub fn media_direction(&self) -> MediaDirection {
+        self.0.media_direction().into()
     }
 }

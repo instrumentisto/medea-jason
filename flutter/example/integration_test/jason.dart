@@ -278,6 +278,10 @@ void main() {
     track.onStopped(() {
       allFired[2].complete();
     });
+    track.onMediaDirectionChanged((direction) {
+      expect(direction, TrackMediaDirection.SendRecv);
+      allFired[3].complete();
+    });
 
     await Future.wait(allFired.map((e) => e.future))
         .timeout(Duration(seconds: 1));

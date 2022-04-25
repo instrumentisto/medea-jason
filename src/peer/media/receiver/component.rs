@@ -5,8 +5,7 @@ use std::{convert::Infallible, rc::Rc};
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
 use medea_client_api_proto::{
-    MediaDirection, MediaSourceKind, MediaType, MemberId, TrackId,
-    TrackPatchEvent,
+    MediaSourceKind, MediaType, MemberId, TrackId, TrackPatchEvent,
 };
 use medea_macro::watchers;
 use medea_reactive::{
@@ -15,7 +14,7 @@ use medea_reactive::{
 };
 
 use crate::{
-    media::{LocalTracksConstraints, MediaKind},
+    media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{
         component::SyncState,
         media::{transitable_state::media_exchange_state, InTransition},
@@ -90,7 +89,7 @@ impl AsProtoState for State {
             media_type: self.media_type,
             sender_id: self.sender_id.clone(),
             muted: false,
-            media_direction: self.media_direction(),
+            media_direction: self.media_direction().into(),
         }
     }
 }
@@ -115,7 +114,7 @@ impl SynchronizableState for State {
                 ),
             ),
             muted: ObservableCell::new(input.muted),
-            media_direction: ObservableCell::new(input.media_direction),
+            media_direction: ObservableCell::new(input.media_direction.into()),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
@@ -138,7 +137,7 @@ impl SynchronizableState for State {
         self.enabled_general.set(media_exchange_state::Stable::from(
             input.media_direction.is_enabled_general(),
         ));
-        self.media_direction.set(input.media_direction);
+        self.media_direction.set(input.media_direction.into());
 
         self.sync_state.set(SyncState::Synced);
     }
@@ -191,7 +190,7 @@ impl From<&State> for proto::state::Receiver {
             mid: from.mid.clone(),
             media_type: from.media_type,
             sender_id: from.sender_id.clone(),
-            media_direction: from.media_direction(),
+            media_direction: from.media_direction().into(),
             muted: false,
         }
     }
@@ -288,7 +287,7 @@ impl State {
             self.muted.set(muted);
         }
         if let Some(direction) = track_patch.media_direction {
-            self.media_direction.set(direction);
+            self.media_direction.set(direction.into());
         }
     }
 }

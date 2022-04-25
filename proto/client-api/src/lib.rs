@@ -707,7 +707,7 @@ pub struct TrackPatchEvent {
     pub muted: Option<bool>,
 }
 
-/// Media exchange direction of the `Track`.
+/// Media exchange direction of a `Track`.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MediaDirection {
     /// `Track` is enabled on recv and send sides.

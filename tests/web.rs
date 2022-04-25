@@ -86,14 +86,15 @@ mod utils;
 use futures::{channel::oneshot, future::Either, Future};
 use js_sys::Promise;
 use medea_client_api_proto::{
-    AudioSettings, Direction, MediaDirection, MediaSourceKind, MediaType,
-    MemberId, Track, TrackId, VideoSettings,
+    AudioSettings, Direction, MediaSourceKind, MediaType, MemberId, Track,
+    TrackId, VideoSettings,
 };
 use medea_jason::{
     api,
     media::{
         track::remote, AudioTrackConstraints, DeviceVideoTrackConstraints,
-        LocalTracksConstraints, MediaKind, MediaManager, MediaStreamSettings,
+        LocalTracksConstraints, MediaDirection, MediaKind, MediaManager,
+        MediaStreamSettings,
     },
     peer::media_exchange_state,
     rpc::ApiUrl,

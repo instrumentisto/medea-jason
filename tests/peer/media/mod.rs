@@ -268,7 +268,6 @@ mod sender_patch {
         let mut proto_state = sender.state().as_proto();
         proto_state.media_direction = MediaDirection::RecvOnly;
         proto_state.muted = true;
-
         sender
             .state()
             .apply(proto_state, &LocalTracksConstraints::default());

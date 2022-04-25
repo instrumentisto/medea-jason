@@ -4,7 +4,7 @@ use crate::{browser::Statement, object::Object};
 
 use super::Error;
 
-/// Media exchange direction of the `Track`.
+/// Media exchange direction of a `Track`.
 #[derive(Clone, Copy, Debug)]
 pub enum MediaDirection {
     /// `Track` is enabled on recv and send sides.

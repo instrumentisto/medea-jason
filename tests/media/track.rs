@@ -6,9 +6,12 @@ use futures::{
     channel::{mpsc, oneshot},
     StreamExt as _,
 };
-use medea_jason::media::{
-    track::remote, DeviceVideoTrackConstraints, MediaManager,
-    MediaStreamSettings,
+use medea_jason::{
+    api::MediaDirection,
+    media::{
+        track::remote, DeviceVideoTrackConstraints, MediaManager,
+        MediaStreamSettings,
+    },
 };
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen_test::*;
@@ -59,11 +62,14 @@ async fn on_track_unmuted_works() {
         })
         .into()
     };
+    api_track.on_media_direction_changed(dont_fire());
     api_track.on_stopped(dont_fire());
 
     core_track.set_muted(true);
+    assert_eq!(api_track.media_direction(), MediaDirection::SendRecv);
     assert!(api_track.muted());
     core_track.set_muted(false);
+    assert_eq!(api_track.media_direction(), MediaDirection::SendRecv);
     assert!(!api_track.muted());
 
     timeout(100, test_rx).await.unwrap().unwrap();
@@ -94,10 +100,13 @@ async fn on_track_muted_works() {
         .into()
     };
     api_track.on_unmuted(dont_fire());
+    api_track.on_media_direction_changed(dont_fire());
     api_track.on_stopped(dont_fire());
 
+    assert_eq!(api_track.media_direction(), MediaDirection::SendRecv);
     assert!(!api_track.muted());
     core_track.set_muted(true);
+    assert_eq!(api_track.media_direction(), MediaDirection::SendRecv);
 
     timeout(100, test_rx).await.unwrap().unwrap();
     timeout(100, dont_fire_rx.next()).await.unwrap_err();

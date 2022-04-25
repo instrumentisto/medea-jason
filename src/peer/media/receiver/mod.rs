@@ -5,13 +5,14 @@ mod component;
 use std::cell::{Cell, RefCell};
 
 use futures::channel::mpsc;
-use medea_client_api_proto::{
-    self as proto, MediaDirection, MediaType, MemberId,
-};
+use medea_client_api_proto as proto;
 use proto::TrackId;
 
 use crate::{
-    media::{track::remote, MediaKind, RecvConstraints, TrackConstraints},
+    media::{
+        track::remote, MediaDirection, MediaKind, RecvConstraints,
+        TrackConstraints,
+    },
     peer::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,
@@ -38,7 +39,7 @@ pub struct Receiver {
     caps: TrackConstraints,
 
     /// ID of the member sending this [`remote::Track`].
-    sender_id: MemberId,
+    sender_id: proto::MemberId,
 
     /// [`Transceiver`] associated with this [`remote::Track`].
     ///
@@ -154,8 +155,8 @@ impl Receiver {
         };
 
         let enabled_in_cons = match &state.media_type() {
-            MediaType::Audio(_) => recv_constraints.is_audio_enabled(),
-            MediaType::Video(_) => recv_constraints.is_video_enabled(),
+            proto::MediaType::Audio(_) => recv_constraints.is_audio_enabled(),
+            proto::MediaType::Video(_) => recv_constraints.is_video_enabled(),
         };
         if !enabled_in_cons {
             state
@@ -314,6 +315,12 @@ impl Receiver {
     #[must_use]
     pub fn enabled_general(&self) -> bool {
         self.enabled_general.get()
+    }
+
+    /// Returns current `media_direction` status of the [`Receiver`].
+    #[must_use]
+    pub fn direction(&self) -> MediaDirection {
+        self.media_direction.get()
     }
 }
 

@@ -100,6 +100,23 @@ pub enum FacingMode {
     Right,
 }
 
+/// Media exchange direction of a `Track`.
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+pub enum MediaDirection {
+    /// `Track` is enabled on recv and send sides.
+    SendRecv,
+
+    /// `Track` is enabled on send side.
+    SendOnly,
+
+    /// `Track` is enabled on recv side.
+    RecvOnly,
+
+    /// `Track` is disabled on both sides.
+    Inactive,
+}
+
 impl From<media::MediaKind> for MediaKind {
     fn from(that: media::MediaKind) -> Self {
         match that {
@@ -165,5 +182,33 @@ impl From<FacingMode> for media::FacingMode {
             FacingMode::Left => Self::Left,
             FacingMode::Right => Self::Right,
         }
+    }
+}
+
+impl From<MediaDirection> for media::MediaDirection {
+    fn from(val: MediaDirection) -> Self {
+        match val {
+            MediaDirection::SendRecv => Self::SendRecv,
+            MediaDirection::SendOnly => Self::SendOnly,
+            MediaDirection::RecvOnly => Self::RecvOnly,
+            MediaDirection::Inactive => Self::Inactive,
+        }
+    }
+}
+
+impl From<media::MediaDirection> for MediaDirection {
+    fn from(val: media::MediaDirection) -> Self {
+        match val {
+            media::MediaDirection::SendRecv => Self::SendRecv,
+            media::MediaDirection::SendOnly => Self::SendOnly,
+            media::MediaDirection::RecvOnly => Self::RecvOnly,
+            media::MediaDirection::Inactive => Self::Inactive,
+        }
+    }
+}
+
+impl From<MediaDirection> for JsValue {
+    fn from(val: MediaDirection) -> Self {
+        JsValue::from(val as u8)
     }
 }
