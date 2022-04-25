@@ -1158,8 +1158,8 @@ mod rpc_close_reason_on_room_drop {
 /// Tests for [`TrackPatch`] generation in [`Room`].
 mod patches_generation {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaType, Track, TrackId, TrackPatchCommand,
-        VideoSettings,
+        AudioSettings, Direction, MediaDirection, MediaType, Track, TrackId,
+        TrackPatchCommand, VideoSettings,
     };
     use medea_jason::peer::{media_exchange_state, mute_state, MediaState};
     use wasm_bindgen_futures::spawn_local;
@@ -1246,12 +1246,23 @@ mod patches_generation {
 
             if let Some(audio_track_id) = audio_track_id {
                 let state = (audio_track_media_state_fn)(i);
+                let media_direction = if matches!(
+                    state,
+                    MediaState::MediaExchange(
+                        media_exchange_state::Stable::Enabled
+                    )
+                ) {
+                    MediaDirection::SendRecv
+                } else {
+                    MediaDirection::RecvOnly
+                };
+
                 event_tx
                     .unbounded_send(Event::PeerUpdated {
                         peer_id: PeerId(i + 1),
                         updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                             id: audio_track_id,
-                            media_direction: None,
+                            media_direction: Some(media_direction),
                             muted: Some(matches!(
                                 state,
                                 MediaState::Mute(mute_state::Stable::Muted)

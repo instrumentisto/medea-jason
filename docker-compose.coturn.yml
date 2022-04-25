@@ -11,14 +11,11 @@ services:
     volumes:
       - ./_dev/coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
       - ./.cache/coturn/data:/var/lib/coturn
-    network_mode: service:coturn-db
+    network_mode: host
   coturn-db:
     container_name: ${COMPOSE_PROJECT_NAME}-coturn-db
     image: redis:alpine
     command: ["redis-server", "/etc/redis.conf"]
     volumes:
       - ./_dev/coturn/redis.conf:/etc/redis.conf:ro
-    ports:
-      - "6379:6379"                  # coturn redis TODO(alexlapa): won't this break turn?
-      - "3478:3478"                  # coturn stun
-      - "49066-49100:49166-49200"    # coturn turn
+    network_mode: host
