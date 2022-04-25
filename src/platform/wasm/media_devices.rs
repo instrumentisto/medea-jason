@@ -9,7 +9,11 @@ use tracerr::Traced;
 use web_sys::{Event, MediaDevices as SysMediaDevices};
 
 use crate::{
-    media::{InvalidOutputAudioDeviceIdError, MediaSourceKind},
+    media::{
+        InvalidOutputAudioDeviceIdError, MediaSourceKind,
+        MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
+        SetMicrophoneVolumeErrorm,
+    },
     platform::{
         utils::EventListener, DisplayMediaStreamConstraints, Error,
         MediaDeviceInfo, MediaStreamConstraints, MediaStreamTrack,
