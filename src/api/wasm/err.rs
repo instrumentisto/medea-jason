@@ -12,7 +12,8 @@ use crate::api::err::{
     EnumerateDevicesException, FormatException, InternalException,
     InvalidOutputAudioDeviceIdException, LocalMediaInitException,
     MediaSettingsUpdateException, MediaStateTransitionException,
-    RpcClientException, StateError,
+    MicrophoneVolumeException, MicrophoneVolumeIsAvailableException,
+    RpcClientException, SetMicrophoneVolumeException, StateError,
 };
 
 /// Wrapper around [`JsValue`] which represents a JS error.
