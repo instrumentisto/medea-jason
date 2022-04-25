@@ -112,22 +112,14 @@ pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
     this: ptr::NonNull<MediaManagerHandle>,
-) -> DartFuture<Result<i64, Traced<MicrophoneVolumeIsAvailableError>>> {
+) -> DartFuture<Result<bool, Traced<MicrophoneVolumeIsAvailableError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
         async move {
-            Ok(
-                if this
-                    .microphone_volume_is_available()
-                    .await
-                    .map_err(tracerr::map_from_and_wrap!())?
-                {
-                    1
-                } else {
-                    0
-                },
-            )
+            this.microphone_volume_is_available()
+                .await
+                .map_err(tracerr::map_from_and_wrap!())
         }
         .into_dart_future()
     })
@@ -142,10 +134,9 @@ pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
         let this = this.as_ref().clone();
 
         async move {
-            Ok(this
-                .microphone_volume()
+            this.microphone_volume()
                 .await
-                .map_err(tracerr::map_from_and_wrap!())?)
+                .map_err(tracerr::map_from_and_wrap!())
         }
         .into_dart_future()
     })

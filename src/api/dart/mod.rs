@@ -40,14 +40,16 @@ use crate::{
         utils::new_panic_error,
     },
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
-    platform,
-    platform::utils::{
-        dart_api::{
-            Dart_DeletePersistentHandle_DL_Trampolined,
-            Dart_NewPersistentHandle_DL_Trampolined,
-            Dart_PropagateError_DL_Trampolined,
+    platform::{
+        self,
+        utils::{
+            dart_api::{
+                Dart_DeletePersistentHandle_DL_Trampolined,
+                Dart_NewPersistentHandle_DL_Trampolined,
+                Dart_PropagateError_DL_Trampolined,
+            },
+            handle::DartHandle,
         },
-        handle::DartHandle,
     },
 };
 

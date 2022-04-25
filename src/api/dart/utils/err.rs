@@ -112,14 +112,20 @@ mod exception {
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
+        /// Returns a new Dart [`SetMicrophoneVolumeException`] with the
+        /// provided `trace` property.
         pub fn new_set_microphone_volume_exception(
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
+        /// Returns a new Dart [`MicrophoneVolumeIsAvailableException`] with the
+        /// provided `trace` property.
         pub fn new_microphone_volume_is_available_exception(
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
+        /// Returns a new Dart [`MicrophoneVolumeException`] with the
+        /// provided `trace` property.
         pub fn new_microphone_volume_exception(
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;

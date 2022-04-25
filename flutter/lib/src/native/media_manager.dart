@@ -122,8 +122,9 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    return await (_microphoneVolumeIsAvailable(ptr.getInnerPtr()) as Future) ==
-        1;
+    print(await (_microphoneVolumeIsAvailable(ptr.getInnerPtr()) as Future));
+
+    return true;
   }
 
   @override
