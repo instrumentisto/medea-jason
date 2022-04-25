@@ -12,7 +12,7 @@ use crate::{
     media::{
         InvalidOutputAudioDeviceIdError, MediaSourceKind,
         MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
-        SetMicrophoneVolumeErrorm,
+        SetMicrophoneVolumeError,
     },
     platform::{
         utils::EventListener, DisplayMediaStreamConstraints, Error,
