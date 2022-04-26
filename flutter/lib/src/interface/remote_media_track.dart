@@ -3,18 +3,18 @@ import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import '/src/util/rust_handles_storage.dart';
 import 'track_kinds.dart';
 
-/// Media exchange direction of the `Track`.
+/// Media exchange direction of a [RemoteMediaTrack].
 enum TrackMediaDirection {
-  /// `Track` is enabled on recv and send sides.
+  /// [RemoteMediaTrack] is enabled on both receiver and sender sides.
   SendRecv,
 
-  /// `Track` is enabled on send side.
+  /// [RemoteMediaTrack] is enabled on sender side only.
   SendOnly,
 
-  /// `Track` is enabled on recv side.
+  /// [RemoteMediaTrack] is enabled on receiver side only.
   RecvOnly,
 
-  /// `Track` is disabled on both sides.
+  /// [RemoteMediaTrack] is disabled on both sides.
   Inactive,
 }
 
@@ -31,10 +31,12 @@ abstract class RemoteMediaTrack implements PlatformHandle {
   /// Returns this [RemoteMediaTrack]'s media source kind (device/display).
   MediaSourceKind mediaSourceKind();
 
-  /// Returns underlying [webrtc.MediaStreamTrack] of this [RemoteMediaTrack].
+  /// Returns the underlying [webrtc.MediaStreamTrack] of this
+  /// [RemoteMediaTrack].
   webrtc.MediaStreamTrack getTrack();
 
-  /// Returns current general media exchange direction of this [RemoteMediaTrack].
+  /// Returns the current general [TrackMediaDirection] of this
+  /// [RemoteMediaTrack].
   TrackMediaDirection mediaDirection();
 
   /// Sets callback to invoke when this [RemoteMediaTrack] is muted.
@@ -46,7 +48,7 @@ abstract class RemoteMediaTrack implements PlatformHandle {
   /// Sets callback to invoke when this [RemoteMediaTrack] is stopped.
   void onStopped(void Function() f);
 
-  /// Sets callback to invoke when this [RemoteMediaTrack]'s general media
-  /// exchange direction changes.
+  /// Sets callback to be invoked whenever this [RemoteMediaTrack]'s general
+  /// [TrackMediaDirection] is changed.
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f);
 }

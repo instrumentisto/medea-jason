@@ -112,7 +112,7 @@ pub struct State {
     /// [`local::Track`]: crate::media::track::local::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
 
-    /// Current general media exchange direction of this [`Sender`].
+    /// Current general [`MediaDirection`] of this [`Sender`].
     media_direction: Cell<MediaDirection>,
 
     /// [MediaStreamConstraints][1] of the [`Sender`]'s [`local::Track`].

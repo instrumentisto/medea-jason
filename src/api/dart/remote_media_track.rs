@@ -60,8 +60,8 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
     });
 }
 
-/// Sets callback to invoke when this [`RemoteMediaTrack`]'s general media
-/// exchange direction is changed.
+/// Sets callback to invoke whenever this [`RemoteMediaTrack`]'s general
+/// [`MediaDirection`] is changed.
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__on_media_direction_changed(
     this: ptr::NonNull<RemoteMediaTrack>,
@@ -97,8 +97,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
     propagate_panic(move || this.as_ref().media_source_kind())
 }
 
-/// Returns current general media exchange direction of this
-/// [`RemoteMediaTrack`].
+/// Returns the current general [`MediaDirection`] of this [`RemoteMediaTrack`].
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__media_direction(
     this: ptr::NonNull<RemoteMediaTrack>,

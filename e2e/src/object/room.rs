@@ -93,10 +93,10 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    const [uri] = args;
-                    await room.room.join(uri);
-                }
+            async (room) => {
+                const [uri] = args;
+                await room.room.join(uri);
+            }
             "#,
             [uri.into()],
         ))
@@ -343,98 +343,98 @@ impl Object<Room> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
             r#"
-                async (r) => {
-                    let store = {
-                        connections: new Map(),
-                        subs: new Map(),
+            async (r) => {
+                let store = {
+                    connections: new Map(),
+                    subs: new Map(),
+                };
+                r.room.on_new_connection((conn) => {
+                    let closeListener = {
+                        isClosed: false,
+                        subs: [],
                     };
-                    r.room.on_new_connection((conn) => {
-                        let closeListener = {
-                            isClosed: false,
-                            subs: [],
+                    let tracksStore = {
+                        tracks: [],
+                        subs: []
+                    };
+                    let connection = {
+                        conn: conn,
+                        tracksStore: tracksStore,
+                        closeListener: closeListener,
+                    };
+                    conn.on_remote_track_added((t) => {
+                        let track = {
+                            track: t,
+                            on_enabled_fire_count: 0,
+                            on_disabled_fire_count: 0,
+                            on_muted_fire_count: 0,
+                            on_unmuted_fire_count: 0,
+                            stopped: false,
+                            onEnabledSubs: [],
+                            onDisabledSubs: [],
+                            onMutedSubs: [],
+                            onUnmutedSubs: [],
+                            onMediaDirectionChangedSubs: []
                         };
-                        let tracksStore = {
-                            tracks: [],
-                            subs: []
-                        };
-                        let connection = {
-                            conn: conn,
-                            tracksStore: tracksStore,
-                            closeListener: closeListener,
-                        };
-                        conn.on_remote_track_added((t) => {
-                            let track = {
-                                track: t,
-                                on_enabled_fire_count: 0,
-                                on_disabled_fire_count: 0,
-                                on_muted_fire_count: 0,
-                                on_unmuted_fire_count: 0,
-                                stopped: false,
-                                onEnabledSubs: [],
-                                onDisabledSubs: [],
-                                onMutedSubs: [],
-                                onUnmutedSubs: [],
-                                onMediaDirectionChangedSubs: []
-                            };
-                            track.track.on_muted(() => {
-                                track.on_muted_fire_count++;
-                                for (sub of track.onMutedSubs) {
-                                    sub();
-                                }
-                                track.onMutedSubs = [];
-                            });
-                            track.track.on_unmuted(() => {
-                                track.on_unmuted_fire_count++;
-                                for (sub of track.onUnmutedSubs) {
-                                    sub();
-                                }
-                                track.onUnmutedSubs = [];
-                            });
-                            track.track.on_stopped(() => {
-                                track.stopped = true;
-                            });
-                            track.track.on_media_direction_changed((dir) => {
-                                if (dir == 0) {
-                                    track.on_enabled_fire_count++;
-                                    for (sub of track.onEnabledSubs) {
-                                        sub();
-                                    }
-                                    track.onEnabledSubs = [];
-                                } else {
-                                    track.on_disabled_fire_count++;
-                                    for (sub of track.onDisabledSubs) {
-                                        sub();
-                                    }
-                                    track.onDisabledSubs = [];
-                                }
-
-                                for (sub of track.onMediaDirectionChangedSubs) {
-                                    sub();
-                                }
-                                track.onMediaDirectionChangedSubs = [];
-                            });
-                            tracksStore.tracks.push(track);
-                            let newStoreSubs = tracksStore.subs
-                                .filter((sub) => {
-                                    return sub(track);
-                                });
-                            tracksStore.subs = newStoreSubs;
-                        });
-                        conn.on_close(() => {
-                            closeListener.isClosed = true;
-                            for (sub of closeListener.subs) {
+                        track.track.on_muted(() => {
+                            track.on_muted_fire_count++;
+                            for (sub of track.onMutedSubs) {
                                 sub();
                             }
+                            track.onMutedSubs = [];
                         });
-                        let id = conn.get_remote_member_id();
-                        store.connections.set(id, connection);
-                        let sub = store.subs.get(id);
-                        if (sub !== undefined) {
-                            sub(connection);
+                        track.track.on_unmuted(() => {
+                            track.on_unmuted_fire_count++;
+                            for (sub of track.onUnmutedSubs) {
+                                sub();
+                            }
+                            track.onUnmutedSubs = [];
+                        });
+                        track.track.on_stopped(() => {
+                            track.stopped = true;
+                        });
+                        track.track.on_media_direction_changed((dir) => {
+                            if (dir == 0) {
+                                track.on_enabled_fire_count++;
+                                for (sub of track.onEnabledSubs) {
+                                    sub();
+                                }
+                                track.onEnabledSubs = [];
+                            } else {
+                                track.on_disabled_fire_count++;
+                                for (sub of track.onDisabledSubs) {
+                                    sub();
+                                }
+                                track.onDisabledSubs = [];
+                            }
+
+                            for (sub of track.onMediaDirectionChangedSubs) {
+                                sub();
+                            }
+                            track.onMediaDirectionChangedSubs = [];
+                        });
+                        tracksStore.tracks.push(track);
+                        let newStoreSubs = tracksStore.subs
+                            .filter((sub) => {
+                                return sub(track);
+                            });
+                        tracksStore.subs = newStoreSubs;
+                    });
+                    conn.on_close(() => {
+                        closeListener.isClosed = true;
+                        for (sub of closeListener.subs) {
+                            sub();
                         }
                     });
-                    return store;
-                }
+                    let id = conn.get_remote_member_id();
+                    store.connections.set(id, connection);
+                    let sub = store.subs.get(id);
+                    if (sub !== undefined) {
+                        sub(connection);
+                    }
+                });
+                return store;
+            }
             "#,
             [],
         ))
@@ -466,18 +466,18 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    if (room.closeListener.isClosed) {
-                        return room.closeListener.closeReason.reason();
-                    } else {
-                        let waiter = new Promise((resolve) => {
-                            room.closeListener.subs.push(resolve);
-                        });
+            async (room) => {
+                if (room.closeListener.isClosed) {
+                    return room.closeListener.closeReason.reason();
+                } else {
+                    let waiter = new Promise((resolve) => {
+                        room.closeListener.subs.push(resolve);
+                    });
 
-                        let closeReason = await waiter;
-                        return closeReason.reason();
-                    }
+                    let closeReason = await waiter;
+                    return closeReason.reason();
                 }
+            }
             "#,
             [],
         ))
@@ -498,13 +498,13 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    if (!room.connLossListener.isLost) {
-                        await new Promise((resolve) => {
-                            room.connLossListener.subs.push(resolve);
-                        });
-                    }
+            async (room) => {
+                if (!room.connLossListener.isLost) {
+                    await new Promise((resolve) => {
+                        room.connLossListener.subs.push(resolve);
+                    });
                 }
+            }
             "#,
             [],
         ))
@@ -522,12 +522,12 @@ impl Object<Room> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (room) => {
-                    await room
-                        .connLossListener
-                        .reconnectHandle
-                        .reconnect_with_backoff(100, 2.0, 1000, 5000);
-                }
+            async (room) => {
+                await room
+                    .connLossListener
+                    .reconnectHandle
+                    .reconnect_with_backoff(100, 2.0, 1000, 5000);
+            }
             "#,
             [],
         ))

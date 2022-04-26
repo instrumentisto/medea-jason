@@ -65,7 +65,7 @@ pub struct Receiver {
     /// Indicator whether this [`remote::Track`] is enabled individually.
     enabled_individual: Cell<bool>,
 
-    /// General media exchange state of the [`Receiver`].
+    /// Current general [`MediaDirection`] of this [`Receiver`].
     media_direction: Cell<MediaDirection>,
 
     /// Indicator whether this [`remote::Track`] is muted.
@@ -311,13 +311,13 @@ impl Receiver {
 
 #[cfg(feature = "mockable")]
 impl Receiver {
-    /// Returns current `enabled_general` status of the [`Receiver`].
+    /// Returns the current `enabled_general` status of this [`Receiver`].
     #[must_use]
     pub fn enabled_general(&self) -> bool {
         self.enabled_general.get()
     }
 
-    /// Returns current `media_direction` status of the [`Receiver`].
+    /// Returns the current `media_direction` status of this [`Receiver`].
     #[must_use]
     pub fn direction(&self) -> MediaDirection {
         self.media_direction.get()

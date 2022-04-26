@@ -708,15 +708,15 @@ pub struct TrackPatchEvent {
 }
 
 /// Media exchange direction of a `Track`.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MediaDirection {
-    /// `Track` is enabled on recv and send sides.
+    /// `Track` is enabled on both receiver and sender sides.
     SendRecv = 0,
 
-    /// `Track` is enabled on send side.
+    /// `Track` is enabled on sender side only.
     SendOnly = 1,
 
-    /// `Track` is enabled on recv side.
+    /// `Track` is enabled on receiver side only.
     RecvOnly = 2,
 
     /// `Track` is disabled on both sides.
@@ -724,19 +724,20 @@ pub enum MediaDirection {
 }
 
 impl MediaDirection {
-    /// Returns `true` if `Track` is enabled on sender side.
+    /// Indicates whether a `Track` is enabled on sender side only.
     #[must_use]
     pub const fn is_send_enabled(self) -> bool {
         matches!(self, MediaDirection::SendRecv | MediaDirection::SendOnly)
     }
 
-    /// Returns `true` if `Track` is enabled on received side.
+    /// Indicates whether a `Track` is enabled on receiver side only.
     #[must_use]
     pub const fn is_recv_enabled(self) -> bool {
         matches!(self, MediaDirection::SendRecv | MediaDirection::RecvOnly)
     }
 
-    /// Returns `true` if `Track` is enabled on both sides.
+    /// Indicates whether a `Track` is enabled on both sender and receiver
+    /// sides.
     #[must_use]
     pub const fn is_enabled_general(self) -> bool {
         matches!(self, MediaDirection::SendRecv)

@@ -1,4 +1,4 @@
-Feature: RemoteMediaTrack media direction
+Feature: Media direction
 
   Scenario: Media direction is `SendRecv` before any media updates
     Given room with joined members Alice and Bob

@@ -4,19 +4,20 @@ use crate::{browser::Statement, object::Object};
 
 use super::Error;
 
-/// Media exchange direction of a `Track`.
+/// Media exchange direction of a `RemoteMediaTrack`.
 #[derive(Clone, Copy, Debug)]
+#[repr(u8)]
 pub enum MediaDirection {
-    /// `Track` is enabled on recv and send sides.
+    /// `RemoteMediaTrack` is enabled on both receiver and sender sides.
     SendRecv = 0,
 
-    /// `Track` is enabled on send side.
+    /// `RemoteMediaTrack` is enabled on sender side only.
     SendOnly = 1,
 
-    /// `Track` is enabled on recv side.
+    /// `RemoteMediaTrack` is enabled on receiver side only.
     RecvOnly = 2,
 
-    /// `Track` is disabled on both sides.
+    /// `RemoteMediaTrack` is disabled on both sides.
     Inactive = 3,
 }
 
@@ -86,10 +87,10 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (t) => {
-                    const currentDirection = t.track.media_direction();
-                    return currentDirection != 0;
-                }
+            async (t) => {
+                const currentDirection = t.track.media_direction();
+                return currentDirection != 0;
+            }
             "#,
             [],
         ))
@@ -111,18 +112,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_disabled_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_disabled_fire_count !== count) {
-                                track.onDisabledSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_disabled_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_disabled_fire_count !== count) {
+                            track.onDisabledSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -143,18 +144,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_enabled_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_enabled_fire_count !== count) {
-                                track.onEnabledSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_enabled_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_enabled_fire_count !== count) {
+                            track.onEnabledSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -175,18 +176,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_muted_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_muted_fire_count !== count) {
-                                track.onMutedSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_muted_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_muted_fire_count !== count) {
+                            track.onMutedSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -207,18 +208,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_unmuted_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_unmuted_fire_count !== count) {
-                                track.onUnmutedSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_unmuted_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_unmuted_fire_count !== count) {
+                            track.onUnmutedSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -239,16 +240,15 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    return;
-                    const [direction] = args;
-                    if (track.track.media_direction() != direction) {
-                        let waiter = new Promise((resolve) => {
-                            track.onMediaDirectionChangedSubs.push(resolve);
-                        });
-                        await waiter;
-                    }
+            async (track) => {
+                const [direction] = args;
+                if (track.track.media_direction() != direction) {
+                    let waiter = new Promise((resolve) => {
+                        track.onMediaDirectionChangedSubs.push(resolve);
+                    });
+                    await waiter;
                 }
+            }
             "#,
             [(direction as u8).into()],
         ))

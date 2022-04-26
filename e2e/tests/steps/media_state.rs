@@ -75,8 +75,7 @@ async fn then_remote_media_direction_is(
         "SendRecv" => MediaDirection::SendRecv,
         "SendOnly" => MediaDirection::SendOnly,
         "RecvOnly" => MediaDirection::RecvOnly,
-        "Inactive" => MediaDirection::Inactive,
-        _ => unreachable!(),
+        _inactive => MediaDirection::Inactive,
     };
 
     let member = world.get_member(&id).unwrap();

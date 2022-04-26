@@ -67,7 +67,7 @@ pub struct State {
     /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
 
-    /// Current general media exchange direction of this [`Receiver`].
+    /// Current general [`MediaDirection`] of this [`Receiver`].
     media_direction: ObservableCell<MediaDirection>,
 
     /// Indicator whether the [`Receiver`]'s [`remote::Track`] is muted.
@@ -265,7 +265,7 @@ impl State {
         self.muted.get()
     }
 
-    /// Returns current [`MediaDirection`] of this [`State`].
+    /// Returns the current general [`MediaDirection`] of this [`State`].
     #[must_use]
     pub fn media_direction(&self) -> MediaDirection {
         self.media_direction.get()
@@ -417,7 +417,7 @@ impl Component {
         Ok(())
     }
 
-    /// Updates [`MediaDirection`] of the [`Receiver`].
+    /// Updates [`MediaDirection`] of the provided [`Receiver`].
     #[watch(self.media_direction.subscribe())]
     async fn direction_watcher(
         receiver: Rc<Receiver>,
