@@ -130,6 +130,7 @@ mod mock {
     )]
 
     use crate::{
+        api,
         media::{
             track::remote::Track as CoreRemoteMediaTrack, MediaDirection,
             MediaKind, MediaSourceKind,
@@ -187,8 +188,12 @@ mod mock {
             cb.call0();
         }
 
-        pub fn on_media_direction_changed(&self, cb: platform::Function<()>) {
-            cb.call0();
+        #[allow(unused_qualifications)]
+        pub fn on_media_direction_changed(
+            &self,
+            cb: platform::Function<api::MediaDirection>,
+        ) {
+            cb.call1(api::MediaDirection::SendRecv);
         }
 
         #[must_use]
