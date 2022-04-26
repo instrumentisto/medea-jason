@@ -403,7 +403,7 @@ impl Object<Room> {
                             } else {
                                 track.on_disabled_fire_count++;
                                 for (sub of track.onDisabledSubs) {
-                                    sub();
+                                    sub(dir);
                                 }
                                 track.onDisabledSubs = [];
                             }

@@ -242,9 +242,13 @@ impl Object<RemoteTrack> {
             r#"
             async (track) => {
                 const [direction] = args;
-                if (track.track.media_direction() != direction) {
-                    let waiter = new Promise((resolve) => {
-                        track.onMediaDirectionChangedSubs.push(resolve);
+                    if (track.track.media_direction() != direction) {
+                        let waiter = new Promise((resolve) => {
+                            track.onMediaDirectionChangedSubs.push((dir) => {
+                                if (dir == direction) {
+                                    resolve();
+                                }
+                            });
                     });
                     await waiter;
                 }
