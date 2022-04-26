@@ -777,6 +777,8 @@ impl PeerConnection {
         HashMap<TrackId, media_exchange_state::Stable>,
         Traced<UpdateLocalStreamError>,
     > {
+        println!("update local stream");
+
         if let Some(required_caps) = self
             .get_simple_tracks_request(criteria)
             .map_err(tracerr::map_from_and_wrap!())?

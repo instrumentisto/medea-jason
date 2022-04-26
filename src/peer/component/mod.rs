@@ -304,6 +304,8 @@ impl State {
         &self,
         peer: &Rc<PeerConnection>,
     ) -> Result<(), Traced<UpdateLocalStreamError>> {
+        println!("upper update l stream");
+
         let mut criteria = LocalStreamUpdateCriteria::empty();
         let senders = self.senders.get_outdated();
         for s in &senders {

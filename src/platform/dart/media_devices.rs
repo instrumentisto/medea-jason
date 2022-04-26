@@ -123,6 +123,7 @@ impl MediaDevices {
         &self,
         caps: MediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
+        println!("get user media");
         let tracks = unsafe {
             FutureFromDart::execute::<DartHandle>(
                 media_devices::get_user_media(caps.into()),
@@ -131,12 +132,16 @@ impl MediaDevices {
         }
         .map_err(tracerr::wrap!())?;
 
+        println!("got media");
+
         let tracks = Vec::from(DartList::from(tracks))
             .into_iter()
             .map(|track| {
                 MediaStreamTrack::new(track, Some(MediaSourceKind::Device))
             })
             .collect();
+
+        println!("parse tracks");
 
         Ok(tracks)
     }
