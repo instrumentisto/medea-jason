@@ -264,26 +264,23 @@ void main() {
 
     var track = await trackFut.future;
 
-    expect(track.enabled(), equals(true));
     expect(track.muted(), equals(false));
     expect(track.kind(), equals(MediaKind.Video));
     expect(track.mediaSourceKind(), equals(MediaSourceKind.Device));
 
-    var allFired = List<Completer>.generate(5, (_) => Completer());
-    track.onEnabled(() {
+    var allFired = List<Completer>.generate(3, (_) => Completer());
+    track.onMuted(() {
       allFired[0].complete();
     });
-    track.onDisabled(() {
+    track.onUnmuted(() {
       allFired[1].complete();
     });
-    track.onMuted(() {
+    track.onStopped(() {
       allFired[2].complete();
     });
-    track.onUnmuted(() {
+    track.onMediaDirectionChanged((direction) {
+      expect(direction, TrackMediaDirection.SendRecv);
       allFired[3].complete();
-    });
-    track.onStopped(() {
-      allFired[4].complete();
     });
 
     await Future.wait(allFired.map((e) => e.future))

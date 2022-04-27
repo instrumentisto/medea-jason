@@ -9,9 +9,6 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
 
-typedef _enabled_C = Uint8 Function(Pointer);
-typedef _enabled_Dart = int Function(Pointer);
-
 typedef _muted_C = Uint8 Function(Pointer);
 typedef _muted_Dart = int Function(Pointer);
 
@@ -21,14 +18,11 @@ typedef _kind_Dart = int Function(Pointer);
 typedef _mediaSourceKind_C = Uint8 Function(Pointer);
 typedef _mediaSourceKind_Dart = int Function(Pointer);
 
+typedef _mediaDirection_C = Uint8 Function(Pointer);
+typedef _mediaDirection_Dart = int Function(Pointer);
+
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
-
-typedef _onEnabled_C = Void Function(Pointer, Handle);
-typedef _onEnabled_Dart = void Function(Pointer, void Function());
-
-typedef _onDisabled_C = Void Function(Pointer, Handle);
-typedef _onDisabled_Dart = void Function(Pointer, void Function());
 
 typedef _onMuted_C = Void Function(Pointer, Handle);
 typedef _onMuted_Dart = void Function(Pointer, void Function());
@@ -39,11 +33,12 @@ typedef _onUnmuted_Dart = void Function(Pointer, void Function());
 typedef _onStopped_C = Void Function(Pointer, Handle);
 typedef _onStopped_Dart = void Function(Pointer, void Function());
 
+typedef _onMediaDirectionChanged_C = Void Function(Pointer, Handle);
+typedef _onMediaDirectionChanged_Dart = void Function(
+    Pointer, void Function(int));
+
 typedef _getTrack_C = Handle Function(Pointer);
 typedef _getTrack_Dart = Object Function(Pointer);
-
-final _enabled =
-    dl.lookupFunction<_enabled_C, _enabled_Dart>('RemoteMediaTrack__enabled');
 
 final _muted =
     dl.lookupFunction<_muted_C, _muted_Dart>('RemoteMediaTrack__muted');
@@ -54,11 +49,9 @@ final _mediaSourceKind =
     dl.lookupFunction<_mediaSourceKind_C, _mediaSourceKind_Dart>(
         'RemoteMediaTrack__media_source_kind');
 
-final _onEnabled = dl.lookupFunction<_onEnabled_C, _onEnabled_Dart>(
-    'RemoteMediaTrack__on_enabled');
-
-final _onDisabled = dl.lookupFunction<_onDisabled_C, _onDisabled_Dart>(
-    'RemoteMediaTrack__on_disabled');
+final _mediaDirectionKind =
+    dl.lookupFunction<_mediaDirection_C, _mediaDirection_Dart>(
+        'RemoteMediaTrack__media_direction');
 
 final _onMuted =
     dl.lookupFunction<_onMuted_C, _onMuted_Dart>('RemoteMediaTrack__on_muted');
@@ -68,6 +61,10 @@ final _onUnmuted = dl.lookupFunction<_onUnmuted_C, _onUnmuted_Dart>(
 
 final _onStopped = dl.lookupFunction<_onStopped_C, _onStopped_Dart>(
     'RemoteMediaTrack__on_stopped');
+
+final _onMediaDirectionChanged = dl
+    .lookupFunction<_onMediaDirectionChanged_C, _onMediaDirectionChanged_Dart>(
+        'RemoteMediaTrack__on_media_direction_changed');
 
 final _getTrack = dl
     .lookupFunction<_getTrack_C, _getTrack_Dart>('RemoteMediaTrack__get_track');
@@ -82,11 +79,6 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   /// provided [Pointer].
   NativeRemoteMediaTrack(this.ptr) {
     RustHandlesStorage().insertHandle(this);
-  }
-
-  @override
-  bool enabled() {
-    return _enabled(ptr.getInnerPtr()) > 0;
   }
 
   @override
@@ -107,18 +99,14 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
+  TrackMediaDirection mediaDirection() {
+    var index = _mediaDirectionKind(ptr.getInnerPtr());
+    return TrackMediaDirection.values[index];
+  }
+
+  @override
   webrtc.MediaStreamTrack getTrack() {
     return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
-  }
-
-  @override
-  void onEnabled(void Function() f) {
-    _onEnabled(ptr.getInnerPtr(), f);
-  }
-
-  @override
-  void onDisabled(void Function() f) {
-    _onDisabled(ptr.getInnerPtr(), f);
   }
 
   @override
@@ -144,5 +132,11 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
       _free(ptr.getInnerPtr());
       ptr.free();
     }
+  }
+
+  @override
+  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+    _onMediaDirectionChanged(
+        ptr.getInnerPtr(), (i) => f(TrackMediaDirection.values[i]));
   }
 }

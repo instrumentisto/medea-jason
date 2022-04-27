@@ -4,6 +4,23 @@ use crate::{browser::Statement, object::Object};
 
 use super::Error;
 
+/// Media exchange direction of a `RemoteMediaTrack`.
+#[derive(Clone, Copy, Debug)]
+#[repr(u8)]
+pub enum MediaDirection {
+    /// `RemoteMediaTrack` is enabled on both receiver and sender sides.
+    SendRecv = 0,
+
+    /// `RemoteMediaTrack` is enabled on sender side only.
+    SendOnly = 1,
+
+    /// `RemoteMediaTrack` is enabled on receiver side only.
+    RecvOnly = 2,
+
+    /// `RemoteMediaTrack` is disabled on both sides.
+    Inactive = 3,
+}
+
 /// Representation of a `RemoteMediaTrack` object.
 #[derive(Clone, Copy, Debug)]
 pub struct RemoteTrack;
@@ -19,7 +36,8 @@ impl Object<RemoteTrack> {
             // language=JavaScript
             r#"
             async (track) => {
-                if (!track.track.enabled()) {
+                const currentDirection = track.track.media_direction()
+                if (currentDirection != 0) {
                     let waiter = new Promise((resolve) => {
                         track.onEnabledSubs.push(resolve);
                     });
@@ -44,7 +62,8 @@ impl Object<RemoteTrack> {
             // language=JavaScript
             r#"
             async (track) => {
-                if (track.track.enabled()) {
+                const currentDirection = track.track.media_direction()
+                if (currentDirection == 0) {
                     let waiter = new Promise((resolve) => {
                         track.onDisabledSubs.push(resolve);
                     });
@@ -67,7 +86,12 @@ impl Object<RemoteTrack> {
     pub async fn disabled(&self) -> Result<bool, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"async (t) => !t.track.get_track().enabled"#,
+            r#"
+            async (t) => {
+                const currentDirection = t.track.media_direction();
+                return currentDirection != 0;
+            }
+            "#,
             [],
         ))
         .await?
@@ -88,18 +112,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_disabled_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_disabled_fire_count !== count) {
-                                track.onDisabledSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_disabled_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_disabled_fire_count !== count) {
+                            track.onDisabledSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -120,18 +144,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_enabled_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_enabled_fire_count !== count) {
-                                track.onEnabledSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_enabled_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_enabled_fire_count !== count) {
+                            track.onEnabledSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -152,18 +176,18 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_muted_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_muted_fire_count !== count) {
-                                track.onMutedSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_muted_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_muted_fire_count !== count) {
+                            track.onMutedSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
         ))
@@ -184,20 +208,53 @@ impl Object<RemoteTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    const [count] = args;
-                    while (track.on_unmuted_fire_count !== count) {
-                        await new Promise((resolve) => {
-                            if (track.on_unmuted_fire_count !== count) {
-                                track.onUnmutedSubs.push(resolve);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }
+            async (track) => {
+                const [count] = args;
+                while (track.on_unmuted_fire_count !== count) {
+                    await new Promise((resolve) => {
+                        if (track.on_unmuted_fire_count !== count) {
+                            track.onUnmutedSubs.push(resolve);
+                        } else {
+                            resolve();
+                        }
+                    });
                 }
+            }
             "#,
             [count.into()],
+        ))
+        .await
+        .map(drop)
+    }
+
+    /// Waits for the `RemoteMediaTrack.on_media_direction` with the provided
+    /// [`MediaDirection`].
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn wait_for_media_direction(
+        &self,
+        direction: MediaDirection,
+    ) -> Result<(), Error> {
+        self.execute(Statement::new(
+            // language=JavaScript
+            r#"
+            async (track) => {
+                const [direction] = args;
+                    if (track.track.media_direction() != direction) {
+                        let waiter = new Promise((resolve) => {
+                            track.onMediaDirectionChangedSubs.push((dir) => {
+                                if (dir == direction) {
+                                    resolve();
+                                }
+                            });
+                    });
+                    await waiter;
+                }
+            }
+            "#,
+            [(direction as u8).into()],
         ))
         .await
         .map(drop)

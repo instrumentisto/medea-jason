@@ -9,7 +9,7 @@ use medea_client_api_proto::{
     AudioSettings, Direction, MediaType, MemberId, Track, TrackId,
 };
 use medea_jason::{
-    media::{MediaManager, RecvConstraints},
+    media::{MediaDirection, MediaManager, RecvConstraints},
     peer::{LocalStreamUpdateCriteria, MediaConnections, SimpleTracksRequest},
     platform::{RtcPeerConnection, TransceiverDirection},
 };
@@ -65,15 +65,15 @@ async fn sendrecv_works() {
         )
         .await
         .unwrap();
-    let video_sender = media_connections.get_sender_by_id(TrackId(1)).unwrap();
-    let video_receiver =
-        media_connections.get_receiver_by_id(TrackId(2)).unwrap();
+    let sender = media_connections.get_sender_by_id(TrackId(1)).unwrap();
+    let receiver = media_connections.get_receiver_by_id(TrackId(2)).unwrap();
 
-    assert!(video_sender.is_publishing().await);
-    assert!(video_receiver.is_receiving().await);
+    assert!(sender.is_publishing().await);
+    assert!(receiver.is_receiving().await);
+    assert_eq!(receiver.direction(), MediaDirection::SendRecv);
 
     assert!(
-        video_sender
+        sender
             .transceiver()
             .has_direction(
                 TransceiverDirection::SEND | TransceiverDirection::RECV
@@ -81,7 +81,7 @@ async fn sendrecv_works() {
             .await,
     );
     assert!(
-        video_receiver
+        receiver
             .transceiver()
             .unwrap()
             .has_direction(

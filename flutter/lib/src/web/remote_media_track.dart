@@ -14,11 +14,6 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   WebRemoteMediaTrack(this.obj);
 
   @override
-  bool enabled() {
-    return fallibleFunction(() => obj.enabled());
-  }
-
-  @override
   bool muted() {
     return fallibleFunction(() => obj.muted());
   }
@@ -35,18 +30,14 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
+  TrackMediaDirection mediaDirection() {
+    return fallibleFunction(
+        () => TrackMediaDirection.values[obj.media_direction().toInt()]);
+  }
+
+  @override
   webrtc.MediaStreamTrack getTrack() {
     return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
-  }
-
-  @override
-  void onEnabled(void Function() f) {
-    fallibleFunction(() => obj.on_enabled(allowInterop(f)));
-  }
-
-  @override
-  void onDisabled(void Function() f) {
-    fallibleFunction(() => obj.on_disabled(allowInterop(f)));
   }
 
   @override
@@ -68,5 +59,11 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   @override
   void free() {
     obj.free();
+  }
+
+  @override
+  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+    fallibleFunction(() => obj.on_media_direction_changed(
+        allowInterop((i) => f(TrackMediaDirection.values[i]))));
   }
 }

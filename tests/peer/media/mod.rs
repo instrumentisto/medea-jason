@@ -157,7 +157,7 @@ async fn new_media_connections_with_disabled_video_tracks() {
 ///
 /// This tests checks that [`TrackPatch`] works as expected.
 mod sender_patch {
-    use medea_client_api_proto::{AudioSettings, MediaType};
+    use medea_client_api_proto::{AudioSettings, MediaDirection, MediaType};
     use medea_jason::{
         peer::{sender, MediaExchangeState},
         utils::{AsProtoState, SynchronizableState},
@@ -191,8 +191,7 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: TrackId(track_id.0 + 100),
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         sender.state().when_updated().await;
@@ -205,8 +204,7 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         sender.state().when_updated().await;
@@ -219,8 +217,7 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(true),
-            enabled_general: Some(true),
+            media_direction: Some(MediaDirection::SendRecv),
             muted: None,
         });
         sender.state().when_updated().await;
@@ -233,8 +230,7 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         sender.state().when_updated().await;
@@ -242,8 +238,7 @@ mod sender_patch {
 
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         sender.state().when_updated().await;
@@ -256,8 +251,7 @@ mod sender_patch {
         let (sender, track_id, _media_connections) = get_sender().await;
         sender.state().update(&TrackPatchEvent {
             id: track_id,
-            enabled_individual: None,
-            enabled_general: None,
+            media_direction: None,
             muted: None,
         });
         sender.state().when_updated().await;
@@ -272,8 +266,7 @@ mod sender_patch {
         let (sender, _, _media_connections) = get_sender().await;
 
         let mut proto_state = sender.state().as_proto();
-        proto_state.enabled_general = false;
-        proto_state.enabled_individual = false;
+        proto_state.media_direction = MediaDirection::RecvOnly;
         proto_state.muted = true;
         sender
             .state()
@@ -290,7 +283,9 @@ mod sender_patch {
 }
 
 mod receiver_patch {
-    use medea_client_api_proto::{AudioSettings, MediaType, MemberId};
+    use medea_client_api_proto::{
+        AudioSettings, MediaDirection, MediaType, MemberId,
+    };
     use medea_jason::{
         media::RecvConstraints,
         peer::{receiver, MediaExchangeState, PeerEvent},
@@ -328,8 +323,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TrackId(TRACK_ID.0 + 100),
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         receiver.state().when_updated().await;
@@ -342,8 +336,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         receiver.state().when_updated().await;
@@ -356,8 +349,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(true),
-            enabled_general: Some(true),
+            media_direction: Some(MediaDirection::SendRecv),
             muted: None,
         });
         receiver.state().when_updated().await;
@@ -370,8 +362,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         receiver.state().when_updated().await;
@@ -379,8 +370,7 @@ mod receiver_patch {
 
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: Some(false),
-            enabled_general: Some(false),
+            media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         receiver.state().when_updated().await;
@@ -393,8 +383,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
-            enabled_individual: None,
-            enabled_general: None,
+            media_direction: None,
             muted: None,
         });
         receiver.state().when_updated().await;
@@ -409,8 +398,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
 
         let mut proto_state = receiver.state().as_proto();
-        proto_state.enabled_individual = false;
-        proto_state.enabled_general = false;
+        proto_state.media_direction = MediaDirection::SendOnly;
 
         receiver
             .state()

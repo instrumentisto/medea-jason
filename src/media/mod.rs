@@ -24,7 +24,7 @@ pub use self::{
         MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
         SetMicrophoneVolumeError,
     },
-    track::MediaSourceKind,
+    track::{remote::MediaDirection, MediaSourceKind},
 };
 
 /// [MediaStreamTrack.kind][1] representation.
