@@ -54,14 +54,14 @@ mod media_devices {
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Sets the microphone volume level in percents.
-        pub fn set_microphone_volume(level: i64) -> Dart_Handle;
-
         /// Indicates if it is possible to set the microphone volume.
         pub fn microphone_volume_is_available() -> Dart_Handle;
 
-        /// Gets the current microphone volume level in percents.
+        /// Returns the current microphone volume level in percents.
         pub fn microphone_volume() -> Dart_Handle;
+
+        /// Sets the microphone volume level in percents.
+        pub fn set_microphone_volume(level: i64) -> Dart_Handle;
 
         /// Subscribes onto the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
@@ -195,6 +195,40 @@ impl MediaDevices {
         .map_err(tracerr::wrap!())
     }
 
+    /// Indicates if it is possible to set the microphone volume.
+    ///
+    /// # Errors
+    ///
+    /// If it the `Audio Device Module` or the `Microphone` is not initialized
+    /// or there is no connected `audio input devices` at all.
+    pub async fn microphone_volume_is_available(
+        &self,
+    ) -> Result<bool, Traced<Error>> {
+        let result = unsafe {
+            FutureFromDart::execute::<i64>(
+                media_devices::microphone_volume_is_available(),
+            )
+            .await
+        }
+        .map_err(tracerr::wrap!())?;
+
+        Ok(result == 1)
+    }
+
+    /// Returns the current microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// If it the `Audio Device Module` or the `Microphone` is not initialized
+    /// or there is no connected `audio input devices` at all.
+    pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
+        unsafe {
+            FutureFromDart::execute::<i64>(media_devices::microphone_volume())
+                .await
+        }
+        .map_err(tracerr::wrap!())
+    }
+
     /// Sets the microphone volume level in percents.
     ///
     /// # Errors
@@ -212,39 +246,6 @@ impl MediaDevices {
                 level,
             ))
             .await
-        }
-        .map_err(tracerr::wrap!())
-    }
-
-    /// Indicates if it is possible to set the microphone volume.
-    ///
-    /// # Errors
-    ///
-    /// If it the `Audio Device Module` or the `Microphone` is not initialized
-    /// or there is no connected `audio input devices` at all.
-    pub async fn microphone_volume_is_available(
-        &self,
-    ) -> Result<bool, Traced<Error>> {
-        let result = unsafe {
-            FutureFromDart::execute::<i64>(
-                media_devices::microphone_volume_is_available(),
-            )
-            .await
-        }
-        .map_err(tracerr::wrap!());
-        Ok(result? == 1)
-    }
-
-    /// Gets the current microphone volume level in percents.
-    ///
-    /// # Errors
-    ///
-    /// If it the `Audio Device Module` or the `Microphone` is not initialized
-    /// or there is no connected `audio input devices` at all.
-    pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
-        unsafe {
-            FutureFromDart::execute::<i64>(media_devices::microphone_volume())
-                .await
         }
         .map_err(tracerr::wrap!())
     }

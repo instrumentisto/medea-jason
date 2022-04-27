@@ -98,6 +98,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
+        // TODO(alexlapa): Just use single MicVolumeError
         async move {
             this.set_microphone_volume(level)
                 .await
@@ -116,6 +117,7 @@ pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
+        // TODO(alexlapa): Cannot error, remove MicrophoneVolumeIsAvailableError.
         async move {
             this.microphone_volume_is_available()
                 .await
@@ -133,6 +135,7 @@ pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
+        // TODO(alexlapa): Just use single MicVolumeError
         async move {
             this.microphone_volume()
                 .await

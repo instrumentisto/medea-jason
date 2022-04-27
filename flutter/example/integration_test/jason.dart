@@ -668,6 +668,10 @@ void main() {
     }
     throw Exception('Exception not fired on panic');
   });
+
+  testWidgets('Volume settings', (WidgetTester widgetTester) async {
+    // TODO(alexlapa): Add tests.
+  });
 }
 
 class TestObj {
