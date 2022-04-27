@@ -51,6 +51,8 @@ use crate::{
     },
 };
 
+pub use crate::media::MediaDirection;
+
 pub use self::{
     audio_track_constraints::AudioTrackConstraints,
     connection_handle::ConnectionHandle,
@@ -244,6 +246,12 @@ impl From<Option<DartError>> for DartValue {
             None => Self::None,
             Some(err) => Self::from(err),
         }
+    }
+}
+
+impl From<MediaDirection> for DartValue {
+    fn from(val: MediaDirection) -> Self {
+        Self::from(val as u8)
     }
 }
 
@@ -583,6 +591,7 @@ impl DartValueCastError {
 
 impl PrimitiveEnum for MediaSourceKind {}
 impl PrimitiveEnum for FacingMode {}
+impl PrimitiveEnum for MediaDirection {}
 
 impl TryFrom<i64> for MediaSourceKind {
     type Error = i64;
@@ -630,6 +639,20 @@ impl TryFrom<i64> for MediaDeviceKind {
             0 => Ok(Self::AudioInput),
             1 => Ok(Self::VideoInput),
             2 => Ok(Self::AudioOutput),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for MediaDirection {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::SendRecv),
+            1 => Ok(Self::SendOnly),
+            2 => Ok(Self::RecvOnly),
+            3 => Ok(Self::Inactive),
             _ => Err(value),
         }
     }

@@ -22,7 +22,7 @@ pub use self::{
         HandleDetachedError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
     },
-    track::MediaSourceKind,
+    track::{remote::MediaDirection, MediaSourceKind},
 };
 
 /// [MediaStreamTrack.kind][1] representation.
