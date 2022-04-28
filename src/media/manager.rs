@@ -570,7 +570,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// With [`SetMicrophoneVolumeError`] if there is no possibility to set the
+    /// With [`MicVolumeError`] if there is no possibility to set the
     /// volume for the current `audio input device` or `system`, the `Audio
     /// Device Module` or the `Microphone` is not initialized or there is no
     /// connected `audio input devices` at all.
@@ -588,12 +588,6 @@ impl MediaManagerHandle {
     }
 
     /// Indicates if it is possible to set the microphone volume.
-    ///
-    /// # Errors
-    ///
-    /// With [`MicrophoneVolumeIsAvailableError`] if it the `Audio Device
-    /// Module` or the `Microphone` is not initialized or there is no connected
-    /// `audio input devices` at all.
     pub async fn microphone_volume_is_available(
         &self,
     ) -> Result<bool, Traced<HandleDetachedError>> {
@@ -608,7 +602,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// With [`MicrophoneVolumeIsAvailableError`] if it the `Audio Device
+    /// With [`MicVolumeError`] if it the `Audio Device
     /// Module` or the `Microphone` is not initialized or there is no connected
     /// `audio input devices` at all.
     pub async fn microphone_volume(
