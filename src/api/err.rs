@@ -224,8 +224,7 @@ pub struct MicVolumeException {
 }
 
 impl MicVolumeException {
-    /// Creates a new [`MicVolumeException`] from the provided
-    /// error [`Trace`].
+    /// Creates a new [`MicVolumeException`] from the provided error [`Trace`].
     #[must_use]
     pub fn new(trace: Trace) -> Self {
         Self { trace }
