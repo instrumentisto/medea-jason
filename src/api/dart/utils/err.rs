@@ -111,9 +111,10 @@ mod exception {
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Returns a new Dart [`MicVolumeException`] with the
-        /// provided `trace` property.
+        /// Returns a new Dart [`MicVolumeException`] with the provided `cause`
+        /// and `trace` properties.
         pub fn new_mic_volume_exception(
+            cause: DartError,
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
@@ -245,9 +246,10 @@ impl From<InvalidOutputAudioDeviceIdException> for DartError {
 impl From<MicVolumeException> for DartError {
     fn from(err: MicVolumeException) -> Self {
         unsafe {
-            Self::new(exception::new_mic_volume_exception(string_into_c_str(
-                err.trace(),
-            )))
+            Self::new(exception::new_mic_volume_exception(
+                err.cause().into(),
+                string_into_c_str(err.trace()),
+            ))
         }
     }
 }

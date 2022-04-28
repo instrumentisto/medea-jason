@@ -219,21 +219,30 @@ impl InvalidOutputAudioDeviceIdException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 #[derive(Debug)]
 pub struct MicVolumeException {
-    /// Stacktrace of this [`MicVolumeException`].
+    /// [`platform::Error`] causing this [`MicVolumeException`].
+    cause: platform::Error,
+
+    /// Stacktrace of this [`EnumerateDevicesException`].
     trace: Trace,
 }
 
 impl MicVolumeException {
     /// Creates a new [`MicVolumeException`] from the provided error [`Trace`].
     #[must_use]
-    pub fn new(trace: Trace) -> Self {
-        Self { trace }
+    pub fn new(cause: platform::Error, trace: Trace) -> Self {
+        Self { cause, trace }
     }
 }
 
 #[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MicVolumeException {
+    /// Returns [`platform::Error`] causing this [`MicVolumeException`].
+    #[must_use]
+    pub fn cause(&self) -> platform::Error {
+        self.cause.clone()
+    }
+
     /// Returns stacktrace of this [`MicVolumeException`].
     #[must_use]
     pub fn trace(&self) -> String {
@@ -581,8 +590,15 @@ impl From<Traced<InvalidOutputAudioDeviceIdError>> for Error {
 
 impl From<Traced<MicVolumeError>> for Error {
     fn from(err: Traced<MicVolumeError>) -> Self {
-        let (_, trace) = err.split();
-        MicVolumeException::new(trace).into()
+        let (err, stacktrace) = err.split();
+        match err {
+            MicVolumeError::MicVolumeError(err) => {
+                MicVolumeException::new(err, stacktrace).into()
+            }
+            MicVolumeError::Detached => {
+                StateError::new(err.to_string(), stacktrace).into()
+            }
+        }
     }
 }
 

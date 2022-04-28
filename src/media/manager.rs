@@ -62,14 +62,19 @@ pub enum InitLocalTracksError {
 #[display(fmt = "Invalid audio device ID provided")]
 pub struct InvalidOutputAudioDeviceIdError;
 
-/// Error returned from the [`MediaManagerHandle::microphone_volume`] or
-/// [`MediaManagerHandle::set_microphone_volume`] method.
-///
-/// Occurs if it the `Audio Device Module` or the `Microphone` is not
-/// initialized or there is no connected `audio input devices` at all.
-#[derive(Clone, Copy, Debug, Display)]
-#[display(fmt = "Can't interact with the microphone volume level")]
-pub struct MicVolumeError;
+/// Error returned from the [`MediaManagerHandle::microphone_volume()`] or
+/// [`MediaManagerHandle::set_microphone_volume()`] methods.
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = "platform::Error")]
+pub enum MicVolumeError {
+    /// Error accessing microphone volume settings.
+    #[display(fmt = "Error accessing microphone volume settings {}", _0)]
+    MicVolumeError(platform::Error),
+
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    #[display(fmt = "MediaManagerHandle is in detached state")]
+    Detached,
+}
 
 /// Error indicating about a [`MediaManagerHandle`] in detached state.
 #[derive(Clone, Copy, Debug, Display)]
@@ -405,47 +410,36 @@ impl InnerMediaManager {
             .map_err(|_| tracerr::new!(InvalidOutputAudioDeviceIdError))
     }
 
+    /// Indicates whether it is possible to access microphone volume settings.
+    async fn microphone_volume_is_available(&self) -> bool {
+        self.media_devices.microphone_volume_is_available().await
+    }
+
     /// Sets the microphone volume level in percents.
     ///
     /// # Errors
     ///
-    /// With [`SetMicrophoneVolumeError`] if there is no possibility to set the
-    /// volume for the current `audio input device` or `system`, the `Audio
-    /// Device Module` or the `Microphone` is not initialized or there is no
-    /// connected `audio input devices` at all.
+    /// With [`MicVolumeError`] if platform call errors.
     async fn set_microphone_volume(
         &self,
         level: i64,
     ) -> Result<(), Traced<MicVolumeError>> {
-        #[allow(clippy::map_err_ignore)]
         self.media_devices
             .set_microphone_volume(level)
             .await
-            .map_err(|_| tracerr::new!(MicVolumeError))
-    }
-
-    /// Indicates if it is possible to set the microphone volume.
-    async fn microphone_volume_is_available(&self) -> bool {
-        #[allow(clippy::map_err_ignore)]
-        self.media_devices
-            .microphone_volume_is_available()
-            .await
-            .unwrap()
+            .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Gets the current microphone volume level in percents.
     ///
     /// # Errors
     ///
-    /// With [`MicVolumeError`] if it the `Audio Device
-    /// Module` or the `Microphone` is not initialized or there is no connected
-    /// `audio input devices` at all.
+    /// With [`MicVolumeError`] if platform call errors.
     async fn microphone_volume(&self) -> Result<i64, Traced<MicVolumeError>> {
-        #[allow(clippy::map_err_ignore)]
         self.media_devices
             .microphone_volume()
             .await
-            .map_err(|_| tracerr::new!(MicVolumeError))
+            .map_err(tracerr::map_from_and_wrap!())
     }
 }
 
@@ -570,10 +564,7 @@ impl MediaManagerHandle {
     ///
     /// # Errors
     ///
-    /// With [`MicVolumeError`] if there is no possibility to set the
-    /// volume for the current `audio input device` or `system`, the `Audio
-    /// Device Module` or the `Microphone` is not initialized or there is no
-    /// connected `audio input devices` at all.
+    /// See [`MicVolumeError`] for details.
     pub async fn set_microphone_volume(
         &self,
         level: i64,
@@ -581,13 +572,14 @@ impl MediaManagerHandle {
         let this = self
             .0
             .upgrade()
-            .ok_or_else(|| tracerr::new!(MicVolumeError))?;
+            .ok_or_else(|| tracerr::new!(MicVolumeError::Detached))?;
+
         this.set_microphone_volume(level)
             .await
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Indicates if it is possible to set the microphone volume.
+    /// Indicates whether it is possible to access microphone volume settings.
     ///
     /// # Errors
     ///
@@ -602,20 +594,18 @@ impl MediaManagerHandle {
         Ok(this.microphone_volume_is_available().await)
     }
 
-    /// Gets the current microphone volume level in percents.
+    /// Returns the current microphone volume level in percents.
     ///
     /// # Errors
     ///
-    /// With [`MicVolumeError`] if it the `Audio Device
-    /// Module` or the `Microphone` is not initialized or there is no connected
-    /// `audio input devices` at all.
+    /// See [`MicVolumeError`] for details.
     pub async fn microphone_volume(
         &self,
     ) -> Result<i64, Traced<MicVolumeError>> {
         let this = self
             .0
             .upgrade()
-            .ok_or_else(|| tracerr::new!(MicVolumeError))?;
+            .ok_or_else(|| tracerr::new!(MicVolumeError::Detached))?;
         this.microphone_volume()
             .await
             .map_err(tracerr::map_from_and_wrap!())

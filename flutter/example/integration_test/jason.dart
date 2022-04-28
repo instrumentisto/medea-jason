@@ -667,7 +667,12 @@ void main() {
   });
 
   testWidgets('Volume settings', (WidgetTester widgetTester) async {
-    // TODO(alexlapa): Add tests.
+    var jason = Jason();
+    var media = jason.mediaManager();
+
+    expect(await media.microphoneVolumeIsAvailable(), true);
+    expect(await media.microphoneVolume(), 50);
+    expect(() async => await media.setMicrophoneVolume(100), returnsNormally);
   });
 }
 

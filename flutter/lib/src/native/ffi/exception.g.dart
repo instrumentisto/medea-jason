@@ -37,7 +37,8 @@ void registerFunction(
       newMediaSettingsUpdateException,
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
       newInvalidOutputAudioDeviceIdException,
-  required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
+  required Pointer<
+          NativeFunction<Handle Function(Pointer<Handle>, Pointer<Utf8>)>>
       newMicVolumeException,
   required Pointer<NativeFunction<Handle Function()>> throwPanicException,
 }) {

@@ -49,14 +49,13 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   }
 
   @override
-  Future<int> microphoneVolume() {
-    // TODO(logist322): implement microphoneVolume
-    throw UnimplementedError();
+  Future<bool> microphoneVolumeIsAvailable() async {
+    return false;
   }
 
   @override
-  Future<bool> microphoneVolumeIsAvailable() {
-    // TODO(logist322): implement microphoneVolumeIsAvailable
+  Future<int> microphoneVolume() {
+    // TODO(logist322): implement microphoneVolume
     throw UnimplementedError();
   }
 

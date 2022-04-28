@@ -97,7 +97,6 @@ pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        // TODO(alexlapa): Just use single MicVolumeError
         async move {
             this.set_microphone_volume(level)
                 .await
@@ -108,7 +107,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
     })
 }
 
-/// Indicates if it is possible to set the microphone volume.
+/// Indicates whether it is possible to access microphone volume settings.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
     this: ptr::NonNull<MediaManagerHandle>,
@@ -121,7 +120,7 @@ pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
     })
 }
 
-/// Gets the current microphone volume level in percents.
+/// Returns the current microphone volume level in percents.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
     this: ptr::NonNull<MediaManagerHandle>,
@@ -129,7 +128,6 @@ pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        // TODO(alexlapa): Just use single MicVolumeError
         async move {
             this.microphone_volume()
                 .await
@@ -232,7 +230,7 @@ mod mock {
 
         pub async fn set_microphone_volume(
             &self,
-            _level: i64,
+            _: i64,
         ) -> Result<(), Traced<MicVolumeError>> {
             Ok(())
         }
@@ -240,13 +238,13 @@ mod mock {
         pub async fn microphone_volume_is_available(
             &self,
         ) -> Result<bool, Traced<HandleDetachedError>> {
-            Ok(false)
+            Ok(true)
         }
 
         pub async fn microphone_volume(
             &self,
         ) -> Result<i64, Traced<MicVolumeError>> {
-            Ok(0)
+            Ok(50)
         }
 
         pub fn on_device_change(

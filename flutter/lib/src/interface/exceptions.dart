@@ -63,6 +63,9 @@ abstract class InvalidOutputAudioDeviceIdException {
 
 /// Exception thrown when cannot interact with microphone volume.
 abstract class MicVolumeException {
+  /// Returns error that caused this [MicVolumeException].
+  dynamic cause();
+
   /// Returns stacktrace of this [MicVolumeException].
   String trace();
 }

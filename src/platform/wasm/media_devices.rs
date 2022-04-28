@@ -235,24 +235,11 @@ impl MediaDevices {
         }
     }
 
-    /// This method should be unreachable, because this functional is
-    /// implemented on the Dart side of Jason only.
-    ///
-    /// # Errors
-    ///
-    /// Never.
-    ///
-    /// # Panics
-    ///
-    /// Always.
+    /// Always returns `false` since accessing microphone is not implemented
+    /// on web.
     #[allow(clippy::unused_async)]
-    pub async fn microphone_volume_is_available(
-        &self,
-    ) -> Result<bool, Traced<Error>> {
-        unreachable!(
-            "`microphone_volume_is_available()` is implemented on the Dart\
-        side, so this method call is unreachable",
-        )
+    pub async fn microphone_volume_is_available(&self) -> bool {
+        false
     }
 
     /// This method should be unreachable, because this functional is
