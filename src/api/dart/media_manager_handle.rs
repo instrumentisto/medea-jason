@@ -9,9 +9,8 @@ use crate::{
         utils::{DartError, DartResult},
     },
     media::{
-        EnumerateDevicesError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
-        MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
+        EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     platform,
 };
@@ -94,7 +93,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
 pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
     this: ptr::NonNull<MediaManagerHandle>,
     level: i64,
-) -> DartFuture<Result<(), Traced<SetMicrophoneVolumeError>>> {
+) -> DartFuture<Result<(), Traced<MicVolumeError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
@@ -113,17 +112,12 @@ pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
     this: ptr::NonNull<MediaManagerHandle>,
-) -> DartFuture<Result<bool, Traced<MicrophoneVolumeIsAvailableError>>> {
+) -> DartFuture<Result<bool, Traced<HandleDetachedError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        // TODO(alexlapa): Cannot error, remove MicrophoneVolumeIsAvailableError.
-        async move {
-            this.microphone_volume_is_available()
-                .await
-                .map_err(tracerr::map_from_and_wrap!())
-        }
-        .into_dart_future()
+        async move { this.microphone_volume_is_available().await }
+            .into_dart_future()
     })
 }
 
@@ -131,7 +125,7 @@ pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
     this: ptr::NonNull<MediaManagerHandle>,
-) -> DartFuture<Result<i64, Traced<MicrophoneVolumeError>>> {
+) -> DartFuture<Result<i64, Traced<MicVolumeError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
@@ -196,8 +190,7 @@ mod mock {
         },
         media::{
             EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-            InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
-            MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
+            InvalidOutputAudioDeviceIdError, MicVolumeError,
         },
         platform,
     };
@@ -240,19 +233,19 @@ mod mock {
         pub async fn set_microphone_volume(
             &self,
             _level: i64,
-        ) -> Result<(), Traced<SetMicrophoneVolumeError>> {
+        ) -> Result<(), Traced<MicVolumeError>> {
             Ok(())
         }
 
         pub async fn microphone_volume_is_available(
             &self,
-        ) -> Result<bool, Traced<MicrophoneVolumeIsAvailableError>> {
+        ) -> Result<bool, Traced<HandleDetachedError>> {
             Ok(false)
         }
 
         pub async fn microphone_volume(
             &self,
-        ) -> Result<i64, Traced<MicrophoneVolumeError>> {
+        ) -> Result<i64, Traced<MicVolumeError>> {
             Ok(0)
         }
 

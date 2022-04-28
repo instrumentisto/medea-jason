@@ -14,8 +14,7 @@ use crate::{
             EnumerateDevicesException, FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,
             MediaSettingsUpdateException, MediaStateTransitionException,
-            MicrophoneVolumeException, MicrophoneVolumeIsAvailableException,
-            RpcClientException, SetMicrophoneVolumeException, StateError,
+            MicVolumeException, RpcClientException, StateError,
         },
     },
     platform,
@@ -114,19 +113,7 @@ mod exception {
 
         /// Returns a new Dart [`SetMicrophoneVolumeException`] with the
         /// provided `trace` property.
-        pub fn new_set_microphone_volume_exception(
-            trace: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
-
-        /// Returns a new Dart [`MicrophoneVolumeIsAvailableException`] with the
-        /// provided `trace` property.
-        pub fn new_microphone_volume_is_available_exception(
-            trace: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
-
-        /// Returns a new Dart [`MicrophoneVolumeException`] with the
-        /// provided `trace` property.
-        pub fn new_microphone_volume_exception(
+        pub fn new_mic_volume_exception(
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
@@ -255,32 +242,12 @@ impl From<InvalidOutputAudioDeviceIdException> for DartError {
     }
 }
 
-impl From<SetMicrophoneVolumeException> for DartError {
-    fn from(err: SetMicrophoneVolumeException) -> Self {
+impl From<MicVolumeException> for DartError {
+    fn from(err: MicVolumeException) -> Self {
         unsafe {
-            Self::new(exception::new_set_microphone_volume_exception(
-                string_into_c_str(err.trace()),
-            ))
-        }
-    }
-}
-
-impl From<MicrophoneVolumeIsAvailableException> for DartError {
-    fn from(err: MicrophoneVolumeIsAvailableException) -> Self {
-        unsafe {
-            Self::new(exception::new_microphone_volume_is_available_exception(
-                string_into_c_str(err.trace()),
-            ))
-        }
-    }
-}
-
-impl From<MicrophoneVolumeException> for DartError {
-    fn from(err: MicrophoneVolumeException) -> Self {
-        unsafe {
-            Self::new(exception::new_microphone_volume_exception(
-                string_into_c_str(err.trace()),
-            ))
+            Self::new(exception::new_mic_volume_exception(string_into_c_str(
+                err.trace(),
+            )))
         }
     }
 }

@@ -9,11 +9,7 @@ use tracerr::Traced;
 use web_sys::{Event, MediaDevices as SysMediaDevices};
 
 use crate::{
-    media::{
-        InvalidOutputAudioDeviceIdError, MediaSourceKind,
-        MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
-        SetMicrophoneVolumeError,
-    },
+    media::{InvalidOutputAudioDeviceIdError, MediaSourceKind, MicVolumeError},
     platform::{
         utils::EventListener, DisplayMediaStreamConstraints, Error,
         MediaDeviceInfo, MediaStreamConstraints, MediaStreamTrack,
@@ -252,7 +248,7 @@ impl MediaDevices {
     #[allow(clippy::unused_async)]
     pub async fn microphone_volume_is_available(
         &self,
-    ) -> Result<bool, Traced<MicrophoneVolumeIsAvailableError>> {
+    ) -> Result<bool, Traced<Error>> {
         unreachable!(
             "`microphone_volume_is_available()` is implemented on the Dart\
         side, so this method call is unreachable",
@@ -272,7 +268,7 @@ impl MediaDevices {
     #[allow(clippy::unused_async)]
     pub async fn microphone_volume(
         &self,
-    ) -> Result<i64, Traced<MicrophoneVolumeError>> {
+    ) -> Result<i64, Traced<MicVolumeError>> {
         unreachable!(
             "`microphone_volume()` is implemented on the Dart side,\
          so this method call is unreachable",
@@ -293,7 +289,7 @@ impl MediaDevices {
     pub async fn set_microphone_volume(
         &self,
         _: i64,
-    ) -> Result<(), Traced<SetMicrophoneVolumeError>> {
+    ) -> Result<(), Traced<MicVolumeError>> {
         unreachable!(
             "`set_microphone_volume()` is implemented on the Dart side,\
          so this method call is unreachable",

@@ -38,32 +38,13 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
       newInvalidOutputAudioDeviceIdException,
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      newSetMicrophoneVolumeException,
-  required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      newMicrophoneVolumeIsAvailableException,
-  required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
-      newMicrophoneVolumeException,
+      newMicVolumeException,
   required Pointer<NativeFunction<Handle Function()>> throwPanicException,
 }) {
   dl.lookupFunction<
-      Void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer),
+      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
+          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(
-          Pointer,
-          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -86,9 +67,7 @@ void registerFunction(
     newInternalException,
     newMediaSettingsUpdateException,
     newInvalidOutputAudioDeviceIdException,
-    newSetMicrophoneVolumeException,
-    newMicrophoneVolumeIsAvailableException,
-    newMicrophoneVolumeException,
+    newMicVolumeException,
     throwPanicException,
   );
 }
