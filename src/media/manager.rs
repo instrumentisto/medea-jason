@@ -240,7 +240,6 @@ impl InnerMediaManager {
                     .collect())
             }
             Some(MultiSourceTracksConstraints::Device(caps)) => {
-                println!("some device");
                 Ok(tracks_from_storage
                     .chain(
                         self.get_user_media(caps)
@@ -499,7 +498,6 @@ impl MediaManager {
         caps: I,
     ) -> Result<Vec<(Rc<local::Track>, bool)>, Traced<InitLocalTracksError>>
     {
-        println!("get tracks");
         self.0
             .get_tracks(caps.into())
             .await
@@ -562,7 +560,6 @@ impl MediaManagerHandle {
         &self,
         caps: MediaStreamSettings,
     ) -> Result<Vec<local::LocalMediaTrack>, Traced<InitLocalTracksError>> {
-        println!("init local tracks");
         let this = self
             .0
             .upgrade()

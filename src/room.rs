@@ -390,8 +390,6 @@ impl RoomHandle {
             ))
         })?;
 
-        println!("asdasd");
-
         inner
             .set_local_media_settings(settings, stop_first, rollback_on_fail)
             .await
@@ -432,7 +430,6 @@ impl RoomHandle {
 
         Box::pin(async move {
             let direction_send = matches!(direction, TrackDirection::Send);
-            println!("{new_state}");
             let enabling = matches!(
                 new_state,
                 MediaState::MediaExchange(
@@ -446,7 +443,6 @@ impl RoomHandle {
             // Hold tracks through all process, to ensure that they will be
             // reused without additional requests.
             let _tracks_handles;
-            println!("unmute cb {direction_send} {enabling}");
             if direction_send && enabling {
                 _tracks_handles = inner
                     .get_local_tracks(kind, source_kind)
@@ -542,7 +538,6 @@ impl RoomHandle {
     pub fn unmute_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
-        println!("unmute");
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Audio,
@@ -1330,9 +1325,6 @@ impl InnerRoom {
             .collect::<Result<Vec<_>, _>>()
             .map_err(tracerr::map_from_and_wrap!())?;
 
-        println!("before len");
-        println!("{}", requests.len());
-
         let mut result = Vec::new();
         for req in requests {
             let tracks = self
@@ -1444,8 +1436,6 @@ impl InnerRoom {
         rollback_on_fail: bool,
     ) -> Result<(), ConstraintsUpdateError> {
         use ConstraintsUpdateError as E;
-
-        println!("set local media setting");
 
         let current_settings = self.send_constraints.inner();
         self.send_constraints.constrain(new_settings);

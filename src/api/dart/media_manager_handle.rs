@@ -40,7 +40,6 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
     caps: ptr::NonNull<MediaStreamSettings>,
 ) -> DartFuture<Result<PtrArray<LocalMediaTrack>, Traced<InitLocalTracksError>>>
 {
-    println!("ffi");
     propagate_panic(move || {
         let this = this.as_ref().clone();
         let caps = caps.as_ref().clone();
