@@ -588,6 +588,10 @@ impl MediaManagerHandle {
     }
 
     /// Indicates if it is possible to set the microphone volume.
+    ///
+    /// # Errors
+    ///
+    /// If the underlying [`MediaManagerHandle`] is dropped.
     pub async fn microphone_volume_is_available(
         &self,
     ) -> Result<bool, Traced<HandleDetachedError>> {
