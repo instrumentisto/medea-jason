@@ -54,7 +54,7 @@ mod media_devices {
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
-        /// Indicates whether it is possible to access microphone volume
+        /// Indicates whether it's possible to access microphone volume
         /// settings.
         pub fn microphone_volume_is_available() -> Dart_Handle;
 
@@ -196,7 +196,7 @@ impl MediaDevices {
         .map_err(tracerr::wrap!())
     }
 
-    /// Indicates whether it is possible to access microphone volume settings.
+    /// Indicates whether it's possible to access microphone volume settings.
     pub async fn microphone_volume_is_available(&self) -> bool {
         let result = unsafe {
             FutureFromDart::execute::<i64>(
@@ -213,8 +213,8 @@ impl MediaDevices {
     ///
     /// # Errors
     ///
-    /// If it the Audio Device Module or initialized or there is no connected
-    /// audio input devices.
+    /// If it the "Audio Device Module" is not initialized or there is no
+    /// connected audio input devices.
     pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
         unsafe {
             FutureFromDart::execute::<i64>(media_devices::microphone_volume())
@@ -227,8 +227,8 @@ impl MediaDevices {
     ///
     /// # Errors
     ///
-    /// If it the Audio Device Module or initialized or there is no connected
-    /// audio input devices.
+    /// If it the "Audio Device Module" is not initialized or there is no
+    /// connected audio input devices.
     pub async fn set_microphone_volume(
         &self,
         level: i64,

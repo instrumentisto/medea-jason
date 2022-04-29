@@ -107,7 +107,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
     })
 }
 
-/// Indicates whether it is possible to access microphone volume settings.
+/// Indicates whether it's possible to access microphone volume settings.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
     this: ptr::NonNull<MediaManagerHandle>,

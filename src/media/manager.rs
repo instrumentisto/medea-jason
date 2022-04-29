@@ -68,11 +68,11 @@ pub struct InvalidOutputAudioDeviceIdError;
 #[cause(error = "platform::Error")]
 pub enum MicVolumeError {
     /// Error accessing microphone volume settings.
-    #[display(fmt = "Error accessing microphone volume settings {}", _0)]
+    #[display(fmt = "Error accessing microphone volume settings: {}", _0)]
     MicVolumeError(platform::Error),
 
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
-    #[display(fmt = "MediaManagerHandle is in detached state")]
+    #[display(fmt = "`MediaManagerHandle` is in detached state")]
     Detached,
 }
 
@@ -410,7 +410,7 @@ impl InnerMediaManager {
             .map_err(|_| tracerr::new!(InvalidOutputAudioDeviceIdError))
     }
 
-    /// Indicates whether it is possible to access microphone volume settings.
+    /// Indicates whether it's possible to access microphone volume settings.
     async fn microphone_volume_is_available(&self) -> bool {
         self.media_devices.microphone_volume_is_available().await
     }
@@ -579,7 +579,7 @@ impl MediaManagerHandle {
             .map_err(tracerr::map_from_and_wrap!())
     }
 
-    /// Indicates whether it is possible to access microphone volume settings.
+    /// Indicates whether it's possible to access microphone volume settings.
     ///
     /// # Errors
     ///

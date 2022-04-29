@@ -235,15 +235,15 @@ impl MediaDevices {
         }
     }
 
-    /// Always returns `false` since accessing microphone is not implemented
-    /// on web.
+    /// Always returns `false` since accessing microphone cannot be implemented
+    /// on web platform.
     #[allow(clippy::unused_async)]
     pub async fn microphone_volume_is_available(&self) -> bool {
         false
     }
 
-    /// This method should be unreachable, because this functional is
-    /// implemented on the Dart side of Jason only.
+    /// This method should be unreachable, because cannot be implemented on web
+    /// platform.
     ///
     /// # Errors
     ///
@@ -257,13 +257,12 @@ impl MediaDevices {
         &self,
     ) -> Result<i64, Traced<MicVolumeError>> {
         unreachable!(
-            "`microphone_volume()` is implemented on the Dart side,\
-         so this method call is unreachable",
+            "`microphone_volume()` cannot be implemented on web platform",
         )
     }
 
-    /// This method should be unreachable, because this functional is
-    /// implemented on the Dart side of Jason only.
+    /// This method should be unreachable, because cannot be implemented on web
+    /// platform.
     ///
     /// # Errors
     ///
@@ -278,8 +277,7 @@ impl MediaDevices {
         _: i64,
     ) -> Result<(), Traced<MicVolumeError>> {
         unreachable!(
-            "`set_microphone_volume()` is implemented on the Dart side,\
-         so this method call is unreachable",
+            "`set_microphone_volume()` cannot be implemented on web platform",
         )
     }
 }

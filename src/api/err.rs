@@ -237,7 +237,7 @@ impl MicVolumeException {
 #[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MicVolumeException {
-    /// Returns [`platform::Error`] causing this [`MicVolumeException`].
+    /// Returns the [`platform::Error`] causing this [`MicVolumeException`].
     #[must_use]
     pub fn cause(&self) -> platform::Error {
         self.cause.clone()
