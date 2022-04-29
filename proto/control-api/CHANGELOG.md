@@ -6,6 +6,26 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.7.0] · 2022-??-?? · To-be-done
+[0.7.0]: /../../tree/medea-control-api-proto-0.7.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.6.0...medea-control-api-proto-0.7.0)
+
+### Added
+
+- gRPC:
+    - `ControlApi` service:
+        - Methods:
+            - `Healthz` ([#51]).
+        - Messages:
+            - `Ping` ([#51]);
+            - `Pong` ([#51]).
+
+[#51]: /../../pull/51
+
+
+
+
 ## [0.6.0] · 2022-04-13
 [0.6.0]: /../../tree/medea-control-api-proto-0.6.0/proto/control-api
 
