@@ -350,6 +350,22 @@ pub struct WebRtcPlayEndpoint {
     #[prost(bool, tag="5")]
     pub force_relay: bool,
 }
+/// Ping message that Control is expected to send to Media Server periodically
+/// for probing its aliveness.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Ping {
+    /// On each Ping Control should increase it's value, starting with 0.
+    #[prost(uint32, tag="1")]
+    pub value: u32,
+}
+//// Pong message that Media Server answers with to Control in response to
+///  received `Ping`.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Pong {
+    //// Media Server answers with latest received Ping value.
+    #[prost(uint32, tag="1")]
+    pub value: u32,
+}
 /// Generated client implementations.
 pub mod control_api_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -497,6 +513,26 @@ pub mod control_api_client {
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
             self.inner.unary(request.into_request(), path, codec).await
         }
+        /// Checks Media Server aliveness.
+        pub async fn check_aliveness(
+            &mut self,
+            request: impl tonic::IntoRequest<super::Ping>,
+        ) -> Result<tonic::Response<super::Pong>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/api.ControlApi/CheckAliveness",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -537,6 +573,11 @@ pub mod control_api_server {
             &self,
             request: tonic::Request<super::ApplyRequest>,
         ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        /// Checks Media Server aliveness.
+        async fn check_aliveness(
+            &self,
+            request: tonic::Request<super::Ping>,
+        ) -> Result<tonic::Response<super::Pong>, tonic::Status>;
     }
     /// Media server's Control API service.
     #[derive(Debug)]
@@ -719,6 +760,44 @@ pub mod control_api_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ApplySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/api.ControlApi/CheckAliveness" => {
+                    #[allow(non_camel_case_types)]
+                    struct CheckAlivenessSvc<T: ControlApi>(pub Arc<T>);
+                    impl<T: ControlApi> tonic::server::UnaryService<super::Ping>
+                    for CheckAlivenessSvc<T> {
+                        type Response = super::Pong;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::Ping>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).check_aliveness(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CheckAlivenessSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

@@ -65,6 +65,8 @@ All user visible changes to this project will be documented in this file. This p
         - `disable_remote_video`;
         - `enable_remote_audio`;
         - `disable_remote_audio`.
+- Transport and messaging:
+    - Ability for a `Control` to probe `Medea` aliveness via `CheckAliveness` handle ([#51]).
 
 ### Updated
 
@@ -76,6 +78,7 @@ All user visible changes to this project will be documented in this file. This p
 [#29]: /../../pull/29
 [#30]: /../../pull/30
 [#43]: /../../pull/43
+[#51]: /../../pull/51
 
 
 
