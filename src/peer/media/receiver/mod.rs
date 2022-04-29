@@ -5,11 +5,14 @@ mod component;
 use std::cell::{Cell, RefCell};
 
 use futures::channel::mpsc;
-use medea_client_api_proto::{self as proto, MediaType, MemberId};
+use medea_client_api_proto as proto;
 use proto::TrackId;
 
 use crate::{
-    media::{track::remote, MediaKind, RecvConstraints, TrackConstraints},
+    media::{
+        track::remote, MediaDirection, MediaKind, RecvConstraints,
+        TrackConstraints,
+    },
     peer::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,
@@ -36,7 +39,7 @@ pub struct Receiver {
     caps: TrackConstraints,
 
     /// ID of the member sending this [`remote::Track`].
-    sender_id: MemberId,
+    sender_id: proto::MemberId,
 
     /// [`Transceiver`] associated with this [`remote::Track`].
     ///
@@ -61,6 +64,9 @@ pub struct Receiver {
 
     /// Indicator whether this [`remote::Track`] is enabled individually.
     enabled_individual: Cell<bool>,
+
+    /// Current general [`MediaDirection`] of this [`Receiver`].
+    media_direction: Cell<MediaDirection>,
 
     /// Indicator whether this [`remote::Track`] is muted.
     muted: Cell<bool>,
@@ -144,12 +150,13 @@ impl Receiver {
             enabled_general: Cell::new(state.enabled_individual()),
             enabled_individual: Cell::new(state.enabled_general()),
             muted: Cell::new(state.muted()),
+            media_direction: Cell::new(state.media_direction()),
             track_events_sender,
         };
 
         let enabled_in_cons = match &state.media_type() {
-            MediaType::Audio(_) => recv_constraints.is_audio_enabled(),
-            MediaType::Video(_) => recv_constraints.is_video_enabled(),
+            proto::MediaType::Audio(_) => recv_constraints.is_audio_enabled(),
+            proto::MediaType::Video(_) => recv_constraints.is_video_enabled(),
         };
         if !enabled_in_cons {
             state
@@ -230,8 +237,8 @@ impl Receiver {
         let new_track = remote::Track::new(
             new_track,
             self.caps.media_source_kind(),
-            self.enabled_individual.get(),
             self.muted.get(),
+            self.media_direction.get(),
         );
 
         if self.enabled_individual.get() {
@@ -249,6 +256,14 @@ impl Receiver {
             prev_track.stop();
         };
         self.maybe_notify_track().await;
+    }
+
+    /// Updates [`MediaDirection`] of this [`Receiver`].
+    pub fn set_media_direction(&self, direction: MediaDirection) {
+        self.media_direction.set(direction);
+        if let Some(track) = self.track.borrow().as_ref().cloned() {
+            track.set_media_direction(direction);
+        }
     }
 
     /// Replaces [`Receiver`]'s [`platform::Transceiver`] with the provided
@@ -296,10 +311,16 @@ impl Receiver {
 
 #[cfg(feature = "mockable")]
 impl Receiver {
-    /// Returns current `enabled_general` status of the [`Receiver`].
+    /// Returns the current `enabled_general` status of this [`Receiver`].
     #[must_use]
     pub fn enabled_general(&self) -> bool {
         self.enabled_general.get()
+    }
+
+    /// Returns the current `media_direction` status of this [`Receiver`].
+    #[must_use]
+    pub fn direction(&self) -> MediaDirection {
+        self.media_direction.get()
     }
 }
 

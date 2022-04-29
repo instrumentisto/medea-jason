@@ -3,7 +3,7 @@ use std::ptr;
 use dart_sys::Dart_Handle;
 
 use crate::{
-    media::{MediaKind, MediaSourceKind},
+    media::{MediaDirection, MediaKind, MediaSourceKind},
     platform,
 };
 
@@ -25,28 +25,6 @@ pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     this: ptr::NonNull<RemoteMediaTrack>,
 ) -> Dart_Handle {
     propagate_panic(move || this.as_ref().get_track().handle())
-}
-
-/// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
-#[no_mangle]
-pub unsafe extern "C" fn RemoteMediaTrack__on_enabled(
-    this: ptr::NonNull<RemoteMediaTrack>,
-    f: Dart_Handle,
-) {
-    propagate_panic(move || {
-        this.as_ref().on_enabled(platform::Function::new(f));
-    });
-}
-
-/// Sets callback, invoked when this [`RemoteMediaTrack`] is disabled.
-#[no_mangle]
-pub unsafe extern "C" fn RemoteMediaTrack__on_disabled(
-    this: ptr::NonNull<RemoteMediaTrack>,
-    f: Dart_Handle,
-) {
-    propagate_panic(move || {
-        this.as_ref().on_disabled(platform::Function::new(f));
-    });
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
@@ -82,12 +60,17 @@ pub unsafe extern "C" fn RemoteMediaTrack__on_stopped(
     });
 }
 
-/// Indicates whether this [`RemoteMediaTrack`] is enabled.
+/// Sets callback to invoke whenever this [`RemoteMediaTrack`]'s general
+/// [`MediaDirection`] is changed.
 #[no_mangle]
-pub unsafe extern "C" fn RemoteMediaTrack__enabled(
+pub unsafe extern "C" fn RemoteMediaTrack__on_media_direction_changed(
     this: ptr::NonNull<RemoteMediaTrack>,
-) -> u8 {
-    propagate_panic(move || this.as_ref().enabled().into())
+    f: Dart_Handle,
+) {
+    propagate_panic(move || {
+        this.as_ref()
+            .on_media_direction_changed(platform::Function::new(f));
+    });
 }
 
 /// Indicate whether this [`RemoteMediaTrack`] is muted.
@@ -114,6 +97,14 @@ pub unsafe extern "C" fn RemoteMediaTrack__media_source_kind(
     propagate_panic(move || this.as_ref().media_source_kind())
 }
 
+/// Returns the current general [`MediaDirection`] of this [`RemoteMediaTrack`].
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__media_direction(
+    this: ptr::NonNull<RemoteMediaTrack>,
+) -> MediaDirection {
+    propagate_panic(move || this.as_ref().media_direction())
+}
+
 /// Frees the data behind the provided pointer.
 ///
 /// # Safety
@@ -138,9 +129,10 @@ mod mock {
     )]
 
     use crate::{
+        api,
         media::{
-            track::remote::Track as CoreRemoteMediaTrack, MediaKind,
-            MediaSourceKind,
+            track::remote::Track as CoreRemoteMediaTrack, MediaDirection,
+            MediaKind, MediaSourceKind,
         },
         platform,
     };
@@ -193,6 +185,19 @@ mod mock {
 
         pub fn on_stopped(&self, cb: platform::Function<()>) {
             cb.call0();
+        }
+
+        #[allow(unused_qualifications)]
+        pub fn on_media_direction_changed(
+            &self,
+            cb: platform::Function<api::MediaDirection>,
+        ) {
+            cb.call1(api::MediaDirection::SendRecv);
+        }
+
+        #[must_use]
+        pub fn media_direction(&self) -> MediaDirection {
+            MediaDirection::SendRecv
         }
 
         #[must_use]

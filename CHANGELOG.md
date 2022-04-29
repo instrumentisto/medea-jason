@@ -44,6 +44,9 @@ All user visible changes to this project will be documented in this file. This p
                 - `InternalException`;
                 - `LocalMediaInitException`.
     - Renamed `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
+    - `RemoteMediaTrack`:
+        - Replaced `on_enabled` and `on_disabled` callbacks with `on_media_direction_changed` callback ([#46]);
+        - Replaced `enabled` method with `media_direction` method ([#46]).
 
 ### Added
 
@@ -65,6 +68,7 @@ All user visible changes to this project will be documented in this file. This p
         - `disable_remote_video`;
         - `enable_remote_audio`;
         - `disable_remote_audio`.
+    - `MediaDirection` type ([#46]).
 - Transport and messaging:
     - Ability for a `Control` to probe `Medea` aliveness via `CheckAliveness` handle ([#51]).
 
@@ -78,6 +82,7 @@ All user visible changes to this project will be documented in this file. This p
 [#29]: /../../pull/29
 [#30]: /../../pull/30
 [#43]: /../../pull/43
+[#46]: /../../pull/46
 [#51]: /../../pull/51
 
 

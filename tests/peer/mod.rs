@@ -15,9 +15,9 @@ use medea_client_api_proto::{
         RtcInboundRtpStreamMediaType, RtcOutboundRtpStreamMediaType, RtcStat,
         RtcStatsType, StatId, TrackStats, TrackStatsKind,
     },
-    AudioSettings, Direction, IceConnectionState, MediaSourceKind, MediaType,
-    MemberId, NegotiationRole, PeerId, Track, TrackId, TrackPatchEvent,
-    VideoSettings,
+    AudioSettings, Direction, IceConnectionState, MediaDirection,
+    MediaSourceKind, MediaType, MemberId, NegotiationRole, PeerId, Track,
+    TrackId, TrackPatchEvent, VideoSettings,
 };
 use medea_jason::{
     connection::Connections,
@@ -39,10 +39,14 @@ use crate::{
 wasm_bindgen_test_configure!(run_in_browser);
 
 fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
+    let media_direction = if enabled {
+        MediaDirection::SendRecv
+    } else {
+        MediaDirection::RecvOnly
+    };
     TrackPatchEvent {
         id,
-        enabled_individual: Some(enabled),
-        enabled_general: Some(enabled),
+        media_direction: Some(media_direction),
         muted: None,
     }
 }
@@ -1465,8 +1469,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: audio_track_id,
-        enabled_general: Some(false),
-        enabled_individual: Some(false),
+        media_direction: Some(MediaDirection::RecvOnly),
         muted: None,
     });
     pc.state().when_updated().await;
@@ -1478,8 +1481,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: video_track_id,
-        enabled_general: Some(false),
-        enabled_individual: Some(false),
+        media_direction: Some(MediaDirection::RecvOnly),
         muted: None,
     });
     pc.state().when_updated().await;
@@ -1491,8 +1493,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: audio_track_id,
-        enabled_individual: Some(true),
-        enabled_general: Some(true),
+        media_direction: Some(MediaDirection::SendRecv),
         muted: None,
     });
     pc.state().when_updated().await;
@@ -1504,8 +1505,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: video_track_id,
-        enabled_individual: Some(true),
-        enabled_general: Some(true),
+        media_direction: Some(MediaDirection::SendRecv),
         muted: None,
     });
     pc.state().when_updated().await;

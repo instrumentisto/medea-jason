@@ -11,12 +11,17 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Cargo features: ([rev])
+- Cargo features: ([#16])
     - Renamed `jason` to `client`.
     - Renamed `medea` to `server`.
     - Made only `client` enabled by default.
-- Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([rev]).
+- Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([#16]).
 - Made `RtcOutboundRtpStreamStats::bytes_sent` and `RtcOutboundRtpStreamStats::packets_sent` optional ([#26]).
+- Replaced `enabled_individual` and `enabled_individual` fields with `MediaDirection` in `TrackPatchEvent`, `state::Receiver` and `state::Sender` ([#46]).
+
+### Added
+
+- `MediaDirection` type ([#46]).
 
 ### Updated
 
@@ -24,6 +29,7 @@ All user visible changes to this project will be documented in this file. This p
 
 [#16]: /../../pull/16
 [#26]: /../../pull/26
+[#46]: /../../pull/46
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 

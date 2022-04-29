@@ -15,9 +15,9 @@ use futures::{
 };
 use medea_client_api_proto::{
     self as proto, Command, Direction, Event, IceConnectionState,
-    MediaSourceKind, MediaType, MemberId, NegotiationRole, PeerId, PeerMetrics,
-    PeerUpdate, Track, TrackId, TrackPatchCommand, TrackPatchEvent,
-    VideoSettings,
+    MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
+    PeerId, PeerMetrics, PeerUpdate, Track, TrackId, TrackPatchCommand,
+    TrackPatchEvent, VideoSettings,
 };
 use medea_jason::{
     api::{
@@ -336,8 +336,8 @@ mod disable_recv_tracks {
 /// Tests disabling tracks publishing.
 mod disable_send_tracks {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaType, MemberId, TrackPatchCommand,
-        VideoSettings,
+        AudioSettings, Direction, MediaDirection, MediaType, MemberId,
+        TrackPatchCommand, VideoSettings,
     };
     use medea_jason::{
         media::MediaKind,
@@ -768,8 +768,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
-                    enabled_individual: Some(false),
-                    enabled_general: Some(false),
+                    media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
                 negotiation_role: None,
@@ -848,8 +847,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
-                    enabled_individual: None,
-                    enabled_general: None,
+                    media_direction: None,
                     muted: Some(true),
                 })],
                 negotiation_role: None,
@@ -931,8 +929,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(2),
-                    enabled_individual: Some(false),
-                    enabled_general: Some(false),
+                    media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
                 negotiation_role: None,
@@ -1161,8 +1158,8 @@ mod rpc_close_reason_on_room_drop {
 /// Tests for [`TrackPatch`] generation in [`Room`].
 mod patches_generation {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaType, Track, TrackId, TrackPatchCommand,
-        VideoSettings,
+        AudioSettings, Direction, MediaDirection, MediaType, Track, TrackId,
+        TrackPatchCommand, VideoSettings,
     };
     use medea_jason::peer::{media_exchange_state, mute_state, MediaState};
     use wasm_bindgen_futures::spawn_local;
@@ -1249,18 +1246,23 @@ mod patches_generation {
 
             if let Some(audio_track_id) = audio_track_id {
                 let state = (audio_track_media_state_fn)(i);
+                let media_direction = if matches!(
+                    state,
+                    MediaState::MediaExchange(
+                        media_exchange_state::Stable::Enabled
+                    )
+                ) {
+                    MediaDirection::SendRecv
+                } else {
+                    MediaDirection::RecvOnly
+                };
+
                 event_tx
                     .unbounded_send(Event::PeerUpdated {
                         peer_id: PeerId(i + 1),
                         updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                             id: audio_track_id,
-                            enabled_individual: Some(matches!(
-                                state,
-                                MediaState::MediaExchange(
-                                    media_exchange_state::Stable::Enabled
-                                )
-                            )),
-                            enabled_general: None,
+                            media_direction: Some(media_direction),
                             muted: Some(matches!(
                                 state,
                                 MediaState::Mute(mute_state::Stable::Muted)
@@ -1713,8 +1715,7 @@ async fn disable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(false),
-                enabled_individual: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -1744,8 +1745,7 @@ async fn enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(false),
-                enabled_individual: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -1763,8 +1763,7 @@ async fn enable_by_server() {
             )),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(true),
-                enabled_individual: Some(true),
+                media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
             })],
         })
@@ -1799,8 +1798,7 @@ async fn only_one_gum_performed_on_enable() {
             negotiation_role: Some(NegotiationRole::Offerer),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(false),
-                enabled_individual: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -1818,8 +1816,7 @@ async fn only_one_gum_performed_on_enable() {
             negotiation_role: Some(NegotiationRole::Offerer),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(false),
-                enabled_individual: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -1935,8 +1932,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(false),
-                enabled_individual: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -1953,8 +1949,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
-                enabled_general: Some(false),
-                enabled_individual: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -2014,8 +2009,7 @@ async fn send_enabling_holds_local_tracks() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: video_track_id,
-                enabled_individual: Some(false),
-                enabled_general: Some(false),
+                media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
         })
@@ -2570,8 +2564,8 @@ mod state_synchronization {
 
     use futures::{channel::mpsc, stream, StreamExt as _};
     use medea_client_api_proto::{
-        state, AudioSettings, Command, Event, MediaType, NegotiationRole,
-        PeerId, TrackId,
+        state, AudioSettings, Command, Event, MediaDirection, MediaType,
+        NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
         media::MediaManager, room::Room, rpc::MockRpcSession,
@@ -2611,8 +2605,7 @@ mod state_synchronization {
             state::Sender {
                 id: TrackId(0),
                 muted: false,
-                enabled_individual: true,
-                enabled_general: true,
+                media_direction: MediaDirection::SendRecv,
                 receivers: Vec::new(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
@@ -2624,8 +2617,7 @@ mod state_synchronization {
             state::Receiver {
                 id: TrackId(1),
                 muted: false,
-                enabled_individual: true,
-                enabled_general: true,
+                media_direction: MediaDirection::SendRecv,
                 sender_id: "".into(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,

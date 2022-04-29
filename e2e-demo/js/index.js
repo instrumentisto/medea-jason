@@ -617,6 +617,9 @@ window.onload = async function() {
 
       connection.on_remote_track_added((track) => {
         let playElement = undefined;
+        track.on_media_direction_changed((direction) => {
+          console.log('New TransceiverDirection: ' + direction);
+        });
         if (track.kind() === rust.MediaKind.Video) {
           if (track.media_source_kind() === rust.MediaSourceKind.Display) {
             playElement = memberVideoDiv.getElementsByClassName('display-video')[0];

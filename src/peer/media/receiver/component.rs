@@ -14,7 +14,7 @@ use medea_reactive::{
 };
 
 use crate::{
-    media::{LocalTracksConstraints, MediaKind},
+    media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{
         component::SyncState,
         media::{transitable_state::media_exchange_state, InTransition},
@@ -67,6 +67,9 @@ pub struct State {
     /// [`remote::Track`]: crate::media::track::remote::Track
     enabled_general: ProgressableCell<media_exchange_state::Stable>,
 
+    /// Current general [`MediaDirection`] of this [`Receiver`].
+    media_direction: ObservableCell<MediaDirection>,
+
     /// Indicator whether the [`Receiver`]'s [`remote::Track`] is muted.
     ///
     /// [`remote::Track`]: crate::media::track::remote::Track
@@ -85,9 +88,8 @@ impl AsProtoState for State {
             mid: self.mid.clone(),
             media_type: self.media_type,
             sender_id: self.sender_id.clone(),
-            enabled_individual: self.enabled_individual(),
-            enabled_general: self.enabled_general(),
             muted: false,
+            media_direction: self.media_direction().into(),
         }
     }
 }
@@ -102,19 +104,25 @@ impl SynchronizableState for State {
             media_type: input.media_type,
             sender_id: input.sender_id,
             enabled_individual: MediaExchangeStateController::new(
-                input.enabled_individual.into(),
+                media_exchange_state::Stable::from(
+                    input.media_direction.is_recv_enabled(),
+                ),
             ),
             enabled_general: ProgressableCell::new(
-                input.enabled_general.into(),
+                media_exchange_state::Stable::from(
+                    input.media_direction.is_enabled_general(),
+                ),
             ),
             muted: ObservableCell::new(input.muted),
+            media_direction: ObservableCell::new(input.media_direction.into()),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
 
     fn apply(&self, input: Self::Input, _: &LocalTracksConstraints) {
-        let new_media_exchange_state =
-            media_exchange_state::Stable::from(input.enabled_individual);
+        let new_media_exchange_state = media_exchange_state::Stable::from(
+            input.media_direction.is_recv_enabled(),
+        );
         let current_media_exchange_state = match self.enabled_individual.state()
         {
             MediaExchangeState::Transition(transition) => {
@@ -126,9 +134,10 @@ impl SynchronizableState for State {
             self.enabled_individual.update(new_media_exchange_state);
         }
 
-        let new_general_media_exchange_state =
-            media_exchange_state::Stable::from(input.enabled_general);
-        self.enabled_general.set(new_general_media_exchange_state);
+        self.enabled_general.set(media_exchange_state::Stable::from(
+            input.media_direction.is_enabled_general(),
+        ));
+        self.media_direction.set(input.media_direction.into());
 
         self.sync_state.set(SyncState::Synced);
     }
@@ -181,8 +190,7 @@ impl From<&State> for proto::state::Receiver {
             mid: from.mid.clone(),
             media_type: from.media_type,
             sender_id: from.sender_id.clone(),
-            enabled_individual: from.enabled_individual(),
-            enabled_general: from.enabled_general(),
+            media_direction: from.media_direction().into(),
             muted: false,
         }
     }
@@ -210,6 +218,7 @@ impl State {
             ),
             muted: ObservableCell::new(false),
             sync_state: ObservableCell::new(SyncState::Synced),
+            media_direction: ObservableCell::new(MediaDirection::SendRecv),
         }
     }
 
@@ -256,19 +265,29 @@ impl State {
         self.muted.get()
     }
 
+    /// Returns the current general [`MediaDirection`] of this [`State`].
+    #[must_use]
+    pub fn media_direction(&self) -> MediaDirection {
+        self.media_direction.get()
+    }
+
     /// Updates this [`State`] with the provided [`TrackPatchEvent`].
     pub fn update(&self, track_patch: &TrackPatchEvent) {
         if self.id != track_patch.id {
             return;
         }
-        if let Some(enabled_general) = track_patch.enabled_general {
-            self.enabled_general.set(enabled_general.into());
-        }
-        if let Some(enabled_individual) = track_patch.enabled_individual {
-            self.enabled_individual.update(enabled_individual.into());
+        if let Some(direction) = track_patch.media_direction {
+            self.enabled_general
+                .set(direction.is_enabled_general().into());
+
+            self.enabled_individual
+                .update(direction.is_recv_enabled().into());
         }
         if let Some(muted) = track_patch.muted {
             self.muted.set(muted);
+        }
+        if let Some(direction) = track_patch.media_direction {
+            self.media_direction.set(direction.into());
         }
     }
 }
@@ -294,9 +313,6 @@ impl Component {
             .set(state == media_exchange_state::Stable::Enabled);
         match state {
             media_exchange_state::Stable::Disabled => {
-                if let Some(track) = receiver.track.borrow().as_ref() {
-                    track.set_enabled(false);
-                }
                 let sub_direction = {
                     receiver.transceiver.borrow().as_ref().map(|trnscvr| {
                         trnscvr
@@ -308,9 +324,6 @@ impl Component {
                 }
             }
             media_exchange_state::Stable::Enabled => {
-                if let Some(track) = receiver.track.borrow().as_ref() {
-                    track.set_enabled(true);
-                }
                 let add_direction =
                     receiver.transceiver.borrow().as_ref().map(|trnscvr| {
                         trnscvr
@@ -401,6 +414,18 @@ impl Component {
             }
             SyncState::Syncing => (),
         }
+        Ok(())
+    }
+
+    /// Updates [`MediaDirection`] of the provided [`Receiver`].
+    #[watch(self.media_direction.subscribe())]
+    async fn direction_watcher(
+        receiver: Rc<Receiver>,
+        _: Rc<State>,
+        direction: MediaDirection,
+    ) -> Result<(), Infallible> {
+        receiver.set_media_direction(direction);
+
         Ok(())
     }
 }
