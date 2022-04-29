@@ -222,7 +222,7 @@ pub struct MicVolumeException {
     /// [`platform::Error`] causing this [`MicVolumeException`].
     cause: platform::Error,
 
-    /// Stacktrace of this [`EnumerateDevicesException`].
+    /// Stacktrace of this [`MicVolumeException`].
     trace: Trace,
 }
 
