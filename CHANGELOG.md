@@ -73,8 +73,6 @@ All user visible changes to this project will be documented in this file. This p
         - `microphone_volume_is_available`;
         - `microphone_volume`;
         - `set_microphone_volume`.
-- Transport and messaging:
-    - Ability for a `Control` to probe `Medea` aliveness via `CheckAliveness` handle ([#51]).
 
 ### Updated
 
@@ -88,7 +86,6 @@ All user visible changes to this project will be documented in this file. This p
 [#43]: /../../pull/43
 [#46]: /../../pull/46
 [#49]: /../../pull/49
-[#51]: /../../pull/51
 
 
 

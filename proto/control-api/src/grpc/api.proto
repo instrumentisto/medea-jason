@@ -31,8 +31,8 @@ service ControlApi {
   // specified in the provided spec will be removed.
   rpc Apply(ApplyRequest) returns (CreateResponse);
 
-  // Checks Media Server aliveness.
-  rpc CheckAliveness (Ping) returns (Pong);
+  // Checks media server healthiness.
+  rpc Healthz (Ping) returns (Pong);
 }
 
 // Request of creating new Element with in element with a given FID (full ID).
@@ -278,16 +278,15 @@ message WebRtcPlayEndpoint {
   bool force_relay = 5;
 }
 
-// Ping message that Control is expected to send to Media Server periodically
-// for probing its aliveness.
+// Ping message received by media server periodically for probing its
+// healthiness.
 message Ping {
-  // On each Ping Control should increase it's value, starting with 0.
-  uint32 value = 1;
+  // Each ping should increase its nonce, starting with 0.
+  uint32 nonce = 1;
 }
 
-/// Pong message that Media Server answers with to Control in response to
-//  received `Ping`.
+// Pong message send by media server in response to received Ping message.
 message Pong {
-  /// Media Server answers with latest received Ping value.
-  uint32 value = 1;
+  /// Nonce of the received Ping message.
+  uint32 nonce = 1;
 }

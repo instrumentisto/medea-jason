@@ -350,21 +350,20 @@ pub struct WebRtcPlayEndpoint {
     #[prost(bool, tag="5")]
     pub force_relay: bool,
 }
-/// Ping message that Control is expected to send to Media Server periodically
-/// for probing its aliveness.
+/// Ping message received by media server periodically for probing its
+/// healthiness.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Ping {
-    /// On each Ping Control should increase it's value, starting with 0.
+    /// Each ping should increase its nonce, starting with 0.
     #[prost(uint32, tag="1")]
-    pub value: u32,
+    pub nonce: u32,
 }
-//// Pong message that Media Server answers with to Control in response to
-///  received `Ping`.
+/// Pong message send by media server in response to received Ping message.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Pong {
-    //// Media Server answers with latest received Ping value.
+    //// Nonce of the received Ping message.
     #[prost(uint32, tag="1")]
-    pub value: u32,
+    pub nonce: u32,
 }
 /// Generated client implementations.
 pub mod control_api_client {
@@ -390,7 +389,7 @@ pub mod control_api_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
@@ -403,6 +402,7 @@ pub mod control_api_client {
         ) -> ControlApiClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -513,8 +513,8 @@ pub mod control_api_client {
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// Checks Media Server aliveness.
-        pub async fn check_aliveness(
+        /// Checks media server healthiness.
+        pub async fn healthz(
             &mut self,
             request: impl tonic::IntoRequest<super::Ping>,
         ) -> Result<tonic::Response<super::Pong>, tonic::Status> {
@@ -528,9 +528,7 @@ pub mod control_api_client {
                     )
                 })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/api.ControlApi/CheckAliveness",
-            );
+            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
@@ -573,8 +571,8 @@ pub mod control_api_server {
             &self,
             request: tonic::Request<super::ApplyRequest>,
         ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
-        /// Checks Media Server aliveness.
-        async fn check_aliveness(
+        /// Checks media server healthiness.
+        async fn healthz(
             &self,
             request: tonic::Request<super::Ping>,
         ) -> Result<tonic::Response<super::Pong>, tonic::Status>;
@@ -771,11 +769,11 @@ pub mod control_api_server {
                     };
                     Box::pin(fut)
                 }
-                "/api.ControlApi/CheckAliveness" => {
+                "/api.ControlApi/Healthz" => {
                     #[allow(non_camel_case_types)]
-                    struct CheckAlivenessSvc<T: ControlApi>(pub Arc<T>);
+                    struct HealthzSvc<T: ControlApi>(pub Arc<T>);
                     impl<T: ControlApi> tonic::server::UnaryService<super::Ping>
-                    for CheckAlivenessSvc<T> {
+                    for HealthzSvc<T> {
                         type Response = super::Pong;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -786,9 +784,7 @@ pub mod control_api_server {
                             request: tonic::Request<super::Ping>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).check_aliveness(request).await
-                            };
+                            let fut = async move { (*inner).healthz(request).await };
                             Box::pin(fut)
                         }
                     }
@@ -797,7 +793,7 @@ pub mod control_api_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = CheckAlivenessSvc(inner);
+                        let method = HealthzSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
