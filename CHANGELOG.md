@@ -61,7 +61,7 @@ All user visible changes to this project will be documented in this file. This p
         - `FormatException`;
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
-    - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]);
+    - `MediaManagerHandle.set_output_audio_id()` method switching output audio device on Dart platform ([#29]);
     - `MediaManagerHandle.on_device_change()` callback firing whenever `MediaManagerHandle.enumerate_devices()` list changes ([#30]);
     - `ConnectionHandle` methods ([#43]):
         - `enable_remote_video`;
@@ -69,6 +69,10 @@ All user visible changes to this project will be documented in this file. This p
         - `enable_remote_audio`;
         - `disable_remote_audio`.
     - `MediaDirection` type ([#46]).
+    - `MediaManagerHandle` methods for microphone volume on Dart platform ([#49]):
+        - `microphone_volume_is_available`;
+        - `microphone_volume`;
+        - `set_microphone_volume`.
 - Transport and messaging:
     - Ability for a `Control` to probe `Medea` aliveness via `CheckAliveness` handle ([#51]).
 
@@ -83,6 +87,7 @@ All user visible changes to this project will be documented in this file. This p
 [#30]: /../../pull/30
 [#43]: /../../pull/43
 [#46]: /../../pull/46
+[#49]: /../../pull/49
 [#51]: /../../pull/51
 
 

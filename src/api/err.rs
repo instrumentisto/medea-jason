@@ -15,7 +15,7 @@ use crate::{
     connection,
     media::{
         self, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -209,6 +209,41 @@ impl InvalidOutputAudioDeviceIdException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl InvalidOutputAudioDeviceIdException {
     /// Returns stacktrace of this [`InvalidOutputAudioDeviceIdException`].
+    #[must_use]
+    pub fn trace(&self) -> String {
+        self.trace.to_string()
+    }
+}
+
+/// Exception thrown when cannot interact with microphone volume.
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+#[derive(Debug)]
+pub struct MicVolumeException {
+    /// [`platform::Error`] causing this [`MicVolumeException`].
+    cause: platform::Error,
+
+    /// Stacktrace of this [`MicVolumeException`].
+    trace: Trace,
+}
+
+impl MicVolumeException {
+    /// Creates a new [`MicVolumeException`] from the provided error [`Trace`].
+    #[must_use]
+    pub fn new(cause: platform::Error, trace: Trace) -> Self {
+        Self { cause, trace }
+    }
+}
+
+#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
+#[cfg_attr(target_family = "wasm", wasm_bindgen)]
+impl MicVolumeException {
+    /// Returns the [`platform::Error`] causing this [`MicVolumeException`].
+    #[must_use]
+    pub fn cause(&self) -> platform::Error {
+        self.cause.clone()
+    }
+
+    /// Returns stacktrace of this [`MicVolumeException`].
     #[must_use]
     pub fn trace(&self) -> String {
         self.trace.to_string()
@@ -550,6 +585,20 @@ impl From<Traced<InvalidOutputAudioDeviceIdError>> for Error {
     fn from(err: Traced<InvalidOutputAudioDeviceIdError>) -> Self {
         let (_, trace) = err.split();
         InvalidOutputAudioDeviceIdException::new(trace).into()
+    }
+}
+
+impl From<Traced<MicVolumeError>> for Error {
+    fn from(err: Traced<MicVolumeError>) -> Self {
+        let (err, stacktrace) = err.split();
+        match err {
+            MicVolumeError::MicVolumeError(err) => {
+                MicVolumeException::new(err, stacktrace).into()
+            }
+            MicVolumeError::Detached => {
+                StateError::new(err.to_string(), stacktrace).into()
+            }
+        }
     }
 }
 

@@ -37,6 +37,15 @@ abstract class MediaManagerHandle implements PlatformHandle {
   /// Switches output audio device to the device with the provided [deviceId].
   Future<void> setOutputAudioId(String deviceId);
 
+  /// Indicates whether it's possible to access microphone volume settings.
+  Future<bool> microphoneVolumeIsAvailable();
+
+  /// Sets the microphone volume level in percents.
+  Future<void> setMicrophoneVolume(int level);
+
+  /// Returns the current microphone volume level in percents.
+  Future<int> microphoneVolume();
+
   /// Subscribes onto the [MediaManagerHandle]'s `devicechange` event.
   void onDeviceChange(void Function() cb);
 }

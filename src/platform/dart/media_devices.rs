@@ -54,6 +54,16 @@ mod media_devices {
             device_id: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
+        /// Indicates whether it's possible to access microphone volume
+        /// settings.
+        pub fn microphone_volume_is_available() -> Dart_Handle;
+
+        /// Returns the current microphone volume level in percents.
+        pub fn microphone_volume() -> Dart_Handle;
+
+        /// Sets the microphone volume level in percents.
+        pub fn set_microphone_volume(level: i64) -> Dart_Handle;
+
         /// Subscribes onto the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
     }
@@ -180,6 +190,52 @@ impl MediaDevices {
         unsafe {
             FutureFromDart::execute::<()>(media_devices::set_output_audio_id(
                 string_into_c_str(device_id),
+            ))
+            .await
+        }
+        .map_err(tracerr::wrap!())
+    }
+
+    /// Indicates whether it's possible to access microphone volume settings.
+    pub async fn microphone_volume_is_available(&self) -> bool {
+        let result = unsafe {
+            FutureFromDart::execute::<i64>(
+                media_devices::microphone_volume_is_available(),
+            )
+            .await
+        }
+        .unwrap();
+
+        result == 1
+    }
+
+    /// Returns the current microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// If it the "Audio Device Module" is not initialized or there is no
+    /// connected audio input devices.
+    pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
+        unsafe {
+            FutureFromDart::execute::<i64>(media_devices::microphone_volume())
+                .await
+        }
+        .map_err(tracerr::wrap!())
+    }
+
+    /// Sets the microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// If it the "Audio Device Module" is not initialized or there is no
+    /// connected audio input devices.
+    pub async fn set_microphone_volume(
+        &self,
+        level: i64,
+    ) -> Result<(), Traced<Error>> {
+        unsafe {
+            FutureFromDart::execute::<()>(media_devices::set_microphone_volume(
+                level,
             ))
             .await
         }

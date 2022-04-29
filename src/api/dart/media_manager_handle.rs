@@ -9,8 +9,8 @@ use crate::{
         utils::{DartError, DartResult},
     },
     media::{
-        EnumerateDevicesError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError,
+        EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     platform,
 };
@@ -88,6 +88,55 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     })
 }
 
+/// Sets the microphone volume level in percents.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__set_microphone_volume(
+    this: ptr::NonNull<MediaManagerHandle>,
+    level: i64,
+) -> DartFuture<Result<(), Traced<MicVolumeError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move {
+            this.set_microphone_volume(level)
+                .await
+                .map_err(tracerr::map_from_and_wrap!())?;
+            Ok(())
+        }
+        .into_dart_future()
+    })
+}
+
+/// Indicates whether it's possible to access microphone volume settings.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__microphone_volume_is_available(
+    this: ptr::NonNull<MediaManagerHandle>,
+) -> DartFuture<Result<bool, Traced<HandleDetachedError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move { this.microphone_volume_is_available().await }
+            .into_dart_future()
+    })
+}
+
+/// Returns the current microphone volume level in percents.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__microphone_volume(
+    this: ptr::NonNull<MediaManagerHandle>,
+) -> DartFuture<Result<i64, Traced<MicVolumeError>>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move {
+            this.microphone_volume()
+                .await
+                .map_err(tracerr::map_from_and_wrap!())
+        }
+        .into_dart_future()
+    })
+}
+
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__on_device_change(
@@ -139,7 +188,7 @@ mod mock {
         },
         media::{
             EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-            InvalidOutputAudioDeviceIdError,
+            InvalidOutputAudioDeviceIdError, MicVolumeError,
         },
         platform,
     };
@@ -177,6 +226,25 @@ mod mock {
             _device_id: String,
         ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
             Ok(())
+        }
+
+        pub async fn set_microphone_volume(
+            &self,
+            _: i64,
+        ) -> Result<(), Traced<MicVolumeError>> {
+            Ok(())
+        }
+
+        pub async fn microphone_volume_is_available(
+            &self,
+        ) -> Result<bool, Traced<HandleDetachedError>> {
+            Ok(true)
+        }
+
+        pub async fn microphone_volume(
+            &self,
+        ) -> Result<i64, Traced<MicVolumeError>> {
+            Ok(50)
         }
 
         pub fn on_device_change(

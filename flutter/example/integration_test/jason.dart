@@ -665,6 +665,15 @@ void main() {
     }
     throw Exception('Exception not fired on panic');
   });
+
+  testWidgets('Volume settings', (WidgetTester widgetTester) async {
+    var jason = Jason();
+    var media = jason.mediaManager();
+
+    expect(await media.microphoneVolumeIsAvailable(), true);
+    expect(await media.microphoneVolume(), 50);
+    expect(() async => await media.setMicrophoneVolume(100), returnsNormally);
+  });
 }
 
 class TestObj {
