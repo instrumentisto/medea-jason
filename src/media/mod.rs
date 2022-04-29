@@ -21,6 +21,7 @@ pub use self::{
         EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
         HandleDetachedError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
+        MicVolumeError,
     },
     track::{remote::MediaDirection, MediaSourceKind},
 };

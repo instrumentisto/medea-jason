@@ -14,7 +14,7 @@ use crate::{
             EnumerateDevicesException, FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,
             MediaSettingsUpdateException, MediaStateTransitionException,
-            RpcClientException, StateError,
+            MicVolumeException, RpcClientException, StateError,
         },
     },
     platform,
@@ -108,6 +108,13 @@ mod exception {
         /// Returns a new Dart [`InvalidOutputAudioDeviceIdException`] with the
         /// provided `trace` property.
         pub fn new_invalid_output_audio_device_id_exception(
+            trace: ptr::NonNull<c_char>,
+        ) -> Dart_Handle;
+
+        /// Returns a new Dart [`MicVolumeException`] with the provided `cause`
+        /// and `trace` properties.
+        pub fn new_mic_volume_exception(
+            cause: DartError,
             trace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
 
@@ -230,6 +237,17 @@ impl From<InvalidOutputAudioDeviceIdException> for DartError {
     fn from(err: InvalidOutputAudioDeviceIdException) -> Self {
         unsafe {
             Self::new(exception::new_invalid_output_audio_device_id_exception(
+                string_into_c_str(err.trace()),
+            ))
+        }
+    }
+}
+
+impl From<MicVolumeException> for DartError {
+    fn from(err: MicVolumeException) -> Self {
+        unsafe {
+            Self::new(exception::new_mic_volume_exception(
+                err.cause().into(),
                 string_into_c_str(err.trace()),
             ))
         }

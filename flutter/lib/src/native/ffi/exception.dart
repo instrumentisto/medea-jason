@@ -26,7 +26,8 @@ void registerFunctions(DynamicLibrary dl) {
           Pointer.fromFunction(_newMediaSettingsUpdateException),
       newInvalidOutputAudioDeviceIdException:
           Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException),
-      throwPanicException: Pointer.fromFunction(_throwPanicException));
+      throwPanicException: Pointer.fromFunction(_throwPanicException),
+      newMicVolumeException: Pointer.fromFunction(_newMicVolumeException));
 }
 
 /// Creates a new [ArgumentError] from the provided invalid [value], its [name]
@@ -58,8 +59,8 @@ Object _newLocalMediaInitException(int kind, Pointer<Utf8> message,
       stacktrace.nativeStringToDartString());
 }
 
-/// Creates a new [NativeEnumerateDevicesException] with the provided error [cause]
-/// and [stacktrace].
+/// Creates a new [NativeEnumerateDevicesException] with the provided error
+/// [cause] and [stacktrace].
 Object _newEnumerateDevicesException(
     Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
   return NativeEnumerateDevicesException(
@@ -71,6 +72,13 @@ Object _newEnumerateDevicesException(
 Object _newInvalidOutputAudioDeviceIdException(Pointer<Utf8> trace) {
   return NativeInvalidOutputAudioDeviceIdException(
       trace.nativeStringToDartString());
+}
+
+/// Creates a new [MicVolumeException] with the provided error [cause] and
+/// [trace].
+Object _newMicVolumeException(Pointer<Handle> cause, Pointer<Utf8> trace) {
+  return NativeMicVolumeException(
+      unboxDartHandle(cause), trace.nativeStringToDartString());
 }
 
 /// Creates a new [NativeRpcClientException] with the provided error [kind],
@@ -199,6 +207,28 @@ class NativeInvalidOutputAudioDeviceIdException
 
   /// Instantiates a new [NativeInvalidOutputAudioDeviceIdException].
   NativeInvalidOutputAudioDeviceIdException(this._nativeStackTrace);
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
+}
+
+/// Exception thrown when cannot interact with microphone volume.
+class NativeMicVolumeException extends MicVolumeException {
+  /// Dart [Exception] or [Error] that caused this [NativeMicVolumeException].
+  late final Object _cause;
+
+  /// Native stacktrace.
+  late final String _nativeStackTrace;
+
+  /// Instantiates a new [NativeMicVolumeException].
+  NativeMicVolumeException(this._cause, this._nativeStackTrace);
+
+  @override
+  dynamic cause() {
+    return _cause;
+  }
 
   @override
   String trace() {

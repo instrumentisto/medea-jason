@@ -14,6 +14,10 @@ void registerFunctions(DynamicLibrary dl) {
     getUserMedia: Pointer.fromFunction(_getUserMedia),
     getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
     setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
+    setMicrophoneVolume: Pointer.fromFunction(_setMicrophoneVolume),
+    microphoneVolumeIsAvailable:
+        Pointer.fromFunction(_microphoneVolumeIsAvailable),
+    microphoneVolume: Pointer.fromFunction(_microphoneVolume),
     onDeviceChange: Pointer.fromFunction(_onDeviceChange),
   );
 }
@@ -37,6 +41,23 @@ Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
 /// Switches output audio device to the device with the provided [deviceId].
 Object _setOutputAudioId(Pointer<Utf8> deviceId) {
   return () => webrtc.setOutputAudioId(deviceId.toDartString());
+}
+
+/// Sets the microphone volume level in percents.
+Object _setMicrophoneVolume(int level) {
+  return () => webrtc.setMicrophoneVolume(level);
+}
+
+/// Indicates whether it's possible to access microphone volume settings.
+Object _microphoneVolumeIsAvailable() {
+  return () async {
+    return await webrtc.microphoneVolumeIsAvailable() ? 1 : 0;
+  };
+}
+
+/// Gets the current microphone volume level in percents.
+Object _microphoneVolume() {
+  return () => webrtc.microphoneVolume();
 }
 
 /// Subscribes onto the `MediaDevices`'s `devicechange` event.
