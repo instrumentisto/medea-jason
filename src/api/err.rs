@@ -15,9 +15,9 @@ use crate::{
     connection,
     media::{
         self, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
-        MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
-        SetMicrophoneVolumeError,
+        GetUserMediaErrorKind, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
+        MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -75,6 +75,10 @@ pub enum LocalMediaInitExceptionKind {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     GetUserMediaFailed,
+
+    GetUserMediaAudioFailed,
+
+    GetUserMediaVideoFailed,
 
     /// Occurs if the [getDisplayMedia()][1] request failed.
     ///
@@ -662,6 +666,7 @@ impl From<Traced<InitLocalTracksError>> for Error {
     fn from(err: Traced<InitLocalTracksError>) -> Self {
         use GetDisplayMediaError as Gdm;
         use GetUserMediaError as Gum;
+        use GetUserMediaErrorKind as Test;
         use InitLocalTracksError as Err;
         use LocalMediaInitExceptionKind as Kind;
 
@@ -672,9 +677,15 @@ impl From<Traced<InitLocalTracksError>> for Error {
             Err::Detached => {
                 return StateError::new(message, stacktrace).into()
             }
-            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(cause)) => {
-                (Kind::GetUserMediaFailed, Some(cause))
-            }
+            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
+                Test::Audio(cause),
+            )) => (Kind::GetUserMediaAudioFailed, Some(cause)),
+            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
+                Test::Video(cause),
+            )) => (Kind::GetUserMediaVideoFailed, Some(cause)),
+            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
+                Test::Unknown(cause),
+            )) => (Kind::GetUserMediaFailed, Some(cause)),
             Err::GetDisplayMediaFailed(Gdm::PlatformRequestFailed(cause)) => {
                 (Kind::GetDisplayMediaFailed, Some(cause))
             }

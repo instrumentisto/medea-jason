@@ -105,6 +105,14 @@ pub struct HandleDetachedError;
 #[display(fmt = "{} track is ended", _0)]
 struct LocalTrackIsEndedError(MediaKind);
 
+#[derive(Caused, Clone, Debug, Display)]
+#[cause(error = "platform::Error")]
+pub enum GetUserMediaErrorKind {
+    Audio(platform::Error),
+    Video(platform::Error),
+    Unknown(platform::Error),
+}
+
 /// Errors occurring when [getUserMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
@@ -115,7 +123,7 @@ pub enum GetUserMediaError {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[display(fmt = "MediaDevices.getUserMedia() failed: {}", _0)]
-    PlatformRequestFailed(platform::Error),
+    PlatformRequestFailed(GetUserMediaErrorKind),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
     /// [getDisplayMedia()][3] request.
@@ -330,11 +338,25 @@ impl InnerMediaManager {
         &self,
         caps: platform::MediaStreamConstraints,
     ) -> Result<Vec<Rc<local::Track>>, Traced<GetUserMediaError>> {
-        let tracks = self
-            .media_devices
-            .get_user_media(caps)
-            .await
-            .map_err(tracerr::map_from_and_wrap!())?;
+        let tracks = self.media_devices.get_user_media(caps).await.map_err(
+            |(kind, e)| -> Traced<GetUserMediaError> {
+                match kind {
+                    platform::media_devices::GetMediaExceptionKind::Audio => {
+                        let (asd, _) = e.split();
+                        tracerr::new!(GetUserMediaError::from(
+                            GetUserMediaErrorKind::Audio(asd)
+                        ))
+                    }
+                    platform::media_devices::GetMediaExceptionKind::Video => {
+                        let (asd, _) = e.split();
+                        tracerr::new!(GetUserMediaError::from(
+                            GetUserMediaErrorKind::Video(asd)
+                        ))
+                    }
+                }
+            },
+        )?;
+        // .map_err(tracerr::map_from_and_wrap!())?;
 
         let tracks = self
             .parse_and_save_tracks(tracks, MediaSourceKind::Device)

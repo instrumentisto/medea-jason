@@ -65,6 +65,25 @@ mod media_devices {
 
         /// Subscribes onto the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
+
+        pub fn get_media_exception_kind(exception: Dart_Handle) -> i64;
+    }
+}
+
+pub enum GetMediaExceptionKind {
+    Audio = 0,
+    Video = 1,
+}
+
+impl TryFrom<i64> for GetMediaExceptionKind {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Audio),
+            1 => Ok(Self::Video),
+            _ => Err(value),
+        }
     }
 }
 
@@ -122,14 +141,26 @@ impl MediaDevices {
     pub async fn get_user_media(
         &self,
         caps: MediaStreamConstraints,
-    ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
+    ) -> Result<Vec<MediaStreamTrack>, (GetMediaExceptionKind, Traced<Error>)>
+    {
         let tracks = unsafe {
             FutureFromDart::execute::<DartHandle>(
                 media_devices::get_user_media(caps.into()),
             )
             .await
         }
-        .map_err(tracerr::wrap!())?;
+        .map_err(|e| -> (GetMediaExceptionKind, Traced<Error>) {
+            unsafe {
+                (
+                    GetMediaExceptionKind::try_from(
+                        media_devices::get_media_exception_kind(e.get_handle()),
+                    )
+                    .unwrap(),
+                    tracerr::new!(e),
+                )
+            }
+        })?;
+        // .map_err(tracerr::wrap!())?;
 
         let tracks = Vec::from(DartList::from(tracks))
             .into_iter()

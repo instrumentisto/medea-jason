@@ -19,6 +19,7 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_microphoneVolumeIsAvailable),
     microphoneVolume: Pointer.fromFunction(_microphoneVolume),
     onDeviceChange: Pointer.fromFunction(_onDeviceChange),
+    getMediaExceptionKind: Pointer.fromFunction(_getMediaExceptionKind, 0),
   );
 }
 
@@ -63,4 +64,8 @@ Object _microphoneVolume() {
 /// Subscribes onto the `MediaDevices`'s `devicechange` event.
 void _onDeviceChange(Function cb) {
   webrtc.onDeviceChange(() => cb(null));
+}
+
+int _getMediaExceptionKind(webrtc.GetMediaException exception) {
+  return exception.kind().index;
 }
