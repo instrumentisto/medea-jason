@@ -192,12 +192,11 @@ mod mock {
             LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings,
         },
         media::{
-            EnumerateDevicesError, GetUserMediaErrorKind, HandleDetachedError,
-            InitLocalTracksError, InvalidOutputAudioDeviceIdError,
-            MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
-            SetMicrophoneVolumeError,
+            EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
+            InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
+            MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
         },
-        platform,
+        platform::{self},
     };
 
     #[derive(Clone, Debug)]
@@ -269,7 +268,7 @@ mod mock {
     ) -> DartResult {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetUserMediaFailed(
-            GetUserMediaErrorKind::Unknown(cause).into()
+            platform::GetUserMediaError::Unknown(cause).into()
         ));
         DartError::from(err).into()
     }

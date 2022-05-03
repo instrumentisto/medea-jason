@@ -19,7 +19,7 @@ pub use self::{
     },
     manager::{
         EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        GetUserMediaErrorKind, HandleDetachedError, InitLocalTracksError,
+        HandleDetachedError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
         MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
         SetMicrophoneVolumeError,

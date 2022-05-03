@@ -17,6 +17,10 @@ cfg_if::cfg_if! {
     }
 }
 
+use derive_more::Display;
+
+use crate::utils::Caused;
+
 pub use self::{
     callback::Callback,
     peer_connection::{IceCandidate, RtcPeerConnectionError, SdpType},
@@ -27,3 +31,11 @@ pub use self::{
 
 #[cfg(feature = "mockable")]
 pub use self::transport::MockRpcTransport;
+
+#[derive(Caused, Clone, Debug, Display)]
+#[cause(error = "Error")]
+pub enum GetUserMediaError {
+    Audio(Error),
+    Video(Error),
+    Unknown(Error),
+}

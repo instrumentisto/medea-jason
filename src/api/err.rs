@@ -15,9 +15,9 @@ use crate::{
     connection,
     media::{
         self, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        GetUserMediaErrorKind, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError, MicrophoneVolumeError,
-        MicrophoneVolumeIsAvailableError, SetMicrophoneVolumeError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError,
+        MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
+        SetMicrophoneVolumeError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -664,9 +664,9 @@ impl From<Traced<MicrophoneVolumeError>> for Error {
 
 impl From<Traced<InitLocalTracksError>> for Error {
     fn from(err: Traced<InitLocalTracksError>) -> Self {
+        use platform::GetUserMediaError as Pgum;
         use GetDisplayMediaError as Gdm;
         use GetUserMediaError as Gum;
-        use GetUserMediaErrorKind as Test;
         use InitLocalTracksError as Err;
         use LocalMediaInitExceptionKind as Kind;
 
@@ -678,13 +678,13 @@ impl From<Traced<InitLocalTracksError>> for Error {
                 return StateError::new(message, stacktrace).into()
             }
             Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
-                Test::Audio(cause),
+                Pgum::Audio(cause),
             )) => (Kind::GetUserMediaAudioFailed, Some(cause)),
             Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
-                Test::Video(cause),
+                Pgum::Video(cause),
             )) => (Kind::GetUserMediaVideoFailed, Some(cause)),
             Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
-                Test::Unknown(cause),
+                Pgum::Unknown(cause),
             )) => (Kind::GetUserMediaFailed, Some(cause)),
             Err::GetDisplayMediaFailed(Gdm::PlatformRequestFailed(cause)) => {
                 (Kind::GetDisplayMediaFailed, Some(cause))
