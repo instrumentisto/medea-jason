@@ -6,8 +6,8 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    IceCandidate, IceServer, MediaType, MemberId, NegotiationRole, PeerId,
-    TrackId,
+    IceCandidate, IceServer, MediaDirection, MediaType, MemberId,
+    NegotiationRole, PeerId, TrackId,
 };
 
 /// State of a `Room` element.
@@ -67,16 +67,11 @@ pub struct Sender {
     /// All `Member`s which receive media from this [`Sender`].
     pub receivers: Vec<MemberId>,
 
-    /// Indicator whether this [`Sender`] is enabled on a `Send` direction
-    /// side.
-    pub enabled_individual: bool,
-
-    /// Indicator whether this [`Sender`] is enabled on a `Send` __and__ `Recv`
-    /// direction sides.
-    pub enabled_general: bool,
-
     /// Indicator whether this [`Sender`] is muted.
     pub muted: bool,
+
+    /// Current general media exchange state of this [`Sender`].
+    pub media_direction: MediaDirection,
 }
 
 /// State of `MediaTrack`s with a `Recv` direction.
@@ -94,14 +89,9 @@ pub struct Receiver {
     /// `Member`s which send media to this [`Receiver`].
     pub sender_id: MemberId,
 
-    /// Indicator whether this [`Receiver`] is enabled on a `Recv` direction
-    /// side.
-    pub enabled_individual: bool,
-
-    /// Indicator whether this [`Receiver`] is enabled on a `Send` __and__
-    /// `Recv` direction sides.
-    pub enabled_general: bool,
-
     /// Indicator whether this [`Receiver`] is muted.
     pub muted: bool,
+
+    /// Current general media exchange state of this [`Receiver`].
+    pub media_direction: MediaDirection,
 }

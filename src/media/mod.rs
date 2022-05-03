@@ -21,10 +21,9 @@ pub use self::{
         EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
         HandleDetachedError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
-        MicrophoneVolumeError, MicrophoneVolumeIsAvailableError,
-        SetMicrophoneVolumeError,
+        MicVolumeError,
     },
-    track::MediaSourceKind,
+    track::{remote::MediaDirection, MediaSourceKind},
 };
 
 /// [MediaStreamTrack.kind][1] representation.

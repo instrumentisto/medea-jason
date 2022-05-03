@@ -30,6 +30,9 @@ service ControlApi {
   // otherwise it will be reconfigured. Elements that exist, but are not
   // specified in the provided spec will be removed.
   rpc Apply(ApplyRequest) returns (CreateResponse);
+
+  // Checks media server healthiness.
+  rpc Healthz (Ping) returns (Pong);
 }
 
 // Request of creating new Element with in element with a given FID (full ID).
@@ -273,4 +276,17 @@ message WebRtcPlayEndpoint {
   string on_stop = 4;
   // Option to relay all media through a TURN server forcibly.
   bool force_relay = 5;
+}
+
+// Ping message received by media server periodically for probing its
+// healthiness.
+message Ping {
+  // Each ping should increase its nonce, starting with 0.
+  uint32 nonce = 1;
+}
+
+// Pong message send by media server in response to received Ping message.
+message Pong {
+  /// Nonce of the received Ping message.
+  uint32 nonce = 1;
 }

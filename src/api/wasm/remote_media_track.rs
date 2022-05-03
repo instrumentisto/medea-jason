@@ -6,7 +6,7 @@ use derive_more::{From, Into};
 use wasm_bindgen::prelude::*;
 
 use crate::{
-    api::{MediaKind, MediaSourceKind},
+    api::{MediaDirection, MediaKind, MediaSourceKind},
     media::track::remote,
 };
 
@@ -28,26 +28,10 @@ impl RemoteMediaTrack {
         Clone::clone(self.0.get_track().as_ref())
     }
 
-    /// Indicates whether this [`RemoteMediaTrack`] is enabled.
-    #[must_use]
-    pub fn enabled(&self) -> bool {
-        self.0.enabled()
-    }
-
     /// Indicates whether this [`RemoteMediaTrack`] is muted.
     #[must_use]
     pub fn muted(&self) -> bool {
         self.0.muted()
-    }
-
-    /// Sets callback, invoked when this [`RemoteMediaTrack`] is enabled.
-    pub fn on_enabled(&self, cb: js_sys::Function) {
-        self.0.on_enabled(cb.into());
-    }
-
-    /// Sets callback, invoked when this [`RemoteMediaTrack`] is disabled.
-    pub fn on_disabled(&self, cb: js_sys::Function) {
-        self.0.on_disabled(cb.into());
     }
 
     /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
@@ -63,6 +47,12 @@ impl RemoteMediaTrack {
     /// Sets callback to invoke when this [`RemoteMediaTrack`] is stopped.
     pub fn on_stopped(&self, cb: js_sys::Function) {
         self.0.on_stopped(cb.into());
+    }
+
+    /// Sets callback to invoke whenever this [`RemoteMediaTrack`]'s general
+    /// [`MediaDirection`] changes.
+    pub fn on_media_direction_changed(&self, cb: js_sys::Function) {
+        self.0.on_media_direction_changed(cb.into());
     }
 
     /// Returns a [`MediaKind::Audio`] if this [`RemoteMediaTrack`] represents
@@ -82,5 +72,12 @@ impl RemoteMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()
+    }
+
+    /// Returns the current general [`MediaDirection`] of this
+    /// [`RemoteMediaTrack`].
+    #[must_use]
+    pub fn media_direction(&self) -> MediaDirection {
+        self.0.media_direction().into()
     }
 }

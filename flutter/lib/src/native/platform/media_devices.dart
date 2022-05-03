@@ -49,7 +49,7 @@ Object _setMicrophoneVolume(int level) {
   return () => webrtc.setMicrophoneVolume(level);
 }
 
-/// Indicates if it is possible to set the microphone volume.
+/// Indicates whether it's possible to access microphone volume settings.
 Object _microphoneVolumeIsAvailable() {
   return () async {
     return await webrtc.microphoneVolumeIsAvailable() ? 1 : 0;

@@ -44,6 +44,9 @@ All user visible changes to this project will be documented in this file. This p
                 - `InternalException`;
                 - `LocalMediaInitException`.
     - Renamed `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
+    - `RemoteMediaTrack`:
+        - Replaced `on_enabled` and `on_disabled` callbacks with `on_media_direction_changed` callback ([#46]);
+        - Replaced `enabled` method with `media_direction` method ([#46]).
 
 ### Added
 
@@ -58,13 +61,18 @@ All user visible changes to this project will be documented in this file. This p
         - `FormatException`;
         - `MediaStateTransitionException`;
         - `MediaSettingsUpdateException`.
-    - `MediaManagerHandle.set_output_audio_id()` function switching output audio device on Dart platform ([#29]);
+    - `MediaManagerHandle.set_output_audio_id()` method switching output audio device on Dart platform ([#29]);
     - `MediaManagerHandle.on_device_change()` callback firing whenever `MediaManagerHandle.enumerate_devices()` list changes ([#30]);
     - `ConnectionHandle` methods ([#43]):
         - `enable_remote_video`;
         - `disable_remote_video`;
         - `enable_remote_audio`;
         - `disable_remote_audio`.
+    - `MediaDirection` type ([#46]).
+    - `MediaManagerHandle` methods for microphone volume on Dart platform ([#49]):
+        - `microphone_volume_is_available`;
+        - `microphone_volume`;
+        - `set_microphone_volume`.
 
 ### Updated
 
@@ -76,6 +84,8 @@ All user visible changes to this project will be documented in this file. This p
 [#29]: /../../pull/29
 [#30]: /../../pull/30
 [#43]: /../../pull/43
+[#46]: /../../pull/46
+[#49]: /../../pull/49
 
 
 
