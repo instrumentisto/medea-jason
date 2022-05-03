@@ -190,7 +190,7 @@ mod mock {
             EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
             InvalidOutputAudioDeviceIdError, MicVolumeError,
         },
-        platform::{self},
+        platform,
     };
 
     #[derive(Clone, Debug)]

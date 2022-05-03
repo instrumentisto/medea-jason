@@ -265,7 +265,19 @@ export const LocalMediaInitExceptionKind = Object.freeze({
 *
 * [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
 */
-GetUserMediaFailed:0,"0":"GetUserMediaFailed",GetUserMediaAudioFailed:1,"1":"GetUserMediaAudioFailed",GetUserMediaVideoFailed:2,"2":"GetUserMediaVideoFailed",
+GetUserMediaFailed:0,"0":"GetUserMediaFailed",
+/**
+* Occurs if the [getUserMedia()][1] request failed on getting audio.
+*
+* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+*/
+GetUserMediaAudioFailed:1,"1":"GetUserMediaAudioFailed",
+/**
+* Occurs if the [getUserMedia()][1] request failed on getting video.
+*
+* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+*/
+GetUserMediaVideoFailed:2,"2":"GetUserMediaVideoFailed",
 /**
 * Occurs if the [getDisplayMedia()][1] request failed.
 *

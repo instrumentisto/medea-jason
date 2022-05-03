@@ -13,10 +13,9 @@ dependencies:
     sdk: flutter
   ffi: ^1.0.0
   flutter_webrtc:
-    path: ../../flutter-webrtc
-    # git:
-    #   url: https://github.com/instrumentisto/flutter-webrtc.git
-    #   ref: master
+    git:
+      url: https://github.com/instrumentisto/flutter-webrtc.git
+      ref: master
   js: ^0.6.3
 
 dev_dependencies:

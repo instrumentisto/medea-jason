@@ -21,9 +21,11 @@ use super::window;
 
 impl From<Error> for GetUserMediaError {
     fn from(err: Error) -> Self {
-        if err.message().to_lowercase().contains("audio") {
+        let message_in_lowercase = err.message().to_lowercase();
+
+        if message_in_lowercase.contains("audio") {
             Self::Audio(err)
-        } else if err.message().to_lowercase().contains("video") {
+        } else if message_in_lowercase.contains("video") {
             Self::Video(err)
         } else {
             Self::Unknown(err)
