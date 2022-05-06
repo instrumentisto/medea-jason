@@ -425,7 +425,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         if: ${{ matrix.if }}
-      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-buildx-action@v2
         if: ${{ matrix.if }}
 
       - run: make docker.build debug=no no-cache=yes
@@ -629,7 +629,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         if: ${{ matrix.if }}
-      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-buildx-action@v2
         if: ${{ matrix.if }}
 
       - uses: actions/download-artifact@v3
