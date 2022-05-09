@@ -67,20 +67,18 @@ mod media_devices {
         /// Subscribes onto the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
 
-        /// Returns a kind of the `GetMediaException`.
+        /// Returns a kind of the Dart side `GetMediaException`.
         pub fn get_media_exception_kind(exception: Dart_Handle) -> i64;
     }
 }
 
 impl From<Error> for GetUserMediaError {
     fn from(err: Error) -> Self {
-        unsafe {
-            match media_devices::get_media_exception_kind(err.get_handle()) {
-                0 => Self::Audio(err),
-                1 => Self::Video(err),
-                _ => Self::Unknown(err),
-            }
-        }
+        let kind = unsafe {
+            media_devices::get_media_exception_kind(err.get_handle())
+        };
+
+        Self::from((kind, err))
     }
 }
 

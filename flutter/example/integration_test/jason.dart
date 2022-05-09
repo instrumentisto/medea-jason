@@ -73,7 +73,7 @@ void main() {
         () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
             e is LocalMediaInitException &&
-            e.kind() == LocalMediaInitExceptionKind.GetUserMediaFailed &&
+            e.kind() == LocalMediaInitExceptionKind.GetUserMediaAudioFailed &&
             e.cause() == 'Dart err cause1' &&
             e.trace().contains('at src'))));
 

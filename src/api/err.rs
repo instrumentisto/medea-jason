@@ -74,12 +74,14 @@ pub enum LocalMediaInitExceptionKind {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     GetUserMediaFailed,
 
-    /// Occurs if the [getUserMedia()][1] request failed on getting audio.
+    /// Occurs if the [getUserMedia()][1] request failed on getting audio
+    /// track.
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     GetUserMediaAudioFailed,
 
-    /// Occurs if the [getUserMedia()][1] request failed on getting video.
+    /// Occurs if the [getUserMedia()][1] request failed on getting video
+    /// track.
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     GetUserMediaVideoFailed,

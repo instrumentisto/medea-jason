@@ -262,7 +262,7 @@ mod mock {
     ) -> DartResult {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetUserMediaFailed(
-            platform::GetUserMediaError::Unknown(cause).into()
+            platform::GetUserMediaError::Audio(cause).into()
         ));
         DartError::from(err).into()
     }
