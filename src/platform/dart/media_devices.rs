@@ -78,7 +78,11 @@ impl From<Error> for GetUserMediaError {
             media_devices::get_media_exception_kind(err.get_handle())
         };
 
-        Self::from((kind, err))
+        match kind {
+            0 => Self::Audio(err),
+            1 => Self::Video(err),
+            _ => Self::Unknown(err),
+        }
     }
 }
 

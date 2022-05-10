@@ -111,8 +111,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: fix-asrc
-      resolved-ref: "8c3aebb4b554bdc30f338dda703ddab9150a6fdf"
+      ref: master
+      resolved-ref: a443208aea93761a4f7f2fabc543e216ec56c80a
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"

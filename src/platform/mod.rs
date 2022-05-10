@@ -45,13 +45,3 @@ pub enum GetUserMediaError {
     /// Can not identify the cause of the [`Error`].
     Unknown(Error),
 }
-
-impl From<(i64, Error)> for GetUserMediaError {
-    fn from((kind, error): (i64, Error)) -> Self {
-        match kind {
-            0 => Self::Audio(error),
-            1 => Self::Video(error),
-            _ => Self::Unknown(error),
-        }
-    }
-}
