@@ -66,7 +66,7 @@ void _onDeviceChange(Function cb) {
   webrtc.onDeviceChange(() => cb(null));
 }
 
-/// Returns a kind of the `GetMediaException`.
+/// Returns the kind of the `GetMediaException`.
 int _getMediaExceptionKind(webrtc.GetMediaException exception) {
   return exception.kind().index;
 }

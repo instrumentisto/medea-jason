@@ -67,7 +67,7 @@ mod media_devices {
         /// Subscribes onto the `MediaDevices`'s `devicechange` event.
         pub fn on_device_change(cb: Dart_Handle);
 
-        /// Returns a kind of the Dart side `GetMediaException`.
+        /// Returns the kind of the Dart side `GetMediaException`.
         pub fn get_media_exception_kind(exception: Dart_Handle) -> i64;
     }
 }

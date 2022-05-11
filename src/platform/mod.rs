@@ -32,16 +32,19 @@ pub use self::{
 #[cfg(feature = "mockable")]
 pub use self::transport::MockRpcTransport;
 
-/// Represents where the [`Error`] has appeared.
+/// [`Error`] appeared on [getUserMedia()][1] request, differentiated by its
+/// cause.
+///
+/// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
 #[derive(Caused, Clone, Debug, Display)]
 #[cause(error = "Error")]
 pub enum GetUserMediaError {
-    /// The [`Error`] has been caused on getting audio.
+    /// [`Error`] has been caused by getting audio.
     Audio(Error),
 
-    /// The [`Error`] has been caused on getting video.
+    /// [`Error`] has been caused by getting video.
     Video(Error),
 
-    /// Can not identify the cause of the [`Error`].
+    /// Cause cannot be identified.
     Unknown(Error),
 }
