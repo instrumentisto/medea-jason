@@ -16,9 +16,20 @@ dependencies:
     git:
       url: https://github.com/instrumentisto/flutter-webrtc.git
   js: ^0.6.3
+  http: ^0.13.4
+  uuid: ^3.0.6
+  tuple: ^2.0.0
 
 dev_dependencies:
+  build_runner: ^2.1.9
   pedantic: ^1.9.0
+  integration_test:
+    sdk: flutter
+  flutter_gherkin: ^3.0.0-rc.9
+      
+dependency_overrides:
+  # TODO: Remove when `flutter_gherkin` updates.
+  # analyzer: ^4.0.0
 
 flutter:
   plugin:

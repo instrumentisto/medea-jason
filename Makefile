@@ -628,7 +628,10 @@ test.flutter:
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))
 
-
+test.e2e.32:
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart
 
 ####################
 # Waiting commands #

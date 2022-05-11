@@ -6,6 +6,11 @@ environment:
   flutter: ">=2.0.0"
 
 dependencies:
+
+  js: ^0.6.3
+  http: ^0.13.4
+  uuid: ^3.0.6
+  tuple: ^2.0.0
   flutter:
     sdk: flutter
 
@@ -16,18 +21,20 @@ dependencies:
   # the parent directory to use the current plugin's version.
   medea_jason:
     path: ../
-
-  http: ^0.13.4
-  uuid: ^3.0.6
-  tuple: ^2.0.0
+    
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
+  js: ^0.6.3
+  http: ^0.13.4
+  uuid: ^3.0.6
+  tuple: ^2.0.0
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
   pedantic: ^1.9.0
+  flutter_gherkin: ^3.0.0-rc.9
 
 flutter:
   assets:
