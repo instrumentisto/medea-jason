@@ -17,6 +17,9 @@ dependencies:
   medea_jason:
     path: ../
 
+  http: ^0.13.4
+  uuid: ^3.0.6
+  tuple: ^2.0.0
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
