@@ -101,7 +101,7 @@ pub enum GetUserMediaError {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[display(fmt = "MediaDevices.getUserMedia() failed: {}", _0)]
-    PlatformRequestFailed(platform::Error),
+    PlatformRequestFailed(platform::GetUserMediaError),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
     /// [getDisplayMedia()][3] request.

@@ -14,12 +14,14 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function()>> microphoneVolume,
   required Pointer<NativeFunction<Handle Function(Int64)>> setMicrophoneVolume,
   required Pointer<NativeFunction<Void Function(Handle)>> onDeviceChange,
+  required Pointer<NativeFunction<Int64 Function(Handle)>>
+      getMediaExceptionKind,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer),
+          Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer)>('register_media_devices')(
+          Pointer, Pointer, Pointer)>('register_media_devices')(
     enumerateDevices,
     getUserMedia,
     getDisplayMedia,
@@ -28,5 +30,6 @@ void registerFunction(
     microphoneVolume,
     setMicrophoneVolume,
     onDeviceChange,
+    getMediaExceptionKind,
   );
 }

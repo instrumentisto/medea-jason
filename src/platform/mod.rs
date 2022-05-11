@@ -17,6 +17,10 @@ cfg_if::cfg_if! {
     }
 }
 
+use derive_more::Display;
+
+use crate::utils::Caused;
+
 pub use self::{
     callback::Callback,
     peer_connection::{IceCandidate, RtcPeerConnectionError, SdpType},
@@ -27,3 +31,20 @@ pub use self::{
 
 #[cfg(feature = "mockable")]
 pub use self::transport::MockRpcTransport;
+
+/// [`Error`] appeared on [getUserMedia()][1] request, differentiated by its
+/// cause.
+///
+/// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+#[derive(Caused, Clone, Debug, Display)]
+#[cause(error = "Error")]
+pub enum GetUserMediaError {
+    /// [`Error`] has been caused by getting audio.
+    Audio(Error),
+
+    /// [`Error`] has been caused by getting video.
+    Video(Error),
+
+    /// Cause cannot be identified.
+    Unknown(Error),
+}
