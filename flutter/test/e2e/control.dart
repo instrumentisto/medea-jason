@@ -44,8 +44,8 @@ class MyClient {
 
   Future<http.Response> callbacks() async {
     var response = await inner.get(
-      Uri.parse('$control_api_address/$callbacks'));
-    print('RESP callbacks: ' + response.body +'\n\n');
+      Uri.parse('http://127.0.0.1:8000/callbacks'));
+    print('RESP callbacks: ' + response.body+'GG' +'\n\n');
     return response;
   }
 

@@ -6,6 +6,7 @@ import 'conf.dart';
 import 'hooks/reset_hook.dart';
 import 'steps/connection.dart';
 import 'steps/control_api.dart';
+import 'steps/room.dart';
 import 'steps/teest.dart';
 import 'world/custom_world.dart';
 
@@ -15,8 +16,12 @@ var gg = FlutterTestConfiguration()
   ..stepDefinitions = [
     fillField2,
     fillField1,
+
     then_connection_closes,
     then_member_receives_connection,
+    then_control_api_sends_on_join,
+    then_on_close_fires,
+
     when_control_api_removes_member,
     when_control_api_removes_room,
     when_interconnects_kind,

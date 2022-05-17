@@ -103,13 +103,18 @@ impl Client {
     //       of huge JSON's.
     /// Fetches all callbacks received by Control API mock server.
     pub async fn callbacks(&self) -> Result<Vec<CallbackItem>> {
-        Ok(self
-            .inner
-            .get(&format!("{}/callbacks", self.control_api_address))
-            .send()
-            .await?
-            .json()
-            .await?)
+
+        let gg: Vec<CallbackItem> = self
+        .inner
+        .get(&format!("{}/callbacks", self.control_api_address))
+        .send()
+        .await?
+        .json()
+        .await?;
+        println!("callll {:?}", &format!("{}/callbacks", self.control_api_address));
+        println!("callll {:?}", &format!("{}/callbacks", self.control_api_address));
+        
+        Ok(gg)
     }
 }
 

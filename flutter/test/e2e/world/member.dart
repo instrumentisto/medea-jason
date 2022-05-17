@@ -67,6 +67,7 @@ class MyMember {
         value(p0);
       });
     });
+
     room.onNewConnection((p0) {
       connection_store.connects.addAll({p0.getRemoteMemberId(): p0});
       connection_store.close_conn.addAll({p0.getRemoteMemberId(): Completer()});

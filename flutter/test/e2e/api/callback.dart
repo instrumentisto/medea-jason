@@ -3,7 +3,7 @@
 import 'package:medea_jason/medea_jason.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-// part 'callback.g.dart';
+part 'callback.g.dart';
 
 @JsonSerializable()
 class CallbackEvent {
@@ -12,11 +12,6 @@ class CallbackEvent {
       toJson: toJ,
       fromJson: fromJ)
   late dynamic data;
-    /// `OnJoin` callback of Control API.
-    // OnJoin(join::OnJoin),
-
-    // /// `OnLeave` callback of Control API.
-    // OnLeave(leave::OnLeave),
 
   static Map<String, dynamic> toJ(dynamic data) {
     var type = data.runtimeType.toString();
@@ -26,26 +21,62 @@ class CallbackEvent {
     return res;
   }
 
+  CallbackEvent(this.data);
+
   static dynamic fromJ(Map<String, dynamic> json) {
     var type = json['type']!;
     json.remove('type');
     var res = null;
     if (type == 'OnJoin') {
-      // res = OnJoin.fromJson(json);
+      res = OnJoin.fromJson(json);
     }
     else {
-      // res = OnLeave.fromJson(json);
+      res = OnLeave.fromJson(json);
     }
+    return res;
   }
+
+  factory CallbackEvent.fromJson(Map<String, dynamic> json) {
+   return CallbackEvent(fromJ(json));
+  }
+
+
+  Map<String, dynamic> toJson() => toJ(data);
 }
 
+
+@JsonSerializable()
 class CallbackItem {
   late String fid;
   late String at;
+      @JsonKey(
+      toJson: toJ,
+      fromJson: fromJ)
   late CallbackEvent event;
+  CallbackItem();
+
+    static Map<String, dynamic> toJ(dynamic data) {
+    return data.toJson();
+  }
+
+
+  static dynamic fromJ(Map<String, dynamic> json) {
+    return CallbackEvent.fromJson(json);
+  }
+
+  factory CallbackItem.fromJson(Map<String, dynamic> json) => _$CallbackItemFromJson(json);
+  Map<String, dynamic> toJson() => _$CallbackItemToJson(this);
 }
 
-class OnJoin {}
+
+@JsonSerializable()
+class OnJoin {
+  OnJoin();
+  factory OnJoin.fromJson(Map<String, dynamic> json) => _$OnJoinFromJson(json);
+  Map<String, dynamic> toJson() => _$OnJoinToJson(this);
+}
+
+
 
 enum OnLeaveReason {
   /// `Member` was normally disconnected.
@@ -61,8 +92,13 @@ enum OnLeaveReason {
   Kicked,
 }
 
+@JsonSerializable()
 class OnLeave {
   late OnLeaveReason reason;
+  OnLeave();
+
+  factory OnLeave.fromJson(Map<String, dynamic> json) => _$OnLeaveFromJson(json);
+  Map<String, dynamic> toJson() => _$OnLeaveToJson(this);
 }
 
 // pub enum CallbackEvent {

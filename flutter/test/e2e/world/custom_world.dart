@@ -15,7 +15,6 @@ import '../control.dart';
 import 'member.dart';
 import 'package:uuid/uuid.dart';
 
-
 /// [FlutterWidgetTesterWorld] storing a custom state during a single test.
 class CustomWorld extends FlutterWidgetTesterWorld {
   late String room_id;
@@ -77,8 +76,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           gg2.id = endpoint_id;
           gg2.src = 'local://$room_id/$id/publish';
           gg2.force_relay = false;
-                var ep = Endpoint();
-      ep.data = gg2;
+          var ep = Endpoint();
+          ep.data = gg2;
           pipeline.addAll({endpoint_id: ep});
         }
       });
@@ -93,7 +92,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     mem.on_join = 'grpc://127.0.0.1:9099';
     mem.on_leave = 'grpc://127.0.0.1:9099';
     var jmem = mem.toJson();
-    jmem.addAll({'kind' : 'Member'});
+    jmem.addAll({'kind': 'Member'});
     await control_client.create('$room_id/$builder_id', jmem);
 
     if (builder.is_send) {
@@ -110,7 +109,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         return Tuple2(id, elem);
       }).toList();
 
-
 // WebRtcPlayEndpoint(WebRtcPlayEndpoint { id: "play-Bob", src: "local://98528b22-8edd-4121-bb13-e5f670ae9778/Bob/publish", force_relay: false })
 // "{\"kind\":\"WebRtcPlayEndpoint\",\"id\":\"play-Bob\",\"src\":\"local://11fc9734-f690-49a5-9436-1f7c2a9f6ce3/Bob/publish\",\"force_relay\":false}"
 //  {\"kind\":\"WebRtcPlayEndpoint\",\"id\":\"play-Bob\",\"src\":\"local://d5515fab-5868-4fb0-87f0-c7ee03cf3cb7/Bob/publish\",\"force_relay\":false}
@@ -125,7 +123,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     var room = jason.initRoom();
 
     var member = builder.build(room, send_state, recv_state);
-
 
     jasons.addAll({member.id: jason});
     members.addAll({member.id: member});
@@ -143,9 +140,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     jason?.closeRoom(room!);
   }
 
-  Future<void> wait_for_on_close(String member_id) async {
-    var member = members[member_id];
-    //???
+  Future<RoomCloseReason> wait_for_on_close(String member_id) async {
+    var member = members[member_id]!;
+    var reason = Completer<RoomCloseReason>();
+    member.room.onClose((p0) {reason.complete(p0);});
+    return reason.future;
   }
 
   Future<void> delete_member_element(String member_id) async {
@@ -158,26 +157,26 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     // todo error check
   }
 
-  Future<Room> get_spec() async { 
+  Future<Room> get_spec() async {
     var resp = await control_client.get(room_id);
     Map<String, dynamic> resp2 = json.decode(resp.body);
     var room = Room();
     room.id = resp2['element']['id'];
-    room.pipeline =  Room.fromPipe(resp2['element']['pipeline']);
+    room.pipeline = Room.fromPipe(resp2['element']['pipeline']);
     return room;
   }
 
 // todo
-  Future<List<CallbackEvent>> get_callbacks(String member_id) async {
+  Future<List<CallbackItem>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
-    //todo
-    return List.empty();
+    return (json.decode(cbs.body) as List)
+        .map((data) => CallbackItem.fromJson(data))
+        .toList();
   }
 
-    Future<void> apply(Room el) async {
-      await control_client.apply(room_id, el.toJson());
-    }
-    
+  Future<void> apply(Room el) async {
+    await control_client.apply(room_id, el.toJson());
+  }
 
   Future<void> wait_for_interconnection(String member_id) async {
     var interconnected_members = members.entries
@@ -187,7 +186,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             (element.value.is_recv || element.value.is_send))
         .toList();
     var member = members[member_id]!;
-    for (var i = 0; i <interconnected_members.length; ++i) {
+    for (var i = 0; i < interconnected_members.length; ++i) {
       var element = interconnected_members[i];
       var temp = member.count_of_tracks_between_members(element.value);
       var send_count = temp.item1;
@@ -195,82 +194,71 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await member.wait_for_connect(element.key);
 
-      // todo 
+      // todo
       //     conn.tracks_store()
       //         .await?
       //         .wait_for_count(recv_count)
       //         .await?;
 
-      var other_member =  members[element.key]!;
+      var other_member = members[element.key]!;
       await other_member.wait_for_connect(member.id);
 
-
-              //     partner_conn
-        //         .tracks_store()
-        //         .await?
-        //         .wait_for_count(send_count)
-        //         .await?;
-        // }
+      //     partner_conn
+      //         .tracks_store()
+      //         .await?
+      //         .wait_for_count(send_count)
+      //         .await?;
+      // }
 
     }
-
   }
-        /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
-    /// provided [`MembersPair`] using an `Apply` method of Control API.
-    Future<void> interconnect_members_via_apply(MembersPair pair) async {
-      var spec = await get_spec();
-      if (spec.pipeline.containsKey(pair.left.id)) {
-        var ep = Endpoint();
-        ep.data = pair.left.publish_endpoint()!;
-        var member = spec.pipeline[pair.left.id]!; // pair.left.id
-        member.pipeline.addAll({'publish' : ep});
 
+  /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
+  /// provided [`MembersPair`] using an `Apply` method of Control API.
+  Future<void> interconnect_members_via_apply(MembersPair pair) async {
+    var spec = await get_spec();
+    if (spec.pipeline.containsKey(pair.left.id)) {
+      var ep = Endpoint();
+      ep.data = pair.left.publish_endpoint()!;
+      var member = spec.pipeline[pair.left.id]!; // pair.left.id
+      member.pipeline.addAll({'publish': ep});
 
-        var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
-        var ep2 = Endpoint();
-        ep2.data = play_endpoint;
-        member.pipeline.addAll({play_endpoint.id : ep2});
-      }
-
-      if (spec.pipeline.containsKey(pair.right.id)) {
-        var member = spec.pipeline[pair.right.id]!; // pair.left.id
-        var ep = Endpoint();
-        ep.data = pair.right.publish_endpoint()!;
-        member.pipeline.addAll({'publish' : ep});
-        
-        var play_endpoint = pair.right.play_endpoint_for(room_id, pair.right)!;
-                var ep2 = Endpoint();
-        ep2.data = play_endpoint;
-
-        member.pipeline.addAll({play_endpoint.id : ep2});
-      }
-
-      await apply(spec);
-
+      var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
+      var ep2 = Endpoint();
+      ep2.data = play_endpoint;
+      member.pipeline.addAll({play_endpoint.id: ep2});
     }
 
-    Future<void> wait_for_on_join(String member_id) async {
-      while (true) {
-        var callbacks = await get_callbacks(member_id);
-        // callbacks.where((element) => element.)
-      }
+    if (spec.pipeline.containsKey(pair.right.id)) {
+      var member = spec.pipeline[pair.right.id]!; // pair.left.id
+      var ep = Endpoint();
+      ep.data = pair.right.publish_endpoint()!;
+      member.pipeline.addAll({'publish': ep});
+
+      var play_endpoint = pair.right.play_endpoint_for(room_id, pair.right)!;
+      var ep2 = Endpoint();
+      ep2.data = play_endpoint;
+
+      member.pipeline.addAll({play_endpoint.id: ep2});
     }
 
-    //     /// Waits for `OnJoin` Control API callback for the provided [`Member`] ID.
-    // pub async fn wait_for_on_join(&mut self, member_id: String) {
-    //     let mut interval = interval(Duration::from_millis(50));
-    //     loop {
-    //         let callbacks = self.get_callbacks().await;
-    //         let on_join_found = callbacks
-    //             .into_iter()
-    //             .filter(|e| e.fid.contains(&member_id))
-    //             .any(|e| matches!(e.event, CallbackEvent::OnJoin(_)));
-    //         if on_join_found {
-    //             break;
-    //         }
-    //         interval.tick().await;
-    //     }
-    // }
+    await apply(spec);
+  }
+
+  Future<void> wait_for_on_join(String member_id) async {
+    while (true) {
+      var callbacks = await get_callbacks(member_id);
+      var on_join_found = callbacks
+          .where((element) => element.fid.contains(member_id))
+          .any((element) {
+            return element.event.toJson()['type'] == 'OnJoin';
+          } );
+      if(on_join_found) {
+        break;
+      }
+      await Future.delayed(Duration(milliseconds: 50));
+    }
+  }
 
 }
 
@@ -315,7 +303,7 @@ class PairedMember {
   bool is_send() {
     return send_audio != null || send_video != null;
   }
-  
+
   WebRtcPublishEndpoint? publish_endpoint() {
     WebRtcPublishEndpoint? res = null;
     if (is_send()) {
@@ -323,25 +311,23 @@ class PairedMember {
       res.id = 'publish';
       res.p2p = P2pMode.Always;
       res.force_relay = false;
-      if(send_audio == null) {
+      if (send_audio == null) {
         res.audio_settings = AudioSettings(PublishPolicy.Disabled);
-      }
-      else {
+      } else {
         res.audio_settings = send_audio!;
       }
 
-      if(send_video == null) {
+      if (send_video == null) {
         res.video_settings = VideoSettings(PublishPolicy.Disabled);
-      }
-      else {
+      } else {
         res.video_settings = send_video!;
       }
-
     }
     return res;
   }
 
-  WebRtcPlayEndpoint? play_endpoint_for(String room_id, PairedMember publisher) {
+  WebRtcPlayEndpoint? play_endpoint_for(
+      String room_id, PairedMember publisher) {
     if (recv) {
       var res = WebRtcPlayEndpoint();
       res.id = 'play-' + publisher.id;

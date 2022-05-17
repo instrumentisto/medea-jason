@@ -31,7 +31,6 @@ StepDefinitionGeneric when_interconnects_kind =
   RegExp(
       r'Control API interconnects (audio|video) of (Alice|Bob|Carol) and (Alice|Bob|Carol)'),
   (kind, left_member_id, right_member_id, context) async {
-    print('BBBBBBBBBBBBBBB');
     AudioSettings? audio_setting = null;
     VideoSettings? video_setting = null;
     if (kind == 'audio') {
@@ -74,7 +73,8 @@ StepDefinitionGeneric then_control_api_sends_on_join =
     then1<String, CustomWorld>(
   r'Control API sends `OnJoin` callback for member (Alice|Bob|Carol)',
   (id, context) async {
-    
+    var future = context.world.wait_for_on_join(id);
+    await future.timeout(Duration(seconds: 10));
   },
 );
 

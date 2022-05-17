@@ -9,27 +9,34 @@ import '../world/member.dart';
 Future<void> new_given_member( joined,
     first_member_id, second_member_id, third_member_id, webrtc, context) async {
 
-  print('CCCCCCCCCCCCC' + webrtc);
   var member_builder = MyBuilder(first_member_id, true, true);
   var member_builder2 = MyBuilder(second_member_id, true, true);
 
-  await context.world.create_member(member_builder);
-  await context.world.create_member(member_builder2);
-  print('CCCCCCCCCCCCC0' + webrtc);
+  if(second_member_id != '') {
+
 
   if (joined == 'joined ') {
-  print('CCCCCCCCCCCCC1' + webrtc);
 
+    await context.world.create_member(member_builder);
     await context.world.join_room(first_member_id);
     await context.world.wait_for_interconnection(first_member_id);
-  print('CCCCCCCCCCCCC2' + webrtc);
 
-
+    await context.world.create_member(member_builder2);
     await context.world.join_room(second_member_id);
     await context.world.wait_for_interconnection(second_member_id);
-  print('CCCCCCCCCCCCC3' + webrtc);
 
   }
+  }
+   else {
+       if (joined == 'joined ') {
+
+    await context.world.create_member(member_builder);
+    await context.world.join_room(first_member_id);
+    await context.world.wait_for_interconnection(first_member_id);
+
+  }
+   }
+
 }
 
 StepDefinitionGeneric fillField1 = given3<String, String, String, CustomWorld>(
