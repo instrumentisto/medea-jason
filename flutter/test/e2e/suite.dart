@@ -16,10 +16,12 @@ var gg = FlutterTestConfiguration()
     fillField2,
     fillField1,
     then_connection_closes,
+    then_member_receives_connection,
     when_control_api_removes_member,
     when_control_api_removes_room,
     when_interconnects_kind,
     when_control_api_removes_member_via_apply,
+    when_control_api_interconnects_via_apply,
   ]
   ..hooks = []
   ..reporters = [

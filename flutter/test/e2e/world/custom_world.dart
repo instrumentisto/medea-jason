@@ -52,8 +52,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       gg.id = 'publish';
       gg.p2p = P2pMode.Always;
       gg.force_relay = false;
-      gg.audio_settings = AudioSettings();
-      gg.video_settings = VideoSettings();
+      gg.audio_settings = AudioSettings(PublishPolicy.Optional);
+      gg.video_settings = VideoSettings(PublishPolicy.Optional);
       var ep = Endpoint();
       ep.data = gg;
       pipeline.addAll({'publish': ep}); // todo
@@ -170,9 +170,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 // todo
   Future<List<CallbackEvent>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
-    return (json.decode(cbs.body) as List)
-        .map((data) => CallbackEvent.fromJson(data))
-        .toList();
+    //todo
+    return List.empty();
   }
 
     Future<void> apply(Room el) async {
@@ -216,32 +215,63 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
 
   }
+        /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
+    /// provided [`MembersPair`] using an `Apply` method of Control API.
+    Future<void> interconnect_members_via_apply(MembersPair pair) async {
+      var spec = await get_spec();
+      if (spec.pipeline.containsKey(pair.left.id)) {
+        var ep = Endpoint();
+        ep.data = pair.left.publish_endpoint()!;
+        var member = spec.pipeline[pair.left.id]!; // pair.left.id
+        member.pipeline.addAll({'publish' : ep});
 
 
+        var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
+        var ep2 = Endpoint();
+        ep2.data = play_endpoint;
+        member.pipeline.addAll({play_endpoint.id : ep2});
+      }
 
+      if (spec.pipeline.containsKey(pair.right.id)) {
+        var member = spec.pipeline[pair.right.id]!; // pair.left.id
+        var ep = Endpoint();
+        ep.data = pair.right.publish_endpoint()!;
+        member.pipeline.addAll({'publish' : ep});
+        
+        var play_endpoint = pair.right.play_endpoint_for(room_id, pair.right)!;
+                var ep2 = Endpoint();
+        ep2.data = play_endpoint;
 
-//             let conn = member
-//                 .connections()
-//                 .wait_for_connection(partner.id().to_owned())
-//                 .await?;
-//             conn.tracks_store()
-//                 .await?
-//                 .wait_for_count(recv_count)
-//                 .await?;
+        member.pipeline.addAll({play_endpoint.id : ep2});
+      }
 
-//             let partner_conn = partner
-//                 .connections()
-//                 .wait_for_connection(member_id.to_owned())
-//                 .await?;
-//             partner_conn
-//                 .tracks_store()
-//                 .await?
-//                 .wait_for_count(send_count)
-//                 .await?;
-//         }
+      await apply(spec);
 
-//         Ok(())
-//     }
+    }
+
+    Future<void> wait_for_on_join(String member_id) async {
+      while (true) {
+        var callbacks = await get_callbacks(member_id);
+        // callbacks.where((element) => element.)
+      }
+    }
+
+    //     /// Waits for `OnJoin` Control API callback for the provided [`Member`] ID.
+    // pub async fn wait_for_on_join(&mut self, member_id: String) {
+    //     let mut interval = interval(Duration::from_millis(50));
+    //     loop {
+    //         let callbacks = self.get_callbacks().await;
+    //         let on_join_found = callbacks
+    //             .into_iter()
+    //             .filter(|e| e.fid.contains(&member_id))
+    //             .any(|e| matches!(e.event, CallbackEvent::OnJoin(_)));
+    //         if on_join_found {
+    //             break;
+    //         }
+    //         interval.tick().await;
+    //     }
+    // }
+
 }
 
 /// [Session] with some additional info about a [User] it represents.
@@ -259,4 +289,66 @@ class CustomUser {
 
   /// ID of a [Chat]-dialog with the authenticated [MyUser].
   String? dialog;
+}
+
+class MembersPair {
+  PairedMember left;
+  PairedMember right;
+
+  MembersPair(this.left, this.right);
+}
+
+class PairedMember {
+  late String id;
+  AudioSettings? send_audio;
+  VideoSettings? send_video;
+  bool recv = false;
+
+  PairedMember(this.id, this.send_audio, this.send_video, this.recv);
+
+// impl PairedMember {
+//     /// Indicates whether this [`PairedMember`] should publish media.
+//     fn is_send(&self) -> bool {
+//         self.send_audio.is_some() || self.send_video.is_some()
+//     }
+
+  bool is_send() {
+    return send_audio != null || send_video != null;
+  }
+  
+  WebRtcPublishEndpoint? publish_endpoint() {
+    WebRtcPublishEndpoint? res = null;
+    if (is_send()) {
+      res = WebRtcPublishEndpoint();
+      res.id = 'publish';
+      res.p2p = P2pMode.Always;
+      res.force_relay = false;
+      if(send_audio == null) {
+        res.audio_settings = AudioSettings(PublishPolicy.Disabled);
+      }
+      else {
+        res.audio_settings = send_audio!;
+      }
+
+      if(send_video == null) {
+        res.video_settings = VideoSettings(PublishPolicy.Disabled);
+      }
+      else {
+        res.video_settings = send_video!;
+      }
+
+    }
+    return res;
+  }
+
+  WebRtcPlayEndpoint? play_endpoint_for(String room_id, PairedMember publisher) {
+    if (recv) {
+      var res = WebRtcPlayEndpoint();
+      res.id = 'play-' + publisher.id;
+      res.force_relay = false;
+      res.src = 'local://$room_id/' + publisher.id + '/publish';
+      return res;
+    }
+    return null;
+  }
 }

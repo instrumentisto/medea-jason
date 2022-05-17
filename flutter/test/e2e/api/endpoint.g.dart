@@ -54,9 +54,9 @@ const _$P2pModeEnumMap = {
 };
 
 AudioSettings _$AudioSettingsFromJson(Map<String, dynamic> json) =>
-    AudioSettings()
-      ..publish_policy =
-          $enumDecode(_$PublishPolicyEnumMap, json['publish_policy']);
+    AudioSettings(
+      $enumDecode(_$PublishPolicyEnumMap, json['publish_policy']),
+    );
 
 Map<String, dynamic> _$AudioSettingsToJson(AudioSettings instance) =>
     <String, dynamic>{
@@ -70,9 +70,9 @@ const _$PublishPolicyEnumMap = {
 };
 
 VideoSettings _$VideoSettingsFromJson(Map<String, dynamic> json) =>
-    VideoSettings()
-      ..publish_policy =
-          $enumDecode(_$PublishPolicyEnumMap, json['publish_policy']);
+    VideoSettings(
+      $enumDecode(_$PublishPolicyEnumMap, json['publish_policy']),
+    );
 
 Map<String, dynamic> _$VideoSettingsToJson(VideoSettings instance) =>
     <String, dynamic>{

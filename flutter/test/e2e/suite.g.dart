@@ -51,6 +51,42 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             'Apply method of Control API',
             <String>[],
           ),
+          onAfter: null,
+        );
+
+        runScenario(
+          'Interconnect members with `Apply` method',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API interconnects Alice and Bob with `Apply` method',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice receives connection with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob receives connection with Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
           onAfter: () async => onAfterRunFeature(
             'Apply method of Control API',
           ),

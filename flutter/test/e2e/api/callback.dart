@@ -1,6 +1,48 @@
+
+
+import 'package:medea_jason/medea_jason.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+// part 'callback.g.dart';
+
+@JsonSerializable()
+class CallbackEvent {
+
+      @JsonKey(
+      toJson: toJ,
+      fromJson: fromJ)
+  late dynamic data;
+    /// `OnJoin` callback of Control API.
+    // OnJoin(join::OnJoin),
+
+    // /// `OnLeave` callback of Control API.
+    // OnLeave(leave::OnLeave),
+
+  static Map<String, dynamic> toJ(dynamic data) {
+    var type = data.runtimeType.toString();
+    var res = <String, dynamic>{};
+    res.addAll({'type' : type});
+    res.addAll(data.toJson());
+    return res;
+  }
+
+  static dynamic fromJ(Map<String, dynamic> json) {
+    var type = json['type']!;
+    json.remove('type');
+    var res = null;
+    if (type == 'OnJoin') {
+      // res = OnJoin.fromJson(json);
+    }
+    else {
+      // res = OnLeave.fromJson(json);
+    }
+  }
+}
+
 class CallbackItem {
   late String fid;
   late String at;
+  late CallbackEvent event;
 }
 
 class OnJoin {}
@@ -21,19 +63,6 @@ enum OnLeaveReason {
 
 class OnLeave {
   late OnLeaveReason reason;
-}
-
-class CallbackEvent {
-  late String type;
-  late OnJoin data1;
-  late OnLeave data2;
-
-  CallbackEvent() {}
-
-  factory CallbackEvent.fromJson(Map<String, dynamic> json) {
-    //todo
-    return CallbackEvent();
-  }
 }
 
 // pub enum CallbackEvent {

@@ -57,8 +57,8 @@ class WebRtcPublishEndpoint {
   late String id;
   late P2pMode p2p;
   late bool force_relay = false; // default
-  AudioSettings audio_settings = AudioSettings(); // default
-  VideoSettings video_settings = VideoSettings(); // default
+  AudioSettings audio_settings = AudioSettings(PublishPolicy.Optional); // default
+  VideoSettings video_settings = VideoSettings(PublishPolicy.Optional); // default
   WebRtcPublishEndpoint();
   factory WebRtcPublishEndpoint.fromJson(Map<String, dynamic> json) => _$WebRtcPublishEndpointFromJson(json);
 
@@ -93,7 +93,7 @@ enum PublishPolicy {
 @JsonSerializable()
 class AudioSettings {
   PublishPolicy publish_policy = PublishPolicy.Optional;
-  AudioSettings();
+  AudioSettings(this.publish_policy);
   factory AudioSettings.fromJson(Map<String, dynamic> json) => _$AudioSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$AudioSettingsToJson(this);
 }
@@ -101,7 +101,7 @@ class AudioSettings {
 @JsonSerializable()
 class VideoSettings {
   PublishPolicy publish_policy = PublishPolicy.Optional;
-  VideoSettings();
+  VideoSettings(this.publish_policy);
   factory VideoSettings.fromJson(Map<String, dynamic> json) => _$VideoSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$VideoSettingsToJson(this);
 

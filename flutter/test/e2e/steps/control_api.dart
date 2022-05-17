@@ -11,53 +11,104 @@ import '../world/custom_world.dart';
 import '../world/member.dart';
 import '../world/custom_world.dart';
 
-StepDefinitionGeneric when_control_api_removes_member = when1<String, CustomWorld>(
-  RegExp(
-      r'Control API removes member (Alice|Bob|Carol)'),
-  (
-      member_id,
-      context) async {
-        await context.world.delete_member_element(member_id);
-      },
+StepDefinitionGeneric when_control_api_removes_member =
+    when1<String, CustomWorld>(
+  RegExp(r'Control API removes member (Alice|Bob|Carol)'),
+  (member_id, context) async {
+    await context.world.delete_member_element(member_id);
+  },
 );
 
 StepDefinitionGeneric when_control_api_removes_room = when<CustomWorld>(
-  RegExp(
-      r'Control API removes the room'),
-  (
-      context) async {
-        await context.world.delete_room_element();
-      },
+  RegExp(r'Control API removes the room'),
+  (context) async {
+    await context.world.delete_room_element();
+  },
 );
 
-StepDefinitionGeneric when_interconnects_kind = when3<String, String, String, CustomWorld>(
+StepDefinitionGeneric when_interconnects_kind =
+    when3<String, String, String, CustomWorld>(
   RegExp(
       r'Control API interconnects (audio|video) of (Alice|Bob|Carol) and (Alice|Bob|Carol)'),
-  (     kind,
-         left_member_id,
-         right_member_id,
-      context) async {
-        AudioSettings? audio_setting = null;
-        VideoSettings? video_setting = null;
-        if(kind == 'audio') {
-          audio_setting = AudioSettings();
-        }
-        else {
-          video_setting = VideoSettings();
-        }
-        // todo
-      },
+  (kind, left_member_id, right_member_id, context) async {
+    print('BBBBBBBBBBBBBBB');
+    AudioSettings? audio_setting = null;
+    VideoSettings? video_setting = null;
+    if (kind == 'audio') {
+      audio_setting = AudioSettings(PublishPolicy.Optional);
+    } else {
+      video_setting = VideoSettings(PublishPolicy.Optional);
+    }
+    // todo
+  },
 );
 
-StepDefinitionGeneric when_control_api_removes_member_via_apply = when1<String, CustomWorld>(
-      r'Control API removes (Alice|Bob|Carol) with `Apply` method',
-  (     member_id,
-      context) async {
-        var spec = await context.world.get_spec();
-        spec.pipeline.remove(member_id);
-        await context.world.apply(spec);
-      },
+StepDefinitionGeneric when_control_api_removes_member_via_apply =
+    when1<String, CustomWorld>(
+  r'Control API removes (Alice|Bob|Carol) with `Apply` method',
+  (member_id, context) async {
+    var spec = await context.world.get_spec();
+    spec.pipeline.remove(member_id);
+    await context.world.apply(spec);
+  },
 );
+
+StepDefinitionGeneric when_control_api_interconnects_via_apply =
+    when2<String, String, CustomWorld>(
+  r'Control API interconnects (Alice|Bob|Carol) and (Alice|Bob|Carol) with `Apply` method',
+  (id, partner_id, context) async {
+
+    var member_pair = MembersPair(
+      PairedMember(id, AudioSettings(PublishPolicy.Optional),
+          VideoSettings(PublishPolicy.Optional), true),
+      PairedMember(partner_id, AudioSettings(PublishPolicy.Optional),
+          VideoSettings(PublishPolicy.Optional), true),
+    );
+
+    await context.world.interconnect_members_via_apply(member_pair);
+
+  },
+);
+
+StepDefinitionGeneric then_control_api_sends_on_join =
+    then1<String, CustomWorld>(
+  r'Control API sends `OnJoin` callback for member (Alice|Bob|Carol)',
+  (id, context) async {
+    
+  },
+);
+
+// #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
+// async fn then_control_api_sends_on_join(world: &mut World, id: String) {
+//     timeout(Duration::from_secs(10), world.wait_for_on_join(id))
+//         .await
+//         .unwrap()
+// }
+
+// #[when(regex = "^Control API interconnects (\\S+) and (\\S+) with \
+//                  `Apply` method$")]
+// async fn when_control_api_interconnects_via_apply(
+//     world: &mut World,
+//     id: String,
+//     partner_id: String,
+// ) {
+//     world
+//         .interconnect_members_via_apply(MembersPair {
+//             left: PairedMember {
+//                 id,
+//                 recv: true,
+//                 send_video: Some(VideoSettings::default()),
+//                 send_audio: Some(AudioSettings::default()),
+//             },
+//             right: PairedMember {
+//                 id: partner_id,
+//                 recv: true,
+//                 send_video: Some(VideoSettings::default()),
+//                 send_audio: Some(AudioSettings::default()),
+//             },
+//         })
+//         .await;
+// }
 
 
 // #[when(regex = r"^$")]
