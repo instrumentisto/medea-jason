@@ -1,35 +1,74 @@
 import 'package:medea_jason/medea_jason.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'endpoint.g.dart';
+
+@JsonSerializable()
 class Endpoint {
-  late String type;
-  late WebRtcPublishEndpoint? data1;
-  late WebRtcPlayEndpoint? data2;
+  late dynamic data;
+    static Endpoint fromJ(Map<String, dynamic> json) {
+    try {
+      var res = Endpoint();
+      res.data = WebRtcPlayEndpoint.fromJson(json);
+      return res;
+    } catch (e) {
+      var res = Endpoint();
+      res.data = WebRtcPublishEndpoint.fromJson(json);
+      return res;
+    }
+  }
+
+  Endpoint();
+  factory Endpoint.fromJson(Map<String, dynamic> json) {
+    try {
+      var res = Endpoint();
+      res.data = WebRtcPlayEndpoint.fromJson(json);
+      return res;
+    } catch (e) {
+      var res = Endpoint();
+      res.data = WebRtcPublishEndpoint.fromJson(json);
+      return res;
+    }
+  }
 
   Map<String, dynamic> toJson() {
-    if (type == 'WebRtcPublishEndpoint') {
-      return {
-        type: {data1!.toString()}
-      };
-    }
-    return {
-      type: {data2!.toString()}
-    };
+    return data.toJson();
   }
 }
 
+@JsonSerializable()
 class WebRtcPlayEndpoint {
   late String id; // skip deser
   late String src;
-  late bool force_relay; // default
+  bool force_relay = false; // default
+
+  WebRtcPlayEndpoint();
+  factory WebRtcPlayEndpoint.fromJson(Map<String, dynamic> json) => _$WebRtcPlayEndpointFromJson(json);
+
+  Map<String, dynamic> toJson() {
+    var gg = _$WebRtcPlayEndpointToJson(this);
+    gg.addAll({'kind':'WebRtcPlayEndpoint'});
+    return gg;
+  }
 }
 
+@JsonSerializable()
 class WebRtcPublishEndpoint {
   late String id;
   late P2pMode p2p;
-  late bool force_relay; // default
-  late Object audio_settings; // default
-  late Object video_settings; // default
+  late bool force_relay = false; // default
+  AudioSettings audio_settings = AudioSettings(); // default
+  VideoSettings video_settings = VideoSettings(); // default
+  WebRtcPublishEndpoint();
+  factory WebRtcPublishEndpoint.fromJson(Map<String, dynamic> json) => _$WebRtcPublishEndpointFromJson(json);
 
+  Map<String, dynamic> toJson() {
+    var gg = _$WebRtcPublishEndpointToJson(this) ;
+    gg.addAll({'kind':'WebRtcPublishEndpoint'});
+    gg['audio_settings'] = audio_settings.toJson();
+    gg['video_settings'] = video_settings.toJson();
+    return gg;
+    }
 }
 
 enum P2pMode {
@@ -49,4 +88,21 @@ enum PublishPolicy {
   ///
   /// Media server will not try to initialize publishing.
   Disabled,
+}
+
+@JsonSerializable()
+class AudioSettings {
+  PublishPolicy publish_policy = PublishPolicy.Optional;
+  AudioSettings();
+  factory AudioSettings.fromJson(Map<String, dynamic> json) => _$AudioSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$AudioSettingsToJson(this);
+}
+
+@JsonSerializable()
+class VideoSettings {
+  PublishPolicy publish_policy = PublishPolicy.Optional;
+  VideoSettings();
+  factory VideoSettings.fromJson(Map<String, dynamic> json) => _$VideoSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$VideoSettingsToJson(this);
+
 }

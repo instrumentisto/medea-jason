@@ -26,6 +26,8 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_gherkin: ^3.0.0-rc.9
+  json_serializable: ^6.1.5
+
       
 dependency_overrides:
   # TODO: Remove when `flutter_gherkin` updates.

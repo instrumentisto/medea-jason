@@ -629,9 +629,27 @@ test.flutter:
 	              $(if $(call eq,$(device),),,-d $(device))
 
 test.e2e.32:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e browser=$(browser) background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+endif
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
+test.e2e.322:
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart
+
 
 ####################
 # Waiting commands #
