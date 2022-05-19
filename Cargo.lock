@@ -1584,10 +1584,17 @@ dependencies = [
 name = "medea-control-api-proto"
 version = "0.7.0"
 dependencies = [
+ "async-trait",
+ "derive_more",
  "prost",
  "prost-types",
+ "rand",
+ "serde",
+ "smart-default",
+ "time 0.3.9",
  "tonic",
  "tonic-build",
+ "url",
 ]
 
 [[package]]
