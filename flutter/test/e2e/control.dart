@@ -17,36 +17,45 @@ class MyClient {
       Uri.parse('$control_api_address/$path'),
       headers: headers,
       body: json.encode(element));
-    print('RESP CREATE: ' + response.body+'\n\n');
+        if(response.statusCode != 200) {
+      throw response.body;
+    }
     return response;
   }
 
   Future<http.Response> delete(String path) async {
     var response = await inner.delete(
       Uri.parse('$control_api_address/$path'));
-    print('RESP delete: ' + response.body+'\n\n');
-    print('RESP delete: ' + response.statusCode.toString()+'\n\n');
+    if(response.statusCode != 200) {
+      throw response.body;
+    }
     return response;
   }
 
   Future<http.Response> get(String path) async {
     var response = await inner.get(
       Uri.parse('$control_api_address/$path'));
-    print('RESP get: ' + response.body+'\n\n');
+        if(response.statusCode != 200) {
+      throw response.body;
+    }
     return response;
   }
 
   Future<http.Response> apply(String path, Object element) async {
     var response = await inner.put(
       Uri.parse('$control_api_address/$path'), headers: headers, body: json.encode(element));
-    print('RESP apply: ' + response.body+'\n\n');
+    if(response.statusCode != 200) {
+      throw response.body;
+    }
     return response;
   }
 
   Future<http.Response> callbacks() async {
     var response = await inner.get(
       Uri.parse('http://127.0.0.1:8000/callbacks'));
-    // print('RESP callbacks: ' + response.body+'\n\n');
+        if(response.statusCode != 200) {
+      throw response.body;
+    }
     return response;
   }
 

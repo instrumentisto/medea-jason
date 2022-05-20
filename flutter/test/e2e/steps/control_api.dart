@@ -125,6 +125,7 @@ StepDefinitionGeneric when_control_api_starts_publishing =
     then3<String, String, String, CustomWorld>(
   r"Control API starts (Alice|Bob|Carol)'s (audio|video|media) publishing to (Alice|Bob|Carol)",
   (publisher_id, kind, receiver_id, context) async {
+
     var all_kinds = kind.contains('media');
 
     AudioSettings? a_setting;
@@ -158,6 +159,7 @@ StepDefinitionGeneric when_control_api_deletes_play_endpoint =
     when2<String, String, CustomWorld>(
   r"Control API deletes (Alice|Bob|Carol)'s play endpoint with (Alice|Bob|Carol)",
   (id, partner_id, context) async {
+
     var future = context.world.delete_play_endpoint(id, partner_id);
     await future.timeout(Duration(milliseconds: 200));
   },

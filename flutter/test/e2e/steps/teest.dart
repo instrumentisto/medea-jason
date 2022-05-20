@@ -11,7 +11,7 @@ import '../world/member.dart';
 import '../world/more_args.dart';
 
 Future<void> new_given_member(
-    joined,
+    String joined,
     first_member_id,
     second_member_id,
     third_member_id,
@@ -19,6 +19,8 @@ Future<void> new_given_member(
     disabled_media_type,
     String disabled_direction,
     StepContext<CustomWorld> context) async {
+  print('__________________');
+  print('|$joined|$first_member_id|$second_member_id|$third_member_id|$media_settings|$disabled_media_type|$disabled_direction|');
   var not_endpoint_direction = '';
   if (media_settings.contains('publish')) {
     not_endpoint_direction = 'publish';
@@ -27,7 +29,8 @@ Future<void> new_given_member(
     not_endpoint_direction = 'play';
   }
 
-  var endpoints_disabled = media_settings == ' with no WebRTC endpoints';
+  var endpoints_disabled = media_settings.contains(' with no WebRTC endpoints');
+
   var all_endpoints_disabled =
       endpoints_disabled && not_endpoint_direction == '';
   var is_send_disabled = endpoints_disabled &&
@@ -39,7 +42,7 @@ Future<void> new_given_member(
       MyBuilder(first_member_id, !is_send_disabled, !is_recv_disabled);
 
   await context.world.create_member(member_builder);
-  if (joined == 'joined ') {
+  if (joined.contains('joined')) {
     await context.world.join_room(first_member_id);
     await context.world.wait_for_interconnection(first_member_id);
   }
@@ -92,9 +95,10 @@ Future<void> new_given_member(
 
 StepDefinitionGeneric fillField1 =
     given5<String, String, String, String, String, CustomWorld>(
-  r'room with (joined |)member (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
+  r'(room with joined |room with |joined |)member (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
   (joined, first_member_id, webrtc, disabled_media_type, disabled_direction,
       context) async {
+  print('__________________1');
     await new_given_member(joined, first_member_id, '', '', webrtc,
         disabled_media_type, disabled_direction, context);
   },
@@ -102,10 +106,10 @@ StepDefinitionGeneric fillField1 =
 
 StepDefinitionGeneric fillField2 =
     given6<String, String, String, String, String, String, CustomWorld>(
-  RegExp(
-      r'room with (joined |)member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| disabled| muted|)( media| audio| video|)( publishing| playing|)'),
+      r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
   (joined, first_member_id, second_member_id, webrtc, disabled_media_type,
       disabled_direction, context) async {
+  print('__________________2');
     await new_given_member(joined, first_member_id, second_member_id, '',
         webrtc, disabled_media_type, disabled_direction, context);
   },
@@ -113,10 +117,10 @@ StepDefinitionGeneric fillField2 =
 
 StepDefinitionGeneric fillField3 =
     given7<String, String, String, String, String, String, String, CustomWorld>(
-  RegExp(
-      r'room with (joined |)member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| disabled| muted|)( media| audio| video|)( publishing| playing|)'),
+      r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
   (joined, first_member_id, second_member_id, third_member_id, webrtc,
       disabled_media_type, disabled_direction, context) async {
+  print('__________________3');
     await new_given_member(
         joined,
         first_member_id,
@@ -128,45 +132,3 @@ StepDefinitionGeneric fillField3 =
         context);
   },
 );
-
-StepDefinitionGeneric fillField01 =
-    given5<String, String, String, String, String, CustomWorld>(
-  r'(joined |)member(s) (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
-  (joined, first_member_id, webrtc, disabled_media_type, disabled_direction,
-      context) async {
-    await new_given_member(joined, first_member_id, '', '', webrtc,
-        disabled_media_type, disabled_direction, context);
-  },
-);
-
-StepDefinitionGeneric fillField02 =
-    given6<String, String, String, String, String, String, CustomWorld>(
-  RegExp(
-      r'(joined |)member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| disabled| muted|)( media| audio| video|)( publishing| playing|)'),
-  (joined, first_member_id, second_member_id, webrtc, disabled_media_type,
-      disabled_direction, context) async {
-    await new_given_member(joined, first_member_id, second_member_id, '',
-        webrtc, disabled_media_type, disabled_direction, context);
-  },
-);
-
-StepDefinitionGeneric fillField03 =
-    given7<String, String, String, String, String, String, String, CustomWorld>(
-  RegExp(
-      r'(joined |)member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| disabled| muted|)( media| audio| video|)( publishing| playing|)'),
-  (joined, first_member_id, second_member_id, third_member_id, webrtc,
-      disabled_media_type, disabled_direction, context) async {
-    await new_given_member(
-        joined,
-        first_member_id,
-        second_member_id,
-        third_member_id,
-        webrtc,
-        disabled_media_type,
-        disabled_direction,
-        context);
-  },
-);
-
-
-// todo recheck Control API removes member Alice (Создает нового пользователя)

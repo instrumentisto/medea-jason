@@ -34,9 +34,10 @@ StepDefinitionGeneric then_member_doesnt_have_remote_tracks_with =
   (id, partner_id, context) async {
     var member = context.world.members[id]!;
     await member.wait_for_connect(partner_id);
-    var track_store = member.connection_store.remote_tracks;
+    var track_store = member.connection_store.remote_tracks[partner_id]!;
     var tracks_count = track_store.length;
     if (tracks_count != 0) {
+      print(tracks_count);
       throw 42;
     }
   },
@@ -49,6 +50,8 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
   (id, expected_count, live_or_stopped, remote_id, context) async {
     var member = context.world.members[id]!;
     await member.wait_for_connect(remote_id);
+    await Future.delayed(Duration(seconds: 5));
+
     var muted;
     var stopped;
     if (live_or_stopped == 'live') {
@@ -62,14 +65,15 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     // todo check muted
     var actual_count = 0;
     for (var i = 0; i < 5; ++i) {
+
       actual_count = member.connection_store.remote_tracks[remote_id]!
           .where((element) =>
               member.connection_store
                       .stopped_tracks[element.getTrack().id()]! ==
-                  stopped )
+                  stopped)
           .length;
       if (actual_count < expected_count) {
-        await Future.delayed(Duration(milliseconds: 30));
+        await Future.delayed(Duration(milliseconds: 300));
         actual_count = member.connection_store.remote_tracks[remote_id]!
             .where((element) =>
                 member.connection_store
@@ -77,6 +81,10 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
                     stopped)
             .length;
       }
+      else {
+        break;
+      }
+      print(member.connection_store.remote_tracks[remote_id]!.length);
     }
 
     print('$actual_count -- $expected_count');

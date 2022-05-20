@@ -19,75 +19,75 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
   void testFeature0() {
     runFeature(
-      'Create endpoint:',
+      'Enable remote media:',
       <String>[],
       () {
         runScenario(
-          'New endpoint creates new connections',
+          '`RemoteMediaTrack.on_enabled()` fires when video is enabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              'Given room with joined member Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API interconnects Alice and Bob',
+              'Given joined member Alice with disabled video playing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice receives connection with Bob',
+              'When Alice enables remote video',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Bob receives connection with Alice',
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote device video track from Bob',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'Create endpoint',
+            'Enable remote media',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          'Only one member publishes all',
+          '`RemoteMediaTrack.on_enabled()` fires when audio is enabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              'Given room with joined member Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API starts Alice\'s media publishing to Bob',
+              'Given joined member Alice with disabled audio playing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice doesn\'t have remote tracks from Bob',
+              'When Alice enables remote audio',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Bob has audio and video remote tracks from Alice',
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote audio track from Bob',
               <String>[],
               null,
               dependencies,
@@ -98,32 +98,53 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Only one member publishes audio',
+          '`RemoteMediaTrack.on_enabled()` doesn\'t fire when track is created',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              'Given room with joined member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API starts Alice\'s audio publishing to Bob',
+              'And member Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice doesn\'t have remote tracks from Bob',
+              'When Bob joins the room',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Bob has audio remote track from Alice',
+              'Then `on_enabled` callback fires 0 times on Alice\'s remote audio track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And `on_enabled` callback fires 0 times on Bob\'s remote audio track from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And `on_enabled` callback fires 0 times on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And `on_enabled` callback fires 0 times on Bob\'s remote device video track from Alice',
               <String>[],
               null,
               dependencies,
@@ -134,32 +155,32 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Only one member publishes video',
+          'Remote member enables video',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              'Given room with joined member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API starts Alice\'s video publishing to Bob',
+              'And joined member Bob with disabled video publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice doesn\'t have remote tracks from Bob',
+              'When Bob enables video and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Bob has video remote track from Alice',
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote device video track from Bob',
               <String>[],
               null,
               dependencies,
@@ -170,68 +191,32 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'WebRtcPlayEndpoint removed and recreated',
+          'Remote member enables audio',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob',
+              'Given room with joined member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API deletes Alice\'s play endpoint with Bob',
+              'And joined member Bob with disabled audio publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Control API starts Bob\'s media publishing to Alice',
+              'When Bob enables audio and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice has 2 live remote tracks from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Endpoints removed and recreated',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Control API deletes Bob\'s publish endpoint',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API starts Bob\'s media publishing to Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice has 2 live remote tracks from Bob',
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote audio track from Bob',
               <String>[],
               null,
               dependencies,
@@ -239,7 +224,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Create endpoint',
+            'Enable remote media',
           ),
         );
       },

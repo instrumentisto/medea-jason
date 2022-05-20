@@ -110,6 +110,7 @@ class MyMember {
         connection_store.stopped_tracks.addAll({p0.getTrack().id(): false});
         connection_store.remote_tracks[id]!.add(p0);
         p0.onStopped(() {
+          print(p0.getTrack().id());
           connection_store.stopped_tracks[p0.getTrack().id()] = true;
         });
       });

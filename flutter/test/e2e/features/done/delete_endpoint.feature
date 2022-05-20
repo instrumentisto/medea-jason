@@ -9,7 +9,7 @@ Feature: Delete endpoint
     Given room with joined member Alice and Bob
     When Control API deletes Alice's play endpoint with Bob
     Then Alice has 2 stopped remote tracks from Bob
-    
+  
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob
     When Control API deletes Alice's publish endpoint

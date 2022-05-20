@@ -16,6 +16,11 @@ part 'suite.g.dart';
 
 var gg = FlutterTestConfiguration()
   ..stepDefinitions = [
+
+    fillField3,
+    fillField2,
+    fillField1,
+
     // control_api
     then_control_api_sends_on_leave,
     when_control_api_removes_member,
@@ -41,9 +46,9 @@ var gg = FlutterTestConfiguration()
     then_on_close_fires,
     given_member_gum_will_error,
     then_room_failed_local_stream_fires,
-    when_member_joins_room,
     when_jason_object_disposes,
     when_room_closed_by_client,
+    when_member_joins_room,
 
     //track
     then_member_has_remote_track,
@@ -59,13 +64,6 @@ var gg = FlutterTestConfiguration()
     when_enables_or_mutes,
     when_member_enables_remote_track,
     // then_remote_media_direction_is,
-
-    fillField3,
-    fillField2,
-    fillField1,
-    fillField03,
-    fillField02,
-    fillField01,
   ]
   ..hooks = []
   ..reporters = [

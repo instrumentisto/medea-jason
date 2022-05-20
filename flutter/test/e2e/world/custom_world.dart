@@ -174,6 +174,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   Future<void> delete_play_endpoint(
       String member_id, String partner_member_id) async {
     var play_endpoint_id = 'play-$partner_member_id';
+
     var resp =
         await control_client.delete('$room_id/$member_id/$play_endpoint_id');
     // todo error check
@@ -236,9 +237,42 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+
+
+
+
+
+    //     if let Some(play_endpoint) =
+    //         pair.right.play_endpoint_for(&self.room_id, &pair.left)
+    //     {
+    //         let right_member = self.members.get_mut(&pair.right.id).unwrap();
+
+    //         right_member.update_recv_media_state(
+    //             Some(MediaKind::Video),
+    //             None,
+    //             true,
+    //         );
+    //         right_member.update_recv_media_state(
+    //             Some(MediaKind::Audio),
+    //             None,
+    //             true,
+    //         );
+
+    //         self.control_client
+    //             .create(
+    //                 &control_api_path!(
+    //                     self.room_id,
+    //                     pair.right.id,
+    //                     play_endpoint.id
+    //                 ),
+    //                 play_endpoint.into(),
+    //             )
+    //             .await?;
+    //     }
   /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
   /// provided [`MembersPair`] using an `Apply` method of Control API.
   Future<void> interconnect_members(MembersPair pair) async {
+
     if (pair.left.publish_endpoint() != null) {
       var publish_endpoint = pair.left.publish_endpoint()!;
       var left_member = members[pair.left.id]!;
@@ -269,6 +303,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           '$room_id/' + pair.right.id + '/publish', publish_endpoint.toJson());
     }
 
+
     if (pair.left.play_endpoint_for(room_id, pair.right) != null) {
       var publish_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
       var left_member = members[pair.left.id]!;
@@ -293,6 +328,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           publish_endpoint.toJson());
     }
 
+
     {
       var left_member = members[pair.left.id]!;
       left_member.is_send = pair.left.is_send();
@@ -303,8 +339,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var right_member = members[pair.right.id]!;
       right_member.is_send = pair.right.is_send();
       right_member.is_recv = pair.right.recv;
-
-      /// ???? right left ??
     }
   }
 
