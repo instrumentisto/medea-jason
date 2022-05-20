@@ -25,6 +25,7 @@ class MyClient {
     var response = await inner.delete(
       Uri.parse('$control_api_address/$path'));
     print('RESP delete: ' + response.body+'\n\n');
+    print('RESP delete: ' + response.statusCode.toString()+'\n\n');
     return response;
   }
 
@@ -45,11 +46,11 @@ class MyClient {
   Future<http.Response> callbacks() async {
     var response = await inner.get(
       Uri.parse('http://127.0.0.1:8000/callbacks'));
-    print('RESP callbacks: ' + response.body+'GG' +'\n\n');
+    // print('RESP callbacks: ' + response.body+'\n\n');
     return response;
   }
 
   String get_url(String path) {
-    return '$control_api_address/control-api/$path';
+    return '$control_api_address/$path';
   }
 }

@@ -26,6 +26,8 @@ StepDefinitionGeneric when_control_api_removes_room = when<CustomWorld>(
   },
 );
 
+
+
 StepDefinitionGeneric when_interconnects_kind =
     when3<String, String, String, CustomWorld>(
   RegExp(
@@ -52,11 +54,25 @@ StepDefinitionGeneric when_control_api_removes_member_via_apply =
   },
 );
 
+StepDefinitionGeneric when_control_api_interconnects_members =
+    when2<String, String, CustomWorld>(
+  r'Control API interconnects (Alice|Bob|Carol) and (Alice|Bob|Carol)',
+  (id, partner_id, context) async {
+    var member_pair = MembersPair(
+      PairedMember(id, AudioSettings(PublishPolicy.Optional),
+          VideoSettings(PublishPolicy.Optional), true),
+      PairedMember(partner_id, AudioSettings(PublishPolicy.Optional),
+          VideoSettings(PublishPolicy.Optional), true),
+    );
+
+    await context.world.interconnect_members(member_pair);
+  },
+);
+
 StepDefinitionGeneric when_control_api_interconnects_via_apply =
     when2<String, String, CustomWorld>(
   r'Control API interconnects (Alice|Bob|Carol) and (Alice|Bob|Carol) with `Apply` method',
   (id, partner_id, context) async {
-
     var member_pair = MembersPair(
       PairedMember(id, AudioSettings(PublishPolicy.Optional),
           VideoSettings(PublishPolicy.Optional), true),
@@ -65,7 +81,6 @@ StepDefinitionGeneric when_control_api_interconnects_via_apply =
     );
 
     await context.world.interconnect_members_via_apply(member_pair);
-
   },
 );
 
@@ -78,200 +93,72 @@ StepDefinitionGeneric then_control_api_sends_on_join =
   },
 );
 
-// #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
-// async fn then_control_api_sends_on_join(world: &mut World, id: String) {
-//     timeout(Duration::from_secs(10), world.wait_for_on_join(id))
-//         .await
-//         .unwrap()
-// }
+StepDefinitionGeneric then_control_api_doesnt_sends_on_leave =
+    then1<String, CustomWorld>(
+  r"Control API doesn't send `OnLeave` callback for member (Alice|Bob|Carol)",
+  (id, context) async {
+    var res = false;
+    try {
+      var future = context.world.wait_for_on_leave(id, '');
+      await future.timeout(Duration(seconds: 10));
+    }
+    catch (e) {
+      if(e.toString().contains('TimeoutException')) {
+        res = true;
+      }
+    }
+    if (!res) {
+      throw 'send onLeav';
+    }
+  },
+);
 
-// #[when(regex = "^Control API interconnects (\\S+) and (\\S+) with \
-//                  `Apply` method$")]
-// async fn when_control_api_interconnects_via_apply(
-//     world: &mut World,
-//     id: String,
-//     partner_id: String,
-// ) {
-//     world
-//         .interconnect_members_via_apply(MembersPair {
-//             left: PairedMember {
-//                 id,
-//                 recv: true,
-//                 send_video: Some(VideoSettings::default()),
-//                 send_audio: Some(AudioSettings::default()),
-//             },
-//             right: PairedMember {
-//                 id: partner_id,
-//                 recv: true,
-//                 send_video: Some(VideoSettings::default()),
-//                 send_audio: Some(AudioSettings::default()),
-//             },
-//         })
-//         .await;
-// }
+StepDefinitionGeneric then_control_api_sends_on_leave =
+    then2<String, String, CustomWorld>(
+  r'Control API sends `OnLeave` callback with `(.+)` reason for member (Alice|Bob|Carol)',
+  (reason, id, context) async {
+    await context.world.wait_for_on_leave(id, reason).timeout(Duration(seconds: 10));
+  },
+);
 
+StepDefinitionGeneric when_control_api_starts_publishing =
+    then3<String, String, String, CustomWorld>(
+  r"Control API starts (Alice|Bob|Carol)'s (audio|video|media) publishing to (Alice|Bob|Carol)",
+  (publisher_id, kind, receiver_id, context) async {
+    var all_kinds = kind.contains('media');
 
-// #[when(regex = r"^$")]
-// async fn when_interconnects_kind(
-//     world: &mut World,
-//     kind: String,
-//     left_member_id: String,
-//     right_member_id: String,
-// ) {
-//     let send_video = kind.contains("video").then(|| VideoSettings {
-//         publish_policy: proto::PublishPolicy::Optional,
-//     });
-//     let send_audio = kind.contains("audio").then(|| AudioSettings {
-//         publish_policy: proto::PublishPolicy::Optional,
-//     });
+    AudioSettings? a_setting;
+    if (all_kinds || kind.contains('audio')) {
+      a_setting = AudioSettings(PublishPolicy.Optional);
+    }
 
-//     world
-//         .interconnect_members(MembersPair {
-//             left: PairedMember {
-//                 id: left_member_id,
-//                 recv: true,
-//                 send_video: send_video.clone(),
-//                 send_audio: send_audio.clone(),
-//             },
-//             right: PairedMember {
-//                 id: right_member_id,
-//                 recv: true,
-//                 send_video,
-//                 send_audio,
-//             },
-//         })
-//         .await
-//         .unwrap();
-// }
+    VideoSettings? v_setting;
+    if (all_kinds || kind.contains('video')) {
+      v_setting = VideoSettings(PublishPolicy.Optional);
+    }
 
-// #[then(regex = "^Control API sends `OnLeave` callback with `(.+)` reason \
-//                  for member (\\S+)$")]
-// async fn then_control_api_sends_on_leave(
-//     world: &mut World,
-//     reason: String,
-//     id: String,
-// ) {
-//     // Assertion is done inside `wait_for_on_leave()` method.
-//     timeout(Duration::from_secs(10), world.wait_for_on_leave(id, reason))
-//         .await
-//         .unwrap();
-// }
+    var member_pair = MembersPair(
+      PairedMember(publisher_id, a_setting, v_setting, false),
+      PairedMember(receiver_id, null, null, true),
+    );
+    await context.world.interconnect_members(member_pair);
+  },
+);
 
-// #[then(regex = "^Control API doesn't send `OnLeave` callback for \
-//                  member (\\S+)$")]
-// async fn then_control_api_doesnt_sends_on_leave(world: &mut World, id: String) {
-//     assert!(timeout(
-//         Duration::from_millis(300),
-//         world.wait_for_on_leave(id, String::new()),
-//     )
-//     .await
-//     .is_err());
-// }
+StepDefinitionGeneric when_control_api_deletes_publish_endpoint =
+    when1<String, CustomWorld>(
+  r"Control API deletes (Alice|Bob|Carol)'s publish endpoint",
+  (id, context) async {
+    var future = context.world.delete_publish_endpoint(id);
+    await future.timeout(Duration(milliseconds: 200));
+  },
+);
 
-// #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
-// async fn then_control_api_sends_on_join(world: &mut World, id: String) {
-//     timeout(Duration::from_secs(10), world.wait_for_on_join(id))
-//         .await
-//         .unwrap()
-// }
-
-// #[when(regex = "^Control API starts (\\S+)'s (audio|video|media) publishing \
-//                  to (\\S+)$")]
-// async fn when_control_api_starts_publishing(
-//     world: &mut World,
-//     publisher_id: String,
-//     kind: String,
-//     receiver_id: String,
-// ) {
-//     let all_kinds = kind.contains("media");
-//     let send_audio =
-//         (all_kinds || kind.contains("audio")).then(AudioSettings::default);
-//     let send_video =
-//         (all_kinds || kind.contains("video")).then(VideoSettings::default);
-//     world
-//         .interconnect_members(MembersPair {
-//             left: PairedMember {
-//                 id: publisher_id,
-//                 recv: false,
-//                 send_audio,
-//                 send_video,
-//             },
-//             right: PairedMember {
-//                 id: receiver_id,
-//                 recv: true,
-//                 send_video: None,
-//                 send_audio: None,
-//             },
-//         })
-//         .await
-//         .unwrap();
-// }
-
-// #[when(regex = r"^Control API interconnects (\S+) and (\S+)$")]
-// async fn when_control_api_interconnects_members(
-//     world: &mut World,
-//     id: String,
-//     partner_id: String,
-// ) {
-//     world
-//         .interconnect_members(MembersPair {
-//             left: PairedMember {
-//                 id,
-//                 recv: true,
-//                 send_video: Some(VideoSettings::default()),
-//                 send_audio: Some(AudioSettings::default()),
-//             },
-//             right: PairedMember {
-//                 id: partner_id,
-//                 recv: true,
-//                 send_video: Some(VideoSettings::default()),
-//                 send_audio: Some(AudioSettings::default()),
-//             },
-//         })
-//         .await
-//         .unwrap();
-// }
-
-// #[when(regex = "^Control API interconnects (\\S+) and (\\S+) with \
-//                  `Apply` method$")]
-// async fn when_control_api_interconnects_via_apply(
-//     world: &mut World,
-//     id: String,
-//     partner_id: String,
-// ) {
-//     world
-//         .interconnect_members_via_apply(MembersPair {
-//             left: PairedMember {
-//                 id,
-//                 recv: true,
-//                 send_video: Some(VideoSettings::default()),
-//                 send_audio: Some(AudioSettings::default()),
-//             },
-//             right: PairedMember {
-//                 id: partner_id,
-//                 recv: true,
-//                 send_video: Some(VideoSettings::default()),
-//                 send_audio: Some(AudioSettings::default()),
-//             },
-//         })
-//         .await;
-// }
-
-// #[when(regex = r"^Control API deletes (\S+)'s publish endpoint$")]
-// async fn when_control_api_deletes_publish_endpoint(
-//     world: &mut World,
-//     id: String,
-// ) {
-//     world.delete_publish_endpoint(&id).await;
-//     sleep(Duration::from_millis(200)).await;
-// }
-
-// #[when(regex = r"^Control API deletes (\S+)'s play endpoint with (\S+)$")]
-// async fn when_control_api_deletes_play_endpoint(
-//     world: &mut World,
-//     id: String,
-//     partner_id: String,
-// ) {
-//     world.delete_play_endpoint(&id, &partner_id).await;
-//     sleep(Duration::from_millis(200)).await;
-// }
+StepDefinitionGeneric when_control_api_deletes_play_endpoint =
+    when2<String, String, CustomWorld>(
+  r"Control API deletes (Alice|Bob|Carol)'s play endpoint with (Alice|Bob|Carol)",
+  (id, partner_id, context) async {
+    var future = context.world.delete_play_endpoint(id, partner_id);
+    await future.timeout(Duration(milliseconds: 200));
+  },
+);

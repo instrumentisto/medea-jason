@@ -18,16 +18,10 @@ class MyBuilder {
       RoomHandle room,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state) {
-    room.onFailedLocalMedia((p0) {
-      print('DEAD');
-    });
-    room.onConnectionLoss((p0) {
-      print('Loss');
-    });
-    room.onClose((p0) => print('$id: Close'));
-    room.onLocalTrack((p0) {
-      print('Ltrack');
-    });
+    room.onFailedLocalMedia((p0) {});
+    room.onConnectionLoss((p0) {});
+    room.onClose((p0) {});
+    room.onLocalTrack((p0) {});
     var result =
         MyMember(id, is_send, is_recv, false, send_state, recv_state, room);
     result.room = room;
@@ -45,8 +39,14 @@ class myConnectionStore {
   var connects = HashMap<String, ConnectionHandle>();
   var close = HashMap<String, ConnectionHandle>();
 
+  var stopped_tracks = HashMap<String, bool>();
+
+  var callback_counter = HashMap<String, Map<String, int>>();
+
+  var remote_tracks = HashMap<String, List<RemoteMediaTrack>>();
+  List<LocalMediaTrack> local_tracks = List.empty(growable: true);
+
   HashMap<String, Function(ConnectionHandle)> onConnect = HashMap();
-  HashMap<String, Function(RoomCloseReason)> onClose = HashMap();
 }
 
 class MyMember {
@@ -56,6 +56,7 @@ class MyMember {
   late bool is_joined;
   late HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state;
   late HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state;
+  late Completer<RoomCloseReason> close_reason = Completer();
   late RoomHandle room;
   var connection_store = myConnectionStore();
   // window: Window,
@@ -63,18 +64,61 @@ class MyMember {
   MyMember(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
     room.onClose((p0) {
-      connection_store.onClose.forEach((key, value) {
-        value(p0);
-      });
+      close_reason.complete(p0);
+    });
+
+    room.onLocalTrack((p0) {
+      connection_store.local_tracks.add(p0);
     });
 
     room.onNewConnection((p0) {
+      var id = p0.getRemoteMemberId();
+      connection_store.remote_tracks.addAll({id: List.empty(growable: true)});
+      p0.onRemoteTrackAdded((p0) {
+        connection_store.callback_counter.addAll({
+          p0.getTrack().id(): {
+            'enabled': 0,
+            'disabled': 0,
+            'muted': 0,
+            'unmuted': 0
+          }
+        });
+        p0.onMuted(() {
+          var c = connection_store.callback_counter[p0.getTrack().id()]!;
+          var old = c['muted']!;
+          c['muted'] = old + 1;
+        });
+
+        p0.onUnmuted(() {
+          var c = connection_store.callback_counter[p0.getTrack().id()]!;
+          var old = c['unmuted']!;
+          c['unmuted'] = old + 1;
+        });
+
+        p0.onMediaDirectionChanged((p0_) {
+          if (p0_ != TrackMediaDirection.SendRecv) {
+            var c = connection_store.callback_counter[p0.getTrack().id()]!;
+            var old = c['disabled']!;
+            c['disabled'] = old + 1;
+          } else {
+            var c = connection_store.callback_counter[p0.getTrack().id()]!;
+            var old = c['enabled']!;
+            c['enabled'] = old + 1;
+          }
+        });
+
+        connection_store.stopped_tracks.addAll({p0.getTrack().id(): false});
+        connection_store.remote_tracks[id]!.add(p0);
+        p0.onStopped(() {
+          connection_store.stopped_tracks[p0.getTrack().id()] = true;
+        });
+      });
+
       connection_store.connects.addAll({p0.getRemoteMemberId(): p0});
       connection_store.close_conn.addAll({p0.getRemoteMemberId(): Completer()});
       p0.onClose(() {
         connection_store.close_conn[p0.getRemoteMemberId()]!.complete();
       });
-      print(connection_store.onConnect);
       connection_store.onConnect.forEach((key, value) {
         value(p0);
       });
@@ -82,24 +126,37 @@ class MyMember {
   }
 
   Future<void> wait_for_connect(String id) {
-    var close = Completer();
+    var connect = Completer();
     if (!connection_store.connects.containsKey(id)) {
       connection_store.onConnect.addAll({
         id: (p0) {
           if (p0.getRemoteMemberId() == id) {
-            close.complete();
+            connect.complete();
             connection_store.onConnect.remove(id);
           }
         }
       });
     } else {
-      close.complete();
+      connect.complete();
     }
-    return close.future;
+    return connect.future;
   }
 
-    Future<void> wait_for_close(String id) {
-      return connection_store.close_conn[id]!.future;
+  Future<void> wait_for_track_count(String id, int count) async {
+    var count_f = Completer();
+    if (connection_store.remote_tracks[id]!.length == count) {
+      count_f.complete();
+    } else {
+      while (connection_store.remote_tracks[id]!.length < count) {
+        await Future.delayed(Duration(milliseconds: 100));
+      }
+      count_f.complete();
+    }
+    return count_f.future;
+  }
+
+  Future<void> wait_for_close(String id) {
+    return connection_store.close_conn[id]!.future;
   }
 
   Future<void> join_room(String room_id) async {
@@ -124,7 +181,7 @@ class MyMember {
 
   List<Tuple2<MediaKind, MediaSourceKind>> kinds_combinations(
       MediaKind? kind, MediaSourceKind? source_kind) {
-    var out = List<Tuple2<MediaKind, MediaSourceKind>>.empty();
+    var out = List<Tuple2<MediaKind, MediaSourceKind>>.empty(growable: true);
     if (kind != null) {
       if (source_kind != null) {
         out.add(Tuple2(kind, source_kind));
@@ -151,7 +208,7 @@ class MyMember {
     var recv_count = 0;
     recv_state.forEach((key, value) {
       if (other.send_state[key] != null) {
-        ++send_count;
+        ++recv_count;
       }
     });
     return Tuple2<int, int>(send_count, recv_count);
@@ -159,7 +216,7 @@ class MyMember {
 
   Future<void> toggle_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
-    update_send_media_state(kind, source, enabled);
+    await update_send_media_state(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.Audio) {
@@ -214,7 +271,7 @@ class MyMember {
 
   Future<void> toggle_remote_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
-    update_recv_media_state(kind, source, enabled);
+    await update_recv_media_state(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.Audio) {

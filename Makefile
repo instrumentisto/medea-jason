@@ -627,6 +627,11 @@ test.flutter:
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))
+regen:
+	cd flutter/ && \
+	flutter clean && \
+	flutter pub get && \
+	flutter pub run build_runner build --delete-conflicting-outputs
 
 test.e2e.32:
 ifeq ($(up),yes)

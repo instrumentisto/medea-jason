@@ -15,6 +15,9 @@ import '../control.dart';
 import 'member.dart';
 import 'package:uuid/uuid.dart';
 
+
+
+
 /// [FlutterWidgetTesterWorld] storing a custom state during a single test.
 class CustomWorld extends FlutterWidgetTesterWorld {
   late String room_id;
@@ -121,6 +124,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
     var jason = Jason();
     var room = jason.initRoom();
+    await room.disableVideo(MediaSourceKind.Display);
+
 
     var member = builder.build(room, send_state, recv_state);
 
@@ -133,18 +138,45 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     await members[member_id]!.join_room(room_id);
   }
 
-  Future<void> close_room(String member_id) async {
-    var jason = jasons[member_id];
-    var member = members[member_id];
-    var room = member?.room;
-    jason?.closeRoom(room!);
+  void close_room(String member_id) {
+    var jason = jasons[member_id]!;
+    var member = members[member_id]!;
+    var room = member.room;
+    jason.closeRoom(room);
+  }
+
+  Future<void> wait_for_on_leave(String member_id, String reason) async {
+    while(true) {
+      var callbacks = await get_callbacks(member_id);
+      var events = callbacks.where((element) => element.fid.contains(member_id) && element.event.data is OnLeave).map((e) => e.event.data as OnLeave);
+      if(events.isNotEmpty) {
+        var ev = events.first;
+        if(ev.reason.name == reason) {
+          break;
+        } else {
+          throw 'not eq';
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 100));
+    }
   }
 
   Future<RoomCloseReason> wait_for_on_close(String member_id) async {
     var member = members[member_id]!;
-    var reason = Completer<RoomCloseReason>();
-    member.room.onClose((p0) {reason.complete(p0);});
-    return reason.future;
+    return member.close_reason.future;
+  }
+
+  Future<void> delete_publish_endpoint(String member_id) async {
+    var resp = await control_client.delete('$room_id/$member_id/publish');
+    // todo error check
+  }
+
+  Future<void> delete_play_endpoint(
+      String member_id, String partner_member_id) async {
+    var play_endpoint_id = 'play-$partner_member_id';
+    var resp =
+        await control_client.delete('$room_id/$member_id/$play_endpoint_id');
+    // todo error check
   }
 
   Future<void> delete_member_element(String member_id) async {
@@ -170,7 +202,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   Future<List<CallbackItem>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
     return (json.decode(cbs.body) as List)
-        .map((data) => CallbackItem.fromJson(data))
+        .map((data) => CallbackItem.fromJson(data)).where((element) => element.fid.contains(room_id))
         .toList();
   }
 
@@ -194,22 +226,85 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await member.wait_for_connect(element.key);
 
-      // todo
-      //     conn.tracks_store()
-      //         .await?
-      //         .wait_for_count(recv_count)
-      //         .await?;
+      await member.wait_for_track_count(element.key, recv_count);
 
       var other_member = members[element.key]!;
       await other_member.wait_for_connect(member.id);
 
-      //     partner_conn
-      //         .tracks_store()
-      //         .await?
-      //         .wait_for_count(send_count)
-      //         .await?;
-      // }
+      await other_member.wait_for_track_count(member.id, send_count);
 
+    }
+  }
+
+  /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
+  /// provided [`MembersPair`] using an `Apply` method of Control API.
+  Future<void> interconnect_members(MembersPair pair) async {
+    if (pair.left.publish_endpoint() != null) {
+      var publish_endpoint = pair.left.publish_endpoint()!;
+      var left_member = members[pair.left.id]!;
+      if (publish_endpoint.audio_settings.publish_policy !=
+          PublishPolicy.Disabled) {
+        await left_member.update_send_media_state(MediaKind.Audio, null, true);
+      }
+      if (publish_endpoint.video_settings.publish_policy !=
+          PublishPolicy.Disabled) {
+        await left_member.update_send_media_state(MediaKind.Video, null, true);
+      }
+      await control_client.create(
+          '$room_id/' + pair.left.id + '/publish', publish_endpoint.toJson());
+    }
+
+    if (pair.right.publish_endpoint() != null) {
+      var publish_endpoint = pair.right.publish_endpoint()!;
+      var right_member = members[pair.right.id]!;
+      if (publish_endpoint.audio_settings.publish_policy !=
+          PublishPolicy.Disabled) {
+        await right_member.update_send_media_state(MediaKind.Audio, null, true);
+      }
+      if (publish_endpoint.video_settings.publish_policy !=
+          PublishPolicy.Disabled) {
+        await right_member.update_send_media_state(MediaKind.Video, null, true);
+      }
+      await control_client.create(
+          '$room_id/' + pair.right.id + '/publish', publish_endpoint.toJson());
+    }
+
+    if (pair.left.play_endpoint_for(room_id, pair.right) != null) {
+      var publish_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
+      var left_member = members[pair.left.id]!;
+
+      await left_member.update_recv_media_state(MediaKind.Video, null, true);
+      await left_member.update_recv_media_state(MediaKind.Audio, null, true);
+
+      await control_client.create(
+          '$room_id/' + pair.left.id + '/' + publish_endpoint.id,
+          publish_endpoint.toJson());
+    }
+
+    if (pair.right.play_endpoint_for(room_id, pair.left) != null) {
+      var publish_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
+      var right_member = members[pair.right.id]!;
+
+      await right_member.update_recv_media_state(MediaKind.Video, null, true);
+      await right_member.update_recv_media_state(MediaKind.Audio, null, true);
+
+      await control_client.create(
+          '$room_id/' + pair.right.id + '/' + publish_endpoint.id,
+          publish_endpoint.toJson());
+    }
+
+    {
+      var left_member = members[pair.left.id]!;
+      left_member.is_send = pair.left.is_send();
+      left_member.is_recv = pair.right.recv;
+    }
+
+    {
+      var right_member = members[pair.right.id]!;
+      right_member.is_send = pair.right.is_send();
+      right_member.is_recv = pair.right.recv;
+
+      /// ???? right left ??
     }
   }
 
@@ -251,15 +346,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var on_join_found = callbacks
           .where((element) => element.fid.contains(member_id))
           .any((element) {
-            return element.event.toJson()['type'] == 'OnJoin';
-          } );
-      if(on_join_found) {
+        return element.event.toJson()['type'] == 'OnJoin';
+      });
+      if (on_join_found) {
         break;
       }
       await Future.delayed(Duration(milliseconds: 50));
     }
   }
-
 }
 
 /// [Session] with some additional info about a [User] it represents.

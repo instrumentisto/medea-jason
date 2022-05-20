@@ -100,7 +100,6 @@ impl cucumber::World for World {
                 }),
             )
             .await?;
-            println!("AAAAAAAAAA");
 
         Ok(Self {
             room_id,
@@ -212,18 +211,12 @@ impl World {
                             },
                         );
                         let gg = serde_json::to_string(&elem).unwrap();
-                        println!("TESTTEST {:?}", (&id, &gg));
-                        println!("TESTTEST {:?}", (&id, &gg));
                         (id, elem)
                     })
                 })
                 .collect();
             for (path, element) in recv_endpoints {
-                println!("{}__________{:?}", path, element);
-                println!("{}__________{:?}", path, element);
                 let gg = self.control_client.create(&path, element).await?;
-                println!("__________{:?}", gg);
-                println!("__________{:?}", gg);
 
             }
         }
