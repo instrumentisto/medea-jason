@@ -12,18 +12,18 @@ StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, Stri
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
     
-    var maybe_await = false;
-    if (awaits.isEmpty) {
-      maybe_await = false;
-    }
-    else {
-      maybe_await = true;
-    }
+    var awats = awaits.contains('awaits');
+    var error = awaits.contains('errors');
 
     try {
       switch(action) { 
         case 'enables': { 
-          await member.toggle_media(kind.item1, null, true);
+          print("ENABLE");
+          print(kind);
+          var future =  member.toggle_media(kind.item1, null, true);
+          if (awats) {
+            await future;
+          }
         } 
         break; 
         
@@ -43,19 +43,12 @@ StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, Stri
         break; 
       } 
     } catch(e) {
-      print('ERRROR AWAITER');
+      if (!error) { rethrow; };
     }
 
   },
 );
 
-StepDefinitionGeneric then_remote_media_direction_is = then4<String, String, String, String, CustomWorld>(
-  RegExp(
-      r"(Alice|Bob|Carol)'s (audio|video) from (Alice|Bob|Carol) has `(SendRecv|SendOnly|RecvOnly|Inactive)` direction"),
-  (id, String kind, remote_id, direction, context) async {
-    // todo
-  },
-);
 
 // #[then(regex = "^(\\S+)'s (audio|video) from (\\S+) has \
 //                  `(SendRecv|SendOnly|RecvOnly|Inactive)` direction$")]
@@ -113,6 +106,20 @@ StepDefinitionGeneric when_member_enables_remote_track = when3<String, String, S
       else {
         await member.room.disableRemoteVideo();
       }
+    }
+  },
+);
+
+StepDefinitionGeneric then_remote_media_direction_is = then4<String, String, String, String, CustomWorld>(
+  RegExp(
+      r"(Alice|Bob|Carol)'s (audio|video) from (Alice|Bob|Carol) has `(SendRecv|SendOnly|RecvOnly|Inactive)` direction"),
+  (id, String kind, remote_id, direction, context) async {
+    var member =context.world.members[id]!;
+    await member.wait_for_connect(remote_id);
+    var kind_ = parse_media_kind(kind);
+    var track = member.connection_store.remote_tracks[remote_id]!.firstWhere((element) => element.mediaSourceKind() == MediaSourceKind.Device && element.kind() == kind_.item1);
+    while (track.mediaDirection().name != direction) {
+      await Future.delayed(Duration(milliseconds: 100));
     }
   },
 );

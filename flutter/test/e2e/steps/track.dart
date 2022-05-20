@@ -109,6 +109,7 @@ StepDefinitionGeneric then_member_has_local_tracks =
     var actual_count = member.connection_store.local_tracks.length;
 
     if (actual_count != expected_count) {
+      print('$actual_count != $expected_count');
       throw 'not eq';
     }
   },
@@ -182,5 +183,22 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
       count = member.connection_store
           .callback_counter[track.getTrack().id()]![callback_kind]!;
     }
+  },
+);
+
+
+StepDefinitionGeneric then_has_local_track =
+    then2<String, String, CustomWorld>(
+  RegExp(r'(Alice|Bob|Carol) has local (audio|device video|display video|video)'),
+  (id, kind, context) async {
+    var member = context.world.members[id]!;
+    var kind_ = parse_media_kind(kind);
+
+    member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
+    if (kind == 'video') {
+    member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
+      
+    }
+
   },
 );

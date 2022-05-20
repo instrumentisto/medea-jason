@@ -17,10 +17,6 @@ part 'suite.g.dart';
 var gg = FlutterTestConfiguration()
   ..stepDefinitions = [
 
-    fillField3,
-    fillField2,
-    fillField1,
-
     // control_api
     then_control_api_sends_on_leave,
     when_control_api_removes_member,
@@ -58,12 +54,17 @@ var gg = FlutterTestConfiguration()
     then_remote_media_track,
     then_remote_track_stops,
     then_callback_fires_on_remote_track,
+    then_has_local_track,
 
 
     //media_state
     when_enables_or_mutes,
     when_member_enables_remote_track,
-    // then_remote_media_direction_is,
+    then_remote_media_direction_is,
+
+    fillField3,
+    fillField2,
+    fillField1,
   ]
   ..hooks = []
   ..reporters = [

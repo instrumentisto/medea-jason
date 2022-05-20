@@ -68,6 +68,7 @@ class MyMember {
     });
 
     room.onLocalTrack((p0) {
+      print(p0.kind());
       connection_store.local_tracks.add(p0);
     });
 
@@ -154,6 +155,7 @@ class MyMember {
       count_f.complete();
     }
     return count_f.future;
+    return Future.delayed(Duration(seconds: 1));
   }
 
   Future<void> wait_for_close(String id) {
@@ -199,31 +201,56 @@ class MyMember {
     return out;
   }
 
+        //   let send_count = self
+        //     .send_state
+        //     .borrow()
+        //     .iter()
+        //     .filter(|(key, enabled)| {
+        //         other.recv_state.borrow().get(key).copied().unwrap_or(false)
+        //             && **enabled
+        //     })
+        //     .count() as u64;
+        // let recv_count = self
+        //     .recv_state
+        //     .borrow()
+        //     .iter()
+        //     .filter(|(key, enabled)| {
+        //         other.send_state.borrow().get(key).copied().unwrap_or(false)
+        //             && **enabled
+        //     })
+        //     .count() as u64;
+
   Tuple2<int, int> count_of_tracks_between_members(MyMember other) {
-    var send_count = 0;
-    send_state.forEach((key, value) {
-      if (other.recv_state[key] != null) {
-        ++send_count;
-      }
-    });
-    var recv_count = 0;
-    recv_state.forEach((key, value) {
-      if (other.send_state[key] != null) {
-        ++recv_count;
-      }
-    });
+    print(other.send_state);
+    print(other.recv_state);
+    print('_______');
+    print(send_state);
+    print(recv_state);
+    var send_count = send_state.entries.where((element) => other.recv_state[element.key]! && element.value).length;
+    var recv_count = recv_state.entries
+        .where(
+            (element) => other.send_state[element.key]! && element.value)
+        .length;
     return Tuple2<int, int>(send_count, recv_count);
   }
 
   Future<void> toggle_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
+    print('HERE1');
     await update_send_media_state(kind, source, enabled);
+    print('HERE2');
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.Audio) {
+        print("WTF1");
           await room.enableAudio();
+        print("WTF2");
+
         } else {
+        print("WTF11");
           await room.enableVideo(source);
+        print("WTF12");
+        
         }
       } else {
         await room.enableAudio();

@@ -42,7 +42,7 @@ Future<void> new_given_member(
       MyBuilder(first_member_id, !is_send_disabled, !is_recv_disabled);
 
   await context.world.create_member(member_builder);
-  if (joined.contains('joined')) {
+  if (joined.contains('joined ')) {
     await context.world.join_room(first_member_id);
     await context.world.wait_for_interconnection(first_member_id);
   }
@@ -54,12 +54,15 @@ Future<void> new_given_member(
   var is_video =
       disabled_media_type == ' video' || disabled_media_type == ' media';
 
-  if (media_settings.contains('disabled')) {
+  if (media_settings.contains(' disabled')) {
+
     var is_publish = disabled_direction.contains(' publishing') ||
         disabled_direction.isEmpty;
     var is_playing =
         disabled_direction.contains(' playing') || disabled_direction.isEmpty;
 
+    print('DIASBLED');
+    print('$is_audio -- $is_video $is_publish --- $is_playing');
     if (is_publish) {
       if (is_audio) {
         await member.toggle_media(MediaKind.Audio, null, false);
@@ -78,7 +81,7 @@ Future<void> new_given_member(
     }
   }
 
-  if (media_settings.contains('muted')) {
+  if (media_settings.contains(' muted')) {
     if (is_audio) {
       await member.toggle_mute(MediaKind.Audio, null, true);
     }
