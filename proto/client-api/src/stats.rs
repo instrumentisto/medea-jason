@@ -72,226 +72,204 @@ pub struct RtcStat {
     pub stats: RtcStatsType,
 }
 
-/// TODO: Remove once no false positive.
-#[allow(clippy::use_self)]
-mod rtc_stats_type {
+/// All known types of [`RtcStat`]s.
+///
+/// [List of all RTCStats types on W3C][1].
+///
+/// [1]: https://w3.org/TR/webrtc-stats/#rtctatstype-%2A
+/// [`RtcStat`]: super::RtcStat
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum RtcStatsType {
+    /// Statistics for a codec that is currently used by [RTP] streams
+    /// being sent or received by [RTCPeerConnection] object.
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
     #[cfg(feature = "extended-stats")]
-    use super::{
-        DataChannelStats, MediaStreamStats, ReceiverStatsKind,
-        RtcCertificateStats, RtcCodecStats, RtcIceServerStats,
-        RtcPeerConnectionStats, RtcRtpTransceiverStats,
-        RtpContributingSourceStats, SenderStatsKind,
-    };
-    use super::{
-        Deserialize, MediaSourceStats, RtcIceCandidatePairStats,
-        RtcIceCandidateStats, RtcInboundRtpStreamStats,
-        RtcOutboundRtpStreamStats, RtcRemoteInboundRtpStreamStats,
-        RtcRemoteOutboundRtpStreamStats, RtcSctpTransportStats,
-        RtcTransportStats, Serialize, TrackStats,
-    };
+    Codec(Box<RtcCodecStats>),
 
-    /// All known types of [`RtcStat`]s.
+    /// Statistics for an inbound [RTP] stream that is currently received
+    /// with [RTCPeerConnection] object.
     ///
-    /// [List of all RTCStats types on W3C][1].
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+    InboundRtp(Box<RtcInboundRtpStreamStats>),
+
+    /// Statistics for an outbound [RTP] stream that is currently sent with
+    /// [RTCPeerConnection] object.
     ///
-    /// [1]: https://w3.org/TR/webrtc-stats/#rtctatstype-%2A
-    /// [`RtcStat`]: super::RtcStat
-    #[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
-    #[serde(tag = "type", rename_all = "kebab-case")]
-    pub enum RtcStatsType {
-        /// Statistics for a codec that is currently used by [RTP] streams
-        /// being sent or received by [RTCPeerConnection] object.
-        ///
-        /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        #[cfg(feature = "extended-stats")]
-        Codec(Box<RtcCodecStats>),
+    /// When there are multiple [RTP] streams connected to the same sender,
+    /// such as when using simulcast or RTX, there will be one
+    /// [`RtcOutboundRtpStreamStats`] per RTP stream, with distinct values
+    /// of the `ssrc` attribute, and all these senders will have a
+    /// reference to the same "sender" object (of type
+    /// [RTCAudioSenderStats][1] or [RTCVideoSenderStats][2]) and
+    /// "track" object (of type
+    /// [RTCSenderAudioTrackAttachmentStats][3] or
+    /// [RTCSenderVideoTrackAttachmentStats][4]).
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+    /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcaudiosenderstats
+    /// [2]: https://w3.org/TR/webrtc-stats/#dom-rtcvideosenderstats
+    /// [3]: https://tinyurl.com/sefa5z4
+    /// [4]: https://tinyurl.com/rkuvpl4
+    OutboundRtp(Box<RtcOutboundRtpStreamStats>),
 
-        /// Statistics for an inbound [RTP] stream that is currently received
-        /// with [RTCPeerConnection] object.
-        ///
-        /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        InboundRtp(Box<RtcInboundRtpStreamStats>),
+    /// Statistics for the remote endpoint's inbound [RTP] stream
+    /// corresponding to an outbound stream that is currently sent with
+    /// [RTCPeerConnection] object.
+    ///
+    /// It is measured at the remote endpoint and reported in a RTCP
+    /// Receiver Report (RR) or RTCP Extended Report (XR).
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+    RemoteInboundRtp(Box<RtcRemoteInboundRtpStreamStats>),
 
-        /// Statistics for an outbound [RTP] stream that is currently sent with
-        /// [RTCPeerConnection] object.
-        ///
-        /// When there are multiple [RTP] streams connected to the same sender,
-        /// such as when using simulcast or RTX, there will be one
-        /// [`RtcOutboundRtpStreamStats`] per RTP stream, with distinct values
-        /// of the `ssrc` attribute, and all these senders will have a
-        /// reference to the same "sender" object (of type
-        /// [RTCAudioSenderStats][1] or [RTCVideoSenderStats][2]) and
-        /// "track" object (of type
-        /// [RTCSenderAudioTrackAttachmentStats][3] or
-        /// [RTCSenderVideoTrackAttachmentStats][4]).
-        ///
-        /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcaudiosenderstats
-        /// [2]: https://w3.org/TR/webrtc-stats/#dom-rtcvideosenderstats
-        /// [3]: https://tinyurl.com/sefa5z4
-        /// [4]: https://tinyurl.com/rkuvpl4
-        OutboundRtp(Box<RtcOutboundRtpStreamStats>),
+    /// Statistics for the remote endpoint's outbound [RTP] stream
+    /// corresponding to an inbound stream that is currently received with
+    /// [RTCPeerConnection] object.
+    ///
+    /// It is measured at the remote endpoint and reported in an RTCP
+    /// Sender Report (SR).
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+    RemoteOutboundRtp(Box<RtcRemoteOutboundRtpStreamStats>),
 
-        /// Statistics for the remote endpoint's inbound [RTP] stream
-        /// corresponding to an outbound stream that is currently sent with
-        /// [RTCPeerConnection] object.
-        ///
-        /// It is measured at the remote endpoint and reported in a RTCP
-        /// Receiver Report (RR) or RTCP Extended Report (XR).
-        ///
-        /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        RemoteInboundRtp(Box<RtcRemoteInboundRtpStreamStats>),
+    /// Statistics for the media produced by a [MediaStreamTrack][1] that
+    /// is currently attached to an [RTCRtpSender]. This reflects
+    /// the media that is fed to the encoder after [getUserMedia]
+    /// constraints have been applied (i.e. not the raw media
+    /// produced by the camera).
+    ///
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [getUserMedia]: https://tinyurl.com/sngpyr6
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    MediaSource(Box<MediaSourceStats>),
 
-        /// Statistics for the remote endpoint's outbound [RTP] stream
-        /// corresponding to an inbound stream that is currently received with
-        /// [RTCPeerConnection] object.
-        ///
-        /// It is measured at the remote endpoint and reported in an RTCP
-        /// Sender Report (SR).
-        ///
-        /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        RemoteOutboundRtp(Box<RtcRemoteOutboundRtpStreamStats>),
+    /// Statistics for a contributing source (CSRC) that contributed to an
+    /// inbound [RTP] stream.
+    ///
+    /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+    #[cfg(feature = "extended-stats")]
+    Csrc(Box<RtpContributingSourceStats>),
 
-        /// Statistics for the media produced by a [MediaStreamTrack][1] that
-        /// is currently attached to an [RTCRtpSender]. This reflects
-        /// the media that is fed to the encoder after [getUserMedia]
-        /// constraints have been applied (i.e. not the raw media
-        /// produced by the camera).
-        ///
-        /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-        /// [getUserMedia]: https://tinyurl.com/sngpyr6
-        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        MediaSource(Box<MediaSourceStats>),
+    /// Statistics related to the [RTCPeerConnection] object.
+    ///
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+    #[cfg(feature = "extended-stats")]
+    PeerConnection(Box<RtcPeerConnectionStats>),
 
-        /// Statistics for a contributing source (CSRC) that contributed to an
-        /// inbound [RTP] stream.
-        ///
-        /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-        #[cfg(feature = "extended-stats")]
-        Csrc(Box<RtpContributingSourceStats>),
+    /// Statistics related to each [RTCDataChannel] ID.
+    ///
+    /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
+    #[cfg(feature = "extended-stats")]
+    DataChannel(Box<DataChannelStats>),
 
-        /// Statistics related to the [RTCPeerConnection] object.
-        ///
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        #[cfg(feature = "extended-stats")]
-        PeerConnection(Box<RtcPeerConnectionStats>),
+    /// Contains statistics related to a specific [MediaStream].
+    ///
+    /// This is now obsolete.
+    ///
+    /// [MediaStream]: https://w3.org/TR/mediacapture-streams#mediastream
+    #[cfg(feature = "extended-stats")]
+    Stream(Box<MediaStreamStats>),
 
-        /// Statistics related to each [RTCDataChannel] ID.
-        ///
-        /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
-        #[cfg(feature = "extended-stats")]
-        DataChannel(Box<DataChannelStats>),
+    /// Statistics related to a specific [MediaStreamTrack][1]'s attachment
+    /// to an [RTCRtpSender] and the corresponding media-level
+    /// metrics.
+    ///
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    Track(Box<TrackStats>),
 
-        /// Contains statistics related to a specific [MediaStream].
-        ///
-        /// This is now obsolete.
-        ///
-        /// [MediaStream]: https://w3.org/TR/mediacapture-streams#mediastream
-        #[cfg(feature = "extended-stats")]
-        Stream(Box<MediaStreamStats>),
+    /// Statistics related to a specific [RTCRtpTransceiver].
+    ///
+    /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
+    #[cfg(feature = "extended-stats")]
+    Transceiver(Box<RtcRtpTransceiverStats>),
 
-        /// Statistics related to a specific [MediaStreamTrack][1]'s attachment
-        /// to an [RTCRtpSender] and the corresponding media-level
-        /// metrics.
-        ///
-        /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-        /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-        Track(Box<TrackStats>),
+    /// Statistics related to a specific [RTCRtpSender] and the
+    /// corresponding media-level metrics.
+    ///
+    /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+    #[cfg(feature = "extended-stats")]
+    Sender(Box<SenderStatsKind>),
 
-        /// Statistics related to a specific [RTCRtpTransceiver].
-        ///
-        /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-        #[cfg(feature = "extended-stats")]
-        Transceiver(Box<RtcRtpTransceiverStats>),
+    /// Statistics related to a specific [RTCRtpReceiver] and the
+    /// corresponding media-level metrics.
+    ///
+    /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
+    #[cfg(feature = "extended-stats")]
+    Receiver(Box<ReceiverStatsKind>),
 
-        /// Statistics related to a specific [RTCRtpSender] and the
-        /// corresponding media-level metrics.
-        ///
-        /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
-        #[cfg(feature = "extended-stats")]
-        Sender(Box<SenderStatsKind>),
+    /// Transport statistics related to the [RTCPeerConnection] object.
+    ///
+    /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+    Transport(Box<RtcTransportStats>),
 
-        /// Statistics related to a specific [RTCRtpReceiver] and the
-        /// corresponding media-level metrics.
-        ///
-        /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
-        #[cfg(feature = "extended-stats")]
-        Receiver(Box<ReceiverStatsKind>),
+    /// SCTP transport statistics related to an [RTCSctpTransport] object.
+    ///
+    /// [RTCSctpTransport]: https://w3.org/TR/webrtc#dom-rtcsctptransport
+    SctpTransport(Box<RtcSctpTransportStats>),
 
-        /// Transport statistics related to the [RTCPeerConnection] object.
-        ///
-        /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-        Transport(Box<RtcTransportStats>),
+    /// ICE candidate pair statistics related to the [RTCIceTransport]
+    /// objects.
+    ///
+    /// A candidate pair that is not the current pair for a transport is
+    /// [deleted][1] when the [RTCIceTransport] does an ICE restart, at the
+    /// time the state changes to `new`.
+    ///
+    /// The candidate pair that is the current pair for a transport is
+    /// deleted after an ICE restart when the [RTCIceTransport]
+    /// switches to using a candidate pair generated from the new
+    /// candidates; this time doesn't correspond to any other
+    /// externally observable event.
+    ///
+    /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+    /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
+    CandidatePair(Box<RtcIceCandidatePairStats>),
 
-        /// SCTP transport statistics related to an [RTCSctpTransport] object.
-        ///
-        /// [RTCSctpTransport]: https://w3.org/TR/webrtc#dom-rtcsctptransport
-        SctpTransport(Box<RtcSctpTransportStats>),
+    /// ICE local candidate statistics related to the [RTCIceTransport]
+    /// objects.
+    ///
+    /// A local candidate is [deleted][1] when the [RTCIceTransport] does
+    /// an ICE restart, and the candidate is no longer a member of
+    /// any non-deleted candidate pair.
+    ///
+    /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+    /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
+    LocalCandidate(Box<RtcIceCandidateStats>),
 
-        /// ICE candidate pair statistics related to the [RTCIceTransport]
-        /// objects.
-        ///
-        /// A candidate pair that is not the current pair for a transport is
-        /// [deleted][1] when the [RTCIceTransport] does an ICE restart, at the
-        /// time the state changes to `new`.
-        ///
-        /// The candidate pair that is the current pair for a transport is
-        /// deleted after an ICE restart when the [RTCIceTransport]
-        /// switches to using a candidate pair generated from the new
-        /// candidates; this time doesn't correspond to any other
-        /// externally observable event.
-        ///
-        /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
-        /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-        CandidatePair(Box<RtcIceCandidatePairStats>),
+    /// ICE remote candidate statistics related to the [RTCIceTransport]
+    /// objects.
+    ///
+    /// A remote candidate is [deleted][1] when the [RTCIceTransport] does
+    /// an ICE restart, and the candidate is no longer a member of
+    /// any non-deleted candidate pair.
+    ///
+    /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+    /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
+    RemoteCandidate(Box<RtcIceCandidateStats>),
 
-        /// ICE local candidate statistics related to the [RTCIceTransport]
-        /// objects.
-        ///
-        /// A local candidate is [deleted][1] when the [RTCIceTransport] does
-        /// an ICE restart, and the candidate is no longer a member of
-        /// any non-deleted candidate pair.
-        ///
-        /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
-        /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-        LocalCandidate(Box<RtcIceCandidateStats>),
+    /// Information about a certificate used by [RTCIceTransport].
+    ///
+    /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+    #[cfg(feature = "extended-stats")]
+    Certificate(Box<RtcCertificateStats>),
 
-        /// ICE remote candidate statistics related to the [RTCIceTransport]
-        /// objects.
-        ///
-        /// A remote candidate is [deleted][1] when the [RTCIceTransport] does
-        /// an ICE restart, and the candidate is no longer a member of
-        /// any non-deleted candidate pair.
-        ///
-        /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
-        /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-        RemoteCandidate(Box<RtcIceCandidateStats>),
+    /// Information about the connection to an ICE server (e.g. STUN or
+    /// TURN).
+    #[cfg(feature = "extended-stats")]
+    IceServer(Box<RtcIceServerStats>),
 
-        /// Information about a certificate used by [RTCIceTransport].
-        ///
-        /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
-        #[cfg(feature = "extended-stats")]
-        Certificate(Box<RtcCertificateStats>),
-
-        /// Information about the connection to an ICE server (e.g. STUN or
-        /// TURN).
-        #[cfg(feature = "extended-stats")]
-        IceServer(Box<RtcIceServerStats>),
-
-        /// Disabled or unknown variants of stats will be deserialized as
-        /// [`RtcStatsType::Other`].
-        #[serde(other)]
-        Other,
-    }
+    /// Disabled or unknown variants of stats will be deserialized as
+    /// [`RtcStatsType::Other`].
+    #[serde(other)]
+    Other,
 }
-
-#[doc(inline)]
-pub use self::rtc_stats_type::RtcStatsType;
 
 #[cfg(feature = "extended-stats")]
 /// Contains statistics related to a specific [MediaStream].
