@@ -778,10 +778,12 @@ pub mod adapter {
                 id: member.id.into(),
                 on_join: member
                     .on_join
-                    .map_or_else(String::default, String::from),
+                    .as_ref()
+                    .map_or_else(String::default, ToString::to_string),
                 on_leave: member
                     .on_leave
-                    .map_or_else(String::default, String::from),
+                    .as_ref()
+                    .map_or_else(String::default, ToString::to_string),
                 idle_timeout: member.idle_timeout.map(Into::into),
                 reconnect_timeout: member.reconnect_timeout.map(Into::into),
                 ping_interval: member.ping_interval.map(Into::into),
