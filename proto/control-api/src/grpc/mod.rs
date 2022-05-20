@@ -52,6 +52,7 @@ pub mod adapter {
 
     use async_trait::async_trait;
     use derive_more::{Display, Error, From, Into};
+    use serde::{de, de::Visitor, Deserialize, Deserializer};
     use tonic::{Request, Response, Status};
     use url::Url;
 
@@ -79,6 +80,38 @@ pub mod adapter {
     #[derive(Clone, Debug, Display, Eq, Hash, Into, PartialEq)]
     #[display(fmt = "grpc://{}", _0)]
     pub struct GrpcCallbackUrl(pub String);
+
+    impl<'de> Deserialize<'de> for GrpcCallbackUrl {
+        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where
+            D: Deserializer<'de>,
+        {
+            struct SrcUriVisitor;
+
+            impl<'de> Visitor<'de> for SrcUriVisitor {
+                type Value = GrpcCallbackUrl;
+
+                fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    f.write_str(
+                        "URI to callback client in format like: \
+                     grpc://127.0.0.1:9090",
+                    )
+                }
+
+                fn visit_str<E>(self, value: &str) -> Result<GrpcCallbackUrl, E>
+                where
+                    E: de::Error,
+                {
+                    match GrpcCallbackUrl::try_from(value.to_owned()) {
+                        Ok(src_uri) => Ok(src_uri),
+                        Err(e) => Err(de::Error::custom(e)),
+                    }
+                }
+            }
+
+            deserializer.deserialize_identifier(SrcUriVisitor)
+        }
+    }
 
     impl TryFrom<String> for GrpcCallbackUrl {
         type Error = CallbackUrlParseError;
