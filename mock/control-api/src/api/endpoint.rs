@@ -189,7 +189,7 @@ impl WebRtcPublishEndpoint {
         let p2p: proto::web_rtc_publish_endpoint::P2p = self.p2p.into();
         proto::WebRtcPublishEndpoint {
             id,
-            p2p: p2p as i32,
+            p2p: p2p.into(),
             force_relay: self.force_relay,
             on_start: String::new(),
             on_stop: String::new(),

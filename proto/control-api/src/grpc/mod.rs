@@ -700,6 +700,16 @@ pub mod adapter {
         }
     }
 
+    impl From<P2pMode> for proto::web_rtc_publish_endpoint::P2p {
+        fn from(value: P2pMode) -> Self {
+            match value {
+                P2pMode::Always => Self::Always,
+                P2pMode::IfPossible => Self::IfPossible,
+                P2pMode::Never => Self::Never,
+            }
+        }
+    }
+
     impl TryFrom<String> for StatefulFid {
         type Error = ParseFidError;
 
@@ -849,8 +859,8 @@ pub mod adapter {
         fn from(publish: WebRtcPublish) -> Self {
             Self {
                 id: publish.id.into(),
-                #[allow(clippy::as_conversions)]
-                p2p: publish.p2p as i32,
+                p2p: proto::web_rtc_publish_endpoint::P2p::from(publish.p2p)
+                    .into(),
                 on_start: String::new(),
                 on_stop: String::new(),
                 force_relay: publish.force_relay,
