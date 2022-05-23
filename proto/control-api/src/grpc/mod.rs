@@ -47,10 +47,20 @@ pub mod api;
 #[rustfmt::skip]
 pub mod callback;
 
+use callback_adapter::{CallbackClientFactoryImpl, GrpcCallbackClient};
+
 mod callback_adapter {
+    use std::{fmt, sync::Arc};
+
+    use async_trait::async_trait;
+    use either::Either;
+    use tonic::transport::Channel;
+
     use crate::{
-        grpc::callback as proto, CallbackEvent, CallbackRequest, OnJoinEvent,
-        OnLeaveEvent, OnLeaveReason,
+        grpc::{adapter::GrpcCallbackUrl, callback as proto},
+        CallbackClient, CallbackClientError, CallbackClientFactory,
+        CallbackEvent, CallbackRequest, CallbackResult, LocalBoxFuture,
+        OnJoinEvent, OnLeaveEvent, OnLeaveReason,
     };
 
     impl From<OnLeaveReason> for proto::on_leave::Reason {
@@ -98,6 +108,70 @@ mod callback_adapter {
             }
         }
     }
+
+    #[derive(Clone, Copy, Debug, Default)]
+    pub struct CallbackClientFactoryImpl;
+
+    impl CallbackClientFactory<GrpcCallbackUrl, GrpcCallbackUrl>
+        for CallbackClientFactoryImpl
+    {
+        fn build(
+            url: Either<GrpcCallbackUrl, GrpcCallbackUrl>,
+        ) -> LocalBoxFuture<'static, CallbackResult<Arc<dyn CallbackClient>>>
+        {
+            let url = url.into_inner().into();
+
+            Box::pin(async move {
+                let client: Arc<dyn CallbackClient> =
+                    Arc::new(GrpcCallbackClient::new(&url).await?);
+                Ok(client)
+            })
+        }
+    }
+
+    /// gRPC client for sending [`CallbackRequest`]s.
+    pub struct GrpcCallbackClient {
+        /// [`tonic`] gRPC client of Control API Callback service.
+        client: proto::callback_client::CallbackClient<Channel>,
+    }
+
+    impl GrpcCallbackClient {
+        /// Returns gRPC client for provided [`GrpcCallbackUrl`].
+        ///
+        /// Note that this function doesn't check availability of gRPC server on
+        /// provided [`GrpcCallbackUrl`].
+        ///
+        /// # Errors
+        ///
+        /// With [`CallbackClientError::Initialization`] if [`tonic`] transport
+        /// cannot be created (so gRPC connection cannot be established).
+        pub async fn new(
+            addr: &GrpcCallbackUrl,
+        ) -> Result<Self, CallbackClientError> {
+            let addr = addr.addr();
+            let client =
+                proto::callback_client::CallbackClient::connect(addr).await?;
+            Ok(Self { client })
+        }
+    }
+
+    #[async_trait(?Send)]
+    impl CallbackClient for GrpcCallbackClient {
+        async fn send(
+            &self,
+            request: CallbackRequest,
+        ) -> Result<(), CallbackClientError> {
+            let mut client = self.client.clone();
+            drop(client.on_event(tonic::Request::new(request.into())).await?);
+            Ok(())
+        }
+    }
+
+    impl fmt::Debug for GrpcCallbackClient {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+            f.debug_struct("GrpcCallbackClient").finish_non_exhaustive()
+        }
+    }
 }
 
 pub mod adapter {
@@ -133,6 +207,18 @@ pub mod adapter {
     #[derive(Clone, Debug, Display, Eq, Hash, Into, PartialEq)]
     #[display(fmt = "grpc://{}", _0)]
     pub struct GrpcCallbackUrl(pub String);
+
+    impl GrpcCallbackUrl {
+        /// Returns address for gRPC callback client.
+        ///
+        /// If you wish to get address with protocol - just use [`Display`]
+        /// implementation.
+        #[must_use]
+        pub fn addr(&self) -> String {
+            // TODO: Do not hardcode protocol.
+            format!("http://{}", self.0)
+        }
+    }
 
     impl<'de> Deserialize<'de> for GrpcCallbackUrl {
         fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
