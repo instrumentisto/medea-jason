@@ -92,10 +92,13 @@
 #[cfg(feature = "grpc")]
 pub mod grpc;
 
-use std::{collections::HashMap, fmt};
+use std::{
+    collections::HashMap, fmt, fmt::Debug, future::Future, pin::Pin, sync::Arc,
+};
 
 use async_trait::async_trait;
-use derive_more::{Display, From};
+use derive_more::{Display, Error, From};
+use either::Either;
 use time::PrimitiveDateTime;
 
 pub use self::{
@@ -163,6 +166,97 @@ pub trait Callback<OnJoin, OnLeave> {
         reason: Reason,
         at: PrimitiveDateTime,
     );
+}
+
+pub type LocalBoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
+
+/// Factory for a [`CallbackClient`]s.
+pub trait CallbackClientFactory<OnJoin, OnLeave> {
+    /// Creates [`CallbackClient`] basing on provided [`CallbackUrl`].
+    fn build(
+        url: Either<OnJoin, OnLeave>,
+    ) -> LocalBoxFuture<'static, CallbackResult<Arc<dyn CallbackClient>>>;
+}
+
+/// Abstraction of a Control API callback client.
+#[async_trait(?Send)]
+pub trait CallbackClient: Debug + Send + Sync {
+    /// Sends provided [`CallbackRequest`].
+    async fn send(&self, request: CallbackRequest) -> CallbackResult;
+}
+
+/// Control API callback.
+///
+/// Used for sending callbacks with [`CallbackClient::send`].
+///
+/// [`CallbackClient::send`]:
+/// crate::api::control::callback::clients::CallbackClient::send
+#[derive(Debug)]
+pub struct CallbackRequest {
+    /// FID (Full ID) of element with which event was occurred.
+    fid: StatefulFid,
+
+    /// [`CallbackEvent`] which occurred.
+    event: CallbackEvent,
+
+    /// Time at which event occurred.
+    at: PrimitiveDateTime,
+}
+
+/// All callbacks which can happen.
+#[derive(Clone, Copy, Debug, From)]
+pub enum CallbackEvent {
+    OnJoin(OnJoinEvent),
+    OnLeave(OnLeaveEvent),
+}
+
+/// Event for `on_leave` `Member` callback.
+#[derive(Clone, Copy, Debug)]
+pub struct OnLeaveEvent {
+    /// Reason of why `Member` was lost.
+    reason: OnLeaveReason,
+}
+
+impl OnLeaveEvent {
+    #[must_use]
+    pub const fn new(reason: OnLeaveReason) -> Self {
+        Self { reason }
+    }
+}
+
+/// Reason of why `Member` was lost.
+#[derive(Clone, Copy, Debug)]
+pub enum OnLeaveReason {
+    /// `Member` was normally disconnected.
+    Disconnected,
+
+    /// Connection with `Member` was lost.
+    LostConnection,
+
+    /// `Member` was forcibly disconnected by server.
+    Kicked,
+
+    /// Server is shutting down.
+    ServerShutdown,
+}
+
+/// `on_join` `Member` callback for Control API.
+#[derive(Clone, Copy, Debug)]
+pub struct OnJoinEvent;
+
+/// Shortcut for [`Result`] of methods in this module.
+pub type CallbackResult<T = ()> = Result<T, CallbackClientError>;
+
+/// Error of sending [`CallbackRequest`] by [`CallbackClient`].
+#[derive(Debug, Display, Error, From)]
+pub enum CallbackClientError {
+    /// [`tonic`] failed to send [`CallbackRequest`].
+    #[display(fmt = "gRPC request failed: {}", _0)]
+    Request(#[error(not(source))] tonic::Status),
+
+    /// Error while creating a new [`CallbackClient`].
+    #[display(fmt = "Failed to initialize gRPC callback client: {}", _0)]
+    Initialization(tonic::transport::Error),
 }
 
 pub struct Ping(pub u32);

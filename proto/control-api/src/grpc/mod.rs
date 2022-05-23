@@ -47,6 +47,37 @@ pub mod api;
 #[rustfmt::skip]
 pub mod callback;
 
+mod callback_adapter {
+    use crate::{
+        grpc::callback as proto, OnJoinEvent, OnLeaveEvent, OnLeaveReason,
+    };
+
+    impl From<OnLeaveReason> for proto::on_leave::Reason {
+        fn from(rsn: OnLeaveReason) -> Self {
+            match rsn {
+                OnLeaveReason::LostConnection => Self::LostConnection,
+                OnLeaveReason::ServerShutdown => Self::ServerShutdown,
+                OnLeaveReason::Disconnected => Self::Disconnected,
+                OnLeaveReason::Kicked => Self::Kicked,
+            }
+        }
+    }
+
+    impl From<OnLeaveEvent> for proto::OnLeave {
+        fn from(ev: OnLeaveEvent) -> Self {
+            Self {
+                reason: proto::on_leave::Reason::from(ev.reason).into(),
+            }
+        }
+    }
+
+    impl From<OnJoinEvent> for proto::OnJoin {
+        fn from(_: OnJoinEvent) -> Self {
+            Self {}
+        }
+    }
+}
+
 pub mod adapter {
     use std::{collections::HashMap, fmt, time::Duration};
 
