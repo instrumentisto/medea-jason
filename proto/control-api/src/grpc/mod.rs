@@ -49,7 +49,8 @@ pub mod callback;
 
 mod callback_adapter {
     use crate::{
-        grpc::callback as proto, OnJoinEvent, OnLeaveEvent, OnLeaveReason,
+        grpc::callback as proto, CallbackEvent, CallbackRequest, OnJoinEvent,
+        OnLeaveEvent, OnLeaveReason,
     };
 
     impl From<OnLeaveReason> for proto::on_leave::Reason {
@@ -74,6 +75,27 @@ mod callback_adapter {
     impl From<OnJoinEvent> for proto::OnJoin {
         fn from(_: OnJoinEvent) -> Self {
             Self {}
+        }
+    }
+
+    impl From<CallbackRequest> for proto::Request {
+        fn from(req: CallbackRequest) -> Self {
+            Self {
+                fid: req.fid.to_string(),
+                at: req.at.to_string(),
+                event: Some(req.event.into()),
+            }
+        }
+    }
+
+    impl From<CallbackEvent> for proto::request::Event {
+        fn from(ev: CallbackEvent) -> Self {
+            match ev {
+                CallbackEvent::OnJoin(on_join) => Self::OnJoin(on_join.into()),
+                CallbackEvent::OnLeave(on_leave) => {
+                    Self::OnLeave(on_leave.into())
+                }
+            }
         }
     }
 }
