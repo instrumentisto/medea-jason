@@ -19,11 +19,11 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
   void testFeature0() {
     runFeature(
-      'Remote Connection closing:',
+      'Media enabling/disabling:',
       <String>[],
       () {
         runScenario(
-          'Connection closes when member is deleted by Control API',
+          'Member starts enabling video and instantly disables it',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -34,83 +34,53 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'When Control API removes member Bob',
+              'And Bob\'s `getUserMedia()` request has added latency',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s connection with Bob closes',
+              'When Bob disables video',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob frees all local tracks',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob enables video',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob disables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s device video remote track from Bob is disabled',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'Remote Connection closing',
+            'Media enabling/disabling',
             <String>[],
           ),
-          onAfter: null,
-        );
-
-        runScenario(
-          'Connection closes when other member disposes Jason',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disposes Jason object',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Connection closes when other member closes Room',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob\'s room closed by client',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Remote Connection closing',
+            'Media enabling/disabling',
           ),
         );
       },

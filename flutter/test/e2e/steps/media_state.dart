@@ -5,6 +5,8 @@ import 'package:medea_jason/src/interface/track_kinds.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
+
+// todo recheck await
 StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, String, CustomWorld>(
   RegExp(
       r'(Alice|Bob|Carol) (enables|disables|mutes|unmutes) (audio|video)( and awaits it completes| and awaits it errors|)'),
@@ -18,72 +20,36 @@ StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, Stri
     try {
       switch(action) { 
         case 'enables': { 
-          print("ENABLE");
-          print(kind);
           var future =  member.toggle_media(kind.item1, null, true);
-          if (awats) {
-            await future;
-          }
+          if(awats) {await future;}
         } 
         break; 
         
         case 'disables': {
-          await member.toggle_media(kind.item1, null, false);
+          var future =   member.toggle_media(kind.item1, null, false);
+                    if(awats) {
+                      await future;}
         } 
         break; 
 
         case 'mutes': { 
-          await member.toggle_mute(kind.item1, null, true);
+          var future =   member.toggle_mute(kind.item1, null, true);
+                    if(awats) {await future;}
         } 
         break; 
             
         default: { 
-          await member.toggle_mute(kind.item1, null, false);
+          var future =   member.toggle_mute(kind.item1, null, false);
+                    if(awats) {await future;}
         }
         break; 
       } 
     } catch(e) {
-      if (!error) { rethrow; };
+      if (!error) { throw 10000; };
     }
 
   },
 );
-
-
-// #[then(regex = "^(\\S+)'s (audio|video) from (\\S+) has \
-//                  `(SendRecv|SendOnly|RecvOnly|Inactive)` direction$")]
-// async fn then_remote_media_direction_is(
-//     world: &mut World,
-//     id: String,
-//     kind: String,
-//     remote_id: String,
-//     direction: String,
-// ) {
-//     let media_kind = kind.parse().unwrap();
-//     let media_direction = match direction.as_str() {
-//         "SendRecv" => MediaDirection::SendRecv,
-//         "SendOnly" => MediaDirection::SendOnly,
-//         "RecvOnly" => MediaDirection::RecvOnly,
-//         _inactive => MediaDirection::Inactive,
-//     };
-
-//     let member = world.get_member(&id).unwrap();
-//     let connection = member
-//         .connections()
-//         .wait_for_connection(remote_id)
-//         .await
-//         .unwrap();
-//     let tracks_store = connection.tracks_store().await.unwrap();
-//     let track = tracks_store
-//         .get_track(media_kind, MediaSourceKind::Device)
-//         .await
-//         .unwrap();
-//     track
-//         .wait_for_media_direction(media_direction)
-//         .await
-//         .unwrap();
-// }
-
 
 StepDefinitionGeneric when_member_enables_remote_track = when3<String, String, String, CustomWorld>(
   RegExp(
@@ -124,29 +90,34 @@ StepDefinitionGeneric then_remote_media_direction_is = then4<String, String, Str
   },
 );
 
-// #[when(regex = "^(\\S+) (enables|disables) remote \
-//                  (audio|(?:device |display )?video)$")]
-// async fn when_member_enables_remote_track(
-//     world: &mut World,
-//     id: String,
-//     toggle: String,
-//     kind: String,
-// ) {
-//     let member = world.get_member(&id).unwrap();
-//     let media_kind = kind.parse().unwrap();
-//     let source_kind = kind.parse().ok();
+StepDefinitionGeneric then_local_track_mute_state = then3<String, String, String, CustomWorld>(
+  RegExp(
+      r"(Alice|Bob|Carol)'s local (audio|device video|display video|video) track is (not muted|muted)"),
+  (id, String kind, not_muted, context) async {
+    var member =context.world.members[id]!;
+    var kind_ = parse_media_kind(kind);
+    var track = member.connection_store.local_tracks.firstWhere((element) => element.mediaSourceKind() == MediaSourceKind.Device && element.kind() == kind_.item1);
+    var muted = !not_muted.contains('not');
 
-//     if toggle == "enables" {
-//         member
-//             .room()
-//             .enable_remote_media(media_kind, source_kind)
-//             .await
-//             .unwrap();
-//     } else {
-//         member
-//             .room()
-//             .disable_remote_media(media_kind, source_kind)
-//             .await
-//             .unwrap();
-//     }
-// }
+    throw 'cant check local track muted';
+  },
+);
+
+
+StepDefinitionGeneric given_gum_delay = given1<String, CustomWorld>(
+  RegExp(
+      r"(Alice|Bob|Carol)'s `getUserMedia\(\)` request has added latency"),
+  (id, context) async {
+    var member =context.world.members[id]!;
+    await member.add_gum_latency(Duration(milliseconds: 500));
+  },
+);
+
+StepDefinitionGeneric when_member_frees_all_local_tracks = when1<String, CustomWorld>(
+  RegExp(
+      r'(Alice|Bob|Carol) frees all local tracks'),
+  (id, context) async {
+    var member = context.world.members[id]!;
+    await member.forget_local_tracks();
+  },
+);

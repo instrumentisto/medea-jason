@@ -26,8 +26,6 @@ StepDefinitionGeneric when_control_api_removes_room = when<CustomWorld>(
   },
 );
 
-
-
 StepDefinitionGeneric when_interconnects_kind =
     when3<String, String, String, CustomWorld>(
   RegExp(
@@ -49,6 +47,9 @@ StepDefinitionGeneric when_control_api_removes_member_via_apply =
   r'Control API removes (Alice|Bob|Carol) with `Apply` method',
   (member_id, context) async {
     var spec = await context.world.get_spec();
+    spec.pipeline.forEach((key, value) {
+      value.pipeline.removeWhere((key, value) => key.contains(member_id)); // todo kostyl
+    });
     spec.pipeline.remove(member_id);
     await context.world.apply(spec);
   },
@@ -101,9 +102,8 @@ StepDefinitionGeneric then_control_api_doesnt_sends_on_leave =
     try {
       var future = context.world.wait_for_on_leave(id, '');
       await future.timeout(Duration(seconds: 10));
-    }
-    catch (e) {
-      if(e.toString().contains('TimeoutException')) {
+    } catch (e) {
+      if (e.toString().contains('TimeoutException')) {
         res = true;
       }
     }
@@ -117,7 +117,9 @@ StepDefinitionGeneric then_control_api_sends_on_leave =
     then2<String, String, CustomWorld>(
   r'Control API sends `OnLeave` callback with `(.+)` reason for member (Alice|Bob|Carol)',
   (reason, id, context) async {
-    await context.world.wait_for_on_leave(id, reason).timeout(Duration(seconds: 10));
+    await context.world
+        .wait_for_on_leave(id, reason)
+        .timeout(Duration(seconds: 10));
   },
 );
 
@@ -125,7 +127,6 @@ StepDefinitionGeneric when_control_api_starts_publishing =
     then3<String, String, String, CustomWorld>(
   r"Control API starts (Alice|Bob|Carol)'s (audio|video|media) publishing to (Alice|Bob|Carol)",
   (publisher_id, kind, receiver_id, context) async {
-
     var all_kinds = kind.contains('media');
 
     AudioSettings? a_setting;
@@ -159,7 +160,6 @@ StepDefinitionGeneric when_control_api_deletes_play_endpoint =
     when2<String, String, CustomWorld>(
   r"Control API deletes (Alice|Bob|Carol)'s play endpoint with (Alice|Bob|Carol)",
   (id, partner_id, context) async {
-
     var future = context.world.delete_play_endpoint(id, partner_id);
     await future.timeout(Duration(milliseconds: 200));
   },

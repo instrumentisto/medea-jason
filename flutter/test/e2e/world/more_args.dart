@@ -221,3 +221,19 @@ StepDefinitionGeneric<TWorld> fix_given5<TInput1, TInput2, TInput3, TInput4,
       onInvoke,
       configuration: configuration,
     );
+
+Future<void> mock_gum(bool isVideoBroken, bool isAudioBroken) async {
+
+}
+                // async () => {
+                //     const [isVideoBroken, isAudioBroken] = args;
+                //     navigator.mediaDevices.getUserMedia = async (cons) => {
+                //         if (isAudioBroken && cons.audio != null) {
+                //             throw new NotFoundError();
+                //         }
+                //         if (isVideoBroken && cons.video != null) {
+                //             throw new NotFoundError();
+                //         }
+                //         return await window.gumMock.original(cons);
+                //     }
+                // }

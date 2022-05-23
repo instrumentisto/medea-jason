@@ -84,7 +84,6 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
       else {
         break;
       }
-      print(member.connection_store.remote_tracks[remote_id]!.length);
     }
 
     print('$actual_count -- $expected_count');
@@ -93,12 +92,6 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     }
   },
 );
-
-//todo
-// &&
-//               (member.connection_store
-//                       .callback_counter[element.getTrack().id()]!['muted']! >
-//                   0 != muted)
 
 StepDefinitionGeneric then_member_has_local_tracks =
     then2<String, int, CustomWorld>(
@@ -115,21 +108,41 @@ StepDefinitionGeneric then_member_has_local_tracks =
   },
 );
 
+StepDefinitionGeneric then_doesnt_have_remote_track =
+    then3<String, String, String, CustomWorld>(
+  RegExp(r"(Alice|Bob|Carol) doesn't have (audio|device video|display video|video) remote track from (Alice|Bob|Carol)"),
+  (id, kind, partner_id, context) async {
+    var member = context.world.members[id]!;
+    await member.wait_for_connect(partner_id);
+    var kind_ = parse_media_kind(kind);
+    var actual_count = member.connection_store.remote_tracks[partner_id]!.where((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2).length;
+    if (actual_count != 0) {
+      print('$actual_count != 0');
+      throw 'not eq';
+    }
+  },
+);
+
 StepDefinitionGeneric then_remote_media_track =
     then4<String, String, String, String, CustomWorld>(
   RegExp(
       r"(Alice|Bob|Carol)'s (audio|device video|display video|video) remote track from (Alice|Bob|Carol) is (enabled|disabled)"),
   (id, kind, partner_id, state, context) async {
+
+    // todo трэки не всегда успевают появиться
     var member = context.world.members[id]!;
     await member.wait_for_connect(partner_id);
+
     var tracks = member.connection_store.remote_tracks[partner_id]!;
 
     var kind_ = parse_media_kind(kind);
+
+    await Future.delayed(Duration(milliseconds: 500));
+
     var track = tracks.firstWhere((element) =>
         element.kind() == kind_.item1 &&
         element.mediaSourceKind() == kind_.item2);
 
-    await Future.delayed(Duration(milliseconds: 500));
 
     if (state == 'enabled') {
       while (track.mediaDirection() != TrackMediaDirection.SendRecv) {

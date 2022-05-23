@@ -38,7 +38,7 @@ impl Client {
         path: &str,
         element: Element,
     ) -> Result<CreateResponse> {
-        let gg = self
+        let gg : CreateResponse = self
         .inner
         .post(&get_url(&self.control_api_address, path))
         .json(&element)
@@ -47,12 +47,15 @@ impl Client {
         .json()
         .await?;
         println!("create {:?}", gg);
+        if let Some(err) = gg.error {
+            panic!();
+        }
         Ok(gg)
     }
 
     /// Deletes a media [`Element`] identified by the provided `path`.
     pub async fn delete(&self, path: &str) -> Result<Response> {
-        let gg = self
+        let gg: Response = self
         .inner
         .delete(&get_url(&self.control_api_address, path))
         .send()
@@ -60,13 +63,15 @@ impl Client {
         .json()
         .await?;
         println!("delete {:?}", gg);
-        
+        if let Some(err) = gg.error {
+            panic!();
+        }
         Ok(gg)
     }
 
     /// Returns a media [`Element`] identified by the provided `path`.
     pub async fn get(&self, path: &str) -> Result<SingleGetResponse> {
-        let gg = self
+        let gg: SingleGetResponse = self
         .inner
         .get(&get_url(&self.control_api_address, path))
         .send()
@@ -74,6 +79,9 @@ impl Client {
         .json()
         .await?;
         println!("delete {:?}", gg);
+        if let Some(err) = gg.error {
+            panic!();
+        }
         Ok(gg)
     }
 
@@ -93,8 +101,9 @@ impl Client {
         .json()
         .await?;
         println!("apply {:?}", &gg);
-        println!("apply {:?}", &gg);
-        
+        if let Some(err) = gg.error {
+            panic!();
+        }
         Ok(gg)
     }
 
@@ -111,8 +120,6 @@ impl Client {
         .await?
         .json()
         .await?;
-        println!("callll {:?}", &format!("{}/callbacks", self.control_api_address));
-        println!("callll {:?}", &format!("{}/callbacks", self.control_api_address));
         
         Ok(gg)
     }

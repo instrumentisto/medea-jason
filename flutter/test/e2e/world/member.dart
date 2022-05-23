@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:tuple/tuple.dart';
 
+import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
+
 import '../conf.dart';
 
 var globalConnect = HashMap<String, ConnectionHandle>();
@@ -68,7 +70,6 @@ class MyMember {
     });
 
     room.onLocalTrack((p0) {
-      print(p0.kind());
       connection_store.local_tracks.add(p0);
     });
 
@@ -111,7 +112,6 @@ class MyMember {
         connection_store.stopped_tracks.addAll({p0.getTrack().id(): false});
         connection_store.remote_tracks[id]!.add(p0);
         p0.onStopped(() {
-          print(p0.getTrack().id());
           connection_store.stopped_tracks[p0.getTrack().id()] = true;
         });
       });
@@ -125,6 +125,10 @@ class MyMember {
         value(p0);
       });
     });
+  }
+
+  Future<void> forget_local_tracks() async {
+    connection_store.local_tracks.forEach((element) {element.free();});
   }
 
   Future<void> wait_for_connect(String id) {
@@ -201,56 +205,44 @@ class MyMember {
     return out;
   }
 
-        //   let send_count = self
-        //     .send_state
-        //     .borrow()
-        //     .iter()
-        //     .filter(|(key, enabled)| {
-        //         other.recv_state.borrow().get(key).copied().unwrap_or(false)
-        //             && **enabled
-        //     })
-        //     .count() as u64;
-        // let recv_count = self
-        //     .recv_state
-        //     .borrow()
-        //     .iter()
-        //     .filter(|(key, enabled)| {
-        //         other.send_state.borrow().get(key).copied().unwrap_or(false)
-        //             && **enabled
-        //     })
-        //     .count() as u64;
+  //   let send_count = self
+  //     .send_state
+  //     .borrow()
+  //     .iter()
+  //     .filter(|(key, enabled)| {
+  //         other.recv_state.borrow().get(key).copied().unwrap_or(false)
+  //             && **enabled
+  //     })
+  //     .count() as u64;
+  // let recv_count = self
+  //     .recv_state
+  //     .borrow()
+  //     .iter()
+  //     .filter(|(key, enabled)| {
+  //         other.send_state.borrow().get(key).copied().unwrap_or(false)
+  //             && **enabled
+  //     })
+  //     .count() as u64;
 
   Tuple2<int, int> count_of_tracks_between_members(MyMember other) {
-    print(other.send_state);
-    print(other.recv_state);
-    print('_______');
-    print(send_state);
-    print(recv_state);
-    var send_count = send_state.entries.where((element) => other.recv_state[element.key]! && element.value).length;
+    var send_count = send_state.entries
+        .where((element) => other.recv_state[element.key]! && element.value)
+        .length;
     var recv_count = recv_state.entries
-        .where(
-            (element) => other.send_state[element.key]! && element.value)
+        .where((element) => other.send_state[element.key]! && element.value)
         .length;
     return Tuple2<int, int>(send_count, recv_count);
   }
 
   Future<void> toggle_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
-    print('HERE1');
     await update_send_media_state(kind, source, enabled);
-    print('HERE2');
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.Audio) {
-        print("WTF1");
           await room.enableAudio();
-        print("WTF2");
-
         } else {
-        print("WTF11");
           await room.enableVideo(source);
-        print("WTF12");
-        
         }
       } else {
         await room.enableAudio();
@@ -269,6 +261,40 @@ class MyMember {
       }
     }
   }
+
+  Future<void> add_gum_latency(Duration latency) async {
+    var caps = fw.DeviceConstraints();
+    caps.video.mandatory = fw.DeviceVideoConstraints();
+    caps.audio.mandatory = fw.AudioConstraints();
+    caps.video.mandatory!.width = 640;
+    caps.video.mandatory!.height = 480;
+    caps.video.mandatory!.fps = 30;
+    await fw.getUserMedia(caps).timeout(latency);
+  }
+
+  //   /// Emulates the provided `latency` for `getUserMedia()` requests.
+  // pub async fn add_gum_latency(&self, latency: Duration) {
+  //     self.window
+  //         .execute(Statement::new(
+  //             r#"
+  //                 async () => {
+  //                     const [duration] = args;
+
+  //                     var gUM = navigator.mediaDevices.getUserMedia.bind(
+  //                         navigator.mediaDevices
+  //                     );
+  //                     navigator.mediaDevices.getUserMedia =
+  //                         async function (cons) {
+  //                             await new Promise(r => setTimeout(r, duration));
+  //                             return await gUM(cons);
+  //                         };
+  //                 }
+  //             "#,
+  //             [(latency.as_millis() as u64).into()],
+  //         ))
+  //         .await
+  //         .unwrap();
+  // }
 
   Future<void> toggle_mute(
       MediaKind? kind, MediaSourceKind? source, bool muted) async {

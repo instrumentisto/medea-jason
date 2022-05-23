@@ -222,17 +222,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     for (var i = 0; i < interconnected_members.length; ++i) {
       var element = interconnected_members[i];
       var temp = member.count_of_tracks_between_members(element.value);
-      print(temp);
       var send_count = temp.item1;
       var recv_count = temp.item2;
 
       await member.wait_for_connect(element.key);
-      print(member_id + ' wait $recv_count tracks1');
       await member.wait_for_track_count(element.key, recv_count);
 
       var other_member = members[element.key]!;
       await other_member.wait_for_connect(member.id);
-      print(other_member.id + ' wait $send_count tracks2');
       await other_member.wait_for_track_count(member.id, send_count);
 
     }

@@ -49,6 +49,7 @@ var gg = FlutterTestConfiguration()
     //track
     then_member_has_remote_track,
     then_member_doesnt_have_remote_tracks_with,
+    then_doesnt_have_remote_track,
     then_member_has_n_remote_tracks_from,
     then_member_has_local_tracks,
     then_remote_media_track,
@@ -61,6 +62,8 @@ var gg = FlutterTestConfiguration()
     when_enables_or_mutes,
     when_member_enables_remote_track,
     then_remote_media_direction_is,
+    given_gum_delay,
+    when_member_frees_all_local_tracks,
 
     fillField3,
     fillField2,
