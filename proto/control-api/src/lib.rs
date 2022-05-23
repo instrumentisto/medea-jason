@@ -194,13 +194,13 @@ pub trait CallbackClient: Debug + Send + Sync {
 #[derive(Debug)]
 pub struct CallbackRequest {
     /// FID (Full ID) of element with which event was occurred.
-    fid: StatefulFid,
+    pub fid: StatefulFid,
 
     /// [`CallbackEvent`] which occurred.
-    event: CallbackEvent,
+    pub event: CallbackEvent,
 
     /// Time at which event occurred.
-    at: PrimitiveDateTime,
+    pub at: PrimitiveDateTime,
 }
 
 /// All callbacks which can happen.
@@ -214,7 +214,7 @@ pub enum CallbackEvent {
 #[derive(Clone, Copy, Debug)]
 pub struct OnLeaveEvent {
     /// Reason of why `Member` was lost.
-    reason: OnLeaveReason,
+    pub reason: OnLeaveReason,
 }
 
 impl OnLeaveEvent {
