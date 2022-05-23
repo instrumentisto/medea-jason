@@ -625,7 +625,7 @@ pub mod adapter {
                 id: value.id.clone().into(),
                 p2p: P2pMode::from(
                     proto::web_rtc_publish_endpoint::P2p::from_i32(value.p2p)
-                        .unwrap_or_default(),
+                        .unwrap(),
                 ),
                 audio_settings: value
                     .audio_settings

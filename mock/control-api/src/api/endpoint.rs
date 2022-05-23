@@ -204,7 +204,7 @@ impl From<proto::WebRtcPublishEndpoint> for WebRtcPublishEndpoint {
         Self {
             id: proto.id,
             p2p: proto::web_rtc_publish_endpoint::P2p::from_i32(proto.p2p)
-                .unwrap_or_default()
+                .unwrap()
                 .into(),
             force_relay: proto.force_relay,
             audio_settings: proto
