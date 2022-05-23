@@ -551,15 +551,16 @@ pub mod endpoint {
 
         /// Peer-to-peer mode of [`WebRtcPublishEndpoint`].
         #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq)]
+        #[repr(i32)]
         pub enum P2pMode {
-            /// Always connect peer-to-peer.
-            Always,
-
             /// Never connect peer-to-peer.
-            Never,
+            Never = 0,
 
             /// Connect peer-to-peer if it possible.
-            IfPossible,
+            IfPossible = 1,
+
+            /// Always connect peer-to-peer.
+            Always = 2,
         }
 
         /// Settings for the audio media type of the [`WebRtcPublishEndpoint`].
