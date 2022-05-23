@@ -47,7 +47,7 @@ pub mod api;
 #[rustfmt::skip]
 pub mod callback;
 
-use callback_adapter::{CallbackClientFactoryImpl, GrpcCallbackClient};
+pub use callback_adapter::{CallbackClientFactoryImpl, GrpcCallbackClient};
 
 mod callback_adapter {
     use std::{fmt, sync::Arc};
