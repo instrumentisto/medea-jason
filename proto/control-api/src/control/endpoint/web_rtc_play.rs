@@ -7,7 +7,7 @@ use serde::{de, de::Visitor, Deserialize, Deserializer, Serialize};
 use url::Url;
 
 use crate::control::{
-    endpoint, endpoint::web_rtc_publish, member, room, ErrorCode, ErrorResponse,
+    endpoint::web_rtc_publish, member, room, ErrorCode, ErrorResponse,
 };
 
 /// `ID` of a [`WebRtcPlay`].
@@ -110,62 +110,60 @@ impl fmt::Display for SrcUri {
         write!(
             f,
             "local://{}/{}/{}",
-            self.room_id, self.member_id, self.endpoint_id
+            self.room_id, self.member_id, self.endpoint_id,
         )
     }
 }
 
 impl TryFrom<String> for SrcUri {
-    type Error = LocalUriParseError;
+    type Error = SrcUriParseError;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if value.is_empty() {
-            return Err(LocalUriParseError::Empty);
+            return Err(SrcUriParseError::Empty);
         }
 
         let url = match Url::parse(&value) {
             Ok(url) => url,
-            Err(err) => {
-                return Err(LocalUriParseError::UrlParseErr(value, err))
-            }
+            Err(err) => return Err(SrcUriParseError::UrlParseErr(value, err)),
         };
 
         if url.scheme() != "local" {
-            return Err(LocalUriParseError::NotLocal(value));
+            return Err(SrcUriParseError::NotLocal(value));
         }
 
         let room_id = match url.host() {
             Some(host) => {
                 let host = host.to_string();
                 if host.is_empty() {
-                    return Err(LocalUriParseError::MissingPaths(value));
+                    return Err(SrcUriParseError::MissingPaths(value));
                 }
                 room::Id(host)
             }
-            None => return Err(LocalUriParseError::MissingPaths(value)),
+            None => return Err(SrcUriParseError::MissingPaths(value)),
         };
 
         let mut path = url
             .path_segments()
-            .ok_or_else(|| LocalUriParseError::MissingPaths(value.clone()))?;
+            .ok_or_else(|| SrcUriParseError::MissingPaths(value.clone()))?;
 
         let member_id = path
             .next()
             .filter(|id| !id.is_empty())
             .map(|id| member::Id(id.into()))
-            .ok_or_else(|| LocalUriParseError::MissingPaths(value.clone()))?;
+            .ok_or_else(|| SrcUriParseError::MissingPaths(value.clone()))?;
 
         let endpoint_id = path
             .next()
             .filter(|id| !id.is_empty())
             .map(|id| web_rtc_publish::Id(id.into()))
-            .ok_or_else(|| LocalUriParseError::MissingPaths(value.clone()))?;
+            .ok_or_else(|| SrcUriParseError::MissingPaths(value.clone()))?;
 
         if path.next().is_some() {
-            return Err(LocalUriParseError::TooManyPaths(value));
+            return Err(SrcUriParseError::TooManyPaths(value));
         }
 
-        Ok(SrcUri {
+        Ok(Self {
             room_id,
             member_id,
             endpoint_id,
@@ -175,7 +173,7 @@ impl TryFrom<String> for SrcUri {
 
 /// Error which can happen while [`SrcUri`] parsing.
 #[derive(Debug, Display, Error)]
-pub enum LocalUriParseError {
+pub enum SrcUriParseError {
     /// Protocol of provided URI is not "local://".
     #[display(fmt = "Provided URIs protocol is not `local://`")]
     NotLocal(#[error(not(source))] String),
@@ -201,9 +199,9 @@ pub enum LocalUriParseError {
     Empty,
 }
 
-impl From<LocalUriParseError> for ErrorResponse {
-    fn from(err: LocalUriParseError) -> Self {
-        use LocalUriParseError as E;
+impl From<SrcUriParseError> for ErrorResponse {
+    fn from(err: SrcUriParseError) -> Self {
+        use SrcUriParseError as E;
 
         match err {
             E::NotLocal(text) => {

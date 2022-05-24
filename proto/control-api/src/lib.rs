@@ -92,92 +92,12 @@
     variant_size_differences
 )]
 
+pub mod callback;
 pub mod control;
 
 #[cfg(feature = "grpc")]
 pub mod grpc;
 
-pub use control::Api as ControlApi;
-
-// /// Abstraction of a Control API callback client.
-// #[async_trait(?Send)]
-// pub trait CallbackClient {
-//     /// Sends provided [`CallbackRequest`].
-//     async fn send(
-//         &self,
-//         request: CallbackRequest,
-//     ) -> Result<(), CallbackClientError>;
-// }
-
-// /// Control API callback.
-// ///
-// /// Used for sending callbacks with [`CallbackClient::send`].
-// ///
-// /// [`CallbackClient::send`]:
-// /// crate::api::control::callback::clients::CallbackClient::send
-// #[derive(Debug)]
-// pub struct CallbackRequest {
-//     /// FID (Full ID) of element with which event was occurred.
-//     pub fid: StatefulFid,
-//
-//     pub url: String,
-//
-//     /// [`CallbackEvent`] which occurred.
-//     pub event: CallbackEvent,
-//
-//     /// Time at which event occurred.
-//     pub at: OffsetDateTime,
-// }
-//
-// /// All callbacks which can happen.
-// #[derive(Clone, Copy, Debug, From)]
-// pub enum CallbackEvent {
-//     OnJoin(OnJoinEvent),
-//     OnLeave(OnLeaveEvent),
-// }
-//
-// /// Event for `on_leave` `Member` callback.
-// #[derive(Clone, Copy, Debug)]
-// pub struct OnLeaveEvent {
-//     /// Reason of why `Member` was lost.
-//     pub reason: OnLeaveReason,
-// }
-//
-// impl OnLeaveEvent {
-//     #[must_use]
-//     pub const fn new(reason: OnLeaveReason) -> Self {
-//         Self { reason }
-//     }
-// }
-//
-// /// Reason of why `Member` was lost.
-// #[derive(Clone, Copy, Debug)]
-// pub enum OnLeaveReason {
-//     /// `Member` was normally disconnected.
-//     Disconnected,
-//
-//     /// Connection with `Member` was lost.
-//     LostConnection,
-//
-//     /// `Member` was forcibly disconnected by server.
-//     Kicked,
-//
-//     /// Server is shutting down.
-//     ServerShutdown,
-// }
-//
-// /// `on_join` `Member` callback for Control API.
-// #[derive(Clone, Copy, Debug)]
-// pub struct OnJoinEvent;
-//
-// /// Error of sending [`CallbackRequest`] by [`CallbackClient`].
-// #[derive(Debug, Display, Error, From)]
-// pub enum CallbackClientError {
-//     /// [`tonic`] failed to send [`CallbackRequest`].
-//     #[display(fmt = "gRPC request failed: {}", _0)]
-//     Request(#[error(not(source))] tonic::Status),
-//
-//     /// Error while creating a new [`CallbackClient`].
-//     #[display(fmt = "Failed to initialize gRPC callback client: {}", _0)]
-//     Initialization(tonic::transport::Error),
-// }
+pub use self::{
+    callback::Client as CallbackClient, control::Api as ControlApi,
+};

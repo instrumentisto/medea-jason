@@ -27,6 +27,7 @@ pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
 pub struct Id(pub String);
 
 /// Media element that one or more media data streams flow through.
+#[allow(variant_size_differences)]
 #[derive(Clone, Debug, From)]
 pub enum Endpoint {
     /// [`WebRtcPublish`] element.

@@ -62,7 +62,7 @@ pub enum P2pMode {
 pub struct AudioSettings {
     /// Publishing policy of the audio media type in the [`WebRtcPublish`].
     #[serde(default)]
-    pub publish_policy: PublishPolicy,
+    pub publish_policy: Policy,
 }
 
 /// Settings for the video media type of the [`WebRtcPublish`].
@@ -70,12 +70,12 @@ pub struct AudioSettings {
 pub struct VideoSettings {
     /// Publishing policy of the video media type in the [`WebRtcPublish`].
     #[serde(default)]
-    pub publish_policy: PublishPolicy,
+    pub publish_policy: Policy,
 }
 
 /// Publishing policy of the video or audio media type in the [`WebRtcPublish`].
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, SmartDefault)]
-pub enum PublishPolicy {
+pub enum Policy {
     /// Specified media type __may__ be published.
     ///
     /// Media server will try to initialize publishing, but won't
