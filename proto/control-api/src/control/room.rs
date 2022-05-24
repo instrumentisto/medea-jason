@@ -3,24 +3,12 @@
 use std::collections::HashMap;
 
 use derive_more::{Display, From, Into};
-use serde::{Deserialize, Serialize};
 
 use super::{member, Member};
 
 /// `ID` of a [`Room`].
 #[derive(
-    Clone,
-    Debug,
-    Deserialize,
-    Display,
-    Eq,
-    From,
-    Hash,
-    Into,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
+    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
 )]
 pub struct Id(pub String);
 

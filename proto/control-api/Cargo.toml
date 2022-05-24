@@ -23,7 +23,6 @@ derive_more = { version = "0.99.17", features = ["display", "error", "from", "in
 prost = { version = "0.10", optional = true }
 prost-types = { version = "0.10", optional = true }
 rand = "0.8.5"
-serde = { version = "1.0", features = ["derive"] }
 smart-default = "0.6.0"
 time = "0.3"
 tonic = { version = "0.7", optional = true }

@@ -3,7 +3,6 @@
 use std::fmt;
 
 use derive_more::{Display, Error, From, Into};
-use serde::{de, de::Visitor, Deserialize, Deserializer, Serialize};
 use url::Url;
 
 use crate::control::{
@@ -12,24 +11,13 @@ use crate::control::{
 
 /// `ID` of a [`WebRtcPlay`].
 #[derive(
-    Clone,
-    Debug,
-    Deserialize,
-    Display,
-    Eq,
-    From,
-    Hash,
-    Into,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
+    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
 )]
 pub struct Id(pub String);
 
 /// Media element which is able to play media data for client via
 /// `WebRTC`.
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Clone, Debug)]
 pub struct WebRtcPlay {
     /// `ID` of this [`WebRtcPlay`].
     pub id: Id,
@@ -39,7 +27,6 @@ pub struct WebRtcPlay {
     pub src: SrcUri,
 
     /// Option to relay all media through a `TURN` server forcibly.
-    #[serde(default)]
     pub force_relay: bool,
 }
 
@@ -63,46 +50,6 @@ pub struct SrcUri {
     ///
     /// [`WebRtcPublish`]: endpoint::WebRtcPublish
     pub endpoint_id: web_rtc_publish::Id,
-}
-
-/// [Serde] deserializer for [`SrcUri`].
-///
-/// Deserializes URIs with pattern:
-/// `local://room_id/member_id/publish_endpoint_id`.
-///
-/// [Serde]: serde
-impl<'de> Deserialize<'de> for SrcUri {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        /// [`Visitor`] implementation for [`Deserialize`]ing
-        /// [`SrcUri`].
-        struct SrcUriVisitor;
-
-        impl<'de> Visitor<'de> for SrcUriVisitor {
-            type Value = SrcUri;
-
-            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                f.write_str(
-                    "URI in format: \
-                             local://room_id/member_id/endpoint_id",
-                )
-            }
-
-            fn visit_str<E>(self, value: &str) -> Result<SrcUri, E>
-            where
-                E: de::Error,
-            {
-                match SrcUri::try_from(value.to_owned()) {
-                    Ok(src_uri) => Ok(src_uri),
-                    Err(e) => Err(de::Error::custom(e)),
-                }
-            }
-        }
-
-        deserializer.deserialize_identifier(SrcUriVisitor)
-    }
 }
 
 impl fmt::Display for SrcUri {

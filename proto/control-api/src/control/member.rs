@@ -3,24 +3,12 @@
 use std::{collections::HashMap, fmt, time::Duration};
 
 use derive_more::{Display, From, Into};
-use serde::{Deserialize, Serialize};
 
 use super::{endpoint, room, Endpoint};
 
 /// `ID` of a [`Member`].
 #[derive(
-    Clone,
-    Debug,
-    Deserialize,
-    Display,
-    Eq,
-    From,
-    Hash,
-    Into,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
+    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
 )]
 pub struct Id(pub String);
 
@@ -113,12 +101,11 @@ impl fmt::Display for Sid {
 /// [Client Api]: https://tinyurl.com/266y74tf
 /// [Control API]: https://tinyurl.com/yxsqplq7
 /// [Jason]: https://github.com/instrumentisto/medea-jason
-#[derive(Clone, Debug, Display, Deserialize, Serialize, From)]
+#[derive(Clone, Debug, Display, From)]
 pub struct PublicUrl(pub String);
 
 /// Credentials of the [`Member`] element.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Credentials {
     /// [Argon2] hash of the `Member` credential.
     ///

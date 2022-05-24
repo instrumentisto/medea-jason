@@ -99,5 +99,9 @@ pub mod control;
 pub mod grpc;
 
 pub use self::{
-    callback::Client as CallbackClient, control::Api as ControlApi,
+    callback::Client as CallbackClient,
+    control::{
+        endpoint, member, room, Api as ControlApi, Element, Elements, Endpoint,
+        ErrorCode, ErrorResponse, Member, Ping, Pong, Room, Sids, StatefulFid,
+    },
 };

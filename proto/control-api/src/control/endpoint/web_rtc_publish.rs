@@ -1,29 +1,17 @@
 //! [`WebRtcPublish`] definitions.
 
 use derive_more::{Display, From, Into};
-use serde::{Deserialize, Serialize};
 use smart_default::SmartDefault;
 
 /// `ID` of [`WebRtcPublish`].
 #[derive(
-    Clone,
-    Debug,
-    Display,
-    Serialize,
-    Deserialize,
-    Eq,
-    From,
-    Hash,
-    Into,
-    Ord,
-    PartialEq,
-    PartialOrd,
+    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
 )]
 pub struct Id(pub String);
 
 /// Media element which is able to publish media data for another client via
 /// `WebRTC`.
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Clone, Debug)]
 pub struct WebRtcPublish {
     /// `ID` og this [`WebRtcPublish`].
     pub id: Id,
@@ -32,20 +20,17 @@ pub struct WebRtcPublish {
     pub p2p: P2pMode,
 
     /// Option to relay all media through a `TURN` server forcibly.
-    #[serde(default)]
     pub force_relay: bool,
 
     /// Settings for the audio media type of the [`WebRtcPublish`].
-    #[serde(default)]
     pub audio_settings: AudioSettings,
 
     /// Settings for the video media type of the [`WebRtcPublish`].
-    #[serde(default)]
     pub video_settings: VideoSettings,
 }
 
 /// Peer-to-peer mode of [`WebRtcPublish`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum P2pMode {
     /// Never connect peer-to-peer.
     Never = 0,
@@ -58,23 +43,21 @@ pub enum P2pMode {
 }
 
 /// Settings for the audio media type of the [`WebRtcPublish`].
-#[derive(Clone, Copy, Debug, Default, Deserialize)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct AudioSettings {
     /// Publishing policy of the audio media type in the [`WebRtcPublish`].
-    #[serde(default)]
     pub publish_policy: Policy,
 }
 
 /// Settings for the video media type of the [`WebRtcPublish`].
-#[derive(Clone, Copy, Debug, Default, Deserialize)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct VideoSettings {
     /// Publishing policy of the video media type in the [`WebRtcPublish`].
-    #[serde(default)]
     pub publish_policy: Policy,
 }
 
 /// Publishing policy of the video or audio media type in the [`WebRtcPublish`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, SmartDefault)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, SmartDefault)]
 pub enum Policy {
     /// Specified media type __may__ be published.
     ///

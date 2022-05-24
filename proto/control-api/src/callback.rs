@@ -3,10 +3,10 @@
 //! [`CallbackClient`]: Client
 
 use async_trait::async_trait;
-use derive_more::{Display, Error, From};
+use derive_more::From;
 use time::OffsetDateTime;
 
-use crate::control::{ErrorResponse, StatefulFid};
+use crate::{ErrorResponse, StatefulFid};
 
 /// Abstraction of a [Control API] callback client.
 ///
