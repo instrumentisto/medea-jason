@@ -108,27 +108,21 @@ pub use self::{
 };
 
 #[async_trait]
-pub trait ControlApi<OnJoin, OnLeave> {
-    async fn create_room(
-        &self,
-        spec: Room<OnJoin, OnLeave>,
-    ) -> Result<Sids, ErrorResponse>;
+pub trait ControlApi {
+    async fn create_room(&self, spec: Room) -> Result<Sids, ErrorResponse>;
 
-    async fn apply_room(
-        &self,
-        spec: Room<OnJoin, OnLeave>,
-    ) -> Result<Sids, ErrorResponse>;
+    async fn apply_room(&self, spec: Room) -> Result<Sids, ErrorResponse>;
 
     async fn create_room_member(
         &self,
         parent_id: Fid<ToRoom>,
-        spec: Member<OnJoin, OnLeave>,
+        spec: Member,
     ) -> Result<Sids, ErrorResponse>;
 
     async fn apply_room_member(
         &self,
         fid: Fid<ToRoom>,
-        spec: Member<OnJoin, OnLeave>,
+        spec: Member,
     ) -> Result<Sids, ErrorResponse>;
 
     async fn create_room_endpoint(
@@ -151,7 +145,7 @@ pub trait ControlApi<OnJoin, OnLeave> {
     async fn get(
         &self,
         fids: Vec<StatefulFid>,
-    ) -> Result<Elements<OnJoin, OnLeave>, ErrorResponse>;
+    ) -> Result<Elements, ErrorResponse>;
 
     async fn healthz(&self, ping: Ping) -> Result<Pong, ErrorResponse>;
 }
@@ -277,13 +271,12 @@ pub enum Reason {
 
 /// Serialized to protobuf `Element`s which will be returned from [`Get`] on
 /// success result.
-pub type Elements<OnJoin, OnLeave> =
-    HashMap<StatefulFid, Element<OnJoin, OnLeave>>;
+pub type Elements = HashMap<StatefulFid, Element>;
 
 #[derive(Clone, Debug)]
-pub enum Element<OnJoin, OnLeave> {
-    Member(Member<OnJoin, OnLeave>),
-    Room(Room<OnJoin, OnLeave>),
+pub enum Element {
+    Member(Member),
+    Room(Room),
     Endpoint(Endpoint),
 }
 
@@ -425,9 +418,9 @@ pub mod room {
     ///
     /// [Control API]: https://tinyurl.com/yxsqplq7
     #[derive(Clone, Debug)]
-    pub struct Room<OnJoin, OnLeave> {
+    pub struct Room {
         pub id: Id,
-        pub pipeline: HashMap<member::Id, Member<OnJoin, OnLeave>>,
+        pub pipeline: HashMap<member::Id, Member>,
     }
 }
 
@@ -458,7 +451,7 @@ pub mod member {
 
     /// Newtype for [`RoomElement::Member`] variant.
     #[derive(Clone, Debug)]
-    pub struct Member<OnJoin, OnLeave> {
+    pub struct Member {
         pub id: Id,
 
         /// Spec of this `Member`.
@@ -468,10 +461,10 @@ pub mod member {
         pub credentials: Credentials,
 
         /// URL to which `OnJoin` Control API callback will be sent.
-        pub on_join: Option<OnJoin>,
+        pub on_join: Option<String>,
 
         /// URL to which `OnLeave` Control API callback will be sent.
-        pub on_leave: Option<OnLeave>,
+        pub on_leave: Option<String>,
 
         /// Timeout of receiving heartbeat messages from the `Member` via
         /// Client API.
