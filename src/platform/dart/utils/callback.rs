@@ -299,7 +299,7 @@ pub mod tests {
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
         Callback::from_once(move |val: Dart_Handle| {
-            unsafe { (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val) };
+            (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val);
         })
         .into_dart()
     }

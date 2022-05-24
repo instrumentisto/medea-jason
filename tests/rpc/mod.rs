@@ -721,7 +721,6 @@ mod on_connection_loss {
 // TODO: this tests should be implemented for the RpcSession!
 #[cfg(feature = "disabled")]
 mod on_reconnected {
-
     use medea_reactive::ObservableCell;
 
     use crate::yield_now;

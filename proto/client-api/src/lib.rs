@@ -33,6 +33,7 @@
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
+    clippy::iter_with_drain,
     clippy::let_underscore_must_use,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
@@ -43,6 +44,7 @@
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::nonstandard_macro_braces,
+    clippy::only_used_in_recursion,
     clippy::option_if_let_else,
     clippy::panic_in_result_fn,
     clippy::pedantic,
@@ -64,6 +66,7 @@
     clippy::trailing_empty_array,
     clippy::transmute_undefined_repr,
     clippy::trivial_regex,
+    clippy::try_err,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
     clippy::unnecessary_self_imports,
@@ -92,6 +95,9 @@
     unused_results,
     variant_size_differences
 )]
+// TODO: Remove once annoying false positive is fixed:
+//       https://github.com/rust-lang/rust-clippy/issues/6902
+#![allow(clippy::use_self)]
 
 pub mod state;
 pub mod stats;
@@ -727,20 +733,20 @@ impl MediaDirection {
     /// Indicates whether a `Track` is enabled on sender side only.
     #[must_use]
     pub const fn is_send_enabled(self) -> bool {
-        matches!(self, MediaDirection::SendRecv | MediaDirection::SendOnly)
+        matches!(self, Self::SendRecv | Self::SendOnly)
     }
 
     /// Indicates whether a `Track` is enabled on receiver side only.
     #[must_use]
     pub const fn is_recv_enabled(self) -> bool {
-        matches!(self, MediaDirection::SendRecv | MediaDirection::RecvOnly)
+        matches!(self, Self::SendRecv | Self::RecvOnly)
     }
 
     /// Indicates whether a `Track` is enabled on both sender and receiver
     /// sides.
     #[must_use]
     pub const fn is_enabled_general(self) -> bool {
-        matches!(self, MediaDirection::SendRecv)
+        matches!(self, Self::SendRecv)
     }
 }
 

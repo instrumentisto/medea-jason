@@ -42,8 +42,8 @@ impl MediaKind {
     #[must_use]
     pub fn as_js(self) -> &'static str {
         match self {
-            MediaKind::Audio => "window.rust.MediaKind.Audio",
-            MediaKind::Video => "window.rust.MediaKind.Video",
+            Self::Audio => "window.rust.MediaKind.Audio",
+            Self::Video => "window.rust.MediaKind.Video",
         }
     }
 }
@@ -77,8 +77,8 @@ impl MediaSourceKind {
     #[must_use]
     pub fn as_js(self) -> &'static str {
         match self {
-            MediaSourceKind::Device => "window.rust.MediaSourceKind.Device",
-            MediaSourceKind::Display => "window.rust.MediaSourceKind.Display",
+            Self::Device => "window.rust.MediaSourceKind.Device",
+            Self::Display => "window.rust.MediaSourceKind.Display",
         }
     }
 }

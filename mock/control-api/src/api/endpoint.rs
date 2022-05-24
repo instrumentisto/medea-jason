@@ -40,35 +40,24 @@ impl From<proto::web_rtc_publish_endpoint::P2p> for P2pMode {
     }
 }
 
-/// TODO: Remove once no false positive.
-#[allow(clippy::use_self)]
-mod publish_policy {
-    use super::{Deserialize, Serialize, SmartDefault};
+/// Publishing policy of the video or audio media type in the
+/// [`WebRtcPublishEndpoint`].
+#[derive(
+    Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize, SmartDefault,
+)]
+pub enum PublishPolicy {
+    /// Publish this media type if it possible.
+    #[default]
+    Optional,
 
-    /// Publishing policy of the video or audio media type in the
-    /// [`WebRtcPublishEndpoint`].
+    /// Don't start call if this media type can't be published.
+    Required,
+
+    /// Media type __must__ not be published.
     ///
-    /// [`WebRtcPublishEndpoint`]: super::WebRtcPublishEndpoint
-    #[derive(
-        Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize, SmartDefault,
-    )]
-    pub enum PublishPolicy {
-        /// Publish this media type if it possible.
-        #[default]
-        Optional,
-
-        /// Don't start call if this media type can't be published.
-        Required,
-
-        /// Media type __must__ not be published.
-        ///
-        /// Media server will not try to initialize publishing.
-        Disabled,
-    }
+    /// Media server will not try to initialize publishing.
+    Disabled,
 }
-
-#[doc(inline)]
-pub use self::publish_policy::PublishPolicy;
 
 impl From<proto::web_rtc_publish_endpoint::PublishPolicy> for PublishPolicy {
     fn from(proto: proto::web_rtc_publish_endpoint::PublishPolicy) -> Self {
