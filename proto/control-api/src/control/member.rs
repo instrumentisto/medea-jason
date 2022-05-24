@@ -82,9 +82,12 @@ pub struct Sid {
     /// [`Id`] of the [`Room`] the [`Member`] participates in.
     ///
     /// [`Id`]: room::Id
+    /// [`Room`]: room::Room
     pub room_id: room::Id,
 
     /// [`Id`] of the [`Member`] participating in the [`Room`].
+    ///
+    /// [`Room`]: room::Room
     pub member_id: Id,
 
     /// [`Credentials`] of the [`Member`] to authorize his connection with.

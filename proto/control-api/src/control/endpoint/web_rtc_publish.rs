@@ -4,7 +4,7 @@ use derive_more::{Display, From, Into};
 use serde::{Deserialize, Serialize};
 use smart_default::SmartDefault;
 
-/// `ID` of [`WebRtcPublishEndpoint`].
+/// `ID` of [`WebRtcPublish`].
 #[derive(
     Clone,
     Debug,

@@ -1,12 +1,16 @@
 //! [`WebRtcPlay`] definitions.
 
-use derive_more::{Display, From, Into};
-use serde::{de, de::Visitor, Deserialize, Deserializer, Serialize};
 use std::fmt;
 
-use crate::control::{endpoint::web_rtc_publish, member, room};
+use derive_more::{Display, Error, From, Into};
+use serde::{de, de::Visitor, Deserialize, Deserializer, Serialize};
+use url::Url;
 
-/// `ID` of a [`WebRtcPublish`].
+use crate::control::{
+    endpoint, endpoint::web_rtc_publish, member, room, ErrorCode, ErrorResponse,
+};
+
+/// `ID` of a [`WebRtcPlay`].
 #[derive(
     Clone,
     Debug,
@@ -47,10 +51,12 @@ pub struct WebRtcPlay {
 pub struct SrcUri {
     /// `ID` of the [`Room`].
     ///
-    /// [`Room`]: crate::signalling::room::Room
+    /// [`Room`]: room::Room
     pub room_id: room::Id,
 
     /// `ID` of the [`Member`].
+    ///
+    /// [`Member`]: member::Member
     pub member_id: member::Id,
 
     /// `ID` of the [`WebRtcPublish`].
@@ -106,5 +112,111 @@ impl fmt::Display for SrcUri {
             "local://{}/{}/{}",
             self.room_id, self.member_id, self.endpoint_id
         )
+    }
+}
+
+impl TryFrom<String> for SrcUri {
+    type Error = LocalUriParseError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.is_empty() {
+            return Err(LocalUriParseError::Empty);
+        }
+
+        let url = match Url::parse(&value) {
+            Ok(url) => url,
+            Err(err) => {
+                return Err(LocalUriParseError::UrlParseErr(value, err))
+            }
+        };
+
+        if url.scheme() != "local" {
+            return Err(LocalUriParseError::NotLocal(value));
+        }
+
+        let room_id = match url.host() {
+            Some(host) => {
+                let host = host.to_string();
+                if host.is_empty() {
+                    return Err(LocalUriParseError::MissingPaths(value));
+                }
+                room::Id(host)
+            }
+            None => return Err(LocalUriParseError::MissingPaths(value)),
+        };
+
+        let mut path = url
+            .path_segments()
+            .ok_or_else(|| LocalUriParseError::MissingPaths(value.clone()))?;
+
+        let member_id = path
+            .next()
+            .filter(|id| !id.is_empty())
+            .map(|id| member::Id(id.into()))
+            .ok_or_else(|| LocalUriParseError::MissingPaths(value.clone()))?;
+
+        let endpoint_id = path
+            .next()
+            .filter(|id| !id.is_empty())
+            .map(|id| web_rtc_publish::Id(id.into()))
+            .ok_or_else(|| LocalUriParseError::MissingPaths(value.clone()))?;
+
+        if path.next().is_some() {
+            return Err(LocalUriParseError::TooManyPaths(value));
+        }
+
+        Ok(SrcUri {
+            room_id,
+            member_id,
+            endpoint_id,
+        })
+    }
+}
+
+/// Error which can happen while [`SrcUri`] parsing.
+#[derive(Debug, Display, Error)]
+pub enum LocalUriParseError {
+    /// Protocol of provided URI is not "local://".
+    #[display(fmt = "Provided URIs protocol is not `local://`")]
+    NotLocal(#[error(not(source))] String),
+
+    /// Too many paths in provided URI.
+    ///
+    /// `local://room_id/member_id/endpoint_id/redundant_path` for example.
+    #[display(fmt = "Too many paths in provided URI ({})", _0)]
+    TooManyPaths(#[error(not(source))] String),
+
+    /// Some paths is missing in URI.
+    ///
+    /// `local://room_id//qwerty` for example.
+    #[display(fmt = "Missing fields: {}", _0)]
+    MissingPaths(#[error(not(source))] String),
+
+    /// Error while parsing URI by [`url::Url`].
+    #[display(fmt = "Error while parsing URL: {}", _0)]
+    UrlParseErr(String, #[error(source)] url::ParseError),
+
+    /// Provided empty URI.
+    #[display(fmt = "Provided empty local URI")]
+    Empty,
+}
+
+impl From<LocalUriParseError> for ErrorResponse {
+    fn from(err: LocalUriParseError) -> Self {
+        use LocalUriParseError as E;
+
+        match err {
+            E::NotLocal(text) => {
+                Self::new(ErrorCode::ElementIdIsNotLocal, &text)
+            }
+            E::TooManyPaths(text) => {
+                Self::new(ErrorCode::ElementIdIsTooLong, &text)
+            }
+            E::Empty => Self::without_id(ErrorCode::EmptyElementId),
+            E::MissingPaths(text) => {
+                Self::new(ErrorCode::MissingFieldsInSrcUri, &text)
+            }
+            E::UrlParseErr(id, _) => Self::new(ErrorCode::InvalidSrcUri, &id),
+        }
     }
 }

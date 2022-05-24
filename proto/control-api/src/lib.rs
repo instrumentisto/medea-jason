@@ -96,15 +96,15 @@ pub mod grpc;
 
 pub use control::Api as ControlApi;
 
-/// Abstraction of a Control API callback client.
-#[async_trait(?Send)]
-pub trait CallbackClient {
-    /// Sends provided [`CallbackRequest`].
-    async fn send(
-        &self,
-        request: CallbackRequest,
-    ) -> Result<(), CallbackClientError>;
-}
+// /// Abstraction of a Control API callback client.
+// #[async_trait(?Send)]
+// pub trait CallbackClient {
+//     /// Sends provided [`CallbackRequest`].
+//     async fn send(
+//         &self,
+//         request: CallbackRequest,
+//     ) -> Result<(), CallbackClientError>;
+// }
 
 // /// Control API callback.
 // ///
