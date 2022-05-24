@@ -33,8 +33,6 @@ pub(crate) fn derive(
     let inp: syn::DeriveInput = syn::parse(input)?;
 
     let enum_name = inp.ident.clone();
-    let (enum_impl_gens, enum_type_gens, enum_where_clause) =
-        inp.generics.split_for_impl();
     let enum_name_iter = iter::repeat(enum_name.clone());
 
     let variants = if let syn::Data::Enum(ref data) = &inp.data {
@@ -105,7 +103,7 @@ pub(crate) fn derive(
 
     let impl_output = quote! {
         #[automatically_derived]
-        impl #enum_impl_gens #enum_name #enum_type_gens #enum_where_clause {
+        impl #enum_name {
             #function
         }
     };
