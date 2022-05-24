@@ -29,13 +29,13 @@ pub struct Member {
     /// `OnJoin` `URL` which will be sent to the [`CallbackApi`]. Nothing will
     /// be sent, in case it's [`None`].
     ///
-    /// [`CallbackApi`]: crate::CallbackApi
+    /// [`CallbackApi`]: crate::CallbackClient
     pub on_join: Option<String>,
 
     /// `OnLeave` `URL` which will be sent to the [`CallbackApi`]. Nothing will
     /// be sent, in case it's [`None`].
     ///
-    /// [`CallbackApi`]: crate::CallbackApi
+    /// [`CallbackApi`]: crate::CallbackClient
     pub on_leave: Option<String>,
 
     /// Timeout of receiving heartbeat messages from the [`Member`] via

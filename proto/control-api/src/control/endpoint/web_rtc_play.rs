@@ -48,7 +48,7 @@ pub struct SrcUri {
 
     /// `ID` of the [`WebRtcPublish`].
     ///
-    /// [`WebRtcPublish`]: endpoint::WebRtcPublish
+    /// [`WebRtcPublish`]: web_rtc_publish::WebRtcPublish
     pub endpoint_id: web_rtc_publish::Id,
 }
 
