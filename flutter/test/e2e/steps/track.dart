@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
+// import 'package:json_serializable/type_helper.dart';
 import 'package:medea_jason/medea_jason.dart';
 
 import '../api/endpoint.dart';
@@ -19,7 +20,7 @@ StepDefinitionGeneric then_member_has_remote_track =
     var member = context.world.members[id]!;
     await member.wait_for_connect(partner_id);
     var track_store = member.connection_store.remote_tracks;
-    await Future.delayed(Duration(milliseconds: 100)); // todo delete
+    await Future.delayed(Duration(milliseconds: 1000)); // todo delete
 
     var kind_ = parse_media_kind(kind);
     track_store[partner_id]!
@@ -37,8 +38,7 @@ StepDefinitionGeneric then_member_doesnt_have_remote_tracks_with =
     var track_store = member.connection_store.remote_tracks[partner_id]!;
     var tracks_count = track_store.length;
     if (tracks_count != 0) {
-      print(tracks_count);
-      throw 42;
+      throw '$tracks_count != 0';
     }
   },
 );
@@ -50,8 +50,7 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
   (id, expected_count, live_or_stopped, remote_id, context) async {
     var member = context.world.members[id]!;
     await member.wait_for_connect(remote_id);
-    await Future.delayed(Duration(seconds: 5));
-
+    // await member.wait_for_track_count(remote_id, 4);
     var muted;
     var stopped;
     if (live_or_stopped == 'live') {
@@ -62,10 +61,11 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
       stopped = true;
     }
 
+    // member.connection_store.remote_tracks[remote_id]!.forEach((element) {print(element.mediaDirection());});
+
     // todo check muted
     var actual_count = 0;
     for (var i = 0; i < 5; ++i) {
-
       actual_count = member.connection_store.remote_tracks[remote_id]!
           .where((element) =>
               member.connection_store
@@ -86,9 +86,10 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
       }
     }
 
-    print('$actual_count -- $expected_count');
+    print(member.connection_store.remote_tracks[remote_id]!.length);
+    print('HHHERRRREEE');
     if (actual_count != expected_count) {
-      throw 'not eq';
+      throw '$actual_count != $expected_count';
     }
   },
 );
@@ -102,8 +103,7 @@ StepDefinitionGeneric then_member_has_local_tracks =
     var actual_count = member.connection_store.local_tracks.length;
 
     if (actual_count != expected_count) {
-      print('$actual_count != $expected_count');
-      throw 'not eq';
+      throw '$actual_count != $expected_count';
     }
   },
 );
@@ -117,8 +117,7 @@ StepDefinitionGeneric then_doesnt_have_remote_track =
     var kind_ = parse_media_kind(kind);
     var actual_count = member.connection_store.remote_tracks[partner_id]!.where((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2).length;
     if (actual_count != 0) {
-      print('$actual_count != 0');
-      throw 'not eq';
+      throw '$actual_count != 0';
     }
   },
 );
@@ -168,7 +167,6 @@ StepDefinitionGeneric then_remote_track_stops =
         (element) =>
             element.kind() == kind_.item1 &&
             element.mediaSourceKind() == kind_.item2);
-    await Future.delayed(Duration(seconds: 1));
     if (track.mediaDirection() != TrackMediaDirection.SendOnly) {
       throw 1042;
     }
@@ -199,7 +197,7 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
   },
 );
 
-
+// todo recheck
 StepDefinitionGeneric then_has_local_track =
     then2<String, String, CustomWorld>(
   RegExp(r'(Alice|Bob|Carol) has local (audio|device video|display video|video)'),
@@ -207,10 +205,11 @@ StepDefinitionGeneric then_has_local_track =
     var member = context.world.members[id]!;
     var kind_ = parse_media_kind(kind);
 
-    member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
     if (kind == 'video') {
-    member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
-      
+      member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
+      member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == MediaSourceKind.Display);
+    } else {
+      member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
     }
 
   },

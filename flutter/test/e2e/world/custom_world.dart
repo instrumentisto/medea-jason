@@ -168,7 +168,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   Future<void> delete_publish_endpoint(String member_id) async {
     var resp = await control_client.delete('$room_id/$member_id/publish');
-    // todo error check
+    // print(resp.body);
   }
 
   Future<void> delete_play_endpoint(
@@ -177,6 +177,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
     var resp =
         await control_client.delete('$room_id/$member_id/$play_endpoint_id');
+    
     // todo error check
   }
 
@@ -270,20 +271,19 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
   /// provided [`MembersPair`] using an `Apply` method of Control API.
   Future<void> interconnect_members(MembersPair pair) async {
-
     if (pair.left.publish_endpoint() != null) {
       var publish_endpoint = pair.left.publish_endpoint()!;
       var left_member = members[pair.left.id]!;
       if (publish_endpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        await left_member.update_send_media_state(MediaKind.Audio, null, true);
+        left_member.update_send_media_state(MediaKind.Audio, null, true);
       }
       if (publish_endpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        await left_member.update_send_media_state(MediaKind.Video, null, true);
+        left_member.update_send_media_state(MediaKind.Video, null, true);
       }
       await control_client.create(
-          '$room_id/' + pair.left.id + '/publish', publish_endpoint.toJson());
+          '$room_id/' + pair.left.id + '/publish', publish_endpoint);
     }
 
     if (pair.right.publish_endpoint() != null) {
@@ -291,14 +291,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var right_member = members[pair.right.id]!;
       if (publish_endpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        await right_member.update_send_media_state(MediaKind.Audio, null, true);
+        right_member.update_send_media_state(MediaKind.Audio, null, true);
       }
       if (publish_endpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        await right_member.update_send_media_state(MediaKind.Video, null, true);
+        right_member.update_send_media_state(MediaKind.Video, null, true);
       }
       await control_client.create(
-          '$room_id/' + pair.right.id + '/publish', publish_endpoint.toJson());
+          '$room_id/' + pair.right.id + '/publish', publish_endpoint);
     }
 
 
@@ -311,7 +311,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await control_client.create(
           '$room_id/' + pair.left.id + '/' + publish_endpoint.id,
-          publish_endpoint.toJson());
+          publish_endpoint);
+
     }
 
     if (pair.right.play_endpoint_for(room_id, pair.left) != null) {
@@ -323,20 +324,20 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await control_client.create(
           '$room_id/' + pair.right.id + '/' + publish_endpoint.id,
-          publish_endpoint.toJson());
+          publish_endpoint);
     }
 
 
     {
       var left_member = members[pair.left.id]!;
       left_member.is_send = pair.left.is_send();
-      left_member.is_recv = pair.right.recv;
+      left_member.is_recv = pair.right.recv; 
     }
 
     {
       var right_member = members[pair.right.id]!;
       right_member.is_send = pair.right.is_send();
-      right_member.is_recv = pair.right.recv;
+      right_member.is_recv = pair.right.recv; 
     }
   }
 

@@ -15,6 +15,7 @@ dependencies:
   flutter_webrtc:
     git:
       url: https://github.com/instrumentisto/flutter-webrtc.git
+      ref: 147f8fb438fe51d991a7998ddaa28727e8a01885
   js: ^0.6.3
   http: ^0.13.4
   uuid: ^3.0.6

@@ -6,7 +6,7 @@ import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
 
-// todo recheck await
+// todo recheck await todo kind without source
 StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, String, CustomWorld>(
   RegExp(
       r'(Alice|Bob|Carol) (enables|disables|mutes|unmutes) (audio|video)( and awaits it completes| and awaits it errors|)'),
@@ -20,26 +20,27 @@ StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, Stri
     try {
       switch(action) { 
         case 'enables': { 
-          var future =  member.toggle_media(kind.item1, null, true);
+          var future =  member.toggle_media(kind.item1, kind.item2, true);
           if(awats) {await future;}
         } 
         break; 
         
         case 'disables': {
-          var future =   member.toggle_media(kind.item1, null, false);
+
+          var future =   member.toggle_media(kind.item1, kind.item2, false);
                     if(awats) {
                       await future;}
         } 
         break; 
 
         case 'mutes': { 
-          var future =   member.toggle_mute(kind.item1, null, true);
+          var future =   member.toggle_mute(kind.item1, kind.item2, true);
                     if(awats) {await future;}
         } 
         break; 
             
         default: { 
-          var future =   member.toggle_mute(kind.item1, null, false);
+          var future =   member.toggle_mute(kind.item1, kind.item2, false);
                     if(awats) {await future;}
         }
         break; 
@@ -82,6 +83,10 @@ StepDefinitionGeneric then_remote_media_direction_is = then4<String, String, Str
   (id, String kind, remote_id, direction, context) async {
     var member =context.world.members[id]!;
     await member.wait_for_connect(remote_id);
+
+    // todo
+    await Future.delayed(Duration(seconds: 1));
+
     var kind_ = parse_media_kind(kind);
     var track = member.connection_store.remote_tracks[remote_id]!.firstWhere((element) => element.mediaSourceKind() == MediaSourceKind.Device && element.kind() == kind_.item1);
     while (track.mediaDirection().name != direction) {
@@ -92,17 +97,36 @@ StepDefinitionGeneric then_remote_media_direction_is = then4<String, String, Str
 
 StepDefinitionGeneric then_local_track_mute_state = then3<String, String, String, CustomWorld>(
   RegExp(
-      r"(Alice|Bob|Carol)'s local (audio|device video|display video|video) track is (not muted|muted)"),
+      r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is (not muted|muted)"),
   (id, String kind, not_muted, context) async {
     var member =context.world.members[id]!;
     var kind_ = parse_media_kind(kind);
+
+    await Future.delayed(Duration(seconds: 1)); // todo локальные трэки не успевают появиться
+
     var track = member.connection_store.local_tracks.firstWhere((element) => element.mediaSourceKind() == MediaSourceKind.Device && element.kind() == kind_.item1);
     var muted = !not_muted.contains('not');
 
-    throw 'cant check local track muted';
+    if (muted != !track.getTrack().isEnabled()) {
+      throw 'muted not muted';
+    }
   },
 );
 
+StepDefinitionGeneric then_track_is_stopped = then2<String, String, CustomWorld>(
+  RegExp(
+      r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is stopped"),
+  (id, kind, context) async {
+    var member =context.world.members[id]!;
+    var kind_ = parse_media_kind(kind);
+
+    await Future.delayed(Duration(seconds: 1));
+    var track = member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
+    if (!track.getTrack().isEnabled()) {
+      throw 'not stopped';
+    }
+  },
+);
 
 StepDefinitionGeneric given_gum_delay = given1<String, CustomWorld>(
   RegExp(

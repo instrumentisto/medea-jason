@@ -46,10 +46,17 @@ class MyMember {
     is_joined = true;
   }
 
+//todo update
   void update_send_media_state(
       MediaKind? kind, MediaSourceKind? source_kind, bool enabled) async {
     kinds_combinations(kind, source_kind).forEach((element) {
+      if (send_state[Tuple2(element.item1, element.item2)] == null) {
       send_state.addAll({Tuple2(element.item1, element.item2): enabled});
+      }
+      else {
+        send_state[Tuple2(element.item1, element.item2)] = enabled;
+      }
+
     });
   }
 

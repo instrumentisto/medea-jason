@@ -71,12 +71,17 @@ class MyMember {
 
     room.onLocalTrack((p0) {
       connection_store.local_tracks.add(p0);
+      // connection_store.stopped_tracks.addAll({p0.getTrack().id(): false});
+      // p0.getTrack().onEnded(() {
+      //   connection_store.stopped_tracks[p0.getTrack().id()] = true;
+      // });
     });
 
     room.onNewConnection((p0) {
       var id = p0.getRemoteMemberId();
       connection_store.remote_tracks.addAll({id: List.empty(growable: true)});
       p0.onRemoteTrackAdded((p0) {
+        print(this.id + ' from $id  ' + p0.getTrack().id());
         connection_store.callback_counter.addAll({
           p0.getTrack().id(): {
             'enabled': 0,
@@ -159,7 +164,6 @@ class MyMember {
       count_f.complete();
     }
     return count_f.future;
-    return Future.delayed(Duration(seconds: 1));
   }
 
   Future<void> wait_for_close(String id) {
@@ -172,10 +176,16 @@ class MyMember {
     is_joined = true;
   }
 
-  Future<void> update_send_media_state(
+  void update_send_media_state(
       MediaKind? kind, MediaSourceKind? source_kind, bool enabled) async {
     kinds_combinations(kind, source_kind).forEach((element) {
+      if (send_state[Tuple2(element.item1, element.item2)] == null) {
       send_state.addAll({Tuple2(element.item1, element.item2): enabled});
+      }
+      else {
+        send_state[Tuple2(element.item1, element.item2)] = enabled;
+      }
+
     });
   }
 
@@ -236,7 +246,7 @@ class MyMember {
 
   Future<void> toggle_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
-    await update_send_media_state(kind, source, enabled);
+    update_send_media_state(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
         if (kind == MediaKind.Audio) {

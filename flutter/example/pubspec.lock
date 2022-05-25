@@ -171,7 +171,7 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.27.2"
+    version: "1.31.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -181,8 +181,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "9b48b5939cb864e70179045532d7cd38d94ec3c9"
+      ref: "147f8fb438fe51d991a7998ddaa28727e8a01885"
+      resolved-ref: "147f8fb438fe51d991a7998ddaa28727e8a01885"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"

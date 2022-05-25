@@ -47,9 +47,9 @@ impl Client {
         .json()
         .await?;
         println!("create {:?}", gg);
-        if let Some(err) = gg.error {
-            panic!();
-        }
+        // if let Some(err) = gg.error {
+        //     // panic!();
+        // }
         Ok(gg)
     }
 

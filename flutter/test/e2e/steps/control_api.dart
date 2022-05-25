@@ -144,6 +144,7 @@ StepDefinitionGeneric when_control_api_starts_publishing =
       PairedMember(receiver_id, null, null, true),
     );
     await context.world.interconnect_members(member_pair);
+
   },
 );
 
@@ -153,6 +154,17 @@ StepDefinitionGeneric when_control_api_deletes_publish_endpoint =
   (id, context) async {
     var future = context.world.delete_publish_endpoint(id);
     await future.timeout(Duration(milliseconds: 200));
+
+    // todo delete
+    {
+      var member = context.world.members[id]!;
+      var iter = member.connection_store.connects.keys.iterator;
+      while (iter.moveNext()) {
+        var key = iter.current;
+        await context.world
+            .delete_play_endpoint(id, key);
+      }
+    }
   },
 );
 
@@ -160,7 +172,14 @@ StepDefinitionGeneric when_control_api_deletes_play_endpoint =
     when2<String, String, CustomWorld>(
   r"Control API deletes (Alice|Bob|Carol)'s play endpoint with (Alice|Bob|Carol)",
   (id, partner_id, context) async {
+
+    // todo delete
+    {
+      var future = context.world.delete_publish_endpoint(id);
+      await future.timeout(Duration(milliseconds: 200));
+    }
     var future = context.world.delete_play_endpoint(id, partner_id);
     await future.timeout(Duration(milliseconds: 200));
+
   },
 );

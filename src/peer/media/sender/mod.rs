@@ -111,6 +111,7 @@ impl Sender {
                 CreateError::CannotDisableRequiredSender
             ));
         }
+        println!("DEBUG 23 {:#?} {:#?}", state.id(), state.receivers());
 
         let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);

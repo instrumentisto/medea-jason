@@ -96,7 +96,6 @@ StepDefinitionGeneric fillField1 =
   r'(room with joined |room with |joined |)member (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
   (joined, first_member_id, webrtc, disabled_media_type, disabled_direction,
       context) async {
-    print('__________________1');
     await new_given_member(joined, first_member_id, '', '', webrtc,
         disabled_media_type, disabled_direction, context);
   },
@@ -107,7 +106,6 @@ StepDefinitionGeneric fillField2 =
   r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
   (joined, first_member_id, second_member_id, webrtc, disabled_media_type,
       disabled_direction, context) async {
-    print('__________________2');
     await new_given_member(joined, first_member_id, second_member_id, '',
         webrtc, disabled_media_type, disabled_direction, context);
   },
@@ -118,7 +116,6 @@ StepDefinitionGeneric fillField3 =
   r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
   (joined, first_member_id, second_member_id, third_member_id, webrtc,
       disabled_media_type, disabled_direction, context) async {
-    print('__________________3');
     await new_given_member(
         joined,
         first_member_id,
