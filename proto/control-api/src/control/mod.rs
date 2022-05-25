@@ -10,10 +10,10 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
 use async_trait::async_trait;
-use derive_more::Display;
+use derive_more::{Display, Error};
 
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
 
@@ -21,7 +21,7 @@ pub use self::{endpoint::Endpoint, member::Member, room::Room};
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
 /// [Medea]: https://git.instrumentisto.com/streaming/medea
-#[async_trait(?Send)]
+#[async_trait]
 pub trait Api {
     /// Creates a new [`Room`].
     ///
@@ -192,6 +192,105 @@ pub enum StatefulFid {
         /// Unique [`Member`] `ID`.
         member_id: member::Id,
     },
+}
+
+impl fmt::Display for StatefulFid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            StatefulFid::Room { id } => write!(f, "{}", id),
+            StatefulFid::Member { id, room_id } => {
+                write!(f, "{}/{}", room_id, id)
+            }
+            StatefulFid::Endpoint {
+                id,
+                room_id,
+                member_id,
+            } => write!(f, "{}/{}/{}", room_id, member_id, id),
+        }
+    }
+}
+
+impl TryFrom<String> for StatefulFid {
+    type Error = ParseFidError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.is_empty() {
+            return Err(ParseFidError::Empty);
+        }
+
+        let mut splitted = value.split('/');
+        let room_id = if let Some(room_id) = splitted.next() {
+            if room_id.is_empty() {
+                return Err(ParseFidError::MissingPath(value));
+            }
+            room_id
+        } else {
+            return Err(ParseFidError::Empty);
+        };
+
+        let member_id = if let Some(member_id) = splitted.next() {
+            if member_id.is_empty() {
+                return Err(ParseFidError::MissingPath(value));
+            }
+            member_id
+        } else {
+            return Ok(StatefulFid::Room {
+                id: room::Id(room_id.to_owned()),
+            });
+        };
+
+        let endpoint_id = if let Some(endpoint_id) = splitted.next() {
+            if endpoint_id.is_empty() {
+                return Err(ParseFidError::MissingPath(value));
+            }
+            endpoint_id
+        } else {
+            return Ok(StatefulFid::Member {
+                id: member::Id(member_id.to_owned()),
+                room_id: room::Id(room_id.to_owned()),
+            });
+        };
+
+        if splitted.next().is_some() {
+            Err(ParseFidError::TooManyPaths(value))
+        } else {
+            Ok(StatefulFid::Endpoint {
+                id: endpoint::Id(endpoint_id.to_owned()),
+                room_id: room::Id(room_id.to_owned()),
+                member_id: member::Id(member_id.to_owned()),
+            })
+        }
+    }
+}
+
+/// Errors which can happen while parsing [`StatefulFid`].
+#[derive(Debug, Display, Error)]
+pub enum ParseFidError {
+    /// [`StatefulFid`] is empty.
+    #[display(fmt = "FID is empty")]
+    Empty,
+
+    /// [`StatefulFid`] has too many paths.
+    #[display(fmt = "Too many paths [fid = {}]", _0)]
+    TooManyPaths(#[error(not(source))] String),
+
+    /// [`StatefulFid`] has missing paths.
+    #[display(fmt = "Missing paths [fid = {}]", _0)]
+    MissingPath(#[error(not(source))] String),
+}
+
+impl From<ParseFidError> for ErrorResponse {
+    fn from(err: ParseFidError) -> Self {
+        use ParseFidError::{Empty, MissingPath, TooManyPaths};
+
+        match err {
+            TooManyPaths(text) => {
+                Self::new(ErrorCode::ElementIdIsTooLong, &text)
+            }
+            Empty => Self::without_id(ErrorCode::EmptyElementId),
+            MissingPath(text) => Self::new(ErrorCode::MissingPath, &text),
+        }
+    }
 }
 
 /// [`Ping`] message received by media server periodically for probing its
