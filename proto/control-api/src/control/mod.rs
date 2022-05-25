@@ -13,7 +13,7 @@ pub mod room;
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use derive_more::Display;
+use derive_more::{Display, From};
 
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
 
@@ -31,13 +31,13 @@ pub trait Api {
     /// [`Id`] already exists.
     ///
     /// [`Id`]: room::Id
-    async fn create_room(&self, spec: Room) -> Result<Sids, ErrorResponse>;
+    async fn create_room(&self, spec: Room) -> Result<member::Sids, ErrorResponse>;
 
     /// Applies changes to the already existing [`Room`], or creates a new one
     /// in case there is no [`Room`] with the provided [`Id`].
     ///
     /// [`Id`]: room::Id
-    async fn apply_room(&self, spec: Room) -> Result<Sids, ErrorResponse>;
+    async fn apply_room(&self, spec: Room) -> Result<member::Sids, ErrorResponse>;
 
     /// Creates a new [`Member`] in already existing [`Room`].
     ///
@@ -51,7 +51,7 @@ pub trait Api {
         &self,
         room_id: room::Id,
         spec: Member,
-    ) -> Result<Sids, ErrorResponse>;
+    ) -> Result<member::Sids, ErrorResponse>;
 
     /// Applies changes to the already existing [`Member`], or creates a new one
     /// in case there is no [`Member`] with the provided [`Id`].
@@ -66,7 +66,7 @@ pub trait Api {
         &self,
         room_id: room::Id,
         spec: Member,
-    ) -> Result<Sids, ErrorResponse>;
+    ) -> Result<member::Sids, ErrorResponse>;
 
     /// Creates a new [`Endpoint`] for already existing [`Member`].
     ///
@@ -83,7 +83,7 @@ pub trait Api {
         room_id: room::Id,
         member_id: member::Id,
         spec: Endpoint,
-    ) -> Result<Sids, ErrorResponse>;
+    ) -> Result<member::Sids, ErrorResponse>;
 
     /// Applies changes to the already existing [`Endpoint`], or creates a new
     /// one in case there is no [`Endpoint`] with the provided [`Id`].
@@ -101,7 +101,7 @@ pub trait Api {
         room_id: room::Id,
         member_id: member::Id,
         spec: Endpoint,
-    ) -> Result<Sids, ErrorResponse>;
+    ) -> Result<member::Sids, ErrorResponse>;
 
     /// Deletes [`Elements`] with provided [`StatefulFid`]s.
     ///
@@ -112,8 +112,8 @@ pub trait Api {
     ///   [`room::Id`]s.
     async fn delete_elements(
         &self,
-        fids: Vec<StatefulFid>,
-    ) -> Result<Sids, ErrorResponse>;
+        fids: Vec<Fid>,
+    ) -> Result<member::Sids, ErrorResponse>;
 
     /// Returns [`Elements`] by their [`StatefulFid`]s.
     ///
@@ -124,83 +124,72 @@ pub trait Api {
     ///   `ID` doesn't exist.
     async fn get_elements(
         &self,
-        fids: Vec<StatefulFid>,
+        fids: Vec<Fid>,
     ) -> Result<Elements, ErrorResponse>;
 
-    /// Checks media server healthiness.
+    /// Checks healthiness of this media server.
     async fn healthz(&self, ping: Ping) -> Result<Pong, ErrorResponse>;
 }
 
-/// [`Element`]s returned from [`ControlApi::get_elements()`].
-///
-/// [`ControlApi::get_elements()`]: Api::get_elements()
-pub type Elements = HashMap<StatefulFid, Element>;
-
-/// [`Sid`]s used by [`Member`]s to connect to a [Medea] server via
-/// [Client API].
-///
-/// [`Sid`]: member::Sid
-/// [Client Api]: https://tinyurl.com/266y74tf
-/// [Medea]: https://git.instrumentisto.com/streaming/medea
-pub type Sids = HashMap<member::Id, member::Sid>;
-
-/// Single element returned by [`ControlApi::get_elements()`].
-///
-/// [`ControlApi::get_elements()`]: Api::get_elements()
-#[derive(Clone, Debug)]
+/// Possible media elements forming a media pipeline.
+#[derive(Clone, Debug, From)]
 pub enum Element {
-    /// [`Room`] element.
+    /// [`Room`] media element.
     Room(Room),
 
-    /// [`Member`] element.
+    /// [`Member`] media element.
     Member(Member),
 
-    /// [`Endpoint`] element.
+    /// [`Endpoint`] media element.
     Endpoint(Endpoint),
 }
 
-/// `FID` (full `ID`, or `fid` in [`ControlApi`]) is a composition of media
-/// [`Element`]s `ID`s, which refers to some media element on a whole server
-/// uniquely.
-///
-/// [`ControlApi`]: Api
+/// Collection of uniquely identified [`Element`]s.
+pub type Elements = HashMap<Fid, Element>;
+
+/// FID (Full ID) is a composition of media [`Element`] IDs referring to some
+/// [`Element`] on a whole media server uniquely.
 #[derive(Clone, Debug)]
-pub enum StatefulFid {
-    /// [`Room`]'s `FID`.
+pub enum Fid {
+    /// FID of a [`Room`].
     Room {
-        /// Unique [`Room`] `ID`.
+        /// Unique ID of the [`Room`].
         id: room::Id,
     },
 
-    /// [`Member`]'s `FID`.
+    /// FID of a [`Member`].
     Member {
-        /// Unique [`Member`] `ID`.
+        /// ID of the [`Member`] in the [`Room`].
         id: member::Id,
 
-        /// Unique [`Room`] `ID`.
+        /// Unique ID of the [`Room`].
         room_id: room::Id,
     },
 
-    /// [`Endpoint`]s `FID`.
+    /// FID of an [`Endpoint`].
     Endpoint {
-        /// Unique [`Endpoint`] `ID`.
+        /// ID of the [`Endpoint`] of the [`Member`].
         id: endpoint::Id,
 
-        /// Unique [`Room`] `ID`.
+        /// Unique ID of the [`Room`].
         room_id: room::Id,
 
-        /// Unique [`Member`] `ID`.
+        /// ID of the [`Member`] in the [`Room`].
         member_id: member::Id,
     },
 }
 
-/// [`Ping`] message received by media server periodically for probing its
+/// [`Ping`] message received by a media server periodically for probing its
 /// healthiness.
+///
+/// Each new [`Ping`] should increase its nonce, starting with `0`.
 #[derive(Clone, Copy, Debug)]
 pub struct Ping(pub u32);
 
-/// [`Pong`] message send by media server in response to received [`Ping`]
+/// [`Pong`] message send by a media server in response to a received [`Ping`]
 /// message.
+///
+/// Contains nonce of the answered [`Ping`] message.
 #[derive(Clone, Copy, Debug)]
 pub struct Pong(pub u32);
 
@@ -210,7 +199,7 @@ pub struct Pong(pub u32);
 #[derive(Clone, Debug)]
 pub struct ErrorResponse {
     /// [`ErrorCode`] which will be returned with code and message.
-    pub error_code: ErrorCode,
+    pub code: ErrorCode,
 
     /// [`Element`] `ID` where some error happened. May be empty.
     pub element_id: Option<String>,
@@ -234,7 +223,7 @@ impl ErrorResponse {
     /// New [`ErrorResponse`] with [`ErrorCode`] and [`Element`] `ID`.
     pub fn new<T: ToString>(error_code: ErrorCode, element_id: &T) -> Self {
         Self {
-            error_code,
+            code: error_code,
             element_id: Some(element_id.to_string()),
             explanation: None,
         }
@@ -244,7 +233,7 @@ impl ErrorResponse {
     #[must_use]
     pub const fn without_id(error_code: ErrorCode) -> Self {
         Self {
-            error_code,
+            code: error_code,
             element_id: None,
             explanation: None,
         }
@@ -259,7 +248,7 @@ impl ErrorResponse {
     /// [`Display`]: std::fmt::Display
     pub fn unexpected<B: ToString>(unknown_error: &B) -> Self {
         Self {
-            error_code: ErrorCode::UnexpectedError,
+            code: ErrorCode::UnexpectedError,
             explanation: Some(unknown_error.to_string()),
             element_id: None,
         }
@@ -276,93 +265,97 @@ impl ErrorResponse {
         id: Option<String>,
     ) -> Self {
         Self {
-            error_code,
+            code: error_code,
             explanation: Some(explanation),
             element_id: id,
         }
     }
 }
 
-/// [Medea]'s [`ControlApi`] errors.
+/// Codes of possible [`ControlApi`] errors.
 ///
 /// [`ControlApi`]: Api
-/// [Medea]: https://git.instrumentisto.com/streaming/medea
 #[derive(Clone, Copy, Debug, Display)]
 #[repr(u16)]
 pub enum ErrorCode {
     /// Unimplemented API call.
     ///
-    /// This code should be with additional text which explains what
-    /// exactly unimplemented (you can do it with
-    /// [`ErrorResponse::with_explanation`] function).
+    /// This code should go with additional explanation of what exactly is
+    /// unimplemented (see [`ErrorResponse::explanation()`]).
     ///
-    /// Code: __1000__.
-    #[display(fmt = "Unimplemented API call.")]
+    /// Code: `1000`
+    #[display(fmt = "Unimplemented API call")]
     UnimplementedCall = 1000,
 
-    /// Request doesn't contain any [`Elements`].
+    /// Request doesn't contain any [`Element`]s.
     ///
-    /// Code: __1001__.
-    #[display(fmt = "Request doesn't contain any elements")]
+    /// Code: `1001`
+    #[display(fmt = "Request doesn't contain any `Element`s")]
     NoElement = 1001,
 
-    /// Provided `FID` can't point to provided element.
+    /// Provided [`Fid`] cannot point to the provided [`Element`].
     ///
-    /// Code: __1002__.
-    #[display(fmt = "Provided fid can't point to provided element")]
+    /// Code: `1002`
+    #[display(fmt = "Provided FID cannot point to provided `Element`")]
     ElementIdMismatch = 1002,
 
     /// [`Room`] not found.
     ///
-    /// Code: __1003__.
-    #[display(fmt = "Room not found.")]
+    /// Code: `1003`
+    #[display(fmt = "`Room` not found")]
     RoomNotFound = 1003,
 
     /// [`Member`] not found.
     ///
-    /// Code: __1004__.
-    #[display(fmt = "Member not found.")]
+    /// Code: `1004`
+    #[display(fmt = "`Member` not found")]
     MemberNotFound = 1004,
 
     /// [`Endpoint`] not found.
     ///
-    /// Code: __1005__.
-    #[display(fmt = "Endpoint not found.")]
+    /// Code: `1005`
+    #[display(fmt = "`Endpoint` not found")]
     EndpointNotFound = 1005,
 
-    /// Medea expects [`Room`] element in pipeline but received not him.
+    /// [`Room`] element is expected in pipeline.
     ///
-    /// Code: __1006__.
-    #[display(fmt = "Expecting Room element but it's not.")]
+    /// Code: `1006`
+    #[display(fmt = "Expecting `Room` element but it's not")]
     NotRoomInSpec = 1006,
 
-    /// Medea expects [`Member`] element in pipeline but received not him.
+    /// [`Member`] element is expected in pipeline.
     ///
-    /// Code: __1007__.
-    #[display(fmt = "Expected Member element but it's not.")]
+    /// Code: `1007`
+    #[display(fmt = "Expecting `Member` element but it's not")]
     NotMemberInSpec = 1007,
 
-    /// Invalid source URI in [`endpoint::WebRtcPlay`].
+    /// Invalid source [URI] in [`endpoint::WebRtcPlay`].
     ///
-    /// Code: __1008__.
-    #[display(fmt = "Invalid source URI in 'WebRtcPlayEndpoint'.")]
+    /// Code: `1008`
+    ///
+    /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
+    #[display(fmt = "Invalid source URI in `WebRtcPlayEndpoint`")]
     InvalidSrcUri = 1008,
 
-    /// Provided not source URI in [`endpoint::WebRtcPlay`].
+    /// Provided not source [URI] in [`endpoint::WebRtcPlay`].
     ///
-    /// Code: __1009__.
-    #[display(fmt = "Provided not source URI in 'WebRtcPlayEndpoint'.")]
+    /// Code: `1009`
+    ///
+    /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
+    #[display(fmt = "Provided not source URI in `WebRtcPlayEndpoint`")]
     NotSourceUri = 1009,
 
-    /// Element's URI don't have `local://` prefix.
+    /// [`Element`]'s [URI] doesn't have `local://` scheme.
     ///
-    /// Code: __1010__.
+    /// Code: `1010`
+    ///
+    /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
     #[display(fmt = "Element's URI don't have 'local://' prefix.")]
     ElementIdIsNotLocal = 1010,
 
     /// Provided element's `FID`/`URI` with too many paths.
     ///
-    /// Code: __1011__.
+    /// Code: `1011`
     #[display(fmt = "You provided element's FID/URI with too many paths.")]
     ElementIdIsTooLong = 1011,
 
@@ -457,7 +450,7 @@ pub enum ErrorCode {
     /// Use this [`ErrorCode`] only with [`ErrorResponse::unexpected`]
     /// function. In error text with this code should be error message
     /// which explain what exactly goes wrong
-    /// ([`ErrorResponse::unexpected`] do this).
+    /// ([`ErrorResponse::unexpected`] does this).
     ///
     /// Code: __2000__.
     #[display(fmt = "Unexpected error happened.")]

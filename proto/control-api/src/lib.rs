@@ -94,14 +94,14 @@
 
 pub mod callback;
 pub mod control;
-
 #[cfg(feature = "grpc")]
 pub mod grpc;
 
+#[doc(inline)]
 pub use self::{
     callback::Client as CallbackClient,
     control::{
         endpoint, member, room, Api as ControlApi, Element, Elements, Endpoint,
-        ErrorCode, ErrorResponse, Member, Ping, Pong, Room, Sids, StatefulFid,
+        ErrorCode, ErrorResponse, Fid, Member, Ping, Pong, Room, Sids,
     },
 };
