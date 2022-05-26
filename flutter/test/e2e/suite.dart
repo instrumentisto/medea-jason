@@ -3,7 +3,6 @@ import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
 
 import 'conf.dart';
-import 'hooks/reset_hook.dart';
 import 'steps/connection.dart';
 import 'steps/control_api.dart';
 import 'steps/media_state.dart';
@@ -67,6 +66,11 @@ var gg = FlutterTestConfiguration()
     when_member_frees_all_local_tracks,
     then_track_is_stopped,
     then_local_track_mute_state,
+
+    // //websockets
+    // ws_connection_loss,
+    // ws_connection_restore,
+    // connection_is_lost,
 
     fillField3,
     fillField2,

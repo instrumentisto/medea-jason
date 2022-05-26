@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:tuple/tuple.dart';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 
-import '../conf.dart';
 
 var globalConnect = HashMap<String, ConnectionHandle>();
 
@@ -58,23 +55,18 @@ class MyMember {
   late bool is_joined;
   late HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state;
   late HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state;
-  late Completer<RoomCloseReason> close_reason = Completer();
+  Completer<RoomCloseReason> close_reason = Completer();
   late RoomHandle room;
   var connection_store = myConnectionStore();
-  // window: Window,
 
   MyMember(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
     room.onClose((p0) {
       close_reason.complete(p0);
     });
-
+    
     room.onLocalTrack((p0) {
       connection_store.local_tracks.add(p0);
-      // connection_store.stopped_tracks.addAll({p0.getTrack().id(): false});
-      // p0.getTrack().onEnded(() {
-      //   connection_store.stopped_tracks[p0.getTrack().id()] = true;
-      // });
     });
 
     room.onNewConnection((p0) {
@@ -272,39 +264,9 @@ class MyMember {
     }
   }
 
-  Future<void> add_gum_latency(Duration latency) async {
-    var caps = fw.DeviceConstraints();
-    caps.video.mandatory = fw.DeviceVideoConstraints();
-    caps.audio.mandatory = fw.AudioConstraints();
-    caps.video.mandatory!.width = 640;
-    caps.video.mandatory!.height = 480;
-    caps.video.mandatory!.fps = 30;
-    await fw.getUserMedia(caps).timeout(latency);
+  Future<void> add_gum_latency(Duration latency) async {  
+    // todo переопределить getUserMedia;
   }
-
-  //   /// Emulates the provided `latency` for `getUserMedia()` requests.
-  // pub async fn add_gum_latency(&self, latency: Duration) {
-  //     self.window
-  //         .execute(Statement::new(
-  //             r#"
-  //                 async () => {
-  //                     const [duration] = args;
-
-  //                     var gUM = navigator.mediaDevices.getUserMedia.bind(
-  //                         navigator.mediaDevices
-  //                     );
-  //                     navigator.mediaDevices.getUserMedia =
-  //                         async function (cons) {
-  //                             await new Promise(r => setTimeout(r, duration));
-  //                             return await gUM(cons);
-  //                         };
-  //                 }
-  //             "#,
-  //             [(latency.as_millis() as u64).into()],
-  //         ))
-  //         .await
-  //         .unwrap();
-  // }
 
   Future<void> toggle_mute(
       MediaKind? kind, MediaSourceKind? source, bool muted) async {

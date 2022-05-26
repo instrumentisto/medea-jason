@@ -14,8 +14,8 @@ StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, Stri
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
     
-    var awats = awaits.contains('awaits');
-    var error = awaits.contains('errors');
+    var awats = true; // todo awaits.contains('awaits');
+    var error = true; // awaits.contains('errors');
 
     try {
       switch(action) { 
@@ -46,7 +46,7 @@ StepDefinitionGeneric when_enables_or_mutes = when4<String, String, String, Stri
         break; 
       } 
     } catch(e) {
-      if (!error) { throw 10000; };
+      if (!error) { rethrow; };
     }
 
   },
@@ -119,12 +119,13 @@ StepDefinitionGeneric then_track_is_stopped = then2<String, String, CustomWorld>
   (id, kind, context) async {
     var member =context.world.members[id]!;
     var kind_ = parse_media_kind(kind);
-
-    await Future.delayed(Duration(seconds: 1));
     var track = member.connection_store.local_tracks.firstWhere((element) => element.kind() == kind_.item1 && element.mediaSourceKind() == kind_.item2);
-    if (!track.getTrack().isEnabled()) {
-      throw 'not stopped';
-    }
+
+    track.free();
+    // check readyState
+    // if(!stopped) {
+    //   throw 'not stopped';
+    // }
   },
 );
 
