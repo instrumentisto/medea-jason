@@ -73,7 +73,6 @@ Pointer _height(MediaStreamTrack track) {
 
 /// Returns width of the video of the provided [MediaStreamTrack].
 Pointer _width(MediaStreamTrack track) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(1300).intoRustOwned();
 }
 
