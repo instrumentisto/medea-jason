@@ -5,9 +5,7 @@
 use derive_more::{Display, Error, From, Into};
 use url::Url;
 
-use crate::control::{
-    endpoint::web_rtc_publish, member, room, ErrorCode, ErrorResponse,
-};
+use crate::control::{endpoint::web_rtc_publish, member, room};
 
 /// Media [`Element`] playing media data for a client via [WebRTC].
 ///
@@ -151,24 +149,4 @@ pub enum LocalSrcUriParseError {
     /// Provided URI is empty.
     #[display(fmt = "Provided URI cannot be empty")]
     Empty,
-}
-
-impl From<LocalSrcUriParseError> for ErrorResponse {
-    fn from(err: LocalSrcUriParseError) -> Self {
-        use LocalSrcUriParseError as E;
-
-        match err {
-            E::NotLocal(text) => {
-                Self::new(ErrorCode::ElementIdIsNotLocal, &text)
-            }
-            E::TooManyPaths(text) => {
-                Self::new(ErrorCode::ElementIdIsTooLong, &text)
-            }
-            E::Empty => Self::without_id(ErrorCode::EmptyElementId),
-            E::MissingPaths(text) => {
-                Self::new(ErrorCode::MissingFieldsInSrcUri, &text)
-            }
-            E::UrlParseErr(id, _) => Self::new(ErrorCode::InvalidSrcUri, &id),
-        }
-    }
 }

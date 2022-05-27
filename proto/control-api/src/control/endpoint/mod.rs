@@ -11,7 +11,6 @@ pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
 /// Media [`Element`] flowing one or more media data streams through itself.
 ///
 /// [`Element`]: crate::Element
-#[allow(variant_size_differences)]
 #[derive(Clone, Debug, From)]
 pub enum Endpoint {
     /// [`WebRtcPublish`] media [`Element`].

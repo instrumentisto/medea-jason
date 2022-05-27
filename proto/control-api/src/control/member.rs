@@ -111,7 +111,6 @@ impl fmt::Display for Sid {
 /// [`Sid`]s used by [`Member`]s to connect to a [Medea] server via
 /// [Client API].
 ///
-/// [`Sid`]: member::Sid
 /// [Client Api]: https://tinyurl.com/266y74tf
 /// [Medea]: https://git.instrumentisto.com/streaming/medea
 pub type Sids = HashMap<Id, Sid>;
@@ -138,8 +137,9 @@ pub struct PublicUrl(Box<str>);
 pub enum Credentials {
     /// [Argon2] hash of credentials.
     ///
-    /// [`Sid`] won't contain a `token` query parameter if [`Credentials::Hash`]
-    /// are used, so it should be appended manually on a client side.
+    /// [`Sid`] won't contain a `token` query parameter if
+    /// [`Credentials::Hash`] are used, so it should be appended manually
+    /// on a client side.
     ///
     /// [Argon2]: https://en.wikipedia.org/wiki/Argon2
     Hash(Box<str>),

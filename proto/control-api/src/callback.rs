@@ -4,18 +4,25 @@ use async_trait::async_trait;
 use derive_more::From;
 use time::OffsetDateTime as DateTime;
 
-use crate::{ErrorResponse, Fid};
+use crate::Fid;
 
 /// Client calling a service receiving callbacks from a media server.
 #[async_trait(?Send)]
-pub trait Client {
+pub trait Api {
+    /// Error of this [`CallbackApi`].
+    ///
+    /// [`CallbackApi`]: Api
+    type Error;
+
     /// Sends the provided callback [`Event`].
-    async fn fire_event(&self, request: Request) -> Result<(), ErrorResponse>;
+    async fn fire_event(&self, request: Request) -> Result<(), Self::Error>;
 }
 
 /// Request with a fired callback [`Event`] and its meta information.
 ///
-/// Used for sending callbacks via [`Client::fire_event()`].
+/// Used for sending callbacks via [`CallbackApi::fire_event()`].
+///
+/// [`CallbackApi::fire_event()`]: Api::fire_event()
 #[derive(Debug)]
 pub struct Request {
     /// FID (Full ID) of the media [`Element`], the occurred [`Event`] is
