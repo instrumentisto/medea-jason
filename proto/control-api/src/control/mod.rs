@@ -10,10 +10,10 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt, str::FromStr};
 
 use async_trait::async_trait;
-use derive_more::From;
+use derive_more::{Display, Error, From};
 
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
 
@@ -146,6 +146,91 @@ pub enum Fid {
         /// ID of the [`Member`] in the [`Room`].
         member_id: member::Id,
     },
+}
+
+impl fmt::Display for Fid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Room { id } => write!(f, "{}", id),
+            Self::Member { id, room_id } => {
+                write!(f, "{}/{}", room_id, id)
+            }
+            Self::Endpoint {
+                id,
+                room_id,
+                member_id,
+            } => write!(f, "{}/{}/{}", room_id, member_id, id),
+        }
+    }
+}
+
+impl FromStr for Fid {
+    type Err = ParseFidError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        if value.is_empty() {
+            return Err(ParseFidError::Empty);
+        }
+
+        let mut splitted = value.split('/');
+        let room_id = if let Some(room_id) = splitted.next() {
+            if room_id.is_empty() {
+                return Err(ParseFidError::MissingPath(value.to_owned()));
+            }
+            room_id
+        } else {
+            return Err(ParseFidError::Empty);
+        };
+
+        let member_id = if let Some(member_id) = splitted.next() {
+            if member_id.is_empty() {
+                return Err(ParseFidError::MissingPath(value.to_owned()));
+            }
+            member_id
+        } else {
+            return Ok(Self::Room {
+                id: room::Id::from(room_id.to_owned()),
+            });
+        };
+
+        let endpoint_id = if let Some(endpoint_id) = splitted.next() {
+            if endpoint_id.is_empty() {
+                return Err(ParseFidError::MissingPath(value.to_owned()));
+            }
+            endpoint_id
+        } else {
+            return Ok(Self::Member {
+                id: member::Id::from(member_id.to_owned()),
+                room_id: room::Id::from(room_id.to_owned()),
+            });
+        };
+
+        if splitted.next().is_some() {
+            Err(ParseFidError::TooManyPaths(value.to_owned()))
+        } else {
+            Ok(Self::Endpoint {
+                id: endpoint::Id::from(endpoint_id.to_owned()),
+                room_id: room::Id::from(room_id.to_owned()),
+                member_id: member::Id::from(member_id.to_owned()),
+            })
+        }
+    }
+}
+
+/// Errors which can happen while parsing [`Fid`].
+#[derive(Debug, Display, Error)]
+pub enum ParseFidError {
+    /// [`Fid`] is empty.
+    #[display(fmt = "FID is empty")]
+    Empty,
+
+    /// [`Fid`] has too many paths.
+    #[display(fmt = "Too many paths [fid = {}]", _0)]
+    TooManyPaths(#[error(not(source))] String),
+
+    /// [`Fid`] has missing paths.
+    #[display(fmt = "Missing paths [fid = {}]", _0)]
+    MissingPath(#[error(not(source))] String),
 }
 
 /// [`Ping`] message received by a media server periodically for probing its

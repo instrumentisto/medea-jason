@@ -2,6 +2,8 @@
 //!
 //! [`Endpoint`]: crate::Endpoint
 
+use std::str::FromStr;
+
 use derive_more::{Display, Error, From, Into};
 use url::Url;
 
@@ -63,36 +65,45 @@ pub struct LocalSrcUri {
     pub endpoint_id: web_rtc_publish::Id,
 }
 
-impl TryFrom<String> for LocalSrcUri {
-    type Error = LocalSrcUriParseError;
+impl FromStr for LocalSrcUri {
+    type Err = LocalSrcUriParseError;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         if value.is_empty() {
             return Err(LocalSrcUriParseError::Empty);
         }
 
-        let url = match Url::parse(&value) {
+        let url = match Url::parse(value) {
             Ok(url) => url,
             Err(err) => {
-                return Err(LocalSrcUriParseError::UrlParseErr(value, err))
+                return Err(LocalSrcUriParseError::UrlParseErr(
+                    value.to_owned(),
+                    err,
+                ))
             }
         };
         if url.scheme() != "local" {
-            return Err(LocalSrcUriParseError::NotLocal(value));
+            return Err(LocalSrcUriParseError::NotLocal(value.to_owned()));
         }
 
         let room_id = match url.host_str() {
             Some(host) => {
                 if host.is_empty() {
-                    return Err(LocalSrcUriParseError::MissingPaths(value));
+                    return Err(LocalSrcUriParseError::MissingPaths(
+                        value.to_owned(),
+                    ));
                 }
                 room::Id::from(host.to_owned())
             }
-            None => return Err(LocalSrcUriParseError::MissingPaths(value)),
+            None => {
+                return Err(LocalSrcUriParseError::MissingPaths(
+                    value.to_owned(),
+                ))
+            }
         };
 
         let mut path = url.path_segments().ok_or_else(|| {
-            LocalSrcUriParseError::MissingPaths(value.clone())
+            LocalSrcUriParseError::MissingPaths(value.to_owned())
         })?;
 
         let member_id = path
@@ -100,7 +111,7 @@ impl TryFrom<String> for LocalSrcUri {
             .filter(|id| !id.is_empty())
             .map(|id| member::Id::from(id.to_owned()))
             .ok_or_else(|| {
-                LocalSrcUriParseError::MissingPaths(value.clone())
+                LocalSrcUriParseError::MissingPaths(value.to_owned())
             })?;
 
         let endpoint_id = path
@@ -108,11 +119,11 @@ impl TryFrom<String> for LocalSrcUri {
             .filter(|id| !id.is_empty())
             .map(|id| web_rtc_publish::Id::from(id.to_owned()))
             .ok_or_else(|| {
-                LocalSrcUriParseError::MissingPaths(value.clone())
+                LocalSrcUriParseError::MissingPaths(value.to_owned())
             })?;
 
         if path.next().is_some() {
-            return Err(LocalSrcUriParseError::TooManyPaths(value));
+            return Err(LocalSrcUriParseError::TooManyPaths(value.to_owned()));
         }
 
         Ok(Self {
