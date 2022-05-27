@@ -7,7 +7,7 @@ packages:
       name: archive
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.6"
+    version: "3.1.11"
   async:
     dependency: transitive
     description:
@@ -49,7 +49,7 @@ packages:
       name: collection
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.15.0"
+    version: "1.16.0"
   crypto:
     dependency: transitive
     description:
@@ -70,7 +70,7 @@ packages:
       name: fake_async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   ffi:
     dependency: transitive
     description:
@@ -111,8 +111,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: master
-      resolved-ref: a443208aea93761a4f7f2fabc543e216ec56c80a
+      ref: HEAD
+      resolved-ref: "37f53422a5c14a2d05df0c89dda1cf2b08b499c5"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"
@@ -160,7 +160,7 @@ packages:
       name: material_color_utilities
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.3"
+    version: "0.1.4"
   medea_jason:
     dependency: "direct main"
     description:
@@ -181,7 +181,7 @@ packages:
       name: path
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.0"
+    version: "1.8.1"
   pedantic:
     dependency: "direct dev"
     description:
@@ -214,7 +214,7 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.1"
+    version: "1.8.2"
   stack_trace:
     dependency: transitive
     description:
@@ -256,7 +256,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.8"
+    version: "0.4.9"
   typed_data:
     dependency: transitive
     description:
@@ -270,14 +270,14 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   vm_service:
     dependency: transitive
     description:
       name: vm_service
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "7.5.0"
+    version: "8.2.2"
   webdriver:
     dependency: transitive
     description:
@@ -286,5 +286,5 @@ packages:
     source: hosted
     version: "3.0.0"
 sdks:
-  dart: ">=2.16.0 <3.0.0"
+  dart: ">=2.17.0-0 <3.0.0"
   flutter: ">=2.0.0"

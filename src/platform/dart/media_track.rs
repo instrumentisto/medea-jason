@@ -5,6 +5,7 @@
 use std::future::Future;
 
 use dart_sys::Dart_Handle;
+use futures::executor::block_on;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -87,7 +88,7 @@ mod media_stream_track {
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-        pub fn ready_state(track: Dart_Handle) -> i64;
+        pub fn ready_state(track: Dart_Handle) -> Dart_Handle;
 
         /// [Stops][1] the provided [MediaStreamTrack][0].
         ///
@@ -235,8 +236,22 @@ impl MediaStreamTrack {
     #[allow(clippy::unused_self)]
     #[must_use]
     pub fn ready_state(&self) -> MediaStreamTrackState {
-        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
-        MediaStreamTrackState::Live
+        let handle = self.inner.get();
+        block_on(async move {
+            let i = unsafe {
+                FutureFromDart::execute::<i32>(media_stream_track::ready_state(
+                    handle,
+                ))
+                .await
+            }
+            .unwrap();
+
+            match i {
+                0 => MediaStreamTrackState::Live,
+                1 => MediaStreamTrackState::Ended,
+                _ => unreachable!(),
+            }
+        })
     }
 
     /// [Stops][1] this [`MediaStreamTrack`].
