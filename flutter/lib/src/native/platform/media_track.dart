@@ -55,7 +55,6 @@ Pointer<Utf8> _deviceId(MediaStreamTrack track) {
 }
 
 Object _readyState(MediaStreamTrack track) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return () => track.state().then((s) => s.index);
 }
 
@@ -73,6 +72,7 @@ Pointer _height(MediaStreamTrack track) {
 
 /// Returns width of the video of the provided [MediaStreamTrack].
 Pointer _width(MediaStreamTrack track) {
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
   return ForeignValue.fromInt(1300).intoRustOwned();
 }
 
