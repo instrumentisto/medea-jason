@@ -11,8 +11,11 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](/../../compare/medea-control-api-proto-0.7.0...medea-control-api-proto-0.8.0)
 
-- Define `ControlApi` and `CallbackClient` traits ([#55]);
-- Implement gRPC `ControlApi` and `CallbackClient` ([#56]).
+### Added
+
+- Abstractions:
+    - `ControlApi` and `CallbackClient` ([#55]);
+    - Implement gRPC `ControlApi` and `CallbackClient` ([#56]).
 
 [#55]: /../../pull/55
 [#56]: /../../pull/56

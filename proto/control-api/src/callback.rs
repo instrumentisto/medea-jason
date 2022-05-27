@@ -1,75 +1,73 @@
-//! [`CallbackClient`] definitions.
-//!
-//! [`CallbackClient`]: Client
+//! Definitions of a service receiving callbacks from a media server.
 
 use async_trait::async_trait;
 use derive_more::From;
-use time::OffsetDateTime;
+use time::OffsetDateTime as DateTime;
 
-use crate::{ErrorResponse, StatefulFid};
+use crate::Fid;
 
-/// Abstraction of a [Control API] callback client.
-///
-/// [Control API]: https://tinyurl.com/yxsqplq7
+/// Client calling a service receiving callbacks from a media server.
 #[async_trait(?Send)]
-pub trait Client {
-    /// Sends provided [`Request`].
-    async fn send(&self, request: Request) -> Result<(), ErrorResponse>;
+pub trait Api {
+    /// Error of this [`CallbackApi`].
+    ///
+    /// [`CallbackApi`]: Api
+    type Error;
+
+    /// Sends the provided callback [`Event`].
+    async fn fire_event(&self, request: Request) -> Result<(), Self::Error>;
 }
 
-/// [Control API] callback.
+/// Request with a fired callback [`Event`] and its meta information.
 ///
-/// Used for sending callbacks with [`Client::send`].
+/// Used for sending callbacks via [`CallbackApi::fire_event()`].
 ///
-/// [Control API]: https://tinyurl.com/yxsqplq7
+/// [`CallbackApi::fire_event()`]: Api::fire_event()
 #[derive(Debug)]
 pub struct Request {
-    /// `FID` (Full `ID`) of element with which event was occurred.
-    pub fid: StatefulFid,
-
-    /// [`Member::on_join`] or [`Member::on_leave`] callback `URL`.
+    /// FID (Full ID) of the media [`Element`], the occurred [`Event`] is
+    /// related to.
     ///
-    /// [`Member::on_join`]: crate::Member::on_join
-    /// [`Member::on_leave`]: crate::Member::on_leave
-    pub url: String,
+    /// [`Element`]: crate::Element
+    pub fid: Fid,
 
     /// [`Event`] which occurred.
     pub event: Event,
 
-    /// Time at which event occurred.
-    pub at: OffsetDateTime,
+    /// [`DateTime`] when the [`Event`] occurred.
+    pub at: DateTime,
 }
 
-/// All callbacks which can happen.
+/// Possible callbacks events which may happen on a media server.
 #[derive(Clone, Copy, Debug, From)]
 pub enum Event {
-    /// Event notifying about [`Member`] joining the [`Room`].
+    /// [`Member`] joined a [`Room`].
     ///
-    /// [`Room`]: crate::Room
     /// [`Member`]: crate::Member
+    /// [`Room`]: crate::Room
     OnJoin(OnJoinEvent),
 
-    /// Event notifying about [`Member`] leaving the [`Room`].
+    /// [`Member`] left its [`Room`].
     ///
-    /// [`Room`]: crate::Room
     /// [`Member`]: crate::Member
+    /// [`Room`]: crate::Room
     OnLeave(OnLeaveEvent),
 }
 
-/// Event notifying about [`Member`] joining the [`Room`].
+/// [`Event`] notifying about a [`Member`] joining a [`Room`].
 ///
-/// [`Room`]: crate::Room
 /// [`Member`]: crate::Member
+/// [`Room`]: crate::Room
 #[derive(Clone, Copy, Debug)]
 pub struct OnJoinEvent;
 
-/// Event notifying about [`Member`] leaving the [`Room`].
+/// [`Event`] notifying about a [`Member`] leaving its [`Room`].
 ///
-/// [`Room`]: crate::Room
 /// [`Member`]: crate::Member
+/// [`Room`]: crate::Room
 #[derive(Clone, Copy, Debug)]
 pub struct OnLeaveEvent {
-    /// Reason of why [`Member`] was lost.
+    /// Reason of why the [`Member`] leaves.
     ///
     /// [`Member`]: crate::Member
     pub reason: OnLeaveReason,
@@ -83,26 +81,27 @@ impl OnLeaveEvent {
     }
 }
 
-/// Reason of why [`Member`] was lost.
+/// Possible reasons of why a [`Member`] leaves its [`Room`].
 ///
 /// [`Member`]: crate::Member
+/// [`Room`]: crate::Room
 #[derive(Clone, Copy, Debug)]
 pub enum OnLeaveReason {
-    /// [`Member`] was normally disconnected.
+    /// [`Member`] was disconnected normally.
     ///
     /// [`Member`]: crate::Member
     Disconnected,
 
-    /// Connection with [`Member`] was lost.
+    /// Connection with the [`Member`] was lost.
     ///
     /// [`Member`]: crate::Member
-    LostConnection,
+    Lost,
 
-    /// [`Member`] was forcibly disconnected by server.
+    /// [`Member`] was forcibly disconnected by a media server.
     ///
     /// [`Member`]: crate::Member
     Kicked,
 
-    /// Server is shutting down.
-    ServerShutdown,
+    /// Media server was shut down.
+    Shutdown,
 }
