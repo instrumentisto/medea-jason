@@ -24,6 +24,16 @@ pub enum Endpoint {
     WebRtcPlay(WebRtcPlay),
 }
 
+impl Endpoint {
+    /// Return [`Id`] of this [`Endpoint`].
+    pub fn id(&self) -> Id {
+        match self {
+            Endpoint::WebRtcPublish(publish) => publish.id.clone().into(),
+            Endpoint::WebRtcPlay(play) => play.id.clone().into(),
+        }
+    }
+}
+
 /// ID of an [`Endpoint`] media [`Element`].
 ///
 /// [`Element`]: crate::Element

@@ -10,11 +10,14 @@
 mod api;
 mod callback;
 
+use std::str::FromStr;
+
 use derive_more::{Display, Error, From, Into};
 use url::Url;
 
 use crate::{
-    endpoint::web_rtc_play::SrcUriParseError, ErrorCode, ErrorResponse,
+    control::ParseFidError, endpoint::web_rtc_play::LocalSrcUriParseError,
+    grpc::api as proto,
 };
 
 /// `URL` of the gRPC [`CallbackClient`].
@@ -35,10 +38,10 @@ impl CallbackUrl {
     }
 }
 
-impl TryFrom<String> for CallbackUrl {
-    type Error = CallbackUrlParseError;
+impl FromStr for CallbackUrl {
+    type Err = CallbackUrlParseError;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         let url = Url::parse(&value)?;
         let url_scheme = url.scheme();
         let host = url.host().ok_or(CallbackUrlParseError::MissingHost)?;
@@ -68,23 +71,23 @@ pub enum CallbackUrlParseError {
     UnsupportedScheme,
 }
 
-impl From<CallbackUrlParseError> for ErrorResponse {
-    fn from(err: CallbackUrlParseError) -> Self {
-        use CallbackUrlParseError::{
-            MissingHost, UnsupportedScheme, UrlParseErr,
-        };
-
-        match err {
-            MissingHost => {
-                Self::without_id(ErrorCode::MissingHostInCallbackUrl)
-            }
-            UnsupportedScheme => {
-                Self::without_id(ErrorCode::UnsupportedCallbackUrlProtocol)
-            }
-            UrlParseErr(_) => Self::without_id(ErrorCode::InvalidCallbackUrl),
-        }
-    }
-}
+// impl From<CallbackUrlParseError> for ErrorResponse {
+//     fn from(err: CallbackUrlParseError) -> Self {
+//         use CallbackUrlParseError::{
+//             MissingHost, UnsupportedScheme, UrlParseErr,
+//         };
+//
+//         match err {
+//             MissingHost => {
+//                 Self::without_id(ErrorCode::MissingHostInCallbackUrl)
+//             }
+//             UnsupportedScheme => {
+//                 Self::without_id(ErrorCode::UnsupportedCallbackUrlProtocol)
+//             }
+//             UrlParseErr(_) =>
+// Self::without_id(ErrorCode::InvalidCallbackUrl),         }
+//     }
+// }
 
 /// Errors which may occur while deserializing protobuf spec.
 #[derive(Debug, Display, Error, From)]
@@ -94,7 +97,7 @@ pub enum TryFromProtobufError {
     /// [`WebRtcPlay`]: crate::endpoint::WebRtcPlay
     /// [`SrcUri`]: crate::endpoint::web_rtc_play::SrcUri
     #[display(fmt = "Src uri parse error: {:?}", _0)]
-    SrcUriError(SrcUriParseError),
+    SrcUriError(LocalSrcUriParseError),
 
     /// [`Room`] element doesn't have [`Member`] element. Currently this is
     /// unimplemented.
@@ -125,34 +128,53 @@ pub enum TryFromProtobufError {
     )]
     #[from(ignore)]
     NegativeDuration(String, &'static str),
+
+    /// TODO
+    #[display(fmt = "FID is too long: {}", _0)]
+    FidIsTooLong(#[error(not(source))] String),
+
+    /// TODO
+    Fid(ParseFidError),
+
+    /// TODO
+    Url(url::ParseError),
+
+    /// TODO
+    UnimplementedCall,
 }
 
-impl From<TryFromProtobufError> for ErrorResponse {
-    fn from(err: TryFromProtobufError) -> Self {
-        use TryFromProtobufError as E;
-
-        match err {
-            E::SrcUriError(e) => e.into(),
-            E::CallbackUrlParseErr(e) => e.into(),
-            E::ExpectedOtherElement(element, id) => Self::with_explanation(
-                ErrorCode::ElementIdMismatch,
-                format!(
-                    "Provided fid can not point to element of type [{element}]",
-                ),
-                Some(id),
-            ),
-            E::EmptyElement(id) => Self::with_explanation(
-                ErrorCode::NoElement,
-                String::from("No element was provided"),
-                Some(id),
-            ),
-            E::NegativeDuration(id, f) => Self::with_explanation(
-                ErrorCode::NegativeDuration,
-                format!(
-                    "Element(id: {id}) contains negative duration field `{f}`",
-                ),
-                Some(id),
-            ),
-        }
+impl From<TryFromProtobufError> for proto::Error {
+    fn from(_: TryFromProtobufError) -> Self {
+        todo!()
     }
 }
+
+// impl From<TryFromProtobufError> for ErrorResponse {
+//     fn from(err: TryFromProtobufError) -> Self {
+//         use TryFromProtobufError as E;
+//
+//         match err {
+//             E::SrcUriError(e) => e.into(),
+//             E::CallbackUrlParseErr(e) => e.into(),
+//             E::ExpectedOtherElement(element, id) => Self::with_explanation(
+//                 ErrorCode::ElementIdMismatch,
+//                 format!(
+//                     "Provided fid can not point to element of type
+// [{element}]",                 ),
+//                 Some(id),
+//             ),
+//             E::EmptyElement(id) => Self::with_explanation(
+//                 ErrorCode::NoElement,
+//                 String::from("No element was provided"),
+//                 Some(id),
+//             ),
+//             E::NegativeDuration(id, f) => Self::with_explanation(
+//                 ErrorCode::NegativeDuration,
+//                 format!(
+//                     "Element(id: {id}) contains negative duration field
+// `{f}`",                 ),
+//                 Some(id),
+//             ),
+//         }
+//     }
+// }

@@ -44,8 +44,8 @@ impl From<OnLeaveEvent> for proto::OnLeave {
 impl From<OnLeaveReason> for proto::on_leave::Reason {
     fn from(rsn: OnLeaveReason) -> Self {
         match rsn {
-            OnLeaveReason::LostConnection => Self::LostConnection,
-            OnLeaveReason::ServerShutdown => Self::ServerShutdown,
+            OnLeaveReason::Lost => Self::LostConnection,
+            OnLeaveReason::Shutdown => Self::ServerShutdown,
             OnLeaveReason::Disconnected => Self::Disconnected,
             OnLeaveReason::Kicked => Self::Kicked,
         }
