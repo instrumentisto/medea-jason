@@ -10,10 +10,10 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
-use std::{collections::HashMap, fmt};
+use std::{collections::HashMap, fmt, str::FromStr};
 
 use async_trait::async_trait;
-use derive_more::{Display, From};
+use derive_more::{Display, Error, From};
 
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
 
@@ -151,11 +151,11 @@ pub enum Fid {
 impl fmt::Display for Fid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            StatefulFid::Room { id } => write!(f, "{}", id),
-            StatefulFid::Member { id, room_id } => {
+            Self::Room { id } => write!(f, "{}", id),
+            Self::Member { id, room_id } => {
                 write!(f, "{}/{}", room_id, id)
             }
-            StatefulFid::Endpoint {
+            Self::Endpoint {
                 id,
                 room_id,
                 member_id,
@@ -164,10 +164,10 @@ impl fmt::Display for Fid {
     }
 }
 
-impl TryFrom<String> for Fid {
-    type Error = ParseFidError;
+impl FromStr for Fid {
+    type Err = ParseFidError;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         if value.is_empty() {
             return Err(ParseFidError::Empty);
         }
@@ -175,7 +175,7 @@ impl TryFrom<String> for Fid {
         let mut splitted = value.split('/');
         let room_id = if let Some(room_id) = splitted.next() {
             if room_id.is_empty() {
-                return Err(ParseFidError::MissingPath(value));
+                return Err(ParseFidError::MissingPath(value.to_owned()));
             }
             room_id
         } else {
@@ -184,51 +184,51 @@ impl TryFrom<String> for Fid {
 
         let member_id = if let Some(member_id) = splitted.next() {
             if member_id.is_empty() {
-                return Err(ParseFidError::MissingPath(value));
+                return Err(ParseFidError::MissingPath(value.to_owned()));
             }
             member_id
         } else {
-            return Ok(StatefulFid::Room {
-                id: room::Id(room_id.to_owned()),
+            return Ok(Self::Room {
+                id: room::Id::from(room_id.to_owned()),
             });
         };
 
         let endpoint_id = if let Some(endpoint_id) = splitted.next() {
             if endpoint_id.is_empty() {
-                return Err(ParseFidError::MissingPath(value));
+                return Err(ParseFidError::MissingPath(value.to_owned()));
             }
             endpoint_id
         } else {
-            return Ok(StatefulFid::Member {
-                id: member::Id(member_id.to_owned()),
-                room_id: room::Id(room_id.to_owned()),
+            return Ok(Self::Member {
+                id: member::Id::from(member_id.to_owned()),
+                room_id: room::Id::from(room_id.to_owned()),
             });
         };
 
         if splitted.next().is_some() {
-            Err(ParseFidError::TooManyPaths(value))
+            Err(ParseFidError::TooManyPaths(value.to_owned()))
         } else {
-            Ok(StatefulFid::Endpoint {
-                id: endpoint::Id(endpoint_id.to_owned()),
-                room_id: room::Id(room_id.to_owned()),
-                member_id: member::Id(member_id.to_owned()),
+            Ok(Self::Endpoint {
+                id: endpoint::Id::from(endpoint_id.to_owned()),
+                room_id: room::Id::from(room_id.to_owned()),
+                member_id: member::Id::from(member_id.to_owned()),
             })
         }
     }
 }
 
-/// Errors which can happen while parsing [`StatefulFid`].
+/// Errors which can happen while parsing [`Fid`].
 #[derive(Debug, Display, Error)]
 pub enum ParseFidError {
-    /// [`StatefulFid`] is empty.
+    /// [`Fid`] is empty.
     #[display(fmt = "FID is empty")]
     Empty,
 
-    /// [`StatefulFid`] has too many paths.
+    /// [`Fid`] has too many paths.
     #[display(fmt = "Too many paths [fid = {}]", _0)]
     TooManyPaths(#[error(not(source))] String),
 
-    /// [`StatefulFid`] has missing paths.
+    /// [`Fid`] has missing paths.
     #[display(fmt = "Missing paths [fid = {}]", _0)]
     MissingPath(#[error(not(source))] String),
 }
