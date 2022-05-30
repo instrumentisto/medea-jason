@@ -291,8 +291,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-               cmake libgtk-3-dev liblzma-dev libpulse-dev ninja-build \
-                pkg-config xvfb
+                       cmake \
+                       libgtk-3-dev liblzma-dev libpulse-dev \
+                       ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
