@@ -77,6 +77,11 @@ All user visible changes to this project will be documented in this file. This p
         - `GetUserMediaAudioFailed`;
         - `GetUserMediaVideoFailed`.
 
+### Fixed
+
+- Library API:
+    - Unconverted into Dart exception error in `RoomHandle.onFailedLocalMedia()` ([#57]).
+
 ### Updated
 
 - Switch to [2021 Rust edition][012-1] ([#16]).
@@ -90,6 +95,7 @@ All user visible changes to this project will be documented in this file. This p
 [#46]: /../../pull/46
 [#49]: /../../pull/49
 [#52]: /../../pull/52
+[#57]: /../../pull/57
 
 
 
