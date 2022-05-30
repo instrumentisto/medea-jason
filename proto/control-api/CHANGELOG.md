@@ -14,7 +14,7 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Abstractions:
-    - `ControlApi` and `CallbackClient` ([#55]);
+    - `ControlApi` and `CallbackApi` ([#55]);
     - Implement gRPC `ControlApi` and `CallbackClient` ([#56]).
 
 [#55]: /../../pull/55
