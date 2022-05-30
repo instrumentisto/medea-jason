@@ -1,17 +1,19 @@
 //! Definitions of conversions from [`ControlApi`] spec into generated from
-//! `api.proto` via [`tonic-build`] and vise-versa.
+//! `api.proto` spec via [`tonic-build`] and vise-versa.
 //!
 //! [`ControlApi`]: crate::ControlApi
 
 use std::time::Duration;
 
 use crate::{
-    control::Request,
+    control::{ParseFidError, Request},
     endpoint::{
         web_rtc_publish::{AudioSettings, P2pMode, Policy, VideoSettings},
         WebRtcPlay, WebRtcPublish,
     },
-    grpc::{api as proto, conversions::TryFromProtobufError},
+    grpc::{
+        api as proto, conversions::TryFromProtobufError, CallbackUrlParseError,
+    },
     member::{self, Credentials},
     Element, Endpoint, Fid, Member, Room,
 };
@@ -43,9 +45,9 @@ impl TryFrom<proto::CreateRequest> for Request {
                     endpoint,
                 })
             }
-            Fid::Endpoint { .. } => {
-                Err(TryFromProtobufError::FidIsTooLong(parent_fid))
-            }
+            Fid::Endpoint { .. } => Err(TryFromProtobufError::ParseFidError(
+                ParseFidError::TooManyPaths(parent_fid),
+            )),
         }
     }
 }
@@ -102,10 +104,7 @@ impl TryFrom<proto::create_request::El> for Room {
                 id, ..
             })
             | proto_el::WebrtcPlay(proto::WebRtcPlayEndpoint { id, .. }) => {
-                Err(TryFromProtobufError::ExpectedOtherElement(
-                    String::from("Room"),
-                    id,
-                ))
+                Err(TryFromProtobufError::ExpectedOtherElement("Room", id))
             }
         }
     }
@@ -124,10 +123,7 @@ impl TryFrom<proto::apply_request::El> for Room {
                 id, ..
             })
             | proto_el::WebrtcPlay(proto::WebRtcPlayEndpoint { id, .. }) => {
-                Err(TryFromProtobufError::ExpectedOtherElement(
-                    String::from("Room"),
-                    id,
-                ))
+                Err(TryFromProtobufError::ExpectedOtherElement("Room", id))
             }
         }
     }
@@ -143,12 +139,13 @@ impl TryFrom<proto::Room> for Room {
                 .pipeline
                 .into_iter()
                 .map(|(id, room_element)| {
-                    if let Some(elem) = room_element.el {
-                        Member::try_from(elem)
-                            .map(|member| (member.id.clone(), member))
-                    } else {
-                        Err(TryFromProtobufError::EmptyElement(id))
-                    }
+                    room_element.el.map_or(
+                        Err(TryFromProtobufError::EmptyElement(id)),
+                        |el| {
+                            Member::try_from(el)
+                                .map(|member| (member.id.clone(), member))
+                        },
+                    )
                 })
                 .collect::<Result<_, _>>()?,
         })
@@ -181,10 +178,7 @@ impl TryFrom<proto::create_request::El> for Member {
                 id, ..
             })
             | proto_el::WebrtcPlay(proto::WebRtcPlayEndpoint { id, .. }) => {
-                Err(TryFromProtobufError::ExpectedOtherElement(
-                    String::from("Member"),
-                    id,
-                ))
+                Err(TryFromProtobufError::ExpectedOtherElement("Member", id))
             }
         }
     }
@@ -203,10 +197,7 @@ impl TryFrom<proto::apply_request::El> for Member {
                 id, ..
             })
             | proto_el::WebrtcPlay(proto::WebRtcPlayEndpoint { id, .. }) => {
-                Err(TryFromProtobufError::ExpectedOtherElement(
-                    String::from("Member"),
-                    id,
-                ))
+                Err(TryFromProtobufError::ExpectedOtherElement("Member", id))
             }
         }
     }
@@ -224,10 +215,7 @@ impl TryFrom<proto::room::element::El> for Member {
                 id, ..
             })
             | proto_el::WebrtcPlay(proto::WebRtcPlayEndpoint { id, .. }) => {
-                Err(TryFromProtobufError::ExpectedOtherElement(
-                    String::from("Member"),
-                    id.to_string(),
-                ))
+                Err(TryFromProtobufError::ExpectedOtherElement("Member", id))
             }
         }
     }
@@ -266,21 +254,24 @@ impl TryFrom<proto::Member> for Member {
                 .pipeline
                 .into_iter()
                 .map(|(id, member_el)| {
-                    if let Some(elem) = member_el.el {
-                        Endpoint::try_from(elem)
-                            .map(|endpoint| (endpoint.id(), endpoint))
-                    } else {
-                        Err(TryFromProtobufError::EmptyElement(id))
-                    }
+                    member_el.el.map_or(
+                        Err(TryFromProtobufError::EmptyElement(id)),
+                        |el| {
+                            Endpoint::try_from(el)
+                                .map(|endpoint| (endpoint.id(), endpoint))
+                        },
+                    )
                 })
                 .collect::<Result<_, _>>()?,
             credentials: member.credentials.map(Into::into),
             on_join: (!member.on_join.is_empty())
                 .then(|| member.on_join.parse())
-                .transpose()?,
+                .transpose()
+                .map_err(CallbackUrlParseError::from)?,
             on_leave: (!member.on_leave.is_empty())
                 .then(|| member.on_leave.parse())
-                .transpose()?,
+                .transpose()
+                .map_err(CallbackUrlParseError::from)?,
             idle_timeout,
             reconnect_timeout,
             ping_interval,
@@ -354,10 +345,7 @@ impl TryFrom<proto::create_request::El> for Endpoint {
             }
             proto_el::Room(proto::Room { id, .. })
             | proto_el::Member(proto::Member { id, .. }) => {
-                Err(TryFromProtobufError::ExpectedOtherElement(
-                    String::from("Endpoint"),
-                    id,
-                ))
+                Err(TryFromProtobufError::ExpectedOtherElement("Endpoint", id))
             }
         }
     }
@@ -538,19 +526,3 @@ impl From<P2pMode> for proto::web_rtc_publish_endpoint::P2p {
         }
     }
 }
-
-// impl From<ErrorResponse> for proto::Error {
-//     fn from(resp: ErrorResponse) -> Self {
-//         let text = if let Some(additional_text) = &resp.explanation {
-//             format!("{} {additional_text}", resp.error_code)
-//         } else {
-//             resp.error_code.to_string()
-//         };
-//         Self {
-//             doc: String::new(),
-//             text,
-//             element: resp.element_id.unwrap_or_default(),
-//             code: resp.error_code.into(),
-//         }
-//     }
-// }

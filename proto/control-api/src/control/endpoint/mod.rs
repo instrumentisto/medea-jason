@@ -26,6 +26,7 @@ pub enum Endpoint {
 
 impl Endpoint {
     /// Return [`Id`] of this [`Endpoint`].
+    #[must_use]
     pub fn id(&self) -> Id {
         match self {
             Endpoint::WebRtcPublish(publish) => publish.id.clone().into(),

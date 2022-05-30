@@ -62,7 +62,7 @@ use crate::{
         api::{
             self as proto, control_api_server::ControlApi as GrpcControlApi,
         },
-        callback::callback_client,
+        callback::callback_client::CallbackClient as GrpcCallbackClient,
     },
     ControlApi, Ping,
 };
@@ -71,13 +71,14 @@ pub use self::conversions::{
     CallbackUrl, CallbackUrlParseError, TryFromProtobufError,
 };
 
-/// gRPC [`CallbackClient`] for sending [`Request`]s.
+/// gRPC [`CallbackApi`] for sending [`Request`]s.
 ///
-/// [`CallbackClient`]: crate::CallbackClient
+/// [`CallbackApi`]: crate::CallbackApi
 /// [`Request`]: CallbackRequest
 #[derive(Debug)]
 pub struct CallbackClient {
-    client: Mutex<callback_client::CallbackClient<Channel>>,
+    /// Inner [`GrpcCallbackClient`].
+    client: Mutex<GrpcCallbackClient<Channel>>,
 }
 
 impl CallbackClient {
@@ -86,13 +87,17 @@ impl CallbackClient {
     /// For every [`CallbackUrl`] creates a unique connection and serves all
     /// [`Event`]s through it.
     ///
+    /// # Errors
+    ///
+    /// If failed to connect to the gRPC server with
+    /// [`CallbackUrl::http_addr()`].
+    ///
     /// [`CallbackClient`]: crate::CallbackClient
     /// [`Event`]: crate::callback::Event
     pub async fn connect(
         url: CallbackUrl,
     ) -> Result<Self, tonic::transport::Error> {
-        let client =
-            callback_client::CallbackClient::connect(url.http_addr()).await?;
+        let client = GrpcCallbackClient::connect(url.http_addr()).await?;
         Ok(Self {
             client: Mutex::new(client),
         })
@@ -108,36 +113,12 @@ impl crate::CallbackApi for CallbackClient {
         request: CallbackRequest,
     ) -> Result<(), Self::Error> {
         let mut guard = self.client.lock().await;
-        let _ = guard.on_event(tonic::Request::new(request.into())).await?;
+        drop(
+            guard
+                .on_event(tonic::Request::new(request.try_into()?))
+                .await?,
+        );
         Ok(())
-
-        // let url = CallbackUrl::try_from(request.url.clone())?;
-        // let read_guard = self.clients.read().await;
-        //
-        // let mut client = if let Some(client) = read_guard.get(&url) {
-        //     client.clone()
-        // } else {
-        //     drop(read_guard);
-        //     let mut write_guard = self.clients.write().await;
-        //     if let Some(client) = write_guard.get(&url) {
-        //         client.clone()
-        //     } else {
-        //         let client =
-        //             callback_client::CallbackClient::connect(url.http_addr())
-        //                 .await
-        //                 .map_err(|e| ErrorResponse::unexpected(&e))?;
-        //         drop(write_guard.insert(url, client.clone()));
-        //         client
-        //     }
-        // };
-        //
-        // drop(
-        //     client
-        //         .on_event(tonic::Request::new(request.into()))
-        //         .await
-        //         .map_err(|e| ErrorResponse::unexpected(&e))?,
-        // );
-        // Ok(())
     }
 }
 
@@ -264,7 +245,7 @@ where
                     |mut acc, s| {
                         if !s.is_empty() {
                             acc.push_str(": ");
-                            acc.push_str(s)
+                            acc.push_str(s);
                         }
                         acc
                     },
