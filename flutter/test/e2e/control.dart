@@ -13,8 +13,6 @@ class MyClient {
   }
 
   Future<http.Response> create(String path, Object element) async {
-    print('PATH:$control_api_address/$path');
-    print('OBject:' +json.encode(element).toString());
     var response = await inner.post(
       Uri.parse('$control_api_address/$path'),
       headers: headers,
@@ -31,7 +29,6 @@ class MyClient {
     if(response.statusCode != 200) {
       throw response.body;
     }
-    print(response.body + '  |||||||');
     return response;
   }
 

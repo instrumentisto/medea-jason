@@ -10,30 +10,24 @@ import '../api/callback.dart';
 import '../api/endpoint.dart';
 import '../api/member.dart';
 import '../api/room.dart';
-import '../conf.dart';
 import '../control.dart';
 import 'member.dart';
 import 'package:uuid/uuid.dart';
 
 
-
-
-/// [FlutterWidgetTesterWorld] storing a custom state during a single test.
 class CustomWorld extends FlutterWidgetTesterWorld {
   late String room_id;
   late MyClient control_client;
-  late HashMap<String, MyMember> members;
-  late HashMap<String, Jason> jasons;
+  var members = HashMap<String, Member>();
+  var jasons = HashMap<String, Jason>();
 
   CustomWorld() {
     var uuid = Uuid();
     room_id = uuid.v4();
-    control_client = MyClient('http://127.0.0.1:8000');
-    members = HashMap();
-    jasons = HashMap();
+    control_client = MyClient('http://127.0.0.1:8000'); // todo ENV
   }
 
-  Future<void> create_member(MyBuilder builder) async {
+  Future<void> create_member(MemberBuilder builder) async {
     var pipeline = HashMap<String, Endpoint>();
     var send_state = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
     var recv_state = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
@@ -49,16 +43,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             MediaKind.Video, MediaSourceKind.Device): true
       });
 
-      //todo
-      var gg = WebRtcPublishEndpoint();
-      gg.id = 'publish';
-      gg.p2p = P2pMode.Always;
-      gg.force_relay = false;
-      gg.audio_settings = AudioSettings(PublishPolicy.Optional);
-      gg.video_settings = VideoSettings(PublishPolicy.Optional);
-      var ep = Endpoint();
-      ep.data = gg;
-      pipeline.addAll({'publish': ep}); // todo
+      var publish = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      pipeline.addAll({'publish': Endpoint(publish)});
     }
 
     if (builder.is_recv) {
@@ -75,13 +61,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         if (value.is_send) {
           var id = value.id;
           var endpoint_id = 'play-$id';
-          var gg2 = WebRtcPlayEndpoint();
-          gg2.id = endpoint_id;
-          gg2.src = 'local://$room_id/$id/publish';
-          gg2.force_relay = false;
-          var ep = Endpoint();
-          ep.data = gg2;
-          pipeline.addAll({endpoint_id: ep});
+          var play = WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish');
+          pipeline.addAll({endpoint_id: Endpoint(play)});
         }
       });
     }
@@ -104,19 +85,12 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         var endpoint_id = 'play-$builder_id';
         var m_id = e.value.id;
         var id = '$room_id/$m_id/$endpoint_id';
-        //todo
-        var elem = WebRtcPlayEndpoint();
-        elem.id = endpoint_id;
-        elem.src = 'local://$room_id/$builder_id/publish';
-        elem.force_relay = false;
+        var elem = WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$builder_id/publish');
         return Tuple2(id, elem);
       }).toList();
 
-// WebRtcPlayEndpoint(WebRtcPlayEndpoint { id: "play-Bob", src: "local://98528b22-8edd-4121-bb13-e5f670ae9778/Bob/publish", force_relay: false })
-// "{\"kind\":\"WebRtcPlayEndpoint\",\"id\":\"play-Bob\",\"src\":\"local://11fc9734-f690-49a5-9436-1f7c2a9f6ce3/Bob/publish\",\"force_relay\":false}"
-//  {\"kind\":\"WebRtcPlayEndpoint\",\"id\":\"play-Bob\",\"src\":\"local://d5515fab-5868-4fb0-87f0-c7ee03cf3cb7/Bob/publish\",\"force_relay\":false}
       recv_endpoints.forEach((element) async {
-        Map<String, dynamic> gg = {};
+        var gg = <String, dynamic>{};
         gg.addAll(element.item2.toJson());
         await control_client.create(element.item1, gg);
       });
@@ -168,7 +142,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   Future<void> delete_publish_endpoint(String member_id) async {
     var resp = await control_client.delete('$room_id/$member_id/publish');
-    // print(resp.body);
   }
 
   Future<void> delete_play_endpoint(
@@ -232,7 +205,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var other_member = members[element.key]!;
       await other_member.wait_for_connect(member.id);
       await other_member.wait_for_track_count(member.id, send_count);
-
     }
   }
 
@@ -327,7 +299,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           publish_endpoint);
     }
 
-
     {
       var left_member = members[pair.left.id]!;
       left_member.is_send = pair.left.is_send();
@@ -341,33 +312,23 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
-  /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
-  /// provided [`MembersPair`] using an `Apply` method of Control API.
   Future<void> interconnect_members_via_apply(MembersPair pair) async {
     var spec = await get_spec();
     if (spec.pipeline.containsKey(pair.left.id)) {
-      var ep = Endpoint();
-      ep.data = pair.left.publish_endpoint()!;
-      var member = spec.pipeline[pair.left.id]!; // pair.left.id
-      member.pipeline.addAll({'publish': ep});
+      var member = spec.pipeline[pair.left.id]!;
+      member.pipeline.addAll({'publish': Endpoint(pair.left.publish_endpoint()!)});
 
       var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
-      var ep2 = Endpoint();
-      ep2.data = play_endpoint;
-      member.pipeline.addAll({play_endpoint.id: ep2});
+      member.pipeline.addAll({play_endpoint.id: Endpoint(play_endpoint)});
     }
 
     if (spec.pipeline.containsKey(pair.right.id)) {
-      var member = spec.pipeline[pair.right.id]!; // pair.left.id
-      var ep = Endpoint();
-      ep.data = pair.right.publish_endpoint()!;
-      member.pipeline.addAll({'publish': ep});
+      var member = spec.pipeline[pair.right.id]!;
 
-      var play_endpoint = pair.right.play_endpoint_for(room_id, pair.right)!;
-      var ep2 = Endpoint();
-      ep2.data = play_endpoint;
+      member.pipeline.addAll({'publish': Endpoint(pair.right.publish_endpoint()!)});
 
-      member.pipeline.addAll({play_endpoint.id: ep2});
+      var play_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
+      member.pipeline.addAll({play_endpoint.id: Endpoint(play_endpoint)});
     }
 
     await apply(spec);
@@ -379,7 +340,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var on_join_found = callbacks
           .where((element) => element.fid.contains(member_id))
           .any((element) {
-        return element.event.toJson()['type'] == 'OnJoin';
+        return CallbackEvent.toJson(element.event)['type'] == 'OnJoin';
       });
       if (on_join_found) {
         break;
@@ -421,12 +382,6 @@ class PairedMember {
 
   PairedMember(this.id, this.send_audio, this.send_video, this.recv);
 
-// impl PairedMember {
-//     /// Indicates whether this [`PairedMember`] should publish media.
-//     fn is_send(&self) -> bool {
-//         self.send_audio.is_some() || self.send_video.is_some()
-//     }
-
   bool is_send() {
     return send_audio != null || send_video != null;
   }
@@ -434,10 +389,7 @@ class PairedMember {
   WebRtcPublishEndpoint? publish_endpoint() {
     WebRtcPublishEndpoint? res = null;
     if (is_send()) {
-      res = WebRtcPublishEndpoint();
-      res.id = 'publish';
-      res.p2p = P2pMode.Always;
-      res.force_relay = false;
+      res = WebRtcPublishEndpoint('publish', P2pMode.Always);
       if (send_audio == null) {
         res.audio_settings = AudioSettings(PublishPolicy.Disabled);
       } else {
@@ -456,10 +408,7 @@ class PairedMember {
   WebRtcPlayEndpoint? play_endpoint_for(
       String room_id, PairedMember publisher) {
     if (recv) {
-      var res = WebRtcPlayEndpoint();
-      res.id = 'play-' + publisher.id;
-      res.force_relay = false;
-      res.src = 'local://$room_id/' + publisher.id + '/publish';
+      var res = WebRtcPlayEndpoint('play-' + publisher.id, 'local://$room_id/' + publisher.id + '/publish');
       return res;
     }
     return null;

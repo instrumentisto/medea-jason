@@ -19,118 +19,89 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
   void testFeature0() {
     runFeature(
-      'State synchronization:',
+      'Media muting:',
       <String>[],
       () {
         runScenario(
-          '`RoomHandle.on_connection_loss()` fires when WS connection lost',
+          '`RemoteTrack.on_muted()` and `RemoteTrack.on_unmuted()` callbacks fire when video is muted/unmuted',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice with no WebRTC endpoints',
+              'Given room with joined members Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice loses WS connection',
+              'When Bob mutes video and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s WS connection is lost',
+              'Then `on_muted` callback fires 1 time on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob unmutes video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_unmuted` callback fires 1 time on Alice\'s remote device video track from Bob',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'State synchronization',
+            'Media muting',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          'Remote track disable works while disconnect',
+          '`RemoteTrack.on_muted()` and `RemoteTrack.on_unmuted()` callbacks fire when audio is muted/unmuted',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob',
+              'Given room with joined members Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice loses WS connection',
+              'When Bob mutes audio and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Bob disables audio and awaits it completes',
+              'Then `on_muted` callback fires 1 time on Alice\'s remote audio track from Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Alice restores WS connection',
+              'When Bob unmutes audio and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s audio remote track from Bob is disabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Local track disable works while disconnect',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice disables audio',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s audio remote track from Alice is disabled',
+              'Then `on_unmuted` callback fires 1 time on Alice\'s remote audio track from Bob',
               <String>[],
               null,
               dependencies,
@@ -138,7 +109,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'State synchronization',
+            'Media muting',
           ),
         );
       },

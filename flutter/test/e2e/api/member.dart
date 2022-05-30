@@ -34,14 +34,14 @@ class ApiMember {
   @JsonKey(includeIfNull: false)
   String? on_leave; // skip null
 
-  @JsonKey(ignore: true)
-  Duration? idle_timeout; //humantime_serde
+  // @JsonKey(ignore: true)
+  String? idle_timeout; //humantime_serde
 
-  @JsonKey(ignore: true)
-  Duration? reconnect_timeout; //humantime_serde
+  // @JsonKey(ignore: true)
+  String? reconnect_timeout; //humantime_serde
   
-  @JsonKey(ignore: true)
-  Duration? ping_interval; //humantime_serde
+  // @JsonKey(ignore: true)
+  String? ping_interval; //humantime_serde
 
   ApiMember();
 
@@ -62,14 +62,11 @@ class ApiMember {
   static Map<String, Endpoint> fromJ(Map<String, dynamic> json) {
     var res = HashMap<String, Endpoint>();
     json.forEach((key, value) {
-      var ep = Endpoint();
       try {
-        ep.data = WebRtcPublishEndpoint.fromJson(value);
-        res.addAll({key: ep});
+        res.addAll({key: Endpoint(WebRtcPublishEndpoint.fromJson(value))});
       }
       catch (e) {
-        ep.data = WebRtcPlayEndpoint.fromJson(value);
-        res.addAll({key: ep});
+        res.addAll({key: Endpoint(WebRtcPlayEndpoint.fromJson(value))});
       }
     });
     return res;

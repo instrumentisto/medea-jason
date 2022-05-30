@@ -1,7 +1,5 @@
 Feature: Remote media disabling
 
-# disabling dont work
-
   Scenario: Remote video track stops when disabled
     Given room with joined members Alice and Bob
     When Alice disables remote video
@@ -76,14 +74,14 @@ Feature: Remote media disabling
     And Alice enables remote video
     Then Alice's device video remote track from Bob is enabled
     Then Alice's device video remote track from Carol is enabled
-
+ 
   Scenario: Member disables remote audio from `Connection` and enables remote audio via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables audio receiving from Bob
     And Alice enables remote audio
     Then Alice's audio remote track from Bob is enabled
     Then Alice's audio remote track from Carol is enabled
-
+ 
   Scenario: Member disables all `Connection`s audio receiving and enables it via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables audio receiving from Bob
@@ -91,7 +89,7 @@ Feature: Remote media disabling
     And Alice enables remote audio
     Then Alice's audio remote track from Bob is enabled
     Then Alice's audio remote track from Carol is enabled
-
+ 
   Scenario: Member disables all `Connection`s video receiving and enables it via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables video receiving from Bob
@@ -99,7 +97,7 @@ Feature: Remote media disabling
     And Alice enables remote video
     Then Alice's device video remote track from Bob is enabled
     Then Alice's device video remote track from Carol is enabled
-
+ 
   Scenario: Member disables remote video via `Room` and enables all `Connection`s remote videos
     Given room with joined members Alice and Bob and Carol
     When Alice disables remote video
@@ -107,7 +105,7 @@ Feature: Remote media disabling
     And Alice enables video receiving from Carol
     Then Alice's device video remote track from Bob is enabled
     And Alice's device video remote track from Carol is enabled
-
+ 
   Scenario: Member disables remote audio via `Room` and enables all `Connection`s remote audios
     Given room with joined members Alice and Bob and Carol
     When Alice disables remote audio

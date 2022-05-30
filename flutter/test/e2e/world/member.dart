@@ -3,163 +3,175 @@ import 'dart:collection';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:tuple/tuple.dart';
 
-
-
 var globalConnect = HashMap<String, ConnectionHandle>();
 
-class MyBuilder {
-  late String id;
-  late bool is_send;
-  late bool is_recv;
-  MyBuilder(this.id, this.is_send, this.is_recv);
+class MemberBuilder {
+  String id;
+  bool is_send;
+  bool is_recv;
+  MemberBuilder(this.id, this.is_send, this.is_recv);
 
-  MyMember build(
+  Member build(
       RoomHandle room,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state) {
     room.onFailedLocalMedia((p0) {});
     room.onConnectionLoss((p0) {});
-    room.onClose((p0) {});
-    room.onLocalTrack((p0) {});
-    var result =
-        MyMember(id, is_send, is_recv, false, send_state, recv_state, room);
-    result.room = room;
-    result.is_recv = is_recv;
-    result.is_send = is_send;
-    result.send_state = send_state;
-    result.recv_state = recv_state;
-    result.is_joined = false;
-    return result;
+    return Member(id, is_send, is_recv, false, send_state, recv_state, room);
   }
 }
 
-class myConnectionStore {
-  var close_conn = HashMap<String, Completer>();
+class ConnectionStore {
+  var close_connect = HashMap<String, Completer>();
   var connects = HashMap<String, ConnectionHandle>();
-  var close = HashMap<String, ConnectionHandle>();
-
-  var stopped_tracks = HashMap<String, bool>();
-
+  var stopped_tracks = HashMap<String, int>();
   var callback_counter = HashMap<String, Map<String, int>>();
-
-  var remote_tracks = HashMap<String, List<RemoteMediaTrack>>();
+  var remote_tracks =
+      HashMap<String, HashMap<String, List<RemoteMediaTrack>>>();
   List<LocalMediaTrack> local_tracks = List.empty(growable: true);
 
-  HashMap<String, Function(ConnectionHandle)> onConnect = HashMap();
+  var MediaDirectionChangedCB = HashMap<String, Function>();
+  var callback_counterCB = HashMap<String, Map<String, Function>>();
+  var Onconnect = HashMap<String, Function>();
+  var OnRemote = HashMap<String, Function>();
 }
 
-class MyMember {
-  late String id;
-  late bool is_send;
-  late bool is_recv;
-  late bool is_joined;
-  late HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state;
-  late HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state;
+class Member {
+  String id;
+  bool is_send;
+  bool is_recv;
+  bool is_joined;
+  HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state;
+  HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state;
+
   Completer<RoomCloseReason> close_reason = Completer();
-  late RoomHandle room;
-  var connection_store = myConnectionStore();
+  RoomHandle room;
+  var connection_store = ConnectionStore();
 
-  MyMember(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
+  Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
-    room.onClose((p0) {
-      close_reason.complete(p0);
+    room.onClose((reason) {
+      close_reason.complete(reason);
     });
-    
-    room.onLocalTrack((p0) {
-      connection_store.local_tracks.add(p0);
+    room.onLocalTrack((local_track) {
+      connection_store.local_tracks.add(local_track);
     });
-
-    room.onNewConnection((p0) {
-      var id = p0.getRemoteMemberId();
-      connection_store.remote_tracks.addAll({id: List.empty(growable: true)});
-      p0.onRemoteTrackAdded((p0) {
-        print(this.id + ' from $id  ' + p0.getTrack().id());
+    room.onNewConnection((connection) {
+      var remote_member_id = connection.getRemoteMemberId();
+      connection.onRemoteTrackAdded((remote_track) {
+        var remote_track_id = remote_track.getTrack().id();
         connection_store.callback_counter.addAll({
-          p0.getTrack().id(): {
+          remote_track_id: {
             'enabled': 0,
             'disabled': 0,
             'muted': 0,
             'unmuted': 0
           }
         });
-        p0.onMuted(() {
-          var c = connection_store.callback_counter[p0.getTrack().id()]!;
-          var old = c['muted']!;
-          c['muted'] = old + 1;
-        });
-
-        p0.onUnmuted(() {
-          var c = connection_store.callback_counter[p0.getTrack().id()]!;
-          var old = c['unmuted']!;
-          c['unmuted'] = old + 1;
-        });
-
-        p0.onMediaDirectionChanged((p0_) {
-          if (p0_ != TrackMediaDirection.SendRecv) {
-            var c = connection_store.callback_counter[p0.getTrack().id()]!;
-            var old = c['disabled']!;
-            c['disabled'] = old + 1;
-          } else {
-            var c = connection_store.callback_counter[p0.getTrack().id()]!;
-            var old = c['enabled']!;
-            c['enabled'] = old + 1;
+        connection_store.callback_counterCB.addAll({
+          remote_track_id: {
+            'enabled': () => {},
+            'disabled': () => {},
+            'muted': () => {},
+            'unmuted': () => {}
           }
         });
 
-        connection_store.stopped_tracks.addAll({p0.getTrack().id(): false});
-        connection_store.remote_tracks[id]!.add(p0);
-        p0.onStopped(() {
-          connection_store.stopped_tracks[p0.getTrack().id()] = true;
+        remote_track.onMuted(() {
+          connection_store.callback_counter[remote_track_id]!
+              .update('muted', (value) => value += 1);
+          connection_store.callback_counterCB[remote_track_id]!['muted']!(
+              connection_store.callback_counter[remote_track_id]!['muted']);
         });
+
+        remote_track.onUnmuted(() {
+          connection_store.callback_counter[remote_track_id]!
+              .update('unmuted', (value) => value += 1);
+          connection_store.callback_counterCB[remote_track_id]!['unmuted']!(
+              connection_store.callback_counter[remote_track_id]!['unmuted']);
+        });
+
+        remote_track.onMediaDirectionChanged((direction) {
+          if (direction != TrackMediaDirection.SendRecv) {
+            connection_store.callback_counter[remote_track_id]!
+                .update('disabled', (value) => value += 1);
+
+            connection_store.callback_counterCB[remote_track_id]!['disabled']!(
+                connection_store
+                    .callback_counter[remote_track_id]!['disabled']);
+          } else {
+            connection_store.callback_counter[remote_track_id]!
+                .update('enabled', (value) => value += 1);
+            connection_store.callback_counterCB[remote_track_id]!['enabled']!(
+                connection_store.callback_counter[remote_track_id]!['enabled']);
+          }
+          connection_store.MediaDirectionChangedCB.forEach((key, value) {
+            value(direction);
+          });
+        });
+
+        connection_store.stopped_tracks[remote_track_id] = 0;
+        if (connection_store
+                .remote_tracks[remote_member_id]![remote_track_id] ==
+            null) {
+          connection_store.remote_tracks[remote_member_id]![remote_track_id] =
+              List.empty(growable: true);
+        }
+        connection_store.remote_tracks[remote_member_id]![remote_track_id]!
+            .add(remote_track);
+        remote_track.onStopped(() {
+          connection_store.stopped_tracks
+              .update(remote_track_id, (value) => value + 1);
+        });
+
+        if (connection_store.OnRemote[remote_member_id] != null) {
+          connection_store.OnRemote[remote_member_id]!(
+              connection_store.remote_tracks[remote_member_id]!.length);
+        }
       });
 
-      connection_store.connects.addAll({p0.getRemoteMemberId(): p0});
-      connection_store.close_conn.addAll({p0.getRemoteMemberId(): Completer()});
-      p0.onClose(() {
-        connection_store.close_conn[p0.getRemoteMemberId()]!.complete();
+      connection_store.remote_tracks.addAll({remote_member_id: HashMap()});
+      connection_store.connects.addAll({remote_member_id: connection});
+      connection_store.close_connect.addAll({remote_member_id: Completer()});
+
+      connection.onClose(() {
+        connection_store.close_connect[remote_member_id]!.complete();
       });
-      connection_store.onConnect.forEach((key, value) {
-        value(p0);
-      });
+      if (connection_store.Onconnect[remote_member_id] != null) {
+        connection_store.Onconnect[remote_member_id]!();
+      }
     });
   }
 
   Future<void> forget_local_tracks() async {
-    connection_store.local_tracks.forEach((element) {element.free();});
+    connection_store.local_tracks.forEach((track) {
+      track.free();
+    });
   }
 
-  Future<void> wait_for_connect(String id) {
-    var connect = Completer();
+  Future<void> wait_for_connect(String id) async {
     if (!connection_store.connects.containsKey(id)) {
-      connection_store.onConnect.addAll({
-        id: (p0) {
-          if (p0.getRemoteMemberId() == id) {
-            connect.complete();
-            connection_store.onConnect.remove(id);
-          }
-        }
-      });
-    } else {
-      connect.complete();
+    var conn = Completer();
+      connection_store.Onconnect[id] = () {
+        conn.complete();
+        connection_store.Onconnect[id] = () {};
+      };
+    return conn.future;
     }
-    return connect.future;
   }
 
   Future<void> wait_for_track_count(String id, int count) async {
-    var count_f = Completer();
-    if (connection_store.remote_tracks[id]!.length == count) {
-      count_f.complete();
-    } else {
-      while (connection_store.remote_tracks[id]!.length < count) {
-        await Future.delayed(Duration(milliseconds: 100));
-      }
-      count_f.complete();
+    if (connection_store.remote_tracks[id]!.length != count) {
+      var track_compl = Completer();
+      connection_store.OnRemote[id] = () {
+        track_compl.complete();
+        connection_store.OnRemote.remove(id);
+      };
     }
-    return count_f.future;
   }
 
   Future<void> wait_for_close(String id) {
-    return connection_store.close_conn[id]!.future;
+    return connection_store.close_connect[id]!.future;
   }
 
   Future<void> join_room(String room_id) async {
@@ -171,13 +183,7 @@ class MyMember {
   void update_send_media_state(
       MediaKind? kind, MediaSourceKind? source_kind, bool enabled) async {
     kinds_combinations(kind, source_kind).forEach((element) {
-      if (send_state[Tuple2(element.item1, element.item2)] == null) {
-      send_state.addAll({Tuple2(element.item1, element.item2): enabled});
-      }
-      else {
-        send_state[Tuple2(element.item1, element.item2)] = enabled;
-      }
-
+      send_state[Tuple2(element.item1, element.item2)] = enabled;
     });
   }
 
@@ -207,26 +213,7 @@ class MyMember {
     return out;
   }
 
-  //   let send_count = self
-  //     .send_state
-  //     .borrow()
-  //     .iter()
-  //     .filter(|(key, enabled)| {
-  //         other.recv_state.borrow().get(key).copied().unwrap_or(false)
-  //             && **enabled
-  //     })
-  //     .count() as u64;
-  // let recv_count = self
-  //     .recv_state
-  //     .borrow()
-  //     .iter()
-  //     .filter(|(key, enabled)| {
-  //         other.send_state.borrow().get(key).copied().unwrap_or(false)
-  //             && **enabled
-  //     })
-  //     .count() as u64;
-
-  Tuple2<int, int> count_of_tracks_between_members(MyMember other) {
+  Tuple2<int, int> count_of_tracks_between_members(Member other) {
     var send_count = send_state.entries
         .where((element) => other.recv_state[element.key]! && element.value)
         .length;
@@ -262,10 +249,6 @@ class MyMember {
         await room.disableVideo(source);
       }
     }
-  }
-
-  Future<void> add_gum_latency(Duration latency) async {  
-    // todo переопределить getUserMedia;
   }
 
   Future<void> toggle_mute(
@@ -321,15 +304,5 @@ class MyMember {
         await room.disableRemoteVideo();
       }
     }
-  }
-
-  // false true ????? todo
-  //room.setLocalMediaSettings(false, true, true);
-  Future<void> switch_video_device() async {
-    var setting = MediaStreamSettings();
-    setting.audio(AudioTrackConstraints());
-    setting.deviceVideo(DeviceVideoTrackConstraints());
-    await room.setLocalMediaSettings(setting, true, true);
-    await room.setLocalMediaSettings(MediaStreamSettings(), true, true);
   }
 }

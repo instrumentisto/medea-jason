@@ -1,14 +1,7 @@
-import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_jason/src/interface/track_kinds.dart';
 import 'package:tuple/tuple.dart';
-
-import '../parameters/user.dart';
-import '../world/custom_world.dart';
-import '../world/member.dart';
 
 StepDefinitionGeneric<TWorld> step6<TWorld extends World, TInput1, TInput2,
     TInput3, TInput4, TInput5, TInput6>(
@@ -221,19 +214,3 @@ StepDefinitionGeneric<TWorld> fix_given5<TInput1, TInput2, TInput3, TInput4,
       onInvoke,
       configuration: configuration,
     );
-
-Future<void> mock_gum(bool isVideoBroken, bool isAudioBroken) async {
-
-}
-                // async () => {
-                //     const [isVideoBroken, isAudioBroken] = args;
-                //     navigator.mediaDevices.getUserMedia = async (cons) => {
-                //         if (isAudioBroken && cons.audio != null) {
-                //             throw new NotFoundError();
-                //         }
-                //         if (isVideoBroken && cons.video != null) {
-                //             throw new NotFoundError();
-                //         }
-                //         return await window.gumMock.original(cons);
-                //     }
-                // }

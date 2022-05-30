@@ -7,7 +7,7 @@ import 'steps/connection.dart';
 import 'steps/control_api.dart';
 import 'steps/media_state.dart';
 import 'steps/room.dart';
-import 'steps/teest.dart';
+import 'steps/given.dart';
 import 'steps/track.dart';
 import 'world/custom_world.dart';
 
@@ -39,8 +39,6 @@ var gg = FlutterTestConfiguration()
 
     //room
     then_on_close_fires,
-    given_member_gum_will_error,
-    then_room_failed_local_stream_fires,
     when_jason_object_disposes,
     when_room_closed_by_client,
     when_member_joins_room,
@@ -62,7 +60,6 @@ var gg = FlutterTestConfiguration()
     when_enables_or_mutes,
     when_member_enables_remote_track,
     then_remote_media_direction_is,
-    given_gum_delay,
     when_member_frees_all_local_tracks,
     then_track_is_stopped,
     then_local_track_mute_state,
@@ -72,9 +69,9 @@ var gg = FlutterTestConfiguration()
     // ws_connection_restore,
     // connection_is_lost,
 
-    fillField3,
-    fillField2,
-    fillField1,
+    givenTreeMembers,
+    givenTwoMembers,
+    givenOneMember,
   ]
   ..hooks = []
   ..reporters = [

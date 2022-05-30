@@ -11,10 +11,7 @@ import 'package:medea_jason/src/native/room_handle.dart';
 import 'package:medea_jason/src/native/media_device_info.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 
-import 'control.dart';
-import 'package:uuid/uuid.dart';
 
-import 'world/world.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

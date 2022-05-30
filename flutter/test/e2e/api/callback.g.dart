@@ -16,24 +16,26 @@ Map<String, dynamic> _$CallbackEventToJson(CallbackEvent instance) =>
       'data': CallbackEvent.toJ(instance.data),
     };
 
-CallbackItem _$CallbackItemFromJson(Map<String, dynamic> json) => CallbackItem()
-  ..fid = json['fid'] as String
-  ..at = json['at'] as String
-  ..event = CallbackItem.fromJ(json['event'] as Map<String, dynamic>);
+CallbackItem _$CallbackItemFromJson(Map<String, dynamic> json) => CallbackItem(
+      json['fid'] as String,
+      json['at'] as String,
+      CallbackItem.fromJ(json['event'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$CallbackItemToJson(CallbackItem instance) =>
     <String, dynamic>{
       'fid': instance.fid,
       'at': instance.at,
-      'event': CallbackItem.toJ(instance.event),
+      'event': CallbackEvent.toJson(instance.event),
     };
 
 OnJoin _$OnJoinFromJson(Map<String, dynamic> json) => OnJoin();
 
 Map<String, dynamic> _$OnJoinToJson(OnJoin instance) => <String, dynamic>{};
 
-OnLeave _$OnLeaveFromJson(Map<String, dynamic> json) =>
-    OnLeave()..reason = $enumDecode(_$OnLeaveReasonEnumMap, json['reason']);
+OnLeave _$OnLeaveFromJson(Map<String, dynamic> json) => OnLeave(
+      $enumDecode(_$OnLeaveReasonEnumMap, json['reason']),
+    );
 
 Map<String, dynamic> _$OnLeaveToJson(OnLeave instance) => <String, dynamic>{
       'reason': _$OnLeaveReasonEnumMap[instance.reason],

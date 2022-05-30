@@ -55,7 +55,7 @@ Feature: Create endpoint
     Then Alice has 2 live remote tracks from Bob
 
   Scenario: Endpoints removed and recreated
-    Given room with joined member Alice and Bob
+    Given room with joined member Bob and Alice
     When Control API deletes Bob's publish endpoint
     And Control API starts Bob's media publishing to Alice
     Then Alice has 2 live remote tracks from Bob

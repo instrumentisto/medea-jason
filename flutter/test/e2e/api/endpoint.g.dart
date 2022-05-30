@@ -6,18 +6,19 @@ part of 'endpoint.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Endpoint _$EndpointFromJson(Map<String, dynamic> json) =>
-    Endpoint()..data = json['data'];
+Endpoint _$EndpointFromJson(Map<String, dynamic> json) => Endpoint(
+      json['data'],
+    );
 
 Map<String, dynamic> _$EndpointToJson(Endpoint instance) => <String, dynamic>{
       'data': instance.data,
     };
 
 WebRtcPlayEndpoint _$WebRtcPlayEndpointFromJson(Map<String, dynamic> json) =>
-    WebRtcPlayEndpoint()
-      ..id = json['id'] as String
-      ..src = json['src'] as String
-      ..force_relay = json['force_relay'] as bool;
+    WebRtcPlayEndpoint(
+      json['id'] as String,
+      json['src'] as String,
+    )..force_relay = json['force_relay'] as bool;
 
 Map<String, dynamic> _$WebRtcPlayEndpointToJson(WebRtcPlayEndpoint instance) =>
     <String, dynamic>{
@@ -28,9 +29,10 @@ Map<String, dynamic> _$WebRtcPlayEndpointToJson(WebRtcPlayEndpoint instance) =>
 
 WebRtcPublishEndpoint _$WebRtcPublishEndpointFromJson(
         Map<String, dynamic> json) =>
-    WebRtcPublishEndpoint()
-      ..id = json['id'] as String
-      ..p2p = $enumDecode(_$P2pModeEnumMap, json['p2p'])
+    WebRtcPublishEndpoint(
+      json['id'] as String,
+      $enumDecode(_$P2pModeEnumMap, json['p2p']),
+    )
       ..force_relay = json['force_relay'] as bool
       ..audio_settings =
           AudioSettings.fromJson(json['audio_settings'] as Map<String, dynamic>)
@@ -43,8 +45,8 @@ Map<String, dynamic> _$WebRtcPublishEndpointToJson(
       'id': instance.id,
       'p2p': _$P2pModeEnumMap[instance.p2p],
       'force_relay': instance.force_relay,
-      'audio_settings': instance.audio_settings,
-      'video_settings': instance.video_settings,
+      'audio_settings': AudioSettings.toJson(instance.audio_settings),
+      'video_settings': VideoSettings.toJson(instance.video_settings),
     };
 
 const _$P2pModeEnumMap = {
