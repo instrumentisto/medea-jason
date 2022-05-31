@@ -456,10 +456,7 @@ impl RoomHandle {
                         );
                         tracerr::map_from_and_wrap!()(e)
                     })?;
-                if !inner
-                    .send_constraints
-                    .is_track_enabled(kind, source_kind.into())
-                {
+                if !inner.send_constraints.is_track_enabled(kind, source_kind) {
                     return Err(tracerr::new!(
                         ChangeMediaStateError::TransitionIntoOppositeState(
                             media_exchange_state::Stable::Disabled.into()

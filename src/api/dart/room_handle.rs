@@ -4,16 +4,18 @@ use dart_sys::Dart_Handle;
 use tracerr::Traced;
 
 use crate::{
-    api::dart::{
-        utils::{
-            c_str_into_string, DartFuture, DartResult, IntoDartFuture as _,
+    api::{
+        dart::{
+            utils::{
+                c_str_into_string, DartFuture, DartResult, IntoDartFuture as _,
+            },
+            DartValueArg, ForeignClass,
         },
-        DartValueArg, ForeignClass,
+        ArgumentError, DartValueCastError,
     },
     media::MediaSourceKind,
     platform,
     room::{ChangeMediaStateError, ConstraintsUpdateError, RoomJoinError},
-    try_into_source_kind,
 };
 
 use super::{propagate_panic, utils::DartError, MediaStreamSettings};
@@ -24,6 +26,21 @@ pub use self::mock::RoomHandle;
 pub use crate::room::RoomHandle;
 
 impl ForeignClass for RoomHandle {}
+
+/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
+///
+/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
+/// [`DartFuture`].
+macro_rules! try_into_source_kind {
+    ($k:expr) => {
+        match $k.try_into().map_err(|err: DartValueCastError| {
+            ArgumentError::new(err.value, "kind", err.expectation)
+        }) {
+            Ok(s) => s,
+            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
+        }
+    };
+}
 
 /// Connects to a media server and joins the [`Room`] with the provided
 /// authorization `token`.
@@ -621,14 +638,14 @@ mod mock {
 
         pub fn enable_remote_video(
             &self,
-            source_kind: Option<MediaSourceKind>,
+            _source_kind: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::err(tracerr::new!(ChangeMediaStateError::Detached))
         }
 
         pub fn disable_remote_video(
             &self,
-            source_kind: Option<MediaSourceKind>,
+            _source_kind: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::ok(())
         }

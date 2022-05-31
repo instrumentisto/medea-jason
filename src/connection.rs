@@ -219,11 +219,8 @@ impl InnerConnection {
         let receivers = self.receivers.borrow().clone();
         let mut change_tasks = Vec::new();
         for r in receivers {
-            let is_correct_source = if let Some(kind) = source_kind {
-                kind == r.source_kind().into()
-            } else {
-                true
-            };
+            let is_correct_source = source_kind
+                .map_or(true, |skind| skind == r.source_kind().into());
 
             if r.is_subscription_needed(desired_state)
                 && r.kind() == kind
@@ -246,7 +243,7 @@ impl InnerConnection {
                 desired_state == media_exchange_state::Stable::Enabled,
                 kind,
                 match source_kind {
-                    Some(skind) => match skind {
+                    Some(source_kind) => match source_kind {
                         MediaSourceKind::Device => {
                             Some(proto::MediaSourceKind::Device)
                         }

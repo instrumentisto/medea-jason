@@ -289,11 +289,8 @@ impl InnerMediaConnections {
             .values()
             .filter(move |s| s.state().kind() == kind)
             .filter(move |s| {
-                if let Some(skind) = source_kind {
-                    s.state().source_kind() == skind
-                } else {
-                    true
-                }
+                source_kind
+                    .map_or(true, |skind| s.state().source_kind() == skind)
             })
     }
 

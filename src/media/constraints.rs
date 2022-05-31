@@ -101,12 +101,12 @@ impl RecvConstraints {
                 self.is_audio_enabled.set(enabled);
             }
             MediaKind::Video => match source_kind {
-                Some(skind) => match skind {
+                Some(source_kind) => match source_kind {
                     MediaSourceKind::Device => {
-                        self.is_video_device_enabled.set(enabled)
+                        self.is_video_device_enabled.set(enabled);
                     }
                     MediaSourceKind::Display => {
-                        self.is_video_display_enabled.set(enabled)
+                        self.is_video_display_enabled.set(enabled);
                     }
                 },
                 None => {
@@ -661,7 +661,7 @@ impl MediaStreamSettings {
         match kind {
             MediaType::Video(video) => self.is_track_enabled_and_constrained(
                 MediaKind::Video,
-                Some(video.source_kind.into()),
+                Some(video.source_kind),
             ),
             MediaType::Audio(_) => self.is_track_enabled_and_constrained(
                 MediaKind::Audio,

@@ -123,7 +123,9 @@ class WebRoomHandle extends RoomHandle {
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    fallibleFunction(() => obj.on_failed_local_media(allowInterop(f)));
+    fallibleFunction(() => obj.on_failed_local_media(allowInterop((e) {
+          f(convertException(e));
+        })));
   }
 
   @moveSemantics

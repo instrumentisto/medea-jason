@@ -7,10 +7,11 @@ use crate::{
     api::{
         dart::utils::{DartError, DartResult},
         utils::{DartFuture, IntoDartFuture as _},
+        ArgumentError, DartValueCastError,
     },
     connection::ChangeMediaStateError,
     media::MediaSourceKind,
-    platform, try_into_source_kind,
+    platform,
 };
 
 use super::{propagate_panic, DartValueArg, ForeignClass};
@@ -21,6 +22,21 @@ pub use self::mock::ConnectionHandle;
 pub use crate::connection::ConnectionHandle;
 
 impl ForeignClass for ConnectionHandle {}
+
+/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
+///
+/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
+/// [`DartFuture`].
+macro_rules! try_into_source_kind {
+    ($k:expr) => {
+        match $k.try_into().map_err(|err: DartValueCastError| {
+            ArgumentError::new(err.value, "kind", err.expectation)
+        }) {
+            Ok(s) => s,
+            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
+        }
+    };
+}
 
 /// Sets callback, invoked when this `Connection` will close.
 #[no_mangle]
@@ -260,14 +276,14 @@ mod mock {
 
         pub fn enable_remote_video(
             &self,
-            source_kind: Option<MediaSourceKind>,
+            _source_kind: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::err(tracerr::new!(ChangeMediaStateError::Detached))
         }
 
         pub fn disable_remote_video(
             &self,
-            source_kind: Option<MediaSourceKind>,
+            _source_kind: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::ok(())
         }
