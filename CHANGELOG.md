@@ -83,6 +83,11 @@ All user visible changes to this project will be documented in this file. This p
 - Library API:
     - Unconverted into Dart exception error in `RoomHandle.onFailedLocalMedia()` ([#57]).
 
+### Fixed
+
+- Library API:
+    - Unconverted into Dart exception error in `RoomHandle.onFailedLocalMedia()` ([#57]).
+
 ### Updated
 
 - Switch to [2021 Rust edition][012-1] ([#16]).
