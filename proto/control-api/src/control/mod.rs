@@ -10,104 +10,132 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
-use std::{collections::HashMap, fmt, str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
 
+#[doc(inline)]
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
 
-/// [Control API] used to control [Medea] server.
+/// API allowing to control a media server dynamically, by creating, updating
+/// and destroying pipelines of media [`Element`]s on it.
 ///
-/// [Control API]: https://tinyurl.com/yxsqplq7
-/// [Medea]: https://git.instrumentisto.com/streaming/medea
+/// Both API client and API server should implement this trait.
 #[async_trait(?Send)]
 pub trait Api {
-    /// Error of this [`ControlApi`].
+    /// Error returned by this [`ControlApi`].
     ///
     /// [`ControlApi`]: Api
     type Error;
 
-    /// Creates a new [`Element`].
+    /// Creates a new [`Element`] on the media server.
+    ///
+    /// # Non-idempotent
+    ///
+    /// Errors if an [`Element`] with such ID already exists.
     ///
     /// # Errors
     ///
-    /// - If [`Element`]'s parent [`Fid`] doesn't exist;
-    /// - If [`Element`] with same ID already exists.
+    /// - If the [`Element`]'s parent [`Element`] (identified by a [`Fid`])
+    ///   doesn't exist.
+    /// - If an [`Element`] with such ID already exists.
+    /// - If the media server failed to perform this request.
     async fn create(&self, req: Request) -> Result<member::Sids, Self::Error>;
 
-    /// Applies changes to the existing [`Element`] or creates a new one, in
-    /// case the is no [`Element`] with the provided `ID`.
+    /// Applies changes to an existing [`Element`] on the media server, or
+    /// creates a new one in case there is no [`Element`] with such ID.
     ///
-    /// - If [`Element`]'s parent [`Fid`] doesn't exist.
+    /// # Idempotent
+    ///
+    /// If no [`Element`] with such ID exists, then it will be created,
+    /// otherwise it will be reconfigured. [`Element`]s that exist on the same
+    /// hierarchy level, but are not specified in the provided [`Request`], will
+    /// be removed.
+    ///
+    /// # Errors
+    ///
+    /// - If the [`Element`]'s parent [`Element`] (identified by a [`Fid`])
+    ///   doesn't exist.
+    /// - If the media server failed to perform this request.
     async fn apply(&self, req: Request) -> Result<member::Sids, Self::Error>;
 
-    /// Deletes [`Elements`] with provided [`Fid`]s.
+    /// Removes [`Element`]s from the media server.
+    ///
+    /// Allows referring multiple [`Element`]s on the last two levels of a
+    /// [`Fid`].
+    ///
+    /// # Idempotent
+    ///
+    /// If no [`Element`]s with such [`Fid`]s exist, then succeeds.
     ///
     /// # Errors
     ///
-    /// - If `fids` is empty;
-    /// - If `fids` contains multiple [`room::Id`]s.
-    async fn delete_elements(
-        &self,
-        fids: Vec<Fid>,
-    ) -> Result<member::Sids, Self::Error>;
+    /// - If no [`Fid`]s were specified.
+    /// - If any [`Fid`] contains multiple [`room::Id`]s.
+    /// - If the media server failed to perform this request.
+    async fn delete(&self, fids: &[Fid]) -> Result<(), Self::Error>;
 
-    /// Returns [`Elements`] by their [`Fid`]s.
+    /// Lookups [`Element`]s by their [`Fid`]s on the media server.
+    ///
+    /// If no [`Fid`]s are specified, then returns all the current [`Element`]s
+    /// on the media server.
+    ///
+    /// If no [`Element`] exists for some [`Fid`], then it won't be present in
+    /// the returned [`Elements`] collection.
     ///
     /// # Errors
     ///
-    /// - If an [`Element`] with the provided [`Fid`] doesn't exist.
-    async fn get_elements(
-        &self,
-        fids: Vec<Fid>,
-    ) -> Result<Elements, Self::Error>;
+    /// - If the media server failed to perform this request.
+    async fn get(&self, fids: &[Fid]) -> Result<Elements, Self::Error>;
 
-    /// Checks healthiness of this media server.
+    /// Checks healthiness of the media server.
+    ///
+    /// Caller should assert that the returned [`Pong`] has the same nonce as
+    /// the sent [`Ping`].
+    ///
+    /// # Errors
+    ///
+    /// - If the media server failed to perform this request.
     async fn healthz(&self, ping: Ping) -> Result<Pong, Self::Error>;
 }
 
-/// Request for creating a new [`Element`] or applying changes to the existing
-/// one.
-#[allow(variant_size_differences, clippy::large_enum_variant)]
+/// Request for creating or applying an [`Element`] on a media server.
 #[derive(Clone, Debug)]
 pub enum Request {
-    /// Creates a new [`Room`] or applies changes to the exising one.
+    /// [`Room`] to be created or to apply changes to.
     Room(Room),
 
-    /// Creates a new [`Member`] in some [`Room`] or applies changes to the
-    /// exising one.
+    /// [`Member`] to be created or to apply changes to.
     Member {
-        /// ID of the [`Room`], [`Member`] is a participant of.
+        /// ID of the [`Room`] this [`Member`] participates in.
         room_id: room::Id,
 
-        /// [`Member`] media element.
-        member: Member,
+        /// Media [`Element`] representing this [`Member`].
+        member: Box<Member>,
     },
 
-    /// Creates a new [`Endpoint`] for some [`Member`] or applies changes to
-    /// the exising one.
+    /// [`Endpoint`] to be created or to apply changes to.
     Endpoint {
-        /// ID of the [`Room`], [`Member`] is a participant of.
+        /// ID of the [`Room`] this [`Endpoint`] belongs to.
         room_id: room::Id,
 
-        /// ID of the [`Member`], [`Endpoint`] belongs to.
+        /// ID of the [`Member`] this [`Endpoint`] belongs to.
         member_id: member::Id,
 
-        /// [`Element`] media element.
+        /// Media [`Element`] representing this [`Endpoint`].
         endpoint: Endpoint,
     },
 }
 
 /// Possible media elements forming a media pipeline.
-#[allow(variant_size_differences, clippy::large_enum_variant)]
 #[derive(Clone, Debug, From)]
 pub enum Element {
     /// [`Room`] media element.
     Room(Room),
 
     /// [`Member`] media element.
-    Member(Member),
+    Member(Box<Member>),
 
     /// [`Endpoint`] media element.
     Endpoint(Endpoint),
@@ -118,15 +146,17 @@ pub type Elements = HashMap<Fid, Element>;
 
 /// FID (Full ID) is a composition of media [`Element`] IDs referring to some
 /// [`Element`] on a whole media server uniquely.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Display)]
 pub enum Fid {
     /// FID of a [`Room`].
+    #[display(fmt = "{}", id)]
     Room {
         /// Unique ID of the [`Room`].
         id: room::Id,
     },
 
     /// FID of a [`Member`].
+    #[display(fmt = "{}/{}", room_id, id)]
     Member {
         /// ID of the [`Member`] in the [`Room`].
         id: member::Id,
@@ -136,6 +166,7 @@ pub enum Fid {
     },
 
     /// FID of an [`Endpoint`].
+    #[display(fmt = "{}/{}/{}", room_id, member_id, id)]
     Endpoint {
         /// ID of the [`Endpoint`] of the [`Member`].
         id: endpoint::Id,
@@ -148,76 +179,55 @@ pub enum Fid {
     },
 }
 
-impl fmt::Display for Fid {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Room { id } => write!(f, "{}", id),
-            Self::Member { id, room_id } => {
-                write!(f, "{}/{}", room_id, id)
-            }
-            Self::Endpoint {
-                id,
-                room_id,
-                member_id,
-            } => write!(f, "{}/{}/{}", room_id, member_id, id),
-        }
-    }
-}
-
 impl FromStr for Fid {
     type Err = ParseFidError;
 
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        if value.is_empty() {
+    fn from_str(val: &str) -> Result<Self, Self::Err> {
+        if val.is_empty() {
             return Err(ParseFidError::Empty);
         }
 
-        let mut splitted = value.split('/');
-        let room_id = if let Some(room_id) = splitted.next() {
-            if room_id.is_empty() {
-                return Err(ParseFidError::MissingPath(value.to_owned()));
+        let mut splitted = val.split('/');
+
+        let room_id = splitted.next().ok_or(ParseFidError::Empty)?;
+        if room_id.is_empty() {
+            return Err(ParseFidError::MissingPath(val.into()));
+        }
+
+        let member_id = if let Some(id) = splitted.next() {
+            if id.is_empty() {
+                return Err(ParseFidError::MissingPath(val.into()));
             }
-            room_id
+            id
         } else {
-            return Err(ParseFidError::Empty);
+            return Ok(Self::Room { id: room_id.into() });
         };
 
-        let member_id = if let Some(member_id) = splitted.next() {
-            if member_id.is_empty() {
-                return Err(ParseFidError::MissingPath(value.to_owned()));
+        let endpoint_id = if let Some(id) = splitted.next() {
+            if id.is_empty() {
+                return Err(ParseFidError::MissingPath(val.into()));
             }
-            member_id
-        } else {
-            return Ok(Self::Room {
-                id: room::Id::from(room_id.to_owned()),
-            });
-        };
-
-        let endpoint_id = if let Some(endpoint_id) = splitted.next() {
-            if endpoint_id.is_empty() {
-                return Err(ParseFidError::MissingPath(value.to_owned()));
-            }
-            endpoint_id
+            id
         } else {
             return Ok(Self::Member {
-                id: member::Id::from(member_id.to_owned()),
-                room_id: room::Id::from(room_id.to_owned()),
+                id: member_id.into(),
+                room_id: room_id.into(),
             });
         };
 
         if splitted.next().is_some() {
-            Err(ParseFidError::TooManyPaths(value.to_owned()))
+            Err(ParseFidError::TooManyPaths(val.into()))
         } else {
             Ok(Self::Endpoint {
-                id: endpoint::Id::from(endpoint_id.to_owned()),
-                room_id: room::Id::from(room_id.to_owned()),
-                member_id: member::Id::from(member_id.to_owned()),
+                id: endpoint_id.into(),
+                room_id: room_id.into(),
+                member_id: member_id.into(),
             })
         }
     }
 }
 
-/// Errors which can happen while parsing [`Fid`].
+/// Possible errors of parsing a [`Fid`].
 #[derive(Debug, Display, Error)]
 pub enum ParseFidError {
     /// [`Fid`] is empty.
@@ -225,22 +235,22 @@ pub enum ParseFidError {
     Empty,
 
     /// [`Fid`] has too many paths.
-    #[display(fmt = "Too many paths [fid = {}]", _0)]
-    TooManyPaths(#[error(not(source))] String),
+    #[display(fmt = "FID has too many paths: {}", _0)]
+    TooManyPaths(#[error(not(source))] Box<str>),
 
     /// [`Fid`] has missing paths.
-    #[display(fmt = "Missing paths [fid = {}]", _0)]
-    MissingPath(#[error(not(source))] String),
+    #[display(fmt = "FID has missing paths: {}", _0)]
+    MissingPath(#[error(not(source))] Box<str>),
 }
 
 /// [`Ping`] message received by a media server periodically for probing its
 /// healthiness.
 ///
-/// Each new [`Ping`] should increase its nonce, starting with `0`.
+/// Each new [`Ping`] should increment its nonce, starting with `0`.
 #[derive(Clone, Copy, Debug)]
 pub struct Ping(pub u32);
 
-/// [`Pong`] message send by a media server in response to a received [`Ping`]
+/// [`Pong`] message sent by a media server in response to a received [`Ping`]
 /// message.
 ///
 /// Contains nonce of the answered [`Ping`] message.

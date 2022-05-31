@@ -6,18 +6,18 @@ package callback;
 
 // Service for receiving callbacks from a media server.
 service Callback {
-  /// Fires when a certain callback event happens on a media server.
+  // Fires when a certain callback event happens on a media server.
   rpc OnEvent (Request) returns (Response);
 }
 
 // Request with a fired callback event and its meta information.
 message Request {
-  // FID (Full ID) of the media element, the occurred event is related to.
+  // FID (Full ID) of the media `Element`, the occurred event is related to.
   string fid = 1;
   // Datetime when the event occurred.
   string at = 2;
 
-  // Event which occurred.
+  // Occurred event.
   oneof event {
     OnJoin on_join = 3;
     OnLeave on_leave = 4;
@@ -38,6 +38,7 @@ message OnLeave {
   // Reason of why the `Member` leaves.
   Reason reason = 1;
 
+  // Possible reasons of why a `Member` leaves its `Room`.
   enum Reason {
     // `Member` was disconnected normally.
     DISCONNECTED = 0;

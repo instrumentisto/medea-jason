@@ -1,4 +1,4 @@
-//! Definitions of a service receiving callbacks from a media server.
+//! API for receiving callbacks from a media server.
 
 use async_trait::async_trait;
 use derive_more::From;
@@ -6,23 +6,25 @@ use time::OffsetDateTime as DateTime;
 
 use crate::Fid;
 
-/// Client calling a service receiving callbacks from a media server.
+/// API for receiving callbacks from a media server.
+///
+/// Both API client and API server should implement this trait.
 #[async_trait(?Send)]
 pub trait Api {
-    /// Error of this [`CallbackApi`].
+    /// Error returned by this [`CallbackApi`].
     ///
     /// [`CallbackApi`]: Api
     type Error;
 
-    /// Sends the provided callback [`Event`].
-    async fn fire_event(&self, request: Request) -> Result<(), Self::Error>;
+    /// Fires when a certain callback [`Event`] happens on a media server.
+    async fn on_event(&self, req: Request) -> Result<(), Self::Error>;
 }
 
 /// Request with a fired callback [`Event`] and its meta information.
 ///
-/// Used for sending callbacks via [`CallbackApi::fire_event()`].
+/// Used for invoking and processing callbacks via [`CallbackApi::on_event()`].
 ///
-/// [`CallbackApi::fire_event()`]: Api::fire_event()
+/// [`CallbackApi::on_event()`]: Api::on_event
 #[derive(Debug)]
 pub struct Request {
     /// FID (Full ID) of the media [`Element`], the occurred [`Event`] is
@@ -31,7 +33,7 @@ pub struct Request {
     /// [`Element`]: crate::Element
     pub fid: Fid,
 
-    /// [`Event`] which occurred.
+    /// Occurred [`Event`].
     pub event: Event,
 
     /// [`DateTime`] when the [`Event`] occurred.

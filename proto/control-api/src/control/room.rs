@@ -22,7 +22,7 @@ pub struct Room {
     pub pipeline: HashMap<member::Id, Member>,
 }
 
-/// ID of a [`Room`] [`Element`].
+/// ID of a [`Room`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
 #[derive(
@@ -31,3 +31,10 @@ pub struct Room {
 #[from(types(String))]
 #[into(owned(types(String)))]
 pub struct Id(Box<str>);
+
+// TODO: Derive via `derive::From` once it's capable to.
+impl<'a> From<&'a str> for Id {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}

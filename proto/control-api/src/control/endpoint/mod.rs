@@ -33,3 +33,10 @@ pub enum Endpoint {
 #[from(types(String, web_rtc_publish::Id, web_rtc_play::Id))]
 #[into(owned(types(String)))]
 pub struct Id(Box<str>);
+
+// TODO: Derive via `derive::From` once it's capable to.
+impl<'a> From<&'a str> for Id {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}

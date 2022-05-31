@@ -61,6 +61,9 @@ pub struct Member {
     /// Interval of pinging with heartbeat messages this [`Member`] via
     /// [Client API] by a media server.
     ///
+    /// If [`None`] then the default interval of a media server is used, if
+    /// configured.
+    ///
     /// [Client API]: https://tinyurl.com/266y74tf
     pub ping_interval: Option<Duration>,
 }
@@ -75,55 +78,64 @@ pub struct Member {
 #[into(owned(types(String)))]
 pub struct Id(Box<str>);
 
-/// `URI` used by [`Member`]s to connect to a media server via [Client API].
+// TODO: Derive via `derive::From` once it's capable to.
+impl<'a> From<&'a str> for Id {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
+/// [URI] used by a [`Member`] to connect to a media server via [Client API].
 ///
-/// [Client Api]: https://tinyurl.com/266y74tf
+/// [Client API]: https://tinyurl.com/266y74tf
+/// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
 #[derive(Clone, Debug)]
 pub struct Sid {
-    /// Public `URL` to establish `WebSocket` connection with.
+    /// Public [URL] to establish [WebSocket] connections with.
+    ///
+    /// [URL]: https://en.wikipedia.org/wiki/URL
+    /// [WebSocket]: https://en.wikipedia.org/wiki/WebSocket
     pub public_url: PublicUrl,
 
-    /// [`Id`] of the [`Room`] the [`Member`] participates in.
+    /// ID of the [`Room`] the [`Member`] participates in.
     ///
-    /// [`Id`]: room::Id
     /// [`Room`]: room::Room
     pub room_id: room::Id,
 
-    /// [`Id`] of the [`Member`] participating in the [`Room`].
+    /// ID of the [`Member`] who establishes [WebSocket] connections.
     ///
-    /// [`Room`]: room::Room
+    /// [WebSocket]: https://en.wikipedia.org/wiki/WebSocket
     pub member_id: Id,
 
-    /// [`Credentials`] of the [`Member`] to authorize his connection with.
-    pub credentials: Credentials,
+    /// [`Credentials`] of the [`Member`] to authenticate him with.
+    pub creds: Credentials,
 }
 
 impl fmt::Display for Sid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
-        if let Credentials::Plain(plain) = &self.credentials {
+        if let Credentials::Plain(plain) = &self.creds {
             write!(f, "?token={plain}")?;
         }
         Ok(())
     }
 }
 
-/// [`Sid`]s used by [`Member`]s to connect to a [Medea] server via
-/// [Client API].
+/// Collection of [`Sid`]s to be used by [`Member`]s to connect to a media
+/// server via [Client API].
 ///
-/// [Client Api]: https://tinyurl.com/266y74tf
-/// [Medea]: https://git.instrumentisto.com/streaming/medea
+/// [Client API]: https://tinyurl.com/266y74tf
 pub type Sids = HashMap<Id, Sid>;
 
-/// Public `URL` of HTTP server. Address for exposed [Client API].
-/// It's assumed that HTTP server can be reached via this URL externally.
+/// Public [URL] of HTTP server exposing [Client API]. It's assumed that HTTP
+/// server can be reached via this [URL] externally.
 ///
-/// This address is returned from [Control API] in `sids` field and [Jason]
-/// uses this address to start its session.
+/// This address is returned from [`ControlApi`] in a [`Sid`] and a client side
+/// should use this address to start its session.
 ///
-/// [Client Api]: https://tinyurl.com/266y74tf
-/// [Control API]: https://tinyurl.com/yxsqplq7
-/// [Jason]: https://github.com/instrumentisto/medea-jason
+/// [`ControlApi`]: crate::ControlApi
+/// [Client API]: https://tinyurl.com/266y74tf
+/// [URL]: https://en.wikipedia.org/wiki/URL
 #[derive(Clone, Debug, Display, From)]
 #[from(types(String))]
 pub struct PublicUrl(Box<str>);
@@ -138,8 +150,8 @@ pub enum Credentials {
     /// [Argon2] hash of credentials.
     ///
     /// [`Sid`] won't contain a `token` query parameter if
-    /// [`Credentials::Hash`] are used, so it should be appended manually
-    /// on a client side.
+    /// [`Credentials::Hash`] is used, so it should be appended manually on
+    /// a client side.
     ///
     /// [Argon2]: https://en.wikipedia.org/wiki/Argon2
     Hash(Box<str>),
