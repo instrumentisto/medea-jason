@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -12,17 +10,13 @@ StepDefinitionGeneric then_member_has_remote_track =
       r'(Alice|Bob|Carol) has (audio|video|audio and video) remote track(s) from (Alice|Bob|Carol)'),
   (id, kind, partner_id, context) async {
     var member = context.world.members[id]!;
-    var tracks = member.connection_store.remote_tracks[partner_id]!.values
-        .where((element) => element.isNotEmpty)
-        .map((e) => e.last)
-        .toList();
-
-    var parsedKind = parse_media_kind(kind);
-    expect(
-        tracks
-            .where((element) => element.kind() == parsedKind.item1)
-            .isNotEmpty,
-        isTrue);
+    await member.wait_for_connect(partner_id);
+    if (kind.contains('audio')) {
+      await member.wait_remote_track_from(partner_id, null, MediaKind.Audio);
+    }
+    if (kind.contains('video')) {
+      await member.wait_remote_track_from(partner_id, null, MediaKind.Video);
+    }
   },
 );
 
@@ -113,45 +107,15 @@ StepDefinitionGeneric then_remote_media_track =
       r"(Alice|Bob|Carol)'s (audio|device video|display video|video) remote track from (Alice|Bob|Carol) is (enabled|disabled)"),
   (id, kind, partner_id, state, context) async {
     var member = context.world.members[id]!;
-    // todo
-    await Future.delayed(Duration(milliseconds: 300));
-    var tracks = member.connection_store.remote_tracks[partner_id]!.values
-        .where((element) => element.isNotEmpty)
-        .map((e) => e.last)
-        .toList();
-
     var parsedKind = parse_media_kind(kind);
 
-    var track = tracks.firstWhere((element) =>
-        element.kind() == parsedKind.item1 &&
-        element.mediaSourceKind() == parsedKind.item2);
+    var track = await member.wait_remote_track_from(
+        partner_id, parsedKind.item2, parsedKind.item1);
 
     if (state == 'enabled') {
-      if (track.mediaDirection() != TrackMediaDirection.SendRecv) {
-        var en_future = Completer();
-        member.connection_store.MediaDirectionChangedCB[track.getTrack().id()] =
-            (d) {
-          if (d == TrackMediaDirection.SendRecv) {
-            en_future.complete();
-            member.connection_store.MediaDirectionChangedCB
-                .remove(track.getTrack().id());
-          }
-        };
-        await en_future.future;
-      }
+      await member.wait_enabled_track(track);
     } else {
-      if (track.mediaDirection() == TrackMediaDirection.SendRecv) {
-        var dis_future = Completer();
-        member.connection_store.MediaDirectionChangedCB[track.getTrack().id()] =
-            (d) {
-          if (d != TrackMediaDirection.SendRecv) {
-            dis_future.complete();
-            member.connection_store.MediaDirectionChangedCB
-                .remove(track.getTrack().id());
-          }
-        };
-        await dis_future.future;
-      }
+      await member.wait_disabled_track(track);
     }
   },
 );
@@ -164,14 +128,9 @@ StepDefinitionGeneric then_remote_track_stops =
     var member = context.world.members[id]!;
 
     var parsedKind = parse_media_kind(kind);
-    var tracks = member.connection_store.remote_tracks[remote_id]!.values
-        .where((element) => element.isNotEmpty)
-        .map((e) => e.last)
-        .toList();
-    var track = tracks.firstWhere((element) =>
-        element.kind() == parsedKind.item1 &&
-        element.mediaSourceKind() == parsedKind.item2);
-    expect(track.mediaDirection() == TrackMediaDirection.SendOnly, isFalse);
+    var track = await member.wait_remote_track_from(
+        remote_id, parsedKind.item2, parsedKind.item1);
+    await member.wait_disabled_track(track);
   },
 );
 
@@ -182,32 +141,11 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
   (callback_kind, int times, id, kind, remote_id, context) async {
     var member = context.world.members[id]!;
 
-    // todo
-    await Future.delayed(Duration(milliseconds: 300));
     var parsedKind = parse_media_kind(kind);
-    var tracks = member.connection_store.remote_tracks[remote_id]!.values
-        .where((element) => element.isNotEmpty)
-        .map((e) => e.last)
-        .toList();
-    var track = tracks.firstWhere((element) =>
-        element.kind() == parsedKind.item1 &&
-        element.mediaSourceKind() == parsedKind.item2);
+    var track = await member.wait_remote_track_from(
+        remote_id, parsedKind.item2, parsedKind.item1);
 
-    if (member.connection_store
-            .callback_counter[track.getTrack().id()]![callback_kind] !=
-        times) {
-      var fires_future = Completer();
-      member.connection_store
-          .callback_counterCB[track.getTrack().id()]![callback_kind] = (f) {
-        if (f == times) {
-          fires_future.complete();
-          member.connection_store
-                  .callback_counterCB[track.getTrack().id()]![callback_kind] =
-              () {};
-        }
-      };
-      await fires_future.future;
-    }
+    await member.wait_for_track_cb_fire_count(callback_kind, track, times);
   },
 );
 

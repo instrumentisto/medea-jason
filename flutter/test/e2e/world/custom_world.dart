@@ -1,30 +1,30 @@
-import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:tuple/tuple.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import '../api/callback.dart';
 import '../api/endpoint.dart';
 import '../api/member.dart';
 import '../api/room.dart';
+import '../conf.dart';
 import '../control.dart';
 import 'member.dart';
 import 'package:uuid/uuid.dart';
 
-
 class CustomWorld extends FlutterWidgetTesterWorld {
   late String room_id;
-  late MyClient control_client;
+  late Client control_client;
   var members = HashMap<String, Member>();
   var jasons = HashMap<String, Jason>();
 
   CustomWorld() {
     var uuid = Uuid();
     room_id = uuid.v4();
-    control_client = MyClient('http://127.0.0.1:8000'); // todo ENV
+    control_client = Client(CONTROL_API_ADDR);
   }
 
   Future<void> create_member(MemberBuilder builder) async {
@@ -61,7 +61,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         if (value.is_send) {
           var id = value.id;
           var endpoint_id = 'play-$id';
-          var play = WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish');
+          var play =
+              WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish');
           pipeline.addAll({endpoint_id: Endpoint(play)});
         }
       });
@@ -85,7 +86,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         var endpoint_id = 'play-$builder_id';
         var m_id = e.value.id;
         var id = '$room_id/$m_id/$endpoint_id';
-        var elem = WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$builder_id/publish');
+        var elem = WebRtcPlayEndpoint(
+            endpoint_id, 'local://$room_id/$builder_id/publish');
         return Tuple2(id, elem);
       }).toList();
 
@@ -100,14 +102,12 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     var room = jason.initRoom();
     await room.disableVideo(MediaSourceKind.Display);
 
-
     var member = builder.build(room, send_state, recv_state);
 
     jasons.addAll({member.id: jason});
     members.addAll({member.id: member});
   }
 
-  // todo error handle
   Future<void> join_room(String member_id) async {
     await members[member_id]!.join_room(room_id);
   }
@@ -120,16 +120,16 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   }
 
   Future<void> wait_for_on_leave(String member_id, String reason) async {
-    while(true) {
+    while (true) {
       var callbacks = await get_callbacks(member_id);
-      var events = callbacks.where((element) => element.fid.contains(member_id) && element.event.data is OnLeave).map((e) => e.event.data as OnLeave);
-      if(events.isNotEmpty) {
+      var events = callbacks
+          .where((element) =>
+              element.fid.contains(member_id) && element.event.data is OnLeave)
+          .map((e) => e.event.data as OnLeave);
+      if (events.isNotEmpty) {
         var ev = events.first;
-        if(ev.reason.name == reason) {
-          break;
-        } else {
-          throw 'not eq';
-        }
+        expect(ev.reason.name, reason);
+        break;
       }
       await Future.delayed(Duration(milliseconds: 100));
     }
@@ -142,6 +142,9 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   Future<void> delete_publish_endpoint(String member_id) async {
     var resp = await control_client.delete('$room_id/$member_id/publish');
+    if (resp.statusCode != 200) {
+      throw resp.body;
+    }
   }
 
   Future<void> delete_play_endpoint(
@@ -150,18 +153,23 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
     var resp =
         await control_client.delete('$room_id/$member_id/$play_endpoint_id');
-    
-    // todo error check
+    if (resp.statusCode != 200) {
+      throw resp.body;
+    }
   }
 
   Future<void> delete_member_element(String member_id) async {
     var resp = await control_client.delete('$room_id/$member_id');
-    // todo error check
+    if (resp.statusCode != 200) {
+      throw resp.body;
+    }
   }
 
   Future<void> delete_room_element() async {
     var resp = await control_client.delete(room_id);
-    // todo error check
+    if (resp.statusCode != 200) {
+      throw resp.body;
+    }
   }
 
   Future<Room> get_spec() async {
@@ -173,11 +181,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     return room;
   }
 
-// todo
   Future<List<CallbackItem>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
     return (json.decode(cbs.body) as List)
-        .map((data) => CallbackItem.fromJson(data)).where((element) => element.fid.contains(room_id))
+        .map((data) => CallbackItem.fromJson(data))
+        .where((element) => element.fid.contains(room_id))
         .toList();
   }
 
@@ -208,40 +216,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
-
-
-
-
-
-    //     if let Some(play_endpoint) =
-    //         pair.right.play_endpoint_for(&self.room_id, &pair.left)
-    //     {
-    //         let right_member = self.members.get_mut(&pair.right.id).unwrap();
-
-    //         right_member.update_recv_media_state(
-    //             Some(MediaKind::Video),
-    //             None,
-    //             true,
-    //         );
-    //         right_member.update_recv_media_state(
-    //             Some(MediaKind::Audio),
-    //             None,
-    //             true,
-    //         );
-
-    //         self.control_client
-    //             .create(
-    //                 &control_api_path!(
-    //                     self.room_id,
-    //                     pair.right.id,
-    //                     play_endpoint.id
-    //                 ),
-    //                 play_endpoint.into(),
-    //             )
-    //             .await?;
-    //     }
-  /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
-  /// provided [`MembersPair`] using an `Apply` method of Control API.
   Future<void> interconnect_members(MembersPair pair) async {
     if (pair.left.publish_endpoint() != null) {
       var publish_endpoint = pair.left.publish_endpoint()!;
@@ -254,8 +228,16 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           PublishPolicy.Disabled) {
         left_member.update_send_media_state(MediaKind.Video, null, true);
       }
-      await control_client.create(
-          '$room_id/' + pair.left.id + '/publish', publish_endpoint);
+      try {
+        await control_client.create(
+            '$room_id/' + pair.left.id + '/publish', publish_endpoint);
+      } catch (e) {
+        if (!e
+            .toString()
+            .contains('Endpoint with provided FID already exists')) {
+          rethrow;
+        }
+      }
     }
 
     if (pair.right.publish_endpoint() != null) {
@@ -269,10 +251,18 @@ class CustomWorld extends FlutterWidgetTesterWorld {
           PublishPolicy.Disabled) {
         right_member.update_send_media_state(MediaKind.Video, null, true);
       }
-      await control_client.create(
-          '$room_id/' + pair.right.id + '/publish', publish_endpoint);
-    }
 
+      try {
+        await control_client.create(
+            '$room_id/' + pair.right.id + '/publish', publish_endpoint);
+      } catch (e) {
+        if (!e
+            .toString()
+            .contains('Endpoint with provided FID already exists')) {
+          rethrow;
+        }
+      }
+    }
 
     if (pair.left.play_endpoint_for(room_id, pair.right) != null) {
       var publish_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
@@ -284,7 +274,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       await control_client.create(
           '$room_id/' + pair.left.id + '/' + publish_endpoint.id,
           publish_endpoint);
-
     }
 
     if (pair.right.play_endpoint_for(room_id, pair.left) != null) {
@@ -302,13 +291,13 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     {
       var left_member = members[pair.left.id]!;
       left_member.is_send = pair.left.is_send();
-      left_member.is_recv = pair.right.recv; 
+      left_member.is_recv = pair.right.recv;
     }
 
     {
       var right_member = members[pair.right.id]!;
       right_member.is_send = pair.right.is_send();
-      right_member.is_recv = pair.right.recv; 
+      right_member.is_recv = pair.right.recv;
     }
   }
 
@@ -316,7 +305,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     var spec = await get_spec();
     if (spec.pipeline.containsKey(pair.left.id)) {
       var member = spec.pipeline[pair.left.id]!;
-      member.pipeline.addAll({'publish': Endpoint(pair.left.publish_endpoint()!)});
+      member.pipeline
+          .addAll({'publish': Endpoint(pair.left.publish_endpoint()!)});
 
       var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
       member.pipeline.addAll({play_endpoint.id: Endpoint(play_endpoint)});
@@ -325,7 +315,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (spec.pipeline.containsKey(pair.right.id)) {
       var member = spec.pipeline[pair.right.id]!;
 
-      member.pipeline.addAll({'publish': Endpoint(pair.right.publish_endpoint()!)});
+      member.pipeline
+          .addAll({'publish': Endpoint(pair.right.publish_endpoint()!)});
 
       var play_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
       member.pipeline.addAll({play_endpoint.id: Endpoint(play_endpoint)});
@@ -350,32 +341,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   }
 }
 
-/// [Session] with some additional info about a [User] it represents.
-class CustomUser {
-  CustomUser(this.session, this.userId, this.userNum);
-
-  /// [Session] of this [CustomUser].
-  final String session;
-
-  /// [UserId] of this [CustomUser].
-  final String userId;
-
-  /// [UserNum] of this [CustomUser].
-  final String userNum;
-
-  /// ID of a [Chat]-dialog with the authenticated [MyUser].
-  String? dialog;
-}
-
 class MembersPair {
   PairedMember left;
   PairedMember right;
-
   MembersPair(this.left, this.right);
 }
 
 class PairedMember {
-  late String id;
+  String id;
   AudioSettings? send_audio;
   VideoSettings? send_video;
   bool recv = false;
@@ -387,7 +360,7 @@ class PairedMember {
   }
 
   WebRtcPublishEndpoint? publish_endpoint() {
-    WebRtcPublishEndpoint? res = null;
+    WebRtcPublishEndpoint? res;
     if (is_send()) {
       res = WebRtcPublishEndpoint('publish', P2pMode.Always);
       if (send_audio == null) {
@@ -408,7 +381,8 @@ class PairedMember {
   WebRtcPlayEndpoint? play_endpoint_for(
       String room_id, PairedMember publisher) {
     if (recv) {
-      var res = WebRtcPlayEndpoint('play-' + publisher.id, 'local://$room_id/' + publisher.id + '/publish');
+      var res = WebRtcPlayEndpoint('play-' + publisher.id,
+          'local://$room_id/' + publisher.id + '/publish');
       return res;
     }
     return null;

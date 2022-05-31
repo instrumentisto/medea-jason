@@ -13,9 +13,8 @@ import 'world/custom_world.dart';
 
 part 'suite.g.dart';
 
-var gg = FlutterTestConfiguration()
+var TestConfigs = FlutterTestConfiguration()
   ..stepDefinitions = [
-
     // control_api
     then_control_api_sends_on_leave,
     when_control_api_removes_member,
@@ -30,8 +29,7 @@ var gg = FlutterTestConfiguration()
     when_control_api_interconnects_members,
     then_control_api_doesnt_sends_on_leave,
 
-    
-    //connection 
+    //connection
     then_connection_closes,
     then_member_receives_connection,
     when_connection_changes_remote_media_state,
@@ -53,8 +51,6 @@ var gg = FlutterTestConfiguration()
     then_remote_track_stops,
     then_callback_fires_on_remote_track,
     then_has_local_track,
-
-
 
     //media_state
     when_enables_or_mutes,
@@ -96,12 +92,11 @@ var gg = FlutterTestConfiguration()
       });
 
 /// Entry point of E2E testing.
+// @GherkinTestSuite(featurePaths: [FEATURES_PATH]) //todo
 @GherkinTestSuite(featurePaths: ['./test/e2e/features/*.feature'])
 void main() {
   executeTestSuite(
-    gg,
-    (World world) async {
-      init_VAR();
-    },
+    TestConfigs,
+    (World world) async {},
   );
 }

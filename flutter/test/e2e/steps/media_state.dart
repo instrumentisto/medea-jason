@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_jason/src/interface/track_kinds.dart';
+import 'package:medea_jason/medea_jason.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
@@ -13,8 +11,6 @@ StepDefinitionGeneric when_enables_or_mutes =
   (id, action, audio_or_video, awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
-
-    await Future.delayed(Duration(seconds: 1));
 
     var awaitable = awaits.contains('awaits');
     var error = awaits.contains('errors');
@@ -45,7 +41,6 @@ StepDefinitionGeneric when_enables_or_mutes =
             if (awaitable) {
               await future;
             }
-            
           }
           break;
 
@@ -100,27 +95,13 @@ StepDefinitionGeneric then_remote_media_direction_is =
     var parsedKind = parse_media_kind(kind);
 
     await member.wait_for_connect(remote_id);
-    var tracks = member.connection_store.remote_tracks[remote_id]!.values
-        .where((element) => element.isNotEmpty)
-        .map((e) => e.last)
-        .toList();
+    var track = await member.wait_remote_track_from(
+        remote_id, parsedKind.item2, parsedKind.item1);
 
-    var track = tracks.firstWhere((element) =>
-        element.mediaSourceKind() == parsedKind.item2 &&
-        element.kind() == parsedKind.item1);
+    var dir =
+        TrackMediaDirection.values.firstWhere((e) => e.name == direction);
 
-    if (track.mediaDirection().name != direction) {
-      var direction_future = Completer();
-      member.connection_store.MediaDirectionChangedCB[track.getTrack().id()] = (d) {
-        if (direction == d) {
-          direction_future.complete();
-          member.connection_store.MediaDirectionChangedCB.remove(track.getTrack().id());
-        }
-      };
-
-      await direction_future.future;
-    }
-
+    await member.wait_media_direction_track(dir, track);
   },
 );
 
@@ -132,11 +113,8 @@ StepDefinitionGeneric then_local_track_mute_state =
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
 
-    // todo
-    await Future.delayed(Duration(milliseconds: 300));
-    var track = member.connection_store.local_tracks.firstWhere((element) =>
-        element.mediaSourceKind() == MediaSourceKind.Device &&
-        element.kind() == parsedKind.item1);
+    var track =
+        await member.wait_local_track(parsedKind.item2, parsedKind.item1);
     var muted = !not_muted.contains('not');
     expect(!track.getTrack().isEnabled(), muted);
   },
@@ -149,9 +127,9 @@ StepDefinitionGeneric then_track_is_stopped =
   (id, kind, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
-    var track = member.connection_store.local_tracks.firstWhere((element) =>
-        element.kind() == parsedKind.item1 &&
-        element.mediaSourceKind() == parsedKind.item2);
+
+    var track =
+        await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
     track.free();
     // todo
