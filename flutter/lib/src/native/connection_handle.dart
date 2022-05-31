@@ -7,7 +7,9 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/result.dart';
 import 'jason.dart';
+import 'ffi/foreign_value.dart';
 import 'remote_media_track.dart';
+import '../interface/track_kinds.dart';
 
 typedef _getRemoteMemberId_C = Result Function(Pointer);
 typedef _getRemoteMemberId_Dart = Result Function(Pointer);
@@ -32,11 +34,11 @@ typedef _disableRemoteAudio_Dart = Object Function(Pointer);
 typedef _enableRemoteAudio_C = Handle Function(Pointer);
 typedef _enableRemoteAudio_Dart = Object Function(Pointer);
 
-typedef _disableRemoteVideo_C = Handle Function(Pointer);
-typedef _disableRemoteVideo_Dart = Object Function(Pointer);
+typedef _disableRemoteVideo_C = Handle Function(Pointer, ForeignValue);
+typedef _disableRemoteVideo_Dart = Object Function(Pointer, ForeignValue);
 
-typedef _enableRemoteVideo_C = Handle Function(Pointer);
-typedef _enableRemoteVideo_Dart = Object Function(Pointer);
+typedef _enableRemoteVideo_C = Handle Function(Pointer, ForeignValue);
+typedef _enableRemoteVideo_Dart = Object Function(Pointer, ForeignValue);
 
 final _getRemoteMemberId =
     dl.lookupFunction<_getRemoteMemberId_C, _getRemoteMemberId_Dart>(
@@ -124,12 +126,24 @@ class NativeConnectionHandle extends ConnectionHandle {
   }
 
   @override
-  Future<void> enableRemoteVideo() async {
-    await (_enableRemoteVideo(ptr.getInnerPtr()) as Future);
+  Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
+    var kind_arg =
+        kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
+    try {
+      await (_enableRemoteVideo(ptr.getInnerPtr(), kind_arg.ref) as Future);
+    } finally {
+      kind_arg.free();
+    }
   }
 
   @override
-  Future<void> disableRemoteVideo() async {
-    await (_disableRemoteVideo(ptr.getInnerPtr()) as Future);
+  Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
+    var kind_arg =
+        kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
+    try {
+      await (_disableRemoteVideo(ptr.getInnerPtr(), kind_arg.ref) as Future);
+    } finally {
+      kind_arg.free();
+    }
   }
 }

@@ -279,14 +279,22 @@ impl InnerMediaConnections {
     }
 
     /// Returns [`Iterator`] over [`receiver::Component`]s with provided
-    /// [`MediaKind`].
-    fn iter_receivers_with_kind(
+    /// [`MediaKind`] and [`MediaSourceKind`].
+    fn iter_receivers_with_kind_and_source_kind(
         &self,
         kind: MediaKind,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Iterator<Item = &receiver::Component> {
         self.receivers
             .values()
             .filter(move |s| s.state().kind() == kind)
+            .filter(move |s| {
+                if let Some(skind) = source_kind {
+                    s.state().source_kind() == skind
+                } else {
+                    true
+                }
+            })
     }
 
     /// Returns all [`TransceiverSide`]s by provided [`TrackDirection`],
@@ -303,7 +311,7 @@ impl InnerMediaConnections {
                 .map(|tx| tx.state() as Rc<dyn TransceiverSide>)
                 .collect(),
             TrackDirection::Recv => self
-                .iter_receivers_with_kind(kind)
+                .iter_receivers_with_kind_and_source_kind(kind, source_kind)
                 .map(|rx| rx.state() as Rc<dyn TransceiverSide>)
                 .collect(),
         }
@@ -718,7 +726,7 @@ impl MediaConnections {
         !self
             .0
             .borrow()
-            .iter_receivers_with_kind(MediaKind::Video)
+            .iter_receivers_with_kind_and_source_kind(MediaKind::Video, None)
             .any(|s| !s.state().enabled_individual())
     }
 
@@ -729,7 +737,7 @@ impl MediaConnections {
         !self
             .0
             .borrow()
-            .iter_receivers_with_kind(MediaKind::Audio)
+            .iter_receivers_with_kind_and_source_kind(MediaKind::Audio, None)
             .any(|s| !s.state().enabled_individual())
     }
 

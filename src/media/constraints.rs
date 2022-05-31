@@ -57,15 +57,23 @@ pub struct RecvConstraints {
     /// Is audio receiving enabled.
     is_audio_enabled: ObservableCell<bool>,
 
-    /// Is video receiving enabled.
-    is_video_enabled: ObservableCell<bool>,
+    /// Is device video receiving enabled.
+    is_video_device_enabled: ObservableCell<bool>,
+
+    /// Is display video receiving enabled.
+    is_video_display_enabled: ObservableCell<bool>,
 }
 
 impl Clone for RecvConstraints {
     fn clone(&self) -> Self {
         Self {
             is_audio_enabled: ObservableCell::new(self.is_audio_enabled.get()),
-            is_video_enabled: ObservableCell::new(self.is_video_enabled.get()),
+            is_video_device_enabled: ObservableCell::new(
+                self.is_video_device_enabled.get(),
+            ),
+            is_video_display_enabled: ObservableCell::new(
+                self.is_video_display_enabled.get(),
+            ),
         }
     }
 }
@@ -74,21 +82,38 @@ impl Default for RecvConstraints {
     fn default() -> Self {
         Self {
             is_audio_enabled: ObservableCell::new(true),
-            is_video_enabled: ObservableCell::new(true),
+            is_video_device_enabled: ObservableCell::new(true),
+            is_video_display_enabled: ObservableCell::new(true),
         }
     }
 }
 
 impl RecvConstraints {
     /// Enables or disables audio or video receiving.
-    pub fn set_enabled(&self, enabled: bool, kind: MediaKind) {
+    pub fn set_enabled(
+        &self,
+        enabled: bool,
+        kind: MediaKind,
+        source_kind: Option<MediaSourceKind>,
+    ) {
         match kind {
             MediaKind::Audio => {
                 self.is_audio_enabled.set(enabled);
             }
-            MediaKind::Video => {
-                self.is_video_enabled.set(enabled);
-            }
+            MediaKind::Video => match source_kind {
+                Some(skind) => match skind {
+                    MediaSourceKind::Device => {
+                        self.is_video_device_enabled.set(enabled)
+                    }
+                    MediaSourceKind::Display => {
+                        self.is_video_display_enabled.set(enabled)
+                    }
+                },
+                None => {
+                    self.is_video_device_enabled.set(enabled);
+                    self.is_video_display_enabled.set(enabled);
+                }
+            },
         }
     }
 
@@ -97,9 +122,14 @@ impl RecvConstraints {
         self.is_audio_enabled.get()
     }
 
-    /// Returns is video receiving enabled.
-    pub fn is_video_enabled(&self) -> bool {
-        self.is_video_enabled.get()
+    /// Returns is device video receiving enabled.
+    pub fn is_video_device_enabled(&self) -> bool {
+        self.is_video_device_enabled.get()
+    }
+
+    /// Returns is display video receiving enabled.
+    pub fn is_video_display_enabled(&self) -> bool {
+        self.is_video_display_enabled.get()
     }
 
     /// Returns [`LocalBoxStream`] into which all `is_audio_enabled` updates
@@ -108,10 +138,20 @@ impl RecvConstraints {
         self.is_audio_enabled.subscribe()
     }
 
-    /// Returns [`LocalBoxStream`] into which all `is_video_enabled` updates
-    /// will be sent.
-    pub fn on_video_enabled_change(&self) -> LocalBoxStream<'static, bool> {
-        self.is_video_enabled.subscribe()
+    /// Returns [`LocalBoxStream`] into which all `is_video_device_enabled`
+    /// updates will be sent.
+    pub fn on_video_device_enabled_change(
+        &self,
+    ) -> LocalBoxStream<'static, bool> {
+        self.is_video_device_enabled.subscribe()
+    }
+
+    /// Returns [`LocalBoxStream`] into which all `is_video_display_enabled`
+    /// updates will be sent.
+    pub fn on_video_display_enabled_change(
+        &self,
+    ) -> LocalBoxStream<'static, bool> {
+        self.is_video_display_enabled.subscribe()
     }
 }
 
@@ -621,7 +661,7 @@ impl MediaStreamSettings {
         match kind {
             MediaType::Video(video) => self.is_track_enabled_and_constrained(
                 MediaKind::Video,
-                Some(video.source_kind),
+                Some(video.source_kind.into()),
             ),
             MediaType::Audio(_) => self.is_track_enabled_and_constrained(
                 MediaKind::Audio,

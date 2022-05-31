@@ -440,6 +440,8 @@ impl RoomHandle {
 
     /// Disables inbound video in this [`Room`].
     ///
+    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    ///
     /// # Errors
     ///
     /// With a [`StateError`] if the underlying pointer has been freed.
@@ -451,10 +453,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn disable_remote_video(&self) -> Promise {
+    pub fn disable_remote_video(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.disable_remote_video();
+        let fut = this.disable_remote_video(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -486,6 +491,8 @@ impl RoomHandle {
 
     /// Enables inbound video in this [`Room`].
     ///
+    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    ///
     /// # Errors
     ///
     /// With a [`StateError`] if the underlying pointer has been freed.
@@ -497,10 +504,13 @@ impl RoomHandle {
     /// [`Room`]: room::Room
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn enable_remote_video(&self) -> Promise {
+    pub fn enable_remote_video(
+        &self,
+        source_kind: Option<MediaSourceKind>,
+    ) -> Promise {
         let this = self.0.clone();
 
-        let fut = this.enable_remote_video();
+        let fut = this.enable_remote_video(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(Error::from)?;
             Ok(JsValue::UNDEFINED)

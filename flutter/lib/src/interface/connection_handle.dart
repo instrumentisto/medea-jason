@@ -1,5 +1,6 @@
 import '/src/util/rust_handles_storage.dart';
 import 'remote_media_track.dart';
+import 'track_kinds.dart';
 
 /// External handler to a `Connection` with a remote `Member`.
 abstract class ConnectionHandle implements PlatformHandle {
@@ -62,7 +63,7 @@ abstract class ConnectionHandle implements PlatformHandle {
   /// Throws a `MediaStateTransitionException` if
   /// [ConnectionHandle.disableRemoteVideo] was called while enabling or a
   /// media server didn't approve this state transition.
-  Future<void> enableRemoteVideo();
+  Future<void> enableRemoteVideo([MediaSourceKind? kind]);
 
   /// Disables inbound video in this `Connection`.
   ///
@@ -71,5 +72,5 @@ abstract class ConnectionHandle implements PlatformHandle {
   /// Throws a `MediaStateTransitionException` if
   /// [ConnectionHandle.enableRemoteVideo] was called while disabling or a
   /// media server didn't approve this state transition.
-  Future<void> disableRemoteVideo();
+  Future<void> disableRemoteVideo([MediaSourceKind? kind]);
 }

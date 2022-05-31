@@ -12,12 +12,14 @@ use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
     StreamExt as _,
 };
-use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
+use medea_client_api_proto::{
+    self as proto, ConnectionQualityScore, MemberId, PeerId,
+};
 use tracerr::Traced;
 
 use crate::{
     api,
-    media::{track::remote, MediaKind, RecvConstraints},
+    media::{track::remote, MediaKind, MediaSourceKind, RecvConstraints},
     peer::{
         media_exchange_state, receiver, MediaState, MediaStateControllable,
         ProhibitedStateError, TransceiverSide,
@@ -212,11 +214,21 @@ impl InnerConnection {
         &self,
         desired_state: MediaState,
         kind: MediaKind,
+        source_kind: Option<MediaSourceKind>,
     ) -> ChangeMediaStateResult {
         let receivers = self.receivers.borrow().clone();
         let mut change_tasks = Vec::new();
         for r in receivers {
-            if r.is_subscription_needed(desired_state) && r.kind() == kind {
+            let is_correct_source = if let Some(kind) = source_kind {
+                kind == r.source_kind().into()
+            } else {
+                true
+            };
+
+            if r.is_subscription_needed(desired_state)
+                && r.kind() == kind
+                && is_correct_source
+            {
                 r.media_state_transition_to(desired_state)
                     .map_err(tracerr::map_from_and_wrap!())?;
                 change_tasks.push(r.when_media_state_stable(desired_state));
@@ -233,6 +245,17 @@ impl InnerConnection {
             self.recv_constraints.set_enabled(
                 desired_state == media_exchange_state::Stable::Enabled,
                 kind,
+                match source_kind {
+                    Some(skind) => match skind {
+                        MediaSourceKind::Device => {
+                            Some(proto::MediaSourceKind::Device)
+                        }
+                        MediaSourceKind::Display => {
+                            Some(proto::MediaSourceKind::Display)
+                        }
+                    },
+                    None => None,
+                },
             );
         }
 
@@ -314,10 +337,12 @@ impl ConnectionHandle {
     /// or a media server didn't approve this state transition.
     pub fn enable_remote_video(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled.into(),
             MediaKind::Video,
+            source_kind,
         )
     }
 
@@ -333,10 +358,12 @@ impl ConnectionHandle {
     /// or a media server didn't approve this state transition.
     pub fn disable_remote_video(
         &self,
+        source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled.into(),
             MediaKind::Video,
+            source_kind,
         )
     }
 
@@ -356,6 +383,7 @@ impl ConnectionHandle {
         self.change_media_state(
             media_exchange_state::Stable::Enabled.into(),
             MediaKind::Audio,
+            None,
         )
     }
 
@@ -375,6 +403,7 @@ impl ConnectionHandle {
         self.change_media_state(
             media_exchange_state::Stable::Disabled.into(),
             MediaKind::Audio,
+            None,
         )
     }
 
@@ -387,6 +416,7 @@ impl ConnectionHandle {
         &self,
         desired_state: MediaState,
         kind: MediaKind,
+        source_kind: Option<MediaSourceKind>,
     ) -> LocalBoxFuture<'static, ChangeMediaStateResult> {
         let inner = self
             .0
@@ -397,9 +427,11 @@ impl ConnectionHandle {
             Err(e) => return Box::pin(future::err(e)),
         };
 
-        Box::pin(
-            async move { inner.change_media_state(desired_state, kind).await },
-        )
+        Box::pin(async move {
+            inner
+                .change_media_state(desired_state, kind, source_kind)
+                .await
+        })
     }
 }
 
@@ -424,13 +456,21 @@ impl Connection {
             _task_handles: vec![
                 Self::spawn_constraints_synchronizer(
                     Rc::clone(&recv_constraints),
-                    room_recv_constraints.on_video_enabled_change(),
+                    room_recv_constraints.on_video_device_enabled_change(),
                     MediaKind::Video,
+                    MediaSourceKind::Device,
+                ),
+                Self::spawn_constraints_synchronizer(
+                    Rc::clone(&recv_constraints),
+                    room_recv_constraints.on_video_display_enabled_change(),
+                    MediaKind::Video,
+                    MediaSourceKind::Display,
                 ),
                 Self::spawn_constraints_synchronizer(
                     Rc::clone(&recv_constraints),
                     room_recv_constraints.on_audio_enabled_change(),
                     MediaKind::Audio,
+                    MediaSourceKind::Device,
                 ),
             ],
             remote_id,
@@ -453,10 +493,15 @@ impl Connection {
         recv_constraints: Rc<RecvConstraints>,
         mut changes_stream: LocalBoxStream<'static, bool>,
         kind: MediaKind,
+        source_kind: MediaSourceKind,
     ) -> TaskHandle {
         let (fut, abort) = future::abortable(async move {
             while let Some(is_enabled) = changes_stream.next().await {
-                recv_constraints.set_enabled(is_enabled, kind);
+                recv_constraints.set_enabled(
+                    is_enabled,
+                    kind,
+                    Some(source_kind.into()),
+                );
             }
         });
         platform::spawn(fut.map(drop));
@@ -473,7 +518,10 @@ impl Connection {
     pub fn add_receiver(&self, receiver: Rc<receiver::State>) {
         let enabled_in_cons = match &receiver.kind() {
             MediaKind::Audio => self.0.recv_constraints.is_audio_enabled(),
-            MediaKind::Video => self.0.recv_constraints.is_video_enabled(),
+            MediaKind::Video => {
+                self.0.recv_constraints.is_video_device_enabled()
+                    || self.0.recv_constraints.is_video_display_enabled()
+            }
         };
         receiver
             .media_exchange_state_controller()
