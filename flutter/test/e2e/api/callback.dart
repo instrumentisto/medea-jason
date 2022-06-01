@@ -2,6 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'callback.g.dart';
 
+/// All callbacks which can happen.
+/// `OnJoin` callback of Control API or 
+/// `OnLeave` callback of Control API.
 @JsonSerializable()
 class CallbackEvent {
   Map<String, dynamic> toJson() => {};
@@ -15,10 +18,16 @@ class CallbackEvent {
   }
 }
 
+/// Control API callback.
 @JsonSerializable()
 class CallbackItem {
+  /// FID (Full ID) of element with which this event was occurred.
   String fid;
+
+  /// Time on which callback was occurred.
   String at;
+
+  /// Event which occurred.
   CallbackEvent event;
 
   CallbackItem(this.fid, this.at, this.event);
@@ -28,6 +37,7 @@ class CallbackItem {
   Map<String, dynamic> toJson() => _$CallbackItemToJson(this);
 }
 
+/// `OnJoin` callback for Control API.
 @JsonSerializable()
 class OnJoin implements CallbackEvent {
   OnJoin();
@@ -37,15 +47,25 @@ class OnJoin implements CallbackEvent {
   Map<String, dynamic> toJson() => _$OnJoinToJson(this);
 }
 
+/// Reason of why `Member` leaves.
 enum OnLeaveReason {
+  /// `Member` was normally disconnected.
   Disconnected,
+
+  /// Connection with `Member` was lost.
   LostConnection,
+
+  /// Server is shutting down.
   ServerShutdown,
+
+  /// `Member` was forcibly disconnected by server.
   Kicked,
 }
 
+/// `OnLeave` callback of Control API.
 @JsonSerializable()
 class OnLeave implements CallbackEvent {
+  /// Reason of why `Member` leaves.
   OnLeaveReason reason;
 
   OnLeave(this.reason);
