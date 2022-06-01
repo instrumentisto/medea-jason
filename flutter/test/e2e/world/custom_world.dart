@@ -15,18 +15,31 @@ import '../control.dart';
 import 'member.dart';
 import 'package:uuid/uuid.dart';
 
+/// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
+
+  /// ID of the `Room` created for this [FlutterWidgetTesterWorld].
   late String room_id;
+
+  /// Client of a Medea Control API.
   late Client control_client;
+
+  /// All [Member]s created in this [FlutterWidgetTesterWorld].
   var members = HashMap<String, Member>();
+
+  /// All [Jason]'s created in this [FlutterWidgetTesterWorld].
   var jasons = HashMap<String, Jason>();
 
+  /// Creates a new [CustomWorld].
   CustomWorld() {
     var uuid = Uuid();
     room_id = uuid.v4();
     control_client = Client(CONTROL_API_ADDR);
   }
 
+  /// Creates a new [Member] from the provided [MemberBuilder].
+  ///
+  /// `Room` for this [Member] will be created, but joining won't be done.
   Future<void> create_member(MemberBuilder builder) async {
     var pipeline = HashMap<String, Endpoint>();
     var send_state = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
@@ -80,9 +93,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       }).toList();
 
       recv_endpoints.forEach((element) async {
-        var gg = <String, dynamic>{};
-        gg.addAll(element.item2.toJson());
-        await control_client.create(element.item1, gg);
+        await control_client.create(element.item1, element);
       });
     }
 
@@ -96,10 +107,13 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     members.addAll({member.id: member});
   }
 
+  /// Joins a [Member] with the provided ID to the `Room` created for this
+  /// [FlutterWidgetTesterWorld].
   Future<void> join_room(String member_id) async {
     await members[member_id]!.join_room(room_id);
   }
 
+  /// Closes a [`Room`] of the provided [`Member`].
   void close_room(String member_id) {
     var jason = jasons[member_id]!;
     var member = members[member_id]!;
@@ -107,6 +121,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     jason.closeRoom(room);
   }
 
+  /// Waits for `OnLeave` Control API callback for the provided [Member] ID.
   Future<void> wait_for_on_leave(String member_id, String reason) async {
     while (true) {
       var callbacks = await get_callbacks(member_id);
@@ -123,11 +138,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Waits for the [Member] `Room` being closed.
   Future<RoomCloseReason> wait_for_on_close(String member_id) async {
     var member = members[member_id]!;
-    return member.close_reason.future;
+    return member.connection_store.close_reason.future;
   }
 
+  /// Deletes a Control API element of a [WebRtcPublishEndpoint] with the
+  /// provided ID.
   Future<void> delete_publish_endpoint(String member_id) async {
     var resp = await control_client.delete('$room_id/$member_id/publish');
     if (resp.statusCode != 200) {
@@ -135,6 +153,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Deletes a Control API element of a [WebRtcPlayEndpoint] with the
+  /// provided ID.
   Future<void> delete_play_endpoint(
       String member_id, String partner_member_id) async {
     var play_endpoint_id = 'play-$partner_member_id';
@@ -146,6 +166,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Deletes a Control API element of the [Member] with the provided ID.
   Future<void> delete_member_element(String member_id) async {
     var resp = await control_client.delete('$room_id/$member_id');
     if (resp.statusCode != 200) {
@@ -153,6 +174,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Deletes a Control API element of the `Room` with the provided ID.
   Future<void> delete_room_element() async {
     var resp = await control_client.delete(room_id);
     if (resp.statusCode != 200) {
@@ -160,6 +182,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Returns [Room] created for this [FlutterWidgetTesterWorld].
   Future<Room> get_spec() async {
     var resp = await control_client.get(room_id);
     var json_room = (json.decode(resp.body) as Map<String, dynamic>)['element'];
@@ -167,6 +190,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     return room;
   }
 
+  /// Returns all [CallbackItem]s sent by Control API for this [FlutterWidgetTesterWorld]'s
+  /// `Room`.
   Future<List<CallbackItem>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
     return (json.decode(cbs.body) as List).map((item) => CallbackItem.fromJson(item))
@@ -174,10 +199,14 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         .toList();
   }
 
+  /// Applies provided [Room] spec to the `Room` created for this
+  /// [FlutterWidgetTesterWorld].
   Future<void> apply(Room room) async {
     await control_client.apply(room_id, room);
   }
 
+  /// Waits until a [Member] with the provided ID will connect with his
+  /// responders.
   Future<void> wait_for_interconnection(String member_id) async {
     var interconnected_members = members.entries
         .where((element) =>
@@ -201,6 +230,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Creates [WebRtcPublishEndpoint]s and [WebRtcPlayEndpoint]s for the
+  /// provided [MembersPair].
   Future<void> interconnect_members(MembersPair pair) async {
     if (pair.left.publish_endpoint() != null) {
       var publish_endpoint = pair.left.publish_endpoint()!;
@@ -286,6 +317,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
   }
 
+  /// Creates [WebRtcPublishEndpoint]s and [WebRtcPlayEndpoint]s for the
+  /// provided [MembersPair] using an `Apply` method of Control API.
   Future<void> interconnect_members_via_apply(MembersPair pair) async {
     var spec = await get_spec();
     if (spec.pipeline.containsKey(pair.left.id)) {
@@ -310,6 +343,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     await apply(spec);
   }
 
+  /// Waits for `OnJoin` Control API callback for the provided [Member] ID.
   Future<void> wait_for_on_join(String member_id) async {
     while (true) {
       var callbacks = await get_callbacks(member_id);
@@ -324,24 +358,46 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   }
 }
 
+/// [Member]s pairing configuration.
+///
+/// Based on this configuration [FlutterWidgetTesterWorld] 
+/// can dynamically create [Endpoint]s for this [Member]s.
 class MembersPair {
+  /// First [`PairedMember`] in a pair.
   PairedMember left;
+
+  /// Second [`PairedMember`] in a pair.
   PairedMember right;
+
+  /// Creates a new [MembersPair].
   MembersPair(this.left, this.right);
 }
 
+/// [Endpoint]s configuration of a [Member].
 class PairedMember {
+  /// Unique ID of this [PairedMember].
   String id;
+
+  /// Audio settings to be sent by this [PairedMember].
   AudioSettings? send_audio;
+
+  /// Video settings to be sent by this [PairedMember].
   VideoSettings? send_video;
+
+  /// Indicator whether this is a receiving configuration, rather than
+  /// publishing.
   bool recv = false;
 
+  /// Creates a new [PairedMember].
   PairedMember(this.id, this.send_audio, this.send_video, this.recv);
 
+  /// Indicates whether this [PairedMember] should publish media.
   bool is_send() {
     return send_audio != null || send_video != null;
   }
 
+  /// Returns a [WebRtcPublishEndpoint] for this [PairedMember] if
+  /// publishing is enabled.
   WebRtcPublishEndpoint? publish_endpoint() {
     WebRtcPublishEndpoint? res;
     if (is_send()) {
@@ -361,6 +417,9 @@ class PairedMember {
     return res;
   }
 
+  /// Returns a [WebRtcPlayEndpoint] for this [PairedMember] which
+  /// will receive media from the provided [PairedMember] if receiving is
+  /// enabled.
   WebRtcPlayEndpoint? play_endpoint_for(
       String room_id, PairedMember publisher) {
     if (recv) {

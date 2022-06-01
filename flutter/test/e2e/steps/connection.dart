@@ -28,7 +28,7 @@ StepDefinitionGeneric then_member_doesnt_receive_connection =
   r"(Alice|Bob|Carol) doesn't receive connection with (Alice|Bob|Carol)",
   (id, responder_id, context) async {
     var member = context.world.members[id]!;
-    expect(member.connection_store.connects[responder_id], null);
+    expect(member.connection_store.connections[responder_id], null);
   },
 );
 
@@ -39,7 +39,7 @@ StepDefinitionGeneric when_connection_changes_remote_media_state =
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
 
-    var connect = member.connection_store.connects[partner_id]!;
+    var connect = member.connection_store.connections[partner_id]!;
     if (action == 'enables') {
       if (parsedKind.item1 == MediaKind.Audio) {
         await connect.enableRemoteAudio();

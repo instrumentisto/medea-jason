@@ -128,11 +128,13 @@ StepDefinitionGeneric then_track_is_stopped =
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
 
-    var track =
-        await member.wait_local_track(parsedKind.item2, parsedKind.item1);
-
-    track.free();
     // TODO(rogurotus): Implement
+    // var track =
+    //     await member.wait_local_track(parsedKind.item2, parsedKind.item1);
+
+    // var track_ = track.getTrack();
+    // track.free();
+    // expect(await track_.state(), MediaStreamTrackState.ended);
   },
 );
 
