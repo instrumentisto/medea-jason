@@ -94,9 +94,13 @@ pub enum TryFromProtobufError {
     ExpectedOtherElement(&'static str, String),
 
     /// Element is [`None`], but expected [`Some`].
+    #[display(fmt = "Element is None, expected Some.")]
+    EmptyElement,
+
+    /// Element is [`None`], but expected [`Some`].
     #[display(fmt = "Element is None, expected Some. Id [{}]", _0)]
     #[from(ignore)]
-    EmptyElement(#[error(not(source))] String),
+    EmptyElementId(#[error(not(source))] String),
 
     /// Error while [`CallbackUrl`] parsing.
     #[display(fmt = "Error while parsing gRPC callback URL: {}", _0)]
@@ -142,7 +146,8 @@ impl From<TryFromProtobufError> for tonic::Status {
         match &err {
             TryFromProtobufError::LocalSrcUriParseError(_)
             | TryFromProtobufError::ExpectedOtherElement(_, _)
-            | TryFromProtobufError::EmptyElement(_)
+            | TryFromProtobufError::EmptyElement
+            | TryFromProtobufError::EmptyElementId(_)
             | TryFromProtobufError::CallbackUrlParseErr(_)
             | TryFromProtobufError::NegativeDuration(_, _)
             | TryFromProtobufError::ParseFidError(_)

@@ -1,8 +1,8 @@
 //! [`Member`] definitions.
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
-use derive_more::{Display, From, Into};
+use derive_more::{Display, Error, From, Into};
 use url::Url;
 
 use super::{endpoint, room, Endpoint};
@@ -108,17 +108,64 @@ pub struct Sid {
     pub member_id: Id,
 
     /// [`Credentials`] of the [`Member`] to authenticate him with.
-    pub creds: Credentials,
+    pub creds: Option<PlainCredentials>,
+}
+
+impl FromStr for Sid {
+    type Err = ParseSidError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut url = Url::parse(s)
+            .map_err(|e| ParseSidError::UrlParseErr(s.into(), e))?;
+
+        let creds = url.query_pairs().find_map(|(k, v)| {
+            (k.as_ref() == "token").then(|| v.as_ref().into())
+        });
+
+        url.set_fragment(None);
+        url.set_query(None);
+
+        let missing_path = || ParseSidError::MissingPaths(s.into());
+        let mut segments = url.path_segments().ok_or_else(missing_path)?.rev();
+        let member_id = segments.next().ok_or_else(missing_path)?.into();
+        let room_id = segments.next().ok_or_else(missing_path)?.into();
+
+        // Removes last two segments.
+        if let Ok(mut path) = url.path_segments_mut() {
+            let _ = path.pop().pop();
+        }
+
+        Ok(Self {
+            public_url: url.into(),
+            room_id,
+            member_id,
+            creds,
+        })
+    }
 }
 
 impl fmt::Display for Sid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
-        if let Credentials::Plain(plain) = &self.creds {
+        if let Some(plain) = &self.creds {
             write!(f, "?token={plain}")?;
         }
         Ok(())
     }
+}
+
+/// Possible errors of parsing a [`LocalSrcUri`].
+#[derive(Debug, Display, Error)]
+pub enum ParseSidError {
+    /// Some paths are missing in the provided URI.
+    ///
+    /// `ws://localhost:8080/ws//qwerty` for example.
+    #[display(fmt = "Missing paths in URI: {}", _0)]
+    MissingPaths(#[error(not(source))] Box<str>),
+
+    /// Error of parsing the provided URI.
+    #[display(fmt = "Cannot parse provided URI `{}`: {}", _0, _1)]
+    UrlParseErr(Box<str>, #[error(source)] url::ParseError),
 }
 
 /// Collection of [`Sid`]s to be used by [`Member`]s to connect to a media
@@ -136,9 +183,10 @@ pub type Sids = HashMap<Id, Sid>;
 /// [`ControlApi`]: crate::ControlApi
 /// [Client API]: https://tinyurl.com/266y74tf
 /// [URL]: https://en.wikipedia.org/wiki/URL
-#[derive(Clone, Debug, Display, From)]
-#[from(types(String))]
-pub struct PublicUrl(Box<str>);
+#[derive(
+    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+)]
+pub struct PublicUrl(Url);
 
 /// Credentials of a [`Member`] media [`Element`] for its client side to
 /// authorize via [Client API] with.
@@ -180,5 +228,25 @@ impl Credentials {
 impl Default for Credentials {
     fn default() -> Self {
         Self::random()
+    }
+}
+
+/// Plain [`Credentials`], that may be returned in [`Sids`].
+#[derive(
+    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+)]
+#[from(types(String))]
+pub struct PlainCredentials(Box<str>);
+
+// TODO: Derive via `derive::From` once it's capable to.
+impl<'a> From<&'a str> for PlainCredentials {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
+impl From<PlainCredentials> for Credentials {
+    fn from(plain: PlainCredentials) -> Self {
+        Self::Plain(plain.0)
     }
 }

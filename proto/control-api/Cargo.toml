@@ -14,7 +14,9 @@ keywords = ["medea", "grpc", "control-api"]
 categories = ["api-bindings", "network-programming"]
 
 [features]
-grpc = ["dep:prost", "dep:prost-types", "dep:tonic", "dep:tokio", "dep:tonic-build", "time/formatting", "time/parsing"]
+client = []
+server = []
+grpc = ["dep:prost", "dep:prost-types", "dep:tonic", "dep:tonic-build", "time/formatting", "time/parsing"]
 
 [dependencies]
 async-trait = "0.1.34"
@@ -24,7 +26,6 @@ prost-types = { version = "0.10", optional = true }
 rand = "0.8"
 smart-default = "0.6"
 time = "0.3.9"
-tokio = { version = "1.18", features = ["sync"], optional = true }
 tonic = { version = "0.7", optional = true }
 url = "2.2"
 

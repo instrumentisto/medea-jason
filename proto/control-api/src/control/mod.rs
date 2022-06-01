@@ -22,7 +22,7 @@ pub use self::{endpoint::Endpoint, member::Member, room::Room};
 /// and destroying pipelines of media [`Element`]s on it.
 ///
 /// Both API client and API server should implement this trait.
-#[async_trait(?Send)]
+#[async_trait]
 pub trait Api {
     /// Error returned by this [`ControlApi`].
     ///
@@ -146,7 +146,7 @@ pub type Elements = HashMap<Fid, Element>;
 
 /// FID (Full ID) is a composition of media [`Element`] IDs referring to some
 /// [`Element`] on a whole media server uniquely.
-#[derive(Clone, Debug, Display)]
+#[derive(Clone, Debug, Display, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Fid {
     /// FID of a [`Room`].
     #[display(fmt = "{}", id)]
@@ -247,12 +247,16 @@ pub enum ParseFidError {
 /// healthiness.
 ///
 /// Each new [`Ping`] should increment its nonce, starting with `0`.
-#[derive(Clone, Copy, Debug)]
+#[derive(
+    Clone, Copy, Debug, Display, Eq, From, Hash, Ord, PartialEq, PartialOrd,
+)]
 pub struct Ping(pub u32);
 
 /// [`Pong`] message sent by a media server in response to a received [`Ping`]
 /// message.
 ///
 /// Contains nonce of the answered [`Ping`] message.
-#[derive(Clone, Copy, Debug)]
+#[derive(
+    Clone, Copy, Debug, Display, Eq, From, Hash, Ord, PartialEq, PartialOrd,
+)]
 pub struct Pong(pub u32);

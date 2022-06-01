@@ -21,7 +21,7 @@ impl TryFrom<proto::Request> for Request {
             event: value
                 .event
                 .map(Into::into)
-                .ok_or(TryFromProtobufError::EmptyElement(value.fid))?,
+                .ok_or(TryFromProtobufError::EmptyElementId(value.fid))?,
             at: DateTime::parse(&value.at, &Rfc3339)?,
         })
     }

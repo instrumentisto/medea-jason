@@ -15,7 +15,7 @@ use crate::{
         api as proto, conversions::TryFromProtobufError, CallbackUrlParseError,
     },
     member::{self, Credentials},
-    Element, Endpoint, Fid, Member, Room,
+    Element, Endpoint, Fid, Member, Ping, Pong, Room,
 };
 
 impl TryFrom<proto::CreateRequest> for Request {
@@ -24,7 +24,7 @@ impl TryFrom<proto::CreateRequest> for Request {
     fn try_from(value: proto::CreateRequest) -> Result<Self, Self::Error> {
         let parent_fid = value.parent_fid;
         let el = value.el.ok_or_else(|| {
-            TryFromProtobufError::EmptyElement(parent_fid.clone())
+            TryFromProtobufError::EmptyElementId(parent_fid.clone())
         })?;
 
         if parent_fid.is_empty() {
@@ -35,7 +35,7 @@ impl TryFrom<proto::CreateRequest> for Request {
             Fid::Room { id } => {
                 Member::try_from(el).map(|member| Self::Member {
                     room_id: id,
-                    member,
+                    member: Box::new(member),
                 })
             }
             Fid::Member { id, room_id } => {
@@ -46,7 +46,7 @@ impl TryFrom<proto::CreateRequest> for Request {
                 })
             }
             Fid::Endpoint { .. } => Err(TryFromProtobufError::ParseFidError(
-                ParseFidError::TooManyPaths(parent_fid),
+                ParseFidError::TooManyPaths(parent_fid.into()),
             )),
         }
     }
@@ -58,16 +58,86 @@ impl TryFrom<proto::ApplyRequest> for Request {
     fn try_from(value: proto::ApplyRequest) -> Result<Self, Self::Error> {
         let parent_fid = value.parent_fid;
         let el = value.el.ok_or_else(|| {
-            TryFromProtobufError::EmptyElement(parent_fid.clone())
+            TryFromProtobufError::EmptyElementId(parent_fid.clone())
         })?;
 
         match parent_fid.parse::<Fid>()? {
             Fid::Room { .. } => Room::try_from(el).map(Self::Room),
-            Fid::Member { room_id, .. } => Member::try_from(el)
-                .map(|member| Self::Member { room_id, member }),
+            Fid::Member { room_id, .. } => {
+                Member::try_from(el).map(|member| Self::Member {
+                    room_id,
+                    member: Box::new(member),
+                })
+            }
             Fid::Endpoint { .. } => {
                 Err(TryFromProtobufError::UnimplementedCall)
             }
+        }
+    }
+}
+
+impl From<Request> for proto::CreateRequest {
+    fn from(req: Request) -> Self {
+        let (parent_fid, el) = match req {
+            Request::Room(room) => (String::new(), room.into()),
+            Request::Member { room_id, member } => (
+                Fid::Room { id: room_id }.to_string(),
+                member.as_ref().clone().into(),
+            ),
+            Request::Endpoint {
+                room_id,
+                member_id,
+                endpoint,
+            } => (
+                Fid::Member {
+                    id: member_id,
+                    room_id,
+                }
+                .to_string(),
+                endpoint.into(),
+            ),
+        };
+
+        Self {
+            parent_fid,
+            el: Some(el),
+        }
+    }
+}
+
+impl From<Request> for proto::ApplyRequest {
+    fn from(req: Request) -> Self {
+        let (parent_fid, el) = match req {
+            Request::Room(room) => (
+                Fid::Room {
+                    id: room.id.clone(),
+                },
+                room.into(),
+            ),
+            Request::Member { room_id, member } => (
+                Fid::Member {
+                    id: member.id.clone(),
+                    room_id,
+                },
+                member.as_ref().clone().into(),
+            ),
+            Request::Endpoint {
+                room_id,
+                member_id,
+                endpoint,
+            } => (
+                Fid::Endpoint {
+                    id: endpoint.id(),
+                    room_id,
+                    member_id,
+                },
+                endpoint.into(),
+            ),
+        };
+
+        Self {
+            parent_fid: parent_fid.to_string(),
+            el: Some(el),
         }
     }
 }
@@ -78,7 +148,9 @@ impl From<Element> for proto::Element {
 
         Self {
             el: Some(match el {
-                Element::Member(member) => proto_el::Member(member.into()),
+                Element::Member(member) => {
+                    proto_el::Member(member.as_ref().clone().into())
+                }
                 Element::Room(room) => proto_el::Room(room.into()),
                 Element::Endpoint(Endpoint::WebRtcPlay(play)) => {
                     proto_el::WebrtcPlay(play.into())
@@ -87,6 +159,47 @@ impl From<Element> for proto::Element {
                     proto_el::WebrtcPub(publish.into())
                 }
             }),
+        }
+    }
+}
+
+impl TryFrom<proto::Element> for Element {
+    type Error = TryFromProtobufError;
+
+    fn try_from(el: proto::Element) -> Result<Self, Self::Error> {
+        use proto::element::El as proto_el;
+
+        Ok(match el.el.ok_or(TryFromProtobufError::EmptyElement)? {
+            proto_el::Member(member) => {
+                Self::Member(Box::new(member.try_into()?))
+            }
+            proto_el::Room(room) => Self::Room(room.try_into()?),
+            proto_el::WebrtcPlay(play) => {
+                Self::Endpoint(Endpoint::WebRtcPlay(play.try_into()?))
+            }
+            proto_el::WebrtcPub(publish) => {
+                Self::Endpoint(Endpoint::WebRtcPublish(publish.into()))
+            }
+        })
+    }
+}
+
+impl From<Element> for proto::create_request::El {
+    fn from(el: Element) -> Self {
+        match el {
+            Element::Room(room) => room.into(),
+            Element::Member(member) => member.as_ref().clone().into(),
+            Element::Endpoint(endpoint) => endpoint.into(),
+        }
+    }
+}
+
+impl From<Element> for proto::apply_request::El {
+    fn from(el: Element) -> Self {
+        match el {
+            Element::Room(room) => room.into(),
+            Element::Member(member) => member.as_ref().clone().into(),
+            Element::Endpoint(endpoint) => endpoint.into(),
         }
     }
 }
@@ -140,7 +253,7 @@ impl TryFrom<proto::Room> for Room {
                 .into_iter()
                 .map(|(id, room_element)| {
                     room_element.el.map_or(
-                        Err(TryFromProtobufError::EmptyElement(id)),
+                        Err(TryFromProtobufError::EmptyElementId(id)),
                         |el| {
                             Member::try_from(el)
                                 .map(|member| (member.id.clone(), member))
@@ -149,6 +262,18 @@ impl TryFrom<proto::Room> for Room {
                 })
                 .collect::<Result<_, _>>()?,
         })
+    }
+}
+
+impl From<Room> for proto::create_request::El {
+    fn from(room: Room) -> Self {
+        Self::Room(room.into())
+    }
+}
+
+impl From<Room> for proto::apply_request::El {
+    fn from(room: Room) -> Self {
+        Self::Room(room.into())
     }
 }
 
@@ -255,7 +380,7 @@ impl TryFrom<proto::Member> for Member {
                 .into_iter()
                 .map(|(id, member_el)| {
                     member_el.el.map_or(
-                        Err(TryFromProtobufError::EmptyElement(id)),
+                        Err(TryFromProtobufError::EmptyElementId(id)),
                         |el| {
                             Endpoint::try_from(el)
                                 .map(|endpoint| (endpoint.id(), endpoint))
@@ -301,6 +426,18 @@ impl From<Member> for proto::Member {
                 .collect(),
             credentials: member.credentials.map(Into::into),
         }
+    }
+}
+
+impl From<Member> for proto::create_request::El {
+    fn from(member: Member) -> Self {
+        Self::Member(member.into())
+    }
+}
+
+impl From<Member> for proto::apply_request::El {
+    fn from(member: Member) -> Self {
+        Self::Member(member.into())
     }
 }
 
@@ -375,6 +512,24 @@ impl From<Endpoint> for proto::member::Element {
                 Endpoint::WebRtcPlay(e) => proto_el::WebrtcPlay(e.into()),
                 Endpoint::WebRtcPublish(e) => proto_el::WebrtcPub(e.into()),
             }),
+        }
+    }
+}
+
+impl From<Endpoint> for proto::create_request::El {
+    fn from(endpoint: Endpoint) -> Self {
+        match endpoint {
+            Endpoint::WebRtcPublish(publish) => Self::WebrtcPub(publish.into()),
+            Endpoint::WebRtcPlay(play) => Self::WebrtcPlay(play.into()),
+        }
+    }
+}
+
+impl From<Endpoint> for proto::apply_request::El {
+    fn from(endpoint: Endpoint) -> Self {
+        match endpoint {
+            Endpoint::WebRtcPublish(publish) => Self::WebrtcPub(publish.into()),
+            Endpoint::WebRtcPlay(play) => Self::WebrtcPlay(play.into()),
         }
     }
 }
@@ -524,5 +679,29 @@ impl From<P2pMode> for proto::web_rtc_publish_endpoint::P2p {
             P2pMode::IfPossible => Self::IfPossible,
             P2pMode::Never => Self::Never,
         }
+    }
+}
+
+impl From<proto::Ping> for Ping {
+    fn from(v: proto::Ping) -> Self {
+        Self(v.nonce)
+    }
+}
+
+impl From<Ping> for proto::Ping {
+    fn from(v: Ping) -> Self {
+        Self { nonce: v.0 }
+    }
+}
+
+impl From<proto::Pong> for Pong {
+    fn from(v: proto::Pong) -> Self {
+        Self(v.nonce)
+    }
+}
+
+impl From<Pong> for proto::Pong {
+    fn from(v: Pong) -> Self {
+        Self { nonce: v.0 }
     }
 }

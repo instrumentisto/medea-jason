@@ -25,7 +25,7 @@ pub enum Endpoint {
 }
 
 impl Endpoint {
-    /// Return [`Id`] of this [`Endpoint`].
+    /// Returns [`Id`] of this [`Endpoint`].
     #[must_use]
     pub fn id(&self) -> Id {
         match self {

@@ -139,8 +139,8 @@ mod grpc {
 
                 tonic_build::configure()
                     .out_dir(GRPC_DIR)
-                    .build_client(true)
-                    .build_server(true)
+                    .build_client(cfg!(feature = "client"))
+                    .build_server(cfg!(feature = "server"))
                     .compile(&grpc_spec_files, &[GRPC_DIR.to_owned()])?;
             }
         }
