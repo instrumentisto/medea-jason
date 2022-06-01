@@ -676,11 +676,6 @@ void main() {
   //   expect(await media.microphoneVolume(), 50);
   //   expect(() async => await media.setMicrophoneVolume(100), returnsNormally);
   // });
-
-  testWidgets('E2E', (WidgetTester widgetTester) async {
-    var world = MyWorld();
-
-  });
 }
 
 class TestObj {

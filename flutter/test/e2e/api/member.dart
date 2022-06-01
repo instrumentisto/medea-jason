@@ -3,77 +3,76 @@ import 'dart:collection';
 
 import 'endpoint.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 part 'member.g.dart';
 
-class ApiCredentials {
-  late String type;
-  late String data;
-
-  Map<String, dynamic> toJson() {
-    return {
-      type : {data}
-    };
+@JsonSerializable()
+class Credentials {
+  Map<String, dynamic> toJson() => {};
+  Credentials();
+  factory Credentials.fromJson(Map<String, dynamic> json) {
+    if (json.toString().contains('Hash')) {
+      return Hash.fromJson(json) as Credentials;
+    } else {
+      return Plain.fromJson(json) as Credentials;
+    }
   }
 }
 
 @JsonSerializable()
-class ApiMember {
-  late String id;
+class Hash implements Credentials {
+  String data;
 
-      @JsonKey(
-      toJson: toJ,
-      fromJson: fromJ)
-  late Map<String, Endpoint> pipeline;
+  Hash(this.data);
+  factory Hash.fromJson(Map<String, dynamic> json) => Hash(json['hash']);
 
-  Map<String, dynamic>? credentials; // ApiCredentials
+  @override
+  Map<String, dynamic> toJson() {
+    return {'hash': data};
+  }
+}
+
+@JsonSerializable()
+class Plain implements Credentials {
+  String data;
+
+  Plain(this.data);
+  factory Plain.fromJson(Map<String, dynamic> json) => Plain(json['plain']);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {'plain': data};
+  }
+}
+
+
+
+@JsonSerializable()
+class Member {
+  String id;
+  Map<String, Endpoint> pipeline;
+  Credentials? credentials;
 
   @JsonKey(includeIfNull: false)
-  String? on_join; // skip null
+  String? on_join;
 
   @JsonKey(includeIfNull: false)
-  String? on_leave; // skip null
+  String? on_leave;
 
-  // @JsonKey(ignore: true)
   String? idle_timeout; //humantime_serde
 
-  // @JsonKey(ignore: true)
   String? reconnect_timeout; //humantime_serde
-  
-  // @JsonKey(ignore: true)
+
   String? ping_interval; //humantime_serde
 
-  ApiMember();
+  Member(this.id, this.pipeline, this.credentials, this.on_join, this.on_leave);
 
-  factory ApiMember.fromJson(Map<String, dynamic> json) => _$ApiMemberFromJson(json);
-
-  static Map<String, dynamic> toJ(Map<String, Endpoint> pipeline) {
-    var res = HashMap<String, dynamic>();
-    pipeline.forEach((key, value) {
-      if (value.data is WebRtcPlayEndpoint || value.data is WebRtcPublishEndpoint) {
-        res.addAll({key: value.toJson()});
-      }
-      else {
-        throw 'ERrr';
-      }
-    });
-    return res;
-  }
-  static Map<String, Endpoint> fromJ(Map<String, dynamic> json) {
-    var res = HashMap<String, Endpoint>();
-    json.forEach((key, value) {
-      try {
-        res.addAll({key: Endpoint(WebRtcPublishEndpoint.fromJson(value))});
-      }
-      catch (e) {
-        res.addAll({key: Endpoint(WebRtcPlayEndpoint.fromJson(value))});
-      }
-    });
-    return res;
-  }
+  factory Member.fromJson(Map<String, dynamic> json) {
+    json.remove('kind');
+    return _$MemberFromJson(json);
+    }
 
   Map<String, dynamic> toJson() {
-    var res = _$ApiMemberToJson(this);
+    var res = _$MemberToJson(this);
     res.addAll({'kind':'Member'});
     return res;
     }

@@ -6,13 +6,9 @@ part of 'endpoint.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Endpoint _$EndpointFromJson(Map<String, dynamic> json) => Endpoint(
-      json['data'],
-    );
+Endpoint _$EndpointFromJson(Map<String, dynamic> json) => Endpoint();
 
-Map<String, dynamic> _$EndpointToJson(Endpoint instance) => <String, dynamic>{
-      'data': instance.data,
-    };
+Map<String, dynamic> _$EndpointToJson(Endpoint instance) => <String, dynamic>{};
 
 WebRtcPlayEndpoint _$WebRtcPlayEndpointFromJson(Map<String, dynamic> json) =>
     WebRtcPlayEndpoint(
@@ -45,8 +41,8 @@ Map<String, dynamic> _$WebRtcPublishEndpointToJson(
       'id': instance.id,
       'p2p': _$P2pModeEnumMap[instance.p2p],
       'force_relay': instance.force_relay,
-      'audio_settings': AudioSettings.toJson(instance.audio_settings),
-      'video_settings': VideoSettings.toJson(instance.video_settings),
+      'audio_settings': instance.audio_settings,
+      'video_settings': instance.video_settings,
     };
 
 const _$P2pModeEnumMap = {

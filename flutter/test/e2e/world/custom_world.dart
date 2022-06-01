@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../api/callback.dart';
 import '../api/endpoint.dart';
-import '../api/member.dart';
+import '../api/member.dart' as api;
 import '../api/room.dart';
 import '../conf.dart';
 import '../control.dart';
@@ -43,8 +43,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             MediaKind.Video, MediaSourceKind.Device): true
       });
 
-      var publish = WebRtcPublishEndpoint('publish', P2pMode.Always);
-      pipeline.addAll({'publish': Endpoint(publish)});
+      pipeline.addAll({'publish': WebRtcPublishEndpoint('publish', P2pMode.Always)});
     }
 
     if (builder.is_recv) {
@@ -61,24 +60,13 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         if (value.is_send) {
           var id = value.id;
           var endpoint_id = 'play-$id';
-          var play =
-              WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish');
-          pipeline.addAll({endpoint_id: Endpoint(play)});
+          pipeline.addAll({endpoint_id: WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish')});
         }
       });
     }
 
-    //todo
-    var mem = ApiMember();
-    mem.id = builder_id;
-    mem.pipeline = pipeline;
-    // mem.credentials = ApiCredentials().toJson();
-    mem.credentials = {'plain': 'test'};
-    mem.on_join = 'grpc://127.0.0.1:9099';
-    mem.on_leave = 'grpc://127.0.0.1:9099';
-    var jmem = mem.toJson();
-    jmem.addAll({'kind': 'Member'});
-    await control_client.create('$room_id/$builder_id', jmem);
+    var create_member = api.Member(builder_id, pipeline, api.Plain('test'), 'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
+    await control_client.create('$room_id/$builder_id', create_member);
 
     if (builder.is_send) {
       var recv_endpoints =
@@ -124,8 +112,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var callbacks = await get_callbacks(member_id);
       var events = callbacks
           .where((element) =>
-              element.fid.contains(member_id) && element.event.data is OnLeave)
-          .map((e) => e.event.data as OnLeave);
+              element.fid.contains(member_id) && element.event is OnLeave)
+          .map((e) => e.event as OnLeave);
       if (events.isNotEmpty) {
         var ev = events.first;
         expect(ev.reason.name, reason);
@@ -174,23 +162,20 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   Future<Room> get_spec() async {
     var resp = await control_client.get(room_id);
-    Map<String, dynamic> resp2 = json.decode(resp.body);
-    var room = Room();
-    room.id = resp2['element']['id'];
-    room.pipeline = Room.fromPipe(resp2['element']['pipeline']);
+    var json_room = (json.decode(resp.body) as Map<String, dynamic>)['element'];
+    var room = Room.fromJson(json_room);
     return room;
   }
 
   Future<List<CallbackItem>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
-    return (json.decode(cbs.body) as List)
-        .map((data) => CallbackItem.fromJson(data))
+    return (json.decode(cbs.body) as List).map((item) => CallbackItem.fromJson(item))
         .where((element) => element.fid.contains(room_id))
         .toList();
   }
 
-  Future<void> apply(Room el) async {
-    await control_client.apply(room_id, el.toJson());
+  Future<void> apply(Room room) async {
+    await control_client.apply(room_id, room);
   }
 
   Future<void> wait_for_interconnection(String member_id) async {
@@ -306,20 +291,20 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (spec.pipeline.containsKey(pair.left.id)) {
       var member = spec.pipeline[pair.left.id]!;
       member.pipeline
-          .addAll({'publish': Endpoint(pair.left.publish_endpoint()!)});
+          .addAll({'publish': pair.left.publish_endpoint()!});
 
       var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
-      member.pipeline.addAll({play_endpoint.id: Endpoint(play_endpoint)});
+      member.pipeline.addAll({play_endpoint.id: play_endpoint});
     }
 
     if (spec.pipeline.containsKey(pair.right.id)) {
       var member = spec.pipeline[pair.right.id]!;
 
       member.pipeline
-          .addAll({'publish': Endpoint(pair.right.publish_endpoint()!)});
+          .addAll({'publish': pair.right.publish_endpoint()!});
 
       var play_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
-      member.pipeline.addAll({play_endpoint.id: Endpoint(play_endpoint)});
+      member.pipeline.addAll({play_endpoint.id: play_endpoint});
     }
 
     await apply(spec);
@@ -330,9 +315,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var callbacks = await get_callbacks(member_id);
       var on_join_found = callbacks
           .where((element) => element.fid.contains(member_id))
-          .any((element) {
-        return CallbackEvent.toJson(element.event)['type'] == 'OnJoin';
-      });
+          .any((element) => element.event is OnJoin);
       if (on_join_found) {
         break;
       }

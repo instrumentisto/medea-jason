@@ -149,6 +149,16 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
   },
 );
 
+
+StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
+    then1<String, CustomWorld>(
+  RegExp(
+      r"(Alice|Bob|Carol) doesn't have live local tracks"),
+  (id, context) async {
+    // TODO(rogurotus): Implement
+  },
+);
+
 StepDefinitionGeneric then_has_local_track = then2<String, String, CustomWorld>(
   RegExp(
       r'(Alice|Bob|Carol) has local (audio|device video|display video|video)'),

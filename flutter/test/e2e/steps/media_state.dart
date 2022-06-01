@@ -132,11 +132,7 @@ StepDefinitionGeneric then_track_is_stopped =
         await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
     track.free();
-    // todo
-    // check readyState
-    // if(!stopped) {
-    //   throw 'not stopped';
-    // }
+    // TODO(rogurotus): Implement
   },
 );
 

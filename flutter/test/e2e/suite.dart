@@ -2,13 +2,13 @@ import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
 
-import 'conf.dart';
 import 'steps/connection.dart';
 import 'steps/control_api.dart';
 import 'steps/media_state.dart';
 import 'steps/room.dart';
 import 'steps/given.dart';
 import 'steps/track.dart';
+import 'steps/websockets.dart';
 import 'world/custom_world.dart';
 
 part 'suite.g.dart';
@@ -42,6 +42,7 @@ var TestConfigs = FlutterTestConfiguration()
     when_member_joins_room,
 
     //track
+    then_member_doesnt_have_live_local_tracks,
     then_member_has_remote_track,
     then_member_doesnt_have_remote_tracks_with,
     then_doesnt_have_remote_track,
@@ -60,11 +61,12 @@ var TestConfigs = FlutterTestConfiguration()
     then_track_is_stopped,
     then_local_track_mute_state,
 
-    // //websockets
-    // ws_connection_loss,
-    // ws_connection_restore,
-    // connection_is_lost,
+    //websockets
+    ws_connection_loss,
+    ws_connection_restore,
+    connection_is_lost,
 
+    //given
     givenTreeMembers,
     givenTwoMembers,
     givenOneMember,
@@ -91,9 +93,26 @@ var TestConfigs = FlutterTestConfiguration()
         return world;
       });
 
-/// Entry point of E2E testing.
 // @GherkinTestSuite(featurePaths: [FEATURES_PATH]) //todo
-@GherkinTestSuite(featurePaths: ['./test/e2e/features/*.feature'])
+@GherkinTestSuite(featurePaths: [
+  '../e2e/tests/features/apply.feature',
+  '../e2e/tests/features/create_endpoint.feature',
+  '../e2e/tests/features/delete_endpoint.feature',
+  '../e2e/tests/features/disable_remote_media.feature',
+  '../e2e/tests/features/enable_remote_media.feature',
+  '../e2e/tests/features/get_user_media.feature',
+  '../e2e/tests/features/local_tracks_create.feature',
+  '../e2e/tests/features/media_direction.feature',
+  // '../e2e/tests/features/media_disable.feature',
+  '../e2e/tests/features/media_mute.feature',
+  '../e2e/tests/features/on_join.feature',
+  '../e2e/tests/features/on_leave.feature',
+  '../e2e/tests/features/on_new_connection_fires.feature',
+  '../e2e/tests/features/remote_connection_close.feature',
+  '../e2e/tests/features/room_close.feature',
+  '../e2e/tests/features/room_join.feature',
+  // '../e2e/tests/features/state_synchronization.feature',
+  ])
 void main() {
   executeTestSuite(
     TestConfigs,
