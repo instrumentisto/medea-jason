@@ -1,4 +1,4 @@
-// Medea's Control API gRPC schema.
+// Control API gRPC schema.
 
 syntax = "proto3";
 
@@ -6,40 +6,45 @@ package api;
 
 import "google/protobuf/duration.proto";
 
-// Media server's Control API service.
+// Service allowing to control a media server dynamically, by creating, updating
+// and destroying pipelines of media `Element`s on it.
 service ControlApi {
-  // Creates new Element with a given ID.
+  // Creates a new `Element` on the media server.
   //
-  // Not idempotent. Errors if an Element with the same ID already exists.
+  // Non-idempotent. Errors if an `Element` with such ID already exists.
   rpc Create (CreateRequest) returns (CreateResponse);
 
-  // Removes Element by its ID.
-  // Allows referring multiple Elements on the last two levels.
+  // Removes `Element`s from the media server.
+  // Allows referring multiple `Element`s on the last two levels of a FID.
   //
-  // Idempotent. If no Elements with such IDs exist, then succeeds.
+  // Idempotent. If no `Element`s with such FIDs exist, then succeeds.
   rpc Delete (IdRequest) returns (Response);
 
-  // Returns Element by its ID.
-  // Allows referring multiple Elements.
-  // If no ID specified, returns all Elements declared.
+  // Lookups `Element`s by their FIDs on the media server.
+  // If no FIDs are specified, then returns all the current `Element`s on the
+  // media server.
   rpc Get (IdRequest) returns (GetResponse);
 
-  // Applies the given spec to Element by its ID.
+  // Applies changes to an existing `Element` on the media server, or creates a
+  // new one in case there is no `Element` with such ID.
   //
-  // Idempotent. If no Element with such ID exists, then it will be created,
-  // otherwise it will be reconfigured. Elements that exist, but are not
-  // specified in the provided spec will be removed.
+  // Idempotent. If no `Element` with such ID exists, then it will be created,
+  // otherwise it will be reconfigured. `Element`s that exist on the same
+  // hierarchy level, but are not specified in the provided spec, will be
+  // removed.
   rpc Apply(ApplyRequest) returns (CreateResponse);
 
-  // Checks media server healthiness.
+  // Checks healthiness of the media server.
+  // Caller should assert that the returned `Pong` has the same nonce as the
+  // sent `Ping`.
   rpc Healthz (Ping) returns (Pong);
 }
 
-// Request of creating new Element with in element with a given FID (full ID).
+// Request for creating a new `Element` on a media server.
 message CreateRequest {
-  // FID (full ID) of the Element in which the provided Element will be created.
+  // FID (Full ID) of the parent `Element` to create the provided `Element` in.
   string parent_fid = 1;
-  // Spec of the created Element.
+  // Spec of the created `Element`.
   oneof el {
     Member member = 2;
     Room room = 3;
@@ -48,17 +53,17 @@ message CreateRequest {
   }
 }
 
-// Request with many FIDs (full IDs) of Elements.
+// Request with many FIDs (Full IDs) of `Element`s.
 message IdRequest {
-  // List of Elements FIDs.
+  // List of `Element`s FIDs.
   repeated string fid = 1;
 }
 
-// Request of applying a spec to Element with the given FID (full ID).
+// Request for applying a spec to an exiting `Element` on a media server.
 message ApplyRequest {
-  // FID (full ID) of the Element to apply the given spec to.
+  // FID (full ID) of the parent `Element` to apply the provided spec to.
   string parent_fid = 1;
-  // Spec of the Element to be applied.
+  // Spec of the `Element` to be applied.
   oneof el {
     Member member = 2;
     Room room = 3;
@@ -67,64 +72,64 @@ message ApplyRequest {
   }
 }
 
-// Response which doesn't return anything on successful result,
-// but is fallible with an Error.
+// Response which doesn't return anything on success, but is fallible with an
+// `Error`.
 //
-// If operation fails then an Error will be returned.
-// The response is considered successful only if it does not contain Error.
+// If operation fails then an `Error` will be returned.
+// The response is considered successful only if it doesn't contain an `Error`.
 message Response {
-  // Error of the Response.
+  // Error of this `Response`.
   Error error = 1;
 }
 
-// Response of Create RPC method.
+// Response of `ControlApi.Create` RPC method.
 //
-// If operation fails then an Error will be returned.
-// The response is considered successful only if it does not contain Error.
+// If operation fails then an `Error` will be returned.
+// The response is considered successful only if it doesn't contain an `Error`.
 message CreateResponse {
-  // Hashmap with IDs (key) and URIs (value) of Elements, which should be used
+  // Hashmap with IDs (key) and URIs (value) of `Element`s, which should be used
   // by clients to connect to a media server via Client API.
   //
-  // Returned only if CreateResponse is successful.
+  // Returned only if this `CreateResponse` is successful.
   map<string, string> sid = 1;
-  // Error of the CreateResponse.
+  // Error of this `CreateResponse`.
   Error error = 2;
 }
 
-// Response of Get RPC method.
+// Response of `ControlApi.Get` RPC method.
 //
-// If operation fails then an Error will be returned.
-// The response is considered successful only if it does not contain Error.
+// If operation fails then an `Error` will be returned.
+// The response is considered successful only if it doesn't contain an `Error`.
 message GetResponse {
-  // Hashmap with IDs (key) and specs (value) of the requested Elements.
+  // Hashmap with IDs (key) and specs (value) of the requested `Elements`.
   //
-  // Returned only if GetResponse is successful.
+  // Returned only if this `GetResponse` is successful.
   map<string, Element> elements = 1;
-  // Error of the GetResponse.
+  // Error of this `GetResponse`.
   Error error = 2;
 }
 
-// Error of failed request.
+// Error of a failed request.
 //
-// If the Error is not returned then request is considered as successful.
+// If an `Error` is not returned then a request is considered as successful.
 message Error {
-  // Concrete unique code of the Error.
+  // Concrete unique code of this `Error`.
   uint32 code = 1;
-  // Human-readable text description of the Error.
+  // Human-readable text description of this `Error`.
   string text = 2;
-  // Link to online documentation of the Error.
+  // Link to online documentation of this `Error`.
   //
   // Optional field.
   string doc = 3;
-  // Full ID of Element that the Error is related to.
-  // Some Errors are not related to any Element and in such case
-  // this field is empty.
+  // FID (Full ID) of the `Element` that this `Error` is related to.
+  // Some `Error`s are not related to any `Element` and so have this field
+  // empty.
   //
   // Optional field.
   string element = 4;
 }
 
-// Media element which can be used in a media pipeline.
+// Possible media elements forming a media pipeline.
 message Element {
   oneof el {
     Member member = 1;
@@ -134,15 +139,15 @@ message Element {
   }
 }
 
-// Media element which represents a single space where multiple Members can
+// Media element representing a single space where multiple `Member`s can
 // interact with each other.
 message Room {
-  // ID of this Room.
+  // ID of this `Room`.
   string id = 1;
-  // Pipeline of this Room.
+  // Media pipeline representing this `Room`.
   map<string, Room.Element> pipeline = 2;
 
-  // Elements which Room's pipeline can contain.
+  // Possible media elements forming a `Room` pipeline.
   message Element {
     oneof el {
       Member member = 1;
@@ -152,41 +157,44 @@ message Room {
   }
 }
 
-// Media element which represents a client authorized to participate
-// in a some bigger media pipeline.
+// Media element representing a client authorized to participate in some bigger
+// media pipeline (`Room`, for example).
 message Member {
-  // ID of this Member.
+  // ID of this `Member`.
   string id = 1;
-  // Callback which fires when the Member establishes persistent connection
-  // with a media server via Client API.
+  // URL of the callback to fire when this `Member` establishes a persistent
+  // connection with a media server via Client API.
   string on_join = 2;
-  // Callback which fires when the Member finishes persistent connection
-  // with a media server via Client API.
+  // URL of the callback to fire when this `Member` finishes a persistent
+  // connection with a media server via Client API.
   string on_leave = 3;
-  // Credentials of the Member to authorize via Client API with.
+  // Credentials to authenticate this `Member` in Client API with.
   //
   // Plain and hashed credentials are supported. If no credentials provided,
   // then random plain string will be generated. If no authentication is
   // required then empty plain string can be used.
   //
   // Hashed variant only supports Argon2 hash at the moment.
-  // Member sid won't contain token if hashed credentials are used, so token
-  // query parameter should be appended manually.
+  // `Member` sid won't contain a `token` query parameter if hashed credentials
+  // are used, so it should be appended manually on a client side.
   oneof credentials {
     // Argon2 hash of credentials.
     string hash = 4;
     // Plain text credentials.
     string plain = 5;
   }
-  // Timeout of receiving heartbeat messages from the Member via Client API.
-  // Once reached, the Member is considered being idle.
+  // Timeout of receiving heartbeat messages from this `Member` via Client API.
+  // Once reached, this `Member` is considered being idle.
   google.protobuf.Duration idle_timeout = 6;
-  // Timeout of the Member reconnecting via Client API.
-  // Once reached, the Member is considered disconnected.
+  // Timeout of reconnecting this `Member` via Client API.
+  // Once reached, this `Member` is considered disconnected.
   google.protobuf.Duration reconnect_timeout = 7;
-  // Interval of sending pings from a media server to the Member via Client API.
+  // Interval of pinging with heartbeat messages this `Member` via Client API
+  // by a media server.
+  // If empty then the default interval of a media server is used, if
+  // configured.
   google.protobuf.Duration ping_interval = 8;
-  // Pipeline of this Member.
+  // Media pipeline representing this `Member`.
   map<string, Member.Element> pipeline = 9;
 
   // Elements which Member's pipeline can contain.
@@ -198,95 +206,96 @@ message Member {
   }
 }
 
-// Media element which is able to receive media data from a client via WebRTC
-// (allows to publish media data).
+// Media element receiving media data from a client via WebRTC (allows to
+// publish media data).
 message WebRtcPublishEndpoint {
-  // ID of this WebRtcPublishEndpoint.
+  // ID of this `WebRtcPublishEndpoint`.
   string id = 1;
-  // P2P mode for this element.
+  // Peer-to-peer mode of this `WebRtcPublishEndpoint`.
   P2P p2p = 2;
-  // Callback which fires when a client starts publishing media data.
+  // Callback firing when a client starts publishing media data.
   string on_start = 3;
-  // Callback which fires when a client stops publishing media data.
+  // Callback firing when a client stops publishing media data.
   string on_stop = 4;
-  // Option to relay all media through a TURN server forcibly.
+  // Indicator whether to relay all media data through a TURN server forcibly.
   bool force_relay = 5;
-  // Settings for the audio media type of this element.
+  // Settings for the audio media type of this `WebRtcPublishEndpoint`.
   AudioSettings audio_settings = 6;
-  // Settings for the video media type of this element.
+  // Settings for the video media type of this `WebRtcPublishEndpoint`.
   VideoSettings video_settings = 7;
 
-  // Audio media type settings of WebRtcPublishEndpoint.
+  // Audio media type settings of a `WebRtcPublishEndpoint`.
   message AudioSettings {
-    // Policy to publish audio media type with.
+    // Policy to publish the audio media type with.
     PublishPolicy publish_policy = 1;
   }
 
-  // Video media type settings of WebRtcPublishEndpoint.
+  // Video media type settings of `WebRtcPublishEndpoint`.
   message VideoSettings {
-    // Policy to publish video media type with.
+    // Policy to publish the video media type with.
     PublishPolicy publish_policy = 1;
   }
 
-  // Policy of how the video or audio media type can be published in
-  // WebRtcPublishEndpoint.
+  // Policy of how a video or an audio media type can be published in a
+  // `WebRtcPublishEndpoint`.
   enum PublishPolicy {
     // Media type MAY be published.
     //
     // Media server will try to initialize publishing, but won't produce any
-    // errors if user application fails to (or chooses not to) acquire a
+    // errors if user application fails to (or chooses not to) acquire the
     // required media track. Media server will approve user requests to stop and
     // to restart publishing the specified media type.
     OPTIONAL = 0;
     // Media type MUST be published.
     //
-    // Media server will try to initialize publishing, and if a required media
-    // track couldn't be acquired, then an error will be thrown. Media server
-    // will deny all requests to stop publishing.
+    // Media server will try to initialize publishing, and if the required media
+    // track cannot be acquired, then an error will be thrown. Media server will
+    // deny all requests to stop publishing.
     REQUIRED = 1;
-    // Media type MUST not be published.
+    // Media type MUST NOT be published.
     //
     // Media server will not try to initialize publishing.
     DISABLED = 2;
   }
 
-  // P2P mode of WebRTC interaction.
+  // Possible peer-to-peer modes of WebRTC interaction in a
+  // `WebRtcPublishEndpoint`.
   enum P2P {
-    // Always send media data through a media server.
+    // Never use peer-to-peer connections and always send media data through a
+    // media server.
     NEVER = 0;
-    // Send media data peer-to-peer directly if it's possible,
-    // otherwise through a media server.
+    // Use peer-to-peer connections directly if it's possible, otherwise send
+    // media data through a media server.
     IF_POSSIBLE = 1;
-    // Send media data peer-to-peer only without a media server.
+    // Send media data via peer-to-peer connections only, and never through a
+    // media server.
     ALWAYS = 2;
   }
 }
 
-// Media element which is able to play media data for a client via WebRTC.
+// Media element playing media data for a client via WebRTC.
 message WebRtcPlayEndpoint {
-  // ID of this WebRtcPlayEndpoint.
+  // ID of this `WebRtcPlayEndpoint`.
   string id = 1;
-  // The source to get media data from.
+  /// Source to play media data from.
   string src = 2;
-  // Callback which fires when a client starts playing media data
-  // from the source.
+  // Callback firing when a client starts playing media data from the source.
   string on_start = 3;
-  // Callback which fires when a client stops playing media data
-  // from the source.
+  // Callback firing when a client stops playing media data from the source.
   string on_stop = 4;
-  // Option to relay all media through a TURN server forcibly.
+  // Indicator whether to relay all media data through a TURN server forcibly.
   bool force_relay = 5;
 }
 
-// Ping message received by media server periodically for probing its
+// Ping message received by a media server periodically for probing its
 // healthiness.
 message Ping {
-  // Each ping should increase its nonce, starting with 0.
+  // Each new `Ping` should increment its nonce, starting with 0.
   uint32 nonce = 1;
 }
 
-// Pong message send by media server in response to received Ping message.
+// Pong message sent by a media server in response to a received `Ping` message.
 message Pong {
-  /// Nonce of the received Ping message.
+  /// Nonce of the answered `Ping` message.
   uint32 nonce = 1;
 }

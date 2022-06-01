@@ -79,8 +79,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
- - Library API:
-    - Convert `wasm` error into the Dart exception in the `RoomHandle.onFailedLocalMedia()` ([#57]).
+- Library API:
+    - Unconverted into Dart exception error in `RoomHandle.onFailedLocalMedia()` ([#57]).
 
 ### Updated
 
