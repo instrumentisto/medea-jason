@@ -1,3 +1,5 @@
+//! gRPC clients.
+
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
 use tonic::codegen::{Body, Bytes};

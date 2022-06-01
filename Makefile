@@ -550,7 +550,7 @@ endif
 #
 # Usage:
 #	make test.unit [( [crate=@all]
-#	                | crate=<crate-name>
+#	                | crate=<crate-name> [features=(@all|<list>)]
 #	                | crate=medea-jason
 #	                  [browser=(chrome|firefox|default)]
 #	                  [timeout=(60|<seconds>)] )]
@@ -580,7 +580,11 @@ else
 	@make docker.down.webdriver browser=$(browser)
 endif
 else
+ifeq ($(or $(features),@all),@all)
 	cargo test -p $(crate) --all-features
+else
+	cargo test -p $(crate) --features $(features)
+endif
 endif
 endif
 
