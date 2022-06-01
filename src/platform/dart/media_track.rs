@@ -5,7 +5,6 @@
 use std::future::Future;
 
 use dart_sys::Dart_Handle;
-use futures::executor::block_on;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -234,24 +233,21 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     #[allow(clippy::unused_self)]
-    #[must_use]
-    pub fn ready_state(&self) -> MediaStreamTrackState {
+    pub async fn ready_state(&self) -> MediaStreamTrackState {
         let handle = self.inner.get();
-        block_on(async move {
-            let i = unsafe {
-                FutureFromDart::execute::<i32>(media_stream_track::ready_state(
-                    handle,
-                ))
-                .await
-            }
-            .unwrap();
+        let state = unsafe {
+            FutureFromDart::execute::<i32>(media_stream_track::ready_state(
+                handle,
+            ))
+            .await
+        }
+        .unwrap();
 
-            match i {
-                0 => MediaStreamTrackState::Live,
-                1 => MediaStreamTrackState::Ended,
-                _ => unreachable!(),
-            }
-        })
+        match state {
+            0 => MediaStreamTrackState::Live,
+            1 => MediaStreamTrackState::Ended,
+            _ => unreachable!(),
+        }
     }
 
     /// [Stops][1] this [`MediaStreamTrack`].

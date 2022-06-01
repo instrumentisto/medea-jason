@@ -792,6 +792,7 @@ impl PeerConnection {
                 .parse_tracks(
                     media_tracks.iter().map(|(t, _)| t).cloned().collect(),
                 )
+                .await
                 .map_err(tracerr::map_from_and_wrap!())?;
 
             let media_exchange_states_updates = self

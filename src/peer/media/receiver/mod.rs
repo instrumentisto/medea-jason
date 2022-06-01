@@ -253,7 +253,7 @@ impl Receiver {
 
         drop(self.transceiver.replace(Some(transceiver)));
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
-            prev_track.stop();
+            prev_track.stop().await;
         };
         self.maybe_notify_track().await;
     }
@@ -336,7 +336,9 @@ impl Drop for Receiver {
             }
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {
-            recv_track.stop();
+            platform::spawn(async move {
+                recv_track.stop().await;
+            });
         }
     }
 }
