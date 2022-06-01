@@ -27,21 +27,6 @@ pub use crate::room::RoomHandle;
 
 impl ForeignClass for RoomHandle {}
 
-/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
-///
-/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
-/// [`DartFuture`].
-macro_rules! try_into_source_kind {
-    ($k:expr) => {
-        match $k.try_into().map_err(|err: DartValueCastError| {
-            ArgumentError::new(err.value, "kind", err.expectation)
-        }) {
-            Ok(s) => s,
-            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
-        }
-    };
-}
-
 /// Connects to a media server and joins the [`Room`] with the provided
 /// authorization `token`.
 ///
@@ -205,7 +190,7 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.mute_video(try_into_source_kind!(source_kind));
+        let fut = this.mute_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -227,7 +212,7 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.unmute_video(try_into_source_kind!(source_kind));
+        let fut = this.unmute_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -247,7 +232,7 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.enable_video(try_into_source_kind!(source_kind));
+        let fut = this.enable_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -267,7 +252,7 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.disable_video(try_into_source_kind!(source_kind));
+        let fut = this.disable_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -327,7 +312,7 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.enable_remote_video(try_into_source_kind!(source_kind));
+        let fut = this.enable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -349,7 +334,7 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.disable_remote_video(try_into_source_kind!(source_kind));
+        let fut = this.disable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())

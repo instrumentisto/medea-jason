@@ -1,10 +1,10 @@
 @JS()
 library medea_jason;
 
+import 'dart:html' as html;
+
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' show promiseToFuture;
-
-import 'dart:html' as html;
 
 @JS()
 class FacingMode {

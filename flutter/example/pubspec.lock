@@ -77,7 +77,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.1"
   file:
     dependency: transitive
     description:
@@ -101,7 +101,7 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.29.0"
+    version: "1.32.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -112,7 +112,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "37f53422a5c14a2d05df0c89dda1cf2b08b499c5"
+      resolved-ref: b844eb2b73a1f9e477a941b254810a1bb8d4f54d
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"

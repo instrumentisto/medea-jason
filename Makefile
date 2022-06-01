@@ -440,6 +440,9 @@ flutter:
 flutter.fmt:
 	flutter format $(if $(call eq,$(check),yes),-n --set-exit-if-changed,) \
 		flutter/
+	cd flutter && \
+	flutter pub run import_sorter:main --no-comments \
+		$(if $(call eq,$(check),yes),--exit-if-changed,)
 
 
 # Lint Flutter Dart sources with dartanalyzer.

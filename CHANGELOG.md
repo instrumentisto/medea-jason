@@ -63,7 +63,7 @@ All user visible changes to this project will be documented in this file. This p
         - `MediaSettingsUpdateException`.
     - `MediaManagerHandle.set_output_audio_id()` method switching output audio device on Dart platform ([#29]);
     - `MediaManagerHandle.on_device_change()` callback firing whenever `MediaManagerHandle.enumerate_devices()` list changes ([#30]);
-    - `ConnectionHandle` methods ([#43]):
+    - `ConnectionHandle` methods ([#43], [#59]):
         - `enable_remote_video`;
         - `disable_remote_video`;
         - `enable_remote_audio`;

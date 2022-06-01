@@ -219,12 +219,12 @@ impl InnerConnection {
         let receivers = self.receivers.borrow().clone();
         let mut change_tasks = Vec::new();
         for r in receivers {
-            let is_correct_source = source_kind
+            let source_filter = source_kind
                 .map_or(true, |skind| skind == r.source_kind().into());
 
             if r.is_subscription_needed(desired_state)
                 && r.kind() == kind
-                && is_correct_source
+                && source_filter
             {
                 r.media_state_transition_to(desired_state)
                     .map_err(tracerr::map_from_and_wrap!())?;
@@ -242,17 +242,10 @@ impl InnerConnection {
             self.recv_constraints.set_enabled(
                 desired_state == media_exchange_state::Stable::Enabled,
                 kind,
-                match source_kind {
-                    Some(source_kind) => match source_kind {
-                        MediaSourceKind::Device => {
-                            Some(proto::MediaSourceKind::Device)
-                        }
-                        MediaSourceKind::Display => {
-                            Some(proto::MediaSourceKind::Display)
-                        }
-                    },
-                    None => None,
-                },
+                source_kind.map(|skind| match skind {
+                    MediaSourceKind::Device => proto::MediaSourceKind::Device,
+                    MediaSourceKind::Display => proto::MediaSourceKind::Display,
+                }),
             );
         }
 

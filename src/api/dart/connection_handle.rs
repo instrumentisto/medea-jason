@@ -23,21 +23,6 @@ pub use crate::connection::ConnectionHandle;
 
 impl ForeignClass for ConnectionHandle {}
 
-/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
-///
-/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
-/// [`DartFuture`].
-macro_rules! try_into_source_kind {
-    ($k:expr) => {
-        match $k.try_into().map_err(|err: DartValueCastError| {
-            ArgumentError::new(err.value, "kind", err.expectation)
-        }) {
-            Ok(s) => s,
-            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
-        }
-    };
-}
-
 /// Sets callback, invoked when this `Connection` will close.
 #[no_mangle]
 pub unsafe extern "C" fn ConnectionHandle__on_close(
@@ -149,7 +134,7 @@ pub unsafe extern "C" fn ConnectionHandle__enable_remote_video(
     propagate_panic(move || {
         let this = this.as_ref();
 
-        let fut = this.enable_remote_video(try_into_source_kind!(source_kind));
+        let fut = this.enable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -171,7 +156,7 @@ pub unsafe extern "C" fn ConnectionHandle__disable_remote_video(
     propagate_panic(move || {
         let this = this.as_ref();
 
-        let fut = this.disable_remote_video(try_into_source_kind!(source_kind));
+        let fut = this.disable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())

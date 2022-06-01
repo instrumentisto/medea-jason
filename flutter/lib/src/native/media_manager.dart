@@ -2,8 +2,8 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../interface/media_device_info.dart';
 import '../interface/local_media_track.dart';
+import '../interface/media_device_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
@@ -11,9 +11,9 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/ptrarray.dart';
 import 'ffi/result.dart';
-import 'media_device_info.dart';
 import 'jason.dart';
 import 'local_media_track.dart';
+import 'media_device_info.dart';
 import 'media_stream_settings.dart';
 
 typedef _initLocalTracks_C = Handle Function(Pointer, Pointer);

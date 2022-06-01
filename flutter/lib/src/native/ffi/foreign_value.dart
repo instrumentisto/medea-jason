@@ -3,9 +3,9 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../../util/move_semantic.dart';
-import 'nullable_pointer.dart';
-import 'box_handle.dart';
 import '../jason.dart';
+import 'box_handle.dart';
+import 'nullable_pointer.dart';
 
 typedef _boxForeignValue_C = Pointer Function(ForeignValue);
 typedef _boxForeignValue_Dart = Pointer Function(ForeignValue);
