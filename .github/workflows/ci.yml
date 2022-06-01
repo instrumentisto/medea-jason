@@ -148,12 +148,12 @@ jobs:
             if: ${{ startsWith(github.ref, 'refs/tags/medea-client-api-proto-')
                     || !startsWith(github.ref, 'refs/tags/medea-') }}
             features:
-              - @all
-              - grpc
-              - client
-              - server
-              - grpc,client
-              - grpc,server
+              - "@all"
+              - "grpc"
+              - "client"
+              - "server"
+              - "grpc,client"
+              - "grpc,server"
           - crate: medea-jason
             wasm: true
             if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
