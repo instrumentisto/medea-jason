@@ -51,6 +51,13 @@ pub struct WebRtcPublish {
 #[into(owned(types(String)))]
 pub struct Id(Box<str>);
 
+// TODO: Derive via `derive::From` once it's capable to.
+impl<'a> From<&'a str> for Id {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
 /// Possible peer-to-peer modes of [WebRTC] interaction in a [`WebRtcPublish`]
 /// media [`Element`].
 ///

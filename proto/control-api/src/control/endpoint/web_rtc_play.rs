@@ -40,6 +40,13 @@ pub struct WebRtcPlay {
 #[into(owned(types(String)))]
 pub struct Id(Box<str>);
 
+// TODO: Derive via `derive::From` once it's capable to.
+impl<'a> From<&'a str> for Id {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
 /// [URI] describing a source of media data for a [`WebRtcPlay`] media
 /// [`Element`] located locally on the same media server.
 ///
@@ -68,62 +75,45 @@ pub struct LocalSrcUri {
 impl FromStr for LocalSrcUri {
     type Err = LocalSrcUriParseError;
 
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        if value.is_empty() {
+    fn from_str(val: &str) -> Result<Self, Self::Err> {
+        if val.is_empty() {
             return Err(LocalSrcUriParseError::Empty);
         }
 
-        let url = match Url::parse(value) {
-            Ok(url) => url,
-            Err(err) => {
-                return Err(LocalSrcUriParseError::UrlParseErr(
-                    value.to_owned(),
-                    err,
-                ))
-            }
-        };
+        let url = Url::parse(val)
+            .map_err(|e| LocalSrcUriParseError::UrlParseErr(val.into(), e))?;
         if url.scheme() != "local" {
-            return Err(LocalSrcUriParseError::NotLocal(value.to_owned()));
+            return Err(LocalSrcUriParseError::NotLocal(val.into()));
         }
 
         let room_id = match url.host_str() {
-            Some(host) => {
-                if host.is_empty() {
-                    return Err(LocalSrcUriParseError::MissingPaths(
-                        value.to_owned(),
-                    ));
-                }
-                room::Id::from(host.to_owned())
-            }
             None => {
-                return Err(LocalSrcUriParseError::MissingPaths(
-                    value.to_owned(),
-                ))
+                return Err(LocalSrcUriParseError::MissingPaths(val.into()))
             }
+            Some(host) if host.is_empty() => {
+                return Err(LocalSrcUriParseError::MissingPaths(val.into()));
+            }
+            Some(host) => host.into(),
         };
 
-        let mut path = url.path_segments().ok_or_else(|| {
-            LocalSrcUriParseError::MissingPaths(value.to_owned())
-        })?;
+        let mut path = url
+            .path_segments()
+            .ok_or_else(|| LocalSrcUriParseError::MissingPaths(val.into()))?;
 
         let member_id = path
             .next()
             .filter(|id| !id.is_empty())
-            .map(|id| member::Id::from(id.to_owned()))
-            .ok_or_else(|| {
-                LocalSrcUriParseError::MissingPaths(value.to_owned())
-            })?;
+            .ok_or_else(|| LocalSrcUriParseError::MissingPaths(val.into()))?
+            .into();
 
         let endpoint_id = path
             .next()
             .filter(|id| !id.is_empty())
-            .map(|id| web_rtc_publish::Id::from(id.to_owned()))
-            .ok_or_else(|| {
-                LocalSrcUriParseError::MissingPaths(value.to_owned())
-            })?;
+            .ok_or_else(|| LocalSrcUriParseError::MissingPaths(val.into()))?
+            .into();
 
         if path.next().is_some() {
-            return Err(LocalSrcUriParseError::TooManyPaths(value.to_owned()));
+            return Err(LocalSrcUriParseError::TooManyPaths(val.into()));
         }
 
         Ok(Self {
@@ -139,23 +129,23 @@ impl FromStr for LocalSrcUri {
 pub enum LocalSrcUriParseError {
     /// Protocol of the provided URI is not `local://`.
     #[display(fmt = "Provided URI protocol is not `local://`: {}", _0)]
-    NotLocal(#[error(not(source))] String),
+    NotLocal(#[error(not(source))] Box<str>),
 
     /// Too many paths in the provided URI.
     ///
     /// `local://room_id/member_id/endpoint_id/redundant_path` for example.
-    #[display(fmt = "Too many paths in provided URI: {}", _0)]
-    TooManyPaths(#[error(not(source))] String),
+    #[display(fmt = "Too many paths in URI: {}", _0)]
+    TooManyPaths(#[error(not(source))] Box<str>),
 
     /// Some paths are missing in the provided URI.
     ///
     /// `local://room_id//qwerty` for example.
-    #[display(fmt = "Missing paths in provided URI: {}", _0)]
-    MissingPaths(#[error(not(source))] String),
+    #[display(fmt = "Missing paths in URI: {}", _0)]
+    MissingPaths(#[error(not(source))] Box<str>),
 
     /// Error of parsing the provided URI.
     #[display(fmt = "Cannot parse provided URI `{}`: {}", _0, _1)]
-    UrlParseErr(String, #[error(source)] url::ParseError),
+    UrlParseErr(Box<str>, #[error(source)] url::ParseError),
 
     /// Provided URI is empty.
     #[display(fmt = "Provided URI cannot be empty")]
