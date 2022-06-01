@@ -191,15 +191,14 @@ jobs:
         if: ${{ matrix.if && matrix.wasm }}
 
       - name: Chrome
-        run: make test.unit crate=${{ matrix.crate }}
-                            features=${{ matrix.features }}
-                            browser=chrome
+        run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ matrix.if && matrix.crate == 'medea-jason' }}
       - name: Firefox
         run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ matrix.if && matrix.crate == 'medea-jason' }}
 
       - run: make test.unit crate=${{ matrix.crate }}
+                            features=${{ matrix.features }}
         if: ${{ matrix.if && matrix.crate != 'medea-jason' }}
 
   test-e2e:
