@@ -92,5 +92,16 @@
     variant_size_differences
 )]
 
+pub mod callback;
+pub mod control;
 #[cfg(feature = "grpc")]
 pub mod grpc;
+
+#[doc(inline)]
+pub use self::{
+    callback::Api as CallbackApi,
+    control::{
+        endpoint, member, room, Api as ControlApi, Element, Elements, Endpoint,
+        Fid, Member, Ping, Pong, Room,
+    },
+};
