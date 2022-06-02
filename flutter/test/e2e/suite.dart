@@ -94,24 +94,24 @@ var TestConfigs = FlutterTestConfiguration()
       });
 
 // @GherkinTestSuite(featurePaths: [FEATURES_PATH]) // TODO(rogurotus)
-@GherkinTestSuite(featurePaths: [
-  '../e2e/tests/features/apply.feature',
-  '../e2e/tests/features/create_endpoint.feature',
-  '../e2e/tests/features/delete_endpoint.feature',
-  '../e2e/tests/features/disable_remote_media.feature',
-  '../e2e/tests/features/enable_remote_media.feature',
-  // '../e2e/tests/features/get_user_media.feature',
-  '../e2e/tests/features/local_tracks_create.feature',
-  '../e2e/tests/features/media_direction.feature',
-  // '../e2e/tests/features/media_disable.feature',
-  '../e2e/tests/features/media_mute.feature',
-  '../e2e/tests/features/on_join.feature',
-  '../e2e/tests/features/on_leave.feature',
-  '../e2e/tests/features/on_new_connection_fires.feature',
-  '../e2e/tests/features/remote_connection_close.feature',
-  '../e2e/tests/features/room_close.feature',
-  '../e2e/tests/features/room_join.feature',
-  // '../e2e/tests/features/state_synchronization.feature',
+@GherkinTestSuite(featurePaths: [ './*.feature',
+  // '../e2e/tests/features/apply.feature',
+  // '../e2e/tests/features/create_endpoint.feature',
+  // '../e2e/tests/features/delete_endpoint.feature',
+  // '../e2e/tests/features/disable_remote_media.feature',
+  // '../e2e/tests/features/enable_remote_media.feature',
+  // // '../e2e/tests/features/get_user_media.feature',
+  // '../e2e/tests/features/local_tracks_create.feature',
+  // '../e2e/tests/features/media_direction.feature',
+  // // '../e2e/tests/features/media_disable.feature',
+  // '../e2e/tests/features/media_mute.feature',
+  // '../e2e/tests/features/on_join.feature',
+  // '../e2e/tests/features/on_leave.feature',
+  // '../e2e/tests/features/on_new_connection_fires.feature',
+  // '../e2e/tests/features/remote_connection_close.feature',
+  // '../e2e/tests/features/room_close.feature',
+  // '../e2e/tests/features/room_join.feature',
+  // // '../e2e/tests/features/state_synchronization.feature',
   ])
 void main() {
   executeTestSuite(
