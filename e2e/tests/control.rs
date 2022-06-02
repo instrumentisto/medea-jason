@@ -38,51 +38,36 @@ impl Client {
         path: &str,
         element: Element,
     ) -> Result<CreateResponse> {
-        let gg : CreateResponse = self
-        .inner
-        .post(&get_url(&self.control_api_address, path))
-        .json(&element)
-        .send()
-        .await?
-        .json()
-        .await?;
-        println!("create {:?}", gg);
-        // if let Some(err) = gg.error {
-        //     // panic!();
-        // }
-        Ok(gg)
+        Ok(self
+            .inner
+            .post(&get_url(&self.control_api_address, path))
+            .json(&element)
+            .send()
+            .await?
+            .json()
+            .await?)
     }
 
     /// Deletes a media [`Element`] identified by the provided `path`.
     pub async fn delete(&self, path: &str) -> Result<Response> {
-        let gg: Response = self
-        .inner
-        .delete(&get_url(&self.control_api_address, path))
-        .send()
-        .await?
-        .json()
-        .await?;
-        println!("delete {:?}", gg);
-        if let Some(err) = gg.error {
-            panic!();
-        }
-        Ok(gg)
+        Ok(self
+            .inner
+            .delete(&get_url(&self.control_api_address, path))
+            .send()
+            .await?
+            .json()
+            .await?)
     }
 
     /// Returns a media [`Element`] identified by the provided `path`.
     pub async fn get(&self, path: &str) -> Result<SingleGetResponse> {
-        let gg: SingleGetResponse = self
-        .inner
-        .get(&get_url(&self.control_api_address, path))
-        .send()
-        .await?
-        .json()
-        .await?;
-        println!("delete {:?}", gg);
-        if let Some(err) = gg.error {
-            panic!();
-        }
-        Ok(gg)
+        Ok(self
+            .inner
+            .get(&get_url(&self.control_api_address, path))
+            .send()
+            .await?
+            .json()
+            .await?)
     }
 
     /// Applies on a media server the provided media [`Element`] identified by
@@ -92,19 +77,14 @@ impl Client {
         path: &str,
         element: Element,
     ) -> Result<CreateResponse> {
-        let gg: CreateResponse = self
-        .inner
-        .put(&get_url(&self.control_api_address, path))
-        .json(&element)
-        .send()
-        .await?
-        .json()
-        .await?;
-        println!("apply {:?}", &gg);
-        if let Some(err) = gg.error {
-            panic!();
-        }
-        Ok(gg)
+        Ok(self
+            .inner
+            .put(&get_url(&self.control_api_address, path))
+            .json(&element)
+            .send()
+            .await?
+            .json()
+            .await?)
     }
 
     // TODO: Server side filtering on GET requests or SSE/WS subscription would
@@ -112,16 +92,13 @@ impl Client {
     //       of huge JSON's.
     /// Fetches all callbacks received by Control API mock server.
     pub async fn callbacks(&self) -> Result<Vec<CallbackItem>> {
-
-        let gg: Vec<CallbackItem> = self
-        .inner
-        .get(&format!("{}/callbacks", self.control_api_address))
-        .send()
-        .await?
-        .json()
-        .await?;
-        
-        Ok(gg)
+        Ok(self
+            .inner
+            .get(&format!("{}/callbacks", self.control_api_address))
+            .send()
+            .await?
+            .json()
+            .await?)
     }
 }
 

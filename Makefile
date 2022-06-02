@@ -38,6 +38,9 @@ ANDROID_SDK_MIN_VERSION = $(strip \
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
+CURRENT_OS ?= $(strip $(or $(os),\
+	$(if $(call eq,$(OS),Windows_NT),windows,\
+	$(if $(call eq,$(shell uname -s),Darwin),macos,linux))))
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -95,6 +98,7 @@ fmt: cargo.fmt flutter.fmt
 
 lint: cargo.lint
 
+codegen: flutter.gen
 
 # Build and publish project crate everywhere.
 #
@@ -474,7 +478,8 @@ flutter.web.assets:
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
 
-
+flutter.gen:
+	flutter pub run build_runner build --delete-conflicting-outputs
 
 
 #################
@@ -616,6 +621,33 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
+# Run E2E desktop tests of project.
+#
+# Usage:
+#	make test.e2e [(only=<regex>|only-tags=<tag-expression>)]
+#		[( [up=no] | up=yes
+#		          [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+test.e2e.desktop:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+endif
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart -d $(CURRENT_OS)
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
 
 # Runs Flutter plugin integration tests on an attached device.
 #
@@ -627,34 +659,6 @@ test.flutter:
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))
-regen:
-	cd flutter/ && \
-	flutter clean && \
-	flutter pub get && \
-	flutter pub run build_runner build --delete-conflicting-outputs
-
-test.e2e.32:
-ifeq ($(up),yes)
-ifeq ($(dockerized),yes)
-ifeq ($(rebuild),yes)
-	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
-endif
-endif
-	@make docker.up.e2e browser=$(browser) background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
-endif
-	cd flutter/example/ && \
-	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart
-ifeq ($(up),yes)
-	@make docker.down.e2e
-endif
-
-test.e2e.322:
-	cd flutter/example/ && \
-	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart
-
 
 ####################
 # Waiting commands #

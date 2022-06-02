@@ -184,8 +184,8 @@ class Member {
         });
 
         remote_track.onStopped(() {
-          connection_store.callback_counter['stopped']!
-              .update(remote_track_id, (value) => value + 1);
+          connection_store.callback_counter[remote_track_id]!
+              .update('stopped', (value) => value + 1);
           connection_store.OnCallbackCounter[remote_track_id]!['stopped']!(
               connection_store.callback_counter[remote_track_id]!['stopped']!);
         });

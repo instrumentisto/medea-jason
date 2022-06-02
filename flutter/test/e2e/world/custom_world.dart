@@ -93,7 +93,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       }).toList();
 
       recv_endpoints.forEach((element) async {
-        await control_client.create(element.item1, element);
+        await control_client.create(element.item1, element.item2);
       });
     }
 

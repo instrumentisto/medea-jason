@@ -181,8 +181,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: master
-      resolved-ref: a443208aea93761a4f7f2fabc543e216ec56c80a
+      ref: "147f8fb438fe51d991a7998ddaa28727e8a01885"
+      resolved-ref: "147f8fb438fe51d991a7998ddaa28727e8a01885"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"

@@ -210,14 +210,12 @@ impl World {
                                 force_relay: false,
                             },
                         );
-                        let gg = serde_json::to_string(&elem).unwrap();
                         (id, elem)
                     })
                 })
                 .collect();
             for (path, element) in recv_endpoints {
-                let gg = self.control_client.create(&path, element).await?;
-
+                self.control_client.create(&path, element).await?;
             }
         }
         let window = self.window_factory.new_window().await;

@@ -125,10 +125,10 @@ StepDefinitionGeneric then_track_is_stopped =
   RegExp(
       r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is stopped"),
   (id, kind, context) async {
-    var member = context.world.members[id]!;
-    var parsedKind = parse_media_kind(kind);
-
     // TODO(rogurotus): Implement
+
+    // var member = context.world.members[id]!;
+    // var parsedKind = parse_media_kind(kind);
     // var track =
     //     await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 

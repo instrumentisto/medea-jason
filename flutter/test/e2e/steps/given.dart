@@ -81,6 +81,7 @@ Future<void> new_given_member(
   }
 
   if (second_member_id != '') {
+    await Future.delayed(Duration(milliseconds: 100));
     await new_given_member(joined, second_member_id, third_member_id, '',
         media_settings, disabled_media_type, disabled_direction, context);
   }
