@@ -1,7 +1,8 @@
-//! Definitions of conversions from [`ControlApi`] spec into generated from
-//! `callback.proto` spec via [`tonic-build`] and vise-versa.
+//! Conversions between [`CallbackApi`] types and the ones generated from
+//! `callback.proto` [gRPC] spec.
 //!
-//! [`ControlApi`]: crate::ControlApi
+//! [`CallbackApi`]: crate::CallbackApi
+//! [gRPC]: https://grpc.io
 
 use time::{
     format_description::well_known::Rfc3339, OffsetDateTime as DateTime,
@@ -9,43 +10,44 @@ use time::{
 
 use crate::{
     callback::{Event, OnJoinEvent, OnLeaveEvent, OnLeaveReason, Request},
-    grpc::{callback as proto, TryFromProtobufError},
+    grpc::{callback as proto, ProtobufError},
 };
 
 impl TryFrom<proto::Request> for Request {
-    type Error = TryFromProtobufError;
+    type Error = ProtobufError;
 
     fn try_from(value: proto::Request) -> Result<Self, Self::Error> {
         Ok(Self {
             fid: value.fid.parse()?,
             event: value
                 .event
-                .map(Into::into)
-                .ok_or(TryFromProtobufError::EmptyElementId(value.fid))?,
+                .ok_or(ProtobufError::NoElementForId(value.fid.into()))?
+                .into(),
             at: DateTime::parse(&value.at, &Rfc3339)?,
         })
     }
 }
 
-impl TryFrom<Request> for proto::Request {
-    type Error = TryFromProtobufError;
-
-    fn try_from(req: Request) -> Result<Self, Self::Error> {
-        Ok(Self {
+impl From<Request> for proto::Request {
+    fn from(req: Request) -> Self {
+        Self {
             fid: req.fid.to_string(),
-            at: req.at.format(&Rfc3339)?,
+            at: req
+                .at
+                .format(&Rfc3339)
+                .unwrap_or_else(|e| unreachable!("{e}")),
             event: Some(req.event.into()),
-        })
+        }
     }
 }
 
 impl From<proto::request::Event> for Event {
     fn from(ev: proto::request::Event) -> Self {
-        use proto::request::Event as Ev;
+        use proto::request::Event;
 
         match ev {
-            Ev::OnJoin(on_join) => Self::OnJoin(on_join.into()),
-            Ev::OnLeave(on_leave) => Self::OnLeave(on_leave.into()),
+            Event::OnJoin(on_join) => Self::OnJoin(on_join.into()),
+            Event::OnLeave(on_leave) => Self::OnLeave(on_leave.into()),
         }
     }
 }
@@ -91,11 +93,13 @@ impl From<OnLeaveEvent> for proto::OnLeave {
 
 impl From<proto::on_leave::Reason> for OnLeaveReason {
     fn from(rsn: proto::on_leave::Reason) -> Self {
+        use proto::on_leave::Reason;
+
         match rsn {
-            proto::on_leave::Reason::LostConnection => Self::Lost,
-            proto::on_leave::Reason::ServerShutdown => Self::Shutdown,
-            proto::on_leave::Reason::Disconnected => Self::Disconnected,
-            proto::on_leave::Reason::Kicked => Self::Kicked,
+            Reason::Lost => Self::Lost,
+            Reason::Shutdown => Self::Shutdown,
+            Reason::Disconnected => Self::Disconnected,
+            Reason::Kicked => Self::Kicked,
         }
     }
 }
@@ -103,8 +107,8 @@ impl From<proto::on_leave::Reason> for OnLeaveReason {
 impl From<OnLeaveReason> for proto::on_leave::Reason {
     fn from(rsn: OnLeaveReason) -> Self {
         match rsn {
-            OnLeaveReason::Lost => Self::LostConnection,
-            OnLeaveReason::Shutdown => Self::ServerShutdown,
+            OnLeaveReason::Lost => Self::Lost,
+            OnLeaveReason::Shutdown => Self::Shutdown,
             OnLeaveReason::Disconnected => Self::Disconnected,
             OnLeaveReason::Kicked => Self::Kicked,
         }

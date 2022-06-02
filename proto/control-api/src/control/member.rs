@@ -3,6 +3,7 @@
 use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
 use derive_more::{Display, Error, From, Into};
+use ref_cast::RefCast;
 use url::Url;
 
 use super::{endpoint, room, Endpoint};
@@ -72,10 +73,21 @@ pub struct Member {
 ///
 /// [`Element`]: crate::Element
 #[derive(
-    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+    Clone,
+    Debug,
+    Display,
+    Eq,
+    From,
+    Hash,
+    Into,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    RefCast,
 )]
 #[from(types(String))]
 #[into(owned(types(String)))]
+#[repr(transparent)]
 pub struct Id(Box<str>);
 
 // TODO: Derive via `derive::From` once it's capable to.
@@ -107,8 +119,18 @@ pub struct Sid {
     /// [WebSocket]: https://en.wikipedia.org/wiki/WebSocket
     pub member_id: Id,
 
-    /// [`Credentials`] of the [`Member`] to authenticate him with.
+    /// [`PlainCredentials`] of the [`Member`] to authenticate him with.
     pub creds: Option<PlainCredentials>,
+}
+
+impl fmt::Display for Sid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
+        if let Some(plain) = &self.creds {
+            write!(f, "?token={plain}")?;
+        }
+        Ok(())
+    }
 }
 
 impl FromStr for Sid {
@@ -116,7 +138,7 @@ impl FromStr for Sid {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut url = Url::parse(s)
-            .map_err(|e| ParseSidError::UrlParseErr(s.into(), e))?;
+            .map_err(|e| ParseSidError::InvalidUrl(s.into(), e))?;
 
         let creds = url.query_pairs().find_map(|(k, v)| {
             (k.as_ref() == "token").then(|| v.as_ref().into())
@@ -125,10 +147,10 @@ impl FromStr for Sid {
         url.set_fragment(None);
         url.set_query(None);
 
-        let missing_path = || ParseSidError::MissingPaths(s.into());
-        let mut segments = url.path_segments().ok_or_else(missing_path)?.rev();
-        let member_id = segments.next().ok_or_else(missing_path)?.into();
-        let room_id = segments.next().ok_or_else(missing_path)?.into();
+        let err_missing = || ParseSidError::MissingPaths(s.into());
+        let mut segments = url.path_segments().ok_or_else(err_missing)?.rev();
+        let member_id = segments.next().ok_or_else(err_missing)?.into();
+        let room_id = segments.next().ok_or_else(err_missing)?.into();
 
         // Removes last two segments.
         if let Ok(mut path) = url.path_segments_mut() {
@@ -144,28 +166,22 @@ impl FromStr for Sid {
     }
 }
 
-impl fmt::Display for Sid {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}/{}/{}", self.public_url, self.room_id, self.member_id)?;
-        if let Some(plain) = &self.creds {
-            write!(f, "?token={plain}")?;
-        }
-        Ok(())
-    }
-}
-
 /// Possible errors of parsing a [`Sid`].
 #[derive(Debug, Display, Error)]
 pub enum ParseSidError {
-    /// Some paths are missing in the provided URI.
+    /// Some paths are missing in the provided [URI].
     ///
-    /// `ws://localhost:8080/ws//qwerty` for example.
+    /// `ws://localhost:8080/ws//qwerty`, for example.
+    ///
+    /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
     #[display(fmt = "Missing paths in URI: {}", _0)]
     MissingPaths(#[error(not(source))] Box<str>),
 
-    /// Error of parsing the provided URI.
+    /// Error of parsing the provided [URI].
+    ///
+    /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
     #[display(fmt = "Cannot parse provided URI `{}`: {}", _0, _1)]
-    UrlParseErr(Box<str>, #[error(source)] url::ParseError),
+    InvalidUrl(Box<str>, #[error(source)] url::ParseError),
 }
 
 /// Collection of [`Sid`]s to be used by [`Member`]s to connect to a media
@@ -193,7 +209,7 @@ pub struct PublicUrl(Url);
 ///
 /// [`Element`]: crate::Element
 /// [Client API]: https://tinyurl.com/266y74tf
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, From, PartialEq)]
 pub enum Credentials {
     /// [Argon2] hash of credentials.
     ///
@@ -202,10 +218,11 @@ pub enum Credentials {
     /// a client side.
     ///
     /// [Argon2]: https://en.wikipedia.org/wiki/Argon2
+    #[from(ignore)]
     Hash(Box<str>),
 
     /// Plain text credentials.
-    Plain(Box<str>),
+    Plain(PlainCredentials),
 }
 
 impl Credentials {
@@ -231,22 +248,17 @@ impl Default for Credentials {
     }
 }
 
-/// Plain [`Credentials`], that may be returned in [`Sids`].
+/// Plain [`Credentials`] returned in a [`Sid`].
 #[derive(
     Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
 )]
 #[from(types(String))]
-pub struct PlainCredentials(Box<str>);
+#[into(owned(types(String)))]
+pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.
 
 // TODO: Derive via `derive::From` once it's capable to.
 impl<'a> From<&'a str> for PlainCredentials {
     fn from(s: &'a str) -> Self {
         Self(s.into())
-    }
-}
-
-impl From<PlainCredentials> for Credentials {
-    fn from(plain: PlainCredentials) -> Self {
-        Self::Plain(plain.0)
     }
 }

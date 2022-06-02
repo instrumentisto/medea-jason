@@ -16,7 +16,7 @@ use crate::{
             self as callback_proto,
             callback_server::Callback as GrpcCallbackApi,
         },
-        TryFromProtobufError,
+        ProtobufError,
     },
     CallbackApi, ControlApi, Ping,
 };
@@ -25,7 +25,7 @@ use crate::{
 impl<T> GrpcControlApi for T
 where
     T: ControlApi + Send + Sync + 'static,
-    T::Error: From<TryFromProtobufError> + Into<control_proto::Error>,
+    T::Error: From<ProtobufError> + Into<control_proto::Error>,
 {
     async fn create(
         &self,
@@ -60,7 +60,7 @@ where
             .into_inner()
             .fid
             .into_iter()
-            .map(|fid| fid.parse().map_err(TryFromProtobufError::from))
+            .map(|fid| fid.parse().map_err(ProtobufError::from))
             .collect::<Result<Vec<_>, _>>();
 
         let result = match ids {
@@ -85,7 +85,7 @@ where
             .into_inner()
             .fid
             .into_iter()
-            .map(|fid| fid.parse().map_err(TryFromProtobufError::from))
+            .map(|fid| fid.parse().map_err(ProtobufError::from))
             .collect::<Result<Vec<_>, _>>();
 
         let result = match ids {
@@ -164,7 +164,7 @@ where
 impl<T> GrpcCallbackApi for T
 where
     T: CallbackApi + Send + Sync + 'static,
-    T::Error: From<TryFromProtobufError>,
+    T::Error: From<ProtobufError>,
     tonic::Status: From<T::Error>,
 {
     async fn on_event(

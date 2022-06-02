@@ -16,9 +16,9 @@ All user visible changes to this project will be documented in this file. This p
 - Abstractions:
     - `ControlApi` and `CallbackApi` ([#55]).
 - gRPC:
-  - `ControlApi` and `CallbackApi` implementations ([#56]).
+    - `ControlApi` and `CallbackApi` implementations ([#56]).
 - Cargo features:
-  - `client` and `server` features ([#56]).
+    - `client` and `server` ([#56]).
 
 [#55]: /../../pull/55
 [#56]: /../../pull/56

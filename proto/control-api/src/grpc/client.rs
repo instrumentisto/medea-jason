@@ -10,7 +10,7 @@ use crate::{
     grpc::{
         api::{self as control_proto},
         callback::{self as callback_proto},
-        CallbackClient, ControlApiClient, TryFromProtobufError,
+        CallbackClient, ControlApiClient, ProtobufError,
     },
     member,
     member::ParseSidError,
@@ -152,7 +152,7 @@ pub enum ControlClientError {
 
     /// Failed to convert from protobuf.
     #[display(fmt = "Failed to convert from protobuf: {}", _0)]
-    TryFromProtobufError(TryFromProtobufError),
+    TryFromProtobufError(ProtobufError),
 
     /// [`ControlApi`] errored.
     #[display(fmt = "ControlApi errored: {:?}", _0)] // TODO
@@ -170,15 +170,12 @@ where
 {
     type Error = CallbackClientError;
 
-    async fn on_event(
-        &self,
-        request: CallbackRequest,
-    ) -> Result<(), Self::Error> {
+    async fn on_event(&self, req: CallbackRequest) -> Result<(), Self::Error> {
         // It's ok to `.clone()` here.
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
 
-        Self::on_event(&mut this, callback_proto::Request::try_from(request)?)
+        Self::on_event(&mut this, callback_proto::Request::from(req))
             .await
             .map(drop)
             .map_err(Into::into)
@@ -194,5 +191,5 @@ pub enum CallbackClientError {
 
     /// Failed to convert from protobuf.
     #[display(fmt = "Failed to convert from protobuf: {}", _0)]
-    TryFromProtobufError(TryFromProtobufError),
+    TryFromProtobufError(ProtobufError),
 }

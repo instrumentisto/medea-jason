@@ -1,19 +1,19 @@
-/// Request with a fired callback event and some meta information.
+/// Request with a fired callback event and its meta information.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Request {
-    /// FID (Full ID) of the element that event was occurred with.
+    /// FID (Full ID) of the media `Element`, the occurred event is related to.
     #[prost(string, tag="1")]
     pub fid: ::prost::alloc::string::String,
-    /// Time of event occurring.
+    /// Datetime when the event occurred.
     #[prost(string, tag="2")]
     pub at: ::prost::alloc::string::String,
-    /// Occurred callback event.
+    /// Occurred event.
     #[prost(oneof="request::Event", tags="3, 4")]
     pub event: ::core::option::Option<request::Event>,
 }
 /// Nested message and enum types in `Request`.
 pub mod request {
-    /// Occurred callback event.
+    /// Occurred event.
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Event {
         #[prost(message, tag="3")]
@@ -22,44 +22,45 @@ pub mod request {
         OnLeave(super::OnLeave),
     }
 }
-/// Empty response of the Callback service.
+/// Empty response of the `Callback` service.
 ///
-/// We don't use 'google.protobuf.Empty' to be able to add
-/// some fields (if necessary) in the future.
+/// We don't use `google.protobuf.Empty` to be able to add some fields (if
+/// necessary) in the future.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Response {
 }
-/// Event that fires when Member joins a Room.
+/// Event notifying about a `Member` joining a `Room`.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OnJoin {
 }
-/// Event that fires when Member leaves its Room.
+/// Event notifying about a `Member` leaving its `Room`.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OnLeave {
-    /// Reason of why Member leaves the Room.
+    /// Reason of why the `Member` leaves.
     #[prost(enumeration="on_leave::Reason", tag="1")]
     pub reason: i32,
 }
 /// Nested message and enum types in `OnLeave`.
 pub mod on_leave {
+    /// Possible reasons of why a `Member` leaves its `Room`.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum Reason {
-        /// Member was normally disconnected.
+        /// `Member` was disconnected normally.
         Disconnected = 0,
-        /// Connection with Member was lost.
-        LostConnection = 1,
-        /// Member was forcibly disconnected by server.
+        /// Connection with the `Member` was lost.
+        Lost = 1,
+        /// `Member` was forcibly disconnected by a media server.
         Kicked = 2,
-        /// Medea media server is shutting down.
-        ServerShutdown = 3,
+        /// Media server was shut down.
+        Shutdown = 3,
     }
 }
 /// Generated client implementations.
 pub mod callback_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Service for receiving callbacks from Medea media server.
+    /// Service for receiving callbacks from a media server.
     #[derive(Debug, Clone)]
     pub struct CallbackClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -120,7 +121,7 @@ pub mod callback_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        //// Fires when a certain callback event happens on Medea media server.
+        /// Fires when a certain callback event happens on a media server.
         pub async fn on_event(
             &mut self,
             request: impl tonic::IntoRequest<super::Request>,
@@ -149,13 +150,13 @@ pub mod callback_server {
     ///Generated trait containing gRPC methods that should be implemented for use with CallbackServer.
     #[async_trait]
     pub trait Callback: Send + Sync + 'static {
-        //// Fires when a certain callback event happens on Medea media server.
+        /// Fires when a certain callback event happens on a media server.
         async fn on_event(
             &self,
             request: tonic::Request<super::Request>,
         ) -> Result<tonic::Response<super::Response>, tonic::Status>;
     }
-    /// Service for receiving callbacks from Medea media server.
+    /// Service for receiving callbacks from a media server.
     #[derive(Debug)]
     pub struct CallbackServer<T: Callback> {
         inner: _Inner<T>,
