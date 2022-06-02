@@ -5,6 +5,16 @@ enum LocalMediaInitExceptionKind {
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
   GetUserMediaFailed,
 
+  /// Occurs if the [getUserMedia()][1] request failed on getting audio.
+  ///
+  /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+  GetUserMediaAudioFailed,
+
+  /// Occurs if the [getUserMedia()][1] request failed on getting video.
+  ///
+  /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+  GetUserMediaVideoFailed,
+
   /// Occurs if the [getDisplayMedia()][1] request failed.
   ///
   /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia

@@ -12,11 +12,26 @@ use crate::{
     media::{InvalidOutputAudioDeviceIdError, MediaSourceKind, MicVolumeError},
     platform::{
         utils::EventListener, DisplayMediaStreamConstraints, Error,
-        MediaDeviceInfo, MediaStreamConstraints, MediaStreamTrack,
+        GetUserMediaError, MediaDeviceInfo, MediaStreamConstraints,
+        MediaStreamTrack,
     },
 };
 
 use super::window;
+
+impl From<Error> for GetUserMediaError {
+    fn from(err: Error) -> Self {
+        let message = err.message().to_lowercase();
+
+        if message.contains("audio") {
+            Self::Audio(err)
+        } else if message.contains("video") {
+            Self::Video(err)
+        } else {
+            Self::Unknown(err)
+        }
+    }
+}
 
 /// Media devices controller.
 #[derive(Debug)]
@@ -116,17 +131,17 @@ impl MediaDevices {
     pub async fn get_user_media(
         &self,
         caps: MediaStreamConstraints,
-    ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
+    ) -> Result<Vec<MediaStreamTrack>, Traced<GetUserMediaError>> {
         let stream = JsFuture::from(
             self.devices
                 .get_user_media_with_constraints(&caps.into())
                 .map_err(Error::from)
-                .map_err(tracerr::wrap!())?,
+                .map_err(tracerr::from_and_wrap!())?,
         )
         .await
         .map(web_sys::MediaStream::from)
         .map_err(Error::from)
-        .map_err(tracerr::wrap!())?;
+        .map_err(tracerr::from_and_wrap!())?;
 
         Ok(js_sys::try_iter(&stream.get_tracks())
             .unwrap()

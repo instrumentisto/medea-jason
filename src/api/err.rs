@@ -74,6 +74,18 @@ pub enum LocalMediaInitExceptionKind {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     GetUserMediaFailed,
 
+    /// Occurs if the [getUserMedia()][1] request failed on getting audio
+    /// track.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+    GetUserMediaAudioFailed,
+
+    /// Occurs if the [getUserMedia()][1] request failed on getting video
+    /// track.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+    GetUserMediaVideoFailed,
+
     /// Occurs if the [getDisplayMedia()][1] request failed.
     ///
     /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
@@ -616,9 +628,15 @@ impl From<Traced<InitLocalTracksError>> for Error {
             Err::Detached => {
                 return StateError::new(message, stacktrace).into()
             }
-            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(cause)) => {
-                (Kind::GetUserMediaFailed, Some(cause))
-            }
+            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
+                platform::GetUserMediaError::Audio(cause),
+            )) => (Kind::GetUserMediaAudioFailed, Some(cause)),
+            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
+                platform::GetUserMediaError::Video(cause),
+            )) => (Kind::GetUserMediaVideoFailed, Some(cause)),
+            Err::GetUserMediaFailed(Gum::PlatformRequestFailed(
+                platform::GetUserMediaError::Unknown(cause),
+            )) => (Kind::GetUserMediaFailed, Some(cause)),
             Err::GetDisplayMediaFailed(Gdm::PlatformRequestFailed(cause)) => {
                 (Kind::GetDisplayMediaFailed, Some(cause))
             }

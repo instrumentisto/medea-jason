@@ -107,8 +107,8 @@ impl WebDriverClient {
         let (tx, rx) = mpsc::channel();
         let client = Arc::clone(&self.inner);
         drop(tokio::spawn(async move {
-            let mut inner = client.lock().await;
-            inner.0.close().await.map_err(|e| dbg!("{:?}", e)).unwrap();
+            let inner = client.lock().await;
+            inner.0.clone().close().await.unwrap();
             tx.send(()).unwrap();
         }));
         task::block_in_place(move || {
@@ -215,7 +215,7 @@ impl Inner {
         headless_chrome: bool,
     ) -> Result<Self> {
         Ok(Self(
-            ClientBuilder::native()
+            ClientBuilder::rustls()
                 .capabilities(Self::get_webdriver_capabilities(
                     headless_firefox,
                     headless_chrome,
