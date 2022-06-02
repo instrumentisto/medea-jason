@@ -164,6 +164,8 @@ jobs:
             wasm: true
     runs-on: ubuntu-latest
     steps:
+      - id: debug
+        run: echo "${{ format('refs/tags/{0}-', matrix.crate) }}"
       - id: should-run
         run: |
           echo "::set-output name=if::\
