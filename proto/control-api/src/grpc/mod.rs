@@ -53,6 +53,7 @@ pub mod api;
 #[rustfmt::skip]
 pub mod callback;
 
+#[doc(inline)]
 pub use self::conversions::{
     CallbackUrl, CallbackUrlParseError, TryFromProtobufError,
 };

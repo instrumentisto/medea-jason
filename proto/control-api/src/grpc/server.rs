@@ -1,4 +1,4 @@
-//! gRPC servers.
+//! gRPC [`ControlApi`] and [`CallbackApi`] servers.
 
 use std::collections::HashMap;
 

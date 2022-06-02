@@ -1,4 +1,4 @@
-//! gRPC clients.
+//! gRPC [`ControlApi`] and [`CallbackApi`] clients.
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
@@ -138,7 +138,7 @@ where
 /// [`ControlApiClient`] error.
 #[derive(Debug, Display, From, Error)]
 pub enum ControlClientError {
-    /// Failed to parse [`Sid`].
+    /// Failed to parse [`member::Sid`].
     #[display(fmt = "Failed to parse Sid: {}", _0)]
     ParseSidError(ParseSidError),
 

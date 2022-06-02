@@ -154,7 +154,7 @@ impl fmt::Display for Sid {
     }
 }
 
-/// Possible errors of parsing a [`LocalSrcUri`].
+/// Possible errors of parsing a [`Sid`].
 #[derive(Debug, Display, Error)]
 pub enum ParseSidError {
     /// Some paths are missing in the provided URI.
