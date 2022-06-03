@@ -1,5 +1,6 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:gherkin/gherkin.dart';
 
 import 'api/room.dart';
@@ -113,7 +114,14 @@ var TestConfigs = FlutterTestConfiguration()
   '../e2e/tests/features/room_join.feature',
   // '../e2e/tests/features/state_synchronization.feature',
   ])
-void main() {
+Future<void> main() async {
+  var mediaDeviceInfos = await enumerateDevices();
+  var devicesInfo = '';
+  for (var device in mediaDeviceInfos) {
+    devicesInfo = devicesInfo +
+        'Kind: ${device.kind}\nName: ${device.label}\nId: ${device.deviceId}\n\n';
+  }
+  print(devicesInfo);
   executeTestSuite(
     TestConfigs,
     (World world) async {},

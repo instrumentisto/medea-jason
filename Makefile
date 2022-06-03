@@ -659,7 +659,7 @@ endif
 endif
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart -d linux -v
+		--target=../test/e2e/suite.dart -d linux
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
