@@ -4,7 +4,8 @@
 
 use std::str::FromStr;
 
-use derive_more::{Display, Error, From, Into};
+use derive_more::{AsRef, Display, Error, From, Into};
+use ref_cast::RefCast;
 use url::Url;
 
 use crate::control::{endpoint::web_rtc_publish, member, room};
@@ -34,10 +35,22 @@ pub struct WebRtcPlay {
 ///
 /// [`Element`]: crate::Element
 #[derive(
-    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+    AsRef,
+    Clone,
+    Debug,
+    Display,
+    Eq,
+    From,
+    Hash,
+    Into,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    RefCast,
 )]
 #[from(types(String))]
 #[into(owned(types(String)))]
+#[repr(transparent)]
 pub struct Id(Box<str>);
 
 // TODO: Derive via `derive::From` once it's capable to.

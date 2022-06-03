@@ -2,7 +2,8 @@
 
 use std::collections::HashMap;
 
-use derive_more::{Display, From, Into};
+use derive_more::{AsRef, Display, From, Into};
+use ref_cast::RefCast;
 
 use super::{member, Member};
 
@@ -26,10 +27,22 @@ pub struct Room {
 ///
 /// [`Element`]: crate::Element
 #[derive(
-    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+    AsRef,
+    Clone,
+    Debug,
+    Display,
+    Eq,
+    From,
+    Hash,
+    Into,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    RefCast,
 )]
 #[from(types(String))]
 #[into(owned(types(String)))]
+#[repr(transparent)]
 pub struct Id(Box<str>);
 
 // TODO: Derive via `derive::From` once it's capable to.
