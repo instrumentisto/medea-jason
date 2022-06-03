@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use derive_more::{Display, From, Into};
+use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
 
 use super::{member, Member};
@@ -27,6 +27,7 @@ pub struct Room {
 ///
 /// [`Element`]: crate::Element
 #[derive(
+    AsRef,
     Clone,
     Debug,
     Display,

@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
-use derive_more::{Display, Error, From, Into};
+use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
 use url::Url;
 
@@ -73,6 +73,7 @@ pub struct Member {
 ///
 /// [`Element`]: crate::Element
 #[derive(
+    AsRef,
     Clone,
     Debug,
     Display,
@@ -200,7 +201,17 @@ pub type Sids = HashMap<Id, Sid>;
 /// [Client API]: https://tinyurl.com/266y74tf
 /// [URL]: https://en.wikipedia.org/wiki/URL
 #[derive(
-    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+    AsRef,
+    Clone,
+    Debug,
+    Display,
+    Eq,
+    From,
+    Hash,
+    Into,
+    Ord,
+    PartialEq,
+    PartialOrd,
 )]
 pub struct PublicUrl(Url);
 
@@ -250,7 +261,17 @@ impl Default for Credentials {
 
 /// Plain [`Credentials`] returned in a [`Sid`].
 #[derive(
-    Clone, Debug, Display, Eq, From, Hash, Into, Ord, PartialEq, PartialOrd,
+    AsRef,
+    Clone,
+    Debug,
+    Display,
+    Eq,
+    From,
+    Hash,
+    Into,
+    Ord,
+    PartialEq,
+    PartialOrd,
 )]
 #[from(types(String))]
 #[into(owned(types(String)))]
