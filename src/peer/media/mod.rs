@@ -555,13 +555,13 @@ impl MediaConnections {
         let mut sender_and_track =
             Vec::with_capacity(self.0.borrow().senders.len());
         let mut media_exchange_state_updates = HashMap::new();
-        let senders: Vec<_> = self
+        let senders = self
             .0
             .borrow()
             .senders
             .values()
             .map(|c| (c.obj(), c.state()))
-            .collect();
+            .collect::<Vec<_>>();
         for (sender, state) in senders {
             if let Some(track) = tracks.get(&state.id()).cloned() {
                 if sender.caps().satisfies(track.as_ref()).await {

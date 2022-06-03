@@ -246,7 +246,7 @@ impl MediaStreamTrack {
         match state {
             0 => MediaStreamTrackState::Live,
             1 => MediaStreamTrackState::Ended,
-            _ => unreachable!(),
+            _ => unreachable!("Unknown `MediaStreamTrackState`: {state}"),
         }
     }
 

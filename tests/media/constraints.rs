@@ -584,7 +584,7 @@ async fn simultaneous_device_and_display() {
     assert!(
         display_video_constraints
             .satisfies(display_video_track.as_ref())
-            .await
+            .await,
     );
     assert_eq!(
         display_video_track.media_source_kind(),
@@ -596,10 +596,10 @@ async fn simultaneous_device_and_display() {
     assert!(
         device_video_constraints
             .satisfies(device_video_track.as_ref())
-            .await
+            .await,
     );
     assert_eq!(
         device_video_track.media_source_kind(),
-        MediaSourceKind::Device
+        MediaSourceKind::Device,
     );
 }

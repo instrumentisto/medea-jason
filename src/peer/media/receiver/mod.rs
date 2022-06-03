@@ -336,9 +336,7 @@ impl Drop for Receiver {
             }
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {
-            platform::spawn(async move {
-                recv_track.stop().await;
-            });
+            platform::spawn(recv_track.stop());
         }
     }
 }
