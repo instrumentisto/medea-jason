@@ -278,11 +278,12 @@ impl Default for AudioMediaTracksSettings {
 
 /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies any
 /// constraints with the provided [`MediaKind`].
-fn satisfies_track(
+async fn satisfies_track(
     track: &platform::MediaStreamTrack,
     kind: MediaKind,
 ) -> bool {
-    track.kind() == kind && track.ready_state() == MediaStreamTrackState::Live
+    track.kind() == kind
+        && track.ready_state().await == MediaStreamTrackState::Live
 }
 
 /// [MediaStreamConstraints][1] for the video media type.
@@ -360,15 +361,15 @@ impl VideoTrackConstraints<DeviceVideoTrackConstraints> {
     ///
     /// Returns `false` if these [`VideoTrackConstraints`] don't have any
     /// constraints configured.
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
-        self.constraints
-            .as_ref()
-            .filter(|_| self.enabled())
-            .map_or(false, |device| device.satisfies(track))
+        if let Some(constraints) = &self.constraints {
+            self.enabled() && constraints.satisfies(track).await
+        } else {
+            false
+        }
     }
 }
 
@@ -378,15 +379,15 @@ impl VideoTrackConstraints<DisplayVideoTrackConstraints> {
     ///
     /// Returns `false` if these [`VideoTrackConstraints`] don't have any
     /// constraints configured.
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
-        self.constraints
-            .as_ref()
-            .filter(|_| self.enabled())
-            .map_or(false, |display| display.satisfies(track))
+        if let Some(constraints) = &self.constraints {
+            self.enabled() && constraints.satisfies(track).await
+        } else {
+            false
+        }
     }
 }
 
@@ -460,15 +461,14 @@ impl MediaStreamSettings {
     ///
     /// Unconstrains [`VideoTrackConstraints`] which this
     /// [`platform::MediaStreamTrack`] satisfies.
-    #[must_use]
-    pub fn unconstrain_if_satisfies_video<T>(&mut self, track: T) -> bool
+    pub async fn unconstrain_if_satisfies_video<T>(&mut self, track: T) -> bool
     where
         T: AsRef<platform::MediaStreamTrack>,
     {
-        if self.device_video.satisfies(&track) {
+        if self.device_video.satisfies(&track).await {
             self.device_video.unconstrain();
             true
-        } else if self.display_video.satisfies(&track) {
+        } else if self.display_video.satisfies(&track).await {
             self.display_video.unconstrain();
             true
         } else {
@@ -850,14 +850,13 @@ impl VideoSource {
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// this [`VideoSource`].
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         match self {
-            VideoSource::Display(display) => display.satisfies(&track),
-            VideoSource::Device(device) => device.satisfies(track),
+            VideoSource::Display(display) => display.satisfies(&track).await,
+            VideoSource::Device(device) => device.satisfies(track).await,
         }
     }
 }
@@ -898,14 +897,13 @@ pub enum TrackConstraints {
 impl TrackConstraints {
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// these [`TrackConstraints`].
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         match self {
-            Self::Audio(audio) => audio.satisfies(&track),
-            Self::Video(video) => video.satisfies(&track),
+            Self::Audio(audio) => audio.satisfies(&track).await,
+            Self::Video(video) => video.satisfies(&track).await,
         }
     }
 
@@ -983,13 +981,12 @@ impl AudioTrackConstraints {
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// contained constraints.
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Audio)
+        satisfies_track(track, MediaKind::Audio).await
             && ConstrainString::satisfies(
                 &self.device_id,
                 &Some(track.device_id()),
@@ -1200,13 +1197,12 @@ impl DeviceVideoTrackConstraints {
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// contained [`DeviceVideoTrackConstraints`].
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Video)
+        satisfies_track(track, MediaKind::Video).await
             && ConstrainString::satisfies(
                 &self.device_id,
                 &Some(track.device_id()),
@@ -1272,13 +1268,12 @@ impl DisplayVideoTrackConstraints {
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// contained [`DisplayVideoTrackConstraints`].
     #[allow(clippy::unused_self)]
-    #[must_use]
-    pub fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
+    pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         let track = track.as_ref();
-        satisfies_track(track, MediaKind::Video)
+        satisfies_track(track, MediaKind::Video).await
             && track.guess_is_from_display()
     }
 

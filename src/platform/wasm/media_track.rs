@@ -93,8 +93,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrackstate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-    #[must_use]
-    pub fn ready_state(&self) -> MediaStreamTrackState {
+    pub async fn ready_state(&self) -> MediaStreamTrackState {
         let state = self.sys_track.ready_state();
         match state {
             web_sys::MediaStreamTrackState::Live => MediaStreamTrackState::Live,
@@ -102,7 +101,7 @@ impl MediaStreamTrack {
                 MediaStreamTrackState::Ended
             }
             web_sys::MediaStreamTrackState::__Nonexhaustive => {
-                unreachable!("Unknown MediaStreamTrackState::{state:?}")
+                unreachable!("Unknown `MediaStreamTrackState`: {state:?}")
             }
         }
     }

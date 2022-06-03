@@ -87,7 +87,7 @@ mod media_stream_track {
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-        pub fn ready_state(track: Dart_Handle) -> i64;
+        pub fn ready_state(track: Dart_Handle) -> Dart_Handle;
 
         /// [Stops][1] the provided [MediaStreamTrack][0].
         ///
@@ -233,10 +233,21 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     #[allow(clippy::unused_self)]
-    #[must_use]
-    pub fn ready_state(&self) -> MediaStreamTrackState {
-        // TODO: Correct implementation requires `flutter_webrtc`-side fixes.
-        MediaStreamTrackState::Live
+    pub async fn ready_state(&self) -> MediaStreamTrackState {
+        let handle = self.inner.get();
+        let state = unsafe {
+            FutureFromDart::execute::<i32>(media_stream_track::ready_state(
+                handle,
+            ))
+            .await
+        }
+        .unwrap();
+
+        match state {
+            0 => MediaStreamTrackState::Live,
+            1 => MediaStreamTrackState::Ended,
+            _ => unreachable!("Unknown `MediaStreamTrackState`: {state}"),
+        }
     }
 
     /// [Stops][1] this [`MediaStreamTrack`].

@@ -21,7 +21,7 @@ void registerFunctions(DynamicLibrary dl) {
     stop: Pointer.fromFunction(_stop),
     onEnded: Pointer.fromFunction(_onEnded),
     clone: Pointer.fromFunction(_clone),
-    readyState: Pointer.fromFunction(_readyState, 0),
+    readyState: Pointer.fromFunction(_readyState),
   );
 }
 
@@ -54,9 +54,8 @@ Pointer<Utf8> _deviceId(MediaStreamTrack track) {
   return track.deviceId().toNativeUtf8();
 }
 
-int _readyState(MediaStreamTrack track) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  throw UnimplementedError();
+Object _readyState(MediaStreamTrack track) {
+  return () => track.state().then((s) => s.index);
 }
 
 /// Returns facingMode of the provided [MediaStreamTrack].
