@@ -67,14 +67,13 @@ pub use self::convert::ProtobufError;
 #[doc(inline)]
 pub use self::{
     api::control_api_client::ControlApiClient,
-    callback::callback_client::CallbackClient,
-    client::{CallbackClientError, ControlClientError},
+    callback::callback_server::CallbackServer, client::ControlClientError,
 };
 #[cfg(feature = "server")]
 #[doc(inline)]
 pub use self::{
     api::control_api_server::ControlApiServer,
-    callback::callback_server::CallbackServer,
+    callback::callback_client::CallbackClient, server::CallbackClientError,
 };
 
 /// URL representing a [gRPC] callback implementing [`CallbackApi`].

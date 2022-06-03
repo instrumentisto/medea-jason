@@ -21,7 +21,7 @@ impl TryFrom<proto::Request> for Request {
             fid: value.fid.parse()?,
             event: value
                 .event
-                .ok_or(ProtobufError::NoElementForId(value.fid.into()))?
+                .ok_or_else(|| ProtobufError::NoElementForId(value.fid.into()))?
                 .into(),
             at: DateTime::parse(&value.at, &Rfc3339)?,
         })

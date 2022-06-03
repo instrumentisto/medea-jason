@@ -9,8 +9,11 @@ use crate::{
     control::{ParseFidError, Request as ControlRequest},
     grpc::{
         api::{self as control_proto},
-        callback::{self as callback_proto},
-        CallbackClient, ControlApiClient, ProtobufError,
+        callback::{
+            self as callback_proto,
+            callback_server::Callback as GrpcCallbackApi,
+        },
+        ControlApiClient, ProtobufError,
     },
     member,
     member::ParseSidError,
@@ -21,6 +24,26 @@ use crate::{
 ///
 /// [`Error`]: std::error::Error
 type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
+
+#[async_trait]
+impl<T> GrpcCallbackApi for T
+where
+    T: CallbackApi + Send + Sync + 'static,
+    T::Error: From<ProtobufError>,
+    tonic::Status: From<T::Error>,
+{
+    async fn on_event(
+        &self,
+        req: tonic::Request<callback_proto::Request>,
+    ) -> Result<tonic::Response<callback_proto::Response>, tonic::Status> {
+        let req = CallbackRequest::try_from(req.into_inner())
+            .map_err(T::Error::from)?;
+        self.on_event(req)
+            .await
+            .map(|_| tonic::Response::new(callback_proto::Response {}))
+            .map_err(Into::into)
+    }
+}
 
 #[async_trait]
 impl<T> ControlApi for ControlApiClient<T>
@@ -157,39 +180,4 @@ pub enum ControlClientError {
     /// [`ControlApi`] errored.
     #[display(fmt = "ControlApi errored: {:?}", _0)] // TODO
     ControlError(#[error(not(source))] control_proto::Error),
-}
-
-#[async_trait]
-impl<T> CallbackApi for CallbackClient<T>
-where
-    T: Clone + tonic::client::GrpcService<tonic::body::BoxBody> + Send + Sync,
-    T::Future: Send,
-    T::Error: Into<StdError>,
-    T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-    <T::ResponseBody as Body>::Error: Into<StdError> + Send,
-{
-    type Error = CallbackClientError;
-
-    async fn on_event(&self, req: CallbackRequest) -> Result<(), Self::Error> {
-        // It's ok to `.clone()` here.
-        // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
-        let mut this = self.clone();
-
-        Self::on_event(&mut this, callback_proto::Request::from(req))
-            .await
-            .map(drop)
-            .map_err(Into::into)
-    }
-}
-
-/// [`CallbackClient`] error.
-#[derive(Debug, Display, From, Error)]
-pub enum CallbackClientError {
-    /// gRPC server errored.
-    #[display(fmt = "gRPC server errored: {}", _0)]
-    Tonic(tonic::Status),
-
-    /// Failed to convert from protobuf.
-    #[display(fmt = "Failed to convert from protobuf: {}", _0)]
-    TryFromProtobufError(ProtobufError),
 }
