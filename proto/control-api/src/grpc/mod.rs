@@ -38,6 +38,7 @@ pub mod api;
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,
+    clippy::same_name_method,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -67,13 +68,15 @@ pub use self::convert::ProtobufError;
 #[doc(inline)]
 pub use self::{
     api::control_api_client::ControlApiClient,
-    callback::callback_server::CallbackServer, client::ControlClientError,
+    callback::callback_server::CallbackServer as CallbackApiServer,
+    client::ControlApiClientError,
 };
 #[cfg(feature = "server")]
 #[doc(inline)]
 pub use self::{
     api::control_api_server::ControlApiServer,
-    callback::callback_client::CallbackClient, server::CallbackClientError,
+    callback::callback_client::CallbackClient as CallbackApiClient,
+    server::CallbackApiClientError,
 };
 
 /// URL representing a [gRPC] callback implementing [`CallbackApi`].
@@ -113,7 +116,7 @@ impl FromStr for CallbackUrl {
 /// Error of parsing a [`CallbackUrl`].
 #[derive(Clone, Copy, Debug, Display, Error, From)]
 pub enum CallbackUrlParseError {
-    /// Error parsing the provided [`Url`].
+    /// Error of parsing the provided [`Url`].
     #[display(fmt = "Invalid URL: {}", _0)]
     UrlParseErr(url::ParseError),
 

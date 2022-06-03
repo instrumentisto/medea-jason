@@ -50,6 +50,7 @@
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::rest_pat_in_fully_bound_structs,
+    clippy::same_name_method,
     clippy::shadow_unrelated,
     clippy::str_to_string,
     clippy::string_add,
@@ -90,6 +91,8 @@
     unused_results,
     variant_size_differences
 )]
+// Because of uncontrolled names in the generated code.
+#![allow(clippy::same_name_method)]
 
 pub mod callback;
 pub mod control;

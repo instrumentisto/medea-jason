@@ -1,4 +1,6 @@
-//! gRPC [`ControlApi`] and [`CallbackApi`] clients.
+//! [`ControlApi`] client and [`CallbackApi`] server [gRPC] implementations.
+//!
+//! [gRPC]: https://grpc.io
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
@@ -11,7 +13,7 @@ use crate::{
         api::{self as control_proto},
         callback::{
             self as callback_proto,
-            callback_server::Callback as GrpcCallbackApi,
+            callback_server::Callback as GrpcCallbackService,
         },
         ControlApiClient, ProtobufError,
     },
@@ -26,7 +28,7 @@ use crate::{
 type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[async_trait]
-impl<T> GrpcCallbackApi for T
+impl<T: ?Sized> GrpcCallbackService for T
 where
     T: CallbackApi + Send + Sync + 'static,
     T::Error: From<ProtobufError>,
@@ -48,26 +50,26 @@ where
 #[async_trait]
 impl<T> ControlApi for ControlApiClient<T>
 where
-    T: Clone + tonic::client::GrpcService<tonic::body::BoxBody> + Send + Sync,
+    T: tonic::client::GrpcService<tonic::body::BoxBody> + Clone + Send + Sync,
     T::Future: Send,
-    T::Error: Into<StdError>,
     T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-    <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    <T::ResponseBody as Body>::Error: Send,
+    StdError: From<T::Error> + From<<T::ResponseBody as Body>::Error>,
 {
-    type Error = ControlClientError;
+    type Error = ControlApiClientError;
 
     async fn create(
         &self,
         req: ControlRequest,
     ) -> Result<member::Sids, Self::Error> {
-        // It's ok to `.clone()` here.
+        // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
+
         let resp =
             Self::create(&mut this, control_proto::CreateRequest::from(req))
                 .await?
                 .into_inner();
-
         if let Some(e) = resp.error {
             return Err(e.into());
         }
@@ -84,14 +86,14 @@ where
         &self,
         req: ControlRequest,
     ) -> Result<member::Sids, Self::Error> {
-        // It's ok to `.clone()` here.
+        // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
+
         let resp =
             Self::apply(&mut this, control_proto::ApplyRequest::from(req))
                 .await?
                 .into_inner();
-
         if let Some(e) = resp.error {
             return Err(e.into());
         }
@@ -105,9 +107,10 @@ where
     }
 
     async fn delete(&self, fids: &[Fid]) -> Result<(), Self::Error> {
-        // It's ok to `.clone()` here.
+        // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
+
         let resp = Self::delete(
             &mut this,
             control_proto::IdRequest {
@@ -116,7 +119,6 @@ where
         )
         .await?
         .into_inner();
-
         if let Some(e) = resp.error {
             return Err(e.into());
         }
@@ -125,9 +127,10 @@ where
     }
 
     async fn get(&self, fids: &[Fid]) -> Result<Elements, Self::Error> {
-        // It's ok to `.clone()` here.
+        // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
+
         let resp = Self::get(
             &mut this,
             control_proto::IdRequest {
@@ -136,7 +139,6 @@ where
         )
         .await?
         .into_inner();
-
         if let Some(e) = resp.error {
             return Err(e.into());
         }
@@ -148,36 +150,41 @@ where
     }
 
     async fn healthz(&self, ping: Ping) -> Result<Pong, Self::Error> {
-        // It's ok to `.clone()` here.
+        // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
-        Self::healthz(&mut this, control_proto::Ping::from(ping))
-            .await
-            .map(|resp| Pong(resp.into_inner().nonce))
-            .map_err(Into::into)
+
+        Ok(Self::healthz(&mut this, control_proto::Ping::from(ping))
+            .await?
+            .into_inner()
+            .into())
     }
 }
 
-/// [`ControlApiClient`] error.
+/// Possible errors of [`ControlApiClient`].
 #[derive(Debug, Display, From, Error)]
-pub enum ControlClientError {
+pub enum ControlApiClientError {
     /// Failed to parse [`member::Sid`].
-    #[display(fmt = "Failed to parse Sid: {}", _0)]
-    ParseSidError(ParseSidError),
+    #[display(fmt = "Invalid SID: {}", _0)]
+    InvalidSid(ParseSidError),
 
     /// Failed to parse [`Fid`].
-    #[display(fmt = "Failed to parse Fid: {}", _0)]
-    ParseFidError(ParseFidError),
+    #[display(fmt = "Invalid FID: {}", _0)]
+    InvalidFid(ParseFidError),
 
-    /// gRPC server errored.
+    /// [gRPC] server errored.
+    ///
+    /// [gRPC]: https://grpc.io
     #[display(fmt = "gRPC server errored: {}", _0)]
     Tonic(tonic::Status),
 
-    /// Failed to convert from protobuf.
-    #[display(fmt = "Failed to convert from protobuf: {}", _0)]
-    TryFromProtobufError(ProtobufError),
+    /// Failed to convert from [gRPC] response.
+    ///
+    /// [gRPC]: https://grpc.io
+    #[display(fmt = "Failed to convert from gRPC response: {}", _0)]
+    InvalidProtobuf(ProtobufError),
 
-    /// [`ControlApi`] errored.
-    #[display(fmt = "ControlApi errored: {:?}", _0)] // TODO
+    /// [`ControlApi`] server implementation errored.
+    #[display(fmt = "Control API server errored: {:?}", _0)]
     ControlError(#[error(not(source))] control_proto::Error),
 }

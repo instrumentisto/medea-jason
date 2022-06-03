@@ -1,4 +1,6 @@
-//! gRPC [`ControlApi`] and [`CallbackApi`] servers.
+//! [`ControlApi`] server and [`CallbackApi`] client [gRPC] implementations.
+//!
+//! [gRPC]: https://grpc.io
 
 use std::collections::HashMap;
 
@@ -12,11 +14,11 @@ use crate::{
     grpc::{
         api::{
             self as control_proto,
-            control_api_server::ControlApi as GrpcControlApi,
+            control_api_server::ControlApi as GrpcControlApiService,
         },
-        callback as callback_proto, CallbackClient, ProtobufError,
+        callback as callback_proto, CallbackApiClient, ProtobufError,
     },
-    CallbackApi, ControlApi, Ping,
+    CallbackApi, ControlApi,
 };
 
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].
@@ -25,10 +27,11 @@ use crate::{
 type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[async_trait]
-impl<T> GrpcControlApi for T
+impl<T: ?Sized> GrpcControlApiService for T
 where
     T: ControlApi + Send + Sync + 'static,
-    T::Error: From<ProtobufError> + Into<control_proto::Error>,
+    T::Error: From<ProtobufError>,
+    control_proto::Error: From<T::Error>,
 {
     async fn create(
         &self,
@@ -36,8 +39,8 @@ where
     ) -> Result<tonic::Response<control_proto::CreateResponse>, tonic::Status>
     {
         let fut = async {
-            let req = ControlRequest::try_from(req.into_inner())?;
-            self.create(req).await
+            self.create(ControlRequest::try_from(req.into_inner())?)
+                .await
         };
 
         Ok(tonic::Response::new(match fut.await {
@@ -140,13 +143,11 @@ where
         &self,
         request: tonic::Request<control_proto::Ping>,
     ) -> Result<tonic::Response<control_proto::Pong>, tonic::Status> {
-        self.healthz(Ping(request.into_inner().nonce))
+        self.healthz(request.into_inner().into())
             .await
-            .map(|pong| {
-                tonic::Response::new(control_proto::Pong { nonce: pong.0 })
-            })
+            .map(|pong| tonic::Response::new(pong.into()))
             .map_err(|e| {
-                let e = e.into();
+                let e = control_proto::Error::from(e);
                 let message = [&e.doc, &e.element, &e.text].into_iter().fold(
                     e.code.to_string(),
                     |mut acc, s| {
@@ -157,25 +158,24 @@ where
                         acc
                     },
                 );
-
                 tonic::Status::unknown(message)
             })
     }
 }
 
 #[async_trait]
-impl<T> CallbackApi for CallbackClient<T>
+impl<T> CallbackApi for CallbackApiClient<T>
 where
-    T: Clone + tonic::client::GrpcService<tonic::body::BoxBody> + Send + Sync,
+    T: tonic::client::GrpcService<tonic::body::BoxBody> + Clone + Send + Sync,
     T::Future: Send,
-    T::Error: Into<StdError>,
     T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-    <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    <T::ResponseBody as Body>::Error: Send,
+    StdError: From<T::Error> + From<<T::ResponseBody as Body>::Error>,
 {
-    type Error = CallbackClientError;
+    type Error = CallbackApiClientError;
 
     async fn on_event(&self, req: CallbackRequest) -> Result<(), Self::Error> {
-        // It's ok to `.clone()` here.
+        // It's OK to `.clone()` `tonic::client`:
         // https://docs.rs/tonic/latest/tonic/client/index.html#concurrent-usage
         let mut this = self.clone();
 
@@ -186,14 +186,20 @@ where
     }
 }
 
-/// [`CallbackClient`] error.
+/// Possible errors of [`CallbackApiClient`].
+///
+/// [`CallbackApiClient`]: CallbackClient
 #[derive(Debug, Display, From, Error)]
-pub enum CallbackClientError {
-    /// gRPC server errored.
+pub enum CallbackApiClientError {
+    /// [gRPC] server errored.
+    ///
+    /// [gRPC]: https://grpc.io
     #[display(fmt = "gRPC server errored: {}", _0)]
     Tonic(tonic::Status),
 
-    /// Failed to convert from protobuf.
-    #[display(fmt = "Failed to convert from protobuf: {}", _0)]
-    TryFromProtobufError(ProtobufError),
+    /// Failed to convert from [gRPC] response.
+    ///
+    /// [gRPC]: https://grpc.io
+    #[display(fmt = "Failed to convert from gRPC response: {}", _0)]
+    InvalidProtobuf(ProtobufError),
 }
