@@ -12,7 +12,7 @@ void registerFunction(
   required Pointer<NativeFunction<Pointer Function(Handle)>> width,
   required Pointer<NativeFunction<Bool Function(Handle)>> enabled,
   required Pointer<NativeFunction<Void Function(Handle, Bool)>> setEnabled,
-  required Pointer<NativeFunction<Int64 Function(Handle)>> readyState,
+  required Pointer<NativeFunction<Handle Function(Handle)>> readyState,
   required Pointer<NativeFunction<Void Function(Handle)>> stop,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
   required Pointer<NativeFunction<Handle Function(Handle)>> clone,
