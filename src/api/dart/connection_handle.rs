@@ -261,14 +261,14 @@ mod mock {
 
         pub fn enable_remote_video(
             &self,
-            _source_kind: Option<MediaSourceKind>,
+            _: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::err(tracerr::new!(ChangeMediaStateError::Detached))
         }
 
         pub fn disable_remote_video(
             &self,
-            _source_kind: Option<MediaSourceKind>,
+            _: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::ok(())
         }
