@@ -145,7 +145,7 @@ impl SimpleTracksRequest {
     ///   constrains.
     /// - [`TracksRequestError::ExpectedDisplayVideoTracks`] when the provided
     ///   [`HashMap`] doesn't have the expected display video track.
-    pub fn parse_tracks(
+    pub async fn parse_tracks(
         &self,
         tracks: Vec<Rc<local::Track>>,
     ) -> Result<HashMap<TrackId, Rc<local::Track>>, Traced<TracksRequestError>>
@@ -175,7 +175,7 @@ impl SimpleTracksRequest {
 
         if let Some((id, audio)) = &self.audio {
             if let Some(track) = audio_tracks.into_iter().next() {
-                if audio.satisfies(track.as_ref()) {
+                if audio.satisfies(track.as_ref()).await {
                     drop(parsed_tracks.insert(*id, track));
                 } else {
                     return Err(tracerr::new!(InvalidAudioTrack));
@@ -184,7 +184,7 @@ impl SimpleTracksRequest {
         }
         if let Some((id, device_video)) = &self.device_video {
             if let Some(track) = device_video_tracks.into_iter().next() {
-                if device_video.satisfies(track.as_ref()) {
+                if device_video.satisfies(track.as_ref()).await {
                     drop(parsed_tracks.insert(*id, track));
                 } else {
                     return Err(tracerr::new!(InvalidVideoTrack));
@@ -193,7 +193,7 @@ impl SimpleTracksRequest {
         }
         if let Some((id, display_video)) = &self.display_video {
             if let Some(track) = display_video_tracks.into_iter().next() {
-                if display_video.satisfies(track.as_ref()) {
+                if display_video.satisfies(track.as_ref()).await {
                     drop(parsed_tracks.insert(*id, track));
                 } else {
                     return Err(tracerr::new!(InvalidVideoTrack));

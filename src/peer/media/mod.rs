@@ -555,10 +555,17 @@ impl MediaConnections {
         let mut sender_and_track =
             Vec::with_capacity(self.0.borrow().senders.len());
         let mut media_exchange_state_updates = HashMap::new();
-        for sender in self.0.borrow().senders.values() {
-            if let Some(track) = tracks.get(&sender.state().id()).cloned() {
-                if sender.caps().satisfies(track.as_ref()) {
-                    sender_and_track.push((sender.obj(), track));
+        let senders = self
+            .0
+            .borrow()
+            .senders
+            .values()
+            .map(|c| (c.obj(), c.state()))
+            .collect::<Vec<_>>();
+        for (sender, state) in senders {
+            if let Some(track) = tracks.get(&state.id()).cloned() {
+                if sender.caps().satisfies(track.as_ref()).await {
+                    sender_and_track.push((sender, track));
                 } else {
                     return Err(tracerr::new!(
                         InsertLocalTracksError::InvalidMediaTrack
@@ -569,10 +576,8 @@ impl MediaConnections {
                     InsertLocalTracksError::NotEnoughTracks
                 ));
             } else {
-                let _ = media_exchange_state_updates.insert(
-                    sender.state().id(),
-                    media_exchange_state::Stable::Disabled,
-                );
+                let _ = media_exchange_state_updates
+                    .insert(state.id(), media_exchange_state::Stable::Disabled);
             }
         }
 
