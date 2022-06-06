@@ -107,7 +107,7 @@ fake.media:
 	pulseaudio -D
 	sudo modprobe v4l2loopback card_label="My Fake Webcam" exclusive_caps=1
 	pactl load-module module-null-sink sink_name=FakeSource sink_properties=device.description="FakeSource"
-	pactl load-module module-virtual-source source_name=VirtualMic master=Source.monitor
+	pactl load-module module-virtual-source source_name=VirtualMic master=FakeSource.monitor
 
 
 
