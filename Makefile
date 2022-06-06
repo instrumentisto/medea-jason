@@ -106,7 +106,7 @@ fake.media:
 	sudo apt install pulseaudio-utils
 	pulseaudio -D
 	sudo modprobe v4l2loopback card_label="My Fake Webcam" exclusive_caps=1
-	pactl load-module module-null-sink sink_name=Source sink_properties=device.description="Source"
+	pactl load-module module-null-sink sink_name=FakeSource sink_properties=device.description="FakeSource"
 	pactl load-module module-virtual-source source_name=VirtualMic master=Source.monitor
 
 
@@ -660,6 +660,7 @@ endif
 	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
 endif
 	cd flutter/example/ && \
+	export WEBRTC_FAKE_MEDIA=true && \
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart -d linux
 ifeq ($(up),yes)

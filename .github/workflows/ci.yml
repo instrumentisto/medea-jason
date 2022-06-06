@@ -45,7 +45,7 @@ jobs:
 
         - name: Create FAKE MEDIA
           run: make fake.media
-
+          
         - uses: subosito/flutter-action@v2
         - run: flutter config --enable-linux-desktop
           if: ${{ matrix.platform == 'linux' }}
@@ -82,7 +82,7 @@ jobs:
 
         - uses: jetli/wasm-pack-action@v0.3.0
         - name: Desktop
-          run: export WEBRTC_FAKE_MEDIA=true && xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
+          run: xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
                             medea-tag=${{ env.MEDEA_BRANCH }}
                             control-tag=build-${{ github.run_number }}
 
