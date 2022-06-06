@@ -148,9 +148,13 @@ impl RpcTransport for WebSocketRpcTransport {
                 .into_dart(),
                 Callback::from_once({
                     let socket_state = Rc::clone(&self.socket_state);
-                    move |_: ()| {
+                    move |code: u16| {
                         socket_state.set(TransportState::Closed(
-                            CloseMsg::Normal(1000, CloseReason::Finished),
+                            if code > 1000 {
+                                CloseMsg::Abnormal(code)
+                            } else {
+                                CloseMsg::Normal(1000, CloseReason::Finished)
+                            },
                         ));
                     }
                 })

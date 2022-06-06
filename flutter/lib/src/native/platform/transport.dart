@@ -29,7 +29,7 @@ Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
         }
       },
       onDone: () {
-        onClose(null);
+        onClose(ws.closeCode);
       },
       cancelOnError: true,
     );
