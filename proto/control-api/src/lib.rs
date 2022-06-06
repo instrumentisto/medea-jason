@@ -91,6 +91,8 @@
     unused_results,
     variant_size_differences
 )]
+// Because of uncontrolled names in the generated code.
+#![allow(clippy::same_name_method)]
 
 pub mod callback;
 pub mod control;
