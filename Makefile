@@ -660,7 +660,6 @@ endif
 	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
 endif
 	cd flutter/example/ && \
-	export WEBRTC_FAKE_MEDIA=true && \
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart -d linux
 ifeq ($(up),yes)
