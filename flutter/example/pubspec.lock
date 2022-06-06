@@ -180,9 +180,11 @@ packages:
   flutter_webrtc:
     dependency: transitive
     description:
-      path: "/media/human/2AC6C562C6C52EBF/Work/Linux/Docs/flutter-webrtc/"
-      relative: false
-    source: path
+      path: "."
+      ref: add-fake-media-env-option
+      resolved-ref: "88a3991bf6c248f57c4eee63e38a4f3a9c345cfb"
+      url: "https://github.com/instrumentisto/flutter-webrtc.git"
+    source: git
     version: "0.8.0-dev"
   freezed_annotation:
     dependency: transitive
