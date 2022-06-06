@@ -15,6 +15,7 @@ env:
   MEDEA_BRANCH: add-media-exchange-direction  # for E2E tests only
   RUST_BACKTRACE: 1
   WEBRTC_FAKE_MEDIA: true
+  DOCKER_DEFAULT_PLATFORM: linux
 
 jobs:
 
@@ -70,6 +71,7 @@ jobs:
         - uses: actions/download-artifact@v3
           with:
             name: docker-medea-control-api-mock-${{ github.run_number }}
+        - run: DockerCli -SwitchLinuxEngine 
         - name: Unpack `medea-control-api-mock` Docker image
           run: make docker.untar from-file=image.tar
 
