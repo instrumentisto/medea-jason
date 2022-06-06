@@ -1,3 +1,4 @@
+import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -125,16 +126,18 @@ StepDefinitionGeneric then_track_is_stopped =
   RegExp(
       r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is stopped"),
   (id, kind, context) async {
-    // TODO(rogurotus): Implement
 
-    // var member = context.world.members[id]!;
-    // var parsedKind = parse_media_kind(kind);
-    // var track =
-    //     await member.wait_local_track(parsedKind.item2, parsedKind.item1);
+    var member = context.world.members[id]!;
+    var parsedKind = parse_media_kind(kind);
+    var track =
+        await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
-    // var track_ = track.getTrack();
-    // track.free();
-    // expect(await track_.state(), MediaStreamTrackState.ended);
+    var track_ = track.getTrack();
+    print(42);
+    track.free();
+    print(43);
+    // await Future.delayed(Duration(milliseconds:100));
+    expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );
 

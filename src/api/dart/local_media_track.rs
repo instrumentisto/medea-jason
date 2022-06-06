@@ -65,7 +65,10 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
     this: ptr::NonNull<LocalMediaTrack>,
 ) {
     propagate_panic(move || {
+        println!("243");
         drop(LocalMediaTrack::from_ptr(this));
+        println!("245");
+
     });
 }
 

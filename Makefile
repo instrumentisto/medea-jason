@@ -106,8 +106,8 @@ fake.media:
 	sudo apt install pulseaudio-utils
 	pulseaudio -D
 	sudo modprobe v4l2loopback card_label="My Fake Webcam" exclusive_caps=1
-	pactl load-module module-null-sink sink_name=Virtual2 sink_properties=device.description="MyFakeMicro"
-	pactl load-module module-loopback sink=Virtual2
+	pactl load-module module-null-sink sink_name=Source sink_properties=device.description="Source"
+	pactl load-module module-virtual-source source_name=VirtualMic master=Source.monitor
 
 
 

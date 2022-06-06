@@ -112,7 +112,9 @@ impl Track {
 
 impl Drop for Track {
     fn drop(&mut self) {
+        println!("1000");
         self.track.stop();
+        println!("1001");
     }
 }
 
@@ -128,6 +130,7 @@ impl LocalMediaTrack {
     /// Creates a new [`LocalMediaTrack`] from the provided [`Track`].
     #[must_use]
     pub fn new(track: Rc<Track>) -> Self {
+        println!("1004 {}", Rc::strong_count(&track));
         Self(track)
     }
 
@@ -154,5 +157,11 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()
+    }
+}
+
+impl Drop for LocalMediaTrack {
+    fn drop(&mut self) {
+        println!("1003 {}", Rc::strong_count(&self.0));
     }
 }

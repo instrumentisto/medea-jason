@@ -1,3 +1,4 @@
+import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -154,15 +155,14 @@ StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
     then1<String, CustomWorld>(
   RegExp(r"(Alice|Bob|Carol) doesn't have live local tracks"),
   (id, context) async {
-    // TODO(rogurotus):
-    // var member = context.world.members[id]!;
-    // var count = 0;
-    // member.connection_store.local_tracks.forEach((element) async {
-    //   if (await element.getTrack().state() == fw.MediaStreamTrackState.live) {
-    //     ++count;
-    //   }
-    // });
-    // expect(count, 0);
+    var member = context.world.members[id]!;
+    var count = 0;
+    member.connection_store.local_tracks.forEach((element) async {
+      if (await element.getTrack().state() == fw.MediaStreamTrackState.live) {
+        ++count;
+      }
+    });
+    expect(count, 0);
   },
 );
 
