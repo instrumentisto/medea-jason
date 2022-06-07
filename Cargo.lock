@@ -1603,6 +1603,7 @@ dependencies = [
  "prost",
  "prost-types",
  "rand",
+ "ref-cast",
  "smart-default",
  "time 0.3.9",
  "tonic",
@@ -2209,6 +2210,26 @@ dependencies = [
  "getrandom",
  "redox_syscall",
  "thiserror",
+]
+
+[[package]]
+name = "ref-cast"
+version = "1.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "685d58625b6c2b83e4cc88a27c4bf65adb7b6b16dbdc413e515c9405b47432ab"
+dependencies = [
+ "ref-cast-impl",
+]
+
+[[package]]
+name = "ref-cast-impl"
+version = "1.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a043824e29c94169374ac5183ac0ed43f5724dc4556b19568007486bd840fa1f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

@@ -9,7 +9,7 @@ use crate::Fid;
 /// API for receiving callbacks from a media server.
 ///
 /// Both API client and API server should implement this trait.
-#[async_trait(?Send)]
+#[async_trait]
 pub trait Api {
     /// Error returned by this [`CallbackApi`].
     ///

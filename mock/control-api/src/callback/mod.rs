@@ -113,8 +113,8 @@ mod leave {
             use proto::on_leave::Reason as R;
 
             match proto {
-                R::ServerShutdown => Self::ServerShutdown,
-                R::LostConnection => Self::LostConnection,
+                R::Shutdown => Self::ServerShutdown,
+                R::Lost => Self::LostConnection,
                 R::Disconnected => Self::Disconnected,
                 R::Kicked => Self::Kicked,
             }
