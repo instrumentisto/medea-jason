@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MEDEA_BRANCH: add-media-exchange-direction  # for E2E tests only
+  MEDEA_BRANCH: edge  # for E2E tests only
   RUST_BACKTRACE: 1
 
 jobs:
