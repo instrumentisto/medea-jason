@@ -15,7 +15,6 @@ env:
   MEDEA_BRANCH: add-media-exchange-direction  # for E2E tests only
   RUST_BACKTRACE: 1
   WEBRTC_FAKE_MEDIA: true
-  DOCKER_DEFAULT_PLATFORM: linux
 
 jobs:
 
