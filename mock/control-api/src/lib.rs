@@ -94,6 +94,7 @@ pub mod prelude;
 
 use clap::Parser as _;
 use slog::{o, Drain};
+use slog_async::OverflowStrategy;
 use slog_scope::GlobalLoggerGuard;
 
 /// Control API protocol re-exported definitions.
@@ -154,7 +155,10 @@ pub fn init_logger() -> GlobalLoggerGuard {
     let decorator = slog_term::TermDecorator::new().build();
     let drain = slog_term::FullFormat::new(decorator).build().fuse();
     let drain = slog_envlogger::new(drain).fuse();
-    let drain = slog_async::Async::new(drain).build().fuse();
+    let drain = slog_async::Async::new(drain)
+        .overflow_strategy(OverflowStrategy::Block)
+        .build()
+        .fuse();
     let logger = slog::Logger::root(drain, o!());
     let scope_guard = slog_scope::set_global_logger(logger);
     slog_stdlog::init().unwrap();
