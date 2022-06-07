@@ -662,7 +662,7 @@ endif
 	cd flutter/example/ && \
 	export WEBRTC_FAKE_MEDIA=true && \
 	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart -d linux
+		--target=../test/e2e/suite.dart -d windows
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
