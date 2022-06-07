@@ -29,10 +29,10 @@ jobs:
         fail-fast: false
         matrix:
           include:
-            # - platform: linux
-            #   os: ubuntu-22.04
-            - platform: windows
-              os: windows-latest
+            - platform: linux
+              os: ubuntu-22.04
+            # - platform: windows
+            #   os: windows-latest
       runs-on: ${{ matrix.os }}
       steps:
         - uses: actions/checkout@v3
@@ -81,7 +81,7 @@ jobs:
 
         - uses: jetli/wasm-pack-action@v0.3.0
         - name: Desktop
-          run: make test.e2e.desktop up=yes debug=no dockerized=yes
+          run: xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
                             medea-tag=${{ env.MEDEA_BRANCH }}
                             control-tag=build-${{ github.run_number }}
 
@@ -269,7 +269,7 @@ jobs:
                        && !contains(github.event.head_commit.message, '[fresh ci]') }}
             export: true  # required for E2E tests
             if: true
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         if: ${{ matrix.if }}
