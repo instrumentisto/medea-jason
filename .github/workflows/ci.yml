@@ -29,10 +29,10 @@ jobs:
         fail-fast: false
         matrix:
           include:
-            # - platform: linux
-            #   os: ubuntu-22.04
-            - platform: windows
-              os: windows-latest
+            - platform: linux
+              os: ubuntu-22.04
+            # - platform: windows
+            #   os: windows-latest
       runs-on: ${{ matrix.os }}
       steps:
         - uses: actions/checkout@v3
