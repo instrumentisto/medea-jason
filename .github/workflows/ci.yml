@@ -81,7 +81,7 @@ jobs:
 
         - uses: jetli/wasm-pack-action@v0.3.0
         - name: Desktop
-          run: make test.e2e.desktop up=yes debug=no dockerized=yes
+          run: xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
                             medea-tag=${{ env.MEDEA_BRANCH }}
                             control-tag=build-${{ github.run_number }}
 
