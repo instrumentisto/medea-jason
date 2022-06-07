@@ -12,7 +12,19 @@ void registerFunctions(DynamicLibrary dl) {
     connect: Pointer.fromFunction(_connect),
     send: Pointer.fromFunction(_send),
     close: Pointer.fromFunction(_close),
+    closeCode: Pointer.fromFunction(_closeCode, 0),
+    closeReason: Pointer.fromFunction(_closeReason),
   );
+}
+
+class LastFrame {
+  /// A [WebSocket]'s `close code`.
+  int? code;
+
+  /// A [WebSocket]'s `close reason`.
+  String? reason;
+
+  LastFrame(this.code, this.reason);
 }
 
 /// Connects to the provided [addr] and returns [WebSocket] for it.
@@ -29,7 +41,7 @@ Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
         }
       },
       onDone: () {
-        onClose(ws.closeCode);
+        onClose(LastFrame(ws.closeCode, ws.closeReason));
       },
       cancelOnError: true,
     );
@@ -46,4 +58,14 @@ void _send(WebSocket ws, Pointer<Utf8> message) {
 /// [closeCode] and [closeMsg].
 void _close(WebSocket ws, int closeCode, Pointer<Utf8> closeMsg) {
   ws.close(closeCode, closeMsg.toDartString());
+}
+
+/// Return [LastFrame.code].
+int _closeCode(LastFrame lastFrame) {
+  return lastFrame.code ?? 1000;
+}
+
+/// Return [LastFrame.reason].
+Pointer<Utf8> _closeReason(LastFrame lastFrame) {
+  return (lastFrame.reason ?? '').toNativeUtf8();
 }

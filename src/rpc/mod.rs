@@ -10,7 +10,8 @@ use std::str::FromStr;
 
 use derive_more::{AsRef, Display, From};
 use medea_client_api_proto::{
-    CloseReason as CloseByServerReason, Credential, MemberId, RoomId,
+    CloseDescription, CloseReason as CloseByServerReason, Credential, MemberId,
+    RoomId,
 };
 use tracerr::Traced;
 use url::Url;
@@ -231,4 +232,22 @@ pub enum CloseMsg {
     /// `1000` without reason.
     #[display(fmt = "Abnormal. Code: {}", _0)]
     Abnormal(u16),
+}
+
+impl From<(u16, &str)> for CloseMsg {
+    fn from(event: (u16, &str)) -> Self {
+        let code = event.0;
+        match code {
+            1000 => {
+                if let Ok(description) =
+                    serde_json::from_str::<CloseDescription>(event.1)
+                {
+                    Self::Normal(code, description.reason)
+                } else {
+                    Self::Abnormal(code)
+                }
+            }
+            _ => Self::Abnormal(code),
+        }
+    }
 }

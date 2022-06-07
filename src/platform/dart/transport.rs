@@ -5,13 +5,13 @@ use std::{
 
 use async_trait::async_trait;
 use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
-use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
+use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_macro::dart_bridge;
 use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::string_into_c_str,
+    api::{c_str_into_string, string_into_c_str},
     platform::{
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
@@ -60,6 +60,20 @@ mod transport {
             close_code: i32,
             close_msg: ptr::NonNull<c_char>,
         );
+
+        /// Returns the [closeCode][1] of the `last frame` of the provided
+        /// [`WebSocket`][0].
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/closeCode.html
+        pub fn close_code(last_frame: Dart_Handle) -> i32;
+
+        /// Returns the [closeReason][1] of the `last frame` of the provided
+        /// [`WebSocket`][0].
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
+        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/closeReason.html
+        pub fn close_reason(last_frame: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
 
@@ -146,15 +160,18 @@ impl RpcTransport for WebSocketRpcTransport {
                     }
                 })
                 .into_dart(),
-                Callback::from_once({
+                Callback::from_fn_mut({
                     let socket_state = Rc::clone(&self.socket_state);
-                    move |code: u16| {
+                    move |last_frame: DartHandle| {
+                        let code: u16 = transport::close_code(last_frame.get())
+                            .try_into()
+                            .unwrap();
+                        let reason = c_str_into_string(
+                            transport::close_reason(last_frame.get()),
+                        );
+
                         socket_state.set(TransportState::Closed(
-                            if code > 1000 {
-                                CloseMsg::Abnormal(code)
-                            } else {
-                                CloseMsg::Normal(1000, CloseReason::Finished)
-                            },
+                            CloseMsg::from((code, reason.as_str())),
                         ));
                     }
                 })
