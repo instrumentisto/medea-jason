@@ -133,9 +133,7 @@ StepDefinitionGeneric then_track_is_stopped =
         await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
     var track_ = track.getTrack();
-    print(42);
     track.free();
-    print(43);
     // await Future.delayed(Duration(milliseconds:100));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
