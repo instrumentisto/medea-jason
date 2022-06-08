@@ -6,7 +6,7 @@ use tracerr::Traced;
 use crate::{
     api::{
         dart::utils::{DartError, DartResult},
-        utils::{DartFuture, IntoDartFuture as _},
+        utils::{dart_arg_try_into, DartFuture, IntoDartFuture as _},
         ArgumentError, DartValueCastError,
     },
     connection::ChangeMediaStateError,
@@ -123,7 +123,7 @@ pub unsafe extern "C" fn ConnectionHandle__disable_remote_audio(
 
 /// Enables inbound video in this [`ConnectionHandle`].
 ///
-/// Affects only video with specific [`MediaSourceKind`] if specified.
+/// Affects only video with the specific [`MediaSourceKind`], if specified.
 ///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 #[no_mangle]
@@ -145,7 +145,7 @@ pub unsafe extern "C" fn ConnectionHandle__enable_remote_video(
 
 /// Disables inbound video in this [`ConnectionHandle`].
 ///
-/// Affects only video with specific [`MediaSourceKind`] if specified.
+/// Affects only video with the specific [`MediaSourceKind`], if specified.
 ///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 #[no_mangle]

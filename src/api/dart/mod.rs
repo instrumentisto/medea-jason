@@ -13,8 +13,6 @@
     missing_docs
 )]
 
-#[macro_use]
-pub mod utils;
 pub mod audio_track_constraints;
 pub mod connection_handle;
 pub mod device_video_track_constraints;
@@ -28,6 +26,7 @@ pub mod reconnect_handle;
 pub mod remote_media_track;
 pub mod room_close_reason;
 pub mod room_handle;
+pub mod utils;
 
 use std::{ffi::c_void, marker::PhantomData, panic, ptr};
 

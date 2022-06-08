@@ -76,7 +76,6 @@ All user visible changes to this project will be documented in this file. This p
     - `LocalMediaInitExceptionKind` variants ([#52]):
         - `GetUserMediaAudioFailed`;
         - `GetUserMediaVideoFailed`.
-    - `RoomHandle.enableRemoteVideo()` and `RoomHandle.disableRemoteVideo()` methods an optional argument to specify `MediaSourceKind` ([#59]).
 
 ### Fixed
 

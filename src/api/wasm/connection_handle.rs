@@ -148,7 +148,7 @@ impl ConnectionHandle {
 
     /// Enables inbound video in this [`ConnectionHandle`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///
@@ -173,7 +173,7 @@ impl ConnectionHandle {
 
     /// Disables inbound video in this [`ConnectionHandle`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///
