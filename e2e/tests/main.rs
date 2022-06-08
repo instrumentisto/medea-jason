@@ -11,15 +11,15 @@ pub use self::world::World;
 
 #[tokio::main]
 async fn main() {
-    // let concurrent = supports_multiple_webdriver_clients()
-    //     .await
-    //     .then(|| 10)
-    //     .unwrap_or(1);
+    let concurrent = supports_multiple_webdriver_clients()
+        .await
+        .then(|| 4)
+        .unwrap_or(1);
 
     World::cucumber()
         .repeat_failed()
         .fail_on_skipped()
-        .max_concurrent_scenarios(1)
+        .max_concurrent_scenarios(concurrent)
         .run_and_exit(conf::FEATURES_PATH.as_str())
         .await;
 }
