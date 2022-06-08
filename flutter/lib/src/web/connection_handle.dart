@@ -4,6 +4,7 @@ import 'package:js/js.dart';
 
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
+import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
@@ -47,13 +48,13 @@ class WebConnectionHandle extends ConnectionHandle {
   }
 
   @override
-  Future<void> enableRemoteVideo() async {
-    await fallibleFuture(obj.enable_remote_video());
+  Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.enable_remote_video(kind?.index));
   }
 
   @override
-  Future<void> disableRemoteVideo() async {
-    await fallibleFuture(obj.disable_remote_video());
+  Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.disable_remote_video(kind?.index));
   }
 
   @moveSemantics

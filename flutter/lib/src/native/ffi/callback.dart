@@ -1,8 +1,8 @@
 import 'dart:ffi';
 
 import '../jason.dart';
-import 'foreign_value.dart';
 import 'callback.g.dart' as bridge;
+import 'foreign_value.dart';
 
 typedef _callbackCall_C = Void Function(Pointer, ForeignValue);
 typedef _callbackCall_Dart = void Function(Pointer, ForeignValue);

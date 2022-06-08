@@ -1,10 +1,10 @@
 @JS()
 library medea_jason;
 
+import 'dart:html' as html;
+
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' show promiseToFuture;
-
-import 'dart:html' as html;
 
 @JS()
 class FacingMode {
@@ -59,9 +59,9 @@ class ConnectionHandle {
 @JS('ConnectionHandle')
 abstract class _ConnectionHandle {
   external Promise<dynamic> disable_remote_audio();
-  external Promise<dynamic> disable_remote_video();
+  external Promise<dynamic> disable_remote_video(num? source_kind);
   external Promise<dynamic> enable_remote_audio();
-  external Promise<dynamic> enable_remote_video();
+  external Promise<dynamic> enable_remote_video(num? source_kind);
 }
 
 extension ConnectionHandleExtensions on ConnectionHandle {
@@ -70,9 +70,9 @@ extension ConnectionHandleExtensions on ConnectionHandle {
     return promiseToFuture(tt.disable_remote_audio());
   }
 
-  Future<dynamic> disable_remote_video() {
+  Future<dynamic> disable_remote_video(num? source_kind) {
     final tt = this as _ConnectionHandle;
-    return promiseToFuture(tt.disable_remote_video());
+    return promiseToFuture(tt.disable_remote_video(source_kind));
   }
 
   Future<dynamic> enable_remote_audio() {
@@ -80,9 +80,9 @@ extension ConnectionHandleExtensions on ConnectionHandle {
     return promiseToFuture(tt.enable_remote_audio());
   }
 
-  Future<dynamic> enable_remote_video() {
+  Future<dynamic> enable_remote_video(num? source_kind) {
     final tt = this as _ConnectionHandle;
-    return promiseToFuture(tt.enable_remote_video());
+    return promiseToFuture(tt.enable_remote_video(source_kind));
   }
 }
 
@@ -288,9 +288,9 @@ abstract class _RoomHandle {
   external Promise<dynamic> disable_video(num? source_kind);
   external Promise<dynamic> enable_video(num? source_kind);
   external Promise<dynamic> disable_remote_audio();
-  external Promise<dynamic> disable_remote_video();
+  external Promise<dynamic> disable_remote_video(num? source_kind);
   external Promise<dynamic> enable_remote_audio();
-  external Promise<dynamic> enable_remote_video();
+  external Promise<dynamic> enable_remote_video(num? source_kind);
 }
 
 extension RoomHandleExtensions on RoomHandle {
@@ -351,9 +351,9 @@ extension RoomHandleExtensions on RoomHandle {
     return promiseToFuture(tt.disable_remote_audio());
   }
 
-  Future<dynamic> disable_remote_video() {
+  Future<dynamic> disable_remote_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.disable_remote_video());
+    return promiseToFuture(tt.disable_remote_video(source_kind));
   }
 
   Future<dynamic> enable_remote_audio() {
@@ -361,9 +361,9 @@ extension RoomHandleExtensions on RoomHandle {
     return promiseToFuture(tt.enable_remote_audio());
   }
 
-  Future<dynamic> enable_remote_video() {
+  Future<dynamic> enable_remote_video(num? source_kind) {
     final tt = this as _RoomHandle;
-    return promiseToFuture(tt.enable_remote_video());
+    return promiseToFuture(tt.enable_remote_video(source_kind));
   }
 }
 

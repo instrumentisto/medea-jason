@@ -7,12 +7,14 @@ use crate::{
     api::{
         dart::utils::{DartError, DartResult},
         utils::{DartFuture, IntoDartFuture as _},
+        ArgumentError, DartValueCastError,
     },
     connection::ChangeMediaStateError,
+    media::MediaSourceKind,
     platform,
 };
 
-use super::{propagate_panic, ForeignClass};
+use super::{propagate_panic, DartValueArg, ForeignClass};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::ConnectionHandle;
@@ -121,15 +123,18 @@ pub unsafe extern "C" fn ConnectionHandle__disable_remote_audio(
 
 /// Enables inbound video in this [`ConnectionHandle`].
 ///
+/// Affects only video with specific [`MediaSourceKind`] if specified.
+///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 #[no_mangle]
 pub unsafe extern "C" fn ConnectionHandle__enable_remote_video(
     this: ptr::NonNull<ConnectionHandle>,
-) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    source_kind: DartValueArg<Option<MediaSourceKind>>,
+) -> DartFuture<Result<(), DartError>> {
     propagate_panic(move || {
         let this = this.as_ref();
 
-        let fut = this.enable_remote_video();
+        let fut = this.enable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -140,15 +145,18 @@ pub unsafe extern "C" fn ConnectionHandle__enable_remote_video(
 
 /// Disables inbound video in this [`ConnectionHandle`].
 ///
+/// Affects only video with specific [`MediaSourceKind`] if specified.
+///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 #[no_mangle]
 pub unsafe extern "C" fn ConnectionHandle__disable_remote_video(
     this: ptr::NonNull<ConnectionHandle>,
-) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    source_kind: DartValueArg<Option<MediaSourceKind>>,
+) -> DartFuture<Result<(), DartError>> {
     propagate_panic(move || {
         let this = this.as_ref();
 
-        let fut = this.disable_remote_video();
+        let fut = this.disable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -192,6 +200,7 @@ mod mock {
             ChangeMediaStateError, ConnectionHandle as CoreConnectionHandle,
             HandleDetachedError,
         },
+        media::MediaSourceKind,
         platform,
     };
 
@@ -252,12 +261,14 @@ mod mock {
 
         pub fn enable_remote_video(
             &self,
+            _: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::err(tracerr::new!(ChangeMediaStateError::Detached))
         }
 
         pub fn disable_remote_video(
             &self,
+            _: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::ok(())
         }
