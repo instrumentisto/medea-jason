@@ -2,8 +2,6 @@ import 'dart:ffi';
 
 import '../interface/audio_track_constraints.dart' as base_audio;
 import '../interface/device_video_track_constraints.dart' as base_device_video;
-import '../interface/display_video_track_constraints.dart'
-    as base_display_video;
 import '../interface/media_stream_settings.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
@@ -12,6 +10,9 @@ import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+
+import '../interface/display_video_track_constraints.dart'
+    as base_display_video;
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();

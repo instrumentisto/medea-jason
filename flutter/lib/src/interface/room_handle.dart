@@ -159,21 +159,25 @@ abstract class RoomHandle implements PlatformHandle {
 
   /// Enables inbound video in this `Room`.
   ///
+  /// Affects only video with specific [MediaSourceKind] if specified.
+  ///
   /// Throws a [StateError] if the underlying [Pointer] has been freed.
   ///
   /// Throws a `MediaStateTransitionException` if
   /// [RoomHandle.disableRemoteVideo] was called while enabling or a media
   /// server didn't approve this state transition.
-  Future<void> enableRemoteVideo();
+  Future<void> enableRemoteVideo([MediaSourceKind? kind]);
 
   /// Disables inbound video in this `Room`.
+  ///
+  /// Affects only video with specific [MediaSourceKind] if specified.
   ///
   /// Throws a [StateError] if the underlying [Pointer] has been freed.
   ///
   /// Throws a `MediaStateTransitionException` if
   /// [RoomHandle.enableRemoteVideo] was called while disabling or a media
   /// server didn't approve this state transition.
-  Future<void> disableRemoteVideo();
+  Future<void> disableRemoteVideo([MediaSourceKind? kind]);
 
   /// Sets callback, invoked when a new `Connection` with some remote `Peer`
   /// is established.

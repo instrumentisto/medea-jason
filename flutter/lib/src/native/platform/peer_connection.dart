@@ -3,8 +3,8 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import 'peer_connection.g.dart' as bridge;
 import '../ffi/foreign_value.dart';
+import 'peer_connection.g.dart' as bridge;
 
 /// Registers [PeerConnection] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {

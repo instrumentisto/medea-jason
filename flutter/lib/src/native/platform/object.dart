@@ -1,6 +1,7 @@
+import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
 
-import 'dart:ffi';
 import 'object.g.dart' as bridge;
 
 /// Registers [Object]-related functions in Rust.

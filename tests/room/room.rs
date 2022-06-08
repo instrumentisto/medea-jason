@@ -1688,11 +1688,11 @@ async fn remote_disable_enable_video() {
     .await;
 
     let room_handle = api::RoomHandle::from(room.new_handle());
-    assert!(JsFuture::from(room_handle.disable_remote_video())
+    assert!(JsFuture::from(room_handle.disable_remote_video(None))
         .await
         .is_ok());
     assert!(!peer.is_recv_video_enabled());
-    assert!(JsFuture::from(room_handle.enable_remote_video())
+    assert!(JsFuture::from(room_handle.enable_remote_video(None))
         .await
         .is_ok());
     assert!(peer.is_recv_video_enabled());

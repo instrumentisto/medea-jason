@@ -84,13 +84,13 @@ class WebRoomHandle extends RoomHandle {
   }
 
   @override
-  Future<void> enableRemoteVideo() async {
-    await fallibleFuture(obj.enable_remote_video());
+  Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.enable_remote_video(kind?.index));
   }
 
   @override
-  Future<void> disableRemoteVideo() async {
-    await fallibleFuture(obj.disable_remote_video());
+  Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
+    await fallibleFuture(obj.disable_remote_video(kind?.index));
   }
 
   @override
