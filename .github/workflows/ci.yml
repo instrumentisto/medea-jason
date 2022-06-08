@@ -278,7 +278,7 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: macos
+            os: macos-11
           # - platform: linux
           #   os: ubuntu-22.04
           # - platform: windows
