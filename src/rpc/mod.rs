@@ -234,13 +234,12 @@ pub enum CloseMsg {
     Abnormal(u16),
 }
 
-impl From<(u16, &str)> for CloseMsg {
-    fn from(event: (u16, &str)) -> Self {
-        let code = event.0;
+impl From<(u16, String)> for CloseMsg {
+    fn from((code, reason): (u16, String)) -> Self {
         match code {
             1000 => {
                 if let Ok(description) =
-                    serde_json::from_str::<CloseDescription>(event.1)
+                    serde_json::from_str::<CloseDescription>(&reason)
                 {
                     Self::Normal(code, description.reason)
                 } else {

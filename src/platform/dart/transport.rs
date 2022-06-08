@@ -61,18 +61,14 @@ mod transport {
             close_msg: ptr::NonNull<c_char>,
         );
 
-        /// Returns the [closeCode][1] of the `last frame` of the provided
-        /// [`WebSocket`][0].
+        /// Returns the [closeCode][0] of the close frame.
         ///
-        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
-        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/closeCode.html
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeCode.html
         pub fn close_code(last_frame: Dart_Handle) -> i32;
 
-        /// Returns the [closeReason][1] of the `last frame` of the provided
-        /// [`WebSocket`][0].
+        /// Returns the [closeReason][0] of the close frame.
         ///
-        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket-class.html
-        /// [1]: https://api.dart.dev/stable/dart-io/WebSocket/closeReason.html
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeReason.html
         pub fn close_reason(last_frame: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
@@ -163,15 +159,15 @@ impl RpcTransport for WebSocketRpcTransport {
                 Callback::from_fn_mut({
                     let socket_state = Rc::clone(&self.socket_state);
                     move |last_frame: DartHandle| {
-                        let code: u16 = transport::close_code(last_frame.get())
+                        let code = transport::close_code(last_frame.get())
                             .try_into()
-                            .unwrap();
+                            .unwrap_or(1007);
                         let reason = c_str_into_string(
                             transport::close_reason(last_frame.get()),
                         );
 
                         socket_state.set(TransportState::Closed(
-                            CloseMsg::from((code, reason.as_str())),
+                            CloseMsg::from((code, reason)),
                         ));
                     }
                 })

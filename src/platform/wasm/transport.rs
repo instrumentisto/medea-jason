@@ -146,7 +146,7 @@ impl WebSocketRpcTransport {
             "close",
             move |msg: CloseEvent| {
                 this.borrow().socket_state.set(TransportState::Closed(
-                    CloseMsg::from((msg.code(), msg.reason().as_str())),
+                    CloseMsg::from((msg.code(), msg.reason())),
                 ));
             },
         )
@@ -207,7 +207,7 @@ impl RpcTransport for WebSocketRpcTransport {
                             inner.borrow().socket_state.set(
                                 TransportState::Closed(CloseMsg::from((
                                     msg.code(),
-                                    msg.reason().as_str(),
+                                    msg.reason(),
                                 ))),
                             );
                         },
