@@ -91,6 +91,7 @@ var TestConfigs = FlutterTestConfiguration()
   ..defaultTimeout = const Duration(seconds: 10)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
+        await Future.delayed(Duration(seconds: 1));
         worlds.forEach((element) {
           element.members.forEach((key, value) {
             try {
@@ -129,6 +130,7 @@ var TestConfigs = FlutterTestConfiguration()
   '../e2e/tests/features/room_close.feature',
   '../e2e/tests/features/room_join.feature',
   // '../e2e/tests/features/state_synchronization.feature',
+  
   ])
 Future<void> main() async {
   var mediaDeviceInfos = await enumerateDevices();
