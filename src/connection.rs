@@ -12,9 +12,7 @@ use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
     StreamExt as _,
 };
-use medea_client_api_proto::{
-    self as proto, ConnectionQualityScore, MemberId, PeerId,
-};
+use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
 use tracerr::Traced;
 
 use crate::{
@@ -242,10 +240,7 @@ impl InnerConnection {
             self.recv_constraints.set_enabled(
                 desired_state == media_exchange_state::Stable::Enabled,
                 kind,
-                source_kind.map(|skind| match skind {
-                    MediaSourceKind::Device => proto::MediaSourceKind::Device,
-                    MediaSourceKind::Display => proto::MediaSourceKind::Display,
-                }),
+                source_kind.map(Into::into),
             );
         }
 

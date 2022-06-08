@@ -66,8 +66,7 @@ where
     }
 }
 
-/// Tries to convert the provided [`DartValueArg`] using
-/// [`std::convert::TryInto`].
+/// Tries to convert the provided [`DartValueArg`] using [`TryInto`].
 ///
 /// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
 /// [`DartFuture`].
@@ -81,3 +80,5 @@ macro_rules! dart_arg_try_into {
         }
     };
 }
+
+pub(crate) use dart_arg_try_into;

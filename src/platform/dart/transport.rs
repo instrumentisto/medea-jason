@@ -158,12 +158,12 @@ impl RpcTransport for WebSocketRpcTransport {
                 .into_dart(),
                 Callback::from_fn_mut({
                     let socket_state = Rc::clone(&self.socket_state);
-                    move |last_frame: DartHandle| {
-                        let code = transport::close_code(last_frame.get())
+                    move |close_frame: DartHandle| {
+                        let code = transport::close_code(close_frame.get())
                             .try_into()
                             .unwrap_or(1007);
                         let reason = c_str_into_string(
-                            transport::close_reason(last_frame.get()),
+                            transport::close_reason(close_frame.get()),
                         );
 
                         socket_state.set(TransportState::Closed(

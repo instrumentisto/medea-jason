@@ -54,7 +54,6 @@ Pointer<Utf8> _deviceId(MediaStreamTrack track) {
   return track.deviceId().toNativeUtf8();
 }
 
-/// Returns [MediaStreamTrackState] of the [MediaStreamTrack].
 Object _readyState(MediaStreamTrack track) {
   return () => track.state().then((s) => s.index);
 }

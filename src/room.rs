@@ -723,7 +723,7 @@ impl RoomHandle {
 
     /// Disables inbound video in this [`Room`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///
@@ -770,7 +770,7 @@ impl RoomHandle {
 
     /// Enables inbound video in this [`Room`].
     ///
-    /// Affects only video with specific [`MediaSourceKind`] if specified.
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///

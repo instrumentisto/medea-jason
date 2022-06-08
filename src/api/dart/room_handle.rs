@@ -7,7 +7,8 @@ use crate::{
     api::{
         dart::{
             utils::{
-                c_str_into_string, DartFuture, DartResult, IntoDartFuture as _,
+                c_str_into_string, dart_arg_try_into, DartFuture, DartResult,
+                IntoDartFuture as _,
             },
             DartValueArg, ForeignClass,
         },
@@ -301,7 +302,7 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
 
 /// Enables inbound video in this [`Room`].
 ///
-/// Affects only video with specific [`MediaSourceKind`] if specified.
+/// Affects only video with the specific [`MediaSourceKind`], if specified.
 ///
 /// [`Room`]: crate::room::Room
 #[no_mangle]
@@ -323,7 +324,7 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
 
 /// Disables inbound video in this [`Room`].
 ///
-/// Affects only video with specific [`MediaSourceKind`] if specified.
+/// Affects only video with the specific [`MediaSourceKind`], if specified.
 ///
 /// [`Room`]: crate::room::Room
 #[no_mangle]
