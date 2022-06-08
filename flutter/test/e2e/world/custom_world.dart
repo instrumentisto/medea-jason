@@ -221,11 +221,15 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var send_count = temp.item1;
       var recv_count = temp.item2;
 
+      print('42 WAIT INTER ' + element.key);
       await member.wait_for_connect(element.key);
+      print('42 WAIT TRACK ' + element.key);
       await member.wait_for_track_count(element.key, recv_count);
 
       var other_member = members[element.key]!;
+      print('42 WAIT INTER ' + member.id);
       await other_member.wait_for_connect(member.id);
+      print('42 WAIT TRACK ' + member.id);
       await other_member.wait_for_track_count(member.id, send_count);
     }
   }

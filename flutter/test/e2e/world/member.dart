@@ -120,7 +120,7 @@ class Member {
 
       connection.onRemoteTrackAdded((remote_track) {
         var remote_track_id = remote_track.getTrack().id();
-
+        print('42 $remote_track_id ' + remote_track.kind().name + ' ' + remote_track.mediaDirection().name + ' from $remote_member_id');
         if (connection_store
                 .remote_tracks[remote_member_id]![remote_track_id] ==
             null) {

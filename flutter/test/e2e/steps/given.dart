@@ -37,6 +37,7 @@ Future<void> new_given_member(
   await context.world.create_member(member_builder);
   if (joined.contains('joined ')) {
     await context.world.join_room(first_member_id);
+    print('42 WAIT INTER');
     await context.world.wait_for_interconnection(first_member_id);
   }
 
@@ -81,7 +82,6 @@ Future<void> new_given_member(
   }
 
   if (second_member_id != '') {
-    await Future.delayed(Duration(milliseconds: 100));
     await new_given_member(joined, second_member_id, third_member_id, '',
         media_settings, disabled_media_type, disabled_direction, context);
   }
