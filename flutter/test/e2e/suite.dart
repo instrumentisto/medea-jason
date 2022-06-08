@@ -15,6 +15,8 @@ import 'world/custom_world.dart';
 
 part 'suite.g.dart';
 
+var worlds = List<CustomWorld>.empty(growable: true);
+
 var TestConfigs = FlutterTestConfiguration()
   ..stepDefinitions = [
     // control_api
@@ -86,15 +88,30 @@ var TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
+  ..defaultTimeout = const Duration(seconds: 10)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
+        worlds.forEach((element) {
+          element.members.forEach((key, value) {
+            try {
+              var room = value.room;
+              var jason = element.jasons[key]!;
+              jason.closeRoom(room);
+            } catch(e) {
+            }
+          });
+         });
+        worlds.clear();
+
         var world = CustomWorld();
+        worlds.add(world);
         await world.control_client.create(world.room_id, Room(world.room_id, {}));
         return world;
       });
 
 // @GherkinTestSuite(featurePaths: [FEATURES_PATH]) // TODO(rogurotus)
 @GherkinTestSuite(featurePaths: [ 
+  // '../e2e/tests/features/given.feature',
   '../e2e/tests/features/apply.feature',
   '../e2e/tests/features/create_endpoint.feature',
   '../e2e/tests/features/delete_endpoint.feature',
