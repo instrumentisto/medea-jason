@@ -228,7 +228,22 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       var other_member = members[element.key]!;
 
-      other_member.connection_store.local_tracks.forEach((element) async {
+      for(var i = 0; i < other_member.connection_store.local_tracks.length; ++i) {
+        var element = other_member.connection_store.local_tracks[i];
+        print('M:' +
+            other_member.id +
+            ' ' +
+            element.getTrack().id() +
+            ' ' +
+            element.kind().name +
+            ' ' +
+            element.mediaSourceKind().name +
+            ' ' +
+            (await element.getTrack().state()).toString());
+      }
+
+      for(var i = 0; i < member.connection_store.local_tracks.length; ++i) {
+        var element = member.connection_store.local_tracks[i];
         print('M:' +
             member.id +
             ' ' +
@@ -239,19 +254,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             element.mediaSourceKind().name +
             ' ' +
             (await element.getTrack().state()).toString());
-      });
-      member.connection_store.local_tracks.forEach((element) async {
-        print('M:' +
-            member.id +
-            ' ' +
-            element.getTrack().id() +
-            ' ' +
-            element.kind().name +
-            ' ' +
-            element.mediaSourceKind().name +
-            ' ' +
-            (await element.getTrack().state()).toString());
-      });
+      }
 
       await member.wait_for_connect(element.key);
       print('42 WAIT TRACK ' + element.key);
