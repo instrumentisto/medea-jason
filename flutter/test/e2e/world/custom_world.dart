@@ -17,7 +17,6 @@ import 'package:uuid/uuid.dart';
 
 /// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
-
   /// ID of the `Room` created for this [FlutterWidgetTesterWorld].
   late String room_id;
 
@@ -56,7 +55,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             MediaKind.Video, MediaSourceKind.Device): true
       });
 
-      pipeline.addAll({'publish': WebRtcPublishEndpoint('publish', P2pMode.Always)});
+      pipeline.addAll(
+          {'publish': WebRtcPublishEndpoint('publish', P2pMode.Always)});
     }
 
     if (builder.is_recv) {
@@ -73,12 +73,16 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         if (value.is_send) {
           var id = value.id;
           var endpoint_id = 'play-$id';
-          pipeline.addAll({endpoint_id: WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish')});
+          pipeline.addAll({
+            endpoint_id:
+                WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish')
+          });
         }
       });
     }
 
-    var create_member = api.Member(builder_id, pipeline, api.Plain('test'), 'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
+    var create_member = api.Member(builder_id, pipeline, api.Plain('test'),
+        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
     await control_client.create('$room_id/$builder_id', create_member);
 
     if (builder.is_send) {
@@ -194,7 +198,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// `Room`.
   Future<List<CallbackItem>> get_callbacks(String member_id) async {
     var cbs = await control_client.callbacks();
-    return (json.decode(cbs.body) as List).map((item) => CallbackItem.fromJson(item))
+    return (json.decode(cbs.body) as List)
+        .map((item) => CallbackItem.fromJson(item))
         .where((element) => element.fid.contains(room_id))
         .toList();
   }
@@ -220,11 +225,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var temp = member.count_of_tracks_between_members(element.value);
       var send_count = temp.item1;
       var recv_count = temp.item2;
+
       var other_member = members[element.key]!;
 
-      await member.wait_for_connect(element.key);
-      print('42 WAIT TRACK ' + element.key);
-      other_member.connection_store.local_tracks.forEach((element) {
+      other_member.connection_store.local_tracks.forEach((element) async {
         print('M:' +
             member.id +
             ' ' +
@@ -234,24 +238,27 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             ' ' +
             element.mediaSourceKind().name +
             ' ' +
-            element.getTrack().state().toString());
+            (await element.getTrack().state()).toString());
       });
+      member.connection_store.local_tracks.forEach((element) async {
+        print('M:' +
+            member.id +
+            ' ' +
+            element.getTrack().id() +
+            ' ' +
+            element.kind().name +
+            ' ' +
+            element.mediaSourceKind().name +
+            ' ' +
+            (await element.getTrack().state()).toString());
+      });
+
+      await member.wait_for_connect(element.key);
+      print('42 WAIT TRACK ' + element.key);
       await member.wait_for_track_count(element.key, recv_count);
 
       await other_member.wait_for_connect(member.id);
       print('42 WAIT TRACK ' + member.id);
-      member.connection_store.local_tracks.forEach((element) {
-        print('M:' +
-            member.id +
-            ' ' +
-            element.getTrack().id() +
-            ' ' +
-            element.kind().name +
-            ' ' +
-            element.mediaSourceKind().name +
-            ' ' +
-            element.getTrack().state().toString());
-      });
       await other_member.wait_for_track_count(member.id, send_count);
     }
   }
@@ -349,8 +356,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     var spec = await get_spec();
     if (spec.pipeline.containsKey(pair.left.id)) {
       var member = spec.pipeline[pair.left.id]!;
-      member.pipeline
-          .addAll({'publish': pair.left.publish_endpoint()!});
+      member.pipeline.addAll({'publish': pair.left.publish_endpoint()!});
 
       var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
       member.pipeline.addAll({play_endpoint.id: play_endpoint});
@@ -359,8 +365,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (spec.pipeline.containsKey(pair.right.id)) {
       var member = spec.pipeline[pair.right.id]!;
 
-      member.pipeline
-          .addAll({'publish': pair.right.publish_endpoint()!});
+      member.pipeline.addAll({'publish': pair.right.publish_endpoint()!});
 
       var play_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
       member.pipeline.addAll({play_endpoint.id: play_endpoint});
@@ -386,7 +391,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
 /// [Member]s pairing configuration.
 ///
-/// Based on this configuration [FlutterWidgetTesterWorld] 
+/// Based on this configuration [FlutterWidgetTesterWorld]
 /// can dynamically create [Endpoint]s for this [Member]s.
 class MembersPair {
   /// First [`PairedMember`] in a pair.
