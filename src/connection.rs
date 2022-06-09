@@ -298,6 +298,7 @@ impl ConnectionHandle {
                 inner.on_remote_track_added.set_func(f);
                 let mut qrt = inner.qrt.borrow_mut();
                 while let Some(track) = qrt.pop() {
+                    println!("42TEST42");
                     inner.on_remote_track_added.call1(track);
                 }
             })
@@ -531,6 +532,7 @@ impl Connection {
         if self.0.on_remote_track_added.is_set() {
             self.0.on_remote_track_added.call1(track);
         } else {
+            println!("43TEST43");
             self.0.qrt.borrow_mut().push(track.into());
         }
     }
