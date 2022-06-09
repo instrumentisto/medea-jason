@@ -13,7 +13,7 @@ pub use self::world::World;
 async fn main() {
     let concurrent = supports_multiple_webdriver_clients()
         .await
-        .then(|| 10)
+        .then(|| 4)
         .unwrap_or(1);
 
     World::cucumber()

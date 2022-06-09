@@ -148,6 +148,8 @@ impl ConnectionHandle {
 
     /// Enables inbound video in this [`ConnectionHandle`].
     ///
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
+    ///
     /// # Errors
     ///
     /// With a [`StateError`] if the underlying pointer has been freed.
@@ -158,8 +160,11 @@ impl ConnectionHandle {
     ///
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn enable_remote_video(&self) -> Promise {
-        let fut = self.0.enable_remote_video();
+    pub fn enable_remote_video(
+        &self,
+        source_kind: Option<api::MediaSourceKind>,
+    ) -> Promise {
+        let fut = self.0.enable_remote_video(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(api::Error::from)?;
             Ok(JsValue::UNDEFINED)
@@ -167,6 +172,8 @@ impl ConnectionHandle {
     }
 
     /// Disables inbound video in this [`ConnectionHandle`].
+    ///
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///
@@ -178,8 +185,11 @@ impl ConnectionHandle {
     ///
     /// [`StateError`]: crate::api::err::StateError
     /// [0]: crate::api::err::MediaStateTransitionException
-    pub fn disable_remote_video(&self) -> Promise {
-        let fut = self.0.disable_remote_video();
+    pub fn disable_remote_video(
+        &self,
+        source_kind: Option<api::MediaSourceKind>,
+    ) -> Promise {
+        let fut = self.0.disable_remote_video(source_kind.map(Into::into));
         future_to_promise(async move {
             fut.await.map_err(api::Error::from)?;
             Ok(JsValue::UNDEFINED)

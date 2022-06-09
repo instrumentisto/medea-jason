@@ -1,7 +1,6 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import 'media_devices.g.dart' as bridge;

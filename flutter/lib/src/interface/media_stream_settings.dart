@@ -1,8 +1,8 @@
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'audio_track_constraints.dart';
-import 'display_video_track_constraints.dart';
 import 'device_video_track_constraints.dart';
+import 'display_video_track_constraints.dart';
 
 /// Representation of [`MediaStreamConstraints`][1].
 ///

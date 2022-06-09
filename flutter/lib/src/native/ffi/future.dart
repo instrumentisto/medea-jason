@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
-import 'foreign_value.dart';
 import '../jason.dart';
+import 'foreign_value.dart';
 import 'future.g.dart' as bridge;
 
 typedef _futureResolveOk_C = Void Function(Pointer, ForeignValue);

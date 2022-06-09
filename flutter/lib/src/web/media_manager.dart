@@ -1,16 +1,17 @@
 import 'package:flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
+
 import 'package:js/js.dart';
 
-import '../interface/media_device_info.dart';
 import '../interface/local_media_track.dart';
+import '../interface/media_device_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
-import 'media_device_info.dart';
 import 'jason_wasm.dart' as wasm;
 import 'local_media_track.dart';
+import 'media_device_info.dart';
 import 'media_stream_settings.dart';
 
 class WebMediaManagerHandle extends MediaManagerHandle {

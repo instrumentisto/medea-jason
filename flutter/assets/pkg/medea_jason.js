@@ -211,27 +211,27 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_32(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h01061cb0be8cad23(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1a4d137de53189d0(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_35(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h01061cb0be8cad23(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1a4d137de53189d0(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_38(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h01061cb0be8cad23(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1a4d137de53189d0(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_41(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h01061cb0be8cad23(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1a4d137de53189d0(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_44(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h01061cb0be8cad23(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1a4d137de53189d0(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_47(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h7639228703229c19(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h5d321f9b2d2a05d1(arg0, arg1, addHeapObject(arg2));
 }
 
 function _assertClass(instance, klass) {
@@ -253,7 +253,7 @@ function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
 function __wbg_adapter_352(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__h4c783aa1bce79249(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__had1b8ae75776544e(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
 /**
@@ -655,6 +655,8 @@ export class ConnectionHandle {
     /**
     * Enables inbound video in this [`ConnectionHandle`].
     *
+    * Affects only video with specific [`MediaSourceKind`] if specified.
+    *
     * # Errors
     *
     * With a [`StateError`] if the underlying pointer has been freed.
@@ -665,14 +667,17 @@ export class ConnectionHandle {
     *
     * [`StateError`]: crate::api::err::StateError
     * [0]: crate::api::err::MediaStateTransitionException
+    * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
-    enable_remote_video() {
-        const ret = wasm.connectionhandle_enable_remote_video(this.ptr);
+    enable_remote_video(source_kind) {
+        const ret = wasm.connectionhandle_enable_remote_video(this.ptr, isLikeNone(source_kind) ? 2 : source_kind);
         return takeObject(ret);
     }
     /**
     * Disables inbound video in this [`ConnectionHandle`].
+    *
+    * Affects only video with specific [`MediaSourceKind`] if specified.
     *
     * # Errors
     *
@@ -684,10 +689,11 @@ export class ConnectionHandle {
     *
     * [`StateError`]: crate::api::err::StateError
     * [0]: crate::api::err::MediaStateTransitionException
+    * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
-    disable_remote_video() {
-        const ret = wasm.connectionhandle_disable_remote_video(this.ptr);
+    disable_remote_video(source_kind) {
+        const ret = wasm.connectionhandle_disable_remote_video(this.ptr, isLikeNone(source_kind) ? 2 : source_kind);
         return takeObject(ret);
     }
 }
@@ -2378,6 +2384,8 @@ export class RoomHandle {
     /**
     * Disables inbound video in this [`Room`].
     *
+    * Affects only video with specific [`MediaSourceKind`] if specified.
+    *
     * # Errors
     *
     * With a [`StateError`] if the underlying pointer has been freed.
@@ -2389,10 +2397,11 @@ export class RoomHandle {
     * [`Room`]: room::Room
     * [`StateError`]: crate::api::err::StateError
     * [0]: crate::api::err::MediaStateTransitionException
+    * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
-    disable_remote_video() {
-        const ret = wasm.roomhandle_disable_remote_video(this.ptr);
+    disable_remote_video(source_kind) {
+        const ret = wasm.roomhandle_disable_remote_video(this.ptr, isLikeNone(source_kind) ? 2 : source_kind);
         return takeObject(ret);
     }
     /**
@@ -2418,6 +2427,8 @@ export class RoomHandle {
     /**
     * Enables inbound video in this [`Room`].
     *
+    * Affects only video with specific [`MediaSourceKind`] if specified.
+    *
     * # Errors
     *
     * With a [`StateError`] if the underlying pointer has been freed.
@@ -2429,10 +2440,11 @@ export class RoomHandle {
     * [`Room`]: room::Room
     * [`StateError`]: crate::api::err::StateError
     * [0]: crate::api::err::MediaStateTransitionException
+    * @param {number | undefined} source_kind
     * @returns {Promise<any>}
     */
-    enable_remote_video() {
-        const ret = wasm.roomhandle_enable_remote_video(this.ptr);
+    enable_remote_video(source_kind) {
+        const ret = wasm.roomhandle_enable_remote_video(this.ptr, isLikeNone(source_kind) ? 2 : source_kind);
         return takeObject(ret);
     }
 }
@@ -2619,6 +2631,15 @@ async function init(input) {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
+    imports.wbg.__wbindgen_cb_drop = function(arg0) {
+        const obj = takeObject(arg0).original;
+        if (obj.cnt-- == 1) {
+            obj.a = 0;
+            return true;
+        }
+        const ret = false;
+        return ret;
+    };
     imports.wbg.__wbg_stateerror_new = function(arg0) {
         const ret = StateError.__wrap(arg0);
         return addHeapObject(ret);
@@ -2671,19 +2692,6 @@ async function init(input) {
         getInt32Memory0()[arg0 / 4 + 1] = len0;
         getInt32Memory0()[arg0 / 4 + 0] = ptr0;
     };
-    imports.wbg.__wbindgen_cb_drop = function(arg0) {
-        const obj = takeObject(arg0).original;
-        if (obj.cnt-- == 1) {
-            obj.a = 0;
-            return true;
-        }
-        const ret = false;
-        return ret;
-    };
-    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
-        const ret = LocalMediaTrack.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbg_reconnecthandle_new = function(arg0) {
         const ret = ReconnectHandle.__wrap(arg0);
         return addHeapObject(ret);
@@ -2694,6 +2702,10 @@ async function init(input) {
     };
     imports.wbg.__wbg_connectionhandle_new = function(arg0) {
         const ret = ConnectionHandle.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
+        const ret = LocalMediaTrack.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_roomclosereason_new = function(arg0) {
@@ -2820,6 +2832,10 @@ async function init(input) {
         const ret = getObject(arg0).now();
         return ret;
     };
+    imports.wbg.__wbg_data_9ccfa9ae4eb71e78 = function(arg0) {
+        const ret = getObject(arg0).data;
+        return addHeapObject(ret);
+    };
     imports.wbg.__wbg_enumerateDevices_4116b72342914d4f = function() { return handleError(function (arg0) {
         const ret = getObject(arg0).enumerateDevices();
         return addHeapObject(ret);
@@ -2838,10 +2854,6 @@ async function init(input) {
     };
     imports.wbg.__wbg_transceiver_1510347ee0e6ea93 = function(arg0) {
         const ret = getObject(arg0).transceiver;
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_data_9ccfa9ae4eb71e78 = function(arg0) {
-        const ret = getObject(arg0).data;
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_candidate_3a423b30a4545015 = function(arg0, arg1) {
@@ -3190,28 +3202,28 @@ async function init(input) {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper871 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 201, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper1094 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper872 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 201, __wbg_adapter_35);
+    imports.wbg.__wbindgen_closure_wrapper1095 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_35);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper874 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 201, __wbg_adapter_38);
+    imports.wbg.__wbindgen_closure_wrapper1096 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_38);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper876 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 201, __wbg_adapter_41);
+    imports.wbg.__wbindgen_closure_wrapper1098 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_41);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper878 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 201, __wbg_adapter_44);
+    imports.wbg.__wbindgen_closure_wrapper1101 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_44);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2790 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 809, __wbg_adapter_47);
+    imports.wbg.__wbindgen_closure_wrapper2810 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 801, __wbg_adapter_47);
         return addHeapObject(ret);
     };
 

@@ -2,8 +2,8 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'media_track.g.dart' as bridge;
 
 /// Registers [MediaStreamTrack] related functions in Rust.
@@ -54,7 +54,6 @@ Pointer<Utf8> _deviceId(MediaStreamTrack track) {
   return track.deviceId().toNativeUtf8();
 }
 
-/// Returns [MediaStreamTrackState] of the [MediaStreamTrack].
 Object _readyState(MediaStreamTrack track) {
   return () => track.state().then((s) => s.index);
 }

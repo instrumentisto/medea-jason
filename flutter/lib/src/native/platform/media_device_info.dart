@@ -2,8 +2,8 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/src/model/device.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
+import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'media_device_info.g.dart' as bridge;
 
 /// Registers functions allowing Rust to operate Dart [MediaDeviceInfo].
