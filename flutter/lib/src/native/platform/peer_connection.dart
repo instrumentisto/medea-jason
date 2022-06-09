@@ -41,10 +41,11 @@ Object _addTransceiver(PeerConnection peer, int kind, int direction) {
 
 /// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
-Object _newPeer(Object iceServers) {
+Object _newPeer(Object iceServers, bool isForceRelayed) {
   var servers = iceServers as List<dynamic>;
+  var iceType = isForceRelayed ? IceTransportType.relay : IceTransportType.all;
   return () => PeerConnection.create(
-      IceTransportType.all, servers.map((e) => e as IceServer).toList());
+      iceType, servers.map((e) => e as IceServer).toList());
 }
 
 /// Sets the provided [f] to the [PeerConnection.onTrack] callback.
