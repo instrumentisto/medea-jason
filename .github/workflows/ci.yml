@@ -314,31 +314,43 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      # Rust does not support ndk >= 23
+      # https://github.com/rust-lang/rust/pull/85806
+      # https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_ROOT=/usr/local/lib/android
+          ANDROID_SDK_ROOT=${ANDROID_ROOT}/sdk
+          SDKMANAGER=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
+          echo "y" | $SDKMANAGER "ndk;22.1.7171670"
+          export ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+          ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
+
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
                                     ${{ matrix.platform == 'android'
                                         && 'targets=x86_64'
                                         || '' }}
 
-      - name: Parse Android NDK versions
-        id: ndk-version
+      - name: Parse Android API versions
+        id: api-version
         run: |
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
-      - name: Test on min Android NDK version
+      - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.ndk-version.outputs.min }}
+          api-level: ${{ steps.api-version.outputs.min }}
           target: google_apis
           arch: x86_64
           profile: Nexus 6
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-      - name: Test on target Android NDK version
+      - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.ndk-version.outputs.target }}
+          api-level: ${{ steps.api-version.outputs.target }}
           target: google_apis
           arch: x86_64
           profile: Nexus 6
@@ -398,6 +410,18 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
         if: ${{ matrix.platform == 'windows' }}
+
+      # Rust does not support ndk >= 23
+      # https://github.com/rust-lang/rust/pull/85806
+      # https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_ROOT=/usr/local/lib/android
+          ANDROID_SDK_ROOT=${ANDROID_ROOT}/sdk
+          SDKMANAGER=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
+          echo "y" | $SDKMANAGER "ndk;22.1.7171670"
+          export ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+          ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
