@@ -397,7 +397,9 @@ impl PeerConnection {
             let media_conns = Rc::downgrade(&peer.media_connections);
             peer.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
+                    println!("SPAWN TRACK");
                     platform::spawn(async move {
+                        println!("SPAWN ONTRACK");
                         if let Err(mid) =
                             c.add_remote_track(track, transceiver).await
                         {
@@ -406,6 +408,8 @@ impl PeerConnection {
                             );
                         };
                     });
+                } else {
+                    println!("CONN not Found");
                 }
             }));
         }
