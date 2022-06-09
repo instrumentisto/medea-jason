@@ -173,22 +173,10 @@ StepDefinitionGeneric then_has_local_track = then2<String, String, CustomWorld>(
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
 
-    expect(
-        member.connection_store.local_tracks
-            .where((element) =>
-                element.kind() == parsedKind.item1 &&
-                element.mediaSourceKind() == parsedKind.item2)
-            .isNotEmpty,
-        isTrue);
+    await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
     if (kind == 'video') {
-      expect(
-          member.connection_store.local_tracks
-              .where((element) =>
-                  element.kind() == parsedKind.item1 &&
-                  element.mediaSourceKind() == MediaSourceKind.Display)
-              .isNotEmpty,
-          isTrue);
+      await member.wait_local_track(MediaSourceKind.Display, parsedKind.item1);
     }
   },
 );
