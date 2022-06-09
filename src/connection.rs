@@ -291,6 +291,7 @@ impl ConnectionHandle {
         &self,
         f: platform::Function<api::RemoteMediaTrack>,
     ) -> Result<(), Traced<HandleDetachedError>> {
+        println!("SET CB");
         self.0
             .upgrade()
             .ok_or_else(|| tracerr::new!(HandleDetachedError))
@@ -529,6 +530,7 @@ impl Connection {
     /// Invokes `on_remote_track_added` callback with the provided
     /// [`remote::Track`].
     pub fn add_remote_track(&self, track: remote::Track) {
+        println!("CALL TEST");
         if self.0.on_remote_track_added.is_set() {
             self.0.on_remote_track_added.call1(track);
         } else {

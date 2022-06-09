@@ -112,12 +112,12 @@ class Member {
       connection_store.local_tracks.add(local_track);
       connection_store.OnLocalTrack(local_track);
     });
-    room.onNewConnection((connection) {
+    room.onNewConnection((connection) async {
       var remote_member_id = connection.getRemoteMemberId();
       connection_store.remote_tracks.addAll({remote_member_id: HashMap()});
       connection_store.connections.addAll({remote_member_id: connection});
       connection_store.close_connect.addAll({remote_member_id: Completer()});
-
+      
       connection.onRemoteTrackAdded((remote_track) {
         var remote_track_id = remote_track.getTrack().id();
         print('42 $remote_track_id ' + remote_track.kind().name + ' ' + remote_track.mediaDirection().name + ' from $remote_member_id');
