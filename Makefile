@@ -459,6 +459,11 @@ flutter:
 flutter.fmt:
 	flutter format $(if $(call eq,$(check),yes),-n --set-exit-if-changed,) \
 		flutter/
+ifeq ($(wildcard flutter/.packages),)
+	@make flutter cmd='pub get'
+endif
+	@make flutter cmd='pub run import_sorter:main --no-comments \
+	                   $(if $(call eq,$(check),yes),--exit-if-changed,)'
 
 
 # Lint Flutter Dart sources with dartanalyzer.

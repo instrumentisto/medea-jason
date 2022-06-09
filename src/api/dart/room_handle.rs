@@ -4,22 +4,22 @@ use dart_sys::Dart_Handle;
 use tracerr::Traced;
 
 use crate::{
-    api::dart::{
-        utils::{
-            c_str_into_string, DartFuture, DartResult, IntoDartFuture as _,
+    api::{
+        dart::{
+            utils::{
+                c_str_into_string, dart_arg_try_into, DartFuture, DartResult,
+                IntoDartFuture as _,
+            },
+            DartValueArg, ForeignClass,
         },
-        DartValueArg, DartValueCastError, ForeignClass,
+        ArgumentError, DartValueCastError,
     },
     media::MediaSourceKind,
     platform,
     room::{ChangeMediaStateError, ConstraintsUpdateError, RoomJoinError},
 };
 
-use super::{
-    propagate_panic,
-    utils::{ArgumentError, DartError},
-    MediaStreamSettings,
-};
+use super::{propagate_panic, utils::DartError, MediaStreamSettings};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::RoomHandle;
@@ -27,21 +27,6 @@ pub use self::mock::RoomHandle;
 pub use crate::room::RoomHandle;
 
 impl ForeignClass for RoomHandle {}
-
-/// Tries to convert the provided [`DartValueArg`] into a [`MediaSourceKind`].
-///
-/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
-/// [`DartFuture`].
-macro_rules! try_into_source_kind {
-    ($k:expr) => {
-        match $k.try_into().map_err(|err: DartValueCastError| {
-            ArgumentError::new(err.value, "kind", err.expectation)
-        }) {
-            Ok(s) => s,
-            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
-        }
-    };
-}
 
 /// Connects to a media server and joins the [`Room`] with the provided
 /// authorization `token`.
@@ -206,7 +191,7 @@ pub unsafe extern "C" fn RoomHandle__mute_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.mute_video(try_into_source_kind!(source_kind));
+        let fut = this.mute_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -228,7 +213,7 @@ pub unsafe extern "C" fn RoomHandle__unmute_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.unmute_video(try_into_source_kind!(source_kind));
+        let fut = this.unmute_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -248,7 +233,7 @@ pub unsafe extern "C" fn RoomHandle__enable_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.enable_video(try_into_source_kind!(source_kind));
+        let fut = this.enable_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -268,7 +253,7 @@ pub unsafe extern "C" fn RoomHandle__disable_video(
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.disable_video(try_into_source_kind!(source_kind));
+        let fut = this.disable_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -317,15 +302,18 @@ pub unsafe extern "C" fn RoomHandle__disable_remote_audio(
 
 /// Enables inbound video in this [`Room`].
 ///
+/// Affects only video with the specific [`MediaSourceKind`], if specified.
+///
 /// [`Room`]: crate::room::Room
 #[no_mangle]
 pub unsafe extern "C" fn RoomHandle__enable_remote_video(
     this: ptr::NonNull<RoomHandle>,
-) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    source_kind: DartValueArg<Option<MediaSourceKind>>,
+) -> DartFuture<Result<(), DartError>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.enable_remote_video();
+        let fut = this.enable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -336,15 +324,18 @@ pub unsafe extern "C" fn RoomHandle__enable_remote_video(
 
 /// Disables inbound video in this [`Room`].
 ///
+/// Affects only video with the specific [`MediaSourceKind`], if specified.
+///
 /// [`Room`]: crate::room::Room
 #[no_mangle]
 pub unsafe extern "C" fn RoomHandle__disable_remote_video(
     this: ptr::NonNull<RoomHandle>,
-) -> DartFuture<Result<(), Traced<ChangeMediaStateError>>> {
+    source_kind: DartValueArg<Option<MediaSourceKind>>,
+) -> DartFuture<Result<(), DartError>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
 
-        let fut = this.disable_remote_video();
+        let fut = this.disable_remote_video(dart_arg_try_into!(source_kind));
         async move {
             fut.await?;
             Ok(())
@@ -633,12 +624,14 @@ mod mock {
 
         pub fn enable_remote_video(
             &self,
+            _: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::err(tracerr::new!(ChangeMediaStateError::Detached))
         }
 
         pub fn disable_remote_video(
             &self,
+            _: Option<MediaSourceKind>,
         ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
             future::ok(())
         }

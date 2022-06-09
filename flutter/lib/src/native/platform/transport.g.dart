@@ -1,5 +1,7 @@
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
+
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 void registerFunction(DynamicLibrary dl, {
 required Pointer<NativeFunction<Handle Function(Pointer<Utf8>, Handle, Handle)>> connect,

@@ -65,3 +65,20 @@ where
         DartFuture(dart_future, PhantomData)
     }
 }
+
+/// Tries to convert the provided [`DartValueArg`] using [`TryInto`].
+///
+/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
+/// [`DartFuture`].
+macro_rules! dart_arg_try_into {
+    ($k:expr) => {
+        match $k.try_into().map_err(|err: DartValueCastError| {
+            ArgumentError::new(err.value, "kind", err.expectation)
+        }) {
+            Ok(s) => s,
+            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
+        }
+    };
+}
+
+pub(crate) use dart_arg_try_into;

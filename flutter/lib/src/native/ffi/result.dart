@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
-import 'foreign_value.dart';
 import 'box_handle.dart';
+import 'foreign_value.dart';
 
 /// Class representing either success or failure.
 ///

@@ -1167,8 +1167,8 @@ async fn new_remote_track() {
             sender_peer.state().when_local_sdp_updated().await.unwrap();
 
         let rcv_caps = Rc::new(RecvConstraints::default());
-        rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio);
-        rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video);
+        rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio, None);
+        rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video, None);
 
         let rcvr_peer_state =
             peer::State::new(PeerId(2), Vec::new(), false, None);

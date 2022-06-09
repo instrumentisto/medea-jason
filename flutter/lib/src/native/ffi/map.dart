@@ -1,5 +1,7 @@
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
+
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'map.g.dart' as bridge;
 

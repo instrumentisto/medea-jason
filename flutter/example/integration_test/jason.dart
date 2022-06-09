@@ -308,7 +308,7 @@ void main() {
     await room.enableAudio();
     await room.disableRemoteAudio();
     await room.enableRemoteAudio();
-    await room.disableRemoteVideo();
+    await room.disableRemoteVideo(MediaSourceKind.Device);
 
     var stateErr;
     try {
