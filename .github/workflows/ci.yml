@@ -317,8 +317,9 @@ jobs:
       # https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
-          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "ndk;21.4.7075529"
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "ndk;22.1.7171670"
           ln -sfn /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk-bundle
+        if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
@@ -410,12 +411,9 @@ jobs:
       # https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
-          ANDROID_ROOT="/usr/local/lib/android"
-          ANDROID_SDK_ROOT="${ANDROID_ROOT}/sdk"
-          SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
-          echo "y" | $SDKMANAGER "ndk;22.1.7171670"
-          export ANDROID_NDK="${ANDROID_SDK_ROOT}/ndk-bundle"
-          ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "ndk;22.1.7171670"
+          ln -sfn /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk-bundle
+        if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
