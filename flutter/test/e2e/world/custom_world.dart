@@ -220,6 +220,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             (element.value.is_recv || element.value.is_send))
         .toList();
     var member = members[member_id]!;
+    
     for (var i = 0; i < interconnected_members.length; ++i) {
       var element = interconnected_members[i];
       var temp = member.count_of_tracks_between_members(element.value);
