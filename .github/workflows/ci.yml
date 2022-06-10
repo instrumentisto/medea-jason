@@ -48,9 +48,7 @@ jobs:
   ##########################
 
   clippy:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
+    if: ${{ contains(github.event.head_commit.message, 'asdasd') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -319,9 +317,8 @@ jobs:
       # https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
-          ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
-          echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "ndk;21.4.7075529"
-          ln -sfn $ANDROID_SDK_ROOT/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk-bundle
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "ndk;21.4.7075529"
+          ln -sfn /usr/local/lib/android/sdk/ndk/21.4.7075529 /usr/local/lib/android/sdk/ndk-bundle
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
