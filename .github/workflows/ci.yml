@@ -47,8 +47,6 @@ jobs:
   ##########################
 
   clippy:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -65,8 +63,6 @@ jobs:
       - run: make cargo.lint
 
   rustfmt:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -310,8 +306,10 @@ jobs:
       # https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
-          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "ndk;22.1.7171670"
-          ln -sfn /usr/local/lib/android/sdk/ndk/22.1.7171670 /usr/local/lib/android/sdk/ndk-bundle
+          ANDROID_HOME=$HOME/Library/Android/sdk
+          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          echo y | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
@@ -411,8 +409,6 @@ jobs:
                                     dockerized=no debug=yes
 
   rustdoc:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -446,8 +442,6 @@ jobs:
 
   docker:
     name: Docker image
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       matrix:
         include:
