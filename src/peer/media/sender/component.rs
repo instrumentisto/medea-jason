@@ -583,6 +583,22 @@ impl Component {
         }
         Ok(())
     }
+
+    /// Disables media exchange on local track acquisition error.
+    #[watch(self.local_track_state.subscribe())]
+    async fn local_track_state_changed(
+        _: Rc<Sender>,
+        state: Rc<State>,
+        new_state: LocalTrackState,
+    ) -> Result<(), Traced<ProhibitedStateError>> {
+        if matches!(new_state, LocalTrackState::Failed(_)) {
+            state.media_state_transition_to(MediaState::MediaExchange(
+                media_exchange_state::Stable::Disabled,
+            ))?;
+        }
+
+        Ok(())
+    }
 }
 
 impl TransceiverSide for State {
