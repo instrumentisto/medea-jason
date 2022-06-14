@@ -655,7 +655,7 @@ export class ConnectionHandle {
     /**
     * Enables inbound video in this [`ConnectionHandle`].
     *
-    * Affects only video with specific [`MediaSourceKind`] if specified.
+    * Affects only video with the specific [`MediaSourceKind`], if specified.
     *
     * # Errors
     *
@@ -677,7 +677,7 @@ export class ConnectionHandle {
     /**
     * Disables inbound video in this [`ConnectionHandle`].
     *
-    * Affects only video with specific [`MediaSourceKind`] if specified.
+    * Affects only video with the specific [`MediaSourceKind`], if specified.
     *
     * # Errors
     *
@@ -2384,7 +2384,7 @@ export class RoomHandle {
     /**
     * Disables inbound video in this [`Room`].
     *
-    * Affects only video with specific [`MediaSourceKind`] if specified.
+    * Affects only video with the specific [`MediaSourceKind`], if specified.
     *
     * # Errors
     *
@@ -2427,7 +2427,7 @@ export class RoomHandle {
     /**
     * Enables inbound video in this [`Room`].
     *
-    * Affects only video with specific [`MediaSourceKind`] if specified.
+    * Affects only video with the specific [`MediaSourceKind`], if specified.
     *
     * # Errors
     *
@@ -3202,28 +3202,28 @@ async function init(input) {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1094 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper1122 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 430, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1095 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_35);
+    imports.wbg.__wbindgen_closure_wrapper1123 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 430, __wbg_adapter_35);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1096 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_38);
+    imports.wbg.__wbindgen_closure_wrapper1124 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 430, __wbg_adapter_38);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1098 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_41);
+    imports.wbg.__wbindgen_closure_wrapper1126 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 430, __wbg_adapter_41);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1101 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 409, __wbg_adapter_44);
+    imports.wbg.__wbindgen_closure_wrapper1129 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 430, __wbg_adapter_44);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2810 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 801, __wbg_adapter_47);
+    imports.wbg.__wbindgen_closure_wrapper2809 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 807, __wbg_adapter_47);
         return addHeapObject(ret);
     };
 
