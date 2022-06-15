@@ -217,10 +217,15 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     pub fn fork(&self) -> impl Future<Output = Self> + 'static {
+        log::error!("FORK");
+        log::error!("OLD TRACK ENABLED: {}", self.sys_track.enabled());
+        let sys_track = Rc::new(web_sys::MediaStreamTrack::clone(
+            &self.sys_track,
+        ));
+        log::error!("NEW TRACK ENABLED: {}", sys_track.enabled());
+        log::error!("FORK END");
         future::ready(Self {
-            sys_track: Rc::new(web_sys::MediaStreamTrack::clone(
-                &self.sys_track,
-            )),
+            sys_track,
             kind: self.kind,
             source_kind: self.source_kind,
             on_ended: RefCell::new(None),
