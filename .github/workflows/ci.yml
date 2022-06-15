@@ -1,6 +1,11 @@
 name: CI
 
-on: ["push"]
+on:
+  push:
+    branches: ["master"]
+    tags: ["medea-*"]
+  pull_request:
+    branches: ["master"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,11 +16,74 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  test:
+  get-commit-message:
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+    env:
+      SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/github-script@v6
+        id: message
+        with:
+          script: |
+            const {SHA} = process.env;
+            const commit = await github.rest.git.getCommit({owner: 'instrumentisto', repo: 'medea-jason', commit_sha: SHA});
+            return commit.data.message;
+          result-encoding: string
+    outputs:
+      commit_message: ${{ steps.message.outputs.result }}
+
+
+  publish:
+    if: github.ref_name == 'master' || contains(needs.get-commit-message.outputs.commit_message, '[publish]')
+
+    needs:
+      - get-commit-message
+      # - build
+      # - clippy
+      # - dartanalyze
+      # - dartfmt
+      # - ktfmt
+      # - rustdoc
+      # - rustfmt
+      # - test-flutter
+      # - test-rust
+
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
 
-      - run: echo "${{ github.ref }}"
+      - uses: subosito/flutter-action@v2
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: web
+          path: flutter/assets
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: windows
+          path: flutter/windows/lib
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux
+          path: flutter/linux/lib
+
+      - run: |
+          cd flutter/
+          grep 'version:' pubspec.yaml |
+          cut -d' ' -f2 |
+          {
+            read version;
+            new_version=${version}.rev.${{ github.sha }};
+            date=`date +"%Y-%m-%d"`;
+            sed -i "s|$version|$new_version|g" pubspec.yaml;
+            sed -i "4s|^|[${new_version}] - ${date}\n\n* Development.\n\n|" CHANGELOG.md;
+          }
+
+      - run: flutter pub publish -n
 
   # ################
   # # Pull Request #
