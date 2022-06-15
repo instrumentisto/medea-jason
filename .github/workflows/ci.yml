@@ -29,6 +29,7 @@ jobs:
           script: |
             const {SHA} = process.env;
             const commit = await github.rest.git.getCommit({owner: 'instrumentisto', repo: 'medea-jason', commit_sha: SHA});
+            console.dir(commit);
             return commit.data.message;
           result-encoding: string
       - run: echo "${{ steps.message.outputs.result }}"
