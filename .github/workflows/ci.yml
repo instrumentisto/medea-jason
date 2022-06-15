@@ -12,7 +12,10 @@ env:
 
 jobs:
   test:
-    - run: echo "${{ github.ref }}"
+    runs-on: ubuntu
+    steps:
+
+      - run: echo "${{ github.ref }}"
 
   # ################
   # # Pull Request #
