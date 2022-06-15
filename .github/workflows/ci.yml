@@ -21,7 +21,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      SHA: ${{ github.sha }}
+      SHA: ${{ github.event.after }}
     steps:
       - uses: actions/github-script@v6
         id: message
