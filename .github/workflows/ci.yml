@@ -30,6 +30,8 @@ jobs:
             return commit.data.message;
           result-encoding: string
       - run: echo "${{ steps.message.outputs.result }}"
+      - run: echo "${{ github.ref }}"
+      - run: echo "${{ github.ref == 'refs/heads/master' }}"
     outputs:
       commit_message: ${{ steps.message.outputs.result }}
 
