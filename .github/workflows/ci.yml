@@ -457,7 +457,7 @@ jobs:
                                     dockerized=no debug=yes
 
       - uses: actions/upload-artifact@v3
-        if: (matrix.platform != 'web') || (matrix.platform != 'android')
+        if: (matrix.platform == 'windows') || (matrix.platform == 'linux')
         with:
           name: ${{ matrix.platform }}
           path: flutter/${{ matrix.platform }}/lib
