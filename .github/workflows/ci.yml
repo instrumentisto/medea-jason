@@ -471,7 +471,7 @@ jobs:
           path: flutter/${{ matrix.platform }}/lib
 
       - uses: actions/upload-artifact@v3
-        if: matrix.platform = 'web'
+        if: matrix.platform == 'web'
         with:
           name: ${{ matrix.platform }}
           path: flutter/assets
