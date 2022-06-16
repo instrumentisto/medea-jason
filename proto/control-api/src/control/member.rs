@@ -253,12 +253,6 @@ impl Credentials {
     }
 }
 
-impl Default for Credentials {
-    fn default() -> Self {
-        Self::random()
-    }
-}
-
 /// Plain [`Credentials`] returned in a [`Sid`].
 #[derive(
     AsRef,
