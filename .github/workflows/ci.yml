@@ -462,7 +462,7 @@ jobs:
           name: ${{ matrix.platform }}
           path: flutter/${{ matrix.platform }}/lib
 
-      - run: make flutter.assets.web
+      - run: make flutter.web.assets
         if: matrix.platform == 'web'
 
       - uses: actions/upload-artifact@v3
