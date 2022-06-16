@@ -75,8 +75,8 @@ jobs:
           }
 
       - run: |
-        cd flutter/
-        flutter pub publish -n
+          cd flutter/
+          flutter pub publish -n
 
   # ################
   # # Pull Request #
