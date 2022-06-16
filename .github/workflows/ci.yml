@@ -122,8 +122,6 @@ jobs:
   ##########################
 
   clippy:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -140,8 +138,6 @@ jobs:
       - run: make cargo.lint
 
   rustfmt:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -180,6 +176,9 @@ jobs:
       - run: make flutter.fmt check=yes
 
   dartanalyze:
+    needs:
+      - crate-jason
+
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || !startsWith(github.ref, 'refs/tags/medea-') }}
@@ -187,6 +186,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: web
+          path: flutter/assets
 
       - run: make flutter
 
@@ -201,8 +205,6 @@ jobs:
 
   test-unit:
     name: Unit tests
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       matrix:
         include:
@@ -282,8 +284,6 @@ jobs:
   test-e2e:
     name: E2E tests
     needs: ["docker"]
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -507,8 +507,6 @@ jobs:
           path: flutter/assets
 
   rustdoc:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -542,8 +540,6 @@ jobs:
 
   docker:
     name: Docker image
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       matrix:
         include:
