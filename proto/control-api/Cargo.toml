@@ -16,11 +16,13 @@ categories = ["api-bindings", "network-programming"]
 [features]
 client = []
 server = []
+channel = ["dep:futures"]
 grpc = ["dep:prost", "dep:prost-types", "dep:tonic", "dep:tonic-build", "time/formatting", "time/parsing"]
 
 [dependencies]
 async-trait = "0.1.34"
 derive_more = { version = "0.99.17", features = ["as_ref", "display", "error", "from", "into"], default-features = false }
+futures = { version = "0.3.21", optional = true }
 prost = { version = "0.10", optional = true }
 prost-types = { version = "0.10", optional = true }
 rand = "0.8"

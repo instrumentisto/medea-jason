@@ -95,6 +95,8 @@
 #![allow(clippy::same_name_method)]
 
 pub mod callback;
+#[cfg(feature = "channel")]
+pub mod channel;
 pub mod control;
 #[cfg(feature = "grpc")]
 pub mod grpc;
