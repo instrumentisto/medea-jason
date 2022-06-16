@@ -33,6 +33,7 @@ jobs:
       - run: echo "${{ github.ref }}"
       - run: echo "${{ github.ref == 'refs/heads/master' }}"
       - run: echo "${{ github.ref_name }}"
+      - run: echo "${{ github.ref_type }}"
     outputs:
       commit_message: ${{ steps.message.outputs.result }}
 
