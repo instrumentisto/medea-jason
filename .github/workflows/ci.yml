@@ -419,8 +419,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: android
-            os: ubuntu
+          # - platform: android
+          #   os: ubuntu
           - platform: linux
             os: ubuntu
           - platform: web
@@ -461,6 +461,9 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: flutter/${{ matrix.platform }}/lib
+
+      - run: make flutter.assets.web
+        if: matrix.platform == 'web'
 
       - uses: actions/upload-artifact@v3
         if: matrix.platform == 'web'
