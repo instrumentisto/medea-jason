@@ -62,11 +62,6 @@ jobs:
           name: linux
           path: flutter/linux/lib
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: web
-          path: flutter/assets
-
       - run: |
           cd flutter/
           grep 'version:' pubspec.yaml |
@@ -79,7 +74,9 @@ jobs:
             sed -i "6s|^|[${new_version}] - ${date}\n\n* Development.\n\n|" CHANGELOG.md;
           }
 
-      - run: flutter pub publish -n
+      - run: |
+        cd flutter/
+        flutter pub publish -n
 
   # ################
   # # Pull Request #
