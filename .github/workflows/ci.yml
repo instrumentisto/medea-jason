@@ -2,10 +2,10 @@ name: CI
 
 on:
   push:
-  #   branches: ["master"]
-  #   tags: ["medea-*"]
-  # pull_request:
-  #   branches: ["master"]
+    branches: ["master"]
+    tags: ["medea-*"]
+  pull_request:
+    branches: ["master"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
