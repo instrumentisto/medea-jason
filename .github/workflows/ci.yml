@@ -39,15 +39,15 @@ jobs:
 
     needs:
       - get-commit-message
-      # - build
-      # - clippy
-      # - dartanalyze
-      # - dartfmt
-      # - ktfmt
-      # - rustdoc
-      # - rustfmt
-      # - test-flutter
-      # - test-rust
+      - build
+      - clippy
+      - dartanalyze
+      - dartfmt
+      - ktfmt
+      - rustdoc
+      - rustfmt
+      - test-flutter
+      - test-rust
 
     runs-on: ubuntu-latest
     steps:
@@ -70,6 +70,11 @@ jobs:
           name: linux
           path: flutter/linux/lib
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: web
+          path: flutter/assets
+
       - run: |
           cd flutter/
           grep 'version:' pubspec.yaml |
@@ -79,7 +84,7 @@ jobs:
             new_version=${version}.rev.${{ github.sha }};
             date=`date +"%Y-%m-%d"`;
             sed -i "s|$version|$new_version|g" pubspec.yaml;
-            sed -i "4s|^|[${new_version}] - ${date}\n\n* Development.\n\n|" CHANGELOG.md;
+            sed -i "6s|^|[${new_version}] - ${date}\n\n* Development.\n\n|" CHANGELOG.md;
           }
 
       - run: flutter pub publish -n
@@ -409,55 +414,67 @@ jobs:
   #     - run: make test.flutter device=windows
   #       if: ${{ matrix.platform == 'windows' }}
 
-  # ############
-  # # Building #
-  # ############
+  ############
+  # Building #
+  ############
 
-  # crate-jason:
-  #   name: Build medea-jason
-  #   if: ${{ github.ref == 'refs/heads/master'
-  #           || startsWith(github.ref, 'refs/tags/medea-jason-')
-  #           || !startsWith(github.ref, 'refs/tags/medea-') }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include:
-  #         - platform: android
-  #           os: ubuntu
-  #         - platform: linux
-  #           os: ubuntu
-  #         - platform: web
-  #           os: ubuntu
-  #         - platform: windows
-  #           os: windows
-  #   runs-on: ${{ matrix.os }}-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #     - uses: Swatinem/rust-cache@v1
-  #       if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+  crate-jason:
+    name: Build medea-jason
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu
+          - platform: linux
+            os: ubuntu
+          - platform: web
+            os: ubuntu
+          - platform: windows
+            os: windows
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-  #     - run: make rustup.targets only=android
-  #       if: ${{ matrix.platform == 'android' }}
-  #     - uses: actions-rs/install@v0.1
-  #       with:
-  #         crate: cargo-ndk
-  #         use-tool-cache: true
-  #       if: ${{ matrix.platform == 'android' }}
+      - run: make rustup.targets only=android
+        if: ${{ matrix.platform == 'android' }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.platform == 'android' }}
 
-  #     - run: make rustup.targets only=web
-  #       if: ${{ matrix.platform == 'web' }}
-  #     - uses: jetli/wasm-pack-action@v0.3.0
-  #       if: ${{ matrix.platform == 'web' }}
+      - run: make rustup.targets only=web
+        if: ${{ matrix.platform == 'web' }}
+      - uses: jetli/wasm-pack-action@v0.3.0
+        if: ${{ matrix.platform == 'web' }}
 
-  #     - uses: dart-lang/setup-dart@v1
-  #       if: ${{ matrix.platform == 'windows' }}
+      - uses: dart-lang/setup-dart@v1
+        if: ${{ matrix.platform == 'windows' }}
 
-  #     - run: make cargo.build.jason platform=${{ matrix.platform }}
-  #                                   dockerized=no debug=yes
+      - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    dockerized=no debug=yes
+
+      - uses: actions/upload-artifact@v3
+        if: (matrix.platform != 'web') || (matrix.platform != 'android')
+        with:
+          name: ${{ matrix.platform }}
+          path: flutter/${{ matrix.platform }}/lib
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.platform = 'web'
+        with:
+          name: ${{ matrix.platform }}
+          path: flutter/assets
 
   # rustdoc:
   #   if: ${{ github.ref == 'refs/heads/master'
