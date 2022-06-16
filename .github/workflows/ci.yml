@@ -39,15 +39,7 @@ jobs:
 
     needs:
       - get-commit-message
-      - build
-      - clippy
-      - dartanalyze
-      - dartfmt
-      - ktfmt
-      - rustdoc
-      - rustfmt
-      - test-flutter
-      - test-rust
+      - crate-jason
 
     runs-on: ubuntu-latest
     steps:
