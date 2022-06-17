@@ -74,13 +74,21 @@ impl<T: ControlApi> ControlApiServer<T> {
 /// [`channel`]-based [`CallbackApi`] client.
 ///
 /// [`channel`]: futures::channel
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct CallbackApiClient<Error> {
     /// [`mpsc::UnboundedSender`] to send [`CallbackApiRequest`]s to linked
     /// [`CallbackApiServer`].
     ///
     /// [`CallbackApiServer`]: super::CallbackApiServer
     pub(crate) sender: mpsc::UnboundedSender<CallbackApiRequest<Error>>,
+}
+
+impl<Error> Clone for CallbackApiClient<Error> {
+    fn clone(&self) -> Self {
+        Self {
+            sender: self.sender.clone(),
+        }
+    }
 }
 
 #[async_trait]

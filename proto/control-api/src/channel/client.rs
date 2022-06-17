@@ -52,13 +52,21 @@ impl<T: CallbackApi> CallbackApiServer<T> {
 ///
 /// [`channel`]: futures::channel
 #[allow(clippy::module_name_repetitions)]
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct ControlApiClient<Error> {
     /// [`mpsc::UnboundedSender`] to send [`ControlApiRequest`]s to linked
     /// [`ControlApiServer`].
     ///
     /// [`ControlApiServer`]: super::ControlApiServer
     pub(crate) sender: mpsc::UnboundedSender<ControlApiRequest<Error>>,
+}
+
+impl<Error> Clone for ControlApiClient<Error> {
+    fn clone(&self) -> Self {
+        Self {
+            sender: self.sender.clone(),
+        }
+    }
 }
 
 #[async_trait]
