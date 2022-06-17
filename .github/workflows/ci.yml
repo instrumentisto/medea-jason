@@ -166,9 +166,9 @@ jobs:
           - crate: medea-control-api-proto
             features: ["channel", "server"]
           - crate: medea-control-api-proto
-            features: ["grpc", "client" "server"]
+            features: ["grpc", "client", "server"]
           - crate: medea-control-api-proto
-            features: ["channel", "client" "server"]
+            features: ["channel", "client", "server"]
 
           - crate: medea-jason
             wasm: true
