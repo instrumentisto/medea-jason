@@ -478,6 +478,7 @@ flutter.web.assets:
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
+	touch flutter/assets/pkg/.gitkeep
 
 
 

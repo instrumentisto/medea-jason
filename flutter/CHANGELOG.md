@@ -3,7 +3,9 @@
 
 All user visible changes to this project will be documented in this file. This project uses [Semantic Versioning 2.0.0].
 
+## [0.3.0-dev] · 2022-15-06
 
+* Development.
 
 
 ## [0.1.0] · 2021-??-?? ~TBD

@@ -16,14 +16,88 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
+  get-commit-message:
+    runs-on: ubuntu-latest
+    env:
+      SHA: ${{ github.event.after }}
+    steps:
+      - uses: actions/github-script@v6
+        id: message
+        with:
+          script: |
+            const {SHA} = process.env;
+            const commit = await github.rest.git.getCommit({owner: 'instrumentisto', repo: 'medea-jason', commit_sha: SHA});
+            return commit.data.message;
+          result-encoding: string
+    outputs:
+      commit_message: ${{ steps.message.outputs.result }}
+
+
+  publish:
+    if: github.ref == 'refs/heads/master' || contains(needs.get-commit-message.outputs.commit_message, '[publish]')
+
+    needs:
+      - get-commit-message
+      - clippy
+      - crate-jason
+      - dartanalyze
+      - dartfmt
+      - docker
+      - helm-lint
+      - rustdoc
+      - rustfmt
+      - test-e2e
+      - test-flutter
+      - test-unit
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: web
+          path: flutter/assets
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: android
+          path: flutter/android/src/main/jniLibs
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: windows
+          path: flutter/windows/lib
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux
+          path: flutter/linux/lib
+
+      - run: |
+          cd flutter/
+          grep 'version:' pubspec.yaml |
+          cut -d' ' -f2 |
+          {
+            read version;
+            new_version=${version}.rev.${{ github.sha }};
+            date=`date +"%Y-%m-%d"`;
+            sed -i "s|$version|$new_version|g" pubspec.yaml;
+            sed -i "6s|^|[${new_version}] - ${date}\n\n* Development.\n\n|" CHANGELOG.md;
+          }
+
+      - run: |
+          cd flutter/
+          flutter pub publish -n
 
   ################
   # Pull Request #
   ################
 
   pr:
-    if: ${{ github.event_name == 'pull_request'
-            && !contains(github.event.head_commit.message, '[skip ci]') }}
+    if: ${{ github.event_name == 'pull_request' }}
     needs:
       - clippy
       - crate-jason
@@ -48,9 +122,6 @@ jobs:
   ##########################
 
   clippy:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -67,9 +138,6 @@ jobs:
       - run: make cargo.lint
 
   rustfmt:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -84,8 +152,7 @@ jobs:
   helm-lint:
     name: Lint Helm chart
     if: ${{ github.ref == 'refs/heads/master'
-            || (!startsWith(github.ref, 'refs/tags/medea-')
-                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       matrix:
         chart:
@@ -100,8 +167,7 @@ jobs:
   dartfmt:
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || (!startsWith(github.ref, 'refs/tags/medea-')
-                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -112,8 +178,7 @@ jobs:
   dartanalyze:
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || (!startsWith(github.ref, 'refs/tags/medea-')
-                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -132,9 +197,6 @@ jobs:
 
   test-unit:
     name: Unit tests
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       matrix:
         include:
@@ -214,9 +276,6 @@ jobs:
   test-e2e:
     name: E2E tests
     needs: ["docker"]
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -271,8 +330,7 @@ jobs:
     name: Flutter tests
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || (!startsWith(github.ref, 'refs/tags/medea-')
-                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       fail-fast: false
       matrix:
@@ -314,31 +372,42 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      # Rust does not support ndk >= 23
+      # https://github.com/rust-lang/rust/pull/85806
+      # https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_HOME=$HOME/Library/Android/sdk
+          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          echo y | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
+        if: ${{ matrix.platform == 'android' }}
+
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
                                     ${{ matrix.platform == 'android'
                                         && 'targets=x86_64'
                                         || '' }}
 
-      - name: Parse Android NDK versions
-        id: ndk-version
+      - name: Parse Android API versions
+        id: api-version
         run: |
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
-      - name: Test on min Android NDK version
+      - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.ndk-version.outputs.min }}
+          api-level: ${{ steps.api-version.outputs.min }}
           target: google_apis
           arch: x86_64
           profile: Nexus 6
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-      - name: Test on target Android NDK version
+      - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.ndk-version.outputs.target }}
+          api-level: ${{ steps.api-version.outputs.target }}
           target: google_apis
           arch: x86_64
           profile: Nexus 6
@@ -359,8 +428,7 @@ jobs:
     name: Build medea-jason
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || (!startsWith(github.ref, 'refs/tags/medea-')
-                && !contains(github.event.head_commit.message, '[skip ci]')) }}
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       fail-fast: false
       matrix:
@@ -399,13 +467,44 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         if: ${{ matrix.platform == 'windows' }}
 
+      # Rust does not support ndk >= 23
+      # https://github.com/rust-lang/rust/pull/85806
+      # https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_ROOT=/usr/local/lib/android
+          ANDROID_SDK_ROOT=${ANDROID_ROOT}/sdk
+          SDKMANAGER=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
+          ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+          echo "y" | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
+        if: ${{ matrix.platform == 'android' }}
+
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
 
+      - uses: actions/upload-artifact@v3
+        if: matrix.platform == 'android'
+        with:
+          name: ${{ matrix.platform }}
+          path: flutter/${{ matrix.platform }}/src/main/jniLibs
+
+      - uses: actions/upload-artifact@v3
+        if: (matrix.platform == 'windows') || (matrix.platform == 'linux')
+        with:
+          name: ${{ matrix.platform }}
+          path: flutter/${{ matrix.platform }}/lib
+
+      - run: make flutter.web.assets
+        if: matrix.platform == 'web'
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.platform == 'web'
+        with:
+          name: ${{ matrix.platform }}
+          path: flutter/assets
+
   rustdoc:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -439,9 +538,6 @@ jobs:
 
   docker:
     name: Docker image
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       matrix:
         include:
