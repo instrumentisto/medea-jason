@@ -63,6 +63,11 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
+          name: android
+          path: flutter/android/src/main/jniLibs
+
+      - uses: actions/download-artifact@v3
+        with:
           name: windows
           path: flutter/windows/lib
 
@@ -477,6 +482,12 @@ jobs:
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=yes
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.platform == 'android'
+        with:
+          name: ${{ matrix.platform }}
+          path: flutter/${{ matrix.platform }}/src/main/jniLibs
 
       - uses: actions/upload-artifact@v3
         if: (matrix.platform == 'windows') || (matrix.platform == 'linux')
