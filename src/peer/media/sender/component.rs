@@ -539,14 +539,17 @@ impl Component {
         new_state: mute_state::Stable,
     ) -> Result<(), Infallible> {
         sender.muted.set(new_state == mute_state::Stable::Muted);
-        match new_state {
-            mute_state::Stable::Muted => {
-                sender.transceiver.set_send_track_enabled(false);
-            }
-            mute_state::Stable::Unmuted => {
-                sender.transceiver.set_send_track_enabled(true);
+        if let Some(track) = sender.track.borrow().as_ref() {
+            match new_state {
+                mute_state::Stable::Muted => {
+                    track.set_enabled(false);
+                }
+                mute_state::Stable::Unmuted => {
+                    track.set_enabled(true);
+                }
             }
         }
+
         Ok(())
     }
 

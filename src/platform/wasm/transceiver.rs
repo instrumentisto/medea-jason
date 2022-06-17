@@ -1,8 +1,8 @@
 //! [`RtcRtpTransceiver`] wrapper.
 
-use std::{cell::RefCell, future::Future, rc::Rc};
+use std::{future::Future, rc::Rc};
 
-use futures::future::LocalBoxFuture;
+use derive_more::From;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::RtcRtpTransceiver;
 
@@ -13,19 +13,13 @@ use crate::{
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
 /// direction changes.
-#[derive(Clone, Debug)]
-pub struct Transceiver {
-    /// [`local::Track`] associated with this [`Transceiver`].
-    send_track: RefCell<Option<Rc<local::Track>>>,
-
-    /// Underlying [`RtcRtpTransceiver`].
-    transceiver: RtcRtpTransceiver,
-}
+#[derive(Clone, Debug, From)]
+pub struct Transceiver(RtcRtpTransceiver);
 
 impl Transceiver {
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     fn direction(&self) -> TransceiverDirection {
-        TransceiverDirection::from(self.transceiver.direction())
+        TransceiverDirection::from(self.0.direction())
     }
 
     /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
@@ -33,7 +27,7 @@ impl Transceiver {
         &self,
         disabled_direction: TransceiverDirection,
     ) -> impl Future<Output = ()> + 'static {
-        let transceiver = self.transceiver.clone();
+        let transceiver = self.0.clone();
         async move {
             transceiver.set_direction(
                 (TransceiverDirection::from(transceiver.direction())
@@ -48,7 +42,7 @@ impl Transceiver {
         &self,
         enabled_direction: TransceiverDirection,
     ) -> impl Future<Output = ()> + 'static {
-        let transceiver = self.transceiver.clone();
+        let transceiver = self.0.clone();
         async move {
             transceiver.set_direction(
                 (TransceiverDirection::from(transceiver.direction())
@@ -74,36 +68,15 @@ impl Transceiver {
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
     pub async fn set_send_track(
         &self,
-        new_track: Rc<local::Track>,
+        new_track: Option<&Rc<local::Track>>,
     ) -> Result<(), Error> {
-        let sys_track: &web_sys::MediaStreamTrack =
-            (*new_track).as_ref().as_ref();
         drop(
-            JsFuture::from(
-                self.transceiver.sender().replace_track(Some(sys_track)),
-            )
+            JsFuture::from(self.0.sender().replace_track(
+                new_track.map(|track| (**track).as_ref().as_ref()),
+            ))
             .await?,
         );
-        drop(self.send_track.replace(Some(new_track)));
         Ok(())
-    }
-
-    /// Sets a [`TransceiverDirection::SEND`] [`local::Track`] of this
-    /// [`Transceiver`] to [`None`].
-    ///
-    /// # Panics
-    ///
-    /// If [`local::Track`] replacement with [`None`] fails on JS side, but
-    /// basing on [WebAPI docs] it should never happen.
-    ///
-    /// [WebAPI docs]: https://tinyurl.com/7pnszaa8
-    pub fn drop_send_track(&self) -> LocalBoxFuture<'static, ()> {
-        drop(self.send_track.replace(None));
-        let fut = self.transceiver.sender().replace_track(None);
-        Box::pin(async move {
-            // Replacing track to None should never fail.
-            drop(JsFuture::from(fut).await.unwrap());
-        })
     }
 
     /// Returns [`mid`] of this [`Transceiver`].
@@ -111,42 +84,13 @@ impl Transceiver {
     /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
     #[must_use]
     pub fn mid(&self) -> Option<String> {
-        self.transceiver.mid()
-    }
-
-    /// Returns [`local::Track`] that is being send to remote, if any.
-    #[must_use]
-    pub fn send_track(&self) -> Option<Rc<local::Track>> {
-        self.send_track.borrow().clone()
-    }
-
-    /// Indicates whether this [`Transceiver`] has [`local::Track`].
-    #[must_use]
-    pub fn has_send_track(&self) -> bool {
-        self.send_track.borrow().is_some()
-    }
-
-    /// Sets the underlying [`local::Track`]'s `enabled` field to the provided
-    /// value, if any.
-    pub fn set_send_track_enabled(&self, enabled: bool) {
-        if let Some(track) = self.send_track.borrow().as_ref() {
-            track.set_enabled(enabled);
-        }
+        self.0.mid()
     }
 
     /// Indicates whether the underlying [`RtcRtpTransceiver`] is stopped.
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        self.transceiver.stopped()
-    }
-}
-
-impl From<RtcRtpTransceiver> for Transceiver {
-    fn from(transceiver: RtcRtpTransceiver) -> Self {
-        Self {
-            send_track: RefCell::new(None),
-            transceiver,
-        }
+        self.0.stopped()
     }
 }
 

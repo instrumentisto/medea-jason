@@ -2,7 +2,10 @@
 
 mod component;
 
-use std::{cell::Cell, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+};
 
 use derive_more::{Display, From};
 use futures::channel::mpsc;
@@ -60,6 +63,9 @@ pub struct Sender {
     ///
     /// [`Transceiver`]: platform::Transceiver
     transceiver: platform::Transceiver,
+
+    /// [`local::Track`] that this [`Sender`] is transmitting to the remote.
+    track: RefCell<Option<Rc<local::Track>>>,
 
     /// Indicator whether this [`local::Track`] is muted.
     muted: Cell<bool>,
@@ -160,6 +166,7 @@ impl Sender {
             muted: Cell::new(state.is_muted()),
             track_events_sender,
             send_constraints,
+            track: RefCell::new(None),
         });
 
         if !enabled_in_cons {
@@ -200,13 +207,14 @@ impl Sender {
     /// [1]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
     /// [2]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
     pub async fn remove_track(&self) {
-        self.transceiver.drop_send_track().await;
+        drop(self.track.take());
+        drop(self.transceiver.set_send_track(None).await);
     }
 
     /// Indicates whether this [`Sender`] has [`local::Track`].
     #[must_use]
     pub fn has_track(&self) -> bool {
-        self.transceiver.has_send_track()
+        self.track.borrow().is_some()
     }
 
     /// Inserts provided [`local::Track`] into provided [`Sender`]s
@@ -217,21 +225,22 @@ impl Sender {
         new_track: Rc<local::Track>,
     ) -> Result<(), Traced<InsertTrackError>> {
         // no-op if we try to insert same track
-        if let Some(current_track) = self.transceiver.send_track() {
+        if let Some(current_track) = self.track.borrow().as_ref() {
             if new_track.id() == current_track.id() {
                 return Ok(());
             }
         }
 
-        let new_track = new_track.fork().await;
-
+        let new_track = Rc::new(new_track.fork().await);
         new_track.set_enabled(!self.muted.get());
-
         self.transceiver
-            .set_send_track(Rc::new(new_track))
+            .set_send_track(Some(&new_track))
             .await
             .map_err(InsertTrackError::from)
             .map_err(tracerr::wrap!())?;
+        // Set enabled once again since `muted` might have changed.
+        new_track.set_enabled(!self.muted.get());
+        drop(self.track.replace(Some(new_track)));
 
         Ok(())
     }
@@ -240,6 +249,12 @@ impl Sender {
     #[must_use]
     pub fn transceiver(&self) -> platform::Transceiver {
         self.transceiver.clone()
+    }
+
+    /// Returns [`local::Track`] that is being send to remote, if any.
+    #[must_use]
+    pub fn send_track(&self) -> Option<Rc<local::Track>> {
+        self.track.borrow().as_ref().cloned()
     }
 
     /// Returns [`mid`] of this [`Sender`].
@@ -318,7 +333,7 @@ impl Drop for Sender {
                 transceiver
                     .sub_direction(platform::TransceiverDirection::SEND)
                     .await;
-                transceiver.drop_send_track().await;
+                drop(transceiver.set_send_track(None).await);
             });
         }
     }
