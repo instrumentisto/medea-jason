@@ -1,31 +1,34 @@
 //! [`Room`] definitions.
 
-use std::collections::HashMap;
-
 use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
 
-use super::{member, Member};
+use super::{member, Member, Pipeline};
 
 /// Media [`Element`] representing a single space where multiple [`Member`]s can
 /// interact with each other.
 ///
 /// [`Element`]: crate::Element
 /// [`Member`]: crate::Member
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(transparent))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Room {
-    /// ID of this [`Room`] media [`Element`].
-    ///
-    /// [`Element`]: crate::Element
-    pub id: Id,
-
     /// Media pipeline representing [`Member`]s of this [`Room`].
-    pub pipeline: HashMap<member::Id, Member>,
+    pub spec: Pipeline<member::Id, Element>,
+}
+
+/// Elements of `Room`'s [`Pipeline`].
+#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(tag = "kind"))]
+#[derive(Clone, Debug, Eq, From, PartialEq)]
+pub enum Element {
+    /// Represent `Member`
+    Member(Member),
 }
 
 /// ID of a [`Room`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,

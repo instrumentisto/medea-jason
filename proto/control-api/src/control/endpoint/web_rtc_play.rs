@@ -14,13 +14,9 @@ use crate::control::{endpoint::web_rtc_publish, member, room};
 ///
 /// [`Element`]: crate::Element
 /// [WebRTC]: https://w3.org/TR/webrtc
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct WebRtcPlay {
-    /// ID of this [`WebRtcPlay`] [`Element`].
-    ///
-    /// [`Element`]: crate::Element
-    pub id: Id,
-
     /// Source to play media data from.
     pub src: LocalSrcUri,
 
@@ -28,12 +24,14 @@ pub struct WebRtcPlay {
     /// forcibly.
     ///
     /// [TURN]: https://webrtc.org/getting-started/turn-server
+    #[cfg_attr(feature = "serde", serde(default))]
     pub force_relay: bool,
 }
 
 /// ID of a [`WebRtcPlay`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -65,7 +63,7 @@ impl<'a> From<&'a str> for Id {
 ///
 /// [`Element`]: crate::Element
 /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-#[derive(Clone, Debug, Display)]
+#[derive(Clone, Debug, Display, Eq, PartialEq)]
 #[display(fmt = "local://{}/{}/{}", room_id, member_id, endpoint_id)]
 pub struct LocalSrcUri {
     /// ID of the [`Room`].
@@ -134,6 +132,20 @@ impl FromStr for LocalSrcUri {
             member_id,
             endpoint_id,
         })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de> for LocalSrcUri {
+    fn deserialize<D>(de: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::de::Error as _;
+
+        String::deserialize(de)?
+            .parse::<LocalSrcUri>()
+            .map_err(D::Error::custom)
     }
 }
 

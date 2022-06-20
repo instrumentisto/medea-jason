@@ -6,24 +6,20 @@ use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
 use url::Url;
 
-use super::{endpoint, room, Endpoint};
+use super::{endpoint, room, Endpoint, Pipeline};
 
 /// Media [`Element`] representing a client authorized to participate in some
 /// bigger media pipeline ([`Room`], for example).
 ///
 /// [`Element`]: crate::Element
 /// [`Room`]: crate::Room
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Member {
-    /// ID of this [`Member`] media [`Element`].
-    ///
-    /// [`Element`]: crate::Element
-    pub id: Id,
-
     /// Media pipeline representing this [`Member`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
-    pub pipeline: HashMap<endpoint::Id, Endpoint>,
+    pub spec: Pipeline<endpoint::Id, Endpoint>,
 
     /// [`Credentials`] to authenticate this [`Member`] in [Client API] with.
     ///
@@ -50,6 +46,7 @@ pub struct Member {
     /// Once reached, this [`Member`] is considered being idle.
     ///
     /// [Client API]: https://tinyurl.com/266y74tf
+    #[cfg_attr(feature = "serde", serde(default, with = "humantime_serde"))]
     pub idle_timeout: Option<Duration>,
 
     /// Timeout of reconnecting for this [`Member`] via [Client API].
@@ -57,6 +54,7 @@ pub struct Member {
     /// Once reached, this [`Member`] is considered disconnected.
     ///
     /// [Client API]: https://tinyurl.com/266y74tf
+    #[cfg_attr(feature = "serde", serde(default, with = "humantime_serde"))]
     pub reconnect_timeout: Option<Duration>,
 
     /// Interval of pinging with heartbeat messages this [`Member`] via
@@ -66,12 +64,14 @@ pub struct Member {
     /// configured.
     ///
     /// [Client API]: https://tinyurl.com/266y74tf
+    #[cfg_attr(feature = "serde", serde(default, with = "humantime_serde"))]
     pub ping_interval: Option<Duration>,
 }
 
 /// ID of a [`Member`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -220,6 +220,11 @@ pub struct PublicUrl(Url);
 ///
 /// [`Element`]: crate::Element
 /// [Client API]: https://tinyurl.com/266y74tf
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(rename_all = "lowercase")
+)]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
 pub enum Credentials {
     /// [Argon2] hash of credentials.
@@ -254,6 +259,7 @@ impl Credentials {
 }
 
 /// Plain [`Credentials`] returned in a [`Sid`].
+#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(transparent))]
 #[derive(
     AsRef,
     Clone,

@@ -11,13 +11,9 @@ use smart_default::SmartDefault;
 ///
 /// [`Element`]: crate::Element
 /// [WebRTC]: https://w3.org/TR/webrtc
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct WebRtcPublish {
-    /// ID of this [`WebRtcPublish`] [`Element`].
-    ///
-    /// [`Element`]: crate::Element
-    pub id: Id,
-
     /// Peer-to-peer mode of this [`WebRtcPublish`] [`Element`].
     ///
     /// [`Element`]: crate::Element
@@ -27,24 +23,28 @@ pub struct WebRtcPublish {
     /// forcibly.
     ///
     /// [TURN]: https://webrtc.org/getting-started/turn-server
+    #[cfg_attr(feature = "serde", serde(default))]
     pub force_relay: bool,
 
     /// Settings for the audio media type of this [`WebRtcPublish`]
     /// [`Element`].
     ///
     /// [`Element`]: crate::Element
+    #[cfg_attr(feature = "serde", serde(default))]
     pub audio_settings: AudioSettings,
 
     /// Settings for the video media type of this [`WebRtcPublish`]
     /// [`Element`].
     ///
     /// [`Element`]: crate::Element
+    #[cfg_attr(feature = "serde", serde(default))]
     pub video_settings: VideoSettings,
 }
 
 /// ID of a [`WebRtcPublish`] media [`Element`]
 ///
 /// [`Element`]: crate::Element
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -76,6 +76,7 @@ impl<'a> From<&'a str> for Id {
 ///
 /// [`Element`]: crate::Element
 /// [WebRTC]: https://w3.org/TR/webrtc
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum P2pMode {
     /// Never use peer-to-peer connections and always send media data through a
@@ -94,18 +95,22 @@ pub enum P2pMode {
 /// Audio media type settings of a [`WebRtcPublish`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct AudioSettings {
     /// [`Policy`] to publish the audio media type with.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub publish_policy: Policy,
 }
 
 /// Video media type settings of a [`WebRtcPublish`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct VideoSettings {
     /// [`Policy`] to publish the video media type with.
+    #[cfg_attr(feature = "serde", serde(default))]
     pub publish_policy: Policy,
 }
 
@@ -113,6 +118,7 @@ pub struct VideoSettings {
 /// [`WebRtcPublish`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq, SmartDefault)]
 pub enum Policy {
     /// Media type __may__ be published.

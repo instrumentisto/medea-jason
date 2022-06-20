@@ -12,33 +12,35 @@ pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
 /// Media [`Element`] flowing one or more media data streams through itself.
 ///
 /// [`Element`]: crate::Element
-#[derive(Clone, Debug, From)]
+#[allow(variant_size_differences)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(tag = "kind"))]
+#[derive(Clone, Debug, Eq, From, PartialEq)]
 pub enum Endpoint {
     /// [`WebRtcPublish`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
-    WebRtcPublish(WebRtcPublish),
+    WebRtcPublishEndpoint {
+        /// [`WebRtcPublish`] media [`Element`].
+        ///
+        /// [`Element`]: crate::Element
+        spec: WebRtcPublish,
+    },
 
     /// [`WebRtcPlay`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
-    WebRtcPlay(WebRtcPlay),
-}
-
-impl Endpoint {
-    /// Returns [`Id`] of this [`Endpoint`].
-    #[must_use]
-    pub fn id(&self) -> &Id {
-        match self {
-            Self::WebRtcPublish(publish) => Id::ref_cast(publish.id.as_ref()),
-            Self::WebRtcPlay(play) => Id::ref_cast(play.id.as_ref()),
-        }
-    }
+    WebRtcPlayEndpoint {
+        /// [`WebRtcPlay`] media [`Element`].
+        ///
+        /// [`Element`]: crate::Element
+        spec: WebRtcPlay,
+    },
 }
 
 /// ID of an [`Endpoint`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
