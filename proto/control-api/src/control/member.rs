@@ -4,6 +4,8 @@ use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
 use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::Deserialize;
 use url::Url;
 
 use super::{endpoint, room, Endpoint, Pipeline};
@@ -13,8 +15,8 @@ use super::{endpoint, room, Endpoint, Pipeline};
 ///
 /// [`Element`]: crate::Element
 /// [`Room`]: crate::Room
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct Member {
     /// Media pipeline representing this [`Member`] media [`Element`].
     ///
@@ -71,7 +73,6 @@ pub struct Member {
 /// ID of a [`Member`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -86,6 +87,7 @@ pub struct Member {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
@@ -220,18 +222,14 @@ pub struct PublicUrl(Url);
 ///
 /// [`Element`]: crate::Element
 /// [Client API]: https://tinyurl.com/266y74tf
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize),
-    serde(rename_all = "lowercase")
-)]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum Credentials {
     /// [Argon2] hash of credentials.
     ///
-    /// [`Sid`] won't contain a `token` query parameter if
-    /// [`Credentials::Hash`] is used, so it should be appended manually on
-    /// a client side.
+    /// [`Sid`] won't contain a `token` query parameter if [`Credentials::Hash`]
+    /// is used, so it should be appended manually on a client side.
     ///
     /// [Argon2]: https://en.wikipedia.org/wiki/Argon2
     #[from(ignore)]
@@ -259,7 +257,6 @@ impl Credentials {
 }
 
 /// Plain [`Credentials`] returned in a [`Sid`].
-#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(transparent))]
 #[derive(
     AsRef,
     Clone,
@@ -273,6 +270,7 @@ impl Credentials {
     PartialEq,
     PartialOrd,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize), serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.

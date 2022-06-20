@@ -6,6 +6,8 @@ use std::str::FromStr;
 
 use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::Deserialize;
 use url::Url;
 
 use crate::control::{endpoint::web_rtc_publish, member, room};
@@ -14,8 +16,8 @@ use crate::control::{endpoint::web_rtc_publish, member, room};
 ///
 /// [`Element`]: crate::Element
 /// [WebRTC]: https://w3.org/TR/webrtc
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct WebRtcPlay {
     /// Source to play media data from.
     pub src: LocalSrcUri,
@@ -31,7 +33,6 @@ pub struct WebRtcPlay {
 /// ID of a [`WebRtcPlay`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -46,6 +47,7 @@ pub struct WebRtcPlay {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
@@ -136,15 +138,14 @@ impl FromStr for LocalSrcUri {
 }
 
 #[cfg(feature = "serde")]
-impl<'de> serde::Deserialize<'de> for LocalSrcUri {
-    fn deserialize<D>(de: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
+impl<'de> Deserialize<'de> for LocalSrcUri {
+    fn deserialize<D: serde::Deserializer<'de>>(
+        de: D,
+    ) -> Result<Self, D::Error> {
         use serde::de::Error as _;
 
         String::deserialize(de)?
-            .parse::<LocalSrcUri>()
+            .parse::<Self>()
             .map_err(D::Error::custom)
     }
 }

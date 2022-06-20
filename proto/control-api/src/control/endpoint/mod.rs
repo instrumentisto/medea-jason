@@ -5,6 +5,8 @@ pub mod web_rtc_publish;
 
 use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::Deserialize;
 
 #[doc(inline)]
 pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
@@ -13,14 +15,14 @@ pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
 ///
 /// [`Element`]: crate::Element
 #[allow(variant_size_differences)]
-#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(tag = "kind"))]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize), serde(tag = "kind"))]
 pub enum Endpoint {
     /// [`WebRtcPublish`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
     WebRtcPublishEndpoint {
-        /// [`WebRtcPublish`] media [`Element`].
+        /// Spec of the [`WebRtcPublish`] media [`Element`].
         ///
         /// [`Element`]: crate::Element
         spec: WebRtcPublish,
@@ -30,7 +32,7 @@ pub enum Endpoint {
     ///
     /// [`Element`]: crate::Element
     WebRtcPlayEndpoint {
-        /// [`WebRtcPlay`] media [`Element`].
+        /// Spec of the [`WebRtcPlay`] media [`Element`].
         ///
         /// [`Element`]: crate::Element
         spec: WebRtcPlay,
@@ -40,7 +42,6 @@ pub enum Endpoint {
 /// ID of an [`Endpoint`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -55,6 +56,7 @@ pub enum Endpoint {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 #[from(types(String, web_rtc_publish::Id, web_rtc_play::Id))]
 #[into(owned(types(String)))]
 #[repr(transparent)]

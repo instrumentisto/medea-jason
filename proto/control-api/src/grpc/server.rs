@@ -99,7 +99,6 @@ where
             Err(e) => Err(e.into()),
         };
 
-        #[allow(clippy::shadow_unrelated)]
         Ok(tonic::Response::new(match result {
             Ok(elements) => control_proto::GetResponse {
                 elements: elements
