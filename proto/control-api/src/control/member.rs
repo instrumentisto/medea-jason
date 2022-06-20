@@ -98,6 +98,13 @@ impl<'a> From<&'a str> for Id {
     }
 }
 
+#[cfg(feature = "client-api-proto")]
+impl From<medea_client_api_proto::MemberId> for Id {
+    fn from(id: medea_client_api_proto::MemberId) -> Self {
+        id.0.into()
+    }
+}
+
 /// [URI] used by a [`Member`] to connect to a media server via [Client API].
 ///
 /// [Client API]: https://tinyurl.com/266y74tf

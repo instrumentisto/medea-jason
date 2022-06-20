@@ -1564,7 +1564,19 @@ version = "0.4.0-dev"
 dependencies = [
  "async-trait",
  "derive_more",
- "medea-macro",
+ "medea-macro 0.3.0-dev",
+ "serde",
+ "serde_with",
+]
+
+[[package]]
+name = "medea-client-api-proto"
+version = "0.4.0-dev"
+source = "git+https://github.com/instrumentisto/medea-jason?branch=master#c8ac696e3faaf11812b8b4b89bf25cccafac51e7"
+dependencies = [
+ "async-trait",
+ "derive_more",
+ "medea-macro 0.3.0-dev (git+https://github.com/instrumentisto/medea-jason?branch=master)",
  "serde",
  "serde_with",
 ]
@@ -1601,6 +1613,7 @@ dependencies = [
  "async-trait",
  "derive_more",
  "humantime-serde",
+ "medea-client-api-proto 0.4.0-dev (git+https://github.com/instrumentisto/medea-jason?branch=master)",
  "prost",
  "prost-types",
  "rand",
@@ -1654,8 +1667,8 @@ dependencies = [
  "js-sys",
  "libc",
  "log",
- "medea-client-api-proto",
- "medea-macro",
+ "medea-client-api-proto 0.4.0-dev",
+ "medea-macro 0.3.0-dev",
  "medea-reactive 0.1.1",
  "mockall",
  "serde",
@@ -1678,6 +1691,18 @@ dependencies = [
  "Inflector",
  "async-trait",
  "medea-jason",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "synstructure",
+]
+
+[[package]]
+name = "medea-macro"
+version = "0.3.0-dev"
+source = "git+https://github.com/instrumentisto/medea-jason?branch=master#c8ac696e3faaf11812b8b4b89bf25cccafac51e7"
+dependencies = [
+ "Inflector",
  "proc-macro2",
  "quote",
  "syn",
