@@ -297,9 +297,9 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
-      # Rust does not support ndk >= 23
-      # https://github.com/rust-lang/rust/pull/85806
-      # https://github.com/actions/virtual-environments/issues/5595
+      # TODO: Rust doesn't support NDK >= 23:
+      #       https://github.com/rust-lang/rust/pull/85806
+      #       https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
           ANDROID_HOME=$HOME/Library/Android/sdk
@@ -392,9 +392,9 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         if: ${{ matrix.platform == 'windows' }}
 
-      # Rust does not support ndk >= 23
-      # https://github.com/rust-lang/rust/pull/85806
-      # https://github.com/actions/virtual-environments/issues/5595
+      # TODO: Rust doesn't support NDK >= 23:
+      #       https://github.com/rust-lang/rust/pull/85806
+      #       https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
           ANDROID_ROOT=/usr/local/lib/android

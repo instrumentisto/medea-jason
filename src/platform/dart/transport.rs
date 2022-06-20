@@ -61,15 +61,17 @@ mod transport {
             close_msg: ptr::NonNull<c_char>,
         );
 
-        /// Returns the [closeCode][0] of the close frame.
+        /// Returns the [closeCode][0] of the [close frame][1].
         ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeCode.html
-        pub fn close_code(last_frame: Dart_Handle) -> i32;
+        /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
+        pub fn close_code(close_frame: Dart_Handle) -> i32;
 
-        /// Returns the [closeReason][0] of the close frame.
+        /// Returns the [closeReason][0] of the [close frame][1].
         ///
         /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeReason.html
-        pub fn close_reason(last_frame: Dart_Handle) -> ptr::NonNull<c_char>;
+        /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
+        pub fn close_reason(close_frame: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
 

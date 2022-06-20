@@ -17,12 +17,15 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// A [CloseFrame] is sent to clients using when the connection is closed.
+/// [Close frame][1], sent to clients when a [WebSocket] connection is closed
+/// normally.
+///
+/// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
 class CloseFrame {
-  /// A close code sent by the server.
+  /// Close code sent by the server.
   int? code;
 
-  /// A reason the server closed the connection.
+  /// Reason why the server closed the connection.
   String? reason;
 
   CloseFrame(this.code, this.reason);
@@ -61,12 +64,12 @@ void _close(WebSocket ws, int closeCode, Pointer<Utf8> closeMsg) {
   ws.close(closeCode, closeMsg.toDartString());
 }
 
-/// Return [CloseFrame.code].
+/// Returns [CloseFrame.code] of the provided [CloseFrame].
 int _closeCode(CloseFrame closeFrame) {
   return closeFrame.code ?? 1005;
 }
 
-/// Return [CloseFrame.reason].
+/// Returns [CloseFrame.reason] of the provided [CloseFrame].
 Pointer<Utf8> _closeReason(CloseFrame closeFrame) {
   return (closeFrame.reason ?? '').toNativeUtf8();
 }
