@@ -21,7 +21,7 @@ void registerFunction(
       addIceCandidate,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>>
       onIceConnectionStateChange,
-  required Pointer<NativeFunction<Handle Function(Handle)>> newPeer,
+  required Pointer<NativeFunction<Handle Function(Handle, Bool)>> newPeer,
   required Pointer<NativeFunction<Handle Function(Handle, Int64, Int64)>>
       addTransceiver,
   required Pointer<NativeFunction<Handle Function(Handle)>> createOffer,
