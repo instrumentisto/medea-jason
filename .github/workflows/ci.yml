@@ -139,6 +139,8 @@ jobs:
           - crate: medea-control-api-proto
             features: ["grpc"]
           - crate: medea-control-api-proto
+            features: ["serde"]
+          - crate: medea-control-api-proto
             features: ["client"]
           - crate: medea-control-api-proto
             features: ["server"]

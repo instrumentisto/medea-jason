@@ -2,28 +2,42 @@
 
 use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
-use derive_more::{AsRef, Display, Error, From, Into};
+use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use url::Url;
 
-use super::{endpoint, room, Endpoint};
+use super::{endpoint, room, Pipeline};
 
 /// Media [`Element`] representing a client authorized to participate in some
 /// bigger media pipeline ([`Room`], for example).
 ///
 /// [`Element`]: crate::Element
 /// [`Room`]: crate::Room
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Member {
     /// ID of this [`Member`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
     pub id: Id,
 
-    /// Media pipeline representing this [`Member`] media [`Element`].
+    /// [`Spec`] of this [`Member`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
-    pub pipeline: HashMap<endpoint::Id, Endpoint>,
+    pub spec: Spec,
+}
+
+/// Spec of a [`Member`] media [`Element`].
+///
+/// [`Element`]: crate::Element
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+pub struct Spec {
+    /// Media [`Pipeline`] representing this [`Member`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
+    pub pipeline: Pipeline<endpoint::Id, endpoint::Spec>,
 
     /// [`Credentials`] to authenticate this [`Member`] in [Client API] with.
     ///
@@ -50,6 +64,7 @@ pub struct Member {
     /// Once reached, this [`Member`] is considered being idle.
     ///
     /// [Client API]: https://tinyurl.com/266y74tf
+    #[cfg_attr(feature = "serde", serde(default, with = "humantime_serde"))]
     pub idle_timeout: Option<Duration>,
 
     /// Timeout of reconnecting for this [`Member`] via [Client API].
@@ -57,6 +72,7 @@ pub struct Member {
     /// Once reached, this [`Member`] is considered disconnected.
     ///
     /// [Client API]: https://tinyurl.com/266y74tf
+    #[cfg_attr(feature = "serde", serde(default, with = "humantime_serde"))]
     pub reconnect_timeout: Option<Duration>,
 
     /// Interval of pinging with heartbeat messages this [`Member`] via
@@ -66,6 +82,7 @@ pub struct Member {
     /// configured.
     ///
     /// [Client API]: https://tinyurl.com/266y74tf
+    #[cfg_attr(feature = "serde", serde(default, with = "humantime_serde"))]
     pub ping_interval: Option<Duration>,
 }
 
@@ -86,6 +103,8 @@ pub struct Member {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
@@ -207,12 +226,15 @@ pub type Sids = HashMap<Id, Sid>;
     Display,
     Eq,
     From,
+    FromStr,
     Hash,
     Into,
     Ord,
     PartialEq,
     PartialOrd,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct PublicUrl(Url);
 
 /// Credentials of a [`Member`] media [`Element`] for its client side to
@@ -221,6 +243,8 @@ pub struct PublicUrl(Url);
 /// [`Element`]: crate::Element
 /// [Client API]: https://tinyurl.com/266y74tf
 #[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum Credentials {
     /// [Argon2] hash of credentials.
     ///
@@ -267,6 +291,8 @@ impl Credentials {
     PartialEq,
     PartialOrd,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.
