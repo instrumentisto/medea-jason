@@ -1601,6 +1601,7 @@ dependencies = [
  "async-trait",
  "derive_more",
  "humantime-serde",
+ "medea-client-api-proto",
  "prost",
  "prost-types",
  "rand",
