@@ -104,6 +104,6 @@ pub use self::{
     callback::Api as CallbackApi,
     control::{
         endpoint, member, room, Api as ControlApi, Element, Elements, Endpoint,
-        Fid, Member, Ping, Pong, Room,
+        Fid, Member, Ping, Pong, Room, RootElement,
     },
 };

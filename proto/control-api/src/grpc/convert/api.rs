@@ -9,13 +9,66 @@ use std::time::Duration;
 use crate::{
     control::{ParseFidError, Request},
     endpoint::{
-        web_rtc_publish::{AudioSettings, P2pMode, Policy, VideoSettings},
-        WebRtcPlay, WebRtcPublish,
+        self, web_rtc_play,
+        web_rtc_play::WebRtcPlay,
+        web_rtc_publish::{
+            self, AudioSettings, P2pMode, Policy, VideoSettings, WebRtcPublish,
+        },
     },
     grpc::{api as proto, convert::ProtobufError, CallbackUrlParseError},
     member::{self, Credentials},
-    Element, Endpoint, Fid, Member, Ping, Pong, Room,
+    room, Element, Endpoint, Fid, Member, Ping, Pong, Room,
 };
+
+impl TryFrom<(Fid, Element)> for proto::Element {
+    type Error = ProtobufError;
+
+    fn try_from((fid, spec): (Fid, Element)) -> Result<Self, Self::Error> {
+        use proto::element::El;
+
+        let el = match (fid, spec) {
+            (Fid::Room { id }, Element::Room(room)) => Ok(El::Room(
+                Room {
+                    id,
+                    spec: room.spec,
+                }
+                .into(),
+            )),
+            (Fid::Member { id, .. }, Element::Member(member)) => {
+                Ok(El::Member(
+                    Member {
+                        id,
+                        spec: member.spec,
+                    }
+                    .into(),
+                ))
+            }
+            (Fid::Endpoint { id, .. }, Element::Endpoint(endpoint)) => {
+                Ok(Endpoint {
+                    id,
+                    spec: endpoint.spec,
+                }
+                .into())
+            }
+            (id @ Fid::Room { .. }, _) => Err(ProtobufError::ExpectedElement(
+                "Room",
+                id.to_string().into(),
+            )),
+            (id @ Fid::Member { .. }, _) => Err(
+                ProtobufError::ExpectedElement("Member", id.to_string().into()),
+            ),
+
+            (id @ Fid::Endpoint { .. }, _) => {
+                Err(ProtobufError::ExpectedElement(
+                    "Endpoint",
+                    id.to_string().into(),
+                ))
+            }
+        }?;
+
+        Ok(Self { el: Some(el) })
+    }
+}
 
 impl TryFrom<proto::CreateRequest> for Request {
     type Error = ProtobufError;
@@ -27,23 +80,29 @@ impl TryFrom<proto::CreateRequest> for Request {
         })?;
 
         if parent_fid.is_empty() {
-            return Room::try_from(el).map(Self::Room);
+            return Room::try_from(el).map(|room| Self::Room {
+                id: room.id,
+                spec: room.spec,
+            });
         }
 
         match parent_fid.parse::<Fid>()? {
-            Fid::Room { id } => {
+            Fid::Room { id: room_id } => {
                 Member::try_from(el).map(|member| Self::Member {
-                    room_id: id,
-                    member: Box::new(member),
-                })
-            }
-            Fid::Member { id, room_id } => {
-                Endpoint::try_from(el).map(|endpoint| Self::Endpoint {
+                    id: member.id,
                     room_id,
-                    member_id: id,
-                    endpoint,
+                    spec: Box::new(member.spec),
                 })
             }
+            Fid::Member {
+                id: member_id,
+                room_id,
+            } => Endpoint::try_from(el).map(|endpoint| Self::Endpoint {
+                id: endpoint.id,
+                room_id,
+                member_id,
+                spec: endpoint.spec,
+            }),
             Fid::Endpoint { .. } => Err(ProtobufError::ParseFidErr(
                 ParseFidError::TooManyPaths(parent_fid.into()),
             )),
@@ -61,11 +120,15 @@ impl TryFrom<proto::ApplyRequest> for Request {
         })?;
 
         match parent_fid.parse::<Fid>()? {
-            Fid::Room { .. } => Room::try_from(el).map(Self::Room),
+            Fid::Room { .. } => Room::try_from(el).map(|room| Self::Room {
+                id: room.id,
+                spec: room.spec,
+            }),
             Fid::Member { room_id, .. } => {
                 Member::try_from(el).map(|member| Self::Member {
+                    id: member.id,
                     room_id,
-                    member: Box::new(member),
+                    spec: Box::new(member.spec),
                 })
             }
             Fid::Endpoint { .. } => Err(ProtobufError::Unimplemented),
@@ -76,21 +139,25 @@ impl TryFrom<proto::ApplyRequest> for Request {
 impl From<Request> for proto::CreateRequest {
     fn from(req: Request) -> Self {
         let (parent_fid, el) = match req {
-            Request::Room(room) => (String::new(), room.into()),
-            Request::Member { room_id, member } => {
-                (Fid::Room { id: room_id }.to_string(), (*member).into())
+            Request::Room { id, spec } => {
+                (String::new(), Room { id, spec }.into())
             }
+            Request::Member { id, room_id, spec } => (
+                Fid::Room { id: room_id }.to_string(),
+                Member { id, spec: *spec }.into(),
+            ),
             Request::Endpoint {
+                id,
                 room_id,
                 member_id,
-                endpoint,
+                spec,
             } => (
                 Fid::Member {
                     id: member_id,
                     room_id,
                 }
                 .to_string(),
-                endpoint.into(),
+                Endpoint { id, spec }.into(),
             ),
         };
 
@@ -104,55 +171,34 @@ impl From<Request> for proto::CreateRequest {
 impl From<Request> for proto::ApplyRequest {
     fn from(req: Request) -> Self {
         let (parent_fid, el) = match req {
-            Request::Room(room) => (
-                Fid::Room {
-                    id: room.id.clone(),
-                },
-                room.into(),
-            ),
-            Request::Member { room_id, member } => (
+            Request::Room { id, spec } => {
+                (Fid::Room { id: id.clone() }, Room { id, spec }.into())
+            }
+            Request::Member { id, room_id, spec } => (
                 Fid::Member {
-                    id: member.id.clone(),
+                    id: id.clone(),
                     room_id,
                 },
-                member.as_ref().clone().into(),
+                Member { id, spec: *spec }.into(),
             ),
             Request::Endpoint {
+                id,
                 room_id,
                 member_id,
-                endpoint,
+                spec,
             } => (
                 Fid::Endpoint {
-                    id: endpoint.id().clone(),
+                    id: id.clone(),
                     room_id,
                     member_id,
                 },
-                endpoint.into(),
+                Endpoint { id, spec }.into(),
             ),
         };
 
         Self {
             parent_fid: parent_fid.to_string(),
             el: Some(el),
-        }
-    }
-}
-
-impl From<Element> for proto::Element {
-    fn from(el: Element) -> Self {
-        use proto::element::El;
-
-        Self {
-            el: Some(match el {
-                Element::Member(member) => El::Member((*member).into()),
-                Element::Room(room) => El::Room(room.into()),
-                Element::Endpoint(Endpoint::WebRtcPlay(play)) => {
-                    El::WebrtcPlay(play.into())
-                }
-                Element::Endpoint(Endpoint::WebRtcPublish(publish)) => {
-                    El::WebrtcPub(publish.into())
-                }
-            }),
         }
     }
 }
@@ -164,35 +210,17 @@ impl TryFrom<proto::Element> for Element {
         use proto::element::El;
 
         Ok(match el.el.ok_or(ProtobufError::NoElement)? {
-            El::Member(member) => Self::Member(Box::new(member.try_into()?)),
-            El::Room(room) => Self::Room(room.try_into()?),
+            El::Member(member) => {
+                Self::Member(Box::new(Member::try_from(member)?))
+            }
+            El::Room(room) => Self::Room(Room::try_from(room)?),
             El::WebrtcPlay(play) => {
-                Self::Endpoint(Endpoint::WebRtcPlay(play.try_into()?))
+                Self::Endpoint(WebRtcPlay::try_from(play)?.into())
             }
             El::WebrtcPub(publish) => {
-                Self::Endpoint(Endpoint::WebRtcPublish(publish.into()))
+                Self::Endpoint(WebRtcPublish::try_from(publish)?.into())
             }
         })
-    }
-}
-
-impl From<Element> for proto::create_request::El {
-    fn from(el: Element) -> Self {
-        match el {
-            Element::Room(room) => room.into(),
-            Element::Member(member) => (*member).into(),
-            Element::Endpoint(endpoint) => endpoint.into(),
-        }
-    }
-}
-
-impl From<Element> for proto::apply_request::El {
-    fn from(el: Element) -> Self {
-        match el {
-            Element::Room(room) => room.into(),
-            Element::Member(member) => (*member).into(),
-            Element::Endpoint(endpoint) => endpoint.into(),
-        }
     }
 }
 
@@ -236,19 +264,21 @@ impl TryFrom<proto::Room> for Room {
     fn try_from(room: proto::Room) -> Result<Self, Self::Error> {
         Ok(Self {
             id: room.id.into(),
-            pipeline: room
-                .pipeline
-                .into_iter()
-                .map(|(id, room_element)| {
-                    room_element.el.map_or(
-                        Err(ProtobufError::NoElementForId(id.into())),
-                        |el| {
-                            Member::try_from(el)
-                                .map(|member| (member.id.clone(), member))
-                        },
-                    )
-                })
-                .collect::<Result<_, _>>()?,
+            spec: room::Spec {
+                pipeline: room
+                    .pipeline
+                    .into_iter()
+                    .map(|(id, room_el)| {
+                        room_el.el.map_or(
+                            Err(ProtobufError::NoElementForId(id.into())),
+                            |el| {
+                                Member::try_from(el)
+                                    .map(|m| (m.id, m.spec.into()))
+                            },
+                        )
+                    })
+                    .collect::<Result<_, _>>()?,
+            },
         })
     }
 }
@@ -270,9 +300,14 @@ impl From<Room> for proto::Room {
         Self {
             id: room.id.into(),
             pipeline: room
+                .spec
                 .pipeline
                 .into_iter()
-                .map(|(id, m)| (id.into(), m.into()))
+                .map(|(id, el)| match el {
+                    room::PipelineSpec::Member(spec) => {
+                        (id.clone().into(), Member { id, spec }.into())
+                    }
+                })
                 .collect(),
         }
     }
@@ -319,7 +354,7 @@ impl TryFrom<proto::room::element::El> for Member {
         use proto::room::element::El;
 
         match val {
-            El::Member(member) => Self::try_from(member),
+            El::Member(member) => member.try_into(),
             El::WebrtcPub(proto::WebRtcPublishEndpoint { id, .. })
             | El::WebrtcPlay(proto::WebRtcPlayEndpoint { id, .. }) => {
                 Err(ProtobufError::ExpectedElement("Member", id.into()))
@@ -356,32 +391,31 @@ impl TryFrom<proto::Member> for Member {
             parse_duration(member.ping_interval, &member.id, "ping_interval")?;
 
         Ok(Self {
-            id: member::Id::from(member.id),
-            pipeline: member
-                .pipeline
-                .into_iter()
-                .map(|(id, member_el)| {
-                    member_el.el.map_or(
-                        Err(ProtobufError::NoElementForId(id.into())),
-                        |el| {
-                            Endpoint::try_from(el)
-                                .map(|endpnt| (endpnt.id().clone(), endpnt))
-                        },
-                    )
-                })
-                .collect::<Result<_, _>>()?,
-            credentials: member.credentials.map(Into::into),
-            on_join: (!member.on_join.is_empty())
-                .then(|| member.on_join.parse())
-                .transpose()
-                .map_err(CallbackUrlParseError::from)?,
-            on_leave: (!member.on_leave.is_empty())
-                .then(|| member.on_leave.parse())
-                .transpose()
-                .map_err(CallbackUrlParseError::from)?,
-            idle_timeout,
-            reconnect_timeout,
-            ping_interval,
+            id: member.id.into(),
+            spec: member::Spec {
+                pipeline: member
+                    .pipeline
+                    .into_iter()
+                    .map(|(id, member_el)| {
+                        member_el.el.map_or(
+                            Err(ProtobufError::NoElementForId(id.into())),
+                            |el| Endpoint::try_from(el).map(|e| (e.id, e.spec)),
+                        )
+                    })
+                    .collect::<Result<_, _>>()?,
+                credentials: member.credentials.map(Into::into),
+                on_join: (!member.on_join.is_empty())
+                    .then(|| member.on_join.parse())
+                    .transpose()
+                    .map_err(CallbackUrlParseError::from)?,
+                on_leave: (!member.on_leave.is_empty())
+                    .then(|| member.on_leave.parse())
+                    .transpose()
+                    .map_err(CallbackUrlParseError::from)?,
+                idle_timeout,
+                reconnect_timeout,
+                ping_interval,
+            },
         })
     }
 }
@@ -391,22 +425,27 @@ impl From<Member> for proto::Member {
         Self {
             id: member.id.into(),
             on_join: member
+                .spec
                 .on_join
                 .as_ref()
                 .map_or_else(String::default, ToString::to_string),
             on_leave: member
+                .spec
                 .on_leave
                 .as_ref()
                 .map_or_else(String::default, ToString::to_string),
-            idle_timeout: member.idle_timeout.map(Into::into),
-            reconnect_timeout: member.reconnect_timeout.map(Into::into),
-            ping_interval: member.ping_interval.map(Into::into),
+            idle_timeout: member.spec.idle_timeout.map(Into::into),
+            reconnect_timeout: member.spec.reconnect_timeout.map(Into::into),
+            ping_interval: member.spec.ping_interval.map(Into::into),
             pipeline: member
+                .spec
                 .pipeline
                 .into_iter()
-                .map(|(id, e)| (id.into(), e.into()))
+                .map(|(id, spec)| {
+                    (id.clone().into(), Endpoint { id, spec }.into())
+                })
                 .collect(),
-            credentials: member.credentials.map(Into::into),
+            credentials: member.spec.credentials.map(Into::into),
         }
     }
 }
@@ -458,8 +497,10 @@ impl TryFrom<proto::create_request::El> for Endpoint {
         use proto::create_request::El;
 
         match val {
-            El::WebrtcPlay(play) => play.try_into().map(Self::WebRtcPlay),
-            El::WebrtcPub(publish) => Ok(Self::WebRtcPublish(publish.into())),
+            El::WebrtcPlay(play) => WebRtcPlay::try_from(play).map(Self::from),
+            El::WebrtcPub(publish) => {
+                WebRtcPublish::try_from(publish).map(Self::from)
+            }
             El::Room(proto::Room { id, .. })
             | El::Member(proto::Member { id, .. }) => {
                 Err(ProtobufError::ExpectedElement("Endpoint", id.into()))
@@ -475,39 +516,96 @@ impl TryFrom<proto::member::element::El> for Endpoint {
         use proto::member::element::El;
 
         match val {
-            El::WebrtcPlay(e) => WebRtcPlay::try_from(e).map(Self::WebRtcPlay),
-            El::WebrtcPub(e) => Ok(Self::WebRtcPublish(e.into())),
+            El::WebrtcPub(e) => WebRtcPublish::try_from(e).map(Self::from),
+            El::WebrtcPlay(e) => WebRtcPlay::try_from(e).map(Self::from),
         }
     }
 }
 
 impl From<Endpoint> for proto::member::Element {
-    fn from(val: Endpoint) -> Self {
+    fn from(endpoint: Endpoint) -> Self {
         use proto::member::element::El;
 
         Self {
-            el: Some(match val {
-                Endpoint::WebRtcPlay(e) => El::WebrtcPlay(e.into()),
-                Endpoint::WebRtcPublish(e) => El::WebrtcPub(e.into()),
+            el: Some(match endpoint.spec {
+                endpoint::Spec::WebRtcPublishEndpoint(spec) => El::WebrtcPub(
+                    WebRtcPublish {
+                        id: String::from(endpoint.id).into(),
+                        spec,
+                    }
+                    .into(),
+                ),
+                endpoint::Spec::WebRtcPlayEndpoint(spec) => El::WebrtcPlay(
+                    WebRtcPlay {
+                        id: String::from(endpoint.id).into(),
+                        spec,
+                    }
+                    .into(),
+                ),
             }),
         }
     }
 }
 
+impl From<Endpoint> for proto::element::El {
+    fn from(endpoint: Endpoint) -> Self {
+        match endpoint.spec {
+            endpoint::Spec::WebRtcPublishEndpoint(spec) => Self::WebrtcPub(
+                WebRtcPublish {
+                    id: String::from(endpoint.id).into(),
+                    spec,
+                }
+                .into(),
+            ),
+            endpoint::Spec::WebRtcPlayEndpoint(spec) => Self::WebrtcPlay(
+                WebRtcPlay {
+                    id: String::from(endpoint.id).into(),
+                    spec,
+                }
+                .into(),
+            ),
+        }
+    }
+}
+
 impl From<Endpoint> for proto::create_request::El {
-    fn from(val: Endpoint) -> Self {
-        match val {
-            Endpoint::WebRtcPublish(publish) => Self::WebrtcPub(publish.into()),
-            Endpoint::WebRtcPlay(play) => Self::WebrtcPlay(play.into()),
+    fn from(endpoint: Endpoint) -> Self {
+        match endpoint.spec {
+            endpoint::Spec::WebRtcPublishEndpoint(spec) => Self::WebrtcPub(
+                WebRtcPublish {
+                    id: String::from(endpoint.id).into(),
+                    spec,
+                }
+                .into(),
+            ),
+            endpoint::Spec::WebRtcPlayEndpoint(spec) => Self::WebrtcPlay(
+                WebRtcPlay {
+                    id: String::from(endpoint.id).into(),
+                    spec,
+                }
+                .into(),
+            ),
         }
     }
 }
 
 impl From<Endpoint> for proto::apply_request::El {
-    fn from(val: Endpoint) -> Self {
-        match val {
-            Endpoint::WebRtcPublish(publish) => Self::WebrtcPub(publish.into()),
-            Endpoint::WebRtcPlay(play) => Self::WebrtcPlay(play.into()),
+    fn from(endpoint: Endpoint) -> Self {
+        match endpoint.spec {
+            endpoint::Spec::WebRtcPublishEndpoint(spec) => Self::WebrtcPub(
+                WebRtcPublish {
+                    id: String::from(endpoint.id).into(),
+                    spec,
+                }
+                .into(),
+            ),
+            endpoint::Spec::WebRtcPlayEndpoint(spec) => Self::WebrtcPlay(
+                WebRtcPlay {
+                    id: String::from(endpoint.id).into(),
+                    spec,
+                }
+                .into(),
+            ),
         }
     }
 }
@@ -518,56 +616,64 @@ impl TryFrom<proto::WebRtcPlayEndpoint> for WebRtcPlay {
     fn try_from(val: proto::WebRtcPlayEndpoint) -> Result<Self, Self::Error> {
         Ok(Self {
             id: val.id.into(),
-            src: val.src.parse()?,
-            force_relay: val.force_relay,
+            spec: web_rtc_play::Spec {
+                src: val.src.parse()?,
+                force_relay: val.force_relay,
+            },
         })
     }
 }
 
 impl From<WebRtcPlay> for proto::WebRtcPlayEndpoint {
-    fn from(val: WebRtcPlay) -> Self {
+    fn from(play: WebRtcPlay) -> Self {
         Self {
-            id: val.id.into(),
-            src: val.src.to_string(),
+            id: play.id.into(),
+            src: play.spec.src.to_string(),
             on_start: String::new(),
             on_stop: String::new(),
-            force_relay: val.force_relay,
+            force_relay: play.spec.force_relay,
         }
     }
 }
 
-impl From<proto::WebRtcPublishEndpoint> for WebRtcPublish {
-    fn from(val: proto::WebRtcPublishEndpoint) -> Self {
+impl TryFrom<proto::WebRtcPublishEndpoint> for WebRtcPublish {
+    type Error = ProtobufError;
+
+    fn try_from(
+        val: proto::WebRtcPublishEndpoint,
+    ) -> Result<Self, Self::Error> {
         use proto::web_rtc_publish_endpoint::P2p;
 
-        Self {
+        Ok(Self {
             id: val.id.into(),
-            p2p: P2p::from_i32(val.p2p).unwrap_or_default().into(),
-            audio_settings: val
-                .audio_settings
-                .map(AudioSettings::from)
-                .unwrap_or_default(),
-            video_settings: val
-                .video_settings
-                .map(VideoSettings::from)
-                .unwrap_or_default(),
-            force_relay: val.force_relay,
-        }
+            spec: web_rtc_publish::Spec {
+                p2p: P2p::from_i32(val.p2p).unwrap_or_default().into(),
+                audio_settings: val
+                    .audio_settings
+                    .map(AudioSettings::from)
+                    .unwrap_or_default(),
+                video_settings: val
+                    .video_settings
+                    .map(VideoSettings::from)
+                    .unwrap_or_default(),
+                force_relay: val.force_relay,
+            },
+        })
     }
 }
 
 impl From<WebRtcPublish> for proto::WebRtcPublishEndpoint {
-    fn from(val: WebRtcPublish) -> Self {
+    fn from(publish: WebRtcPublish) -> Self {
         use proto::web_rtc_publish_endpoint::P2p;
 
         Self {
-            id: val.id.into(),
-            p2p: P2p::from(val.p2p).into(),
+            id: publish.id.into(),
+            p2p: P2p::from(publish.spec.p2p).into(),
             on_start: String::new(),
             on_stop: String::new(),
-            force_relay: val.force_relay,
-            audio_settings: Some(val.audio_settings.into()),
-            video_settings: Some(val.video_settings.into()),
+            force_relay: publish.spec.force_relay,
+            audio_settings: Some(publish.spec.audio_settings.into()),
+            video_settings: Some(publish.spec.video_settings.into()),
         }
     }
 }

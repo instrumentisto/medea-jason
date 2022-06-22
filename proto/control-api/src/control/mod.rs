@@ -14,6 +14,10 @@ use std::{collections::HashMap, str::FromStr};
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
+pub use std::collections::HashMap as Pipeline;
 
 #[doc(inline)]
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
@@ -104,31 +108,45 @@ pub trait Api {
 #[derive(Clone, Debug)]
 pub enum Request {
     /// [`Room`] to be created or to apply changes to.
-    Room(Room),
+    Room {
+        /// ID of the created [`Room`].
+        id: room::Id,
+
+        /// Spec of the created [`Room`].
+        spec: room::Spec,
+    },
 
     /// [`Member`] to be created or to apply changes to.
     Member {
+        /// ID of the created [`Member`].
+        id: member::Id,
+
         /// ID of the [`Room`] this [`Member`] participates in.
         room_id: room::Id,
 
-        /// Media [`Element`] representing this [`Member`].
-        member: Box<Member>,
+        /// Spec of the created [`Member`].
+        spec: Box<member::Spec>,
     },
 
     /// [`Endpoint`] to be created or to apply changes to.
     Endpoint {
+        /// ID of the created [`Endpoint`].
+        id: endpoint::Id,
+
         /// ID of the [`Room`] this [`Endpoint`] belongs to.
         room_id: room::Id,
 
         /// ID of the [`Member`] this [`Endpoint`] belongs to.
         member_id: member::Id,
 
-        /// Media [`Element`] representing this [`Endpoint`].
-        endpoint: Endpoint,
+        /// Spec of the created [`Endpoint`].
+        spec: endpoint::Spec,
     },
 }
 
-/// Possible media elements forming a media pipeline.
+/// All possible media elements of [`ControlApi`].
+///
+/// [`ControlApi`]: Api
 #[derive(Clone, Debug, From)]
 pub enum Element {
     /// [`Room`] media element.
@@ -143,6 +161,18 @@ pub enum Element {
 
 /// Collection of uniquely identified [`Element`]s.
 pub type Elements = HashMap<Fid, Element>;
+
+/// Possible [`Element`]s allowed to act as a root of [`ControlApi`] static
+/// spec.
+///
+/// [`ControlApi`]: Api
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(tag = "kind"))]
+pub enum RootElement {
+    /// [`Room`] media [`Element`].
+    Room(Room),
+}
 
 /// FID (Full ID) is a composition of media [`Element`] IDs referring to some
 /// [`Element`] on a whole media server uniquely.
@@ -260,3 +290,172 @@ pub struct Ping(pub u32);
     Clone, Copy, Debug, Display, Eq, From, Hash, Ord, PartialEq, PartialOrd,
 )]
 pub struct Pong(pub u32);
+
+#[cfg(all(feature = "serde", test))]
+mod serialization {
+    use super::{
+        endpoint::{
+            web_rtc_play::{self, LocalSrcUri},
+            web_rtc_publish::{self, AudioSettings, P2pMode, VideoSettings},
+        },
+        member::{self, Credentials},
+        room, Room, RootElement,
+    };
+
+    // language=YAML
+    const SPEC: &str = r#"
+kind: Room
+id: test-call
+spec:
+  pipeline:
+    caller:
+      kind: Member
+      spec:
+        credentials:
+          plain: test
+        pipeline:
+          publish:
+            kind: WebRtcPublishEndpoint
+            spec:
+              p2p: Always
+    some-member:
+      kind: Member
+      spec:
+        credentials:
+          plain: test
+        pipeline:
+          publish:
+            kind: WebRtcPublishEndpoint
+            spec:
+              p2p: Always
+    responder:
+      kind: Member
+      spec:
+        credentials:
+          plain: test
+        pipeline:
+          play:
+            kind: WebRtcPlayEndpoint
+            spec:
+              src: "local://test-call/caller/publish"
+          play2:
+            kind: WebRtcPlayEndpoint
+            spec:
+              src: "local://test-call/some-member/publish"
+    "#;
+
+    #[test]
+    fn spec() {
+        assert_eq!(
+            serde_yaml::from_str::<RootElement>(SPEC)
+                .unwrap_or_else(|e| panic!("{e}")),
+            RootElement::Room(Room {
+                id: "test-call".into(),
+                spec: room::Spec {
+                    pipeline: [
+                        (
+                            "caller".into(),
+                            member::Spec {
+                                pipeline: [(
+                                    "publish".into(),
+                                    web_rtc_publish::Spec {
+                                        p2p: P2pMode::Always,
+                                        force_relay: false,
+                                        audio_settings: AudioSettings::default(
+                                        ),
+                                        video_settings: VideoSettings::default(
+                                        ),
+                                    }
+                                    .into(),
+                                )]
+                                .into_iter()
+                                .collect(),
+                                credentials: Some(Credentials::Plain(
+                                    "test".into(),
+                                )),
+                                on_join: None,
+                                on_leave: None,
+                                idle_timeout: None,
+                                reconnect_timeout: None,
+                                ping_interval: None,
+                            }
+                            .into(),
+                        ),
+                        (
+                            "some-member".into(),
+                            member::Spec {
+                                pipeline: [(
+                                    "publish".into(),
+                                    web_rtc_publish::Spec {
+                                        p2p: P2pMode::Always,
+                                        force_relay: false,
+                                        audio_settings: AudioSettings::default(
+                                        ),
+                                        video_settings: VideoSettings::default(
+                                        ),
+                                    }
+                                    .into(),
+                                )]
+                                .into_iter()
+                                .collect(),
+                                credentials: Some(Credentials::Plain(
+                                    "test".into()
+                                )),
+                                on_join: None,
+                                on_leave: None,
+                                idle_timeout: None,
+                                reconnect_timeout: None,
+                                ping_interval: None,
+                            }
+                            .into(),
+                        ),
+                        (
+                            "responder".into(),
+                            member::Spec {
+                                pipeline: [
+                                    (
+                                        "play".into(),
+                                        web_rtc_play::Spec {
+                                            src: LocalSrcUri {
+                                                room_id: "test-call".into(),
+                                                member_id: "caller".into(),
+                                                endpoint_id: "publish".into(),
+                                            },
+                                            force_relay: false,
+                                        }
+                                        .into(),
+                                    ),
+                                    (
+                                        "play2".into(),
+                                        web_rtc_play::Spec {
+                                            src: LocalSrcUri {
+                                                room_id: "test-call".into(),
+                                                member_id: "some-member".into(),
+                                                endpoint_id: "publish".into(),
+                                            },
+                                            force_relay: false,
+                                        }
+                                        .into(),
+                                    )
+                                ]
+                                .into_iter()
+                                .collect(),
+                                credentials: Some(Credentials::Plain(
+                                    "test".into(),
+                                )),
+                                on_join: None,
+                                on_leave: None,
+                                idle_timeout: None,
+                                reconnect_timeout: None,
+                                ping_interval: None,
+                            }
+                            .into(),
+                        ),
+                    ]
+                    .into_iter()
+                    .collect(),
+                }
+            })
+        );
+    }
+}
