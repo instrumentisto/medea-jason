@@ -21,7 +21,9 @@ pub struct Endpoint {
     /// [`Element`]: crate::Element
     pub id: Id,
 
-    /// [`Endpoint`] spec.
+    /// [`Spec`] of this [`Endpoint`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
     pub spec: Spec,
 }
 
@@ -43,31 +45,23 @@ impl From<WebRtcPublish> for Endpoint {
     }
 }
 
-/// [`Endpoint`] spec.
+/// Spec of an [`Endpoint`] media [`Element`].
+///
+/// [`Element`]: crate::Element
 #[allow(variant_size_differences)]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(tag = "kind"))]
+#[cfg_attr(feature = "serde", serde(tag = "kind", content = "spec"))]
 pub enum Spec {
-    /// [`WebRtcPublish`] media [`Element`].
+    /// [`WebRtcPublish`] media [`Element`] spec.
     ///
     /// [`Element`]: crate::Element
-    WebRtcPublishEndpoint {
-        /// Spec of the [`WebRtcPublish`] media [`Element`].
-        ///
-        /// [`Element`]: crate::Element
-        spec: web_rtc_publish::Spec,
-    },
+    WebRtcPublishEndpoint(web_rtc_publish::Spec),
 
-    /// [`WebRtcPlay`] media [`Element`].
+    /// [`WebRtcPlay`] media [`Element`] spec.
     ///
     /// [`Element`]: crate::Element
-    WebRtcPlayEndpoint {
-        /// Spec of the [`WebRtcPlay`] media [`Element`].
-        ///
-        /// [`Element`]: crate::Element
-        spec: web_rtc_play::Spec,
-    },
+    WebRtcPlayEndpoint(web_rtc_play::Spec),
 }
 
 /// ID of an [`Endpoint`] media [`Element`].
