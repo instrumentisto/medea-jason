@@ -105,7 +105,7 @@ where
                     .into_iter()
                     .map(|(id, el)| {
                         let s = id.to_string();
-                        (id, el).try_into().map(|el| (s, el))
+                        (id, el).try_into().map(|proto| (s, proto))
                     })
                     .collect::<Result<_, _>>()?,
                 error: None,

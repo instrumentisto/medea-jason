@@ -6,7 +6,7 @@ pub mod web_rtc_publish;
 use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[doc(inline)]
 pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
@@ -14,10 +14,41 @@ pub use self::{web_rtc_play::WebRtcPlay, web_rtc_publish::WebRtcPublish};
 /// Media [`Element`] flowing one or more media data streams through itself.
 ///
 /// [`Element`]: crate::Element
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Endpoint {
+    /// ID of this [`Endpoint`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
+    pub id: Id,
+
+    /// [`Endpoint`] spec.
+    pub spec: Spec,
+}
+
+impl From<WebRtcPlay> for Endpoint {
+    fn from(play: WebRtcPlay) -> Self {
+        Self {
+            id: play.id.into(),
+            spec: play.spec.into(),
+        }
+    }
+}
+
+impl From<WebRtcPublish> for Endpoint {
+    fn from(publish: WebRtcPublish) -> Self {
+        Self {
+            id: publish.id.into(),
+            spec: publish.spec.into(),
+        }
+    }
+}
+
+/// [`Endpoint`] spec.
 #[allow(variant_size_differences)]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Deserialize), serde(tag = "kind"))]
-pub enum Endpoint {
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(tag = "kind"))]
+pub enum Spec {
     /// [`WebRtcPublish`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
@@ -25,7 +56,7 @@ pub enum Endpoint {
         /// Spec of the [`WebRtcPublish`] media [`Element`].
         ///
         /// [`Element`]: crate::Element
-        spec: WebRtcPublish,
+        spec: web_rtc_publish::Spec,
     },
 
     /// [`WebRtcPlay`] media [`Element`].
@@ -35,7 +66,7 @@ pub enum Endpoint {
         /// Spec of the [`WebRtcPlay`] media [`Element`].
         ///
         /// [`Element`]: crate::Element
-        spec: WebRtcPlay,
+        spec: web_rtc_play::Spec,
     },
 }
 
@@ -56,7 +87,8 @@ pub enum Endpoint {
     PartialOrd,
     RefCast,
 )]
-#[cfg_attr(feature = "serde", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String, web_rtc_publish::Id, web_rtc_play::Id))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
