@@ -2,33 +2,53 @@
 
 use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
-use super::{member, Member, Pipeline};
+use super::{member, Pipeline};
 
 /// Media [`Element`] representing a single space where multiple [`Member`]s can
 /// interact with each other.
 ///
 /// [`Element`]: crate::Element
 /// [`Member`]: crate::Member
-#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(transparent))]
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Room {
+    /// ID of this [`Room`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
+    pub id: Id,
+
+    /// [`Room`] spec.
+    pub spec: Spec,
+}
+
+/// [`Room`] spec.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub struct Spec {
     /// Media pipeline representing [`Member`]s of this [`Room`].
+    ///
+    /// [`Member`]: crate::Member
     pub spec: Pipeline<member::Id, Element>,
 }
 
-/// Elements of `Room`'s [`Pipeline`].
-#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(tag = "kind"))]
+/// Possible [`Element`]s of a [`Room`]'s [`Pipeline`].
 #[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(tag = "kind"))]
 pub enum Element {
-    /// Represent `Member`
-    Member(Member),
+    /// [`Member`] media [`Element`] of the [`Room`]'s [`Pipeline`].
+    ///
+    /// [`Member`]: crate::Member
+    Member(member::Spec),
 }
 
 /// ID of a [`Room`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -43,6 +63,8 @@ pub enum Element {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]

@@ -4,22 +4,36 @@ use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
 use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use url::Url;
 
-use super::{endpoint, room, Endpoint, Pipeline};
+use super::{endpoint, room, Pipeline};
 
 /// Media [`Element`] representing a client authorized to participate in some
 /// bigger media pipeline ([`Room`], for example).
 ///
 /// [`Element`]: crate::Element
 /// [`Room`]: crate::Room
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Member {
+    /// ID of this [`Member`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
+    pub id: Id,
+
+    /// [`Member`] spec.
+    pub spec: Spec,
+}
+
+/// [`Member`] spec.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+pub struct Spec {
     /// Media pipeline representing this [`Member`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
-    pub spec: Pipeline<endpoint::Id, Endpoint>,
+    pub spec: Pipeline<endpoint::Id, endpoint::Spec>,
 
     /// [`Credentials`] to authenticate this [`Member`] in [Client API] with.
     ///
@@ -71,7 +85,6 @@ pub struct Member {
 /// ID of a [`Member`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -86,6 +99,8 @@ pub struct Member {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
@@ -220,19 +235,26 @@ pub type Sids = HashMap<Id, Sid>;
     PartialEq,
     PartialOrd,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct PublicUrl(Url);
+
+impl FromStr for PublicUrl {
+    type Err = url::ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse().map(Self)
+    }
+}
 
 /// Credentials of a [`Member`] media [`Element`] for its client side to
 /// authorize via [Client API] with.
 ///
 /// [`Element`]: crate::Element
 /// [Client API]: https://tinyurl.com/266y74tf
-#[cfg_attr(
-    feature = "serde",
-    derive(serde::Deserialize),
-    serde(rename_all = "lowercase")
-)]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum Credentials {
     /// [Argon2] hash of credentials.
     ///
@@ -266,7 +288,6 @@ impl Credentials {
 }
 
 /// Plain [`Credentials`] returned in a [`Sid`].
-#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(transparent))]
 #[derive(
     AsRef,
     Clone,
@@ -280,6 +301,8 @@ impl Credentials {
     PartialEq,
     PartialOrd,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 pub struct PlainCredentials(Box<str>); // TODO: Use `secrecy` crate.

@@ -6,6 +6,8 @@ use std::str::FromStr;
 
 use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
 use url::Url;
 
 use crate::control::{endpoint::web_rtc_publish, member, room};
@@ -14,9 +16,21 @@ use crate::control::{endpoint::web_rtc_publish, member, room};
 ///
 /// [`Element`]: crate::Element
 /// [WebRTC]: https://w3.org/TR/webrtc
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct WebRtcPlay {
+    /// ID of this [`WebRtcPlay`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
+    pub id: Id,
+
+    /// [`WebRtcPlay`] spec.
+    pub spec: Spec,
+}
+
+/// [`WebRtcPlay`] spec.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+pub struct Spec {
     /// Source to play media data from.
     pub src: LocalSrcUri,
 
@@ -31,7 +45,6 @@ pub struct WebRtcPlay {
 /// ID of a [`WebRtcPlay`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(
     AsRef,
     Clone,
@@ -46,6 +59,8 @@ pub struct WebRtcPlay {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
@@ -136,16 +151,24 @@ impl FromStr for LocalSrcUri {
 }
 
 #[cfg(feature = "serde")]
-impl<'de> serde::Deserialize<'de> for LocalSrcUri {
+impl<'de> Deserialize<'de> for LocalSrcUri {
     fn deserialize<D>(de: D) -> Result<Self, D::Error>
     where
-        D: serde::Deserializer<'de>,
+        D: Deserializer<'de>,
     {
-        use serde::de::Error as _;
-
         String::deserialize(de)?
-            .parse::<LocalSrcUri>()
+            .parse::<Self>()
             .map_err(D::Error::custom)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl Serialize for LocalSrcUri {
+    fn serialize<S>(&self, se: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        se.serialize_str(&self.to_string())
     }
 }
 

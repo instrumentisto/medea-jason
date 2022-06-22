@@ -18,6 +18,8 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[doc(inline)]
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
@@ -113,7 +115,7 @@ pub enum Request {
         id: room::Id,
 
         /// Media [`Element`] representing this [`Room`].
-        room: Room,
+        room: room::Spec,
     },
 
     /// [`Member`] to be created or to apply changes to.
@@ -125,7 +127,7 @@ pub enum Request {
         room_id: room::Id,
 
         /// Media [`Element`] representing this [`Member`].
-        member: Box<Member>,
+        member: Box<member::Spec>,
     },
 
     /// [`Endpoint`] to be created or to apply changes to.
@@ -140,7 +142,7 @@ pub enum Request {
         member_id: member::Id,
 
         /// Media [`Element`] representing this [`Endpoint`].
-        endpoint: Endpoint,
+        endpoint: endpoint::Spec,
     },
 }
 
@@ -148,13 +150,13 @@ pub enum Request {
 #[derive(Clone, Debug, From)]
 pub enum Element {
     /// [`Room`] media element.
-    Room(Room),
+    Room(room::Spec),
 
     /// [`Member`] media element.
-    Member(Box<Member>),
+    Member(Box<member::Spec>),
 
     /// [`Endpoint`] media element.
-    Endpoint(Endpoint),
+    Endpoint(endpoint::Spec),
 }
 
 /// Collection of uniquely identified [`Element`]s.
@@ -280,22 +282,17 @@ pub struct Pong(pub u32);
 /// [Control API] spec root element.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[cfg_attr(feature = "serde", derive(serde::Deserialize), serde(tag = "kind"))]
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(tag = "kind"))]
 pub enum RootElement {
     /// [`Room`] element.
-    Room {
-        /// [`Room`]'s ID.
-        id: room::Id,
-
-        /// [`Room`] root element.
-        spec: Room,
-    },
+    Room(Room),
 }
 
 /// Entity that represents some pipeline of spec.
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Pipeline<K: Hash + Eq, V> {
     /// Elements contained in this [`Pipeline`].
     pub pipeline: HashMap<K, V>,
@@ -331,12 +328,11 @@ impl<K: Eq + Hash, V> FromIterator<(K, V)> for Pipeline<K, V> {
 mod tests {
     use super::{
         endpoint::{
-            web_rtc_play::LocalSrcUri,
-            web_rtc_publish::{AudioSettings, P2pMode, VideoSettings},
-            WebRtcPlay, WebRtcPublish,
+            web_rtc_play::{self, LocalSrcUri},
+            web_rtc_publish::{self, AudioSettings, P2pMode, VideoSettings},
         },
-        member::Credentials,
-        Member, Room, RootElement,
+        member::{self, Credentials},
+        room, Room, RootElement,
     };
 
     const SPEC: &str = r#"
@@ -385,16 +381,16 @@ mod tests {
         let root = serde_yaml::from_str::<RootElement>(SPEC).unwrap();
         assert_eq!(
             root,
-            RootElement::Room {
+            RootElement::Room(Room {
                 id: "test-call".into(),
-                spec: Room {
+                spec: room::Spec {
                     spec: [
                         (
                             "caller".into(),
-                            Member {
+                            member::Spec {
                                 spec: [(
                                     "publish".into(),
-                                    WebRtcPublish {
+                                    web_rtc_publish::Spec {
                                         p2p: P2pMode::Always,
                                         force_relay: false,
                                         audio_settings: AudioSettings::default(
@@ -419,10 +415,10 @@ mod tests {
                         ),
                         (
                             "some-member".into(),
-                            Member {
+                            member::Spec {
                                 spec: [(
                                     "publish".into(),
-                                    WebRtcPublish {
+                                    web_rtc_publish::Spec {
                                         p2p: P2pMode::Always,
                                         force_relay: false,
                                         audio_settings: AudioSettings::default(
@@ -447,11 +443,11 @@ mod tests {
                         ),
                         (
                             "responder".into(),
-                            Member {
+                            member::Spec {
                                 spec: [
                                     (
                                         "play".into(),
-                                        WebRtcPlay {
+                                        web_rtc_play::Spec {
                                             src: LocalSrcUri {
                                                 room_id: "test-call".into(),
                                                 member_id: "caller".into(),
@@ -463,7 +459,7 @@ mod tests {
                                     ),
                                     (
                                         "play2".into(),
-                                        WebRtcPlay {
+                                        web_rtc_play::Spec {
                                             src: LocalSrcUri {
                                                 room_id: "test-call".into(),
                                                 member_id: "some-member".into(),
@@ -491,7 +487,7 @@ mod tests {
                     .into_iter()
                     .collect(),
                 }
-            }
+            })
         );
     }
 }

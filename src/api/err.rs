@@ -1,8 +1,5 @@
 //! External API errors.
 
-// TODO: See https://github.com/rustwasm/wasm-bindgen/pull/2719
-#![allow(clippy::use_self)]
-
 use std::borrow::Cow;
 
 #[cfg(target_family = "wasm")]

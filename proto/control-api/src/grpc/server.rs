@@ -99,14 +99,13 @@ where
             Err(e) => Err(e.into()),
         };
 
-        #[allow(clippy::shadow_unrelated)]
         Ok(tonic::Response::new(match result {
             Ok(elements) => control_proto::GetResponse {
                 elements: elements
                     .into_iter()
                     .map(|(id, el)| {
                         let s = id.to_string();
-                        (id, el).try_into().map(|el| (s, el))
+                        (id, el).try_into().map(|proto| (s, proto))
                     })
                     .collect::<Result<_, _>>()?,
                 error: None,
