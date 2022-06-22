@@ -539,14 +539,17 @@ impl Component {
         new_state: mute_state::Stable,
     ) -> Result<(), Infallible> {
         sender.muted.set(new_state == mute_state::Stable::Muted);
-        match new_state {
-            mute_state::Stable::Muted => {
-                sender.transceiver.set_send_track_enabled(false);
-            }
-            mute_state::Stable::Unmuted => {
-                sender.transceiver.set_send_track_enabled(true);
+        if let Some(track) = sender.track.borrow().as_ref() {
+            match new_state {
+                mute_state::Stable::Muted => {
+                    track.set_enabled(false);
+                }
+                mute_state::Stable::Unmuted => {
+                    track.set_enabled(true);
+                }
             }
         }
+
         Ok(())
     }
 
@@ -580,6 +583,21 @@ impl Component {
                 state.mute_state.stop_transition_timeout();
             }
             SyncState::Syncing => (),
+        }
+        Ok(())
+    }
+
+    /// Disables media exchange on a local track acquisition error.
+    #[watch(self.local_track_state.subscribe())]
+    async fn local_track_state_changed(
+        _: Rc<Sender>,
+        state: Rc<State>,
+        new_state: LocalTrackState,
+    ) -> Result<(), Traced<ProhibitedStateError>> {
+        if matches!(new_state, LocalTrackState::Failed(_)) {
+            state.media_state_transition_to(MediaState::MediaExchange(
+                media_exchange_state::Stable::Disabled,
+            ))?;
         }
         Ok(())
     }

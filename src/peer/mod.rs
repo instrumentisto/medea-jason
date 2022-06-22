@@ -1040,7 +1040,7 @@ impl PeerConnection {
         self.media_connections
             .get_senders()
             .into_iter()
-            .filter_map(|sndr| sndr.transceiver().send_track())
+            .filter_map(|sndr| sndr.get_send_track())
             .collect()
     }
 
