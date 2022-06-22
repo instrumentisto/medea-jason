@@ -117,7 +117,7 @@ impl<'a> From<&'a str> for Id {
     }
 }
 
-#[cfg(feature = "client-api-proto")]
+#[cfg(feature = "client-api")]
 impl From<medea_client_api_proto::MemberId> for Id {
     fn from(id: medea_client_api_proto::MemberId) -> Self {
         id.0.into()

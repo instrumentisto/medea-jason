@@ -18,13 +18,13 @@ client = []
 server = []
 grpc = ["dep:prost", "dep:prost-types", "dep:tonic", "dep:tonic-build", "time/formatting", "time/parsing"]
 serde = ["dep:serde", "dep:humantime-serde", "url/serde"]
-client-api-proto = ["dep:medea-client-api-proto"]
+client-api = ["dep:medea-client-api-proto"]
 
 [dependencies]
 async-trait = "0.1.34"
 derive_more = { version = "0.99.17", features = ["as_ref", "display", "error", "from", "from_str", "into"], default-features = false }
 humantime-serde = { version = "1.1", optional = true }
-medea-client-api-proto = { git = "https://github.com/instrumentisto/medea-jason", branch = "master", optional = true }
+medea-client-api-proto = { path = "../client-api", optional = true }
 prost = { version = "0.10", optional = true }
 prost-types = { version = "0.10", optional = true }
 rand = "0.8"
