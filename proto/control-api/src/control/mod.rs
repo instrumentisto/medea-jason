@@ -10,10 +10,16 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
-use std::{collections::HashMap, str::FromStr};
+use std::{
+    collections::{hash_map, HashMap},
+    hash::Hash,
+    str::FromStr,
+};
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[doc(inline)]
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
@@ -104,19 +110,31 @@ pub trait Api {
 #[derive(Clone, Debug)]
 pub enum Request {
     /// [`Room`] to be created or to apply changes to.
-    Room(Room),
+    Room {
+        /// ID of the [`Room`].
+        id: room::Id,
+
+        /// Media [`Element`] representing this [`Room`].
+        room: room::Spec,
+    },
 
     /// [`Member`] to be created or to apply changes to.
     Member {
+        /// ID of the [`Member`].
+        id: member::Id,
+
         /// ID of the [`Room`] this [`Member`] participates in.
         room_id: room::Id,
 
         /// Media [`Element`] representing this [`Member`].
-        member: Box<Member>,
+        member: Box<member::Spec>,
     },
 
     /// [`Endpoint`] to be created or to apply changes to.
     Endpoint {
+        /// ID of the [`Endpoint`].
+        id: endpoint::Id,
+
         /// ID of the [`Room`] this [`Endpoint`] belongs to.
         room_id: room::Id,
 
@@ -124,7 +142,7 @@ pub enum Request {
         member_id: member::Id,
 
         /// Media [`Element`] representing this [`Endpoint`].
-        endpoint: Endpoint,
+        endpoint: endpoint::Spec,
     },
 }
 
@@ -132,13 +150,13 @@ pub enum Request {
 #[derive(Clone, Debug, From)]
 pub enum Element {
     /// [`Room`] media element.
-    Room(Room),
+    Room(room::Spec),
 
     /// [`Member`] media element.
-    Member(Box<Member>),
+    Member(Box<member::Spec>),
 
     /// [`Endpoint`] media element.
-    Endpoint(Endpoint),
+    Endpoint(endpoint::Spec),
 }
 
 /// Collection of uniquely identified [`Element`]s.
@@ -260,3 +278,216 @@ pub struct Ping(pub u32);
     Clone, Copy, Debug, Display, Eq, From, Hash, Ord, PartialEq, PartialOrd,
 )]
 pub struct Pong(pub u32);
+
+/// [Control API] spec root element.
+///
+/// [Control API]: https://tinyurl.com/yxsqplq7
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(tag = "kind"))]
+pub enum RootElement {
+    /// [`Room`] element.
+    Room(Room),
+}
+
+/// Entity that represents some pipeline of spec.
+#[derive(Clone, Debug, Eq, From, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+pub struct Pipeline<K: Hash + Eq, V> {
+    /// Elements contained in this [`Pipeline`].
+    pub pipeline: HashMap<K, V>,
+}
+
+impl<'a, K: Eq + Hash, V> IntoIterator for &'a Pipeline<K, V> {
+    type IntoIter = hash_map::Iter<'a, K, V>;
+    type Item = (&'a K, &'a V);
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.pipeline.iter()
+    }
+}
+
+impl<K: Eq + Hash, V> IntoIterator for Pipeline<K, V> {
+    type IntoIter = hash_map::IntoIter<K, V>;
+    type Item = (K, V);
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.pipeline.into_iter()
+    }
+}
+
+impl<K: Eq + Hash, V> FromIterator<(K, V)> for Pipeline<K, V> {
+    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
+        Self {
+            pipeline: HashMap::from_iter(iter),
+        }
+    }
+}
+
+#[cfg(all(feature = "serde", test))]
+mod tests {
+    use super::{
+        endpoint::{
+            web_rtc_play::{self, LocalSrcUri},
+            web_rtc_publish::{self, AudioSettings, P2pMode, VideoSettings},
+        },
+        member::{self, Credentials},
+        room, Room, RootElement,
+    };
+
+    const SPEC: &str = r#"
+        kind: Room
+        id: test-call
+        spec:
+          pipeline:
+            caller:
+              kind: Member
+              credentials:
+                plain: test
+              spec:
+                pipeline:
+                  publish:
+                    kind: WebRtcPublishEndpoint
+                    spec:
+                      p2p: Always
+            some-member:
+              kind: Member
+              credentials:
+                plain: test
+              spec:
+                pipeline:
+                  publish:
+                    kind: WebRtcPublishEndpoint
+                    spec:
+                      p2p: Always
+            responder:
+              kind: Member
+              credentials:
+                plain: test
+              spec:
+                pipeline:
+                  play:
+                    kind: WebRtcPlayEndpoint
+                    spec:
+                      src: "local://test-call/caller/publish"
+                  play2:
+                    kind: WebRtcPlayEndpoint
+                    spec:
+                      src: "local://test-call/some-member/publish"
+    "#;
+
+    #[test]
+    fn spec() {
+        let root = serde_yaml::from_str::<RootElement>(SPEC).unwrap();
+        assert_eq!(
+            root,
+            RootElement::Room(Room {
+                id: "test-call".into(),
+                spec: room::Spec {
+                    spec: [
+                        (
+                            "caller".into(),
+                            member::Spec {
+                                spec: [(
+                                    "publish".into(),
+                                    web_rtc_publish::Spec {
+                                        p2p: P2pMode::Always,
+                                        force_relay: false,
+                                        audio_settings: AudioSettings::default(
+                                        ),
+                                        video_settings: VideoSettings::default(
+                                        ),
+                                    }
+                                    .into(),
+                                )]
+                                .into_iter()
+                                .collect(),
+                                credentials: Some(Credentials::Plain(
+                                    "test".into(),
+                                )),
+                                on_join: None,
+                                on_leave: None,
+                                idle_timeout: None,
+                                reconnect_timeout: None,
+                                ping_interval: None,
+                            }
+                            .into(),
+                        ),
+                        (
+                            "some-member".into(),
+                            member::Spec {
+                                spec: [(
+                                    "publish".into(),
+                                    web_rtc_publish::Spec {
+                                        p2p: P2pMode::Always,
+                                        force_relay: false,
+                                        audio_settings: AudioSettings::default(
+                                        ),
+                                        video_settings: VideoSettings::default(
+                                        ),
+                                    }
+                                    .into(),
+                                )]
+                                .into_iter()
+                                .collect(),
+                                credentials: Some(Credentials::Plain(
+                                    "test".into()
+                                )),
+                                on_join: None,
+                                on_leave: None,
+                                idle_timeout: None,
+                                reconnect_timeout: None,
+                                ping_interval: None,
+                            }
+                            .into(),
+                        ),
+                        (
+                            "responder".into(),
+                            member::Spec {
+                                spec: [
+                                    (
+                                        "play".into(),
+                                        web_rtc_play::Spec {
+                                            src: LocalSrcUri {
+                                                room_id: "test-call".into(),
+                                                member_id: "caller".into(),
+                                                endpoint_id: "publish".into(),
+                                            },
+                                            force_relay: false,
+                                        }
+                                        .into(),
+                                    ),
+                                    (
+                                        "play2".into(),
+                                        web_rtc_play::Spec {
+                                            src: LocalSrcUri {
+                                                room_id: "test-call".into(),
+                                                member_id: "some-member".into(),
+                                                endpoint_id: "publish".into(),
+                                            },
+                                            force_relay: false,
+                                        }
+                                        .into(),
+                                    )
+                                ]
+                                .into_iter()
+                                .collect(),
+                                credentials: Some(Credentials::Plain(
+                                    "test".into(),
+                                )),
+                                on_join: None,
+                                on_leave: None,
+                                idle_timeout: None,
+                                reconnect_timeout: None,
+                                ping_interval: None,
+                            }
+                            .into(),
+                        ),
+                    ]
+                    .into_iter()
+                    .collect(),
+                }
+            })
+        );
+    }
+}
