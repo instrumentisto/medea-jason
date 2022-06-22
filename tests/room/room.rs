@@ -1774,7 +1774,7 @@ async fn enable_by_server() {
     assert_eq!(mock.get_user_media_requests_count(), 2);
     mock.stop();
     let sender = peer.get_sender_by_id(audio_track_id).unwrap();
-    assert!(sender.send_track().is_some());
+    assert!(sender.get_send_track().is_some());
 }
 
 /// Checks that only one get user media request will be performed on

@@ -238,6 +238,7 @@ impl Sender {
             .await
             .map_err(InsertTrackError::from)
             .map_err(tracerr::wrap!())?;
+
         // Set enabled once again since `muted` might have changed.
         new_track.set_enabled(!self.muted.get());
         drop(self.track.replace(Some(new_track)));
@@ -251,9 +252,9 @@ impl Sender {
         self.transceiver.clone()
     }
 
-    /// Returns [`local::Track`] that is being send to remote, if any.
+    /// Returns the [`local::Track`] being sent to remote, if any.
     #[must_use]
-    pub fn send_track(&self) -> Option<Rc<local::Track>> {
+    pub fn get_send_track(&self) -> Option<Rc<local::Track>> {
         self.track.borrow().as_ref().cloned()
     }
 

@@ -587,7 +587,7 @@ impl Component {
         Ok(())
     }
 
-    /// Disables media exchange on local track acquisition error.
+    /// Disables media exchange on a local track acquisition error.
     #[watch(self.local_track_state.subscribe())]
     async fn local_track_state_changed(
         _: Rc<Sender>,
@@ -599,7 +599,6 @@ impl Component {
                 media_exchange_state::Stable::Disabled,
             ))?;
         }
-
         Ok(())
     }
 }
