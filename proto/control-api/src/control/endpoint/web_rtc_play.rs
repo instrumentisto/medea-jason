@@ -23,11 +23,15 @@ pub struct WebRtcPlay {
     /// [`Element`]: crate::Element
     pub id: Id,
 
-    /// [`WebRtcPlay`] spec.
+    /// [`Spec`] of this [`WebRtcPlay`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
     pub spec: Spec,
 }
 
-/// [`WebRtcPlay`] spec.
+/// Spec of a [`WebRtcPlay`] media [`Element`].
+///
+/// [`Element`]: crate::Element
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Spec {

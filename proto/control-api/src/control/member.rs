@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, fmt, str::FromStr, time::Duration};
 
-use derive_more::{AsRef, Display, Error, From, Into};
+use derive_more::{AsRef, Display, Error, From, FromStr, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -22,18 +22,22 @@ pub struct Member {
     /// [`Element`]: crate::Element
     pub id: Id,
 
-    /// [`Member`] spec.
+    /// [`Spec`] of this [`Member`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
     pub spec: Spec,
 }
 
-/// [`Member`] spec.
+/// Spec of a [`Member`] media [`Element`].
+///
+/// [`Element`]: crate::Element
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Spec {
-    /// Media pipeline representing this [`Member`] media [`Element`].
+    /// Media [`Pipeline`] representing this [`Member`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
-    pub spec: Pipeline<endpoint::Id, endpoint::Spec>,
+    pub pipeline: Pipeline<endpoint::Id, endpoint::Spec>,
 
     /// [`Credentials`] to authenticate this [`Member`] in [Client API] with.
     ///
@@ -229,6 +233,7 @@ pub type Sids = HashMap<Id, Sid>;
     Display,
     Eq,
     From,
+    FromStr,
     Hash,
     Into,
     Ord,
@@ -238,14 +243,6 @@ pub type Sids = HashMap<Id, Sid>;
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 pub struct PublicUrl(Url);
-
-impl FromStr for PublicUrl {
-    type Err = url::ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.parse().map(Self)
-    }
-}
 
 /// Credentials of a [`Member`] media [`Element`] for its client side to
 /// authorize via [Client API] with.
