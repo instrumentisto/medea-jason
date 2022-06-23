@@ -7,8 +7,8 @@ use crate::{
     api::{
         dart::{
             utils::{
-                c_str_into_string, dart_arg_try_into, DartFuture, DartResult,
-                IntoDartFuture as _,
+                c_str_into_string, dart_arg_try_into, free_dart_native_string,
+                DartFuture, DartResult, IntoDartFuture as _,
             },
             DartValueArg, ForeignClass,
         },
@@ -43,9 +43,9 @@ pub unsafe extern "C" fn RoomHandle__join(
 ) -> DartFuture<Result<(), Traced<RoomJoinError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
-
         async move {
             this.join(c_str_into_string(token)).await?;
+            free_dart_native_string(token);
             Ok(())
         }
         .into_dart_future()

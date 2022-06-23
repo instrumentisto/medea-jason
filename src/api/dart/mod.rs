@@ -334,7 +334,11 @@ impl TryFrom<DartValueArg<Self>> for String {
 
     fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
         match value.0 {
-            DartValue::String(c_str) => unsafe { Ok(c_str_into_string(c_str)) },
+            DartValue::String(c_str) => unsafe {
+                let result = Ok(c_str_into_string(c_str));
+                free_dart_native_string(c_str);
+                result
+            },
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::Handle(_)
@@ -389,7 +393,9 @@ impl TryFrom<DartValueArg<Self>> for Option<String> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::String(c_str) => unsafe {
-                Ok(Some(c_str_into_string(c_str)))
+                let result = Ok(Some(c_str_into_string(c_str)));
+                free_dart_native_string(c_str);
+                result
             },
             DartValue::Ptr(_) | DartValue::Handle(_) | DartValue::Int(_) => {
                 Err(DartValueCastError {

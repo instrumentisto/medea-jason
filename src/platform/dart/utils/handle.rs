@@ -58,8 +58,9 @@ impl DartHandle {
     #[must_use]
     pub unsafe fn new(handle: Dart_Handle) -> Self {
         if Dart_IsError_DL_Trampolined(handle) {
-            let err_msg =
-                c_str_into_string(Dart_GetError_DL_Trampolined(handle));
+            let raw = Dart_GetError_DL_Trampolined(handle);
+            let err_msg = c_str_into_string(raw);
+            free_dart_native_string(raw);
             panic!("Unexpected Dart error: {err_msg}")
         }
         Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(handle)))

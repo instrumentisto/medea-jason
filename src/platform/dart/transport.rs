@@ -11,7 +11,7 @@ use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::{c_str_into_string, string_into_c_str},
+    api::{c_str_into_string, free_dart_native_string, string_into_c_str},
     platform::{
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
@@ -164,9 +164,9 @@ impl RpcTransport for WebSocketRpcTransport {
                         let code = transport::close_code(close_frame.get())
                             .try_into()
                             .unwrap_or(1007);
-                        let reason = c_str_into_string(
-                            transport::close_reason(close_frame.get()),
-                        );
+                        let raw = transport::close_reason(close_frame.get());
+                        let reason = c_str_into_string(raw);
+                        free_dart_native_string(raw);
 
                         socket_state.set(TransportState::Closed(
                             CloseMsg::from((code, reason)),

@@ -4,7 +4,9 @@ use crate::media::FacingMode;
 
 use super::{
     propagate_panic,
-    utils::{c_str_into_string, ArgumentError, DartResult},
+    utils::{
+        c_str_into_string, free_dart_native_string, ArgumentError, DartResult,
+    },
     ForeignClass,
 };
 
@@ -29,7 +31,9 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__device_id(
     device_id: ptr::NonNull<c_char>,
 ) {
     propagate_panic(move || {
-        this.as_mut().device_id(c_str_into_string(device_id));
+        let device_id_string = c_str_into_string(device_id);
+        this.as_mut().device_id(device_id_string);
+        free_dart_native_string(device_id);
     });
 }
 
