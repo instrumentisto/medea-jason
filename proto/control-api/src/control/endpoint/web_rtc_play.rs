@@ -10,7 +10,10 @@ use ref_cast::RefCast;
 use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
 use url::Url;
 
-use crate::control::{endpoint::web_rtc_publish, member, room};
+use crate::control::{
+    endpoint::{self, web_rtc_publish},
+    member, room,
+};
 
 /// Media [`Element`] playing media data for a client via [WebRTC].
 ///
@@ -74,6 +77,12 @@ pub struct Id(Box<str>);
 impl<'a> From<&'a str> for Id {
     fn from(s: &'a str) -> Self {
         Self(s.into())
+    }
+}
+
+impl AsRef<endpoint::Id> for Id {
+    fn as_ref(&self) -> &endpoint::Id {
+        endpoint::Id::ref_cast(&self.0)
     }
 }
 
