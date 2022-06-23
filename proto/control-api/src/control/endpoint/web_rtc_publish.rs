@@ -20,11 +20,15 @@ pub struct WebRtcPublish {
     /// [`Element`]: crate::Element
     pub id: Id,
 
-    /// [`WebRtcPublish`] spec.
+    /// [`Spec`] of this [`WebRtcPublish`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
     pub spec: Spec,
 }
 
-/// [`WebRtcPublish`] spec.
+/// Spec of a [`WebRtcPublish`] media [`Element`].
+///
+/// [`Element`]: crate::Element
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Spec {

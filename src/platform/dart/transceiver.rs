@@ -2,8 +2,9 @@
 //!
 //! [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
-use std::{cell::RefCell, future::Future, rc::Rc};
+use std::{future::Future, rc::Rc};
 
+use derive_more::From;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -46,18 +47,10 @@ mod transceiver {
         /// Returns stopped status of the provided [`Transceiver`].
         pub fn is_stopped(transceiver: Dart_Handle) -> bool;
 
-        /// Sets `enabled` field of `Send` [`MediaStreamTrack`] of the provided
-        /// [`Transceiver`].
-        pub fn set_send_track_enabled(transceiver: Dart_Handle, enabled: bool);
-
         /// Returns MID of the provided [`Transceiver`].
         pub fn mid(
             transceiver: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
-
-        /// Returns `1` if the provided [`Transceiver`] has `Send`
-        /// [`MediaStreamTrack`].
-        pub fn has_send_track(transceiver: Dart_Handle) -> bool;
 
         /// Sets `direction` of this [`Transceiver`].
         pub fn set_direction(
@@ -71,14 +64,12 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Clone, Debug)]
-pub struct Transceiver {
-    transceiver: DartHandle,
-    send_track: RefCell<Option<Rc<local::Track>>>,
-}
+#[derive(Clone, Debug, From)]
+pub struct Transceiver(DartHandle);
 
 impl Transceiver {
     /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
+    #[must_use]
     pub fn sub_direction(
         &self,
         disabled_direction: TransceiverDirection,
@@ -91,6 +82,7 @@ impl Transceiver {
     }
 
     /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
+    #[must_use]
     pub fn add_direction(
         &self,
         enabled_direction: TransceiverDirection,
@@ -120,34 +112,27 @@ impl Transceiver {
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
     pub async fn set_send_track(
         &self,
-        new_sender: Rc<local::Track>,
+        new_track: Option<&Rc<local::Track>>,
     ) -> Result<(), platform::Error> {
-        unsafe {
-            FutureFromDart::execute::<()>(transceiver::replace_track(
-                self.transceiver.get(),
-                new_sender.platform_track().handle(),
-            ))
-            .await
-        }
-        .unwrap();
-        drop(self.send_track.replace(Some(new_sender)));
-        Ok(())
-    }
-
-    /// Sets a [`TransceiverDirection::SEND`] [`local::Track`] of this
-    /// [`Transceiver`] to [`None`].
-    pub fn drop_send_track(&self) -> impl Future<Output = ()> {
-        drop(self.send_track.borrow_mut().take());
-        let transceiver = self.transceiver.get();
-        async move {
+        if let Some(track) = new_track {
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::replace_track(
+                    self.0.get(),
+                    track.platform_track().handle(),
+                ))
+                .await
+            }
+            .unwrap();
+        } else {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::drop_sender(
-                    transceiver,
+                    self.0.get(),
                 ))
                 .await
             }
             .unwrap();
         }
+        Ok(())
     }
 
     /// Returns [`mid`] of this [`Transceiver`].
@@ -157,31 +142,8 @@ impl Transceiver {
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         unsafe {
-            let mid = transceiver::mid(self.transceiver.get());
+            let mid = transceiver::mid(self.0.get());
             (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
-        }
-    }
-
-    /// Returns [`local::Track`] that is being send to remote, if any.
-    #[must_use]
-    pub fn send_track(&self) -> Option<Rc<local::Track>> {
-        self.send_track.borrow().as_ref().cloned()
-    }
-
-    /// Indicates whether this [`Transceiver`] has [`local::Track`].
-    #[must_use]
-    pub fn has_send_track(&self) -> bool {
-        unsafe { transceiver::has_send_track(self.transceiver.get()) }
-    }
-
-    /// Sets the underlying [`local::Track`]'s `enabled` field to the provided
-    /// value, if any.
-    pub fn set_send_track_enabled(&self, enabled: bool) {
-        unsafe {
-            transceiver::set_send_track_enabled(
-                self.transceiver.get(),
-                enabled,
-            );
         }
     }
 
@@ -190,12 +152,12 @@ impl Transceiver {
     /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        unsafe { transceiver::is_stopped(self.transceiver.get()) }
+        unsafe { transceiver::is_stopped(self.0.get()) }
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
-        let handle = self.transceiver.get();
+        let handle = self.0.get();
         async move {
             unsafe {
                 FutureFromDart::execute::<i32>(transceiver::get_direction(
@@ -213,7 +175,7 @@ impl Transceiver {
         &self,
         direction: TransceiverDirection,
     ) -> LocalBoxFuture<'static, ()> {
-        let handle = self.transceiver.get();
+        let handle = self.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_direction(
@@ -224,14 +186,5 @@ impl Transceiver {
             }
             .unwrap();
         })
-    }
-}
-
-impl From<DartHandle> for Transceiver {
-    fn from(handle: DartHandle) -> Self {
-        Self {
-            transceiver: handle,
-            send_track: RefCell::new(None),
-        }
     }
 }

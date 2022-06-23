@@ -22,11 +22,10 @@ All user visible changes to this project will be documented in this file. This p
 - Cargo features:
     - `client` and `server` ([#56]);
     - `serde` ([#67]);
-    - `client-api-proto` ([#68]).
+    - `client-api` ([#68]).
 
 [#55]: /../../pull/55
 [#56]: /../../pull/56
-[#65]: /../../pull/65
 [#67]: /../../pull/67
 [#68]: /../../pull/68
 

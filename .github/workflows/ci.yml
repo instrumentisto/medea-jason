@@ -141,9 +141,9 @@ jobs:
           - crate: medea-control-api-proto
             features: ["serde"]
           - crate: medea-control-api-proto
-            features: ["client-api-proto"]
+            features: ["client-api"]
           - crate: medea-control-api-proto
-            features: ["channel"]
+            features: [ "channel" ]
           - crate: medea-control-api-proto
             features: ["client"]
           - crate: medea-control-api-proto

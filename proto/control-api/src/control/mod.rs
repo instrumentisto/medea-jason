@@ -10,16 +10,14 @@ pub mod endpoint;
 pub mod member;
 pub mod room;
 
-use std::{
-    collections::{hash_map, HashMap},
-    hash::Hash,
-    str::FromStr,
-};
+use std::{collections::HashMap, str::FromStr};
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
+pub use std::collections::HashMap as Pipeline;
 
 #[doc(inline)]
 pub use self::{endpoint::Endpoint, member::Member, room::Room};
@@ -111,28 +109,28 @@ pub trait Api {
 pub enum Request {
     /// [`Room`] to be created or to apply changes to.
     Room {
-        /// ID of the [`Room`].
+        /// ID of the created [`Room`].
         id: room::Id,
 
-        /// Media [`Element`] representing this [`Room`].
-        room: room::Spec,
+        /// Spec of the created [`Room`].
+        spec: room::Spec,
     },
 
     /// [`Member`] to be created or to apply changes to.
     Member {
-        /// ID of the [`Member`].
+        /// ID of the created [`Member`].
         id: member::Id,
 
         /// ID of the [`Room`] this [`Member`] participates in.
         room_id: room::Id,
 
-        /// Media [`Element`] representing this [`Member`].
-        member: Box<member::Spec>,
+        /// Spec of the created [`Member`].
+        spec: Box<member::Spec>,
     },
 
     /// [`Endpoint`] to be created or to apply changes to.
     Endpoint {
-        /// ID of the [`Endpoint`].
+        /// ID of the created [`Endpoint`].
         id: endpoint::Id,
 
         /// ID of the [`Room`] this [`Endpoint`] belongs to.
@@ -141,26 +139,40 @@ pub enum Request {
         /// ID of the [`Member`] this [`Endpoint`] belongs to.
         member_id: member::Id,
 
-        /// Media [`Element`] representing this [`Endpoint`].
-        endpoint: endpoint::Spec,
+        /// Spec of the created [`Endpoint`].
+        spec: endpoint::Spec,
     },
 }
 
-/// Possible media elements forming a media pipeline.
+/// All possible media elements of [`ControlApi`].
+///
+/// [`ControlApi`]: Api
 #[derive(Clone, Debug, From)]
 pub enum Element {
     /// [`Room`] media element.
-    Room(room::Spec),
+    Room(Room),
 
     /// [`Member`] media element.
-    Member(Box<member::Spec>),
+    Member(Box<Member>),
 
     /// [`Endpoint`] media element.
-    Endpoint(endpoint::Spec),
+    Endpoint(Endpoint),
 }
 
 /// Collection of uniquely identified [`Element`]s.
 pub type Elements = HashMap<Fid, Element>;
+
+/// Possible [`Element`]s allowed to act as a root of [`ControlApi`] static
+/// spec.
+///
+/// [`ControlApi`]: Api
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(tag = "kind"))]
+pub enum RootElement {
+    /// [`Room`] media [`Element`].
+    Room(Room),
+}
 
 /// FID (Full ID) is a composition of media [`Element`] IDs referring to some
 /// [`Element`] on a whole media server uniquely.
@@ -279,53 +291,8 @@ pub struct Ping(pub u32);
 )]
 pub struct Pong(pub u32);
 
-/// [Control API] spec root element.
-///
-/// [Control API]: https://tinyurl.com/yxsqplq7
-#[derive(Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(tag = "kind"))]
-pub enum RootElement {
-    /// [`Room`] element.
-    Room(Room),
-}
-
-/// Entity that represents some pipeline of spec.
-#[derive(Clone, Debug, Eq, From, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-pub struct Pipeline<K: Hash + Eq, V> {
-    /// Elements contained in this [`Pipeline`].
-    pub pipeline: HashMap<K, V>,
-}
-
-impl<'a, K: Eq + Hash, V> IntoIterator for &'a Pipeline<K, V> {
-    type IntoIter = hash_map::Iter<'a, K, V>;
-    type Item = (&'a K, &'a V);
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.pipeline.iter()
-    }
-}
-
-impl<K: Eq + Hash, V> IntoIterator for Pipeline<K, V> {
-    type IntoIter = hash_map::IntoIter<K, V>;
-    type Item = (K, V);
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.pipeline.into_iter()
-    }
-}
-
-impl<K: Eq + Hash, V> FromIterator<(K, V)> for Pipeline<K, V> {
-    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
-        Self {
-            pipeline: HashMap::from_iter(iter),
-        }
-    }
-}
-
 #[cfg(all(feature = "serde", test))]
-mod tests {
+mod serialization {
     use super::{
         endpoint::{
             web_rtc_play::{self, LocalSrcUri},
@@ -335,60 +302,61 @@ mod tests {
         room, Room, RootElement,
     };
 
+    // language=YAML
     const SPEC: &str = r#"
-        kind: Room
-        id: test-call
-        spec:
-          pipeline:
-            caller:
-              kind: Member
-              credentials:
-                plain: test
-              spec:
-                pipeline:
-                  publish:
-                    kind: WebRtcPublishEndpoint
-                    spec:
-                      p2p: Always
-            some-member:
-              kind: Member
-              credentials:
-                plain: test
-              spec:
-                pipeline:
-                  publish:
-                    kind: WebRtcPublishEndpoint
-                    spec:
-                      p2p: Always
-            responder:
-              kind: Member
-              credentials:
-                plain: test
-              spec:
-                pipeline:
-                  play:
-                    kind: WebRtcPlayEndpoint
-                    spec:
-                      src: "local://test-call/caller/publish"
-                  play2:
-                    kind: WebRtcPlayEndpoint
-                    spec:
-                      src: "local://test-call/some-member/publish"
+kind: Room
+id: test-call
+spec:
+  pipeline:
+    caller:
+      kind: Member
+      spec:
+        credentials:
+          plain: test
+        pipeline:
+          publish:
+            kind: WebRtcPublishEndpoint
+            spec:
+              p2p: Always
+    some-member:
+      kind: Member
+      spec:
+        credentials:
+          plain: test
+        pipeline:
+          publish:
+            kind: WebRtcPublishEndpoint
+            spec:
+              p2p: Always
+    responder:
+      kind: Member
+      spec:
+        credentials:
+          plain: test
+        pipeline:
+          play:
+            kind: WebRtcPlayEndpoint
+            spec:
+              src: "local://test-call/caller/publish"
+          play2:
+            kind: WebRtcPlayEndpoint
+            spec:
+              src: "local://test-call/some-member/publish"
     "#;
 
     #[test]
     fn spec() {
-        let root = serde_yaml::from_str::<RootElement>(SPEC).unwrap();
         assert_eq!(
-            root,
+            serde_yaml::from_str::<RootElement>(SPEC)
+                .unwrap_or_else(|e| panic!("{e}")),
             RootElement::Room(Room {
                 id: "test-call".into(),
                 spec: room::Spec {
-                    spec: [
+                    pipeline: [
                         (
                             "caller".into(),
                             member::Spec {
-                                spec: [(
+                                pipeline: [(
                                     "publish".into(),
                                     web_rtc_publish::Spec {
                                         p2p: P2pMode::Always,
@@ -416,7 +384,7 @@ mod tests {
                         (
                             "some-member".into(),
                             member::Spec {
-                                spec: [(
+                                pipeline: [(
                                     "publish".into(),
                                     web_rtc_publish::Spec {
                                         p2p: P2pMode::Always,
@@ -444,7 +412,7 @@ mod tests {
                         (
                             "responder".into(),
                             member::Spec {
-                                spec: [
+                                pipeline: [
                                     (
                                         "play".into(),
                                         web_rtc_play::Spec {

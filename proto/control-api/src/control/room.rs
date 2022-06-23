@@ -20,28 +20,35 @@ pub struct Room {
     /// [`Element`]: crate::Element
     pub id: Id,
 
-    /// [`Room`] spec.
+    /// [`Spec`] of this [`Room`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
     pub spec: Spec,
 }
 
-/// [`Room`] spec.
+/// Spec of a [`Room`] media [`Element`].
+///
+/// [`Element`]: crate::Element
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Spec {
     /// Media pipeline representing [`Member`]s of this [`Room`].
     ///
+    /// [`Element`]: crate::Element
     /// [`Member`]: crate::Member
-    pub spec: Pipeline<member::Id, Element>,
+    pub pipeline: Pipeline<member::Id, PipelineSpec>,
 }
 
-/// Possible [`Element`]s of a [`Room`]'s [`Pipeline`].
+/// Specs of [`Element`]s allowed a [`Room`]'s [`Spec::pipeline`].
+///
+/// [`Element`]: crate::Element
 #[derive(Clone, Debug, Eq, From, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(tag = "kind"))]
-pub enum Element {
-    /// [`Member`] media [`Element`] of the [`Room`]'s [`Pipeline`].
+#[cfg_attr(feature = "serde", serde(tag = "kind", content = "spec"))]
+pub enum PipelineSpec {
+    /// [`Member`] media [`Element`].
     ///
+    /// [`Element`]: crate::Element
     /// [`Member`]: crate::Member
     Member(member::Spec),
 }
@@ -77,7 +84,7 @@ impl<'a> From<&'a str> for Id {
     }
 }
 
-#[cfg(feature = "client-api-proto")]
+#[cfg(feature = "client-api")]
 impl From<medea_client_api_proto::RoomId> for Id {
     fn from(id: medea_client_api_proto::RoomId) -> Self {
         id.0.into()
