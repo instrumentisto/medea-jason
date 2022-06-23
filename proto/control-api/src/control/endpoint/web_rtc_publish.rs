@@ -8,6 +8,8 @@ use ref_cast::RefCast;
 use serde::{Deserialize, Serialize};
 use smart_default::SmartDefault;
 
+use crate::control::endpoint;
+
 /// Media [`Element`] receiving media data from a client via [WebRTC] (allows to
 /// publish media data).
 ///
@@ -87,6 +89,12 @@ pub struct Id(Box<str>);
 impl<'a> From<&'a str> for Id {
     fn from(s: &'a str) -> Self {
         Self(s.into())
+    }
+}
+
+impl AsRef<endpoint::Id> for Id {
+    fn as_ref(&self) -> &endpoint::Id {
+        endpoint::Id::ref_cast(&self.0)
     }
 }
 
