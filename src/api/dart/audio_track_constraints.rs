@@ -2,10 +2,7 @@
 
 use std::{os::raw::c_char, ptr};
 
-use super::{
-    free_dart_native_string, propagate_panic, utils::c_str_into_string,
-    ForeignClass,
-};
+use super::{propagate_panic, utils::c_str_into_string, ForeignClass};
 
 pub use crate::media::AudioTrackConstraints;
 
@@ -27,9 +24,7 @@ pub unsafe extern "C" fn AudioTrackConstraints__device_id(
     device_id: ptr::NonNull<c_char>,
 ) {
     propagate_panic(move || {
-        let device_id_string = c_str_into_string(device_id);
-        this.as_mut().device_id(device_id_string);
-        free_dart_native_string(device_id);
+        this.as_mut().device_id(c_str_into_string(device_id));
     });
 }
 
