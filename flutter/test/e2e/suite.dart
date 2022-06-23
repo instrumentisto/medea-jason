@@ -15,9 +15,9 @@ import 'world/custom_world.dart';
 
 part 'suite.g.dart';
 
-var worlds = List<CustomWorld>.empty(growable: true);
+CustomWorld? old_world = null;
 
-var TestConfigs = FlutterTestConfiguration()
+final TestConfigs = FlutterTestConfiguration() 
   ..stepDefinitions = [
     // control_api
     then_control_api_sends_on_leave,
@@ -75,7 +75,6 @@ var TestConfigs = FlutterTestConfiguration()
     givenTwoMembers,
     givenOneMember,
   ]
-  ..hooks = []
   ..reporters = [
     StdoutReporter(MessageLevel.verbose)
       ..setWriteLineFn(print)
@@ -88,29 +87,27 @@ var TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
-  ..defaultTimeout = const Duration(seconds: 15)
+  ..defaultTimeout = const Duration(seconds: 100)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
-        worlds.forEach((element) {
-          element.members.forEach((key, value) {
-            try {
-              var room = value.room;
-              var jason = element.jasons[key]!;
-              jason.closeRoom(room);
-            } catch(e) {
-            }
-          });
-         });
-        worlds.clear();
-
+        if (old_world != null) {
+          var vl = old_world!.jasons.values.toList();
+          for (var i = 0; i < vl.length; ++i) {
+            var value = vl[i];
+            value.free();
+          }
+        }
         var world = CustomWorld();
-        worlds.add(world);
-        await world.control_client.create(world.room_id, Room(world.room_id, {}));
+        old_world = world;
+        print('\n\n\n\n');
+        await world.control_client
+            .create(world.room_id, Room(world.room_id, {}));
+        print('Create world');
         return world;
       });
 
 // @GherkinTestSuite(featurePaths: [FEATURES_PATH]) // TODO(rogurotus)
-@GherkinTestSuite(featurePaths: [ 
+@GherkinTestSuite(featurePaths: [
   // '../e2e/tests/features/given.feature',
   '../e2e/tests/features/apply.feature',
   '../e2e/tests/features/create_endpoint.feature',
@@ -129,8 +126,8 @@ var TestConfigs = FlutterTestConfiguration()
   '../e2e/tests/features/room_close.feature',
   '../e2e/tests/features/room_join.feature',
   // '../e2e/tests/features/state_synchronization.feature',
-  
-  ])
+
+])
 Future<void> main() async {
   var mediaDeviceInfos = await enumerateDevices();
   var devicesInfo = '';

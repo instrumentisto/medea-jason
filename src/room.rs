@@ -1764,7 +1764,6 @@ impl PeerEventHandler for InnerRoom {
         sender_id: MemberId,
         track: remote::Track,
     ) -> Self::Output {
-        println!("ONRT {:?}", sender_id);
         let conn = self.connections.get(&sender_id).ok_or_else(|| {
             tracerr::new!(UnknownRemoteMemberError(sender_id))
         })?;

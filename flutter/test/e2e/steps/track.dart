@@ -49,7 +49,7 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     }
 
     var actual_count = 0;
-    for (var i = 0; i < 5 && actual_count != expected_count; ++i) {
+    for (var i = 0; i < 10 && actual_count != expected_count; ++i) {
       actual_count = 0;
       member.connection_store.remote_tracks[remote_id]!.forEach((key, value) {
         var stopped_length = member.connection_store.callback_counter[key]!['stopped']!;
@@ -59,7 +59,7 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
           actual_count += 1;
         }
       });
-      await Future.delayed(Duration(milliseconds: 300));
+      await Future.delayed(Duration(milliseconds: 500));
     }
 
     expect(actual_count, expected_count);

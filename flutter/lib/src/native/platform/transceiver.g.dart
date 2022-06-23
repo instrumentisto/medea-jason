@@ -13,8 +13,11 @@ required Pointer<NativeFunction<Void Function(Handle, Bool)>> setSendTrackEnable
 required Pointer<NativeFunction<Pointer Function(Handle)>> mid,
 required Pointer<NativeFunction<Bool Function(Handle)>> hasSendTrack,
 required Pointer<NativeFunction<Handle Function(Handle, Int64)>> setDirection,
+required Pointer<NativeFunction<Handle Function(Handle, Int64)>> addDirection,
+required Pointer<NativeFunction<Handle Function(Handle, Int64)>> subDirection,
+
 } ) {
-dl.lookupFunction<Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer), void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer)>('register_transceiver')(
+dl.lookupFunction<Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer), void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer)>('register_transceiver')(
 getDirection,
 getSendTrack,
 replaceTrack,
@@ -24,4 +27,6 @@ setSendTrackEnabled,
 mid,
 hasSendTrack,
 setDirection,
+addDirection,
+subDirection,
 );}

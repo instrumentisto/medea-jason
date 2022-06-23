@@ -327,16 +327,36 @@ impl Receiver {
     }
 }
 
+#[cfg(not(target_family = "wasm"))]
 impl Drop for Receiver {
     fn drop(&mut self) {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
-            if !transceiver.is_stopped() {
-                platform::spawn(async move {
-                    transceiver
-                        .sub_direction(platform::TransceiverDirection::RECV)
-                        .await;
-                });
-            }
+            platform::spawn(async move {
+                if !transceiver.is_stopped() {
+                    if let Err(e) = transceiver.sub_direction(platform::TransceiverDirection::RECV).await {
+                        let message = e.message();
+                        if !message.contains("Cannot set direction on a stopping transceiver.") {
+                            panic!("{message}");
+                        }
+                    }
+                }
+            });
+        }
+        if let Some(recv_track) = self.track.borrow_mut().take() {
+            platform::spawn(recv_track.stop());
+        }
+    }
+}
+
+#[cfg(target_family = "wasm")]
+impl Drop for Receiver {
+    fn drop(&mut self) {
+        if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
+            platform::spawn(async move {
+                if !transceiver.is_stopped() {
+                    transceiver.sub_direction(platform::TransceiverDirection::RECV).await;
+                }
+            });
         }
         if let Some(recv_track) = self.track.borrow_mut().take() {
             platform::spawn(recv_track.stop());

@@ -291,7 +291,6 @@ impl ConnectionHandle {
         &self,
         f: platform::Function<api::RemoteMediaTrack>,
     ) -> Result<(), Traced<HandleDetachedError>> {
-        println!("SET CB");
         self.0
             .upgrade()
             .ok_or_else(|| tracerr::new!(HandleDetachedError))
@@ -299,7 +298,6 @@ impl ConnectionHandle {
                 inner.on_remote_track_added.set_func(f);
                 let mut qrt = inner.qrt.borrow_mut();
                 while let Some(track) = qrt.pop() {
-                    println!("42TEST42");
                     inner.on_remote_track_added.call1(track);
                 }
             })
@@ -530,11 +528,9 @@ impl Connection {
     /// Invokes `on_remote_track_added` callback with the provided
     /// [`remote::Track`].
     pub fn add_remote_track(&self, track: remote::Track) {
-        println!("CALL TEST");
         if self.0.on_remote_track_added.is_set() {
             self.0.on_remote_track_added.call1(track);
         } else {
-            println!("43TEST43");
             self.0.qrt.borrow_mut().push(track.into());
         }
     }

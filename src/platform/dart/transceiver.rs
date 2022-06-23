@@ -64,6 +64,18 @@ mod transceiver {
             transceiver: Dart_Handle,
             direction: i64,
         ) -> Dart_Handle;
+
+        /// todo
+        pub fn add_direction(
+            transceiver: Dart_Handle,
+            direction: i64,
+        ) -> Dart_Handle;
+
+        /// todo
+        pub fn sub_direction(
+            transceiver: Dart_Handle,
+            direction: i64,
+        ) -> Dart_Handle;
     }
 }
 
@@ -82,11 +94,16 @@ impl Transceiver {
     pub fn sub_direction(
         &self,
         disabled_direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
+    ) -> LocalBoxFuture<'static, Result<(), platform::dart::error::Error>> {
         let this = self.clone();
         Box::pin(async move {
-            this.set_direction(this.direction().await - disabled_direction)
-                .await;
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::sub_direction(
+                    this.transceiver.get(),
+                    disabled_direction.into(),
+                ))
+                .await
+            }
         })
     }
 
@@ -97,12 +114,17 @@ impl Transceiver {
     ) -> LocalBoxFuture<'static, ()> {
         let this = self.clone();
         Box::pin(async move {
-            this.set_direction(this.direction().await | enabled_direction)
-                .await;
+            unsafe {
+                let res = FutureFromDart::execute::<()>(transceiver::add_direction(
+                    this.transceiver.get(),
+                    enabled_direction.into(),
+                ))
+                .await.unwrap();
+            }
         })
     }
 
-    /// Indicates whether the provided [`TransceiverDirection`] is enabled for
+       /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.direction().await.contains(direction)
@@ -212,7 +234,7 @@ impl Transceiver {
     fn set_direction(
         &self,
         direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
+    ) -> LocalBoxFuture<'static, Result<(), platform::dart::error::Error>> {
         let handle = self.transceiver.get();
         Box::pin(async move {
             unsafe {
@@ -222,7 +244,6 @@ impl Transceiver {
                 ))
                 .await
             }
-            .unwrap();
         })
     }
 }
