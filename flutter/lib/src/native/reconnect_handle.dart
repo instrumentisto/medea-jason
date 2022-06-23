@@ -57,7 +57,6 @@ class NativeReconnectHandle extends ReconnectHandle {
     } finally {
       maxElapsedTimeMs_arg.free();
     }
-
   }
 
   @moveSemantics
