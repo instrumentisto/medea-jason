@@ -1612,6 +1612,7 @@ version = "0.8.0-dev"
 dependencies = [
  "async-trait",
  "derive_more",
+ "futures",
  "humantime-serde",
  "medea-client-api-proto 0.4.0-dev (git+https://github.com/instrumentisto/medea-jason?branch=master)",
  "prost",
