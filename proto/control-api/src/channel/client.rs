@@ -170,7 +170,7 @@ pub enum ControlApiClientError<E> {
     ///
     /// [`ControlApiServer`]: super::ControlApiServer
     #[from(ignore)]
-    ControlApiServer(E),
+    ControlApiServer(#[error(not(source))] E),
 
     /// Failed to send request to [`ControlApiServer`].
     ///

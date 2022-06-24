@@ -125,7 +125,7 @@ pub enum CallbackApiClientError<E> {
     ///
     /// [`CallbackApiServer`]: super::CallbackApiServer
     #[from(ignore)]
-    ControlApiServer(E),
+    ControlApiServer(#[error(not(source))] E),
 
     /// Failed to send request to [`CallbackApiServer`].
     ///
