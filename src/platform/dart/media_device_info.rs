@@ -5,7 +5,7 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{c_str_into_string, free_dart_native_string},
+    api::{c_str_into_string, free_dart_native_string, DartValue},
     media::MediaDeviceKind,
     platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
@@ -98,10 +98,16 @@ impl MediaDeviceInfo {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
-        Option::try_from(unsafe {
-            media_device_info::group_id(self.handle.get()).unbox()
-        })
-        .unwrap()
+        unsafe {
+            let raw = media_device_info::group_id(self.handle.get()).unbox();
+            if let DartValue::String(c_str) = raw.value() {
+                let group_id = c_str_into_string(c_str);
+                free_dart_native_string(c_str);
+                Some(group_id)
+            } else {
+                None
+            }
+        }
     }
 }
 

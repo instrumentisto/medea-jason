@@ -9,6 +9,7 @@ use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
 use crate::{
+    api::{c_str_into_string, free_dart_native_string, DartValue},
     media::track::local,
     platform,
     platform::{
@@ -143,7 +144,15 @@ impl Transceiver {
     pub fn mid(&self) -> Option<String> {
         unsafe {
             let mid = transceiver::mid(self.0.get());
-            (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
+            if let DartValue::String(c_str) =
+                (*Box::from_raw(mid.as_ptr())).value()
+            {
+                let result = c_str_into_string(c_str);
+                free_dart_native_string(c_str);
+                Some(result)
+            } else {
+                None
+            }
         }
     }
 
