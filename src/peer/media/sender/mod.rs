@@ -310,31 +310,14 @@ impl Sender {
     }
 }
 
-#[cfg(not(target_family = "wasm"))]
 impl Drop for Sender {
     fn drop(&mut self) {
         let transceiver = self.transceiver.clone();
         platform::spawn(async move {
             if !transceiver.is_stopped() {
-                if let Err(e) = transceiver.sub_direction(platform::TransceiverDirection::SEND).await {
-                    let message = e.message();
-                    if !message.contains("Cannot set direction on a stopping transceiver.") {
-                        panic!("{message}");
-                    }
-                }
-                transceiver.drop_send_track().await;
-            }
-        });
-    }
-}
-
-#[cfg(target_family = "wasm")]
-impl Drop for Sender {
-    fn drop(&mut self) {
-        let transceiver = self.transceiver.clone();
-        platform::spawn(async move {
-            if !transceiver.is_stopped() {
-                transceiver.sub_direction(platform::TransceiverDirection::SEND).await;
+                transceiver
+                    .sub_direction(platform::TransceiverDirection::SEND)
+                    .await;
                 transceiver.drop_send_track().await;
             }
         });

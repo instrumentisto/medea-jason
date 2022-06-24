@@ -123,7 +123,7 @@ impl Receiver {
             if let Some(s) = sender {
                 let trnsvr = s.transceiver();
                 trnsvr.add_direction(transceiver_direction).await;
-
+                
                 Some(trnsvr)
             } else {
                 let fut = media_connections
@@ -226,6 +226,7 @@ impl Receiver {
     ///
     /// Sets [`platform::MediaStreamTrack::enabled`] same as
     /// `enabled_individual` of this [`Receiver`].
+    #[allow(clippy::missing_panics_doc)]
     pub async fn set_remote_track(
         &self,
         transceiver: platform::Transceiver,
@@ -236,7 +237,7 @@ impl Receiver {
                 return;
             }
         }
-
+        self.set_transceiver(transceiver);
         let new_track = remote::Track::new(
             new_track,
             self.caps.media_source_kind(),
@@ -244,17 +245,17 @@ impl Receiver {
             self.media_direction.get(),
         );
 
+        let trnscvr = self.transceiver.borrow().as_ref().cloned().unwrap();
         if self.enabled_individual.get() {
-            transceiver
+            trnscvr
                 .add_direction(platform::TransceiverDirection::RECV)
                 .await;
         } else {
-            transceiver
+            trnscvr
                 .sub_direction(platform::TransceiverDirection::RECV)
                 .await;
         }
 
-        drop(self.transceiver.replace(Some(transceiver)));
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop().await;
         };
@@ -277,8 +278,10 @@ impl Receiver {
     ///
     /// No-op if provided with the same [`platform::Transceiver`] as already
     /// exists in this [`Receiver`].
-    pub fn replace_transceiver(&self, transceiver: platform::Transceiver) {
-        if self.mid.borrow().as_ref() == transceiver.mid().as_ref() {
+    pub fn set_transceiver(&self, transceiver: platform::Transceiver) {
+        if self.transceiver.borrow().is_none()
+            && self.mid.borrow().as_ref() == transceiver.mid().as_ref()
+        {
             drop(self.transceiver.replace(Some(transceiver)));
         }
     }
@@ -327,34 +330,14 @@ impl Receiver {
     }
 }
 
-#[cfg(not(target_family = "wasm"))]
 impl Drop for Receiver {
     fn drop(&mut self) {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             platform::spawn(async move {
                 if !transceiver.is_stopped() {
-                    if let Err(e) = transceiver.sub_direction(platform::TransceiverDirection::RECV).await {
-                        let message = e.message();
-                        if !message.contains("Cannot set direction on a stopping transceiver.") {
-                            panic!("{message}");
-                        }
-                    }
-                }
-            });
-        }
-        if let Some(recv_track) = self.track.borrow_mut().take() {
-            platform::spawn(recv_track.stop());
-        }
-    }
-}
-
-#[cfg(target_family = "wasm")]
-impl Drop for Receiver {
-    fn drop(&mut self) {
-        if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
-            platform::spawn(async move {
-                if !transceiver.is_stopped() {
-                    transceiver.sub_direction(platform::TransceiverDirection::RECV).await;
+                    transceiver
+                        .sub_direction(platform::TransceiverDirection::RECV)
+                        .await;
                 }
             });
         }
