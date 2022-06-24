@@ -83,8 +83,8 @@ pub enum Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types(String, web_rtc_publish::Id, web_rtc_play::Id))]
-#[into(owned(types(String)))]
+#[from(types(String, web_rtc_play::Id, web_rtc_publish::Id))]
+#[into(owned(types(String, web_rtc_play::Id, web_rtc_publish::Id)))]
 #[repr(transparent)]
 pub struct Id(Box<str>);
 
@@ -92,5 +92,17 @@ pub struct Id(Box<str>);
 impl<'a> From<&'a str> for Id {
     fn from(s: &'a str) -> Self {
         Self(s.into())
+    }
+}
+
+impl AsRef<web_rtc_play::Id> for Id {
+    fn as_ref(&self) -> &web_rtc_play::Id {
+        web_rtc_play::Id::ref_cast(&self.0)
+    }
+}
+
+impl AsRef<web_rtc_publish::Id> for Id {
+    fn as_ref(&self) -> &web_rtc_publish::Id {
+        web_rtc_publish::Id::ref_cast(&self.0)
     }
 }
