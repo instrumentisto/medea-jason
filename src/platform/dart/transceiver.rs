@@ -145,7 +145,7 @@ impl Transceiver {
         unsafe {
             let mid = transceiver::mid(self.0.get());
             if let DartValue::String(c_str) =
-                (*Box::from_raw(mid.as_ptr())).value()
+                (*Box::from_raw(mid.as_ptr())).into_value()
             {
                 let result = c_str_into_string(c_str);
                 free_dart_native_string(c_str);
