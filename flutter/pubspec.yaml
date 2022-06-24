@@ -31,5 +31,7 @@ flutter:
         pluginClass: MedeaJasonPlugin
       windows:
         pluginClass: MedeaJasonPlugin
+      macos:
+        pluginClass: MedeaJasonPlugin
   assets:
     - assets/pkg/

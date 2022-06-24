@@ -36,6 +36,7 @@ ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
 LINUX_TARGETS := x86_64-unknown-linux-gnu
+DARWIN_TARGETS := x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
@@ -220,6 +221,7 @@ cargo:
 cargo-build-platform = $(or $(platform),web)
 cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
 cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
+cargo-build-targets-darwin = $(or $(targets),$(DARWIN_TARGETS))
 cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
@@ -274,6 +276,10 @@ ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
 		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
+ifeq ($(cargo-build-platform),macos)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-darwin)),\
+		$(call cargo.build.medea-jason.darwin,$(target),$(debug)))
+endif
 endif
 endif
 define cargo.build.medea-jason.android
@@ -303,6 +309,16 @@ define cargo.build.medea-jason.windows
 	@mkdir -p ./flutter/windows/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
 	      ./flutter/windows/lib/$(target)/medea_jason.dll
+endef
+define cargo.build.medea-jason.darwin
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/macos/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dylib \
+	      ./flutter/macos/lib/$(target)/medea_jason.dll
 endef
 
 
@@ -355,7 +371,7 @@ endif
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(WEB_TARGETS) $(WINDOWS_TARGETS)),\
+		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(WEB_TARGETS) $(WINDOWS_TARGETS) $(DARWIN_TARGETS)),\
 			$(call cargo.lint.medea-jason,$(target)))
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
@@ -380,7 +396,8 @@ cargo.version:
 rustup-targets = $(ANDROID_TARGETS) \
                  $(LINUX_TARGETS) \
                  $(WEB_TARGETS) \
-                 $(WINDOWS_TARGETS)
+                 $(WINDOWS_TARGETS) \
+                 $(DARWIN_TARGETS)
 ifeq ($(only),android)
 rustup-targets = $(ANDROID_TARGETS)
 endif
@@ -392,6 +409,9 @@ rustup-targets = $(WEB_TARGETS)
 endif
 ifeq ($(only),windows)
 rustup-targets = $(WINDOWS_TARGETS)
+endif
+ifeq ($(only),macos)
+rustup-targets = $(DARWIN_TARGETS)
 endif
 
 rustup.targets:
