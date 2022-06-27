@@ -110,11 +110,9 @@ packages:
   flutter_webrtc:
     dependency: transitive
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: b844eb2b73a1f9e477a941b254810a1bb8d4f54d
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
+      path: "../../../flutter-webrtc"
+      relative: true
+    source: path
     version: "0.8.0-dev"
   freezed_annotation:
     dependency: transitive
