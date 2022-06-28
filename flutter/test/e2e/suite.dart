@@ -15,7 +15,7 @@ import 'world/custom_world.dart';
 
 part 'suite.g.dart';
 
-CustomWorld? old_world = null;
+CustomWorld? old_world;
 
 final TestConfigs = FlutterTestConfiguration()
   ..stepDefinitions = [

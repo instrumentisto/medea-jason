@@ -182,9 +182,6 @@ struct InnerConnection {
     /// Callback invoked when a [`remote::Track`] is received.
     on_remote_track_added: platform::Callback<api::RemoteMediaTrack>,
 
-    /// queue rTrack
-    qrt: RefCell<Vec<api::RemoteMediaTrack>>,
-
     /// Individual [`RecvConstraints`] of this [`Connection`].
     recv_constraints: Rc<RecvConstraints>,
 
@@ -294,13 +291,7 @@ impl ConnectionHandle {
         self.0
             .upgrade()
             .ok_or_else(|| tracerr::new!(HandleDetachedError))
-            .map(|inner| {
-                inner.on_remote_track_added.set_func(f);
-                let mut qrt = inner.qrt.borrow_mut();
-                while let Some(track) = qrt.pop() {
-                    inner.on_remote_track_added.call1(track);
-                }
-            })
+            .map(|inner| inner.on_remote_track_added.set_func(f))
     }
 
     /// Sets callback, invoked when a connection quality score is updated by
@@ -473,7 +464,6 @@ impl Connection {
             recv_constraints,
             on_close: platform::Callback::default(),
             on_remote_track_added: platform::Callback::default(),
-            qrt: RefCell::default(),
             receivers: RefCell::default(),
         }))
     }
@@ -528,11 +518,7 @@ impl Connection {
     /// Invokes `on_remote_track_added` callback with the provided
     /// [`remote::Track`].
     pub fn add_remote_track(&self, track: remote::Track) {
-        if self.0.on_remote_track_added.is_set() {
-            self.0.on_remote_track_added.call1(track);
-        } else {
-            self.0.qrt.borrow_mut().push(track.into());
-        }
+        self.0.on_remote_track_added.call1(track);
     }
 
     /// Creates a new external handle to this [`Connection`].

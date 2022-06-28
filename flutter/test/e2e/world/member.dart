@@ -70,6 +70,28 @@ class ConnectionStore {
 
   /// Callback calls after [RoomHandle.onLocalTrack].
   Function(LocalMediaTrack) OnLocalTrack = (_) {};
+
+  /// Returns stopped of track from `remote_id` by the provided `track_id`.
+  bool remote_track_is_stopped(String remote_id, String track_id) {
+    var tracks = remote_tracks[remote_id]![track_id]!;
+    var stopped_length = callback_counter[track_id]!['stopped']!;
+    var all_length = tracks.length;
+    return stopped_length == all_length;
+  }
+
+  /// Returns count of tracks from `remote_id` by the provided `live` values.
+  int count_tracks_by_selector(bool live, String remote_id) {
+    var count = 0;
+    remote_tracks[remote_id]!.forEach((key, value) {
+      var track_stopped = remote_track_is_stopped(remote_id, key);
+      if (live && !value.last.muted() && !track_stopped) {
+        count += 1;
+      } else if (!live && track_stopped) {
+        count += 1;
+      }
+    });
+    return count;
+  }
 }
 
 /// Representing a `Member` connected to a media server.

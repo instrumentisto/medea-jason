@@ -42,25 +42,12 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
   (id, expected_count, live_or_stopped, remote_id, context) async {
     var member = context.world.members[id]!;
     await context.world.wait_for_interconnection(id);
-    bool stopped;
-    if (live_or_stopped == 'live') {
-      stopped = false;
-    } else {
-      stopped = true;
-    }
+    var live = (live_or_stopped == 'live');
 
     var actual_count = 0;
     for (var i = 0; i < 10 && actual_count != expected_count; ++i) {
-      actual_count = 0;
-      member.connection_store.remote_tracks[remote_id]!.forEach((key, value) {
-        var stopped_length =
-            member.connection_store.callback_counter[key]!['stopped']!;
-        var all_length = value.length;
-        var track_stopped = stopped_length == all_length;
-        if (stopped == track_stopped) {
-          actual_count += 1;
-        }
-      });
+      actual_count =
+          member.connection_store.count_tracks_by_selector(live, remote_id);
       await Future.delayed(Duration(milliseconds: 500));
     }
 
