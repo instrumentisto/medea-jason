@@ -131,15 +131,14 @@ impl Transceiver {
                     track.platform_track().handle(),
                 ))
                 .await
-            }
-            .unwrap();
+            }?;
         } else {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::drop_sender(
                     self.0.get(),
                 ))
                 .await
-            }.unwrap()
+            }?;
         }
         Ok(())
     }
