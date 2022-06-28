@@ -40,7 +40,7 @@ impl<T: CallbackApi> CallbackApiServer<T> {
     #[allow(clippy::map_err_ignore)]
     pub async fn run(mut self) -> Result<(), SendErr> {
         while let Some(ev) = self.receiver.next().await {
-            ev.response
+            ev.sender
                 .send(self.api.on_event(ev.request).await)
                 .map_err(|_| SendErr)?;
         }
@@ -83,10 +83,7 @@ where
         let (sender, receiver) = oneshot::channel();
         self.sender
             .clone()
-            .unbounded_send(ControlApiRequest::Create {
-                request,
-                response: sender,
-            })
+            .unbounded_send(ControlApiRequest::Create { request, sender })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
             Ok(Ok(ok)) => Ok(ok),
@@ -102,10 +99,7 @@ where
         let (sender, receiver) = oneshot::channel();
         self.sender
             .clone()
-            .unbounded_send(ControlApiRequest::Apply {
-                request,
-                response: sender,
-            })
+            .unbounded_send(ControlApiRequest::Apply { request, sender })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
             Ok(Ok(ok)) => Ok(ok),
@@ -120,7 +114,7 @@ where
             .clone()
             .unbounded_send(ControlApiRequest::Delete {
                 request: fids.to_vec(),
-                response: sender,
+                sender,
             })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
@@ -136,7 +130,7 @@ where
             .clone()
             .unbounded_send(ControlApiRequest::Get {
                 request: fids.to_vec(),
-                response: sender,
+                sender,
             })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
@@ -150,10 +144,7 @@ where
         let (sender, receiver) = oneshot::channel();
         self.sender
             .clone()
-            .unbounded_send(ControlApiRequest::Healthz {
-                request,
-                response: sender,
-            })
+            .unbounded_send(ControlApiRequest::Healthz { request, sender })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
             Ok(Ok(ok)) => Ok(ok),

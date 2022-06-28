@@ -67,7 +67,7 @@ pub(crate) enum ControlApiRequest<Error> {
         request: control::Request,
 
         /// [`oneshot::Sender`] to send [`ControlApi::create()`] response.
-        response: oneshot::Sender<Result<member::Sids, Error>>,
+        sender: oneshot::Sender<Result<member::Sids, Error>>,
     },
 
     /// [`ControlApi::apply()`].
@@ -76,7 +76,7 @@ pub(crate) enum ControlApiRequest<Error> {
         request: control::Request,
 
         /// [`oneshot::Sender`] to send [`ControlApi::apply()`] response.
-        response: oneshot::Sender<Result<member::Sids, Error>>,
+        sender: oneshot::Sender<Result<member::Sids, Error>>,
     },
 
     /// [`ControlApi::delete()`].
@@ -85,7 +85,7 @@ pub(crate) enum ControlApiRequest<Error> {
         request: Vec<Fid>,
 
         /// [`oneshot::Sender`] to send [`ControlApi::delete()`] response.
-        response: oneshot::Sender<Result<(), Error>>,
+        sender: oneshot::Sender<Result<(), Error>>,
     },
 
     /// [`ControlApi::get()`].
@@ -94,7 +94,7 @@ pub(crate) enum ControlApiRequest<Error> {
         request: Vec<Fid>,
 
         /// [`oneshot::Sender`] to send [`ControlApi::get()`] response.
-        response: oneshot::Sender<Result<Elements, Error>>,
+        sender: oneshot::Sender<Result<Elements, Error>>,
     },
 
     /// [`ControlApi::healthz()`].
@@ -103,7 +103,7 @@ pub(crate) enum ControlApiRequest<Error> {
         request: Ping,
 
         /// [`oneshot::Sender`] to send [`ControlApi::healthz()`] response.
-        response: oneshot::Sender<Result<Pong, Error>>,
+        sender: oneshot::Sender<Result<Pong, Error>>,
     },
 }
 
@@ -114,5 +114,5 @@ pub(crate) struct CallbackApiRequest<Error> {
     request: callback::Request,
 
     /// [`oneshot::Sender`] to send [`CallbackApi::on_event()`] response.
-    response: oneshot::Sender<Result<(), Error>>,
+    sender: oneshot::Sender<Result<(), Error>>,
 }

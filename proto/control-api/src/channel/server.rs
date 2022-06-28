@@ -40,28 +40,28 @@ impl<T: ControlApi> ControlApiServer<T> {
     pub async fn run(mut self) -> Result<(), SendErr> {
         while let Some(request) = self.receiver.next().await {
             match request {
-                ControlApiRequest::Create { request, response } => {
-                    response
+                ControlApiRequest::Create { request, sender } => {
+                    sender
                         .send(self.api.create(request).await)
                         .map_err(|_| SendErr)?;
                 }
-                ControlApiRequest::Apply { request, response } => {
-                    response
+                ControlApiRequest::Apply { request, sender } => {
+                    sender
                         .send(self.api.apply(request).await)
                         .map_err(|_| SendErr)?;
                 }
-                ControlApiRequest::Delete { request, response } => {
-                    response
+                ControlApiRequest::Delete { request, sender } => {
+                    sender
                         .send(self.api.delete(&request).await)
                         .map_err(|_| SendErr)?;
                 }
-                ControlApiRequest::Get { request, response } => {
-                    response
+                ControlApiRequest::Get { request, sender } => {
+                    sender
                         .send(self.api.get(&request).await)
                         .map_err(|_| SendErr)?;
                 }
-                ControlApiRequest::Healthz { request, response } => {
-                    response
+                ControlApiRequest::Healthz { request, sender } => {
+                    sender
                         .send(self.api.healthz(request).await)
                         .map_err(|_| SendErr)?;
                 }
@@ -105,10 +105,7 @@ where
         let (sender, receiver) = oneshot::channel();
         self.sender
             .clone()
-            .unbounded_send(CallbackApiRequest {
-                request,
-                response: sender,
-            })
+            .unbounded_send(CallbackApiRequest { request, sender })
             .map_err(mpsc::TrySendError::into_send_error)?;
         match receiver.await {
             Ok(Ok(())) => Ok(()),
