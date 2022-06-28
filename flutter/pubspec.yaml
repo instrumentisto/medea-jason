@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^1.0.0
+  ffi: ^2.0.0
   flutter_webrtc:
     # path: /media/human/2AC6C562C6C52EBF/Work/Linux/Docs/flutter-webrtc/
     git:

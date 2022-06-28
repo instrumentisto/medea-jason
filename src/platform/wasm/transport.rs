@@ -7,7 +7,7 @@ use std::{cell::RefCell, rc::Rc};
 use async_trait::async_trait;
 use derive_more::{From, Into};
 use futures::{channel::mpsc, stream::LocalBoxStream, StreamExt};
-use medea_client_api_proto::{ClientMsg, CloseDescription, ServerMsg};
+use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_reactive::ObservableCell;
 use tracerr::Traced;
 use web_sys::{CloseEvent, Event, MessageEvent, WebSocket as SysWebSocket};
@@ -145,9 +145,9 @@ impl WebSocketRpcTransport {
             Rc::new(socket),
             "close",
             move |msg: CloseEvent| {
-                this.borrow()
-                    .socket_state
-                    .set(TransportState::Closed(CloseMsg::from(&msg)));
+                this.borrow().socket_state.set(TransportState::Closed(
+                    CloseMsg::from((msg.code(), msg.reason())),
+                ));
             },
         )
         .unwrap();
@@ -205,7 +205,10 @@ impl RpcTransport for WebSocketRpcTransport {
                         "close",
                         move |msg: CloseEvent| {
                             inner.borrow().socket_state.set(
-                                TransportState::Closed(CloseMsg::from(&msg)),
+                                TransportState::Closed(CloseMsg::from((
+                                    msg.code(),
+                                    msg.reason(),
+                                ))),
                             );
                         },
                     )
@@ -293,23 +296,5 @@ impl Drop for WebSocketRpcTransport {
         drop(inner.on_open_listener.take());
         drop(inner.on_message_listener.take());
         drop(inner.on_close_listener.take());
-    }
-}
-
-impl From<&CloseEvent> for CloseMsg {
-    fn from(event: &CloseEvent) -> Self {
-        let code: u16 = event.code();
-        match code {
-            1000 => {
-                if let Ok(description) =
-                    serde_json::from_str::<CloseDescription>(&event.reason())
-                {
-                    Self::Normal(code, description.reason)
-                } else {
-                    Self::Abnormal(code)
-                }
-            }
-            _ => Self::Abnormal(code),
-        }
     }
 }

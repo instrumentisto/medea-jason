@@ -40,21 +40,23 @@ jobs:
             profile: minimal
             toolchain: stable
 
-        - uses: Swatinem/rust-cache@v1
-          if: ${{ matrix.platform != 'windows'
-                  && !contains(github.event.head_commit.message, '[fresh ci]') }}
-          
-        - uses: subosito/flutter-action@v2
-        - run: flutter config --enable-linux-desktop
-          if: ${{ matrix.platform == 'linux' }}
-        - name: Install Flutter Linux dependencies
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y \
-                        cmake \
-                        libgtk-3-dev liblzma-dev libpulse-dev \
-                        ninja-build pkg-config xvfb
-          if: ${{ matrix.platform == 'linux' }}
+  pr:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs:
+      - clippy
+      - crate-jason
+      - dartanalyze
+      - dartfmt
+      - docker
+      - helm-lint
+      - rustdoc
+      - rustfmt
+      - test-e2e
+      - test-flutter
+      - test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - run: true
 
         - run: make cargo.build.jason platform=${{ matrix.platform }}
 
@@ -78,11 +80,17 @@ jobs:
                             -p ${{ secrets.MEDEA_DOCKER_PASS }}
                             hub.instrumentisto.com
 
-        - uses: jetli/wasm-pack-action@v0.3.0
-        - name: Desktop
-          run: xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
-                            medea-tag=${{ env.MEDEA_BRANCH }}
-                            control-tag=build-${{ github.run_number }}
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: clippy
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
   # test-flutter:
   #   name: Flutter tests
@@ -119,17 +127,15 @@ jobs:
   #         use-tool-cache: true
   #       if: ${{ matrix.platform == 'android' }}
 
-  #     - uses: subosito/flutter-action@v2
-  #     - run: flutter config --enable-linux-desktop
-  #       if: ${{ matrix.platform == 'linux' }}
-  #     - name: Install Flutter Linux dependencies
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y \
-  #                      cmake \
-  #                      libgtk-3-dev liblzma-dev libpulse-dev \
-  #                      ninja-build pkg-config xvfb
-  #       if: ${{ matrix.platform == 'linux' }}
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          components: rustfmt
 
   #     - run: make cargo.build.jason platform=${{ matrix.platform }}
   #                                   args="--features mockable"
@@ -137,68 +143,43 @@ jobs:
   #                                       && 'targets=x86_64'
   #                                       || '' }}
 
-  #     - name: Parse Android NDK versions
-  #       id: ndk-version
-  #       run: |
-  #         echo ::set-output name=min::$(make flutter.android.version.min)
-  #         echo ::set-output name=target::$(make flutter.android.version.compile)
-  #       if: ${{ matrix.platform == 'android' }}
-  #     - name: Test on min Android NDK version
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ steps.ndk-version.outputs.min }}
-  #         target: google_apis
-  #         arch: x86_64
-  #         profile: Nexus 6
-  #         script: make test.flutter
-  #       if: ${{ matrix.platform == 'android' }}
-  #     - name: Test on target Android NDK version
-  #       uses: reactivecircus/android-emulator-runner@v2
-  #       with:
-  #         api-level: ${{ steps.ndk-version.outputs.target }}
-  #         target: google_apis
-  #         arch: x86_64
-  #         profile: Nexus 6
-  #         script: make test.flutter
-  #       if: ${{ matrix.platform == 'android' }}
+  helm-lint:
+    name: Lint Helm chart
+    if: ${{ github.ref == 'refs/heads/master'
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      matrix:
+        chart:
+          - medea-demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/setup-helm@v2.1
 
   #     - run: xvfb-run -a make test.flutter device=linux
   #       if: ${{ matrix.platform == 'linux' }}
 
-  #     - run: make test.flutter device=windows
-  #       if: ${{ matrix.platform == 'windows' }}
+  dartfmt:
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
 
   # ############
   # # Building #
   # ############
 
-  # crate-jason:
-  #   name: Build medea-jason
-  #   if: ${{ github.ref == 'refs/heads/master'
-  #           || startsWith(github.ref, 'refs/tags/medea-jason-')
-  #           || (!startsWith(github.ref, 'refs/tags/medea-')
-  #               && !contains(github.event.head_commit.message, '[skip ci]')) }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       include:
-  #         - platform: android
-  #           os: ubuntu
-  #         - platform: linux
-  #           os: ubuntu
-  #         - platform: web
-  #           os: ubuntu
-  #         - platform: windows
-  #           os: windows
-  #   runs-on: ${{ matrix.os }}-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #     - uses: Swatinem/rust-cache@v1
-  #       if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+  dartanalyze:
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
 
   #     - run: make rustup.targets only=android
   #       if: ${{ matrix.platform == 'android' }}
@@ -238,9 +219,13 @@ jobs:
   #       if: ${{ startsWith(github.ref, 'refs/tags/medea-macro-')
   #               || !startsWith(github.ref, 'refs/tags/medea-') }}
 
-  #     - run: make docs.rust crate=medea-reactive open=no
-  #       if: ${{ startsWith(github.ref, 'refs/tags/medea-reactive-')
-  #               || !startsWith(github.ref, 'refs/tags/medea-') }}
+  test-unit:
+    name: Unit tests
+    strategy:
+      matrix:
+        include:
+          - crate: medea-macro
+            features: ["all"]
 
   #     - run: make docs.rust crate=medea-client-api-proto open=no
   #       if: ${{ startsWith(github.ref, 'refs/tags/medea-client-api-proto-')
@@ -250,15 +235,318 @@ jobs:
   #       if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-proto-')
   #               || !startsWith(github.ref, 'refs/tags/medea-') }}
 
-  #     - run: make docs.rust crate=medea-jason open=no
-  #       if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
-  #               || !startsWith(github.ref, 'refs/tags/medea-') }}
+          - crate: medea-control-api-proto
+            features: ["all"]
+          - crate: medea-control-api-proto
+            features: ["grpc"]
+          - crate: medea-control-api-proto
+            features: ["serde"]
+          - crate: medea-control-api-proto
+            features: ["client-api"]
+          - crate: medea-control-api-proto
+            features: ["client"]
+          - crate: medea-control-api-proto
+            features: ["server"]
+          - crate: medea-control-api-proto
+            features: ["grpc", "client"]
+          - crate: medea-control-api-proto
+            features: ["grpc", "server"]
+
+          - crate: medea-jason
+            wasm: true
+    runs-on: ubuntu-latest
+    steps:
+      - id: skip
+        run: echo ::set-output name=no::${{
+               startsWith(github.ref, format('refs/tags/{0}-', matrix.crate))
+               || !startsWith(github.ref, 'refs/tags/medea-')
+             }}
+
+      - uses: actions/checkout@v3
+        if: ${{ steps.skip.outputs.no }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+        if: ${{ steps.skip.outputs.no && !matrix.wasm }}
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: wasm32-unknown-unknown
+        if: ${{ steps.skip.outputs.no && matrix.wasm }}
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ steps.skip.outputs.no
+                && !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - name: Parse wasm-bindgen-cli version from Cargo.lock
+        id: wasm-cli
+        run: echo ::set-output
+                  name=VERSION::$(cargo pkgid wasm-bindgen | grep -o '#.*'
+                                                           | grep -o '[0-9\.]*')
+        if: ${{ steps.skip.outputs.no && matrix.wasm }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: wasm-bindgen-cli
+          version: ${{ steps.wasm-cli.outputs.VERSION }}
+          use-tool-cache: true
+        if: ${{ steps.skip.outputs.no && matrix.wasm }}
+
+      - name: Chrome
+        run: make test.unit crate=${{ matrix.crate }} browser=chrome
+        if: ${{ steps.skip.outputs.no && matrix.crate == 'medea-jason' }}
+      - name: Firefox
+        run: make test.unit crate=${{ matrix.crate }} browser=firefox
+        if: ${{ steps.skip.outputs.no && matrix.crate == 'medea-jason' }}
+
+      - run: make test.unit crate=${{ matrix.crate }}
+                            features=${{ join(matrix.features, ',') }}
+        if: ${{ steps.skip.outputs.no && matrix.crate != 'medea-jason' }}
+
+  test-e2e:
+    name: E2E tests
+    needs: ["docker"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        with:
+          key: test-e2e-{hash}
+          restore-keys: test-e2e-
+        continue-on-error: true
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: wasm-pack
+          use-tool-cache: true
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: docker-medea-control-api-mock-${{ github.run_number }}
+      - name: Unpack `medea-control-api-mock` Docker image
+        run: make docker.untar from-file=image.tar
+
+      - name: Login to Medea Docker registry
+        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+                          -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                          hub.instrumentisto.com
+
+      - name: Pull edge Medea Docker image
+        run: docker pull hub.instrumentisto.com/streaming/medea:edge
+        if: ${{ env.MEDEA_BRANCH == 'edge' }}
+      - name: Pull review Medea Docker image
+        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
+        if: ${{ env.MEDEA_BRANCH != 'edge' }}
+
+      - name: Chrome
+        run: make test.e2e browser=chrome up=yes debug=no dockerized=yes
+                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           control-tag=build-${{ github.run_number }}
+      - name: Firefox
+        run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
+                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           control-tag=build-${{ github.run_number }}
+
+  test-flutter:
+    name: Flutter tests
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: macos-latest
+          - platform: linux
+            os: ubuntu-22.04
+          - platform: windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ matrix.platform != 'windows'
+                && !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - run: make rustup.targets only=android
+        if: ${{ matrix.platform == 'android' }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.platform == 'android' }}
+
+      - uses: subosito/flutter-action@v2
+      - run: flutter config --enable-linux-desktop
+        if: ${{ matrix.platform == 'linux' }}
+      - name: Install Flutter Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+                       cmake \
+                       libgtk-3-dev liblzma-dev libpulse-dev \
+                       ninja-build pkg-config xvfb
+        if: ${{ matrix.platform == 'linux' }}
+
+      # TODO: Rust doesn't support NDK >= 23:
+      #       https://github.com/rust-lang/rust/pull/85806
+      #       https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_HOME=$HOME/Library/Android/sdk
+          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          echo y | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    args="--features mockable"
+                                    ${{ matrix.platform == 'android'
+                                        && 'targets=x86_64'
+                                        || '' }}
+
+      - name: Parse Android API versions
+        id: api-version
+        run: |
+          echo ::set-output name=min::$(make flutter.android.version.min)
+          echo ::set-output name=target::$(make flutter.android.version.compile)
+        if: ${{ matrix.platform == 'android' }}
+      - name: Test on min Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.min }}
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: make test.flutter
+        if: ${{ matrix.platform == 'android' }}
+      - name: Test on target Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.target }}
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: make test.flutter
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: xvfb-run -a make test.flutter device=linux
+        if: ${{ matrix.platform == 'linux' }}
+
+      - run: make test.flutter device=windows
+        if: ${{ matrix.platform == 'windows' }}
+
+  ############
+  # Building #
+  ############
+
+  crate-jason:
+    name: Build medea-jason
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu
+          - platform: linux
+            os: ubuntu
+          - platform: web
+            os: ubuntu
+          - platform: windows
+            os: windows
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - run: make rustup.targets only=android
+        if: ${{ matrix.platform == 'android' }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: make rustup.targets only=web
+        if: ${{ matrix.platform == 'web' }}
+      - uses: jetli/wasm-pack-action@v0.3.0
+        if: ${{ matrix.platform == 'web' }}
+
+      - uses: dart-lang/setup-dart@v1
+        if: ${{ matrix.platform == 'windows' }}
+
+      # TODO: Rust doesn't support NDK >= 23:
+      #       https://github.com/rust-lang/rust/pull/85806
+      #       https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_ROOT=/usr/local/lib/android
+          ANDROID_SDK_ROOT=${ANDROID_ROOT}/sdk
+          SDKMANAGER=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
+          ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+          echo "y" | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    dockerized=no debug=yes
+
+  rustdoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      # Run all task sequentially to not flood the jobs list.
+      - run: make docs.rust crate=medea-macro open=no
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-macro-')
+                || !startsWith(github.ref, 'refs/tags/medea-') }}
+
+      - run: make docs.rust crate=medea-reactive open=no
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-reactive-')
+                || !startsWith(github.ref, 'refs/tags/medea-') }}
+
+      - run: make docs.rust crate=medea-client-api-proto open=no
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-client-api-proto-')
+                || !startsWith(github.ref, 'refs/tags/medea-') }}
+
+      - run: make docs.rust crate=medea-control-api-proto open=no
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-proto-')
+                || !startsWith(github.ref, 'refs/tags/medea-') }}
+
+      - run: make docs.rust crate=medea-jason open=no
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
+                || !startsWith(github.ref, 'refs/tags/medea-') }}
 
   docker:
     name: Docker image
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       matrix:
         include:

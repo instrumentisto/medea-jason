@@ -12,11 +12,9 @@ void registerFunctions(DynamicLibrary dl) {
     getDirection: Pointer.fromFunction(_getDirection),
     replaceTrack: Pointer.fromFunction(_replaceSendTrack),
     getSendTrack: Pointer.fromFunction(_getSendTrack),
-    setSendTrackEnabled: Pointer.fromFunction(_setSendTrackEnabled),
     dropSender: Pointer.fromFunction(_dropSender),
     isStopped: Pointer.fromFunction(_isStopped, true),
     mid: Pointer.fromFunction(_mid),
-    hasSendTrack: Pointer.fromFunction(_hasSendTrack, false),
     setDirection: Pointer.fromFunction(_setDirection),
     setRecv: Pointer.fromFunction(_setRecv),
     setSend: Pointer.fromFunction(_setSend),
@@ -65,32 +63,18 @@ Pointer _getSendTrack(RtpTransceiver transceiver) {
   }
 }
 
-/// Indicates whether the provided [RtpTransceiver]'s [RtpTransceiver.sender]
-/// has some [MediaStreamTrack].
-bool _hasSendTrack(RtpTransceiver transceiver) {
-  return transceiver.sender.track != null;
-}
-
 /// Replaces [RtpTransceiver.sender]'s [MediaStreamTrack] of the provided
 /// [RtpTransceiver] with a provided [MediaStreamTrack].
 Object _replaceSendTrack(RtpTransceiver transceiver, MediaStreamTrack track) {
   return () => transceiver.sender.replaceTrack(track);
 }
 
-/// Sets [MediaStreamTrack.enabled] status in the [RtpTransceiver.sender] of the
-/// provided [RtpTransceiver].
-void _setSendTrackEnabled(RtpTransceiver transceiver, bool enabled) {
-  if (transceiver.sender.track != null) {
-    transceiver.sender.track!.setEnabled(enabled);
-  }
-}
-
 /// Drops the [RtpTransceiver.sender] of the provided [RtpTransceiver].
 Object _dropSender(RtpTransceiver transceiver) {
   if (transceiver.sender.track == null) {
-    return () => Future.value();
+    return () => transceiver.sender.replaceTrack(null);
   } else {
-    return () => transceiver.sender.track!.stop();
+    return () => Future.value();
   }
 }
 
