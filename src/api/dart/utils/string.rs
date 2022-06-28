@@ -79,6 +79,6 @@ pub unsafe extern "C" fn register_free_dart_native_string(
 ///
 /// `FREE_DART_NATIVE_STRING` function must be registered and the provided
 /// pointer must be a valid native string.
-pub unsafe fn free_dart_native_string(s: ptr::NonNull<c_char>) {
-    // todo FREE_DART_NATIVE_STRING.unwrap()(s);
+pub unsafe fn free_dart_native_string(_: ptr::NonNull<c_char>) {
+    // TODO(rogurotus): uncomment after #69 FREE_DART_NATIVE_STRING.unwrap()(s);
 }

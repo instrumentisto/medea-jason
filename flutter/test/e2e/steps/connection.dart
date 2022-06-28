@@ -1,9 +1,9 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
+
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 
 StepDefinitionGeneric then_connection_closes =
     then2<String, String, CustomWorld>(

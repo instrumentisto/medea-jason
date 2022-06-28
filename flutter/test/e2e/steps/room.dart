@@ -1,5 +1,6 @@
-import 'package:gherkin/gherkin.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gherkin/gherkin.dart';
+
 import '../world/custom_world.dart';
 
 StepDefinitionGeneric then_on_close_fires = then2<String, String, CustomWorld>(

@@ -90,7 +90,6 @@ enum P2pMode {
   IfPossible,
 }
 
-
 /// Publishing policy of the video or audio media type in the
 /// [WebRtcPublishEndpoint].
 enum PublishPolicy {

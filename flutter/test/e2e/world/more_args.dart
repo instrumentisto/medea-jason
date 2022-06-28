@@ -1,7 +1,7 @@
-
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_jason/src/interface/track_kinds.dart';
 import 'package:tuple/tuple.dart';
+
+import 'package:medea_jason/src/interface/track_kinds.dart';
 
 StepDefinitionGeneric<TWorld> step6<TWorld extends World, TInput1, TInput2,
     TInput3, TInput4, TInput5, TInput6>(
@@ -126,8 +126,8 @@ StepDefinitionGeneric<TWorld> given8<TInput1, TInput2, TInput3, TInput4,
       onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
-    step8<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6,
-        TInput7, TInput8>(
+    step8<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6, TInput7,
+        TInput8>(
       pattern,
       8,
       onInvoke,
@@ -152,8 +152,8 @@ StepDefinitionGeneric<TWorld> given9<TInput1, TInput2, TInput3, TInput4,
       onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
-    step9<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6,
-        TInput7, TInput8, TInput9>(
+    step9<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6, TInput7,
+        TInput8, TInput9>(
       pattern,
       9,
       onInvoke,

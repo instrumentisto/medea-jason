@@ -2,10 +2,11 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter_gherkin/flutter_gherkin.dart';
-import 'package:medea_jason/medea_jason.dart';
-import 'package:tuple/tuple.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tuple/tuple.dart';
+import 'package:uuid/uuid.dart';
 
+import 'package:medea_jason/medea_jason.dart';
 import '../api/callback.dart';
 import '../api/endpoint.dart';
 import '../api/member.dart' as api;
@@ -13,7 +14,6 @@ import '../api/room.dart';
 import '../conf.dart';
 import '../control.dart';
 import 'member.dart';
-import 'package:uuid/uuid.dart';
 
 /// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
@@ -220,7 +220,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
             (element.value.is_recv || element.value.is_send))
         .toList();
     var member = members[member_id]!;
-    
+
     for (var i = 0; i < interconnected_members.length; ++i) {
       var element = interconnected_members[i];
       var temp = member.count_of_tracks_between_members(element.value);

@@ -18,8 +18,8 @@ void registerFunctions(DynamicLibrary dl) {
     mid: Pointer.fromFunction(_mid),
     hasSendTrack: Pointer.fromFunction(_hasSendTrack, false),
     setDirection: Pointer.fromFunction(_setDirection),
-    addDirection: Pointer.fromFunction(_addDirection),
-    subDirection: Pointer.fromFunction(_subDirection),
+    setRecv: Pointer.fromFunction(_setRecv),
+    setSend: Pointer.fromFunction(_setSend),
   );
 }
 
@@ -29,14 +29,16 @@ Object _setDirection(RtpTransceiver transceiver, int direction) {
   return () => transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
-/// todo
-Object _addDirection(RtpTransceiver transceiver, int direction) {
-  return () => transceiver.addDirection(TransceiverDirection.values[direction]);
+/// Sets receive of the provided [RtpTransceiver] to the provided
+/// one.
+Object _setRecv(RtpTransceiver transceiver, bool recv) {
+  return () => transceiver.setRecv(recv);
 }
 
-/// todo
-Object _subDirection(RtpTransceiver transceiver, int direction) {
-  return () => transceiver.subDirection(TransceiverDirection.values[direction]);
+/// Sets send of the provided [RtpTransceiver] to the provided
+/// one.
+Object _setSend(RtpTransceiver transceiver, bool send) {
+  return () => transceiver.setSend(send);
 }
 
 /// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].

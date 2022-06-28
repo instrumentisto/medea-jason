@@ -4,7 +4,7 @@
 
 use std::{cell::RefCell, future::Future, rc::Rc};
 
-use futures::{future::LocalBoxFuture, lock::Mutex};
+use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -15,22 +15,6 @@ use crate::{
         TransceiverDirection,
     },
 };
-
-use std::{
-    collections::HashMap,
-    sync::{
-        atomic::{AtomicU64, Ordering},
-        Arc,
-    },
-};
-
-/// Counter used to generate unique IDs.
-static ID_COUNTER: AtomicU64 = AtomicU64::new(1);
-
-/// Returns a next unique ID.
-pub(crate) fn next_id() -> u64 {
-    ID_COUNTER.fetch_add(1, Ordering::Relaxed)
-}
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
 mod transceiver {
@@ -81,17 +65,11 @@ mod transceiver {
             direction: i64,
         ) -> Dart_Handle;
 
-        /// todo
-        pub fn add_direction(
-            transceiver: Dart_Handle,
-            direction: i64,
-        ) -> Dart_Handle;
+        /// Sets receive of this [`Transceiver`].
+        pub fn set_recv(transceiver: Dart_Handle, recv: bool) -> Dart_Handle;
 
-        /// todo
-        pub fn sub_direction(
-            transceiver: Dart_Handle,
-            direction: i64,
-        ) -> Dart_Handle;
+        /// Sets send of this [`Transceiver`].
+        pub fn set_send(transceiver: Dart_Handle, sens: bool) -> Dart_Handle;
     }
 }
 
@@ -102,61 +80,37 @@ mod transceiver {
 #[derive(Clone, Debug)]
 pub struct Transceiver {
     transceiver: DartHandle,
-    id: u64,
-    add_sub_direction_mutex: Rc<Mutex<()>>,
     send_track: RefCell<Option<Rc<local::Track>>>,
 }
 
 impl Transceiver {
-    /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
-
-    // todo ignore error
+    /// Sets this [`Transceiver`] receive to the `recv`.
     #[must_use]
-    pub fn sub_direction(
-        &self,
-        disabled_direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let this = self.clone();
-        let mutex = self.add_sub_direction_mutex.clone();
-        println!(
-            "{} SUB {:?} SPAWN {:?}",
-            this.id, disabled_direction, this.transceiver
-        );
+    pub fn set_recv(&self, recv: bool) -> LocalBoxFuture<'static, ()> {
+        let handle = self.transceiver.get();
         Box::pin(async move {
-            let lock = mutex.lock().await;
-            this.set_direction(this.direction().await - disabled_direction)
-                .await;
-            drop(lock);
-            println!(
-                "{} SUB {:?} COMPLETE {:?}",
-                this.id, disabled_direction, this.transceiver
-            );
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::set_recv(
+                    handle, recv,
+                ))
+                .await
+                .unwrap();
+            }
         })
     }
 
-    /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
-
-    // todo ignore error
+    /// Sets this [`Transceiver`] send to the `send`.
     #[must_use]
-    pub fn add_direction(
-        &self,
-        enabled_direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let this = self.clone();
-        let mutex = self.add_sub_direction_mutex.clone();
-        println!(
-            "{} ADD {:?} SPAWN {:?}",
-            this.id, enabled_direction, this.transceiver
-        );
+    pub fn set_send(&self, send: bool) -> LocalBoxFuture<'static, ()> {
+        let handle = self.transceiver.get();
         Box::pin(async move {
-            let lock = mutex.lock().await;
-            this.set_direction(this.direction().await | enabled_direction)
-                .await;
-            drop(lock);
-            println!(
-                "{} ADD {:?} COMPLETE {:?}",
-                this.id, enabled_direction, this.transceiver
-            );
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::set_send(
+                    handle, send,
+                ))
+                .await
+                .unwrap();
+            }
         })
     }
 
@@ -267,8 +221,7 @@ impl Transceiver {
     }
 
     /// Sets this [`Transceiver`] to the provided [`TransceiverDirection`].
-
-    // ignore error
+    #[allow(dead_code)]
     fn set_direction(
         &self,
         direction: TransceiverDirection,
@@ -280,7 +233,8 @@ impl Transceiver {
                     handle,
                     direction.into(),
                 ))
-                .await;
+                .await
+                .unwrap();
             }
         })
     }
@@ -290,8 +244,6 @@ impl From<DartHandle> for Transceiver {
     fn from(handle: DartHandle) -> Self {
         Self {
             transceiver: handle,
-            id: next_id(),
-            add_sub_direction_mutex: Rc::new(Mutex::new(())),
             send_track: RefCell::new(None),
         }
     }

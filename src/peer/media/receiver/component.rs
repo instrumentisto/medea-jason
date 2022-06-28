@@ -21,7 +21,6 @@ use crate::{
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -314,21 +313,22 @@ impl Component {
         match state {
             media_exchange_state::Stable::Disabled => {
                 let sub_direction = {
-                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
-                        trnscvr
-                            .sub_direction(platform::TransceiverDirection::RECV)
-                    })
+                    receiver
+                        .transceiver
+                        .borrow()
+                        .as_ref()
+                        .map(|trnscvr| trnscvr.set_recv(false))
                 };
                 if let Some(fut) = sub_direction {
                     fut.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
-                let add_direction =
-                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
-                        trnscvr
-                            .add_direction(platform::TransceiverDirection::RECV)
-                    });
+                let add_direction = receiver
+                    .transceiver
+                    .borrow()
+                    .as_ref()
+                    .map(|trnscvr| trnscvr.set_recv(true));
 
                 if let Some(fut) = add_direction {
                     fut.await;

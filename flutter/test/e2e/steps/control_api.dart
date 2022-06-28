@@ -1,9 +1,10 @@
 import 'dart:async';
+
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
+
 import '../api/endpoint.dart';
 import '../world/custom_world.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 
 StepDefinitionGeneric when_control_api_removes_member =
     when1<String, CustomWorld>(

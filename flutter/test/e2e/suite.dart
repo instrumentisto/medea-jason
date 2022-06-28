@@ -6,9 +6,9 @@ import 'package:gherkin/gherkin.dart';
 import 'api/room.dart';
 import 'steps/connection.dart';
 import 'steps/control_api.dart';
+import 'steps/given.dart';
 import 'steps/media_state.dart';
 import 'steps/room.dart';
-import 'steps/given.dart';
 import 'steps/track.dart';
 import 'steps/websockets.dart';
 import 'world/custom_world.dart';
@@ -17,7 +17,7 @@ part 'suite.g.dart';
 
 CustomWorld? old_world = null;
 
-final TestConfigs = FlutterTestConfiguration() 
+final TestConfigs = FlutterTestConfiguration()
   ..stepDefinitions = [
     // control_api
     then_control_api_sends_on_leave,
@@ -126,7 +126,6 @@ final TestConfigs = FlutterTestConfiguration()
   '../e2e/tests/features/room_close.feature',
   '../e2e/tests/features/room_join.feature',
   // '../e2e/tests/features/state_synchronization.feature',
-
 ])
 Future<void> main() async {
   var mediaDeviceInfos = await enumerateDevices();

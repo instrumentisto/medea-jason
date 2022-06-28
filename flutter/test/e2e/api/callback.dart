@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'callback.g.dart';
 
 /// All callbacks which can happen.
-/// `OnJoin` callback of Control API or 
+/// `OnJoin` callback of Control API or
 /// `OnLeave` callback of Control API.
 @JsonSerializable()
 class CallbackEvent {

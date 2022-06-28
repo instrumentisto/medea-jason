@@ -31,7 +31,9 @@ bitflags! {
         /// [1]: https://tinyurl.com/y2nlxpzf
         const RECV = 0b010;
 
-        /// todo
+        /// [`stopped` direction][1] of transceiver.
+        ///
+        /// [1]: https://tinyurl.com/39ddy5z2
         const STOPPED = 0b100;
     }
 }
@@ -76,7 +78,7 @@ impl From<TransceiverDirection> for RtcRtpTransceiverDirection {
     #[inline]
     fn from(direction: TransceiverDirection) -> Self {
         use TransceiverDirection as D;
-        
+
         if direction.contains(D::RECV) && direction.contains(D::SEND) {
             Self::Sendrecv
         } else if direction.contains(D::RECV) {
@@ -127,6 +129,10 @@ mod tests {
             (D::INACTIVE, D::RECV, D::RECV),
             (D::SEND, D::RECV, D::SEND | D::RECV),
             (D::RECV, D::SEND, D::SEND | D::RECV),
+            (D::RECV, D::STOPPED, D::STOPPED),
+            (D::SEND, D::STOPPED, D::STOPPED),
+            (D::STOPPED, D::RECV, D::STOPPED),
+            (D::STOPPED, D::SEND, D::STOPPED),
         ] {
             assert_eq!(init | enable_dir, result);
         }
@@ -141,6 +147,8 @@ mod tests {
             (D::RECV, D::RECV, D::INACTIVE),
             (D::SEND | D::RECV, D::SEND, D::RECV),
             (D::SEND | D::RECV, D::RECV, D::SEND),
+            (D::STOPPED, D::RECV, D::STOPPED),
+            (D::STOPPED, D::SEND, D::STOPPED),
         ] {
             assert_eq!(init - disable_dir, result);
         }

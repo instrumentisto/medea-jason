@@ -315,9 +315,7 @@ impl Drop for Sender {
         let transceiver = self.transceiver.clone();
         platform::spawn(async move {
             if !transceiver.is_stopped() {
-                transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND)
-                    .await;
+                transceiver.set_send(false).await;
                 transceiver.drop_send_track().await;
             }
         });

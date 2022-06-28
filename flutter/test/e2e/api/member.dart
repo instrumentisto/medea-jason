@@ -1,6 +1,7 @@
+import 'package:json_annotation/json_annotation.dart';
 
 import 'endpoint.dart';
-import 'package:json_annotation/json_annotation.dart';
+
 part 'member.g.dart';
 
 /// Credentials of the [Member].
@@ -48,7 +49,6 @@ class Plain implements Credentials {
   }
 }
 
-
 /// Entity that represents a [Control API] [Member].
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
@@ -77,11 +77,11 @@ class Member {
 
   /// Timeout of receiving heartbeat messages from this [`Member`] via Client
   /// API. Once reached, the [`Member`] is considered being idle.
-  String? idle_timeout; 
+  String? idle_timeout;
 
   /// Timeout of this [`Member`] reconnecting via Client API.
   /// Once reached, the [`Member`] is considered disconnected.
-  String? reconnect_timeout; 
+  String? reconnect_timeout;
 
   /// Interval of sending pings from Medea to this [`Member`] via Client API.
   String? ping_interval;
@@ -91,11 +91,11 @@ class Member {
   factory Member.fromJson(Map<String, dynamic> json) {
     json.remove('kind');
     return _$MemberFromJson(json);
-    }
+  }
 
   Map<String, dynamic> toJson() {
     var res = _$MemberToJson(this);
-    res.addAll({'kind':'Member'});
+    res.addAll({'kind': 'Member'});
     return res;
-    }
+  }
 }

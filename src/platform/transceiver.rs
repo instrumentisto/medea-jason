@@ -28,7 +28,9 @@ bitflags! {
         /// [1]: https://tinyurl.com/y2nlxpzf
         const RECV = 0b010;
 
-        /// todo
+        /// [`stopped` direction][1] of transceiver.
+        ///
+        /// [1]: https://tinyurl.com/39ddy5z2
         const STOPPED = 0b100;
     }
 }

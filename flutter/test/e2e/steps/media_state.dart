@@ -1,7 +1,8 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 import 'package:gherkin/gherkin.dart';
+
 import 'package:medea_jason/medea_jason.dart';
-import 'package:flutter_test/flutter_test.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
@@ -99,8 +100,7 @@ StepDefinitionGeneric then_remote_media_direction_is =
     var track = await member.wait_remote_track_from(
         remote_id, parsedKind.item2, parsedKind.item1);
 
-    var dir =
-        TrackMediaDirection.values.firstWhere((e) => e.name == direction);
+    var dir = TrackMediaDirection.values.firstWhere((e) => e.name == direction);
 
     await member.wait_media_direction_track(dir, track);
   },
@@ -126,7 +126,6 @@ StepDefinitionGeneric then_track_is_stopped =
   RegExp(
       r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is stopped"),
   (id, kind, context) async {
-
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
     var track =

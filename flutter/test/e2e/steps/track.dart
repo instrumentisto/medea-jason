@@ -1,8 +1,9 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 import 'package:gherkin/gherkin.dart';
+
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
-import 'package:flutter_test/flutter_test.dart';
 import '../world/more_args.dart';
 
 StepDefinitionGeneric then_member_has_remote_track =
@@ -52,7 +53,8 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     for (var i = 0; i < 10 && actual_count != expected_count; ++i) {
       actual_count = 0;
       member.connection_store.remote_tracks[remote_id]!.forEach((key, value) {
-        var stopped_length = member.connection_store.callback_counter[key]!['stopped']!;
+        var stopped_length =
+            member.connection_store.callback_counter[key]!['stopped']!;
         var all_length = value.length;
         var track_stopped = stopped_length == all_length;
         if (stopped == track_stopped) {
@@ -149,7 +151,6 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
     await member.wait_for_track_cb_fire_count(callback_kind, track, times);
   },
 );
-
 
 StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
     then1<String, CustomWorld>(

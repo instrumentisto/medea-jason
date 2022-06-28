@@ -100,13 +100,9 @@ impl Receiver {
     ) -> Self {
         let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
-        let transceiver_direction = if state.enabled_individual() {
-            platform::TransceiverDirection::RECV
-        } else {
-            platform::TransceiverDirection::INACTIVE
-        };
 
-        let transceiver = if state.mid().is_none() {
+        let mut transceiver = None;
+        if state.mid().is_none() {
             // Try to find send transceiver that can be used as sendrecv.
             let sender = media_connections
                 .0
@@ -120,20 +116,17 @@ impl Receiver {
                 })
                 .map(utils::component::Component::obj);
 
-            if let Some(s) = sender {
-                let trnsvr = s.transceiver();
-                trnsvr.add_direction(transceiver_direction).await;
-                
-                Some(trnsvr)
+            let trnsvr = if let Some(s) = sender {
+                s.transceiver()
             } else {
-                let fut = media_connections
-                    .0
-                    .borrow()
-                    .add_transceiver(kind, transceiver_direction);
-                Some(fut.await)
-            }
-        } else {
-            None
+                let fut = media_connections.0.borrow().add_transceiver(
+                    kind,
+                    platform::TransceiverDirection::INACTIVE,
+                );
+                fut.await
+            };
+            trnsvr.set_recv(state.enabled_individual()).await;
+            transceiver = Some(trnsvr);
         };
 
         let peer_events_sender =
@@ -246,15 +239,7 @@ impl Receiver {
         );
 
         let trnscvr = self.transceiver.borrow().as_ref().cloned().unwrap();
-        if self.enabled_individual.get() {
-            trnscvr
-                .add_direction(platform::TransceiverDirection::RECV)
-                .await;
-        } else {
-            trnscvr
-                .sub_direction(platform::TransceiverDirection::RECV)
-                .await;
-        }
+        trnscvr.set_recv(self.enabled_individual.get()).await;
 
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop().await;
@@ -335,9 +320,7 @@ impl Drop for Receiver {
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             platform::spawn(async move {
                 if !transceiver.is_stopped() {
-                    transceiver
-                        .sub_direction(platform::TransceiverDirection::RECV)
-                        .await;
+                    transceiver.set_recv(false).await;
                 }
             });
         }

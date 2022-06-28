@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:medea_jason/medea_jason.dart';
+
 import 'package:tuple/tuple.dart';
+
+import 'package:medea_jason/medea_jason.dart';
 import '../conf.dart';
 
 /// Builder of a [Member].
@@ -55,7 +57,7 @@ class ConnectionStore {
   /// where `key` - `track.id`.
   var OnMediaDirectionChanged =
       HashMap<String, Function(TrackMediaDirection)>();
-  
+
   /// Callbacks calls after [RemoteMediaTrack] `callback_kind`,
   /// where `key` - `track.id`.
   var OnCallbackCounter = HashMap<String, Map<String, Function(int)>>();
@@ -117,7 +119,7 @@ class Member {
       connection_store.remote_tracks.addAll({remote_member_id: HashMap()});
       connection_store.connections.addAll({remote_member_id: connection});
       connection_store.close_connect.addAll({remote_member_id: Completer()});
-      
+
       connection.onRemoteTrackAdded((remote_track) {
         var remote_track_id = remote_track.getTrack().id();
         if (connection_store

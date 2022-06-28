@@ -28,33 +28,33 @@ impl Transceiver {
         TransceiverDirection::from(self.transceiver.direction())
     }
 
-    /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn sub_direction(
-        &self,
-        disabled_direction: TransceiverDirection,
-    ) -> impl Future<Output = ()> + 'static {
+    /// Sets this [`Transceiver`] receive to the `recv`.
+    pub fn set_recv(&self, recv: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.transceiver.clone();
         async move {
-            transceiver.set_direction(
-                (TransceiverDirection::from(transceiver.direction())
-                    - disabled_direction)
-                    .into(),
-            );
+            let current_direction =
+                TransceiverDirection::from(transceiver.direction());
+            let new_direction = if recv {
+                current_direction | TransceiverDirection::RECV
+            } else {
+                current_direction - TransceiverDirection::RECV
+            };
+            transceiver.set_direction(new_direction.into());
         }
     }
 
-    /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn add_direction(
-        &self,
-        enabled_direction: TransceiverDirection,
-    ) -> impl Future<Output = ()> + 'static {
+    /// Sets this [`Transceiver`] send to the `send`.
+    pub fn set_send(&self, send: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.transceiver.clone();
         async move {
-            transceiver.set_direction(
-                (TransceiverDirection::from(transceiver.direction())
-                    | enabled_direction)
-                    .into(),
-            );
+            let current_direction =
+                TransceiverDirection::from(transceiver.direction());
+            let new_direction = if send {
+                current_direction | TransceiverDirection::SEND
+            } else {
+                current_direction - TransceiverDirection::SEND
+            };
+            transceiver.set_direction(new_direction.into());
         }
     }
 

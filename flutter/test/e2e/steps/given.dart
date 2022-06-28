@@ -1,6 +1,6 @@
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_jason/src/interface/track_kinds.dart';
 
+import 'package:medea_jason/src/interface/track_kinds.dart';
 import '../world/custom_world.dart';
 import '../world/member.dart';
 import '../world/more_args.dart';

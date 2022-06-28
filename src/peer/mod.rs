@@ -406,7 +406,6 @@ impl PeerConnection {
                             );
                         };
                     });
-                } else {
                 }
             }));
         }
