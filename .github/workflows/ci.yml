@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: azure/setup-helm@v2.1
+      - uses: azure/setup-helm@v3
 
       - run: make helm.lint chart=${{ matrix.chart }}
 
@@ -629,7 +629,7 @@ jobs:
                   name=MANIFEST::$(make helm.dir
                                         chart=${{ matrix.chart }})/Chart.yaml
 
-      - uses: azure/setup-helm@v2.1
+      - uses: azure/setup-helm@v3
         if: ${{ contains(steps.changed.outputs.files,
                          steps.chart.outputs.MANIFEST) }}
 
