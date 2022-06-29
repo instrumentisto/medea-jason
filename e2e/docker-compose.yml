@@ -34,7 +34,7 @@ services:
     network_mode: service:frontend
   coturn-db:
     container_name: ${COMPOSE_PROJECT_NAME}-coturn-db
-    image: redis:alpine
+    image: redis:stable
     command: ["redis-server", "/etc/redis.conf"]
     volumes:
       - ../_dev/coturn/redis.conf:/etc/redis.conf:ro
