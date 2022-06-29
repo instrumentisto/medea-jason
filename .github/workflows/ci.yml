@@ -49,8 +49,8 @@ jobs:
                         -p ${{ secrets.MEDEA_DOCKER_PASS }}
                         hub.instrumentisto.com
       - name: UP
-      run: make docker.up.e2e background=yes log=no \
-	                    dockerized=yes tag=edge debug=no
+      run: make docker.up.e2e background=yes log=no dockerized=yes tag=edge debug=no
+
 
 
 
