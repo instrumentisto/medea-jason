@@ -3,7 +3,7 @@ version: "2"
 services:
   frontend:
     container_name: ${COMPOSE_PROJECT_NAME}-frontend
-    image: nginx:stable-alpine
+    image: e2eteam/nginx:stable
     ports:
       - "6379:6379"      # coturn redis
       - "6565:6565"      # medea grpc
