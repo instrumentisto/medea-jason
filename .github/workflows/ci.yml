@@ -17,18 +17,6 @@ env:
 
 jobs:
 
-  my-test:
-    name: WINDOWS DESKTOP TEST
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Login to Medea Docker registry
-      run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-                        -p ${{ secrets.MEDEA_DOCKER_PASS }}
-                        hub.instrumentisto.com
-      - name: UP
-      run: make docker.up.e2e background=yes log=no \
-	                    dockerized=yes tag=edge debug=no
   ################
   # Pull Request #
   ################
@@ -51,6 +39,18 @@ jobs:
     steps:
       - run: true
 
+  my-test:
+    name: WINDOWS DESKTOP TEST
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to Medea Docker registry
+      run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+                        -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                        hub.instrumentisto.com
+      - name: UP
+      run: make docker.up.e2e background=yes log=no \
+	                    dockerized=yes tag=edge debug=no
 
 
 
