@@ -1008,7 +1008,6 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 			/entrypoint.sh ))
 
 docker.up.e2e: docker.down.e2e
-	@make build.jason target=web debug=$(debug) dockerized=no
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
