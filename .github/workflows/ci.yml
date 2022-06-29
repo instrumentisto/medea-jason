@@ -21,36 +21,35 @@ jobs:
   # Pull Request #
   ################
 
-  pr:
-    if: ${{ github.event_name == 'pull_request' }}
-    needs:
-      - clippy
-      - crate-jason
-      - dartanalyze
-      - dartfmt
-      - docker
-      - helm-lint
-      - rustdoc
-      - rustfmt
-      - test-e2e
-      - test-flutter
-      - test-unit
-    runs-on: ubuntu-latest
-    steps:
-      - run: true
+  # pr:
+  #   if: ${{ github.event_name == 'pull_request' }}
+  #   needs:
+  #     - clippy
+  #     - crate-jason
+  #     - dartanalyze
+  #     - dartfmt
+  #     - docker
+  #     - helm-lint
+  #     - rustdoc
+  #     - rustfmt
+  #     - test-e2e
+  #     - test-flutter
+  #     - test-unit
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - run: true
 
   my-test:
     name: WINDOWS DESKTOP TEST
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - run: echo 42
-      # - name: Login to Medea Docker registry
-      # run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-      #                   -p ${{ secrets.MEDEA_DOCKER_PASS }}
-      #                   hub.instrumentisto.com
-      # - name: UP
-      # run: make docker.up.e2e background=yes log=no dockerized=yes tag=edge debug=no
+      - name: Login to Medea Docker registry
+      run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+                        -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                        hub.instrumentisto.com
+      - name: UP
+      run: make docker.up.e2e background=yes log=no dockerized=yes tag=edge debug=no
 
 
 
