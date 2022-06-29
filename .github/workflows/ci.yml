@@ -52,7 +52,12 @@ jobs:
       - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
                         -p ${{ secrets.MEDEA_DOCKER_PASS }}
                         hub.instrumentisto.com
-      - run: make docker.up.e2e background=yes log=no dockerized=yes tag=edge debug=no
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: wasm-pack
+          use-tool-cache: true
+
+      - run: make docker.up.e2e background=yes log=no dockerized=yes medea-tag=edge debug=no
 
 
 
