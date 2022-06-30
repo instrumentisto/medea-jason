@@ -1,6 +1,5 @@
-//! [`channel`]-based [Control API] implementation.
+//! Direct in-process [Control API] implementation.
 //!
-//! [`channel`]: futures::channel
 //! [Control API]: https://tinyurl.com/yxsqplq7
 
 #[cfg(feature = "client")]
@@ -27,8 +26,8 @@ pub use self::server::{
     CallbackApiClient, CallbackApiClientError, ControlApiServer,
 };
 
-/// Creates pair of [`ControlApiClient`] and [`ControlApiServer`].
 #[cfg(all(feature = "client", feature = "server"))]
+/// Creates pair of a [`ControlApiClient`] and a [`ControlApiServer`].
 pub fn control_api<T: ControlApi>() -> (
     ControlApiClient<T::Error>,
     impl FnOnce(T) -> ControlApiServer<T>,
@@ -40,8 +39,8 @@ pub fn control_api<T: ControlApi>() -> (
     })
 }
 
-/// Creates pair of [`CallbackApiClient`] and [`CallbackApiServer`].
 #[cfg(all(feature = "client", feature = "server"))]
+/// Creates a pair of a [`CallbackApiClient`] and a [`CallbackApiServer`].
 pub fn callback_api<T: CallbackApi>() -> (
     CallbackApiClient<T::Error>,
     impl FnOnce(T) -> CallbackApiServer<T>,
@@ -55,10 +54,11 @@ pub fn callback_api<T: CallbackApi>() -> (
 
 /// Error of sending response via [`oneshot::Sender`].
 #[derive(Clone, Copy, Debug, Display, Error)]
-#[display(fmt = "oneshot::Sender errored.")]
+#[display(fmt = "`oneshot::Sender` errored")]
 pub struct SendErr;
 
-/// [`ControlApi`] request paired with [`oneshot::Sender`] to send response.
+/// [`ControlApi`] request paired with an [`oneshot::Sender`] to send response
+/// via.
 #[derive(Debug)]
 pub(crate) enum ControlApiRequest<Error> {
     /// [`ControlApi::create()`].
@@ -66,7 +66,7 @@ pub(crate) enum ControlApiRequest<Error> {
         /// [`ControlApi::create()`] request.
         request: control::Request,
 
-        /// [`oneshot::Sender`] to send [`ControlApi::create()`] response.
+        /// [`oneshot::Sender`] to send [`ControlApi::create()`] response via.
         sender: oneshot::Sender<Result<member::Sids, Error>>,
     },
 
@@ -75,7 +75,7 @@ pub(crate) enum ControlApiRequest<Error> {
         /// [`ControlApi::apply()`] request.
         request: control::Request,
 
-        /// [`oneshot::Sender`] to send [`ControlApi::apply()`] response.
+        /// [`oneshot::Sender`] to send [`ControlApi::apply()`] response via.
         sender: oneshot::Sender<Result<member::Sids, Error>>,
     },
 
@@ -84,7 +84,7 @@ pub(crate) enum ControlApiRequest<Error> {
         /// [`ControlApi::delete()`] request.
         request: Vec<Fid>,
 
-        /// [`oneshot::Sender`] to send [`ControlApi::delete()`] response.
+        /// [`oneshot::Sender`] to send [`ControlApi::delete()`] response via.
         sender: oneshot::Sender<Result<(), Error>>,
     },
 
@@ -93,7 +93,7 @@ pub(crate) enum ControlApiRequest<Error> {
         /// [`ControlApi::get()`] request.
         request: Vec<Fid>,
 
-        /// [`oneshot::Sender`] to send [`ControlApi::get()`] response.
+        /// [`oneshot::Sender`] to send [`ControlApi::get()`] response via.
         sender: oneshot::Sender<Result<Elements, Error>>,
     },
 
@@ -102,17 +102,18 @@ pub(crate) enum ControlApiRequest<Error> {
         /// [`ControlApi::healthz()`] request.
         request: Ping,
 
-        /// [`oneshot::Sender`] to send [`ControlApi::healthz()`] response.
+        /// [`oneshot::Sender`] to send [`ControlApi::healthz()`] response via.
         sender: oneshot::Sender<Result<Pong, Error>>,
     },
 }
 
-/// [`CallbackApi`] request paired with [`oneshot::Sender`] to send response.
+/// [`CallbackApi`] request paired with an [`oneshot::Sender`] to send response
+/// via.
 #[derive(Debug)]
 pub(crate) struct CallbackApiRequest<Error> {
     /// [`CallbackApi::on_event()`] request.
     request: callback::Request,
 
-    /// [`oneshot::Sender`] to send [`CallbackApi::on_event()`] response.
+    /// [`oneshot::Sender`] to send [`CallbackApi::on_event()`] response via.
     sender: oneshot::Sender<Result<(), Error>>,
 }

@@ -1,4 +1,4 @@
-//! [`ControlApi`] client and [`CallbackApi`] server [`channel`]
+//! [`ControlApi`] client and [`CallbackApi`] server direct in-process
 //! implementations.
 //!
 //! [`channel`]: futures::channel
@@ -16,25 +16,25 @@ use crate::{
 
 use super::{CallbackApiRequest, ControlApiRequest, SendErr};
 
-/// [`channel`]-based [`CallbackApi`] server.
-///
-/// [`channel`]: futures::channel
+/// Direct in-process [`CallbackApi`] server.
 #[derive(Debug)]
 pub struct CallbackApiServer<T: CallbackApi> {
     /// Inner [`CallbackApi`] implementation.
     pub(crate) api: T,
 
-    /// [`mpsc::UnboundedReceiver`] to receive [`CallbackApiRequest`].
+    /// [`mpsc::UnboundedReceiver`] to receive [`CallbackApiRequest`] via.
     pub(crate) receiver: mpsc::UnboundedReceiver<CallbackApiRequest<T::Error>>,
 }
 
 impl<T: CallbackApi> CallbackApiServer<T> {
-    /// Runs this [`CallbackApiServer`]. Completes after all
-    /// [`CallbackApiClient`]s linked to this [`CallbackApiServer`] are dropped.
+    /// Runs this [`CallbackApiServer`].
+    ///
+    /// Completes after all the [`CallbackApiClient`]s linked to this
+    /// [`CallbackApiServer`] are dropped.
     ///
     /// # Errors
     ///
-    /// In case failed to send response via [`oneshot::Sender`].
+    /// If failed to send response via [`oneshot::Sender`].
     ///
     /// [`CallbackApiClient`]: super::CallbackApiClient
     #[allow(clippy::map_err_ignore)]
@@ -48,9 +48,7 @@ impl<T: CallbackApi> CallbackApiServer<T> {
     }
 }
 
-/// [`channel`]-based [`ControlApi`] client.
-///
-/// [`channel`]: futures::channel
+/// Direct in-process [`ControlApi`] client.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug)]
 pub struct ControlApiClient<Error> {
@@ -61,6 +59,8 @@ pub struct ControlApiClient<Error> {
     pub(crate) sender: mpsc::UnboundedSender<ControlApiRequest<Error>>,
 }
 
+// Implemented manually to omit redundant `Error: Clone` trait bound, imposed by
+// `#[derive(Clone)]`.
 impl<Error> Clone for ControlApiClient<Error> {
     fn clone(&self) -> Self {
         Self {

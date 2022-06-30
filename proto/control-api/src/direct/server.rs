@@ -1,4 +1,4 @@
-//! [`ControlApi`] client and [`ControlApi`] server [`channel`]
+//! [`ControlApi`] client and [`ControlApi`] server direct in-process
 //! implementations.
 //!
 //! [`channel`]: futures::channel
@@ -14,9 +14,7 @@ use crate::{callback, CallbackApi, ControlApi};
 
 use super::{CallbackApiRequest, ControlApiRequest, SendErr};
 
-/// [`channel`]-based [`ControlApi`] server.
-///
-/// [`channel`]: futures::channel
+/// Direct in-process [`ControlApi`] server.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug)]
 pub struct ControlApiServer<T: ControlApi> {
@@ -28,8 +26,10 @@ pub struct ControlApiServer<T: ControlApi> {
 }
 
 impl<T: ControlApi> ControlApiServer<T> {
-    /// Runs this [`ControlApiServer`]. Completes after all
-    /// [`ControlApiClient`]s linked to this [`ControlApiServer`] are dropped.
+    /// Runs this [`ControlApiServer`].
+    ///
+    /// Completes after all [`ControlApiClient`]s linked to this
+    /// [`ControlApiServer`] are dropped.
     ///
     /// # Errors
     ///
@@ -71,9 +71,7 @@ impl<T: ControlApi> ControlApiServer<T> {
     }
 }
 
-/// [`channel`]-based [`CallbackApi`] client.
-///
-/// [`channel`]: futures::channel
+/// Direct in-process [`CallbackApi`] client.
 #[derive(Debug)]
 pub struct CallbackApiClient<Error> {
     /// [`mpsc::UnboundedSender`] to send [`CallbackApiRequest`]s to linked
@@ -83,6 +81,8 @@ pub struct CallbackApiClient<Error> {
     pub(crate) sender: mpsc::UnboundedSender<CallbackApiRequest<Error>>,
 }
 
+// Implemented manually to omit redundant `Error: Clone` trait bound, imposed by
+// `#[derive(Clone)]`.
 impl<Error> Clone for CallbackApiClient<Error> {
     fn clone(&self) -> Self {
         Self {
