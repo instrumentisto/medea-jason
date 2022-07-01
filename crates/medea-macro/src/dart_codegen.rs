@@ -300,7 +300,7 @@ impl DartCodegen {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
-                inputs.push_str(&format!("{}, ", i.to_ffi_type()));
+                write!(inputs, "{}, ", i.to_ffi_type())?;
             }
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);

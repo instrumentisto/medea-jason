@@ -12,7 +12,7 @@ use futures::{
 
 use crate::{callback, CallbackApi, ControlApi};
 
-use super::{CallbackApiRequest, ControlApiRequest, SendErr};
+use super::{CallbackApiRequest, ControlApiRequest};
 
 /// Direct in-process [`ControlApi`] server.
 #[allow(clippy::module_name_repetitions)]
@@ -31,43 +31,33 @@ impl<T: ControlApi> ControlApiServer<T> {
     /// Completes after all [`ControlApiClient`]s linked to this
     /// [`ControlApiServer`] are dropped.
     ///
-    /// # Errors
-    ///
-    /// In case failed to send response via [`oneshot::Sender`].
+    /// `limit` specifies number of concurrently handled requests. Note: a
+    /// `limit` of zero is interpreted as no limit at all, and will have the
+    /// same result as passing in None.
     ///
     /// [`ControlApiClient`]: super::ControlApiClient
-    #[allow(clippy::map_err_ignore)]
-    pub async fn run(mut self) -> Result<(), SendErr> {
-        while let Some(request) = self.receiver.next().await {
-            match request {
-                ControlApiRequest::Create { request, sender } => {
-                    sender
-                        .send(self.api.create(request).await)
-                        .map_err(|_| SendErr)?;
-                }
-                ControlApiRequest::Apply { request, sender } => {
-                    sender
-                        .send(self.api.apply(request).await)
-                        .map_err(|_| SendErr)?;
-                }
-                ControlApiRequest::Delete { request, sender } => {
-                    sender
-                        .send(self.api.delete(&request).await)
-                        .map_err(|_| SendErr)?;
-                }
-                ControlApiRequest::Get { request, sender } => {
-                    sender
-                        .send(self.api.get(&request).await)
-                        .map_err(|_| SendErr)?;
-                }
-                ControlApiRequest::Healthz { request, sender } => {
-                    sender
-                        .send(self.api.healthz(request).await)
-                        .map_err(|_| SendErr)?;
-                }
-            }
-        }
-        Ok(())
+    pub async fn run(self, limit: impl Into<Option<usize>>) {
+        self.receiver
+            .for_each_concurrent(limit, |req| async {
+                let _ = match req {
+                    ControlApiRequest::Create { request, sender } => {
+                        sender.send(self.api.create(request).await).ok()
+                    }
+                    ControlApiRequest::Apply { request, sender } => {
+                        sender.send(self.api.apply(request).await).ok()
+                    }
+                    ControlApiRequest::Delete { request, sender } => {
+                        sender.send(self.api.delete(&request).await).ok()
+                    }
+                    ControlApiRequest::Get { request, sender } => {
+                        sender.send(self.api.get(&request).await).ok()
+                    }
+                    ControlApiRequest::Healthz { request, sender } => {
+                        sender.send(self.api.healthz(request).await).ok()
+                    }
+                };
+            })
+            .await;
     }
 }
 

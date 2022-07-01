@@ -14,7 +14,7 @@ use crate::{
     control, member, CallbackApi, ControlApi, Elements, Fid, Ping, Pong,
 };
 
-use super::{CallbackApiRequest, ControlApiRequest, SendErr};
+use super::{CallbackApiRequest, ControlApiRequest};
 
 /// Direct in-process [`CallbackApi`] server.
 #[derive(Debug)]
@@ -32,19 +32,18 @@ impl<T: CallbackApi> CallbackApiServer<T> {
     /// Completes after all the [`CallbackApiClient`]s linked to this
     /// [`CallbackApiServer`] are dropped.
     ///
-    /// # Errors
-    ///
-    /// If failed to send response via [`oneshot::Sender`].
+    /// `limit` specifies number of concurrently handled requests. Note: a
+    /// `limit` of zero is interpreted as no limit at all, and will have the
+    /// same result as passing in None.
     ///
     /// [`CallbackApiClient`]: super::CallbackApiClient
-    #[allow(clippy::map_err_ignore)]
-    pub async fn run(mut self) -> Result<(), SendErr> {
-        while let Some(ev) = self.receiver.next().await {
-            ev.sender
-                .send(self.api.on_event(ev.request).await)
-                .map_err(|_| SendErr)?;
-        }
-        Ok(())
+    pub async fn run(self, limit: impl Into<Option<usize>>) {
+        self.receiver
+            .for_each_concurrent(limit, |ev| async {
+                let _ =
+                    ev.sender.send(self.api.on_event(ev.request).await).ok();
+            })
+            .await;
     }
 }
 

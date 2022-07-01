@@ -165,6 +165,7 @@ impl Callback {
     /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two
     /// arguments, that can be converted to a [`Dart_Handle`] and passed to
     /// Dart.
+    #[allow(clippy::trait_duplication_in_bounds)] // false positive
     pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
     where
         F: FnMut(T, S) + 'static,

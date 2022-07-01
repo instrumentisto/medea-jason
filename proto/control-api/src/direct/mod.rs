@@ -7,7 +7,6 @@ mod client;
 #[cfg(feature = "server")]
 mod server;
 
-use derive_more::{Display, Error};
 use futures::channel::{mpsc, oneshot};
 
 use crate::{
@@ -51,11 +50,6 @@ pub fn callback_api<T: CallbackApi>() -> (
         receiver,
     })
 }
-
-/// Error of sending response via [`oneshot::Sender`].
-#[derive(Clone, Copy, Debug, Display, Error)]
-#[display(fmt = "`oneshot::Sender` errored")]
-pub struct SendErr;
 
 /// [`ControlApi`] request paired with an [`oneshot::Sender`] to send response
 /// via.
