@@ -1,7 +1,5 @@
 //! [`ControlApi`] client and [`CallbackApi`] server direct in-process
 //! implementations.
-//!
-//! [`channel`]: futures::channel
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
@@ -32,9 +30,9 @@ impl<T: CallbackApi> CallbackApiServer<T> {
     /// Completes after all the [`CallbackApiClient`]s linked to this
     /// [`CallbackApiServer`] are dropped.
     ///
-    /// `limit` specifies number of concurrently handled requests. Note: a
-    /// `limit` of zero is interpreted as no limit at all, and will have the
-    /// same result as passing in None.
+    /// `limit` argument specifies number of concurrently handled requests.
+    /// Note, that `limit` of zero is interpreted as no limit at all, and will
+    /// have the same result as passing in a `None`.
     ///
     /// [`CallbackApiClient`]: super::CallbackApiClient
     pub async fn run(self, limit: impl Into<Option<usize>>) {

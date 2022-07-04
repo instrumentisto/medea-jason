@@ -1,7 +1,5 @@
 //! [`ControlApi`] client and [`ControlApi`] server direct in-process
 //! implementations.
-//!
-//! [`channel`]: futures::channel
 
 use async_trait::async_trait;
 use derive_more::{Display, Error, From};
@@ -31,9 +29,9 @@ impl<T: ControlApi> ControlApiServer<T> {
     /// Completes after all [`ControlApiClient`]s linked to this
     /// [`ControlApiServer`] are dropped.
     ///
-    /// `limit` specifies number of concurrently handled requests. Note: a
-    /// `limit` of zero is interpreted as no limit at all, and will have the
-    /// same result as passing in None.
+    /// `limit` argument specifies number of concurrently handled requests.
+    /// Note, that `limit` of zero is interpreted as no limit at all, and will
+    /// have the same result as passing in a `None`.
     ///
     /// [`ControlApiClient`]: super::ControlApiClient
     pub async fn run(self, limit: impl Into<Option<usize>>) {
