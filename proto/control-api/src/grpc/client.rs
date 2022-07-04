@@ -54,7 +54,7 @@ where
     T::Future: Send,
     T::ResponseBody: Body<Data = Bytes> + Send + 'static,
     <T::ResponseBody as Body>::Error: Send,
-    StdError: From<T::Error> + From<<T::ResponseBody as Body>::Error>,
+    StdError: From<<T::ResponseBody as Body>::Error>,
 {
     type Error = ControlApiClientError;
 

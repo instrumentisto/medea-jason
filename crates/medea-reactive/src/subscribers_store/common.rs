@@ -10,6 +10,8 @@ use super::SubscribersStore;
 #[derive(Debug)]
 pub struct SubStore<T>(RefCell<Vec<mpsc::UnboundedSender<T>>>);
 
+// Implemented manually to omit redundant `T: Default` trait bound, imposed by
+// `#[derive(Default)]`.
 impl<T> Default for SubStore<T> {
     fn default() -> Self {
         Self(RefCell::new(Vec::new()))

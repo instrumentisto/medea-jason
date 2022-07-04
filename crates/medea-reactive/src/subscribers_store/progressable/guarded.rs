@@ -77,7 +77,7 @@ impl Guard {
         counter.mutate(|mut c| {
             *c = c
                 .checked_add(1)
-                .expect("progressable::Guard counter overflow");
+                .expect("`progressable::Guard` counter overflow");
         });
         Self(counter)
     }

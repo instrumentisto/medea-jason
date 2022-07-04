@@ -30,6 +30,8 @@ impl Callback<()> {
     }
 }
 
+// Implemented manually to omit redundant `A: Default` trait bound, imposed by
+// `#[derive(Default)]`.
 impl<A> Default for Callback<A> {
     fn default() -> Self {
         Self(RefCell::new(None))

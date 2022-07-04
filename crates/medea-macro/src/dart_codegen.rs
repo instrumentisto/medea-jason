@@ -300,7 +300,8 @@ impl DartCodegen {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
-                inputs.push_str(&format!("{}, ", i.to_ffi_type()));
+                #[allow(clippy::let_underscore_must_use)]
+                let _ = write!(inputs, "{}, ", i.to_ffi_type());
             }
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);
@@ -308,7 +309,7 @@ impl DartCodegen {
             writeln!(
                 out,
                 "required Pointer<NativeFunction<{ret_ty} \
-                Function({inputs})>> {name},",
+                 Function({inputs})>> {name},",
                 ret_ty = f.output.to_ffi_type(),
                 name = f.name.to_camel_case()
             )?;

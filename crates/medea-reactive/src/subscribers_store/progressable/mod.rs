@@ -32,6 +32,8 @@ pub struct SubStore<T> {
     counter: Rc<ObservableCell<u32>>,
 }
 
+// Implemented manually to omit redundant `T: Default` trait bound, imposed by
+// `#[derive(Default)]`.
 impl<T> Default for SubStore<T> {
     fn default() -> Self {
         Self {
