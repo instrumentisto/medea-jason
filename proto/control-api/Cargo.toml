@@ -2,7 +2,7 @@
 name = "medea-control-api-proto"
 version = "0.8.0-dev"
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.62"
 description = "Control API protocol implementation for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"
@@ -32,7 +32,6 @@ prost-types = { version = "0.10", optional = true }
 rand = "0.8"
 ref-cast = "1.0.7"
 serde = { version = "1.0.103", features = ["derive"], optional = true }
-smart-default = "0.6"
 time = "0.3.9"
 tonic = { version = "0.7", optional = true }
 url = "2.2"

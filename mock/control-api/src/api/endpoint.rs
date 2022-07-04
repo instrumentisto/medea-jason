@@ -2,7 +2,6 @@
 
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
-use smart_default::SmartDefault;
 
 /// P2P mode of [`WebRtcPublishEndpoint`].
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -43,7 +42,7 @@ impl From<proto::web_rtc_publish_endpoint::P2p> for P2pMode {
 /// Publishing policy of the video or audio media type in the
 /// [`WebRtcPublishEndpoint`].
 #[derive(
-    Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize, SmartDefault,
+    Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize, Default,
 )]
 pub enum PublishPolicy {
     /// Publish this media type if it possible.

@@ -62,7 +62,7 @@ impl LocalSdp {
             self.0
                 .approved
                 .subscribe()
-                .filter_map(|approved| future::ready(approved.then(|| ()))),
+                .filter_map(|approved| future::ready(approved.then_some(()))),
         )
     }
 

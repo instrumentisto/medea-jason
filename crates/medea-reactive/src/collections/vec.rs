@@ -203,6 +203,8 @@ where
     }
 }
 
+// Implemented manually to omit redundant `: Default` trait bounds, imposed by
+// `#[derive(Default)]`.
 impl<T, S: SubscribersStore<T, O>, O> Default for Vec<T, S, O> {
     fn default() -> Self {
         Self {

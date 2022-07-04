@@ -35,7 +35,7 @@ impl Object<ConnectionStore> {
             ))
             .await?;
 
-        Ok((!connection.is_undefined().await?).then(|| connection))
+        Ok((!connection.is_undefined().await?).then_some(connection))
     }
 
     /// Returns a [`Connection`] for the provided remote member, awaiting for it

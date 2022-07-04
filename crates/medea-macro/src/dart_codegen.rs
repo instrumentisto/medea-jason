@@ -308,7 +308,7 @@ impl DartCodegen {
             writeln!(
                 out,
                 "required Pointer<NativeFunction<{ret_ty} \
-                Function({inputs})>> {name},",
+                 Function({inputs})>> {name},",
                 ret_ty = f.output.to_ffi_type(),
                 name = f.name.to_camel_case()
             )?;
