@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
   MEDEA_BRANCH: edge  # for E2E tests only
   RUST_BACKTRACE: 1
 
@@ -56,7 +57,7 @@ jobs:
           toolchain: stable
           components: clippy
       - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ env.CACHE == 'true' }}
 
       - run: make rustup.targets
 
@@ -162,45 +163,50 @@ jobs:
              }}
 
       - uses: actions/checkout@v3
-        if: ${{ steps.skip.outputs.no }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
-        if: ${{ steps.skip.outputs.no && !matrix.wasm }}
+        if: ${{ steps.skip.outputs.no == 'true' && !matrix.wasm }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
-        if: ${{ steps.skip.outputs.no && matrix.wasm }}
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.wasm }}
       - uses: Swatinem/rust-cache@v1
-        if: ${{ steps.skip.outputs.no
-                && !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ steps.skip.outputs.no == 'true' && env.CACHE == 'true' }}
 
       - name: Parse wasm-bindgen-cli version from Cargo.lock
         id: wasm-cli
         run: echo ::set-output
                   name=VERSION::$(cargo pkgid wasm-bindgen | grep -o '#.*'
                                                            | grep -o '[0-9\.]*')
-        if: ${{ steps.skip.outputs.no && matrix.wasm }}
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.wasm }}
       - uses: actions-rs/install@v0.1
         with:
           crate: wasm-bindgen-cli
           version: ${{ steps.wasm-cli.outputs.VERSION }}
           use-tool-cache: true
-        if: ${{ steps.skip.outputs.no && matrix.wasm }}
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.wasm }}
 
       - name: Chrome
         run: make test.unit crate=${{ matrix.crate }} browser=chrome
-        if: ${{ steps.skip.outputs.no && matrix.crate == 'medea-jason' }}
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.crate == 'medea-jason' }}
       - name: Firefox
         run: make test.unit crate=${{ matrix.crate }} browser=firefox
-        if: ${{ steps.skip.outputs.no && matrix.crate == 'medea-jason' }}
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.crate == 'medea-jason' }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
-        if: ${{ steps.skip.outputs.no && matrix.crate != 'medea-jason' }}
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.crate != 'medea-jason' }}
 
   test-e2e:
     name: E2E tests
@@ -215,13 +221,13 @@ jobs:
           target: wasm32-unknown-unknown
 
       - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ env.CACHE == 'true' }}
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
           key: test-e2e-{hash}
           restore-keys: test-e2e-
         continue-on-error: true
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ env.CACHE == 'true' }}
 
       - uses: actions-rs/install@v0.1
         with:
@@ -278,8 +284,7 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v1
-        if: ${{ matrix.platform != 'windows'
-                && !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ matrix.platform != 'windows' && env.CACHE == 'true' }}
 
       - run: make rustup.targets only=android
         if: ${{ matrix.platform == 'android' }}
@@ -378,7 +383,7 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ env.CACHE == 'true' }}
 
       - run: make rustup.targets only=android
         if: ${{ matrix.platform == 'android' }}
@@ -421,7 +426,7 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+        if: ${{ env.CACHE == 'true' }}
 
       # Run all task sequentially to not flood the jobs list.
       - run: make docs.rust crate=medea-macro open=no
