@@ -99,6 +99,8 @@
 
 pub mod callback;
 pub mod control;
+#[cfg(feature = "direct")]
+pub mod direct;
 #[cfg(feature = "grpc")]
 pub mod grpc;
 

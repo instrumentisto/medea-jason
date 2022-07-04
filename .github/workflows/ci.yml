@@ -138,8 +138,6 @@ jobs:
           - crate: medea-control-api-proto
             features: ["all"]
           - crate: medea-control-api-proto
-            features: ["grpc"]
-          - crate: medea-control-api-proto
             features: ["serde"]
           - crate: medea-control-api-proto
             features: ["client-api"]
@@ -148,9 +146,21 @@ jobs:
           - crate: medea-control-api-proto
             features: ["server"]
           - crate: medea-control-api-proto
+            features: ["direct"]
+          - crate: medea-control-api-proto
+            features: ["direct", "client"]
+          - crate: medea-control-api-proto
+            features: ["direct", "server"]
+          - crate: medea-control-api-proto
+            features: ["direct", "client", "server"]
+          - crate: medea-control-api-proto
+            features: ["grpc"]
+          - crate: medea-control-api-proto
             features: ["grpc", "client"]
           - crate: medea-control-api-proto
             features: ["grpc", "server"]
+          - crate: medea-control-api-proto
+            features: ["grpc", "client", "server"]
 
           - crate: medea-jason
             wasm: true

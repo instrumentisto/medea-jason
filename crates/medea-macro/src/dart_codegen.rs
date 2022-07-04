@@ -300,8 +300,7 @@ impl DartCodegen {
         for f in &self.registrators {
             let mut inputs = String::new();
             for i in &f.inputs {
-                #[allow(clippy::let_underscore_must_use)]
-                let _ = write!(inputs, "{}, ", i.to_ffi_type());
+                write!(inputs, "{}, ", i.to_ffi_type())?;
             }
             if !inputs.is_empty() {
                 inputs.truncate(inputs.len() - 2);
