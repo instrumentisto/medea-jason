@@ -39,27 +39,23 @@ jobs:
   #   steps:
   #     - run: true
 
-  my-test:
-    name: WINDOWS DESKTOP TEST
-    runs-on: windows-latest
+  test-on-mac:
+    runs-on: macOs-12
+    needs: ["docker"]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: wasm32-unknown-unknown
-      - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-                        -p ${{ secrets.MEDEA_DOCKER_PASS }}
-                        hub.instrumentisto.com
-      # - uses: actions-rs/install@v0.1
-      #   with:
-      #     crate: wasm-pack
-      #     use-tool-cache: true
+    - uses: actions/checkout@v3
+    - uses: docker-practice/actions-setup-docker@master
 
-      - run: make docker.up.e2e background=yes log=no dockerized=yes medea-tag=edge debug=no
-
-
+    - uses: actions/download-artifact@v3
+      with:
+        name: docker-medea-control-api-mock-${{ github.run_number }}
+    - name: Unpack `medea-control-api-mock` Docker image
+      run: make docker.untar from-file=image.tar
+    - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+                  -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                  hub.instrumentisto.com
+    - run: brew install vagrant && vagrant autocomplete install && vagrant plugin install vagrant-sshfs && vagrant plugin install vagrant-scp
+    - run: make test.e2e.desktop.mac up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
 
 
   # ##########################
@@ -530,62 +526,62 @@ jobs:
   #       if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
   #               || !startsWith(github.ref, 'refs/tags/medea-') }}
 
-  # docker:
-  #   name: Docker image
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - image: medea-control-api-mock
-  #           cache: ${{ github.ref != 'refs/heads/master'
-  #                      && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
-  #                      && !contains(github.event.head_commit.message, '[fresh ci]') }}
-  #           export: true  # required for E2E tests
-  #           if: true
+  docker:
+    name: Docker image
+    strategy:
+      matrix:
+        include:
+          - image: medea-control-api-mock
+            cache: ${{ github.ref != 'refs/heads/master'
+                       && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
+                       && !contains(github.event.head_commit.message, '[fresh ci]') }}
+            export: true  # required for E2E tests
+            if: true
 
-  #         - image: medea-demo
-  #           cache: ${{ github.ref != 'refs/heads/master'
-  #                      && !startsWith(github.ref, 'refs/tags/medea-demo-')
-  #                      && !contains(github.event.head_commit.message, '[fresh ci]') }}
-  #           export: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
-  #           if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-')
-  #                   || !startsWith(github.ref, 'refs/tags/medea-') }}
-  #         - image: medea-demo-edge
-  #           cache: false  # temporary disable caching due to CI issues
-  #           #cache: ${{ github.ref != 'refs/heads/master'
-  #           #           && !contains(github.event.head_commit.message, '[fresh ci]') }}
-  #           export: ${{ github.ref == 'refs/heads/master' }}
-  #           if: ${{ !startsWith(github.ref, 'refs/tags/medea-') }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       if: ${{ matrix.if }}
-  #     - uses: docker/setup-buildx-action@v2
-  #       if: ${{ matrix.if }}
+          - image: medea-demo
+            cache: ${{ github.ref != 'refs/heads/master'
+                       && !startsWith(github.ref, 'refs/tags/medea-demo-')
+                       && !contains(github.event.head_commit.message, '[fresh ci]') }}
+            export: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
+            if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-')
+                    || !startsWith(github.ref, 'refs/tags/medea-') }}
+          - image: medea-demo-edge
+            cache: false  # temporary disable caching due to CI issues
+            #cache: ${{ github.ref != 'refs/heads/master'
+            #           && !contains(github.event.head_commit.message, '[fresh ci]') }}
+            export: ${{ github.ref == 'refs/heads/master' }}
+            if: ${{ !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        if: ${{ matrix.if }}
+      - uses: docker/setup-buildx-action@v2
+        if: ${{ matrix.if }}
 
-  #     - run: make docker.build debug=no no-cache=yes
-  #                 image=${{ matrix.image }} tag=build-${{ github.run_number }}
-  #       if: ${{ matrix.if && !matrix.cache }}
+      - run: make docker.build debug=no no-cache=yes
+                  image=${{ matrix.image }} tag=build-${{ github.run_number }}
+        if: ${{ matrix.if && !matrix.cache }}
 
-  #     - uses: satackey/action-docker-layer-caching@v0.0.11
-  #       with:
-  #         key: docker-${{ matrix.image }}-build-{hash}
-  #         restore-keys: docker-${{ matrix.image }}-build-
-  #       continue-on-error: true
-  #       timeout-minutes: 10
-  #       if: ${{ matrix.if && matrix.cache }}
-  #     - run: make docker.build debug=yes no-cache=no
-  #                 image=${{ matrix.image }} tag=build-${{ github.run_number }}
-  #       if: ${{ matrix.if && matrix.cache }}
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        with:
+          key: docker-${{ matrix.image }}-build-{hash}
+          restore-keys: docker-${{ matrix.image }}-build-
+        continue-on-error: true
+        timeout-minutes: 10
+        if: ${{ matrix.if && matrix.cache }}
+      - run: make docker.build debug=yes no-cache=no
+                  image=${{ matrix.image }} tag=build-${{ github.run_number }}
+        if: ${{ matrix.if && matrix.cache }}
 
-  #     - run: make docker.tar to-file=image.tar
-  #                 image=${{ matrix.image }} tags=build-${{ github.run_number }}
-  #       if: ${{ matrix.if && matrix.export }}
-  #     - uses: actions/upload-artifact@v3
-  #       with:
-  #         name: docker-${{ matrix.image }}-${{ github.run_number }}
-  #         path: image.tar
-  #         retention-days: 1
-  #       if: ${{ matrix.if && matrix.export }}
+      - run: make docker.tar to-file=image.tar
+                  image=${{ matrix.image }} tags=build-${{ github.run_number }}
+        if: ${{ matrix.if && matrix.export }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: docker-${{ matrix.image }}-${{ github.run_number }}
+          path: image.tar
+          retention-days: 1
+        if: ${{ matrix.if && matrix.export }}
 
 
 

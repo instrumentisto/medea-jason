@@ -3,7 +3,7 @@ version: "2"
 services:
   frontend:
     container_name: ${COMPOSE_PROJECT_NAME}-frontend
-    image: e2eteam/nginx:1.14-alpine
+    image: nginx:stable-alpine
     ports:
       - "6379:6379"      # coturn redis
       - "6565:6565"      # medea grpc
@@ -34,7 +34,7 @@ services:
     network_mode: service:frontend
   coturn-db:
     container_name: ${COMPOSE_PROJECT_NAME}-coturn-db
-    image: redis:windowsservercore
+    image: redis:alpine
     command: ["redis-server", "/etc/redis.conf"]
     volumes:
       - ../_dev/coturn/redis.conf:/etc/redis.conf:ro
@@ -44,10 +44,10 @@ services:
     image: ${COMPOSE_CONTROL_MOCK_IMAGE_NAME}:${COMPOSE_CONTROL_MOCK_IMAGE_VER}
     depends_on: ["medea"]
     network_mode: service:frontend
-  webdriver:
-    container_name: ${COMPOSE_PROJECT_NAME}-webdriver
-    image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
-    depends_on: ["control-api-mock", "coturn", "frontend", "medea"]
-    shm_size: 512m
-    entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
-    network_mode: host
+  # webdriver:
+  #   container_name: ${COMPOSE_PROJECT_NAME}-webdriver
+  #   image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
+  #   depends_on: ["control-api-mock", "coturn", "frontend", "medea"]
+  #   shm_size: 512m
+  #   entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
+  #   network_mode: host

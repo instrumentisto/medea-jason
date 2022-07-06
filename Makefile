@@ -672,6 +672,21 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
+test.e2e.desktop.mac:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+endif
+	cd flutter/example/ && \
+	export WEBRTC_FAKE_MEDIA=true && vagrant up
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
 
 # Runs Flutter plugin integration tests on an attached device.
 #

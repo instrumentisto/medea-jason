@@ -14,9 +14,10 @@ dependencies:
   ffi: ^2.0.0
   flutter_webrtc:
     # path: /media/human/2AC6C562C6C52EBF/Work/Linux/Docs/flutter-webrtc/
-    git:
-      url: https://github.com/instrumentisto/flutter-webrtc.git
-      ref: add-fake-media-env-option
+    path: C:\Work\Github\Current\flutter-webrtc
+    # git:
+    #   url: https://github.com/instrumentisto/flutter-webrtc.git
+    #   ref: add-fake-media-env-option
   js: ^0.6.3
   http: ^0.13.4
   uuid: ^3.0.6
