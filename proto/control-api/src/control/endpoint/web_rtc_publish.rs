@@ -6,7 +6,6 @@ use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use smart_default::SmartDefault;
 
 use crate::control::endpoint;
 
@@ -145,7 +144,7 @@ pub struct VideoSettings {
 /// [`WebRtcPublish`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[derive(Clone, Copy, Debug, Eq, PartialEq, SmartDefault)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub enum Policy {
     /// Media type __may__ be published.

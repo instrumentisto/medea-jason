@@ -2,7 +2,7 @@
 name = "medea-e2e"
 version = "0.0.0"
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.62"
 description = "E2E tests for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 publish = false

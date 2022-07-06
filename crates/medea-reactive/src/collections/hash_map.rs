@@ -299,6 +299,8 @@ where
     }
 }
 
+// Implemented manually to omit redundant `: Default` trait bounds, imposed by
+// `#[derive(Default)]`.
 impl<K, V, S: SubscribersStore<(K, V), O>, O> Default for HashMap<K, V, S, O> {
     fn default() -> Self {
         Self {
