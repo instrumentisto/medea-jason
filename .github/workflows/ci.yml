@@ -34,6 +34,8 @@ jobs:
       - rustdoc
       - rustfmt
       - test-e2e
+      - test-desktop
+      - test-e2e-windows
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
@@ -451,7 +453,7 @@ jobs:
         if: ${{ matrix.platform == 'windows' }}
 
   test-e2e-windows:
-    name: Build medea-jason
+    name: E2E tests for windows
     runs-on: macOs-12
     needs: ["docker", "test-e2e-desktop"]
     steps:

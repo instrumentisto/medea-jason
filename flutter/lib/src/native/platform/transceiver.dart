@@ -32,7 +32,7 @@ Object _setRecv(RtpTransceiver transceiver, bool recv) {
   return () => transceiver.setRecv(recv);
 }
 
-  /// Changes the send direction of this [RtpTransceiver].
+/// Changes the send direction of this [RtpTransceiver].
 Object _setSend(RtpTransceiver transceiver, bool send) {
   return () => transceiver.setSend(send);
 }
