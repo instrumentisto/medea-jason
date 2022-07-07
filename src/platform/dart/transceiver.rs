@@ -58,9 +58,11 @@ mod transceiver {
             direction: i64,
         ) -> Dart_Handle;
 
+        // todo doc
         /// Sets receive of this [`Transceiver`].
         pub fn set_recv(transceiver: Dart_Handle, recv: bool) -> Dart_Handle;
 
+        // todo doc
         /// Sets send of this [`Transceiver`].
         pub fn set_send(transceiver: Dart_Handle, sens: bool) -> Dart_Handle;
     }
@@ -74,6 +76,7 @@ mod transceiver {
 pub struct Transceiver(DartHandle);
 
 impl Transceiver {
+    // todo doc
     /// Sets this [`Transceiver`] receive to the `recv`.
     #[must_use]
     pub fn set_recv(&self, recv: bool) -> LocalBoxFuture<'static, ()> {
@@ -89,6 +92,7 @@ impl Transceiver {
         })
     }
 
+    // todo doc
     /// Sets this [`Transceiver`] send to the `send`.
     #[must_use]
     pub fn set_send(&self, send: bool) -> LocalBoxFuture<'static, ()> {

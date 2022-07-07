@@ -207,7 +207,7 @@ impl<T> Object<TracksStore<T>> {
     ///
     /// - If failed to execute JS statement.
     /// - If failed to parse result as [`u64`].
-    pub async fn count_tracks_by_selector(
+    pub async fn count_tracks_by_lived(
         &self,
         live: bool,
     ) -> Result<u64, Error> {

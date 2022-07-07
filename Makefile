@@ -38,9 +38,6 @@ ANDROID_SDK_MIN_VERSION = $(strip \
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
-CURRENT_OS ?= $(strip $(or $(os),\
-	$(if $(call eq,$(OS),Windows_NT),windows,\
-	$(if $(call eq,$(shell uname -s),Darwin),macos,linux))))
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -95,25 +92,9 @@ down: down.dev
 
 fmt: cargo.fmt flutter.fmt
 
-fake.media:
-	sudo apt update 
-	sudo apt install -y dkms
-	sudo apt install -y linux-modules-extra-$(shell uname -r)
-	sudo apt install -y ffmpeg
-	sudo apt -y install v4l2loopback-dkms v4l2loopback-utils
-	sudo apt install v4l-utils
-	sudo apt install pulseaudio
-	sudo apt install pulseaudio-utils
-	pulseaudio -D
-	sudo modprobe v4l2loopback card_label="My Fake Webcam" exclusive_caps=1
-	pactl load-module module-null-sink sink_name=FakeSource sink_properties=device.description="FakeSource"
-	pactl load-module module-virtual-source source_name=VirtualMic master=FakeSource.monitor
-
-
 
 lint: cargo.lint
 
-codegen: flutter.gen
 
 # Build and publish project crate everywhere.
 #
@@ -498,11 +479,9 @@ flutter.web.assets:
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
 
-flutter.gen:
-	cd flutter/ && \
-	flutter clean && \
-	flutter pub get && \
-	flutter pub run build_runner build --delete-conflicting-outputs
+
+
+
 #################
 # Yarn commands #
 #################
@@ -644,6 +623,7 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
+# todo fow windows
 # Run E2E desktop tests of project.
 #
 # Usage:
@@ -698,6 +678,8 @@ test.flutter:
 	flutter drive --driver=test_driver/integration_test.dart \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))
+
+
 
 ####################
 # Waiting commands #
@@ -1023,6 +1005,7 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 			/entrypoint.sh ))
 
 docker.up.e2e: docker.down.e2e
+	@make build.jason target=web debug=$(debug) dockerized=no
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\

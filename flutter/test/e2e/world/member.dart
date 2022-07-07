@@ -80,7 +80,7 @@ class ConnectionStore {
   }
 
   /// Returns count of tracks from `remote_id` by the provided `live` values.
-  int count_tracks_by_selector(bool live, String remote_id) {
+  int count_tracks_by_lived(bool live, String remote_id) {
     var count = 0;
     remote_tracks[remote_id]!.forEach((key, value) {
       var track_stopped = remote_track_is_stopped(remote_id, key);

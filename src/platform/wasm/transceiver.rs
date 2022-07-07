@@ -22,6 +22,7 @@ impl Transceiver {
         TransceiverDirection::from(self.0.direction())
     }
 
+    //todo doc
     /// Sets this [`Transceiver`] receive to the `recv`.
     pub fn set_recv(&self, recv: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.0.clone();
@@ -37,6 +38,7 @@ impl Transceiver {
         }
     }
 
+    //todo doc
     /// Sets this [`Transceiver`] send to the `send`.
     pub fn set_send(&self, send: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.0.clone();

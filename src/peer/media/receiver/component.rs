@@ -324,13 +324,13 @@ impl Component {
                 }
             }
             media_exchange_state::Stable::Enabled => {
-                let add_direction = receiver
+                let add_recv = receiver
                     .transceiver
                     .borrow()
                     .as_ref()
                     .map(|trnscvr| trnscvr.set_recv(true));
 
-                if let Some(fut) = add_direction {
+                if let Some(fut) = add_recv {
                     fut.await;
                 }
             }

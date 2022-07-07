@@ -13,11 +13,9 @@ dependencies:
     sdk: flutter
   ffi: ^2.0.0
   flutter_webrtc:
-    # path: /media/human/2AC6C562C6C52EBF/Work/Linux/Docs/flutter-webrtc/
-    path: C:\Work\Github\Current\flutter-webrtc
-    # git:
-    #   url: https://github.com/instrumentisto/flutter-webrtc.git
-    #   ref: add-fake-media-env-option
+    git:
+      url: https://github.com/instrumentisto/flutter-webrtc.git
+      ref: add-fake-media-env-option
   js: ^0.6.3
   http: ^0.13.4
   uuid: ^3.0.6
@@ -31,11 +29,6 @@ dev_dependencies:
     sdk: flutter
   flutter_gherkin: 3.0.0-rc.9
   json_serializable: ^6.1.5
-
-      
-dependency_overrides:
-  # TODO: Remove when `flutter_gherkin` updates.
-  # analyzer: ^4.0.0
 
 flutter:
   plugin:

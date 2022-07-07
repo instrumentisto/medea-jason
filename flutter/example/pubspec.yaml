@@ -21,7 +21,7 @@ dependencies:
   # the parent directory to use the current plugin's version.
   medea_jason:
     path: ../
-    
+
   cupertino_icons: ^1.0.2
 
 dev_dependencies:

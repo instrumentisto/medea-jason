@@ -27,12 +27,14 @@ Object _setDirection(RtpTransceiver transceiver, int direction) {
   return () => transceiver.setDirection(TransceiverDirection.values[direction]);
 }
 
+// todo doc
 /// Sets receive of the provided [RtpTransceiver] to the provided
 /// one.
 Object _setRecv(RtpTransceiver transceiver, bool recv) {
   return () => transceiver.setRecv(recv);
 }
 
+// todo doc
 /// Sets send of the provided [RtpTransceiver] to the provided
 /// one.
 Object _setSend(RtpTransceiver transceiver, bool send) {

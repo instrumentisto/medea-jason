@@ -1,22 +1,28 @@
+
+
+// todo 10.0.2.2
+const IP_TEST_BASE = String.fromEnvironment('IP_TEST_BASE',
+    defaultValue: '127.0.0.1');
+
 /// Address of a [WebDriver] client.
 ///
 /// Default: `http://127.0.0.1:4444`
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
 const WEBDRIVER_ADDR = String.fromEnvironment('WEBDRIVER_ADDR',
-    defaultValue: 'http://10.0.2.2:4444');
+    defaultValue: 'http://$IP_TEST_BASE:4444');
 
 /// Address of a Control API mock server.
 ///
-/// Default: `http://10.0.2.2:8000`
+/// Default: `http://127.0.0.1:8000`
 const CONTROL_API_ADDR = String.fromEnvironment('CONTROL_API_ADDR',
-    defaultValue: 'http://10.0.2.2:8000');
+    defaultValue: 'http://$IP_TEST_BASE:8000');
 
 /// Address a Client API WebSocket endpoint.
 ///
 /// Default: `ws://127.0.0.1:8001/ws`
 const CLIENT_API_ADDR = String.fromEnvironment('CLIENT_API_ADDR',
-    defaultValue: 'ws://10.0.2.2:8001/ws');
+    defaultValue: 'ws://$IP_TEST_BASE:8001/ws');
 
 /// Host of a [`FileServer`].
 ///
@@ -24,7 +30,7 @@ const CLIENT_API_ADDR = String.fromEnvironment('CLIENT_API_ADDR',
 ///
 /// [`FileServer`]: crate::file_server::FileServer
 const FILE_SERVER_HOST =
-    String.fromEnvironment('FILE_SERVER_HOST', defaultValue: '10.0.2.2:30000');
+    String.fromEnvironment('FILE_SERVER_HOST', defaultValue: '$IP_TEST_BASE:30000');
 
 /// Path to a Cucumber features which should be run.
 const FEATURES_PATH =

@@ -1,6 +1,6 @@
+# todo recheck
 targets:
   $default:
     sources:
       - $package$
-      # - lib/**
       - test/**

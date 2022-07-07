@@ -214,7 +214,7 @@ async fn then_member_doesnt_have_live_local_tracks(
 ) {
     let member = world.get_member(&id).unwrap();
     let local_tracks = member.room().local_tracks().await.unwrap();
-    let count = local_tracks.count_tracks_by_selector(true).await.unwrap();
+    let count = local_tracks.count_tracks_by_lived(true).await.unwrap();
     assert_eq!(count, 0);
 }
 
@@ -239,7 +239,7 @@ async fn then_member_has_n_remote_tracks_from(
     let mut actual_count = 0;
     for _ in 0..5 {
         actual_count =
-            tracks_store.count_tracks_by_selector(live).await.unwrap();
+            tracks_store.count_tracks_by_lived(live).await.unwrap();
         if actual_count != expected_count {
             sleep(Duration::from_millis(300)).await;
         }
