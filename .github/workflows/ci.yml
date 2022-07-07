@@ -483,6 +483,7 @@ jobs:
         path: ./windows_test_staff/test/
 
     - run: make test.e2e.desktop.windows up=yes debug=no dockerized=yes 
+                                        background=yes
                                         medea-tag=${{ env.MEDEA_BRANCH }} 
                                         control-tag=build-${{ github.run_number }}
 
