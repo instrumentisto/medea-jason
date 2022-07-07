@@ -350,7 +350,8 @@ jobs:
           make cargo.build.jason platform=${{ matrix.platform }}
           make test.e2e.desktop.windows.build
         if: ${{ matrix.platform == 'windows' }}
-        uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v3
         with:
           name: windows-test-bundle-${{ github.run_number }}
           path: ./flutter/example/build/windows/runner/Debug
