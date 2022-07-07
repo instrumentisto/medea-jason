@@ -22,6 +22,7 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
+    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 

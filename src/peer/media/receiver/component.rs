@@ -21,6 +21,7 @@ use crate::{
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
     },
+    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
