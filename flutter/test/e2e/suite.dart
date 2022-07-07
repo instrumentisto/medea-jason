@@ -1,6 +1,5 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:gherkin/gherkin.dart';
 
 import 'api/room.dart';

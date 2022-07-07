@@ -1,8 +1,10 @@
 import 'dart:io';
 
-// todo 10.0.2.2
-final String IP_TEST_BASE =
-    Platform.environment['IP_TEST_BASE'] ?? '127.0.0.1';
+/// Base address of a servers/clients.
+/// Use `10.0.2.2` for windows test in VM.
+///
+/// Default: `127.0.0.1`
+final String IP_TEST_BASE = Platform.environment['IP_TEST_BASE'] ?? '127.0.0.1';
 
 /// Address of a [WebDriver] client.
 ///
@@ -15,7 +17,7 @@ final String WEBDRIVER_ADDR =
 /// Address of a Control API mock server.
 ///
 /// Default: `http://127.0.0.1:8000`
-final String CONTROL_API_ADDR = 
+final String CONTROL_API_ADDR =
     Platform.environment['CONTROL_API_ADDR'] ?? 'http://$IP_TEST_BASE:8000';
 
 /// Address a Client API WebSocket endpoint.

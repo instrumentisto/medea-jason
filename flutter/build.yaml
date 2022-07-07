@@ -1,4 +1,3 @@
-# todo recheck
 targets:
   $default:
     sources:
