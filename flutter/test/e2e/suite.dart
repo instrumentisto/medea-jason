@@ -131,8 +131,8 @@ final TestConfigs = FlutterTestConfiguration()
 ])
 Future<void> main() async {
   var Fake = Platform.environment['WEBRTC_FAKE_MEDIA'] ?? 'NOPE';
-  print(Fake);
-  
+  print('WTF $Fake');
+
   var mediaDeviceInfos = await enumerateDevices();
   var devicesInfo = '';
   for (var device in mediaDeviceInfos) {
@@ -140,7 +140,7 @@ Future<void> main() async {
         'Kind: ${device.kind}\nName: ${device.label}\nId: ${device.deviceId}\n\n';
   }
   print(devicesInfo);
-  
+
   executeTestSuite(
     TestConfigs,
     (World world) async {},
