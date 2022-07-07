@@ -13,6 +13,9 @@ use medea_reactive::{
     ProgressableCell,
 };
 
+#[cfg(doc)]
+use crate::platform;
+
 use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{
@@ -21,7 +24,6 @@ use crate::{
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 

@@ -685,7 +685,7 @@ endif
 #	make test.e2e.desktop.windows.build
 test.e2e.desktop.windows.build:
 	cd flutter/example/ && \
-	flutter build windwos --target=../test/e2e/suite.dart --debug
+	flutter build windows --target=../test/e2e/suite.dart --debug
 
 # Runs Flutter plugin integration tests on an attached device.
 #

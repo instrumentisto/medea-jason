@@ -11,6 +11,9 @@ use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
 use tracerr::Traced;
 
+#[cfg(doc)]
+use crate::platform;
+
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
@@ -22,7 +25,6 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 

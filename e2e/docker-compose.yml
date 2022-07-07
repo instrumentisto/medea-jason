@@ -44,10 +44,10 @@ services:
     image: ${COMPOSE_CONTROL_MOCK_IMAGE_NAME}:${COMPOSE_CONTROL_MOCK_IMAGE_VER}
     depends_on: ["medea"]
     network_mode: service:frontend
-  # webdriver:
-  #   container_name: ${COMPOSE_PROJECT_NAME}-webdriver
-  #   image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
-  #   depends_on: ["control-api-mock", "coturn", "frontend", "medea"]
-  #   shm_size: 512m
-  #   entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
-  #   network_mode: host
+  webdriver:
+    container_name: ${COMPOSE_PROJECT_NAME}-webdriver
+    image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
+    depends_on: ["control-api-mock", "coturn", "frontend", "medea"]
+    shm_size: 512m
+    entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
+    network_mode: host

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:gherkin/gherkin.dart';
 
 import 'api/room.dart';
@@ -127,6 +130,17 @@ final TestConfigs = FlutterTestConfiguration()
   // '../e2e/tests/features/state_synchronization.feature',
 ])
 Future<void> main() async {
+  var Fake = Platform.environment['WEBRTC_FAKE_MEDIA'] ?? 'NOPE';
+  print(Fake);
+  
+  var mediaDeviceInfos = await enumerateDevices();
+  var devicesInfo = '';
+  for (var device in mediaDeviceInfos) {
+    devicesInfo = devicesInfo +
+        'Kind: ${device.kind}\nName: ${device.label}\nId: ${device.deviceId}\n\n';
+  }
+  print(devicesInfo);
+  
   executeTestSuite(
     TestConfigs,
     (World world) async {},

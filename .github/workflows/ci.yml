@@ -348,9 +348,7 @@ jobs:
         if: ${{ matrix.platform == 'linux' }}
 
       - name: Build windows test bundle
-        run: |
-          make cargo.build.jason platform=${{ matrix.platform }}
-          make test.e2e.desktop.windows.build
+        run: make test.e2e.desktop.windows.build
         if: ${{ matrix.platform == 'windows' }}
 
       - uses: actions/upload-artifact@v3
@@ -649,7 +647,7 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit"]
+    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit", "test-e2e-desktop", "test-e2e-windows"]
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
