@@ -670,8 +670,10 @@ ifeq ($(rebuild),yes)
 	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
 endif
 endif
-	@make docker.up.e2e background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+	env $(docker-up-e2e-env) \
+	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
+		up $(if $(call eq,$(dockerized),yes),\
+		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
 endif
 	cd windwos_test_staff/ && \
 	vagrant up
