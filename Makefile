@@ -675,7 +675,7 @@ endif
 		up $(if $(call eq,$(dockerized),yes),\
 		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
 endif
-	cd windwos_test_staff/ && \
+	cd windows_test_staff/ && \
 	vagrant up
 ifeq ($(up),yes)
 	@make docker.down.e2e
