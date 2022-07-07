@@ -1,37 +1,37 @@
-
+import 'dart:io';
 
 // todo 10.0.2.2
-const IP_TEST_BASE = String.fromEnvironment('IP_TEST_BASE',
-    defaultValue: '127.0.0.1');
+final String IP_TEST_BASE =
+    Platform.environment['IP_TEST_BASE'] ?? '127.0.0.1';
 
 /// Address of a [WebDriver] client.
 ///
 /// Default: `http://127.0.0.1:4444`
 ///
 /// [WebDriver]: https://w3.org/TR/webdriver
-const WEBDRIVER_ADDR = String.fromEnvironment('WEBDRIVER_ADDR',
-    defaultValue: 'http://$IP_TEST_BASE:4444');
+final String WEBDRIVER_ADDR =
+    Platform.environment['WEBDRIVER_ADDR'] ?? 'http://$IP_TEST_BASE:4444';
 
 /// Address of a Control API mock server.
 ///
 /// Default: `http://127.0.0.1:8000`
-const CONTROL_API_ADDR = String.fromEnvironment('CONTROL_API_ADDR',
-    defaultValue: 'http://$IP_TEST_BASE:8000');
+final String CONTROL_API_ADDR = 
+    Platform.environment['CONTROL_API_ADDR'] ?? 'http://$IP_TEST_BASE:8000';
 
 /// Address a Client API WebSocket endpoint.
 ///
 /// Default: `ws://127.0.0.1:8001/ws`
-const CLIENT_API_ADDR = String.fromEnvironment('CLIENT_API_ADDR',
-    defaultValue: 'ws://$IP_TEST_BASE:8001/ws');
+final String CLIENT_API_ADDR =
+    Platform.environment['CLIENT_API_ADDR'] ?? 'ws://$IP_TEST_BASE:8001/ws';
 
 /// Host of a [`FileServer`].
 ///
 /// Default: `127.0.0.1:30000`
 ///
 /// [`FileServer`]: crate::file_server::FileServer
-const FILE_SERVER_HOST =
-    String.fromEnvironment('FILE_SERVER_HOST', defaultValue: '$IP_TEST_BASE:30000');
+final String FILE_SERVER_HOST =
+    Platform.environment['FILE_SERVER_HOST'] ?? '$IP_TEST_BASE:30000';
 
 /// Path to a Cucumber features which should be run.
-const FEATURES_PATH =
-    String.fromEnvironment('FEATURES_PATH', defaultValue: 'tests/features');
+final String FEATURES_PATH =
+    Platform.environment['FEATURES_PATH'] ?? 'tests/features';

@@ -623,17 +623,17 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
-# todo fow windows
 # Run E2E desktop tests of project.
 #
 # Usage:
-#	make test.e2e [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
 #		[( [up=no] | up=yes
 #		          [( [dockerized=no]
 #		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
 #		          [debug=(yes|no)]
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
+
 test.e2e.desktop:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
@@ -652,7 +652,18 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
-test.e2e.desktop.mac:
+# Run E2E windows tests of project in vagrant vm.
+#
+# Usage:
+#	make test.e2e.desktop.windows [(only=<regex>|only-tags=<tag-expression>)]
+#		[( [up=no] | up=yes
+#		          [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e.desktop.windows:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -662,11 +673,19 @@ endif
 	@make docker.up.e2e background=yes log=$(log) \
 	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
 endif
-	cd flutter/example/ && \
-	export WEBRTC_FAKE_MEDIA=true && vagrant up
+	cd windwos_test_staff/ && \
+	vagrant up
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
+
+# Build flutter e2e test as bundle. 
+#
+# Usage:
+#	make test.e2e.desktop.windows.build
+test.e2e.desktop.windows.build:
+	cd flutter/example/ && \
+	flutter build windwos --target=../test/e2e/suite.dart --debug
 
 # Runs Flutter plugin integration tests on an attached device.
 #
