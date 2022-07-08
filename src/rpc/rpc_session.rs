@@ -519,7 +519,7 @@ impl RpcSession for WebSocketRpcSession {
                 async move {
                     (matches!(current_state, SessionState::Opened(_))
                         && can_reconnect.get())
-                    .then(|| ())
+                    .then_some(())
                 }
             })
             .boxed_local()

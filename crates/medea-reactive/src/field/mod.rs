@@ -316,7 +316,7 @@ impl<D: Clone> OnObservableFieldModification<D>
                     sender
                         .borrow_mut()
                         .take()
-                        .expect("UniversalSubscriber::When used already")
+                        .expect("`UniversalSubscriber::When` used already")
                         .send(())
                         .map_or(false, |_| false)
                 } else {

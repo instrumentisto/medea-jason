@@ -123,8 +123,10 @@ impl Notification {
 struct WsSession {
     /// `Room` id that this [`WsSession`] is subscribed to.
     room_id: String,
+
     /// Map of subscribers to [`Notification`]s.
     subscribers: Subscribers,
+
     /// `Ping` messages counter.
     last_ping_num: u32,
 }

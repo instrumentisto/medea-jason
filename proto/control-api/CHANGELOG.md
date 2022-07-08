@@ -17,6 +17,8 @@ All user visible changes to this project will be documented in this file. This p
     - `ControlApi` and `CallbackApi` ([#55]).
 - gRPC:
     - `ControlApi` and `CallbackApi` implementations ([#56]).
+- Direct:
+    - `ControlApi` and `CallbackApi` implementations ([#65]).
 - Cargo features:
     - `client` and `server` ([#56]);
     - `serde` ([#67]);
