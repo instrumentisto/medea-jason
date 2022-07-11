@@ -286,13 +286,7 @@ impl_from_num_for_dart_value!(bool);
 #[repr(transparent)]
 pub struct DartValueArg<T>(DartValue, PhantomData<*const T>);
 
-impl<T> DartValueArg<T> {
-    #[must_use]
-    /// Returns [`DartValue`] that could not be casted.
-    pub fn into_value(self) -> DartValue {
-        self.0
-    }
-}
+
 
 impl<F, T> From<F> for DartValueArg<T>
 where

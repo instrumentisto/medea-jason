@@ -43,6 +43,7 @@ pub unsafe extern "C" fn RoomHandle__join(
 ) -> DartFuture<Result<(), Traced<RoomJoinError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
+
         async move {
             this.join(c_str_into_string(token)).await?;
             Ok(())
