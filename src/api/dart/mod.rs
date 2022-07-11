@@ -70,8 +70,8 @@ pub use self::{
     room_close_reason::RoomCloseReason,
     room_handle::RoomHandle,
     utils::{
-        c_str_into_string, free_dart_native_string, string_into_c_str,
-        ArgumentError, DartError as Error,
+        c_str_into_string, dart_string_into_rust, free_dart_native_string,
+        string_into_c_str, ArgumentError, DartError as Error,
     },
 };
 
@@ -285,8 +285,6 @@ impl_from_num_for_dart_value!(bool);
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct DartValueArg<T>(DartValue, PhantomData<*const T>);
-
-
 
 impl<F, T> From<F> for DartValueArg<T>
 where

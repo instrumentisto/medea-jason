@@ -11,7 +11,7 @@ use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::{c_str_into_string, free_dart_native_string, string_into_c_str},
+    api::{dart_string_into_rust, string_into_c_str},
     platform::{
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
@@ -133,7 +133,8 @@ impl RpcTransport for WebSocketRpcTransport {
         #[allow(clippy::map_err_ignore)]
         let handle = unsafe {
             FutureFromDart::execute::<DartHandle>(transport::connect(
-                string_into_c_str(url.as_ref().to_owned()),
+                string_into_c_str(url.as_ref().to_owned()), /* TODO: leaks
+                                                             * here? */
                 Callback::from_fn_mut({
                     let weak_subs = Rc::downgrade(&self.on_message_subs);
                     move |msg: String| {
@@ -164,9 +165,9 @@ impl RpcTransport for WebSocketRpcTransport {
                         let code = transport::close_code(close_frame.get())
                             .try_into()
                             .unwrap_or(1007);
-                        let raw = transport::close_reason(close_frame.get());
-                        let reason = c_str_into_string(raw);
-                        free_dart_native_string(raw);
+                        let reason = dart_string_into_rust(
+                            transport::close_reason(close_frame.get()),
+                        );
 
                         socket_state.set(TransportState::Closed(
                             CloseMsg::from((code, reason)),

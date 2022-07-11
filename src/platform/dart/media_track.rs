@@ -8,7 +8,7 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{c_str_into_string, free_dart_native_string},
+    api::dart_string_into_rust,
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
@@ -147,10 +147,7 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn id(&self) -> String {
         unsafe {
-            let raw = media_stream_track::id(self.inner.get());
-            let id = c_str_into_string(raw);
-            free_dart_native_string(raw);
-            id
+            dart_string_into_rust(media_stream_track::id(self.inner.get()))
         }
     }
 
@@ -161,11 +158,9 @@ impl MediaStreamTrack {
     #[must_use]
     pub fn device_id(&self) -> String {
         unsafe {
-            let raw = media_stream_track::device_id(self.inner.get());
-            let device_id = c_str_into_string(raw);
-            free_dart_native_string(raw);
-
-            device_id
+            dart_string_into_rust(media_stream_track::device_id(
+                self.inner.get(),
+            ))
         }
     }
 

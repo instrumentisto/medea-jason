@@ -5,7 +5,7 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{c_str_into_string, free_dart_native_string, DartValue},
+    api::{dart_string_into_rust, DartValue},
     media::MediaDeviceKind,
     platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
@@ -57,11 +57,9 @@ impl MediaDeviceInfo {
     #[must_use]
     pub fn device_id(&self) -> String {
         unsafe {
-            let raw = media_device_info::device_id(self.handle.get());
-            let device_id = c_str_into_string(raw);
-            free_dart_native_string(raw);
-
-            device_id
+            dart_string_into_rust(media_device_info::device_id(
+                self.handle.get(),
+            ))
         }
     }
 
@@ -78,11 +76,7 @@ impl MediaDeviceInfo {
     #[must_use]
     pub fn label(&self) -> String {
         unsafe {
-            let raw = media_device_info::label(self.handle.get());
-            let label = c_str_into_string(raw);
-            free_dart_native_string(raw);
-
-            label
+            dart_string_into_rust(media_device_info::label(self.handle.get()))
         }
     }
 
@@ -101,9 +95,7 @@ impl MediaDeviceInfo {
         unsafe {
             let raw = media_device_info::group_id(self.handle.get()).unbox();
             if let DartValue::String(c_str) = raw.into_value() {
-                let group_id = c_str_into_string(c_str);
-                free_dart_native_string(c_str);
-                Some(group_id)
+                Some(dart_string_into_rust(c_str))
             } else {
                 None
             }
