@@ -130,17 +130,6 @@ final TestConfigs = FlutterTestConfiguration()
   // '../e2e/tests/features/state_synchronization.feature',
 ])
 Future<void> main() async {
-  var Fake = Platform.environment['WEBRTC_FAKE_MEDIA'] ?? 'NOPE';
-  print('WTF $Fake');
-
-  var mediaDeviceInfos = await enumerateDevices();
-  var devicesInfo = '';
-  for (var device in mediaDeviceInfos) {
-    devicesInfo = devicesInfo +
-        'Kind: ${device.kind}\nName: ${device.label}\nId: ${device.deviceId}\n\n';
-  }
-  print(devicesInfo);
-
   executeTestSuite(
     TestConfigs,
     (World world) async {},
