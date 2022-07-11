@@ -86,7 +86,7 @@ final TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
-  ..defaultTimeout = const Duration(seconds: 100)
+  ..defaultTimeout = const Duration(seconds: 30)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
         if (old_world != null) {
@@ -98,10 +98,8 @@ final TestConfigs = FlutterTestConfiguration()
         }
         var world = CustomWorld();
         old_world = world;
-        print('\n\n\n\n');
         await world.control_client
             .create(world.room_id, Room(world.room_id, {}));
-        print('Create world');
         return world;
       });
 
