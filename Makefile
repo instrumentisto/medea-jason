@@ -1004,7 +1004,7 @@ docker.up.demo: docker.down.demo
 #                         [control-tag=(dev|<tag>)] )]
 #	                   [debug=(yes|no)]
 #	                   [( [background=no]
-#	                    | background=yes [log=(no|yes)] )]
+#	                    | background=yes [log=(no|yes)])]
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
