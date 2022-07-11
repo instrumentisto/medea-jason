@@ -283,8 +283,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: linux
-          #   os: ubuntu-22.04
+          - platform: linux
+            os: ubuntu-22.04
           - platform: windows
             os: windows-latest
           # TODO: Add macos e2e tests
