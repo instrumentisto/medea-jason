@@ -161,7 +161,7 @@ impl Track {
         }
     }
 
-    /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
+    /// Invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
     #[cfg(target_family = "wasm")]
     pub async fn stop(self) {
