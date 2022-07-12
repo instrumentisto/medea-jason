@@ -76,9 +76,9 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
 ) -> DartFuture<Result<(), Traced<InvalidOutputAudioDeviceIdError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
-        let device_id_string = dart_string_into_rust(device_id);
+        let device_id = dart_string_into_rust(device_id);
         async move {
-            this.set_output_audio_id(device_id_string)
+            this.set_output_audio_id(device_id)
                 .await
                 .map_err(tracerr::map_from_and_wrap!())?;
             Ok(())

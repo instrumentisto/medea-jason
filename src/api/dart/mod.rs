@@ -309,14 +309,6 @@ impl_from_num_for_dart_value!(bool);
 #[repr(transparent)]
 pub struct DartValueArg<T>(DartValue, PhantomData<*const T>);
 
-impl<T> DartValueArg<T> {
-    #[must_use]
-    /// Returns [`DartValue`] that could not be casted.
-    pub fn into_value(self) -> DartValue {
-        self.0
-    }
-}
-
 impl<F, T> From<F> for DartValueArg<T>
 where
     DartValue: From<F>,
@@ -413,7 +405,7 @@ impl TryFrom<DartValueArg<Self>> for Option<DartHandle> {
     }
 }
 
-impl TryFrom<DartValueArg<Self>> for Option<String> { // asdasd
+impl TryFrom<DartValueArg<Self>> for Option<String> {
     type Error = DartValueCastError;
 
     fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {

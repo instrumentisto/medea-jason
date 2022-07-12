@@ -31,7 +31,6 @@ void _completeProxy(Function f, Pointer rustFuture) {
   fut.then((val) {
     var arg = ForeignValue.fromDart(val);
     _futureResolveOk(rustFuture, arg.ref);
-    arg.free();
   }).onError((error, stackTrace) {
     _futureResolveErr(rustFuture, error!);
   });

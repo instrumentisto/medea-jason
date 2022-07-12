@@ -500,7 +500,6 @@ void main() {
 
     none.free();
     ptr.free();
-    str.free();
     num.free();
   });
 
@@ -527,7 +526,6 @@ void main() {
 
     none.free();
     ptr.free();
-    str.free();
     num.free();
   });
 
@@ -567,17 +565,17 @@ void main() {
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
+    var someStringVal = ForeignValue.fromString('test string');
     var noneVal = ForeignValue.none();
 
     (intListener(intVal.ref) as Function)(45);
     (stringListener(stringVal.ref) as Function)('test string');
     (optionalIntListener(intVal.ref) as Function)(45);
     (optionalIntListener(noneVal.ref) as Function)(null);
-    (optionalStringListener(stringVal.ref) as Function)('test string');
+    (optionalStringListener(someStringVal.ref) as Function)('test string');
     (optionalStringListener(noneVal.ref) as Function)(null);
 
     intVal.free();
-    stringVal.free();
     noneVal.free();
   });
 

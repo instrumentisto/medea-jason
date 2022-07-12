@@ -9,7 +9,6 @@ use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{dart_string_into_rust, DartValue},
     media::track::local,
     platform,
     platform::{
@@ -144,13 +143,8 @@ impl Transceiver {
     pub fn mid(&self) -> Option<String> {
         unsafe {
             let mid = transceiver::mid(self.0.get());
-            if let DartValue::String(c_str, _) =
-                (*Box::from_raw(mid.as_ptr())).into_value()
-            {
-                Some(dart_string_into_rust(c_str))
-            } else {
-                None
-            }
+            // todo mem leak
+            (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
         }
     }
 
