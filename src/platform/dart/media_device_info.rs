@@ -94,7 +94,7 @@ impl MediaDeviceInfo {
     pub fn group_id(&self) -> Option<String> {
         unsafe {
             let raw = media_device_info::group_id(self.handle.get()).unbox();
-            if let DartValue::String(c_str) = raw.into_value() {
+            if let DartValue::String(c_str, _) = raw.into_value() {
                 Some(dart_string_into_rust(c_str))
             } else {
                 None

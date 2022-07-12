@@ -144,7 +144,7 @@ impl Transceiver {
     pub fn mid(&self) -> Option<String> {
         unsafe {
             let mid = transceiver::mid(self.0.get());
-            if let DartValue::String(c_str) =
+            if let DartValue::String(c_str, _) =
                 (*Box::from_raw(mid.as_ptr())).into_value()
             {
                 Some(dart_string_into_rust(c_str))

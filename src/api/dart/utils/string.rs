@@ -45,6 +45,7 @@ pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
 }
 
 /// Converts C-string received from Dart into Rust `String`.
+#[must_use]
 pub unsafe fn dart_string_into_rust(
     dart_string: ptr::NonNull<c_char>,
 ) -> String {

@@ -140,9 +140,17 @@ class _ForeignValueFields extends Union {
   external Pointer<Handle> handlePtr;
 
   /// [Pointer] to a native string.
-  external Pointer<Utf8> string;
+  external _StringField stringField;
 
   /// Integer value.
   @Int64()
   external int number;
+}
+
+class _StringField extends Struct {
+  /// [Pointer] to a native string.
+  external Pointer<Utf8> string;
+
+  @Uint8()
+  external int memoryOwner;
 }
