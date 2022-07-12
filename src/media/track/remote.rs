@@ -153,9 +153,19 @@ impl Track {
 
     /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
+    #[cfg(not(target_family = "wasm"))]
     pub async fn stop(self) {
         if self.0.track.ready_state().await == MediaStreamTrackState::Live {
-            // self.0.track.stop();
+            self.0.track.stop();
+            self.0.on_stopped.call0();
+        }
+    }
+
+    /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
+    /// [`MediaStreamTrackState::Live`] state.
+    #[cfg(target_family = "wasm")]
+    pub async fn stop(self) {
+        if self.0.track.ready_state().await == MediaStreamTrackState::Live {
             self.0.on_stopped.call0();
         }
     }
