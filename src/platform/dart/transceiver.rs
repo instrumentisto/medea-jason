@@ -143,7 +143,6 @@ impl Transceiver {
     pub fn mid(&self) -> Option<String> {
         unsafe {
             let mid = transceiver::mid(self.0.get());
-            // todo mem leak
             (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
         }
     }

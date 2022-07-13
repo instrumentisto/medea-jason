@@ -92,7 +92,7 @@ impl MediaDeviceInfo {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
-        Option::try_from(unsafe { // todo mem leak
+        Option::try_from(unsafe {
             media_device_info::group_id(self.handle.get()).unbox()
         })
         .unwrap()
