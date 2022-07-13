@@ -39,7 +39,7 @@ Map<String, dynamic> _$WebRtcPublishEndpointToJson(
         WebRtcPublishEndpoint instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'p2p': _$P2pModeEnumMap[instance.p2p]!,
+      'p2p': _$P2pModeEnumMap[instance.p2p],
       'force_relay': instance.force_relay,
       'audio_settings': instance.audio_settings,
       'video_settings': instance.video_settings,
@@ -58,7 +58,7 @@ AudioSettings _$AudioSettingsFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$AudioSettingsToJson(AudioSettings instance) =>
     <String, dynamic>{
-      'publish_policy': _$PublishPolicyEnumMap[instance.publish_policy]!,
+      'publish_policy': _$PublishPolicyEnumMap[instance.publish_policy],
     };
 
 const _$PublishPolicyEnumMap = {
@@ -74,5 +74,5 @@ VideoSettings _$VideoSettingsFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$VideoSettingsToJson(VideoSettings instance) =>
     <String, dynamic>{
-      'publish_policy': _$PublishPolicyEnumMap[instance.publish_policy]!,
+      'publish_policy': _$PublishPolicyEnumMap[instance.publish_policy],
     };

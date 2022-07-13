@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
+import 'package:tuple/tuple.dart';
 
 import '../world/custom_world.dart';
 
@@ -32,3 +33,18 @@ StepDefinitionGeneric when_jason_object_disposes = when1<String, CustomWorld>(
     context.world.jasons[id]!.free();
   },
 );
+
+StepDefinitionGeneric given_member_gum_will_error = given2 <String, String, CustomWorld>(
+  RegExp(r'(Alice|Bob|Carol) `getUserMedia\(\)` (audio |video |)errors'),
+  (id, kind, context) async {
+    var member = context.world.members[id]!;
+    Tuple2<bool,bool> gumSetting;
+    if (kind.isEmpty) {
+      gumSetting = Tuple2(true,true);
+    } else {
+      gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
+    }
+    member.get_user_media_mock(gumSetting.item1, gumSetting.item2);
+  },
+);
+

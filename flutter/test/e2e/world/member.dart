@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
@@ -515,5 +516,24 @@ class Member {
   /// Waits for [Member] with `id` to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
+  }
+
+  // todo
+  void get_user_media_mock(bool audio, bool video) {
+    //TODO
+  }
+
+  // todo
+  void add_gum_latency(Duration time) {
+    GUM_DELAY = time;
+  }
+
+  // todo
+  Future<void> switch_video_device() async {
+    await room.setLocalMediaSettings(MediaStreamSettings(), true, true);
+
+    var constraints = MediaStreamSettings();
+    constraints.deviceVideo(DeviceVideoTrackConstraints());
+    await room.setLocalMediaSettings(constraints, true, false);
   }
 }

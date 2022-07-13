@@ -22,9 +22,14 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
+// todo
+var GUM_DELAY = Duration();
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
 Object _getUserMedia(webrtc.DeviceConstraints constraints) {
-  return () => webrtc.getUserMedia(constraints);
+  return () async {
+    await Future.delayed(GUM_DELAY);
+    return webrtc.getUserMedia(constraints);
+  };
 }
 
 /// Returns all the available media devices.

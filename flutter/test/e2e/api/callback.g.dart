@@ -34,7 +34,7 @@ OnLeave _$OnLeaveFromJson(Map<String, dynamic> json) => OnLeave(
     );
 
 Map<String, dynamic> _$OnLeaveToJson(OnLeave instance) => <String, dynamic>{
-      'reason': _$OnLeaveReasonEnumMap[instance.reason]!,
+      'reason': _$OnLeaveReasonEnumMap[instance.reason],
     };
 
 const _$OnLeaveReasonEnumMap = {

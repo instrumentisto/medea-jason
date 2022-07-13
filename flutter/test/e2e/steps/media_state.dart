@@ -133,7 +133,7 @@ StepDefinitionGeneric then_track_is_stopped =
 
     var track_ = track.getTrack();
     track.free();
-    // await Future.delayed(Duration(milliseconds:100));
+    await Future.delayed(Duration(milliseconds:100));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );
@@ -144,5 +144,25 @@ StepDefinitionGeneric when_member_frees_all_local_tracks =
   (id, context) async {
     var member = context.world.members[id]!;
     await member.forget_local_tracks();
+  },
+);
+
+StepDefinitionGeneric when_member_switches_device_with_latency =
+    when1<String, CustomWorld>(
+  RegExp(r'(Alice|Bob|Carol) switches device with latency'),
+  (id, context) async {
+    var member = context.world.members[id]!;
+    member.add_gum_latency(Duration(seconds: 3));
+    await member.switch_video_device();
+  },
+);
+
+// todo errorit
+StepDefinitionGeneric given_gum_delay =
+    given1<String, CustomWorld>(
+  RegExp(r"(Alice|Bob|Carol)'s `getUserMedia\(\)` request has added latency"),
+  (id, context) async {
+    var member = context.world.members[id]!;
+    member.add_gum_latency(Duration(milliseconds: 5000));
   },
 );
