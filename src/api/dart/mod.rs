@@ -28,9 +28,11 @@ pub mod room_close_reason;
 pub mod room_handle;
 pub mod utils;
 
-use std::{ffi::{
-    c_void, CString
-}, marker::PhantomData, panic, ptr};
+use std::{
+    ffi::{c_void, CString},
+    marker::PhantomData,
+    panic, ptr,
+};
 
 use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
@@ -128,7 +130,7 @@ pub trait PrimitiveEnum: TryFrom<i64> {}
 #[repr(u8)]
 pub enum MemoryOwner {
     Rust,
-    Dart
+    Dart,
 }
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
@@ -158,13 +160,16 @@ pub enum DartValue {
 impl Drop for DartValue {
     fn drop(&mut self) {
         match self {
-            DartValue::Int(_) | DartValue::Handle(_) | DartValue::Ptr(_) | DartValue::None => {}
-            DartValue::String(ptr, MemoryOwner::Dart) => {
-                unsafe { free_dart_native_string(*ptr); }
-            }
-            DartValue::String(ptr, MemoryOwner::Rust) => {
-                unsafe { drop(CString::from_raw(ptr.as_ptr())); }
-            }
+            DartValue::Int(_)
+            | DartValue::Handle(_)
+            | DartValue::Ptr(_)
+            | DartValue::None => {}
+            DartValue::String(ptr, MemoryOwner::Dart) => unsafe {
+                free_dart_native_string(*ptr);
+            },
+            DartValue::String(ptr, MemoryOwner::Rust) => unsafe {
+                drop(CString::from_raw(ptr.as_ptr()));
+            },
         }
     }
 }
@@ -342,12 +347,12 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<c_void>> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Ptr(ptr) => Ok(Some(ptr)),
-            DartValue::Handle(_) | DartValue::String(_, _) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<NonNull<c_void>>",
-                    value: value.0,
-                })
-            }
+            DartValue::Handle(_)
+            | DartValue::String(_, _)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<NonNull<c_void>>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -357,7 +362,9 @@ impl TryFrom<DartValueArg<Self>> for String {
 
     fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
         match value.0 {
-            DartValue::String(c_str, _) => unsafe { Ok(c_str_into_string(c_str)) },
+            DartValue::String(c_str, _) => unsafe {
+                Ok(c_str_into_string(c_str))
+            },
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::Handle(_)
@@ -586,12 +593,12 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<Self>> for Option<T> {
                     value: value.0,
                 }),
             },
-            DartValue::Ptr(_) | DartValue::Handle(_) | DartValue::String(_, _) => {
-                Err(DartValueCastError {
-                    expectation: "Option<i64>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(_, _) => Err(DartValueCastError {
+                expectation: "Option<i64>",
+                value: value.0,
+            }),
         }
     }
 }

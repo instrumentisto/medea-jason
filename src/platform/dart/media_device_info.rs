@@ -5,7 +5,7 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{dart_string_into_rust, DartValue},
+    api::dart_string_into_rust,
     media::MediaDeviceKind,
     platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
