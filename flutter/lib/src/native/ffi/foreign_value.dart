@@ -121,9 +121,6 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
   /// Releases the memory allocated on a native heap.
   @moveSemantics
   void free() {
-    if (ref._tag == 3) {
-      calloc.free(ref._payload.stringField.string);
-    }
     if (ref._tag == 2) {
       freeBoxedDartHandle(ref._payload.handlePtr);
     }

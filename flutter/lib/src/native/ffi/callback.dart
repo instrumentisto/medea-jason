@@ -31,6 +31,7 @@ Object _callProxy(Pointer cb) {
   return (val) {
     var arg = ForeignValue.fromDart(val);
     _callbackCall(cb, arg.ref);
+    arg.free();
   };
 }
 
@@ -40,5 +41,7 @@ Object _callTwoArgProxy(Pointer cb) {
     var firstArg = ForeignValue.fromDart(first);
     var secondArg = ForeignValue.fromDart(second);
     _callbackTwoArgCall(cb, firstArg.ref, secondArg.ref);
+    firstArg.free();
+    secondArg.free();
   };
 }
