@@ -501,6 +501,7 @@ void main() {
     none.free();
     ptr.free();
     num.free();
+    str.free();
   });
 
   testWidgets('ForeignValue Dart => Rust', (WidgetTester tester) async {
@@ -527,6 +528,7 @@ void main() {
     none.free();
     ptr.free();
     num.free();
+    str.free();
   });
 
   testWidgets('Complex arguments validation', (WidgetTester tester) async {
@@ -576,6 +578,8 @@ void main() {
     (optionalStringListener(noneVal.ref) as Function)(null);
 
     intVal.free();
+    stringVal.free();
+    someStringVal.free();
     noneVal.free();
   });
 
