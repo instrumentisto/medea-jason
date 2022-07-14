@@ -44,6 +44,17 @@ pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
     ptr::NonNull::new(CString::new(string).unwrap().into_raw()).unwrap()
 }
 
+/// Converts C-string received from Dart into Rust `String`.
+#[must_use]
+pub unsafe fn dart_string_into_rust(
+    dart_string: ptr::NonNull<c_char>,
+) -> String {
+    let rust_string = c_str_into_string(dart_string);
+    free_dart_native_string(dart_string);
+
+    rust_string
+}
+
 /// Retakes ownership over a [`CString`] previously transferred to Dart via
 /// [`CString::into_raw()`].
 ///

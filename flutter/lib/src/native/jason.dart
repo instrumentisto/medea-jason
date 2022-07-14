@@ -16,6 +16,7 @@ import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
+import 'ffi/native_string.dart' as native_string;
 import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
@@ -106,6 +107,7 @@ DynamicLibrary _dl_load() {
   platform_utils_registerer.registerFunctions(dl);
   list.registerFunctions(dl);
   map.registerFunctions(dl);
+  native_string.registerFunctions(dl);
 
   executor = Executor(dl);
 

@@ -2,6 +2,8 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#rtciceserver-dictionary
 
+use std::ffi::CString;
+
 use dart_sys::Dart_Handle;
 use medea_client_api_proto::IceServer;
 use medea_macro::dart_bridge;
@@ -54,12 +56,14 @@ where
         for srv in servers {
             for url in srv.urls {
                 unsafe {
+                    let url_c_str = string_into_c_str(url);
                     ice_servers::add(
                         ice_servers.get(),
-                        string_into_c_str(url),
+                        url_c_str,
                         srv.username.clone().into(),
                         srv.credential.clone().into(),
                     );
+                    drop(CString::from_raw(url_c_str.as_ptr()));
                 }
             }
         }

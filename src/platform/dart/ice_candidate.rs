@@ -7,7 +7,7 @@ use derive_more::From;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::c_str_into_string, platform::dart::utils::handle::DartHandle,
+    api::dart_string_into_rust, platform::dart::utils::handle::DartHandle,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/ice_candidate.g.dart")]
@@ -71,7 +71,7 @@ impl IceCandidate {
     /// Returns candidate of this [`IceCandidate`].
     #[must_use]
     pub fn candidate(&self) -> String {
-        unsafe { c_str_into_string(ice_candidate::candidate(self.0.get())) }
+        unsafe { dart_string_into_rust(ice_candidate::candidate(self.0.get())) }
     }
 
     /// Returns SDP M line index of this [`IceCandidate`].
@@ -90,6 +90,8 @@ impl IceCandidate {
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        unsafe { Some(c_str_into_string(ice_candidate::sdp_mid(self.0.get()))) }
+        unsafe {
+            Some(dart_string_into_rust(ice_candidate::sdp_mid(self.0.get())))
+        }
     }
 }

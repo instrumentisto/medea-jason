@@ -1,5 +1,6 @@
 use std::{
     cell::{Cell, RefCell},
+    ffi::CString,
     rc::Rc,
 };
 
@@ -11,7 +12,7 @@ use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::{c_str_into_string, string_into_c_str},
+    api::{dart_string_into_rust, string_into_c_str},
     platform::{
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
@@ -129,11 +130,12 @@ impl Default for WebSocketRpcTransport {
 #[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> Result<()> {
+        let url_c_str = string_into_c_str(url.as_ref().to_owned());
         // TODO: Propagate execution error.
         #[allow(clippy::map_err_ignore)]
         let handle = unsafe {
             FutureFromDart::execute::<DartHandle>(transport::connect(
-                string_into_c_str(url.as_ref().to_owned()),
+                url_c_str,
                 Callback::from_fn_mut({
                     let weak_subs = Rc::downgrade(&self.on_message_subs);
                     move |msg: String| {
@@ -143,7 +145,8 @@ impl RpcTransport for WebSocketRpcTransport {
                                     Ok(parsed) => parsed,
                                     Err(e) => {
                                         // TODO: Protocol versions mismatch?
-                                        //       Should drop connection if so.
+                                        //       Should drop connection
+                                        //       if so.
                                         log::error!("{}", tracerr::new!(e));
                                         return;
                                     }
@@ -164,7 +167,7 @@ impl RpcTransport for WebSocketRpcTransport {
                         let code = transport::close_code(close_frame.get())
                             .try_into()
                             .unwrap_or(1007);
-                        let reason = c_str_into_string(
+                        let reason = dart_string_into_rust(
                             transport::close_reason(close_frame.get()),
                         );
 
@@ -176,10 +179,12 @@ impl RpcTransport for WebSocketRpcTransport {
                 .into_dart(),
             ))
             .await
-        }
-        .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
+            .map_err(|_| tracerr::new!(TransportError::InitSocket))
+        };
 
-        *self.handle.borrow_mut() = Some(handle);
+        unsafe { drop(CString::from_raw(url_c_str.as_ptr())) };
+
+        *self.handle.borrow_mut() = Some(handle?);
         self.socket_state.set(TransportState::Open);
 
         Ok(())
@@ -207,7 +212,9 @@ impl RpcTransport for WebSocketRpcTransport {
         match state {
             TransportState::Open => unsafe {
                 let msg = serde_json::to_string(msg).unwrap();
-                transport::send(handle.get(), string_into_c_str(msg));
+                let msg_c_str = string_into_c_str(msg);
+                transport::send(handle.get(), msg_c_str);
+                drop(CString::from_raw(msg_c_str.as_ptr()));
                 Ok(())
             },
             TransportState::Connecting
@@ -229,7 +236,9 @@ impl Drop for WebSocketRpcTransport {
             .expect("Could not serialize close message");
         if let Some(handle) = self.handle.borrow().as_ref() {
             unsafe {
-                transport::close(handle.get(), 1000, string_into_c_str(rsn));
+                let rsn_c_str = string_into_c_str(rsn);
+                transport::close(handle.get(), 1000, rsn_c_str);
+                drop(CString::from_raw(rsn_c_str.as_ptr()));
             }
         }
     }

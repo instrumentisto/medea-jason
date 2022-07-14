@@ -2,6 +2,8 @@
 //!
 //! [`Map`]: https://api.dart.dev/stable/dart-core/Map-class.html
 
+use std::ffi::CString;
+
 use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
@@ -63,8 +65,10 @@ impl DartMap {
 
     /// Sets the provided `value` under the provided `key` to this [`DartMap`].
     pub fn set(&mut self, key: String, value: DartValue) {
+        let key_c_str = string_into_c_str(key);
         unsafe {
-            map::set(self.0.get(), string_into_c_str(key), value);
+            map::set(self.0.get(), key_c_str, value);
+            drop(CString::from_raw(key_c_str.as_ptr()));
         }
     }
 

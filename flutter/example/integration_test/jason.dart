@@ -566,18 +566,20 @@ void main() {
             ForeignValue)>('test_callback_listener_optional_string');
 
     var intVal = ForeignValue.fromInt(45);
-    var stringVal = ForeignValue.fromString('test string');
+    var stringVal1 = ForeignValue.fromString('test string');
+    var stringVal2 = ForeignValue.fromString('test string');
     var noneVal = ForeignValue.none();
 
     (intListener(intVal.ref) as Function)(45);
-    (stringListener(stringVal.ref) as Function)('test string');
+    (stringListener(stringVal1.ref) as Function)('test string');
     (optionalIntListener(intVal.ref) as Function)(45);
     (optionalIntListener(noneVal.ref) as Function)(null);
-    (optionalStringListener(stringVal.ref) as Function)('test string');
+    (optionalStringListener(stringVal2.ref) as Function)('test string');
     (optionalStringListener(noneVal.ref) as Function)(null);
 
     intVal.free();
-    stringVal.free();
+    stringVal1.free();
+    stringVal2.free();
     noneVal.free();
   });
 
