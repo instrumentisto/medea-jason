@@ -161,15 +161,15 @@ pub enum DartValue {
 impl Drop for DartValue {
     fn drop(&mut self) {
         match self {
-            DartValue::Int(_)
-            | DartValue::Handle(_)
-            | DartValue::Ptr(_)
-            | DartValue::None => {}
+            DartValue::Int(_) | DartValue::Ptr(_) | DartValue::None => {}
             DartValue::String(ptr, MemoryOwner::Dart) => unsafe {
                 free_dart_native_string(*ptr);
             },
             DartValue::String(ptr, MemoryOwner::Rust) => unsafe {
                 drop(CString::from_raw(ptr.as_ptr()));
+            },
+            DartValue::Handle(ptr) => unsafe {
+                free_boxed_dart_handle(*ptr);
             },
         }
     }
