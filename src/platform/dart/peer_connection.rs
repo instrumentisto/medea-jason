@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
 
-use std::future::Future;
+use std::{ffi::CString, future::Future};
 
 use derive_more::Display;
 use medea_client_api_proto::{
@@ -434,28 +434,45 @@ impl RtcPeerConnection {
     pub async fn set_remote_description(&self, sdp: SdpType) -> Result<()> {
         match sdp {
             SdpType::Offer(sdp) => unsafe {
-                FutureFromDart::execute::<()>(
+                let sdp_c_str = string_into_c_str(sdp);
+                let ty_c_str = string_into_c_str(RtcSdpType::Offer.to_string());
+
+                let result = FutureFromDart::execute::<()>(
                     peer_connection::set_remote_description(
                         self.handle.get(),
-                        string_into_c_str(RtcSdpType::Offer.to_string()),
-                        string_into_c_str(sdp),
+                        ty_c_str,
+                        sdp_c_str,
                     ),
                 )
                 .await
                 .map_err(RtcPeerConnectionError::SetRemoteDescriptionFailed)
-                .map_err(tracerr::wrap!())
+                .map_err(tracerr::wrap!());
+
+                drop(CString::from_raw(sdp_c_str.as_ptr()));
+                drop(CString::from_raw(ty_c_str.as_ptr()));
+
+                result
             },
             SdpType::Answer(sdp) => unsafe {
-                FutureFromDart::execute::<()>(
+                let sdp_c_str = string_into_c_str(sdp);
+                let ty_c_str =
+                    string_into_c_str(RtcSdpType::Answer.to_string());
+
+                let result = FutureFromDart::execute::<()>(
                     peer_connection::set_remote_description(
                         self.handle.get(),
-                        string_into_c_str(RtcSdpType::Answer.to_string()),
-                        string_into_c_str(sdp),
+                        ty_c_str,
+                        sdp_c_str,
                     ),
                 )
                 .await
                 .map_err(RtcPeerConnectionError::SetRemoteDescriptionFailed)
-                .map_err(tracerr::wrap!())
+                .map_err(tracerr::wrap!());
+
+                drop(CString::from_raw(sdp_c_str.as_ptr()));
+                drop(CString::from_raw(ty_c_str.as_ptr()));
+
+                result
             },
         }
     }
@@ -498,14 +515,15 @@ impl RtcPeerConnection {
         unsafe {
             let handle = self.handle.get();
             async move {
+                let mid_c_str = string_into_c_str(mid);
                 let transceiver: Option<DartHandle> = FutureFromDart::execute(
-                    peer_connection::get_transceiver_by_mid(
-                        handle,
-                        string_into_c_str(mid),
-                    ),
+                    peer_connection::get_transceiver_by_mid(handle, mid_c_str),
                 )
                 .await
                 .unwrap();
+
+                drop(CString::from_raw(mid_c_str.as_ptr()));
+
                 transceiver.map(Transceiver::from)
             }
         }
@@ -518,14 +536,23 @@ impl RtcPeerConnection {
         sdp: String,
     ) -> Result<()> {
         unsafe {
-            FutureFromDart::execute(peer_connection::set_local_description(
-                self.handle.get(),
-                string_into_c_str(sdp_type.to_string()),
-                string_into_c_str(sdp),
-            ))
+            let ty_c_str = string_into_c_str(sdp_type.to_string());
+            let sdp_c_str = string_into_c_str(sdp);
+            let result = FutureFromDart::execute(
+                peer_connection::set_local_description(
+                    self.handle.get(),
+                    ty_c_str,
+                    sdp_c_str,
+                ),
+            )
             .await
             .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
-            .map_err(tracerr::wrap!())
+            .map_err(tracerr::wrap!());
+
+            drop(CString::from_raw(ty_c_str.as_ptr()));
+            drop(CString::from_raw(sdp_c_str.as_ptr()));
+
+            result
         }
     }
 }

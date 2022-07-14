@@ -148,6 +148,8 @@ class _StringField extends Struct {
   /// [Pointer] to a native string.
   external Pointer<Utf8> string;
 
+  /// `0` if the native string was allocated by `Rust`, and `1` if it was
+  /// allocated by `Dart`.
   @Uint8()
   external int memoryOwner;
 }

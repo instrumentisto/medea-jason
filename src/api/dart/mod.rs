@@ -126,6 +126,7 @@ pub trait ForeignClass: Sized {
 /// primitives.
 pub trait PrimitiveEnum: TryFrom<i64> {}
 
+/// Indicates whether some object was allocated by `Rust` or by `Dart`.
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum MemoryOwner {

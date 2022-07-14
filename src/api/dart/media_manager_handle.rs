@@ -77,6 +77,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
     propagate_panic(move || {
         let this = this.as_ref().clone();
         let device_id = dart_string_into_rust(device_id);
+
         async move {
             this.set_output_audio_id(device_id)
                 .await
