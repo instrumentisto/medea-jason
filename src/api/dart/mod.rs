@@ -126,12 +126,15 @@ pub trait ForeignClass: Sized {
 /// primitives.
 pub trait PrimitiveEnum: TryFrom<i64> {}
 
-/// Indicates whether some object was allocated by `Rust` or by `Dart`.
+/// Owner of some allocated memory.
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum MemoryOwner {
-    Rust,
-    Dart,
+    /// Memory is allocated on Rust side.
+    Rust = 0,
+
+    /// Memory is allocated on Dart side.
+    Dart = 1,
 }
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Dart.
@@ -161,14 +164,11 @@ pub enum DartValue {
 impl Drop for DartValue {
     fn drop(&mut self) {
         match self {
-            DartValue::Int(_)
-            | DartValue::Ptr(_)
-            | DartValue::Handle(_)
-            | DartValue::None => {}
-            DartValue::String(ptr, MemoryOwner::Dart) => unsafe {
+            Self::Int(_) | Self::Ptr(_) | Self::Handle(_) | Self::None => {}
+            Self::String(ptr, MemoryOwner::Dart) => unsafe {
                 free_dart_native_string(*ptr);
             },
-            DartValue::String(ptr, MemoryOwner::Rust) => unsafe {
+            Self::String(ptr, MemoryOwner::Rust) => unsafe {
                 drop(CString::from_raw(ptr.as_ptr()));
             },
         }
