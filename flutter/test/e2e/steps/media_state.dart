@@ -152,17 +152,17 @@ StepDefinitionGeneric when_member_switches_device_with_latency =
   RegExp(r'(Alice|Bob|Carol) switches device with latency'),
   (id, context) async {
     var member = context.world.members[id]!;
-    member.add_gum_latency(Duration(seconds: 3));
+    member.set_gum_latency(Duration(seconds: 3));
     await member.switch_video_device();
   },
 );
 
-// todo errorit
+// todo
 StepDefinitionGeneric given_gum_delay =
     given1<String, CustomWorld>(
   RegExp(r"(Alice|Bob|Carol)'s `getUserMedia\(\)` request has added latency"),
   (id, context) async {
     var member = context.world.members[id]!;
-    member.add_gum_latency(Duration(milliseconds: 5000));
+    member.set_gum_latency(Duration(milliseconds: 500));
   },
 );

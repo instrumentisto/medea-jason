@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -31,21 +32,57 @@ class CloseFrame {
   CloseFrame(this.code, this.reason);
 }
 
+// todo
+late mock_ws LAST_MOCK_WS;
+var gg = HashMap<WebSocket, mock_ws>();
+
+class mock_ws {
+  late WebSocket ws;
+  late Function onMessage;
+  late Function onClose;
+
+  var old_om;
+
+  void set_om(Function f) {
+    gg.forEach((key, value) {key.close(9999);});
+  }
+
+  void restore_om() {
+  }
+
+  bool s = true;
+  void send(String msg) {
+    if (s) {
+      ws.add(msg);
+    } else {
+      print(msg);
+    }
+  }
+}
+
 /// Connects to the provided [addr] and returns [WebSocket] for it.
 ///
 /// Subscribes to the created [WebSocket] messages with the given [onMessage]
 /// and [onClose] callbacks.
 Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
   return () async {
+    print(addr.toDartString());
     var ws = await WebSocket.connect(addr.toDartString());
+    var mws = mock_ws();
+    mws.ws = ws;
+    mws.onClose = onClose;
+    mws.onMessage = onMessage;
+    LAST_MOCK_WS = mws;
+    gg.addAll({ws: mws});
+
     ws.listen(
       (msg) {
         if (msg is String) {
-          onMessage(msg);
+          mws.onMessage(msg);
         }
       },
       onDone: () {
-        onClose(CloseFrame(ws.closeCode, ws.closeReason));
+        mws.onClose(CloseFrame(ws.closeCode, ws.closeReason));
       },
       cancelOnError: true,
     );
@@ -55,7 +92,8 @@ Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
 
 /// Sends the provided [message] to the provided [WebSocket].
 void _send(WebSocket ws, Pointer<Utf8> message) {
-  ws.add(message.toDartString());
+  var mws = gg[ws]!;
+  mws.send(message.toDartString());
 }
 
 /// Closes the provided [WebSocket] connection with the provided

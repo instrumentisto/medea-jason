@@ -1,6 +1,9 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_jason/src/native/platform/media_devices.dart';
+
 
 import 'api/room.dart';
 import 'steps/connection.dart';
@@ -43,6 +46,8 @@ final TestConfigs = FlutterTestConfiguration()
     when_jason_object_disposes,
     when_room_closed_by_client,
     when_member_joins_room,
+    given_member_gum_will_error,
+    then_room_failed_local_stream_fires,
 
     // track
     then_member_doesnt_have_live_local_tracks,
@@ -64,6 +69,7 @@ final TestConfigs = FlutterTestConfiguration()
     then_track_is_stopped,
     then_local_track_mute_state,
     given_gum_delay,
+    when_member_switches_device_with_latency,
 
     // websockets
     ws_connection_loss,
@@ -87,9 +93,10 @@ final TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
-  ..defaultTimeout = const Duration(seconds: 120)
+  ..defaultTimeout = const Duration(seconds: 20)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
+        MOCK_GUM = (webrtc.DeviceConstraints constraints) => webrtc.getUserMedia(constraints);
         if (old_world != null) {
           var vl = old_world!.jasons.values.toList();
           for (var i = 0; i < vl.length; ++i) {
@@ -106,23 +113,23 @@ final TestConfigs = FlutterTestConfiguration()
 
 // @GherkinTestSuite(featurePaths: [FEATURES_PATH]) // TODO(rogurotus)
 @GherkinTestSuite(featurePaths: [
-  '../e2e/tests/features/apply.feature',
-  '../e2e/tests/features/create_endpoint.feature',
-  '../e2e/tests/features/delete_endpoint.feature',
-  '../e2e/tests/features/disable_remote_media.feature',
-  '../e2e/tests/features/enable_remote_media.feature',
-  // // '../e2e/tests/features/get_user_media.feature',
-  '../e2e/tests/features/local_tracks_create.feature',
-  '../e2e/tests/features/media_direction.feature',
-  '../e2e/tests/features/media_disable.feature',
-  '../e2e/tests/features/media_mute.feature',
-  '../e2e/tests/features/on_join.feature',
-  '../e2e/tests/features/on_leave.feature',
-  '../e2e/tests/features/on_new_connection_fires.feature',
-  '../e2e/tests/features/remote_connection_close.feature',
-  '../e2e/tests/features/room_close.feature',
-  '../e2e/tests/features/room_join.feature',
-  // '../e2e/tests/features/state_synchronization.feature',
+  // '../e2e/tests/features/apply.feature',
+  // '../e2e/tests/features/create_endpoint.feature',
+  // '../e2e/tests/features/delete_endpoint.feature',
+  // '../e2e/tests/features/disable_remote_media.feature',
+  // '../e2e/tests/features/enable_remote_media.feature',
+  // '../e2e/tests/features/get_user_media.feature',
+  // '../e2e/tests/features/local_tracks_create.feature',
+  // '../e2e/tests/features/media_direction.feature',
+  // '../e2e/tests/features/media_disable.feature',
+  // '../e2e/tests/features/media_mute.feature',
+  // '../e2e/tests/features/on_join.feature',
+  // '../e2e/tests/features/on_leave.feature',
+  // '../e2e/tests/features/on_new_connection_fires.feature',
+  // '../e2e/tests/features/remote_connection_close.feature',
+  // '../e2e/tests/features/room_close.feature',
+  // '../e2e/tests/features/room_join.feature',
+  '../e2e/tests/features/state_synchronization.feature',
 ])
 Future<void> main() async {
   executeTestSuite(

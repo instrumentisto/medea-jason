@@ -1,8 +1,10 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
@@ -17,6 +19,10 @@ import 'member.dart';
 
 /// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
+
+  var MOCK_WS = HashMap<String, mock_ws>();
+
+
   /// ID of the `Room` created for this [FlutterWidgetTesterWorld].
   late String room_id;
 
@@ -115,7 +121,20 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// [FlutterWidgetTesterWorld].
   Future<void> join_room(String member_id) async {
     await members[member_id]!.join_room(room_id);
+    MOCK_WS.addAll({member_id: LAST_MOCK_WS});
   }
+
+  Future<void> connection_loss(String member_id) async {
+    var ws = MOCK_WS[member_id]!;
+    ws.set_om((msg) {});
+    ws.s = false;
+  }
+
+  Future<void> disable_connection_loss(String member_id) async {
+    var ws = MOCK_WS[member_id]!;
+    ws.restore_om();
+  }
+
 
   /// Closes a [`Room`] of the provided [`Member`].
   void close_room(String member_id) {

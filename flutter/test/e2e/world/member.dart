@@ -5,6 +5,7 @@ import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import '../conf.dart';
 
 /// Builder of a [Member].
@@ -25,8 +26,6 @@ class MemberBuilder {
       RoomHandle room,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state) {
-    room.onFailedLocalMedia((p0) {});
-    room.onConnectionLoss((p0) {});
     return Member(id, is_send, is_recv, false, send_state, recv_state, room);
   }
 }
@@ -125,11 +124,18 @@ class Member {
   /// [RoomHandle]'s that this [Member] is intended to join.
   RoomHandle room;
 
+  // todo
+  int failed_local_stream_count = 0;
+
   /// Storage of [ConnectionHandle]s thrown by this [Member]'s [RoomHandle].
   var connection_store = ConnectionStore();
 
+  ReconnectHandle? rh;
+
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
+    room.onConnectionLoss((p0) {print('TAKI LOSS'); rh = p0;});
+    room.onFailedLocalMedia((p0) {++failed_local_stream_count;});
     room.onClose((reason) {
       connection_store.close_reason.complete(reason);
     });
@@ -230,9 +236,10 @@ class Member {
 
   /// Frees all [LocalMediaTrack].
   Future<void> forget_local_tracks() async {
-    connection_store.local_tracks.forEach((track) {
+    for (var track in connection_store.local_tracks) {
       track.free();
-    });
+    }
+    await Future.delayed(Duration(milliseconds: 100));
   }
 
   /// Waits [ConnectionHandle] from [Member] with `id`.
@@ -520,12 +527,22 @@ class Member {
 
   // todo
   void get_user_media_mock(bool audio, bool video) {
-    //TODO
+    MOCK_GUM = (constraints) async {
+      if (audio) {
+        throw webrtc.GetMediaException(webrtc.GetMediaExceptionKind.audio, 'Mock Error');
+      } else if (video) {
+        throw webrtc.GetMediaException(webrtc.GetMediaExceptionKind.video, 'Mock Error');
+      }
+      return webrtc.getUserMedia(constraints);
+    };
   }
 
   // todo
-  void add_gum_latency(Duration time) {
-    GUM_DELAY = time;
+  void set_gum_latency(Duration time) {
+    MOCK_GUM = (constraints) async {
+      await Future.delayed(time);
+      return webrtc.getUserMedia(constraints);
+    };
   }
 
   // todo
@@ -536,4 +553,37 @@ class Member {
     constraints.deviceVideo(DeviceVideoTrackConstraints());
     await room.setLocalMediaSettings(constraints, true, false);
   }
+
+  // todo
+  Future<void> wait_failed_local_stream_count(int times) async {
+    if (failed_local_stream_count != times) {
+      var failed_local_stream_future = Completer();
+      room.onFailedLocalMedia((err) {
+        ++failed_local_stream_count;
+        if (failed_local_stream_count == times) {
+          failed_local_stream_future.complete();
+          room.onFailedLocalMedia((p0) {++failed_local_stream_count;});
+        }
+      });
+      return failed_local_stream_future.future;
+    }
+  }
+
+  // todo
+  Future<void> wait_connection_lost() async {
+    if (rh == null) {
+      var connection_lost_future = Completer();
+      room.onConnectionLoss((p0) {
+        rh = p0;
+        print('taki loss');
+        connection_lost_future.complete();
+        room.onConnectionLoss((p0) { print('taki loss');
+        rh = p0;
+      });
+      });
+      return connection_lost_future.future;
+    }
+  }
+  
+  
 }
