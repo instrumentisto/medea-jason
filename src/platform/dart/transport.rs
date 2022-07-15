@@ -1,6 +1,5 @@
 use std::{
     cell::{Cell, RefCell},
-    ffi::CString,
     rc::Rc,
 };
 
@@ -130,12 +129,11 @@ impl Default for WebSocketRpcTransport {
 #[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> Result<()> {
-        let url_c_str = string_into_c_str(url.as_ref().to_owned());
         // TODO: Propagate execution error.
         #[allow(clippy::map_err_ignore)]
         let handle = unsafe {
             FutureFromDart::execute::<DartHandle>(transport::connect(
-                url_c_str,
+                string_into_c_str(url.as_ref().to_owned()),
                 Callback::from_fn_mut({
                     let weak_subs = Rc::downgrade(&self.on_message_subs);
                     move |msg: String| {
@@ -145,8 +143,7 @@ impl RpcTransport for WebSocketRpcTransport {
                                     Ok(parsed) => parsed,
                                     Err(e) => {
                                         // TODO: Protocol versions mismatch?
-                                        //       Should drop connection
-                                        //       if so.
+                                        //       Should drop connection if so.
                                         log::error!("{}", tracerr::new!(e));
                                         return;
                                     }
@@ -179,12 +176,10 @@ impl RpcTransport for WebSocketRpcTransport {
                 .into_dart(),
             ))
             .await
-            .map_err(|_| tracerr::new!(TransportError::InitSocket))
-        };
+        }
+        .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
 
-        unsafe { drop(CString::from_raw(url_c_str.as_ptr())) };
-
-        *self.handle.borrow_mut() = Some(handle?);
+        *self.handle.borrow_mut() = Some(handle);
         self.socket_state.set(TransportState::Open);
 
         Ok(())
@@ -212,9 +207,7 @@ impl RpcTransport for WebSocketRpcTransport {
         match state {
             TransportState::Open => unsafe {
                 let msg = serde_json::to_string(msg).unwrap();
-                let msg_c_str = string_into_c_str(msg);
-                transport::send(handle.get(), msg_c_str);
-                drop(CString::from_raw(msg_c_str.as_ptr()));
+                transport::send(handle.get(), string_into_c_str(msg));
                 Ok(())
             },
             TransportState::Connecting
@@ -236,9 +229,7 @@ impl Drop for WebSocketRpcTransport {
             .expect("Could not serialize close message");
         if let Some(handle) = self.handle.borrow().as_ref() {
             unsafe {
-                let rsn_c_str = string_into_c_str(rsn);
-                transport::close(handle.get(), 1000, rsn_c_str);
-                drop(CString::from_raw(rsn_c_str.as_ptr()));
+                transport::close(handle.get(), 1000, string_into_c_str(rsn));
             }
         }
     }

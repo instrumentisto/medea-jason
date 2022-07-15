@@ -162,8 +162,8 @@ impl Drop for DartValue {
     fn drop(&mut self) {
         match self {
             DartValue::Int(_)
-            | DartValue::Handle(_)
             | DartValue::Ptr(_)
+            | DartValue::Handle(_)
             | DartValue::None => {}
             DartValue::String(ptr, MemoryOwner::Dart) => unsafe {
                 free_dart_native_string(*ptr);

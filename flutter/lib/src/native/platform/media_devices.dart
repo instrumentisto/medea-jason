@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
+import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
 
 /// Registers functions allowing Rust to operate Dart media devices.
@@ -45,7 +46,7 @@ Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
 
 /// Switches output audio device to the device with the provided [deviceId].
 Object _setOutputAudioId(Pointer<Utf8> deviceId) {
-  return () => webrtc.setOutputAudioId(deviceId.toDartString());
+  return () => webrtc.setOutputAudioId(deviceId.nativeStringToDartString());
 }
 
 /// Sets the microphone volume level in percents.
