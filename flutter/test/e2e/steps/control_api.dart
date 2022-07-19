@@ -148,7 +148,7 @@ StepDefinitionGeneric when_control_api_deletes_publish_endpoint =
   r"Control API deletes (Alice|Bob|Carol)'s publish endpoint",
   (id, context) async {
     var future = context.world.delete_publish_endpoint(id);
-    await future.timeout(Duration(milliseconds: 200));
+    await future.timeout(Duration(seconds: 2));
   },
 );
 
@@ -157,6 +157,6 @@ StepDefinitionGeneric when_control_api_deletes_play_endpoint =
   r"Control API deletes (Alice|Bob|Carol)'s play endpoint with (Alice|Bob|Carol)",
   (id, partner_id, context) async {
     var future = context.world.delete_play_endpoint(id, partner_id);
-    await future.timeout(Duration(milliseconds: 200));
+    await future.timeout(Duration(seconds: 2));
   },
 );
