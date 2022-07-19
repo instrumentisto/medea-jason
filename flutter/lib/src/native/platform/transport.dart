@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 
+import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'transport.g.dart' as bridge;
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 

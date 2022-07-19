@@ -83,11 +83,10 @@ impl DartHandle {
 
 impl fmt::Display for DartHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        unsafe {
-            let string = dart_string_into_rust(handle::to_string(self.get()));
+        let string =
+            unsafe { dart_string_into_rust(handle::to_string(self.get())) };
 
-            write!(f, "{string}")
-        }
+        write!(f, "{string}")
     }
 }
 
