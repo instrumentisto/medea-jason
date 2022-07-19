@@ -644,10 +644,18 @@ endif
 	@make docker.up.e2e background=yes log=$(log) \
 	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
 endif
+ifneq ($(FEATURES_PATH), ../e2e/tests/features/**)
+
+	cd flutter/ && \
+	flutter clean && flutter pub get && \
+	flutter pub run \
+	build_runner build --delete-conflicting-outputs
+endif
 	cd flutter/example/ && \
 	export WEBRTC_FAKE_MEDIA=true && \
 	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart -d linux
+		--target=../test/e2e/suite.dart \
+		--dart-define=MOCKABLE=true -d linux
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif

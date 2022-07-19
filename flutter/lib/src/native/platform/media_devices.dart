@@ -6,30 +6,65 @@ import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
 
+// todo
+const bool MOCKABLE = bool.fromEnvironment('MOCKABLE', defaultValue: false);
+
 /// Registers functions allowing Rust to operate Dart media devices.
 void registerFunctions(DynamicLibrary dl) {
-  bridge.registerFunction(
-    dl,
-    enumerateDevices: Pointer.fromFunction(_enumerateDevices),
-    getUserMedia: Pointer.fromFunction(_getUserMedia),
-    getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
-    setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
-    setMicrophoneVolume: Pointer.fromFunction(_setMicrophoneVolume),
-    microphoneVolumeIsAvailable:
-        Pointer.fromFunction(_microphoneVolumeIsAvailable),
-    microphoneVolume: Pointer.fromFunction(_microphoneVolume),
-    onDeviceChange: Pointer.fromFunction(_onDeviceChange),
-    getMediaExceptionKind: Pointer.fromFunction(_getMediaExceptionKind, 0),
-  );
+  if (MOCKABLE) {
+    bridge.registerFunction(
+      dl,
+      enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+      getUserMedia: Pointer.fromFunction(MockMediaDevices.getUserMedia),
+      getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
+      setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
+      setMicrophoneVolume: Pointer.fromFunction(_setMicrophoneVolume),
+      microphoneVolumeIsAvailable:
+          Pointer.fromFunction(_microphoneVolumeIsAvailable),
+      microphoneVolume: Pointer.fromFunction(_microphoneVolume),
+      onDeviceChange: Pointer.fromFunction(_onDeviceChange),
+      getMediaExceptionKind: Pointer.fromFunction(_getMediaExceptionKind, 0),
+    );
+  } else {
+    bridge.registerFunction(
+      dl,
+      enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+      getUserMedia: Pointer.fromFunction(_getUserMedia),
+      getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
+      setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
+      setMicrophoneVolume: Pointer.fromFunction(_setMicrophoneVolume),
+      microphoneVolumeIsAvailable:
+          Pointer.fromFunction(_microphoneVolumeIsAvailable),
+      microphoneVolume: Pointer.fromFunction(_microphoneVolume),
+      onDeviceChange: Pointer.fromFunction(_onDeviceChange),
+      getMediaExceptionKind: Pointer.fromFunction(_getMediaExceptionKind, 0),
+    );
+  }
 }
 
 // todo
-var MOCK_GUM = (webrtc.DeviceConstraints constraints) => webrtc.getUserMedia(constraints);
+class MockMediaDevices {
+  static const _defaultGUM = webrtc.getUserMedia;
+  static Function _getUserMedia = _defaultGUM;
+
+  static set GUM(Function(webrtc.DeviceConstraints) f) {
+    _getUserMedia = f;
+  }
+
+  static Object getUserMedia(webrtc.DeviceConstraints constraints) {
+    return () async {
+      return _getUserMedia(constraints);
+    };
+  }
+  static void resetGUM() {
+    _getUserMedia = _defaultGUM;
+  }
+}
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
 Object _getUserMedia(webrtc.DeviceConstraints constraints) {
   return () async {
-    return MOCK_GUM(constraints);
+    return webrtc.getUserMedia(constraints);
   };
 }
 

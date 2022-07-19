@@ -16,7 +16,6 @@ StepDefinitionGeneric when_member_joins_room = when1<String, CustomWorld>(
   RegExp(r'(Alice|Bob|Carol) joins the room'),
   (id, context) async {
     await context.world.join_room(id);
-    await context.world.wait_for_interconnection(id);
   },
 );
 

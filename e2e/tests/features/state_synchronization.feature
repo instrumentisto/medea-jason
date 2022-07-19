@@ -23,7 +23,7 @@ Feature: State synchronization
     Given room with joined member Alice and Bob
     When Alice loses WS connection
     And Alice disables audio
-    And Alice enables audio
+    And Alice enables audio and error
     And Alice restores WS connection
     Then Bob's audio remote track from Alice is enabled
 

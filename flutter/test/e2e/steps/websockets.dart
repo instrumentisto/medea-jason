@@ -14,10 +14,8 @@ StepDefinitionGeneric ws_connection_loss = when1<String, CustomWorld>(
 StepDefinitionGeneric ws_connection_restore = when1<String, CustomWorld>(
   RegExp(r'(Alice|Bob|Carol) restores WS connection'),
   (id, context) async {
-    await context.world.disable_connection_loss(id);
     var member = context.world.members[id]!;
-    await member.rh!.reconnectWithBackoff(100, 2.0, 1000, 5000);
-    member.rh = null;
+    await member.reconnect();
   },
 );
 

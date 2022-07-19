@@ -527,7 +527,7 @@ class Member {
 
   // todo
   void get_user_media_mock(bool audio, bool video) {
-    MOCK_GUM = (constraints) async {
+    MockMediaDevices.GUM = (constraints) async {
       if (audio) {
         throw webrtc.GetMediaException(webrtc.GetMediaExceptionKind.audio, 'Mock Error');
       } else if (video) {
@@ -539,7 +539,7 @@ class Member {
 
   // todo
   void set_gum_latency(Duration time) {
-    MOCK_GUM = (constraints) async {
+    MockMediaDevices.GUM = (constraints) async {
       await Future.delayed(time);
       return webrtc.getUserMedia(constraints);
     };
@@ -570,18 +570,29 @@ class Member {
   }
 
   // todo
+  Future<void> reconnect() async {
+    if (rh != null) {
+      await rh!.reconnectWithBackoff(100, 2.0, 1000, 5000);
+    } else {
+      await wait_connection_lost();
+      await rh!.reconnectWithBackoff(100, 2.0, 1000, 5000);
+    }
+    rh = null;
+  }
+
+  // todo
   Future<void> wait_connection_lost() async {
     if (rh == null) {
       var connection_lost_future = Completer();
       room.onConnectionLoss((p0) {
         rh = p0;
-        print('taki loss');
         connection_lost_future.complete();
-        room.onConnectionLoss((p0) { print('taki loss');
+      });
+
+      await connection_lost_future.future;
+      room.onConnectionLoss((p0) {
         rh = p0;
       });
-      });
-      return connection_lost_future.future;
     }
   }
   
