@@ -712,7 +712,8 @@ ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 	@make flutter.gen overwrite=yes dockerized=$(dockerized)
 endif
 	cd flutter/example/ && \
-	flutter build windows --target=../test/e2e/suite.dart --debug
+	flutter build windows --dart-define=MOCKABLE=true \
+	--target=../test/e2e/suite.dart --debug
 
 # Runs Flutter plugin integration tests on an attached device.
 #
