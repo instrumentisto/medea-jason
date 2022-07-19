@@ -6,9 +6,8 @@ import 'package:ffi/ffi.dart';
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'transport.g.dart' as bridge;
-import 'package:medea_jason/src/native/ffi/native_string.dart';
 
-// todo
+/// Option to mock WebSocket.
 const bool MOCKABLE = bool.fromEnvironment('MOCKABLE', defaultValue: false);
 
 /// Registers functions allowing Rust to operate Dart [WebSocket]s.
@@ -49,11 +48,19 @@ class CloseFrame {
 }
 
 
-// todo
+/// Provider to mock [WebSocket].
+/// [MOCKABLE] must be `true`.
 class MockWebSocket {
+  /// Safe last created [WebSocket].
   static late WebSocket _lastWebSocket;
+
+  /// Storage [WebSocket] for outside access.
   static final _allWebSocket = HashMap<String, WebSocket>();
 
+  /// Connects to the provided [addr] and returns [WebSocket] for it.
+  ///
+  /// Subscribes to the created [WebSocket] messages with the given [onMessage]
+  /// and [onClose] callbacks.
   static Object connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
       return () async {
     var ws = await WebSocket.connect(addr.nativeStringToDartString());
@@ -74,10 +81,12 @@ class MockWebSocket {
   };
   }
   
+  /// Saves the [member] : [WebSocket] association.
   static void add_member(String member) {
     _allWebSocket.addAll({member: _lastWebSocket});
   }
 
+  /// Returns the [WebSocket] of [member].
   static WebSocket? get_socket(String member) {
     return _allWebSocket[member];
   }

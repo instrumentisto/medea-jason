@@ -6,7 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
 
-// todo
+/// Option to mock `getUserMedia`.
 const bool MOCKABLE = bool.fromEnvironment('MOCKABLE', defaultValue: false);
 
 /// Registers functions allowing Rust to operate Dart media devices.
@@ -42,20 +42,29 @@ void registerFunctions(DynamicLibrary dl) {
   }
 }
 
-// todo
+/// Provider to mock `getUserMedia`.
+/// [MOCKABLE] must be `true`.
 class MockMediaDevices {
+
+  /// Default `getUserMedia`.
   static const _defaultGUM = webrtc.getUserMedia;
+
+  /// Current `getUserMedia`.
   static Function _getUserMedia = _defaultGUM;
 
+  /// Sets `getUserMedia` function to `f`.
   static set GUM(Function(webrtc.DeviceConstraints) f) {
     _getUserMedia = f;
   }
 
+  /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
   static Object getUserMedia(webrtc.DeviceConstraints constraints) {
     return () async {
       return _getUserMedia(constraints);
     };
   }
+
+  /// Sets current `getUserMedia` to default.
   static void resetGUM() {
     _getUserMedia = _defaultGUM;
   }

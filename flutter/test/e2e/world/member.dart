@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:medea_jason/src/native/platform/media_devices.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
@@ -124,17 +125,18 @@ class Member {
   /// [RoomHandle]'s that this [Member] is intended to join.
   RoomHandle room;
 
-  // todo
+  /// Counter of failed local `getUserMedia`.
   int failed_local_stream_count = 0;
 
   /// Storage of [ConnectionHandle]s thrown by this [Member]'s [RoomHandle].
   var connection_store = ConnectionStore();
 
-  ReconnectHandle? rh;
+  /// Last [ReconnectHandle].
+  ReconnectHandle? reconnectHandle;
 
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
-    room.onConnectionLoss((p0) {print('TAKI LOSS'); rh = p0;});
+    room.onConnectionLoss((p0) {reconnectHandle = p0;});
     room.onFailedLocalMedia((p0) {++failed_local_stream_count;});
     room.onClose((reason) {
       connection_store.close_reason.complete(reason);
@@ -520,12 +522,12 @@ class Member {
     }
   }
 
-  /// Waits for [Member] with `id` to close.
+  /// Waits for [Member] with [id] to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
   }
 
-  // todo
+  /// Sets `getUserMedia` returns error.
   void get_user_media_mock(bool audio, bool video) {
     MockMediaDevices.GUM = (constraints) async {
       if (audio) {
@@ -537,7 +539,7 @@ class Member {
     };
   }
 
-  // todo
+  /// Sets latency to `getUserMedia`.
   void set_gum_latency(Duration time) {
     MockMediaDevices.GUM = (constraints) async {
       await Future.delayed(time);
@@ -545,7 +547,7 @@ class Member {
     };
   }
 
-  // todo
+  /// Emulates video device switching.
   Future<void> switch_video_device() async {
     await room.setLocalMediaSettings(MediaStreamSettings(), true, true);
 
@@ -554,7 +556,7 @@ class Member {
     await room.setLocalMediaSettings(constraints, true, false);
   }
 
-  // todo
+  /// Waits while [failed_local_stream_count] will be [times].
   Future<void> wait_failed_local_stream_count(int times) async {
     if (failed_local_stream_count != times) {
       var failed_local_stream_future = Completer();
@@ -569,32 +571,38 @@ class Member {
     }
   }
 
-  // todo
+  /// To restore connection.
   Future<void> reconnect() async {
-    if (rh != null) {
-      await rh!.reconnectWithBackoff(100, 2.0, 1000, 5000);
+    if (reconnectHandle != null) {
+      await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
     } else {
       await wait_connection_lost();
-      await rh!.reconnectWithBackoff(100, 2.0, 1000, 5000);
+      await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
     }
-    rh = null;
+    reconnectHandle = null;
   }
 
-  // todo
+  /// Waiting for connection loss.
   Future<void> wait_connection_lost() async {
-    if (rh == null) {
+    if (reconnectHandle == null) {
       var connection_lost_future = Completer();
       room.onConnectionLoss((p0) {
-        rh = p0;
+        reconnectHandle = p0;
         connection_lost_future.complete();
       });
 
       await connection_lost_future.future;
+
       room.onConnectionLoss((p0) {
-        rh = p0;
+        reconnectHandle = p0;
       });
     }
   }
-  
+
+  /// Closes [WebSocket] connect.
+  Future<void> connection_loss() async {
+    var ws = MockWebSocket.get_socket(id)!;
+    await ws.close(9999);
+  }
   
 }

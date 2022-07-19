@@ -5,9 +5,8 @@ import '../world/custom_world.dart';
 StepDefinitionGeneric ws_connection_loss = when1<String, CustomWorld>(
   RegExp(r'(Alice|Bob|Carol) loses WS connection'),
   (id, context) async {
-    await context.world.connection_loss(id);
     var member = context.world.members[id]!;
-    await member.wait_connection_lost();
+    await member.connection_loss();
   },
 );
 

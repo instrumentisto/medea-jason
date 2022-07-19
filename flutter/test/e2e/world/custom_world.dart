@@ -120,12 +120,6 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     MockWebSocket.add_member(member_id);
   }
 
-  // todo
-  Future<void> connection_loss(String member_id) async {
-    var ws = MockWebSocket.get_socket(member_id)!;
-    await ws.close(9999);
-  }
-
   /// Closes a [`Room`] of the provided [`Member`].
   void close_room(String member_id) {
     var jason = jasons[member_id]!;
