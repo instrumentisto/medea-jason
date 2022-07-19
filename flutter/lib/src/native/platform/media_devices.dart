@@ -58,9 +58,7 @@ class MockMediaDevices {
 
   /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
   static Object getUserMedia(webrtc.DeviceConstraints constraints) {
-    return () async {
-      return _getUserMedia(constraints);
-    };
+    return () => _getUserMedia(constraints);
   }
 
   /// Sets current `getUserMedia` to default.
@@ -71,9 +69,7 @@ class MockMediaDevices {
 
 /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
 Object _getUserMedia(webrtc.DeviceConstraints constraints) {
-  return () async {
-    return webrtc.getUserMedia(constraints);
-  };
+  return () => webrtc.getUserMedia(constraints);
 }
 
 /// Returns all the available media devices.
