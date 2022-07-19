@@ -101,8 +101,8 @@ impl Receiver {
         let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
 
-        let mut transceiver = None;
-        if state.mid().is_none() {
+        #[allow(clippy::if_then_some_else_none)]
+        let transceiver = if state.mid().is_none() {
             // Try to find send transceiver that can be used as sendrecv.
             let sender = media_connections
                 .0
@@ -119,14 +119,17 @@ impl Receiver {
             let trnsvr = if let Some(s) = sender {
                 s.transceiver()
             } else {
-                let fut = media_connections.0.borrow().add_transceiver(
-                    kind,
-                    platform::TransceiverDirection::INACTIVE,
-                );
-                fut.await
+                let new_transceiver =
+                    media_connections.0.borrow().add_transceiver(
+                        kind,
+                        platform::TransceiverDirection::INACTIVE,
+                    );
+                new_transceiver.await
             };
             trnsvr.set_recv(state.enabled_individual()).await;
-            transceiver = Some(trnsvr);
+            Some(trnsvr)
+        } else {
+            None
         };
 
         let peer_events_sender =

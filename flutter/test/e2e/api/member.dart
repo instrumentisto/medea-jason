@@ -4,12 +4,13 @@ import 'endpoint.dart';
 
 part 'member.g.dart';
 
-/// Credentials of the [Member].
-/// [Hash] or [Plain].
+/// Credentials of the [Member]. [Hash] or [Plain].
 @JsonSerializable()
 class Credentials {
   Map<String, dynamic> toJson() => {};
+
   Credentials();
+
   factory Credentials.fromJson(Map<String, dynamic> json) {
     if (json.toString().contains('Hash')) {
       return Hash.fromJson(json);
@@ -27,6 +28,7 @@ class Hash implements Credentials {
   String data;
 
   Hash(this.data);
+
   factory Hash.fromJson(Map<String, dynamic> json) => Hash(json['hash']);
 
   @override
@@ -41,6 +43,7 @@ class Plain implements Credentials {
   String data;
 
   Plain(this.data);
+
   factory Plain.fromJson(Map<String, dynamic> json) => Plain(json['plain']);
 
   @override

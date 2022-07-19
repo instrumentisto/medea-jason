@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'endpoint.g.dart';
 
-/// `Endpoint` element representation.
+/// Media element flowing one or more media data streams through itself.
 @JsonSerializable()
 class Endpoint {
   Map<String, dynamic> toJson() => {};
@@ -16,9 +16,7 @@ class Endpoint {
   }
 }
 
-/// [Control API]'s `WebRtcPlayEndpoint` element representation.
-///
-/// [Control API]: https://tinyurl.com/yxsqplq7
+/// Media element playing media data for a client via WebRTC.
 @JsonSerializable()
 class WebRtcPlayEndpoint implements Endpoint {
   /// ID of this [WebRtcPlayEndpoint].
@@ -44,9 +42,8 @@ class WebRtcPlayEndpoint implements Endpoint {
   }
 }
 
-/// [Control API]'s `WebRtcPublishEndpoint` representation.
-///
-/// [Control API]: https://tinyurl.com/yxsqplq7
+/// Media element receiving media data from a client via WebRTC (allows to
+/// publish media data).
 @JsonSerializable()
 class WebRtcPublishEndpoint implements Endpoint {
   /// ID of [WebRtcPublishEndpoint].
@@ -77,21 +74,24 @@ class WebRtcPublishEndpoint implements Endpoint {
   }
 }
 
-/// P2P mode of [WebRtcPublishEndpoint].
+/// Possible peer-to-peer modes of WebRTC interaction in a
+/// [WebRtcPublishEndpoint].
 enum P2pMode {
-  /// Send media data peer-to-peer only without a media server.
+  /// Send media data via peer-to-peer connections only, and never through a
+  /// media server.
   Always,
 
-  /// Always send media data through a media server.
+  /// Never use peer-to-peer connections and always send media data through a
+  /// media server.
   Never,
 
-  /// Send media data peer-to-peer directly if it's possible, otherwise
-  /// through a media server.
+  /// Use peer-to-peer connections directly if it's possible, otherwise send
+  /// media data through a media server.
   IfPossible,
 }
 
-/// Publishing policy of the video or audio media type in the
-/// [WebRtcPublishEndpoint].
+/// Policy of how a video or an audio media type can be published in a
+/// [WebRtcPublishEndpoint]. asdasd
 enum PublishPolicy {
   /// Publish this media type if it possible.
   Optional,
@@ -116,6 +116,7 @@ class AudioSettings {
 
   factory AudioSettings.fromJson(Map<String, dynamic> json) =>
       _$AudioSettingsFromJson(json);
+
   Map<String, dynamic> toJson() => _$AudioSettingsToJson(this);
 }
 
@@ -127,7 +128,9 @@ class VideoSettings {
   PublishPolicy publish_policy = PublishPolicy.Optional;
 
   VideoSettings(this.publish_policy);
+
   factory VideoSettings.fromJson(Map<String, dynamic> json) =>
       _$VideoSettingsFromJson(json);
+
   Map<String, dynamic> toJson() => _$VideoSettingsToJson(this);
 }

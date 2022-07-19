@@ -13,9 +13,6 @@ use medea_reactive::{
     ProgressableCell,
 };
 
-#[cfg(doc)]
-use crate::platform;
-
 use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{
@@ -43,7 +40,7 @@ pub struct State {
 
     /// [MID] of the [`Receiver`]'s [`Transceiver`].
     ///
-    /// [`Transceiver`]: platform::Transceiver
+    /// [`Transceiver`]: crate::platform::Transceiver
     /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
 
@@ -299,10 +296,10 @@ impl Component {
     /// Watcher for the [`State::enabled_general`] updates.
     ///
     /// Updates [`Receiver`]'s general media exchange state. Adds or removes
-    /// [`TransceiverDirection::RECV`] from the [`platform::Transceiver`] of the
-    /// [`Receiver`].
+    /// [`RECV`] direction from the [`Transceiver`] of the [`Receiver`].
     ///
-    /// [`TransceiverDirection::RECV`]: platform::TransceiverDirection::RECV
+    /// [`Transceiver`]: crate::platform::Transceiver
+    /// [`RECV`]: crate::platform::TransceiverDirection::RECV
     #[watch(self.enabled_general.subscribe())]
     async fn general_media_exchange_state_changed(
         receiver: Rc<Receiver>,

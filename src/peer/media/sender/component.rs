@@ -11,9 +11,6 @@ use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
 use tracerr::Traced;
 
-#[cfg(doc)]
-use crate::platform;
-
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
@@ -83,7 +80,7 @@ pub struct State {
 
     /// [MID] of the [`Sender`]'s [`Transceiver`].
     ///
-    /// [`Transceiver`]: platform::Transceiver
+    /// [`Transceiver`]: crate::platform::Transceiver
     /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
 
@@ -464,10 +461,10 @@ impl Component {
     /// Watcher for the [`State::enabled_general`] update.
     ///
     /// Updates [`Sender`]'s general media exchange state. Adds or removes
-    /// [`TransceiverDirection::SEND`] from the [`platform::Transceiver`] of
-    /// this [`Sender`].
+    /// [`SEND`] direction from the [`Transceiver`] of this [`Sender`].
     ///
-    /// [`TransceiverDirection::SEND`]: platform::TransceiverDirection::SEND
+    /// [`Transceiver`]: crate::platform::Transceiver
+    /// [`SEND`]: crate::platform::TransceiverDirection::SEND
     #[watch(self.enabled_general.subscribe())]
     async fn enabled_general_state_changed(
         sender: Rc<Sender>,

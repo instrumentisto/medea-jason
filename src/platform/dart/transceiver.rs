@@ -177,23 +177,4 @@ impl Transceiver {
             .into()
         }
     }
-
-    /// Sets this [`Transceiver`] to the provided [`TransceiverDirection`].
-    #[allow(dead_code)]
-    fn set_direction(
-        &self,
-        direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
-        Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_direction(
-                    handle,
-                    direction.into(),
-                ))
-                .await
-                .unwrap();
-            }
-        })
-    }
 }

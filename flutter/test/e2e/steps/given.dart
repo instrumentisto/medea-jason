@@ -88,7 +88,10 @@ Future<void> new_given_member(
 
 StepDefinitionGeneric givenOneMember =
     given5<String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined |)member (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
+  r'''(room with joined |room with |joined |)member (Alice|Bob|Carol)
+  ( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play
+  WebRTC endpoints| with disabled| with muted|)( media| audio| video|)
+  ( publishing| playing|)''',
   (joined, first_member_id, endpoints, disabled_media_type, disabled_direction,
       context) async {
     await new_given_member(joined, first_member_id, '', '', endpoints,
@@ -98,7 +101,10 @@ StepDefinitionGeneric givenOneMember =
 
 StepDefinitionGeneric givenTwoMembers =
     given6<String, String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
+  r'''(room with joined |room with |joined )member(s) (Alice|Bob|Carol)
+      and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC
+      endpoints| with no play WebRTC endpoints| with disabled| with muted|)
+      ( media| audio| video|)( publishing| playing|)''',
   (joined, first_member_id, second_member_id, endpoints, disabled_media_type,
       disabled_direction, context) async {
     await new_given_member(joined, first_member_id, second_member_id, '',
@@ -108,7 +114,10 @@ StepDefinitionGeneric givenTwoMembers =
 
 StepDefinitionGeneric givenTreeMembers =
     given7<String, String, String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| with no play WebRTC endpoints| with disabled| with muted|)( media| audio| video|)( publishing| playing|)',
+  r'''(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and
+  (Alice|Bob|Carol) and (Alice|Bob|Carol)( with no WebRTC endpoints| with no
+  publish WebRTC endpoints| with no play WebRTC endpoints| with disabled|
+  with muted|)( media| audio| video|)( publishing| playing|)''',
   (joined, first_member_id, second_member_id, third_member_id, endpoints,
       disabled_media_type, disabled_direction, context) async {
     await new_given_member(

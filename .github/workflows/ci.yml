@@ -356,7 +356,7 @@ jobs:
           name: windows-test-bundle-${{ github.run_number }}
           path: ./flutter/example/build/windows/runner/Debug
         if: ${{ matrix.platform == 'windows' }}
-        
+
   test-flutter:
     name: Flutter tests
     if: ${{ github.ref == 'refs/heads/master'
@@ -482,9 +482,9 @@ jobs:
         name: windows-test-bundle-${{ github.run_number }}
         path: ./windows_test_staff/test/
 
-    - run: make test.e2e.desktop.windows up=yes debug=no dockerized=yes 
+    - run: make test.e2e.desktop.windows up=yes debug=no dockerized=yes
                                         background=yes
-                                        medea-tag=${{ env.MEDEA_BRANCH }} 
+                                        medea-tag=${{ env.MEDEA_BRANCH }}
                                         control-tag=build-${{ github.run_number }}
 
   ############
