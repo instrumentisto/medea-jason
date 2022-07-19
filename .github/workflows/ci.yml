@@ -206,10 +206,10 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true'
                 && matrix.wasm }}
 
-      # - name: Chrome
-      #   run: make test.unit crate=${{ matrix.crate }} browser=chrome
-      #   if: ${{ steps.skip.outputs.no == 'true'
-      #           && matrix.crate == 'medea-jason' }}
+      - name: Chrome
+        run: make test.unit crate=${{ matrix.crate }} browser=chrome
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.crate == 'medea-jason' }}
       - name: Firefox
         run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
