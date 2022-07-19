@@ -11,6 +11,9 @@ use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
 use tracerr::Traced;
 
+#[cfg(doc)]
+use crate::platform;
+
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
@@ -22,7 +25,6 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -479,17 +481,11 @@ impl Component {
         match new_state {
             media_exchange_state::Stable::Enabled => {
                 if sender.enabled_in_cons() {
-                    sender
-                        .transceiver
-                        .add_direction(platform::TransceiverDirection::SEND)
-                        .await;
+                    sender.transceiver.set_send(true).await;
                 }
             }
             media_exchange_state::Stable::Disabled => {
-                sender
-                    .transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND)
-                    .await;
+                sender.transceiver.set_send(false).await;
             }
         }
 

@@ -243,10 +243,10 @@ pub enum UniversalSubscriber<D> {
 impl<D> fmt::Debug for UniversalSubscriber<D> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            UniversalSubscriber::When { .. } => {
+            Self::When { .. } => {
                 write!(f, "UniversalSubscriber::When")
             }
-            UniversalSubscriber::Subscribe(_) => {
+            Self::Subscribe(_) => {
                 write!(f, "UniversalSubscriber::Subscribe")
             }
         }

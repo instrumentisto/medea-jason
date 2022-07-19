@@ -217,7 +217,7 @@ pub enum RpcClientError {
 }
 
 /// Connection with remote was closed.
-#[derive(Clone, Copy, Debug, Display, PartialEq)]
+#[derive(Clone, Copy, Debug, Display, PartialEq, Eq)]
 pub enum CloseMsg {
     /// Transport was gracefully closed by remote.
     ///
