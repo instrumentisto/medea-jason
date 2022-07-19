@@ -98,7 +98,7 @@ StepDefinitionGeneric then_remote_media_track =
   (id, kind, partner_id, state, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
-    
+
     await member.wait_for_connect(partner_id);
 
     var track = await member.wait_remote_track_from(

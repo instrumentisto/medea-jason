@@ -33,13 +33,14 @@ StepDefinitionGeneric when_jason_object_disposes = when1<String, CustomWorld>(
   },
 );
 
-StepDefinitionGeneric given_member_gum_will_error = given2 <String, String, CustomWorld>(
+StepDefinitionGeneric given_member_gum_will_error =
+    given2<String, String, CustomWorld>(
   RegExp(r"(Alice|Bob|Carol)'s `getUserMedia\(\)` (audio |video |)errors"),
   (id, kind, context) async {
     var member = context.world.members[id]!;
-    Tuple2<bool,bool> gumSetting;
+    Tuple2<bool, bool> gumSetting;
     if (kind.isEmpty) {
-      gumSetting = Tuple2(true,true);
+      gumSetting = Tuple2(true, true);
     } else {
       gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
     }
@@ -47,8 +48,10 @@ StepDefinitionGeneric given_member_gum_will_error = given2 <String, String, Cust
   },
 );
 
-StepDefinitionGeneric then_room_failed_local_stream_fires = then2<String, String, CustomWorld>(
-  RegExp(r"(Alice|Bob|Carol)'s `Room.on_failed_local_stream\(\)` fires {int} time(s)"),
+StepDefinitionGeneric then_room_failed_local_stream_fires =
+    then2<String, String, CustomWorld>(
+  RegExp(
+      r"(Alice|Bob|Carol)'s `Room.on_failed_local_stream\(\)` fires {int} time(s)"),
   (id, times, context) async {
     var member = context.world.members[id]!;
     var times_parse = int.parse(times);

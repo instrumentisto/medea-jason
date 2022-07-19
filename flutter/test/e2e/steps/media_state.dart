@@ -23,6 +23,7 @@ StepDefinitionGeneric when_enables_or_mutes =
         {
           future = member.toggle_media(kind.item1, kind.item2, true);
           if (errors) {
+            // ignore: unawaited_futures
             future.catchError((e) => print('Expected: $e'));
           }
         }
@@ -32,6 +33,7 @@ StepDefinitionGeneric when_enables_or_mutes =
         {
           future = member.toggle_media(kind.item1, kind.item2, false);
           if (errors) {
+            // ignore: unawaited_futures
             future.catchError((e) => print('Expected: $e'));
           }
         }
@@ -41,6 +43,7 @@ StepDefinitionGeneric when_enables_or_mutes =
         {
           future = member.toggle_mute(kind.item1, kind.item2, true);
           if (errors) {
+            // ignore: unawaited_futures
             future.catchError((e) => print('Expected: $e'));
           }
         }
@@ -50,6 +53,7 @@ StepDefinitionGeneric when_enables_or_mutes =
         {
           future = member.toggle_mute(kind.item1, kind.item2, false);
           if (errors) {
+            // ignore: unawaited_futures
             future.catchError((e) => print('Expected: $e'));
           }
         }

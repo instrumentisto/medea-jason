@@ -37,4 +37,3 @@ final String FILE_SERVER_HOST =
 /// Path to a Cucumber features which should be run.
 final String FEATURES_PATH =
     Platform.environment['FEATURES_PATH'] ?? '../e2e/tests/features/**';
-    

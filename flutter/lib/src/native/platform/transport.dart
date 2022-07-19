@@ -22,7 +22,7 @@ void registerFunctions(DynamicLibrary dl) {
       closeReason: Pointer.fromFunction(_closeReason),
     );
   } else {
-      bridge.registerFunction(
+    bridge.registerFunction(
       dl,
       connect: Pointer.fromFunction(_connect),
       send: Pointer.fromFunction(_send),
@@ -47,7 +47,6 @@ class CloseFrame {
   CloseFrame(this.code, this.reason);
 }
 
-
 /// Provider to mock [WebSocket].
 /// [MOCKABLE] must be `true`.
 class MockWebSocket {
@@ -61,26 +60,27 @@ class MockWebSocket {
   ///
   /// Subscribes to the created [WebSocket] messages with the given [onMessage]
   /// and [onClose] callbacks.
-  static Object connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
-      return () async {
-    var ws = await WebSocket.connect(addr.nativeStringToDartString());
-    _lastWebSocket = ws;
+  static Object connect(
+      Pointer<Utf8> addr, Function onMessage, Function onClose) {
+    return () async {
+      var ws = await WebSocket.connect(addr.nativeStringToDartString());
+      _lastWebSocket = ws;
 
-    ws.listen(
-      (msg) {
-        if (msg is String) {
-          onMessage(msg);
-        }
-      },
-      onDone: () {
-        onClose(CloseFrame(ws.closeCode, ws.closeReason));
-      },
-      cancelOnError: true,
-    );
-    return ws;
-  };
+      ws.listen(
+        (msg) {
+          if (msg is String) {
+            onMessage(msg);
+          }
+        },
+        onDone: () {
+          onClose(CloseFrame(ws.closeCode, ws.closeReason));
+        },
+        cancelOnError: true,
+      );
+      return ws;
+    };
   }
-  
+
   /// Saves the [member] : [WebSocket] association.
   static void add_member(String member) {
     _allWebSocket.addAll({member: _lastWebSocket});

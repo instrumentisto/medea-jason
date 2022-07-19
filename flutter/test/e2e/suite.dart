@@ -1,11 +1,9 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
-import 'package:medea_jason/src/native/platform/media_devices.dart';
 
+import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'api/room.dart';
-import 'conf.dart';
 import 'steps/connection.dart';
 import 'steps/control_api.dart';
 import 'steps/given.dart';
@@ -21,7 +19,9 @@ void clear_world() {
   MockMediaDevices.resetGUM();
 
   if (old_world != null) {
-    old_world!.jasons.values.forEach((element) {element.free();});
+    old_world!.jasons.values.forEach((element) {
+      element.free();
+    });
   }
 }
 

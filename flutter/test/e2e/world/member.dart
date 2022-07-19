@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:medea_jason/src/native/platform/media_devices.dart';
-import 'package:medea_jason/src/native/platform/transport.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_jason/src/native/platform/media_devices.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
 
 /// Builder of a [Member].
@@ -136,8 +136,12 @@ class Member {
 
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
-    room.onConnectionLoss((p0) {reconnectHandle = p0;});
-    room.onFailedLocalMedia((p0) {++failed_local_stream_count;});
+    room.onConnectionLoss((p0) {
+      reconnectHandle = p0;
+    });
+    room.onFailedLocalMedia((p0) {
+      ++failed_local_stream_count;
+    });
     room.onClose((reason) {
       connection_store.close_reason.complete(reason);
     });
@@ -531,9 +535,11 @@ class Member {
   void get_user_media_mock(bool audio, bool video) {
     MockMediaDevices.GUM = (constraints) async {
       if (audio) {
-        throw webrtc.GetMediaException(webrtc.GetMediaExceptionKind.audio, 'Mock Error');
+        throw webrtc.GetMediaException(
+            webrtc.GetMediaExceptionKind.audio, 'Mock Error');
       } else if (video) {
-        throw webrtc.GetMediaException(webrtc.GetMediaExceptionKind.video, 'Mock Error');
+        throw webrtc.GetMediaException(
+            webrtc.GetMediaExceptionKind.video, 'Mock Error');
       }
       return webrtc.getUserMedia(constraints);
     };
@@ -564,7 +570,9 @@ class Member {
         ++failed_local_stream_count;
         if (failed_local_stream_count == times) {
           failed_local_stream_future.complete();
-          room.onFailedLocalMedia((p0) {++failed_local_stream_count;});
+          room.onFailedLocalMedia((p0) {
+            ++failed_local_stream_count;
+          });
         }
       });
       return failed_local_stream_future.future;
@@ -604,5 +612,4 @@ class Member {
     var ws = MockWebSocket.get_socket(id)!;
     await ws.close(9999);
   }
-  
 }
