@@ -703,6 +703,41 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
+
+# Run E2E android tests of project.
+#
+# Usage:
+#	make test.e2e.android [(only=<regex>|only-tags=<tag-expression>)]
+#		[( [up=no] | up=yes
+#		          [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e.android:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+endif
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes dockerized=$(dockerized)
+endif
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart \
+		--dart-define=IP_TEST_BASE='10.0.2.2' \
+		--dart-define=MOCKABLE=true \
+		$(if $(call eq,$(device),),,-d $(device))
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
 # Build flutter e2e test as bundle.
 #
 # Usage:
@@ -712,7 +747,9 @@ ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 	@make flutter.gen overwrite=yes dockerized=$(dockerized)
 endif
 	cd flutter/example/ && \
-	flutter build windows --dart-define=MOCKABLE=true \
+	flutter build windows \
+	--dart-define=IP_TEST_BASE='10.0.2.2' \
+	--dart-define=MOCKABLE=true \
 	--target=../test/e2e/suite.dart --debug
 
 # Runs Flutter plugin integration tests on an attached device.
