@@ -34,7 +34,6 @@ jobs:
       - rustdoc
       - rustfmt
       - test-e2e
-      - test-e2e-desktop
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
