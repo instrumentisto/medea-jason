@@ -328,14 +328,12 @@ impl Sender {
 
 impl Drop for Sender {
     fn drop(&mut self) {
-        if !self.transceiver.is_stopped() {
-            let transceiver = self.transceiver.clone();
-            platform::spawn(async move {
-                transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND)
-                    .await;
+        let transceiver = self.transceiver.clone();
+        platform::spawn(async move {
+            if !transceiver.is_stopped() {
+                transceiver.set_send(false).await;
                 drop(transceiver.set_send_track(None).await);
-            });
-        }
+            }
+        });
     }
 }
