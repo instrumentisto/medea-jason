@@ -491,6 +491,9 @@ flutter.web.assets:
 #	make flutter.gen [overwrite=(yes|no)]
 
 flutter.gen:
+ifeq ($(wildcard flutter/pubspec.lock),)
+	@make flutter
+endif
 	cd flutter && \
 	flutter pub run build_runner build \
 		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
