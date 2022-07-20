@@ -732,8 +732,7 @@ endif
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=IP_TEST_BASE='10.0.2.2' \
-		--dart-define=MOCKABLE=true \
-		$(if $(call eq,$(device),),,-d $(device))
+		--dart-define=MOCKABLE=true
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
