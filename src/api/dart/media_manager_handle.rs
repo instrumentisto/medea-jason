@@ -5,7 +5,7 @@ use tracerr::Traced;
 
 use crate::{
     api::{
-        c_str_into_string,
+        dart_string_into_rust,
         utils::{DartError, DartResult},
     },
     media::{
@@ -76,7 +76,7 @@ pub unsafe extern "C" fn MediaManagerHandle__set_output_audio_id(
 ) -> DartFuture<Result<(), Traced<InvalidOutputAudioDeviceIdError>>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
-        let device_id = c_str_into_string(device_id);
+        let device_id = dart_string_into_rust(device_id);
 
         async move {
             this.set_output_audio_id(device_id)

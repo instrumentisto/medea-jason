@@ -43,7 +43,7 @@ class ForeignValue extends Struct {
       case 2:
         return unboxDartHandle(_payload.handlePtr);
       case 3:
-        return _payload.string.toDartString();
+        return _payload.stringPtr.string.toDartString();
       case 4:
         return _payload.number;
       default:
@@ -95,7 +95,7 @@ class ForeignValue extends Struct {
   static Pointer<ForeignValue> fromString(String str) {
     var fVal = calloc<ForeignValue>();
     fVal.ref._tag = 3;
-    fVal.ref._payload.string = str.toNativeUtf8();
+    fVal.ref._payload.stringPtr.string = str.toNativeUtf8();
     return fVal;
   }
 
@@ -121,9 +121,6 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
   /// Releases the memory allocated on a native heap.
   @moveSemantics
   void free() {
-    if (ref._tag == 3) {
-      calloc.free(ref._payload.string);
-    }
     if (ref._tag == 2) {
       freeBoxedDartHandle(ref._payload.handlePtr);
     }
@@ -140,9 +137,22 @@ class _ForeignValueFields extends Union {
   external Pointer<Handle> handlePtr;
 
   /// [Pointer] to a native string.
-  external Pointer<Utf8> string;
+  external _StringPointer stringPtr;
 
   /// Integer value.
   @Int64()
   external int number;
+}
+
+/// [Pointer] to a native string along with information of its owner.
+class _StringPointer extends Struct {
+  /// [Pointer] to the native string.
+  external Pointer<Utf8> string;
+
+  /// Indicator of who allocated the native [string].
+  ///
+  /// `0` if the native string was allocated by `Rust`, and `1` if it was
+  /// allocated by `Dart`.
+  @Uint8()
+  external int memoryOwner;
 }

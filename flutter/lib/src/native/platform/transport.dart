@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 
+import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'transport.g.dart' as bridge;
 
 /// Registers functions allowing Rust to operate Dart [WebSocket]s.
@@ -37,7 +38,7 @@ class CloseFrame {
 /// and [onClose] callbacks.
 Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
   return () async {
-    var ws = await WebSocket.connect(addr.toDartString());
+    var ws = await WebSocket.connect(addr.nativeStringToDartString());
     ws.listen(
       (msg) {
         if (msg is String) {
@@ -55,13 +56,13 @@ Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
 
 /// Sends the provided [message] to the provided [WebSocket].
 void _send(WebSocket ws, Pointer<Utf8> message) {
-  ws.add(message.toDartString());
+  ws.add(message.nativeStringToDartString());
 }
 
 /// Closes the provided [WebSocket] connection with the provided
 /// [closeCode] and [closeMsg].
 void _close(WebSocket ws, int closeCode, Pointer<Utf8> closeMsg) {
-  ws.close(closeCode, closeMsg.toDartString());
+  ws.close(closeCode, closeMsg.nativeStringToDartString());
 }
 
 /// Returns [CloseFrame.code] of the provided [CloseFrame].
