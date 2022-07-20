@@ -1,5 +1,6 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:gherkin/gherkin.dart';
 
 import 'api/room.dart';
@@ -89,6 +90,7 @@ final TestConfigs = FlutterTestConfiguration()
   ..defaultTimeout = const Duration(seconds: 120)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
+        await webrtc.enableFakeMedia();
         if (old_world != null) {
           var vl = old_world!.jasons.values.toList();
           for (var i = 0; i < vl.length; ++i) {
@@ -105,7 +107,6 @@ final TestConfigs = FlutterTestConfiguration()
 
 // @GherkinTestSuite(featurePaths: [FEATURES_PATH]) // TODO(rogurotus)
 @GherkinTestSuite(featurePaths: [
-  // '../e2e/tests/features/given.feature',
   '../e2e/tests/features/apply.feature',
   '../e2e/tests/features/create_endpoint.feature',
   '../e2e/tests/features/delete_endpoint.feature',

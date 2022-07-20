@@ -9,8 +9,7 @@ import '../world/more_args.dart';
 StepDefinitionGeneric then_member_has_remote_track =
     then3<String, String, String, CustomWorld>(
   RegExp(
-      r'''(Alice|Bob|Carol) has (audio|video|audio and video) remote track(s)
-          from (Alice|Bob|Carol)'''),
+      r'(Alice|Bob|Carol) has (audio|video|audio and video) remote track(s) from (Alice|Bob|Carol)'),
   (id, kind, partner_id, context) async {
     var member = context.world.members[id]!;
     await member.wait_for_connect(partner_id);
@@ -39,8 +38,7 @@ StepDefinitionGeneric then_member_doesnt_have_remote_tracks_with =
 StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     then4<String, int, String, String, CustomWorld>(
   RegExp(
-      r'''(Alice|Bob|Carol) has {int} (live|stopped) remote tracks from
-          (Alice|Bob|Carol)'''),
+      r'(Alice|Bob|Carol) has {int} (live|stopped) remote tracks from (Alice|Bob|Carol)'),
   (id, expected_count, live_or_stopped, remote_id, context) async {
     var member = context.world.members[id]!;
     await context.world.wait_for_interconnection(id);
@@ -72,8 +70,7 @@ StepDefinitionGeneric then_member_has_local_tracks =
 StepDefinitionGeneric then_doesnt_have_remote_track =
     then3<String, String, String, CustomWorld>(
   RegExp(
-      r"""(Alice|Bob|Carol) doesn't have (audio|device video|display
-          video|video) remote track from (Alice|Bob|Carol)"""),
+      r"(Alice|Bob|Carol) doesn't have (audio|device video|display video|video) remote track from (Alice|Bob|Carol)"),
   (id, kind, partner_id, context) async {
     var member = context.world.members[id]!;
     await member.wait_for_connect(partner_id);
@@ -97,8 +94,7 @@ StepDefinitionGeneric then_doesnt_have_remote_track =
 StepDefinitionGeneric then_remote_media_track =
     then4<String, String, String, String, CustomWorld>(
   RegExp(
-      r"""(Alice|Bob|Carol)'s (audio|device video|display video|video)
-          remote track from (Alice|Bob|Carol) is (enabled|disabled)"""),
+      r"(Alice|Bob|Carol)'s (audio|device video|display video|video) remote track from (Alice|Bob|Carol) is (enabled|disabled)"),
   (id, kind, partner_id, state, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
@@ -117,8 +113,7 @@ StepDefinitionGeneric then_remote_media_track =
 StepDefinitionGeneric then_remote_track_stops =
     then3<String, String, String, CustomWorld>(
   RegExp(
-      r"""(Alice|Bob|Carol)'s remote (audio|device video|display video|video)
-          track from (Alice|Bob|Carol) disables"""),
+      r"(Alice|Bob|Carol)'s remote (audio|device video|display video|video) track from (Alice|Bob|Carol) disables"),
   (id, kind, remote_id, context) async {
     var member = context.world.members[id]!;
 
@@ -132,9 +127,7 @@ StepDefinitionGeneric then_remote_track_stops =
 StepDefinitionGeneric then_callback_fires_on_remote_track =
     fix_then5<String, int, String, String, String, CustomWorld>(
   RegExp(
-      r"""`on_(enabled|disabled|muted|unmuted)` callback fires {int} time(s)
-          on (Alice|Bob|Carol)'s remote (audio|device video|display video|video)
-          track from (Alice|Bob|Carol)"""),
+      r"`on_(enabled|disabled|muted|unmuted)` callback fires {int} time(s) on (Alice|Bob|Carol)'s remote (audio|device video|display video|video) track from (Alice|Bob|Carol)"),
   (callback_kind, int times, id, kind, remote_id, context) async {
     var member = context.world.members[id]!;
 

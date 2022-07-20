@@ -34,8 +34,7 @@ StepDefinitionGeneric then_member_doesnt_receive_connection =
 
 StepDefinitionGeneric when_connection_changes_remote_media_state =
     when4<String, String, String, String, CustomWorld>(
-  r'''(Alice|Bob|Carol) (enables|disables) (audio|video)
-        receiving from (Alice|Bob|Carol)''',
+  r'(Alice|Bob|Carol) (enables|disables) (audio|video) receiving from (Alice|Bob|Carol)',
   (id, action, kind, partner_id, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
