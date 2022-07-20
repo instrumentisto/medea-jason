@@ -206,10 +206,10 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true'
                 && matrix.wasm }}
 
-      # - name: Chrome
-      #   run: make test.unit crate=${{ matrix.crate }} browser=chrome
-      #   if: ${{ steps.skip.outputs.no == 'true'
-      #           && matrix.crate == 'medea-jason' }}
+      - name: Chrome
+        run: make test.unit crate=${{ matrix.crate }} browser=chrome
+        if: ${{ steps.skip.outputs.no == 'true'
+                && matrix.crate == 'medea-jason' }}
       - name: Firefox
         run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
@@ -648,7 +648,7 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit", "test-e2e-desktop", "test-e2e-windows"]
+    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit", "test-e2e-desktop"]
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
