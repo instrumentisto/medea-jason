@@ -201,17 +201,13 @@ impl<T> Object<TracksStore<T>> {
         .await
     }
 
-    /// Returns count of tracks by the provided `muted` and `stopped` values.
+    /// Returns count of tracks by the provided `live` values.
     ///
     /// # Errors
     ///
     /// - If failed to execute JS statement.
     /// - If failed to parse result as [`u64`].
-    pub async fn count_tracks_by_selector(
-        &self,
-        muted: bool,
-        stopped: bool,
-    ) -> Result<u64, Error> {
+    pub async fn count_tracks_by_live(&self, live: bool) -> Result<u64, Error> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
@@ -219,10 +215,9 @@ impl<T> Object<TracksStore<T>> {
                 async (store) => {{
                     let count = 0;
                     for (track of store.tracks) {{
-                        let t = track.track.get_track();
-                        if (t.muted == {muted} &&
-                            track.stopped == {stopped})
-                        {{
+                        if ({live} && !track.stopped) {{
+                            count++;
+                        }} else if (!{live} && track.stopped) {{
                             count++;
                         }}
                     }}

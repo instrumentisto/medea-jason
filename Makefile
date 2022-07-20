@@ -93,7 +93,7 @@ down: down.dev
 fmt: cargo.fmt flutter.fmt
 
 
-lint: cargo.lint
+lint: cargo.lint flutter.lint
 
 
 # Build and publish project crate everywhere.
@@ -453,6 +453,9 @@ endif
 #	make flutter.lint
 
 flutter.lint:
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes dockerized=$(dockerized)
+endif
 	flutter analyze flutter/
 
 
@@ -478,6 +481,22 @@ flutter.web.assets:
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
+
+
+
+
+# Run `build_runner` Flutter tool to generate project Dart sources.
+#
+# Usage:
+#	make flutter.gen [overwrite=(yes|no)]
+
+flutter.gen:
+ifeq ($(wildcard flutter/pubspec.lock),)
+	@make flutter
+endif
+	cd flutter && \
+	flutter pub run build_runner build \
+		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
 
 
 
@@ -623,6 +642,74 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
+# Run E2E desktop tests of project.
+#
+# Usage:
+#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
+# 		[device=<device-id>]
+#		[( [up=no] | up=yes
+#		          [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e.desktop:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+endif
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes dockerized=$(dockerized)
+endif
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart $(if $(call eq,$(device),),,-d $(device))
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
+# Run E2E windows tests of project in vagrant vm.
+#
+# Usage:
+#	make test.e2e.desktop.windows [(only=<regex>|only-tags=<tag-expression>)]
+#		[( [up=no] | up=yes
+#		          [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e.desktop.windows:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	env $(docker-up-e2e-env) \
+	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
+		up $(if $(call eq,$(dockerized),yes),\
+		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
+endif
+	cd windows_test_staff/ && \
+	vagrant up
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
+# Build flutter e2e test as bundle.
+#
+# Usage:
+#	make test.e2e.desktop.windows.build
+test.e2e.desktop.windows.build:
+	cd flutter/example/ && \
+	flutter build windows --target=../test/e2e/suite.dart --debug
 
 # Runs Flutter plugin integration tests on an attached device.
 #
@@ -939,7 +1026,7 @@ docker.up.demo: docker.down.demo
 #                         [control-tag=(dev|<tag>)] )]
 #	                   [debug=(yes|no)]
 #	                   [( [background=no]
-#	                    | background=yes [log=(no|yes)] )]
+#	                    | background=yes [log=(no|yes)])]
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
@@ -1227,7 +1314,7 @@ endef
         flutter flutter.fmt flutter.lint flutter.run \
         	flutter.android.compile_api_version \
         	flutter.android.min_api_version \
-        	flutter.web.assets \
+        	flutter.web.assets flutter.gen \
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
