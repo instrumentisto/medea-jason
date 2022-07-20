@@ -365,25 +365,25 @@ jobs:
           path: ./flutter/example/build/windows/runner/Debug
         if: ${{ matrix.platform == 'windows' }}
 
-      - name: Change NDK version to r22
-        run: |
-          ANDROID_HOME=$HOME/Library/Android/sdk
-          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
-          echo y | $SDKMANAGER "ndk;22.1.7171670"
-          ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
-        if: ${{ matrix.platform == 'android' }}
+      # - name: Change NDK version to r22
+      #   run: |
+      #     ANDROID_HOME=$HOME/Library/Android/sdk
+      #     SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+      #     echo y | $SDKMANAGER "ndk;22.1.7171670"
+      #     ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
+      #   if: ${{ matrix.platform == 'android' }}
 
-      - run: make cargo.build.jason platform=${{ matrix.platform }}
-                                    ${{ matrix.platform == 'android'
-                                        && 'targets=x86_64'
-                                        || '' }}
+      # - run: make cargo.build.jason platform=${{ matrix.platform }}
+      #                               ${{ matrix.platform == 'android'
+      #                                   && 'targets=x86_64'
+      #                                   || '' }}
 
-      - name: Parse Android API versions
-        id: api-version
-        run: |
-          echo ::set-output name=min::$(make flutter.android.version.min)
-          echo ::set-output name=target::$(make flutter.android.version.compile)
-        if: ${{ matrix.platform == 'android' }}
+      # - name: Parse Android API versions
+      #   id: api-version
+      #   run: |
+      #     echo ::set-output name=min::$(make flutter.android.version.min)
+      #     echo ::set-output name=target::$(make flutter.android.version.compile)
+      #   if: ${{ matrix.platform == 'android' }}
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
