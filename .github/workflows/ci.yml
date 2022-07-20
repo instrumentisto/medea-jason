@@ -35,7 +35,6 @@ jobs:
       - rustfmt
       - test-e2e
       - test-e2e-desktop
-      - test-e2e-windows
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
@@ -285,8 +284,8 @@ jobs:
         include:
           - platform: linux
             os: ubuntu-22.04
-          - platform: windows
-            os: windows-latest
+#          - platform: windows
+#            os: windows-latest
           # TODO: Add macos e2e tests
           # - platform: macos
           #   os: macos-latest
@@ -318,6 +317,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v1
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
           key: test-e2e-{hash}
@@ -347,15 +347,6 @@ jobs:
                           control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'linux' }}
 
-      - name: Build windows test bundle
-        run: make test.e2e.desktop.windows.build
-        if: ${{ matrix.platform == 'windows' }}
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: windows-test-bundle-${{ github.run_number }}
-          path: ./flutter/example/build/windows/runner/Debug
-        if: ${{ matrix.platform == 'windows' }}
 
   test-flutter:
     name: Flutter tests
@@ -449,43 +440,6 @@ jobs:
 
       - run: make test.flutter device=windows
         if: ${{ matrix.platform == 'windows' }}
-
-  test-e2e-windows:
-    name: E2E tests for windows
-    runs-on: macOs-12
-    needs: ["docker", "test-e2e-desktop"]
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install docker
-      uses: docker-practice/actions-setup-docker@master
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: docker-medea-control-api-mock-${{ github.run_number }}
-
-    - name: Unpack `medea-control-api-mock` Docker image
-      run: make docker.untar from-file=image.tar
-
-    - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-                  -p ${{ secrets.MEDEA_DOCKER_PASS }}
-                  hub.instrumentisto.com
-
-    - name: Install vagrant
-      run: |
-        brew install vagrant
-        vagrant autocomplete install
-
-    - name: Download windows test bundle
-      uses: actions/download-artifact@v3
-      with:
-        name: windows-test-bundle-${{ github.run_number }}
-        path: ./windows_test_staff/test/
-
-    - run: make test.e2e.desktop.windows up=yes debug=no dockerized=yes
-                                        background=yes
-                                        medea-tag=${{ env.MEDEA_BRANCH }}
-                                        control-tag=build-${{ github.run_number }}
 
   ############
   # Building #
