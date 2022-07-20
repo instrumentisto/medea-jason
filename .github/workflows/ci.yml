@@ -22,25 +22,25 @@ jobs:
   # Pull Request #
   ################
 
-  pr:
-    if: ${{ github.event_name == 'pull_request' }}
-    needs:
-      - clippy
-      - crate-jason
-      - dartanalyze
-      - dartfmt
-      - docker
-      - helm-lint
-      - rustdoc
-      - rustfmt
-      - test-e2e
-      - test-e2e-desktop
-      - test-e2e-windows
-      - test-flutter
-      - test-unit
-    runs-on: ubuntu-latest
-    steps:
-      - run: true
+  # pr:
+  #   if: ${{ github.event_name == 'pull_request' }}
+  #   needs:
+  #     - clippy
+  #     - crate-jason
+  #     - dartanalyze
+  #     - dartfmt
+  #     - docker
+  #     - helm-lint
+  #     - rustdoc
+  #     - rustfmt
+  #     - test-e2e
+  #     - test-e2e-desktop
+  #     - test-e2e-windows
+  #     - test-flutter
+  #     - test-unit
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - run: true
 
 
 
