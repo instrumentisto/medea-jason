@@ -378,12 +378,12 @@ jobs:
       #                                   && 'targets=x86_64'
       #                                   || '' }}
 
-      # - name: Parse Android API versions
-      #   id: api-version
-      #   run: |
-      #     echo ::set-output name=min::$(make flutter.android.version.min)
-      #     echo ::set-output name=target::$(make flutter.android.version.compile)
-      #   if: ${{ matrix.platform == 'android' }}
+      - name: Parse Android API versions
+        id: api-version
+        run: |
+          echo ::set-output name=min::$(make flutter.android.version.min)
+          echo ::set-output name=target::$(make flutter.android.version.compile)
+        if: ${{ matrix.platform == 'android' }}
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
