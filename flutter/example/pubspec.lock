@@ -182,7 +182,7 @@ packages:
     description:
       path: "."
       ref: add-fake-media-env-option
-      resolved-ref: "0d7cf1cfbc48618c27304d7d18426b9982ba0e6c"
+      resolved-ref: "845a7df36f6aabf943857d45185b2a68f181448c"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"
