@@ -34,7 +34,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test-e2e
-      - test-e2e-desktop
+      - test-e2e-native
       - test-e2e-windows
       - test-flutter
       - test-unit
@@ -273,8 +273,8 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
-  test-e2e-desktop:
-    name: E2E tests desktop
+  test-e2e-native:
+    name: E2E tests native
     needs: ["docker"]
     if: ${{ github.ref == 'refs/heads/master'
       || startsWith(github.ref, 'refs/tags/medea-')
@@ -287,6 +287,8 @@ jobs:
             os: ubuntu-22.04
           - platform: windows
             os: windows-latest
+          - platform: android
+            os: macos-latest
           # TODO: Add macos e2e tests
           # - platform: macos
           #   os: macos-latest
@@ -510,7 +512,7 @@ jobs:
   test-e2e-windows:
     name: E2E tests for windows
     runs-on: macOs-12
-    needs: ["docker", "test-e2e-desktop"]
+    needs: ["docker", "test-e2e-native"]
     steps:
       - uses: actions/checkout@v3
 
@@ -557,7 +559,7 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: ubuntu
+            os: macos-latest
           - platform: linux
             os: ubuntu
           - platform: web
@@ -704,7 +706,7 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit", "test-e2e-desktop", "test-e2e-windows"]
+    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit", "test-e2e-native", "test-e2e-windows"]
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
