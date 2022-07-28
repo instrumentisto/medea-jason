@@ -559,7 +559,7 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: macos-latest
+            os: macos
           - platform: linux
             os: ubuntu
           - platform: web
