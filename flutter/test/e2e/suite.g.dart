@@ -3336,7 +3336,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'And Alice disables audio',
+              'And Alice disables audio ',
               <String>[],
               null,
               dependencies,

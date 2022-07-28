@@ -491,6 +491,9 @@ flutter.web.assets:
 #	make flutter.gen [overwrite=(yes|no)]
 
 flutter.gen:
+ifeq ($(wildcard flutter/pubspec.lock),)
+	@make flutter
+endif
 	cd flutter && \
 	flutter pub run build_runner build \
 		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
@@ -665,7 +668,6 @@ ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 	@make flutter.gen overwrite=yes dockerized=$(dockerized)
 endif
 	cd flutter/example/ && \
-	export WEBRTC_FAKE_MEDIA=true && \
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \

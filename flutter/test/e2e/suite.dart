@@ -1,6 +1,7 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'api/room.dart';
@@ -115,6 +116,7 @@ final TestConfigs = FlutterTestConfiguration()
 
 @GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
 Future<void> main() async {
+  await enableFakeMedia();
   executeTestSuite(
     TestConfigs,
     (World world) async {},
