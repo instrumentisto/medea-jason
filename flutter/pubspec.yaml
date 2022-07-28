@@ -12,10 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.0
-  flutter_webrtc:
-    git:
-      url: https://github.com/instrumentisto/flutter-webrtc.git
-      ref: add-fake-media-env-option
+  medea_flutter_webrtc:
+    path: /media/human/AE66A1DB66A1A495/Work/Github/Current/flutter-webrtc/
+    # git:
+    #   url: https://github.com/instrumentisto/flutter-webrtc.git
+    #   ref: add-fake-media-env-option
   js: ^0.6.3
   http: ^0.13.4
   uuid: ^3.0.6

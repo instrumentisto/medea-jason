@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/src/model/constraints.dart';
+import 'package:medea_flutter_webrtc/src/model/constraints.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'constraints.g.dart' as bridge;

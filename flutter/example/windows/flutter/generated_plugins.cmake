@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  flutter_webrtc
+  medea_flutter_webrtc
   medea_jason
 )
 
