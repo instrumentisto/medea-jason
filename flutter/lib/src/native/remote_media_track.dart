@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';

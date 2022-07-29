@@ -1,5 +1,5 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
-import 'package:flutter_webrtc/src/platform/web/media_stream_track.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
 
 import '../interface/local_media_track.dart';
 import '../interface/track_kinds.dart';

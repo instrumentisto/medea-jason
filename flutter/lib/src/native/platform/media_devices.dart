@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;

@@ -1,4 +1,4 @@
-import 'package:flutter_webrtc/src/platform/web/video_renderer.dart'
+import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
 
 import 'package:js/js.dart';
