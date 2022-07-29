@@ -101,28 +101,19 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.34.2"
+    version: "1.37.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_webrtc:
-    dependency: transitive
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: b844eb2b73a1f9e477a941b254810a1bb8d4f54d
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
-    version: "0.8.0-dev"
   freezed_annotation:
     dependency: transitive
     description:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "2.1.0"
   fuchsia_remote_debug_protocol:
     dependency: transitive
     description: flutter
@@ -161,6 +152,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
+  medea_flutter_webrtc:
+    dependency: transitive
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "3b6c2d1fd003af748513dae29e4d925490153f1e"
+      url: "https://github.com/instrumentisto/flutter-webrtc.git"
+    source: git
+    version: "0.8.0-dev"
   medea_jason:
     dependency: "direct main"
     description:
