@@ -267,9 +267,11 @@ packages:
   medea_flutter_webrtc:
     dependency: transitive
     description:
-      path: "/media/human/AE66A1DB66A1A495/Work/Github/Current/flutter-webrtc/"
-      relative: false
-    source: path
+      path: "."
+      ref: fix-android-invalidate-bug
+      resolved-ref: "8bffc21ef4eae3eced18d8c671666d0ea924ffea"
+      url: "https://github.com/instrumentisto/flutter-webrtc.git"
+    source: git
     version: "0.8.0-dev"
   medea_jason:
     dependency: "direct main"
