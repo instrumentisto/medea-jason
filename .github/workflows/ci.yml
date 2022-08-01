@@ -288,7 +288,7 @@ jobs:
           # - platform: windows
           #   os: windows-latest
           - platform: android
-            os: macos-12
+            os: macos-latest
           # TODO: Add macos e2e tests
           # - platform: macos
           #   os: macos-latest
