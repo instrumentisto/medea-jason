@@ -306,6 +306,8 @@ jobs:
 
       - name: Install docker
         uses: docker-practice/actions-setup-docker@master
+        with:
+          docker_version: '19.03'
         if: ${{ matrix.platform == 'android' }}
 
       - uses: subosito/flutter-action@v2
