@@ -388,18 +388,18 @@ jobs:
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
-      # - name: Test on min Android API version
-      #   uses: reactivecircus/android-emulator-runner@v2
-      #   with:
-      #     api-level: ${{ steps.api-version.outputs.min }}
-      #     target: google_apis
-      #     arch: x86_64
-      #     profile: Nexus 6
-      #     script: make test.e2e.android up=yes debug=no 
-      #                     dockerized=yes device=linux
-      #                     medea-tag=${{ env.MEDEA_BRANCH }}
-      #                     control-tag=build-${{ github.run_number }}
-      #   if: ${{ matrix.platform == 'android' }}
+      - name: Test on min Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.min }}
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: make test.e2e.android up=yes debug=no 
+                          dockerized=yes device=linux
+                          medea-tag=${{ env.MEDEA_BRANCH }}
+                          control-tag=build-${{ github.run_number }}
+        if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
