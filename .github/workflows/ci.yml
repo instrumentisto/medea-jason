@@ -29,7 +29,7 @@ jobs:
       # - crate-jason
       # - dartanalyze
       # - dartfmt
-      - docker
+      # - docker
       # - helm-lint
       # - rustdoc
       # - rustfmt
@@ -275,7 +275,7 @@ jobs:
 
   test-e2e-native:
     name: E2E tests native
-    needs: ["docker"]
+    # needs: ["docker"]
     if: ${{ github.ref == 'refs/heads/master'
       || startsWith(github.ref, 'refs/tags/medea-')
       || !contains(github.event.head_commit.message, '[skip ci]') }}
@@ -295,16 +295,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      - run: sysctl -a | grep machdep.cpu
-      - run: brew install --cask docker
-        if: ${{ matrix.platform == 'android' }}
-
-      - run: brew install --cask docker-compose
-        if: ${{ matrix.platform == 'android' }}
-
-      - run: docker ps
-        if: ${{ matrix.platform == 'android' }}
-        
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -316,10 +306,6 @@ jobs:
 
 
       - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '2.10.5'
-          channel: 'stable'
-
       - run: flutter config --enable-linux-desktop
         if: ${{ matrix.platform == 'linux' }}
       - name: Install Flutter Linux dependencies
@@ -364,20 +350,20 @@ jobs:
         continue-on-error: true
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: docker-medea-control-api-mock-${{ github.run_number }}
-        if: ${{ matrix.platform != 'windows' }}
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: docker-medea-control-api-mock-${{ github.run_number }}
+      #   if: ${{ matrix.platform != 'windows' }}
 
-      - name: Unpack `medea-control-api-mock` Docker image
-        run: make docker.untar from-file=image.tar
-        if: ${{ matrix.platform != 'windows' }}
+      # - name: Unpack `medea-control-api-mock` Docker image
+      #   run: make docker.untar from-file=image.tar
+      #   if: ${{ matrix.platform != 'windows' }}
 
-      - name: Login to Medea Docker registry
-        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-          -p ${{ secrets.MEDEA_DOCKER_PASS }}
-          hub.instrumentisto.com
-        if: ${{ matrix.platform != 'windows' }}
+      # - name: Login to Medea Docker registry
+      #   run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+      #     -p ${{ secrets.MEDEA_DOCKER_PASS }}
+      #     hub.instrumentisto.com
+      #   if: ${{ matrix.platform != 'windows' }}
 
       - uses: jetli/wasm-pack-action@v0.3.0
       - name: Desktop linux test
