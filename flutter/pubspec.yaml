@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^1.2.1
+  ffi: ^2.0.0
   medea_flutter_webrtc:
     # path: /media/human/AE66A1DB66A1A495/Work/Github/Current/flutter-webrtc/
     git:
