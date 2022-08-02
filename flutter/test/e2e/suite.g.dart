@@ -35,6 +35,106 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
   void testFeature0() {
     runFeature(
+      'Remote Connection closing:',
+      <String>[],
+      () {
+        runScenario(
+          'Connection closes when member is deleted by Control API',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s connection with Bob closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            'Remote Connection closing',
+            <String>[],
+          ),
+          onAfter: null,
+        );
+
+        runScenario(
+          'Connection closes when other member disposes Jason',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob disposes Jason object',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s connection with Bob closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Connection closes when other member closes Room',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob\'s room closed by client',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s connection with Bob closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: () async => onAfterRunFeature(
+            'Remote Connection closing',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature1() {
+    runFeature(
       '`on_new_connection` callback:',
       <String>[],
       () {
@@ -218,227 +318,13 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
     );
   }
 
-  void testFeature1() {
-    runFeature(
-      'Enable remote media:',
-      <String>[],
-      () {
-        runScenario(
-          '`RemoteMediaTrack.on_enabled()` fires when video is enabled',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Given joined member Alice with disabled video playing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice enables remote video',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_enabled` callback fires 1 time on Alice\'s remote device video track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            'Enable remote media',
-            <String>[],
-          ),
-          onAfter: null,
-        );
-
-        runScenario(
-          '`RemoteMediaTrack.on_enabled()` fires when audio is enabled',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Given joined member Alice with disabled audio playing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice enables remote audio',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_enabled` callback fires 1 time on Alice\'s remote audio track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          '`RemoteMediaTrack.on_enabled()` doesn\'t fire when track is created',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_enabled` callback fires 0 times on Alice\'s remote audio track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And `on_enabled` callback fires 0 times on Bob\'s remote audio track from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And `on_enabled` callback fires 0 times on Alice\'s remote device video track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And `on_enabled` callback fires 0 times on Bob\'s remote device video track from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Remote member enables video',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And joined member Bob with disabled video publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob enables video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_enabled` callback fires 1 time on Alice\'s remote device video track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Remote member enables audio',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And joined member Bob with disabled audio publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob enables audio and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_enabled` callback fires 1 time on Alice\'s remote audio track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: () async => onAfterRunFeature(
-            'Enable remote media',
-          ),
-        );
-      },
-    );
-  }
-
   void testFeature2() {
     runFeature(
-      'Room joining:',
+      'Media muting:',
       <String>[],
       () {
         runScenario(
-          'Member joined',
+          'Member mutes video before call and track is created and enabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -449,7 +335,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'And member Bob',
+              'And member Bob with muted video publishing',
               <String>[],
               null,
               dependencies,
@@ -463,60 +349,46 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'Then Alice receives connection with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob receives connection with Alice',
+              'Then Alice\'s device video remote track from Bob is enabled',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'Room joining',
+            'Media muting',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          'Member joined with disabled media',
+          'Member mutes audio before call and track is created and enabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with member Alice with disabled media publishing',
+              'Given room with joined member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And joined member Bob',
+              'And member Bob with muted audio publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice joins the room',
+              'When Bob joins the room',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice receives connection with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob receives connection with Alice',
+              'Then Alice\'s audio remote track from Bob is enabled',
               <String>[],
               null,
               dependencies,
@@ -527,39 +399,32 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Member without endpoints joined',
+          'Local track is not muted when member mutes audio before call',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with member Alice with no WebRTC endpoints',
+              'Given room with joined member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And joined member Bob with no WebRTC endpoints',
+              'And member Bob with muted audio publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice joins the room',
+              'When Bob joins the room',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice doesn\'t receive connection with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob doesn\'t receive connection with Alice',
+              'Then Bob\'s audio local track is not muted',
               <String>[],
               null,
               dependencies,
@@ -570,7 +435,43 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Third member joined',
+          'Local track is not muted when member mutes video before call',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Bob with muted video publishing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Bob\'s device video local track is not muted',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Local track is not muted when member mutes video during call',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -581,28 +482,129 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'And member Carol',
+              'When Bob mutes video and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Carol joins the room',
+              'Then Bob\'s device video local track is not muted',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Local track is not muted when member mutes audio during call',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice receives connection with Carol',
+              'When Bob mutes audio and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Bob receives connection with Carol',
+              'Then Bob\'s audio local track is not muted',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`RemoteTrack.on_muted()` and `RemoteTrack.on_unmuted()` callbacks fire when video is muted/unmuted',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob mutes video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_muted` callback fires 1 time on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob unmutes video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_unmuted` callback fires 1 time on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`RemoteTrack.on_muted()` and `RemoteTrack.on_unmuted()` callbacks fire when audio is muted/unmuted',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob mutes audio and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_muted` callback fires 1 time on Alice\'s remote audio track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob unmutes audio and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_unmuted` callback fires 1 time on Alice\'s remote audio track from Bob',
               <String>[],
               null,
               dependencies,
@@ -610,7 +612,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Room joining',
+            'Media muting',
           ),
         );
       },
@@ -619,89 +621,75 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
   void testFeature3() {
     runFeature(
-      'Local tracks are created:',
+      'State synchronization:',
       <String>[],
       () {
         runScenario(
-          'Local tracks are created when connecting',
+          '`RoomHandle.on_connection_loss()` fires when WS connection lost',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with member Alice',
+              'Given room with joined member Alice with no WebRTC endpoints',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And joined member Bob',
+              'When Alice loses WS connection',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice has 2 local tracks',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice has local device video',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice has local audio',
+              'Then Alice\'s WS connection is lost',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'Local tracks are created',
+            'State synchronization',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          'Local tracks are not created when all media is disabled',
+          'Remote track disable works while disconnect',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with member Alice with disabled media publishing',
+              'Given room with joined member Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And joined member Bob',
+              'When Alice loses WS connection',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice joins the room',
+              'And Bob disables audio and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice has 0 local tracks',
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s audio remote track from Bob is disabled',
               <String>[],
               null,
               dependencies,
@@ -712,39 +700,39 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Local video track is created when member enables video',
+          'Local track disable works while disconnect',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice with disabled media publishing',
+              'Given room with joined member Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And joined member Bob',
+              'When Alice loses WS connection',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice enables video and awaits it completes',
+              'And Alice disables audio',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice has 1 local tracks',
+              'And Alice restores WS connection',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Alice has local device video',
+              'Then Bob\'s audio remote track from Alice is disabled',
               <String>[],
               null,
               dependencies,
@@ -755,39 +743,532 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Local audio track is created when member enables audio',
+          'Disable/enable works fine while disconnect',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice with disabled media publishing',
+              'Given room with joined member Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And joined member Bob',
+              'When Alice loses WS connection',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice enables audio and awaits it completes',
+              'And Alice disables audio',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice has 1 local tracks',
+              'And Alice enables audio and error',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Alice has local audio',
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Bob\'s audio remote track from Alice is enabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Audio endpoint added while disconnected',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API interconnects audio of Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice has audio remote tracks from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob has audio remote tracks from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Video endpoint added while disconnected',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API interconnects video of Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice has video remote tracks from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob has video remote tracks from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'New endpoint creates new tracks',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API interconnects Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice has audio and video remote tracks from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob has audio and video remote tracks from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'New member joins while disconnected',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice receives connection with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob receives connection with Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`Connection.on_close()` fires when other member leaves while disconnected',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob\'s room closed by client',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s connection with Bob closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`Connection.on_close()` fires when other member is deleted by Control API while disconnected',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API removes member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s connection with Bob closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Control API deletes WebRtcPublishEndpoint',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API deletes Alice\'s publish endpoint',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Bob has 2 stopped remote tracks from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Control API deletes WebRtcPlayEndpoint',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API deletes Alice\'s play endpoint with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice has 2 stopped remote tracks from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Control API deletes all endpoints',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API deletes Alice\'s publish endpoint',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API deletes Alice\'s play endpoint with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s connection with Bob closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob\'s connection with Alice closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Create and delete endpoints while disconnected',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice loses WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API starts Alice\'s audio publishing to Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Control API deletes Alice\'s publish endpoint',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice restores WS connection',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice doesn\'t have live local tracks',
               <String>[],
               null,
               dependencies,
@@ -795,7 +1276,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Local tracks are created',
+            'State synchronization',
           ),
         );
       },
@@ -1507,6 +1988,220 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
   void testFeature5() {
     runFeature(
+      'Enable remote media:',
+      <String>[],
+      () {
+        runScenario(
+          '`RemoteMediaTrack.on_enabled()` fires when video is enabled',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Given joined member Alice with disabled video playing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice enables remote video',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            'Enable remote media',
+            <String>[],
+          ),
+          onAfter: null,
+        );
+
+        runScenario(
+          '`RemoteMediaTrack.on_enabled()` fires when audio is enabled',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Given joined member Alice with disabled audio playing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice enables remote audio',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote audio track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`RemoteMediaTrack.on_enabled()` doesn\'t fire when track is created',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_enabled` callback fires 0 times on Alice\'s remote audio track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And `on_enabled` callback fires 0 times on Bob\'s remote audio track from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And `on_enabled` callback fires 0 times on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And `on_enabled` callback fires 0 times on Bob\'s remote device video track from Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Remote member enables video',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And joined member Bob with disabled video publishing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob enables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote device video track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Remote member enables audio',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And joined member Bob with disabled audio publishing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob enables audio and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_enabled` callback fires 1 time on Alice\'s remote audio track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: () async => onAfterRunFeature(
+            'Enable remote media',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature6() {
+    runFeature(
       'Create endpoint:',
       <String>[],
       () {
@@ -1870,52 +2565,130 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
     );
   }
 
-  void testFeature6() {
+  void testFeature7() {
     runFeature(
-      'Media muting:',
+      '`OnJoin` callback of Control API:',
       <String>[],
       () {
         runScenario(
-          'Member mutes video before call and track is created and enabled',
+          '`OnJoin` fires when member joins',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice',
+              'Given room with member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And member Bob with muted video publishing',
+              'When Alice joins the room',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s device video remote track from Bob is enabled',
+              'Then Control API sends `OnJoin` callback for member Alice',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'Media muting',
+            '`OnJoin` callback of Control API',
+            <String>[],
+          ),
+          onAfter: () async => onAfterRunFeature(
+            '`OnJoin` callback of Control API',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature8() {
+    runFeature(
+      'Media enabling/disabling:',
+      <String>[],
+      () {
+        runScenario(
+          'Member disables video during call',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob disables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s device video remote track from Bob is disabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice\'s audio remote track from Bob is enabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            'Media enabling/disabling',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          'Member mutes audio before call and track is created and enabled',
+          'Member disables audio during call',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob disables audio and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s audio remote track from Bob is disabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice\'s device video remote track from Bob is enabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member disables video before call',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -1926,7 +2699,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'And member Bob with muted audio publishing',
+              'And member Bob with disabled video publishing',
               <String>[],
               null,
               dependencies,
@@ -1934,6 +2707,99 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
 
             await runStep(
               'When Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice doesn\'t have device video remote track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice\'s audio remote track from Bob is enabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member disables audio before call',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Bob with disabled audio publishing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice doesn\'t have audio remote track from Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice\'s device video remote track from Bob is enabled',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member enables audio during call',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Bob with disabled audio publishing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob enables audio and awaits it completes',
               <String>[],
               null,
               dependencies,
@@ -1951,7 +2817,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Local track is not muted when member mutes audio before call',
+          'Member enables video during call',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -1962,7 +2828,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'And member Bob with muted audio publishing',
+              'And member Bob with disabled video publishing',
               <String>[],
               null,
               dependencies,
@@ -1976,7 +2842,14 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'Then Bob\'s audio local track is not muted',
+              'And Bob enables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s device video remote track from Bob is enabled',
               <String>[],
               null,
               dependencies,
@@ -1987,43 +2860,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          'Local track is not muted when member mutes video before call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob with muted video publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s device video local track is not muted',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Local track is not muted when member mutes video during call',
+          'Local track is dropped when video is disabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -2034,43 +2871,14 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'When Bob mutes video and awaits it completes',
+              'When Bob disables video and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Bob\'s device video local track is not muted',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Local track is not muted when member mutes audio during call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob mutes audio and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s audio local track is not muted',
+              'Then Bob\'s device video local track is stopped',
               <String>[],
               null,
               dependencies,
@@ -2081,7 +2889,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          '`RemoteTrack.on_muted()` and `RemoteTrack.on_unmuted()` callbacks fire when video is muted/unmuted',
+          'Local track is dropped when audio is disabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -2092,28 +2900,14 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'When Bob mutes video and awaits it completes',
+              'When Bob disables audio and awaits it completes',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then `on_muted` callback fires 1 time on Alice\'s remote device video track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob unmutes video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_unmuted` callback fires 1 time on Alice\'s remote device video track from Bob',
+              'Then Bob\'s audio local track is stopped',
               <String>[],
               null,
               dependencies,
@@ -2124,7 +2918,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          '`RemoteTrack.on_muted()` and `RemoteTrack.on_unmuted()` callbacks fire when audio is muted/unmuted',
+          'Member starts enabling video and instantly disables it',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
@@ -2135,28 +2929,42 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'When Bob mutes audio and awaits it completes',
+              'And Bob\'s `getUserMedia()` request has added latency',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then `on_muted` callback fires 1 time on Alice\'s remote audio track from Bob',
+              'When Bob disables video',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Bob unmutes audio and awaits it completes',
+              'And Bob frees all local tracks',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then `on_unmuted` callback fires 1 time on Alice\'s remote audio track from Bob',
+              'And Bob enables video and error',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob disables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s device video remote track from Bob is disabled',
               <String>[],
               null,
               dependencies,
@@ -2164,14 +2972,464 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Media muting',
+            'Media enabling/disabling',
           ),
         );
       },
     );
   }
 
-  void testFeature7() {
+  void testFeature9() {
+    runFeature(
+      '`OnLeave` callback of Control API:',
+      <String>[],
+      () {
+        runScenario(
+          'Member closes room',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice\'s room closed by client',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Control API sends `OnLeave` callback with `Disconnected` reason for member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            '`OnLeave` callback of Control API',
+            <String>[],
+          ),
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member\'s Jason object disposed',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice disposes Jason object',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Control API sends `OnLeave` callback with `Disconnected` reason for member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member deleted by Control API',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Control API doesn\'t send `OnLeave` callback for member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member\'s room deleted by Control API',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Control API doesn\'t send `OnLeave` callback for member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: () async => onAfterRunFeature(
+            '`OnLeave` callback of Control API',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature10() {
+    runFeature(
+      'Apply method of Control API:',
+      <String>[],
+      () {
+        runScenario(
+          'Remove member with `Apply` method',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes Alice with `Apply` method',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Bob\'s connection with Alice closes',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            'Apply method of Control API',
+            <String>[],
+          ),
+          onAfter: null,
+        );
+
+        runScenario(
+          'Interconnect members with `Apply` method',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API interconnects Alice and Bob with `Apply` method',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice receives connection with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob receives connection with Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`OnJoin` callback fires on interconnection with `Apply` method',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API interconnects Alice and Bob with `Apply` method',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Control API sends `OnJoin` callback for member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`Room.on_close()` fires when room is removed with `Apply` method',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes Alice with `Apply` method',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `on_close` room\'s callback fires with `Evicted` reason',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: () async => onAfterRunFeature(
+            'Apply method of Control API',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature11() {
+    runFeature(
+      'Room joining:',
+      <String>[],
+      () {
+        runScenario(
+          'Member joined',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Bob joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice receives connection with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob receives connection with Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            'Room joining',
+            <String>[],
+          ),
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member joined with disabled media',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with member Alice with disabled media publishing',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And joined member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice receives connection with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob receives connection with Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Member without endpoints joined',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with member Alice with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And joined member Bob with no WebRTC endpoints',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice doesn\'t receive connection with Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob doesn\'t receive connection with Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          'Third member joined',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined members Alice and Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And member Carol',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Carol joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice receives connection with Carol',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Bob receives connection with Carol',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: () async => onAfterRunFeature(
+            'Room joining',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature12() {
     runFeature(
       'Delete endpoint:',
       <String>[],
@@ -2343,63 +3601,84 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
     );
   }
 
-  void testFeature8() {
+  void testFeature13() {
     runFeature(
-      'Room closing:',
+      '`getUserMedia()` requests:',
       <String>[],
       () {
         runScenario(
-          '`Room.on_close()` fires when `Jason.close_room()` is invoked',
+          'Member joins Room and its `getUserMedia()` errors',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice',
+              'Given room with member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice\'s room closed by client',
+              'And Alice\'s `getUserMedia()` errors',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s `on_close` room\'s callback fires with `RoomClosed` reason',
+              'And joined member Bob',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice joins the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `Room.on_failed_local_stream()` fires 1 time',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            'Room closing',
+            '`getUserMedia()` requests',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          '`Room.on_close()` fires when `Jason.dispose()` is invoked',
+          'Member tries to enable media publishing and its `getUserMedia()` errors',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice',
+              'Given room with joined member Alice and Bob with disabled media publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Alice disposes Jason object',
+              'And Alice\'s `getUserMedia()` errors',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s `on_close` room\'s callback fires with `RoomClosed` reason',
+              'When Alice enables video and awaits it errors',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `Room.on_failed_local_stream()` fires 1 time',
               <String>[],
               null,
               dependencies,
@@ -2410,25 +3689,32 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          '`Room.on_close()` fires when member is removed by Control API',
+          'Member tries to enable audio and video and its `getUserMedia()` errors',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice',
+              'Given room with joined member Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API removes member Alice',
+              'And Alice\'s `getUserMedia()` errors',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s `on_close` room\'s callback fires with `Evicted` reason',
+              'When Alice enables video and audio in local media settings',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice doesn\'t have live local tracks',
               <String>[],
               null,
               dependencies,
@@ -2439,25 +3725,32 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          '`Room.on_close()` fires when room is removed by Control API',
+          'Latency in `getUserMedia()` request',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice',
+              'Given room with joined member Alice and Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API removes the room',
+              'When Alice switches device with latency',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s `on_close` room\'s callback fires with `Evicted` reason',
+              'And Alice disables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then `on_disabled` callback fires 1 time on Bob\'s remote device video track from Alice',
               <String>[],
               null,
               dependencies,
@@ -2465,14 +3758,14 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Room closing',
+            '`getUserMedia()` requests',
           ),
         );
       },
     );
   }
 
-  void testFeature9() {
+  void testFeature14() {
     runFeature(
       'Media direction:',
       <String>[],
@@ -3030,24 +4323,146 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
     );
   }
 
-  void testFeature10() {
+  void testFeature15() {
     runFeature(
-      '`getUserMedia()` requests:',
+      'Room closing:',
       <String>[],
       () {
         runScenario(
-          'Member joins Room and its `getUserMedia()` errors',
+          '`Room.on_close()` fires when `Jason.close_room()` is invoked',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with member Alice',
+              'Given room with joined member Alice',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Alice\'s `getUserMedia()` errors',
+              'When Alice\'s room closed by client',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `on_close` room\'s callback fires with `RoomClosed` reason',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: () async => onBeforeRunFeature(
+            'Room closing',
+            <String>[],
+          ),
+          onAfter: null,
+        );
+
+        runScenario(
+          '`Room.on_close()` fires when `Jason.dispose()` is invoked',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Alice disposes Jason object',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `on_close` room\'s callback fires with `RoomClosed` reason',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`Room.on_close()` fires when member is removed by Control API',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `on_close` room\'s callback fires with `Evicted` reason',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: null,
+        );
+
+        runScenario(
+          '`Room.on_close()` fires when room is removed by Control API',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with joined member Alice',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'When Control API removes the room',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice\'s `on_close` room\'s callback fires with `Evicted` reason',
+              <String>[],
+              null,
+              dependencies,
+            );
+          },
+          onBefore: null,
+          onAfter: () async => onAfterRunFeature(
+            'Room closing',
+          ),
+        );
+      },
+    );
+  }
+
+  void testFeature16() {
+    runFeature(
+      'Local tracks are created:',
+      <String>[],
+      () {
+        runScenario(
+          'Local tracks are created when connecting',
+          <String>[],
+          (TestDependencies dependencies) async {
+            await runStep(
+              'Given room with member Alice',
               <String>[],
               null,
               dependencies,
@@ -3068,907 +4483,46 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'Then Alice\'s `Room.on_failed_local_stream()` fires 1 time',
+              'Then Alice has 2 local tracks',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice has local device video',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice has local audio',
               <String>[],
               null,
               dependencies,
             );
           },
           onBefore: () async => onBeforeRunFeature(
-            '`getUserMedia()` requests',
+            'Local tracks are created',
             <String>[],
           ),
           onAfter: null,
         );
 
         runScenario(
-          'Member tries to enable media publishing and its `getUserMedia()` errors',
+          'Local tracks are not created when all media is disabled',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob with disabled media publishing',
+              'Given room with member Alice with disabled media publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'And Alice\'s `getUserMedia()` errors',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice enables video and awaits it errors',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s `Room.on_failed_local_stream()` fires 1 time',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member tries to enable audio and video and its `getUserMedia()` errors',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice\'s `getUserMedia()` errors',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice enables video and audio in local media settings',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice doesn\'t have live local tracks',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Latency in `getUserMedia()` request',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice switches device with latency',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice disables video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then `on_disabled` callback fires 1 time on Bob\'s remote device video track from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: () async => onAfterRunFeature(
-            '`getUserMedia()` requests',
-          ),
-        );
-      },
-    );
-  }
-
-  void testFeature11() {
-    runFeature(
-      'State synchronization:',
-      <String>[],
-      () {
-        runScenario(
-          '`RoomHandle.on_connection_loss()` fires when WS connection lost',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice with no WebRTC endpoints',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s WS connection is lost',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            'State synchronization',
-            <String>[],
-          ),
-          onAfter: null,
-        );
-
-        runScenario(
-          'Remote track disable works while disconnect',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob disables audio and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s audio remote track from Bob is disabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Local track disable works while disconnect',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice disables audio',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s audio remote track from Alice is disabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Disable/enable works fine while disconnect',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice disables audio ',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice enables audio and error',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s audio remote track from Alice is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Audio endpoint added while disconnected',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API interconnects audio of Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice has audio remote tracks from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob has audio remote tracks from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Video endpoint added while disconnected',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API interconnects video of Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice has video remote tracks from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob has video remote tracks from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'New endpoint creates new tracks',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API interconnects Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice has audio and video remote tracks from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob has audio and video remote tracks from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'New member joins while disconnected',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice receives connection with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob receives connection with Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          '`Connection.on_close()` fires when other member leaves while disconnected',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob\'s room closed by client',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          '`Connection.on_close()` fires when other member is deleted by Control API while disconnected',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API removes member Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Control API deletes WebRtcPublishEndpoint',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API deletes Alice\'s publish endpoint',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob has 2 stopped remote tracks from Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Control API deletes WebRtcPlayEndpoint',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API deletes Alice\'s play endpoint with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice has 2 stopped remote tracks from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Control API deletes all endpoints',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API deletes Alice\'s publish endpoint',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API deletes Alice\'s play endpoint with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob\'s connection with Alice closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Create and delete endpoints while disconnected',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice loses WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API starts Alice\'s audio publishing to Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Control API deletes Alice\'s publish endpoint',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice restores WS connection',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice doesn\'t have live local tracks',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: () async => onAfterRunFeature(
-            'State synchronization',
-          ),
-        );
-      },
-    );
-  }
-
-  void testFeature12() {
-    runFeature(
-      'Remote Connection closing:',
-      <String>[],
-      () {
-        runScenario(
-          'Connection closes when member is deleted by Control API',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Control API removes member Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            'Remote Connection closing',
-            <String>[],
-          ),
-          onAfter: null,
-        );
-
-        runScenario(
-          'Connection closes when other member disposes Jason',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disposes Jason object',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Connection closes when other member closes Room',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob\'s room closed by client',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s connection with Bob closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: () async => onAfterRunFeature(
-            'Remote Connection closing',
-          ),
-        );
-      },
-    );
-  }
-
-  void testFeature13() {
-    runFeature(
-      '`OnJoin` callback of Control API:',
-      <String>[],
-      () {
-        runScenario(
-          '`OnJoin` fires when member joins',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with member Alice',
+              'And joined member Bob',
               <String>[],
               null,
               dependencies,
@@ -3982,88 +4536,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
             );
 
             await runStep(
-              'Then Control API sends `OnJoin` callback for member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            '`OnJoin` callback of Control API',
-            <String>[],
-          ),
-          onAfter: () async => onAfterRunFeature(
-            '`OnJoin` callback of Control API',
-          ),
-        );
-      },
-    );
-  }
-
-  void testFeature14() {
-    runFeature(
-      'Apply method of Control API:',
-      <String>[],
-      () {
-        runScenario(
-          'Remove member with `Apply` method',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Control API removes Alice with `Apply` method',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s connection with Alice closes',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            'Apply method of Control API',
-            <String>[],
-          ),
-          onAfter: null,
-        );
-
-        runScenario(
-          'Interconnect members with `Apply` method',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Control API interconnects Alice and Bob with `Apply` method',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice receives connection with Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob receives connection with Alice',
+              'Then Alice has 0 local tracks',
               <String>[],
               null,
               dependencies,
@@ -4074,25 +4547,39 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          '`OnJoin` callback fires on interconnection with `Apply` method',
+          'Local video track is created when member enables video',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice and Bob with no WebRTC endpoints',
+              'Given room with joined member Alice with disabled media publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API interconnects Alice and Bob with `Apply` method',
+              'And joined member Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Control API sends `OnJoin` callback for member Alice',
+              'When Alice enables video and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice has 1 local tracks',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice has local device video',
               <String>[],
               null,
               dependencies,
@@ -4103,25 +4590,39 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
         );
 
         runScenario(
-          '`Room.on_close()` fires when room is removed with `Apply` method',
+          'Local audio track is created when member enables audio',
           <String>[],
           (TestDependencies dependencies) async {
             await runStep(
-              'Given room with joined member Alice',
+              'Given room with joined member Alice with disabled media publishing',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'When Control API removes Alice with `Apply` method',
+              'And joined member Bob',
               <String>[],
               null,
               dependencies,
             );
 
             await runStep(
-              'Then Alice\'s `on_close` room\'s callback fires with `Evicted` reason',
+              'When Alice enables audio and awaits it completes',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'Then Alice has 1 local tracks',
+              <String>[],
+              null,
+              dependencies,
+            );
+
+            await runStep(
+              'And Alice has local audio',
               <String>[],
               null,
               dependencies,
@@ -4129,508 +4630,7 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
           },
           onBefore: null,
           onAfter: () async => onAfterRunFeature(
-            'Apply method of Control API',
-          ),
-        );
-      },
-    );
-  }
-
-  void testFeature15() {
-    runFeature(
-      'Media enabling/disabling:',
-      <String>[],
-      () {
-        runScenario(
-          'Member disables video during call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disables video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s device video remote track from Bob is disabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice\'s audio remote track from Bob is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            'Media enabling/disabling',
-            <String>[],
-          ),
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member disables audio during call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disables audio and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s audio remote track from Bob is disabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice\'s device video remote track from Bob is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member disables video before call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob with disabled video publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice doesn\'t have device video remote track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice\'s audio remote track from Bob is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member disables audio before call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob with disabled audio publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice doesn\'t have audio remote track from Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Alice\'s device video remote track from Bob is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member enables audio during call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob with disabled audio publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob enables audio and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s audio remote track from Bob is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member enables video during call',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And member Bob with disabled video publishing',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob joins the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob enables video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s device video remote track from Bob is enabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Local track is dropped when video is disabled',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disables video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s device video local track is stopped',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Local track is dropped when audio is disabled',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disables audio and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Bob\'s audio local track is stopped',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member starts enabling video and instantly disables it',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined members Alice and Bob',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob\'s `getUserMedia()` request has added latency',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Bob disables video',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob frees all local tracks',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob enables video and error',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'And Bob disables video and awaits it completes',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Alice\'s device video remote track from Bob is disabled',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: () async => onAfterRunFeature(
-            'Media enabling/disabling',
-          ),
-        );
-      },
-    );
-  }
-
-  void testFeature16() {
-    runFeature(
-      '`OnLeave` callback of Control API:',
-      <String>[],
-      () {
-        runScenario(
-          'Member closes room',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice\'s room closed by client',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Control API sends `OnLeave` callback with `Disconnected` reason for member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: () async => onBeforeRunFeature(
-            '`OnLeave` callback of Control API',
-            <String>[],
-          ),
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member\'s Jason object disposed',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Alice disposes Jason object',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Control API sends `OnLeave` callback with `Disconnected` reason for member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member deleted by Control API',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Control API removes member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Control API doesn\'t send `OnLeave` callback for member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: null,
-        );
-
-        runScenario(
-          'Member\'s room deleted by Control API',
-          <String>[],
-          (TestDependencies dependencies) async {
-            await runStep(
-              'Given room with joined member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'When Control API removes the room',
-              <String>[],
-              null,
-              dependencies,
-            );
-
-            await runStep(
-              'Then Control API doesn\'t send `OnLeave` callback for member Alice',
-              <String>[],
-              null,
-              dependencies,
-            );
-          },
-          onBefore: null,
-          onAfter: () async => onAfterRunFeature(
-            '`OnLeave` callback of Control API',
+            'Local tracks are created',
           ),
         );
       },
