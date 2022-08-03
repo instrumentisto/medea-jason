@@ -425,14 +425,7 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
-                                    dockerized=no debug=no
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: flutter/windows/lib/x86_64-pc-windows-msvc
-          if-no-files-found: error
-        if: ${{ matrix.platform == 'windows' }}
+                                    dockerized=no debug=yes
 
   rustdoc:
     runs-on: ubuntu-latest
