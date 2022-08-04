@@ -403,7 +403,7 @@ jobs:
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ steps.api-version.outputs.target }}
+          api-level: 27
           target: google_apis
           arch: x86_64
           profile: Nexus 6
