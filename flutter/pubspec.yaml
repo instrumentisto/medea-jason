@@ -12,10 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.0
-  flutter_webrtc:
-    git:
-      url: https://github.com/instrumentisto/flutter-webrtc.git
   js: ^0.6.3
+  medea_flutter_webrtc: ^0.8.0-dev
 
 dev_dependencies:
   import_sorter: ^4.6.0
