@@ -570,12 +570,13 @@ class Member {
         ++failed_local_stream_count;
         if (failed_local_stream_count == times) {
           failed_local_stream_future.complete();
-          room.onFailedLocalMedia((p0) {
-            ++failed_local_stream_count;
-          });
         }
       });
-      return failed_local_stream_future.future;
+      await failed_local_stream_future.future;
+
+      room.onFailedLocalMedia((p0) {
+        ++failed_local_stream_count;
+      });
     }
   }
 
