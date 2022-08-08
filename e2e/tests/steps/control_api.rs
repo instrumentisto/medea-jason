@@ -25,10 +25,10 @@ async fn when_interconnects_kind(
     left_member_id: String,
     right_member_id: String,
 ) {
-    let send_video = kind.contains("video").then(|| VideoSettings {
+    let send_video = kind.contains("video").then_some(VideoSettings {
         publish_policy: proto::PublishPolicy::Optional,
     });
-    let send_audio = kind.contains("audio").then(|| AudioSettings {
+    let send_audio = kind.contains("audio").then_some(AudioSettings {
         publish_policy: proto::PublishPolicy::Optional,
     });
 

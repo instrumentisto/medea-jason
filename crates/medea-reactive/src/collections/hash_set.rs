@@ -264,6 +264,8 @@ where
     }
 }
 
+// Implemented manually to omit redundant `: Default` trait bounds, imposed by
+// `#[derive(Default)]`.
 impl<T, S, O> Default for HashSet<T, S, O>
 where
     S: SubscribersStore<T, O>,

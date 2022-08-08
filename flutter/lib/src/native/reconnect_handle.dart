@@ -51,8 +51,12 @@ class NativeReconnectHandle extends ReconnectHandle {
         ? ForeignValue.none()
         : ForeignValue.fromInt(maxElapsedTimeMs);
 
-    await (_reconnect_with_backoff(ptr.getInnerPtr(), startingDelayMs,
-        multiplier, maxDelay, maxElapsedTimeMs_arg.ref) as Future);
+    try {
+      await (_reconnect_with_backoff(ptr.getInnerPtr(), startingDelayMs,
+          multiplier, maxDelay, maxElapsedTimeMs_arg.ref) as Future);
+    } finally {
+      maxElapsedTimeMs_arg.free();
+    }
   }
 
   @moveSemantics

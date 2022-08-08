@@ -7,7 +7,7 @@ use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{c_str_into_string, free_dart_native_string},
+    api::{c_str_into_string, dart_string_into_rust},
     platform::{
         dart::utils::dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
@@ -77,25 +77,16 @@ impl DartHandle {
     /// [`DartHandle`].
     #[must_use]
     pub fn name(&self) -> String {
-        unsafe {
-            let raw = handle::runtime_type(self.get());
-            let name = c_str_into_string(raw);
-            free_dart_native_string(raw);
-
-            name
-        }
+        unsafe { dart_string_into_rust(handle::runtime_type(self.get())) }
     }
 }
 
 impl fmt::Display for DartHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        unsafe {
-            let raw = handle::to_string(self.get());
-            let to_string = c_str_into_string(raw);
-            free_dart_native_string(raw);
+        let string =
+            unsafe { dart_string_into_rust(handle::to_string(self.get())) };
 
-            write!(f, "{to_string}")
-        }
+        write!(f, "{string}")
     }
 }
 

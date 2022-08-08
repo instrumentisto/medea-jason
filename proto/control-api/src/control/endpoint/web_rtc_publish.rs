@@ -6,7 +6,8 @@ use derive_more::{AsRef, Display, From, Into};
 use ref_cast::RefCast;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use smart_default::SmartDefault;
+
+use crate::control::endpoint;
 
 /// Media [`Element`] receiving media data from a client via [WebRTC] (allows to
 /// publish media data).
@@ -90,6 +91,12 @@ impl<'a> From<&'a str> for Id {
     }
 }
 
+impl AsRef<endpoint::Id> for Id {
+    fn as_ref(&self) -> &endpoint::Id {
+        endpoint::Id::ref_cast(&self.0)
+    }
+}
+
 /// Possible peer-to-peer modes of [WebRTC] interaction in a [`WebRtcPublish`]
 /// media [`Element`].
 ///
@@ -137,7 +144,7 @@ pub struct VideoSettings {
 /// [`WebRtcPublish`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[derive(Clone, Copy, Debug, Eq, PartialEq, SmartDefault)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub enum Policy {
     /// Media type __may__ be published.
