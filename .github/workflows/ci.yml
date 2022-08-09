@@ -280,6 +280,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - platform: macos
+            os: macos-latest
           - platform: android
             os: macos-latest
           - platform: linux
@@ -361,8 +363,9 @@ jobs:
       - run: xvfb-run -a make test.flutter device=linux
         if: ${{ matrix.platform == 'linux' }}
 
-      - run: make test.flutter device=windows
-        if: ${{ matrix.platform == 'windows' }}
+      - run: make test.flutter device=${{ matrix.platform }}
+        if: ${{ matrix.platform == 'windows'
+          || matrix.platform == 'macos') }}
 
   ############
   # Building #
@@ -377,6 +380,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - platform: macos
+            os: macos
           - platform: android
             os: ubuntu
           - platform: linux
@@ -425,14 +430,7 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
-                                    dockerized=no debug=no
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: flutter/windows/lib/x86_64-pc-windows-msvc
-          if-no-files-found: error
-        if: ${{ matrix.platform == 'windows' }}
+                                    dockerized=no debug=yes
 
   rustdoc:
     runs-on: ubuntu-latest
