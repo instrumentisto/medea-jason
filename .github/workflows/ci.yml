@@ -403,14 +403,12 @@ jobs:
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 27
+          api-level: 24
           target: google_apis
           arch: x86_64
           profile: Nexus 6
-          script: make test.e2e.android up=yes debug=no 
-                          dockerized=yes device=linux
-                          medea-tag=${{ env.MEDEA_BRANCH }}
-                          control-tag=build-${{ github.run_number }}
+          emulator-options: -no-window -cores 4 -netdelay none -netspeed full
+          script: make test.e2e.android
         if: ${{ matrix.platform == 'android' }}
 
   # test-flutter:

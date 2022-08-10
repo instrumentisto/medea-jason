@@ -269,7 +269,7 @@ packages:
     description:
       path: "."
       ref: fix-android-invalidate-bug
-      resolved-ref: "0eb810c5ecb1c3a57d25a430dcb22519a8be7633"
+      resolved-ref: b64b34af409fa2082e1fd78288c9f480627b4624
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"
