@@ -14,12 +14,7 @@
 // Handles provided FlutterMethodCall.
 - (void)handleMethodCall:(nonnull FlutterMethodCall*)methodCall
                   result:(nonnull FlutterResult)result {
-    NSString* method = methodCall.method;
-    if ([method isEqualToString:@"getPlatformVersion"]) {
-        result(@"Hello world");
-    } else {
-        result(FlutterMethodNotImplemented);
-    }
+    result(FlutterMethodNotImplemented);
 }
 
 // Initializes this FlutterWebRTCPlugin with a FlutterMethodChannel.
