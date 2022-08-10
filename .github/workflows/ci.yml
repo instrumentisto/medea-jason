@@ -365,7 +365,7 @@ jobs:
 
       - run: make test.flutter device=${{ matrix.platform }}
         if: ${{ matrix.platform == 'windows'
-          || matrix.platform == 'macos') }}
+          || matrix.platform == 'macos' }}
 
   ############
   # Building #
