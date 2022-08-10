@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:medea_jason/medea_jason.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 const MEDEA_HOST = '127.0.0.1';
 const MEDEA_PORT = 8080;
