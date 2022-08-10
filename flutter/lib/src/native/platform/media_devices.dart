@@ -58,6 +58,9 @@ class MockMediaDevices {
 
   /// Requests media input access and returns the created [webrtc.MediaStreamTrack]s.
   static Object getUserMedia(webrtc.DeviceConstraints constraints) {
+    constraints.video.mandatory!.width = 640;
+    constraints.video.mandatory!.height = 480;
+    constraints.video.mandatory!.fps = 20;
     return () => _getUserMedia(constraints);
   }
 

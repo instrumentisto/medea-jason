@@ -15,47 +15,67 @@ class Client {
   /// Creates the provided media `Element` in the provided `path` on a Medea
   /// media server.
   Future<http.Response> create(String path, Object element) async {
-    var response = await inner.post(
-        Uri.parse(get_url(control_api_address, path)),
-        headers: headers,
-        body: json.encode(element));
-    if (response.statusCode != 200) {
-      throw response.body;
+    for (var i = 0; i < 5; ++i) {
+      try {
+        var response = await inner.post(
+            Uri.parse(get_url(control_api_address, path)),
+            headers: headers,
+            body: json.encode(element));
+        return response;
+      } catch (e) {
+        print(e.toString());
+        await Future.delayed(Duration(milliseconds: 500));
+      }
     }
-    return response;
+    throw 'Failed create';
   }
 
   /// Deletes a media `Element` identified by the provided `path`.
   Future<http.Response> delete(String path) async {
-    var response =
-        await inner.delete(Uri.parse(get_url(control_api_address, path)));
-    if (response.statusCode != 200) {
-      throw response.body;
+    for (var i = 0; i < 5; ++i) {
+      try {
+        var response =
+            await inner.delete(Uri.parse(get_url(control_api_address, path)));
+        return response;
+      } catch (e) {
+        print(e.toString());
+        await Future.delayed(Duration(milliseconds: 500));
+      }
     }
-    return response;
+    throw 'Failed delete';
   }
 
   /// Returns a media `Element` identified by the provided `path`.
   Future<http.Response> get(String path) async {
-    var response =
-        await inner.get(Uri.parse(get_url(control_api_address, path)));
-    if (response.statusCode != 200) {
-      throw response.body;
+    for (var i = 0; i < 5; ++i) {
+      try {
+        var response =
+            await inner.get(Uri.parse(get_url(control_api_address, path)));
+        return response;
+      } catch (e) {
+        print(e.toString());
+        await Future.delayed(Duration(milliseconds: 500));
+      }
     }
-    return response;
+    throw 'Failed get';
   }
 
   /// Applies on a media server the provided media `Element` identified by
   /// the provided `path`.
   Future<http.Response> apply(String path, Object element) async {
-    var response = await inner.put(
-        Uri.parse(get_url(control_api_address, path)),
-        headers: headers,
-        body: json.encode(element));
-    if (response.statusCode != 200) {
-      throw response.body;
+    for (var i = 0; i < 5; ++i) {
+      try {
+        var response = await inner.put(
+            Uri.parse(get_url(control_api_address, path)),
+            headers: headers,
+            body: json.encode(element));
+        return response;
+      } catch (e) {
+        print(e.toString());
+        await Future.delayed(Duration(milliseconds: 500));
+      }
     }
-    return response;
+    throw 'Failed apply';
   }
 
   // TODO: Server side filtering on GET requests or SSE/WS subscription would
@@ -63,11 +83,17 @@ class Client {
   //       of huge JSON's.
   /// Fetches all callbacks received by Control API mock server.
   Future<http.Response> callbacks() async {
-    var response = await inner.get(Uri.parse('$control_api_address/callbacks'));
-    if (response.statusCode != 200) {
-      throw response.body;
+    for (var i = 0; i < 5; ++i) {
+      try {
+        var response =
+            await inner.get(Uri.parse('$control_api_address/callbacks'));
+        return response;
+      } catch (e) {
+        print(e.toString());
+        await Future.delayed(Duration(milliseconds: 500));
+      }
     }
-    return response;
+    throw 'Failed callbacks';
   }
 
   /// Returns URL of a media [`Element`] identified by the provided `path`.

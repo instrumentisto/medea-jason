@@ -136,8 +136,10 @@ class Member {
 
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
-    room.onConnectionLoss((p0) {
+    room.onConnectionLoss((p0) async {
+      print('onConnectionLoss $id');
       reconnectHandle = p0;
+      await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
     });
     room.onFailedLocalMedia((p0) {
       ++failed_local_stream_count;
