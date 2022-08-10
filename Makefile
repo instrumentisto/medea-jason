@@ -317,8 +317,8 @@ define cargo.build.medea-jason.darwin
 	            --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/macos/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dylib \
-	      ./flutter/macos/lib/$(target)/medea_jason.dll
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib \
+	      ./flutter/macos/lib/$(target)/libmedea_jason.dylib
 endef
 
 
