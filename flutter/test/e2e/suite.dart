@@ -102,7 +102,7 @@ final TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
-  ..defaultTimeout = const Duration(seconds: 360)
+  ..defaultTimeout = const Duration(minutes: 10)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
         clear_world();

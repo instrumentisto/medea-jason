@@ -48,7 +48,9 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     while (true) {
       actual_count =
           member.connection_store.count_tracks_by_lived(live, remote_id);
-      if (actual_count == expected_count) {break;}
+      if (actual_count == expected_count) {
+        break;
+      }
       await Future.delayed(Duration(milliseconds: 200));
     }
 

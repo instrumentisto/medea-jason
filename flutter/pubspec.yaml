@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
   ffi: ^2.0.0
   medea_flutter_webrtc:
-    # path: /media/human/AE66A1DB66A1A495/Work/Github/Current/flutter-webrtc/
     git:
       url: https://github.com/instrumentisto/flutter-webrtc.git
       ref: fix-android-invalidate-bug

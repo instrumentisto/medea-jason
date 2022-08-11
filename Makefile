@@ -642,10 +642,11 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
-# Run E2E desktop tests of project.
+# Run E2E native tests of project.
 #
 # Usage:
-#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
+#       [server_ip=<server-ip>]
 # 		[device=<device-id>]
 #		[( [up=no] | up=yes
 #		          [( [dockerized=no]
@@ -654,7 +655,7 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e.desktop:
+test.e2e.native:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -671,7 +672,8 @@ endif
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \
-		--dart-define=IP_TEST_BASE='10.0.2.2'
+		$(if $(call eq,$(server_ip),),,--dart-define=IP_TEST_BASE=$(server_ip)) \
+		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
@@ -679,7 +681,7 @@ endif
 # Run E2E windows tests of project in vagrant vm.
 #
 # Usage:
-#	make test.e2e.desktop.windows [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.native.windows [(only=<regex>|only-tags=<tag-expression>)]
 #		[( [up=no] | up=yes
 #		          [( [dockerized=no]
 #		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
@@ -687,7 +689,7 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e.desktop.windows:
+test.e2e.native.windows:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -705,36 +707,17 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
-
-# Run E2E android tests of project.
-#
-# Usage:
-#	make test.e2e.android [(only=<regex>|only-tags=<tag-expression>)]
-#		[( [up=no] | up=yes
-#		          [( [dockerized=no]
-#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
-#		          [debug=(yes|no)]
-#		          [( [background=no]
-#		           | background=yes [log=(no|yes)] )]
-
-test.e2e.android:
-	cd flutter/example/ && \
-	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart \
-		--dart-define=IP_TEST_BASE='10.0.2.2' \
-		--dart-define=MOCKABLE=true
-
 # Build flutter e2e test as bundle.
 #
 # Usage:
-#	make test.e2e.desktop.windows.build
-test.e2e.desktop.windows.build:
+#	make test.e2e.native.windows.build [server_ip=<server-ip>]
+test.e2e.native.windows.build:
 ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 	@make flutter.gen overwrite=yes dockerized=$(dockerized)
 endif
 	cd flutter/example/ && \
 	flutter build windows \
-	--dart-define=IP_TEST_BASE='10.0.2.2' \
+	$(if $(call eq,$(server_ip),),,--dart-define=IP_TEST_BASE=$(server_ip)) \
 	--dart-define=MOCKABLE=true \
 	--target=../test/e2e/suite.dart --debug
 
