@@ -411,7 +411,7 @@ jobs:
           profile: Nexus 6
           cores: 3
           emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
-          script: make test.e2e.android up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
+          script: make test.e2e.desktop up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
 
   # test-flutter:
