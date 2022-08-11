@@ -35,7 +35,7 @@ jobs:
       - rustfmt
       - test-e2e
       - test-e2e-native
-      - test-e2e-windows
+      # - test-e2e-windows
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
