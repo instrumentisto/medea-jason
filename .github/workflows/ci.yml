@@ -297,7 +297,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Install docker for macos
-      - uses: docker-practice/actions-setup-docker@master
+        uses: docker-practice/actions-setup-docker@master
         if: ${{ matrix.os == 'macos-latest' }}
 
       - uses: actions-rs/toolchain@v1
