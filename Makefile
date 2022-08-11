@@ -36,7 +36,7 @@ ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
 LINUX_TARGETS := x86_64-unknown-linux-gnu
-DARWIN_TARGETS := x86_64-apple-darwin
+MACOS_TARGETS := x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
@@ -215,13 +215,14 @@ cargo:
 #		 | platform=all
 #		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
 cargo-build-platform = $(or $(platform),web)
 cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
 cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
-cargo-build-targets-darwin = $(or $(targets),$(DARWIN_TARGETS))
+cargo-build-targets-macos = $(or $(targets),$(MACOS_TARGETS))
 cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
@@ -272,13 +273,13 @@ ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
 		$(call cargo.build.medea-jason.linux,$(target),$(debug)))
 endif
+ifeq ($(cargo-build-platform),macos)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-macos)),\
+		$(call cargo.build.medea-jason.macos,$(target),$(debug)))
+endif
 ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
 		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
-endif
-ifeq ($(cargo-build-platform),macos)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-darwin)),\
-		$(call cargo.build.medea-jason.darwin,$(target),$(debug)))
 endif
 endif
 endif
@@ -300,6 +301,16 @@ define cargo.build.medea-jason.linux
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.so \
 	      ./flutter/linux/lib/$(target)/libmedea_jason.so
 endef
+define cargo.build.medea-jason.macos
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/macos/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib \
+	      ./flutter/macos/lib/$(target)/libmedea_jason.dylib
+endef
 define cargo.build.medea-jason.windows
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
@@ -309,16 +320,6 @@ define cargo.build.medea-jason.windows
 	@mkdir -p ./flutter/windows/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
 	      ./flutter/windows/lib/$(target)/medea_jason.dll
-endef
-define cargo.build.medea-jason.darwin
-	$(eval target := $(strip $(1)))
-	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
-	            $(args)
-	@mkdir -p ./flutter/macos/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib \
-	      ./flutter/macos/lib/$(target)/libmedea_jason.dylib
 endef
 
 
@@ -371,7 +372,8 @@ endif
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(WEB_TARGETS) $(WINDOWS_TARGETS) $(DARWIN_TARGETS)),\
+		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
+		$(WINDOWS_TARGETS)),\
 			$(call cargo.lint.medea-jason,$(target)))
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
@@ -395,23 +397,23 @@ cargo.version:
 
 rustup-targets = $(ANDROID_TARGETS) \
                  $(LINUX_TARGETS) \
+                 $(MACOS_TARGETS) \
                  $(WEB_TARGETS) \
-                 $(WINDOWS_TARGETS) \
-                 $(DARWIN_TARGETS)
+                 $(WINDOWS_TARGETS)
 ifeq ($(only),android)
 rustup-targets = $(ANDROID_TARGETS)
 endif
 ifeq ($(only),linux)
 rustup-targets = $(LINUX_TARGETS)
 endif
+ifeq ($(only),macos)
+rustup-targets = $(MACOS_TARGETS)
+endif
 ifeq ($(only),web)
 rustup-targets = $(WEB_TARGETS)
 endif
 ifeq ($(only),windows)
 rustup-targets = $(WINDOWS_TARGETS)
-endif
-ifeq ($(only),macos)
-rustup-targets = $(DARWIN_TARGETS)
 endif
 
 rustup.targets:
