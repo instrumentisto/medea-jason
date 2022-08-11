@@ -45,10 +45,11 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     var live = (live_or_stopped == 'live');
 
     var actual_count = 0;
-    for (var i = 0; i < 30 && actual_count != expected_count; ++i) {
+    while (true) {
       actual_count =
           member.connection_store.count_tracks_by_lived(live, remote_id);
-      await Future.delayed(Duration(milliseconds: 500));
+      if (actual_count == expected_count) {break;}
+      await Future.delayed(Duration(milliseconds: 200));
     }
 
     expect(actual_count, expected_count);

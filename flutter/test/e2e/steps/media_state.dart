@@ -141,7 +141,7 @@ StepDefinitionGeneric then_track_is_stopped =
 
     var track_ = track.getTrack();
     track.free();
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(Duration(milliseconds: 200));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );

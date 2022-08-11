@@ -5,7 +5,7 @@ import 'dart:io';
 ///
 /// Default: `127.0.0.1`
 const String IP_TEST_BASE =
-    String.fromEnvironment('IP_TEST_BASE', defaultValue: '158.181.222.229');
+    String.fromEnvironment('IP_TEST_BASE', defaultValue: '10.0.2.2');
 
 /// Address of a [WebDriver] client.
 ///

@@ -350,20 +350,22 @@ jobs:
         continue-on-error: true
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: docker-medea-control-api-mock-${{ github.run_number }}
-      #   if: ${{ matrix.platform != 'windows' }}
+      - uses: docker-practice/actions-setup-docker@master
 
-      # - name: Unpack `medea-control-api-mock` Docker image
-      #   run: make docker.untar from-file=image.tar
-      #   if: ${{ matrix.platform != 'windows' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: docker-medea-control-api-mock-${{ github.run_number }}
+        if: ${{ matrix.platform != 'windows' }}
 
-      # - name: Login to Medea Docker registry
-      #   run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-      #     -p ${{ secrets.MEDEA_DOCKER_PASS }}
-      #     hub.instrumentisto.com
-      #   if: ${{ matrix.platform != 'windows' }}
+      - name: Unpack `medea-control-api-mock` Docker image
+        run: make docker.untar from-file=image.tar
+        if: ${{ matrix.platform != 'windows' }}
+
+      - name: Login to Medea Docker registry
+        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+          -p ${{ secrets.MEDEA_DOCKER_PASS }}
+          hub.instrumentisto.com
+        if: ${{ matrix.platform != 'windows' }}
 
       - uses: jetli/wasm-pack-action@v0.3.0
       - name: Desktop linux test
@@ -409,7 +411,7 @@ jobs:
           profile: Nexus 6
           cores: 3
           emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
-          script: make test.e2e.android
+          script: make test.e2e.desktop up=yes dockerized=yes debug=no tag=edge
         if: ${{ matrix.platform == 'android' }}
 
   # test-flutter:
