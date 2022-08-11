@@ -408,7 +408,7 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           cores: 3
-          emulator-options: -no-window -netdelay none -netspeed full -virtualscene-poster wall=logo.jpg -virtualscene-poster table=logo.jpg 
+          emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
           script: make test.e2e.android
         if: ${{ matrix.platform == 'android' }}
 
