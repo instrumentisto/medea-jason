@@ -283,10 +283,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: windows
-            os: windows-latest
+          # TODO(rogurotus): after fix-android-invalidate-bug
+          # - platform: linux
+          #   os: ubuntu-22.04
+          # - platform: windows
+          #   os: windows-latest
           - platform: android
             os: macos-latest
           # TODO: Add macos e2e tests
@@ -421,9 +422,9 @@ jobs:
       matrix:
         platform:
           - android
-          - linux
+          # - linux TODO(rogurotus): after fix-android-invalidate-bug
           - macos
-          - windows
+          # - windows TODO(rogurotus): after fix-android-invalidate-bug
     runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'macos-latest' }}
@@ -508,42 +509,42 @@ jobs:
 
 
 
+  # TODO(rogurotus): after fix-android-invalidate-bug
+  # test-e2e-windows:
+  #   name: E2E tests for windows
+  #   runs-on: macOs-12
+  #   needs: ["docker", "test-e2e-native"]
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-  test-e2e-windows:
-    name: E2E tests for windows
-    runs-on: macOs-12
-    needs: ["docker", "test-e2e-native"]
-    steps:
-      - uses: actions/checkout@v3
+  #     - name: Install docker
+  #       uses: docker-practice/actions-setup-docker@master
 
-      - name: Install docker
-        uses: docker-practice/actions-setup-docker@master
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: docker-medea-control-api-mock-${{ github.run_number }}
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: docker-medea-control-api-mock-${{ github.run_number }}
+  #     - name: Unpack `medea-control-api-mock` Docker image
+  #       run: make docker.untar from-file=image.tar
 
-      - name: Unpack `medea-control-api-mock` Docker image
-        run: make docker.untar from-file=image.tar
+  #     - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+  #         -p ${{ secrets.MEDEA_DOCKER_PASS }}
+  #         hub.instrumentisto.com
 
-      - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-          -p ${{ secrets.MEDEA_DOCKER_PASS }}
-          hub.instrumentisto.com
+  #     - name: Install vagrant
+  #       run: |
+  #         brew install vagrant
+  #         vagrant autocomplete install
+  #     - name: Download windows test bundle
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: windows-test-bundle-${{ github.run_number }}
+  #         path: ./windows_test_staff/test/
 
-      - name: Install vagrant
-        run: |
-          brew install vagrant
-          vagrant autocomplete install
-      - name: Download windows test bundle
-        uses: actions/download-artifact@v3
-        with:
-          name: windows-test-bundle-${{ github.run_number }}
-          path: ./windows_test_staff/test/
-
-      - run: make test.e2e.native.windows up=yes debug=no dockerized=yes
-          background=yes
-          medea-tag=${{ env.MEDEA_BRANCH }}
-          control-tag=build-${{ github.run_number }}
+  #     - run: make test.e2e.native.windows up=yes debug=no dockerized=yes
+  #         background=yes
+  #         medea-tag=${{ env.MEDEA_BRANCH }}
+  #         control-tag=build-${{ github.run_number }}
 
   ############
   # Building #
