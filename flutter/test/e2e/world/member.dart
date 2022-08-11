@@ -613,6 +613,9 @@ class Member {
   /// Closes [WebSocket] connect.
   Future<void> connection_loss() async {
     var ws = MockWebSocket.get_socket(id)!;
+    room.onConnectionLoss((p0) {
+      reconnectHandle = p0;
+    });
     await ws.close(9999);
   }
 }

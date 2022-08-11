@@ -407,7 +407,8 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: Nexus 6
-          emulator-options: -no-window -cores 3 -netdelay none -netspeed full
+          cores: 3
+          emulator-options: -no-window -netdelay none -netspeed full 
           script: make test.e2e.android
         if: ${{ matrix.platform == 'android' }}
 
