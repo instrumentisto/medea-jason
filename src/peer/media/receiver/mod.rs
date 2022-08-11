@@ -320,7 +320,8 @@ impl Receiver {
 
 impl Drop for Receiver {
     fn drop(&mut self) {
-        if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
+        let transceiver = self.transceiver.borrow_mut().take();
+        if let Some(transceiver) = transceiver {
             platform::spawn(async move {
                 if !transceiver.is_stopped() {
                     transceiver.set_recv(false).await;

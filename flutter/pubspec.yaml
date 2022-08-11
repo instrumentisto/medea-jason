@@ -12,19 +12,19 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.0
-  medea_flutter_webrtc: ^0.8.0-dev
-  js: ^0.6.3
-  http: ^0.13.4
+  medea_flutter_webrtc: 0.8.0-dev+rev.3e3145cf9611fe95fdf89ee962bcf99071e9731b
+  js: ^0.6.4
+  http: ^0.13.5
   uuid: ^3.0.6
   tuple: ^2.0.0
 
 dev_dependencies:
-  build_runner: ^2.1.9
+  build_runner: ^2.2.0
   flutter_gherkin: 3.0.0-rc.9
   import_sorter: ^4.6.0
   integration_test:
     sdk: flutter
-  json_serializable: ^6.1.5
+  json_serializable: ^6.3.1
   pedantic: ^1.9.0
 
 flutter:

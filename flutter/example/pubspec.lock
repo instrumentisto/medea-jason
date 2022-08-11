@@ -171,21 +171,12 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.36.0"
+    version: "1.40.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_webrtc:
-    dependency: transitive
-    description:
-      path: "."
-      ref: add-fake-media-env-option
-      resolved-ref: "1418bd9795ac8b09c56702d5b35a58a163b9b860"
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
-    version: "0.8.0-dev"
   freezed_annotation:
     dependency: transitive
     description:
@@ -218,7 +209,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.4"
+    version: "0.13.5"
   http_parser:
     dependency: transitive
     description:
@@ -273,6 +264,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
+  medea_flutter_webrtc:
+    dependency: transitive
+    description:
+      name: medea_flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0-dev+rev.3e3145cf9611fe95fdf89ee962bcf99071e9731b"
   medea_jason:
     dependency: "direct main"
     description:

@@ -6,6 +6,23 @@ import 'package:gherkin/gherkin.dart';
 import '../api/endpoint.dart';
 import '../world/custom_world.dart';
 
+List<StepDefinitionGeneric> steps() {
+  return [
+    when_control_api_removes_member,
+    when_control_api_removes_room,
+    when_interconnects_kind,
+    when_control_api_removes_member_via_apply,
+    when_control_api_interconnects_members,
+    when_control_api_interconnects_via_apply,
+    then_control_api_sends_on_join,
+    then_control_api_doesnt_sends_on_leave,
+    then_control_api_sends_on_leave,
+    when_control_api_starts_publishing,
+    when_control_api_deletes_publish_endpoint,
+    when_control_api_deletes_play_endpoint
+  ];
+}
+
 StepDefinitionGeneric when_control_api_removes_member =
     when1<String, CustomWorld>(
   RegExp(r'Control API removes member (Alice|Bob|Carol)'),

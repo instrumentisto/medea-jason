@@ -5,6 +5,15 @@ import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
+List<StepDefinitionGeneric> steps() {
+  return [
+    then_connection_closes,
+    then_member_receives_connection,
+    when_connection_changes_remote_media_state,
+    then_member_doesnt_receive_connection,
+  ];
+}
+
 StepDefinitionGeneric then_connection_closes =
     then2<String, String, CustomWorld>(
   r"(Alice|Bob|Carol)'s connection with (Alice|Bob|Carol) closes",

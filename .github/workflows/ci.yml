@@ -918,4 +918,3 @@ jobs:
             instrumentisto/${{ steps.image.outputs.result }}
           readme_file: ${{ matrix.readme_file }}
         if: ${{ matrix.if }}
-

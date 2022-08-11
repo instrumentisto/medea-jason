@@ -3,6 +3,15 @@ import 'package:gherkin/gherkin.dart';
 
 import '../world/custom_world.dart';
 
+List<StepDefinitionGeneric> steps() {
+  return [
+    then_on_close_fires,
+    when_jason_object_disposes,
+    when_room_closed_by_client,
+    when_member_joins_room,
+  ];
+}
+
 StepDefinitionGeneric then_on_close_fires = then2<String, String, CustomWorld>(
   RegExp(r"(Alice|Bob|Carol)'s `on_close` room's callback fires with `(.+)`"),
   (id, expect_reason, context) async {

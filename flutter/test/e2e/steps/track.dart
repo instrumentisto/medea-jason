@@ -1,10 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 import 'package:gherkin/gherkin.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
+
+List<StepDefinitionGeneric> steps() {
+  return [
+    then_member_doesnt_have_live_local_tracks,
+    then_member_has_remote_track,
+    then_member_doesnt_have_remote_tracks_with,
+    then_doesnt_have_remote_track,
+    then_member_has_n_remote_tracks_from,
+    then_member_has_local_tracks,
+    then_remote_media_track,
+    then_remote_track_stops,
+    then_callback_fires_on_remote_track,
+    then_has_local_track,
+  ];
+}
 
 StepDefinitionGeneric then_member_has_remote_track =
     then3<String, String, String, CustomWorld>(

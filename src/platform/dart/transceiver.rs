@@ -52,12 +52,6 @@ mod transceiver {
             transceiver: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-        /// Sets `direction` of this [`Transceiver`].
-        pub fn set_direction(
-            transceiver: Dart_Handle,
-            direction: i64,
-        ) -> Dart_Handle;
-
         /// Changes the receive direction of the specified [`Transceiver`].
         pub fn set_recv(transceiver: Dart_Handle, recv: bool) -> Dart_Handle;
 

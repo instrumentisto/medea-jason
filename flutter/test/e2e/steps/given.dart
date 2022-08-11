@@ -5,6 +5,14 @@ import '../world/custom_world.dart';
 import '../world/member.dart';
 import '../world/more_args.dart';
 
+List<StepDefinitionGeneric> steps() {
+  return [
+    givenTreeMembers,
+    givenTwoMembers,
+    givenOneMember,
+  ];
+}
+
 Future<void> new_given_member(
     String joined,
     first_member_id,

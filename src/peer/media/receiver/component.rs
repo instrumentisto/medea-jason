@@ -312,14 +312,14 @@ impl Component {
             .set(state == media_exchange_state::Stable::Enabled);
         match state {
             media_exchange_state::Stable::Disabled => {
-                let sub_direction = {
+                let sub_recv = {
                     receiver
                         .transceiver
                         .borrow()
                         .as_ref()
                         .map(|trnscvr| trnscvr.set_recv(false))
                 };
-                if let Some(fut) = sub_direction {
+                if let Some(fut) = sub_recv {
                     fut.await;
                 }
             }

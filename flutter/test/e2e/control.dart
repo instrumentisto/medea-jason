@@ -58,9 +58,6 @@ class Client {
     return response;
   }
 
-  // TODO: Server side filtering on GET requests or SSE/WS subscription would
-  //       speed up things. We a probably wasting a lot of time on ser/deser
-  //       of huge JSON's.
   /// Fetches all callbacks received by Control API mock server.
   Future<http.Response> callbacks() async {
     var response = await inner.get(Uri.parse('$control_api_address/callbacks'));

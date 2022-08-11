@@ -1,10 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as fw;
 import 'package:gherkin/gherkin.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
+
+List<StepDefinitionGeneric> steps() {
+  return [
+    when_enables_or_mutes,
+    when_member_enables_remote_track,
+    then_remote_media_direction_is,
+    when_member_frees_all_local_tracks,
+    then_track_is_stopped,
+    then_local_track_mute_state,
+  ];
+}
 
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
@@ -133,7 +144,6 @@ StepDefinitionGeneric then_track_is_stopped =
 
     var track_ = track.getTrack();
     track.free();
-    // await Future.delayed(Duration(milliseconds:100));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );

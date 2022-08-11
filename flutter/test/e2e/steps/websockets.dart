@@ -2,6 +2,14 @@ import 'package:gherkin/gherkin.dart';
 
 import '../world/custom_world.dart';
 
+List<StepDefinitionGeneric> steps() {
+  return [
+    ws_connection_loss,
+    ws_connection_restore,
+    connection_is_lost,
+  ];
+}
+
 StepDefinitionGeneric ws_connection_loss = when1<String, CustomWorld>(
   RegExp(r'(Alice|Bob|Carol) loses WS connection'),
   (id, context) async {
