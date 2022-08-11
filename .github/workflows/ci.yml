@@ -295,6 +295,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      - uses: docker-practice/actions-setup-docker@master
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -350,7 +351,6 @@ jobs:
         continue-on-error: true
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
 
-      - uses: docker-practice/actions-setup-docker@master
 
       - uses: actions/download-artifact@v3
         with:
@@ -411,7 +411,7 @@ jobs:
           profile: Nexus 6
           cores: 3
           emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
-          script: make test.e2e.desktop up=yes dockerized=yes debug=no tag=edge
+          script: script: make test.e2e.android up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
 
   # test-flutter:
