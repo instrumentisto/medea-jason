@@ -419,14 +419,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: android
-            os: macos-latest
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: windows
-            os: windows-latest
-    runs-on: ${{ matrix.os }}
+        platform:
+          - android
+          - linux
+          - macos
+          - windows
+    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'macos-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -434,7 +434,8 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v1
-        if: ${{ matrix.platform != 'windows' && env.CACHE == 'true' }}
+        if: ${{ matrix.platform != 'windows'
+             && env.CACHE == 'true' }}
 
       - run: make rustup.targets only=android
         if: ${{ matrix.platform == 'android' }}
@@ -469,9 +470,9 @@ jobs:
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
-                                    ${{ matrix.platform == 'android'
-                                        && 'targets=x86_64'
-                                        || '' }}
+                                    ${{ (matrix.platform == 'android'
+                                         && 'targets=x86_64')
+                                     ||     '' }}
 
       - name: Parse Android API versions
         id: api-version
@@ -501,8 +502,12 @@ jobs:
       - run: xvfb-run -a make test.flutter device=linux
         if: ${{ matrix.platform == 'linux' }}
 
-      - run: make test.flutter device=windows
-        if: ${{ matrix.platform == 'windows' }}
+      - run: make test.flutter device=${{ matrix.platform }}
+        if: ${{ matrix.platform == 'macos'
+             || matrix.platform == 'windows' }}
+
+
+
 
   test-e2e-windows:
     name: E2E tests for windows
@@ -552,16 +557,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: android
-            os: macos
-          - platform: linux
-            os: ubuntu
-          - platform: web
-            os: ubuntu
-          - platform: windows
-            os: windows
-    runs-on: ${{ matrix.os }}-latest
+        platform:
+          - android
+          - linux
+          - macos
+          - web
+          - windows
+    runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
