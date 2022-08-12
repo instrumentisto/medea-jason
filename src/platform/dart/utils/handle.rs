@@ -38,7 +38,7 @@ mod handle {
 
 /// Reference-counting based [`Dart_Handle`] wrapper taking care of its
 /// lifetime management.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DartHandle(Rc<Dart_PersistentHandle>);
 
 impl DartHandle {
