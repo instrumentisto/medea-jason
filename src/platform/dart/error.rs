@@ -6,7 +6,7 @@ use derive_more::Display;
 use super::utils::handle::DartHandle;
 
 /// Wrapper for Dart exception thrown when calling Dart code.
-#[derive(Clone, Debug, Display, PartialEq, Eq)]
+#[derive(Clone, Debug, Display, PartialEq)]
 #[display(fmt = "DartPlatformError")]
 pub struct Error(DartHandle);
 

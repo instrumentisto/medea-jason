@@ -171,7 +171,7 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.37.2"
+    version: "1.40.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -267,12 +267,10 @@ packages:
   medea_flutter_webrtc:
     dependency: transitive
     description:
-      path: "."
-      ref: fix-android-invalidate-bug
-      resolved-ref: "47b42e6b3bd829274ce6b25a59fdeb44acb07653"
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
-    version: "0.8.0-dev"
+      name: medea_flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0-dev+rev.9ac88a3764768828e6b87e0ff9e381476f31d1b0"
   medea_jason:
     dependency: "direct main"
     description:

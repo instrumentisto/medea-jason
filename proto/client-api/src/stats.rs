@@ -283,7 +283,7 @@ pub enum RtcStatsType {
 /// [MediaStream]: https://w3.org/TR/mediacapture-streams#mediastream
 /// [1]: https://w3.org/TR/webrtc-stats/#idl-def-rtcmediastreamstats
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaStreamStats {
     /// [`stream.id`][1] property.
@@ -305,7 +305,7 @@ pub struct MediaStreamStats {
 /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
 /// [1]: https://w3.org/TR/webrtc-stats/#dcstats-dict%2A
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DataChannelStats {
     /// [`label`][1] value of the [RTCDataChannel] object.
@@ -364,7 +364,7 @@ pub type DataChannelState = NonExhaustive<KnownDataChannelState>;
 /// State of the [RTCDataChannel]'s underlying data connection.
 ///
 /// [RTCDataChannel]: https://w3.org/TR/webrtc#dom-rtcdatachannel
-#[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum KnownDataChannelState {
     /// User agent is attempting to establish the underlying data transport.
@@ -408,7 +408,7 @@ pub enum KnownDataChannelState {
 /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 /// [1]: https://w3.org/TR/webrtc-stats/#pcstats-dict%2A
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RtcPeerConnectionStats {
     /// Number of unique `DataChannel`s that have entered the `open` state
@@ -1285,7 +1285,7 @@ pub enum RtcOutboundRtpStreamMediaType {
 /// [4]: https://tinyurl.com/rkuvpl4
 /// [5]: https://w3.org/TR/webrtc-stats/#outboundrtpstats-dict%2A
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RtcOutboundRtpStreamStats {
     /// ID of the stats object representing the current track attachment to the
@@ -1319,7 +1319,7 @@ pub struct RtcOutboundRtpStreamStats {
 /// [1]: https://tools.ietf.org/html/rfc5245#section-15.1
 /// [2]: https://w3.org/TR/webrtc-stats/#icecandidate-dict%2A
 #[serde_with::skip_serializing_none]
-#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RtcIceCandidateStats {
     /// Unique ID that is associated to the object that was inspected to
