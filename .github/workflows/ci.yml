@@ -298,9 +298,9 @@ jobs:
       
       - name: Install docker for macos
         uses: Wandalen/wretry.action@v1.0.11
-          with:
-            action: docker-practice/actions-setup-docker@master
-            attempt_limit: 5
+        with:
+          action: docker-practice/actions-setup-docker@master
+          attempt_limit: 5
         if: ${{ matrix.os == 'macos-latest' }}
 
       - uses: actions-rs/toolchain@v1
@@ -521,9 +521,9 @@ jobs:
 
       - name: Install docker
         uses: Wandalen/wretry.action@v1.0.11
-          with:
-            action: docker-practice/actions-setup-docker@master
-            attempt_limit: 5
+        with:
+          action: docker-practice/actions-setup-docker@master
+          attempt_limit: 5
 
       - uses: actions/download-artifact@v3
         with:
