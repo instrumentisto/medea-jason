@@ -13,7 +13,7 @@ use crate::{
 };
 
 /// Possible states of a [`RpcTransport`].
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TransportState {
     /// Socket has been created. The connection is not opened yet.
     Connecting,
