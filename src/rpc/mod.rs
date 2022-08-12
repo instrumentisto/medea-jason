@@ -185,7 +185,7 @@ pub enum ClosedStateReason {
 
 /// Reason of why [`WebSocketRpcClient`]/[`platform::RpcTransport`] lost
 /// connection with a server.
-#[derive(Clone, Copy, Debug, Display, PartialEq)]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
 pub enum ConnectionLostReason {
     /// Connection has been closed with a close frame and the provided message.
     WithMessage(CloseMsg),
@@ -217,7 +217,7 @@ pub enum RpcClientError {
 }
 
 /// Connection with remote was closed.
-#[derive(Clone, Copy, Debug, Display, PartialEq)]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
 pub enum CloseMsg {
     /// Transport was gracefully closed by remote.
     ///
