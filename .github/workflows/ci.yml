@@ -14,6 +14,7 @@ concurrency:
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
   MEDEA_BRANCH: edge  # for E2E tests only
+  PROTOC_VER: 3.x
   RUST_BACKTRACE: 1
 
 jobs:
@@ -58,6 +59,9 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VER }}
 
       - run: make rustup.targets
 
@@ -178,16 +182,23 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-        if: ${{ steps.skip.outputs.no == 'true' && !matrix.wasm }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && !matrix.wasm }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.wasm }}
+             && matrix.wasm }}
       - uses: Swatinem/rust-cache@v1
-        if: ${{ steps.skip.outputs.no == 'true' && env.CACHE == 'true' }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && env.CACHE == 'true' }}
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VER }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && matrix.crate == 'medea-control-api-proto' }}
 
       - name: Parse wasm-bindgen-cli version from Cargo.lock
         id: wasm-cli
@@ -195,28 +206,28 @@ jobs:
                   name=VERSION::$(cargo pkgid wasm-bindgen | grep -o '#.*'
                                                            | grep -o '[0-9\.]*')
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.wasm }}
+             && matrix.wasm }}
       - uses: actions-rs/install@v0.1
         with:
           crate: wasm-bindgen-cli
           version: ${{ steps.wasm-cli.outputs.VERSION }}
           use-tool-cache: true
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.wasm }}
+             && matrix.wasm }}
 
       - name: Chrome
         run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.crate == 'medea-jason' }}
+             && matrix.crate == 'medea-jason' }}
       - name: Firefox
         run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.crate == 'medea-jason' }}
+             && matrix.crate == 'medea-jason' }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.crate != 'medea-jason' }}
+             && matrix.crate != 'medea-jason' }}
 
   test-e2e-browser:
     name: Run e2e test on Chrome and Firefox
@@ -229,6 +240,9 @@ jobs:
           profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VER }}
 
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}

@@ -319,6 +319,19 @@ pub mod web_rtc_publish_endpoint {
         /// Media server will not try to initialize publishing.
         Disabled = 2,
     }
+    impl PublishPolicy {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                PublishPolicy::Optional => "OPTIONAL",
+                PublishPolicy::Required => "REQUIRED",
+                PublishPolicy::Disabled => "DISABLED",
+            }
+        }
+    }
     /// Possible peer-to-peer modes of WebRTC interaction in a
     /// `WebRtcPublishEndpoint`.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
@@ -334,6 +347,19 @@ pub mod web_rtc_publish_endpoint {
         /// media server.
         Always = 2,
     }
+    impl P2p {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                P2p::Never => "NEVER",
+                P2p::IfPossible => "IF_POSSIBLE",
+                P2p::Always => "ALWAYS",
+            }
+        }
+    }
 }
 /// Media element playing media data for a client via WebRTC.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -341,7 +367,7 @@ pub struct WebRtcPlayEndpoint {
     /// ID of this `WebRtcPlayEndpoint`.
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
-    //// Source to play media data from.
+    /// / Source to play media data from.
     #[prost(string, tag="2")]
     pub src: ::prost::alloc::string::String,
     /// Callback firing when a client starts playing media data from the source.
@@ -365,7 +391,7 @@ pub struct Ping {
 /// Pong message sent by a media server in response to a received `Ping` message.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Pong {
-    //// Nonce of the answered `Ping` message.
+    /// / Nonce of the answered `Ping` message.
     #[prost(uint32, tag="1")]
     pub nonce: u32,
 }
@@ -373,6 +399,7 @@ pub struct Pong {
 pub mod control_api_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     /// Service allowing to control a media server dynamically, by creating, updating
     /// and destroying pipelines of media `Element`s on it.
     #[derive(Debug, Clone)]
@@ -401,6 +428,10 @@ pub mod control_api_client {
             let inner = tonic::client::Grpc::new(inner);
             Self { inner }
         }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
+            Self { inner }
+        }
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
@@ -420,19 +451,19 @@ pub mod control_api_client {
         {
             ControlApiClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
             self
         }
         /// Creates a new `Element` on the media server.
@@ -595,8 +626,8 @@ pub mod control_api_server {
     #[derive(Debug)]
     pub struct ControlApiServer<T: ControlApi> {
         inner: _Inner<T>,
-        accept_compression_encodings: (),
-        send_compression_encodings: (),
+        accept_compression_encodings: EnabledCompressionEncodings,
+        send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: ControlApi> ControlApiServer<T> {
@@ -619,6 +650,18 @@ pub mod control_api_server {
             F: tonic::service::Interceptor,
         {
             InterceptedService::new(Self::new(inner), interceptor)
+        }
+        /// Enable decompressing requests with the given encoding.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
+            self
+        }
+        /// Compress responses with the given encoding, if the client supports it.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
         }
     }
     impl<T, B> tonic::codegen::Service<http::Request<B>> for ControlApiServer<T>
@@ -854,7 +897,7 @@ pub mod control_api_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: ControlApi> tonic::transport::NamedService for ControlApiServer<T> {
+    impl<T: ControlApi> tonic::server::NamedService for ControlApiServer<T> {
         const NAME: &'static str = "api.ControlApi";
     }
 }
