@@ -289,6 +289,7 @@ jobs:
 
   prepare-e2e-desktop:
     name: Prepare e2e test bundle for Windows
+    needs: ["crate-jason"]
     runs-on: windows-latest
     steps:
       - uses: actions-rs/toolchain@v1
@@ -302,10 +303,15 @@ jobs:
 
       - uses: subosito/flutter-action@v2
 
+      - name: Download medea-jason library
+        uses: actions/download-artifact@v3
+        with:
+          name: jason-lib-windows-${{ github.run_number }}
+          path: ./flutter/windows/lib/x86_64-pc-windows-msvc/
+
       - name: Build e2e test bundle for Windows
         run: |
-          make cargo.build.jason platform=windows
-          cd flutter/example/
+          cd ./flutter/example/
           flutter build windows --target=../test/e2e/suite.dart --debug
           cp ../../flutter/example/build/windows/runner/Debug \
              ../../windows_test_staff/test/
@@ -317,17 +323,20 @@ jobs:
 
   test-e2e-desktop:
     name: Run E2E tests desktop platforms
-    needs: ["docker", "prepare-e2e-desktop"]
+    needs: ["docker", "prepare-e2e-desktop", "crate-jason"]
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: linux
             os: ubuntu-22.04
+            lib_path: ./flutter/linux/lib/
           - platform: windows
             os: windows-latest
+            lib_path: ./flutter/windows/lib/
           - platform: macos
             os: macos-latest
+            lib_path: ./flutter/macos/lib/
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -351,7 +360,11 @@ jobs:
                       ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
-      - run: make cargo.build.jason platform=${{ matrix.platform }}
+      - name: Download medea-jason library
+        uses: actions/download-artifact@v3
+        with:
+          name: jason-lib-${{ matrix.platform }}-${{ github.run_number }}
+          path: ${{ matrix.lib_path }}
 
       - name: Install docker
         uses: docker-practice/actions-setup-docker@master
@@ -527,12 +540,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - android
-          - linux
-          - macos
-          - web
-          - windows
+        include:
+          - platform: android
+            lib_path: ./flutter/android/src/main/jniLibs
+          - platform: linux
+            lib_path: ./flutter/linux/lib/
+          - platform: macos
+            lib_path: ./flutter/macos/lib/
+          - platform: windows
+            lib_path: ./flutter/windows/lib/
+          - platform: web
+            lib_path: ./flutter/assets/pkg/
     runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
@@ -575,7 +593,12 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
-                                    dockerized=no debug=yes
+                                    dockerized=no debug=no
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: jason-lib-${{ matrix.platform }}-${{ github.run_number }}
+          path: ${{ matrix.lib_path }}
 
   rustdoc:
     runs-on: ubuntu-latest
