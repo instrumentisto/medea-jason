@@ -725,14 +725,6 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
-# Build flutter e2e test as bundle.
-#
-# Usage:
-#	make test.e2e.desktop.windows.build
-test.e2e.desktop.windows.build:
-	cd flutter/example/ && \
-	flutter build windows --target=../test/e2e/suite.dart --debug
-
 # Runs Flutter plugin integration tests on an attached device.
 #
 # Usage:

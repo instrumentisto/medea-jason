@@ -34,6 +34,7 @@ jobs:
       - helm-lint
       - rustdoc
       - rustfmt
+      - prepare-e2e-desktop
       - test-e2e-browser
       - test-e2e-desktop
       - test-flutter
@@ -286,12 +287,41 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
+  prepare-e2e-desktop:
+    name: Prepare e2e test bundle for Windows
+    if: ${{ github.ref == 'refs/heads/master'
+      || startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ matrix.platform != 'windows'
+          && !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - uses: subosito/flutter-action@v2
+
+      - name: Build e2e test bundle for Windows
+        run: |
+          make cargo.build.jason platform=windows
+          cd flutter/example/
+          flutter build windows --target=../test/e2e/suite.dart --debug
+          cp ../../flutter/example/build/windows/runner/Debug \
+             ../../windows_test_staff/test/
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows-test-bundle-${{ github.run_number }}
+          path: ./flutter/example/build/windows/runner/Debug
+
   test-e2e-desktop:
-    name: E2E tests desktop
+    name: Run E2E tests desktop platforms
     needs: ["docker"]
     if: ${{ github.ref == 'refs/heads/master'
-      || startsWith(github.ref, 'refs/tags/medea-')
-      || !contains(github.event.head_commit.message, '[skip ci]') }}
+      || startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       fail-fast: false
       matrix:
@@ -315,8 +345,7 @@ jobs:
                 && env.CACHE == 'true' }}
 
       - uses: subosito/flutter-action@v2
-      - run: flutter config --enable-linux-desktop
-        if: ${{ matrix.platform == 'linux' }}
+
       - name: Install Flutter Linux dependencies
         run: |
           sudo apt-get update
@@ -328,12 +357,20 @@ jobs:
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
 
+      - name: Install docker
+        uses: docker-practice/actions-setup-docker@master
+        if: ${{ matrix.platform == 'windows' }}
+
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
           key: test-e2e-desktop-{hash}
           restore-keys: test-e2e-desktop-
         continue-on-error: true
         if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: docker-${{ matrix.image }}-${{ github.run_number }}
 
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
@@ -348,8 +385,11 @@ jobs:
           -p ${{ secrets.MEDEA_DOCKER_PASS }}
           hub.instrumentisto.com
 
-      - name: Build windows test bundle
-        run: make test.e2e.desktop.windows.build
+      - name: Download e2e test Windows bundle
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-test-bundle-${{ github.run_number }}
+          path: ./windows_test_staff/test/
         if: ${{ matrix.platform == 'windows' }}
 
       - name: Install vagrant
@@ -358,26 +398,20 @@ jobs:
           vagrant autocomplete install
         if: ${{ matrix.platform == 'windows' }}
 
-      - name: Download windows test bundle
-        uses: actions/download-artifact@v3
-        with:
-          name: windows-test-bundle-${{ github.run_number }}
-          path: ./windows_test_staff/test/
-        if: ${{ matrix.platform == 'windows' }}
-
-      - name: Desktop macOS test
+      - name: Run e2e tests on macOS
         run: make test.e2e.desktop up=yes debug=no dockerized=yes
           medea-tag=${{ env.MEDEA_BRANCH }} device=linux
           control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'macos' }}
 
+      - name: Run e2e tests on Windows
       - run: make test.e2e.desktop.windows up=yes debug=no dockerized=yes
           background=yes
           medea-tag=${{ env.MEDEA_BRANCH }}
           control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'windows' }}
 
-      - name: Desktop linux test
+      - name: Run e2e tests on Linux
         run: xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
           medea-tag=${{ env.MEDEA_BRANCH }} device=linux
           control-tag=build-${{ github.run_number }}
