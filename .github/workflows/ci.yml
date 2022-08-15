@@ -289,8 +289,6 @@ jobs:
 
   prepare-e2e-desktop:
     name: Prepare e2e test bundle for Windows
-    if: ${{ github.ref == 'refs/heads/master'
-      || startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: windows-latest
     steps:
       - uses: actions-rs/toolchain@v1
@@ -319,9 +317,7 @@ jobs:
 
   test-e2e-desktop:
     name: Run E2E tests desktop platforms
-    needs: ["docker"]
-    if: ${{ github.ref == 'refs/heads/master'
-      || startsWith(github.ref, 'refs/tags/medea-') }}
+    needs: ["docker", "prepare-e2e-desktop"]
     strategy:
       fail-fast: false
       matrix:
@@ -486,21 +482,25 @@ jobs:
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
           target: google_apis
           arch: x86_64
+          cores: 3
           profile: Nexus 6
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
           target: google_apis
           arch: x86_64
+          cores: 3
           profile: Nexus 6
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
