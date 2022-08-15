@@ -19,8 +19,8 @@ List<StepDefinitionGeneric> steps() {
 
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
-  RegExp(
-      r'(Alice|Bob|Carol) (enables|disables|mutes|unmutes) (audio|video)( and awaits it completes| and awaits it errors|)'),
+  RegExp(r'(Alice|Bob|Carol) (enables|disables|mutes|unmutes) (audio|video)'
+      r'( and awaits it completes| and awaits it errors|)'),
   (id, action, audio_or_video, awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
@@ -76,8 +76,8 @@ StepDefinitionGeneric when_enables_or_mutes =
 
 StepDefinitionGeneric when_member_enables_remote_track =
     when3<String, String, String, CustomWorld>(
-  RegExp(
-      r'(Alice|Bob|Carol) (enables|disables) remote (audio|device video|display video|video)'),
+  RegExp(r'(Alice|Bob|Carol) (enables|disables) remote '
+      r'(audio|device video|display video|video)'),
   (id, toggle, String kind, context) async {
     var parsedKind = parse_media_kind(kind);
     var member = context.world.members[id]!;
@@ -100,8 +100,8 @@ StepDefinitionGeneric when_member_enables_remote_track =
 
 StepDefinitionGeneric then_remote_media_direction_is =
     then4<String, String, String, String, CustomWorld>(
-  RegExp(
-      r"(Alice|Bob|Carol)'s (audio|video) from (Alice|Bob|Carol) has `(SendRecv|SendOnly|RecvOnly|Inactive)` direction"),
+  RegExp(r"(Alice|Bob|Carol)'s (audio|video) from (Alice|Bob|Carol) has "
+      r'`(SendRecv|SendOnly|RecvOnly|Inactive)` direction'),
   (id, String kind, remote_id, direction, context) async {
     var member = context.world.members[id]!;
 
@@ -119,8 +119,8 @@ StepDefinitionGeneric then_remote_media_direction_is =
 
 StepDefinitionGeneric then_local_track_mute_state =
     then3<String, String, String, CustomWorld>(
-  RegExp(
-      r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is (not muted|muted)"),
+  RegExp(r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local "
+      r'track is (not muted|muted)'),
   (id, String kind, not_muted, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
@@ -134,8 +134,8 @@ StepDefinitionGeneric then_local_track_mute_state =
 
 StepDefinitionGeneric then_track_is_stopped =
     then2<String, String, CustomWorld>(
-  RegExp(
-      r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local track is stopped"),
+  RegExp(r"(Alice|Bob|Carol)'s (audio|device video|display video|video) local "
+      r'track is stopped'),
   (id, kind, context) async {
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
