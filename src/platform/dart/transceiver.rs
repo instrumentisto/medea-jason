@@ -63,6 +63,30 @@ mod transceiver {
 
         /// Changes the send direction of the specified [`Transceiver`].
         pub fn set_send(transceiver: Dart_Handle, sens: bool) -> Dart_Handle;
+
+        // todo
+        pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
+    }
+}
+
+#[derive(Debug, From)]
+struct WrapDartHandle(DartHandle);
+
+impl Drop for WrapDartHandle {
+    fn drop(&mut self) {
+        let handle = self.0.get();
+        let f = Box::pin(async move {
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::dispose(
+                    handle
+                ))
+                .await
+                .unwrap();
+            }
+        });
+        platform::spawn(async move {
+            f.await;
+        });
     }
 }
 
@@ -70,14 +94,26 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Clone, Debug, From)]
-pub struct Transceiver(DartHandle);
+#[derive(Debug)]
+pub struct Transceiver(Rc<WrapDartHandle>);
+
+impl Clone for Transceiver {
+    fn clone(&self) -> Self {
+        Self(Rc::clone(&self.0))
+    }
+}
+
+impl From<DartHandle> for Transceiver {
+    fn from(from: DartHandle) -> Self {
+        Self(Rc::new(WrapDartHandle(from)))
+    }
+}
 
 impl Transceiver {
     /// Changes the receive direction of the specified [`Transceiver`].
     #[must_use]
     pub fn set_recv(&self, recv: bool) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
+        let handle = self.0.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_recv(
@@ -92,7 +128,7 @@ impl Transceiver {
     /// Changes the send direction of the specified [`Transceiver`].
     #[must_use]
     pub fn set_send(&self, send: bool) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
+        let handle = self.0.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_send(
@@ -127,7 +163,7 @@ impl Transceiver {
         if let Some(track) = new_track {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::replace_track(
-                    self.0.get(),
+                    self.0.0.get(),
                     track.platform_track().handle(),
                 ))
                 .await
@@ -135,7 +171,7 @@ impl Transceiver {
         } else {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::drop_sender(
-                    self.0.get(),
+                    self.0.0.get(),
                 ))
                 .await
             }?;
@@ -150,7 +186,7 @@ impl Transceiver {
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         unsafe {
-            let mid = transceiver::mid(self.0.get());
+            let mid = transceiver::mid(self.0.0.get());
             (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
         }
     }
@@ -160,12 +196,12 @@ impl Transceiver {
     /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        unsafe { transceiver::is_stopped(self.0.get()) }
+        unsafe { transceiver::is_stopped(self.0.0.get()) }
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
-        let handle = self.0.get();
+        let handle = self.0.0.get();
         async move {
             unsafe {
                 FutureFromDart::execute::<i32>(transceiver::get_direction(
@@ -178,13 +214,27 @@ impl Transceiver {
         }
     }
 
+    // todo
+    pub fn dispose(&self) -> LocalBoxFuture<'static, ()> {
+        let handle = self.0.0.get();
+        Box::pin(async move {
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::dispose(
+                    handle
+                ))
+                .await
+                .unwrap();
+            }
+        })
+    }
+
     /// Sets this [`Transceiver`] to the provided [`TransceiverDirection`].
     #[allow(dead_code)]
     fn set_direction(
         &self,
         direction: TransceiverDirection,
     ) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
+        let handle = self.0.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_direction(

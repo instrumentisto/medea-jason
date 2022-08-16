@@ -227,6 +227,9 @@ impl MediaStreamTrack {
         })
     }
 
+    // todo
+    pub fn dispose(&self) {}
+
     /// Sets handler for the [`ended`][1] event on underlying
     /// [`web_sys::MediaStreamTrack`].
     ///

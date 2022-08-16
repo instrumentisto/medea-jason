@@ -18,6 +18,7 @@ void registerFunctions(DynamicLibrary dl) {
     setDirection: Pointer.fromFunction(_setDirection),
     setRecv: Pointer.fromFunction(_setRecv),
     setSend: Pointer.fromFunction(_setSend),
+    dispose: Pointer.fromFunction(_dispose),
   );
 }
 
@@ -80,4 +81,9 @@ Object _dropSender(RtpTransceiver transceiver) {
 /// stopped.
 bool _isStopped(RtpTransceiver transceiver) {
   return transceiver.isStopped();
+}
+
+// todo
+Object _dispose(RtpTransceiver transceiver) {
+  return () => transceiver.dispose();
 }

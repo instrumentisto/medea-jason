@@ -18,11 +18,13 @@ void registerFunction(
   required Pointer<NativeFunction<Void Function(Handle)>> stop,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
   required Pointer<NativeFunction<Handle Function(Handle)>> clone,
+  required Pointer<NativeFunction<Void Function(Handle)>> dispose,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
+          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -47,5 +49,6 @@ void registerFunction(
     stop,
     onEnded,
     clone,
+    dispose,
   );
 }

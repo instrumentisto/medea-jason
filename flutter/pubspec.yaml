@@ -12,7 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.0
-  medea_flutter_webrtc: 0.8.0-dev+rev.9ac88a3764768828e6b87e0ff9e381476f31d1b0
+  # medea_flutter_webrtc: 0.8.0-dev+rev.9ac88a3764768828e6b87e0ff9e381476f31d1b0
+  medea_flutter_webrtc: 
+    path: /media/human/AE66A1DB66A1A495/Work/Github/Current/flutter-webrtc/
   js: ^0.6.3
   http: ^0.13.4
   uuid: ^3.0.6

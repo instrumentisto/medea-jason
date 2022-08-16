@@ -662,7 +662,7 @@ impl MediaConnections {
                         let receiver = Component::obj(receiver);
                         async move {
                             if let Some(t) = fut.await {
-                                receiver.set_transceiver(t);
+                                receiver.set_transceiver(t).await;
                             }
                         }
                     })

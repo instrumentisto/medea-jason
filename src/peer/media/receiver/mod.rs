@@ -22,8 +22,24 @@ use crate::{
 
 use super::TransceiverSide;
 
+use derive_more::Deref;
+
 #[doc(inline)]
 pub use self::component::{Component, State};
+
+#[derive(Debug, Deref)]
+struct WrapTransceiver {
+    disposeable: bool,
+
+    #[deref]
+    transceiver: RefCell<Option<platform::Transceiver>>,
+}
+
+impl WrapTransceiver {
+    fn disposeable(&self) -> bool {
+        self.disposeable
+    } 
+}
 
 /// Representation of a [`remote::Track`] that is being received from some
 /// remote peer. It may have two states: `waiting` and `receiving`.
@@ -44,7 +60,7 @@ pub struct Receiver {
     /// [`Transceiver`] associated with this [`remote::Track`].
     ///
     /// [`Transceiver`]: platform::Transceiver
-    transceiver: RefCell<Option<platform::Transceiver>>,
+    transceiver: WrapTransceiver,
 
     /// [MID] of the associated [`Transceiver`].
     ///
@@ -102,6 +118,7 @@ impl Receiver {
         let kind = MediaKind::from(&caps);
 
         let mut transceiver = None;
+        let mut disposeable = false;
         if state.mid().is_none() {
             // Try to find send transceiver that can be used as sendrecv.
             let sender = media_connections
@@ -115,10 +132,11 @@ impl Receiver {
                             == caps.media_source_kind()
                 })
                 .map(utils::component::Component::obj);
-
+            
             let trnsvr = if let Some(s) = sender {
                 s.transceiver()
             } else {
+                disposeable = true;
                 let fut = media_connections.0.borrow().add_transceiver(
                     kind,
                     platform::TransceiverDirection::INACTIVE,
@@ -135,7 +153,7 @@ impl Receiver {
             track_id: state.track_id(),
             caps,
             sender_id: state.sender_id().clone(),
-            transceiver: RefCell::new(transceiver),
+            transceiver: WrapTransceiver{disposeable, transceiver: RefCell::new(transceiver)},
             mid: RefCell::new(state.mid().map(ToString::to_string)),
             track: RefCell::new(None),
             is_track_notified: Cell::new(false),
@@ -230,7 +248,7 @@ impl Receiver {
                 return;
             }
         }
-        self.set_transceiver(transceiver);
+        self.set_transceiver(transceiver).await;
         let new_track = remote::Track::new(
             new_track,
             self.caps.media_source_kind(),
@@ -263,11 +281,16 @@ impl Receiver {
     ///
     /// No-op if provided with the same [`platform::Transceiver`] as already
     /// exists in this [`Receiver`].
-    pub fn set_transceiver(&self, transceiver: platform::Transceiver) {
+    pub async fn set_transceiver(&self, transceiver: platform::Transceiver) {
         if self.transceiver.borrow().is_none()
             && self.mid.borrow().as_ref() == transceiver.mid().as_ref()
         {
-            drop(self.transceiver.replace(Some(transceiver)));
+            if let Some(tr) = self.transceiver.replace(Some(transceiver)) {
+                // tr.dispose().await;
+            }
+        } else {
+            log::error!("DROP TR IN SET TR");
+            // transceiver.dispose().await;
         }
     }
 
@@ -317,10 +340,15 @@ impl Receiver {
 
 impl Drop for Receiver {
     fn drop(&mut self) {
+        let dis = self.transceiver.disposeable();
         if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
             platform::spawn(async move {
                 if !transceiver.is_stopped() {
                     transceiver.set_recv(false).await;
+                }
+                log::error!("DROP TR IN DROP RECEIVER");
+                if dis {
+                    // transceiver.dispose().await;
                 }
             });
         }

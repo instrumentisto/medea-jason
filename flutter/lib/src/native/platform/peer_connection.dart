@@ -84,14 +84,19 @@ void _onConnectionStateChange(PeerConnection conn, Function f) {
 Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.nativeStringToDartString();
+        RtpTransceiver? result;
         for (var transceiver in transceivers) {
           if (transceiver.mid == mMid) {
-            return transceiver;
+            result = transceiver;
+          } else {
+            transceiver.dispose();
           }
+        }
+        if(result != null) {
+          return result;
         }
       });
 }
-
 /// Sets a remote SDP offer in the provided [PeerConnection].
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {

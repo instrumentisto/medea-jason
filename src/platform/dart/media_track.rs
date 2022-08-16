@@ -105,6 +105,9 @@ mod media_stream_track {
         /// Creates a new instance of [`MediaStreamTrack`] depending on the same
         /// media source as this [`MediaStreamTrack`].
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
+
+        // todo
+        pub fn dispose(track: Dart_Handle);
     }
 }
 
@@ -298,6 +301,13 @@ impl MediaStreamTrack {
                         .unwrap();
                 Self::new(new_track, source_kind)
             }
+        }
+    }
+
+    // todo
+    pub fn dispose(&self) {
+        unsafe {
+            media_stream_track::dispose(self.inner.get());
         }
     }
 

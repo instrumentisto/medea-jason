@@ -92,6 +92,9 @@ impl Transceiver {
     pub fn is_stopped(&self) -> bool {
         self.0.stopped()
     }
+
+    // todo
+    pub async fn dispose(&self) {}
 }
 
 #[cfg(test)]

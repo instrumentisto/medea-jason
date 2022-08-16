@@ -22,6 +22,7 @@ void registerFunctions(DynamicLibrary dl) {
     onEnded: Pointer.fromFunction(_onEnded),
     clone: Pointer.fromFunction(_clone),
     readyState: Pointer.fromFunction(_readyState),
+    dispose: Pointer.fromFunction(_dispose),
   );
 }
 
@@ -94,4 +95,9 @@ bool _enabled(MediaStreamTrack track) {
 /// Clones the provided [MediaStreamTrack] preserving the same media source.
 Object _clone(MediaStreamTrack track) {
   return () => track.clone();
+}
+
+/// todo
+void _dispose(MediaStreamTrack track) {
+  track.dispose();
 }

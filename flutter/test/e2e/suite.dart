@@ -2,6 +2,7 @@ import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
+import 'package:medea_jason/src/interface/track_kinds.dart' as tk;
 
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'api/room.dart';
@@ -16,14 +17,25 @@ import 'world/custom_world.dart';
 
 part 'suite.g.dart';
 
-void clear_world() {
+Future<void> clear_world() async {
+  print('\n\n\n\n\n*******************');
   MockMediaDevices.resetGUM();
 
   if (old_world != null) {
     old_world!.jasons.values.forEach((element) {
       element.free();
     });
+
+    var alice = old_world!.members['Alice'];
+    await alice?.forget_local_tracks();
+
+    var bob = old_world!.members['Bob'];
+    await bob?.forget_local_tracks();
+
+    var carol = old_world!.members['Carol']; 
+    await carol?.forget_local_tracks();
   }
+  print('___________________\n\n\n\n\n');
 }
 
 CustomWorld? old_world;
@@ -102,10 +114,10 @@ final TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
-  ..defaultTimeout = const Duration(minutes: 10)
+  ..defaultTimeout = const Duration(minutes: 1)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
-        clear_world();
+        await clear_world();
 
         var world = CustomWorld();
         old_world = world;

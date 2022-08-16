@@ -141,6 +141,7 @@ impl MediaDevices {
         &self,
         caps: MediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<GetUserMediaError>> {
+        log::error!("MEDIA DART GUM");
         let tracks = unsafe {
             FutureFromDart::execute::<DartHandle>(
                 media_devices::get_user_media(caps.into()),

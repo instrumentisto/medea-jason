@@ -334,6 +334,7 @@ impl Drop for Sender {
                 transceiver.set_send(false).await;
                 drop(transceiver.set_send_track(None).await);
             }
+            // transceiver.dispose().await;
         });
     }
 }
