@@ -422,6 +422,9 @@ impl TryFrom<proto::Member> for Member {
 
 impl From<Member> for proto::Member {
     fn from(member: Member) -> Self {
+        // PANIC: Unwrapping `Duration` conversion is OK here, because its
+        //        values are not expected to be large.
+        #[allow(clippy::unwrap_used)]
         Self {
             id: member.id.into(),
             on_join: member
@@ -434,9 +437,18 @@ impl From<Member> for proto::Member {
                 .on_leave
                 .as_ref()
                 .map_or_else(String::default, ToString::to_string),
-            idle_timeout: member.spec.idle_timeout.map(Into::into),
-            reconnect_timeout: member.spec.reconnect_timeout.map(Into::into),
-            ping_interval: member.spec.ping_interval.map(Into::into),
+            idle_timeout: member
+                .spec
+                .idle_timeout
+                .map(|d| d.try_into().unwrap()),
+            reconnect_timeout: member
+                .spec
+                .reconnect_timeout
+                .map(|d| d.try_into().unwrap()),
+            ping_interval: member
+                .spec
+                .ping_interval
+                .map(|d| d.try_into().unwrap()),
             pipeline: member
                 .spec
                 .pipeline

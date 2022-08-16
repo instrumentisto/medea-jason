@@ -51,6 +51,7 @@ pub struct Member {
 
 impl Member {
     /// Converts [`Member`] into protobuf [`proto::Member`].
+    #[allow(clippy::missing_panics_doc)]
     #[must_use]
     pub fn into_proto(self, member_id: String) -> proto::Member {
         let member_elements = self
@@ -59,15 +60,20 @@ impl Member {
             .map(|(id, endpoint)| (id.clone(), endpoint.into_proto(id)))
             .collect();
 
+        // PANIC: Unwrapping `Duration` conversion is OK here, because its
+        //        values are not expected to be large.
+        #[allow(clippy::unwrap_used)]
         proto::Member {
             pipeline: member_elements,
             id: member_id,
             credentials: self.credentials.map(Into::into),
             on_join: self.on_join.unwrap_or_default(),
             on_leave: self.on_leave.unwrap_or_default(),
-            idle_timeout: self.idle_timeout.map(Into::into),
-            reconnect_timeout: self.reconnect_timeout.map(Into::into),
-            ping_interval: self.ping_interval.map(Into::into),
+            idle_timeout: self.idle_timeout.map(|d| d.try_into().unwrap()),
+            reconnect_timeout: self
+                .reconnect_timeout
+                .map(|d| d.try_into().unwrap()),
+            ping_interval: self.ping_interval.map(|d| d.try_into().unwrap()),
         }
     }
 
