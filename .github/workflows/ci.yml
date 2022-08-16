@@ -311,14 +311,14 @@ jobs:
 
       - run: pwd
       - run: ls
-      - run: cd ./flutter/example/
+      - run: cd flutter\example
       - run: pwd
       - run: ls
       - name: Build e2e test bundle for Windows
         run: |
           pwd
           ls -a
-          cd ./flutter/example/
+          cd flutter\example
           flutter build windows --target=../test/e2e/suite.dart --debug
           cp ../../flutter/example/build/windows/runner/Debug \
              ../../windows_test_staff/test/
