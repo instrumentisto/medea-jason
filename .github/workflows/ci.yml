@@ -309,9 +309,7 @@ jobs:
           name: jason-lib-windows-${{ github.run_number }}
           path: ./flutter/windows/lib/x86_64-pc-windows-msvc/
 
-      - run: pwd
       - run: ls
-      - run: cd flutter\example
       - run: pwd
       - run: |
           ls
