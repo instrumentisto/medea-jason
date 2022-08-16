@@ -106,7 +106,7 @@ mod media_stream_track {
         /// media source as this [`MediaStreamTrack`].
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
 
-        // todo
+        /// Disposes of this [`MediaStreamTrack`].
         pub fn dispose(track: Dart_Handle);
     }
 }
@@ -304,7 +304,7 @@ impl MediaStreamTrack {
         }
     }
 
-    // todo
+    /// Disposes this [`MediaStreamTrack`].
     pub fn dispose(&self) {
         unsafe {
             media_stream_track::dispose(self.inner.get());

@@ -97,7 +97,7 @@ Object _clone(MediaStreamTrack track) {
   return () => track.clone();
 }
 
-/// todo
+/// Disposes of this [MediaStreamTrack].
 void _dispose(MediaStreamTrack track) {
   track.dispose();
 }

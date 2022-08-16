@@ -227,7 +227,8 @@ impl MediaStreamTrack {
         })
     }
 
-    // todo
+    /// Disposes of this [`MediaStreamTrack`].
+    #[allow(clippy::unused_self)]
     pub fn dispose(&self) {}
 
     /// Sets handler for the [`ended`][1] event on underlying

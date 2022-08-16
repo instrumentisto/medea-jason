@@ -93,8 +93,9 @@ impl Transceiver {
         self.0.stopped()
     }
 
-    // todo
-    pub async fn dispose(&self) {}
+    /// Disposes of this [`Transceiver`].
+    #[allow(clippy::unused_self)]
+    pub fn dispose(&self) {}
 }
 
 #[cfg(test)]

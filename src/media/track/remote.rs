@@ -216,7 +216,6 @@ impl Track {
 
 impl Drop for Inner {
     fn drop(&mut self) {
-        log::error!("DROP REMOTE TRACK");
         self.track.dispose();
     }
 }

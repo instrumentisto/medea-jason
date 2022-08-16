@@ -20,9 +20,7 @@ impl Error {
     /// correct Dart exception.
     #[must_use]
     pub unsafe fn from_handle(h: Dart_Handle) -> Self {
-        let e = Self(DartHandle::new(h));
-        log::error!("HEHEHE {} - {}", e.name(), e.message());
-        e
+        Self(DartHandle::new(h))
     }
 
     /// Returns a [`Dart_Handle`] to the underlying error.

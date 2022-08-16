@@ -2,8 +2,8 @@ import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
-import 'package:medea_jason/src/interface/track_kinds.dart' as tk;
 
+import 'package:medea_jason/src/interface/track_kinds.dart' as tk;
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'api/room.dart';
 import 'steps/connection.dart';
@@ -18,7 +18,6 @@ import 'world/custom_world.dart';
 part 'suite.g.dart';
 
 Future<void> clear_world() async {
-  print('\n\n\n\n\n*******************');
   MockMediaDevices.resetGUM();
 
   if (old_world != null) {
@@ -26,16 +25,11 @@ Future<void> clear_world() async {
       element.free();
     });
 
-    var alice = old_world!.members['Alice'];
-    await alice?.forget_local_tracks();
-
-    var bob = old_world!.members['Bob'];
-    await bob?.forget_local_tracks();
-
-    var carol = old_world!.members['Carol']; 
-    await carol?.forget_local_tracks();
+    var members = old_world!.members.values;
+    for (var member in members) {
+      await member.forget_local_tracks();
+    }
   }
-  print('___________________\n\n\n\n\n');
 }
 
 CustomWorld? old_world;

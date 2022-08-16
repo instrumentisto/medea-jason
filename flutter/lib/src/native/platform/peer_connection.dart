@@ -92,11 +92,10 @@ Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
             transceiver.dispose();
           }
         }
-        if(result != null) {
-          return result;
-        }
+        return result;
       });
 }
+
 /// Sets a remote SDP offer in the provided [PeerConnection].
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {

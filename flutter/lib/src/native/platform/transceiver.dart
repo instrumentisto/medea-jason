@@ -83,7 +83,7 @@ bool _isStopped(RtpTransceiver transceiver) {
   return transceiver.isStopped();
 }
 
-// todo
-Object _dispose(RtpTransceiver transceiver) {
-  return () => transceiver.dispose();
+/// Disposes of this [RtpTransceiver].
+void _dispose(RtpTransceiver transceiver) {
+  transceiver.dispose();
 }
