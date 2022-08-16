@@ -292,6 +292,7 @@ jobs:
     needs: ["crate-jason"]
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -309,14 +310,6 @@ jobs:
           name: jason-lib-windows-${{ github.run_number }}
           path: ./flutter/windows/lib/x86_64-pc-windows-msvc/
 
-      - run: ls
-      - run: pwd
-      - run: |
-          ls
-          cd flutter
-          ls
-          cd example
-          ls
       - name: Build e2e test bundle for Windows
         run: |
           cd flutter\example
