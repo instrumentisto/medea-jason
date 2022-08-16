@@ -113,6 +113,7 @@ impl Track {
 impl Drop for Track {
     fn drop(&mut self) {
         self.track.stop();
+        self.track.dispose();
     }
 }
 

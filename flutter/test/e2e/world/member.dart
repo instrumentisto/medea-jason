@@ -390,7 +390,9 @@ class Member {
           await room.disableVideo(source);
         }
       } else {
+        print('room disA');
         await room.disableAudio();
+        print('room disV');
         await room.disableVideo(source);
       }
     }

@@ -214,6 +214,12 @@ impl Track {
     }
 }
 
+impl Drop for Inner {
+    fn drop(&mut self) {
+        self.track.dispose();
+    }
+}
+
 /// Media exchange direction of a [`Track`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u8)]

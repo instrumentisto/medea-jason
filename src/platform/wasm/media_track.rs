@@ -227,6 +227,10 @@ impl MediaStreamTrack {
         })
     }
 
+    /// Disposes of this [`MediaStreamTrack`].
+    #[allow(clippy::unused_self)]
+    pub fn dispose(&self) {}
+
     /// Sets handler for the [`ended`][1] event on underlying
     /// [`web_sys::MediaStreamTrack`].
     ///

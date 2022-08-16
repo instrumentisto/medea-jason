@@ -92,6 +92,10 @@ impl Transceiver {
     pub fn is_stopped(&self) -> bool {
         self.0.stopped()
     }
+
+    /// Disposes of this [`Transceiver`].
+    #[allow(clippy::unused_self)]
+    pub fn dispose(&self) {}
 }
 
 #[cfg(test)]
