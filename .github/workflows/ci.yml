@@ -333,7 +333,7 @@ jobs:
             os: ubuntu-22.04
             lib_path: ./flutter/linux/lib/
           - platform: windows
-            os: macos-latest
+            os: macos-12
             lib_path: ./flutter/windows/lib/
           - platform: macos
             os: macos-latest
@@ -381,6 +381,13 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
+
+      - run: ls
+        if: ${{ matrix.platform == 'windows' }}
+      - run: pwd
+        if: ${{ matrix.platform == 'windows' }}
+      - run: docker load -i image.tar
+        if: ${{ matrix.platform == 'windows' }}
 
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
