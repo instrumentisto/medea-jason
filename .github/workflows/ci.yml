@@ -310,13 +310,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Install docker, docker-compose, docker-machine
-        run: |
-          brew install docker
-          brew install docker-compose
-          brew install docker-machine
-          brew services start docker-machine
-          docker-machine create --driver virtualbox default
+      - name: Install docker
+        uses: Wandalen/wretry.action@v1.0.11
+        with:
+          action: docker-practice/actions-setup-docker@master
+          attempt_limit: 5
         if: ${{ matrix.os == 'macos-latest' }}
 
       - uses: actions-rs/toolchain@v1
