@@ -393,7 +393,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: docker-${{ matrix.image }}-${{ github.run_number }}
+          name: docker-medea-control-api-mock-${{ github.run_number }}
 
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
