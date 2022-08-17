@@ -302,7 +302,7 @@ jobs:
           - platform: windows
             os: windows-latest
           - platform: android
-            os: macos-12
+            os: macos-latest
           # TODO: Add macos e2e tests
           # - platform: macos
           #   os: macos-latest
@@ -315,7 +315,7 @@ jobs:
         with:
           action: docker-practice/actions-setup-docker@master
           attempt_limit: 5
-        if: ${{ matrix.os == 'macos-12' }}
+        if: ${{ matrix.os == 'macos-latest' }}
 
       - uses: actions-rs/toolchain@v1
         with:
