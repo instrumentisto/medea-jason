@@ -36,6 +36,7 @@ jobs:
       - rustfmt
       - test-e2e-browser
       - prepare-e2e-desktop
+      - asdasd
       - test-e2e-desktop
       - test-flutter
       - test-unit
@@ -287,6 +288,18 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
+  asdasd:
+    name: asdasd
+    runs-on: windows-latest
+    steps:
+      - name: Login to Medea Docker registry
+        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+          -p ${{ secrets.MEDEA_DOCKER_PASS }}
+          hub.instrumentisto.com
+
+      - run: docker run hub.instrumentisto.com/streaming/medea:latest
+
+
   prepare-e2e-desktop:
     name: Prepare e2e test bundle for Windows
     needs: ["crate-jason"]
@@ -315,8 +328,7 @@ jobs:
           make flutter.gen
           cd flutter\example
           flutter build windows --target=../test/e2e/suite.dart --debug
-          cp ../../flutter/example/build/windows/runner/Debug \
-             ../../windows_test_staff/test/
+          cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
 
       - uses: actions/upload-artifact@v3
         with:
@@ -334,7 +346,7 @@ jobs:
             os: ubuntu-22.04
             lib_path: ./flutter/linux/lib/
           - platform: windows
-            os: windows-latest
+            os: macos-latest
             lib_path: ./flutter/windows/lib/
           - platform: macos
             os: macos-latest
@@ -386,10 +398,6 @@ jobs:
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
         if: ${{ matrix.platform != 'windows' }}
-
-      - name: Install docker
-        uses: docker-practice/actions-setup-docker@master
-        if: ${{ matrix.platform == 'windows' }}
 
       - name: Login to Medea Docker registry
         run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
