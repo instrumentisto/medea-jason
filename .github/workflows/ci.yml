@@ -315,6 +315,8 @@ jobs:
           brew install docker
           brew install docker-compose
           brew install docker-machine
+          brew services start docker-machine
+          docker-machine create --driver virtualbox default
         if: ${{ matrix.os == 'macos-latest' }}
 
       - uses: actions-rs/toolchain@v1
