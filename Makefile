@@ -653,7 +653,8 @@ ifeq ($(rebuild),yes)
 endif
 endif
 	@make docker.up.e2e browser=$(browser) background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug) \
+	                    rebuild=yes
 	@make wait.port port=4444
 endif
 	cargo test -p medea-e2e --test e2e \
@@ -684,7 +685,8 @@ ifeq ($(rebuild),yes)
 endif
 endif
 	@make docker.up.e2e background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug) \
+	                    rebuild=no
 endif
 ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 	@make flutter.gen overwrite=yes dockerized=$(dockerized)
@@ -1035,6 +1037,7 @@ docker.up.demo: docker.down.demo
 #
 # Usage:
 #	make docker.up.e2e [browser=(chrome|firefox)]
+#                      [rebuild=(no|yes)]
 #	                   [( [dockerized=no]
 #	                    | dockerized=yes [medea-tag=(dev|<tag>)]
 #                         [control-tag=(dev|<tag>)] )]
@@ -1062,7 +1065,9 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 			/entrypoint.sh ))
 
 docker.up.e2e: docker.down.e2e
+ifeq ($(rebuild),yes)
 	@make build.jason target=web debug=$(debug) dockerized=no
+endif
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
