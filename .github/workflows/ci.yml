@@ -312,6 +312,7 @@ jobs:
 
       - name: Build e2e test bundle for Windows
         run: |
+          make flutter.gen
           cd flutter\example
           flutter build windows --target=../test/e2e/suite.dart --debug
           cp ../../flutter/example/build/windows/runner/Debug \
