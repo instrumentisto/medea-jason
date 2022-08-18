@@ -369,7 +369,7 @@ jobs:
 
       - name: Install docker
         uses: docker-practice/actions-setup-docker@master
-        if: ${{ matrix.platform == 'windows' }}
+        if: ${{ matrix.platform == 'windows' || matrix.platform == 'macos' }}
 
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
