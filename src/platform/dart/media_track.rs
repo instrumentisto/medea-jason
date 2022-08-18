@@ -261,13 +261,14 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     #[inline]
-    pub async fn stop(&self) {
-        unsafe {
-            FutureFromDart::execute::<()>(media_stream_track::stop(
-                self.inner.get(),
-            ))
-            .await
-            .unwrap();
+    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
+        let inner = self.inner.get();
+        async move {
+            unsafe {
+                FutureFromDart::execute::<()>(media_stream_track::stop(inner))
+                    .await
+                    .unwrap();
+            }
         }
     }
 
