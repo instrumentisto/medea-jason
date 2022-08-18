@@ -60,6 +60,10 @@ impl Track {
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[must_use]
     pub fn platform_track(&self) -> &platform::MediaStreamTrack {
         self.track.as_ref().unwrap()
@@ -67,6 +71,10 @@ impl Track {
 
     /// Changes [`enabled`][1] attribute on the underlying
     /// [MediaStreamTrack][2].
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
@@ -76,6 +84,10 @@ impl Track {
 
     /// Returns [`id`] of underlying [MediaStreamTrack][2].
     ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
+    ///
     /// [`id`]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
@@ -84,12 +96,20 @@ impl Track {
     }
 
     /// Returns this [`Track`]'s media source kind.
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[must_use]
     pub fn media_source_kind(&self) -> proto::MediaSourceKind {
         self.source_kind
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.track.as_ref().unwrap().kind()
@@ -101,6 +121,10 @@ impl Track {
     /// [`platform::MediaStreamTrack`] using a [`clone()`][1] method.
     ///
     /// Forked [`Track`] will hold a strong reference to this [`Track`].
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     pub async fn fork(self: &Rc<Self>) -> Self {
@@ -127,6 +151,10 @@ impl Drop for Track {
 /// Strongly referenced [`Track`] received from a
 /// [getUserMedia()][1]/[getDisplayMedia()][2] request.
 ///
+/// # Panics
+///
+/// Will panic if `track` is None.
+///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(Debug)]
@@ -141,9 +169,13 @@ impl LocalMediaTrack {
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this
     /// [`LocalMediaTrack`].
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        &self.0.track.as_ref().unwrap()
+        self.0.track.as_ref().unwrap()
     }
 
     /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an

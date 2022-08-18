@@ -59,6 +59,10 @@ impl Track {
     /// Creates a new [`Track`] spawning a listener for its [`enabled`][1] and
     /// [`muted`][2] properties changes.
     ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
+    ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-muted
     #[allow(clippy::mut_mut)]
@@ -133,6 +137,10 @@ impl Track {
     /// Returns [`id`][1] of the underlying [`platform::MediaStreamTrack`] of
     /// this [`Track`].
     ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
+    ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> String {
@@ -140,6 +148,10 @@ impl Track {
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.track.as_ref().unwrap().kind()
@@ -153,9 +165,15 @@ impl Track {
 
     /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[cfg(not(target_family = "wasm"))]
     pub async fn stop(self) {
-        if self.0.track.as_ref().unwrap().ready_state().await == MediaStreamTrackState::Live {
+        if self.0.track.as_ref().unwrap().ready_state().await
+            == MediaStreamTrackState::Live
+        {
             self.0.track.as_ref().unwrap().stop().await;
             self.0.on_stopped.call0();
         }
@@ -165,15 +183,21 @@ impl Track {
     /// [`MediaStreamTrackState::Live`] state.
     #[cfg(target_family = "wasm")]
     pub async fn stop(self) {
-        if self.0.track.as_ref().unwrap().ready_state().await == MediaStreamTrackState::Live {
+        if self.0.track.as_ref().unwrap().ready_state().await
+            == MediaStreamTrackState::Live
+        {
             self.0.on_stopped.call0();
         }
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        &self.0.track.as_ref().unwrap()
+        self.0.track.as_ref().unwrap()
     }
 
     /// Indicate whether this [`Track`] is muted.

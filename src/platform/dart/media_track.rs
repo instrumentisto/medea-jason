@@ -264,9 +264,10 @@ impl MediaStreamTrack {
     pub async fn stop(&self) {
         unsafe {
             FutureFromDart::execute::<()>(media_stream_track::stop(
-                self.inner.get()
+                self.inner.get(),
             ))
-            .await.unwrap();
+            .await
+            .unwrap();
         }
     }
 
@@ -311,9 +312,10 @@ impl MediaStreamTrack {
     pub async fn dispose(&self) {
         unsafe {
             FutureFromDart::execute::<()>(media_stream_track::dispose(
-                self.inner.get()
+                self.inner.get(),
             ))
-            .await.unwrap();
+            .await
+            .unwrap();
         }
     }
 
