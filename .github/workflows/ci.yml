@@ -371,23 +371,9 @@ jobs:
         uses: docker-practice/actions-setup-docker@v1
         if: ${{ matrix.platform == 'windows' || matrix.platform == 'macos' }}
 
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        with:
-          key: test-e2e-desktop-{hash}
-          restore-keys: test-e2e-desktop-
-        continue-on-error: true
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-
       - uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
-
-      - run: ls
-        if: ${{ matrix.platform == 'macos' }}
-      - run: pwd
-        if: ${{ matrix.platform == 'macos' }}
-      - run: docker load -i image.tar
-        if: ${{ matrix.platform == 'macos' }}
 
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
