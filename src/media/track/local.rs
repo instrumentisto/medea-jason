@@ -138,6 +138,14 @@ impl Track {
     }
 }
 
+#[cfg(target_family = "wasm")]
+impl Drop for Track {
+    fn drop(&mut self) {
+        let track = self.track.unwrap().stop();
+    }
+}
+
+#[cfg(not(target_family = "wasm"))]
 impl Drop for Track {
     fn drop(&mut self) {
         let track = self.track.take().unwrap();

@@ -184,9 +184,8 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
+    pub fn stop(&self) {
         self.sys_track.stop();
-        async {}
     }
 
     /// Returns an [`enabled`][1] attribute of the underlying
