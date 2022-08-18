@@ -270,7 +270,7 @@ packages:
       name: medea_flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0-dev+rev.3e3145cf9611fe95fdf89ee962bcf99071e9731b"
+    version: "0.8.0-dev+rev.1c0c2769afb29a76f4e6b7c4707ab3526ceab937"
   medea_jason:
     dependency: "direct main"
     description:
@@ -333,7 +333,7 @@ packages:
       name: pubspec_parse
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   quiver:
     dependency: transitive
     description:
