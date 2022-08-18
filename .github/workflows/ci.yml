@@ -383,11 +383,11 @@ jobs:
           name: docker-medea-control-api-mock-${{ github.run_number }}
 
       - run: ls
-        if: ${{ matrix.platform == 'windows' }}
+        if: ${{ matrix.platform == 'macos' }}
       - run: pwd
-        if: ${{ matrix.platform == 'windows' }}
+        if: ${{ matrix.platform == 'macos' }}
       - run: docker load -i image.tar
-        if: ${{ matrix.platform == 'windows' }}
+        if: ${{ matrix.platform == 'macos' }}
 
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
