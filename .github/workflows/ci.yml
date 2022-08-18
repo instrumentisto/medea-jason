@@ -412,7 +412,7 @@ jobs:
 
       - name: Run e2e tests on macOS
         run: make test.e2e.desktop up=yes debug=no dockerized=yes
-          medea-tag=${{ env.MEDEA_BRANCH }} device=linux
+          medea-tag=${{ env.MEDEA_BRANCH }} device=macos
           control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'macos' }}
 
