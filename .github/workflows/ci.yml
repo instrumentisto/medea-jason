@@ -368,7 +368,7 @@ jobs:
           path: ${{ matrix.lib_path }}
 
       - name: Install docker
-        uses: docker-practice/actions-setup-docker@master
+        uses: docker-practice/actions-setup-docker@v1
         if: ${{ matrix.platform == 'windows' || matrix.platform == 'macos' }}
 
       - uses: satackey/action-docker-layer-caching@v0.0.11
