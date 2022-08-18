@@ -15,10 +15,10 @@ void registerFunction(
   required Pointer<NativeFunction<Bool Function(Handle)>> enabled,
   required Pointer<NativeFunction<Void Function(Handle, Bool)>> setEnabled,
   required Pointer<NativeFunction<Handle Function(Handle)>> readyState,
-  required Pointer<NativeFunction<Void Function(Handle)>> stop,
+  required Pointer<NativeFunction<Handle Function(Handle)>> stop,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
   required Pointer<NativeFunction<Handle Function(Handle)>> clone,
-  required Pointer<NativeFunction<Void Function(Handle)>> dispose,
+  required Pointer<NativeFunction<Handle Function(Handle)>> dispose,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,

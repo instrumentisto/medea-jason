@@ -6,7 +6,6 @@
 
 use std::rc::Rc;
 
-use derive_more::AsRef;
 use medea_client_api_proto as proto;
 
 use crate::{
@@ -22,11 +21,10 @@ use crate::{
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(AsRef, Debug)]
+#[derive(Debug)]
 pub struct Track {
     /// Actual [`platform::MediaStreamTrack`].
-    #[as_ref]
-    track: platform::MediaStreamTrack,
+    track: Option<platform::MediaStreamTrack>,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
     source_kind: proto::MediaSourceKind,
@@ -40,6 +38,12 @@ pub struct Track {
     _parent: Option<Rc<Self>>,
 }
 
+impl AsRef<platform::MediaStreamTrack> for Track {
+    fn as_ref(&self) -> &platform::MediaStreamTrack {
+        self.track.as_ref().unwrap()
+    }
+}
+
 impl Track {
     /// Builds a new [`Track`] from the provided [`platform::MediaStreamTrack`]
     /// and [`proto::MediaSourceKind`].
@@ -49,7 +53,7 @@ impl Track {
         source_kind: proto::MediaSourceKind,
     ) -> Self {
         Self {
-            track,
+            track: Some(track),
             source_kind,
             _parent: None,
         }
@@ -58,7 +62,7 @@ impl Track {
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
     pub fn platform_track(&self) -> &platform::MediaStreamTrack {
-        &self.track
+        self.track.as_ref().unwrap()
     }
 
     /// Changes [`enabled`][1] attribute on the underlying
@@ -67,7 +71,7 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn set_enabled(&self, enabled: bool) {
-        self.track.set_enabled(enabled);
+        self.track.as_ref().unwrap().set_enabled(enabled);
     }
 
     /// Returns [`id`] of underlying [MediaStreamTrack][2].
@@ -76,7 +80,7 @@ impl Track {
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
     pub fn id(&self) -> String {
-        self.track.id()
+        self.track.as_ref().unwrap().id()
     }
 
     /// Returns this [`Track`]'s media source kind.
@@ -88,7 +92,7 @@ impl Track {
     /// Returns this [`Track`]'s kind (audio/video).
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        self.track.kind()
+        self.track.as_ref().unwrap().kind()
     }
 
     /// Forks this [`Track`].
@@ -101,9 +105,9 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     pub async fn fork(self: &Rc<Self>) -> Self {
         let parent = Rc::clone(self);
-        let track = self.track.fork().await;
+        let track = self.track.as_ref().unwrap().fork().await;
         Self {
-            track,
+            track: Some(track),
             source_kind: self.source_kind,
             _parent: Some(parent),
         }
@@ -112,8 +116,11 @@ impl Track {
 
 impl Drop for Track {
     fn drop(&mut self) {
-        self.track.stop();
-        self.track.dispose();
+        let track = self.track.take().unwrap();
+        platform::spawn(async move {
+            track.stop().await;
+            track.dispose().await;
+        });
     }
 }
 
@@ -136,7 +143,7 @@ impl LocalMediaTrack {
     /// [`LocalMediaTrack`].
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        &self.0.track
+        &self.0.track.as_ref().unwrap()
     }
 
     /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an

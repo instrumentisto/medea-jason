@@ -93,7 +93,7 @@ mod media_stream_track {
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-stop
-        pub fn stop(track: Dart_Handle);
+        pub fn stop(track: Dart_Handle) -> Dart_Handle;
 
         /// Sets [`onended`][1] event handler of the provided
         /// [MediaStreamTrack][0].
@@ -107,7 +107,7 @@ mod media_stream_track {
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
 
         /// Disposes of this [`MediaStreamTrack`].
-        pub fn dispose(track: Dart_Handle);
+        pub fn dispose(track: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -261,9 +261,12 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     #[inline]
-    pub fn stop(&self) {
+    pub async fn stop(&self) {
         unsafe {
-            media_stream_track::stop(self.inner.get());
+            FutureFromDart::execute::<()>(media_stream_track::stop(
+                self.inner.get()
+            ))
+            .await.unwrap();
         }
     }
 
@@ -305,9 +308,12 @@ impl MediaStreamTrack {
     }
 
     /// Disposes this [`MediaStreamTrack`].
-    pub fn dispose(&self) {
+    pub async fn dispose(&self) {
         unsafe {
-            media_stream_track::dispose(self.inner.get());
+            FutureFromDart::execute::<()>(media_stream_track::dispose(
+                self.inner.get()
+            ))
+            .await.unwrap();
         }
     }
 

@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug)]
 struct Inner {
     /// Underlying platform-specific [`platform::MediaStreamTrack`].
-    track: platform::MediaStreamTrack,
+    track: Option<platform::MediaStreamTrack>,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
     media_source_kind: proto::MediaSourceKind,
@@ -74,7 +74,7 @@ impl Track {
     {
         let track = platform::MediaStreamTrack::from(track);
         let track = Self(Rc::new(Inner {
-            track,
+            track: Some(track),
             media_source_kind,
             muted: ObservableCell::new(muted),
             on_media_direction_changed: platform::Callback::default(),
@@ -84,7 +84,7 @@ impl Track {
             on_unmuted: platform::Callback::default(),
         }));
 
-        track.0.track.on_ended({
+        track.0.track.as_ref().unwrap().on_ended({
             let weak_inner = Rc::downgrade(&track.0);
             Some(move || {
                 if let Some(inner) = weak_inner.upgrade() {
@@ -136,13 +136,13 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> String {
-        self.0.track.id()
+        self.0.track.as_ref().unwrap().id()
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        self.0.track.kind()
+        self.0.track.as_ref().unwrap().kind()
     }
 
     /// Returns this [`Track`]'s media source kind.
@@ -155,8 +155,8 @@ impl Track {
     /// [`MediaStreamTrackState::Live`] state.
     #[cfg(not(target_family = "wasm"))]
     pub async fn stop(self) {
-        if self.0.track.ready_state().await == MediaStreamTrackState::Live {
-            self.0.track.stop();
+        if self.0.track.as_ref().unwrap().ready_state().await == MediaStreamTrackState::Live {
+            self.0.track.as_ref().unwrap().stop().await;
             self.0.on_stopped.call0();
         }
     }
@@ -165,7 +165,7 @@ impl Track {
     /// [`MediaStreamTrackState::Live`] state.
     #[cfg(target_family = "wasm")]
     pub async fn stop(self) {
-        if self.0.track.ready_state().await == MediaStreamTrackState::Live {
+        if self.0.track.as_ref().unwrap().ready_state().await == MediaStreamTrackState::Live {
             self.0.on_stopped.call0();
         }
     }
@@ -173,7 +173,7 @@ impl Track {
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        &self.0.track
+        &self.0.track.as_ref().unwrap()
     }
 
     /// Indicate whether this [`Track`] is muted.
@@ -216,7 +216,10 @@ impl Track {
 
 impl Drop for Inner {
     fn drop(&mut self) {
-        self.track.dispose();
+        let track = self.track.take().unwrap();
+        platform::spawn(async move {
+            track.dispose().await;
+        });
     }
 }
 

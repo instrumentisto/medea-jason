@@ -184,7 +184,7 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    pub fn stop(&self) {
+    pub async fn stop(&self) {
         self.sys_track.stop();
     }
 
@@ -229,7 +229,7 @@ impl MediaStreamTrack {
 
     /// Disposes of this [`MediaStreamTrack`].
     #[allow(clippy::unused_self)]
-    pub fn dispose(&self) {}
+    pub async fn dispose(&self) {}
 
     /// Sets handler for the [`ended`][1] event on underlying
     /// [`web_sys::MediaStreamTrack`].

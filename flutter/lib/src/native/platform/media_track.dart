@@ -83,8 +83,8 @@ void _setEnabled(MediaStreamTrack track, bool enabled) {
 }
 
 /// Stops the provided [MediaStreamTrack].
-void _stop(MediaStreamTrack track) {
-  track.stop();
+Object _stop(MediaStreamTrack track) {
+  return () => track.stop();
 }
 
 /// Indicates whether the provided [MediaStreamTrack] is enabled.
@@ -98,6 +98,6 @@ Object _clone(MediaStreamTrack track) {
 }
 
 /// Disposes of this [MediaStreamTrack].
-void _dispose(MediaStreamTrack track) {
-  track.dispose();
+Object _dispose(MediaStreamTrack track) {
+  return () => track.dispose();
 }
