@@ -181,6 +181,10 @@ impl Track {
 
     /// Invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
+    ///
+    /// # Panics
+    ///
+    /// Will panic if `track` is None.
     #[cfg(target_family = "wasm")]
     pub async fn stop(self) {
         if self.0.track.as_ref().unwrap().ready_state().await
