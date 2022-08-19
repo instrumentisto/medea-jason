@@ -407,7 +407,6 @@ jobs:
           make docker.up.e2e background=yes dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
           cd windows_test_staff
           vagrant up
-          make docker.down.e2e
         if: ${{ matrix.platform == 'windows' }}
 
       - name: Run e2e tests on Linux
