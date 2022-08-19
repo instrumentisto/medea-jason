@@ -698,35 +698,6 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
-# Run E2E windows tests of project in vagrant vm.
-#
-# Usage:
-#	make test.e2e.desktop.windows [(only=<regex>|only-tags=<tag-expression>)]
-#		[( [up=no] | up=yes
-#		          [( [dockerized=no]
-#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
-#		          [debug=(yes|no)]
-#		          [( [background=no]
-#		           | background=yes [log=(no|yes)] )]
-
-test.e2e.desktop.windows:
-ifeq ($(up),yes)
-ifeq ($(dockerized),yes)
-ifeq ($(rebuild),yes)
-	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
-endif
-endif
-	env $(docker-up-e2e-env) \
-	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
-		up $(if $(call eq,$(dockerized),yes),\
-		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
-endif
-	cd windows_test_staff/ && \
-	vagrant up
-ifeq ($(up),yes)
-	@make docker.down.e2e
-endif
-
 # Runs Flutter plugin integration tests on an attached device.
 #
 # Usage:
