@@ -298,10 +298,6 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ matrix.platform != 'windows'
-          && !contains(github.event.head_commit.message, '[fresh ci]') }}
-
       - uses: subosito/flutter-action@v2
 
       - name: Download medea-jason library
@@ -318,8 +314,10 @@ jobs:
 #          cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
 
       - run: make flutter.gen
-      - run: cd flutter\example && flutter build windows --target=../test/e2e/suite.dart --debug
-      - run: cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
+      - run: cd flutter\example && flutter build windows --target=..\test\e2e\suite.dart --debug
+      - run: pwd
+      - run: ls
+      - run: cp ..\..\flutter\example\build\windows\runner\Debug\* ..\..\windows_test_staff\test\
       - run: ls windows_test_staff/test/
 
       - uses: actions/upload-artifact@v3
