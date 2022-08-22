@@ -318,7 +318,7 @@ jobs:
       - run: pwd
       - run: ls flutter\example
       - run: ls flutter\example\build\windows\runner\Debug\
-      - run: cp ..\..\flutter\example\build\windows\runner\Debug\* ..\..\windows_test_staff\test\
+      - run: cp flutter\example\build\windows\runner\Debug\* windows_test_staff\test\
       - run: ls windows_test_staff/test/
 
       - uses: actions/upload-artifact@v3
