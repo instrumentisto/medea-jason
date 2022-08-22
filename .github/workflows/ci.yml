@@ -310,12 +310,17 @@ jobs:
           name: jason-lib-windows-${{ github.run_number }}
           path: ./flutter/windows/lib/x86_64-pc-windows-msvc/
 
-      - name: Build e2e test bundle for Windows
-        run: |
-          make flutter.gen
-          cd flutter\example
-          flutter build windows --target=../test/e2e/suite.dart --debug
-          cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
+#      - name: Build e2e test bundle for Windows
+#        run: |
+#          make flutter.gen
+#          cd flutter\example &&
+#          flutter build windows --target=../test/e2e/suite.dart --debug
+#          cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
+
+      - run: make flutter.gen
+      - run: cd flutter\example && flutter build windows --target=../test/e2e/suite.dart --debug
+      - run: cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
+      - run: ls windows_test_staff/test/
 
       - uses: actions/upload-artifact@v3
         with:
