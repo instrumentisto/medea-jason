@@ -316,7 +316,8 @@ jobs:
       - run: make flutter.gen
       - run: cd flutter\example && flutter build windows --target=..\test\e2e\suite.dart --debug
       - run: pwd
-      - run: ls
+      - run: ls flutter\example
+      - run: ls flutter\example\build\windows\runner\Debug\
       - run: cp ..\..\flutter\example\build\windows\runner\Debug\* ..\..\windows_test_staff\test\
       - run: ls windows_test_staff/test/
 
