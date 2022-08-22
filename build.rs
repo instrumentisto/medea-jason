@@ -10,6 +10,14 @@ fn main() {
         return;
     }
 
+    #[cfg(target_os = "macos")]
+    {
+        println!(
+            "cargo:rustc-link-arg=-Wl,-install_name,\
+             @rpath/libmedea_jason.dylib"
+        );
+    }
+
     if let Ok("wasm32-unknown-unknown") = env::var("TARGET").as_deref() {
         return;
     }
