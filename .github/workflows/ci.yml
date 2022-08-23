@@ -341,10 +341,6 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ matrix.platform != 'windows'
-                && env.CACHE == 'true' }}
-
       - uses: subosito/flutter-action@v2
 
       - name: Install Flutter Linux dependencies
