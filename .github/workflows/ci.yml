@@ -311,7 +311,6 @@ jobs:
           make flutter.gen
           cd flutter/example
           flutter build windows --target=../test/e2e/suite.dart --debug
-          cp ../../flutter/example/build/windows/runner/Debug/* ../../.github/windows_e2e/test
 
       - uses: actions/upload-artifact@v3
         with:
