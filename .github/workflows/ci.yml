@@ -306,20 +306,12 @@ jobs:
           name: jason-lib-windows-${{ github.run_number }}
           path: ./flutter/windows/lib/x86_64-pc-windows-msvc/
 
-#      - name: Build e2e test bundle for Windows
-#        run: |
-#          make flutter.gen
-#          cd flutter\example &&
-#          flutter build windows --target=../test/e2e/suite.dart --debug
-#          cp ../../flutter/example/build/windows/runner/Debug/* ../../windows_test_staff/test/
-
-      - run: make flutter.gen
-      - run: cd flutter\example && flutter build windows --target=..\test\e2e\suite.dart --debug
-      - run: pwd
-      - run: ls flutter\example
-      - run: ls flutter\example\build\windows\runner\Debug\
-      - run: cp flutter\example\build\windows\runner\Debug\* windows_test_staff\test\
-      - run: ls windows_test_staff/test/
+      - name: Build e2e test bundle for Windows
+        run: |
+          make flutter.gen
+          cd flutter/example
+          flutter build windows --target=../test/e2e/suite.dart --debug
+          cp ../../flutter/example/build/windows/runner/Debug/* ../../.github/windows_e2e/test
 
       - uses: actions/upload-artifact@v3
         with:
@@ -391,7 +383,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: windows-test-bundle-${{ github.run_number }}
-          path: ./windows_test_staff/test/
+          path: ./.github/windows_e2e/test/
         if: ${{ matrix.platform == 'windows' }}
 
       - name: Install vagrant
@@ -409,7 +401,7 @@ jobs:
       - name: Run e2e tests on Windows
         run: |
           make docker.up.e2e background=yes dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
-          cd windows_test_staff
+          cd .github/windows_e2e
           vagrant up
         if: ${{ matrix.platform == 'windows' }}
 
