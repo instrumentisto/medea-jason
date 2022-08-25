@@ -250,7 +250,7 @@ impl Receiver {
 
         drop(self.transceiver.replace(Some(transceiver)));
         if let Some(prev_track) = self.track.borrow_mut().as_mut() {
-            if prev_track.get_track().get().is_none() {
+            if prev_track.get_track().is_none() {
                 drop(prev_track.set_track(new_track));
                 prev_track.set_media_direction(self.media_direction.get());
             } else {
@@ -325,7 +325,7 @@ impl Receiver {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {
-            if track.get_track().get().is_some() {
+            if track.get_track().is_some() {
                 drop(self.peer_events_sender.unbounded_send(
                     PeerEvent::NewRemoteTrack {
                         sender_id: self.sender_id.clone(),
