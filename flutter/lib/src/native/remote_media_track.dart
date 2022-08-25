@@ -73,8 +73,8 @@ final _onMediaDirectionChanged = dl
 final _getTrack = dl
     .lookupFunction<_getTrack_C, _getTrack_Dart>('RemoteMediaTrack__get_track');
 
-final _waitTrack = dl
-    .lookupFunction<_waitTrack_C, _waitTrack_Dart>('RemoteMediaTrack__wait_track');
+final _waitTrack = dl.lookupFunction<_waitTrack_C, _waitTrack_Dart>(
+    'RemoteMediaTrack__wait_track');
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
 

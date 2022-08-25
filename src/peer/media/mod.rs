@@ -10,7 +10,7 @@ use std::{
     cell::RefCell,
     collections::HashMap,
     future::Future,
-    rc::{self, Rc},
+    rc::Rc,
 };
 
 use async_std::task;
@@ -23,14 +23,14 @@ use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{MediaType, MemberId};
 use proto::{
-    AudioSettings, MediaSourceKind, MediaType, TrackId, VideoSettings,
+    MediaSourceKind, TrackId
 };
 use tracerr::Traced;
 
 #[cfg(feature = "mockable")]
 use crate::media::{LocalTracksConstraints, RecvConstraints};
 use crate::{
-    media::{track::local, MediaKind, TrackConstraints},
+    media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
     utils::{Caused, Component},
