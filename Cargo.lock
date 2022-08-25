@@ -1851,7 +1851,6 @@ dependencies = [
  "medea-macro",
  "medea-reactive 0.1.1",
  "mockall",
- "once_cell",
  "serde",
  "serde_json",
  "simple_logger",

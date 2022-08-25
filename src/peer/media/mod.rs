@@ -6,12 +6,7 @@ pub mod receiver;
 pub mod sender;
 mod transitable_state;
 
-use std::{
-    cell::RefCell,
-    collections::HashMap,
-    future::Future,
-    rc::Rc,
-};
+use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
 
 use async_std::task;
 use derive_more::{Display, From};
@@ -22,9 +17,7 @@ use futures::{
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{MediaType, MemberId};
-use proto::{
-    MediaSourceKind, TrackId
-};
+use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
 #[cfg(feature = "mockable")]

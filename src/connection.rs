@@ -140,15 +140,26 @@ impl Connections {
                     if let Some(tracks) =
                         self.tasks.borrow_mut().remove(&local_peer_id)
                     {
-                        for tr in tracks {
-                            let pc = peer_conn.clone();
-                            platform::spawn(async move {
+                        let pc = peer_conn.clone();
+                        let fut = async move {
+                            log::warn!(
+                                "{local_peer_id} DEBUG 1 {:?}",
+                                tracks.len()
+                            );
+                            for tr in tracks.into_iter().filter(|a| {
+                                match &a.direction {
+                                    medea_client_api_proto::Direction::Send { receivers: _, mid: _ } => false,
+                                    medea_client_api_proto::Direction::Recv { sender: _, mid: _ } => true,
+                                }
+                            }) {
+                                log::warn!("DEBUG ITER");
                                 pc.media_connections
                                     .add_remote_pretrack(&tr)
                                     .await
                                     .unwrap();
-                            });
-                        }
+                            }
+                        };
+                        platform::spawn(fut);
                     }
                 };
                 connection

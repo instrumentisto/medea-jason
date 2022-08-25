@@ -2,10 +2,15 @@ use std::ptr;
 
 use dart_sys::Dart_Handle;
 
-use super::{propagate_panic, DartValueArg, ForeignClass, utils::{DartFuture, IntoDartFuture}};
+use super::{
+    propagate_panic,
+    utils::{DartFuture, IntoDartFuture},
+    DartValueArg, ForeignClass,
+};
 use crate::{
+    api::err::InternalException,
     media::{MediaDirection, MediaKind, MediaSourceKind},
-    platform::{self}, api::err::InternalException,
+    platform::{self},
 };
 
 #[cfg(feature = "mockable")]
@@ -26,7 +31,11 @@ pub unsafe extern "C" fn RemoteMediaTrack__get_track(
 ) -> DartValueArg<Option<Dart_Handle>> {
     propagate_panic(move || {
         DartValueArg::from(
-            this.as_ref().get_track().as_ref().map(|tr| tr.handle()),
+            this.as_ref()
+                .get_track()
+                .as_ref()
+                .as_ref()
+                .map(|tr| tr.handle()),
         )
     })
 }
@@ -38,10 +47,7 @@ pub unsafe extern "C" fn RemoteMediaTrack__wait_track(
 ) -> DartFuture<Result<Dart_Handle, InternalException>> {
     propagate_panic(move || {
         let this = this.as_ref().clone();
-        async move {
-            Ok(this.wait_track().await.handle())
-        }
-        .into_dart_future()
+        async move { Ok(this.wait_track().await.handle()) }.into_dart_future()
     })
 }
 

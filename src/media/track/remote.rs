@@ -19,9 +19,9 @@ use crate::{
 #[derive(Debug)]
 struct Inner {
     /// Underlying platform-specific [`platform::MediaStreamTrack`].
-    track: ObservableCell<Option<platform::MediaStreamTrack>>,
+    track: ObservableCell<Rc<Option<platform::MediaStreamTrack>>>,
 
-    //todo
+    // todo
     media_kind: MediaKind,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
@@ -81,7 +81,7 @@ impl Track {
     {
         let track = track.map(platform::MediaStreamTrack::from);
         let track = Self(Rc::new(Inner {
-            track: ObservableCell::new(track),
+            track: ObservableCell::new(Rc::new(track)),
             media_kind,
             media_source_kind,
             muted: ObservableCell::new(muted),
@@ -135,7 +135,7 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> Option<String> {
-        self.0.track.borrow().as_ref().map(|a| a.id())
+        self.0.track.borrow().as_ref().as_ref().map(|a| a.id())
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
@@ -163,7 +163,7 @@ impl Track {
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
     pub fn get_track(&self) -> Ref<'_, Option<platform::MediaStreamTrack>> {
-        self.0.track.borrow()
+        Ref::map(self.0.track.borrow(), |b| b.as_ref())
     }
 
     /// todo
@@ -171,18 +171,12 @@ impl Track {
         if self.0.track.borrow().as_ref().is_none() {
             self.0.track.when(|track| track.is_some()).await.unwrap();
         }
-        Ref::map(self.0.track.borrow(), |b| {
-            b.as_ref().unwrap()
-        })
-        
+        Ref::map(self.0.track.borrow(), |b| b.as_ref().as_ref().unwrap())
     }
 
     /// todo
     #[must_use]
-    pub fn set_track(
-        &mut self,
-        track: platform::MediaStreamTrack,
-    ) {
+    pub fn set_track(&mut self, track: platform::MediaStreamTrack) {
         track.on_ended({
             let weak_inner = Rc::downgrade(&self.0);
             Some(move || {
@@ -191,7 +185,7 @@ impl Track {
                 }
             })
         });
-        self.0.track.set(Some(track));
+        self.0.track.set(Rc::new(Some(track)));
     }
 
     /// Indicate whether this [`Track`] is muted.
