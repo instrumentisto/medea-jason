@@ -292,14 +292,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Run e2e test on windows
+        # TODO: Run e2e test on Windows and macOS
         include:
           - platform: linux
             os: ubuntu-22.04
             lib_path: ./flutter/linux/lib/
-          - platform: macos
-            os: macos-latest
-            lib_path: ./flutter/macos/lib/
+#          - platform: macos
+#            os: macos-latest
+#            lib_path: ./flutter/macos/lib/
+#          - platform: windows
+#            os: windows-latest
+#            lib_path: ./flutter/windows/lib/
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
