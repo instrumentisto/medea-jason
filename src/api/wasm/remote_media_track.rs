@@ -24,7 +24,7 @@ impl RemoteMediaTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
     #[must_use]
-    pub fn get_track(&self) -> Option<web_sys::MediaStreamTrack> {
+    pub fn get_track(&self) -> web_sys::MediaStreamTrack {
         Clone::clone(self.0.get_track())
     }
 
