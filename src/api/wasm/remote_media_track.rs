@@ -4,6 +4,10 @@
 
 use derive_more::{From, Into};
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
+use js_sys::Promise;
+
+
 
 use crate::{
     api::{MediaDirection, MediaKind, MediaSourceKind},
@@ -24,8 +28,18 @@ impl RemoteMediaTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
     #[must_use]
-    pub fn get_track(&self) -> web_sys::MediaStreamTrack {
-        Clone::clone(self.0.get_track())
+    pub fn get_track(&self) -> Option<web_sys::MediaStreamTrack> {
+        Some(Clone::clone(self.0.get_track().as_ref().get()?.as_ref()))
+    }
+
+    /// Returns the underlying [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
+    pub fn wait_track(&self) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            Ok(JsValue::from(Clone::clone(this.wait_track().await.as_ref().get().unwrap().as_ref())))
+        })
     }
 
     /// Indicates whether this [`RemoteMediaTrack`] is muted.
