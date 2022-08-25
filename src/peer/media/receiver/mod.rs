@@ -232,17 +232,11 @@ impl Receiver {
         new_track: platform::MediaStreamTrack,
     ) {
         if let Some(old_track) = self.track.borrow().as_ref() {
-            if old_track.id() == new_track.id() {
+            if old_track.id() == Some(new_track.id()) {
                 return;
             }
         }
-
-        let new_track = remote::Track::new(
-            new_track,
-            self.caps.media_source_kind(),
-            self.muted.get(),
-            self.media_direction.get(),
-        );
+        let media_kind = new_track.kind();
 
         if self.enabled_individual.get() {
             transceiver
@@ -255,10 +249,40 @@ impl Receiver {
         }
 
         drop(self.transceiver.replace(Some(transceiver)));
-        if let Some(prev_track) = self.track.replace(Some(new_track)) {
-            prev_track.stop().await;
-        };
-        self.maybe_notify_track().await;
+        if let Some(prev_track) = self.track.borrow_mut().as_mut() {
+            if prev_track.get_track().get().is_none() {
+                drop(prev_track.set_track(new_track));
+                prev_track.set_media_direction(self.media_direction.get());
+            } else {
+                let new_track_ = remote::Track::new(
+                    Some(new_track),
+                    self.caps.media_source_kind(),
+                    self.muted.get(),
+                    self.media_direction.get(),
+                    media_kind,
+                );
+                if let Some(prev_track) = self.track.replace(Some(new_track_)) {
+                    prev_track.stop().await;
+                };
+                self.maybe_notify_track().await;
+            }
+        }
+    }
+
+    /// NO
+    pub async fn set_remote_pretrack(&self) {
+        let new_track = remote::Track::new(
+            None,
+            self.caps().media_source_kind(),
+            false,
+            self.media_direction.get(),
+            self.caps().media_kind(),
+        );
+
+        if self.track.borrow().is_none() {
+            drop(self.track.replace(Some(new_track)));
+            self.maybe_notify_track_gg();
+        }
     }
 
     /// Updates [`MediaDirection`] of this [`Receiver`].
@@ -301,13 +325,31 @@ impl Receiver {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {
+            if track.get_track().get().is_some() {
+                drop(self.peer_events_sender.unbounded_send(
+                    PeerEvent::NewRemoteTrack {
+                        sender_id: self.sender_id.clone(),
+                        track: track.clone(),
+                    },
+                ));
+                self.is_track_notified.set(true);
+            }
+        }
+    }
+
+    /// todo
+    fn maybe_notify_track_gg(&self) {
+        if self.is_track_notified.get() {
+            return;
+        }
+        if let Some(track) = self.track.borrow().as_ref() {
+            self.is_track_notified.set(true);
             drop(self.peer_events_sender.unbounded_send(
                 PeerEvent::NewRemoteTrack {
                     sender_id: self.sender_id.clone(),
                     track: track.clone(),
                 },
             ));
-            self.is_track_notified.set(true);
         }
     }
 }

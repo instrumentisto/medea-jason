@@ -246,7 +246,7 @@ pub struct PeerConnection {
 
     /// [`sender::Component`]s and [`receiver::Component`]s of this
     /// [`platform::RtcPeerConnection`].
-    media_connections: Rc<MediaConnections>,
+    pub media_connections: Rc<MediaConnections>,
 
     /// [`MediaManager`] that will be used to acquire [`local::Track`]s.
     media_manager: Rc<MediaManager>,

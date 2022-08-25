@@ -12,8 +12,10 @@ use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
     StreamExt as _,
 };
-use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
+use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId, Track};
 use tracerr::Traced;
+
+use crate::peer::PeerConnection;
 
 use crate::{
     api,
@@ -66,6 +68,9 @@ pub struct Connections {
     /// Remote [`MemberId`] to [`Connection`] with that `Member`.
     connections: RefCell<HashMap<MemberId, Connection>>,
 
+    /// todo
+    tasks: RefCell<HashMap<PeerId, Vec<Track>>>,
+
     /// Global constraints to the [`remote::Track`]s of the Jason.
     room_recv_constraints: Rc<RecvConstraints>,
 
@@ -75,10 +80,16 @@ pub struct Connections {
 }
 
 impl Connections {
+    /// todo
+    pub fn add_pre_tracks(&self, peer_id: PeerId, tracks: Vec<Track>) {
+        drop(self.tasks.borrow_mut().insert(peer_id, tracks));
+    }
+
     /// Creates new [`Connections`].
     pub fn new(room_recv_constraints: Rc<RecvConstraints>) -> Self {
         Self {
             peer_members: RefCell::default(),
+            tasks: RefCell::default(),
             connections: RefCell::default(),
             room_recv_constraints,
             on_new_connection: platform::Callback::default(),
@@ -103,6 +114,7 @@ impl Connections {
         &self,
         local_peer_id: PeerId,
         remote_member_id: &MemberId,
+        peer_conn: Rc<PeerConnection>,
     ) -> Connection {
         let conn = self.connections.borrow().get(remote_member_id).cloned();
         conn.map_or_else(
@@ -124,6 +136,21 @@ impl Connections {
                     .or_default()
                     .insert(remote_member_id.clone());
 
+                {
+                    if let Some(tracks) =
+                        self.tasks.borrow_mut().remove(&local_peer_id)
+                    {
+                        for tr in tracks {
+                            let pc = peer_conn.clone();
+                            platform::spawn(async move {
+                                pc.media_connections
+                                    .add_remote_pretrack(&tr)
+                                    .await
+                                    .unwrap();
+                            });
+                        }
+                    }
+                };
                 connection
             },
             |c| c,

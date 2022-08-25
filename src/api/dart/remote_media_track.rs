@@ -1,13 +1,12 @@
-use std::ptr;
+use std::{ptr, borrow::Borrow};
 
 use dart_sys::Dart_Handle;
 
+use super::{propagate_panic, DartValueArg, ForeignClass, utils::{DartFuture, IntoDartFuture}};
 use crate::{
     media::{MediaDirection, MediaKind, MediaSourceKind},
-    platform,
+    platform::{self}, api::err::InternalException,
 };
-
-use super::{propagate_panic, ForeignClass};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::RemoteMediaTrack;
@@ -16,6 +15,7 @@ pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
 
+// todo
 /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
 /// [`RemoteMediaTrack`].
 ///
@@ -23,8 +23,26 @@ impl ForeignClass for RemoteMediaTrack {}
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     this: ptr::NonNull<RemoteMediaTrack>,
-) -> Dart_Handle {
-    propagate_panic(move || this.as_ref().get_track().handle())
+) -> DartValueArg<Option<Dart_Handle>> {
+    propagate_panic(move || {
+        DartValueArg::from(
+            this.as_ref().get_track().borrow().get().map(|tr| tr.handle()),
+        )
+    })
+}
+
+// todo
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__wait_track(
+    this: ptr::NonNull<RemoteMediaTrack>,
+) -> DartFuture<Result<Dart_Handle, InternalException>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+        async move {
+            Ok(this.wait_track().await.get().unwrap().handle())
+        }
+        .into_dart_future()
+    })
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.

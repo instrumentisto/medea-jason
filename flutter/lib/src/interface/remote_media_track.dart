@@ -33,7 +33,10 @@ abstract class RemoteMediaTrack implements PlatformHandle {
 
   /// Returns the underlying [webrtc.MediaStreamTrack] of this
   /// [RemoteMediaTrack].
-  webrtc.MediaStreamTrack getTrack();
+  webrtc.MediaStreamTrack? getTrack();
+
+  //todo
+  Future<webrtc.MediaStreamTrack> waitTrack();
 
   /// Returns the current general [TrackMediaDirection] of this
   /// [RemoteMediaTrack].
