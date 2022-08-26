@@ -1174,6 +1174,7 @@ async fn new_remote_track() {
             Rc::new(rcvr_peer_state),
         );
 
+        rcvr_peer.state().when_all_tracks_created().await;
         rcvr_peer.state().stabilize_all();
         rcvr_peer.state().when_all_updated().await;
 
