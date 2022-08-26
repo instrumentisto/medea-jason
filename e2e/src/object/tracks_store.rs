@@ -219,7 +219,7 @@ impl<T> Object<TracksStore<T>> {
                 async (store) => {{
                     let count = 0;
                     for (track of store.tracks) {{
-                        let t = await track.track.wait_track();
+                        let t = track.track.get_track();
                         if (t.muted == {muted} &&
                             track.stopped == {stopped})
                         {{

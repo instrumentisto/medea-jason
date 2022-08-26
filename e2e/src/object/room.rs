@@ -364,8 +364,9 @@ impl Object<Room> {
                         closeListener: closeListener,
                     };
                     conn.on_remote_track_added(async (t) => {
-                        if (t.media_source_kind() != MediaSourceKind.Display) {
-                            await track.wait_track();
+                        if (t.media_source_kind() == 0)
+                        {
+                            await t.wait_track();
                             let track = {
                                 track: t,
                                 on_enabled_fire_count: 0,
