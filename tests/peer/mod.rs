@@ -1239,14 +1239,22 @@ async fn new_remote_track() {
                                 if result.has_audio {
                                     return Err(MediaKind::Audio);
                                 } else {
-                                    result.has_audio = true;
+                                    result.has_audio =
+                                    match timeout(300, track.wait_track()).await {
+                                        Ok(_) => true,
+                                        _ => false,
+                                    };
                                 }
                             }
                             MediaKind::Video => {
                                 if result.has_video {
                                     return Err(MediaKind::Video);
                                 } else {
-                                    result.has_video = true;
+                                    result.has_video =
+                                    match timeout(300, track.wait_track()).await {
+                                        Ok(_) => true,
+                                        _ => false,
+                                    };
                                 }
                             }
                         }
