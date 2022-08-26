@@ -1582,8 +1582,6 @@ impl EventHandler for InnerRoom {
             Some(negotiation_role),
         );
 
-        self.connections.add_pre_tracks(peer_id, tracks.clone());
-
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
         }

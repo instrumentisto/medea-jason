@@ -20,8 +20,7 @@ pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
 
-// todo
-/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
+/// Returns a [`DartValueArg`] to the underlying [`MediaStreamTrack`] of this
 /// [`RemoteMediaTrack`].
 ///
 /// [`MediaStreamTrack`]: platform::MediaStreamTrack
@@ -40,7 +39,10 @@ pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     })
 }
 
-// todo
+/// Returns a [`DartFuture`] to the underlying [`MediaStreamTrack`] of this
+/// [`RemoteMediaTrack`].
+///
+/// [`MediaStreamTrack`]: platform::MediaStreamTrack
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__wait_track(
     this: ptr::NonNull<RemoteMediaTrack>,
@@ -160,6 +162,7 @@ mod mock {
         },
         platform,
     };
+    use std::cell::Ref;
 
     #[derive(Clone, Debug)]
     pub struct RemoteMediaTrack(pub u8);
@@ -225,7 +228,11 @@ mod mock {
         }
 
         #[must_use]
-        pub fn get_track(&self) -> platform::MediaStreamTrack {
+        pub fn get_track(&self) -> Ref<'_, Option<platform::MediaStreamTrack>> {
+            unreachable!()
+        }
+
+        pub async fn wait_track(&self) -> Ref<'_, platform::MediaStreamTrack> {
             unreachable!()
         }
     }

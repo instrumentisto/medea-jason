@@ -21,7 +21,7 @@ struct Inner {
     /// Underlying platform-specific [`platform::MediaStreamTrack`].
     track: ObservableCell<Rc<Option<platform::MediaStreamTrack>>>,
 
-    // todo
+    /// Underlying [`platform::MediaStreamTrack`] media kind.
     media_kind: MediaKind,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
@@ -135,7 +135,12 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> Option<String> {
-        self.0.track.borrow().as_ref().as_ref().map(|a| a.id())
+        self.0
+            .track
+            .borrow()
+            .as_ref()
+            .as_ref()
+            .map(platform::MediaStreamTrack::id)
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
@@ -153,30 +158,39 @@ impl Track {
     /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
     pub async fn stop(self) {
-        if let Some(track) = self.0.track.borrow().as_ref() {
+        if let Some(track) = self.0.track.get().as_ref() {
             if track.ready_state().await == MediaStreamTrackState::Live {
                 self.0.on_stopped.call0();
             }
         }
     }
 
-    /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
+    /// Returns the underlying [`Option<platform::MediaStreamTrack>`] of this
+    /// [`Track`].
     #[must_use]
     pub fn get_track(&self) -> Ref<'_, Option<platform::MediaStreamTrack>> {
         Ref::map(self.0.track.borrow(), |b| b.as_ref())
     }
 
-    /// todo
+    /// Waits and returns the underlying [`platform::MediaStreamTrack`] of this
+    /// [`Track`].
+    ///
+    /// # Panics
+    ///
+    /// Unwrapping `MediaStreamTrack` conversion is OK here, because its
+    /// values are not expected to be `None`.
     pub async fn wait_track(&self) -> Ref<'_, platform::MediaStreamTrack> {
         if self.0.track.borrow().as_ref().is_none() {
-            self.0.track.when(|track| track.is_some()).await.unwrap();
+            let _ = self.0.track.when(|track| track.is_some()).await;
         }
-        Ref::map(self.0.track.borrow(), |b| b.as_ref().as_ref().unwrap())
+        Ref::map(self.0.track.borrow(), |track| {
+            track.as_ref().as_ref().unwrap()
+        })
     }
 
-    /// todo
-    #[must_use]
-    pub fn set_track(&mut self, track: platform::MediaStreamTrack) {
+    /// Sets the underlying [`platform::MediaStreamTrack`] of this
+    /// [`Track`].
+    pub fn set_track(&self, track: platform::MediaStreamTrack) {
         track.on_ended({
             let weak_inner = Rc::downgrade(&self.0);
             Some(move || {

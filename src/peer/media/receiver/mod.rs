@@ -249,28 +249,32 @@ impl Receiver {
         }
 
         drop(self.transceiver.replace(Some(transceiver)));
-        if let Some(prev_track) = self.track.borrow_mut().as_mut() {
-            if prev_track.get_track().is_none() {
-                drop(prev_track.set_track(new_track));
-                prev_track.set_media_direction(self.media_direction.get());
-            } else {
-                let new_track_ = remote::Track::new(
-                    Some(new_track),
-                    self.caps.media_source_kind(),
-                    self.muted.get(),
-                    self.media_direction.get(),
-                    media_kind,
-                );
-                if let Some(prev_track) = self.track.replace(Some(new_track_)) {
-                    prev_track.stop().await;
-                };
-                self.maybe_notify_track().await;
+
+        let some = self.track.borrow().as_ref().is_some();
+        if some {
+            if let Some(prev_track) = self.track.borrow().as_ref() {
+                if prev_track.get_track().is_none() {
+                    prev_track.set_track(new_track);
+                    prev_track.set_media_direction(self.media_direction.get());
+                }
             }
+        } else {
+            let new_track_ = remote::Track::new(
+                Some(new_track),
+                self.caps.media_source_kind(),
+                self.muted.get(),
+                self.media_direction.get(),
+                media_kind,
+            );
+            if let Some(prev_track_) = self.track.replace(Some(new_track_)) {
+                prev_track_.stop().await;
+            };
+            self.maybe_notify_track().await;
         }
     }
 
     /// NO
-    pub async fn set_remote_pretrack(&self) {
+    pub fn set_remote_pre_track(&self) {
         let new_track = remote::Track::new(
             None,
             self.caps().media_source_kind(),
@@ -281,7 +285,7 @@ impl Receiver {
 
         if self.track.borrow().is_none() {
             drop(self.track.replace(Some(new_track)));
-            self.maybe_notify_track_gg();
+            self.maybe_notify_pre_track();
         }
     }
 
@@ -337,8 +341,9 @@ impl Receiver {
         }
     }
 
-    /// todo
-    fn maybe_notify_track_gg(&self) {
+    /// Emits empty [`PeerEvent::NewRemoteTrack`] if [`Receiver`]
+    /// and has not notified yet.
+    fn maybe_notify_pre_track(&self) {
         if self.is_track_notified.get() {
             return;
         }

@@ -8,7 +8,6 @@ mod transitable_state;
 
 use std::{cell::RefCell, collections::HashMap, future::Future, rc::Rc};
 
-use async_std::task;
 use derive_more::{Display, From};
 use futures::{
     channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
@@ -30,7 +29,6 @@ use crate::{
 };
 
 use super::tracks_request::TracksRequest;
-use medea_client_api_proto::Track;
 
 #[doc(inline)]
 pub use self::{
@@ -636,23 +634,6 @@ impl MediaConnections {
         } else {
             Err(mid)
         }
-    }
-
-    /// NOPE.
-    pub async fn add_remote_pretrack(
-        &self,
-        track: &Track,
-    ) -> Result<(), String> {
-        // todo
-        while self.0.borrow().receivers.get(&track.id).is_none() {
-            task::sleep(std::time::Duration::from_millis(100)).await;
-        }
-
-        let rc = self.0.borrow().receivers.get(&track.id).map(Component::obj);
-        if let Some(rcvr) = rc {
-            rcvr.set_remote_pretrack().await;
-        }
-        Ok(())
     }
 
     /// Iterates over all [`Receiver`]s with [`mid`] and without
