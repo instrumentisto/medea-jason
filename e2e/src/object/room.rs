@@ -409,7 +409,6 @@ impl Object<Room> {
                                     }
                                     track.onDisabledSubs = [];
                                 }
-    
                                 for (sub of track.onMediaDirectionChangedSubs) {
                                     sub();
                                 }

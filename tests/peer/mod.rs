@@ -1240,10 +1240,12 @@ async fn new_remote_track() {
                                     return Err(MediaKind::Audio);
                                 } else {
                                     result.has_audio =
-                                    match timeout(300, track.wait_track()).await {
-                                        Ok(_) => true,
-                                        _ => false,
-                                    };
+                                        match timeout(500, track.wait_track())
+                                            .await
+                                        {
+                                            Ok(_) => true,
+                                            _ => false,
+                                        };
                                 }
                             }
                             MediaKind::Video => {
@@ -1251,10 +1253,12 @@ async fn new_remote_track() {
                                     return Err(MediaKind::Video);
                                 } else {
                                     result.has_video =
-                                    match timeout(300, track.wait_track()).await {
-                                        Ok(_) => true,
-                                        _ => false,
-                                    };
+                                        match timeout(500, track.wait_track())
+                                            .await
+                                        {
+                                            Ok(_) => true,
+                                            _ => false,
+                                        };
                                 }
                             }
                         }

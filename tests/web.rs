@@ -315,7 +315,7 @@ async fn get_video_track() -> api::RemoteMediaTrack {
         MediaSourceKind::Device,
         false,
         MediaDirection::SendRecv,
-        media_kind
+        media_kind,
     )
     .into()
 }
@@ -332,7 +332,7 @@ async fn get_audio_track() -> api::RemoteMediaTrack {
         MediaSourceKind::Device,
         false,
         MediaDirection::SendRecv,
-        media_kind
+        media_kind,
     )
     .into()
 }
