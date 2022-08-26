@@ -1105,6 +1105,193 @@ async fn reset_transition_timers() {
     timeout(600, all_enabled).await.unwrap();
 }
 
+#[wasm_bindgen_test]
+async fn new_remote_track() {
+    #[derive(Debug, PartialEq)]
+    struct FinalTrack {
+        has_audio: bool,
+        has_video: bool,
+    }
+    async fn helper(
+        audio_tx_enabled: bool,
+        video_tx_enabled: bool,
+        audio_rx_enabled: bool,
+        video_rx_enabled: bool,
+    ) -> Result<FinalTrack, MediaKind> {
+        let (tx1, _rx1) = mpsc::unbounded();
+        let (tx2, mut rx2) = mpsc::unbounded();
+        let manager = Rc::new(MediaManager::default());
+
+        let tx_caps = LocalTracksConstraints::default();
+        tx_caps.set_media_state(
+            media_exchange_state::Stable::from(audio_tx_enabled).into(),
+            MediaKind::Audio,
+            None,
+        );
+        tx_caps.set_media_state(
+            media_exchange_state::Stable::from(video_tx_enabled).into(),
+            MediaKind::Video,
+            None,
+        );
+
+        let sender_peer_state =
+            peer::State::new(PeerId(1), Vec::new(), false, None);
+        let recv_constraints = Rc::new(RecvConstraints::default());
+        let sender_peer = peer::Component::new(
+            peer::PeerConnection::new(
+                &sender_peer_state,
+                tx1,
+                manager.clone(),
+                tx_caps.clone(),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
+            )
+            .await
+            .unwrap(),
+            Rc::new(sender_peer_state),
+        );
+
+        let (audio_track, video_track) = get_test_unrequired_tracks();
+        sender_peer
+            .state()
+            .insert_track(&audio_track, tx_caps.clone());
+        sender_peer
+            .state()
+            .insert_track(&video_track, tx_caps.clone());
+        sender_peer
+            .state()
+            .set_negotiation_role(NegotiationRole::Offerer)
+            .await;
+
+        let sender_offer =
+            sender_peer.state().when_local_sdp_updated().await.unwrap();
+
+        let rcv_caps = Rc::new(RecvConstraints::default());
+        rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio, None);
+        rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video, None);
+
+        let rcvr_peer_state =
+            peer::State::new(PeerId(2), Vec::new(), false, None);
+        let rcvr_peer = peer::Component::new(
+            peer::PeerConnection::new(
+                &rcvr_peer_state,
+                tx2,
+                manager,
+                LocalTracksConstraints::default(),
+                Rc::new(Connections::new(Rc::clone(&rcv_caps))),
+                rcv_caps,
+            )
+            .await
+            .unwrap(),
+            Rc::new(rcvr_peer_state),
+        );
+
+        rcvr_peer.state().insert_track(
+            &Track {
+                id: TrackId(1),
+                direction: Direction::Recv {
+                    sender: MemberId::from("whatever"),
+                    mid: Some(String::from("0")),
+                },
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            },
+            LocalTracksConstraints::default(),
+        );
+        rcvr_peer.state().insert_track(
+            &Track {
+                id: TrackId(2),
+                direction: Direction::Recv {
+                    sender: MemberId::from("whatever"),
+                    mid: Some(String::from("1")),
+                },
+                media_type: MediaType::Video(VideoSettings {
+                    required: true,
+                    source_kind: MediaSourceKind::Device,
+                }),
+            },
+            LocalTracksConstraints::default(),
+        );
+
+        rcvr_peer.state().when_all_tracks_created().await;
+        rcvr_peer.state().stabilize_all();
+        rcvr_peer.state().when_all_updated().await;
+
+        rcvr_peer
+            .state()
+            .set_negotiation_role(NegotiationRole::Answerer(sender_offer))
+            .await;
+
+        let answer = rcvr_peer.state().when_local_sdp_updated().await.unwrap();
+
+        sender_peer.state().set_remote_sdp(answer);
+        sender_peer.state().when_remote_sdp_processed().await;
+
+        let mut result = FinalTrack {
+            has_audio: false,
+            has_video: false,
+        };
+        loop {
+            match timeout(300, rx2.next()).await {
+                Ok(Some(event)) => {
+                    if let PeerEvent::NewRemoteTrack { track, .. } = event {
+                        match track.kind() {
+                            MediaKind::Audio => {
+                                if result.has_audio {
+                                    return Err(MediaKind::Audio);
+                                } else {
+                                    result.has_audio = true;
+                                }
+                            }
+                            MediaKind::Video => {
+                                if result.has_video {
+                                    return Err(MediaKind::Video);
+                                } else {
+                                    result.has_video = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                Ok(None) | Err(_) => {
+                    break;
+                }
+            }
+        }
+        Ok(result)
+    }
+
+    fn bit_at(input: u32, n: u8) -> bool {
+        (input >> n) & 1 != 0
+    }
+
+    for i in 0..16 {
+        let audio_tx_enabled = bit_at(i, 0);
+        let video_tx_enabled = bit_at(i, 1);
+        let audio_rx_enabled = bit_at(i, 2);
+        let video_rx_enabled = bit_at(i, 3);
+
+        assert_eq!(
+            helper(
+                audio_tx_enabled,
+                video_tx_enabled,
+                audio_rx_enabled,
+                video_rx_enabled
+            )
+            .await
+            .unwrap(),
+            FinalTrack {
+                has_audio: audio_tx_enabled && audio_rx_enabled,
+                has_video: video_tx_enabled && video_rx_enabled,
+            },
+            "{} {} {} {}",
+            audio_tx_enabled,
+            video_tx_enabled,
+            audio_rx_enabled,
+            video_rx_enabled,
+        );
+    }
+}
+
 mod ice_restart {
     use medea_jason::utils::{AsProtoState, SynchronizableState};
 
