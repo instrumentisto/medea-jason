@@ -19,17 +19,22 @@ bitflags! {
         /// [`inactive` direction][1] of transceiver.
         ///
         /// [1]: https://tinyurl.com/y2zslyw2
-        const INACTIVE = 0b00;
+        const INACTIVE = 0b000;
 
         /// [`sendonly` direction][1] of transceiver.
         ///
         /// [1]: https://tinyurl.com/y6y2ye97
-        const SEND = 0b01;
+        const SEND = 0b001;
 
         /// [`recvonly` direction][1] of transceiver.
         ///
         /// [1]: https://tinyurl.com/y2nlxpzf
-        const RECV = 0b10;
+        const RECV = 0b010;
+
+        /// [`stopped` direction][1] of transceiver.
+        ///
+        /// [1]: https://tinyurl.com/39ddy5z2
+        const STOPPED = 0b100;
     }
 }
 
@@ -37,8 +42,9 @@ bitflags! {
 impl From<TransceiverDirection> for i64 {
     fn from(from: TransceiverDirection) -> Self {
         use TransceiverDirection as D;
-
-        if from.is_all() {
+        if from.contains(D::STOPPED) {
+            4
+        } else if from.contains(D::SEND) && from.contains(D::RECV) {
             0
         } else if from.contains(D::SEND) {
             1
@@ -73,7 +79,7 @@ impl From<TransceiverDirection> for RtcRtpTransceiverDirection {
     fn from(direction: TransceiverDirection) -> Self {
         use TransceiverDirection as D;
 
-        if direction.is_all() {
+        if direction.contains(D::RECV) && direction.contains(D::SEND) {
             Self::Sendrecv
         } else if direction.contains(D::RECV) {
             Self::Recvonly
@@ -98,10 +104,11 @@ impl From<&DirectionProto> for TransceiverDirection {
 impl From<i32> for TransceiverDirection {
     fn from(i: i32) -> Self {
         match i {
-            0 => Self::all(),
+            0 => Self::SEND | Self::RECV,
             1 => Self::SEND,
             2 => Self::RECV,
             3 => Self::INACTIVE,
+            4 => Self::STOPPED,
             _ => {
                 unreachable!("Unknown `TransceiverDirection` enum variant {i}")
             }
@@ -120,8 +127,12 @@ mod tests {
         for (init, enable_dir, result) in [
             (D::INACTIVE, D::SEND, D::SEND),
             (D::INACTIVE, D::RECV, D::RECV),
-            (D::SEND, D::RECV, D::all()),
-            (D::RECV, D::SEND, D::all()),
+            (D::SEND, D::RECV, D::SEND | D::RECV),
+            (D::RECV, D::SEND, D::SEND | D::RECV),
+            (D::RECV, D::STOPPED, D::STOPPED),
+            (D::SEND, D::STOPPED, D::STOPPED),
+            (D::STOPPED, D::RECV, D::STOPPED),
+            (D::STOPPED, D::SEND, D::STOPPED),
         ] {
             assert_eq!(init | enable_dir, result);
         }
@@ -134,8 +145,10 @@ mod tests {
         for (init, disable_dir, result) in [
             (D::SEND, D::SEND, D::INACTIVE),
             (D::RECV, D::RECV, D::INACTIVE),
-            (D::all(), D::SEND, D::RECV),
-            (D::all(), D::RECV, D::SEND),
+            (D::SEND | D::RECV, D::SEND, D::RECV),
+            (D::SEND | D::RECV, D::RECV, D::SEND),
+            (D::STOPPED, D::RECV, D::STOPPED),
+            (D::STOPPED, D::SEND, D::STOPPED),
         ] {
             assert_eq!(init - disable_dir, result);
         }
@@ -149,7 +162,7 @@ mod tests {
         for (trnscvr_dir, sys_dir) in [
             (D::SEND, S::Sendonly),
             (D::RECV, S::Recvonly),
-            (D::all(), S::Sendrecv),
+            (D::SEND | D::RECV, S::Sendrecv),
             (D::INACTIVE, S::Inactive),
         ] {
             assert_eq!(S::from(trnscvr_dir), sys_dir);
@@ -164,7 +177,7 @@ mod tests {
         for (sys_dir, trnscvr_dir) in [
             (S::Sendonly, D::SEND),
             (S::Recvonly, D::RECV),
-            (S::Sendrecv, D::all()),
+            (S::Sendrecv, D::SEND | D::RECV),
             (S::Inactive, D::INACTIVE),
         ] {
             assert_eq!(D::from(sys_dir), trnscvr_dir);
