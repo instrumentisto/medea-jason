@@ -1230,7 +1230,6 @@ async fn new_remote_track() {
             has_audio: false,
             has_video: false,
         };
-        let mut video_count = 0;
         loop {
             match timeout(300, rx2.next()).await {
                 Ok(Some(event)) => {
@@ -1244,11 +1243,10 @@ async fn new_remote_track() {
                                 }
                             }
                             MediaKind::Video => {
-                                video_count += 1;
-                                if video_count > 2 {
+                                if result.has_video {
                                     return Err(MediaKind::Video);
                                 } else {
-                                    result.has_video = video_count == 2;
+                                    result.has_video = true;
                                 }
                             }
                         }
