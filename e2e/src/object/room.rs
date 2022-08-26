@@ -337,6 +337,7 @@ impl Object<Room> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
+    #[allow(clippy::too_many_lines)]
     pub async fn connections_store(
         &self,
     ) -> Result<Object<ConnectionStore>, Error> {
@@ -362,7 +363,7 @@ impl Object<Room> {
                         tracksStore: tracksStore,
                         closeListener: closeListener,
                     };
-                    conn.on_remote_track_added((t) => {
+                    conn.on_remote_track_added(async (t) => {
                         if (t.media_source_kind() != MediaSourceKind.Display) {
                             await track.wait_track();
                             let track = {

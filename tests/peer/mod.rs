@@ -1112,24 +1112,19 @@ async fn new_remote_track() {
         has_audio: bool,
         has_video: bool,
     }
-    async fn helper(
-        audio_tx_enabled: bool,
-        video_tx_enabled: bool,
-        audio_rx_enabled: bool,
-        video_rx_enabled: bool,
-    ) -> Result<FinalTrack, MediaKind> {
+    async fn helper() -> Result<FinalTrack, MediaKind> {
         let (tx1, _rx1) = mpsc::unbounded();
         let (tx2, mut rx2) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
 
         let tx_caps = LocalTracksConstraints::default();
         tx_caps.set_media_state(
-            media_exchange_state::Stable::from(audio_tx_enabled).into(),
+            media_exchange_state::Stable::from(false).into(),
             MediaKind::Audio,
             None,
         );
         tx_caps.set_media_state(
-            media_exchange_state::Stable::from(video_tx_enabled).into(),
+            media_exchange_state::Stable::from(false).into(),
             MediaKind::Video,
             None,
         );
@@ -1151,13 +1146,6 @@ async fn new_remote_track() {
             Rc::new(sender_peer_state),
         );
 
-        let (audio_track, video_track) = get_test_unrequired_tracks();
-        sender_peer
-            .state()
-            .insert_track(&audio_track, tx_caps.clone());
-        sender_peer
-            .state()
-            .insert_track(&video_track, tx_caps.clone());
         sender_peer
             .state()
             .set_negotiation_role(NegotiationRole::Offerer)
@@ -1167,8 +1155,8 @@ async fn new_remote_track() {
             sender_peer.state().when_local_sdp_updated().await.unwrap();
 
         let rcv_caps = Rc::new(RecvConstraints::default());
-        rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio, None);
-        rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video, None);
+        rcv_caps.set_enabled(false, MediaKind::Audio, None);
+        rcv_caps.set_enabled(false, MediaKind::Video, None);
 
         let rcvr_peer_state =
             peer::State::new(PeerId(2), Vec::new(), false, None);
@@ -1184,32 +1172,6 @@ async fn new_remote_track() {
             .await
             .unwrap(),
             Rc::new(rcvr_peer_state),
-        );
-
-        rcvr_peer.state().insert_track(
-            &Track {
-                id: TrackId(1),
-                direction: Direction::Recv {
-                    sender: MemberId::from("whatever"),
-                    mid: Some(String::from("0")),
-                },
-                media_type: MediaType::Audio(AudioSettings { required: true }),
-            },
-            LocalTracksConstraints::default(),
-        );
-        rcvr_peer.state().insert_track(
-            &Track {
-                id: TrackId(2),
-                direction: Direction::Recv {
-                    sender: MemberId::from("whatever"),
-                    mid: Some(String::from("1")),
-                },
-                media_type: MediaType::Video(VideoSettings {
-                    required: true,
-                    source_kind: MediaSourceKind::Device,
-                }),
-            },
-            LocalTracksConstraints::default(),
         );
 
         rcvr_peer.state().when_all_tracks_created().await;
@@ -1239,27 +1201,11 @@ async fn new_remote_track() {
                                 if result.has_audio {
                                     return Err(MediaKind::Audio);
                                 } else {
-                                    result.has_audio =
-                                        match timeout(500, track.wait_track())
-                                            .await
-                                        {
-                                            Ok(_) => true,
-                                            _ => false,
-                                        };
+                                    result.has_audio = true;
                                 }
                             }
                             MediaKind::Video => {
-                                if result.has_video {
-                                    return Err(MediaKind::Video);
-                                } else {
-                                    result.has_video =
-                                        match timeout(500, track.wait_track())
-                                            .await
-                                        {
-                                            Ok(_) => true,
-                                            _ => false,
-                                        };
-                                }
+                                result.has_video = true;
                             }
                         }
                     }
@@ -1272,36 +1218,13 @@ async fn new_remote_track() {
         Ok(result)
     }
 
-    fn bit_at(input: u32, n: u8) -> bool {
-        (input >> n) & 1 != 0
-    }
-
-    for i in 0..16 {
-        let audio_tx_enabled = bit_at(i, 0);
-        let video_tx_enabled = bit_at(i, 1);
-        let audio_rx_enabled = bit_at(i, 2);
-        let video_rx_enabled = bit_at(i, 3);
-
-        assert_eq!(
-            helper(
-                audio_tx_enabled,
-                video_tx_enabled,
-                audio_rx_enabled,
-                video_rx_enabled
-            )
-            .await
-            .unwrap(),
-            FinalTrack {
-                has_audio: audio_tx_enabled && audio_rx_enabled,
-                has_video: video_tx_enabled && video_rx_enabled,
-            },
-            "{} {} {} {}",
-            audio_tx_enabled,
-            video_tx_enabled,
-            audio_rx_enabled,
-            video_rx_enabled,
-        );
-    }
+    assert_eq!(
+        helper().await.unwrap(),
+        FinalTrack {
+            has_audio: true,
+            has_video: true,
+        }
+    );
 }
 
 mod ice_restart {
