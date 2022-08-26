@@ -273,7 +273,8 @@ impl Receiver {
         }
     }
 
-    /// NO
+    /// Adds the empty [`platform::MediaStreamTrack`]
+    /// to this [`Receiver`].
     pub fn set_remote_pre_track(&self) {
         let new_track = remote::Track::new(
             None,
@@ -348,13 +349,13 @@ impl Receiver {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {
-            self.is_track_notified.set(true);
             drop(self.peer_events_sender.unbounded_send(
                 PeerEvent::NewRemoteTrack {
                     sender_id: self.sender_id.clone(),
                     track: track.clone(),
                 },
             ));
+            self.is_track_notified.set(true);
         }
     }
 }
