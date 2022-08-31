@@ -97,6 +97,7 @@ enum VideoConstraintKind {
     DeviceId = 1,
     Width = 2,
     Height = 3,
+    FrameRate = 4,
 }
 
 /// Kind of a [MediaStreamConstraints.audio][0] setting.
@@ -282,6 +283,7 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
 }
 
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
+    #[allow(clippy::too_many_lines)]
     fn from(from: DeviceVideoTrackConstraints) -> Self {
         unsafe {
             let optional =
@@ -378,6 +380,28 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                     }
                 }
             }
+            if let Some(frame_rate) = from.frame_rate {
+                match frame_rate {
+                    ConstrainU32::Ideal(frame_rate) => {
+                        log::error!("WTF");
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::FrameRate as i64,
+                            DartValue::from(frame_rate),
+                        );
+                    }
+                    ConstrainU32::Exact(frame_rate) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::FrameRate as i64,
+                            DartValue::from(frame_rate),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        unreachable!()
+                    }
+                }
+            }
 
             Self {
                 optional,
@@ -388,12 +412,87 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
 }
 
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
-    fn from(_: DisplayVideoTrackConstraints) -> Self {
+    fn from(from: DisplayVideoTrackConstraints) -> Self {
         unsafe {
             let optional =
                 DartHandle::new(constraints::new_video_constraints());
             let mandatory =
                 DartHandle::new(constraints::new_video_constraints());
+
+            if let Some(width) = from.width {
+                match width {
+                    ConstrainU32::Ideal(width) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(width),
+                        );
+                    }
+                    ConstrainU32::Exact(width) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(width),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Width as i64,
+                            DartValue::from(i64::from(min)),
+                        );
+                    }
+                }
+            }
+
+            if let Some(height) = from.height {
+                match height {
+                    ConstrainU32::Ideal(height) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(height),
+                        );
+                    }
+                    ConstrainU32::Exact(height) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(height),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::Height as i64,
+                            DartValue::from(min),
+                        );
+                    }
+                }
+            }
+
+            if let Some(frame_rate) = from.frame_rate {
+                match frame_rate {
+                    ConstrainU32::Ideal(frame_rate) => {
+                        constraints::set_video_constraint_value(
+                            optional.get(),
+                            VideoConstraintKind::FrameRate as i64,
+                            DartValue::from(frame_rate),
+                        );
+                    }
+                    ConstrainU32::Exact(frame_rate) => {
+                        constraints::set_video_constraint_value(
+                            mandatory.get(),
+                            VideoConstraintKind::FrameRate as i64,
+                            DartValue::from(frame_rate),
+                        );
+                    }
+                    ConstrainU32::Range(min, max) => {
+                        unreachable!()
+                    }
+                }
+            }
+
             Self {
                 optional,
                 mandatory,

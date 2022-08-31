@@ -75,6 +75,10 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
         if let Some(height) = track_constraints.height {
             let _ = constraints.height(&ConstrainDoubleRange::from(height));
         }
+        if let Some(frame_rate) = track_constraints.frame_rate {
+            let _ =
+                constraints.frame_rate(&ConstrainDoubleRange::from(frame_rate));
+        }
 
         constraints
     }
@@ -139,7 +143,19 @@ impl DisplayMediaStreamConstraints {
 }
 
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
-    fn from(_: DisplayVideoTrackConstraints) -> Self {
-        Self::new()
+    fn from(track_constraints: DisplayVideoTrackConstraints) -> Self {
+        let mut constraints = Self::new();
+
+        if let Some(width) = track_constraints.width {
+            let _ = constraints.width(&ConstrainDoubleRange::from(width));
+        }
+        if let Some(height) = track_constraints.height {
+            let _ = constraints.height(&ConstrainDoubleRange::from(height));
+        }
+        if let Some(frame_rate) = track_constraints.frame_rate {
+            let _ = constraints.height(&ConstrainDoubleRange::from(frame_rate));
+        }
+
+        constraints
     }
 }

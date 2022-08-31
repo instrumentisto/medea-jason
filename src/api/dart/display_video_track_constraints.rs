@@ -1,7 +1,8 @@
 use std::ptr;
 
-use super::{propagate_panic, ForeignClass};
+use super::{propagate_panic, utils::DartResult, ForeignClass};
 
+use crate::api::ArgumentError;
 pub use crate::media::DisplayVideoTrackConstraints;
 
 impl ForeignClass for DisplayVideoTrackConstraints {}
@@ -12,6 +13,180 @@ impl ForeignClass for DisplayVideoTrackConstraints {}
 pub extern "C" fn DisplayVideoTrackConstraints__new(
 ) -> ptr::NonNull<DisplayVideoTrackConstraints> {
     propagate_panic(|| DisplayVideoTrackConstraints::new().into_ptr())
+}
+
+/// Sets an exact [height][1] constraint.
+///
+/// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_height(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    height: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(height) {
+            Ok(h) => this.as_mut().exact_height(h),
+            Err(_) => {
+                return ArgumentError::new(height, "height", "Expected u32")
+                    .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets an ideal [height][1] constraint.
+///
+/// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_height(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    height: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(height) {
+            Ok(h) => this.as_mut().ideal_height(h),
+            Err(_) => {
+                return ArgumentError::new(height, "height", "Expected u32")
+                    .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets an ideal [frameRate][1] constraint.
+///
+/// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-framerate
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_frame_rate(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    frame_rate: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(frame_rate) {
+            Ok(h) => this.as_mut().ideal_frame_rate(h),
+            Err(_) => {
+                return ArgumentError::new(
+                    frame_rate,
+                    "frame_rate",
+                    "Expected u32",
+                )
+                .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets an exact [frameRate][1] constraint.
+///
+/// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-framerate
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_frame_rate(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    frame_rate: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(frame_rate) {
+            Ok(h) => this.as_mut().exact_frame_rate(h),
+            Err(_) => {
+                return ArgumentError::new(
+                    frame_rate,
+                    "frame_rate",
+                    "Expected u32",
+                )
+                .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets a range of a [height][1] constraint.
+///
+/// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__height_in_range(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    min: i64,
+    max: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match (u32::try_from(min), u32::try_from(max)) {
+            (Ok(min), Ok(max)) => this.as_mut().height_in_range(min, max),
+            (Err(_), _) => {
+                return ArgumentError::new(min, "min", "Expected u32").into();
+            }
+            (_, Err(_)) => {
+                return ArgumentError::new(max, "max", "Expected u32").into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets an exact [width][1] constraint.
+///
+/// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_width(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    width: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(width) {
+            Ok(w) => this.as_mut().exact_width(w),
+            Err(_) => {
+                return ArgumentError::new(width, "width", "Expected u32")
+                    .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets an ideal [width][1] constraint.
+///
+/// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_width(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    width: i64,
+) -> DartResult {
+    propagate_panic(|| {
+        match u32::try_from(width) {
+            Ok(w) => this.as_mut().ideal_width(w),
+            Err(_) => {
+                return ArgumentError::new(width, "width", "Expected u32")
+                    .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets a range of a [width][1] constraint.
+///
+/// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__width_in_range(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    min: i64,
+    max: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match (u32::try_from(min), u32::try_from(max)) {
+            (Ok(min), Ok(max)) => this.as_mut().width_in_range(min, max),
+            (Err(_), _) => {
+                return ArgumentError::new(min, "min", "Expected u32").into();
+            }
+            (_, Err(_)) => {
+                return ArgumentError::new(max, "max", "Expected u32").into();
+            }
+        };
+        Ok(()).into()
+    })
 }
 
 /// Frees the data behind the provided pointer.

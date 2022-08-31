@@ -99,6 +99,54 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_height(
     })
 }
 
+/// Sets an ideal [frameRate][1] constraint.
+///
+/// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-framerate
+#[no_mangle]
+pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_frame_rate(
+    mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
+    frame_rate: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(frame_rate) {
+            Ok(f) => this.as_mut().ideal_frame_rate(f),
+            Err(_) => {
+                return ArgumentError::new(
+                    frame_rate,
+                    "frame_rate",
+                    "Expected u32",
+                )
+                .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
+/// Sets an exact [frameRate][1] constraint.
+///
+/// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-framerate
+#[no_mangle]
+pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_frame_rate(
+    mut this: ptr::NonNull<DeviceVideoTrackConstraints>,
+    frame_rate: i64,
+) -> DartResult {
+    propagate_panic(move || {
+        match u32::try_from(frame_rate) {
+            Ok(f) => this.as_mut().exact_frame_rate(f),
+            Err(_) => {
+                return ArgumentError::new(
+                    frame_rate,
+                    "frame_rate",
+                    "Expected u32",
+                )
+                .into();
+            }
+        };
+        Ok(()).into()
+    })
+}
+
 /// Sets a range of a [height][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
@@ -152,7 +200,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_width(
 ) -> DartResult {
     propagate_panic(|| {
         match u32::try_from(width) {
-            Ok(w) => this.as_mut().exact_width(w),
+            Ok(w) => this.as_mut().ideal_width(w),
             Err(_) => {
                 return ArgumentError::new(width, "width", "Expected u32")
                     .into();

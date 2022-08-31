@@ -144,6 +144,20 @@ impl DeviceVideoTrackConstraints {
         self.0.ideal_width(width);
     }
 
+    /// Sets an exact [`frameRate`][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+    pub fn exact_frame_rate(&mut self, frame_rate: u32) {
+        self.0.exact_frame_rate(frame_rate);
+    }
+
+    /// Sets an ideal [`frameRate`][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+    pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
+        self.0.ideal_frame_rate(frame_rate);
+    }
+
     /// Sets a range of a [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
@@ -166,5 +180,61 @@ impl DisplayVideoTrackConstraints {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         media::DisplayVideoTrackConstraints::new().into()
+    }
+
+    /// Sets an exact [`height`][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+    pub fn exact_height(&mut self, height: u32) {
+        self.0.exact_height(height);
+    }
+
+    /// Sets an ideal [`height`][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+    pub fn ideal_height(&mut self, height: u32) {
+        self.0.ideal_height(height);
+    }
+
+    /// Sets a range of a [`height`][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+    pub fn height_in_range(&mut self, min: u32, max: u32) {
+        self.0.height_in_range(min, max);
+    }
+
+    /// Sets an exact [`width`][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+    pub fn exact_width(&mut self, width: u32) {
+        self.0.exact_width(width);
+    }
+
+    /// Sets an ideal [`width`][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+    pub fn ideal_width(&mut self, width: u32) {
+        self.0.ideal_width(width);
+    }
+
+    /// Sets a range of a [`width`][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+    pub fn width_in_range(&mut self, min: u32, max: u32) {
+        self.0.width_in_range(min, max);
+    }
+
+    /// Sets an exact [`frameRate`][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+    pub fn exact_frame_rate(&mut self, frame_rate: u32) {
+        self.0.exact_frame_rate(frame_rate);
+    }
+
+    /// Sets an ideal [`frameRate`][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+    pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
+        self.0.ideal_frame_rate(frame_rate);
     }
 }

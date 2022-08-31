@@ -269,7 +269,7 @@ impl SimpleTracksRequest {
         if other.is_display_video_enabled() {
             if let Some((_, display_video)) = self.display_video.as_mut() {
                 if let Some(other_display_video) = other.get_display_video() {
-                    display_video.merge(other_display_video);
+                    display_video.merge(*other_display_video);
                 }
             }
         }

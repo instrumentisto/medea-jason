@@ -52,6 +52,16 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
     fallibleFunction(() => obj.width_in_range(min, max));
   }
 
+  @override
+  void exactFrameRate(int frameRate) {
+    fallibleFunction(() => obj.exact_frame_rate(frameRate));
+  }
+
+  @override
+  void idealFrameRate(int frameRate) {
+    fallibleFunction(() => obj.ideal_frame_rate(frameRate));
+  }
+
   @moveSemantics
   @override
   void free() {

@@ -99,12 +99,22 @@ class DeviceVideoTrackConstraints {
   external void exact_width(num width);
   external void ideal_width(num width);
   external void width_in_range(num min, num max);
+  external void exact_frame_rate(num frame_rate);
+  external void ideal_frame_rate(num frame_rate);
 }
 
 @JS()
 class DisplayVideoTrackConstraints {
   external void free();
   external factory DisplayVideoTrackConstraints();
+  external void exact_height(num height);
+  external void ideal_height(num height);
+  external void height_in_range(num min, num max);
+  external void exact_width(num width);
+  external void ideal_width(num width);
+  external void width_in_range(num min, num max);
+  external void exact_frame_rate(num frame_rate);
+  external void ideal_frame_rate(num frame_rate);
 }
 
 @JS()
