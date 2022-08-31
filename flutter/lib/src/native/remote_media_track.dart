@@ -6,7 +6,6 @@ import '../interface/remote_media_track.dart';
 import '../interface/track_kinds.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/foreign_value.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
 
@@ -38,11 +37,8 @@ typedef _onMediaDirectionChanged_C = Void Function(Pointer, Handle);
 typedef _onMediaDirectionChanged_Dart = void Function(
     Pointer, void Function(int));
 
-typedef _getTrack_C = ForeignValue Function(Pointer);
-typedef _getTrack_Dart = ForeignValue Function(Pointer);
-
-typedef _waitTrack_C = Handle Function(Pointer);
-typedef _waitTrack_Dart = Object Function(Pointer);
+typedef _getTrack_C = Handle Function(Pointer);
+typedef _getTrack_Dart = Object Function(Pointer);
 
 final _muted =
     dl.lookupFunction<_muted_C, _muted_Dart>('RemoteMediaTrack__muted');
@@ -72,9 +68,6 @@ final _onMediaDirectionChanged = dl
 
 final _getTrack = dl
     .lookupFunction<_getTrack_C, _getTrack_Dart>('RemoteMediaTrack__get_track');
-
-final _waitTrack = dl.lookupFunction<_waitTrack_C, _waitTrack_Dart>(
-    'RemoteMediaTrack__wait_track');
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
 
@@ -112,13 +105,8 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
-  webrtc.MediaStreamTrack? getTrack() {
-    return _getTrack(ptr.getInnerPtr()).toDart();
-  }
-
-  @override
-  Future<webrtc.MediaStreamTrack> waitTrack() async {
-    return await (_waitTrack(ptr.getInnerPtr()) as Future);
+  webrtc.MediaStreamTrack getTrack() {
+    return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
   }
 
   @override

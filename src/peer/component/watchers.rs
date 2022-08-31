@@ -204,9 +204,6 @@ impl Component {
             &peer.recv_constraints,
         )
         .await;
-
-        receiver.set_remote_pre_track();
-
         peer.media_connections
             .insert_receiver(receiver::Component::new(
                 Rc::new(receiver),

@@ -55,7 +55,7 @@ class Call {
         if (track.kind() == MediaKind.Audio && !kIsWeb) {
           return;
         }
-        var sysTrack = await track.waitTrack();
+        var sysTrack = track.getTrack();
         f(sysTrack);
       });
     });

@@ -337,7 +337,6 @@ impl Object<Room> {
     /// # Errors
     ///
     /// If failed to execute JS statement.
-    #[allow(clippy::too_many_lines)]
     pub async fn connections_store(
         &self,
     ) -> Result<Object<ConnectionStore>, Error> {
@@ -363,66 +362,63 @@ impl Object<Room> {
                         tracksStore: tracksStore,
                         closeListener: closeListener,
                     };
-                    conn.on_remote_track_added(async (t) => {
-                        if (t.media_source_kind() == 0)
-                        {
-                            await t.wait_track();
-                            let track = {
-                                track: t,
-                                on_enabled_fire_count: 0,
-                                on_disabled_fire_count: 0,
-                                on_muted_fire_count: 0,
-                                on_unmuted_fire_count: 0,
-                                stopped: false,
-                                onEnabledSubs: [],
-                                onDisabledSubs: [],
-                                onMutedSubs: [],
-                                onUnmutedSubs: [],
-                                onMediaDirectionChangedSubs: []
-                            };
-                            track.track.on_muted(() => {
-                                track.on_muted_fire_count++;
-                                for (sub of track.onMutedSubs) {
+                    conn.on_remote_track_added((t) => {
+                        let track = {
+                            track: t,
+                            on_enabled_fire_count: 0,
+                            on_disabled_fire_count: 0,
+                            on_muted_fire_count: 0,
+                            on_unmuted_fire_count: 0,
+                            stopped: false,
+                            onEnabledSubs: [],
+                            onDisabledSubs: [],
+                            onMutedSubs: [],
+                            onUnmutedSubs: [],
+                            onMediaDirectionChangedSubs: []
+                        };
+                        track.track.on_muted(() => {
+                            track.on_muted_fire_count++;
+                            for (sub of track.onMutedSubs) {
+                                sub();
+                            }
+                            track.onMutedSubs = [];
+                        });
+                        track.track.on_unmuted(() => {
+                            track.on_unmuted_fire_count++;
+                            for (sub of track.onUnmutedSubs) {
+                                sub();
+                            }
+                            track.onUnmutedSubs = [];
+                        });
+                        track.track.on_stopped(() => {
+                            track.stopped = true;
+                        });
+                        track.track.on_media_direction_changed((dir) => {
+                            if (dir == 0) {
+                                track.on_enabled_fire_count++;
+                                for (sub of track.onEnabledSubs) {
                                     sub();
                                 }
-                                track.onMutedSubs = [];
-                            });
-                            track.track.on_unmuted(() => {
-                                track.on_unmuted_fire_count++;
-                                for (sub of track.onUnmutedSubs) {
-                                    sub();
+                                track.onEnabledSubs = [];
+                            } else {
+                                track.on_disabled_fire_count++;
+                                for (sub of track.onDisabledSubs) {
+                                    sub(dir);
                                 }
-                                track.onUnmutedSubs = [];
+                                track.onDisabledSubs = [];
+                            }
+
+                            for (sub of track.onMediaDirectionChangedSubs) {
+                                sub();
+                            }
+                            track.onMediaDirectionChangedSubs = [];
+                        });
+                        tracksStore.tracks.push(track);
+                        let newStoreSubs = tracksStore.subs
+                            .filter((sub) => {
+                                return sub(track);
                             });
-                            track.track.on_stopped(() => {
-                                track.stopped = true;
-                            });
-                            track.track.on_media_direction_changed((dir) => {
-                                if (dir == 0) {
-                                    track.on_enabled_fire_count++;
-                                    for (sub of track.onEnabledSubs) {
-                                        sub();
-                                    }
-                                    track.onEnabledSubs = [];
-                                } else {
-                                    track.on_disabled_fire_count++;
-                                    for (sub of track.onDisabledSubs) {
-                                        sub(dir);
-                                    }
-                                    track.onDisabledSubs = [];
-                                }
-                                for (sub of track.onMediaDirectionChangedSubs) {
-                                    sub();
-                                }
-                                track.onMediaDirectionChangedSubs = [];
-                            });
-                            tracksStore.tracks.push(track);
-                            let newStoreSubs = tracksStore.subs
-                                .filter((sub) => {
-                                    return sub(track);
-                                });
-                            tracksStore.subs = newStoreSubs;
-                        }
+                        tracksStore.subs = newStoreSubs;
                     });
                     conn.on_close(() => {
                         closeListener.isClosed = true;

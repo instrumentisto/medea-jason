@@ -142,7 +142,7 @@ impl Receiver {
             track_id: state.track_id(),
             caps,
             sender_id: state.sender_id().clone(),
-            transceiver: RefCell::new(transceiver),
+            transceiver: RefCell::new(None),
             mid: RefCell::new(state.mid().map(ToString::to_string)),
             track: RefCell::new(None),
             is_track_notified: Cell::new(false),
@@ -165,6 +165,11 @@ impl Receiver {
             state
                 .media_exchange_state_controller()
                 .transition_to(enabled_in_cons.into());
+        }
+
+        if let Some(transceiver) = transceiver {
+            let track = transceiver.get_recv_track();
+            this.set_remote_track(transceiver, track).await;
         }
 
         this
@@ -232,11 +237,17 @@ impl Receiver {
         new_track: platform::MediaStreamTrack,
     ) {
         if let Some(old_track) = self.track.borrow().as_ref() {
-            if old_track.id() == Some(new_track.id()) {
+            if old_track.id() == new_track.id() {
                 return;
             }
         }
-        let media_kind = new_track.kind();
+
+        let new_track = remote::Track::new(
+            new_track,
+            self.caps.media_source_kind(),
+            self.muted.get(),
+            self.media_direction.get(),
+        );
 
         if self.enabled_individual.get() {
             transceiver
@@ -249,45 +260,10 @@ impl Receiver {
         }
 
         drop(self.transceiver.replace(Some(transceiver)));
-
-        let some = self.track.borrow().as_ref().is_some();
-        if some {
-            if let Some(prev_track) = self.track.borrow().as_ref() {
-                if prev_track.get_track().is_none() {
-                    prev_track.set_track(new_track);
-                    prev_track.set_media_direction(self.media_direction.get());
-                }
-            }
-        } else {
-            let new_track_ = remote::Track::new(
-                Some(new_track),
-                self.caps.media_source_kind(),
-                self.muted.get(),
-                self.media_direction.get(),
-                media_kind,
-            );
-            if let Some(prev_track_) = self.track.replace(Some(new_track_)) {
-                prev_track_.stop().await;
-            };
-            self.maybe_notify_track().await;
-        }
-    }
-
-    /// Adds the empty [`platform::MediaStreamTrack`]
-    /// to this [`Receiver`].
-    pub fn set_remote_pre_track(&self) {
-        let new_track = remote::Track::new(
-            None,
-            self.caps().media_source_kind(),
-            false,
-            self.media_direction.get(),
-            self.caps().media_kind(),
-        );
-
-        if self.track.borrow().is_none() {
-            drop(self.track.replace(Some(new_track)));
-            self.maybe_notify_pre_track();
-        }
+        if let Some(prev_track) = self.track.replace(Some(new_track)) {
+            prev_track.stop().await;
+        };
+        self.maybe_notify_track().await;
     }
 
     /// Updates [`MediaDirection`] of this [`Receiver`].
@@ -327,25 +303,6 @@ impl Receiver {
             return;
         }
         if !self.is_receiving().await {
-            return;
-        }
-        if let Some(track) = self.track.borrow().as_ref() {
-            if track.get_track().is_some() {
-                drop(self.peer_events_sender.unbounded_send(
-                    PeerEvent::NewRemoteTrack {
-                        sender_id: self.sender_id.clone(),
-                        track: track.clone(),
-                    },
-                ));
-                self.is_track_notified.set(true);
-            }
-        }
-    }
-
-    /// Emits empty [`PeerEvent::NewRemoteTrack`] if [`Receiver`]
-    /// and has not notified yet.
-    fn maybe_notify_pre_track(&self) {
-        if self.is_track_notified.get() {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {

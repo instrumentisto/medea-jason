@@ -1,7 +1,6 @@
 @JS()
 library medea_jason;
 
-import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:js/js.dart';
@@ -243,8 +242,7 @@ extension ReconnectHandleExtensions on ReconnectHandle {
 @JS()
 class RemoteMediaTrack {
   external void free();
-  external html.MediaStreamTrack? get_track();
-  external Promise<dynamic> wait_track();
+  external html.MediaStreamTrack get_track();
   external bool enabled();
   external bool muted();
   external void on_enabled(Function cb);

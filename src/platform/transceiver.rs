@@ -16,21 +16,16 @@ bitflags! {
         /// [`inactive` direction][1] of transceiver.
         ///
         /// [1]: https://tinyurl.com/y2zslyw2
-        const INACTIVE = 0b000;
+        const INACTIVE = 0b00;
 
         /// [`sendonly` direction][1] of transceiver.
         ///
         /// [1]: https://tinyurl.com/y6y2ye97
-        const SEND = 0b001;
+        const SEND = 0b01;
 
         /// [`recvonly` direction][1] of transceiver.
         ///
         /// [1]: https://tinyurl.com/y2nlxpzf
-        const RECV = 0b010;
-
-        /// [`stopped` direction][1] of transceiver.
-        ///
-        /// [1]: https://tinyurl.com/39ddy5z2
-        const STOPPED = 0b100;
+        const RECV = 0b10;
     }
 }

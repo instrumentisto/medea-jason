@@ -1581,7 +1581,6 @@ impl EventHandler for InnerRoom {
             is_force_relayed,
             Some(negotiation_role),
         );
-
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
         }

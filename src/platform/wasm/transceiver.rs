@@ -8,7 +8,9 @@ use web_sys::RtcRtpTransceiver;
 
 use crate::{
     media::track::local,
-    platform::{transceiver_direction::TransceiverDirection, Error},
+    platform::{
+        transceiver_direction::TransceiverDirection, Error, MediaStreamTrack,
+    },
 };
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
@@ -77,6 +79,12 @@ impl Transceiver {
             .await?,
         );
         Ok(())
+    }
+
+    /// TODO: add docs
+    #[must_use]
+    pub fn get_recv_track(&self) -> MediaStreamTrack {
+        MediaStreamTrack::new(self.0.receiver().track(), None)
     }
 
     /// Returns [`mid`] of this [`Transceiver`].

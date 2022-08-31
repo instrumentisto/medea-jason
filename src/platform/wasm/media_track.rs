@@ -46,12 +46,6 @@ pub struct MediaStreamTrack {
     >,
 }
 
-impl PartialEq for MediaStreamTrack {
-    fn eq(&self, other: &Self) -> bool {
-        self.id() == other.id()
-    }
-}
-
 impl MediaStreamTrack {
     /// Creates a new [`MediaStreamTrack`].
     #[must_use]

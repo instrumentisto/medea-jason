@@ -309,13 +309,11 @@ async fn get_video_track() -> api::RemoteMediaTrack {
     settings.device_video(DeviceVideoTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
-    let media_kind = track.kind();
     remote::Track::new(
-        Some(track),
+        track,
         MediaSourceKind::Device,
         false,
         MediaDirection::SendRecv,
-        media_kind,
     )
     .into()
 }
@@ -326,13 +324,11 @@ async fn get_audio_track() -> api::RemoteMediaTrack {
     settings.audio(AudioTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
     let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
-    let media_kind = track.kind();
     remote::Track::new(
-        Some(track),
+        track,
         MediaSourceKind::Device,
         false,
         MediaDirection::SendRecv,
-        media_kind,
     )
     .into()
 }

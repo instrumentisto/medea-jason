@@ -1,5 +1,3 @@
-import 'dart:js_util';
-
 import 'package:js/js.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
@@ -38,20 +36,8 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
-  webrtc.MediaStreamTrack? getTrack() {
-    return fallibleFunction(() {
-      var tr = obj.get_track();
-      if (tr == null) {
-        return null;
-      }
-      return WebMediaStreamTrack(tr);
-    });
-  }
-
-  @override
-  Future<webrtc.MediaStreamTrack> waitTrack() async {
-    return WebMediaStreamTrack(
-        await fallibleFuture(promiseToFuture(obj.wait_track())));
+  webrtc.MediaStreamTrack getTrack() {
+    return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
   }
 
   @override
