@@ -1,19 +1,15 @@
 # Additional labels to apply to all Kubernetes resources created by this chart.
 labels: {}
-  # app.kubernetes.io/part-of: frontend
-
+# app.kubernetes.io/part-of: frontend
 
 server:
   image:
-    repository: ghcr.io/instrumentisto/medea
+    repository: hub.instrumentisto.com/streaming/medea
     tag: 0.2.0
     pullPolicy: IfNotPresent
 
   # Medea media server configuration:
   # https://github.com/instrumentisto/medea/blob/master/config.toml
-  # NOTE: Options declared by 'coturn' and 'coturn-db' services below (like
-  #       ports and passwords) are auto-wired and specifying them in this
-  #       configuration will have no effect.
   conf:
     server:
       client:
@@ -23,12 +19,12 @@ server:
       control:
         grpc:
           bind_port: 6565
-    turn:
-      user: USER
-      pass: PASS
-      db:
-        redis:
-          db_number: 0
+
+    ice:
+      embedded:
+        # IP address to be used by Turn as relay.
+        # If empty then `status.hostIP` of Pod will be used.
+        public_host: ""
 
   deployment:
     revisionHistoryLimit: 0
@@ -36,10 +32,12 @@ server:
     # Optional revision number that may used for fine-grained Deployment rollouts.
     revision: ""
 
-    annotations: {}
+    annotations:
+      {}
       # kubernetes.io/change-cause=kubectl set ...
 
-    affinity: {}
+    affinity:
+      {}
       # nodeAffinity:
       #   requiredDuringSchedulingIgnoredDuringExecution:
       #     nodeSelectorTerms:
@@ -48,12 +46,14 @@ server:
       #           operator: In
       #           values: ["node-label-value"]
 
-    tolerations: []
+    tolerations:
+      []
       # - key: "node.alpha.kubernetes.io/unreachable"
       #   operator: "Exists"
       #   effect: "NoExecute"
 
-    resources: {}
+    resources:
+      {}
       # limits:
       #   cpu: 100m
       #   memory: 128Mi
@@ -72,56 +72,6 @@ server:
       bind_port: 8000
       log:
         level: DEBUG
-
-  coturn:
-    image:
-      repository: ghcr.io/coturn/coturn
-      tag: 4.5-alpine
-      pullPolicy: IfNotPresent
-
-    # Coturn TURN server configuration.
-    conf:
-      listening-port: 3478
-      # Admin interface (CLI management) configuration.
-      cli-port: 5766
-      cli-password: turn
-      # IP address to be used by Coturn as external.
-      # If empty then `status.hostIP` of Pod will be used.
-      external-ip: ""
-
-    extraArgs: []
-      # - --verbose
-
-    resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 128Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 128Mi
-
-  coturn-db:
-    image:
-      repository: redis
-      tag: alpine
-      pullPolicy: IfNotPresent
-
-    # Redis server configuration:
-    # http://download.redis.io/redis-stable/redis.conf
-    conf:
-      port: 6379
-      requirepass: turn
-      timeout: 0
-      tcp-keepalive: 60
-
-    resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 128Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 128Mi
-
 
 web-client:
   image:
@@ -144,10 +94,12 @@ web-client:
     # Optional revision number that may used for fine-grained Deployment rollouts.
     revision: ""
 
-    annotations: {}
+    annotations:
+      {}
       # kubernetes.io/change-cause=kubectl set ...
 
-    affinity: {}
+    affinity:
+      {}
       # nodeAffinity:
       #   requiredDuringSchedulingIgnoredDuringExecution:
       #     nodeSelectorTerms:
@@ -156,19 +108,20 @@ web-client:
       #           operator: In
       #           values: ["node-label-value"]
 
-    tolerations: []
+    tolerations:
+      []
       # - key: "node.alpha.kubernetes.io/unreachable"
       #   operator: "Exists"
       #   effect: "NoExecute"
 
-    resources: {}
+    resources:
+      {}
       # limits:
       #   cpu: 100m
       #   memory: 128Mi
       # requests:
       #   cpu: 100m
       #   memory: 128Mi
-
 
 ingress:
   enabled: yes

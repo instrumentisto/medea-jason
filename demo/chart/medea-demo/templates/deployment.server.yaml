@@ -50,20 +50,23 @@ spec:
       tolerations: {{- toYaml . | nindent 8 }}
     {{- end }}
       containers:
-      {{- $coturn := .Values.server.coturn }}
-      {{- $coturnDb := index .Values "server" "coturn-db" }}
         - name: medea
           image: {{ printf "%s:%s" .Values.server.image.repository .Values.server.image.tag | quote }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy | quote }}
           env:
             - name: MEDEA__CONF
               value: /etc/medea.toml
-            - name: MEDEA__TURN__PORT
-              value: {{ index $coturn "conf" "listening-port" | quote }}
-            - name: MEDEA__TURN__DB__REDIS__PORT
-              value: {{ $coturnDb.conf.port | quote }}
-            - name: MEDEA__TURN__CLI__PORT
-              value: {{ index $coturn "conf" "cli-port" | quote }}
+            - name: POD_ID
+            {{- $embedded := .Values.server.conf.ice.embedded }}
+            {{- if index $embedded "public_host" }}
+              value: {{ index $embedded "public_host" | quote }}
+            {{- else }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            {{- end }}
+            - name: MEDEA__ICE__EMBEDDED__PUBLIC_HOST
+              value: "$(POD_ID):{{ .Values.server.conf.ice.embedded.bind_port }}"
           envFrom:
             - secretRef:
                 name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
@@ -104,103 +107,9 @@ spec:
             - name: control-http
               containerPort: {{ $controlMock.conf.bind_port | int }}
               protocol: TCP
-        - name: coturn
-          image: {{ printf "%s:%s" $coturn.image.repository $coturn.image.tag | quote }}
-          imagePullPolicy: {{ $coturn.image.pullPolicy | quote }}
-          command: ["turnserver"]
-          args:
-            - --log-file=stdout
-            - --external-ip=$(EXTERNAL_IP)
-            - --listening-ip=$(EXTERNAL_IP)
-            - --relay-ip=$(EXTERNAL_IP)
-            - --redis-userdb=ip=127.0.0.1 port={{ $coturnDb.conf.port | int }} dbname={{ .Values.server.conf.turn.db.redis.db_number }} password=$(MEDEA__TURN__DB__REDIS__PASS)
-            - --redis-statsdb=ip=127.0.0.1 port={{ $coturnDb.conf.port | int }} dbname={{ .Values.server.conf.turn.db.redis.db_number }} password=$(MEDEA__TURN__DB__REDIS__PASS)
-            - --user={{ .Values.server.conf.turn.user }}:$(MEDEA__TURN__PASS)
-            - --cli-password=$(MEDEA__TURN__CLI__PASS)
-          {{- with $coturn.extraArgs }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          env:
-            - name: EXTERNAL_IP
-            {{- if index $coturn "conf" "external-ip" }}
-              value: {{ index $coturn "conf" "external-ip" | quote }}
-            {{- else }}
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            {{- end }}
-            - name: MEDEA__TURN__PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA__TURN__PASS
-            - name: MEDEA__TURN__DB__REDIS__PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA__TURN__DB__REDIS__PASS
-            - name: MEDEA__TURN__CLI__PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA__TURN__CLI__PASS
-          ports:
-            - name: turn
-              containerPort: {{ index $coturn "conf" "listening-port" | int }}
-              protocol: TCP
-            - name: turn-udp
-              containerPort: {{ index $coturn "conf" "listening-port" | int }}
-              protocol: UDP
-          volumeMounts:
-            - name: conf
-              subPath: turnserver.conf
-              mountPath: /etc/coturn/turnserver.conf
-              readOnly: true
-            - name: coturn-data
-              mountPath: /var/lib/coturn
-        {{- with $coturn.resources }}
-          resources: {{- toYaml . | nindent 12 }}
-        {{- end }}
-          livenessProbe:
-            tcpSocket:
-              port: {{ index $coturn "conf" "listening-port" | int }}
-            initialDelaySeconds: 3
-          readinessProbe:
-            tcpSocket:
-              port: {{ index $coturn "conf" "listening-port" | int }}
-            initialDelaySeconds: 5
-        - name: coturn-db
-          image: {{ printf "%s:%s" $coturnDb.image.repository $coturnDb.image.tag | quote }}
-          imagePullPolicy: {{ $coturnDb.image.pullPolicy | quote }}
-          args:
-            - redis-server
-            - /etc/redis.conf
-            - --requirepass $(MEDEA__TURN__DB__REDIS__PASS)
-          env:
-            - name: MEDEA__TURN__DB__REDIS__PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
-                  key: MEDEA__TURN__DB__REDIS__PASS
-          volumeMounts:
-            - name: conf
-              subPath: redis.conf
-              mountPath: /etc/redis.conf
-              readOnly: true
-        {{- with $coturnDb.resources }}
-          resources: {{- toYaml . | nindent 12 }}
-        {{- end }}
-          livenessProbe:
-            exec:
-              command: ['redis-cli', '-p', '{{ $coturnDb.conf.port | int }}', 'ping']
-            initialDelaySeconds: 3
-          readinessProbe:
-            exec:
-              command: ['redis-cli', '-p', '{{ $coturnDb.conf.port | int }}', 'ping']
-            initialDelaySeconds: 5
+      imagePullSecrets:
+        - name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
       volumes:
         - name: conf
           configMap:
             name: {{ printf "%s.server.conf" (include "medea-demo.fullname" .) | quote }}
-        - name: coturn-data
-          emptyDir: {}
