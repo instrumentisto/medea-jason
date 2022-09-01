@@ -248,6 +248,7 @@ class RemoteMediaTrack {
   external void on_enabled(Function cb);
   external void on_disabled(Function cb);
   external void on_muted(Function cb);
+  external void on_track_update(Function cb);
   external void on_unmuted(Function cb);
   external void on_stopped(Function cb);
   external void on_media_direction_changed(Function cb);

@@ -1,6 +1,9 @@
 //! Wrapper around a received remote [`platform::MediaStreamTrack`].
 
-use std::{cell::Cell, rc::Rc};
+use std::{
+    cell::{Cell, Ref, RefCell},
+    rc::Rc,
+};
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
@@ -16,13 +19,16 @@ use crate::{
 #[derive(Debug)]
 struct Inner {
     /// Underlying platform-specific [`platform::MediaStreamTrack`].
-    track: platform::MediaStreamTrack,
+    track: RefCell<platform::MediaStreamTrack>,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
     media_source_kind: proto::MediaSourceKind,
 
     /// Callback to be invoked when this [`Track`] is muted.
     on_muted: platform::Callback<()>,
+
+    /// todo
+    on_track_update: platform::Callback<()>,
 
     /// Callback to be invoked when this [`Track`] is unmuted.
     on_unmuted: platform::Callback<()>,
@@ -74,7 +80,7 @@ impl Track {
     {
         let track = platform::MediaStreamTrack::from(track);
         let track = Self(Rc::new(Inner {
-            track,
+            track: RefCell::new(track),
             media_source_kind,
             muted: ObservableCell::new(muted),
             on_media_direction_changed: platform::Callback::default(),
@@ -82,9 +88,10 @@ impl Track {
             on_stopped: platform::Callback::default(),
             on_muted: platform::Callback::default(),
             on_unmuted: platform::Callback::default(),
+            on_track_update: platform::Callback::default(),
         }));
 
-        track.0.track.on_ended({
+        track.0.track.borrow().on_ended({
             let weak_inner = Rc::downgrade(&track.0);
             Some(move || {
                 if let Some(inner) = weak_inner.upgrade() {
@@ -136,13 +143,13 @@ impl Track {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> String {
-        self.0.track.id()
+        self.0.track.borrow().id()
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        self.0.track.kind()
+        self.0.track.borrow().kind()
     }
 
     /// Returns this [`Track`]'s media source kind.
@@ -154,15 +161,23 @@ impl Track {
     /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
     pub async fn stop(self) {
-        if self.0.track.ready_state().await == MediaStreamTrackState::Live {
+        if self.0.track.borrow().ready_state().await
+            == MediaStreamTrackState::Live
+        {
             self.0.on_stopped.call0();
         }
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
-    pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        &self.0.track
+    pub fn get_track(&self) -> Ref<'_, platform::MediaStreamTrack> {
+        self.0.track.borrow()
+    }
+
+    /// todo
+    pub async fn set_track(&self, track: platform::MediaStreamTrack) {
+        drop(self.0.track.replace(track));
+        self.0.on_track_update.call0();
     }
 
     /// Indicate whether this [`Track`] is muted.
@@ -174,6 +189,11 @@ impl Track {
     /// Sets callback to invoke when this [`Track`] is muted.
     pub fn on_muted(&self, callback: platform::Function<()>) {
         self.0.on_muted.set_func(callback);
+    }
+
+    /// todo
+    pub fn on_track_update(&self, callback: platform::Function<()>) {
+        self.0.on_track_update.set_func(callback);
     }
 
     /// Sets callback to invoke when this [`Track`] is unmuted.

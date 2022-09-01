@@ -125,6 +125,12 @@ pub struct MediaStreamTrack {
     source_kind: Option<MediaSourceKind>,
 }
 
+impl PartialEq for MediaStreamTrack {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
 impl MediaStreamTrack {
     /// Creates a new [`MediaStreamTrack`].
     #[must_use]

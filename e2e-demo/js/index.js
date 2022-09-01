@@ -665,6 +665,12 @@ window.onload = async function() {
           playElement.srcObject = mediaStream;
         }
 
+        track.on_track_update(() => {
+          let mediaStream = new MediaStream();
+          mediaStream.addTrack(track.get_track());
+          playElement.srcObject = mediaStream;
+        });
+
         track.on_media_direction_changed((direction) => {
           console.log('New TransceiverDirection: ' + direction);
         });

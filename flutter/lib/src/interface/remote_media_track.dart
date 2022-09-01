@@ -42,6 +42,9 @@ abstract class RemoteMediaTrack implements PlatformHandle {
   /// Sets callback to invoke when this [RemoteMediaTrack] is muted.
   void onMuted(void Function() f);
 
+  /// todo
+  void onTrackUpdate(void Function() f);
+
   /// Sets callback to invoke when this [RemoteMediaTrack] is unmuted.
   void onUnmuted(void Function() f);
 

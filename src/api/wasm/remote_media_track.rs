@@ -25,7 +25,7 @@ impl RemoteMediaTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
     #[must_use]
     pub fn get_track(&self) -> web_sys::MediaStreamTrack {
-        Clone::clone(self.0.get_track().as_ref())
+        Clone::clone(self.0.get_track().as_ref().as_ref())
     }
 
     /// Indicates whether this [`RemoteMediaTrack`] is muted.
@@ -37,6 +37,11 @@ impl RemoteMediaTrack {
     /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
     pub fn on_muted(&self, cb: js_sys::Function) {
         self.0.on_muted(cb.into());
+    }
+
+    /// todo.
+    pub fn on_track_update(&self, cb: js_sys::Function) {
+        self.0.on_track_update(cb.into());
     }
 
     /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.

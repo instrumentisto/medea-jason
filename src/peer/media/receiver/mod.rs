@@ -105,15 +105,7 @@ impl Receiver {
         } else {
             platform::TransceiverDirection::INACTIVE
         };
-        let mid = state.mid();
-        let transceiver: platform::Transceiver = if let Some(mid) = mid {
-            media_connections
-                .0
-                .borrow_mut()
-                .get_transceiver_by_mid(mid.to_owned())
-                .await
-                .unwrap()
-        } else {
+        let transceiver = {
             // Try to find send transceiver that can be used as sendrecv.
             let sender = media_connections
                 .0
@@ -174,10 +166,6 @@ impl Receiver {
 
         let track = transceiver.get_recv_track();
         this.set_remote_track(transceiver, track).await;
-
-        // this.transceiver.replace(Some(transceiver));
-        // if let Some(transceiver) = transceiver {
-        // }
 
         this
     }
@@ -249,13 +237,6 @@ impl Receiver {
             }
         }
 
-        let new_track = remote::Track::new(
-            new_track,
-            self.caps.media_source_kind(),
-            self.muted.get(),
-            self.media_direction.get(),
-        );
-
         if self.enabled_individual.get() {
             transceiver
                 .add_direction(platform::TransceiverDirection::RECV)
@@ -267,9 +248,20 @@ impl Receiver {
         }
 
         drop(self.transceiver.replace(Some(transceiver)));
-        if let Some(prev_track) = self.track.replace(Some(new_track)) {
-            prev_track.stop().await;
+
+        let new_track = if let Some(track) = self.track.take() {
+            track.set_track(new_track).await;
+            track
+        } else {
+            remote::Track::new(
+                new_track,
+                self.caps.media_source_kind(),
+                self.muted.get(),
+                self.media_direction.get(),
+            )
         };
+
+        drop(self.track.replace(Some(new_track)));
         self.maybe_notify_track().await;
     }
 

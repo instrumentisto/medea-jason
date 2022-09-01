@@ -46,6 +46,11 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
   }
 
   @override
+  void onTrackUpdate(void Function() f) {
+    fallibleFunction(() => obj.on_track_update(allowInterop(f)));
+  }
+
+  @override
   void onUnmuted(void Function() f) {
     fallibleFunction(() => obj.on_unmuted(allowInterop(f)));
   }
