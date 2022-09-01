@@ -88,3 +88,16 @@ Feature: Media direction
     Then Alice's video from Bob has `SendOnly` direction
     When Alice enables remote video
     Then Alice's video from Bob has `SendRecv` direction
+
+  Scenario: Test direction change with disabled media receiving
+    Given room with joined member Alice
+    And member Bob 
+    When Alice disables remote video
+    And Alice disables remote audio
+    And Bob joins the room
+    Then Alice's video from Bob has `SendOnly` direction
+    And Alice's audio from Bob has `SendOnly` direction
+    When Bob disables audio and awaits it completes
+    And Bob disables video and awaits it completes
+    Then Alice's video from Bob has `Inactive` direction
+    And Alice's audio from Bob has `Inactive` direction
