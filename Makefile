@@ -1162,8 +1162,9 @@ endif
 			--values=$(helm-chart-vals-dir)/$(helm-cluster).vals.yaml \
 			--values=$(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml \
 			--set server.conf.ice.embedded.bind_port="9$(helm-up-port-prefix)0" \
-			--set server.conf.server.client.http.public_url="ws://127.0.0.1:9$(helm-up-port-prefix)1/ws" \
 			--set server.conf.server.client.http.bind_port="9$(helm-up-port-prefix)1" \
+			--set server.conf.server.control.grpc.bind_port="9$(helm-up-port-prefix)2" \
+			--set server.control-mock.conf.bind_port="9$(helm-up-port-prefix)3" \
 			--set server.deployment.revision=$(shell date +%s) \
 			--set web-client.deployment.revision=$(shell date +%s) \
 			$(if $(call eq,$(force),yes),\
