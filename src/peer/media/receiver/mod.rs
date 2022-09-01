@@ -105,8 +105,15 @@ impl Receiver {
         } else {
             platform::TransceiverDirection::INACTIVE
         };
-
-        let transceiver = if state.mid().is_none() {
+        let mid = state.mid();
+        let transceiver: platform::Transceiver = if let Some(mid) = mid {
+            media_connections
+                .0
+                .borrow_mut()
+                .get_transceiver_by_mid(mid.to_owned())
+                .await
+                .unwrap()
+        } else {
             // Try to find send transceiver that can be used as sendrecv.
             let sender = media_connections
                 .0
@@ -124,16 +131,14 @@ impl Receiver {
                 let trnsvr = s.transceiver();
                 trnsvr.add_direction(transceiver_direction).await;
 
-                Some(trnsvr)
+                trnsvr
             } else {
                 let fut = media_connections
                     .0
                     .borrow()
                     .add_transceiver(kind, transceiver_direction);
-                Some(fut.await)
+                fut.await
             }
-        } else {
-            None
         };
 
         let peer_events_sender =
@@ -167,10 +172,12 @@ impl Receiver {
                 .transition_to(enabled_in_cons.into());
         }
 
-        if let Some(transceiver) = transceiver {
-            let track = transceiver.get_recv_track();
-            this.set_remote_track(transceiver, track).await;
-        }
+        let track = transceiver.get_recv_track();
+        this.set_remote_track(transceiver, track).await;
+
+        // this.transceiver.replace(Some(transceiver));
+        // if let Some(transceiver) = transceiver {
+        // }
 
         this
     }
