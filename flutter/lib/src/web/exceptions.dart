@@ -110,7 +110,7 @@ class WebEnumerateDisplaysException extends EnumerateDisplaysException {
     return _cause;
   }
 
-  /// Returns stacktrace of this [EnumerateDevicesException].
+  /// Returns stacktrace of this [EnumerateDisplaysException].
   @override
   String trace() {
     return _trace;

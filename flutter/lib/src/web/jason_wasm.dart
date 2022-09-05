@@ -137,6 +137,13 @@ class MediaDeviceInfo {
 }
 
 @JS()
+class MediaDisplayInfo {
+  external void free();
+  external String device_id();
+  external String? title();
+}
+
+@JS()
 class InternalException {
   external void free();
   external String message();

@@ -5,6 +5,7 @@ import 'package:js/js.dart';
 
 import '../interface/local_media_track.dart';
 import '../interface/media_device_info.dart';
+import '../interface/media_display_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
@@ -12,6 +13,7 @@ import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 import 'local_media_track.dart';
 import 'media_device_info.dart';
+import 'media_display_info.dart';
 import 'media_stream_settings.dart';
 
 class WebMediaManagerHandle extends MediaManagerHandle {
@@ -34,7 +36,7 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   }
 
   @override
-  Future<List<MediaDeviceInfo>> enumerateDisplays() async {
+  Future<List<MediaDisplayInfo>> enumerateDisplays() async {
     var tracks = await fallibleFuture(obj.enumerate_displays());
     return tracks.map((t) => WebMediaDisplayInfo(t)).toList();
   }
