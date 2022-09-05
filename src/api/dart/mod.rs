@@ -20,6 +20,7 @@ pub mod display_video_track_constraints;
 pub mod jason;
 pub mod local_media_track;
 pub mod media_device_info;
+pub mod media_display_info;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
 pub mod reconnect_handle;

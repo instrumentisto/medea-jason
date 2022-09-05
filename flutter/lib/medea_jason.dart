@@ -3,6 +3,7 @@ library medea_jason;
 export 'src/interface/connection_handle.dart';
 export 'src/interface/exceptions.dart';
 export 'src/interface/media_device_info.dart';
+export 'src/interface/media_display_info.dart';
 export 'src/interface/local_media_track.dart';
 export 'src/interface/media_manager.dart';
 export 'src/interface/reconnect_handle.dart';

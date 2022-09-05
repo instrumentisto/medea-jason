@@ -111,6 +111,30 @@ impl MediaDevices {
             .collect())
     }
 
+    pub async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<MediaDeviceInfo>, Traced<Error>> {
+        todo!()
+        // let devices = JsFuture::from(
+        //     self.devices
+        //         .enumerate_devices()
+        //         .map_err(Error::from)
+        //         .map_err(tracerr::wrap!())?,
+        // )
+        // .await
+        // .map_err(Error::from)
+        // .map_err(tracerr::wrap!())?;
+
+        // Ok(js_sys::Array::from(&devices)
+        //     .values()
+        //     .into_iter()
+        //     .map(|info| {
+        //         let info = web_sys::MediaDeviceInfo::from(info.unwrap());
+        //         MediaDeviceInfo::from(info)
+        //     })
+        //     .collect())
+    }
+
     /// Prompts a user for a permission to use a media input which produces
     /// [`MediaStreamTrack`]s containing the requested types of media.
     ///

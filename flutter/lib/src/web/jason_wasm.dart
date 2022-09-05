@@ -173,6 +173,7 @@ class MediaManagerHandle {
 @JS('MediaManagerHandle')
 abstract class _MediaManagerHandle {
   external Promise<List<dynamic>> enumerate_devices();
+  external Promise<List<dynamic>> enumerate_displays();
   external Promise<List<dynamic>> init_local_tracks(MediaStreamSettings caps);
 }
 
@@ -180,6 +181,11 @@ extension MediaManagerHandleExtensions on MediaManagerHandle {
   Future<List<dynamic>> enumerate_devices() {
     final tt = this as _MediaManagerHandle;
     return promiseToFuture(tt.enumerate_devices());
+  }
+
+  Future<List<dynamic>> enumerate_displays() {
+    final tt = this as _MediaManagerHandle;
+    return promiseToFuture(tt.enumerate_displays());
   }
 
   Future<List<dynamic>> init_local_tracks(MediaStreamSettings caps) {

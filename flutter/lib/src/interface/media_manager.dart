@@ -1,6 +1,7 @@
 import '/src/util/rust_handles_storage.dart';
 import 'local_media_track.dart';
 import 'media_device_info.dart';
+import 'media_display_info.dart';
 import 'media_stream_settings.dart';
 
 /// External handle to a `MediaManager`.
@@ -33,6 +34,9 @@ abstract class MediaManagerHandle implements PlatformHandle {
   /// Throws a [EnumerateDevicesException] if a request of platform media
   /// devices access failed.
   Future<List<MediaDeviceInfo>> enumerateDevices();
+
+  // todo
+  Future<List<MediaDisplayInfo>> enumerateDisplays();
 
   /// Switches output audio device to the device with the provided [deviceId].
   Future<void> setOutputAudioId(String deviceId);

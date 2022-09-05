@@ -20,7 +20,7 @@ use crate::{
 use super::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     media_device_info::MediaDeviceInfo,
-    media_track::MediaStreamTrack,
+    media_track::MediaStreamTrack, media_display_info::MediaDisplayInfo,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/media_devices.g.dart")]
@@ -32,6 +32,9 @@ mod media_devices {
     extern "C" {
         /// Returns information about available media input devices.
         pub fn enumerate_devices() -> Dart_Handle;
+
+        //todo
+        pub fn enumerate_displays() -> Dart_Handle;
 
         /// Prompts a user for permissions to use a media input device,
         /// producing a vector of [MediaStreamTrack][1]s containing the
@@ -118,6 +121,39 @@ impl MediaDevices {
         let mut result = Vec::with_capacity(len);
         for i in 0..len {
             let val = devices.get(i).unwrap();
+            if let Ok(v) = val.try_into() {
+                result.push(v);
+            }
+        }
+        Ok(result)
+    }
+
+    //todo
+    /// Returns the enumerate displays of this [`MediaDevices`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if .
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if .
+    pub async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
+        let displays = unsafe {
+            FutureFromDart::execute::<DartHandle>(
+                media_devices::enumerate_displays(),
+            )
+            .await
+        }
+        .map(DartList::from)
+        .map_err(tracerr::wrap!())?;
+
+        let len = displays.length();
+        let mut result = Vec::with_capacity(len);
+        for i in 0..len {
+            let val = displays.get(i).unwrap();
             if let Ok(v) = val.try_into() {
                 result.push(v);
             }

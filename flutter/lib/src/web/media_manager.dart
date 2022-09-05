@@ -33,6 +33,12 @@ class WebMediaManagerHandle extends MediaManagerHandle {
     return tracks.map((t) => WebMediaDeviceInfo(t)).toList();
   }
 
+  @override
+  Future<List<MediaDeviceInfo>> enumerateDisplays() async {
+    var tracks = await fallibleFuture(obj.enumerate_displays());
+    return tracks.map((t) => WebMediaDisplayInfo(t)).toList();
+  }
+
   @moveSemantics
   @override
   void free() {

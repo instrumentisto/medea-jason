@@ -1,6 +1,7 @@
 use std::{os::raw::c_char, ptr};
 
 use dart_sys::Dart_Handle;
+use platform::MediaDisplayInfo;
 use tracerr::Traced;
 
 use crate::{
@@ -10,7 +11,7 @@ use crate::{
     },
     media::{
         EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError, MicVolumeError,
+        InvalidOutputAudioDeviceIdError, MicVolumeError, EnumerateDisplaysError,
     },
     platform,
 };
@@ -63,6 +64,25 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
         let this = this.as_ref().clone();
 
         async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
+            .into_dart_future()
+    })
+}
+
+/// Returns a list of [`MediaDeviceInfo`] objects representing available media
+/// input and devices, such as microphones, cameras, and so forth.
+///
+/// [`MediaDeviceInfo`]: super::media_device_info::MediaDeviceInfo
+#[rustfmt::skip]
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__enumerate_displays(
+    this: ptr::NonNull<MediaManagerHandle>,
+) -> DartFuture<
+    Result<PtrArray<MediaDisplayInfo>, Traced<EnumerateDisplaysError>>,
+> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move { Ok(PtrArray::new(this.enumerate_displays().await?)) }
             .into_dart_future()
     })
 }

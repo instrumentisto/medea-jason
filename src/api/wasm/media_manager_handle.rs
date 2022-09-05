@@ -76,6 +76,29 @@ impl MediaManagerHandle {
         })
     }
 
+    //todo
+    pub fn enumerate_displays(&self) -> Promise {
+        // let this = self.0.clone();
+
+        // future_to_promise(async move {
+        //     this.enumerate_devices()
+        //         .await
+        //         .map(|devices| {
+        //             devices
+        //                 .into_iter()
+        //                 .fold(js_sys::Array::new(), |devices_info, info| {
+        //                     let _ = devices_info.push(&JsValue::from(
+        //                         MediaDeviceInfo::from(info),
+        //                     ));
+        //                     devices_info
+        //                 })
+        //                 .into()
+        //         })
+        //         .map_err(Error::from)
+        //         .map_err(Into::into)
+        // })
+    }
+
     /// Returns [`LocalMediaTrack`]s objects, built from the provided
     /// [`MediaStreamSettings`].
     ///

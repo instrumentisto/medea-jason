@@ -18,7 +18,7 @@ pub use self::{
         VideoSource, VideoTrackConstraints,
     },
     manager::{
-        EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
+        EnumerateDevicesError, EnumerateDisplaysError, GetDisplayMediaError, GetUserMediaError,
         HandleDetachedError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
         MicVolumeError,

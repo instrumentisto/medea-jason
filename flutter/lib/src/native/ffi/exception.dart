@@ -18,6 +18,8 @@ void registerFunctions(DynamicLibrary dl) {
           Pointer.fromFunction(_newLocalMediaInitException),
       newEnumerateDevicesException:
           Pointer.fromFunction(_newEnumerateDevicesException),
+      newEnumerateDisplaysException:
+          Pointer.fromFunction(_newEnumerateDisplaysException),
       newRpcClientException: Pointer.fromFunction(_newRpcClientException),
       newMediaStateTransitionException:
           Pointer.fromFunction(_newMediaStateTransitionException),
@@ -64,6 +66,14 @@ Object _newLocalMediaInitException(int kind, Pointer<Utf8> message,
 Object _newEnumerateDevicesException(
     Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
   return NativeEnumerateDevicesException(
+      unboxDartHandle(cause), stacktrace.nativeStringToDartString());
+}
+
+/// Creates a new [NativeEnumerateDisplaysException] with the provided error
+/// [cause] and [stacktrace].
+Object _newEnumerateDisplaysException(
+    Pointer<Handle> cause, Pointer<Utf8> stacktrace) {
+  return NativeEnumerateDisplaysException(
       unboxDartHandle(cause), stacktrace.nativeStringToDartString());
 }
 
@@ -187,6 +197,29 @@ class NativeEnumerateDevicesException extends EnumerateDevicesException
 
   /// Instantiates a new [NativeEnumerateDevicesException].
   NativeEnumerateDevicesException(this._cause, this._nativeStackTrace);
+
+  @override
+  dynamic cause() {
+    return _cause;
+  }
+
+  @override
+  String trace() {
+    return _nativeStackTrace;
+  }
+}
+
+/// todo
+class NativeEnumerateDisplaysException extends EnumerateDisplaysException
+    implements Exception {
+  /// Dart [Exception] or [Error] that caused this [NativeEnumerateDisplaysException].
+  late final Object _cause;
+
+  /// Native stacktrace.
+  late final String _nativeStackTrace;
+
+  /// Instantiates a new [NativeEnumerateDisplaysException].
+  NativeEnumerateDisplaysException(this._cause, this._nativeStackTrace);
 
   @override
   dynamic cause() {
