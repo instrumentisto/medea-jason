@@ -113,7 +113,6 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
         .toList();
   }
 
-  // todo
   @override
   Future<List<MediaDisplayInfo>> enumerateDisplays() async {
     Pointer pointer = await (_enumerateDisplays(ptr.getInnerPtr()) as Future);

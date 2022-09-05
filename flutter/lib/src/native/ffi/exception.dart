@@ -209,7 +209,7 @@ class NativeEnumerateDevicesException extends EnumerateDevicesException
   }
 }
 
-/// todo
+/// Exception thrown when cannot get info about displays.
 class NativeEnumerateDisplaysException extends EnumerateDisplaysException
     implements Exception {
   /// Dart [Exception] or [Error] that caused this [NativeEnumerateDisplaysException].

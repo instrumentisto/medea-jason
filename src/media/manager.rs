@@ -34,7 +34,8 @@ pub enum EnumerateDevicesError {
     Detached,
 }
 
-/// Errors returned from the [`MediaManagerHandle::enumerate_displays()`] method.
+/// Errors returned from the [`MediaManagerHandle::enumerate_displays()`]
+/// method.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum EnumerateDisplaysError {

@@ -1,7 +1,6 @@
 use std::{os::raw::c_char, ptr};
 
 use dart_sys::Dart_Handle;
-use platform::MediaDisplayInfo;
 use tracerr::Traced;
 
 use crate::{
@@ -10,8 +9,8 @@ use crate::{
         utils::{DartError, DartResult},
     },
     media::{
-        EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError, MicVolumeError, EnumerateDisplaysError,
+        EnumerateDevicesError, EnumerateDisplaysError, HandleDetachedError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     platform,
 };
@@ -20,7 +19,7 @@ use super::{
     media_stream_settings::MediaStreamSettings,
     propagate_panic,
     utils::{DartFuture, IntoDartFuture, PtrArray},
-    ForeignClass, LocalMediaTrack, MediaDeviceInfo,
+    ForeignClass, LocalMediaTrack, MediaDeviceInfo, MediaDisplayInfo,
 };
 
 #[cfg(feature = "mockable")]
@@ -204,11 +203,13 @@ mod mock {
                 utils::{DartFuture, DartResult, IntoDartFuture},
                 DartError,
             },
-            LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings,
+            LocalMediaTrack, MediaDeviceInfo, MediaDisplayInfo,
+            MediaStreamSettings,
         },
         media::{
-            EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-            InvalidOutputAudioDeviceIdError, MicVolumeError,
+            EnumerateDevicesError, EnumerateDisplaysError, HandleDetachedError,
+            InitLocalTracksError, InvalidOutputAudioDeviceIdError,
+            MicVolumeError,
         },
         platform,
     };
@@ -227,6 +228,13 @@ mod mock {
                 MediaDeviceInfo(0),
                 MediaDeviceInfo(0),
             ])
+        }
+
+        pub async fn enumerate_displays(
+            &self,
+        ) -> Result<Vec<MediaDisplayInfo>, Traced<EnumerateDisplaysError>>
+        {
+            Ok(vec![MediaDisplayInfo(0)])
         }
 
         pub async fn init_local_tracks(

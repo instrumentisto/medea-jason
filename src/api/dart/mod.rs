@@ -68,6 +68,7 @@ pub use self::{
     jason::Jason,
     local_media_track::LocalMediaTrack,
     media_device_info::MediaDeviceInfo,
+    media_display_info::MediaDisplayInfo,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::MediaStreamSettings,
     reconnect_handle::ReconnectHandle,

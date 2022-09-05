@@ -11,7 +11,8 @@ use crate::{
         box_dart_handle,
         dart::{utils::string_into_c_str, DartValue},
         err::{
-            EnumerateDevicesException, EnumerateDisplaysException, FormatException, InternalException,
+            EnumerateDevicesException, EnumerateDisplaysException,
+            FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,
             MediaSettingsUpdateException, MediaStateTransitionException,
             MicVolumeException, RpcClientException, StateError,

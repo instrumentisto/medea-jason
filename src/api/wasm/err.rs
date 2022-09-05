@@ -9,10 +9,11 @@ use wasm_bindgen::{
 };
 
 use crate::api::err::{
-    EnumerateDevicesException, EnumerateDisplaysException, FormatException, InternalException,
-    InvalidOutputAudioDeviceIdException, LocalMediaInitException,
-    MediaSettingsUpdateException, MediaStateTransitionException,
-    MicVolumeException, RpcClientException, StateError,
+    EnumerateDevicesException, EnumerateDisplaysException, FormatException,
+    InternalException, InvalidOutputAudioDeviceIdException,
+    LocalMediaInitException, MediaSettingsUpdateException,
+    MediaStateTransitionException, MicVolumeException, RpcClientException,
+    StateError,
 };
 
 /// Wrapper around [`JsValue`] which represents a JS error.

@@ -4,8 +4,8 @@ pub mod constraints;
 pub mod error;
 pub mod ice_server;
 pub mod media_device_info;
-pub mod media_display_info;
 pub mod media_devices;
+pub mod media_display_info;
 pub mod media_track;
 pub mod peer_connection;
 pub mod rtc_stats;
@@ -25,8 +25,8 @@ pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     media_device_info::MediaDeviceInfo,
-    media_display_info::MediaDisplayInfo,
     media_devices::MediaDevices,
+    media_display_info::MediaDisplayInfo,
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,

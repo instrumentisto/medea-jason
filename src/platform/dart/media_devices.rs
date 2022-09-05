@@ -20,7 +20,8 @@ use crate::{
 use super::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     media_device_info::MediaDeviceInfo,
-    media_track::MediaStreamTrack, media_display_info::MediaDisplayInfo,
+    media_display_info::MediaDisplayInfo,
+    media_track::MediaStreamTrack,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/media_devices.g.dart")]
@@ -33,7 +34,7 @@ mod media_devices {
         /// Returns information about available media input devices.
         pub fn enumerate_devices() -> Dart_Handle;
 
-        //todo
+        /// Returns information about available displays.
         pub fn enumerate_displays() -> Dart_Handle;
 
         /// Prompts a user for permissions to use a media input device,
@@ -128,16 +129,11 @@ impl MediaDevices {
         Ok(result)
     }
 
-    //todo
-    /// Returns the enumerate displays of this [`MediaDevices`].
-    ///
-    /// # Panics
-    ///
-    /// Panics if .
+    /// Collects information about available displays.
     ///
     /// # Errors
     ///
-    /// This function will return an error if .
+    /// If [`DartHandle`] errors.
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
