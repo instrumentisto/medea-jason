@@ -115,6 +115,13 @@ class EnumerateDevicesException {
 }
 
 @JS()
+class EnumerateDisplaysException {
+  external void free();
+  external Error cause();
+  external String trace();
+}
+
+@JS()
 class FormatException {
   external void free();
   external String message();

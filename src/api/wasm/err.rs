@@ -9,7 +9,7 @@ use wasm_bindgen::{
 };
 
 use crate::api::err::{
-    EnumerateDevicesException, FormatException, InternalException,
+    EnumerateDevicesException, EnumerateDisplaysException, FormatException, InternalException,
     InvalidOutputAudioDeviceIdException, LocalMediaInitException,
     MediaSettingsUpdateException, MediaStateTransitionException,
     MicVolumeException, RpcClientException, StateError,
@@ -58,6 +58,7 @@ macro_rules! impl_from_into_jsval_for_error {
 
 impl_from_into_jsval_for_error!(StateError);
 impl_from_into_jsval_for_error!(EnumerateDevicesException);
+impl_from_into_jsval_for_error!(EnumerateDisplaysException);
 impl_from_into_jsval_for_error!(LocalMediaInitException);
 impl_from_into_jsval_for_error!(RpcClientException);
 impl_from_into_jsval_for_error!(InternalException);
