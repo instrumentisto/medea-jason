@@ -18,14 +18,6 @@ abstract class DisplayVideoTrackConstraints implements PlatformHandle {
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
   void idealHeight(int height);
 
-  /// Sets a range of a [`height`][1] constraint.
-  ///
-  /// Converts the provided [min] and [max] into an `u32`. Throws an
-  /// [ArgumentError] if conversion fails.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  void heightInRange(int min, int max);
-
   /// Sets an exact [`width`][1] constraint.
   ///
   /// Converts the provided [width] into an `u32`. Throws an [ArgumentError] if
@@ -41,14 +33,6 @@ abstract class DisplayVideoTrackConstraints implements PlatformHandle {
   ///
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
   void idealWidth(int width);
-
-  /// Sets a range of a [`width`][1] constraint.
-  ///
-  /// Converts the provided [min] and [max] into an `u32`. Throws an
-  /// [ArgumentError] if conversion fails.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  void widthInRange(int min, int max);
 
   /// Sets an ideal of a [`frameRate`][1] constraint.
   ///

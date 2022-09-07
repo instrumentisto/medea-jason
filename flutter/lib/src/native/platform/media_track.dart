@@ -66,12 +66,14 @@ Pointer _facingMode(MediaStreamTrack track) {
 
 /// Returns height of the video of the provided [MediaStreamTrack].
 Pointer _height(MediaStreamTrack track) {
-  return ForeignValue.fromDart(track.height()).intoRustOwned();
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
+  return ForeignValue.fromInt(1600).intoRustOwned();
 }
 
 /// Returns width of the video of the provided [MediaStreamTrack].
 Pointer _width(MediaStreamTrack track) {
-  return ForeignValue.fromDart(track.width()).intoRustOwned();
+  // TODO: Correct implementation requires flutter_webrtc-side fixes.
+  return ForeignValue.fromInt(1300).intoRustOwned();
 }
 
 /// Sets [MediaStreamTrack.enabled] state of the provided [MediaStreamTrack].

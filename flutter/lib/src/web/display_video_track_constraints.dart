@@ -18,11 +18,6 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   }
 
   @override
-  void heightInRange(int min, int max) {
-    fallibleFunction(() => obj.height_in_range(min, max));
-  }
-
-  @override
   void exactWidth(int width) {
     fallibleFunction(() => obj.exact_width(width));
   }
@@ -30,11 +25,6 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   @override
   void idealWidth(int width) {
     fallibleFunction(() => obj.ideal_width(width));
-  }
-
-  @override
-  void widthInRange(int min, int max) {
-    fallibleFunction(() => obj.width_in_range(min, max));
   }
 
   @override

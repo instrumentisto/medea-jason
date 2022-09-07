@@ -83,20 +83,4 @@ abstract class DeviceVideoTrackConstraints implements PlatformHandle {
   ///
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
   void widthInRange(int min, int max);
-
-  /// Sets an ideal of a [`frameRate`][1] constraint.
-  ///
-  /// Converts the provided [frameRate] into an `u32`. Throws an
-  /// [ArgumentError] if conversion fails.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
-  void idealFrameRate(int frameRate);
-
-  /// Sets an exact of a [`frameRate`][1] constraint.
-  ///
-  /// Converts the provided [frameRate] into an `u32`. Throws an
-  /// [ArgumentError] if conversion fails.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
-  void exactFrameRate(int frameRate);
 }

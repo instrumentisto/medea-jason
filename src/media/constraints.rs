@@ -870,16 +870,15 @@ impl From<VideoSettings> for VideoSource {
                     facing_mode: None,
                     width: None,
                     height: None,
-                    frame_rate: None,
                     required: settings.required,
                 })
             }
             MediaSourceKind::Display => {
                 Self::Display(DisplayVideoTrackConstraints {
-                    required: settings.required,
                     height: None,
                     width: None,
                     frame_rate: None,
+                    required: settings.required,
                 })
             }
         }
@@ -1125,9 +1124,6 @@ pub struct DeviceVideoTrackConstraints {
 
     /// Width of the video in pixels.
     pub width: Option<ConstrainU32>,
-
-    /// Frame rate of the video.
-    pub frame_rate: Option<ConstrainU32>,
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1195,21 +1191,6 @@ impl DeviceVideoTrackConstraints {
         self.width = Some(ConstrainU32::Ideal(width));
     }
 
-    /// Sets exact [`frame_rate`][1] constraint.
-    ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
-    pub fn exact_frame_rate(&mut self, frame_rate: u32) {
-        self.frame_rate = Some(ConstrainU32::Exact(frame_rate));
-    }
-
-    /// Sets ideal [`frame_rate`][1] constraint.
-    ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
-    pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
-        log::error!("NU SET je");
-        self.frame_rate = Some(ConstrainU32::Ideal(frame_rate));
-    }
-
     /// Sets range of [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
@@ -1256,9 +1237,6 @@ impl DeviceVideoTrackConstraints {
         }
         if self.width.is_none() && another.width.is_some() {
             self.width = another.width;
-        }
-        if self.frame_rate.is_none() && another.frame_rate.is_some() {
-            self.frame_rate = another.frame_rate;
         }
     }
 
@@ -1344,13 +1322,6 @@ impl DisplayVideoTrackConstraints {
         self.height = Some(ConstrainU32::Ideal(height));
     }
 
-    /// Sets range of [`height`][1] constraint.
-    ///
-    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-    pub fn height_in_range(&mut self, min: u32, max: u32) {
-        self.height = Some(ConstrainU32::Range(min, max));
-    }
-
     /// Sets exact [`width`][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
@@ -1377,13 +1348,6 @@ impl DisplayVideoTrackConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
     pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
         self.frame_rate = Some(ConstrainU32::Ideal(frame_rate));
-    }
-
-    /// Sets range of [`width`][1] constraint.
-    ///
-    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-    pub fn width_in_range(&mut self, min: u32, max: u32) {
-        self.width = Some(ConstrainU32::Range(min, max));
     }
 
     /// Returns an importance of this [`DisplayVideoTrackConstraints`].

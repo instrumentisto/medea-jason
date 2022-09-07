@@ -36,12 +36,6 @@ typedef _exactWidth_Dart = Result Function(Pointer, int);
 typedef _idealWidth_C = Result Function(Pointer, Int64);
 typedef _idealWidth_Dart = Result Function(Pointer, int);
 
-typedef _exactFrameRate_C = Result Function(Pointer, Int64);
-typedef _exactFrameRate_Dart = Result Function(Pointer, int);
-
-typedef _idealFrameRate_C = Result Function(Pointer, Int64);
-typedef _idealFrameRate_Dart = Result Function(Pointer, int);
-
 typedef _widthInRange_C = Result Function(Pointer, Int64, Int64);
 typedef _widthInRange_Dart = Result Function(Pointer, int, int);
 
@@ -76,14 +70,6 @@ final _exactWidth = dl.lookupFunction<_exactWidth_C, _exactWidth_Dart>(
 
 final _idealWidth = dl.lookupFunction<_idealWidth_C, _idealWidth_Dart>(
     'DeviceVideoTrackConstraints__ideal_width');
-
-final _exactFrameRate =
-    dl.lookupFunction<_exactFrameRate_C, _exactFrameRate_Dart>(
-        'DeviceVideoTrackConstraints__exact_frame_rate');
-
-final _idealFrameRate =
-    dl.lookupFunction<_idealFrameRate_C, _idealFrameRate_Dart>(
-        'DeviceVideoTrackConstraints__ideal_frame_rate');
 
 final _widthInRange = dl.lookupFunction<_widthInRange_C, _widthInRange_Dart>(
     'DeviceVideoTrackConstraints__width_in_range');
@@ -147,16 +133,6 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void widthInRange(int min, int max) {
     _widthInRange(ptr.getInnerPtr(), min, max).unwrap();
-  }
-
-  @override
-  void exactFrameRate(int frameRate) {
-    _exactFrameRate(ptr.getInnerPtr(), frameRate).unwrap();
-  }
-
-  @override
-  void idealFrameRate(int frameRate) {
-    _idealFrameRate(ptr.getInnerPtr(), frameRate).unwrap();
   }
 
   @moveSemantics
