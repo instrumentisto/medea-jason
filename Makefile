@@ -497,6 +497,11 @@ flutter.run:
 flutter.web.assets:
 	@rm -rf flutter/assets/pkg
 	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
+		
+	sed -i "s/medea_jason_bg.wasm/medea_jason_bg.wasm?\
+	$(shell sha256sum flutter/assets/pkg/medea_jason_bg.wasm | cut -f 1 -d " ")\
+	/g" flutter/assets/pkg/medea_jason.js
+
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
