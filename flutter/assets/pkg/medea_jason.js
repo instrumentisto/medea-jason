@@ -214,11 +214,11 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_32(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h0e5eda72bcfb5f49(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h09580ed6726e1a5d(arg0, arg1, addHeapObject(arg2));
 }
 
 function __wbg_adapter_43(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hd8e154ad31500f3f(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h62e8b8ccfbceb97e(arg0, arg1, addHeapObject(arg2));
 }
 
 function _assertClass(instance, klass) {
@@ -240,87 +240,9 @@ function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
 function __wbg_adapter_348(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__hd9e82354762a9d76(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__h551cd57e328e84e2(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
-/**
-* Possible error kinds of a [`LocalMediaInitException`].
-*/
-export const LocalMediaInitExceptionKind = Object.freeze({
-/**
-* Occurs if the [getUserMedia()][1] request failed.
-*
-* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-*/
-GetUserMediaFailed:0,"0":"GetUserMediaFailed",
-/**
-* Occurs if the [getUserMedia()][1] request failed on getting audio
-* track.
-*
-* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-*/
-GetUserMediaAudioFailed:1,"1":"GetUserMediaAudioFailed",
-/**
-* Occurs if the [getUserMedia()][1] request failed on getting video
-* track.
-*
-* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-*/
-GetUserMediaVideoFailed:2,"2":"GetUserMediaVideoFailed",
-/**
-* Occurs if the [getDisplayMedia()][1] request failed.
-*
-* [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-*/
-GetDisplayMediaFailed:3,"3":"GetDisplayMediaFailed",
-/**
-* Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
-* or [getDisplayMedia()][3] request.
-*
-* [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-* [2]: https://tinyurl.com/rnxcavf
-* [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-*/
-LocalTrackIsEnded:4,"4":"LocalTrackIsEnded", });
-/**
-* Possible error kinds of a [`RpcClientException`].
-*/
-export const RpcClientExceptionKind = Object.freeze({
-/**
-* Connection with a server was lost.
-*
-* This usually means that some transport error occurred, so a client can
-* continue performing reconnecting attempts.
-*/
-ConnectionLost:0,"0":"ConnectionLost",
-/**
-* Could not authorize an RPC session.
-*
-* This usually means that authentication data a client provides is
-* obsolete.
-*/
-AuthorizationFailed:1,"1":"AuthorizationFailed",
-/**
-* RPC session has been finished. This is a terminal state.
-*/
-SessionFinished:2,"2":"SessionFinished", });
-/**
-* Kind of a [`MediaStateTransitionException`].
-*/
-export const MediaStateTransitionExceptionKind = Object.freeze({
-/**
-* Media state of a [`Sender`] transits to an opposite of the requested
-* one.
-*
-* [`Sender`]: crate::peer::media::Sender
-*/
-OppositeState:0,"0":"OppositeState",
-/**
-* Requested state transition is not allowed by [`Sender`]'s settings.
-*
-* [`Sender`]: crate::peer::media::Sender
-*/
-ProhibitedState:1,"1":"ProhibitedState", });
 /**
 * Media exchange direction of a `Track`.
 */
@@ -408,6 +330,84 @@ Audio:0,"0":"Audio",
 * Video track.
 */
 Video:1,"1":"Video", });
+/**
+* Possible error kinds of a [`LocalMediaInitException`].
+*/
+export const LocalMediaInitExceptionKind = Object.freeze({
+/**
+* Occurs if the [getUserMedia()][1] request failed.
+*
+* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+*/
+GetUserMediaFailed:0,"0":"GetUserMediaFailed",
+/**
+* Occurs if the [getUserMedia()][1] request failed on getting audio
+* track.
+*
+* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+*/
+GetUserMediaAudioFailed:1,"1":"GetUserMediaAudioFailed",
+/**
+* Occurs if the [getUserMedia()][1] request failed on getting video
+* track.
+*
+* [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
+*/
+GetUserMediaVideoFailed:2,"2":"GetUserMediaVideoFailed",
+/**
+* Occurs if the [getDisplayMedia()][1] request failed.
+*
+* [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
+*/
+GetDisplayMediaFailed:3,"3":"GetDisplayMediaFailed",
+/**
+* Occurs when local track is [`ended`][1] right after [getUserMedia()][2]
+* or [getDisplayMedia()][3] request.
+*
+* [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
+* [2]: https://tinyurl.com/rnxcavf
+* [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+*/
+LocalTrackIsEnded:4,"4":"LocalTrackIsEnded", });
+/**
+* Possible error kinds of a [`RpcClientException`].
+*/
+export const RpcClientExceptionKind = Object.freeze({
+/**
+* Connection with a server was lost.
+*
+* This usually means that some transport error occurred, so a client can
+* continue performing reconnecting attempts.
+*/
+ConnectionLost:0,"0":"ConnectionLost",
+/**
+* Could not authorize an RPC session.
+*
+* This usually means that authentication data a client provides is
+* obsolete.
+*/
+AuthorizationFailed:1,"1":"AuthorizationFailed",
+/**
+* RPC session has been finished. This is a terminal state.
+*/
+SessionFinished:2,"2":"SessionFinished", });
+/**
+* Kind of a [`MediaStateTransitionException`].
+*/
+export const MediaStateTransitionExceptionKind = Object.freeze({
+/**
+* Media state of a [`Sender`] transits to an opposite of the requested
+* one.
+*
+* [`Sender`]: crate::peer::media::Sender
+*/
+OppositeState:0,"0":"OppositeState",
+/**
+* Requested state transition is not allowed by [`Sender`]'s settings.
+*
+* [`Sender`]: crate::peer::media::Sender
+*/
+ProhibitedState:1,"1":"ProhibitedState", });
 /**
 * Constraints applicable to audio tracks.
 */
@@ -2672,12 +2672,12 @@ function getImports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
-        const ret = LocalMediaTrack.__wrap(arg0);
+    imports.wbg.__wbg_reconnecthandle_new = function(arg0) {
+        const ret = ReconnectHandle.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_remotemediatrack_new = function(arg0) {
-        const ret = RemoteMediaTrack.__wrap(arg0);
+    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
+        const ret = LocalMediaTrack.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_roomclosereason_new = function(arg0) {
@@ -2688,8 +2688,8 @@ function getImports() {
         const ret = ConnectionHandle.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_reconnecthandle_new = function(arg0) {
-        const ret = ReconnectHandle.__wrap(arg0);
+    imports.wbg.__wbg_remotemediatrack_new = function(arg0) {
+        const ret = RemoteMediaTrack.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_mediadeviceinfo_new = function(arg0) {
@@ -3186,28 +3186,28 @@ function getImports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper888 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 192, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper908 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 289, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper889 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 192, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper909 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 289, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper890 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 192, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper912 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 289, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper893 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 192, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper914 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 289, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper895 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 192, __wbg_adapter_32);
+    imports.wbg.__wbindgen_closure_wrapper916 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 289, __wbg_adapter_32);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper2811 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 808, __wbg_adapter_43);
+    imports.wbg.__wbindgen_closure_wrapper2808 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 806, __wbg_adapter_43);
         return addHeapObject(ret);
     };
 
@@ -3242,7 +3242,7 @@ function initSync(bytes) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('medea_jason_bg.wasm?b86519a2815ca6045ab91b72ad0eb64ea389708ba6df90d24559207d0e8fb40e', import.meta.url);
+        input = new URL('medea_jason_bg.wasm?3a5d551980d9e06accc0c99d08d85e2738ed1397cbd5de1e64e1d0fca232d4f3', import.meta.url);
     }
     const imports = getImports();
 
