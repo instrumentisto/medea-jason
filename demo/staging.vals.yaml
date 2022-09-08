@@ -39,6 +39,7 @@ server:
                   operator: In
                   values: ["true"]
 
+
 web-client:
   image:
     tag: edge
@@ -53,6 +54,7 @@ web-client:
                 - key: "role/application"
                   operator: In
                   values: ["true"]
+
 
 ingress:
   hosts:

@@ -22,11 +22,13 @@ server:
       tag: dev
       pullPolicy: IfNotPresent
 
+
 web-client:
   image:
     repository: instrumentisto/medea-demo
     tag: dev
     pullPolicy: IfNotPresent
+
 
 ingress:
   hosts:
