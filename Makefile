@@ -169,7 +169,7 @@ up.demo: docker.up.demo
 # Usage:
 #	make up.dev
 
-up.dev: 
+up.dev:
 	$(MAKE) -j3 up.jason docker.up.medea up.control
 
 
@@ -1090,7 +1090,8 @@ helm.list:
 
 # Build Helm package from project Helm chart.
 #
-# Usage:review
+# Usage:
+#	make helm.package [chart=medea-demo]
 helm-package-dir = .cache/helm/packages
 
 helm.package:
