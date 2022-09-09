@@ -4,7 +4,7 @@ import 'package:js/js.dart';
 
 import '../interface/connection_handle.dart';
 import '../interface/remote_media_track.dart';
-import '../interface/track_kinds.dart';
+import '../interface/track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;

@@ -4,7 +4,7 @@ import 'local_media_track.dart';
 import 'media_stream_settings.dart';
 import 'reconnect_handle.dart';
 import 'room_close_reason.dart';
-import 'track_kinds.dart';
+import 'track.dart';
 
 /// External handle to a `Room`.
 abstract class RoomHandle implements PlatformHandle {

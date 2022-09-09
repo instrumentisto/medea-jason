@@ -9,7 +9,7 @@ export 'src/interface/reconnect_handle.dart';
 export 'src/interface/remote_media_track.dart';
 export 'src/interface/room_close_reason.dart';
 export 'src/interface/room_handle.dart';
-export 'src/interface/track_kinds.dart';
+export 'src/interface/track.dart';
 export 'src/native/jason.dart' if (dart.library.html) 'src/web/jason.dart';
 export 'src/native/audio_track_constraints.dart'
     if (dart.library.html) 'src/web/audio_track_constraints.dart';

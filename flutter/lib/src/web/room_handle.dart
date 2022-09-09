@@ -6,7 +6,7 @@ import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/reconnect_handle.dart';
 import '../interface/room_close_reason.dart';
 import '../interface/room_handle.dart';
-import '../interface/track_kinds.dart';
+import '../interface/track.dart';
 import '../util/move_semantic.dart';
 import 'connection_handle.dart';
 import 'exceptions.dart';

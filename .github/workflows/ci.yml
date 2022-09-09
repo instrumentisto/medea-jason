@@ -27,7 +27,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs:
       - clippy
-      - crate-jason-non-linux
+      - crate-jason
       - crate-jason-linux
       - dartanalyze
       - dartfmt
@@ -388,7 +388,7 @@ jobs:
   # Building #
   ############
 
-  crate-jason-non-linux:
+  crate-jason:
     name: Build medea-jason
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
@@ -450,12 +450,9 @@ jobs:
     if: ${{ github.ref == 'refs/heads/master'
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || !startsWith(github.ref, 'refs/tags/medea-') }}
-    strategy:
-      fail-fast: false
     runs-on: ubuntu-22.04
-    container:
-      image: debian:buster # reduces requirements GLIBC to 2.28
-      options: -e "SET_CONTAINER_TIMEZONE=true" -e "CONTAINER_TIMEZONE=Greenwich"
+    # reduces requirements GLIBC to 2.28
+    container: debian:buster
     steps:
       - uses: actions/checkout@v3
       - name: Install linux dependencies

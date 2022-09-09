@@ -1,6 +1,6 @@
 import '/src/util/rust_handles_storage.dart';
 import 'remote_media_track.dart';
-import 'track_kinds.dart';
+import 'track.dart';
 
 /// External handler to a `Connection` with a remote `Member`.
 abstract class ConnectionHandle implements PlatformHandle {

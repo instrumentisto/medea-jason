@@ -1,7 +1,4 @@
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-
-import '/src/util/rust_handles_storage.dart';
-import 'track_kinds.dart';
+import 'track.dart';
 
 /// Media exchange direction of a [RemoteMediaTrack].
 enum TrackMediaDirection {
@@ -21,19 +18,9 @@ enum TrackMediaDirection {
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
-abstract class RemoteMediaTrack implements PlatformHandle {
+abstract class RemoteMediaTrack implements MediaTrack {
   /// Indicate whether this [RemoteMediaTrack] is muted.
   bool muted();
-
-  /// Returns this [RemoteMediaTrack]'s kind (audio/video).
-  MediaKind kind();
-
-  /// Returns this [RemoteMediaTrack]'s media source kind (device/display).
-  MediaSourceKind mediaSourceKind();
-
-  /// Returns the underlying [webrtc.MediaStreamTrack] of this
-  /// [RemoteMediaTrack].
-  webrtc.MediaStreamTrack getTrack();
 
   /// Returns the current general [TrackMediaDirection] of this
   /// [RemoteMediaTrack].
