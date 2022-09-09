@@ -1090,9 +1090,7 @@ helm.list:
 
 # Build Helm package from project Helm chart.
 #
-# Usage:
-#	make helm.package [chart=medea-demo]
-
+# Usage:review
 helm-package-dir = .cache/helm/packages
 
 helm.package:
@@ -1141,10 +1139,11 @@ endif
 #	              | cluster=staging )]
 
 helm-up-port-prefix := $(strip $(shell shuf -i 10-99 -n 1))
+helm-file-name := $(if $(call eq,$(helm-cluster),minikue),minikube,staging)
 
 helm.up:
-ifeq ($(wildcard $(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml),)
-	touch $(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml
+ifeq ($(wildcard $(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml),)
+	touch $(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml
 endif
 ifeq ($(helm-cluster),minikube)
 ifeq ($(helm-chart),medea-demo)
@@ -1159,12 +1158,12 @@ endif
 	helm $(helm-cluster-args) upgrade --install \
 		$(helm-release) $(helm-chart-dir)/ \
 			--namespace=$(helm-release-namespace) \
-			--values=$(helm-chart-vals-dir)/$(helm-cluster).vals.yaml \
-			--values=$(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml \
-			--set server.conf.ice.embedded.bind_port="9$(helm-up-port-prefix)0" \
-			--set server.conf.server.client.http.bind_port="9$(helm-up-port-prefix)1" \
-			--set server.conf.server.control.grpc.bind_port="9$(helm-up-port-prefix)2" \
-			--set server.control-mock.conf.bind_port="9$(helm-up-port-prefix)3" \
+			--values=$(helm-chart-vals-dir)/$(helm-file-name).vals.yaml \
+			--values=$(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml \
+			--set server.conf.ice.embedded.bind_port="7$(helm-up-port-prefix)0" \
+			--set server.conf.server.client.http.bind_port="7$(helm-up-port-prefix)1" \
+			--set server.conf.server.control.grpc.bind_port="7$(helm-up-port-prefix)2" \
+			--set server.control-mock.conf.bind_port="7$(helm-up-port-prefix)3" \
 			--set server.deployment.revision=$(shell date +%s) \
 			--set web-client.deployment.revision=$(shell date +%s) \
 			$(if $(call eq,$(force),yes),\
