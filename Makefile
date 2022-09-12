@@ -1030,9 +1030,8 @@ helm-chart-vals-dir = demo
 
 helm-release = $(if $(call eq,$(release),),,$(release)-)$(helm-chart)
 helm-release-namespace = $(strip \
-	$(if $(call eq,$(helm-cluster),staging), \
-		staging, \
-		$(if $(call eq,$(helm-cluster),review),staging-review,default)))
+	$(if $(call eq,$(helm-cluster),staging),staging,\
+	$(if $(call eq,$(helm-cluster),review),staging-review,default)))
 
 # Run Helm command in context of concrete Kubernetes cluster.
 #
@@ -1092,6 +1091,7 @@ helm.list:
 #
 # Usage:
 #	make helm.package [chart=medea-demo]
+
 helm-package-dir = .cache/helm/packages
 
 helm.package:
@@ -1220,8 +1220,8 @@ endef
         cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
         	cargo.lint cargo.version \
         docker.build \
-        	docker.down.control docker.down.demo \
-        	docker.down.e2e docker.down.medea docker.down.webdriver  \
+        	docker.down.control docker.down.demo docker.down.e2e \
+        	docker.down.medea docker.down.webdriver  \
         	docker.pull docker.push docker.tag docker.tar docker.untar \
         	docker.up.control docker.up.demo docker.up.e2e \
         	docker.up.medea docker.up.webdriver \

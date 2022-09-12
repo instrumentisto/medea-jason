@@ -7,10 +7,6 @@ server:
   image:
     tag: edge
     pullPolicy: Always
-    credentials:
-      registry: hub.instrumentisto.com
-      username: changename
-      password: changepass
   conf:
     server:
       client:

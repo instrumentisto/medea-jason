@@ -2,11 +2,16 @@
 labels: {}
   # app.kubernetes.io/part-of: frontend
 
+
 server:
   image:
-    repository: hub.instrumentisto.com/streaming/medea
+    repository: ghcr.io/instrumentisto/medea
     tag: 0.2.0
     pullPolicy: IfNotPresent
+    #credentials:
+    #  registry: docker.io
+    #  username: changeme
+    #  password: changeme
 
   # Medea media server configuration:
   # https://github.com/instrumentisto/medea/blob/master/config.toml
@@ -19,12 +24,12 @@ server:
       control:
         grpc:
           bind_port: 6565
-
     ice:
       embedded:
-        # IP address to be used by Turn as relay.
-        # If empty then `status.hostIP` of Pod will be used.
+        # External IP address to be used by embedded TURN server as relay.
+        # If empty, then `status.hostIP` of Pod is used.
         public_host: ""
+        bind_port: 3478
 
   deployment:
     revisionHistoryLimit: 0
@@ -68,6 +73,7 @@ server:
       bind_port: 8000
       log:
         level: DEBUG
+
 
 web-client:
   image:
