@@ -33,7 +33,6 @@ spec:
       {{- end }}
       annotations:
         checksum/conf: {{ pick (include (print $.Template.BasePath "/configmap.server.yaml") . | fromYaml) "data" | toYaml | sha256sum | quote }}
-        checksum/cred: {{ pick (include (print $.Template.BasePath "/secret.server.yaml") . | fromYaml) "data" | toYaml | sha256sum | quote }}
       {{- with .Values.server.deployment.revision }}
         revision: {{ . | quote }}
       {{- end }}
@@ -49,6 +48,10 @@ spec:
     {{- with .Values.server.deployment.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
     {{- end }}
+    {{- if .Values.server.image.credentials }}
+      imagePullSecrets:
+        - name: {{ printf "%s.registry" (include "medea-demo.fullname" .) | quote }}
+    {{- end }}
       containers:
         - name: medea
           image: {{ printf "%s:%s" .Values.server.image.repository .Values.server.image.tag | quote }}
@@ -56,15 +59,14 @@ spec:
           env:
             - name: MEDEA__CONF
               value: /etc/medea.toml
-            {{- $embedded := .Values.server.conf.ice.embedded }}
-            {{- if not (index $embedded "public_host") }}
+          {{- if not (index .Values.server.conf.ice.embedded "public_host") }}
             - name: POD_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
             - name: MEDEA__ICE__EMBEDDED__PUBLIC_HOST
-              value: "$(POD_IP):{{ .Values.server.conf.ice.embedded.bind_port }}"
-            {{- end }}
+              value: "$(POD_IP):{{ .Values.server.conf.ice.embedded.bind_port | int }}"
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.server.conf.server.client.http.bind_port | int }}
@@ -102,8 +104,6 @@ spec:
             - name: control-http
               containerPort: {{ $controlMock.conf.bind_port | int }}
               protocol: TCP
-      imagePullSecrets:
-        - name: {{ printf "%s.server.cred" (include "medea-demo.fullname" .) | quote }}
       volumes:
         - name: conf
           configMap:
