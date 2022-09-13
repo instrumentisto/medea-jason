@@ -355,6 +355,7 @@ jobs:
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -365,6 +366,7 @@ jobs:
           profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -398,11 +400,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - android
-          - macos
-          - web
-          - windows
+        include:
+          - platform: android
+            lib_path: ./flutter/android/src/main/jniLibs
+          - platform: macos
+            lib_path: ./flutter/macos/lib/
+          - platform: windows
+            lib_path: ./flutter/windows/lib/
+          - platform: web
+            lib_path: ./flutter/assets/pkg/
     runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
@@ -445,7 +451,12 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
-                                    dockerized=no debug=yes
+                                    dockerized=no debug=no
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: jason-lib-${{ matrix.platform }}-${{ github.run_number }}
+          path: ${{ matrix.lib_path }}
 
   crate-jason-linux:
     name: Build medea-jason (linux)
@@ -469,7 +480,12 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
 
-      - run: make cargo.build.jason platform=linux dockerized=no debug=yes
+      - run: make cargo.build.jason platform=linux dockerized=no debug=no
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: jason-lib-linux-${{ github.run_number }}
+          path: ./flutter/linux/lib/
 
   rustdoc:
     runs-on: ubuntu-latest
