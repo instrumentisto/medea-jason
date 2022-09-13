@@ -255,7 +255,6 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
                 DartHandle::new(constraints::new_audio_constraints());
             let mandatory =
                 DartHandle::new(constraints::new_audio_constraints());
-
             if let Some(device_id) = from.device_id {
                 match device_id {
                     ConstrainString::Exact(device_id) => {

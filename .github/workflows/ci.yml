@@ -361,7 +361,8 @@ jobs:
           api-level: ${{ steps.api-version.outputs.min }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
@@ -370,7 +371,8 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
@@ -451,7 +453,7 @@ jobs:
             || startsWith(github.ref, 'refs/tags/medea-jason-')
             || !startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-22.04
-    # reduces requirements GLIBC to 2.28
+    # Pin glibc to 2.28 for better compatibility.
     container: debian:buster
     steps:
       - uses: actions/checkout@v3

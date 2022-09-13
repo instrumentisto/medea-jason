@@ -94,7 +94,7 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.42.0"
+    version: "1.44.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -151,7 +151,7 @@ packages:
       name: medea_flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0-dev+rev.e95f71df940a6d60d9e9a6cd69bfbfc9fe7f82c5"
+    version: "0.8.0-dev+rev.19ec4703802689ccceb525c2795e8f1a253437ee"
   medea_jason:
     dependency: "direct main"
     description:

@@ -11,9 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^2.0.0
-  js: ^0.6.3
-  medea_flutter_webrtc: 0.8.0-dev+rev.e95f71df940a6d60d9e9a6cd69bfbfc9fe7f82c5
+  ffi: ^2.0.1
+  js: ^0.6.4
+  medea_flutter_webrtc: 0.8.0-dev+rev.19ec4703802689ccceb525c2795e8f1a253437ee
 
 dev_dependencies:
   import_sorter: ^4.6.0
