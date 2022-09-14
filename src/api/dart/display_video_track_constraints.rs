@@ -1,6 +1,10 @@
-use std::ptr;
+use std::{os::raw::c_char, ptr};
 
-use super::{propagate_panic, utils::DartResult, ArgumentError, ForeignClass};
+use super::{
+    propagate_panic,
+    utils::{c_str_into_string, DartResult},
+    ArgumentError, ForeignClass,
+};
 
 pub use crate::media::DisplayVideoTrackConstraints;
 
@@ -142,6 +146,19 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_width(
     })
 }
 
+/// Sets an exact [deviceId][1] constraint.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
+#[no_mangle]
+pub unsafe extern "C" fn DisplayVideoTrackConstraints__device_id(
+    mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
+    device_id: ptr::NonNull<c_char>,
+) {
+    propagate_panic(move || {
+        this.as_mut().device_id(c_str_into_string(device_id));
+    });
+}
+
 /// Frees the data behind the provided pointer.
 ///
 /// # Safety
@@ -153,6 +170,6 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__free(
     this: ptr::NonNull<DisplayVideoTrackConstraints>,
 ) {
     propagate_panic(move || {
-        let _ = DisplayVideoTrackConstraints::from_ptr(this);
+        drop(DisplayVideoTrackConstraints::from_ptr(this));
     });
 }

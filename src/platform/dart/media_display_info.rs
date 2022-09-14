@@ -1,4 +1,6 @@
 //! WebRTC display source related representations.
+use derive_more::From;
+
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -26,7 +28,7 @@ mod media_display_info {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, From)]
 /// Representation of a display source.
 pub struct MediaDisplayInfo(DartHandle);
 
@@ -50,17 +52,3 @@ impl MediaDisplayInfo {
         .unwrap()
     }
 }
-
-impl TryFrom<DartHandle> for MediaDisplayInfo {
-    type Error = NotInput;
-
-    fn try_from(value: DartHandle) -> Result<Self, Self::Error> {
-        Ok(Self(value))
-    }
-}
-
-/// Error of a [MediaDeviceInfo][0] representing not an input device.
-///
-/// [0]: https://w3.org/TR/mediacapture-streams#device-info
-#[derive(Clone, Copy, Debug)]
-pub struct NotInput;

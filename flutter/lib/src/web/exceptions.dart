@@ -93,30 +93,6 @@ class WebEnumerateDevicesException extends EnumerateDevicesException {
   }
 }
 
-/// Exception thrown when cannot get info of available displays.
-class WebEnumerateDisplaysException extends EnumerateDisplaysException {
-  late dynamic _cause;
-  late String _trace;
-
-  WebEnumerateDisplaysException(wasm.EnumerateDisplaysException e) {
-    _cause = e.cause();
-    _trace = e.trace();
-    e.free();
-  }
-
-  /// Returns error that caused this [EnumerateDisplaysException].
-  @override
-  dynamic cause() {
-    return _cause;
-  }
-
-  /// Returns stacktrace of this [EnumerateDisplaysException].
-  @override
-  String trace() {
-    return _trace;
-  }
-}
-
 /// Jason's internal exception.
 ///
 /// This is either a programmatic error or some unexpected platform component

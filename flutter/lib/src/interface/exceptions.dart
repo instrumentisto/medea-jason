@@ -65,15 +65,6 @@ abstract class EnumerateDevicesException {
   String trace();
 }
 
-/// Exception thrown when cannot get info of available displays.
-abstract class EnumerateDisplaysException {
-  /// Returns error that caused this [EnumerateDisplaysException].
-  dynamic cause();
-
-  /// Returns stacktrace of this [EnumerateDisplaysException].
-  String trace();
-}
-
 /// Exception thrown when cannot switch output audio device ID.
 abstract class InvalidOutputAudioDeviceIdException {
   /// Returns stacktrace of this [InvalidOutputAudioDeviceIdException].

@@ -76,14 +76,6 @@ impl MediaManagerHandle {
         })
     }
 
-    /// Returns empty array because redundant for web.
-    #[allow(clippy::unused_self)]
-    pub fn enumerate_displays(&self) -> Promise {
-        future_to_promise(
-            async move { Ok(JsValue::from(js_sys::Array::new())) },
-        )
-    }
-
     /// Returns [`LocalMediaTrack`]s objects, built from the provided
     /// [`MediaStreamSettings`].
     ///

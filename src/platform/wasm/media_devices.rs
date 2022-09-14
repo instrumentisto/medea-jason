@@ -111,13 +111,12 @@ impl MediaDevices {
             .collect())
     }
 
-    /// Collects information about the available displays.
-    /// Return emplty list, becase redundant for the web.
+    /// Unimplemented on wasm.
     #[allow(clippy::missing_errors_doc)]
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
-        Ok(vec![])
+        unimplemented!()
     }
 
     /// Prompts a user for a permission to use a media input which produces

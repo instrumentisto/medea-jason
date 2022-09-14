@@ -13,7 +13,6 @@ import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 import 'local_media_track.dart';
 import 'media_device_info.dart';
-import 'media_display_info.dart';
 import 'media_stream_settings.dart';
 
 class WebMediaManagerHandle extends MediaManagerHandle {
@@ -37,8 +36,7 @@ class WebMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<List<MediaDisplayInfo>> enumerateDisplays() async {
-    var tracks = await fallibleFuture(obj.enumerate_displays());
-    return tracks.map((t) => WebMediaDisplayInfo(t)).toList();
+    throw UnsupportedError('enumerateDisplays() is not implemented for web');
   }
 
   @moveSemantics

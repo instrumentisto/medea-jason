@@ -49,4 +49,9 @@ abstract class DisplayVideoTrackConstraints implements PlatformHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
   void exactFrameRate(int frameRate);
+
+  /// Sets an exact [`deviceId`][1] constraint.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
+  void deviceId(String deviceId);
 }

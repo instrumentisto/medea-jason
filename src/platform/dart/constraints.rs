@@ -291,22 +291,12 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                 DartHandle::new(constraints::new_video_constraints());
 
             if let Some(device_id) = from.device_id {
-                match device_id {
-                    ConstrainString::Exact(device_id) => {
-                        constraints::set_video_constraint_value(
-                            optional.get(),
-                            VideoConstraintKind::DeviceId as i64,
-                            DartValue::from(device_id),
-                        );
-                    }
-                    ConstrainString::Ideal(device_id) => {
-                        constraints::set_video_constraint_value(
-                            mandatory.get(),
-                            VideoConstraintKind::DeviceId as i64,
-                            DartValue::from(device_id),
-                        );
-                    }
-                }
+                set_constrain_string(
+                    device_id,
+                    VideoConstraintKind::DeviceId,
+                    &optional,
+                    &mandatory,
+                );
             }
 
             if let Some(facing_mode) = from.facing_mode {
@@ -362,6 +352,15 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
             let mandatory =
                 DartHandle::new(constraints::new_video_constraints());
 
+            if let Some(device_id) = from.device_id {
+                set_constrain_string(
+                    device_id,
+                    VideoConstraintKind::DeviceId,
+                    &optional,
+                    &mandatory,
+                );
+            }
+
             if let Some(width) = from.width {
                 set_video_constrain_u32(
                     width,
@@ -393,6 +392,33 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
                 optional,
                 mandatory,
             }
+        }
+    }
+}
+/// Applies the specified [`ConstrainString`] to the provided  `optional` and
+/// `mandatory` [`DartHandle`]s representing the Dart side constraints.
+unsafe fn set_constrain_string<T>(
+    constrain: ConstrainString<T>,
+    kind: VideoConstraintKind,
+    optional: &DartHandle,
+    mandatory: &DartHandle,
+) where
+    DartValue: From<T>,
+{
+    match constrain {
+        ConstrainString::Exact(val) => {
+            constraints::set_video_constraint_value(
+                mandatory.get(),
+                kind as i64,
+                DartValue::from(val),
+            );
+        }
+        ConstrainString::Ideal(val) => {
+            constraints::set_video_constraint_value(
+                optional.get(),
+                kind as i64,
+                DartValue::from(val),
+            );
         }
     }
 }

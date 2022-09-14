@@ -133,7 +133,7 @@ impl MediaDevices {
     ///
     /// # Errors
     ///
-    /// If [`DartHandle`] errors.
+    /// If platform call returns error.
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
@@ -144,16 +144,15 @@ impl MediaDevices {
             .await
         }
         .map(DartList::from)
-        .map_err(tracerr::wrap!())?;
+        .map_err(tracerr::from_and_wrap!())?;
 
         let len = displays.length();
         let mut result = Vec::with_capacity(len);
         for i in 0..len {
             let val = displays.get(i).unwrap();
-            if let Ok(v) = val.try_into() {
-                result.push(v);
-            }
+            result.push(MediaDisplayInfo::from(val));
         }
+
         Ok(result)
     }
 

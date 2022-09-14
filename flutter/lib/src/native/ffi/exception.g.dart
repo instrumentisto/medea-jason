@@ -23,9 +23,6 @@ void registerFunction(
           NativeFunction<Handle Function(Pointer<Handle>, Pointer<Utf8>)>>
       newEnumerateDevicesException,
   required Pointer<
-          NativeFunction<Handle Function(Pointer<Handle>, Pointer<Utf8>)>>
-      newEnumerateDisplaysException,
-  required Pointer<
           NativeFunction<
               Handle Function(
                   Int64, Pointer<Utf8>, ForeignValue, Pointer<Utf8>)>>
@@ -49,9 +46,8 @@ void registerFunction(
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
+          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
       void Function(
-          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -69,7 +65,6 @@ void registerFunction(
     newFormatException,
     newLocalMediaInitException,
     newEnumerateDevicesException,
-    newEnumerateDisplaysException,
     newRpcClientException,
     newMediaStateTransitionException,
     newInternalException,

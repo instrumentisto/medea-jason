@@ -154,7 +154,7 @@ impl DeviceVideoTrackConstraints {
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
 #[wasm_bindgen]
-#[derive(Clone, Copy, Debug, From, Into)]
+#[derive(Clone, Debug, From, Into)]
 pub struct DisplayVideoTrackConstraints(media::DisplayVideoTrackConstraints);
 
 #[allow(clippy::unused_unit)]

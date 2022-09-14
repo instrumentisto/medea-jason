@@ -11,8 +11,7 @@ use crate::{
         box_dart_handle,
         dart::{utils::string_into_c_str, DartValue},
         err::{
-            EnumerateDevicesException, EnumerateDisplaysException,
-            FormatException, InternalException,
+            EnumerateDevicesException, FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,
             MediaSettingsUpdateException, MediaStateTransitionException,
             MicVolumeException, RpcClientException, StateError,
@@ -69,13 +68,6 @@ mod exception {
         /// Returns a new Dart [`EnumerateDevicesException`] with the provided
         /// error `cause` and `stacktrace`.
         pub fn new_enumerate_devices_exception(
-            cause: DartError,
-            stacktrace: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
-
-        /// Returns a new Dart [`EnumerateDisplaysException`] with the provided
-        /// error `cause` and `stacktrace`.
-        pub fn new_enumerate_displays_exception(
             cause: DartError,
             stacktrace: ptr::NonNull<c_char>,
         ) -> Dart_Handle;
@@ -234,17 +226,6 @@ impl From<EnumerateDevicesException> for DartError {
     fn from(err: EnumerateDevicesException) -> Self {
         unsafe {
             Self::new(exception::new_enumerate_devices_exception(
-                err.cause().into(),
-                string_into_c_str(err.trace()),
-            ))
-        }
-    }
-}
-
-impl From<EnumerateDisplaysException> for DartError {
-    fn from(err: EnumerateDisplaysException) -> Self {
-        unsafe {
-            Self::new(exception::new_enumerate_displays_exception(
                 err.cause().into(),
                 string_into_c_str(err.trace()),
             ))

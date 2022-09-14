@@ -182,26 +182,6 @@ impl EnumerateDevicesException {
     }
 }
 
-/// Exception thrown when cannot get info of available displays.
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
-#[derive(Debug)]
-pub struct EnumerateDisplaysException {
-    /// [`platform::Error`] causing this [`EnumerateDisplaysException`].
-    cause: platform::Error,
-
-    /// Stacktrace of this [`EnumerateDisplaysException`].
-    trace: Trace,
-}
-
-impl EnumerateDisplaysException {
-    /// Creates a new [`EnumerateDisplaysException`] from the provided error
-    /// `cause` and `trace`.
-    #[must_use]
-    pub fn new(cause: platform::Error, trace: Trace) -> Self {
-        Self { cause, trace }
-    }
-}
-
 #[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl EnumerateDevicesException {
@@ -212,22 +192,6 @@ impl EnumerateDevicesException {
     }
 
     /// Returns stacktrace of this [`EnumerateDevicesException`].
-    #[must_use]
-    pub fn trace(&self) -> String {
-        self.trace.to_string()
-    }
-}
-
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
-#[cfg_attr(target_family = "wasm", wasm_bindgen)]
-impl EnumerateDisplaysException {
-    /// Returns [`platform::Error`] causing this [`EnumerateDisplaysException`].
-    #[must_use]
-    pub fn cause(&self) -> platform::Error {
-        self.cause.clone()
-    }
-
-    /// Returns stacktrace of this [`EnumerateDisplaysException`].
     #[must_use]
     pub fn trace(&self) -> String {
         self.trace.to_string()
@@ -632,7 +596,8 @@ impl From<Traced<EnumerateDisplaysError>> for Error {
         let (err, stacktrace) = err.split();
         match err {
             EnumerateDisplaysError::Failed(err) => {
-                EnumerateDisplaysException::new(err, stacktrace).into()
+                InternalException::new(err.to_string(), Some(err), stacktrace)
+                    .into()
             }
             EnumerateDisplaysError::Detached => {
                 StateError::new(err.to_string(), stacktrace).into()

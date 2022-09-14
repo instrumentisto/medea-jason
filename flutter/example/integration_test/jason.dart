@@ -676,6 +676,17 @@ void main() {
     expect(await media.microphoneVolume(), 50);
     expect(() async => await media.setMicrophoneVolume(100), returnsNormally);
   });
+
+  testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
+    var jason = Jason();
+    var media = jason.mediaManager();
+
+    var displays = await media.enumerateDisplays();
+
+    expect(displays.length, 1);
+    expect(displays[0].deviceId(), 'device_id');
+    expect(displays[0].title(), 'title');
+  });
 }
 
 class TestObj {

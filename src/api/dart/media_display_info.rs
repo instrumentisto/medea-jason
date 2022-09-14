@@ -52,12 +52,12 @@ mod mock {
     impl MediaDisplayInfo {
         #[must_use]
         pub fn device_id(&self) -> String {
-            String::from("MediaDisplayInfo.device_id")
+            String::from("device_id")
         }
 
         #[must_use]
         pub fn title(&self) -> Option<String> {
-            Some(String::from("MediaDisplayInfo.title"))
+            Some(String::from("title"))
         }
     }
 }

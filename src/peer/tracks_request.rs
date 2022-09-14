@@ -105,7 +105,7 @@ impl TracksRequest {
                     drop(self.device_video.insert(track_id, device));
                 }
                 VideoSource::Display(display) => {
-                    let _ = self.display_video.insert(track_id, display);
+                    drop(self.display_video.insert(track_id, display));
                 }
             },
         }
@@ -257,7 +257,7 @@ impl SimpleTracksRequest {
                         TracksRequestError::ExpectedDisplayVideoTracks
                     ));
                 }
-                let _ = self.display_video.take();
+                drop(self.display_video.take());
             }
         }
 
@@ -269,7 +269,7 @@ impl SimpleTracksRequest {
         if other.is_display_video_enabled() {
             if let Some((_, display_video)) = self.display_video.as_mut() {
                 if let Some(other_display_video) = other.get_display_video() {
-                    display_video.merge(*other_display_video);
+                    display_video.merge(other_display_video.clone());
                 }
             }
         }
@@ -319,7 +319,7 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
             drop(req.device_video.replace((id, device)));
         }
         for (id, display) in value.display_video {
-            let _ = req.display_video.replace((id, display));
+            drop(req.display_video.replace((id, display)));
         }
 
         Ok(req)
@@ -337,7 +337,7 @@ impl From<&SimpleTracksRequest> for MediaStreamSettings {
             constraints.device_video(device_video.clone());
         }
         if let Some((_, display_video)) = &request.display_video {
-            constraints.display_video(*display_video);
+            constraints.display_video(display_video.clone());
         }
 
         constraints

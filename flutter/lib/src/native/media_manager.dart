@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 
@@ -115,6 +116,11 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<List<MediaDisplayInfo>> enumerateDisplays() async {
+    if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
+      throw UnsupportedError(
+          'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
+    }
+
     Pointer pointer = await (_enumerateDisplays(ptr.getInnerPtr()) as Future);
     return pointer
         .cast<PtrArray>()
