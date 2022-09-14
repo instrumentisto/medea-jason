@@ -28,6 +28,7 @@ jobs:
     needs:
       - clippy
       - crate-jason
+      - crate-jason-linux
       - dartanalyze
       - dartfmt
       - docker
@@ -360,7 +361,8 @@ jobs:
           api-level: ${{ steps.api-version.outputs.min }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
@@ -369,7 +371,8 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
@@ -390,14 +393,13 @@ jobs:
   crate-jason:
     name: Build medea-jason
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || !startsWith(github.ref, 'refs/tags/medea-') }}
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       fail-fast: false
       matrix:
         platform:
           - android
-          - linux
           - macos
           - web
           - windows
@@ -443,7 +445,44 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
-                                    dockerized=no debug=yes
+                                    dockerized=no debug=no
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-jason-${{ matrix.platform }}
+          path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
+                 || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
+                 || (matrix.platform == 'windows' && './flutter/windows/lib/')
+                 ||                                  './flutter/assets/pkg/' }}
+
+  crate-jason-linux:
+    name: Build medea-jason (linux)
+    if: ${{ github.ref == 'refs/heads/master'
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-22.04
+    # Pin glibc to 2.28 for better compatibility.
+    container: debian:buster
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install linux dependencies
+        run: |
+          apt update
+          apt install -y curl xz-utils make clang
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ env.CACHE == 'true' }}
+
+      - run: make cargo.build.jason platform=linux
+                                    dockerized=no debug=no
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-jason-linux
+          path: ./flutter/linux/lib/
 
   rustdoc:
     runs-on: ubuntu-latest
