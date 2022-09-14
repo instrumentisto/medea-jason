@@ -3,10 +3,10 @@ import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
 
 import 'package:js/js.dart';
 
-import '../interface/local_media_track.dart';
 import '../interface/media_device_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;

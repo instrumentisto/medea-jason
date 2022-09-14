@@ -1,10 +1,9 @@
 import '/src/util/rust_handles_storage.dart';
 import 'connection_handle.dart';
-import 'local_media_track.dart';
 import 'media_stream_settings.dart';
+import 'media_track.dart';
 import 'reconnect_handle.dart';
 import 'room_close_reason.dart';
-import 'track.dart';
 
 /// External handle to a `Room`.
 abstract class RoomHandle implements PlatformHandle {

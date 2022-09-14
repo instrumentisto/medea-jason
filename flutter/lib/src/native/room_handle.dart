@@ -3,12 +3,11 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../interface/connection_handle.dart';
-import '../interface/local_media_track.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
+import '../interface/media_track.dart';
 import '../interface/reconnect_handle.dart';
 import '../interface/room_close_reason.dart';
 import '../interface/room_handle.dart';
-import '../interface/track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'connection_handle.dart';
