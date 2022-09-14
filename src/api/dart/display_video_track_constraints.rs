@@ -56,7 +56,7 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_height(
 
 /// Sets an ideal [frameRate][1] constraint.
 ///
-/// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-framerate
+/// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
 #[no_mangle]
 pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_frame_rate(
     mut this: ptr::NonNull<DisplayVideoTrackConstraints>,
@@ -80,7 +80,7 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_frame_rate(
 
 /// Sets an exact [frameRate][1] constraint.
 ///
-/// [1]: https://www.w3.org/TR/mediacapture-streams/#dfn-framerate
+/// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
 #[no_mangle]
 pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_frame_rate(
     mut this: ptr::NonNull<DisplayVideoTrackConstraints>,

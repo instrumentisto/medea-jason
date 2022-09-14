@@ -34,19 +34,19 @@ abstract class DisplayVideoTrackConstraints implements PlatformHandle {
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
   void idealWidth(int width);
 
-  /// Sets an ideal of a [`frameRate`][1] constraint.
+  /// Sets an ideal [`frameRate`][1] constraint.
   ///
-  /// Converts the provided [frameRate] into an `u32`. Throws an
-  /// [ArgumentError] if conversion fails.
+  /// Converts the provided [frameRate] into an `u32`. Throws an [ArgumentError]
+  /// if conversion fails.
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
   void idealFrameRate(int frameRate);
 
-  /// Sets an exact of a [`frameRate`][1] constraint.
+  /// Sets an exact [`frameRate`][1] constraint.
   ///
-  /// Converts the provided [frameRate] into an `u32`. Throws an
-  /// [ArgumentError] if conversion fails.
+  /// Converts the provided [frameRate] into an `u32`. Throws an [ArgumentError]
+  /// if conversion fails.
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
   void exactFrameRate(int frameRate);
 }

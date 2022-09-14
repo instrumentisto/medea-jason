@@ -397,8 +397,8 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
     }
 }
 
-/// Applies the given [`ConstrainU32`] to the `optional` and `mandatory`
-/// [`DartHandle`]s that represent the `Dart`-side constraint.
+/// Applies the specified [`ConstrainU32`] to the provided  `optional` and
+/// `mandatory` [`DartHandle`]s representing the Dart side constraints.
 unsafe fn set_video_constrain_u32(
     constrain: ConstrainU32,
     kind: VideoConstraintKind,

@@ -1259,13 +1259,19 @@ pub struct DisplayVideoTrackConstraints {
     /// call can't be started.
     required: bool,
 
-    /// Height of the video in pixels.
+    /// [Height][1] of the video in pixels.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
     pub height: Option<ConstrainU32>,
 
-    /// Width of the video in pixels.
+    /// [Width][1] of the video in pixels.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
     pub width: Option<ConstrainU32>,
 
-    /// Frame rate of the video.
+    /// [Frame rate][1] of the video.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub frame_rate: Option<ConstrainU32>,
 }
 
@@ -1308,44 +1314,44 @@ impl DisplayVideoTrackConstraints {
         }
     }
 
-    /// Sets exact [`height`][1] constraint.
+    /// Sets an exact [height][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
     pub fn exact_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Exact(height));
     }
 
-    /// Sets ideal [`height`][1] constraint.
+    /// Sets an ideal [height][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
     pub fn ideal_height(&mut self, height: u32) {
         self.height = Some(ConstrainU32::Ideal(height));
     }
 
-    /// Sets exact [`width`][1] constraint.
+    /// Sets an exact [width][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
     pub fn exact_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Exact(width));
     }
 
-    /// Sets ideal [`width`][1] constraint.
+    /// Sets an ideal [width][1] constraint.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
     pub fn ideal_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Ideal(width));
     }
 
-    /// Sets exact [`frame_rate`][1] constraint.
+    /// Sets an exact [frameRate][1] constraint.
     ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub fn exact_frame_rate(&mut self, frame_rate: u32) {
         self.frame_rate = Some(ConstrainU32::Exact(frame_rate));
     }
 
-    /// Sets ideal [`frame_rate`][1] constraint.
+    /// Sets an ideal [frameRate][1] constraint.
     ///
-    /// [1]: https://w3.org/TR/mediacapture-streams/#dfn-framerate
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
         self.frame_rate = Some(ConstrainU32::Ideal(frame_rate));
     }

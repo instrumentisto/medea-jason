@@ -37,7 +37,7 @@ enum TrackMediaDirection {
   Inactive,
 }
 
-/// Abstraction of a handle to an object allocated in the Rust side.
+/// Abstraction of a handle to an object allocated on the Rust side.
 abstract class MediaTrack implements PlatformHandle {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
   /// audio track, or the [MediaKind.Video] if it represents a video track.
@@ -50,7 +50,7 @@ abstract class MediaTrack implements PlatformHandle {
   /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
   MediaSourceKind mediaSourceKind();
 
-  /// Returns underlying [MediaStreamTrack] of this [LocalMediaTrack].
+  /// Returns the underlying [MediaStreamTrack] of this [LocalMediaTrack].
   webrtc.MediaStreamTrack getTrack();
 }
 
