@@ -43,16 +43,18 @@ impl TryFrom<&JsValue> for RtcStats {
             let stat = stat.unchecked_into::<JsArray>();
             let stat = RtcStatsReportEntry::try_from(stat)
                 .map_err(tracerr::map_from_and_wrap!())?;
-            let stat: RtcStat = JsValue::from(&stat.1)
-                .into_serde()
+            let stat_json = js_sys::JSON::stringify(&JsValue::from(&stat.1))
+                .map(String::from)
+                .unwrap_throw();
+            let rtc_stat: RtcStat = serde_json::from_str(&stat_json)
                 .map_err(Rc::new)
                 .map_err(tracerr::from_and_wrap!())?;
 
-            if let RtcStatsType::Other = &stat.stats {
+            if let RtcStatsType::Other = &rtc_stat.stats {
                 continue;
             }
 
-            out.push(stat);
+            out.push(rtc_stat);
         }
 
         Ok(Self(out))

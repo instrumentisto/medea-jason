@@ -2,10 +2,10 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 
-import '../interface/local_media_track.dart';
 import '../interface/media_device_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
