@@ -296,7 +296,7 @@ jobs:
         # TODO: Run e2e test on Windows and macOS
         include:
           - platform: linux
-    runs-on: ${{ matrix.platform }}-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
