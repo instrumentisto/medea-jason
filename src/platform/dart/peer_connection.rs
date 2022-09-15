@@ -131,6 +131,9 @@ mod peer_connection {
 
         /// Closes the provided [`PeerConnection`].
         pub fn close(peer: Dart_Handle);
+
+        // todo
+        pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -170,6 +173,7 @@ impl RtcPeerConnection {
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
+        // IHERE
         // TODO: Correct implementation requires `flutter_webrtc`-side rework.
         Ok(RtcStats(Vec::new()))
     }

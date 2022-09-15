@@ -29,6 +29,7 @@ void registerFunctions(DynamicLibrary dl) {
     getTransceiverByMid: Pointer.fromFunction(_getTransceiverByMid),
     onConnectionStateChange: Pointer.fromFunction(_onConnectionStateChange),
     close: Pointer.fromFunction(_close),
+    getStats: Pointer.fromFunction(_getStats),
   );
 }
 
@@ -160,6 +161,11 @@ Object _rollback(PeerConnection conn) {
 /// Returns all the [RtpTransceiver]s of the provided [PeerConnection].
 Object getTransceivers(PeerConnection conn) {
   return () => conn.getTransceivers();
+}
+
+// todo
+Object _getStats(PeerConnection conn) {
+  return () => conn.getStats();
 }
 
 /// Closes the provided [PeerConnection].
