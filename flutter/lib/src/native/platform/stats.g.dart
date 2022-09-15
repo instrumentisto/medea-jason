@@ -8,7 +8,7 @@ void registerFunction(
   DynamicLibrary dl, {
   required Pointer<NativeFunction<Handle Function(Handle)>> rtcStatsKind,
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> rtcStatsType,
-  required Pointer<NativeFunction<Int64 Function(Handle)>> rtcStatsTimestampUs,
+  required Pointer<NativeFunction<Int32 Function(Handle)>> rtcStatsTimestampUs,
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> rtcStatsId,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcMediaSourceStatsTrackIdentifier,
@@ -34,6 +34,8 @@ void registerFunction(
       rtcStatsCastToRtcOutboundRtpStreamStats,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsTransportId,
+  required Pointer<NativeFunction<Pointer Function(Handle)>>
+      rtcIceCandidateStatsIsRemote,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsAddress,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
@@ -73,39 +75,47 @@ void registerFunction(
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcInboundRtpStreamStatsJitterBufferEmittedCount,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsTotalSamplesReceived,
+      rtcInboundRtpStreamStatsMediaType,
+  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>>
+      rtcInboundRtpStreamStatsMediaTypeClass,
+  required Pointer<NativeFunction<Handle Function(Handle)>>
+      rtcInboundRtpStreamMediaTypeCastToAudio,
+  required Pointer<NativeFunction<Handle Function(Handle)>>
+      rtcInboundRtpStreamMediaTypeCastToVideo,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsConcealedSamples,
+      rtcInboundRtpStreamAudioTotalSamplesReceived,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsSilentConcealedSamples,
+      rtcInboundRtpStreamAudioConcealedSamples,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsAudioLevel,
+      rtcInboundRtpStreamAudioSilentConcealedSamples,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsTotalAudioEnergy,
+      rtcInboundRtpStreamAudioAudioLevel,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsTotalSamplesDuration,
+      rtcInboundRtpStreamAudioTotalAudioEnergy,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFramesDecoded,
+      rtcInboundRtpStreamAudioTotalSamplesDuration,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsKeyFramesDecoded,
+      rtcInboundRtpStreamVideoFramesDecoded,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFrameWidth,
+      rtcInboundRtpStreamVideoKeyFramesDecoded,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFrameHeight,
+      rtcInboundRtpStreamVideoFrameWidth,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsTotalInterFrameDelay,
+      rtcInboundRtpStreamVideoFrameHeight,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFramesPerSecond,
+      rtcInboundRtpStreamVideoTotalInterFrameDelay,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFrameBitDepth,
+      rtcInboundRtpStreamVideoFramesPerSecond,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFirCount,
+      rtcInboundRtpStreamVideoFrameBitDepth,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsPliCount,
+      rtcInboundRtpStreamVideoFirCount,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsConcealmentEvents,
+      rtcInboundRtpStreamVideoPliCount,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcInboundRtpStreamStatsFramesReceived,
+      rtcInboundRtpStreamVideoConcealmentEvents,
+  required Pointer<NativeFunction<Pointer Function(Handle)>>
+      rtcInboundRtpStreamVideoFramesReceived,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidatePairStatsState,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
@@ -163,6 +173,11 @@ void registerFunction(
 }) {
   dl.lookupFunction<
       Void Function(
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -321,6 +336,11 @@ void registerFunction(
           Pointer,
           Pointer,
           Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
           Pointer)>('register_stats')(
     rtcStatsKind,
     rtcStatsType,
@@ -338,6 +358,7 @@ void registerFunction(
     rtcStatsCastToRtcInboundRtpStreamStats,
     rtcStatsCastToRtcOutboundRtpStreamStats,
     rtcIceCandidateStatsTransportId,
+    rtcIceCandidateStatsIsRemote,
     rtcIceCandidateStatsAddress,
     rtcIceCandidateStatsPort,
     rtcIceCandidateStatsProtocol,
@@ -357,23 +378,27 @@ void registerFunction(
     rtcInboundRtpStreamStatsPacketsReceived,
     rtcInboundRtpStreamStatsTotalDecodeTime,
     rtcInboundRtpStreamStatsJitterBufferEmittedCount,
-    rtcInboundRtpStreamStatsTotalSamplesReceived,
-    rtcInboundRtpStreamStatsConcealedSamples,
-    rtcInboundRtpStreamStatsSilentConcealedSamples,
-    rtcInboundRtpStreamStatsAudioLevel,
-    rtcInboundRtpStreamStatsTotalAudioEnergy,
-    rtcInboundRtpStreamStatsTotalSamplesDuration,
-    rtcInboundRtpStreamStatsFramesDecoded,
-    rtcInboundRtpStreamStatsKeyFramesDecoded,
-    rtcInboundRtpStreamStatsFrameWidth,
-    rtcInboundRtpStreamStatsFrameHeight,
-    rtcInboundRtpStreamStatsTotalInterFrameDelay,
-    rtcInboundRtpStreamStatsFramesPerSecond,
-    rtcInboundRtpStreamStatsFrameBitDepth,
-    rtcInboundRtpStreamStatsFirCount,
-    rtcInboundRtpStreamStatsPliCount,
-    rtcInboundRtpStreamStatsConcealmentEvents,
-    rtcInboundRtpStreamStatsFramesReceived,
+    rtcInboundRtpStreamStatsMediaType,
+    rtcInboundRtpStreamStatsMediaTypeClass,
+    rtcInboundRtpStreamMediaTypeCastToAudio,
+    rtcInboundRtpStreamMediaTypeCastToVideo,
+    rtcInboundRtpStreamAudioTotalSamplesReceived,
+    rtcInboundRtpStreamAudioConcealedSamples,
+    rtcInboundRtpStreamAudioSilentConcealedSamples,
+    rtcInboundRtpStreamAudioAudioLevel,
+    rtcInboundRtpStreamAudioTotalAudioEnergy,
+    rtcInboundRtpStreamAudioTotalSamplesDuration,
+    rtcInboundRtpStreamVideoFramesDecoded,
+    rtcInboundRtpStreamVideoKeyFramesDecoded,
+    rtcInboundRtpStreamVideoFrameWidth,
+    rtcInboundRtpStreamVideoFrameHeight,
+    rtcInboundRtpStreamVideoTotalInterFrameDelay,
+    rtcInboundRtpStreamVideoFramesPerSecond,
+    rtcInboundRtpStreamVideoFrameBitDepth,
+    rtcInboundRtpStreamVideoFirCount,
+    rtcInboundRtpStreamVideoPliCount,
+    rtcInboundRtpStreamVideoConcealmentEvents,
+    rtcInboundRtpStreamVideoFramesReceived,
     rtcIceCandidatePairStatsState,
     rtcIceCandidatePairStatsNominated,
     rtcIceCandidatePairStatsBytesSent,

@@ -36,7 +36,7 @@ mod stats {
         pub fn rtc_stats_kind(stats: Dart_Handle) -> Dart_Handle;
         pub fn rtc_stats_type(stats: Dart_Handle) -> ptr::NonNull<c_char>;
 
-        pub fn rtc_stats_timestamp_us(stats: Dart_Handle) -> i64;
+        pub fn rtc_stats_timestamp_us(stats: Dart_Handle) -> i32;
         pub fn rtc_stats_id(stats: Dart_Handle) -> ptr::NonNull<c_char>;
 
         pub fn rtc_media_source_stats_track_identifier(
@@ -144,10 +144,13 @@ mod stats {
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
 
-        //here
         pub fn rtc_inbound_rtp_stream_stats_media_type(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
+
+        pub fn rtc_inbound_rtp_stream_stats_media_type_class(
+            stats: Dart_Handle,
+        ) -> ptr::NonNull<c_char>;
 
         pub fn rtc_inbound_rtp_stream_media_type_cast_to_audio(
             stats: Dart_Handle,
@@ -466,6 +469,18 @@ impl RTCInboundRTPStreamVideo {
 pub enum RTCInboundRTPStreamMediaType {
     Audio(RTCInboundRTPStreamAudio),
     Video(RTCInboundRTPStreamVideo)
+}
+
+impl From<Dart_Handle> for RTCInboundRTPStreamMediaType {
+    fn from(handle: Dart_Handle) -> Self {
+        unsafe {
+            let kind = dart_string_into_rust(stats::rtc_inbound_rtp_stream_stats_media_type_class(handle));
+            match kind.as_str() {
+                "_$RTCInboundRTPStreamAudio" => Self::Audio(RTCInboundRTPStreamAudio(DartHandle::new(stats::rtc_inbound_rtp_stream_media_type_cast_to_audio(handle)))),
+                _ => Self::Video(RTCInboundRTPStreamVideo(DartHandle::new(stats::rtc_inbound_rtp_stream_media_type_cast_to_video(handle))))
+            } 
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -1140,14 +1155,14 @@ impl From<Dart_Handle> for RTCStatsType {
 }
 
 #[derive(Debug)]
-pub struct RTCStats(DartHandle);
+pub struct RTCStats(pub DartHandle);
 
 impl RTCStats {
     pub fn id(&self) -> String {
         unsafe { dart_string_into_rust(stats::rtc_stats_id(self.0.get())) }
     }
 
-    pub fn timestamp_us(&self) -> i64 {
+    pub fn timestamp_us(&self) -> i32 {
         unsafe { stats::rtc_stats_timestamp_us(self.0.get()) }
     }
 

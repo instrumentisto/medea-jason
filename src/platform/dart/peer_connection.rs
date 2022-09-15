@@ -6,7 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState,
+    IceConnectionState, IceServer, PeerConnectionState, stats::RtcStat,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -31,7 +31,7 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack,
+    media_track::MediaStreamTrack, utils::list::DartList, rtc_stats::RTCStats,
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
@@ -132,7 +132,6 @@ mod peer_connection {
         /// Closes the provided [`PeerConnection`].
         pub fn close(peer: Dart_Handle);
 
-        // todo
         pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
     }
 }
@@ -173,9 +172,24 @@ impl RtcPeerConnection {
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
-        // IHERE
-        // TODO: Correct implementation requires `flutter_webrtc`-side rework.
-        Ok(RtcStats(Vec::new()))
+        let handle = self.handle.get();
+
+        let list = unsafe {
+            FutureFromDart::execute::<DartHandle>(peer_connection::get_stats(
+                handle
+            ))
+            .await
+            .map(DartList::from).unwrap()
+        };
+
+        let len = list.length();
+        let mut result = Vec::with_capacity(len);
+        for i in 0..len {
+            let val = RTCStats(list.get(i).unwrap());
+            result.push(RtcStat::from(val));
+        }
+
+        Ok(RtcStats(vec![]))
     }
 
     /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).

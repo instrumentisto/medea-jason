@@ -13,7 +13,7 @@ void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
     rtcStatsKind: Pointer.fromFunction(_rtcStatsKind),
-    rtcStatsTimestampUs: Pointer.fromFunction(_rtcStatsTimestampUs),
+    rtcStatsTimestampUs: Pointer.fromFunction(_rtcStatsTimestampUs, 0),
     rtcStatsId: Pointer.fromFunction(_rtcStatsId),
     rtcMediaSourceStatsTrackIdentifier:
         Pointer.fromFunction(_rtcMediaSourceStatsTrackIdentifier),
@@ -55,40 +55,40 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcInboundRtpStreamStatsTotalDecodeTime),
     rtcInboundRtpStreamStatsJitterBufferEmittedCount:
         Pointer.fromFunction(_rtcInboundRtpStreamStatsJitterBufferEmittedCount),
-    rtcInboundRtpStreamStatsTotalSamplesReceived:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsTotalSamplesReceived),
-    rtcInboundRtpStreamStatsConcealedSamples:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsConcealedSamples),
-    rtcInboundRtpStreamStatsSilentConcealedSamples:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsSilentConcealedSamples),
-    rtcInboundRtpStreamStatsAudioLevel:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsAudioLevel),
-    rtcInboundRtpStreamStatsTotalAudioEnergy:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsTotalAudioEnergy),
-    rtcInboundRtpStreamStatsTotalSamplesDuration:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsTotalSamplesDuration),
-    rtcInboundRtpStreamStatsFramesDecoded:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFramesDecoded),
-    rtcInboundRtpStreamStatsKeyFramesDecoded:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsKeyFramesDecoded),
-    rtcInboundRtpStreamStatsFrameWidth:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFrameWidth),
-    rtcInboundRtpStreamStatsFrameHeight:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFrameHeight),
-    rtcInboundRtpStreamStatsTotalInterFrameDelay:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsTotalInterFrameDelay),
-    rtcInboundRtpStreamStatsFramesPerSecond:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFramesPerSecond),
-    rtcInboundRtpStreamStatsFrameBitDepth:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFrameBitDepth),
-    rtcInboundRtpStreamStatsFirCount:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFirCount),
-    rtcInboundRtpStreamStatsPliCount:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsPliCount),
-    rtcInboundRtpStreamStatsConcealmentEvents:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsConcealmentEvents),
-    rtcInboundRtpStreamStatsFramesReceived:
-        Pointer.fromFunction(_rtcInboundRtpStreamStatsFramesReceived),
+    rtcInboundRtpStreamAudioTotalSamplesReceived:
+        Pointer.fromFunction(_rtcInboundRtpStreamAudioTotalSamplesReceived),
+    rtcInboundRtpStreamAudioConcealedSamples:
+        Pointer.fromFunction(_rtcInboundRtpStreamAudioConcealedSamples),
+    rtcInboundRtpStreamAudioSilentConcealedSamples:
+        Pointer.fromFunction(_rtcInboundRtpStreamAudioSilentConcealedSamples),
+    rtcInboundRtpStreamAudioAudioLevel:
+        Pointer.fromFunction(_rtcInboundRtpStreamAudioAudioLevel),
+    rtcInboundRtpStreamAudioTotalAudioEnergy:
+        Pointer.fromFunction(_rtcInboundRtpStreamAudioTotalAudioEnergy),
+    rtcInboundRtpStreamAudioTotalSamplesDuration:
+        Pointer.fromFunction(_rtcInboundRtpStreamAudioTotalSamplesDuration),
+    rtcInboundRtpStreamVideoFramesDecoded:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFramesDecoded),
+    rtcInboundRtpStreamVideoKeyFramesDecoded:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoKeyFramesDecoded),
+    rtcInboundRtpStreamVideoFrameWidth:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFrameWidth),
+    rtcInboundRtpStreamVideoFrameHeight:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFrameHeight),
+    rtcInboundRtpStreamVideoTotalInterFrameDelay:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoTotalInterFrameDelay),
+    rtcInboundRtpStreamVideoFramesPerSecond:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFramesPerSecond),
+    rtcInboundRtpStreamVideoFrameBitDepth:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFrameBitDepth),
+    rtcInboundRtpStreamVideoFirCount:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFirCount),
+    rtcInboundRtpStreamVideoPliCount:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoPliCount),
+    rtcInboundRtpStreamVideoConcealmentEvents:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoConcealmentEvents),
+    rtcInboundRtpStreamVideoFramesReceived:
+        Pointer.fromFunction(_rtcInboundRtpStreamVideoFramesReceived),
     rtcIceCandidatePairStatsState:
         Pointer.fromFunction(_rtcIceCandidatePairStatsState),
     rtcIceCandidatePairStatsNominated:
@@ -162,6 +162,16 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcStatsCastToRtcInboundRtpStreamStats),
     rtcStatsCastToRtcOutboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcOutboundRtpStreamStats),
+    rtcIceCandidateStatsIsRemote:
+        Pointer.fromFunction(_rtcIceCandidateStatsIsRemote),
+    rtcInboundRtpStreamMediaTypeCastToAudio:
+        Pointer.fromFunction(_rtcInboundRtpStreamMediaTypeCastToAudio),
+    rtcInboundRtpStreamMediaTypeCastToVideo:
+        Pointer.fromFunction(_rtcInboundRtpStreamMediaTypeCastToVideo),
+    rtcInboundRtpStreamStatsMediaType:
+        Pointer.fromFunction(_rtcInboundRtpStreamStatsMediaType),
+    rtcInboundRtpStreamStatsMediaTypeClass:
+        Pointer.fromFunction(_rtcInboundRtpStreamStatsMediaTypeClass),
   );
 }
 
@@ -169,8 +179,8 @@ Object _rtcStatsKind(RTCStats stats) {
   return stats.type;
 }
 
-Int64 _rtcStatsTimestampUs(RTCStats stats) {
-  return (stats.timestampUs as Int64);
+int _rtcStatsTimestampUs(RTCStats stats) {
+  return stats.timestampUs;
 }
 
 Pointer<Utf8> _rtcStatsId(RTCStats stats) {
@@ -343,8 +353,8 @@ Pointer _rtcInboundRtpStreamStatsJitterBufferEmittedCount(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsTotalSamplesReceived(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamAudioTotalSamplesReceived(
+    RTCInboundRTPStreamAudio stats) {
   if (stats.totalSamplesReceived != null) {
     return ForeignValue.fromInt(stats.totalSamplesReceived!).intoRustOwned();
   } else {
@@ -352,8 +362,8 @@ Pointer _rtcInboundRtpStreamStatsTotalSamplesReceived(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsConcealedSamples(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamAudioConcealedSamples(
+    RTCInboundRTPStreamAudio stats) {
   if (stats.concealedSamples != null) {
     return ForeignValue.fromInt(stats.concealedSamples!).intoRustOwned();
   } else {
@@ -361,8 +371,8 @@ Pointer _rtcInboundRtpStreamStatsConcealedSamples(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsSilentConcealedSamples(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamAudioSilentConcealedSamples(
+    RTCInboundRTPStreamAudio stats) {
   if (stats.silentConcealedSamples != null) {
     return ForeignValue.fromInt(stats.silentConcealedSamples!).intoRustOwned();
   } else {
@@ -370,7 +380,7 @@ Pointer _rtcInboundRtpStreamStatsSilentConcealedSamples(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsAudioLevel(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamAudioAudioLevel(RTCInboundRTPStreamAudio stats) {
   if (stats.audioLevel != null) {
     return ForeignValue.fromDouble(stats.audioLevel!).intoRustOwned();
   } else {
@@ -378,8 +388,8 @@ Pointer _rtcInboundRtpStreamStatsAudioLevel(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsTotalAudioEnergy(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamAudioTotalAudioEnergy(
+    RTCInboundRTPStreamAudio stats) {
   if (stats.totalAudioEnergy != null) {
     return ForeignValue.fromDouble(stats.totalAudioEnergy!).intoRustOwned();
   } else {
@@ -387,8 +397,8 @@ Pointer _rtcInboundRtpStreamStatsTotalAudioEnergy(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsTotalSamplesDuration(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamAudioTotalSamplesDuration(
+    RTCInboundRTPStreamAudio stats) {
   if (stats.totalSamplesDuration != null) {
     return ForeignValue.fromDouble(stats.totalSamplesDuration!).intoRustOwned();
   } else {
@@ -396,7 +406,7 @@ Pointer _rtcInboundRtpStreamStatsTotalSamplesDuration(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFramesDecoded(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFramesDecoded(RTCInboundRTPStreamVideo stats) {
   if (stats.framesDecoded != null) {
     return ForeignValue.fromInt(stats.framesDecoded!).intoRustOwned();
   } else {
@@ -404,8 +414,8 @@ Pointer _rtcInboundRtpStreamStatsFramesDecoded(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsKeyFramesDecoded(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoKeyFramesDecoded(
+    RTCInboundRTPStreamVideo stats) {
   if (stats.keyFramesDecoded != null) {
     return ForeignValue.fromInt(stats.keyFramesDecoded!).intoRustOwned();
   } else {
@@ -413,7 +423,7 @@ Pointer _rtcInboundRtpStreamStatsKeyFramesDecoded(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFrameWidth(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFrameWidth(RTCInboundRTPStreamVideo stats) {
   if (stats.frameWidth != null) {
     return ForeignValue.fromInt(stats.frameWidth!).intoRustOwned();
   } else {
@@ -421,7 +431,7 @@ Pointer _rtcInboundRtpStreamStatsFrameWidth(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFrameHeight(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFrameHeight(RTCInboundRTPStreamVideo stats) {
   if (stats.frameHeight != null) {
     return ForeignValue.fromInt(stats.frameHeight!).intoRustOwned();
   } else {
@@ -429,8 +439,8 @@ Pointer _rtcInboundRtpStreamStatsFrameHeight(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsTotalInterFrameDelay(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoTotalInterFrameDelay(
+    RTCInboundRTPStreamVideo stats) {
   if (stats.totalInterFrameDelay != null) {
     return ForeignValue.fromDouble(stats.totalInterFrameDelay!).intoRustOwned();
   } else {
@@ -438,8 +448,8 @@ Pointer _rtcInboundRtpStreamStatsTotalInterFrameDelay(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFramesPerSecond(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFramesPerSecond(
+    RTCInboundRTPStreamVideo stats) {
   if (stats.framesPerSecond != null) {
     return ForeignValue.fromDouble(stats.framesPerSecond!).intoRustOwned();
   } else {
@@ -447,7 +457,7 @@ Pointer _rtcInboundRtpStreamStatsFramesPerSecond(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFrameBitDepth(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFrameBitDepth(RTCInboundRTPStreamVideo stats) {
   if (stats.frameBitDepth != null) {
     return ForeignValue.fromInt(stats.frameBitDepth!).intoRustOwned();
   } else {
@@ -455,7 +465,7 @@ Pointer _rtcInboundRtpStreamStatsFrameBitDepth(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFirCount(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFirCount(RTCInboundRTPStreamVideo stats) {
   if (stats.firCount != null) {
     return ForeignValue.fromInt(stats.firCount!).intoRustOwned();
   } else {
@@ -463,7 +473,7 @@ Pointer _rtcInboundRtpStreamStatsFirCount(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsPliCount(RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoPliCount(RTCInboundRTPStreamVideo stats) {
   if (stats.pliCount != null) {
     return ForeignValue.fromInt(stats.pliCount!).intoRustOwned();
   } else {
@@ -471,8 +481,8 @@ Pointer _rtcInboundRtpStreamStatsPliCount(RTCInboundRTPStreamStats stats) {
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsConcealmentEvents(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoConcealmentEvents(
+    RTCInboundRTPStreamVideo stats) {
   if (stats.concealmentEvents != null) {
     return ForeignValue.fromInt(stats.concealmentEvents!).intoRustOwned();
   } else {
@@ -480,8 +490,8 @@ Pointer _rtcInboundRtpStreamStatsConcealmentEvents(
   }
 }
 
-Pointer _rtcInboundRtpStreamStatsFramesReceived(
-    RTCInboundRTPStreamStats stats) {
+Pointer _rtcInboundRtpStreamVideoFramesReceived(
+    RTCInboundRTPStreamVideo stats) {
   if (stats.framesReceived != null) {
     return ForeignValue.fromInt(stats.framesReceived!).intoRustOwned();
   } else {
@@ -758,4 +768,35 @@ Object _rtcStatsCastToRtcRemoteInboundRtpStreamStats(RTCStatsType stats) {
 
 Object _rtcStatsCastToRtcRemoteOutboundRtpStreamStats(RTCStatsType stats) {
   return stats as RTCRemoteOutboundRtpStreamStats;
+}
+
+Object _rtcIceCandidateStatsIsRemote(RTCIceCandidateStats stats) {
+  if (stats.isRemote != null) {
+    return ForeignValue.fromBool(stats.isRemote!).intoRustOwned();
+  } else {
+    return ForeignValue.none().intoRustOwned();
+  }
+}
+
+Object _rtcInboundRtpStreamMediaTypeCastToAudio(
+    RTCInboundRTPStreamMediaType stats) {
+  return stats as RTCInboundRTPStreamAudio;
+}
+
+Object _rtcInboundRtpStreamMediaTypeCastToVideo(
+    RTCInboundRTPStreamMediaType stats) {
+  return stats as RTCInboundRTPStreamVideo;
+}
+
+Object _rtcInboundRtpStreamStatsMediaType(RTCInboundRTPStreamStats stats) {
+  if (stats.mediaType == null) {
+    return ForeignValue.none().intoRustOwned();
+  } else {
+    return ForeignValue.fromHandle(stats.mediaType!).intoRustOwned();
+  }
+}
+
+Pointer<Utf8> _rtcInboundRtpStreamStatsMediaTypeClass(
+    RTCInboundRTPStreamMediaType stats) {
+  return stats.type.runtimeType.toString().toNativeUtf8();
 }
