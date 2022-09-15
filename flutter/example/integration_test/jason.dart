@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -678,14 +679,26 @@ void main() {
   });
 
   testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
+    var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+
     var jason = Jason();
     var media = jason.mediaManager();
 
-    var displays = await media.enumerateDisplays();
+    if (shouldWork) {
+      var displays = await media.enumerateDisplays();
 
-    expect(displays.length, 1);
-    expect(displays[0].deviceId(), 'device_id');
-    expect(displays[0].title(), 'title');
+      expect(displays.length, 1);
+      expect(displays[0].deviceId(), 'device_id');
+      expect(displays[0].title(), 'title');
+    } else {
+      var err;
+      try {
+        await media.enumerateDisplays();
+      } catch (e) {
+        err = e;
+      }
+      expect(err is UnsupportedError, true);
+    }
   });
 }
 
