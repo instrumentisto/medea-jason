@@ -289,16 +289,14 @@ jobs:
 
   test-e2e-desktop:
     name: Run E2E tests desktop platforms
-    needs: ["docker", "crate-jason"]
+    needs: ["docker", "crate-jason", "crate-jason-linux"]
     strategy:
       fail-fast: false
       matrix:
         # TODO: Run e2e test on Windows and macOS
         include:
           - platform: linux
-            os: ubuntu-22.04
-            lib_path: ./flutter/linux/lib/
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform }}-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -325,7 +323,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: jason-lib-${{ matrix.platform }}-${{ github.run_number }}
-          path: ${{ matrix.lib_path }}
+          path: ./flutter/${{ matrix.platform }}/lib/
 
       - uses: actions/download-artifact@v3
         with:
