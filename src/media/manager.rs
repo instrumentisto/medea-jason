@@ -40,7 +40,7 @@ pub enum EnumerateDevicesError {
 #[cause(error = "platform::Error")]
 pub enum EnumerateDisplaysError {
     /// Occurs if the `enumerateDisplays` request fails.
-    #[display(fmt = "MediaDevices.enumerateDisplays) failed: {}", _0)]
+    #[display(fmt = "MediaDevices.enumerateDisplays() failed: {}", _0)]
     Failed(platform::Error),
 
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
