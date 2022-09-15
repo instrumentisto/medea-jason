@@ -51,9 +51,9 @@ class _JoinRouteState extends State<JoinRoute> {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                      primary: Colors.white,
+                      foregroundColor: Colors.white,
                       backgroundColor: Colors.blue,
-                      onSurface: Colors.grey,
+                      disabledForegroundColor: Colors.grey,
                     ),
                     onPressed: () {
                       print('RoomID: $_roomId and MemberID: $_memberId');

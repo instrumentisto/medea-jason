@@ -1,7 +1,7 @@
 import '/src/util/rust_handles_storage.dart';
-import 'local_media_track.dart';
 import 'media_device_info.dart';
 import 'media_stream_settings.dart';
+import 'media_track.dart';
 
 /// External handle to a `MediaManager`.
 ///

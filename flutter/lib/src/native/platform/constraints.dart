@@ -31,6 +31,7 @@ enum VideoConstraintKind {
   deviceId,
   width,
   height,
+  frameRate,
 }
 
 /// Kind of a [MediaStreamConstraints.audio][0] setting.
@@ -85,6 +86,9 @@ void _setVideoConstraintValue(
       break;
     case VideoConstraintKind.height:
       cons.height = value.toDart();
+      break;
+    case VideoConstraintKind.frameRate:
+      cons.fps = value.toDart();
       break;
   }
 }

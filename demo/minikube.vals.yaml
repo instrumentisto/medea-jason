@@ -12,12 +12,13 @@ server:
       client:
         http:
           public_url: wss://medea-demo.test/ws
-    turn:
-      host: medea-demo.test
+    ice:
+      embedded:
+        public_host: medea-demo.test
 
   control-mock:
     image:
-      image: instrumentisto/medea-control-api-mock
+      repository: instrumentisto/medea-control-api-mock
       tag: dev
       pullPolicy: IfNotPresent
 

@@ -3,13 +3,11 @@ library medea_jason;
 export 'src/interface/connection_handle.dart';
 export 'src/interface/exceptions.dart';
 export 'src/interface/media_device_info.dart';
-export 'src/interface/local_media_track.dart';
 export 'src/interface/media_manager.dart';
+export 'src/interface/media_track.dart';
 export 'src/interface/reconnect_handle.dart';
-export 'src/interface/remote_media_track.dart';
 export 'src/interface/room_close_reason.dart';
 export 'src/interface/room_handle.dart';
-export 'src/interface/track_kinds.dart';
 export 'src/native/jason.dart' if (dart.library.html) 'src/web/jason.dart';
 export 'src/native/audio_track_constraints.dart'
     if (dart.library.html) 'src/web/audio_track_constraints.dart';

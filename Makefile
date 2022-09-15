@@ -134,9 +134,6 @@ down.control:
 	-killall medea-control-api-mock
 
 
-down.coturn: docker.down.coturn
-
-
 down.demo: docker.down.demo
 
 
@@ -148,7 +145,6 @@ down.demo: docker.down.demo
 down.dev:
 	@make docker.down.medea
 	@make down.control
-	@make docker.down.coturn
 
 
 down.medea: docker.down.medea
@@ -165,9 +161,6 @@ up.control:
 	cargo run -p medea-control-api-mock $(if $(call eq,$(background),yes),&,)
 
 
-up.coturn: docker.up.coturn
-
-
 up.demo: docker.up.demo
 
 
@@ -176,7 +169,7 @@ up.demo: docker.up.demo
 # Usage:
 #	make up.dev
 
-up.dev: up.coturn
+up.dev:
 	$(MAKE) -j3 up.jason docker.up.medea up.control
 
 
@@ -817,16 +810,6 @@ docker.down.control:
 	-docker stop medea-control-api-mock
 
 
-# Stop Coturn STUN/TURN server in Docker Compose environment
-# and remove all related containers.
-#
-# Usage:
-#	make docker.down.coturn
-
-docker.down.coturn:
-	docker-compose -f docker-compose.coturn.yml down --rmi=local -v
-
-
 # Stop demo application in Docker Compose environment
 # and remove all related containers.
 #
@@ -985,16 +968,6 @@ docker.up.control:
 		$(IMAGE_REPO)/medea-control-api-mock:$(or $(tag),dev)
 
 
-# Run Coturn STUN/TURN server in Docker Compose environment.
-#
-# Usage:
-#	make docker.up.coturn [background=(yes|no)]
-
-docker.up.coturn: docker.down.coturn
-	docker-compose -f docker-compose.coturn.yml up \
-		$(if $(call eq,$(background),no),--abort-on-container-exit,-d)
-
-
 # Run demo application in Docker Compose environment.
 #
 # Usage:
@@ -1112,7 +1085,8 @@ helm-chart-vals-dir = demo
 
 helm-release = $(if $(call eq,$(release),),,$(release)-)$(helm-chart)
 helm-release-namespace = $(strip \
-	$(if $(call eq,$(helm-cluster),staging),staging,default))
+	$(if $(call eq,$(helm-cluster),staging),staging,\
+	$(if $(call eq,$(helm-cluster),review),staging-review,default)))
 
 # Run Helm command in context of concrete Kubernetes cluster.
 #
@@ -1220,9 +1194,12 @@ endif
 #	                                    | rebuild=yes [no-cache=(no|yes)] )]
 #	              | cluster=staging )]
 
+helm-up-port-prefix := $(strip $(shell shuf -i 10-99 -n 1))
+helm-file-name := $(if $(call eq,$(helm-cluster),minikue),minikube,staging)
+
 helm.up:
-ifeq ($(wildcard $(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml),)
-	touch $(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml
+ifeq ($(wildcard $(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml),)
+	touch $(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml
 endif
 ifeq ($(helm-cluster),minikube)
 ifeq ($(helm-chart),medea-demo)
@@ -1237,8 +1214,12 @@ endif
 	helm $(helm-cluster-args) upgrade --install \
 		$(helm-release) $(helm-chart-dir)/ \
 			--namespace=$(helm-release-namespace) \
-			--values=$(helm-chart-vals-dir)/$(helm-cluster).vals.yaml \
-			--values=$(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml \
+			--values=$(helm-chart-vals-dir)/$(helm-file-name).vals.yaml \
+			--values=$(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml \
+			--set server.conf.ice.embedded.bind_port="7$(helm-up-port-prefix)0" \
+			--set server.conf.server.client.http.bind_port="7$(helm-up-port-prefix)1" \
+			--set server.conf.server.control.grpc.bind_port="7$(helm-up-port-prefix)2" \
+			--set server.control-mock.conf.bind_port="7$(helm-up-port-prefix)3" \
 			--set server.deployment.revision=$(shell date +%s) \
 			--set web-client.deployment.revision=$(shell date +%s) \
 			$(if $(call eq,$(force),yes),\
@@ -1294,13 +1275,13 @@ endef
         cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
         	cargo.lint cargo.version \
         docker.build \
-        	docker.down.control docker.down.coturn docker.down.demo \
-        	docker.down.e2e docker.down.medea docker.down.webdriver  \
+        	docker.down.control docker.down.demo docker.down.e2e \
+        	docker.down.medea docker.down.webdriver  \
         	docker.pull docker.push docker.tag docker.tar docker.untar \
-        	docker.up.control docker.up.coturn docker.up.demo docker.up.e2e \
+        	docker.up.control docker.up.demo docker.up.e2e \
         	docker.up.medea docker.up.webdriver \
         docs docs.rust \
-        down down.control down.coturn down.demo down.dev down.medea \
+        down down.control down.demo down.dev down.medea \
         flutter flutter.fmt flutter.lint flutter.run \
         	flutter.android.compile_api_version \
         	flutter.android.min_api_version \
@@ -1311,6 +1292,6 @@ endef
         release release.crates release.helm release.npm \
         rustup.targets \
         test test.e2e test.flutter test.unit \
-        up up.control up.coturn up.demo up.dev up.jason up.medea \
+        up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
