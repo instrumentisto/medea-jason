@@ -322,7 +322,7 @@ jobs:
       - name: Download medea-jason library
         uses: actions/download-artifact@v3
         with:
-          name: jason-lib-${{ matrix.platform }}-${{ github.run_number }}
+          name: build-jason-${{ matrix.platform }}
           path: ./flutter/${{ matrix.platform }}/lib/
 
       - uses: actions/download-artifact@v3
