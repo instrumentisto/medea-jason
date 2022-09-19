@@ -6,7 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState, stats::RtcStat,
+    stats::RtcStat, IceConnectionState, IceServer, PeerConnectionState,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -31,7 +31,7 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack, utils::list::DartList, rtc_stats::RTCStats,
+    media_track::MediaStreamTrack, rtc_stats::RTCStats, utils::list::DartList,
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
@@ -132,6 +132,7 @@ mod peer_connection {
         /// Closes the provided [`PeerConnection`].
         pub fn close(peer: Dart_Handle);
 
+        // todo
         pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
     }
 }
@@ -176,10 +177,11 @@ impl RtcPeerConnection {
 
         let list = unsafe {
             FutureFromDart::execute::<DartHandle>(peer_connection::get_stats(
-                handle
+                handle,
             ))
             .await
-            .map(DartList::from).unwrap()
+            .map(DartList::from)
+            .unwrap()
         };
 
         let len = list.length();
