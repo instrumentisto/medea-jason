@@ -49,7 +49,7 @@ class ForeignValue extends Struct {
       case 5:
         return _payload.float;
       case 6:
-        return _payload.float;
+        return _payload.flag;
       default:
         throw TypeError();
     }
