@@ -8,6 +8,7 @@ import 'media_devices.dart' as media_devices;
 import 'media_track.dart' as media_track;
 import 'object.dart' as object;
 import 'peer_connection.dart' as peer_connection;
+import 'stats.dart' as stats;
 import 'transceiver.dart' as transceiver;
 import 'transport.dart' as transport;
 
@@ -21,6 +22,7 @@ void registerFunctions(DynamicLibrary dl) {
   constraints.registerFunctions(dl);
   media_devices.registerFunctions(dl);
   transport.registerFunctions(dl);
+  stats.registerFunctions(dl);
   media_device_info.registerFunctions(dl);
   ice_candidate.registerFunctions(dl);
 }
