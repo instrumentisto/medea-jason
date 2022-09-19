@@ -836,7 +836,7 @@ async fn get_traffic_stats() {
     for stat in second_peer_stats.0 {
         match stat.stats {
             RtcStatsType::InboundRtp(inbound) => {
-                match inbound.unwrap().media_specific_stats {
+                match inbound.media_specific_stats.unwrap() {
                     RtcInboundRtpStreamMediaType::Audio { .. } => {
                         second_peer_audio_inbound_stats_count += 1
                     }
