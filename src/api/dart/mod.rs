@@ -645,7 +645,11 @@ impl TryFrom<DartValueArg<Self>> for Option<f64> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Float(num) => Ok(Some(num)),
-            _ => Err(DartValueCastError {
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Bool(_) => Err(DartValueCastError {
                 expectation: concat!("Option<f64>"),
                 value: value.0,
             }),
@@ -660,7 +664,11 @@ impl TryFrom<DartValueArg<Self>> for Option<bool> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Bool(num) => Ok(Some(num)),
-            _ => Err(DartValueCastError {
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Float(_) => Err(DartValueCastError {
                 expectation: concat!("Option<f64>"),
                 value: value.0,
             }),

@@ -108,7 +108,7 @@ impl From<Protocol> for KnownProtocol {
     }
 }
 
-/// Representation of [RTCStatsIceCandidatePairState][1].
+/// Representation of [`RTCStatsIceCandidatePairState`][1].
 ///
 /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstatsicecandidatepairstate
 #[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]

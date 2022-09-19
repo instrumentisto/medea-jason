@@ -115,9 +115,8 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcRemoteInboundRtpStreamStatsRoundTripTime),
     rtcRemoteInboundRtpStreamStatsFractionLost:
         Pointer.fromFunction(_rtcRemoteInboundRtpStreamStatsFractionLost),
-    rtcRemoteInboundRtpStreamStatsRoundTripTimeMeasurements:
-        Pointer.fromFunction(
-            _rtcRemoteInboundRtpStreamStatsRoundTripTimeMeasurements),
+    roundTripTimeMeasurements: Pointer.fromFunction(
+        _rtcRemoteInboundRtpStreamStatsRoundTripTimeMeasurements),
     rtcRemoteOutboundRtpStreamStatsLocalId:
         Pointer.fromFunction(_rtcRemoteOutboundRtpStreamStatsLocalId),
     rtcRemoteOutboundRtpStreamStatsRemoteTimestamp:
@@ -139,25 +138,25 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcAudioSourceStatsEchoReturnLoss),
     rtcAudioSourceStatsEchoReturnLossEnhancement:
         Pointer.fromFunction(_rtcAudioSourceStatsEchoReturnLossEnhancement),
-    rtcStatsCastToRtcMediaSourceStats:
+    castToRtcMediaSourceStats:
         Pointer.fromFunction(_rtcStatsCastToRtcMediaSourceStats),
-    rtcMediaSourceStatsCastToRtcVideoSourceStats:
+    castToRtcVideoSourceStats:
         Pointer.fromFunction(_rtcMediaSourceStatsCastToRtcVideoSourceStats),
-    rtcMediaSourceStatsCastToRtcAudioSourceStats:
+    castToRtcAudioSourceStats:
         Pointer.fromFunction(_rtcMediaSourceStatsCastToRtcAudioSourceStats),
-    rtcStatsCastToRtcIceCandidateStats:
+    castToRtcIceCandidateStats:
         Pointer.fromFunction(_rtcStatsCastToRtcIceCandidateStats),
-    rtcStatsCastToRtcIceCandidatePairStats:
+    castToRtcIceCandidatePairStats:
         Pointer.fromFunction(_rtcStatsCastToRtcIceCandidatePairStats),
-    rtcStatsCastToRtcTransportStats:
+    castToRtcTransportStats:
         Pointer.fromFunction(_rtcStatsCastToRtcTransportStats),
-    rtcStatsCastToRtcRemoteInboundRtpStreamStats:
+    castToRtcRemoteInboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcRemoteInboundRtpStreamStats),
-    rtcStatsCastToRtcRemoteOutboundRtpStreamStats:
+    castToRtcRemoteOutboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcRemoteOutboundRtpStreamStats),
-    rtcStatsCastToRtcInboundRtpStreamStats:
+    castToRtcInboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcInboundRtpStreamStats),
-    rtcStatsCastToRtcOutboundRtpStreamStats:
+    castToRtcOutboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcOutboundRtpStreamStats),
     rtcInboundRtpStreamMediaTypeCastToAudio:
         Pointer.fromFunction(_rtcInboundRtpStreamMediaTypeCastToAudio),
