@@ -836,14 +836,15 @@ async fn get_traffic_stats() {
     for stat in second_peer_stats.0 {
         match stat.stats {
             RtcStatsType::InboundRtp(inbound) => {
-                match inbound.media_specific_stats {
+                let stats = match inbound.media_specific_stats {
                     RtcInboundRtpStreamMediaType::Audio { .. } => {
                         second_peer_audio_inbound_stats_count += 1
                     }
                     RtcInboundRtpStreamMediaType::Video { .. } => {
                         second_peer_video_inbound_stats_count += 1
                     }
-                }
+                };
+                Some(stats)
             }
             RtcStatsType::OutboundRtp(_) => unreachable!(
                 "Second Peer shouldn't have any OutboundRtp stats."
