@@ -161,8 +161,10 @@ pub enum DartValue {
     /// This can also be used to transfer boolean values and C-like enums.
     Int(i64),
 
+    /// Float value.
     Float(f64),
 
+    /// Boolean value.
     Bool(bool),
 }
 
