@@ -6,7 +6,6 @@ pub mod member;
 
 use std::{collections::HashMap, fmt, time::Duration};
 
-use async_trait::async_trait;
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
     callback::{CallbackEvent, CallbackItem},
@@ -53,7 +52,8 @@ type Result<T> = std::result::Result<T, Error>;
 /// [`World`][1] used by all E2E tests.
 ///
 /// [1]: cucumber::World
-#[derive(cucumber::WorldInit)]
+#[derive(cucumber::World)]
+#[world(init = Self::try_new)]
 pub struct World {
     /// ID of the `Room` created for this [`World`].
     room_id: String,
@@ -83,11 +83,15 @@ impl fmt::Debug for World {
     }
 }
 
-#[async_trait(?Send)]
-impl cucumber::World for World {
-    type Error = Error;
-
-    async fn new() -> Result<Self> {
+impl World {
+    /// Attempts to initialized a new fresh [`World`].
+    ///
+    /// # Errors
+    ///
+    /// If fails to instantiate a [`control::Client`] or a [WebDriver] client.
+    ///
+    /// [WebDriver]: https://w3.org/TR/webdriver
+    pub async fn try_new() -> Result<Self> {
         let room_id = Uuid::new_v4().to_string();
 
         let control_client = control::Client::new(&conf::CONTROL_API_ADDR);
@@ -114,9 +118,7 @@ impl cucumber::World for World {
             jasons: HashMap::new(),
         })
     }
-}
 
-impl World {
     /// Creates a new [`Member`] from the provided [`MemberBuilder`].
     ///
     /// `Room` for this [`Member`] will be created, but joining won't be done.
