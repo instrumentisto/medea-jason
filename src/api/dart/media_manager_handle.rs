@@ -9,8 +9,8 @@ use crate::{
         utils::{DartError, DartResult},
     },
     media::{
-        EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError, MicVolumeError,
+        EnumerateDevicesError, EnumerateDisplaysError, HandleDetachedError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     platform,
 };
@@ -19,7 +19,7 @@ use super::{
     media_stream_settings::MediaStreamSettings,
     propagate_panic,
     utils::{DartFuture, IntoDartFuture, PtrArray},
-    ForeignClass, LocalMediaTrack, MediaDeviceInfo,
+    ForeignClass, LocalMediaTrack, MediaDeviceInfo, MediaDisplayInfo,
 };
 
 #[cfg(feature = "mockable")]
@@ -50,8 +50,6 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
 
 /// Returns a list of [`MediaDeviceInfo`] objects representing available media
 /// input and devices, such as microphones, cameras, and so forth.
-///
-/// [`MediaDeviceInfo`]: super::media_device_info::MediaDeviceInfo
 #[rustfmt::skip]
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
@@ -63,6 +61,22 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
         let this = this.as_ref().clone();
 
         async move { Ok(PtrArray::new(this.enumerate_devices().await?)) }
+            .into_dart_future()
+    })
+}
+
+/// Returns a list of [`MediaDisplayInfo`] objects representing available
+/// sources that can be used for screen capturing.
+#[no_mangle]
+pub unsafe extern "C" fn MediaManagerHandle__enumerate_displays(
+    this: ptr::NonNull<MediaManagerHandle>,
+) -> DartFuture<
+    Result<PtrArray<MediaDisplayInfo>, Traced<EnumerateDisplaysError>>,
+> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+
+        async move { Ok(PtrArray::new(this.enumerate_displays().await?)) }
             .into_dart_future()
     })
 }
@@ -184,11 +198,13 @@ mod mock {
                 utils::{DartFuture, DartResult, IntoDartFuture},
                 DartError,
             },
-            LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings,
+            LocalMediaTrack, MediaDeviceInfo, MediaDisplayInfo,
+            MediaStreamSettings,
         },
         media::{
-            EnumerateDevicesError, HandleDetachedError, InitLocalTracksError,
-            InvalidOutputAudioDeviceIdError, MicVolumeError,
+            EnumerateDevicesError, EnumerateDisplaysError, HandleDetachedError,
+            InitLocalTracksError, InvalidOutputAudioDeviceIdError,
+            MicVolumeError,
         },
         platform,
     };
@@ -207,6 +223,13 @@ mod mock {
                 MediaDeviceInfo(0),
                 MediaDeviceInfo(0),
             ])
+        }
+
+        pub async fn enumerate_displays(
+            &self,
+        ) -> Result<Vec<MediaDisplayInfo>, Traced<EnumerateDisplaysError>>
+        {
+            Ok(vec![MediaDisplayInfo(0)])
         }
 
         pub async fn init_local_tracks(
