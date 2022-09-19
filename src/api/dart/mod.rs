@@ -53,7 +53,7 @@ use crate::{
                 Dart_PropagateError_DL_Trampolined,
             },
             handle::DartHandle,
-        },
+        }, rtc_stats::{Protocol, RTCStatsIceCandidatePairState, CandidateType},
     },
 };
 
@@ -726,6 +726,48 @@ impl TryFrom<i64> for MediaKind {
         }
     }
 }
+
+impl TryFrom<i64> for Protocol {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Tcp),
+            1 => Ok(Self::Udp),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for RTCStatsIceCandidatePairState {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Frozen),
+            1 => Ok(Self::Waiting),
+            2 => Ok(Self::InProgress),
+            3 => Ok(Self::Failed),
+            4 => Ok(Self::Succeeded),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for CandidateType {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Host),
+            1 => Ok(Self::Srlfx),
+            2 => Ok(Self::Prflx),
+            3 => Ok(Self::Relay),
+            _ => Err(value),
+        }
+    }
+}
+
 
 impl TryFrom<i64> for MediaDeviceKind {
     type Error = i64;
