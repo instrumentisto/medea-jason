@@ -395,6 +395,7 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
         }
     }
 }
+
 /// Applies the specified [`ConstrainString`] to the provided  `optional` and
 /// `mandatory` [`DartHandle`]s representing the Dart side constraints.
 unsafe fn set_constrain_string<T>(

@@ -1,13 +1,13 @@
 //! WebRTC display source related representations.
-use derive_more::From;
 
+use derive_more::From;
 use medea_macro::dart_bridge;
 
 use crate::{
     api::dart_string_into_rust, platform::dart::utils::handle::DartHandle,
 };
 
-use super::utils::NonNullDartValueArgExt;
+use super::utils::NonNullDartValueArgExt as _;
 
 #[dart_bridge("flutter/lib/src/native/platform/media_display_info.g.dart")]
 mod media_display_info {
@@ -18,18 +18,18 @@ mod media_display_info {
     use crate::api::DartValueArg;
 
     extern "C" {
-        /// Returns an unique identifier of the provided display.
+        /// Returns a unique identifier of the provided display.
         pub fn device_id(info: Dart_Handle) -> ptr::NonNull<c_char>;
 
-        /// Returns describing the represented display.
+        /// Returns a title describing the represented display.
         pub fn title(
             info: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
     }
 }
 
-#[derive(Clone, Debug, From)]
 /// Representation of a display source.
+#[derive(Clone, Debug, From)]
 pub struct MediaDisplayInfo(DartHandle);
 
 impl MediaDisplayInfo {
@@ -42,7 +42,7 @@ impl MediaDisplayInfo {
         }
     }
 
-    /// Returns describing the represented display.
+    /// Returns a title describing the represented display.
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn title(&self) -> Option<String> {

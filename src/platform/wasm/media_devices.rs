@@ -111,7 +111,7 @@ impl MediaDevices {
             .collect())
     }
 
-    /// Unimplemented on wasm.
+    /// Unimplemented on WASM targets.
     #[allow(clippy::missing_errors_doc)]
     pub async fn enumerate_displays(
         &self,

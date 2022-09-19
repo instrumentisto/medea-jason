@@ -36,7 +36,7 @@ class WebMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<List<MediaDisplayInfo>> enumerateDisplays() async {
-    throw UnsupportedError('enumerateDisplays() is not implemented for web');
+    throw UnsupportedError('enumerateDisplays() is not implemented for Web');
   }
 
   @moveSemantics

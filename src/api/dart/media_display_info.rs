@@ -11,7 +11,7 @@ pub use crate::platform::MediaDisplayInfo;
 
 impl ForeignClass for MediaDisplayInfo {}
 
-/// Returns unique identifier of the represented display.
+/// Returns a unique identifier of the represented display.
 #[no_mangle]
 pub unsafe extern "C" fn MediaDisplayInfo__device_id(
     this: ptr::NonNull<MediaDisplayInfo>,
@@ -19,7 +19,7 @@ pub unsafe extern "C" fn MediaDisplayInfo__device_id(
     propagate_panic(move || string_into_c_str(this.as_ref().device_id()))
 }
 
-/// Returns describing the represented display.
+/// Returns a title describing the represented display.
 #[no_mangle]
 pub unsafe extern "C" fn MediaDisplayInfo__title(
     this: ptr::NonNull<MediaDisplayInfo>,

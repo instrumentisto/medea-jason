@@ -50,8 +50,6 @@ pub unsafe extern "C" fn MediaManagerHandle__init_local_tracks(
 
 /// Returns a list of [`MediaDeviceInfo`] objects representing available media
 /// input and devices, such as microphones, cameras, and so forth.
-///
-/// [`MediaDeviceInfo`]: super::media_device_info::MediaDeviceInfo
 #[rustfmt::skip]
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
@@ -69,7 +67,6 @@ pub unsafe extern "C" fn MediaManagerHandle__enumerate_devices(
 
 /// Returns a list of [`MediaDisplayInfo`] objects representing available
 /// sources that can be used for screen capturing.
-#[rustfmt::skip]
 #[no_mangle]
 pub unsafe extern "C" fn MediaManagerHandle__enumerate_displays(
     this: ptr::NonNull<MediaManagerHandle>,

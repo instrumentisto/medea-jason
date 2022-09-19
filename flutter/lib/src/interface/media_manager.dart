@@ -35,16 +35,17 @@ abstract class MediaManagerHandle implements PlatformHandle {
   /// devices access failed.
   Future<List<MediaDeviceInfo>> enumerateDevices();
 
-  /// Returns a list of [MediaDisplayInfo] objects representing available displays.
+  /// Returns a list of [MediaDisplayInfo] objects representing available
+  /// displays.
   ///
-  /// This method is supported on Linux, macOS and Windows. Throws
-  /// [UnsupportedError] on other platforms.
+  /// This method is supported on Linux, macOS and Windows platforms only.
+  /// Throws an [UnsupportedError] on other platforms.
   ///
   /// Throws a [StateError] if an underlying object has been disposed, e.g.
   /// [free] was called on this [MediaManagerHandle], or on a [Jason] that
   /// implicitly owns native object behind this [MediaManagerHandle].
   ///
-  /// Throws [InternalException] on unexpected platform error.
+  /// Throws an [InternalException] on unexpected platform error.
   Future<List<MediaDisplayInfo>> enumerateDisplays();
 
   /// Switches output audio device to the device with the provided [deviceId].

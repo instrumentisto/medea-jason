@@ -33,7 +33,7 @@ pub use self::{
     utils::Function,
 };
 
-/// Unimplemented for wasm targets.
+/// Unimplemented on WASM targets.
 pub type MediaDisplayInfo = ();
 
 #[cfg(feature = "wee_alloc")]
