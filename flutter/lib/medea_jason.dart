@@ -5,6 +5,7 @@ export 'src/interface/exceptions.dart';
 export 'src/interface/media_device_info.dart';
 export 'src/interface/media_manager.dart';
 export 'src/interface/media_track.dart';
+export 'src/interface/media_display_info.dart';
 export 'src/interface/reconnect_handle.dart';
 export 'src/interface/room_close_reason.dart';
 export 'src/interface/room_handle.dart';

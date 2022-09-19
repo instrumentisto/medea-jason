@@ -37,6 +37,11 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
     fallibleFunction(() => obj.ideal_frame_rate(frameRate));
   }
 
+  @override
+  void deviceId(String deviceId) {
+    // no-op
+  }
+
   @moveSemantics
   @override
   void free() {

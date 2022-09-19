@@ -11,6 +11,7 @@ void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
     enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+    enumerateDisplays: Pointer.fromFunction(_enumerateDisplays),
     getUserMedia: Pointer.fromFunction(_getUserMedia),
     getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
     setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
@@ -31,6 +32,11 @@ Object _getUserMedia(webrtc.DeviceConstraints constraints) {
 /// Returns all the available media devices.
 Object _enumerateDevices() {
   return () => webrtc.enumerateDevices();
+}
+
+/// Returns all the available media displays.
+Object _enumerateDisplays() {
+  return () => webrtc.enumerateDisplays();
 }
 
 /// Starts capturing the contents of a display and returns the created

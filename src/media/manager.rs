@@ -34,6 +34,20 @@ pub enum EnumerateDevicesError {
     Detached,
 }
 
+/// Errors returned from the [`MediaManagerHandle::enumerate_displays()`]
+/// method.
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = "platform::Error")]
+pub enum EnumerateDisplaysError {
+    /// Occurs if the `enumerateDisplays` request fails.
+    #[display(fmt = "MediaDevices.enumerateDisplays() failed: {}", _0)]
+    Failed(platform::Error),
+
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    #[display(fmt = "MediaManagerHandle is in detached state")]
+    Detached,
+}
+
 /// Errors returned from the [`MediaManagerHandle::init_local_tracks()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
@@ -184,6 +198,16 @@ impl InnerMediaManager {
     ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<platform::Error>> {
         self.media_devices
             .enumerate_devices()
+            .await
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Returns a list of [`platform::MediaDeviceInfo`] objects.
+    async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<platform::Error>> {
+        self.media_devices
+            .enumerate_displays()
             .await
             .map_err(tracerr::wrap!())
     }
@@ -505,6 +529,25 @@ impl MediaManagerHandle {
             .upgrade()
             .ok_or_else(|| tracerr::new!(EnumerateDevicesError::Detached))?;
         this.enumerate_devices()
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Returns a list of [`platform::MediaDisplayInfo`] objects representing
+    /// available displays.
+    ///
+    /// # Errors
+    ///
+    /// See [`EnumerateDisplaysError`] for details.
+    pub async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<EnumerateDisplaysError>>
+    {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(EnumerateDisplaysError::Detached))?;
+        this.enumerate_displays()
             .await
             .map_err(tracerr::map_from_and_wrap!())
     }

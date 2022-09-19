@@ -7,6 +7,7 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 void registerFunction(
   DynamicLibrary dl, {
   required Pointer<NativeFunction<Handle Function()>> enumerateDevices,
+  required Pointer<NativeFunction<Handle Function()>> enumerateDisplays,
   required Pointer<NativeFunction<Handle Function(Handle)>> getUserMedia,
   required Pointer<NativeFunction<Handle Function(Handle)>> getDisplayMedia,
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
@@ -21,10 +22,11 @@ void registerFunction(
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer),
+          Pointer, Pointer, Pointer, Pointer),
       void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer)>('register_media_devices')(
+          Pointer, Pointer, Pointer, Pointer)>('register_media_devices')(
     enumerateDevices,
+    enumerateDisplays,
     getUserMedia,
     getDisplayMedia,
     setOutputAudioId,
