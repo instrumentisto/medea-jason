@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:ffi/ffi.dart';
+
 import '../interface/display_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
@@ -31,6 +33,9 @@ typedef _exactFrameRate_Dart = Result Function(Pointer, int);
 typedef _idealFrameRate_C = Result Function(Pointer, Int64);
 typedef _idealFrameRate_Dart = Result Function(Pointer, int);
 
+typedef _deviceId_C = Void Function(Pointer, Pointer<Utf8>);
+typedef _deviceId_Dart = void Function(Pointer, Pointer<Utf8>);
+
 final _new =
     dl.lookupFunction<_new_C, _new_Dart>('DisplayVideoTrackConstraints__new');
 
@@ -53,6 +58,9 @@ final _exactFrameRate =
 final _idealFrameRate =
     dl.lookupFunction<_idealFrameRate_C, _idealFrameRate_Dart>(
         'DisplayVideoTrackConstraints__ideal_frame_rate');
+
+final _deviceId = dl.lookupFunction<_deviceId_C, _deviceId_Dart>(
+    'DisplayVideoTrackConstraints__device_id');
 
 final _free_Dart _free = dl
     .lookupFunction<_free_C, _free_Dart>('DisplayVideoTrackConstraints__free');
@@ -93,6 +101,16 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   @override
   void idealFrameRate(int frameRate) {
     _idealFrameRate(ptr.getInnerPtr(), frameRate).unwrap();
+  }
+
+  @override
+  void deviceId(String deviceId) {
+    var deviceIdPtr = deviceId.toNativeUtf8();
+    try {
+      _deviceId(ptr.getInnerPtr(), deviceIdPtr);
+    } finally {
+      calloc.free(deviceIdPtr);
+    }
   }
 
   @moveSemantics

@@ -879,6 +879,7 @@ impl From<VideoSettings> for VideoSource {
                     width: None,
                     frame_rate: None,
                     required: settings.required,
+                    device_id: None,
                 })
             }
         }
@@ -1251,13 +1252,16 @@ impl DeviceVideoTrackConstraints {
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DisplayVideoTrackConstraints {
     /// Importance of this [`DisplayVideoTrackConstraints`].
     ///
     /// If `true` then without these [`DisplayVideoTrackConstraints`] a session
     /// call can't be started.
     required: bool,
+
+    /// Identifier of the device generating the content for the media track.
+    pub device_id: Option<ConstrainString<String>>,
 
     /// [Height][1] of the video in pixels.
     ///
@@ -1291,6 +1295,10 @@ impl DisplayVideoTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video).await
+            && ConstrainString::satisfies(
+                &self.device_id,
+                &Some(track.device_id()),
+            )
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
             && track.guess_is_from_display()
@@ -1300,6 +1308,9 @@ impl DisplayVideoTrackConstraints {
     /// meaning that if some constraints are not set on these ones, then they
     /// will be applied from `another`.
     pub fn merge(&mut self, another: Self) {
+        if self.device_id.is_none() && another.device_id.is_some() {
+            self.device_id = another.device_id;
+        }
         if !self.required && another.required {
             self.required = another.required;
         }
@@ -1340,6 +1351,13 @@ impl DisplayVideoTrackConstraints {
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
     pub fn ideal_width(&mut self, width: u32) {
         self.width = Some(ConstrainU32::Ideal(width));
+    }
+
+    /// Sets an exact [deviceId][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
+    pub fn device_id(&mut self, device_id: String) {
+        self.device_id = Some(ConstrainString::Exact(device_id));
     }
 
     /// Sets an exact [frameRate][1] constraint.

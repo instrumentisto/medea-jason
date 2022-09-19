@@ -4,6 +4,7 @@ import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
 import 'package:js/js.dart';
 
 import '../interface/media_device_info.dart';
+import '../interface/media_display_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/media_track.dart';
@@ -31,6 +32,11 @@ class WebMediaManagerHandle extends MediaManagerHandle {
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
     var tracks = await fallibleFuture(obj.enumerate_devices());
     return tracks.map((t) => WebMediaDeviceInfo(t)).toList();
+  }
+
+  @override
+  Future<List<MediaDisplayInfo>> enumerateDisplays() async {
+    throw UnsupportedError('enumerateDisplays() is not implemented for Web');
   }
 
   @moveSemantics

@@ -11,8 +11,9 @@ use crate::{
     api::Error,
     connection,
     media::{
-        self, EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError, InvalidOutputAudioDeviceIdError, MicVolumeError,
+        self, EnumerateDevicesError, EnumerateDisplaysError,
+        GetDisplayMediaError, GetUserMediaError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
     peer::{
         sender::CreateError, InsertLocalTracksError, LocalMediaError,
@@ -584,6 +585,21 @@ impl From<Traced<EnumerateDevicesError>> for Error {
                 EnumerateDevicesException::new(err, stacktrace).into()
             }
             EnumerateDevicesError::Detached => {
+                StateError::new(err.to_string(), stacktrace).into()
+            }
+        }
+    }
+}
+
+impl From<Traced<EnumerateDisplaysError>> for Error {
+    fn from(err: Traced<EnumerateDisplaysError>) -> Self {
+        let (err, stacktrace) = err.split();
+        match err {
+            EnumerateDisplaysError::Failed(err) => {
+                InternalException::new(err.to_string(), Some(err), stacktrace)
+                    .into()
+            }
+            EnumerateDisplaysError::Detached => {
                 StateError::new(err.to_string(), stacktrace).into()
             }
         }
