@@ -163,7 +163,7 @@ Object getTransceivers(PeerConnection conn) {
   return () => conn.getTransceivers();
 }
 
-// todo
+/// Returns all the [RTCStats] of the provided [PeerConnection].
 Object _getStats(PeerConnection conn) {
   return () => conn.getStats();
 }
