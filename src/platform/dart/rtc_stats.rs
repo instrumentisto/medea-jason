@@ -5,16 +5,22 @@ use std::convert::TryFrom;
 use dart_sys::Dart_Handle;
 use medea_client_api_proto::stats::{
     Float, HighResTimeStamp, KnownCandidateType, KnownIceCandidatePairState,
-    KnownProtocol, MediaSourceStats, NonExhaustive,
-    RtcIceCandidatePairStats, RtcIceCandidateStats,
-    RtcInboundRtpStreamMediaType, RtcInboundRtpStreamStats,
-    RtcOutboundRtpStreamMediaType, RtcOutboundRtpStreamStats,
-    RtcRemoteInboundRtpStreamStats, RtcRemoteOutboundRtpStreamStats, RtcStat,
-    RtcStatsType, RtcTransportStats, StatId,
+    KnownProtocol, MediaSourceStats, NonExhaustive, RtcIceCandidatePairStats,
+    RtcIceCandidateStats, RtcInboundRtpStreamMediaType,
+    RtcInboundRtpStreamStats, RtcOutboundRtpStreamMediaType,
+    RtcOutboundRtpStreamStats, RtcRemoteInboundRtpStreamStats,
+    RtcRemoteOutboundRtpStreamStats, RtcStat, RtcStatsType, RtcTransportStats,
+    StatId,
 };
 use medea_macro::dart_bridge;
 
-use crate::{api::dart_string_into_rust, platform::rtc_stats::{Protocol, CandidateType, RTCStatsIceCandidatePairState}, media::MediaKind};
+use crate::{
+    api::dart_string_into_rust,
+    media::MediaKind,
+    platform::rtc_stats::{
+        CandidateType, Protocol, RTCStatsIceCandidatePairState,
+    },
+};
 
 use super::utils::{handle::DartHandle, NonNullDartValueArgExt};
 
@@ -34,266 +40,721 @@ mod stats {
     use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
 
     extern "C" {
+        /// Returns [kind][1] of the provided [`RTCStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats-type
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_kind(stats: Dart_Handle) -> Dart_Handle;
+
+        /// Returns runtime type of the provided [`RTCStats`][0].
+        ///
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_type(stats: Dart_Handle) -> ptr::NonNull<c_char>;
 
+        /// Returns [timestamp][1] of the provided [`RTCStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats-timestamp
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_timestamp_us(stats: Dart_Handle) -> i64;
+
+        /// Returns [id][1] of the provided [`RTCStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats-id
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_id(stats: Dart_Handle) -> ptr::NonNull<c_char>;
 
+        /// Returns [trackidentifier][1] of the provided
+        /// [`RTCMediaSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats-trackidentifier
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
         pub fn rtc_media_source_stats_track_identifier(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
+        /// Returns runtime type of [kind][1] of the provided
+        /// [`RTCMediaSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats-kind
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
         pub fn rtc_media_source_stats_class_type(
             stats: Dart_Handle,
         ) -> ptr::NonNull<c_char>;
 
+        /// Casts a [`RTCStats`][0] to a [`RTCMediaSourceStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_media_source_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCMediaSourceStats`][0] to a [`RTCVideoSourceStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
         pub fn rtc_media_source_stats_cast_to_rtc_video_source_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCMediaSourceStats`][0] to a [`RTCAudioSourceStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
         pub fn rtc_media_source_stats_cast_to_rtc_audio_source_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCIceCandidateStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_ice_candidate_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCIceCandidatePairStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_ice_candidate_pair_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCTransportStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_transport_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCRemoteInboundRTPStreamStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_remote_inbound_rtp_stream_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCRemoteOutboundRTPStreamStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_remote_outbound_rtp_stream_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCInboundRTPStreamStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_inbound_rtp_stream_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCStats`][0] to a [`RTCOutboundRTPStreamStats`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_stats_cast_to_rtc_outbound_rtp_stream_stats(
             stats: Dart_Handle,
         ) -> Dart_Handle;
 
+        /// Returns [transport_id][1] of the provided
+        /// [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-transportid
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_transport_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        /// Returns [address][1] of the provided [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-address
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_address(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        /// Returns [port][1] of the provided [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-port
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_port(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
+
+        /// Returns [protocol][1] of the provided [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-protocol
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_protocol(stats: Dart_Handle) -> i64;
 
+        /// Returns [candidate_type][1] of the provided
+        /// [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-candidatetype
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_candidate_type(
             stats: Dart_Handle,
         ) -> i64;
 
+        /// Returns [priority][1] of the provided [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-priority
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_priority(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
+
+        /// Returns [url][1] of the provided [`RTCIceCandidateStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats-url
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
         pub fn rtc_ice_candidate_stats_url(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
+        /// Returns [track_id][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-trackid
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_track_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
+        /// Returns [kind][1] of the provided [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-kind
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_kind(stats: Dart_Handle) -> i64;
 
+        /// Returns [bytes_sent][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-retransmittedbytessent
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_bytes_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [packets_sent][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-retransmittedpacketssent
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_packets_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [media_source_id][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-mediasourceid
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_media_source_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        /// Returns [frame_width][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-framewidth
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_frame_width(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [frame_height][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-frameheight
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_frame_height(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [frames_per_second][1] of the provided
+        /// [`RTCOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats-framespersecond
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
         pub fn rtc_outbound_rtp_stream_stats_frames_per_second(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
 
+        /// Returns [remote_id][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-remoteid
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_remote_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        /// Returns [bytes_received][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-bytesreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_bytes_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [packets_received][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-fecpacketsreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_packets_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
 
+        /// Returns [total_decode_time][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totaldecodetime
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_total_decode_time(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [jitter_buffer_emitted_count][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-jitterbufferemittedcount
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_jitter_buffer_emitted_count(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
 
+        /// Returns [media_type][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-kind
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_media_type(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<DartHandle>>>;
 
+        /// Returns runtime type of [kind][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-kind
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_stats_media_type_class(
             stats: Dart_Handle,
         ) -> ptr::NonNull<c_char>;
 
+        /// Casts a [`RTCInboundRTPStreamStats`][0] kind to a
+        /// [`RTCInboundRTPStreamAudio`][1].
+        ///
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_inbound_rtp_stream_media_type_cast_to_audio(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Casts a [`RTCInboundRTPStreamStats`][0] kind to a
+        /// [`RTCInboundRTPStreamVideo`][1].
+        ///
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
         pub fn rtc_inbound_rtp_stream_media_type_cast_to_video(
             stats: Dart_Handle,
         ) -> Dart_Handle;
+
+        /// Returns [total_samples_received][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalsamplesreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_audio_total_samples_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [concealed_samples][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-concealedsamples
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_audio_concealed_samples(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [silent_concealed_samples][1] of the
+        /// provided [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-silentconcealedsamples
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_audio_silent_concealed_samples(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [audio_level][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-audiolevel
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_audio_audio_level(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [total_audio_energy][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalaudioenergy
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_audio_total_audio_energy(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [total_samples_duration][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalsamplesduration
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_audio_total_samples_duration(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [frames_decoded][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framesdecoded
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_frames_decoded(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [key_frames_decoded][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-keyframesdecoded
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_key_frames_decoded(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [frame_width][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framewidth
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_frame_width(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [frame_height][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-frameheight
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_frame_height(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [total_inter_frame_delay][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalinterframedelay
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_total_inter_frame_delay(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [frames_per_second][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framespersecond
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_frames_per_second(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [frame_bit_depth][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framebitdepth
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_frame_bit_depth(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [fir_count][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-fircount
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_fir_count(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [pli_count][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-plicount
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_pli_count(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
 
+        /// Returns [concealment_events][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-concealmentevents
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_concealment_events(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [frames_received][1] of the provided
+        /// [`RTCInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-framesreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
         pub fn rtc_inbound_rtp_stream_video_frames_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
 
+        /// Returns [state][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-state
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_state(stats: Dart_Handle) -> i64;
 
+        /// Returns [nominated][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-nominated
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_nominated(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<bool>>>;
+
+        /// Returns [bytes_sent][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-bytessent
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_bytes_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [bytes_received][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-bytesreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_bytes_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [total_round_trip_time][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-totalroundtriptime
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_total_round_trip_time(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [current_round_trip_time][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_current_round_trip_time(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [available_outgoing_bitrate][1] of the provided
+        /// [`RTCIceCandidatePairStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-availableoutgoingbitrate
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
         pub fn rtc_ice_candidate_pair_stats_available_outgoing_bitrate(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
 
+        /// Returns [packets_sent][1] of the provided
+        /// [`RTCTransportStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats-packetssent
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats
         pub fn rtc_transport_stats_packets_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [packets_received][1] of the provided
+        /// [`RTCTransportStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats-packetsreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats
         pub fn rtc_transport_stats_packets_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [bytes_sent][1] of the provided
+        /// [`RTCTransportStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats-bytessent
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats
         pub fn rtc_transport_stats_bytes_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
+        /// Returns [bytes_received][1] of the provided
+        /// [`RTCTransportStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats-bytesreceived
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats
         pub fn rtc_transport_stats_bytes_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
 
+        /// Returns [local_id][1] of the provided
+        /// [`RTCRemoteInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-localid
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
         pub fn rtc_remote_inbound_rtp_stream_stats_local_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
+        /// Returns [round_trip_time][1] of the provided
+        /// [`RTCRemoteInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
         pub fn rtc_remote_inbound_rtp_stream_stats_round_trip_time(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [fraction_lost][1] of the provided
+        /// [`RTCRemoteInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-fractionlost
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
         pub fn rtc_remote_inbound_rtp_stream_stats_fraction_lost(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
 
+        /// Returns [round_trip_time_measurements][1] of the provided
+        /// [`RTCRemoteInboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptimemeasurements
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
         pub fn rtc_remote_inbound_rtp_stream_stats_round_trip_time_measurements(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
 
+        /// Returns [local_id][1] of the provided
+        /// [`RTCRemoteOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats-localid
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats
         pub fn rtc_remote_outbound_rtp_stream_stats_local_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        /// Returns [remote_timestamp][1] of the provided
+        /// [`RTCRemoteOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats-remotetimestamp
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats
         pub fn rtc_remote_outbound_rtp_stream_stats_remote_timestamp(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [reports_sent][1] of the provided
+        /// [`RTCRemoteOutboundRTPStreamStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats-reportssent
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats
         pub fn rtc_remote_outbound_rtp_stream_stats_reports_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
 
+        /// Returns [width][1] of the provided
+        /// [`RTCVideoSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats-width
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats
         pub fn rtc_video_source_stats_width(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [height][1] of the provided
+        /// [`RTCVideoSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats-height
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats
         pub fn rtc_video_source_stats_height(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [frames][1] of the provided
+        /// [`RTCVideoSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats-frames
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats
         pub fn rtc_video_source_stats_frames(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
+
+        /// Returns [frames_per_second][1] of the provided
+        /// [`RTCVideoSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats-framespersecond
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats
         pub fn rtc_video_source_stats_frames_per_second(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
 
+        /// Returns [audio_level][1] of the provided
+        /// [`RTCAudioSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-audiolevel
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
         pub fn rtc_audio_source_stats_audio_level(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [total_audio_energy][1] of the provided
+        /// [`RTCAudioSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-totalaudioenergy
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
         pub fn rtc_audio_source_stats_total_audio_energy(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [total_samples_duration][1] of the provided
+        /// [`RTCAudioSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-totalsamplesduration
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
         pub fn rtc_audio_source_stats_total_samples_duration(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [echo_return_loss][1] of the provided
+        /// [`RTCAudioSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-echoreturnloss
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
         pub fn rtc_audio_source_stats_echo_return_loss(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
+
+        /// Returns [echo_return_loss_enhancement][1] of the provided
+        /// [`RTCAudioSourceStats`][0].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats-echoreturnlossenhancement
+        /// [0]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
         pub fn rtc_audio_source_stats_echo_return_loss_enhancement(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
@@ -517,9 +978,9 @@ impl RTCInboundRTPStreamVideo {
 /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
 #[derive(Debug)]
 pub enum RTCInboundRTPStreamMediaType {
-    /// Stats when [RTCInboundRTPStreamStats] kind is audio. 
+    /// Stats when [RTCInboundRTPStreamStats] kind is audio.
     Audio(RTCInboundRTPStreamAudio),
-    /// Stats when [RTCInboundRTPStreamStats] kind is video. 
+    /// Stats when [RTCInboundRTPStreamStats] kind is video.
     Video(RTCInboundRTPStreamVideo),
 }
 
@@ -695,7 +1156,8 @@ impl RTCIceCandidatePairStats {
         unsafe {
             RTCStatsIceCandidatePairState::try_from(
                 stats::rtc_ice_candidate_pair_stats_state(self.0.get()),
-            ).unwrap()
+            )
+            .unwrap()
         }
     }
 
@@ -771,8 +1233,6 @@ impl RTCIceCandidatePairStats {
         .unwrap()
     }
 }
-
-
 
 impl From<RTCIceCandidatePairStats> for RtcIceCandidatePairStats {
     fn from(stats: RTCIceCandidatePairStats) -> Self {
@@ -1264,7 +1724,6 @@ impl RTCMediaSourceStats {
     }
 }
 
-
 /// Representation of [RTCIceCandidateStats][1].
 ///
 /// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
@@ -1326,7 +1785,8 @@ impl RTCIceCandidateStats {
     pub fn protocol(&self) -> Protocol {
         Protocol::try_from(unsafe {
             stats::rtc_ice_candidate_stats_protocol(self.get_handle())
-        }).unwrap()
+        })
+        .unwrap()
     }
 
     /// Returns [candidate_type][1] of this [`RTCIceCandidateStats`].
@@ -1445,7 +1905,9 @@ impl RTCStats {
     }
 }
 
-impl From<RTCMediaSourceStatsType> for medea_client_api_proto::stats::MediaKind {
+impl From<RTCMediaSourceStatsType>
+    for medea_client_api_proto::stats::MediaKind
+{
     fn from(stats: RTCMediaSourceStatsType) -> Self {
         match stats {
             RTCMediaSourceStatsType::RTCVideoSourceStats(stats) => {

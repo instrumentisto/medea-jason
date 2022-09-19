@@ -172,22 +172,27 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
+/// Returns [RTCStatsType] of the provided [RTCStats].
 Object _rtcStatsKind(RTCStats stats) {
   return stats.type;
 }
 
+/// Returns timestampUs of the provided [RTCStats].
 int _rtcStatsTimestampUs(RTCStats stats) {
   return stats.timestampUs;
 }
 
+/// Returns id of the provided [RTCStats].
 Pointer<Utf8> _rtcStatsId(RTCStats stats) {
   return stats.id.toNativeUtf8();
 }
 
+/// Returns runtime type of the provided [RTCMediaSourceStats].
 Pointer<Utf8> _rtcMediaSourceStatsClassType(RTCMediaSourceStats stats) {
   return stats.runtimeType.toString().toNativeUtf8();
 }
 
+/// Returns trackIdentifier of the provided [RTCMediaSourceStats].
 Pointer _rtcMediaSourceStatsTrackIdentifier(RTCMediaSourceStats stats) {
   if (stats.trackIdentifier != null) {
     return ForeignValue.fromString(stats.trackIdentifier!).intoRustOwned();
@@ -196,6 +201,7 @@ Pointer _rtcMediaSourceStatsTrackIdentifier(RTCMediaSourceStats stats) {
   }
 }
 
+/// Returns transportId of the provided [RTCIceCandidateStats].
 Pointer _rtcIceCandidateStatsTransportId(RTCIceCandidateStats stats) {
   if (stats.transportId != null) {
     return ForeignValue.fromString(stats.transportId!).intoRustOwned();
@@ -204,6 +210,7 @@ Pointer _rtcIceCandidateStatsTransportId(RTCIceCandidateStats stats) {
   }
 }
 
+/// Returns address of the provided [RTCIceCandidateStats].
 Pointer _rtcIceCandidateStatsAddress(RTCIceCandidateStats stats) {
   if (stats.address != null) {
     return ForeignValue.fromString(stats.address!).intoRustOwned();
@@ -212,6 +219,7 @@ Pointer _rtcIceCandidateStatsAddress(RTCIceCandidateStats stats) {
   }
 }
 
+/// Returns port of the provided [RTCIceCandidateStats].
 Pointer _rtcIceCandidateStatsPort(RTCIceCandidateStats stats) {
   if (stats.port != null) {
     return ForeignValue.fromInt(stats.port!).intoRustOwned();
@@ -220,14 +228,17 @@ Pointer _rtcIceCandidateStatsPort(RTCIceCandidateStats stats) {
   }
 }
 
+/// Returns index of [Protocol] of the provided [RTCIceCandidateStats].
 int _rtcIceCandidateStatsProtocol(RTCIceCandidateStats stats) {
   return stats.protocol.index;
 }
 
+/// Returns index of [CandidateType] of the provided [RTCIceCandidateStats].
 int _rtcIceCandidateStatsCandidateType(RTCIceCandidateStats stats) {
   return stats.candidateType.index;
 }
 
+/// Returns priority of the provided [RTCIceCandidateStats].
 Pointer _rtcIceCandidateStatsPriority(RTCIceCandidateStats stats) {
   if (stats.priority != null) {
     return ForeignValue.fromInt(stats.priority!).intoRustOwned();
@@ -236,6 +247,7 @@ Pointer _rtcIceCandidateStatsPriority(RTCIceCandidateStats stats) {
   }
 }
 
+/// Returns url of the provided [RTCIceCandidateStats].
 Pointer _rtcIceCandidateStatsUrl(RTCIceCandidateStats stats) {
   if (stats.url != null) {
     return ForeignValue.fromString(stats.url!).intoRustOwned();
@@ -244,6 +256,7 @@ Pointer _rtcIceCandidateStatsUrl(RTCIceCandidateStats stats) {
   }
 }
 
+/// Returns trackId of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsTrackId(RTCOutboundRTPStreamStats stats) {
   if (stats.trackId != null) {
     return ForeignValue.fromString(stats.trackId!).intoRustOwned();
@@ -252,10 +265,12 @@ Pointer _rtcOutboundRtpStreamStatsTrackId(RTCOutboundRTPStreamStats stats) {
   }
 }
 
+/// Returns index of [TrackKind] of the provided [RTCOutboundRTPStreamStats].
 int _rtcOutboundRtpStreamStatsKind(RTCOutboundRTPStreamStats stats) {
   return stats.kind.index;
 }
 
+/// Returns bytesSent of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsBytesSent(RTCOutboundRTPStreamStats stats) {
   if (stats.bytesSent != null) {
     return ForeignValue.fromInt(stats.bytesSent!).intoRustOwned();
@@ -264,6 +279,7 @@ Pointer _rtcOutboundRtpStreamStatsBytesSent(RTCOutboundRTPStreamStats stats) {
   }
 }
 
+/// Returns packetsSent of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsPacketsSent(RTCOutboundRTPStreamStats stats) {
   if (stats.packetsSent != null) {
     return ForeignValue.fromInt(stats.packetsSent!).intoRustOwned();
@@ -272,6 +288,7 @@ Pointer _rtcOutboundRtpStreamStatsPacketsSent(RTCOutboundRTPStreamStats stats) {
   }
 }
 
+/// Returns mediaSourceId of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsMediaSourceId(
     RTCOutboundRTPStreamStats stats) {
   if (stats.mediaSourceId != null) {
@@ -281,6 +298,7 @@ Pointer _rtcOutboundRtpStreamStatsMediaSourceId(
   }
 }
 
+/// Returns frameWidth of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsFrameWidth(RTCOutboundRTPStreamStats stats) {
   if (stats.frameWidth != null) {
     return ForeignValue.fromInt(stats.frameWidth!).intoRustOwned();
@@ -289,6 +307,7 @@ Pointer _rtcOutboundRtpStreamStatsFrameWidth(RTCOutboundRTPStreamStats stats) {
   }
 }
 
+/// Returns frameHeight of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsFrameHeight(RTCOutboundRTPStreamStats stats) {
   if (stats.frameHeight != null) {
     return ForeignValue.fromInt(stats.frameHeight!).intoRustOwned();
@@ -297,6 +316,7 @@ Pointer _rtcOutboundRtpStreamStatsFrameHeight(RTCOutboundRTPStreamStats stats) {
   }
 }
 
+/// Returns framesPerSecond of the provided [RTCOutboundRTPStreamStats].
 Pointer _rtcOutboundRtpStreamStatsFramesPerSecond(
     RTCOutboundRTPStreamStats stats) {
   if (stats.framesPerSecond != null) {
@@ -306,6 +326,7 @@ Pointer _rtcOutboundRtpStreamStatsFramesPerSecond(
   }
 }
 
+/// Returns remoteId of the provided [RTCInboundRTPStreamStats].
 Pointer _rtcInboundRtpStreamStatsRemoteId(RTCInboundRTPStreamStats stats) {
   if (stats.remoteId != null) {
     return ForeignValue.fromString(stats.remoteId!).intoRustOwned();
@@ -314,6 +335,7 @@ Pointer _rtcInboundRtpStreamStatsRemoteId(RTCInboundRTPStreamStats stats) {
   }
 }
 
+/// Returns bytesReceived of the provided [RTCInboundRTPStreamStats].
 Pointer _rtcInboundRtpStreamStatsBytesReceived(RTCInboundRTPStreamStats stats) {
   if (stats.bytesReceived != null) {
     return ForeignValue.fromInt(stats.bytesReceived!).intoRustOwned();
@@ -322,6 +344,7 @@ Pointer _rtcInboundRtpStreamStatsBytesReceived(RTCInboundRTPStreamStats stats) {
   }
 }
 
+/// Returns packetsReceived of the provided [RTCInboundRTPStreamStats].
 Pointer _rtcInboundRtpStreamStatsPacketsReceived(
     RTCInboundRTPStreamStats stats) {
   if (stats.packetsReceived != null) {
@@ -331,6 +354,7 @@ Pointer _rtcInboundRtpStreamStatsPacketsReceived(
   }
 }
 
+/// Returns totalDecodeTime of the provided [RTCInboundRTPStreamStats].
 Pointer _rtcInboundRtpStreamStatsTotalDecodeTime(
     RTCInboundRTPStreamStats stats) {
   if (stats.totalDecodeTime != null) {
@@ -340,6 +364,7 @@ Pointer _rtcInboundRtpStreamStatsTotalDecodeTime(
   }
 }
 
+/// Returns jitterBufferEmittedCount of the provided [RTCInboundRTPStreamStats].
 Pointer _rtcInboundRtpStreamStatsJitterBufferEmittedCount(
     RTCInboundRTPStreamStats stats) {
   if (stats.jitterBufferEmittedCount != null) {
@@ -350,6 +375,7 @@ Pointer _rtcInboundRtpStreamStatsJitterBufferEmittedCount(
   }
 }
 
+/// Returns totalSamplesReceived of the provided [RTCInboundRTPStreamAudio].
 Pointer _rtcInboundRtpStreamAudioTotalSamplesReceived(
     RTCInboundRTPStreamAudio stats) {
   if (stats.totalSamplesReceived != null) {
@@ -359,6 +385,7 @@ Pointer _rtcInboundRtpStreamAudioTotalSamplesReceived(
   }
 }
 
+/// Returns concealedSamples of the provided [RTCInboundRTPStreamAudio].
 Pointer _rtcInboundRtpStreamAudioConcealedSamples(
     RTCInboundRTPStreamAudio stats) {
   if (stats.concealedSamples != null) {
@@ -368,6 +395,7 @@ Pointer _rtcInboundRtpStreamAudioConcealedSamples(
   }
 }
 
+/// Returns silentConcealedSamples of the provided [RTCInboundRTPStreamAudio].
 Pointer _rtcInboundRtpStreamAudioSilentConcealedSamples(
     RTCInboundRTPStreamAudio stats) {
   if (stats.silentConcealedSamples != null) {
@@ -377,6 +405,7 @@ Pointer _rtcInboundRtpStreamAudioSilentConcealedSamples(
   }
 }
 
+/// Returns audioLevel of the provided [RTCInboundRTPStreamAudio].
 Pointer _rtcInboundRtpStreamAudioAudioLevel(RTCInboundRTPStreamAudio stats) {
   if (stats.audioLevel != null) {
     return ForeignValue.fromDouble(stats.audioLevel!).intoRustOwned();
@@ -385,6 +414,7 @@ Pointer _rtcInboundRtpStreamAudioAudioLevel(RTCInboundRTPStreamAudio stats) {
   }
 }
 
+/// Returns totalAudioEnergy of the provided [RTCInboundRTPStreamAudio].
 Pointer _rtcInboundRtpStreamAudioTotalAudioEnergy(
     RTCInboundRTPStreamAudio stats) {
   if (stats.totalAudioEnergy != null) {
@@ -394,6 +424,7 @@ Pointer _rtcInboundRtpStreamAudioTotalAudioEnergy(
   }
 }
 
+/// Returns totalSamplesDuration of the provided [RTCInboundRTPStreamAudio].
 Pointer _rtcInboundRtpStreamAudioTotalSamplesDuration(
     RTCInboundRTPStreamAudio stats) {
   if (stats.totalSamplesDuration != null) {
@@ -403,6 +434,7 @@ Pointer _rtcInboundRtpStreamAudioTotalSamplesDuration(
   }
 }
 
+/// Returns framesDecoded of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFramesDecoded(RTCInboundRTPStreamVideo stats) {
   if (stats.framesDecoded != null) {
     return ForeignValue.fromInt(stats.framesDecoded!).intoRustOwned();
@@ -411,6 +443,7 @@ Pointer _rtcInboundRtpStreamVideoFramesDecoded(RTCInboundRTPStreamVideo stats) {
   }
 }
 
+/// Returns keyFramesDecoded of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoKeyFramesDecoded(
     RTCInboundRTPStreamVideo stats) {
   if (stats.keyFramesDecoded != null) {
@@ -420,6 +453,7 @@ Pointer _rtcInboundRtpStreamVideoKeyFramesDecoded(
   }
 }
 
+/// Returns frameWidth of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFrameWidth(RTCInboundRTPStreamVideo stats) {
   if (stats.frameWidth != null) {
     return ForeignValue.fromInt(stats.frameWidth!).intoRustOwned();
@@ -428,6 +462,7 @@ Pointer _rtcInboundRtpStreamVideoFrameWidth(RTCInboundRTPStreamVideo stats) {
   }
 }
 
+/// Returns frameHeight of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFrameHeight(RTCInboundRTPStreamVideo stats) {
   if (stats.frameHeight != null) {
     return ForeignValue.fromInt(stats.frameHeight!).intoRustOwned();
@@ -436,6 +471,7 @@ Pointer _rtcInboundRtpStreamVideoFrameHeight(RTCInboundRTPStreamVideo stats) {
   }
 }
 
+/// Returns totalInterFrameDelay of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoTotalInterFrameDelay(
     RTCInboundRTPStreamVideo stats) {
   if (stats.totalInterFrameDelay != null) {
@@ -445,6 +481,7 @@ Pointer _rtcInboundRtpStreamVideoTotalInterFrameDelay(
   }
 }
 
+/// Returns framesPerSecond of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFramesPerSecond(
     RTCInboundRTPStreamVideo stats) {
   if (stats.framesPerSecond != null) {
@@ -454,6 +491,7 @@ Pointer _rtcInboundRtpStreamVideoFramesPerSecond(
   }
 }
 
+/// Returns frameBitDepth of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFrameBitDepth(RTCInboundRTPStreamVideo stats) {
   if (stats.frameBitDepth != null) {
     return ForeignValue.fromInt(stats.frameBitDepth!).intoRustOwned();
@@ -462,6 +500,7 @@ Pointer _rtcInboundRtpStreamVideoFrameBitDepth(RTCInboundRTPStreamVideo stats) {
   }
 }
 
+/// Returns firCount of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFirCount(RTCInboundRTPStreamVideo stats) {
   if (stats.firCount != null) {
     return ForeignValue.fromInt(stats.firCount!).intoRustOwned();
@@ -470,6 +509,7 @@ Pointer _rtcInboundRtpStreamVideoFirCount(RTCInboundRTPStreamVideo stats) {
   }
 }
 
+/// Returns pliCount of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoPliCount(RTCInboundRTPStreamVideo stats) {
   if (stats.pliCount != null) {
     return ForeignValue.fromInt(stats.pliCount!).intoRustOwned();
@@ -478,6 +518,7 @@ Pointer _rtcInboundRtpStreamVideoPliCount(RTCInboundRTPStreamVideo stats) {
   }
 }
 
+/// Returns concealmentEvents of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoConcealmentEvents(
     RTCInboundRTPStreamVideo stats) {
   if (stats.concealmentEvents != null) {
@@ -487,6 +528,7 @@ Pointer _rtcInboundRtpStreamVideoConcealmentEvents(
   }
 }
 
+/// Returns framesReceived of the provided [RTCInboundRTPStreamVideo].
 Pointer _rtcInboundRtpStreamVideoFramesReceived(
     RTCInboundRTPStreamVideo stats) {
   if (stats.framesReceived != null) {
@@ -496,10 +538,12 @@ Pointer _rtcInboundRtpStreamVideoFramesReceived(
   }
 }
 
+/// Returns index of [RTCStatsIceCandidatePairState] of the provided [RTCIceCandidatePairStats].
 int _rtcIceCandidatePairStatsState(RTCIceCandidatePairStats stats) {
   return stats.state.index;
 }
 
+/// Returns nominated of the provided [RTCIceCandidatePairStats].
 Pointer _rtcIceCandidatePairStatsNominated(RTCIceCandidatePairStats stats) {
   if (stats.nominated != null) {
     return ForeignValue.fromBool(stats.nominated!).intoRustOwned();
@@ -508,6 +552,7 @@ Pointer _rtcIceCandidatePairStatsNominated(RTCIceCandidatePairStats stats) {
   }
 }
 
+/// Returns bytesSent of the provided [RTCIceCandidatePairStats].
 Pointer _rtcIceCandidatePairStatsBytesSent(RTCIceCandidatePairStats stats) {
   if (stats.bytesSent != null) {
     return ForeignValue.fromInt(stats.bytesSent!).intoRustOwned();
@@ -516,6 +561,7 @@ Pointer _rtcIceCandidatePairStatsBytesSent(RTCIceCandidatePairStats stats) {
   }
 }
 
+/// Returns bytesReceived of the provided [RTCIceCandidatePairStats].
 Pointer _rtcIceCandidatePairStatsBytesReceived(RTCIceCandidatePairStats stats) {
   if (stats.bytesReceived != null) {
     return ForeignValue.fromInt(stats.bytesReceived!).intoRustOwned();
@@ -524,6 +570,7 @@ Pointer _rtcIceCandidatePairStatsBytesReceived(RTCIceCandidatePairStats stats) {
   }
 }
 
+/// Returns totalRoundTripTime of the provided [RTCIceCandidatePairStats].
 Pointer _rtcIceCandidatePairStatsTotalRoundTripTime(
     RTCIceCandidatePairStats stats) {
   if (stats.totalRoundTripTime != null) {
@@ -533,6 +580,7 @@ Pointer _rtcIceCandidatePairStatsTotalRoundTripTime(
   }
 }
 
+/// Returns currentRoundTripTime of the provided [RTCIceCandidatePairStats].
 Pointer _rtcIceCandidatePairStatsCurrentRoundTripTime(
     RTCIceCandidatePairStats stats) {
   if (stats.currentRoundTripTime != null) {
@@ -542,6 +590,7 @@ Pointer _rtcIceCandidatePairStatsCurrentRoundTripTime(
   }
 }
 
+/// Returns availableOutgoingBitrate of the provided [RTCIceCandidatePairStats].
 Pointer _rtcIceCandidatePairStatsAvailableOutgoingBitrate(
     RTCIceCandidatePairStats stats) {
   if (stats.availableOutgoingBitrate != null) {
@@ -552,6 +601,7 @@ Pointer _rtcIceCandidatePairStatsAvailableOutgoingBitrate(
   }
 }
 
+/// Returns packetsSent of the provided [RTCTransportStats].
 Pointer _rtcTransportStatsPacketsSent(RTCTransportStats stats) {
   if (stats.packetsSent != null) {
     return ForeignValue.fromInt(stats.packetsSent!).intoRustOwned();
@@ -560,6 +610,7 @@ Pointer _rtcTransportStatsPacketsSent(RTCTransportStats stats) {
   }
 }
 
+/// Returns packetsReceived of the provided [RTCTransportStats].
 Pointer _rtcTransportStatsPacketsReceived(RTCTransportStats stats) {
   if (stats.packetsReceived != null) {
     return ForeignValue.fromInt(stats.packetsReceived!).intoRustOwned();
@@ -568,6 +619,7 @@ Pointer _rtcTransportStatsPacketsReceived(RTCTransportStats stats) {
   }
 }
 
+/// Returns bytesSent of the provided [RTCTransportStats].
 Pointer _rtcTransportStatsBytesSent(RTCTransportStats stats) {
   if (stats.bytesSent != null) {
     return ForeignValue.fromInt(stats.bytesSent!).intoRustOwned();
@@ -576,6 +628,7 @@ Pointer _rtcTransportStatsBytesSent(RTCTransportStats stats) {
   }
 }
 
+/// Returns bytesReceived of the provided [RTCTransportStats].
 Pointer _rtcTransportStatsBytesReceived(RTCTransportStats stats) {
   if (stats.bytesReceived != null) {
     return ForeignValue.fromInt(stats.bytesReceived!).intoRustOwned();
@@ -584,6 +637,7 @@ Pointer _rtcTransportStatsBytesReceived(RTCTransportStats stats) {
   }
 }
 
+/// Returns localId of the provided [RTCRemoteInboundRtpStreamStats].
 Pointer _rtcRemoteInboundRtpStreamStatsLocalId(
     RTCRemoteInboundRtpStreamStats stats) {
   if (stats.localId != null) {
@@ -593,6 +647,7 @@ Pointer _rtcRemoteInboundRtpStreamStatsLocalId(
   }
 }
 
+/// Returns roundTripTime of the provided [RTCRemoteInboundRtpStreamStats].
 Pointer _rtcRemoteInboundRtpStreamStatsRoundTripTime(
     RTCRemoteInboundRtpStreamStats stats) {
   if (stats.roundTripTime != null) {
@@ -602,6 +657,7 @@ Pointer _rtcRemoteInboundRtpStreamStatsRoundTripTime(
   }
 }
 
+/// Returns fractionLost of the provided [RTCRemoteInboundRtpStreamStats].
 Pointer _rtcRemoteInboundRtpStreamStatsFractionLost(
     RTCRemoteInboundRtpStreamStats stats) {
   if (stats.fractionLost != null) {
@@ -611,6 +667,7 @@ Pointer _rtcRemoteInboundRtpStreamStatsFractionLost(
   }
 }
 
+/// Returns roundTripTimeMeasurements of the provided [RTCRemoteInboundRtpStreamStats].
 Pointer _rtcRemoteInboundRtpStreamStatsRoundTripTimeMeasurements(
     RTCRemoteInboundRtpStreamStats stats) {
   if (stats.roundTripTimeMeasurements != null) {
@@ -621,6 +678,7 @@ Pointer _rtcRemoteInboundRtpStreamStatsRoundTripTimeMeasurements(
   }
 }
 
+/// Returns localId of the provided [RTCRemoteOutboundRtpStreamStats].
 Pointer _rtcRemoteOutboundRtpStreamStatsLocalId(
     RTCRemoteOutboundRtpStreamStats stats) {
   if (stats.localId != null) {
@@ -630,6 +688,7 @@ Pointer _rtcRemoteOutboundRtpStreamStatsLocalId(
   }
 }
 
+/// Returns remoteTimestamp of the provided [RTCRemoteOutboundRtpStreamStats].
 Pointer _rtcRemoteOutboundRtpStreamStatsRemoteTimestamp(
     RTCRemoteOutboundRtpStreamStats stats) {
   if (stats.remoteTimestamp != null) {
@@ -639,6 +698,7 @@ Pointer _rtcRemoteOutboundRtpStreamStatsRemoteTimestamp(
   }
 }
 
+/// Returns reportsSent of the provided [RTCRemoteOutboundRtpStreamStats].
 Pointer _rtcRemoteOutboundRtpStreamStatsReportsSent(
     RTCRemoteOutboundRtpStreamStats stats) {
   if (stats.reportsSent != null) {
@@ -648,6 +708,7 @@ Pointer _rtcRemoteOutboundRtpStreamStatsReportsSent(
   }
 }
 
+/// Returns width of the provided [RTCVideoSourceStats].
 Pointer _rtcVideoSourceStatsWidth(RTCVideoSourceStats stats) {
   if (stats.width != null) {
     return ForeignValue.fromInt(stats.width!).intoRustOwned();
@@ -656,6 +717,7 @@ Pointer _rtcVideoSourceStatsWidth(RTCVideoSourceStats stats) {
   }
 }
 
+/// Returns height of the provided [RTCVideoSourceStats].
 Pointer _rtcVideoSourceStatsHeight(RTCVideoSourceStats stats) {
   if (stats.height != null) {
     return ForeignValue.fromInt(stats.height!).intoRustOwned();
@@ -664,6 +726,7 @@ Pointer _rtcVideoSourceStatsHeight(RTCVideoSourceStats stats) {
   }
 }
 
+/// Returns frames of the provided [RTCVideoSourceStats].
 Pointer _rtcVideoSourceStatsFrames(RTCVideoSourceStats stats) {
   if (stats.frames != null) {
     return ForeignValue.fromInt(stats.frames!).intoRustOwned();
@@ -672,6 +735,7 @@ Pointer _rtcVideoSourceStatsFrames(RTCVideoSourceStats stats) {
   }
 }
 
+/// Returns framesPerSecond of the provided [RTCVideoSourceStats].
 Pointer _rtcVideoSourceStatsFramesPerSecond(RTCVideoSourceStats stats) {
   if (stats.framesPerSecond != null) {
     return ForeignValue.fromDouble(stats.framesPerSecond!).intoRustOwned();
@@ -680,6 +744,7 @@ Pointer _rtcVideoSourceStatsFramesPerSecond(RTCVideoSourceStats stats) {
   }
 }
 
+/// Returns audioLevel of the provided [RTCAudioSourceStats].
 Pointer _rtcAudioSourceStatsAudioLevel(RTCAudioSourceStats stats) {
   if (stats.audioLevel != null) {
     return ForeignValue.fromDouble(stats.audioLevel!).intoRustOwned();
@@ -688,6 +753,7 @@ Pointer _rtcAudioSourceStatsAudioLevel(RTCAudioSourceStats stats) {
   }
 }
 
+/// Returns totalAudioEnergy of the provided [RTCAudioSourceStats].
 Pointer _rtcAudioSourceStatsTotalAudioEnergy(RTCAudioSourceStats stats) {
   if (stats.totalAudioEnergy != null) {
     return ForeignValue.fromDouble(stats.totalAudioEnergy!).intoRustOwned();
@@ -696,6 +762,7 @@ Pointer _rtcAudioSourceStatsTotalAudioEnergy(RTCAudioSourceStats stats) {
   }
 }
 
+/// Returns totalSamplesDuration of the provided [RTCAudioSourceStats].
 Pointer _rtcAudioSourceStatsTotalSamplesDuration(RTCAudioSourceStats stats) {
   if (stats.totalSamplesDuration != null) {
     return ForeignValue.fromDouble(stats.totalSamplesDuration!).intoRustOwned();
@@ -704,6 +771,7 @@ Pointer _rtcAudioSourceStatsTotalSamplesDuration(RTCAudioSourceStats stats) {
   }
 }
 
+/// Returns echoReturnLoss of the provided [RTCAudioSourceStats].
 Pointer _rtcAudioSourceStatsEchoReturnLoss(RTCAudioSourceStats stats) {
   if (stats.echoReturnLoss != null) {
     return ForeignValue.fromDouble(stats.echoReturnLoss!).intoRustOwned();
@@ -712,71 +780,99 @@ Pointer _rtcAudioSourceStatsEchoReturnLoss(RTCAudioSourceStats stats) {
   }
 }
 
+/// Returns echoReturnLossEnhancement of the provided [RTCAudioSourceStats].
 Pointer _rtcAudioSourceStatsEchoReturnLossEnhancement(
     RTCAudioSourceStats stats) {
-  if (stats.echoReturnLoss != null) {
-    return ForeignValue.fromDouble(stats.echoReturnLoss!).intoRustOwned();
+  if (stats.echoReturnLossEnhancement != null) {
+    return ForeignValue.fromDouble(stats.echoReturnLossEnhancement!)
+        .intoRustOwned();
   } else {
     return ForeignValue.none().intoRustOwned();
   }
 }
 
+/// Returns runtime type of the provided [RTCStatsType].
 Pointer<Utf8> _rtcStatsType(RTCStatsType stats) {
   return stats.runtimeType.toString().toNativeUtf8();
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCInboundRTPStreamStats].
 Object _rtcStatsCastToRtcInboundRtpStreamStats(RTCStatsType stats) {
   return stats as RTCInboundRTPStreamStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCOutboundRTPStreamStats].
 Object _rtcStatsCastToRtcOutboundRtpStreamStats(RTCStatsType stats) {
   return stats as RTCOutboundRTPStreamStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCMediaSourceStats].
 Object _rtcStatsCastToRtcMediaSourceStats(RTCStatsType stats) {
   return stats as RTCMediaSourceStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCVideoSourceStats].
 Object _rtcMediaSourceStatsCastToRtcVideoSourceStats(
     RTCMediaSourceStats stats) {
   return stats as RTCVideoSourceStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCAudioSourceStats].
 Object _rtcMediaSourceStatsCastToRtcAudioSourceStats(
     RTCMediaSourceStats stats) {
   return stats as RTCAudioSourceStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCIceCandidateStats].
 Object _rtcStatsCastToRtcIceCandidateStats(RTCStatsType stats) {
   return stats as RTCIceCandidateStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCIceCandidatePairStats].
 Object _rtcStatsCastToRtcIceCandidatePairStats(RTCStatsType stats) {
   return stats as RTCIceCandidatePairStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCTransportStats].
 Object _rtcStatsCastToRtcTransportStats(RTCStatsType stats) {
   return stats as RTCTransportStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCRemoteInboundRtpStreamStats].
 Object _rtcStatsCastToRtcRemoteInboundRtpStreamStats(RTCStatsType stats) {
   return stats as RTCRemoteInboundRtpStreamStats;
 }
 
+/// Cast the provided [RTCStatsType]
+/// to a [RTCRemoteOutboundRtpStreamStats].
 Object _rtcStatsCastToRtcRemoteOutboundRtpStreamStats(RTCStatsType stats) {
   return stats as RTCRemoteOutboundRtpStreamStats;
 }
 
+/// Cast the provided [RTCInboundRTPStreamMediaType]
+/// to a [RTCInboundRTPStreamAudio].
 Object _rtcInboundRtpStreamMediaTypeCastToAudio(
     RTCInboundRTPStreamMediaType stats) {
   return stats as RTCInboundRTPStreamAudio;
 }
 
+/// Cast the provided [RTCInboundRTPStreamMediaType]
+/// to a [RTCInboundRTPStreamVideo].
 Object _rtcInboundRtpStreamMediaTypeCastToVideo(
     RTCInboundRTPStreamMediaType stats) {
   return stats as RTCInboundRTPStreamVideo;
 }
 
+/// Returns [RTCInboundRTPStreamMediaType] of the provided [RTCInboundRTPStreamMediaType].
 Object _rtcInboundRtpStreamStatsMediaType(RTCInboundRTPStreamStats stats) {
   if (stats.mediaType == null) {
     return ForeignValue.none().intoRustOwned();
@@ -785,6 +881,7 @@ Object _rtcInboundRtpStreamStatsMediaType(RTCInboundRTPStreamStats stats) {
   }
 }
 
+/// Returns runtime type of the provided [RTCInboundRTPStreamMediaType].
 Pointer<Utf8> _rtcInboundRtpStreamStatsMediaTypeClass(
     RTCInboundRTPStreamMediaType stats) {
   return stats.runtimeType.toString().toNativeUtf8();

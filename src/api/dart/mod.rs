@@ -46,6 +46,7 @@ use crate::{
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::{
         self,
+        rtc_stats::{CandidateType, Protocol, RTCStatsIceCandidatePairState},
         utils::{
             dart_api::{
                 Dart_DeletePersistentHandle_DL_Trampolined,
@@ -53,7 +54,7 @@ use crate::{
                 Dart_PropagateError_DL_Trampolined,
             },
             handle::DartHandle,
-        }, rtc_stats::{Protocol, RTCStatsIceCandidatePairState, CandidateType},
+        },
     },
 };
 
@@ -767,7 +768,6 @@ impl TryFrom<i64> for CandidateType {
         }
     }
 }
-
 
 impl TryFrom<i64> for MediaDeviceKind {
     type Error = i64;

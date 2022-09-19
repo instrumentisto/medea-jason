@@ -3,7 +3,9 @@
 use std::rc::Rc;
 
 use derive_more::{Display, From};
-use medea_client_api_proto::stats::{KnownCandidateType, KnownProtocol, KnownIceCandidatePairState};
+use medea_client_api_proto::stats::{
+    KnownCandidateType, KnownIceCandidatePairState, KnownProtocol,
+};
 
 use crate::{platform, utils::Caused};
 
@@ -42,7 +44,6 @@ pub enum RtcStatsError {
 #[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Protocol {
-
     /// [Transmission Control Protocol][1].
     ///
     /// [1]: https://en.wikipedia.org/wiki/Transmission_Control_Protocol
@@ -54,7 +55,6 @@ pub enum Protocol {
     #[display(fmt = "UDP")]
     Udp = 1,
 }
-
 
 /// [RTCIceCandidateType] represents the type of the ICE candidate, as
 /// defined in [Section 15.1 of RFC 5245][1].
