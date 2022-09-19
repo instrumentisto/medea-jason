@@ -8,7 +8,7 @@ void registerFunction(
   DynamicLibrary dl, {
   required Pointer<NativeFunction<Handle Function(Handle)>> rtcStatsKind,
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> rtcStatsType,
-  required Pointer<NativeFunction<Int32 Function(Handle)>> rtcStatsTimestampUs,
+  required Pointer<NativeFunction<Int64 Function(Handle)>> rtcStatsTimestampUs,
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> rtcStatsId,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcMediaSourceStatsTrackIdentifier,
@@ -40,9 +40,9 @@ void registerFunction(
       rtcIceCandidateStatsAddress,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsPort,
-  required Pointer<NativeFunction<Int32 Function(Handle)>>
+  required Pointer<NativeFunction<Int64 Function(Handle)>>
       rtcIceCandidateStatsProtocol,
-  required Pointer<NativeFunction<Int32 Function(Handle)>>
+  required Pointer<NativeFunction<Int64 Function(Handle)>>
       rtcIceCandidateStatsCandidateType,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsPriority,
@@ -50,7 +50,7 @@ void registerFunction(
       rtcIceCandidateStatsUrl,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcOutboundRtpStreamStatsTrackId,
-  required Pointer<NativeFunction<Int32 Function(Handle)>>
+  required Pointer<NativeFunction<Int64 Function(Handle)>>
       rtcOutboundRtpStreamStatsKind,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcOutboundRtpStreamStatsBytesSent,
@@ -116,7 +116,7 @@ void registerFunction(
       rtcInboundRtpStreamVideoConcealmentEvents,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcInboundRtpStreamVideoFramesReceived,
-  required Pointer<NativeFunction<Int32 Function(Handle)>>
+  required Pointer<NativeFunction<Int64 Function(Handle)>>
       rtcIceCandidatePairStatsState,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidatePairStatsNominated,

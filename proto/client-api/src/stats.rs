@@ -1123,7 +1123,7 @@ pub struct RtcInboundRtpStreamStats {
 
     /// Fields which should be in the [`RtcStat`] based on `mediaType`.
     #[serde(flatten)]
-    pub media_specific_stats: RtcInboundRtpStreamMediaType,
+    pub media_specific_stats: Option<RtcInboundRtpStreamMediaType>,
 
     /// Total number of bytes received for this SSRC.
     pub bytes_received: u64,
