@@ -9,11 +9,12 @@ use medea_client_api_proto::stats::{
     RtcInboundRtpStreamMediaType, RtcInboundRtpStreamStats,
     RtcOutboundRtpStreamMediaType, RtcOutboundRtpStreamStats,
     RtcRemoteInboundRtpStreamStats, RtcRemoteOutboundRtpStreamStats, RtcStat,
-    RtcStatsType, RtcTransportStats, StatId, RtcIceCandidateStats, KnownCandidateType,
+    RtcStatsType, RtcTransportStats, StatId, RtcIceCandidateStats, KnownCandidateType, KnownProtocol,
 };
 use medea_macro::dart_bridge;
 
 use crate::api::dart_string_into_rust;
+
 
 use super::utils::{handle::DartHandle, NonNullDartValueArgExt};
 
@@ -42,6 +43,10 @@ mod stats {
         pub fn rtc_media_source_stats_track_identifier(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        pub fn rtc_media_source_stats_class_type(
+            stats: Dart_Handle,
+        ) -> ptr::NonNull<c_char>;
 
         pub fn rtc_stats_cast_to_rtc_media_source_stats(
             stats: Dart_Handle,
@@ -77,9 +82,6 @@ mod stats {
         pub fn rtc_ice_candidate_stats_transport_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
-        pub fn rtc_ice_candidate_stats_is_remote(
-            stats: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<bool>>>;
         pub fn rtc_ice_candidate_stats_address(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
@@ -88,10 +90,12 @@ mod stats {
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
         pub fn rtc_ice_candidate_stats_protocol(
             stats: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> i32;
+
         pub fn rtc_ice_candidate_stats_candidate_type(
             stats: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> i32;
+
         pub fn rtc_ice_candidate_stats_priority(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
@@ -102,9 +106,11 @@ mod stats {
         pub fn rtc_outbound_rtp_stream_stats_track_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
         pub fn rtc_outbound_rtp_stream_stats_kind(
             stats: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> i32;
+
         pub fn rtc_outbound_rtp_stream_stats_bytes_sent(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
@@ -133,10 +139,7 @@ mod stats {
         pub fn rtc_inbound_rtp_stream_stats_packets_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
-        // pub fn RTCInboundRTPStreamStats_packets_lost(stats: Dart_Handle) ->
-        // ptr::NonNull<DartValueArg<Option<String>>>;
-        // pub fn RTCInboundRTPStreamStats_jitter(stats: Dart_Handle) ->
-        // ptr::NonNull<DartValueArg<Option<String>>>;
+
         pub fn rtc_inbound_rtp_stream_stats_total_decode_time(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
@@ -158,10 +161,6 @@ mod stats {
         pub fn rtc_inbound_rtp_stream_media_type_cast_to_video(
             stats: Dart_Handle,
         ) -> Dart_Handle;
-
-        // todo audio
-        // pub fn RTCInboundRTPStreamStats_voice_activity_flag(stats:
-        // Dart_Handle) -> UniquePtr<RTCStatsMemberbool>;
         pub fn rtc_inbound_rtp_stream_audio_total_samples_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
@@ -180,9 +179,6 @@ mod stats {
         pub fn rtc_inbound_rtp_stream_audio_total_samples_duration(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
-        // todo audio
-
-        // todo video
         pub fn rtc_inbound_rtp_stream_video_frames_decoded(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
@@ -210,8 +206,7 @@ mod stats {
         pub fn rtc_inbound_rtp_stream_video_pli_count(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u32>>>;
-        // pub fn RTCInboundRTPStreamStats_sli_count(stats: Dart_Handle) ->
-        // ptr::NonNull<DartValueArg<Option<u64>>>;
+
         pub fn rtc_inbound_rtp_stream_video_concealment_events(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
@@ -221,7 +216,8 @@ mod stats {
 
         pub fn rtc_ice_candidate_pair_stats_state(
             stats: Dart_Handle,
-        ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+        ) -> i32;
+
         pub fn rtc_ice_candidate_pair_stats_nominated(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<bool>>>;
@@ -253,22 +249,19 @@ mod stats {
         pub fn rtc_transport_stats_bytes_received(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<u64>>>;
-        // pub fn RTCTransportStats_ice_role(stats:Dart_Handle) ->
-        // ptr::NonNull<DartValueArg<Option<String>>>;
+
 
         pub fn rtc_remote_inbound_rtp_stream_stats_local_id(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
-        // pub fn RTCRemoteInboundRtpStreamStats_jitter(stats: Dart_Handle) ->
-        // ptr::NonNull<DartValueArg<Option<u64>>>;
+
         pub fn rtc_remote_inbound_rtp_stream_stats_round_trip_time(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
         pub fn rtc_remote_inbound_rtp_stream_stats_fraction_lost(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<f64>>>;
-        // pub fn RTCRemoteInboundRtpStreamStats_reports_received(stats:
-        // Dart_Handle) -> ptr::NonNull<DartValueArg<Option<u64>>>;
+
         pub fn rtc_remote_inbound_rtp_stream_stats_round_trip_time_measurements(
             stats: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<i32>>>;
@@ -315,9 +308,14 @@ mod stats {
     }
 }
 
+
+/// Representation of [RTCInboundRTPStreamStats][1] when kind is audio.
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
 #[derive(Debug)]
 pub struct RTCInboundRTPStreamAudio(DartHandle);
 impl RTCInboundRTPStreamAudio {
+    /// Returns [total_samples_received] of this [`RTCInboundRTPStreamAudio`].
     pub fn total_samples_received(&self) -> Option<u64> {
         Option::try_from(unsafe {
             stats::rtc_inbound_rtp_stream_audio_total_samples_received(
@@ -373,6 +371,9 @@ impl RTCInboundRTPStreamAudio {
     }
 }
 
+/// Representation of [RTCInboundRTPStreamStats][1] when kind is video.
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
 #[derive(Debug)]
 pub struct RTCInboundRTPStreamVideo(DartHandle);
 impl RTCInboundRTPStreamVideo {
@@ -465,6 +466,9 @@ impl RTCInboundRTPStreamVideo {
     }
 }
 
+/// Representation of [RTCInboundRTPStreamStats][1] kind variants.
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
 #[derive(Debug)]
 pub enum RTCInboundRTPStreamMediaType {
     Audio(RTCInboundRTPStreamAudio),
@@ -476,13 +480,16 @@ impl From<Dart_Handle> for RTCInboundRTPStreamMediaType {
         unsafe {
             let kind = dart_string_into_rust(stats::rtc_inbound_rtp_stream_stats_media_type_class(handle));
             match kind.as_str() {
-                "_$RTCInboundRTPStreamAudio" => Self::Audio(RTCInboundRTPStreamAudio(DartHandle::new(stats::rtc_inbound_rtp_stream_media_type_cast_to_audio(handle)))),
+                "RTCInboundRTPStreamAudio" => Self::Audio(RTCInboundRTPStreamAudio(DartHandle::new(stats::rtc_inbound_rtp_stream_media_type_cast_to_audio(handle)))),
                 _ => Self::Video(RTCInboundRTPStreamVideo(DartHandle::new(stats::rtc_inbound_rtp_stream_media_type_cast_to_video(handle))))
             } 
         }
     }
 }
 
+/// Representation of [RTCInboundRTPStreamStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
 #[derive(Debug)]
 pub struct RTCInboundRTPStreamStats(DartHandle);
 impl RTCInboundRTPStreamStats {
@@ -542,7 +549,7 @@ impl From<&RTCInboundRTPStreamMediaType> for RtcInboundRtpStreamMediaType {
     fn from(stats: &RTCInboundRTPStreamMediaType) -> Self {
         match stats {
             RTCInboundRTPStreamMediaType::Audio(audio) => Self::Audio{
-                voice_activity_flag: None,
+                voice_activity_flag: None, // TODO
                 total_samples_received: audio.total_samples_received(),
                 concealed_samples: audio.concealed_samples(),
                 silent_concealed_samples: audio.silent_concealed_samples(),
@@ -564,7 +571,7 @@ impl From<&RTCInboundRTPStreamMediaType> for RtcInboundRtpStreamMediaType {
                 frame_bit_depth: video.frame_bit_depth().map(|v| v as u64),
                 fir_count: video.fir_count().map(|v| v as u64),
                 pli_count: video.pli_count().map(|v| v as u64),
-                sli_count: None,
+                sli_count: None, // TODO
                 concealment_events: video.concealment_events(),
                 frames_received: video.frames_received().map(|v| v as u64),
             },
@@ -574,37 +581,67 @@ impl From<&RTCInboundRTPStreamMediaType> for RtcInboundRtpStreamMediaType {
 
 impl From<RTCInboundRTPStreamStats> for RtcInboundRtpStreamStats {
     fn from(stats: RTCInboundRTPStreamStats) -> Self {
-        todo!();
-        // let media_specific_stats = RtcInboundRtpStreamMediaType::from();
-        // Self {
-        //     track_id: stats.remote_id(),
-        //     media_specific_stats,
-        //     bytes_received: stats.bytes_received().unwrap(),
-        //     packets_received: stats.packets_received().unwrap() as u64,
-        //     packets_lost: None,
-        //     jitter: None,
-        //     total_decode_time: stats
-        //         .total_decode_time()
-        //         .map(|v| HighResTimeStamp(v)),
-        //     jitter_buffer_emitted_count: stats.jitter_buffer_emitted_count(),
-        // }
+        let temp = stats.media_type().map(|v| RTCInboundRTPStreamMediaType::from(v.get()));
+        let media_specific_stats = temp.as_ref().map(|v| RtcInboundRtpStreamMediaType::from(v));
+        Self {
+            track_id: stats.remote_id(),
+            media_specific_stats,
+            bytes_received: stats.bytes_received().unwrap(),
+            packets_received: stats.packets_received().unwrap() as u64,
+            packets_lost: None, // TODO
+            jitter: None, // TODO
+            total_decode_time: stats
+                .total_decode_time()
+                .map(|v| HighResTimeStamp(v)),
+            jitter_buffer_emitted_count: stats.jitter_buffer_emitted_count(),
+        }
     }
 }
 
+/// Representation of [RTCStatsIceCandidatePairState][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstatsicecandidatepairstate
 #[derive(Debug, Copy, Clone)]
 pub enum RTCStatsIceCandidatePairState {
+    //todo
     Frozen,
+    //todo
+
     Waiting,
+    //todo
+
     InProgress,
+    //todo
+
     Failed,
+    //todo
+
     Succeeded,
 }
 
+impl From<i32> for RTCStatsIceCandidatePairState {
+    fn from(index: i32) -> Self {
+        match index {
+            0 => Self::Frozen,
+            1 => Self::Waiting,
+            2 => Self::InProgress,
+            3 => Self::Failed,
+            4 => Self::Succeeded,
+            _ => unreachable!()
+        }
+    }
+}
+ 
+
+/// Representation of [RTCIceCandidatePairStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats
 #[derive(Debug)]
 pub struct RTCIceCandidatePairStats(DartHandle);
 impl RTCIceCandidatePairStats {
+    
     pub fn state(&self) -> RTCStatsIceCandidatePairState {
-        todo!()
+        unsafe {RTCStatsIceCandidatePairState::from(stats::rtc_ice_candidate_pair_stats_state(self.0.get()))}
     }
 
     pub fn nominated(&self) -> Option<bool> {
@@ -693,6 +730,10 @@ impl From<RTCIceCandidatePairStats> for RtcIceCandidatePairStats {
     }
 }
 
+
+/// Representation of [RTCTransportStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtctransportstats
 #[derive(Debug)]
 pub struct RTCTransportStats(DartHandle);
 impl RTCTransportStats {
@@ -732,11 +773,14 @@ impl From<RTCTransportStats> for RtcTransportStats {
             packets_received: stats.packets_received(),
             bytes_sent: stats.bytes_sent(),
             bytes_received: stats.bytes_received(),
-            ice_role: None,
+            ice_role: None, // TODO
         }
     }
 }
 
+/// Representation of [RTCRemoteInboundRtpStreamStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
 #[derive(Debug)]
 pub struct RTCRemoteInboundRtpStreamStats(DartHandle);
 impl RTCRemoteInboundRtpStreamStats {
@@ -780,10 +824,10 @@ impl From<RTCRemoteInboundRtpStreamStats> for RtcRemoteInboundRtpStreamStats {
     fn from(stats: RTCRemoteInboundRtpStreamStats) -> Self {
         Self {
             local_id: stats.local_id(),
-            jitter: None,
+            jitter: None, // TODO
             round_trip_time: stats.round_trip_time().map(|v| Float(v)),
             fraction_lost: stats.fraction_lost().map(|v| Float(v)),
-            reports_received: None,
+            reports_received: None, // TODO
             round_trip_time_measurements: stats
                 .round_trip_time_measurements()
                 .map(|v| Float(v as f64)),
@@ -791,6 +835,10 @@ impl From<RTCRemoteInboundRtpStreamStats> for RtcRemoteInboundRtpStreamStats {
     }
 }
 
+
+/// Representation of [RTCRemoteOutboundRtpStreamStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteoutboundrtpstreamstats
 #[derive(Debug)]
 pub struct RTCRemoteOutboundRtpStreamStats(DartHandle);
 impl RTCRemoteOutboundRtpStreamStats {
@@ -840,7 +888,20 @@ pub enum TrackKind {
     Audio,
     Video,
 }
+impl From<i32> for TrackKind {
+    fn from(index: i32) -> Self {
+        match index {
+            0 => Self::Audio,
+            1 => Self::Video,
+            _ => unreachable!()
+        }
+    }
+}
 
+
+/// Representation of [RTCOutboundRTPStreamStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
 #[derive(Debug)]
 pub struct RTCOutboundRTPStreamStats(DartHandle);
 impl RTCOutboundRTPStreamStats {
@@ -852,7 +913,10 @@ impl RTCOutboundRTPStreamStats {
     }
 
     pub fn kind(&self) -> TrackKind {
-        todo!()
+        let temp =  unsafe {
+            stats::rtc_outbound_rtp_stream_stats_kind(self.0.get())
+        };
+        TrackKind::from(temp)
     }
 
     pub fn frame_width(&self) -> Option<u32> {
@@ -908,8 +972,8 @@ impl From<&RTCOutboundRTPStreamStats> for RtcOutboundRtpStreamMediaType {
     fn from(stats: &RTCOutboundRTPStreamStats) -> Self {
         match stats.kind() {
             TrackKind::Audio => Self::Audio {
-                total_samples_sent: None,
-                voice_activity_flag: None,
+                total_samples_sent: None, // TODO
+                voice_activity_flag: None, // TODO
             },
             TrackKind::Video => Self::Video {
                 frame_width: stats.frame_width().map(|v| v as u64),
@@ -933,6 +997,9 @@ impl From<RTCOutboundRTPStreamStats> for RtcOutboundRtpStreamStats {
     }
 }
 
+/// Representation of [RTCVideoSourceStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcvideosourcestats
 #[derive(Debug)]
 pub struct RTCVideoSourceStats(DartHandle);
 impl RTCVideoSourceStats {
@@ -966,6 +1033,9 @@ impl RTCVideoSourceStats {
     }
 }
 
+/// Representation of [RTCAudioSourceStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
 #[derive(Debug)]
 pub struct RTCAudioSourceStats(DartHandle);
 impl RTCAudioSourceStats {
@@ -1010,12 +1080,34 @@ impl RTCAudioSourceStats {
     }
 }
 
+/// Representation of [RTCMediaSourceStats][1] kind.
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
 #[derive(Debug)]
 pub enum RTCMediaSourceStatsType {
+    /// Stats when kind is video.
     RTCVideoSourceStats(RTCVideoSourceStats),
+    /// Stats when kind is audio.
     RTCAudioSourceStats(RTCAudioSourceStats),
 }
 
+impl From<DartHandle> for RTCMediaSourceStatsType {
+    fn from(handle: DartHandle) -> Self {
+        unsafe { let kind =  dart_string_into_rust(
+            stats::rtc_media_source_stats_class_type(handle.get())
+        );
+
+        match kind.as_str() {
+            "RTCAudioSourceStats" => Self::RTCAudioSourceStats(RTCAudioSourceStats(DartHandle::new(stats::rtc_media_source_stats_cast_to_rtc_audio_source_stats(handle.get())))),
+            "RTCVideoSourceStats" => Self::RTCVideoSourceStats(RTCVideoSourceStats(DartHandle::new(stats::rtc_media_source_stats_cast_to_rtc_video_source_stats(handle.get())))),
+            _ => unreachable!()
+        }}
+    }
+}
+
+/// Representation of [RTCMediaSourceStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcmediasourcestats
 #[derive(Debug)]
 pub struct RTCMediaSourceStats(DartHandle);
 impl RTCMediaSourceStats {
@@ -1026,102 +1118,162 @@ impl RTCMediaSourceStats {
         .unwrap()
     }
 
-    pub fn kind(&self) -> RTCMediaSourceStatsType {
-        todo!()
+    pub fn kind(self) -> RTCMediaSourceStatsType {
+        RTCMediaSourceStatsType::from(self.0)
     }
 }
 
+// todo
 #[derive(Debug, Copy, Clone)]
 pub enum CandidateType {
+    //todo
     Host,
-    Srflx,
+    //todo
+    Srlfx,
+    //todo
     Prflx,
+    //todo
     Relay,
+}
+
+impl From<i32> for CandidateType {
+    fn from(index: i32) -> Self {
+        match index {
+            0 => Self::Host,
+            1 => Self::Srlfx,
+            2 => Self::Prflx,
+            3 => Self::Relay,
+            _ => unreachable!()
+        }
+    }
 }
 
 impl From<CandidateType> for KnownCandidateType {
     fn from(kind: CandidateType) -> Self {
         match kind {
             CandidateType::Host => Self::Host,
-            CandidateType::Srflx => Self::Srlfx,
+            CandidateType::Srlfx => Self::Srlfx,
             CandidateType::Prflx => Self::Prflx,
             CandidateType::Relay => Self::Relay,
         }
     }
 }
 
+//todo
+#[derive(Debug, Clone, Copy)]
+pub enum Protocol {
+    //todo
+    TCP,
+    //todo
+    UDP,
+}
+
+impl From<i32> for Protocol {
+    fn from(index: i32) -> Self {
+        match index {
+            0 => Self::TCP,
+            1 => Self::UDP,
+            _ => unreachable!()
+        }
+    }
+}
+
+impl From<Protocol> for KnownProtocol {
+    fn from(protocol: Protocol) -> Self {
+        match protocol {
+            Protocol::TCP => Self::Tcp,
+            Protocol::UDP => Self::Udp,
+        }
+    }
+}
+
+/// Representation of [RTCIceCandidateStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatestats
 #[derive(Debug)]
-pub struct RTCIceCandidateStats(DartHandle);
+pub enum RTCIceCandidateStats {
+    /// Stats when [RTCIceCandidateStats] is local.
+    RTCLocalIceCandidateStats(DartHandle),
+    /// Stats when [RTCIceCandidateStats] is remote.
+    RTCRemoteIceCandidateStats(DartHandle),
+}
+
 impl RTCIceCandidateStats {
-    pub fn is_remote(&self) -> Option<bool> {
-        Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_is_remote(self.0.get()).unbox()
-        })
-        .unwrap()
+    fn get_handle(&self) -> Dart_Handle {
+        match self {
+            RTCIceCandidateStats::RTCLocalIceCandidateStats(handle) => handle.get(),
+            RTCIceCandidateStats::RTCRemoteIceCandidateStats(handle) => handle.get(),
+        }
     }
 
     pub fn transport_id(&self) -> Option<String> {
         Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_transport_id(self.0.get()).unbox()
+            stats::rtc_ice_candidate_stats_transport_id(self.get_handle()).unbox()
         })
         .unwrap()
     }
 
     pub fn address(&self) -> Option<String> {
         Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_address(self.0.get()).unbox()
+            stats::rtc_ice_candidate_stats_address(self.get_handle()).unbox()
         })
         .unwrap()
     }
 
     pub fn port(&self) -> Option<i32> {
         Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_priority(self.0.get()).unbox()
+            stats::rtc_ice_candidate_stats_priority(self.get_handle()).unbox()
         })
         .unwrap()
     }
 
-    pub fn protocol(&self) -> Option<String> {
-        Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_protocol(self.0.get()).unbox()
-        })
-        .unwrap()
+    pub fn protocol(&self) -> Protocol {
+        Protocol::from(
+            unsafe{
+            stats::rtc_ice_candidate_stats_protocol(self.get_handle())
+    })
     }
 
     pub fn candidate_type(&self) -> CandidateType {
-        todo!()
+        let index = unsafe {
+            stats::rtc_ice_candidate_stats_candidate_type(self.get_handle())
+        };
+        CandidateType::from(index) 
     }
 
     pub fn priority(&self) -> Option<i32> {
         Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_priority(self.0.get()).unbox()
+            stats::rtc_ice_candidate_stats_priority(self.get_handle()).unbox()
         })
         .unwrap()
     }
 
     pub fn url(&self) -> Option<String> {
         Option::try_from(unsafe {
-            stats::rtc_ice_candidate_stats_url(self.0.get()).unbox()
+            stats::rtc_ice_candidate_stats_url(self.get_handle()).unbox()
         })
         .unwrap()
     }
 }
 
-impl From<RTCIceCandidateStats> for RtcIceCandidateStats{
-    fn from(stats: RTCIceCandidateStats) -> Self {
+impl From<&RTCIceCandidateStats> for RtcIceCandidateStats {
+    fn from(stats: &RTCIceCandidateStats) -> Self {
         Self {
             transport_id: stats.transport_id(),
             address: stats.address(),
             port: stats.port().unwrap() as u16,
-            protocol: NonExhaustive::Unknown(stats.protocol().unwrap()),
+            protocol: NonExhaustive::Known(KnownProtocol::from(stats.protocol())),
             candidate_type: NonExhaustive::Known(KnownCandidateType::from(stats.candidate_type())),
             priority: stats.priority().unwrap() as u32,
             url: stats.url(),
-            relay_protocol: None,
+            relay_protocol: None, // TODO
         }
     }
 }
 
+/// Representation of [RTCStatsType][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstatstype
 #[derive(Debug)]
 pub enum RTCStatsType {
     RTCMediaSourceStats(RTCMediaSourceStats),
@@ -1140,20 +1292,24 @@ impl From<Dart_Handle> for RTCStatsType {
         unsafe {
             let kind = dart_string_into_rust(stats::rtc_stats_type(inner));
             match kind.as_str() {
-            "_$RTCMediaSourceStats" => Self::RTCMediaSourceStats(RTCMediaSourceStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_media_source_stats(inner)))),
-            "_$RTCIceCandidateStats" => Self::RTCIceCandidateStats(RTCIceCandidateStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_ice_candidate_stats(inner)))),
-            "_$RTCOutboundRTPStreamStats" => Self::RTCOutboundRTPStreamStats(RTCOutboundRTPStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_outbound_rtp_stream_stats(inner)))),
-            "_$RTCInboundRTPStreamStats" => Self::RTCInboundRTPStreamStats(RTCInboundRTPStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_inbound_rtp_stream_stats(inner)))),
-            "_$RTCIceCandidatePairStats" => Self::RTCIceCandidatePairStats(RTCIceCandidatePairStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_ice_candidate_pair_stats(inner)))),
-            "_$RTCTransportStats" => Self::RTCTransportStats(RTCTransportStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_transport_stats(inner)))),
-            "_$RTCRemoteInboundRtpStreamStats" => Self::RTCRemoteInboundRtpStreamStats(RTCRemoteInboundRtpStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_remote_inbound_rtp_stream_stats(inner)))),
-            "_$RTCRemoteOutboundRtpStreamStats" => Self::RTCRemoteOutboundRtpStreamStats(RTCRemoteOutboundRtpStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_remote_outbound_rtp_stream_stats(inner)))),
+            "RTCAudioSourceStats" | "RTCVideoSourceStats" => Self::RTCMediaSourceStats(RTCMediaSourceStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_media_source_stats(inner)))),
+            "RTCLocalIceCandidateStats" => Self::RTCIceCandidateStats(RTCIceCandidateStats::RTCLocalIceCandidateStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_ice_candidate_stats(inner)))),
+            "RTCRemoteIceCandidateStats" => Self::RTCIceCandidateStats(RTCIceCandidateStats::RTCRemoteIceCandidateStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_ice_candidate_stats(inner)))),
+            "RTCOutboundRTPStreamStats" => Self::RTCOutboundRTPStreamStats(RTCOutboundRTPStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_outbound_rtp_stream_stats(inner)))),
+            "RTCInboundRTPStreamStats" => Self::RTCInboundRTPStreamStats(RTCInboundRTPStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_inbound_rtp_stream_stats(inner)))),
+            "RTCIceCandidatePairStats" => Self::RTCIceCandidatePairStats(RTCIceCandidatePairStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_ice_candidate_pair_stats(inner)))),
+            "RTCTransportStats" => Self::RTCTransportStats(RTCTransportStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_transport_stats(inner)))),
+            "RTCRemoteInboundRtpStreamStats" => Self::RTCRemoteInboundRtpStreamStats(RTCRemoteInboundRtpStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_remote_inbound_rtp_stream_stats(inner)))),
+            "RTCRemoteOutboundRtpStreamStats" => Self::RTCRemoteOutboundRtpStreamStats(RTCRemoteOutboundRtpStreamStats(DartHandle::new(stats::rtc_stats_cast_to_rtc_remote_outbound_rtp_stream_stats(inner)))),
             _ => Self::Unimplenented,
         }
         }
     }
 }
 
+/// Representation of [RTCStats][1].
+///
+/// [1]: https://www.w3.org/TR/webrtc-stats/#dom-rtcstats
 #[derive(Debug)]
 pub struct RTCStats(pub DartHandle);
 
@@ -1240,17 +1396,10 @@ impl From<RTCStatsType> for RtcStatsType {
                 ))
             }
             RTCStatsType::RTCIceCandidateStats(stats) => {
-                let remote = stats.is_remote().unwrap(); 
-                let candidate = RtcIceCandidateStats::from(stats);
-                if remote {
-                    Self::RemoteCandidate(Box::new(
-                        candidate
-                    ))
-                } else 
-                {
-                    Self::LocalCandidate(Box::new(
-                        candidate
-                    ))
+                let candidate = RtcIceCandidateStats::from(&stats);
+                match stats {
+                    RTCIceCandidateStats::RTCLocalIceCandidateStats(_) => Self::LocalCandidate(Box::new(candidate)),
+                    RTCIceCandidateStats::RTCRemoteIceCandidateStats(_) => Self::LocalCandidate(Box::new(candidate)),
                 }
             }
             _ => Self::Other,
@@ -1262,7 +1411,8 @@ impl From<RTCStats> for RtcStat {
     fn from(stats: RTCStats) -> Self {
         let id = stats.id();
         let time = HighResTimeStamp(stats.timestamp_us() as f64);
-        let stats = RtcStatsType::from(stats.kind());
+        let kind = stats.kind();
+        let stats = RtcStatsType::from(kind);
         Self {
             id: StatId(id),
             timestamp: time,

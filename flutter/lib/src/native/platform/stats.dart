@@ -1,7 +1,4 @@
 import 'dart:ffi';
-import 'dart:html';
-
-import 'package:flutter/foundation.dart';
 
 import 'package:ffi/ffi.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
@@ -15,6 +12,7 @@ void registerFunctions(DynamicLibrary dl) {
     rtcStatsKind: Pointer.fromFunction(_rtcStatsKind),
     rtcStatsTimestampUs: Pointer.fromFunction(_rtcStatsTimestampUs, 0),
     rtcStatsId: Pointer.fromFunction(_rtcStatsId),
+    rtcStatsType: Pointer.fromFunction(_rtcStatsType),
     rtcMediaSourceStatsTrackIdentifier:
         Pointer.fromFunction(_rtcMediaSourceStatsTrackIdentifier),
     rtcIceCandidateStatsTransportId:
@@ -23,16 +21,16 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcIceCandidateStatsAddress),
     rtcIceCandidateStatsPort: Pointer.fromFunction(_rtcIceCandidateStatsPort),
     rtcIceCandidateStatsProtocol:
-        Pointer.fromFunction(_rtcIceCandidateStatsProtocol),
+        Pointer.fromFunction(_rtcIceCandidateStatsProtocol, 0),
     rtcIceCandidateStatsCandidateType:
-        Pointer.fromFunction(_rtcIceCandidateStatsCandidateType),
+        Pointer.fromFunction(_rtcIceCandidateStatsCandidateType, 0),
     rtcIceCandidateStatsPriority:
         Pointer.fromFunction(_rtcIceCandidateStatsPriority),
     rtcIceCandidateStatsUrl: Pointer.fromFunction(_rtcIceCandidateStatsUrl),
     rtcOutboundRtpStreamStatsTrackId:
         Pointer.fromFunction(_rtcOutboundRtpStreamStatsTrackId),
     rtcOutboundRtpStreamStatsKind:
-        Pointer.fromFunction(_rtcOutboundRtpStreamStatsKind),
+        Pointer.fromFunction(_rtcOutboundRtpStreamStatsKind, 0),
     rtcOutboundRtpStreamStatsBytesSent:
         Pointer.fromFunction(_rtcOutboundRtpStreamStatsBytesSent),
     rtcOutboundRtpStreamStatsPacketsSent:
@@ -90,7 +88,7 @@ void registerFunctions(DynamicLibrary dl) {
     rtcInboundRtpStreamVideoFramesReceived:
         Pointer.fromFunction(_rtcInboundRtpStreamVideoFramesReceived),
     rtcIceCandidatePairStatsState:
-        Pointer.fromFunction(_rtcIceCandidatePairStatsState),
+        Pointer.fromFunction(_rtcIceCandidatePairStatsState, 0),
     rtcIceCandidatePairStatsNominated:
         Pointer.fromFunction(_rtcIceCandidatePairStatsNominated),
     rtcIceCandidatePairStatsBytesSent:
@@ -157,13 +155,10 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcStatsCastToRtcRemoteInboundRtpStreamStats),
     rtcStatsCastToRtcRemoteOutboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcRemoteOutboundRtpStreamStats),
-    rtcStatsType: Pointer.fromFunction(_rtcStatsType),
     rtcStatsCastToRtcInboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcInboundRtpStreamStats),
     rtcStatsCastToRtcOutboundRtpStreamStats:
         Pointer.fromFunction(_rtcStatsCastToRtcOutboundRtpStreamStats),
-    rtcIceCandidateStatsIsRemote:
-        Pointer.fromFunction(_rtcIceCandidateStatsIsRemote),
     rtcInboundRtpStreamMediaTypeCastToAudio:
         Pointer.fromFunction(_rtcInboundRtpStreamMediaTypeCastToAudio),
     rtcInboundRtpStreamMediaTypeCastToVideo:
@@ -172,6 +167,8 @@ void registerFunctions(DynamicLibrary dl) {
         Pointer.fromFunction(_rtcInboundRtpStreamStatsMediaType),
     rtcInboundRtpStreamStatsMediaTypeClass:
         Pointer.fromFunction(_rtcInboundRtpStreamStatsMediaTypeClass),
+    rtcMediaSourceStatsClassType:
+        Pointer.fromFunction(_rtcMediaSourceStatsClassType),
   );
 }
 
@@ -185,6 +182,10 @@ int _rtcStatsTimestampUs(RTCStats stats) {
 
 Pointer<Utf8> _rtcStatsId(RTCStats stats) {
   return stats.id.toNativeUtf8();
+}
+
+Pointer<Utf8> _rtcMediaSourceStatsClassType(RTCMediaSourceStats stats) {
+  return stats.runtimeType.toString().toNativeUtf8();
 }
 
 Pointer _rtcMediaSourceStatsTrackIdentifier(RTCMediaSourceStats stats) {
@@ -219,16 +220,12 @@ Pointer _rtcIceCandidateStatsPort(RTCIceCandidateStats stats) {
   }
 }
 
-Pointer _rtcIceCandidateStatsProtocol(RTCIceCandidateStats stats) {
-  if (stats.protocol != null) {
-    return ForeignValue.fromString(stats.protocol!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
+int _rtcIceCandidateStatsProtocol(RTCIceCandidateStats stats) {
+  return stats.protocol.index;
 }
 
-Object _rtcIceCandidateStatsCandidateType(RTCIceCandidateStats stats) {
-  return stats.candidateType;
+int _rtcIceCandidateStatsCandidateType(RTCIceCandidateStats stats) {
+  return stats.candidateType.index;
 }
 
 Pointer _rtcIceCandidateStatsPriority(RTCIceCandidateStats stats) {
@@ -255,8 +252,8 @@ Pointer _rtcOutboundRtpStreamStatsTrackId(RTCOutboundRTPStreamStats stats) {
   }
 }
 
-Object _rtcOutboundRtpStreamStatsKind(RTCOutboundRTPStreamStats stats) {
-  return stats.kind;
+int _rtcOutboundRtpStreamStatsKind(RTCOutboundRTPStreamStats stats) {
+  return stats.kind.index;
 }
 
 Pointer _rtcOutboundRtpStreamStatsBytesSent(RTCOutboundRTPStreamStats stats) {
@@ -499,8 +496,8 @@ Pointer _rtcInboundRtpStreamVideoFramesReceived(
   }
 }
 
-Object _rtcIceCandidatePairStatsState(RTCIceCandidatePairStats stats) {
-  return stats.state;
+int _rtcIceCandidatePairStatsState(RTCIceCandidatePairStats stats) {
+  return stats.state.index;
 }
 
 Pointer _rtcIceCandidatePairStatsNominated(RTCIceCandidatePairStats stats) {
@@ -724,8 +721,8 @@ Pointer _rtcAudioSourceStatsEchoReturnLossEnhancement(
   }
 }
 
-Pointer<Utf8> _rtcStatsType(RTCStats stats) {
-  return stats.type.runtimeType.toString().toNativeUtf8();
+Pointer<Utf8> _rtcStatsType(RTCStatsType stats) {
+  return stats.runtimeType.toString().toNativeUtf8();
 }
 
 Object _rtcStatsCastToRtcInboundRtpStreamStats(RTCStatsType stats) {
@@ -770,14 +767,6 @@ Object _rtcStatsCastToRtcRemoteOutboundRtpStreamStats(RTCStatsType stats) {
   return stats as RTCRemoteOutboundRtpStreamStats;
 }
 
-Object _rtcIceCandidateStatsIsRemote(RTCIceCandidateStats stats) {
-  if (stats.isRemote != null) {
-    return ForeignValue.fromBool(stats.isRemote!).intoRustOwned();
-  } else {
-    return ForeignValue.none().intoRustOwned();
-  }
-}
-
 Object _rtcInboundRtpStreamMediaTypeCastToAudio(
     RTCInboundRTPStreamMediaType stats) {
   return stats as RTCInboundRTPStreamAudio;
@@ -798,5 +787,5 @@ Object _rtcInboundRtpStreamStatsMediaType(RTCInboundRTPStreamStats stats) {
 
 Pointer<Utf8> _rtcInboundRtpStreamStatsMediaTypeClass(
     RTCInboundRTPStreamMediaType stats) {
-  return stats.type.runtimeType.toString().toNativeUtf8();
+  return stats.runtimeType.toString().toNativeUtf8();
 }

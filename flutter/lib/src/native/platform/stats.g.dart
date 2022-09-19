@@ -12,6 +12,8 @@ void registerFunction(
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> rtcStatsId,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcMediaSourceStatsTrackIdentifier,
+  required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>>
+      rtcMediaSourceStatsClassType,
   required Pointer<NativeFunction<Handle Function(Handle)>>
       rtcStatsCastToRtcMediaSourceStats,
   required Pointer<NativeFunction<Handle Function(Handle)>>
@@ -35,14 +37,12 @@ void registerFunction(
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsTransportId,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
-      rtcIceCandidateStatsIsRemote,
-  required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsAddress,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsPort,
-  required Pointer<NativeFunction<Pointer Function(Handle)>>
+  required Pointer<NativeFunction<Int32 Function(Handle)>>
       rtcIceCandidateStatsProtocol,
-  required Pointer<NativeFunction<Pointer Function(Handle)>>
+  required Pointer<NativeFunction<Int32 Function(Handle)>>
       rtcIceCandidateStatsCandidateType,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidateStatsPriority,
@@ -50,7 +50,7 @@ void registerFunction(
       rtcIceCandidateStatsUrl,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcOutboundRtpStreamStatsTrackId,
-  required Pointer<NativeFunction<Pointer Function(Handle)>>
+  required Pointer<NativeFunction<Int32 Function(Handle)>>
       rtcOutboundRtpStreamStatsKind,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcOutboundRtpStreamStatsBytesSent,
@@ -116,7 +116,7 @@ void registerFunction(
       rtcInboundRtpStreamVideoConcealmentEvents,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcInboundRtpStreamVideoFramesReceived,
-  required Pointer<NativeFunction<Pointer Function(Handle)>>
+  required Pointer<NativeFunction<Int32 Function(Handle)>>
       rtcIceCandidatePairStatsState,
   required Pointer<NativeFunction<Pointer Function(Handle)>>
       rtcIceCandidatePairStatsNominated,
@@ -347,6 +347,7 @@ void registerFunction(
     rtcStatsTimestampUs,
     rtcStatsId,
     rtcMediaSourceStatsTrackIdentifier,
+    rtcMediaSourceStatsClassType,
     rtcStatsCastToRtcMediaSourceStats,
     rtcMediaSourceStatsCastToRtcVideoSourceStats,
     rtcMediaSourceStatsCastToRtcAudioSourceStats,
@@ -358,7 +359,6 @@ void registerFunction(
     rtcStatsCastToRtcInboundRtpStreamStats,
     rtcStatsCastToRtcOutboundRtpStreamStats,
     rtcIceCandidateStatsTransportId,
-    rtcIceCandidateStatsIsRemote,
     rtcIceCandidateStatsAddress,
     rtcIceCandidateStatsPort,
     rtcIceCandidateStatsProtocol,

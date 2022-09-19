@@ -189,7 +189,7 @@ impl RtcPeerConnection {
             result.push(RtcStat::from(val));
         }
 
-        Ok(RtcStats(vec![]))
+        Ok(RtcStats(result))
     }
 
     /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).
