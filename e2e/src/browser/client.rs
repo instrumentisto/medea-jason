@@ -162,6 +162,7 @@ impl<'a> WebDriverClientBuilder<'a> {
 
     /// Creates new [`WebDriverClientBuilder`] with manually provided
     /// [`Capabilities`].
+    #[must_use]
     pub fn new_with_manual_caps(
         webdriver_address: &'a str,
         capabilities: Capabilities,
@@ -175,19 +176,19 @@ impl<'a> WebDriverClientBuilder<'a> {
     /// Sets `moz:firefoxOptions` `--headless` for Firefox browser.
     #[must_use]
     pub fn headless_firefox(mut self, value: bool) -> Self {
-        self.headless_firefox = value;
+        self.capabilities.headless_firefox = value;
         self
     }
 
     /// Sets `goog:chromeOptions` `--headless` for Chrome browser.
     #[must_use]
     pub fn headless_chrome(mut self, value: bool) -> Self {
-        self.headless_chrome = value;
+        self.capabilities.headless_chrome = value;
         self
     }
 }
 
-impl<Caps: Into<Capabilities>> WebDriverClientBuilder<'a, Caps> {
+impl<'a, Caps: Into<Capabilities>> WebDriverClientBuilder<'a, Caps> {
     /// Creates a new [`WebDriverClient`] connected to a [WebDriver].
     ///
     /// # Errors
@@ -328,6 +329,7 @@ impl Inner {
 }
 
 /// Settings to build [`Capabilities`] automatically.
+#[derive(Clone, Copy, Debug)]
 pub struct AutoCapabilities {
     /// Indicator whether [`WebDriverClient`] will run against headless Firefox
     /// browser.
@@ -340,7 +342,7 @@ pub struct AutoCapabilities {
 
 impl AutoCapabilities {
     /// Returns `moz:firefoxOptions` for a Firefox browser.
-    fn firefox(&self) -> serde_json::Value {
+    fn firefox(self) -> serde_json::Value {
         let mut args = FIREFOX_ARGS.to_vec();
         if self.headless_firefox {
             args.push("--headless");
@@ -359,9 +361,9 @@ impl AutoCapabilities {
     }
 
     /// Returns `goog:chromeOptions` for a Chrome browser.
-    fn chrome(&self) -> serde_json::Value {
+    fn chrome(self) -> serde_json::Value {
         let mut args = CHROME_ARGS.to_vec();
-        if value {
+        if self.headless_chrome {
             args.push("--headless");
         }
         json!({ "args": args })
@@ -370,7 +372,7 @@ impl AutoCapabilities {
 
 impl From<AutoCapabilities> for Capabilities {
     fn from(auto: AutoCapabilities) -> Self {
-        let mut caps = Capabilities::new();
+        let mut caps = Self::new();
         drop(caps.insert("moz:firefoxOptions".to_owned(), auto.firefox()));
         drop(caps.insert("goog:chromeOptions".to_owned(), auto.chrome()));
         caps
