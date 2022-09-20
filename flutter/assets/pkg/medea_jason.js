@@ -2726,8 +2726,8 @@ function getImports() {
         const ret = ReconnectHandle.__wrap(arg0);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_localmediatrack_new = function(arg0) {
-        const ret = LocalMediaTrack.__wrap(arg0);
+    imports.wbg.__wbg_connectionhandle_new = function(arg0) {
+        const ret = ConnectionHandle.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_roomclosereason_new = function(arg0) {
@@ -2740,10 +2740,6 @@ function getImports() {
     };
     imports.wbg.__wbg_mediadeviceinfo_new = function(arg0) {
         const ret = MediaDeviceInfo.__wrap(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
-        const ret = getObject(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
