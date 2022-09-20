@@ -137,19 +137,14 @@ impl WebDriverClient {
 
 /// Builder for [`WebDriverClientBuilder`].
 #[derive(Clone, Debug)]
-pub struct WebDriverClientBuilder<'a> {
+pub struct WebDriverClientBuilder<'a, Caps = AutoCapabilities> {
     /// Address of a [WebDriver] server.
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
     webdriver_address: &'a str,
 
-    /// Indicator whether [`WebDriverClient`] will run against headless Firefox
-    /// browser.
-    headless_firefox: bool,
-
-    /// Indicator whether [`WebDriverClient`] will run against headless Chrome
-    /// browser.
-    headless_chrome: bool,
+    /// [`WebDriverClient`] [`Capabilities`].
+    capabilities: Caps,
 }
 
 impl<'a> WebDriverClientBuilder<'a> {
@@ -158,8 +153,22 @@ impl<'a> WebDriverClientBuilder<'a> {
     pub fn new(webdriver_address: &'a str) -> Self {
         Self {
             webdriver_address,
-            headless_firefox: false,
-            headless_chrome: false,
+            capabilities: AutoCapabilities {
+                headless_firefox: false,
+                headless_chrome: false,
+            },
+        }
+    }
+
+    /// Creates new [`WebDriverClientBuilder`] with manually provided
+    /// [`Capabilities`].
+    pub fn new_with_manual_caps(
+        webdriver_address: &'a str,
+        capabilities: Capabilities,
+    ) -> WebDriverClientBuilder<'a, Capabilities> {
+        WebDriverClientBuilder {
+            webdriver_address,
+            capabilities,
         }
     }
 
@@ -176,7 +185,9 @@ impl<'a> WebDriverClientBuilder<'a> {
         self.headless_chrome = value;
         self
     }
+}
 
+impl<Caps: Into<Capabilities>> WebDriverClientBuilder<'a, Caps> {
     /// Creates a new [`WebDriverClient`] connected to a [WebDriver].
     ///
     /// # Errors
@@ -190,12 +201,8 @@ impl<'a> WebDriverClientBuilder<'a> {
     ) -> Result<WebDriverClient> {
         Ok(WebDriverClient {
             inner: Arc::new(Mutex::new(
-                Inner::new(
-                    self.webdriver_address,
-                    self.headless_firefox,
-                    self.headless_chrome,
-                )
-                .await?,
+                Inner::new(self.webdriver_address, self.capabilities.into())
+                    .await?,
             )),
             file_server_host: file_server_host.to_owned(),
         })
@@ -211,15 +218,11 @@ impl Inner {
     /// [WebDriver]: https://w3.org/TR/webdriver
     pub async fn new(
         webdriver_address: &str,
-        headless_firefox: bool,
-        headless_chrome: bool,
+        caps: Capabilities,
     ) -> Result<Self> {
         Ok(Self(
             ClientBuilder::rustls()
-                .capabilities(Self::get_webdriver_capabilities(
-                    headless_firefox,
-                    headless_chrome,
-                ))
+                .capabilities(caps)
                 .connect(webdriver_address)
                 .await?,
         ))
@@ -322,11 +325,24 @@ impl Inner {
             drop(self.0.close_window().await);
         }
     }
+}
 
+/// Settings to build [`Capabilities`] automatically.
+pub struct AutoCapabilities {
+    /// Indicator whether [`WebDriverClient`] will run against headless Firefox
+    /// browser.
+    headless_firefox: bool,
+
+    /// Indicator whether [`WebDriverClient`] will run against headless Chrome
+    /// browser.
+    headless_chrome: bool,
+}
+
+impl AutoCapabilities {
     /// Returns `moz:firefoxOptions` for a Firefox browser.
-    fn get_firefox_caps(value: bool) -> serde_json::Value {
+    fn firefox(&self) -> serde_json::Value {
         let mut args = FIREFOX_ARGS.to_vec();
-        if value {
+        if self.headless_firefox {
             args.push("--headless");
         }
         json!({
@@ -343,30 +359,20 @@ impl Inner {
     }
 
     /// Returns `goog:chromeOptions` for a Chrome browser.
-    fn get_chrome_caps(value: bool) -> serde_json::Value {
+    fn chrome(&self) -> serde_json::Value {
         let mut args = CHROME_ARGS.to_vec();
         if value {
             args.push("--headless");
         }
         json!({ "args": args })
     }
+}
 
-    /// Returns [WebDriver capabilities][1] for Chrome and Firefox browsers.
-    ///
-    /// [1]: https:/mdn.io/Web/WebDriver/Capabilities
-    fn get_webdriver_capabilities(
-        headless_firefox: bool,
-        headless_chrome: bool,
-    ) -> Capabilities {
+impl From<AutoCapabilities> for Capabilities {
+    fn from(auto: AutoCapabilities) -> Self {
         let mut caps = Capabilities::new();
-        drop(caps.insert(
-            "moz:firefoxOptions".to_owned(),
-            Self::get_firefox_caps(headless_firefox),
-        ));
-        drop(caps.insert(
-            "goog:chromeOptions".to_owned(),
-            Self::get_chrome_caps(headless_chrome),
-        ));
+        drop(caps.insert("moz:firefoxOptions".to_owned(), auto.firefox()));
+        drop(caps.insert("goog:chromeOptions".to_owned(), auto.chrome()));
         caps
     }
 }
