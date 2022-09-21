@@ -160,15 +160,14 @@ impl<'a> WebDriverClientBuilder<'a> {
         }
     }
 
-    /// Creates new [`WebDriverClientBuilder`] with manually provided
-    /// [`Capabilities`].
+    /// Sets manually provided browser [`Capabilities`].
     #[must_use]
-    pub fn new_with_manual_caps(
-        webdriver_address: &'a str,
+    pub fn capabilities(
+        self,
         capabilities: Capabilities,
     ) -> WebDriverClientBuilder<'a, Capabilities> {
         WebDriverClientBuilder {
-            webdriver_address,
+            webdriver_address: self.webdriver_address,
             capabilities,
         }
     }
