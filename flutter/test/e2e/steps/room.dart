@@ -13,7 +13,8 @@ List<StepDefinitionGeneric> steps() {
 }
 
 StepDefinitionGeneric then_on_close_fires = then2<String, String, CustomWorld>(
-  RegExp(r"(Alice|Bob|Carol)'s `on_close` room's callback fires with `(.+)`"),
+  RegExp(r"^(Alice|Bob|Carol)'s `on_close` room's callback fires with `(.+)` "
+    r'reason$'),
   (id, expect_reason, context) async {
     var reason = await context.world.wait_for_on_close(id);
     expect(reason.reason(), expect_reason);

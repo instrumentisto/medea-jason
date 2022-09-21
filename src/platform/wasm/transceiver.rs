@@ -8,7 +8,7 @@ use web_sys::RtcRtpTransceiver;
 
 use crate::{
     media::track::local,
-    platform::{transceiver_direction::TransceiverDirection, Error},
+    platform::{Error, TransceiverDirection},
 };
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
@@ -22,13 +22,13 @@ impl Transceiver {
         TransceiverDirection::from(self.0.direction())
     }
 
-    /// Changes the receive direction of the specified [`Transceiver`].
-    pub fn set_recv(&self, recv: bool) -> impl Future<Output = ()> + 'static {
+    /// Changes the receive direction of this [`Transceiver`].
+    pub fn set_recv(&self, active: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.0.clone();
         async move {
             let current_direction =
                 TransceiverDirection::from(transceiver.direction());
-            let new_direction = if recv {
+            let new_direction = if active {
                 current_direction | TransceiverDirection::RECV
             } else {
                 current_direction - TransceiverDirection::RECV
@@ -37,13 +37,13 @@ impl Transceiver {
         }
     }
 
-    /// Changes the send direction of the specified [`Transceiver`].
-    pub fn set_send(&self, send: bool) -> impl Future<Output = ()> + 'static {
+    /// Changes the send direction of this [`Transceiver`].
+    pub fn set_send(&self, active: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.0.clone();
         async move {
             let current_direction =
                 TransceiverDirection::from(transceiver.direction());
-            let new_direction = if send {
+            let new_direction = if active {
                 current_direction | TransceiverDirection::SEND
             } else {
                 current_direction - TransceiverDirection::SEND

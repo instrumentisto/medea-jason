@@ -2,11 +2,15 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'callback.g.dart';
 
-/// Media [`Element`] flowing one or more media data streams through itself.
+/// Possible Control API callbacks events which may happen on a media server.
+///
+/// May be either [OnJoin] or [OnLeave].
 @JsonSerializable()
 class CallbackEvent {
   Map<String, dynamic> toJson() => {};
+
   CallbackEvent();
+
   factory CallbackEvent.fromJson(Map<String, dynamic> json) {
     if (json.toString().contains('OnLeave')) {
       return OnLeave.fromJson(json);
@@ -35,7 +39,7 @@ class CallbackItem {
   Map<String, dynamic> toJson() => _$CallbackItemToJson(this);
 }
 
-/// Event notifying about a `Member` joining a `Room`.
+/// Event notifying about a [Member] joining a [Room].
 @JsonSerializable()
 class OnJoin implements CallbackEvent {
   OnJoin();
@@ -45,25 +49,25 @@ class OnJoin implements CallbackEvent {
   Map<String, dynamic> toJson() => _$OnJoinToJson(this);
 }
 
-/// Reason of why `Member` leaves.
+/// Reason of why a [Member] leaves its [Room].
 enum OnLeaveReason {
-  /// `Member` was disconnected normally.
+  /// [Member] was disconnected normally.
   Disconnected,
 
-  /// Connection with the `Member` was lost.
+  /// Connection with the [Member] was lost.
   Lost,
 
-  /// `Member` was forcibly disconnected by a media server.
+  /// [Member[ was forcibly disconnected by a media server.
   Kicked,
 
   /// Media server was shut down.
   Shutdown,
 }
 
-/// Event notifying about a `Member` leaving its `Room`.
+/// Event notifying about a [Member] leaving its [Room].
 @JsonSerializable()
 class OnLeave implements CallbackEvent {
-  /// Reason of why the `Member` leaves.
+  /// Reason of why the [Member] leaves.
   OnLeaveReason reason;
 
   OnLeave(this.reason);

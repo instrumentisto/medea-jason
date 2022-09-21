@@ -14,7 +14,6 @@ mod convert;
 mod server;
 
 #[allow(
-    clippy::derive_partial_eq_without_eq,
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,
@@ -37,7 +36,6 @@ mod server;
 #[rustfmt::skip]
 pub mod api;
 #[allow(
-    clippy::derive_partial_eq_without_eq,
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,

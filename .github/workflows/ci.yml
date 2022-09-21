@@ -232,7 +232,7 @@ jobs:
              && matrix.crate != 'medea-jason' }}
 
   test-e2e-browser:
-    name: Run e2e test on Chrome and Firefox
+    name: E2E tests (chrome, firefox)
     needs: ["docker"]
     runs-on: ubuntu-latest
     steps:
@@ -260,7 +260,8 @@ jobs:
           crate: wasm-pack
           use-tool-cache: true
 
-      - uses: actions/download-artifact@v3
+      - name: Download `medea-control-api-mock` Docker image
+        uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
       - name: Unpack `medea-control-api-mock` Docker image
@@ -288,14 +289,12 @@ jobs:
                            control-tag=build-${{ github.run_number }}
 
   test-e2e-desktop:
-    name: Run E2E tests desktop platforms
+    name: E2E tests
     needs: ["docker", "crate-jason", "crate-jason-linux"]
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Run e2e test on Windows and macOS
-        include:
-          - platform: linux
+        platform: ["linux"]  # TODO: Run E2E test on Windows and macOS
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -303,13 +302,10 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-
-      - uses: subosito/flutter-action@v2
-
-      - name: Install docker
-        uses: docker-practice/actions-setup-docker@master
+      - uses: docker-practice/actions-setup-docker@master
         if: ${{ matrix.platform == 'macos' }}
 
+      - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
         run: |
           sudo apt-get update
@@ -319,35 +315,30 @@ jobs:
                       ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
-      - name: Download medea-jason library
+      - name: Download `medea-jason` lib
         uses: actions/download-artifact@v3
         with:
           name: build-jason-${{ matrix.platform }}
           path: ./flutter/${{ matrix.platform }}/lib/
 
-      - uses: actions/download-artifact@v3
+      - name: Download `medea-control-api-mock` Docker image
+        uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
-
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
 
       - name: Login to Medea Docker registry
         run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-          -p ${{ secrets.MEDEA_DOCKER_PASS }}
-          hub.instrumentisto.com
+                          -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                          hub.instrumentisto.com
 
-      - name: Run e2e tests on macOS
-        run: make test.e2e.desktop up=yes debug=no dockerized=yes
-          medea-tag=${{ env.MEDEA_BRANCH }} device=macos
-          control-tag=build-${{ github.run_number }}
-        if: ${{ matrix.platform == 'macos' }}
-
-      - name: Run e2e tests on Linux
-        run: xvfb-run -a make test.e2e.desktop up=yes debug=no dockerized=yes
-          medea-tag=${{ env.MEDEA_BRANCH }} device=linux
-          control-tag=build-${{ github.run_number }}
-        if: ${{ matrix.platform == 'linux' }}
+      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+              ||                                '' }}
+             make test.e2e.desktop device=${{ matrix.platform }}
+                                   up=yes debug=no dockerized=yes
+                                   medea-tag=${{ env.MEDEA_BRANCH }}
+                                   control-tag=build-${{ github.run_number }}
 
   test-flutter:
     name: Flutter tests
@@ -418,7 +409,6 @@ jobs:
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
-
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -429,7 +419,6 @@ jobs:
           profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -647,7 +636,13 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["clippy", "rustfmt", "rustdoc", "test-unit", "test-e2e-browser", "test-e2e-desktop"]
+    needs:
+      - clippy
+      - rustdoc
+      - rustfmt
+      - test-e2e-browser
+      - test-e2e-desktop
+      - test-unit
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:

@@ -422,7 +422,7 @@ rustup.targets:
 # Show Android SDK compile API version of medea_jason Flutter plugin.
 #
 # Usage:
-#	make flutter.android.compile_api_version
+#	make flutter.android.version.compile
 
 flutter.android.version.compile:
 	@printf "$(ANDROID_SDK_COMPILE_VERSION)"
@@ -462,6 +462,20 @@ endif
 	                   $(if $(call eq,$(check),yes),--exit-if-changed,)'
 
 
+# Run `build_runner` Flutter tool to generate project Dart sources.
+#
+# Usage:
+#	make flutter.gen [overwrite=(yes|no)]
+
+flutter.gen:
+ifeq ($(wildcard flutter/pubspec.lock),)
+	@make flutter
+endif
+	cd flutter && \
+	flutter pub run build_runner build \
+		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
+
+
 # Lint Flutter Dart sources with dartanalyzer.
 #
 # Usage:
@@ -496,22 +510,6 @@ flutter.web.assets:
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
-
-
-
-
-# Run `build_runner` Flutter tool to generate project Dart sources.
-#
-# Usage:
-#	make flutter.gen [overwrite=(yes|no)]
-
-flutter.gen:
-ifeq ($(wildcard flutter/pubspec.lock),)
-	@make flutter
-endif
-	cd flutter && \
-	flutter pub run build_runner build \
-		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
 
 
 
@@ -1282,10 +1280,10 @@ endef
         	docker.up.medea docker.up.webdriver \
         docs docs.rust \
         down down.control down.demo down.dev down.medea \
-        flutter flutter.fmt flutter.lint flutter.run \
-        	flutter.android.compile_api_version \
-        	flutter.android.min_api_version \
-        	flutter.web.assets flutter.gen \
+        flutter flutter.fmt flutter.gen flutter.lint flutter.run \
+        	flutter.android.version.compile \
+        	flutter.android.version.min \
+        	flutter.web.assets \
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \

@@ -20,13 +20,13 @@ dependencies:
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
+  flutter_gherkin: 3.0.0-rc.9
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
-  pedantic: ^1.9.0
-  flutter_gherkin: 3.0.0-rc.9
   json_serializable: ^6.3.1
+  pedantic: ^1.9.0
 
 flutter:
   assets:

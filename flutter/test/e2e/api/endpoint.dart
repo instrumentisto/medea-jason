@@ -23,7 +23,7 @@ class WebRtcPlayEndpoint implements Endpoint {
   String id = '';
 
   /// URI in format `local://{room_id}/{member_id}/{endpoint_id}` pointing to
-  /// [WebRtcPublishEndpoint] which this [`WebRtcPlayEndpoint`] plays.
+  /// [WebRtcPublishEndpoint] which this [WebRtcPlayEndpoint] plays.
   String src;
 
   /// Option to relay all media through a TURN server forcibly.
@@ -74,7 +74,7 @@ class WebRtcPublishEndpoint implements Endpoint {
   }
 }
 
-/// Possible peer-to-peer modes of WebRTC interaction in a
+/// Possible peer-to-peer modes of a WebRTC interaction in a
 /// [WebRtcPublishEndpoint].
 enum P2pMode {
   /// Send media data via peer-to-peer connections only, and never through a
@@ -91,9 +91,9 @@ enum P2pMode {
 }
 
 /// Policy of how a video or an audio media type can be published in a
-/// [WebRtcPublishEndpoint]. asdasd
+/// [WebRtcPublishEndpoint].
 enum PublishPolicy {
-  /// Publish this media type if it possible.
+  /// Publish this media type, if it's possible.
   Optional,
 
   /// Don't start call if this media type can't be published.
@@ -105,11 +105,10 @@ enum PublishPolicy {
   Disabled,
 }
 
-/// Settings for the audio media type of the [WebRtcPublishEndpoint].
+/// Settings for an audio media type of a [WebRtcPublishEndpoint].
 @JsonSerializable()
 class AudioSettings {
-  /// Publishing policy of the audio media type in the
-  /// [WebRtcPublishEndpoint].
+  /// Publishing policy of the audio media type.
   PublishPolicy publish_policy = PublishPolicy.Optional;
 
   AudioSettings(this.publish_policy);
@@ -120,11 +119,10 @@ class AudioSettings {
   Map<String, dynamic> toJson() => _$AudioSettingsToJson(this);
 }
 
-/// Settings for the video media type of the [WebRtcPublishEndpoint].
+/// Settings for a video media type of a [WebRtcPublishEndpoint].
 @JsonSerializable()
 class VideoSettings {
-  /// Publishing policy of the video media type in the
-  /// [WebRtcPublishEndpoint].
+  /// Publishing policy of the video media type.
   PublishPolicy publish_policy = PublishPolicy.Optional;
 
   VideoSettings(this.publish_policy);

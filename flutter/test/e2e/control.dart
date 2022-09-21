@@ -67,7 +67,7 @@ class Client {
     return response;
   }
 
-  /// Returns URL of a media [`Element`] identified by the provided `path`.
+  /// Returns URL of a media element identified by the provided `path`.
   String get_url(String control_api_address, String path) {
     return '$control_api_address/control-api/$path';
   }

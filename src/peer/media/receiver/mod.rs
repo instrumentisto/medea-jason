@@ -103,7 +103,7 @@ impl Receiver {
 
         #[allow(clippy::if_then_some_else_none)]
         let transceiver = if state.mid().is_none() {
-            // Try to find send transceiver that can be used as sendrecv.
+            // Try to find send transceiver that can be used as `sendrecv`.
             let sender = media_connections
                 .0
                 .borrow()
@@ -222,7 +222,6 @@ impl Receiver {
     ///
     /// Sets [`platform::MediaStreamTrack::enabled`] same as
     /// `enabled_individual` of this [`Receiver`].
-    #[allow(clippy::missing_panics_doc)]
     pub async fn set_remote_track(
         &self,
         transceiver: platform::Transceiver,
@@ -233,7 +232,9 @@ impl Receiver {
                 return;
             }
         }
+
         self.set_transceiver(transceiver);
+
         let new_track = remote::Track::new(
             new_track,
             self.caps.media_source_kind(),
@@ -241,8 +242,12 @@ impl Receiver {
             self.media_direction.get(),
         );
 
-        let trnscvr = self.transceiver.borrow().as_ref().cloned().unwrap();
-        trnscvr.set_recv(self.enabled_individual.get()).await;
+        // It's OK to `.clone()` here, as the `Transceiver` represents a pointer
+        // to a garbage-collectable memory on each platform.
+        let trnscvr = self.transceiver.borrow().as_ref().cloned();
+        if let Some(t) = trnscvr {
+            t.set_recv(self.enabled_individual.get()).await;
+        }
 
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop().await;

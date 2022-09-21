@@ -8,13 +8,13 @@ import '../conf.dart';
 
 /// Builder of a [Member].
 class MemberBuilder {
-  /// ID with which a [`Member`] will be created.
+  /// ID with which the [Member] will be created.
   String id;
 
-  /// Indicator whether a [`Member`] will publish media.
+  /// Indicator whether the [Member] will publish media.
   bool is_send;
 
-  /// Indicator whether a [`Member`] will receive media.
+  /// Indicator whether the [Member] will receive media.
   bool is_recv;
 
   MemberBuilder(this.id, this.is_send, this.is_recv);
@@ -30,36 +30,36 @@ class MemberBuilder {
   }
 }
 
-/// Storage of [ConnectionHandle]'s and `MediaStreamTrack`'s
-/// thrown by this [Member].
+/// Storage of [ConnectionHandle]'s and `MediaStreamTrack`'s thrown by this
+/// [Member].
 class ConnectionStore {
   /// [Completer] for waits close [RoomHandle].
   Completer<RoomCloseReason> close_reason = Completer();
 
-  /// Storage of [ConnectionHandle]'s, where `key` - [Member.id].
+  /// Storage of [ConnectionHandle]s, where the key is [Member.id].
   var connections = HashMap<String, ConnectionHandle>();
 
-  /// Storage of [LocalMediaTrack]'s.
+  /// Storage of [LocalMediaTrack]s.
   List<LocalMediaTrack> local_tracks = List.empty(growable: true);
 
-  /// Storage of [RemoteMediaTrack]'s where `key` - [Member.id].
+  /// Storage of [RemoteMediaTrack]s, where the key is [Member.id].
   var remote_tracks =
       HashMap<String, HashMap<String, List<RemoteMediaTrack>>>();
 
-  /// Storage of [RemoteMediaTrack]'s callbacks fires count,
-  /// where `key` - `MediaStreamTrack.id`.
+  /// Storage of [RemoteMediaTrack]'s callbacks fires count, where the key is
+  /// `MediaStreamTrack.id`.
   var callback_counter = HashMap<String, Map<String, int>>();
 
-  /// [Completer]'s for waits close [ConnectionHandle].
+  /// [Completer]s waiting the [ConnectionHandle]s being closed.
   var close_connect = HashMap<String, Completer>();
 
-  /// Callbacks calls after [RemoteMediaTrack.onMediaDirectionChanged],
-  /// where `key` - `track.id`.
+  /// Callbacks calls after [RemoteMediaTrack.onMediaDirectionChanged], where
+  /// the key is `track.id`.
   var OnMediaDirectionChanged =
       HashMap<String, Function(TrackMediaDirection)>();
 
-  /// Callbacks calls after [RemoteMediaTrack] `callback_kind`,
-  /// where `key` - `track.id`.
+  /// Callbacks calls after [RemoteMediaTrack] `callback_kind`, where the key is
+  /// `track.id`.
   var OnCallbackCounter = HashMap<String, Map<String, Function(int)>>();
 
   /// Callback calls after [RoomHandle.onNewConnection].
@@ -71,7 +71,8 @@ class ConnectionStore {
   /// Callback calls after [RoomHandle.onLocalTrack].
   Function(LocalMediaTrack) OnLocalTrack = (_) {};
 
-  /// Returns stopped of track from `remote_id` by the provided `track_id`.
+  /// Indicates whether the provided track from the specified `remote_id` is
+  /// stopped.
   bool remote_track_is_stopped(String remote_id, String track_id) {
     var tracks = remote_tracks[remote_id]![track_id]!;
     var stopped_length = callback_counter[track_id]!['stopped']!;
@@ -94,7 +95,7 @@ class ConnectionStore {
   }
 }
 
-/// Representing a `Member` connected to a media server.
+/// Representation of a [Member] connected to a media server.
 class Member {
   /// ID of this [Member] on a media server.
   String id;
@@ -227,14 +228,14 @@ class Member {
     });
   }
 
-  /// Frees all [LocalMediaTrack].
+  /// Frees all the [LocalMediaTrack]s of this [Member].
   Future<void> forget_local_tracks() async {
     connection_store.local_tracks.forEach((track) {
       track.free();
     });
   }
 
-  /// Waits [ConnectionHandle] from [Member] with `id`.
+  /// Waits for a [ConnectionHandle] from the [Member] with the provided `id`.
   Future<void> wait_for_connect(String id) async {
     if (!connection_store.connections.containsKey(id)) {
       var conn = Completer();
@@ -246,7 +247,8 @@ class Member {
     }
   }
 
-  /// Waits `count` [RemoteMediaTrack] from [Member] with `id`.
+  /// Waits for a `count` of [RemoteMediaTrack]s from the [Member] with the
+  /// provided `id`.
   Future<void> wait_for_track_count(String id, int count) async {
     if (connection_store.remote_tracks[id]!.length != count) {
       var track_compl = Completer();
@@ -260,7 +262,8 @@ class Member {
     }
   }
 
-  /// Waits [RemoteMediaTrack] from [Member] with `id` and based on the provided options.
+  /// Waits for a [RemoteMediaTrack] from the [Member] with the provided `id`,
+  /// based on the provided options.
   Future<RemoteMediaTrack> wait_remote_track_from(
       String id, MediaSourceKind? source, MediaKind? kind) async {
     bool source_check(MediaSourceKind a, MediaSourceKind? b) {
@@ -298,7 +301,7 @@ class Member {
     }
   }
 
-  /// Waits [LocalMediaTrack] with based on the provided options.
+  /// Waits for a [LocalMediaTrack], based on the provided options.
   Future<LocalMediaTrack> wait_local_track(
       MediaSourceKind source, MediaKind kind) async {
     if (connection_store.local_tracks.any((element) =>
@@ -323,7 +326,7 @@ class Member {
     is_joined = true;
   }
 
-  /// Updates [Member.send_state].
+  /// Updates this [Member.send_state].
   void update_send_media_state(
       MediaKind? kind, MediaSourceKind? source_kind, bool enabled) async {
     kinds_combinations(kind, source_kind).forEach((element) {
@@ -331,7 +334,7 @@ class Member {
     });
   }
 
-  /// Updates [Member.recv_state].
+  /// Updates this [Member.recv_state].
   Future<void> update_recv_media_state(
       MediaKind? kind, MediaSourceKind? source_kind, bool enabled) async {
     kinds_combinations(kind, source_kind).forEach((element) {
@@ -339,8 +342,8 @@ class Member {
     });
   }
 
-  /// Returns count of [LocalMediaTrack]s and [RemoteMediaTrack]s of this [Member]
-  /// with a provided partner [Member].
+  /// Returns a count of [LocalMediaTrack]s and [RemoteMediaTrack]s of this
+  /// [Member] with the provided partner [Member].
   Tuple2<int, int> count_of_tracks_between_members(Member other) {
     var send_count = send_state.entries
         .where((element) => other.recv_state[element.key]! && element.value)
@@ -351,7 +354,7 @@ class Member {
     return Tuple2<int, int>(send_count, recv_count);
   }
 
-  /// Toggles media state of this [Member]'s [RoomHandle].
+  /// Toggles a media state of this [Member]'s [RoomHandle].
   Future<void> toggle_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
     update_send_media_state(kind, source, enabled);
@@ -380,7 +383,7 @@ class Member {
     }
   }
 
-  /// Toggles mute state of this [Member]'s [RoomHandle].
+  /// Toggles a mute state of this [Member]'s [RoomHandle].
   Future<void> toggle_mute(
       MediaKind? kind, MediaSourceKind? source, bool muted) async {
     if (!muted) {
@@ -408,7 +411,7 @@ class Member {
     }
   }
 
-  /// Toggles remote media state of this [Member]'s [RoomHandle].
+  /// Toggles a remote media state of this [Member]'s [RoomHandle].
   Future<void> toggle_remote_media(
       MediaKind? kind, MediaSourceKind? source, bool enabled) async {
     await update_recv_media_state(kind, source, enabled);
@@ -437,8 +440,8 @@ class Member {
     }
   }
 
-  /// Returns list of [MediaKind]s and [MediaSourceKind] based on the provided
-  /// options.
+  /// Returns a list of [MediaKind]s and a [MediaSourceKind], based on the
+  /// provided options.
   List<Tuple2<MediaKind, MediaSourceKind>> kinds_combinations(
       MediaKind? kind, MediaSourceKind? source_kind) {
     var out = List<Tuple2<MediaKind, MediaSourceKind>>.empty(growable: true);
@@ -458,7 +461,8 @@ class Member {
     return out;
   }
 
-  /// Waits for [RemoteMediaTrack] callbacks of `callback_kind` `count` times.
+  /// Waits for the [RemoteMediaTrack]'s callbacks of `callback_kind` to happen
+  /// the provided `count` times.
   Future<void> wait_for_track_cb_fire_count(
       String callback_kind, RemoteMediaTrack track, int count) async {
     var id = track.getTrack().id();
@@ -474,7 +478,7 @@ class Member {
     }
   }
 
-  /// Waits for [RemoteMediaTrack] disabled state.
+  /// Waits for the [RemoteMediaTrack]'s disabled state.
   Future<void> wait_disabled_track(RemoteMediaTrack track) async {
     var id = track.getTrack().id();
     if (track.mediaDirection() == TrackMediaDirection.SendRecv) {
@@ -490,12 +494,13 @@ class Member {
     }
   }
 
-  /// Waits for [RemoteMediaTrack] enabled state.
+  /// Waits for the [RemoteMediaTrack]'s enabled state.
   Future<void> wait_enabled_track(RemoteMediaTrack track) async {
     return wait_media_direction_track(TrackMediaDirection.SendRecv, track);
   }
 
-  /// Waits for [RemoteMediaTrack] direction change to `direction`.
+  /// Waits for the [RemoteMediaTrack]'s direction change to the provided
+  /// [direction].
   Future<void> wait_media_direction_track(
       TrackMediaDirection direction, RemoteMediaTrack track) async {
     var id = track.getTrack().id();
@@ -512,7 +517,7 @@ class Member {
     }
   }
 
-  /// Waits for [Member] with `id` to close.
+  /// Waits for the [Member] with the provided `id` to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
   }
