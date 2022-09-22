@@ -25,7 +25,7 @@ List<StepDefinitionGeneric> steps() {
 
 StepDefinitionGeneric when_control_api_removes_member =
     when1<String, CustomWorld>(
-  RegExp(r'Control API removes member (Alice|Bob|Carol)'),
+  RegExp(r'Control API removes member (\S+)$'),
   (member_id, context) async {
     await context.world.delete_member_element(member_id);
   },
@@ -40,8 +40,7 @@ StepDefinitionGeneric when_control_api_removes_room = when<CustomWorld>(
 
 StepDefinitionGeneric when_interconnects_kind =
     when3<String, String, String, CustomWorld>(
-  RegExp(r'Control API interconnects (audio|video) of (Alice|Bob|Carol) and'
-      r' (Alice|Bob|Carol)'),
+  RegExp(r'Control API interconnects (audio|video) of (\S+) and (\S+)$'),
   (kind, left_member_id, right_member_id, context) async {
     AudioSettings? audio_setting;
     VideoSettings? video_setting;
@@ -61,7 +60,7 @@ StepDefinitionGeneric when_interconnects_kind =
 
 StepDefinitionGeneric when_control_api_removes_member_via_apply =
     when1<String, CustomWorld>(
-  r'Control API removes (Alice|Bob|Carol) with `Apply` method',
+  r'Control API removes (\S+) with `Apply` method$',
   (member_id, context) async {
     var spec = await context.world.get_spec();
     spec.pipeline.forEach((key, value) {
@@ -74,7 +73,7 @@ StepDefinitionGeneric when_control_api_removes_member_via_apply =
 
 StepDefinitionGeneric when_control_api_interconnects_members =
     when2<String, String, CustomWorld>(
-  r'Control API interconnects (Alice|Bob|Carol) and (Alice|Bob|Carol)',
+  r'Control API interconnects (\S+) and (\S+)$',
   (id, partner_id, context) async {
     var member_pair = MembersPair(
       PairedMember(id, AudioSettings(PublishPolicy.Optional),
@@ -89,8 +88,8 @@ StepDefinitionGeneric when_control_api_interconnects_members =
 
 StepDefinitionGeneric when_control_api_interconnects_via_apply =
     when2<String, String, CustomWorld>(
-  r'Control API interconnects (Alice|Bob|Carol) and (Alice|Bob|Carol) with '
-  r'`Apply` method',
+  r'Control API interconnects (\S+) and (\S+) with '
+  r'`Apply` method$',
   (id, partner_id, context) async {
     var member_pair = MembersPair(
       PairedMember(id, AudioSettings(PublishPolicy.Optional),
@@ -105,7 +104,7 @@ StepDefinitionGeneric when_control_api_interconnects_via_apply =
 
 StepDefinitionGeneric then_control_api_sends_on_join =
     then1<String, CustomWorld>(
-  r'Control API sends `OnJoin` callback for member (Alice|Bob|Carol)',
+  r'Control API sends `OnJoin` callback for member (\S+)$',
   (id, context) async {
     var future = context.world.wait_for_on_join(id);
     await future.timeout(Duration(seconds: 10));
@@ -114,7 +113,8 @@ StepDefinitionGeneric then_control_api_sends_on_join =
 
 StepDefinitionGeneric then_control_api_doesnt_sends_on_leave =
     then1<String, CustomWorld>(
-  r"Control API doesn't send `OnLeave` callback for member (Alice|Bob|Carol)",
+  r"Control API doesn't send `OnLeave` callback for "
+  r'member (\S+)$',
   (id, context) async {
     var sendOnLeave = true;
     try {
@@ -129,8 +129,8 @@ StepDefinitionGeneric then_control_api_doesnt_sends_on_leave =
 
 StepDefinitionGeneric then_control_api_sends_on_leave =
     then2<String, String, CustomWorld>(
-  r'Control API sends `OnLeave` callback with `(.+)` reason for '
-  r'member (Alice|Bob|Carol)',
+  r'Control API sends `OnLeave` callback with `(.+)` reason '
+  r'for member (\S+)$',
   (reason, id, context) async {
     await context.world
         .wait_for_on_leave(id, reason)
@@ -140,8 +140,8 @@ StepDefinitionGeneric then_control_api_sends_on_leave =
 
 StepDefinitionGeneric when_control_api_starts_publishing =
     then3<String, String, String, CustomWorld>(
-  r"Control API starts (Alice|Bob|Carol)'s (audio|video|media) publishing to"
-  r' (Alice|Bob|Carol)',
+  r"Control API starts (\S+)'s (audio|video|media) publishing "
+  r'to (\S+)$',
   (publisher_id, kind, receiver_id, context) async {
     var all_kinds = kind.contains('media');
 
@@ -165,7 +165,7 @@ StepDefinitionGeneric when_control_api_starts_publishing =
 
 StepDefinitionGeneric when_control_api_deletes_publish_endpoint =
     when1<String, CustomWorld>(
-  r"Control API deletes (Alice|Bob|Carol)'s publish endpoint",
+  r"Control API deletes (\S+)'s publish endpoint$",
   (id, context) async {
     var future = context.world.delete_publish_endpoint(id);
     await future.timeout(Duration(milliseconds: 200));
@@ -174,8 +174,7 @@ StepDefinitionGeneric when_control_api_deletes_publish_endpoint =
 
 StepDefinitionGeneric when_control_api_deletes_play_endpoint =
     when2<String, String, CustomWorld>(
-  r"Control API deletes (Alice|Bob|Carol)'s play endpoint with "
-  r'(Alice|Bob|Carol)',
+  r"Control API deletes (\S+)'s play endpoint with (\S+)$",
   (id, partner_id, context) async {
     var future = context.world.delete_play_endpoint(id, partner_id);
     await future.timeout(Duration(milliseconds: 200));

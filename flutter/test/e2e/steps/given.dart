@@ -96,10 +96,10 @@ Future<void> new_given_member(
 
 StepDefinitionGeneric givenOneMember =
     given5<String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined |)member (Alice|Bob|Carol)'
+  r'(room with joined |room with |joined |)member (\S+)'
   r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
-  r'( media| audio| video|)( publishing| playing|)',
+  r'( media| audio| video|)( publishing| playing|)$',
   (joined, first_member_id, endpoints, disabled_media_type, disabled_direction,
       context) async {
     await new_given_member(joined, first_member_id, '', '', endpoints,
@@ -109,10 +109,10 @@ StepDefinitionGeneric givenOneMember =
 
 StepDefinitionGeneric givenTwoMembers =
     given6<String, String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and '
-  r'(Alice|Bob|Carol)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
+  r'(room with joined |room with |joined )member(s) (\S+) and '
+  r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
-  r'( media| audio| video|)( publishing| playing|)',
+  r'( media| audio| video|)( publishing| playing|)$',
   (joined, first_member_id, second_member_id, endpoints, disabled_media_type,
       disabled_direction, context) async {
     await new_given_member(joined, first_member_id, second_member_id, '',
@@ -122,11 +122,11 @@ StepDefinitionGeneric givenTwoMembers =
 
 StepDefinitionGeneric givenTreeMembers =
     given7<String, String, String, String, String, String, String, CustomWorld>(
-  r'(room with joined |room with |joined )member(s) (Alice|Bob|Carol) and '
-  r'(Alice|Bob|Carol) and (Alice|Bob|Carol)'
+  r'(room with joined |room with |joined )member(s) (\S+) and '
+  r'(\S+) and (\S+)'
   r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
-  r'( media| audio| video|)( publishing| playing|)',
+  r'( media| audio| video|)( publishing| playing|)$',
   (joined, first_member_id, second_member_id, third_member_id, endpoints,
       disabled_media_type, disabled_direction, context) async {
     await new_given_member(
