@@ -11,9 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^2.0.0
-  js: ^0.6.3
-  medea_flutter_webrtc: 0.8.0-dev+rev.18ee24fc614f664bf4815e04775c08aa9fc09b26
+  ffi: ^2.0.1
+  js: ^0.6.4
+  medea_flutter_webrtc:
+    path: /media/alexlapa/drive2/CLionProjects3/flutter-webrtc
 
 dev_dependencies:
   import_sorter: ^4.6.0

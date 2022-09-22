@@ -6,6 +6,7 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'stats.g.dart' as bridge;
 
+// TODO(alexlapa): can we package everything in a structure, so we won`t have billion of functions?
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
