@@ -141,8 +141,6 @@ mod tests {
 
     #[test]
     fn disable_works_correctly() {
-        use Direction as D;
-
         for (init, disable_dir, result) in [
             (D::SEND, D::SEND, D::INACTIVE),
             (D::RECV, D::RECV, D::INACTIVE),
