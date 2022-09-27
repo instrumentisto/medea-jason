@@ -1,9 +1,8 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
-import '../interface/local_media_track.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';

@@ -152,7 +152,7 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_width(
 ) -> DartResult {
     propagate_panic(|| {
         match u32::try_from(width) {
-            Ok(w) => this.as_mut().exact_width(w),
+            Ok(w) => this.as_mut().ideal_width(w),
             Err(_) => {
                 return ArgumentError::new(width, "width", "Expected u32")
                     .into();

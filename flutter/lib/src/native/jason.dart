@@ -16,6 +16,7 @@ import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
+import 'ffi/native_string.dart' as native_string;
 import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
@@ -72,7 +73,10 @@ void onPanic(void Function(String)? cb) {
 }
 
 DynamicLibrary _dl_load() {
-  if (!(Platform.isAndroid || Platform.isLinux || Platform.isWindows)) {
+  if (!(Platform.isAndroid ||
+      Platform.isLinux ||
+      Platform.isWindows ||
+      Platform.isMacOS)) {
     throw UnsupportedError('This platform is not supported.');
   }
   if (NativeApi.majorVersion != 2) {
@@ -106,6 +110,7 @@ DynamicLibrary _dl_load() {
   platform_utils_registerer.registerFunctions(dl);
   list.registerFunctions(dl);
   map.registerFunctions(dl);
+  native_string.registerFunctions(dl);
 
   executor = Executor(dl);
 

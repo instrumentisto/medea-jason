@@ -1,11 +1,13 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 
-import '../interface/local_media_track.dart';
 import '../interface/media_device_info.dart';
+import '../interface/media_display_info.dart';
 import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
@@ -14,6 +16,7 @@ import 'ffi/result.dart';
 import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_device_info.dart';
+import 'media_display_info.dart';
 import 'media_stream_settings.dart';
 
 typedef _initLocalTracks_C = Handle Function(Pointer, Pointer);
@@ -21,6 +24,9 @@ typedef _initLocalTracks_Dart = Object Function(Pointer, Pointer);
 
 typedef _enumerateDevices_C = Handle Function(Pointer);
 typedef _enumerateDevices_Dart = Object Function(Pointer);
+
+typedef _enumerateDisplays_C = Handle Function(Pointer);
+typedef _enumerateDisplays_Dart = Object Function(Pointer);
 
 typedef _setOutputAudioId_C = Handle Function(Pointer, Pointer<Utf8>);
 typedef _setOutputAudioId_Dart = Object Function(Pointer, Pointer<Utf8>);
@@ -47,6 +53,10 @@ final _initLocalTracks =
 final _enumerateDevices =
     dl.lookupFunction<_enumerateDevices_C, _enumerateDevices_Dart>(
         'MediaManagerHandle__enumerate_devices');
+
+final _enumerateDisplays =
+    dl.lookupFunction<_enumerateDisplays_C, _enumerateDisplays_Dart>(
+        'MediaManagerHandle__enumerate_displays');
 
 final _setOutputAudioId =
     dl.lookupFunction<_setOutputAudioId_C, _setOutputAudioId_Dart>(
@@ -101,6 +111,21 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
         .cast<PtrArray>()
         .intoPointerList()
         .map((e) => NativeMediaDeviceInfo(NullablePointer(e)))
+        .toList();
+  }
+
+  @override
+  Future<List<MediaDisplayInfo>> enumerateDisplays() async {
+    if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
+      throw UnsupportedError(
+          'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
+    }
+
+    Pointer pointer = await (_enumerateDisplays(ptr.getInnerPtr()) as Future);
+    return pointer
+        .cast<PtrArray>()
+        .intoPointerList()
+        .map((e) => NativeMediaDisplayInfo(NullablePointer(e)))
         .toList();
   }
 

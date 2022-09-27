@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'call.dart';
 

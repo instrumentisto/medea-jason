@@ -20,6 +20,7 @@ use crate::{
 use super::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     media_device_info::MediaDeviceInfo,
+    media_display_info::MediaDisplayInfo,
     media_track::MediaStreamTrack,
 };
 
@@ -32,6 +33,9 @@ mod media_devices {
     extern "C" {
         /// Returns information about available media input devices.
         pub fn enumerate_devices() -> Dart_Handle;
+
+        /// Returns information about available displays.
+        pub fn enumerate_displays() -> Dart_Handle;
 
         /// Prompts a user for permissions to use a media input device,
         /// producing a vector of [MediaStreamTrack][1]s containing the
@@ -122,6 +126,33 @@ impl MediaDevices {
                 result.push(v);
             }
         }
+        Ok(result)
+    }
+
+    /// Collects information about available displays.
+    ///
+    /// # Errors
+    ///
+    /// If platform call returns error.
+    pub async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
+        let displays = unsafe {
+            FutureFromDart::execute::<DartHandle>(
+                media_devices::enumerate_displays(),
+            )
+            .await
+        }
+        .map(DartList::from)
+        .map_err(tracerr::from_and_wrap!())?;
+
+        let len = displays.length();
+        let mut result = Vec::with_capacity(len);
+        for i in 0..len {
+            let val = displays.get(i).unwrap();
+            result.push(MediaDisplayInfo::from(val));
+        }
+
         Ok(result)
     }
 

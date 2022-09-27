@@ -686,7 +686,7 @@ impl MediaConnections {
                 (kinds.has(s.state().kind(), s.state().source_kind())
                     && s.state().enabled()
                     && !s.has_track())
-                .then(|| s.state().id())
+                .then_some(s.state().id())
             })
             .collect()
     }

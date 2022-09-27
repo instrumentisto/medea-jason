@@ -1252,7 +1252,7 @@ impl InnerRoom {
                                     media_exchange_state::Stable::Enabled
                                 )
                             )
-                            .then(|| *track_id)
+                            .then_some(*track_id)
                         })
                         .collect(),
                 )
@@ -1274,7 +1274,7 @@ impl InnerRoom {
                         .filter_map(|(trnscvr, desired_state)| {
                             trnscvr
                                 .is_subscription_needed(desired_state)
-                                .then(|| (trnscvr, desired_state))
+                                .then_some((trnscvr, desired_state))
                         })
                         .map(|(trnscvr, desired_state)| {
                             trnscvr.media_state_transition_to(desired_state)?;

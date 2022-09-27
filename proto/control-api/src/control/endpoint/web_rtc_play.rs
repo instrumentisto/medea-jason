@@ -6,21 +6,38 @@ use std::str::FromStr;
 
 use derive_more::{AsRef, Display, Error, From, Into};
 use ref_cast::RefCast;
+#[cfg(feature = "serde")]
+use serde::{de::Error as _, Deserialize, Deserializer, Serialize, Serializer};
 use url::Url;
 
-use crate::control::{endpoint::web_rtc_publish, member, room};
+use crate::control::{
+    endpoint::{self, web_rtc_publish},
+    member, room,
+};
 
 /// Media [`Element`] playing media data for a client via [WebRTC].
 ///
 /// [`Element`]: crate::Element
 /// [WebRTC]: https://w3.org/TR/webrtc
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct WebRtcPlay {
-    /// ID of this [`WebRtcPlay`] [`Element`].
+    /// ID of this [`WebRtcPlay`] media [`Element`].
     ///
     /// [`Element`]: crate::Element
     pub id: Id,
 
+    /// [`Spec`] of this [`WebRtcPlay`] media [`Element`].
+    ///
+    /// [`Element`]: crate::Element
+    pub spec: Spec,
+}
+
+/// Spec of a [`WebRtcPlay`] media [`Element`].
+///
+/// [`Element`]: crate::Element
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+pub struct Spec {
     /// Source to play media data from.
     pub src: LocalSrcUri,
 
@@ -28,6 +45,7 @@ pub struct WebRtcPlay {
     /// forcibly.
     ///
     /// [TURN]: https://webrtc.org/getting-started/turn-server
+    #[cfg_attr(feature = "serde", serde(default))]
     pub force_relay: bool,
 }
 
@@ -48,6 +66,8 @@ pub struct WebRtcPlay {
     PartialOrd,
     RefCast,
 )]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 #[from(types(String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
@@ -60,12 +80,18 @@ impl<'a> From<&'a str> for Id {
     }
 }
 
+impl AsRef<endpoint::Id> for Id {
+    fn as_ref(&self) -> &endpoint::Id {
+        endpoint::Id::ref_cast(&self.0)
+    }
+}
+
 /// [URI] describing a source of media data for a [`WebRtcPlay`] media
 /// [`Element`] located locally on the same media server.
 ///
 /// [`Element`]: crate::Element
 /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-#[derive(Clone, Debug, Display)]
+#[derive(Clone, Debug, Display, Eq, PartialEq)]
 #[display(fmt = "local://{}/{}/{}", room_id, member_id, endpoint_id)]
 pub struct LocalSrcUri {
     /// ID of the [`Room`].
@@ -134,6 +160,28 @@ impl FromStr for LocalSrcUri {
             member_id,
             endpoint_id,
         })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> Deserialize<'de> for LocalSrcUri {
+    fn deserialize<D>(de: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        String::deserialize(de)?
+            .parse::<Self>()
+            .map_err(D::Error::custom)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl Serialize for LocalSrcUri {
+    fn serialize<S>(&self, se: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        se.serialize_str(&self.to_string())
     }
 }
 

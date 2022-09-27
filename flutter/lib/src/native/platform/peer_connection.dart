@@ -1,8 +1,9 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
+import 'package:medea_jason/src/native/ffi/native_string.dart';
 import '../ffi/foreign_value.dart';
 import 'peer_connection.g.dart' as bridge;
 
@@ -41,10 +42,11 @@ Object _addTransceiver(PeerConnection peer, int kind, int direction) {
 
 /// Returns a newly created [PeerConnection] with the provided `iceServers`
 /// [List].
-Object _newPeer(Object iceServers) {
+Object _newPeer(Object iceServers, bool isForceRelayed) {
   var servers = iceServers as List<dynamic>;
+  var iceType = isForceRelayed ? IceTransportType.relay : IceTransportType.all;
   return () => PeerConnection.create(
-      IceTransportType.all, servers.map((e) => e as IceServer).toList());
+      iceType, servers.map((e) => e as IceServer).toList());
 }
 
 /// Sets the provided [f] to the [PeerConnection.onTrack] callback.
@@ -81,7 +83,7 @@ void _onConnectionStateChange(PeerConnection conn, Function f) {
 /// [mid].
 Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
-        var mMid = mid.toDartString();
+        var mMid = mid.nativeStringToDartString();
         for (var transceiver in transceivers) {
           if (transceiver.mid == mMid) {
             return transceiver;
@@ -94,12 +96,12 @@ Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
-  if (type.toDartString() == 'offer') {
+  if (type.nativeStringToDartString() == 'offer') {
     sdpType = SessionDescriptionType.offer;
   } else {
     sdpType = SessionDescriptionType.answer;
   }
-  var desc = SessionDescription(sdpType, sdp.toDartString());
+  var desc = SessionDescription(sdpType, sdp.nativeStringToDartString());
   return () => conn.setRemoteDescription(desc);
 }
 
@@ -107,13 +109,13 @@ Object _setRemoteDescription(
 Object _setLocalDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
   var sdpType;
-  if (type.toDartString() == 'offer') {
+  if (type.nativeStringToDartString() == 'offer') {
     sdpType = SessionDescriptionType.offer;
   } else {
     sdpType = SessionDescriptionType.answer;
   }
-  return () =>
-      conn.setLocalDescription(SessionDescription(sdpType, sdp.toDartString()));
+  return () => conn.setLocalDescription(
+      SessionDescription(sdpType, sdp.nativeStringToDartString()));
 }
 
 /// Creates a new SDP offer for the provided [PeerConnection].

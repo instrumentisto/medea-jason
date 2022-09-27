@@ -17,11 +17,24 @@ All user visible changes to this project will be documented in this file. This p
     - `ControlApi` and `CallbackApi` ([#55]).
 - gRPC:
     - `ControlApi` and `CallbackApi` implementations ([#56]).
+- Direct:
+    - `ControlApi` and `CallbackApi` implementations ([#65]).
 - Cargo features:
-    - `client` and `server` ([#56]).
+    - `client` and `server` ([#56]);
+    - `serde` ([#67]);
+    - `client-api` ([#68]).
+
+### Upgraded
+
+- Dependencies: ([todo])
+    - [`prost`] to `0.11`;
+    - [`tonic`] to `0.8`.
 
 [#55]: /../../pull/55
 [#56]: /../../pull/56
+[#67]: /../../pull/67
+[#68]: /../../pull/68
+[todo]: /../../commit/todo
 
 
 

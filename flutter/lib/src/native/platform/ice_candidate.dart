@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/src/model/ice.dart';
+import 'package:medea_flutter_webrtc/src/model/ice.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'ice_candidate.g.dart' as bridge;

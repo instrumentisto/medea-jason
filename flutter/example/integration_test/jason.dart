@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -567,17 +568,19 @@ void main() {
 
     var intVal = ForeignValue.fromInt(45);
     var stringVal = ForeignValue.fromString('test string');
+    var stringVal2 = ForeignValue.fromString('test string');
     var noneVal = ForeignValue.none();
 
     (intListener(intVal.ref) as Function)(45);
     (stringListener(stringVal.ref) as Function)('test string');
     (optionalIntListener(intVal.ref) as Function)(45);
     (optionalIntListener(noneVal.ref) as Function)(null);
-    (optionalStringListener(stringVal.ref) as Function)('test string');
+    (optionalStringListener(stringVal2.ref) as Function)('test string');
     (optionalStringListener(noneVal.ref) as Function)(null);
 
     intVal.free();
     stringVal.free();
+    stringVal2.free();
     noneVal.free();
   });
 
@@ -673,6 +676,29 @@ void main() {
     expect(await media.microphoneVolumeIsAvailable(), true);
     expect(await media.microphoneVolume(), 50);
     expect(() async => await media.setMicrophoneVolume(100), returnsNormally);
+  });
+
+  testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
+    var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+
+    var jason = Jason();
+    var media = jason.mediaManager();
+
+    if (shouldWork) {
+      var displays = await media.enumerateDisplays();
+
+      expect(displays.length, 1);
+      expect(displays[0].deviceId(), 'device_id');
+      expect(displays[0].title(), 'title');
+    } else {
+      var err;
+      try {
+        await media.enumerateDisplays();
+      } catch (e) {
+        err = e;
+      }
+      expect(err is UnsupportedError, true);
+    }
   });
 }
 

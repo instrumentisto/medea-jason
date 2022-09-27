@@ -5,13 +5,13 @@ use std::{
 
 use async_trait::async_trait;
 use futures::{channel::mpsc, prelude::stream::LocalBoxStream};
-use medea_client_api_proto::{ClientMsg, CloseReason, ServerMsg};
+use medea_client_api_proto::{ClientMsg, ServerMsg};
 use medea_macro::dart_bridge;
 use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::string_into_c_str,
+    api::{dart_string_into_rust, string_into_c_str},
     platform::{
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
@@ -60,6 +60,18 @@ mod transport {
             close_code: i32,
             close_msg: ptr::NonNull<c_char>,
         );
+
+        /// Returns the [closeCode][0] of the [close frame][1].
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeCode.html
+        /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
+        pub fn close_code(close_frame: Dart_Handle) -> i32;
+
+        /// Returns the [closeReason][0] of the [close frame][1].
+        ///
+        /// [0]: https://api.dart.dev/stable/dart-io/WebSocket/closeReason.html
+        /// [1]: https://tools.ietf.org/html/rfc6455#section-5.5.1
+        pub fn close_reason(close_frame: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
 
@@ -146,11 +158,18 @@ impl RpcTransport for WebSocketRpcTransport {
                     }
                 })
                 .into_dart(),
-                Callback::from_once({
+                Callback::from_fn_mut({
                     let socket_state = Rc::clone(&self.socket_state);
-                    move |_: ()| {
+                    move |close_frame: DartHandle| {
+                        let code = transport::close_code(close_frame.get())
+                            .try_into()
+                            .unwrap_or(1007);
+                        let reason = dart_string_into_rust(
+                            transport::close_reason(close_frame.get()),
+                        );
+
                         socket_state.set(TransportState::Closed(
-                            CloseMsg::Normal(1000, CloseReason::Finished),
+                            CloseMsg::from((code, reason)),
                         ));
                     }
                 })

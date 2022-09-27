@@ -25,7 +25,7 @@ pub struct MediaStreamTrack {
     /// Underlying [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[as_ref]
+    #[as_ref(forward)]
     sys_track: Rc<web_sys::MediaStreamTrack>,
 
     /// Kind of the underlying [MediaStreamTrack][1].

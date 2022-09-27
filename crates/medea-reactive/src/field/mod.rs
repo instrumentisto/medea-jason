@@ -242,11 +242,11 @@ pub enum UniversalSubscriber<D> {
 
 impl<D> fmt::Debug for UniversalSubscriber<D> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self {
-            UniversalSubscriber::When { .. } => {
+        match self {
+            Self::When { .. } => {
                 write!(f, "UniversalSubscriber::When")
             }
-            UniversalSubscriber::Subscribe(_) => {
+            Self::Subscribe(_) => {
                 write!(f, "UniversalSubscriber::Subscribe")
             }
         }
@@ -316,7 +316,7 @@ impl<D: Clone> OnObservableFieldModification<D>
                     sender
                         .borrow_mut()
                         .take()
-                        .expect("UniversalSubscriber::When used already")
+                        .expect("`UniversalSubscriber::When` used already")
                         .send(())
                         .map_or(false, |_| false)
                 } else {

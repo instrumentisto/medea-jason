@@ -103,8 +103,11 @@ where
             Ok(elements) => control_proto::GetResponse {
                 elements: elements
                     .into_iter()
-                    .map(|(id, el)| (id.to_string(), el.into()))
-                    .collect(),
+                    .map(|(id, el)| {
+                        let s = id.to_string();
+                        (id, el).try_into().map(|proto| (s, proto))
+                    })
+                    .collect::<Result<_, _>>()?,
                 error: None,
             },
             Err(e) => control_proto::GetResponse {
@@ -170,7 +173,7 @@ where
     T::Future: Send,
     T::ResponseBody: Body<Data = Bytes> + Send + 'static,
     <T::ResponseBody as Body>::Error: Send,
-    StdError: From<T::Error> + From<<T::ResponseBody as Body>::Error>,
+    StdError: From<<T::ResponseBody as Body>::Error>,
 {
     type Error = CallbackApiClientError;
 
@@ -187,8 +190,6 @@ where
 }
 
 /// Possible errors of [`CallbackApiClient`].
-///
-/// [`CallbackApiClient`]: CallbackClient
 #[derive(Debug, Display, From, Error)]
 pub enum CallbackApiClientError {
     /// [gRPC] server errored.

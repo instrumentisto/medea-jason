@@ -18,7 +18,9 @@
     clippy::debug_assert_with_mut_call,
     clippy::decimal_literal_representation,
     clippy::else_if_without_else,
+    clippy::empty_drop,
     clippy::empty_line_after_outer_attr,
+    clippy::empty_structs_with_brackets,
     clippy::equatable_if_let,
     clippy::exit,
     clippy::expect_used,
@@ -27,11 +29,13 @@
     clippy::float_cmp_const,
     clippy::fn_to_numeric_cast,
     clippy::fn_to_numeric_cast_any,
+    clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
     clippy::iter_with_drain,
+    clippy::large_include_file,
     clippy::let_underscore_must_use,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
@@ -96,6 +100,8 @@
 
 pub mod callback;
 pub mod control;
+#[cfg(feature = "direct")]
+pub mod direct;
 #[cfg(feature = "grpc")]
 pub mod grpc;
 
@@ -104,6 +110,6 @@ pub use self::{
     callback::Api as CallbackApi,
     control::{
         endpoint, member, room, Api as ControlApi, Element, Elements, Endpoint,
-        Fid, Member, Ping, Pong, Room,
+        Fid, Member, Ping, Pong, Room, RootElement,
     },
 };

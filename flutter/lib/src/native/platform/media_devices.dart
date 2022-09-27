@@ -1,8 +1,9 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
+import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
 
 /// Registers functions allowing Rust to operate Dart media devices.
@@ -10,6 +11,7 @@ void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
     enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+    enumerateDisplays: Pointer.fromFunction(_enumerateDisplays),
     getUserMedia: Pointer.fromFunction(_getUserMedia),
     getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
     setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
@@ -32,6 +34,11 @@ Object _enumerateDevices() {
   return () => webrtc.enumerateDevices();
 }
 
+/// Returns all the available media displays.
+Object _enumerateDisplays() {
+  return () => webrtc.enumerateDisplays();
+}
+
 /// Starts capturing the contents of a display and returns the created
 /// [webrtc.MediaStreamTrack]s.
 Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
@@ -40,7 +47,7 @@ Object _getDisplayMedia(webrtc.DisplayConstraints constraints) {
 
 /// Switches output audio device to the device with the provided [deviceId].
 Object _setOutputAudioId(Pointer<Utf8> deviceId) {
-  return () => webrtc.setOutputAudioId(deviceId.toDartString());
+  return () => webrtc.setOutputAudioId(deviceId.nativeStringToDartString());
 }
 
 /// Sets the microphone volume level in percents.
