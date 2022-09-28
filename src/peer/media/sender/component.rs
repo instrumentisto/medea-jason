@@ -434,6 +434,7 @@ impl Component {
     ///
     /// [1]: crate::peer::TrackEvent::MediaExchangeIntention
     #[watch(self.enabled_individual.subscribe_transition())]
+    #[allow(clippy::unused_async)]
     async fn enabled_individual_transition_started(
         sender: Rc<Sender>,
         _: Rc<State>,
@@ -450,6 +451,7 @@ impl Component {
     ///
     /// [1]: crate::peer::TrackEvent::MuteUpdateIntention
     #[watch(self.mute_state.subscribe_transition())]
+    #[allow(clippy::unused_async)]
     async fn mute_state_transition_watcher(
         sender: Rc<Sender>,
         _: Rc<State>,
@@ -533,6 +535,7 @@ impl Component {
     /// Updates [`Sender`]'s [`platform::Transceiver`] `MediaTrack.enabled`
     /// property.
     #[watch(self.mute_state.subscribe_stable())]
+    #[allow(clippy::unused_async)]
     async fn mute_state_stable_watcher(
         sender: Rc<Sender>,
         _: Rc<State>,
@@ -558,6 +561,7 @@ impl Component {
     /// Sends media state intentions and resets transition timeouts on a
     /// [`SyncState::Synced`].
     #[watch(self.sync_state.subscribe().skip(1))]
+    #[allow(clippy::unused_async)]
     async fn sync_state_watcher(
         sender: Rc<Sender>,
         state: Rc<State>,
@@ -589,6 +593,7 @@ impl Component {
 
     /// Disables media exchange on a local track acquisition error.
     #[watch(self.local_track_state.subscribe())]
+    #[allow(clippy::unused_async)]
     async fn local_track_state_changed(
         _: Rc<Sender>,
         state: Rc<State>,

@@ -13,13 +13,14 @@ use crate::{
 };
 
 use self::{
+    ice_candidate::RTCIceCandidateFfiStats,
     ice_candidate_pair::RTCIceCandidatePairFfiStats,
     inbound_stream::RTCInboundRTPStreamFfiStats,
     media_source::RTCMediaSourceFfiStats,
     outbound_stream::RTCOutboundRTPStreamFfiStats,
     remote_inbound_stream::RTCRemoteInboundRtpStreamFfiStats,
     remote_outbound_stream::RTCRemoteOutboundRtpStreamFfiStats,
-    transport::RTCTransportFfiStats, ice_candidate::RTCIceCandidateFfiStats,
+    transport::RTCTransportFfiStats,
 };
 
 mod ice_candidate;

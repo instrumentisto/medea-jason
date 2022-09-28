@@ -256,6 +256,7 @@ impl Component {
     ///
     /// [`Connection`]: crate::connection::Connection
     #[watch(self.0.borrow().on_remove())]
+    #[allow(clippy::unused_async)]
     async fn peer_removed(
         peers: Rc<Repository>,
         _: Rc<State>,

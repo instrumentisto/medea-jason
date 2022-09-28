@@ -98,8 +98,8 @@ impl From<RTCMediaSourceFfiStats> for MediaSourceStats {
 #[derive(Debug)]
 #[repr(C)]
 #[allow(missing_copy_implementations)]
-    /// [`RtcStat`] fields of [`RtcStatsType::MediaSource`]
-    /// type based on video kind.
+/// [`RtcStat`] fields of [`RtcStatsType::MediaSource`]
+/// type based on video kind.
 struct RTCVideoSourceFfiStats {
     /// Width (in pixels) of the last frame originating from the source.
     /// Before a frame has been produced this attribute is missing.
@@ -121,8 +121,8 @@ struct RTCVideoSourceFfiStats {
 #[derive(Debug)]
 #[repr(C)]
 #[allow(missing_copy_implementations)]
-    /// [`RtcStat`] fields of [`RtcStatsType::MediaSource`]
-    /// type based on audio kind.
+/// [`RtcStat`] fields of [`RtcStatsType::MediaSource`]
+/// type based on audio kind.
 struct RTCAudioSourceFfiStats {
     /// Audio level of the media source.
     audio_level: ptr::NonNull<DartValueArg<Option<f64>>>,

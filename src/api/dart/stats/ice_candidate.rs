@@ -60,9 +60,9 @@ pub struct IceCandidateFfiStats {
 #[derive(Debug)]
 #[repr(u8)]
 pub enum RTCIceCandidateFfiStats {
-    /// Remote candidate variant. 
+    /// Remote candidate variant.
     Remote(ptr::NonNull<IceCandidateFfiStats>),
-    /// Remote candidate variant. 
+    /// Remote candidate variant.
     Local(ptr::NonNull<IceCandidateFfiStats>),
 }
 

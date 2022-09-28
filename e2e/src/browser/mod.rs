@@ -130,6 +130,7 @@ impl Window {
 pub struct WindowFactory(WebDriverClient);
 
 impl WindowFactory {
+    #[allow(clippy::unused_async)]
     /// Returns a new [`WindowFactory`] from [`WebDriverClient`].
     pub async fn new(client: WebDriverClient) -> Self {
         Self(client)

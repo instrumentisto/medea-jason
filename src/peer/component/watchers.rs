@@ -101,6 +101,7 @@ impl Component {
     ///
     /// Removes a [`sender::Component`] from the [`PeerConnection`].
     #[watch(self.senders.on_remove())]
+    #[allow(clippy::unused_async)]
     async fn sender_removed(
         peer: Rc<PeerConnection>,
         _: Rc<State>,
@@ -115,6 +116,7 @@ impl Component {
     ///
     /// Removes a [`receiver::Component`] from the [`PeerConnection`].
     #[watch(self.receivers.on_remove())]
+    #[allow(clippy::unused_async)]
     async fn receiver_removed(
         peer: Rc<PeerConnection>,
         _: Rc<State>,
@@ -311,6 +313,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
+    #[allow(clippy::unused_async)]
     async fn local_sdp_approved(
         _: Rc<PeerConnection>,
         state: Rc<State>,
@@ -445,6 +448,7 @@ impl Component {
     /// Sends [`PeerConnection`]'s connection state and ICE connection state to
     /// the server.
     #[watch(self.sync_state.subscribe().skip(1))]
+    #[allow(clippy::unused_async)]
     async fn sync_state_changed(
         peer: Rc<PeerConnection>,
         _: Rc<State>,
