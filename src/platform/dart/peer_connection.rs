@@ -24,14 +24,15 @@ use crate::{
                 peer_connection_state_from_int,
             },
         },
-        IceCandidate, RtcPeerConnectionError, RtcStats, SdpType,
-        TransceiverDirection,
+        IceCandidate, RtcPeerConnectionError, SdpType, TransceiverDirection,
     },
 };
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack, rtc_stats::RTCStats, utils::list::DartList,
+    media_track::MediaStreamTrack,
+    rtc_stats::RtcStats,
+    utils::{list::DartList, NonNullDartValueArgExt},
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
@@ -132,8 +133,13 @@ mod peer_connection {
         /// Closes the provided [`PeerConnection`].
         pub fn close(peer: Dart_Handle);
 
-        // todo
+        /// Returns stats of the provided [`PeerConnection`].
         pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
+
+        /// Gets owned `Dart` stats by rust.
+        pub fn to_owned_stats(
+            stats: Dart_Handle,
+        ) -> ptr::NonNull<crate::api::stats::RTCFfiStats>;
     }
 }
 
@@ -187,8 +193,11 @@ impl RtcPeerConnection {
         let len = list.length();
         let mut result = Vec::with_capacity(len);
         for i in 0..len {
-            let val = RTCStats(list.get(i).unwrap());
-            result.push(RtcStat::from(val));
+            let handle_stats = list.get(i).unwrap();
+            let val = RtcStat::from(unsafe {
+                peer_connection::to_owned_stats(handle_stats.get()).unbox()
+            });
+            result.push(val);
         }
 
         Ok(RtcStats(result))

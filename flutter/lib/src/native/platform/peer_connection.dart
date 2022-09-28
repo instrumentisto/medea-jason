@@ -6,6 +6,7 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import '../ffi/foreign_value.dart';
 import 'peer_connection.g.dart' as bridge;
+import 'stats_ffi.dart';
 
 /// Registers [PeerConnection] related functions in Rust.
 void registerFunctions(DynamicLibrary dl) {
@@ -30,6 +31,7 @@ void registerFunctions(DynamicLibrary dl) {
     onConnectionStateChange: Pointer.fromFunction(_onConnectionStateChange),
     close: Pointer.fromFunction(_close),
     getStats: Pointer.fromFunction(_getStats),
+    toOwnedStats: Pointer.fromFunction(_toOwnedStats),
   );
 }
 
@@ -166,6 +168,14 @@ Object getTransceivers(PeerConnection conn) {
 /// Returns all the [RTCStats] of the provided [PeerConnection].
 Object _getStats(PeerConnection conn) {
   return () => conn.getStats();
+}
+
+/// Transfers [RTCFfiStats] ownership to Rust.
+///
+/// Frees Dart side [RTCFfiStats].
+Pointer<NativeType> _toOwnedStats(RTCStats stats) {
+  var ffi = RTCFfiStats.fromDartStats(stats);
+  return ffi.intoRustOwned();
 }
 
 /// Closes the provided [PeerConnection].

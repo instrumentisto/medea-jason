@@ -34,9 +34,11 @@ void registerFunction(
       setRemoteDescription,
   required Pointer<NativeFunction<Void Function(Handle)>> close,
   required Pointer<NativeFunction<Handle Function(Handle)>> getStats,
+  required Pointer<NativeFunction<Pointer Function(Handle)>> toOwnedStats,
 }) {
   dl.lookupFunction<
       Void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -73,6 +75,7 @@ void registerFunction(
           Pointer,
           Pointer,
           Pointer,
+          Pointer,
           Pointer)>('register_peer_connection')(
     iceConnectionState,
     onConnectionStateChange,
@@ -92,5 +95,6 @@ void registerFunction(
     setRemoteDescription,
     close,
     getStats,
+    toOwnedStats,
   );
 }

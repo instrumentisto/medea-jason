@@ -27,6 +27,7 @@ pub mod reconnect_handle;
 pub mod remote_media_track;
 pub mod room_close_reason;
 pub mod room_handle;
+pub mod stats;
 pub mod utils;
 
 use std::{
@@ -47,7 +48,9 @@ use crate::{
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::{
         self,
-        rtc_stats::{CandidateType, Protocol, RTCStatsIceCandidatePairState},
+        rtc_stats::{
+            CandidateType, IceRole, Protocol, RTCStatsIceCandidatePairState,
+        },
         utils::{
             dart_api::{
                 Dart_DeletePersistentHandle_DL_Trampolined,
@@ -737,6 +740,20 @@ impl TryFrom<i64> for MediaKind {
             1 => Ok(Self::Video),
             _ => Err(value),
         }
+    }
+}
+
+impl TryFrom<i64> for IceRole {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        let res = match value {
+            0 => Self::Unknown,
+            1 => Self::Controlled,
+            2 => Self::Controlling,
+            _ => return Err(value),
+        };
+        Ok(res)
     }
 }
 

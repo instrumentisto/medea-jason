@@ -56,6 +56,35 @@ pub enum Protocol {
     Udp = 1,
 }
 
+/// Variants of [ICE roles][1].
+///
+/// More info in the [RFC 5245].
+///
+/// [RFC 5245]: https://tools.ietf.org/html/rfc5245
+/// [1]: https://w3.org/TR/webrtc#dom-icetransport-role
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+#[repr(u8)]
+pub enum IceRole {
+    /// Agent whose role as defined by [Section 3 in RFC 5245][1], has not yet
+    /// been determined.
+    ///
+    /// [1]: https://tools.ietf.org/html/rfc5245#section-3
+    #[display(fmt = "unknown")]
+    Unknown = 0,
+
+    /// Controlling agent as defined by [Section 3 in RFC 5245][1].
+    ///
+    /// [1]: https://tools.ietf.org/html/rfc5245#section-3
+    #[display(fmt = "controlling")]
+    Controlling = 1,
+
+    /// Controlled agent as defined by [Section 3 in RFC 5245][1].
+    ///
+    /// [1]: https://tools.ietf.org/html/rfc5245#section-3
+    #[display(fmt = "controlled")]
+    Controlled = 2,
+}
+
 /// [RTCIceCandidateType] represents the type of the ICE candidate, as
 /// defined in [Section 15.1 of RFC 5245][1].
 ///
@@ -86,6 +115,16 @@ pub enum CandidateType {
     /// [1]: https://tools.ietf.org/html/rfc5245#section-7.1.3.2.1
     #[display(fmt = "relay")]
     Relay = 3,
+}
+
+impl From<IceRole> for medea_client_api_proto::stats::IceRole {
+    fn from(role: IceRole) -> Self {
+        match role {
+            IceRole::Unknown => Self::Unknown,
+            IceRole::Controlling => Self::Controlling,
+            IceRole::Controlled => Self::Controlled,
+        }
+    }
 }
 
 impl From<CandidateType> for KnownCandidateType {

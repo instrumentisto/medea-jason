@@ -1123,13 +1123,13 @@ pub struct RtcInboundRtpStreamStats {
 
     /// Fields which should be in the [`RtcStat`] based on `mediaType`.
     #[serde(flatten)]
-    pub media_specific_stats: Option<RtcInboundRtpStreamMediaType>,
+    pub media_specific_stats: RtcInboundRtpStreamMediaType,
 
     /// Total number of bytes received for this SSRC.
-    pub bytes_received: u64,
+    pub bytes_received: Option<u64>,
 
     /// Total number of RTP data packets received for this SSRC.
-    pub packets_received: u64,
+    pub packets_received: Option<u64>,
 
     /// Total number of RTP data packets for this SSRC that have been lost
     /// since the beginning of reception.
@@ -1294,7 +1294,7 @@ pub struct RtcOutboundRtpStreamStats {
 
     /// Fields which should be in the [`RtcStat`] based on `mediaType`.
     #[serde(flatten)]
-    pub media_type: RtcOutboundRtpStreamMediaType,
+    pub media_type: Option<RtcOutboundRtpStreamMediaType>,
 
     /// Total number of bytes sent for this SSRC.
     pub bytes_sent: Option<u64>,

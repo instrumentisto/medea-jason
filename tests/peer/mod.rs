@@ -804,7 +804,7 @@ async fn get_traffic_stats() {
     let mut first_peer_audio_outbound_stats_count = 0;
     for stat in first_peer_stats.0 {
         match stat.stats {
-            RtcStatsType::OutboundRtp(outbound) => match outbound.media_type {
+            RtcStatsType::OutboundRtp(outbound) => match outbound.media_type.unwrap() {
                 RtcOutboundRtpStreamMediaType::Audio { .. } => {
                     first_peer_audio_outbound_stats_count += 1
                 }
@@ -836,7 +836,7 @@ async fn get_traffic_stats() {
     for stat in second_peer_stats.0 {
         match stat.stats {
             RtcStatsType::InboundRtp(inbound) => {
-                match inbound.media_specific_stats.unwrap() {
+                match inbound.media_specific_stats {
                     RtcInboundRtpStreamMediaType::Audio { .. } => {
                         second_peer_audio_inbound_stats_count += 1
                     }
