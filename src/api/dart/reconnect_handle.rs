@@ -141,7 +141,11 @@ pub unsafe extern "C" fn ReconnectHandle__free(
 
 #[cfg(feature = "mockable")]
 mod mock {
-    #![allow(clippy::missing_errors_doc, missing_copy_implementations)]
+    #![allow(
+        clippy::missing_errors_doc,
+        missing_copy_implementations,
+        clippy::unused_async
+    )]
 
     use dart_sys::Dart_Handle;
     use futures::future;

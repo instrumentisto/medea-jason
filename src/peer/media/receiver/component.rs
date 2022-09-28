@@ -344,6 +344,7 @@ impl Component {
     /// updates.
     ///
     /// Updates [`Receiver::enabled_individual`] to the new state.
+    #[allow(clippy::unused_async)]
     #[watch(self.enabled_individual.subscribe_stable())]
     async fn enabled_individual_stable_state_changed(
         receiver: Rc<Receiver>,
@@ -363,6 +364,7 @@ impl Component {
     /// [`media_exchange_state`].
     ///
     /// [1]: crate::peer::TrackEvent::MediaExchangeIntention
+    #[allow(clippy::unused_async)]
     #[watch(self.enabled_individual.subscribe_transition())]
     async fn enabled_individual_transition_started(
         receiver: Rc<Receiver>,
@@ -377,6 +379,7 @@ impl Component {
     ///
     /// Propagates command to the associated [`Receiver`] and updates its media
     /// track (if any).
+    #[allow(clippy::unused_async)]
     #[watch(self.muted.subscribe())]
     async fn mute_state_changed(
         receiver: Rc<Receiver>,
@@ -394,6 +397,7 @@ impl Component {
     ///
     /// Sends media state intentions and resets transition timeouts on
     /// [`SyncState::Synced`].
+    #[allow(clippy::unused_async)]
     #[watch(self.sync_state.subscribe().skip(1))]
     async fn sync_state_watcher(
         receiver: Rc<Receiver>,
@@ -418,6 +422,7 @@ impl Component {
     }
 
     /// Updates [`MediaDirection`] of the provided [`Receiver`].
+    #[allow(clippy::unused_async)]
     #[watch(self.media_direction.subscribe())]
     async fn direction_watcher(
         receiver: Rc<Receiver>,
