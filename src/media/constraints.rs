@@ -100,8 +100,12 @@ impl RecvConstraints {
             MediaKind::Audio => {
                 self.is_audio_enabled.set(enabled);
             }
-            MediaKind::Video => match source_kind {
-                Some(source_kind) => match source_kind {
+            MediaKind::Video => source_kind.map_or_else(
+                || {
+                    self.is_video_device_enabled.set(enabled);
+                    self.is_video_display_enabled.set(enabled);
+                },
+                |sk| match sk {
                     MediaSourceKind::Device => {
                         self.is_video_device_enabled.set(enabled);
                     }
@@ -109,11 +113,7 @@ impl RecvConstraints {
                         self.is_video_display_enabled.set(enabled);
                     }
                 },
-                None => {
-                    self.is_video_device_enabled.set(enabled);
-                    self.is_video_display_enabled.set(enabled);
-                }
-            },
+            ),
         }
     }
 

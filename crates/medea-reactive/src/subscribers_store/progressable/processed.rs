@@ -4,12 +4,12 @@
 use std::{
     fmt,
     pin::Pin,
-    task::{Context, Poll},
+    task::{ready, Context, Poll},
 };
 
 use futures::{
     future::{self, Future, LocalBoxFuture},
-    ready, FutureExt as _,
+    FutureExt as _,
 };
 
 /// Factory producing a [`Future`] in [`when_all_processed()`] function.

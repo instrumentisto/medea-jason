@@ -351,7 +351,7 @@ impl Member {
                             };
                     }
                 "#,
-                [(latency.as_millis() as u64).into()],
+                [u64::try_from(latency.as_millis()).unwrap().into()],
             ))
             .await
             .unwrap();

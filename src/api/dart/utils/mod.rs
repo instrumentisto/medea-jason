@@ -25,9 +25,13 @@ pub use self::{
 /// Rust representation of a Dart [`Future`].
 ///
 /// [`Future`]: https://api.dart.dev/dart-async/Future-class.html
+
 #[derive(Debug)]
 #[repr(transparent)]
-pub struct DartFuture<O>(Dart_Handle, PhantomData<*const O>);
+pub struct DartFuture<O>(
+    #[allow(unused_tuple_struct_fields)] Dart_Handle, // read by Dart side
+    PhantomData<*const O>,
+);
 
 /// Extension trait for a [`Future`] allowing to convert Rust [`Future`]s to
 /// [`DartFuture`]s.

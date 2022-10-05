@@ -168,7 +168,7 @@ impl RtcPeerConnection {
     }
 
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
-    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
         // TODO: Correct implementation requires `flutter_webrtc`-side rework.
         Ok(RtcStats(Vec::new()))

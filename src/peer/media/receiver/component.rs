@@ -1,6 +1,6 @@
 //! [`Component`] for `MediaTrack` with a `Recv` direction.
 
-use std::{convert::Infallible, rc::Rc};
+use std::rc::Rc;
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
@@ -306,7 +306,7 @@ impl Component {
         receiver: Rc<Receiver>,
         _: Rc<State>,
         state: Guarded<media_exchange_state::Stable>,
-    ) -> Result<(), Infallible> {
+    ) {
         let (state, _guard) = state.into_parts();
         receiver
             .enabled_general
@@ -336,8 +336,6 @@ impl Component {
             }
         }
         receiver.maybe_notify_track().await;
-
-        Ok(())
     }
 
     /// Watcher for [`media_exchange_state::Stable`] media exchange state
@@ -345,15 +343,14 @@ impl Component {
     ///
     /// Updates [`Receiver::enabled_individual`] to the new state.
     #[watch(self.enabled_individual.subscribe_stable())]
-    async fn enabled_individual_stable_state_changed(
-        receiver: Rc<Receiver>,
-        _: Rc<State>,
+    fn enabled_individual_stable_state_changed(
+        receiver: &Receiver,
+        _: &State,
         state: media_exchange_state::Stable,
-    ) -> Result<(), Infallible> {
+    ) {
         receiver
             .enabled_individual
             .set(state == media_exchange_state::Stable::Enabled);
-        Ok(())
     }
 
     /// Watcher for media exchange state [`media_exchange_state::Transition`]
@@ -364,13 +361,12 @@ impl Component {
     ///
     /// [1]: crate::peer::TrackEvent::MediaExchangeIntention
     #[watch(self.enabled_individual.subscribe_transition())]
-    async fn enabled_individual_transition_started(
-        receiver: Rc<Receiver>,
-        _: Rc<State>,
+    fn enabled_individual_transition_started(
+        receiver: &Receiver,
+        _: &State,
         state: media_exchange_state::Transition,
-    ) -> Result<(), Infallible> {
+    ) {
         receiver.send_media_exchange_state_intention(state);
-        Ok(())
     }
 
     /// Watcher for the mute state updates.
@@ -378,16 +374,11 @@ impl Component {
     /// Propagates command to the associated [`Receiver`] and updates its media
     /// track (if any).
     #[watch(self.muted.subscribe())]
-    async fn mute_state_changed(
-        receiver: Rc<Receiver>,
-        _: Rc<State>,
-        muted: bool,
-    ) -> Result<(), Infallible> {
+    fn mute_state_changed(receiver: &Receiver, _: &State, muted: bool) {
         receiver.muted.set(muted);
         if let Some(track) = receiver.track.borrow().as_ref() {
             track.set_muted(muted);
         }
-        Ok(())
     }
 
     /// Stops transition timeouts on [`SyncState::Desynced`].
@@ -395,11 +386,11 @@ impl Component {
     /// Sends media state intentions and resets transition timeouts on
     /// [`SyncState::Synced`].
     #[watch(self.sync_state.subscribe().skip(1))]
-    async fn sync_state_watcher(
-        receiver: Rc<Receiver>,
-        state: Rc<State>,
+    fn sync_state_watcher(
+        receiver: &Receiver,
+        state: &State,
         sync_state: SyncState,
-    ) -> Result<(), Infallible> {
+    ) {
         match sync_state {
             SyncState::Synced => {
                 if let MediaExchangeState::Transition(transition) =
@@ -414,19 +405,16 @@ impl Component {
             }
             SyncState::Syncing => (),
         }
-        Ok(())
     }
 
     /// Updates [`MediaDirection`] of the provided [`Receiver`].
     #[watch(self.media_direction.subscribe())]
-    async fn direction_watcher(
-        receiver: Rc<Receiver>,
-        _: Rc<State>,
+    fn direction_watcher(
+        receiver: &Receiver,
+        _: &State,
         direction: MediaDirection,
-    ) -> Result<(), Infallible> {
+    ) {
         receiver.set_media_direction(direction);
-
-        Ok(())
     }
 }
 
