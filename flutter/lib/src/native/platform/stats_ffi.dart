@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as medea;
 
+import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import '../../util/move_semantic.dart';
 import '../ffi/foreign_value.dart';
 import '../jason.dart';
@@ -464,9 +465,14 @@ class RTCOutboundRTPStreamStats extends Struct {
     fVal.ref.bytesSent = ForeignValue.fromDart(stats.bytesSent);
     fVal.ref.packetsSent = ForeignValue.fromDart(stats.packetsSent);
     fVal.ref.mediaSourceId = ForeignValue.fromDart(stats.mediaSourceId);
+    var mediaType =
+        RTCOutboundRTPStreamStatsMediaType.fromDartStats(stats.mediaType);
+    if (mediaType == null) {
+      fVal.ref.mediaType = ForeignValue.none();
+    } else {
+      fVal.ref.mediaType = ForeignValue.fromPtr(NullablePointer(mediaType));
+    }
 
-    fVal.ref.mediaType = ForeignValue.fromDart(
-        RTCOutboundRTPStreamStatsMediaType.fromDartStats(stats.mediaType));
     return fVal;
   }
 }
