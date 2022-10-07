@@ -93,6 +93,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrackstate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let state = self.sys_track.ready_state();
         match state {
