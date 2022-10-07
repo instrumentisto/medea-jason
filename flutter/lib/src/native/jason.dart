@@ -76,7 +76,7 @@ DynamicLibrary _dl_load() {
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
-      Platform.isMacOS)) {
+      Platform.isMacOS || Platform.isIOS)) {
     throw UnsupportedError('This platform is not supported.');
   }
   if (NativeApi.majorVersion != 2) {
