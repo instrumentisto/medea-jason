@@ -403,7 +403,8 @@ jobs:
           - macos
           - web
           - windows
-    runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
+          - ios
+    runs-on: ${{ ((matrix.platform == 'macos' || matrix.platform == 'ios') &&   'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
     steps:
@@ -452,6 +453,7 @@ jobs:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
                  || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
+                 || (matrix.platform == 'ios' &&   './flutter/ios/lib/')
                  || (matrix.platform == 'windows' && './flutter/windows/lib/')
                  ||                                  './flutter/assets/pkg/' }}
 
