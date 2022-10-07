@@ -39,6 +39,7 @@ LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
+IOS_TARGETS := aarch64-apple-ios
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -218,6 +219,7 @@ cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
 cargo-build-targets-macos = $(or $(targets),$(MACOS_TARGETS))
 cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
+cargo-build-targets-ios = $(or $(targets),$(IOS_TARGETS))
 
 cargo.build.jason:
 ifeq ($(platform),all)
@@ -225,6 +227,7 @@ ifeq ($(platform),all)
 	@make cargo.build.jason platform=linux
 	@make cargo.build.jason platform=web
 	@make cargo.build.jason platform=windows
+	@make cargo.build.jason platform=ios
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -274,6 +277,10 @@ ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
 		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
+ifeq ($(cargo-build-platform),ios)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+endif
 endif
 endif
 define cargo.build.medea-jason.android
@@ -313,6 +320,16 @@ define cargo.build.medea-jason.windows
 	@mkdir -p ./flutter/windows/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
 	      ./flutter/windows/lib/$(target)/medea_jason.dll
+endef
+define cargo.build.medea-jason.ios
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/ios/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
+	      ./flutter/ios/lib/$(target)/libmedea_jason.a
 endef
 
 
