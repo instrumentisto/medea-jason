@@ -210,6 +210,7 @@ cargo:
 #		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
@@ -403,13 +404,14 @@ cargo.version:
 # Install or upgrade all the required project's targets for Rust.
 #
 # Usage:
-#	make rustup.targets [only=(android|linux|web|windows)]
+#	make rustup.targets [only=(android|linux|web|windows|ios)]
 
 rustup-targets = $(ANDROID_TARGETS) \
                  $(LINUX_TARGETS) \
                  $(MACOS_TARGETS) \
                  $(WEB_TARGETS) \
-                 $(WINDOWS_TARGETS)
+                 $(WINDOWS_TARGETS) \
+				 $(IOS_TARGETS)
 ifeq ($(only),android)
 rustup-targets = $(ANDROID_TARGETS)
 endif
@@ -424,6 +426,9 @@ rustup-targets = $(WEB_TARGETS)
 endif
 ifeq ($(only),windows)
 rustup-targets = $(WINDOWS_TARGETS)
+endif
+ifeq ($(only),ios)
+rustup-targets = $(IOS_TARGETS)
 endif
 
 rustup.targets:

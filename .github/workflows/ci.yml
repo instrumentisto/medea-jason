@@ -429,6 +429,9 @@ jobs:
       - uses: jetli/wasm-pack-action@v0.3.0
         if: ${{ matrix.platform == 'web' }}
 
+      - run: make rustup.targets only=ios
+        if: ${{ matrix.platform == 'ios' }}
+
       - uses: dart-lang/setup-dart@v1
         if: ${{ matrix.platform == 'windows' }}
 
