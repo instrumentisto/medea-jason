@@ -21,6 +21,7 @@ use crate::world::{member::Builder as MemberBuilder, World};
                   (?: with (no (play |publish )?WebRTC endpoints\
                           |(?:disabled|muted) (media|audio|video) \
                                               (publishing|playing)?))?$")]
+#[allow(clippy::too_many_lines)]
 #[async_recursion(?Send)]
 async fn new_given_member(
     world: &mut World,

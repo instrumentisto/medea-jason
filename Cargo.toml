@@ -2,7 +2,7 @@
 name = "medea-jason"
 version = "0.3.0-dev"
 edition = "2021"
-rust-version = "1.62"
+rust-version = "1.64"
 description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
@@ -46,6 +46,7 @@ medea-client-api-proto = { version = "0.4.0-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3.0-dev", path = "crates/medea-macro" }
 medea-reactive = "0.1"
 mockall = { version = "0.11", optional = true }
+sealed = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracerr = "0.3"

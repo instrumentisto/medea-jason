@@ -54,6 +54,7 @@ impl Transceiver {
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.direction().contains(direction)
     }

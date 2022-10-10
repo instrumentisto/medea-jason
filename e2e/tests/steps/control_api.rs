@@ -37,8 +37,8 @@ async fn when_interconnects_kind(
             left: PairedMember {
                 id: left_member_id,
                 recv: true,
-                send_video: send_video.clone(),
-                send_audio: send_audio.clone(),
+                send_video,
+                send_audio,
             },
             right: PairedMember {
                 id: right_member_id,
@@ -79,7 +79,7 @@ async fn then_control_api_doesnt_sends_on_leave(world: &mut World, id: String) {
 async fn then_control_api_sends_on_join(world: &mut World, id: String) {
     timeout(Duration::from_secs(10), world.wait_for_on_join(id))
         .await
-        .unwrap()
+        .unwrap();
 }
 
 #[when(regex = "^Control API starts (\\S+)'s (audio|video|media) publishing \
