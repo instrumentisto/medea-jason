@@ -12,11 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.1
-  medea_flutter_webrtc: 0.8.0-dev+rev.a909030f9a6378036bb0571611fc9a3fe44fe917
-  js: ^0.6.4
   http: ^0.13.5
-  uuid: ^3.0.6
+  js: ^0.6.4
+  medea_flutter_webrtc: 0.8.0-dev+rev.a909030f9a6378036bb0571611fc9a3fe44fe917
   tuple: ^2.0.0
+  uuid: ^3.0.6
 
 dev_dependencies:
   build_runner: ^2.2.0

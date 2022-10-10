@@ -235,7 +235,7 @@ class Member {
     });
   }
 
-  /// Waits for a [ConnectionHandle] from the [Member] with the provided `id`.
+  /// Waits for a [ConnectionHandle] from the [Member] with the provided [id].
   Future<void> wait_for_connect(String id) async {
     if (!connection_store.connections.containsKey(id)) {
       var conn = Completer();
@@ -248,7 +248,7 @@ class Member {
   }
 
   /// Waits for a `count` of [RemoteMediaTrack]s from the [Member] with the
-  /// provided `id`.
+  /// provided [id].
   Future<void> wait_for_track_count(String id, int count) async {
     if (connection_store.remote_tracks[id]!.length != count) {
       var track_compl = Completer();
@@ -262,7 +262,7 @@ class Member {
     }
   }
 
-  /// Waits for a [RemoteMediaTrack] from the [Member] with the provided `id`,
+  /// Waits for a [RemoteMediaTrack] from the [Member] with the provided [id],
   /// based on the provided options.
   Future<RemoteMediaTrack> wait_remote_track_from(
       String id, MediaSourceKind? source, MediaKind? kind) async {
@@ -517,7 +517,7 @@ class Member {
     }
   }
 
-  /// Waits for the [Member] with the provided `id` to close.
+  /// Waits for the [Member] with the provided [id] to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
   }

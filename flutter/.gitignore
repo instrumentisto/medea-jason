@@ -11,5 +11,5 @@
 /build/
 
 # Tests related generated code
-test/e2e/*.g.dart
-test/e2e/api/*.g.dart
+/test/e2e/*.g.dart
+/test/e2e/api/*.g.dart

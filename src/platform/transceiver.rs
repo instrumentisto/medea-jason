@@ -13,8 +13,8 @@ bitflags! {
     /// [`sendrecv` direction][2] can be represented by
     /// [`Direction::SEND`]` | `[`Direction::RECV`] bitflag.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiverdirection
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiverdirection-sendrecv
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiverdirection
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtptransceiverdirection-sendrecv
     pub struct Direction: u8 {
         /// [`inactive` direction][1] of transceiver.
         ///

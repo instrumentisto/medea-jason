@@ -290,7 +290,7 @@ jobs:
 
   test-e2e-desktop:
     name: E2E tests
-    needs: ["docker", "crate-jason", "crate-jason-linux"]
+    needs: ["crate-jason", "crate-jason-linux", "docker"]
     strategy:
       fail-fast: false
       matrix:
@@ -310,9 +310,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-                      cmake \
-                      libgtk-3-dev liblzma-dev libpulse-dev \
-                      ninja-build pkg-config xvfb
+                       cmake \
+                       libgtk-3-dev liblzma-dev libpulse-dev \
+                       ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
       - name: Download `medea-jason` lib

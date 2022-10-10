@@ -298,8 +298,8 @@ impl Component {
     /// Updates [`Receiver`]'s general media exchange state. Adds or removes
     /// [`RECV`] direction from the [`Transceiver`] of the [`Receiver`].
     ///
-    /// [`Transceiver`]: crate::platform::Transceiver
     /// [`RECV`]: crate::platform::TransceiverDirection::RECV
+    /// [`Transceiver`]: crate::platform::Transceiver
     #[watch(self.enabled_general.subscribe())]
     async fn general_media_exchange_state_changed(
         receiver: Rc<Receiver>,
@@ -329,7 +329,6 @@ impl Component {
                     .borrow()
                     .as_ref()
                     .map(|trnscvr| trnscvr.set_recv(true));
-
                 if let Some(fut) = add_recv {
                     fut.await;
                 }

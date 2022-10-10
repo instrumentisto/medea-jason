@@ -46,7 +46,7 @@ class WebRtcPlayEndpoint implements Endpoint {
 /// publish media data).
 @JsonSerializable()
 class WebRtcPublishEndpoint implements Endpoint {
-  /// ID of [WebRtcPublishEndpoint].
+  /// ID of this [WebRtcPublishEndpoint].
   String id;
 
   /// Mode of connection for this [WebRtcPublishEndpoint].
@@ -55,10 +55,10 @@ class WebRtcPublishEndpoint implements Endpoint {
   /// Option to relay all media through a TURN server forcibly.
   bool force_relay = false;
 
-  /// Settings for the audio media type of the [WebRtcPublishEndpoint].
+  /// Settings for the audio media type of this [WebRtcPublishEndpoint].
   AudioSettings audio_settings = AudioSettings(PublishPolicy.Optional);
 
-  /// Settings for the video media type of the [WebRtcPublishEndpoint].
+  /// Settings for the video media type of this [WebRtcPublishEndpoint].
   VideoSettings video_settings = VideoSettings(PublishPolicy.Optional);
 
   WebRtcPublishEndpoint(this.id, this.p2p);

@@ -483,7 +483,7 @@ endif
 
 flutter.lint:
 ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
-	@make flutter.gen overwrite=yes dockerized=$(dockerized)
+	@make flutter.gen overwrite=yes
 endif
 	flutter analyze flutter/
 
@@ -624,10 +624,13 @@ endif
 endif
 
 
-# Run E2E tests of project.
+test.e2e: test.e2e.browser
+
+
+# Run browser E2E tests of project.
 #
 # Usage:
-#	make test.e2e [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.browser [(only=<regex>|only-tags=<tag-expression>)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -636,7 +639,7 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e:
+test.e2e.browser:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -656,13 +659,14 @@ ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
 
+
 # Run E2E desktop tests of project.
 #
 # Usage:
 #	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
 # 		[device=<device-id>]
-#		[( [up=no] | up=yes
-#		          [( [dockerized=no]
+#		[( [up=no]
+#		 | up=yes [( [dockerized=no]
 #		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
 #		          [debug=(yes|no)]
 #		          [( [background=no]
@@ -684,10 +688,12 @@ ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 endif
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart $(if $(call eq,$(device),),,-d $(device))
+		--target=../test/e2e/suite.dart \
+		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
+
 
 # Runs Flutter plugin integration tests on an attached device.
 #
@@ -985,7 +991,7 @@ docker.up.demo: docker.down.demo
 #                         [control-tag=(dev|<tag>)] )]
 #	                   [debug=(yes|no)]
 #	                   [( [background=no]
-#	                    | background=yes [log=(no|yes)])]
+#	                    | background=yes [log=(no|yes)] )]
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \
@@ -1281,15 +1287,14 @@ endef
         docs docs.rust \
         down down.control down.demo down.dev down.medea \
         flutter flutter.fmt flutter.gen flutter.lint flutter.run \
-        	flutter.android.version.compile \
-        	flutter.android.version.min \
+        	flutter.android.version.compile flutter.android.version.min \
         	flutter.web.assets \
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
         release release.crates release.helm release.npm \
         rustup.targets \
-        test test.e2e test.flutter test.unit \
+        test test.e2e test.e2e.browser test.e2e.desktop test.flutter test.unit \
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version

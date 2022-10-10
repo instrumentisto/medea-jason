@@ -461,8 +461,8 @@ impl Component {
     /// Updates [`Sender`]'s general media exchange state. Adds or removes
     /// [`SEND`] direction from the [`Transceiver`] of this [`Sender`].
     ///
-    /// [`Transceiver`]: crate::platform::Transceiver
     /// [`SEND`]: crate::platform::TransceiverDirection::SEND
+    /// [`Transceiver`]: crate::platform::Transceiver
     #[watch(self.enabled_general.subscribe())]
     async fn enabled_general_state_changed(
         sender: Rc<Sender>,
