@@ -95,7 +95,7 @@ down: down.dev
 fmt: cargo.fmt flutter.fmt
 
 
-lint: cargo.lint
+lint: cargo.lint flutter.lint
 
 
 # Build and publish project crate everywhere.
@@ -444,7 +444,7 @@ rustup.targets:
 # Show Android SDK compile API version of medea_jason Flutter plugin.
 #
 # Usage:
-#	make flutter.android.compile_api_version
+#	make flutter.android.version.compile
 
 flutter.android.version.compile:
 	@printf "$(ANDROID_SDK_COMPILE_VERSION)"
@@ -484,12 +484,29 @@ endif
 	                   $(if $(call eq,$(check),yes),--exit-if-changed,)'
 
 
+# Run `build_runner` Flutter tool to generate project Dart sources.
+#
+# Usage:
+#	make flutter.gen [overwrite=(yes|no)]
+
+flutter.gen:
+ifeq ($(wildcard flutter/pubspec.lock),)
+	@make flutter
+endif
+	cd flutter && \
+	flutter pub run build_runner build \
+		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
+
+
 # Lint Flutter Dart sources with dartanalyzer.
 #
 # Usage:
 #	make flutter.lint
 
 flutter.lint:
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes
+endif
 	flutter analyze flutter/
 
 
@@ -629,10 +646,13 @@ endif
 endif
 
 
-# Run E2E tests of project.
+test.e2e: test.e2e.browser
+
+
+# Run browser E2E tests of project.
 #
 # Usage:
-#	make test.e2e [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.browser [(only=<regex>|only-tags=<tag-expression>)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -641,7 +661,7 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e:
+test.e2e.browser:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -649,13 +669,49 @@ ifeq ($(rebuild),yes)
 endif
 endif
 	@make docker.up.e2e browser=$(browser) background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug) \
+	                    rebuild=yes
 	@make wait.port port=4444
 endif
 	cargo test -p medea-e2e --test e2e \
 		$(if $(call eq,$(only),),\
 			$(if $(call eq,$(only-tags),),,-- --tags '$(only-tags)'),\
 			-- --name '$(only)')
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
+
+# Run E2E desktop tests of project.
+#
+# Usage:
+#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
+# 		[device=<device-id>]
+#		[( [up=no]
+#		 | up=yes [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e.desktop:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug) \
+	                    rebuild=no
+endif
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes dockerized=$(dockerized)
+endif
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart \
+		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
@@ -951,6 +1007,7 @@ docker.up.demo: docker.down.demo
 #
 # Usage:
 #	make docker.up.e2e [browser=(chrome|firefox)]
+#                      [rebuild=(no|yes)]
 #	                   [( [dockerized=no]
 #	                    | dockerized=yes [medea-tag=(dev|<tag>)]
 #                         [control-tag=(dev|<tag>)] )]
@@ -978,7 +1035,9 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 			/entrypoint.sh ))
 
 docker.up.e2e: docker.down.e2e
+ifeq ($(rebuild),yes)
 	@make build.jason target=web debug=$(debug) dockerized=no
+endif
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
@@ -1249,16 +1308,15 @@ endef
         	docker.up.medea docker.up.webdriver \
         docs docs.rust \
         down down.control down.demo down.dev down.medea \
-        flutter flutter.fmt flutter.lint flutter.run \
-        	flutter.android.compile_api_version \
-        	flutter.android.min_api_version \
+        flutter flutter.fmt flutter.gen flutter.lint flutter.run \
+        	flutter.android.version.compile flutter.android.version.min \
         	flutter.web.assets \
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
         release release.crates release.helm release.npm \
         rustup.targets \
-        test test.e2e test.flutter test.unit \
+        test test.e2e test.e2e.browser test.e2e.desktop test.flutter test.unit \
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
