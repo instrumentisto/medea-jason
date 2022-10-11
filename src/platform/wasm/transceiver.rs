@@ -8,7 +8,7 @@ use web_sys::RtcRtpTransceiver;
 
 use crate::{
     media::track::local,
-    platform::{transceiver_direction::TransceiverDirection, Error},
+    platform::{Error, TransceiverDirection},
 };
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
@@ -22,39 +22,39 @@ impl Transceiver {
         TransceiverDirection::from(self.0.direction())
     }
 
-    /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn sub_direction(
-        &self,
-        disabled_direction: TransceiverDirection,
-    ) -> impl Future<Output = ()> + 'static {
+    /// Changes the receive direction of this [`Transceiver`].
+    pub fn set_recv(&self, active: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.0.clone();
         async move {
-            transceiver.set_direction(
-                (TransceiverDirection::from(transceiver.direction())
-                    - disabled_direction)
-                    .into(),
-            );
+            let current_direction =
+                TransceiverDirection::from(transceiver.direction());
+            let new_direction = if active {
+                current_direction | TransceiverDirection::RECV
+            } else {
+                current_direction - TransceiverDirection::RECV
+            };
+            transceiver.set_direction(new_direction.into());
         }
     }
 
-    /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
-    pub fn add_direction(
-        &self,
-        enabled_direction: TransceiverDirection,
-    ) -> impl Future<Output = ()> + 'static {
+    /// Changes the send direction of this [`Transceiver`].
+    pub fn set_send(&self, active: bool) -> impl Future<Output = ()> + 'static {
         let transceiver = self.0.clone();
         async move {
-            transceiver.set_direction(
-                (TransceiverDirection::from(transceiver.direction())
-                    | enabled_direction)
-                    .into(),
-            );
+            let current_direction =
+                TransceiverDirection::from(transceiver.direction());
+            let new_direction = if active {
+                current_direction | TransceiverDirection::SEND
+            } else {
+                current_direction - TransceiverDirection::SEND
+            };
+            transceiver.set_direction(new_direction.into());
         }
     }
 
     /// Indicates whether the provided [`TransceiverDirection`] is enabled for
     /// this [`Transceiver`].
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn has_direction(&self, direction: TransceiverDirection) -> bool {
         self.direction().contains(direction)
     }
@@ -108,8 +108,8 @@ mod tests {
         for (init, enable_dir, result) in [
             (D::INACTIVE, D::SEND, D::SEND),
             (D::INACTIVE, D::RECV, D::RECV),
-            (D::SEND, D::RECV, D::all()),
-            (D::RECV, D::SEND, D::all()),
+            (D::SEND, D::RECV, D::RECV | D::SEND),
+            (D::RECV, D::SEND, D::RECV | D::SEND),
         ] {
             assert_eq!(init | enable_dir, result);
         }
@@ -122,8 +122,8 @@ mod tests {
         for (init, disable_dir, result) in [
             (D::SEND, D::SEND, D::INACTIVE),
             (D::RECV, D::RECV, D::INACTIVE),
-            (D::all(), D::SEND, D::RECV),
-            (D::all(), D::RECV, D::SEND),
+            (D::RECV | D::SEND, D::SEND, D::RECV),
+            (D::RECV | D::SEND, D::RECV, D::SEND),
         ] {
             assert_eq!(init - disable_dir, result);
         }
@@ -137,7 +137,7 @@ mod tests {
         for (trnscvr_dir, sys_dir) in [
             (D::SEND, S::Sendonly),
             (D::RECV, S::Recvonly),
-            (D::all(), S::Sendrecv),
+            (D::RECV | D::SEND, S::Sendrecv),
             (D::INACTIVE, S::Inactive),
         ] {
             assert_eq!(S::from(trnscvr_dir), sys_dir);
@@ -152,7 +152,7 @@ mod tests {
         for (sys_dir, trnscvr_dir) in [
             (S::Sendonly, D::SEND),
             (S::Recvonly, D::RECV),
-            (S::Sendrecv, D::all()),
+            (S::Sendrecv, D::RECV | D::SEND),
             (S::Inactive, D::INACTIVE),
         ] {
             assert_eq!(D::from(sys_dir), trnscvr_dir);

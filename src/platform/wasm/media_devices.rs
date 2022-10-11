@@ -112,7 +112,8 @@ impl MediaDevices {
     }
 
     /// Unimplemented on WASM targets.
-    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
+    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {

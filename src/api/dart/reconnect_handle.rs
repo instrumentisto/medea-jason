@@ -143,8 +143,8 @@ pub unsafe extern "C" fn ReconnectHandle__free(
 mod mock {
     #![allow(
         clippy::missing_errors_doc,
-        missing_copy_implementations,
-        clippy::unused_async
+        clippy::unused_async,
+        missing_copy_implementations
     )]
 
     use dart_sys::Dart_Handle;

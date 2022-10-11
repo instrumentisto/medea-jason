@@ -9,10 +9,11 @@ pub use self::world::World;
 
 #[tokio::main]
 async fn main() {
-    let concurrent = supports_multiple_webdriver_clients()
-        .await
-        .then_some(4)
-        .unwrap_or(1);
+    let concurrent = if supports_multiple_webdriver_clients().await {
+        4
+    } else {
+        1
+    };
 
     <World as cucumber::World>::cucumber()
         .with_writer(cucumber::writer::Libtest::or_basic())

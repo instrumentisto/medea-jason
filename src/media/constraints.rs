@@ -105,7 +105,7 @@ impl RecvConstraints {
                     self.is_video_device_enabled.set(enabled);
                     self.is_video_display_enabled.set(enabled);
                 },
-                |source_kind_internal| match source_kind_internal {
+                |sk| match sk {
                     MediaSourceKind::Device => {
                         self.is_video_device_enabled.set(enabled);
                     }

@@ -106,7 +106,7 @@ impl RtcPeerConnection {
     ///
     /// Errors with [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`SysRtcPeerConnection`] creation fails.
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn new<I>(ice_servers: I, is_force_relayed: bool) -> Result<Self>
     where
         I: IntoIterator<Item = IceServer>,

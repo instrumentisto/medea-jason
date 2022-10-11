@@ -184,6 +184,7 @@ pub unsafe extern "C" fn MediaManagerHandle__free(
 mod mock {
     #![allow(
         clippy::needless_pass_by_value,
+        clippy::unused_async,
         clippy::unused_self,
         missing_copy_implementations
     )]
