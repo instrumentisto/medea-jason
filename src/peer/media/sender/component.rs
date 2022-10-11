@@ -22,7 +22,6 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -81,7 +80,7 @@ pub struct State {
 
     /// [MID] of the [`Sender`]'s [`Transceiver`].
     ///
-    /// [`Transceiver`]: platform::Transceiver
+    /// [`Transceiver`]: crate::platform::Transceiver
     /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
 
@@ -460,10 +459,10 @@ impl Component {
     /// Watcher for the [`State::enabled_general`] update.
     ///
     /// Updates [`Sender`]'s general media exchange state. Adds or removes
-    /// [`TransceiverDirection::SEND`] from the [`platform::Transceiver`] of
-    /// this [`Sender`].
+    /// [`SEND`] direction from the [`Transceiver`] of this [`Sender`].
     ///
-    /// [`TransceiverDirection::SEND`]: platform::TransceiverDirection::SEND
+    /// [`SEND`]: crate::platform::TransceiverDirection::SEND
+    /// [`Transceiver`]: crate::platform::Transceiver
     #[watch(self.enabled_general.subscribe())]
     async fn enabled_general_state_changed(
         sender: Rc<Sender>,
@@ -477,17 +476,11 @@ impl Component {
         match new_state {
             media_exchange_state::Stable::Enabled => {
                 if sender.enabled_in_cons() {
-                    sender
-                        .transceiver
-                        .add_direction(platform::TransceiverDirection::SEND)
-                        .await;
+                    sender.transceiver.set_send(true).await;
                 }
             }
             media_exchange_state::Stable::Disabled => {
-                sender
-                    .transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND)
-                    .await;
+                sender.transceiver.set_send(false).await;
             }
         }
     }

@@ -21,7 +21,6 @@ use crate::{
         MediaExchangeState, MediaExchangeStateController,
         MediaStateControllable, MuteStateController, TransceiverSide,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -41,7 +40,7 @@ pub struct State {
 
     /// [MID] of the [`Receiver`]'s [`Transceiver`].
     ///
-    /// [`Transceiver`]: platform::Transceiver
+    /// [`Transceiver`]: crate::platform::Transceiver
     /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
 
@@ -297,10 +296,10 @@ impl Component {
     /// Watcher for the [`State::enabled_general`] updates.
     ///
     /// Updates [`Receiver`]'s general media exchange state. Adds or removes
-    /// [`TransceiverDirection::RECV`] from the [`platform::Transceiver`] of the
-    /// [`Receiver`].
+    /// [`RECV`] direction from the [`Transceiver`] of the [`Receiver`].
     ///
-    /// [`TransceiverDirection::RECV`]: platform::TransceiverDirection::RECV
+    /// [`RECV`]: crate::platform::TransceiverDirection::RECV
+    /// [`Transceiver`]: crate::platform::Transceiver
     #[watch(self.enabled_general.subscribe())]
     async fn general_media_exchange_state_changed(
         receiver: Rc<Receiver>,
@@ -313,24 +312,24 @@ impl Component {
             .set(state == media_exchange_state::Stable::Enabled);
         match state {
             media_exchange_state::Stable::Disabled => {
-                let sub_direction = {
-                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
-                        trnscvr
-                            .sub_direction(platform::TransceiverDirection::RECV)
-                    })
+                let sub_recv = {
+                    receiver
+                        .transceiver
+                        .borrow()
+                        .as_ref()
+                        .map(|trnscvr| trnscvr.set_recv(false))
                 };
-                if let Some(fut) = sub_direction {
+                if let Some(fut) = sub_recv {
                     fut.await;
                 }
             }
             media_exchange_state::Stable::Enabled => {
-                let add_direction =
-                    receiver.transceiver.borrow().as_ref().map(|trnscvr| {
-                        trnscvr
-                            .add_direction(platform::TransceiverDirection::RECV)
-                    });
-
-                if let Some(fut) = add_direction {
+                let add_recv = receiver
+                    .transceiver
+                    .borrow()
+                    .as_ref()
+                    .map(|trnscvr| trnscvr.set_recv(true));
+                if let Some(fut) = add_recv {
                     fut.await;
                 }
             }
