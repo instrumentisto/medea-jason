@@ -501,6 +501,9 @@ jobs:
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=no
 
+      - run: make flutter.web.assets
+        if: ${{ matrix.platform == 'web' }}
+
       - uses: actions/upload-artifact@v3
         with:
           name: build-jason-${{ matrix.platform }}
