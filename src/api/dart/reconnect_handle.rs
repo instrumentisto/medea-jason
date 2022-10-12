@@ -140,7 +140,6 @@ pub unsafe extern "C" fn ReconnectHandle__free(
 }
 
 #[cfg(feature = "mockable")]
-#[allow(clippy::unused_async)]
 mod mock {
     #![allow(
         clippy::missing_errors_doc,
