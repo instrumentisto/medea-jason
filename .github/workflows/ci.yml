@@ -35,7 +35,8 @@ jobs:
       - helm-lint
       - rustdoc
       - rustfmt
-      - test-e2e
+      - test-e2e-browser
+      - test-e2e-desktop
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
@@ -230,8 +231,8 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate != 'medea-jason' }}
 
-  test-e2e:
-    name: E2E tests
+  test-e2e-browser:
+    name: E2E tests (chrome, firefox)
     needs: ["docker"]
     runs-on: ubuntu-latest
     steps:
@@ -249,8 +250,8 @@ jobs:
         if: ${{ env.CACHE == 'true' }}
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: test-e2e-{hash}
-          restore-keys: test-e2e-
+          key: test-e2e-browser-{hash}
+          restore-keys: test-e2e-browser-
         continue-on-error: true
         if: ${{ env.CACHE == 'true' }}
 
@@ -259,7 +260,8 @@ jobs:
           crate: wasm-pack
           use-tool-cache: true
 
-      - uses: actions/download-artifact@v3
+      - name: Download `medea-control-api-mock` Docker image
+        uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
       - name: Unpack `medea-control-api-mock` Docker image
@@ -285,6 +287,58 @@ jobs:
         run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
+
+  test-e2e-desktop:
+    name: E2E tests
+    needs: ["crate-jason", "crate-jason-linux", "docker"]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ["linux"]  # TODO: Run E2E test on Windows and macOS
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: docker-practice/actions-setup-docker@master
+        if: ${{ matrix.platform == 'macos' }}
+
+      - uses: subosito/flutter-action@v2
+      - name: Install Flutter Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+                       cmake \
+                       libgtk-3-dev liblzma-dev libpulse-dev \
+                       ninja-build pkg-config xvfb
+        if: ${{ matrix.platform == 'linux' }}
+
+      - name: Download `medea-jason` lib
+        uses: actions/download-artifact@v3
+        with:
+          name: build-jason-${{ matrix.platform }}
+          path: ./flutter/${{ matrix.platform }}/lib/
+
+      - name: Download `medea-control-api-mock` Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-medea-control-api-mock-${{ github.run_number }}
+      - name: Unpack `medea-control-api-mock` Docker image
+        run: make docker.untar from-file=image.tar
+
+      - name: Login to Medea Docker registry
+        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
+                          -p ${{ secrets.MEDEA_DOCKER_PASS }}
+                          hub.instrumentisto.com
+
+      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+              ||                                '' }}
+             make test.e2e.desktop device=${{ matrix.platform }}
+                                   up=yes debug=no dockerized=yes
+                                   medea-tag=${{ env.MEDEA_BRANCH }}
+                                   control-tag=build-${{ github.run_number }}
 
   test-flutter:
     name: Flutter tests
@@ -582,7 +636,13 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit"]
+    needs:
+      - clippy
+      - rustdoc
+      - rustfmt
+      - test-e2e-browser
+      - test-e2e-desktop
+      - test-unit
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:

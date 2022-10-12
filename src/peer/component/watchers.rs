@@ -1,6 +1,6 @@
 //! Implementation of a [`Component`] watchers.
 
-use std::{convert::Infallible, rc::Rc};
+use std::rc::Rc;
 
 use derive_more::{Display, From};
 use futures::{future, StreamExt as _};
@@ -101,30 +101,26 @@ impl Component {
     ///
     /// Removes a [`sender::Component`] from the [`PeerConnection`].
     #[watch(self.senders.on_remove())]
-    #[allow(clippy::unused_async)]
-    async fn sender_removed(
-        peer: Rc<PeerConnection>,
-        _: Rc<State>,
+    fn sender_removed(
+        peer: &PeerConnection,
+        _: &State,
         val: Guarded<(TrackId, Rc<sender::State>)>,
-    ) -> Result<(), Infallible> {
+    ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
-        Ok(())
     }
 
     /// Watcher for the [`State::receivers`] remove update.
     ///
     /// Removes a [`receiver::Component`] from the [`PeerConnection`].
     #[watch(self.receivers.on_remove())]
-    #[allow(clippy::unused_async)]
-    async fn receiver_removed(
-        peer: Rc<PeerConnection>,
-        _: Rc<State>,
+    fn receiver_removed(
+        peer: &PeerConnection,
+        _: &State,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
-    ) -> Result<(), Infallible> {
+    ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
-        Ok(())
     }
 
     /// Watcher for the [`State::senders`] insert update.
@@ -194,7 +190,7 @@ impl Component {
         peer: Rc<PeerConnection>,
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
-    ) -> Result<(), Infallible> {
+    ) {
         let ((_, rcvr_state), _guard) = val.into_parts();
         let conn = peer
             .connections
@@ -212,7 +208,6 @@ impl Component {
                 Rc::clone(&rcvr_state),
             ));
         conn.add_receiver(rcvr_state);
-        Ok(())
     }
 
     /// Watcher for the [`State::local_sdp`] updates.
@@ -313,12 +308,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
-    #[allow(clippy::unused_async)]
-    async fn local_sdp_approved(
-        _: Rc<PeerConnection>,
-        state: Rc<State>,
-        _: (),
-    ) -> Result<(), Infallible> {
+    fn local_sdp_approved(_: &PeerConnection, state: &State, _: ()) {
         if let Some(negotiation_role) = state.negotiation_role.get() {
             match negotiation_role {
                 NegotiationRole::Offerer => {
@@ -332,7 +322,6 @@ impl Component {
                 }
             }
         }
-        Ok(())
     }
 
     /// Watcher for the [`NegotiationState`] change.
@@ -399,7 +388,7 @@ impl Component {
         _: Rc<PeerConnection>,
         state: Rc<State>,
         role: NegotiationRole,
-    ) -> Result<(), Infallible> {
+    ) {
         match role {
             NegotiationRole::Offerer => {
                 medea_reactive::when_all_processed(vec![
@@ -439,8 +428,6 @@ impl Component {
         let _ = state.maybe_update_local_stream.when_eq(false).await;
 
         state.negotiation_state.set(NegotiationState::WaitLocalSdp);
-
-        Ok(())
     }
 
     /// Watcher for the [`State::sync_state`] updates.
@@ -448,16 +435,14 @@ impl Component {
     /// Sends [`PeerConnection`]'s connection state and ICE connection state to
     /// the server.
     #[watch(self.sync_state.subscribe().skip(1))]
-    #[allow(clippy::unused_async)]
-    async fn sync_state_changed(
-        peer: Rc<PeerConnection>,
-        _: Rc<State>,
+    fn sync_state_changed(
+        peer: &PeerConnection,
+        _: &State,
         sync_state: SyncState,
-    ) -> Result<(), Infallible> {
+    ) {
         if sync_state == SyncState::Synced {
             peer.send_current_connection_states();
         }
-        Ok(())
     }
 
     /// Watcher for the [`State::maybe_update_local_stream`] `true` updates.
@@ -471,11 +456,10 @@ impl Component {
         peer: Rc<PeerConnection>,
         state: Rc<State>,
         _: bool,
-    ) -> Result<(), Infallible> {
+    ) {
         state.senders.when_updated().await;
         drop(state.update_local_stream(&peer).await);
 
         state.maybe_update_local_stream.set(false);
-        Ok(())
     }
 }

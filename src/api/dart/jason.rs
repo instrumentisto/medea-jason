@@ -64,7 +64,11 @@ pub unsafe extern "C" fn Jason__free(this: ptr::NonNull<Jason>) {
 
 #[cfg(feature = "mockable")]
 mod mock {
-    #![allow(clippy::new_without_default, clippy::unused_self)]
+    #![allow(
+        clippy::new_without_default,
+        clippy::unused_self,
+        unused_tuple_struct_fields
+    )]
 
     use crate::api::{MediaManagerHandle, RoomHandle};
 

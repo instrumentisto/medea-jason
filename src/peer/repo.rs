@@ -1,9 +1,6 @@
 //! Component responsible for the [`peer::Component`] creating and removing.
 
-use std::{
-    cell::RefCell, collections::HashMap, convert::Infallible, rc::Rc,
-    time::Duration,
-};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Duration};
 
 use futures::{channel::mpsc, future};
 use medea_client_api_proto::{self as proto, PeerId};
@@ -256,14 +253,12 @@ impl Component {
     ///
     /// [`Connection`]: crate::connection::Connection
     #[watch(self.0.borrow().on_remove())]
-    #[allow(clippy::unused_async)]
-    async fn peer_removed(
-        peers: Rc<Repository>,
-        _: Rc<State>,
+    fn peer_removed(
+        peers: &Repository,
+        _: &State,
         (peer_id, _): (PeerId, Rc<peer::State>),
-    ) -> Result<(), Infallible> {
+    ) {
         drop(peers.peers.borrow_mut().remove(&peer_id));
         peers.connections.close_connection(peer_id);
-        Ok(())
     }
 }

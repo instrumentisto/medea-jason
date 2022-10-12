@@ -453,8 +453,9 @@ pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
 #[allow(clippy::unused_async)]
 mod mock {
     #![allow(
-        clippy::unused_self,
         clippy::needless_pass_by_value,
+        clippy::unused_async,
+        clippy::unused_self,
         missing_copy_implementations
     )]
 
