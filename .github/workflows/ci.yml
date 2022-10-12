@@ -926,7 +926,6 @@ jobs:
       - helm-lint
       - rustdoc
       - rustfmt
-      - test-e2e
       - test-e2e-browser
       - test-e2e-desktop
       - test-flutter
