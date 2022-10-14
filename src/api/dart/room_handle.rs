@@ -484,7 +484,7 @@ mod mock {
     #[derive(Clone, Debug)]
     pub struct RoomHandle(pub u8);
 
-    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     impl RoomHandle {
         pub fn on_new_connection(
             &self,

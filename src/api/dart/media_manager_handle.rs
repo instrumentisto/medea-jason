@@ -213,7 +213,7 @@ mod mock {
     #[derive(Clone, Debug)]
     pub struct MediaManagerHandle(pub u8);
 
-    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     impl MediaManagerHandle {
         pub async fn enumerate_devices(
             &self,
