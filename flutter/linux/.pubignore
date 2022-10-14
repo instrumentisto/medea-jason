@@ -1,1 +1,1 @@
-# Overrides the `.gitignore` file since we want to publish `lib/` directory.
+# Overrides the `.gitignore` file since we want to publish the `lib/` dir.

@@ -1,2 +1,2 @@
-pkg/*
-!pkg/.gitkeep
+/pkg/*
+!/pkg/.gitkeep
