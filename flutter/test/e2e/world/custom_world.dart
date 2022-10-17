@@ -3,11 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medea_jason/src/native/platform/transport.dart';
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import '../api/callback.dart';
 import '../api/endpoint.dart';
 import '../api/member.dart' as api;

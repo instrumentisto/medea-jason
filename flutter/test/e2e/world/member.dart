@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-import 'package:medea_jason/src/native/platform/media_devices.dart';
-import 'package:medea_jason/src/native/platform/transport.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/native/platform/media_devices.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
 
 /// Builder of a [Member].

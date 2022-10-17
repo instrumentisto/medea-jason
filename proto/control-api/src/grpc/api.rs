@@ -573,7 +573,6 @@ pub mod control_api_client {
         }
     }
 }
-
 /// Generated server implementations.
 pub mod control_api_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
