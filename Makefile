@@ -512,22 +512,6 @@ flutter.web.assets:
 	       flutter/assets/pkg/package.json
 	@touch flutter/assets/pkg/.gitkeep
 
-
-
-
-# Run `build_runner` Flutter tool to generate project Dart sources.
-#
-# Usage:
-#	make flutter.gen [overwrite=(yes|no)]
-
-flutter.gen:
-	cd flutter && \
-	flutter pub run build_runner build \
-		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
-
-
-
-
 #################
 # Yarn commands #
 #################
@@ -678,82 +662,6 @@ endif
 # Usage:
 #	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
 # 		[device=<device-id>]
-#		[( [up=no] | up=yes
-#		          [( [dockerized=no]
-#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
-#		          [debug=(yes|no)]
-#		          [( [background=no]
-#		           | background=yes [log=(no|yes)] )]
-
-test.e2e.desktop:
-ifeq ($(up),yes)
-ifeq ($(dockerized),yes)
-ifeq ($(rebuild),yes)
-	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
-endif
-endif
-	@make docker.up.e2e background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
-endif
-ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
-	@make flutter.gen overwrite=yes dockerized=$(dockerized)
-endif
-	cd flutter/example/ && \
-	export WEBRTC_FAKE_MEDIA=true && \
-	flutter drive --driver=test_driver/integration_test.dart \
-		--target=../test/e2e/suite.dart \
-		--dart-define=MOCKABLE=true \
-		$(if $(call eq,$(device),),,-d $(device))
-ifeq ($(up),yes)
-	@make docker.down.e2e
-endif
-
-# Run E2E windows tests of project in vagrant vm.
-#
-# Usage:
-#	make test.e2e.desktop.windows [(only=<regex>|only-tags=<tag-expression>)]
-#		[( [up=no] | up=yes
-#		          [( [dockerized=no]
-#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
-#		          [debug=(yes|no)]
-#		          [( [background=no]
-#		           | background=yes [log=(no|yes)] )]
-
-test.e2e.desktop.windows:
-ifeq ($(up),yes)
-ifeq ($(dockerized),yes)
-ifeq ($(rebuild),yes)
-	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
-endif
-endif
-	env $(docker-up-e2e-env) \
-	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
-		up $(if $(call eq,$(dockerized),yes),\
-		   $(if $(call eq,$(background),yes),-d,--abort-on-container-exit),-d)
-endif
-	cd windows_test_staff/ && \
-	vagrant up
-ifeq ($(up),yes)
-	@make docker.down.e2e
-endif
-
-# Build flutter e2e test as bundle.
-#
-# Usage:
-#	make test.e2e.desktop.windows.build
-test.e2e.desktop.windows.build:
-ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
-	@make flutter.gen overwrite=yes dockerized=$(dockerized)
-endif
-	cd flutter/example/ && \
-	flutter build windows --dart-define=MOCKABLE=true \
-	--target=../test/e2e/suite.dart --debug
-
-# Run E2E desktop tests of project.
-#
-# Usage:
-#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
-# 		[device=<device-id>]
 #		[( [up=no]
 #		 | up=yes [( [dockerized=no]
 #		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
@@ -778,6 +686,7 @@ endif
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
+		--dart-define=MOCKABLE=true \
 		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e

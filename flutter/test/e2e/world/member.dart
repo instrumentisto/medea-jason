@@ -246,7 +246,7 @@ class Member {
     connection_store.local_tracks.forEach((track) {
       track.free();
     });
-    // await Future.delayed(Duration(milliseconds: 100)); ???
+    await Future.delayed(Duration(milliseconds: 100));
   }
 
   /// Waits for a [ConnectionHandle] from the [Member] with the provided [id].

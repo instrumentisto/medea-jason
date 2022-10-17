@@ -22,54 +22,62 @@ List<StepDefinitionGeneric> steps() {
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
   RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video)'
-      r'( and awaits it completes| and awaits it errors)?$'),
-  (id, action, audio_or_video, String awaits, context) async {
+      r'( and awaits it completes| and awaits it errors| and error)?$'),
+  (id, action, audio_or_video, awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
 
-    var awaitable = awaits.contains('awaits');
-    var error = awaits.contains('errors');
+    var awaitable = awaits.contains('awaits it');
+    var awaits_error = awaits.contains('awaits it error');
+    var errors = awaits.contains('and error');
+    Future<void> future;
+    switch (action) {
+      case 'enables':
+        {
+          future = member.toggle_media(kind.item1, kind.item2, true);
+          if (errors) {
+            // ignore: unawaited_futures
+            future.catchError((e) => print('Expected: $e'));
+          }
+        }
+        break;
 
+      case 'disables':
+        {
+          future = member.toggle_media(kind.item1, kind.item2, false);
+          if (errors) {
+            // ignore: unawaited_futures
+            future.catchError((e) => print('Expected: $e'));
+          }
+        }
+        break;
+
+      case 'mutes':
+        {
+          future = member.toggle_mute(kind.item1, kind.item2, true);
+          if (errors) {
+            // ignore: unawaited_futures
+            future.catchError((e) => print('Expected: $e'));
+          }
+        }
+        break;
+
+      default:
+        {
+          future = member.toggle_mute(kind.item1, kind.item2, false);
+          if (errors) {
+            // ignore: unawaited_futures
+            future.catchError((e) => print('Expected: $e'));
+          }
+        }
+        break;
+    }
     try {
-      switch (action) {
-        case 'enables':
-          {
-            var future = member.toggle_media(kind.item1, kind.item2, true);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
-
-        case 'disables':
-          {
-            var future = member.toggle_media(kind.item1, kind.item2, false);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
-
-        case 'mutes':
-          {
-            var future = member.toggle_mute(kind.item1, kind.item2, true);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
-
-        default:
-          {
-            var future = member.toggle_mute(kind.item1, kind.item2, false);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      if (awaitable) {
+        await future;
       }
     } catch (e) {
-      if (!error) {
+      if (!awaits_error) {
         rethrow;
       }
     }
@@ -146,6 +154,7 @@ StepDefinitionGeneric then_track_is_stopped =
 
     var track_ = track.getTrack();
     track.free();
+    await Future.delayed(Duration(milliseconds: 100));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );
