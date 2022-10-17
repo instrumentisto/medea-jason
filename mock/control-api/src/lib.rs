@@ -26,6 +26,7 @@
     clippy::float_cmp_const,
     clippy::fn_to_numeric_cast,
     clippy::fn_to_numeric_cast_any,
+    clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
@@ -82,7 +83,9 @@
     unused_labels,
     unused_lifetimes,
     unused_qualifications,
-    unused_results
+    unused_results,
+    unused_tuple_struct_fields,
+    variant_size_differences
 )]
 #![allow(clippy::module_name_repetitions)]
 // TODO: Make this unnecessary.
@@ -114,22 +117,22 @@ pub mod proto {
 
 /// CLI options.
 #[derive(Clone, Debug, clap::Parser)]
-#[clap(about, version)]
+#[command(about, version)]
 pub struct Cli {
     /// Address to host medea-control-api-mock-server on.
-    #[clap(long, short, default_value = "0.0.0.0:8000")]
-    pub addr: String,
+    #[arg(long, short, default_value = "0.0.0.0:8000")]
+    pub addr: Box<str>,
 
     /// Address to Medea's gRPC control API.
-    #[clap(long, short, default_value = "http://0.0.0.0:6565")]
-    pub medea_addr: String,
+    #[arg(long, short, default_value = "http://0.0.0.0:6565")]
+    pub medea_addr: Box<str>,
 
     /// Address to host gRPC Control API Callback service on.
-    #[clap(long, short, default_value = "0.0.0.0")]
-    pub callback_host: String,
+    #[arg(long, short, default_value = "0.0.0.0")]
+    pub callback_host: Box<str>,
 
     /// Port to listen by gRPC Control API Callback service.
-    #[clap(long, short = 'p', default_value_t = 9099)]
+    #[arg(long, short = 'p', default_value_t = 9099)]
     pub callback_port: u16,
 }
 

@@ -105,8 +105,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-/// gRPC Protobuf specs compilation.
 #[cfg(feature = "grpc")]
+/// gRPC Protobuf specs compilation.
 mod grpc {
     use std::{error::Error, fs, io};
 
@@ -147,6 +147,7 @@ mod grpc {
                         || (cfg!(feature = "server")
                             && out.ends_with("api.rs")),
                 )
+                .emit_rerun_if_changed(false)
                 .compile(&[proto], &[GRPC_DIR.to_owned()])?;
         }
 
@@ -174,7 +175,7 @@ mod grpc {
                 .map(|entry| entry.path())
                 .filter(|path| {
                     path.extension().map_or(false, |ext| {
-                        path.is_file() && ext.to_string_lossy() == *"proto"
+                        path.is_file() && ext.to_string_lossy() == "proto"
                     })
                 })
                 .filter_map(|path| {
@@ -189,7 +190,7 @@ mod grpc {
         fn get_grpc_spec_files(&self) -> Vec<String> {
             self.0
                 .iter()
-                .map(|name| format!("{}/{}.proto", GRPC_DIR, name))
+                .map(|name| format!("{GRPC_DIR}/{name}.proto"))
                 .collect()
         }
 
@@ -198,7 +199,7 @@ mod grpc {
         fn get_out_files(&self) -> Vec<String> {
             self.0
                 .iter()
-                .map(|filename| format!("{}/{}.rs", GRPC_DIR, filename))
+                .map(|filename| format!("{GRPC_DIR}/{filename}.rs"))
                 .collect()
         }
     }

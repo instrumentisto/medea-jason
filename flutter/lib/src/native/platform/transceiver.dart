@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'transceiver.g.dart' as bridge;
@@ -15,26 +15,19 @@ void registerFunctions(DynamicLibrary dl) {
     dropSender: Pointer.fromFunction(_dropSender),
     isStopped: Pointer.fromFunction(_isStopped, true),
     mid: Pointer.fromFunction(_mid),
-    setDirection: Pointer.fromFunction(_setDirection),
     setRecv: Pointer.fromFunction(_setRecv),
     setSend: Pointer.fromFunction(_setSend),
   );
 }
 
-/// Sets [TransceiverDirection] of the provided [RtpTransceiver] to the provided
-/// one.
-Object _setDirection(RtpTransceiver transceiver, int direction) {
-  return () => transceiver.setDirection(TransceiverDirection.values[direction]);
+/// Changes the receive direction of the provided [RtpTransceiver].
+Object _setRecv(RtpTransceiver transceiver, bool active) {
+  return () => transceiver.setRecv(active);
 }
 
-/// Changes the receive direction of this [RtpTransceiver].
-Object _setRecv(RtpTransceiver transceiver, bool recv) {
-  return () => transceiver.setRecv(recv);
-}
-
-/// Changes the send direction of this [RtpTransceiver].
-Object _setSend(RtpTransceiver transceiver, bool send) {
-  return () => transceiver.setSend(send);
+/// Changes the send direction of the provided [RtpTransceiver].
+Object _setSend(RtpTransceiver transceiver, bool active) {
+  return () => transceiver.setSend(active);
 }
 
 /// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].

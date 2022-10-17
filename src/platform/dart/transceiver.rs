@@ -52,17 +52,11 @@ mod transceiver {
             transceiver: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-        /// Sets `direction` of this [`Transceiver`].
-        pub fn set_direction(
-            transceiver: Dart_Handle,
-            direction: i64,
-        ) -> Dart_Handle;
-
         /// Changes the receive direction of the specified [`Transceiver`].
-        pub fn set_recv(transceiver: Dart_Handle, recv: bool) -> Dart_Handle;
+        pub fn set_recv(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
 
         /// Changes the send direction of the specified [`Transceiver`].
-        pub fn set_send(transceiver: Dart_Handle, sens: bool) -> Dart_Handle;
+        pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
     }
 }
 
@@ -76,12 +70,12 @@ pub struct Transceiver(DartHandle);
 impl Transceiver {
     /// Changes the receive direction of the specified [`Transceiver`].
     #[must_use]
-    pub fn set_recv(&self, recv: bool) -> LocalBoxFuture<'static, ()> {
+    pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_recv(
-                    handle, recv,
+                    handle, active,
                 ))
                 .await
                 .unwrap();
@@ -91,12 +85,12 @@ impl Transceiver {
 
     /// Changes the send direction of the specified [`Transceiver`].
     #[must_use]
-    pub fn set_send(&self, send: bool) -> LocalBoxFuture<'static, ()> {
+    pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_send(
-                    handle, send,
+                    handle, active,
                 ))
                 .await
                 .unwrap();
@@ -130,15 +124,15 @@ impl Transceiver {
                     self.0.get(),
                     track.platform_track().handle(),
                 ))
-                .await
-            }?;
+                .await?;
+            }
         } else {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::drop_sender(
                     self.0.get(),
                 ))
-                .await
-            }?;
+                .await?;
+            }
         }
         Ok(())
     }
@@ -176,24 +170,5 @@ impl Transceiver {
             .unwrap()
             .into()
         }
-    }
-
-    /// Sets this [`Transceiver`] to the provided [`TransceiverDirection`].
-    #[allow(dead_code)]
-    fn set_direction(
-        &self,
-        direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
-        Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_direction(
-                    handle,
-                    direction.into(),
-                ))
-                .await
-                .unwrap();
-            }
-        })
     }
 }

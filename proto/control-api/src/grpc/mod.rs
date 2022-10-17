@@ -17,6 +17,7 @@ mod server;
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,
+    clippy::style,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -30,6 +31,7 @@ mod server;
     unused_lifetimes,
     unused_qualifications,
     unused_results,
+    unused_tuple_struct_fields,
     variant_size_differences
 )]
 #[rustfmt::skip]
@@ -38,7 +40,7 @@ pub mod api;
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,
-    clippy::same_name_method,
+    clippy::style,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -52,6 +54,7 @@ pub mod api;
     unused_lifetimes,
     unused_qualifications,
     unused_results,
+    unused_tuple_struct_fields,
     variant_size_differences
 )]
 #[rustfmt::skip]

@@ -14,6 +14,7 @@ concurrency:
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
   MEDEA_BRANCH: edge  # for E2E tests only
+  PROTOC_VER: 3.x
   RUST_BACKTRACE: 1
 
 jobs:
@@ -27,15 +28,15 @@ jobs:
     needs:
       - clippy
       - crate-jason
+      - crate-jason-linux
       - dartanalyze
       - dartfmt
       - docker
       - helm-lint
       - rustdoc
       - rustfmt
-      - test-e2e
+      - test-e2e-browser
       - test-e2e-desktop
-      - test-e2e-windows
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
@@ -60,6 +61,9 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VER }}
 
       - run: make rustup.targets
 
@@ -180,16 +184,23 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-        if: ${{ steps.skip.outputs.no == 'true' && !matrix.wasm }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && !matrix.wasm }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.wasm }}
+             && matrix.wasm }}
       - uses: Swatinem/rust-cache@v1
-        if: ${{ steps.skip.outputs.no == 'true' && env.CACHE == 'true' }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && env.CACHE == 'true' }}
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VER }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && matrix.crate == 'medea-control-api-proto' }}
 
       - name: Parse wasm-bindgen-cli version from Cargo.lock
         id: wasm-cli
@@ -197,31 +208,31 @@ jobs:
                   name=VERSION::$(cargo pkgid wasm-bindgen | grep -o '#.*'
                                                            | grep -o '[0-9\.]*')
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.wasm }}
+             && matrix.wasm }}
       - uses: actions-rs/install@v0.1
         with:
           crate: wasm-bindgen-cli
           version: ${{ steps.wasm-cli.outputs.VERSION }}
           use-tool-cache: true
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.wasm }}
+             && matrix.wasm }}
 
       - name: Chrome
         run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.crate == 'medea-jason' }}
+             && matrix.crate == 'medea-jason' }}
       - name: Firefox
         run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.crate == 'medea-jason' }}
+             && matrix.crate == 'medea-jason' }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
         if: ${{ steps.skip.outputs.no == 'true'
-                && matrix.crate != 'medea-jason' }}
+             && matrix.crate != 'medea-jason' }}
 
-  test-e2e:
-    name: E2E tests
+  test-e2e-browser:
+    name: E2E tests (chrome, firefox)
     needs: ["docker"]
     runs-on: ubuntu-latest
     steps:
@@ -231,13 +242,16 @@ jobs:
           profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VER }}
 
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: test-e2e-{hash}
-          restore-keys: test-e2e-
+          key: test-e2e-browser-{hash}
+          restore-keys: test-e2e-browser-
         continue-on-error: true
         if: ${{ env.CACHE == 'true' }}
 
@@ -246,7 +260,8 @@ jobs:
           crate: wasm-pack
           use-tool-cache: true
 
-      - uses: actions/download-artifact@v3
+      - name: Download `medea-control-api-mock` Docker image
+        uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
       - name: Unpack `medea-control-api-mock` Docker image
@@ -274,90 +289,57 @@ jobs:
                            control-tag=build-${{ github.run_number }}
 
   test-e2e-desktop:
-    name: E2E tests desktop
-    needs: ["docker"]
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
+    name: E2E tests
+    needs: ["crate-jason", "crate-jason-linux", "docker"]
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: windows
-            os: windows-latest
-          # TODO: Add macos e2e tests
-          # - platform: macos
-          #   os: macos-latest
-    runs-on: ${{ matrix.os }}
+        platform: ["linux"]  # TODO: Run E2E test on Windows and macOS
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
-
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ matrix.platform != 'windows'
-                && !contains(github.event.head_commit.message, '[fresh ci]') }}
+      - uses: docker-practice/actions-setup-docker@master
+        if: ${{ matrix.platform == 'macos' }}
 
       - uses: subosito/flutter-action@v2
-      - run: flutter config --enable-linux-desktop
-        if: ${{ matrix.platform == 'linux' }}
       - name: Install Flutter Linux dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-                      cmake \
-                      libgtk-3-dev liblzma-dev libpulse-dev \
-                      ninja-build pkg-config xvfb
+                       cmake \
+                       libgtk-3-dev liblzma-dev libpulse-dev \
+                       ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
-      - run: make cargo.build.jason platform=${{ matrix.platform }}
-
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-      - uses: satackey/action-docker-layer-caching@v0.0.11
+      - name: Download `medea-jason` lib
+        uses: actions/download-artifact@v3
         with:
-          key: test-e2e-{hash}
-          restore-keys: test-e2e-
-        continue-on-error: true
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+          name: build-jason-${{ matrix.platform }}
+          path: ./flutter/${{ matrix.platform }}/lib/
 
-      - uses: actions/download-artifact@v3
+      - name: Download `medea-control-api-mock` Docker image
+        uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
-        if: ${{ matrix.platform != 'windows' }}
-
       - name: Unpack `medea-control-api-mock` Docker image
         run: make docker.untar from-file=image.tar
-        if: ${{ matrix.platform != 'windows' }}
 
       - name: Login to Medea Docker registry
         run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
                           -p ${{ secrets.MEDEA_DOCKER_PASS }}
                           hub.instrumentisto.com
-        if: ${{ matrix.platform != 'windows' }}
 
-      - uses: jetli/wasm-pack-action@v0.3.0
-      - name: Desktop linux test
-        run: xvfb-run -a make test.e2e.desktop up=yes debug=no 
-                          dockerized=yes device=linux
-                          medea-tag=${{ env.MEDEA_BRANCH }}
-                          control-tag=build-${{ github.run_number }}
-        if: ${{ matrix.platform == 'linux' }}
+      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+              ||                                '' }}
+             make test.e2e.desktop device=${{ matrix.platform }}
+                                   up=yes debug=no dockerized=yes
+                                   medea-tag=${{ env.MEDEA_BRANCH }}
+                                   control-tag=build-${{ github.run_number }}
 
-      - name: Build windows test bundle
-        run: make test.e2e.desktop.windows.build
-        if: ${{ matrix.platform == 'windows' }}
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: windows-test-bundle-${{ github.run_number }}
-          path: ./flutter/example/build/windows/runner/Debug
-        if: ${{ matrix.platform == 'windows' }}
-        
   test-flutter:
     name: Flutter tests
     if: ${{ github.ref == 'refs/heads/master'
@@ -366,14 +348,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: android
-            os: macos-latest
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: windows
-            os: windows-latest
-    runs-on: ${{ matrix.os }}
+        platform:
+          - android
+          - linux
+          - macos
+          - windows
+    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'macos-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -381,7 +363,8 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v1
-        if: ${{ matrix.platform != 'windows' && env.CACHE == 'true' }}
+        if: ${{ matrix.platform != 'windows'
+             && env.CACHE == 'true' }}
 
       - run: make rustup.targets only=android
         if: ${{ matrix.platform == 'android' }}
@@ -416,9 +399,9 @@ jobs:
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     args="--features mockable"
-                                    ${{ matrix.platform == 'android'
-                                        && 'targets=x86_64'
-                                        || '' }}
+                                    ${{ (matrix.platform == 'android'
+                                         && 'targets=x86_64')
+                                     ||     '' }}
 
       - name: Parse Android API versions
         id: api-version
@@ -432,7 +415,8 @@ jobs:
           api-level: ${{ steps.api-version.outputs.min }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
       - name: Test on target Android API version
@@ -441,52 +425,17 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 6
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
       - run: xvfb-run -a make test.flutter device=linux
         if: ${{ matrix.platform == 'linux' }}
 
-      - run: make test.flutter device=windows
-        if: ${{ matrix.platform == 'windows' }}
-
-  test-e2e-windows:
-    name: E2E tests for windows
-    runs-on: macOs-12
-    needs: ["docker", "test-e2e-desktop"]
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install docker
-      uses: docker-practice/actions-setup-docker@master
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: docker-medea-control-api-mock-${{ github.run_number }}
-
-    - name: Unpack `medea-control-api-mock` Docker image
-      run: make docker.untar from-file=image.tar
-
-    - run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-                  -p ${{ secrets.MEDEA_DOCKER_PASS }}
-                  hub.instrumentisto.com
-
-    - name: Install vagrant
-      run: |
-        brew install vagrant
-        vagrant autocomplete install
-
-    - name: Download windows test bundle
-      uses: actions/download-artifact@v3
-      with:
-        name: windows-test-bundle-${{ github.run_number }}
-        path: ./windows_test_staff/test/
-
-    - run: make test.e2e.desktop.windows up=yes debug=no dockerized=yes 
-                                        background=yes
-                                        medea-tag=${{ env.MEDEA_BRANCH }} 
-                                        control-tag=build-${{ github.run_number }}
+      - run: make test.flutter device=${{ matrix.platform }}
+        if: ${{ matrix.platform == 'macos'
+             || matrix.platform == 'windows' }}
 
   ############
   # Building #
@@ -495,21 +444,19 @@ jobs:
   crate-jason:
     name: Build medea-jason
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || !startsWith(github.ref, 'refs/tags/medea-') }}
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: android
-            os: ubuntu
-          - platform: linux
-            os: ubuntu
-          - platform: web
-            os: ubuntu
-          - platform: windows
-            os: windows
-    runs-on: ${{ matrix.os }}-latest
+        platform:
+          - android
+          - macos
+          - web
+          - windows
+    runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -550,13 +497,45 @@ jobs:
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=no
+      - run: make flutter.web.assets
+        if: ${{ matrix.platform == 'web' }}
 
       - uses: actions/upload-artifact@v3
         with:
-          name: build
-          path: flutter/windows/lib/x86_64-pc-windows-msvc
-          if-no-files-found: error
-        if: ${{ matrix.platform == 'windows' }}
+          name: build-jason-${{ matrix.platform }}
+          path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
+                 || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
+                 || (matrix.platform == 'windows' && './flutter/windows/lib/')
+                 ||                                  './flutter/assets/pkg/' }}
+
+  crate-jason-linux:
+    name: Build medea-jason (linux)
+    if: ${{ github.ref == 'refs/heads/master'
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-22.04
+    # Pin glibc to 2.28 for better compatibility.
+    container: debian:buster
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install linux dependencies
+        run: |
+          apt update
+          apt install -y curl xz-utils make clang
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ env.CACHE == 'true' }}
+
+      - run: make cargo.build.jason platform=linux
+                                    dockerized=no debug=no
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-jason-linux
+          path: ./flutter/linux/lib/
 
   rustdoc:
     runs-on: ubuntu-latest
@@ -656,7 +635,13 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["clippy", "rustfmt", "rustdoc", "test-e2e", "test-unit", "test-e2e-desktop", "test-e2e-windows"]
+    needs:
+      - clippy
+      - rustdoc
+      - rustfmt
+      - test-e2e-browser
+      - test-e2e-desktop
+      - test-unit
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
     steps:
@@ -790,6 +775,101 @@ jobs:
         if: ${{ contains(steps.changed.outputs.files,
                          steps.chart.outputs.MANIFEST) }}
 
+  release-dart:
+    name: Release on pub.dev
+    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
+         || github.ref_name == 'master'
+         || (github.event_name == 'pull_request'
+             && github.event.pull_request.head.repo.owner.login == 'instrumentisto') }}
+    needs:
+      - clippy
+      - crate-jason
+      - crate-jason-linux
+      - dartanalyze
+      - dartfmt
+      - rustdoc
+      - rustfmt
+      - test-e2e-browser
+      - test-e2e-desktop
+      - test-flutter
+      - test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2 # for PRs only
+
+      - name: Retrieve commit message and hash
+        id: commit
+        run: |
+          echo ::set-output name=message::$(git log --grep='\[publish\]' --format=%s)
+          echo ::set-output name=sha::${{ (github.event_name == 'pull_request'
+                                           && github.event.pull_request.head.sha)
+                                       ||  github.sha }}
+      - name: Check whether should be skipped
+        id: skip
+        run: echo ::set-output name=no::${{!(
+               github.event_name == 'pull_request'
+               && !contains(steps.commit.outputs.message, '[publish]')
+             )}}
+
+      - uses: dart-lang/setup-dart@v1.3
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-android
+          path: ./flutter/android/src/main/jniLibs
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-linux
+          path: ./flutter/linux/lib/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-macos
+          path: ./flutter/macos/lib/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-web
+          path: ./flutter/assets/pkg/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-windows
+          path: ./flutter/windows/lib/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - name: Append package version with commit SHA
+        run: |
+          sed -i "s/^version: \(.*\)$/version: \1+rev.${{ steps.commit.outputs.sha }}/g" \
+              flutter/pubspec.yaml
+        if: ${{ steps.skip.outputs.no == 'true'
+             && !startsWith(github.ref, 'refs/tags/') }}
+
+      - name: Login to pub.dev
+        run: |
+          echo "$PUB_CREDENTIALS" > ~/pub-credentials.json
+          mkdir -p ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/
+          cp -f ~/pub-credentials.json \
+                ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUBDEV_CREDS }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - run: dart pub publish --force
+        working-directory: flutter/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - name: Logout from pub.dev
+        run: |
+          rm -rf ~/pub-credentials.json \
+                 ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
+        if: ${{ always()
+             && steps.skip.outputs.no == 'true' }}
+
   release-docker:
     name: Release Docker image
     needs: ["docker"]
@@ -880,7 +960,7 @@ jobs:
                 && startsWith(github.ref, 'refs/tags/medea-') }}
       - name: Prepare final image tags
         id: tags
-        uses: bluwy/substitute-string-action@v1
+        uses: bluwy/substitute-string-action@v2
         with:
           _input-text: ${{ matrix.tags }}
           "@versions": ${{ steps.versions.outputs.result }}
@@ -896,7 +976,7 @@ jobs:
 
       - name: Prepare real image name
         id: image
-        uses: bluwy/substitute-string-action@v1
+        uses: bluwy/substitute-string-action@v2
         with:
           _input-text: ${{ matrix.image }}
           -edge: ""

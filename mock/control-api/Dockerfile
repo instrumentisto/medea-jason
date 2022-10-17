@@ -22,7 +22,7 @@ RUN mkdir -p /out/etc/ \
 # Install required system packages for building.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-            cmake
+            libprotobuf-dev protobuf-compiler
 
 # Prepare Cargo workspace for building dependencies only.
 COPY crates/medea-macro/Cargo.toml /app/crates/medea-macro/

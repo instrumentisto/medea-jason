@@ -24,10 +24,17 @@ All user visible changes to this project will be documented in this file. This p
     - `serde` ([#67]);
     - `client-api` ([#68]).
 
+### Upgraded
+
+- Dependencies: ([todo])
+    - [`prost`] to `0.11`;
+    - [`tonic`] to `0.8`.
+
 [#55]: /../../pull/55
 [#56]: /../../pull/56
 [#67]: /../../pull/67
 [#68]: /../../pull/68
+[todo]: /../../commit/todo
 
 
 

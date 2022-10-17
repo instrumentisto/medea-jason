@@ -1,9 +1,8 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
-import 'package:flutter_webrtc/src/platform/web/media_stream_track.dart';
 import 'package:js/js.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
 
-import '../interface/remote_media_track.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;

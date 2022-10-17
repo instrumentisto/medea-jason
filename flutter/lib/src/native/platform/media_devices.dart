@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
@@ -15,6 +15,7 @@ void registerFunctions(DynamicLibrary dl) {
     bridge.registerFunction(
       dl,
       enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+      enumerateDisplays: Pointer.fromFunction(_enumerateDisplays),
       getUserMedia: Pointer.fromFunction(MockMediaDevices.getUserMedia),
       getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
       setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
@@ -29,6 +30,7 @@ void registerFunctions(DynamicLibrary dl) {
     bridge.registerFunction(
       dl,
       enumerateDevices: Pointer.fromFunction(_enumerateDevices),
+      enumerateDisplays: Pointer.fromFunction(_enumerateDisplays),
       getUserMedia: Pointer.fromFunction(_getUserMedia),
       getDisplayMedia: Pointer.fromFunction(_getDisplayMedia),
       setOutputAudioId: Pointer.fromFunction(_setOutputAudioId),
@@ -75,6 +77,11 @@ Object _getUserMedia(webrtc.DeviceConstraints constraints) {
 /// Returns all the available media devices.
 Object _enumerateDevices() {
   return () => webrtc.enumerateDevices();
+}
+
+/// Returns all the available media displays.
+Object _enumerateDisplays() {
+  return () => webrtc.enumerateDisplays();
 }
 
 /// Starts capturing the contents of a display and returns the created

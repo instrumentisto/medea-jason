@@ -26,6 +26,7 @@
     clippy::float_cmp_const,
     clippy::fn_to_numeric_cast,
     clippy::fn_to_numeric_cast_any,
+    clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
@@ -82,7 +83,8 @@
     unused_labels,
     unused_lifetimes,
     unused_qualifications,
-    unused_results
+    unused_results,
+    unused_tuple_struct_fields
 )]
 #![cfg_attr(not(feature = "mockable"), warn(missing_docs))]
 #![cfg_attr(feature = "mockable", allow(missing_docs))]

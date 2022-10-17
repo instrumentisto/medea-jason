@@ -166,6 +166,7 @@ impl Track {
     #[cfg(target_family = "wasm")]
     pub async fn stop(self) {
         if self.0.track.ready_state().await == MediaStreamTrackState::Live {
+            self.0.track.stop();
             self.0.on_stopped.call0();
         }
     }

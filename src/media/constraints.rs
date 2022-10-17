@@ -100,8 +100,12 @@ impl RecvConstraints {
             MediaKind::Audio => {
                 self.is_audio_enabled.set(enabled);
             }
-            MediaKind::Video => match source_kind {
-                Some(source_kind) => match source_kind {
+            MediaKind::Video => source_kind.map_or_else(
+                || {
+                    self.is_video_device_enabled.set(enabled);
+                    self.is_video_display_enabled.set(enabled);
+                },
+                |sk| match sk {
                     MediaSourceKind::Device => {
                         self.is_video_device_enabled.set(enabled);
                     }
@@ -109,11 +113,7 @@ impl RecvConstraints {
                         self.is_video_display_enabled.set(enabled);
                     }
                 },
-                None => {
-                    self.is_video_device_enabled.set(enabled);
-                    self.is_video_display_enabled.set(enabled);
-                }
-            },
+            ),
         }
     }
 
@@ -875,7 +875,11 @@ impl From<VideoSettings> for VideoSource {
             }
             MediaSourceKind::Display => {
                 Self::Display(DisplayVideoTrackConstraints {
+                    height: None,
+                    width: None,
+                    frame_rate: None,
                     required: settings.required,
+                    device_id: None,
                 })
             }
         }
@@ -1248,13 +1252,31 @@ impl DeviceVideoTrackConstraints {
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DisplayVideoTrackConstraints {
     /// Importance of this [`DisplayVideoTrackConstraints`].
     ///
     /// If `true` then without these [`DisplayVideoTrackConstraints`] a session
     /// call can't be started.
     required: bool,
+
+    /// Identifier of the device generating the content for the media track.
+    pub device_id: Option<ConstrainString<String>>,
+
+    /// [Height][1] of the video in pixels.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+    pub height: Option<ConstrainU32>,
+
+    /// [Width][1] of the video in pixels.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+    pub width: Option<ConstrainU32>,
+
+    /// [Frame rate][1] of the video.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
+    pub frame_rate: Option<ConstrainU32>,
 }
 
 impl DisplayVideoTrackConstraints {
@@ -1267,23 +1289,89 @@ impl DisplayVideoTrackConstraints {
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies
     /// contained [`DisplayVideoTrackConstraints`].
-    #[allow(clippy::unused_self)]
     pub async fn satisfies<T: AsRef<platform::MediaStreamTrack>>(
         &self,
         track: T,
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video).await
+            && ConstrainString::satisfies(
+                &self.device_id,
+                &Some(track.device_id()),
+            )
+            && ConstrainU32::satisfies(self.height, track.height())
+            && ConstrainU32::satisfies(self.width, track.width())
             && track.guess_is_from_display()
     }
 
     /// Merges these [`DisplayVideoTrackConstraints`] with `another` ones,
     /// meaning that if some constraints are not set on these ones, then they
     /// will be applied from `another`.
-    pub fn merge(&mut self, another: &Self) {
+    pub fn merge(&mut self, another: Self) {
+        if self.device_id.is_none() && another.device_id.is_some() {
+            self.device_id = another.device_id;
+        }
         if !self.required && another.required {
             self.required = another.required;
         }
+        if self.height.is_none() && another.height.is_some() {
+            self.height = another.height;
+        }
+        if self.width.is_none() && another.width.is_some() {
+            self.width = another.width;
+        }
+        if self.frame_rate.is_none() && another.frame_rate.is_some() {
+            self.frame_rate = another.frame_rate;
+        }
+    }
+
+    /// Sets an exact [height][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+    pub fn exact_height(&mut self, height: u32) {
+        self.height = Some(ConstrainU32::Exact(height));
+    }
+
+    /// Sets an ideal [height][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+    pub fn ideal_height(&mut self, height: u32) {
+        self.height = Some(ConstrainU32::Ideal(height));
+    }
+
+    /// Sets an exact [width][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+    pub fn exact_width(&mut self, width: u32) {
+        self.width = Some(ConstrainU32::Exact(width));
+    }
+
+    /// Sets an ideal [width][1] constraint.
+    ///
+    /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+    pub fn ideal_width(&mut self, width: u32) {
+        self.width = Some(ConstrainU32::Ideal(width));
+    }
+
+    /// Sets an exact [deviceId][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
+    pub fn device_id(&mut self, device_id: String) {
+        self.device_id = Some(ConstrainString::Exact(device_id));
+    }
+
+    /// Sets an exact [frameRate][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
+    pub fn exact_frame_rate(&mut self, frame_rate: u32) {
+        self.frame_rate = Some(ConstrainU32::Exact(frame_rate));
+    }
+
+    /// Sets an ideal [frameRate][1] constraint.
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
+    pub fn ideal_frame_rate(&mut self, frame_rate: u32) {
+        self.frame_rate = Some(ConstrainU32::Ideal(frame_rate));
     }
 
     /// Returns an importance of this [`DisplayVideoTrackConstraints`].

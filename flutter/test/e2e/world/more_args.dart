@@ -1,7 +1,7 @@
 import 'package:gherkin/gherkin.dart';
 import 'package:tuple/tuple.dart';
 
-import 'package:medea_jason/src/interface/track_kinds.dart';
+import 'package:medea_jason/src/interface/media_track.dart';
 
 StepDefinitionGeneric<TWorld> step6<TWorld extends World, TInput1, TInput2,
     TInput3, TInput4, TInput5, TInput6>(

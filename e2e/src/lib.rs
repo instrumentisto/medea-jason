@@ -30,6 +30,7 @@
     clippy::float_cmp_const,
     clippy::fn_to_numeric_cast,
     clippy::fn_to_numeric_cast_any,
+    clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
@@ -85,7 +86,9 @@
     unused_labels,
     unused_lifetimes,
     unused_qualifications,
-    unused_results
+    unused_results,
+    unused_tuple_struct_fields,
+    variant_size_differences
 )]
 
 pub mod browser;

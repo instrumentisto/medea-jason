@@ -33,6 +33,9 @@ pub use self::{
     utils::Function,
 };
 
+/// Unimplemented on WASM targets.
+pub type MediaDisplayInfo = ();
+
 #[cfg(feature = "wee_alloc")]
 /// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 /// allocator.
