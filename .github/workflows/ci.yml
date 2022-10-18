@@ -500,6 +500,8 @@ jobs:
 
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=no
+      - run: make flutter.web.assets
+        if: ${{ matrix.platform == 'web' }}
 
       - uses: actions/upload-artifact@v3
         with:
@@ -775,6 +777,101 @@ jobs:
       - run: make helm.package.release chart=${{ matrix.chart }} build=yes
         if: ${{ contains(steps.changed.outputs.files,
                          steps.chart.outputs.MANIFEST) }}
+
+  release-dart:
+    name: Release on pub.dev
+    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
+         || github.ref_name == 'master'
+         || (github.event_name == 'pull_request'
+             && github.event.pull_request.head.repo.owner.login == 'instrumentisto') }}
+    needs:
+      - clippy
+      - crate-jason
+      - crate-jason-linux
+      - dartanalyze
+      - dartfmt
+      - rustdoc
+      - rustfmt
+      - test-e2e-browser
+      - test-e2e-desktop
+      - test-flutter
+      - test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2 # for PRs only
+
+      - name: Retrieve commit message and hash
+        id: commit
+        run: |
+          echo ::set-output name=message::$(git log --grep='\[publish\]' --format=%s)
+          echo ::set-output name=sha::${{ (github.event_name == 'pull_request'
+                                           && github.event.pull_request.head.sha)
+                                       ||  github.sha }}
+      - name: Check whether should be skipped
+        id: skip
+        run: echo ::set-output name=no::${{!(
+               github.event_name == 'pull_request'
+               && !contains(steps.commit.outputs.message, '[publish]')
+             )}}
+
+      - uses: dart-lang/setup-dart@v1.3
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-android
+          path: ./flutter/android/src/main/jniLibs
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-linux
+          path: ./flutter/linux/lib/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-macos
+          path: ./flutter/macos/lib/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-web
+          path: ./flutter/assets/pkg/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-windows
+          path: ./flutter/windows/lib/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - name: Append package version with commit SHA
+        run: |
+          sed -i "s/^version: \(.*\)$/version: \1+rev.${{ steps.commit.outputs.sha }}/g" \
+              flutter/pubspec.yaml
+        if: ${{ steps.skip.outputs.no == 'true'
+             && !startsWith(github.ref, 'refs/tags/') }}
+
+      - name: Login to pub.dev
+        run: |
+          echo "$PUB_CREDENTIALS" > ~/pub-credentials.json
+          mkdir -p ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/
+          cp -f ~/pub-credentials.json \
+                ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
+        env:
+          PUB_CREDENTIALS: ${{ secrets.PUBDEV_CREDS }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - run: dart pub publish --force
+        working-directory: flutter/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - name: Logout from pub.dev
+        run: |
+          rm -rf ~/pub-credentials.json \
+                 ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
+        if: ${{ always()
+             && steps.skip.outputs.no == 'true' }}
 
   release-docker:
     name: Release Docker image
