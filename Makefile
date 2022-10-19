@@ -35,11 +35,11 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
+IOS_TARGETS := aarch64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
-IOS_TARGETS := aarch64-apple-ios
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -208,27 +208,28 @@ cargo:
 #		[( [platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
 #		 | platform=all
 #		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
-#		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
 cargo-build-platform = $(or $(platform),web)
 cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
+cargo-build-targets-ios = $(or $(targets),$(IOS_TARGETS))
 cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
 cargo-build-targets-macos = $(or $(targets),$(MACOS_TARGETS))
 cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
-cargo-build-targets-ios = $(or $(targets),$(IOS_TARGETS))
 
 cargo.build.jason:
 ifeq ($(platform),all)
 	@make cargo.build.jason platform=android
+	@make cargo.build.jason platform=ios
 	@make cargo.build.jason platform=linux
+	@make cargo.build.jason platform=macos
 	@make cargo.build.jason platform=web
 	@make cargo.build.jason platform=windows
-	@make cargo.build.jason platform=ios
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -266,6 +267,10 @@ ifeq ($(cargo-build-platform),android)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-android)),\
 		$(call cargo.build.medea-jason.android,$(target),$(debug)))
 endif
+ifeq ($(cargo-build-platform),ios)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
 		$(call cargo.build.medea-jason.linux,$(target),$(debug)))
@@ -278,10 +283,6 @@ ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
 		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
-ifeq ($(cargo-build-platform),ios)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
-		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
-endif
 endif
 endif
 define cargo.build.medea-jason.android
@@ -291,6 +292,16 @@ define cargo.build.medea-jason.android
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
+endef
+define cargo.build.medea-jason.ios
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/ios/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
+	      ./flutter/ios/lib/$(target)/libmedea_jason.a
 endef
 define cargo.build.medea-jason.linux
 	$(eval target := $(strip $(1)))
@@ -321,16 +332,6 @@ define cargo.build.medea-jason.windows
 	@mkdir -p ./flutter/windows/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
 	      ./flutter/windows/lib/$(target)/medea_jason.dll
-endef
-define cargo.build.medea-jason.ios
-	$(eval target := $(strip $(1)))
-	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
-	            $(args)
-	@mkdir -p ./flutter/ios/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
-	      ./flutter/ios/lib/$(target)/libmedea_jason.a
 endef
 
 
@@ -404,16 +405,19 @@ cargo.version:
 # Install or upgrade all the required project's targets for Rust.
 #
 # Usage:
-#	make rustup.targets [only=(android|linux|web|windows|ios)]
+#	make rustup.targets [only=(android|ios|linux|web|windows)]
 
 rustup-targets = $(ANDROID_TARGETS) \
+                 $(IOS_TARGETS) \
                  $(LINUX_TARGETS) \
                  $(MACOS_TARGETS) \
                  $(WEB_TARGETS) \
-                 $(WINDOWS_TARGETS) \
-				 $(IOS_TARGETS)
+                 $(WINDOWS_TARGETS)
 ifeq ($(only),android)
 rustup-targets = $(ANDROID_TARGETS)
+endif
+ifeq ($(only),ios)
+rustup-targets = $(IOS_TARGETS)
 endif
 ifeq ($(only),linux)
 rustup-targets = $(LINUX_TARGETS)
@@ -426,9 +430,6 @@ rustup-targets = $(WEB_TARGETS)
 endif
 ifeq ($(only),windows)
 rustup-targets = $(WINDOWS_TARGETS)
-endif
-ifeq ($(only),ios)
-rustup-targets = $(IOS_TARGETS)
 endif
 
 rustup.targets:

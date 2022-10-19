@@ -32,13 +32,13 @@ flutter:
       android:
         package: com.medea.jason
         pluginClass: JasonPlugin
+      ios:
+        pluginClass: MedeaJasonPlugin
       linux:
         pluginClass: MedeaJasonPlugin
       macos:
         pluginClass: MedeaJasonPlugin
       windows:
-        pluginClass: MedeaJasonPlugin
-      ios:
         pluginClass: MedeaJasonPlugin
   assets:
     - assets/pkg/

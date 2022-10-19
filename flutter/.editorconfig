@@ -18,10 +18,18 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
-[*.podspec]
+[{*.podspec,Podfile}]
 indent_style = space
 indent_size = 2
 
-[*.xml]
+[*.{plist,pbxproj,xcsettings}]
+indent_style = tab
+indent_size = 4
+
+[*.{xcscheme,xcwokspacedata}]
+indent_style = space
+indent_size = 3
+
+[*.{xml,storyboard}]
 indent_style = space
 indent_size = 4

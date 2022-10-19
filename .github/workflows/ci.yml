@@ -460,11 +460,12 @@ jobs:
       matrix:
         platform:
           - android
+          - ios
           - macos
           - web
           - windows
-          - ios
-    runs-on: ${{ ((matrix.platform == 'macos' || matrix.platform == 'ios') &&   'macos-latest')
+    runs-on: ${{ ((matrix.platform == 'ios' || matrix.platform == 'macos')
+                                               && 'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
     steps:
@@ -473,28 +474,15 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+      - run: make rustup.targets only=${{ matrix.platform }}
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
 
-      - run: make rustup.targets only=android
-        if: ${{ matrix.platform == 'android' }}
       - uses: actions-rs/install@v0.1
         with:
           crate: cargo-ndk
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
-
-      - run: make rustup.targets only=web
-        if: ${{ matrix.platform == 'web' }}
-      - uses: jetli/wasm-pack-action@v0.3.0
-        if: ${{ matrix.platform == 'web' }}
-
-      - run: make rustup.targets only=ios
-        if: ${{ matrix.platform == 'ios' }}
-
-      - uses: dart-lang/setup-dart@v1
-        if: ${{ matrix.platform == 'windows' }}
-
       # TODO: Rust doesn't support NDK >= 23:
       #       https://github.com/rust-lang/rust/pull/85806
       #       https://github.com/actions/virtual-environments/issues/5595
@@ -508,6 +496,12 @@ jobs:
           ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
         if: ${{ matrix.platform == 'android' }}
 
+      - uses: jetli/wasm-pack-action@v0.3.0
+        if: ${{ matrix.platform == 'web' }}
+
+      - uses: dart-lang/setup-dart@v1
+        if: ${{ matrix.platform == 'windows' }}
+
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=no
       - run: make flutter.web.assets
@@ -517,8 +511,8 @@ jobs:
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
+                 || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
                  || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
-                 || (matrix.platform == 'ios' &&   './flutter/ios/lib/')
                  || (matrix.platform == 'windows' && './flutter/windows/lib/')
                  ||                                  './flutter/assets/pkg/' }}
 
@@ -834,6 +828,11 @@ jobs:
         with:
           name: build-jason-android
           path: ./flutter/android/src/main/jniLibs
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-ios
+          path: ./flutter/ios/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: actions/download-artifact@v3
         with:
