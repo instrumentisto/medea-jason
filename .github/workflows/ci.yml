@@ -343,7 +343,8 @@ jobs:
                                    up=yes debug=no dockerized=yes
                                    medea-tag=${{ env.MEDEA_BRANCH }}
                                    control-tag=build-${{ github.run_number }}
-                                   
+        if: ${{ matrix.platform != 'android' }}
+
       - name: Test on Android 
         uses: reactivecircus/android-emulator-runner@v2
         with:
