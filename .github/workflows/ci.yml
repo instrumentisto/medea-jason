@@ -361,7 +361,7 @@ jobs:
           cores: 3
           emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
           script: make test.e2e.native up=yes 
-            debug=no dockerized=yes server_ip="10.0.2.2"
+            debug=no dockerized=yes server="10.0.2.2"
             medea-tag=${{ env.MEDEA_BRANCH }} 
             control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
