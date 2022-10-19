@@ -55,6 +55,6 @@ Feature: Media enabling/disabling
     And Bob's `getUserMedia()` request has added latency
     When Bob disables video
     And Bob frees all local tracks
-    And Bob enables video and error
+    And Bob enables video
     And Bob disables video and awaits it completes
     Then Alice's device video remote track from Bob is disabled

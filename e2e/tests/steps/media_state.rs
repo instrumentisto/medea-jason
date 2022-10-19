@@ -96,7 +96,7 @@ async fn then_remote_media_direction_is(
 }
 
 #[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video)\
-                 ( and (error|awaits it (complete|error)s))?$")]
+                 ( and awaits it (complete|error)s)?$")]
 async fn when_enables_or_mutes(
     world: &mut World,
     id: String,
@@ -105,10 +105,10 @@ async fn when_enables_or_mutes(
     awaits: String,
 ) {
     let member = world.get_member(&id).unwrap();
-    let maybe_await = if awaits.contains("awaits") {
-        AwaitCompletion::Do
-    } else {
+    let maybe_await = if awaits.is_empty() {
         AwaitCompletion::Dont
+    } else {
+        AwaitCompletion::Do
     };
 
     let result = match action.as_str() {

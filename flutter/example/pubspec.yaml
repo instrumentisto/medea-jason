@@ -6,11 +6,6 @@ environment:
   flutter: ">=2.0.0"
 
 dependencies:
-
-  js: ^0.6.3
-  http: ^0.13.4
-  uuid: ^3.0.6
-  tuple: ^2.0.0
   flutter:
     sdk: flutter
 
