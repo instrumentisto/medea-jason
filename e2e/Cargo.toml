@@ -9,9 +9,7 @@ publish = false
 
 [dependencies]
 async-recursion = "1.0"
-async-trait = "0.1"
-clap = "3.0"
-cucumber = "0.13"
+cucumber = { version = "0.15", features = ["libtest"] }
 derive_more = "0.99"
 fantoccini = { version = "0.19", features = ["rustls-tls"], default-features = false }
 futures = "0.3"

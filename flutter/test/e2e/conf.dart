@@ -34,3 +34,7 @@ final String CLIENT_API_ADDR =
 /// [`FileServer`]: crate::file_server::FileServer
 final String FILE_SERVER_HOST =
     Platform.environment['FILE_SERVER_HOST'] ?? '$IP_TEST_BASE:30000';
+
+/// Path to a Cucumber features which should be run.
+final String FEATURES_PATH =
+    Platform.environment['FEATURES_PATH'] ?? 'tests/features';

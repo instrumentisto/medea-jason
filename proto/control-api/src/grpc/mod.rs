@@ -30,7 +30,8 @@ mod server;
     unused_lifetimes,
     unused_qualifications,
     unused_results,
-    variant_size_differences,
+    unused_tuple_struct_fields,
+    variant_size_differences
 )]
 #[rustfmt::skip]
 pub mod api;
@@ -53,7 +54,8 @@ pub mod api;
     unused_lifetimes,
     unused_qualifications,
     unused_results,
-    variant_size_differences,
+    unused_tuple_struct_fields,
+    variant_size_differences
 )]
 #[rustfmt::skip]
 pub mod callback;

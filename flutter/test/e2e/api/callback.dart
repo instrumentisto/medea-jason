@@ -2,13 +2,15 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'callback.g.dart';
 
-/// All callbacks which can happen.
-/// `OnJoin` callback of Control API or
-/// `OnLeave` callback of Control API.
+/// Possible Control API callbacks events which may happen on a media server.
+///
+/// May be either [OnJoin] or [OnLeave].
 @JsonSerializable()
 class CallbackEvent {
   Map<String, dynamic> toJson() => {};
+
   CallbackEvent();
+
   factory CallbackEvent.fromJson(Map<String, dynamic> json) {
     if (json.toString().contains('OnLeave')) {
       return OnLeave.fromJson(json);
@@ -37,7 +39,7 @@ class CallbackItem {
   Map<String, dynamic> toJson() => _$CallbackItemToJson(this);
 }
 
-/// `OnJoin` callback for Control API.
+/// Event notifying about a [Member] joining a [Room].
 @JsonSerializable()
 class OnJoin implements CallbackEvent {
   OnJoin();
@@ -47,25 +49,25 @@ class OnJoin implements CallbackEvent {
   Map<String, dynamic> toJson() => _$OnJoinToJson(this);
 }
 
-/// Reason of why `Member` leaves.
+/// Reason of why a [Member] leaves its [Room].
 enum OnLeaveReason {
-  /// `Member` was normally disconnected.
+  /// [Member] was disconnected normally.
   Disconnected,
 
-  /// Connection with `Member` was lost.
-  LostConnection,
+  /// Connection with the [Member] was lost.
+  Lost,
 
-  /// Server is shutting down.
-  ServerShutdown,
-
-  /// `Member` was forcibly disconnected by server.
+  /// [Member[ was forcibly disconnected by a media server.
   Kicked,
+
+  /// Media server was shut down.
+  Shutdown,
 }
 
-/// `OnLeave` callback of Control API.
+/// Event notifying about a [Member] leaving its [Room].
 @JsonSerializable()
 class OnLeave implements CallbackEvent {
-  /// Reason of why `Member` leaves.
+  /// Reason of why the [Member] leaves.
   OnLeaveReason reason;
 
   OnLeave(this.reason);

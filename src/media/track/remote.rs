@@ -169,27 +169,11 @@ impl Track {
     /// # Panics
     ///
     /// Will panic if `track` is None.
-    #[cfg(not(target_family = "wasm"))]
     pub async fn stop(self) {
         if self.0.track.as_ref().unwrap().ready_state().await
             == MediaStreamTrackState::Live
         {
             self.0.track.as_ref().unwrap().stop().await;
-            self.0.on_stopped.call0();
-        }
-    }
-
-    /// Invoking an `on_stopped` callback if it's in a
-    /// [`MediaStreamTrackState::Live`] state.
-    ///
-    /// # Panics
-    ///
-    /// Will panic if `track` is None.
-    #[cfg(target_family = "wasm")]
-    pub async fn stop(self) {
-        if self.0.track.as_ref().unwrap().ready_state().await
-            == MediaStreamTrackState::Live
-        {
             self.0.on_stopped.call0();
         }
     }

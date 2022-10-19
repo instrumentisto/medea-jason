@@ -452,8 +452,9 @@ pub unsafe extern "C" fn RoomHandle__free(this: ptr::NonNull<RoomHandle>) {
 #[cfg(feature = "mockable")]
 mod mock {
     #![allow(
-        clippy::unused_self,
         clippy::needless_pass_by_value,
+        clippy::unused_async,
+        clippy::unused_self,
         missing_copy_implementations
     )]
 
@@ -483,7 +484,7 @@ mod mock {
     #[derive(Clone, Debug)]
     pub struct RoomHandle(pub u8);
 
-    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     impl RoomHandle {
         pub fn on_new_connection(
             &self,

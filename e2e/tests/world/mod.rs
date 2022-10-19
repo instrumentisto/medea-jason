@@ -6,7 +6,6 @@ pub mod member;
 
 use std::{collections::HashMap, fmt, time::Duration};
 
-use async_trait::async_trait;
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
     callback::{CallbackEvent, CallbackItem},
@@ -53,7 +52,8 @@ type Result<T> = std::result::Result<T, Error>;
 /// [`World`][1] used by all E2E tests.
 ///
 /// [1]: cucumber::World
-#[derive(cucumber::WorldInit)]
+#[derive(cucumber::World)]
+#[world(init = Self::try_new)]
 pub struct World {
     /// ID of the `Room` created for this [`World`].
     room_id: String,
@@ -83,11 +83,15 @@ impl fmt::Debug for World {
     }
 }
 
-#[async_trait(?Send)]
-impl cucumber::World for World {
-    type Error = Error;
-
-    async fn new() -> Result<Self> {
+impl World {
+    /// Attempts to initialized a new fresh [`World`].
+    ///
+    /// # Errors
+    ///
+    /// If fails to instantiate a [`control::Client`] or a [WebDriver] client.
+    ///
+    /// [WebDriver]: https://w3.org/TR/webdriver
+    pub async fn try_new() -> Result<Self> {
         let room_id = Uuid::new_v4().to_string();
 
         let control_client = control::Client::new(&conf::CONTROL_API_ADDR);
@@ -114,12 +118,16 @@ impl cucumber::World for World {
             jasons: HashMap::new(),
         })
     }
-}
 
-impl World {
     /// Creates a new [`Member`] from the provided [`MemberBuilder`].
     ///
     /// `Room` for this [`Member`] will be created, but joining won't be done.
+    ///
+    /// # Errors
+    ///
+    /// - If the performed request to Control API fails.
+    /// - If initializing the [`Member`] fails on JS side.
+    #[allow(clippy::too_many_lines)]
     pub async fn create_member(
         &mut self,
         builder: MemberBuilder,
@@ -173,7 +181,7 @@ impl World {
         self.control_client
             .create(
                 &format!("{}/{}", self.room_id, builder.id),
-                proto::Element::Member(proto::Member {
+                proto::Element::Member(Box::new(proto::Member {
                     id: builder.id.clone(),
                     pipeline,
                     credentials: Some(proto::Credentials::Plain(
@@ -184,12 +192,12 @@ impl World {
                     idle_timeout: None,
                     reconnect_timeout: None,
                     ping_interval: None,
-                }),
+                })),
             )
             .await?;
 
         if builder.is_send {
-            let recv_endpoints: HashMap<_, _> = self
+            let recv_endpoints = self
                 .members
                 .values()
                 .filter_map(|m| {
@@ -213,7 +221,7 @@ impl World {
                         (id, elem)
                     })
                 })
-                .collect();
+                .collect::<HashMap<_, _>>();
             for (path, element) in recv_endpoints {
                 self.control_client.create(&path, element).await?;
             }
@@ -240,6 +248,11 @@ impl World {
 
     /// Joins a [`Member`] with the provided ID to the `Room` created for this
     /// [`World`].
+    ///
+    /// # Errors
+    ///
+    /// - If the specified [`Member`] doesn't exist in this [`World`].
+    /// - If joining the `Room` fails on JS side.
     pub async fn join_room(&mut self, member_id: &str) -> Result<()> {
         let member = self
             .members
@@ -251,6 +264,14 @@ impl World {
 
     /// Waits until a [`Member`] with the provided ID will connect with his
     /// responders.
+    ///
+    /// # Errors
+    ///
+    /// If waiting fails on JS side.
+    ///
+    /// # Panics
+    ///
+    /// If the specified [`Member`] doesn't exist in this [`World`].
     pub async fn wait_for_interconnection(
         &mut self,
         member_id: &str,
@@ -281,11 +302,19 @@ impl World {
                 .wait_for_count(send_count)
                 .await?;
         }
-
         Ok(())
     }
 
     /// Closes a [`Room`] of the provided [`Member`].
+    ///
+    /// # Errors
+    ///
+    /// If the [`Room`] fails to be closed.
+    ///
+    /// # Panics
+    ///
+    /// If the provided [`Member`] doesn't exist in this [`World`], or there are
+    /// no [`Jason`] objects present in this [`World`] for him.
     ///
     /// [`Room`]: crate::object::room::Room
     pub async fn close_room(&mut self, member_id: &str) -> Result<()> {
@@ -298,6 +327,11 @@ impl World {
 
     /// Waits for the [`Member`]'s [`Room`] being closed.
     ///
+    /// # Errors
+    ///
+    /// - If the specified [`Member`] doesn't exist in this [`World`].
+    /// - If waiting for the [`Member`] fails on JS side.
+    ///
     /// [`Room`]: crate::object::room::Room
     pub async fn wait_for_on_close(&self, member_id: &str) -> Result<String> {
         let member = self
@@ -309,6 +343,8 @@ impl World {
     }
 
     /// Waits for `OnLeave` Control API callback for the provided [`Member`] ID.
+    ///
+    /// # Panics
     ///
     /// Asserts the `OnLeave` reason to be equal to the provided one.
     pub async fn wait_for_on_leave(
@@ -355,6 +391,10 @@ impl World {
 
     /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
     /// provided [`MembersPair`] using an `Apply` method of Control API.
+    ///
+    /// # Panics
+    ///
+    /// If the provided [`MembersPair`] is misconfigured.
     pub async fn interconnect_members_via_apply(&mut self, pair: MembersPair) {
         let mut spec = self.get_spec().await;
         if let Some(proto::RoomElement::Member(member)) =
@@ -398,6 +438,16 @@ impl World {
 
     /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
     /// provided [`MembersPair`].
+    ///
+    /// # Errors
+    ///
+    /// If the performed requests to Control API fail.
+    ///
+    /// # Panics
+    ///
+    /// If any [`Member`] of the provided [`MembersPair`] doesn't exist in this
+    /// [`World`].
+    #[allow(clippy::too_many_lines)]
     pub async fn interconnect_members(
         &mut self,
         pair: MembersPair,
@@ -527,6 +577,15 @@ impl World {
     }
 
     /// Disposes a [`Jason`] object of the provided [`Member`] ID.
+    ///
+    /// # Errors
+    ///
+    /// If the [`Jason`] object fails to be disposed on JS side.
+    ///
+    /// # Panics
+    ///
+    /// If no [`Jason`] objects exist for the provided [`Member`] in this
+    /// [`World`].
     pub async fn dispose_jason(&mut self, member_id: &str) -> Result<()> {
         let jason = self.jasons.remove(member_id).unwrap();
         jason.dispose().await?;
@@ -535,6 +594,10 @@ impl World {
 
     /// Deletes a Control API element of a `WebRtcPublishEndpoint` with the
     /// provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn delete_publish_endpoint(&mut self, member_id: &str) {
         let resp = self
             .control_client
@@ -546,6 +609,10 @@ impl World {
 
     /// Deletes a Control API element of a `WebRtcPlayEndpoint` with the
     /// provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn delete_play_endpoint(
         &mut self,
         member_id: &str,
@@ -554,15 +621,17 @@ impl World {
         let play_endpoint_id = format!("play-{partner_member_id}");
         let resp = self
             .control_client
-            .delete(
-                &format!("{}/{member_id}/{play_endpoint_id}", self.room_id,),
-            )
+            .delete(&format!("{}/{member_id}/{play_endpoint_id}", self.room_id))
             .await
             .unwrap();
         assert!(resp.error.is_none());
     }
 
     /// Deletes a Control API element of the [`Member`] with the provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn delete_member_element(&mut self, member_id: &str) {
         let resposne = self
             .control_client
@@ -573,6 +642,10 @@ impl World {
     }
 
     /// Deletes a Control API element of the [`Room`] with the provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     ///
     /// [`Room`]: crate::object::room::Room
     pub async fn delete_room_element(&mut self) {
@@ -597,6 +670,11 @@ impl World {
     }
 
     /// Returns [`proto::Room`] spec of the `Room` created for this [`World`].
+    ///
+    /// # Panics
+    ///
+    /// - If the performed request to Control API fails.
+    /// - If the element returned by Control API is absent or is not a `Room`.
     pub async fn get_spec(&mut self) -> proto::Room {
         let el = self
             .control_client
@@ -608,12 +686,16 @@ impl World {
         if let proto::Element::Room(room) = el {
             room
         } else {
-            panic!("Returned not Room element")
+            panic!("Returned not `Room` element")
         }
     }
 
     /// Applies provided [`proto::Room`] spec to the `Room` created for this
     /// [`World`].
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn apply(&mut self, el: proto::Room) {
         self.control_client
             .apply(&self.room_id, proto::Element::Room(el))
@@ -663,16 +745,12 @@ impl PairedMember {
             id: "publish".to_owned(),
             p2p: proto::P2pMode::Always,
             force_relay: false,
-            audio_settings: self.send_audio.clone().unwrap_or(
-                proto::AudioSettings {
-                    publish_policy: PublishPolicy::Disabled,
-                },
-            ),
-            video_settings: self.send_video.clone().unwrap_or(
-                proto::VideoSettings {
-                    publish_policy: PublishPolicy::Disabled,
-                },
-            ),
+            audio_settings: self.send_audio.unwrap_or(proto::AudioSettings {
+                publish_policy: PublishPolicy::Disabled,
+            }),
+            video_settings: self.send_video.unwrap_or(proto::VideoSettings {
+                publish_policy: PublishPolicy::Disabled,
+            }),
         })
     }
 

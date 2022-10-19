@@ -4,15 +4,15 @@ import 'member.dart';
 
 part 'room.g.dart';
 
-/// [Control API]'s `Room` representation.
+/// [Control API]'s [Room] representation.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
 @JsonSerializable()
 class Room {
-  /// ID of this [`Room`].
+  /// ID of this [Room].
   String id;
 
-  /// Pipeline of this [`Room`].
+  /// Pipeline of this [Room].
   Map<String, Member> pipeline;
 
   Room(this.id, this.pipeline);

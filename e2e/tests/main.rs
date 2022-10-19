@@ -5,18 +5,18 @@ mod control;
 mod steps;
 mod world;
 
-use cucumber::{World as _, WorldInit as _};
-
 pub use self::world::World;
 
 #[tokio::main]
 async fn main() {
-    let concurrent = supports_multiple_webdriver_clients()
-        .await
-        .then_some(4)
-        .unwrap_or(1);
+    let concurrent = if supports_multiple_webdriver_clients().await {
+        4
+    } else {
+        1
+    };
 
-    World::cucumber()
+    <World as cucumber::World>::cucumber()
+        .with_writer(cucumber::writer::Libtest::or_basic())
         .repeat_failed()
         .fail_on_skipped()
         .max_concurrent_scenarios(concurrent)
@@ -32,5 +32,5 @@ async fn main() {
 ///
 /// [1]: https://github.com/mozilla/geckodriver/issues/1523
 async fn supports_multiple_webdriver_clients() -> bool {
-    World::new().await.and(World::new().await).is_ok()
+    World::try_new().await.and(World::try_new().await).is_ok()
 }

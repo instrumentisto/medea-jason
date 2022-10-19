@@ -147,6 +147,7 @@ mod grpc {
                         || (cfg!(feature = "server")
                             && out.ends_with("api.rs")),
                 )
+                .emit_rerun_if_changed(false)
                 .compile(&[proto], &[GRPC_DIR.to_owned()])?;
         }
 

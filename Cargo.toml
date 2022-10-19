@@ -2,7 +2,7 @@
 name = "medea-jason"
 version = "0.3.0-dev"
 edition = "2021"
-rust-version = "1.62"
+rust-version = "1.64"
 description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
@@ -46,16 +46,17 @@ medea-client-api-proto = { version = "0.4.0-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3.0-dev", path = "crates/medea-macro" }
 medea-reactive = "0.1"
 mockall = { version = "0.11", optional = true }
+sealed = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracerr = "0.3"
-url = "2.2"
+url = "2.3"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"
 
 [target.'cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))'.dependencies]
-simple_logger = "2.1"
+simple_logger = "2.3"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "2.0"
@@ -65,7 +66,7 @@ libc = "0.2"
 backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 js-sys = "0.3"
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }

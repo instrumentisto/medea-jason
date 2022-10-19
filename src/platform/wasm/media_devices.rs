@@ -12,8 +12,8 @@ use crate::{
     media::{InvalidOutputAudioDeviceIdError, MediaSourceKind, MicVolumeError},
     platform::{
         utils::EventListener, DisplayMediaStreamConstraints, Error,
-        GetUserMediaError, MediaDeviceInfo, MediaStreamConstraints,
-        MediaStreamTrack,
+        GetUserMediaError, MediaDeviceInfo, MediaDisplayInfo,
+        MediaStreamConstraints, MediaStreamTrack,
     },
 };
 
@@ -109,6 +109,15 @@ impl MediaDevices {
                 MediaDeviceInfo::from(info)
             })
             .collect())
+    }
+
+    /// Unimplemented on WASM targets.
+    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
+    pub async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
+        unimplemented!()
     }
 
     /// Prompts a user for a permission to use a media input which produces

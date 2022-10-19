@@ -5,7 +5,7 @@
 use std::rc::Rc;
 
 use js_sys::{
-    Array as JsArray, Function as JsFunction, Iterator as JsIterator, JsString,
+    Array as JsArray, Function as JsFunction, Iterator as JsIterator,
 };
 use medea_client_api_proto::stats::{RtcStat, RtcStatsType};
 use tracerr::Traced;
@@ -43,23 +43,26 @@ impl TryFrom<&JsValue> for RtcStats {
             let stat = stat.unchecked_into::<JsArray>();
             let stat = RtcStatsReportEntry::try_from(stat)
                 .map_err(tracerr::map_from_and_wrap!())?;
-            let stat: RtcStat = JsValue::from(&stat.1)
-                .into_serde()
+            let stat_json = js_sys::JSON::stringify(&JsValue::from(&stat.0))
+                .map(String::from)
+                .unwrap_throw();
+            let rtc_stat: RtcStat = serde_json::from_str(&stat_json)
                 .map_err(Rc::new)
                 .map_err(tracerr::from_and_wrap!())?;
 
-            if let RtcStatsType::Other = &stat.stats {
+            if let RtcStatsType::Other = &rtc_stat.stats {
                 continue;
             }
 
-            out.push(stat);
+            out.push(rtc_stat);
         }
 
         Ok(Self(out))
     }
 }
+
 /// Entry of a JS RTC stats dictionary.
-struct RtcStatsReportEntry(JsString, JsValue);
+struct RtcStatsReportEntry(JsValue);
 
 impl TryFrom<JsArray> for RtcStatsReportEntry {
     type Error = Traced<RtcStatsError>;
@@ -68,23 +71,18 @@ impl TryFrom<JsArray> for RtcStatsReportEntry {
         use RtcStatsError::{Platform, UndefinedId, UndefinedStats};
 
         let id = value.get(0);
-        let stats = value.get(1);
-
         if id.is_undefined() {
             return Err(tracerr::new!(UndefinedId));
         }
 
+        let stats = value.get(1);
         if stats.is_undefined() {
             return Err(tracerr::new!(UndefinedStats));
         }
-
-        let id = id
-            .dyn_into::<JsString>()
-            .map_err(|e| tracerr::new!(Platform(platform::Error::from(e))))?;
         let stats = stats
             .dyn_into::<JsValue>()
             .map_err(|e| tracerr::new!(Platform(platform::Error::from(e))))?;
 
-        Ok(Self(id, stats))
+        Ok(Self(stats))
     }
 }

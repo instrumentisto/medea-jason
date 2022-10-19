@@ -101,9 +101,9 @@ impl Receiver {
         let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
 
-        let mut transceiver = None;
-        if state.mid().is_none() {
-            // Try to find send transceiver that can be used as sendrecv.
+        #[allow(clippy::if_then_some_else_none)]
+        let transceiver = if state.mid().is_none() {
+            // Try to find send transceiver that can be used as `sendrecv`.
             let sender = media_connections
                 .0
                 .borrow()
@@ -119,14 +119,17 @@ impl Receiver {
             let trnsvr = if let Some(s) = sender {
                 s.transceiver()
             } else {
-                let fut = media_connections.0.borrow().add_transceiver(
-                    kind,
-                    platform::TransceiverDirection::INACTIVE,
-                );
-                fut.await
+                let new_transceiver =
+                    media_connections.0.borrow().add_transceiver(
+                        kind,
+                        platform::TransceiverDirection::INACTIVE,
+                    );
+                new_transceiver.await
             };
             trnsvr.set_recv(state.enabled_individual()).await;
-            transceiver = Some(trnsvr);
+            Some(trnsvr)
+        } else {
+            None
         };
 
         let peer_events_sender =
@@ -230,7 +233,9 @@ impl Receiver {
                 return;
             }
         }
+
         self.set_transceiver(transceiver);
+
         let new_track = remote::Track::new(
             new_track,
             self.caps.media_source_kind(),
@@ -238,8 +243,12 @@ impl Receiver {
             self.media_direction.get(),
         );
 
-        let trnscvr = self.transceiver.borrow().as_ref().cloned().unwrap();
-        trnscvr.set_recv(self.enabled_individual.get()).await;
+        // It's OK to `.clone()` here, as the `Transceiver` represents a pointer
+        // to a garbage-collectable memory on each platform.
+        let trnscvr = self.transceiver.borrow().as_ref().cloned();
+        if let Some(t) = trnscvr {
+            t.set_recv(self.enabled_individual.get()).await;
+        }
 
         if let Some(prev_track) = self.track.replace(Some(new_track)) {
             prev_track.stop().await;
@@ -317,7 +326,8 @@ impl Receiver {
 
 impl Drop for Receiver {
     fn drop(&mut self) {
-        if let Some(transceiver) = self.transceiver.borrow().as_ref().cloned() {
+        let transceiver = self.transceiver.borrow_mut().take();
+        if let Some(transceiver) = transceiver {
             platform::spawn(async move {
                 if !transceiver.is_stopped() {
                     transceiver.set_recv(false).await;
