@@ -141,7 +141,7 @@ impl Track {
 #[cfg(target_family = "wasm")]
 impl Drop for Track {
     fn drop(&mut self) {
-        let track = self.track.as_ref().unwrap().stop();
+        self.track.as_ref().unwrap().stop();
     }
 }
 
