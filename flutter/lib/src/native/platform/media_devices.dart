@@ -45,6 +45,7 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Provider to mock `getUserMedia`.
+///
 /// [MOCKABLE] must be `true`.
 class MockMediaDevices {
   /// Default `getUserMedia`.

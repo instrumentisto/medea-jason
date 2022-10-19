@@ -512,6 +512,9 @@ flutter.web.assets:
 	       flutter/assets/pkg/package.json
 	@touch flutter/assets/pkg/.gitkeep
 
+
+
+
 #################
 # Yarn commands #
 #################
@@ -656,6 +659,7 @@ endif
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
+
 
 # Run E2E desktop tests of project.
 #
@@ -989,7 +993,7 @@ docker.up.demo: docker.down.demo
 #                         [control-tag=(dev|<tag>)] )]
 #	                   [debug=(yes|no)]
 #	                   [( [background=no]
-#	                    | background=yes [log=(no|yes)])]
+#	                    | background=yes [log=(no|yes)] )]
 
 docker-up-e2e-env = RUST_BACKTRACE=1 \
 	$(if $(call eq,$(log),yes),,RUST_LOG=warn) \

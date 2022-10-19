@@ -48,6 +48,7 @@ class CloseFrame {
 }
 
 /// Provider to mock [WebSocket].
+///
 /// [MOCKABLE] must be `true`.
 class MockWebSocket {
   /// Safe last created [WebSocket].
