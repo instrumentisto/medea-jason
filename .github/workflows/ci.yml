@@ -324,6 +324,14 @@ jobs:
         with:
           name: build-jason-${{ matrix.platform }}
           path: ./flutter/${{ matrix.platform }}/lib/
+        if: ${{ matrix.platform != 'android' }}
+
+      - name: Download `medea-jason` lib
+        uses: actions/download-artifact@v3
+        with:
+          name: build-jason-${{ matrix.platform }}
+          path: ./flutter/${{ matrix.platform }}/src/main/jniLibs/
+        if: ${{ matrix.platform == 'android' }}
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v3
