@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:tuple/tuple.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
+import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
-
 import '../conf.dart';
 
 /// Builder of a [Member].
@@ -139,7 +138,6 @@ class Member {
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
     room.onConnectionLoss((p0) async {
-      print('onConnectionLoss $id'); //todo 
       reconnectHandle = p0;
       await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
     });

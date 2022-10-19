@@ -2,8 +2,8 @@ import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-import 'package:medea_jason/src/native/platform/media_devices.dart';
 
+import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'api/room.dart';
 import 'steps/connection.dart' as connection;
 import 'steps/control_api.dart' as control_api;
@@ -31,7 +31,6 @@ Future<void> clear_world() async {
     }
   }
 }
-
 
 final TestConfigs = FlutterTestConfiguration()
   ..stepDefinitions = control_api.steps() +

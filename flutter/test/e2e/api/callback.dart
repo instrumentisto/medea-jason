@@ -55,13 +55,13 @@ enum OnLeaveReason {
   Disconnected,
 
   /// Connection with the [Member] was lost.
-  Lost,
+  LostConnection,
 
   /// [Member[ was forcibly disconnected by a media server.
   Kicked,
 
   /// Media server was shut down.
-  Shutdown,
+  ServerShutdown,
 }
 
 /// Event notifying about a [Member] leaving its [Room].

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -115,7 +115,7 @@ StepDefinitionGeneric then_remote_media_track =
     var member = context.world.members[id]!;
     var parsedKind = parse_media_kind(kind);
 
-    // await member.wait_for_connect(partner_id); // todo
+    await member.wait_for_connect(partner_id);
 
     var track = await member.wait_remote_track_from(
         partner_id, parsedKind.item2, parsedKind.item1);
@@ -150,7 +150,7 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
   (callback_kind, int times, id, kind, remote_id, context) async {
     var member = context.world.members[id]!;
 
-    // await member.wait_for_connect(remote_id); todo
+    await member.wait_for_connect(remote_id);
 
     var parsedKind = parse_media_kind(kind);
     var track = await member.wait_remote_track_from(
@@ -167,7 +167,8 @@ StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
     var member = context.world.members[id]!;
     var count = 0;
     member.connection_store.local_tracks.forEach((element) async {
-      if (await element.getTrack().state() == fw.MediaStreamTrackState.live) {
+      if (await element.getTrack().state() ==
+          webrtc.MediaStreamTrackState.live) {
         ++count;
       }
     });

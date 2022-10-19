@@ -229,7 +229,7 @@ impl MediaStreamTrack {
     }
 
     /// Disposes of this [`MediaStreamTrack`].
-    #[allow(clippy::unused_self)]
+    #[allow(clippy::unused_self, clippy::unused_async)]
     pub async fn dispose(&self) {}
 
     /// Sets handler for the [`ended`][1] event on underlying

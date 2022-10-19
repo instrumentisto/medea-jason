@@ -36,7 +36,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test-e2e-browser
-      - test-e2e-desktop
+      - test-e2e-native
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest
@@ -288,14 +288,18 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
-  test-e2e-desktop:
+  test-e2e-native:
     name: E2E tests
     needs: ["crate-jason", "crate-jason-linux", "docker"]
     strategy:
       fail-fast: false
       matrix:
-        platform: ["linux"]  # TODO: Run E2E test on Windows and macOS
-    runs-on: ubuntu-22.04
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+          - platform: android
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -303,7 +307,7 @@ jobs:
           profile: minimal
           toolchain: stable
       - uses: docker-practice/actions-setup-docker@master
-        if: ${{ matrix.platform == 'macos' }}
+        if: ${{ matrix.platform == 'macos' || matrix.platform == 'android' }}
 
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
@@ -335,10 +339,25 @@ jobs:
 
       - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
-             make test.e2e.desktop device=${{ matrix.platform }}
+             make test.e2e.native device=${{ matrix.platform }}
                                    up=yes debug=no dockerized=yes
                                    medea-tag=${{ env.MEDEA_BRANCH }}
                                    control-tag=build-${{ github.run_number }}
+                                   
+      - name: Test on Android 
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 24
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          cores: 3
+          emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
+          script: make test.e2e.native up=yes 
+            debug=no dockerized=yes server_ip="10.0.2.2"
+            medea-tag=${{ env.MEDEA_BRANCH }} 
+            control-tag=build-${{ github.run_number }}
+        if: ${{ matrix.platform == 'android' }}
 
   test-flutter:
     name: Flutter tests
@@ -643,7 +662,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test-e2e-browser
-      - test-e2e-desktop
+      - test-e2e-native
       - test-unit
     if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
     runs-on: ubuntu-latest
@@ -793,7 +812,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test-e2e-browser
-      - test-e2e-desktop
+      - test-e2e-native
       - test-flutter
       - test-unit
     runs-on: ubuntu-latest

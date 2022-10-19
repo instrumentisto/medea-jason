@@ -57,9 +57,11 @@ mod transceiver {
 
         /// Changes the send direction of the specified [`Transceiver`].
         pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
+
+        /// Disposes of this [`Transceiver`].
+        pub fn dispose(transceiver: Dart_Handle);
     }
 }
-
 
 #[derive(Debug, From)]
 struct WrapDartHandle(DartHandle);
@@ -68,7 +70,7 @@ impl Drop for WrapDartHandle {
     fn drop(&mut self) {
         let handle = self.0.get();
         unsafe {
-            // transceiver::dispose(handle);  //todo
+            transceiver::dispose(handle);
         }
     }
 }
@@ -90,7 +92,7 @@ impl Transceiver {
     /// Changes the receive direction of the specified [`Transceiver`].
     #[must_use]
     pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.0.get();
+        let handle = self.0 .0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_recv(
@@ -105,7 +107,7 @@ impl Transceiver {
     /// Changes the send direction of the specified [`Transceiver`].
     #[must_use]
     pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.0.get();
+        let handle = self.0 .0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_send(
@@ -190,11 +192,12 @@ impl Transceiver {
             .into()
         }
     }
-        /// Disposes this [`Transceiver`].
-        pub fn dispose(&self) {
-            let handle = self.0.0.get();
-            unsafe {
-                // transceiver::dispose(handle); //todo 
-            }
+
+    /// Disposes this [`Transceiver`].
+    pub fn dispose(&self) {
+        let handle = self.0 .0.get();
+        unsafe {
+            transceiver::dispose(handle);
         }
+    }
 }

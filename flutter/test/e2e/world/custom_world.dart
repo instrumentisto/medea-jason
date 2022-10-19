@@ -116,6 +116,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// [FlutterWidgetTesterWorld].
   Future<void> join_room(String member_id) async {
     await members[member_id]!.join_room(room_id);
+    MockWebSocket.add_member(member_id);
   }
 
   /// Closes a [Room] of the provided [Member].

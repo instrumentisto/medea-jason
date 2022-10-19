@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:tuple/tuple.dart';
 
+import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 
 List<StepDefinitionGeneric> steps() {
@@ -11,7 +12,8 @@ List<StepDefinitionGeneric> steps() {
     when_room_closed_by_client,
     when_member_joins_room,
     given_member_gum_will_error,
-    then_room_failed_local_stream_fires
+    then_room_failed_local_stream_fires,
+    when_member_enables_via_local_media_settings
   ];
 }
 
@@ -47,7 +49,7 @@ StepDefinitionGeneric when_jason_object_disposes = when1<String, CustomWorld>(
 
 StepDefinitionGeneric given_member_gum_will_error =
     given2<String, String, CustomWorld>(
-  RegExp(r"(Alice|Bob|Carol)'s `getUserMedia\(\)` (audio |video |)errors"),
+  RegExp(r"(\S+)'s `getUserMedia\(\)` (audio |video |)errors$"),
   (id, kind, context) async {
     var member = context.world.members[id]!;
     Tuple2<bool, bool> gumSetting;
@@ -62,11 +64,27 @@ StepDefinitionGeneric given_member_gum_will_error =
 
 StepDefinitionGeneric then_room_failed_local_stream_fires =
     then2<String, String, CustomWorld>(
-  RegExp(
-      r"(Alice|Bob|Carol)'s `Room.on_failed_local_stream\(\)` fires {int} time(s)"),
+  RegExp(r"(\S+)'s `Room.on_failed_local_stream\(\)` fires {int} time(:?s)?$"),
   (id, times, context) async {
     var member = context.world.members[id]!;
     var times_parse = int.parse(times);
     await member.wait_failed_local_stream_count(times_parse);
+  },
+);
+
+StepDefinitionGeneric when_member_enables_via_local_media_settings =
+    then2<String, String, CustomWorld>(
+  RegExp(r'(\S+) enables (video|audio|video and audio) in local '
+      r'media settings'),
+  (id, kind, context) async {
+    var member = context.world.members[id]!;
+    var setting = MediaStreamSettings();
+    if (kind.contains('video')) {
+      setting.deviceVideo(DeviceVideoTrackConstraints());
+    }
+    if (kind.contains('audio')) {
+      setting.audio(AudioTrackConstraints());
+    }
+    await member.room.setLocalMediaSettings(setting, true, true);
   },
 );

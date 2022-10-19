@@ -17,7 +17,7 @@ void registerFunctions(DynamicLibrary dl) {
     mid: Pointer.fromFunction(_mid),
     setRecv: Pointer.fromFunction(_setRecv),
     setSend: Pointer.fromFunction(_setSend),
-    // _dispose todo
+    dispose: Pointer.fromFunction(_dispose),
   );
 }
 

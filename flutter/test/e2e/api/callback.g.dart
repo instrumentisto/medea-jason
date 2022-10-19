@@ -40,6 +40,6 @@ Map<String, dynamic> _$OnLeaveToJson(OnLeave instance) => <String, dynamic>{
 const _$OnLeaveReasonEnumMap = {
   OnLeaveReason.Disconnected: 'Disconnected',
   OnLeaveReason.LostConnection: 'LostConnection',
-  OnLeaveReason.ServerShutdown: 'ServerShutdown',
   OnLeaveReason.Kicked: 'Kicked',
+  OnLeaveReason.ServerShutdown: 'ServerShutdown',
 };

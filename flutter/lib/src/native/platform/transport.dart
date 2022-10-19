@@ -51,10 +51,10 @@ class CloseFrame {
 /// [MOCKABLE] must be `true`.
 class MockWebSocket {
   /// Safe last created [WebSocket].
-  static late WebSocket _lastWebSocket;
+  static WebSocket? _lastWebSocket;
 
   /// Storage [WebSocket] for outside access.
-  static final _allWebSocket = HashMap<String, WebSocket>();
+  static final _allWebSocket = HashMap<String, WebSocket?>();
 
   /// Connects to the provided [addr] and returns [WebSocket] for it.
   ///

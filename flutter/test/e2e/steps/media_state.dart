@@ -14,13 +14,15 @@ List<StepDefinitionGeneric> steps() {
     when_member_frees_all_local_tracks,
     then_track_is_stopped,
     then_local_track_mute_state,
+    when_member_switches_device_with_latency,
+    given_gum_delay,
   ];
 }
 
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
-  RegExp( // todo regex
-      r'(Alice|Bob|Carol) (enables|disables|mutes|unmutes) (audio|video)( and awaits it completes| and awaits it error| and error|)'),
+  RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video)'
+      r'( and awaits it completes| and awaits it errors| and error|)$'),
   (id, action, audio_or_video, awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
@@ -152,7 +154,7 @@ StepDefinitionGeneric then_track_is_stopped =
 
     var track_ = track.getTrack();
     track.free();
-    await Future.delayed(Duration(milliseconds: 200)); // todo
+    await Future.delayed(Duration(milliseconds: 200));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );
@@ -168,7 +170,7 @@ StepDefinitionGeneric when_member_frees_all_local_tracks =
 
 StepDefinitionGeneric when_member_switches_device_with_latency =
     when1<String, CustomWorld>(
-  RegExp(r'(Alice|Bob|Carol) switches device with latency'),
+  RegExp(r'(\S+) switches device with latency$'),
   (id, context) async {
     var member = context.world.members[id]!;
     member.set_gum_latency(Duration(seconds: 3));
@@ -177,7 +179,7 @@ StepDefinitionGeneric when_member_switches_device_with_latency =
 );
 
 StepDefinitionGeneric given_gum_delay = given1<String, CustomWorld>(
-  RegExp(r"(Alice|Bob|Carol)'s `getUserMedia\(\)` request has added latency"),
+  RegExp(r"(\S+)'s `getUserMedia\(\)` request has added latency$"),
   (id, context) async {
     var member = context.world.members[id]!;
     member.set_gum_latency(Duration(milliseconds: 1000));

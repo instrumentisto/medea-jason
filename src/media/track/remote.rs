@@ -173,7 +173,10 @@ impl Track {
         if self.0.track.as_ref().unwrap().ready_state().await
             == MediaStreamTrackState::Live
         {
-            self.0.track.as_ref().unwrap().stop().await;
+            #[cfg(not(target_family = "wasm"))]
+            {
+                self.0.track.as_ref().unwrap().stop().await;
+            }
             self.0.on_stopped.call0();
         }
     }
