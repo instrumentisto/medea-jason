@@ -7,13 +7,13 @@ import '../world/custom_world.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
+    given_member_gum_will_error,
     then_on_close_fires,
+    then_room_failed_local_stream_fires,
     when_jason_object_disposes,
     when_room_closed_by_client,
-    when_member_joins_room,
-    given_member_gum_will_error,
-    then_room_failed_local_stream_fires,
-    when_member_enables_via_local_media_settings
+    when_member_enables_via_local_media_settings,
+    when_member_joins_room
   ];
 }
 

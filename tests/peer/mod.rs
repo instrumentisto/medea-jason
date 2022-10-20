@@ -799,7 +799,7 @@ impl InterconnectedPeers {
 async fn get_traffic_stats() {
     let peers = InterconnectedPeers::new().await;
 
-    // We might have to wait a bit for the target stat
+    // We might have to wait a bit for the target stat.
     let mut first_peer_stats = None;
     for _ in 0..10 {
         let stats: RtcStats = peers.first_peer.get_stats().await.unwrap();

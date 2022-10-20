@@ -10,21 +10,21 @@ import '../world/more_args.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
+    given_gum_delay,
+    then_local_track_mute_state,
+    then_remote_media_direction_is,
+    then_track_is_stopped,
     when_enables_or_mutes,
     when_member_enables_remote_track,
-    then_remote_media_direction_is,
     when_member_frees_all_local_tracks,
-    then_track_is_stopped,
-    then_local_track_mute_state,
-    when_member_switches_device_with_latency,
-    given_gum_delay
+    when_member_switches_device_with_latency
   ];
 }
 
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
   RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
-      r' (awaits it completes|awaits it errors|ignores result)?$'),
+      r' (awaits it completes|awaits it errors|ignores the result)?$'),
   (id, action, audio_or_video, String awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;

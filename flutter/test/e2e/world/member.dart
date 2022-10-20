@@ -126,7 +126,7 @@ class Member {
   /// [RoomHandle]'s that this [Member] is intended to join.
   RoomHandle room;
 
-  /// Counter of failed local `getUserMedia`.
+  /// Counter of failed local `getUserMedia()` requests.
   int failed_local_stream_count = 0;
 
   /// Storage of [ConnectionHandle]s thrown by this [Member]'s [RoomHandle].
@@ -531,12 +531,12 @@ class Member {
     }
   }
 
-  /// Waits for [Member] with [id] to close.
+  /// Waits for a [Member] with the specified [id] to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
   }
 
-  /// Sets `getUserMedia` returns error.
+  /// Sets the `getUserMedia()` request to return error.
   void get_user_media_mock(bool audio, bool video) {
     MockMediaDevices.GUM = (constraints) async {
       if (audio) {
@@ -550,7 +550,7 @@ class Member {
     };
   }
 
-  /// Sets latency to `getUserMedia`.
+  /// Sets latency to the `getUserMedia()` request.
   void set_gum_latency(Duration time) {
     MockMediaDevices.GUM = (constraints) async {
       await Future.delayed(time);
@@ -567,7 +567,7 @@ class Member {
     await room.setLocalMediaSettings(constraints, true, false);
   }
 
-  /// Waits while [failed_local_stream_count] will be [times].
+  /// Waits for the [failed_local_stream_count] to become [times].
   Future<void> wait_failed_local_stream_count(int times) async {
     if (failed_local_stream_count != times) {
       var failed_local_stream_future = Completer();
@@ -584,7 +584,7 @@ class Member {
     }
   }
 
-  /// To restore connection.
+  /// Restores the connection.
   Future<void> reconnect() async {
     if (reconnectHandle != null) {
       await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
@@ -595,7 +595,7 @@ class Member {
     reconnectHandle = null;
   }
 
-  /// Waiting for connection loss.
+  /// Waits for the connection loss.
   Future<void> wait_connection_lost() async {
     if (reconnectHandle == null) {
       var connection_lost_future = Completer();
@@ -612,7 +612,7 @@ class Member {
     }
   }
 
-  /// Closes [WebSocket] connect.
+  /// Closes the [WebSocket] connection.
   Future<void> connection_loss() async {
     var ws = MockWebSocket.get_socket(id)!;
     await ws.close(9999);
