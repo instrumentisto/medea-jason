@@ -15,15 +15,15 @@ Feature: State synchronization
   Scenario: Local track disable works while disconnect
     Given room with joined member Alice and Bob
     When Alice loses WS connection
-    And Alice disables audio
+    And Alice disables audio and ignores result
     And Alice restores WS connection
     Then Bob's audio remote track from Alice is disabled
 
   Scenario: Disable/enable works fine while disconnect
     Given room with joined member Alice and Bob
     When Alice loses WS connection
-    And Alice disables audio
-    And Alice enables audio
+    And Alice disables audio and ignores result
+    And Alice enables audio and ignores result
     And Alice restores WS connection
     Then Bob's audio remote track from Alice is enabled
 

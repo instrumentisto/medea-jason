@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
@@ -21,57 +23,45 @@ List<StepDefinitionGeneric> steps() {
 
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
-  RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video)'
-      r'( and awaits it completes| and awaits it errors)?$'),
+  RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
+      r' (awaits it completes|awaits it errors|ignores result)?$'),
   (id, action, audio_or_video, String awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
 
     var awaitable = awaits.contains('awaits');
     var error = awaits.contains('errors');
-    throw StateError("asdasdasd");
-    try {
-      switch (action) {
-        case 'enables':
-          {
-            var future = member.toggle_media(kind.item1, kind.item2, true);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+    Future<void> future;
+    switch (action) {
+      case 'enables':
+        future = member.toggle_media(kind.item1, kind.item2, true);
+        break;
 
-        case 'disables':
-          {
-            var future = member.toggle_media(kind.item1, kind.item2, false);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      case 'disables':
+        future = member.toggle_media(kind.item1, kind.item2, false);
+        break;
 
-        case 'mutes':
-          {
-            var future = member.toggle_mute(kind.item1, kind.item2, true);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      case 'mutes':
+        future = member.toggle_mute(kind.item1, kind.item2, true);
+        break;
 
-        default:
-          {
-            var future = member.toggle_mute(kind.item1, kind.item2, false);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      default:
+        future = member.toggle_mute(kind.item1, kind.item2, false);
+        break;
+    }
+
+    if (awaitable) {
+      try {
+        await future;
+      } catch (e) {
+        if (!error) {
+          rethrow;
+        }
       }
-    } catch (e) {
-      if (!error) {
-        rethrow;
-      }
+    } else {
+      unawaited(future.catchError((e) => {
+            // suppress error
+          }));
     }
   },
 );
