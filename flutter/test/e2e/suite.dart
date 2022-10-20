@@ -3,6 +3,7 @@ import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
+import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'api/room.dart';
 import 'steps/connection.dart' as connection;
 import 'steps/control_api.dart' as control_api;
@@ -16,6 +17,15 @@ import 'world/custom_world.dart';
 part 'suite.g.dart';
 
 CustomWorld? old_world;
+void clear_world() {
+  MockMediaDevices.resetGUM();
+
+  if (old_world != null) {
+    old_world!.jasons.values.forEach((element) {
+      element.free();
+    });
+  }
+}
 
 final TestConfigs = FlutterTestConfiguration()
   ..stepDefinitions = control_api.steps() +
@@ -40,14 +50,9 @@ final TestConfigs = FlutterTestConfiguration()
   ..defaultTimeout = const Duration(seconds: 120)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
+        clear_world();
         await webrtc.enableFakeMedia();
-        if (old_world != null) {
-          var vl = old_world!.jasons.values.toList();
-          for (var i = 0; i < vl.length; ++i) {
-            var value = vl[i];
-            value.free();
-          }
-        }
+
         var world = CustomWorld();
         old_world = world;
         await world.control_client
@@ -55,27 +60,7 @@ final TestConfigs = FlutterTestConfiguration()
         return world;
       });
 
-// TODO: Enable all tests in #71
-// @GherkinTestSuite(featurePaths: [FEATURES_PATH])
-@GherkinTestSuite(featurePaths: [
-  '../e2e/tests/features/apply.feature',
-  '../e2e/tests/features/create_endpoint.feature',
-  '../e2e/tests/features/delete_endpoint.feature',
-  '../e2e/tests/features/disable_remote_media.feature',
-  '../e2e/tests/features/enable_remote_media.feature',
-  // // '../e2e/tests/features/get_user_media.feature',
-  '../e2e/tests/features/local_tracks_create.feature',
-  '../e2e/tests/features/media_direction.feature',
-  // '../e2e/tests/features/media_disable.feature',
-  '../e2e/tests/features/media_mute.feature',
-  '../e2e/tests/features/on_join.feature',
-  '../e2e/tests/features/on_leave.feature',
-  '../e2e/tests/features/on_new_connection_fires.feature',
-  '../e2e/tests/features/remote_connection_close.feature',
-  '../e2e/tests/features/room_close.feature',
-  '../e2e/tests/features/room_join.feature',
-  // '../e2e/tests/features/state_synchronization.feature',
-])
+@GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
 Future<void> main() async {
   executeTestSuite(
     TestConfigs,

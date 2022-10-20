@@ -99,7 +99,7 @@ mod leave {
         Disconnected,
 
         /// Connection with `Member` was lost.
-        LostConnection,
+        Lost,
 
         /// Server is shutting down.
         ServerShutdown,
@@ -114,7 +114,7 @@ mod leave {
 
             match proto {
                 R::Shutdown => Self::ServerShutdown,
-                R::Lost => Self::LostConnection,
+                R::Lost => Self::Lost,
                 R::Disconnected => Self::Disconnected,
                 R::Kicked => Self::Kicked,
             }

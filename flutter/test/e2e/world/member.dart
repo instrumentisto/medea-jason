@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:tuple/tuple.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/native/platform/media_devices.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
 
 /// Builder of a [Member].
@@ -24,8 +27,6 @@ class MemberBuilder {
       RoomHandle room,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> send_state,
       HashMap<Tuple2<MediaKind, MediaSourceKind>, bool> recv_state) {
-    room.onFailedLocalMedia((p0) {});
-    room.onConnectionLoss((p0) {});
     return Member(id, is_send, is_recv, false, send_state, recv_state, room);
   }
 }
@@ -125,11 +126,23 @@ class Member {
   /// [RoomHandle]'s that this [Member] is intended to join.
   RoomHandle room;
 
+  /// Counter of failed local `getUserMedia()` requests.
+  int failed_local_stream_count = 0;
+
   /// Storage of [ConnectionHandle]s thrown by this [Member]'s [RoomHandle].
   var connection_store = ConnectionStore();
 
+  /// Last [ReconnectHandle].
+  ReconnectHandle? reconnectHandle;
+
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
+    room.onConnectionLoss((p0) {
+      reconnectHandle = p0;
+    });
+    room.onFailedLocalMedia((p0) {
+      ++failed_local_stream_count;
+    });
     room.onClose((reason) {
       connection_store.close_reason.complete(reason);
     });
@@ -233,6 +246,7 @@ class Member {
     connection_store.local_tracks.forEach((track) {
       track.free();
     });
+    await Future.delayed(Duration(milliseconds: 100));
   }
 
   /// Waits for a [ConnectionHandle] from the [Member] with the provided [id].
@@ -517,8 +531,90 @@ class Member {
     }
   }
 
-  /// Waits for the [Member] with the provided [id] to close.
+  /// Waits for a [Member] with the specified [id] to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
+  }
+
+  /// Sets the `getUserMedia()` request to return error.
+  void get_user_media_mock(bool audio, bool video) {
+    MockMediaDevices.GUM = (constraints) async {
+      if (audio) {
+        throw webrtc.GetMediaException(
+            webrtc.GetMediaExceptionKind.audio, 'Mock Error');
+      } else if (video) {
+        throw webrtc.GetMediaException(
+            webrtc.GetMediaExceptionKind.video, 'Mock Error');
+      }
+      return webrtc.getUserMedia(constraints);
+    };
+  }
+
+  /// Sets latency to the `getUserMedia()` request.
+  void set_gum_latency(Duration time) {
+    MockMediaDevices.GUM = (constraints) async {
+      await Future.delayed(time);
+      return webrtc.getUserMedia(constraints);
+    };
+  }
+
+  /// Emulates video device switching.
+  Future<void> switch_video_device() async {
+    await room.setLocalMediaSettings(MediaStreamSettings(), true, true);
+
+    var constraints = MediaStreamSettings();
+    constraints.deviceVideo(DeviceVideoTrackConstraints());
+    await room.setLocalMediaSettings(constraints, true, false);
+  }
+
+  /// Waits for the [failed_local_stream_count] to become [times].
+  Future<void> wait_failed_local_stream_count(int times) async {
+    if (failed_local_stream_count != times) {
+      var failed_local_stream_future = Completer();
+      room.onFailedLocalMedia((err) {
+        ++failed_local_stream_count;
+        if (failed_local_stream_count == times) {
+          failed_local_stream_future.complete();
+          room.onFailedLocalMedia((p0) {
+            ++failed_local_stream_count;
+          });
+        }
+      });
+      return failed_local_stream_future.future;
+    }
+  }
+
+  /// Restores the connection.
+  Future<void> reconnect() async {
+    if (reconnectHandle != null) {
+      await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
+    } else {
+      await wait_connection_lost();
+      await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
+    }
+    reconnectHandle = null;
+  }
+
+  /// Waits for the connection loss.
+  Future<void> wait_connection_lost() async {
+    if (reconnectHandle == null) {
+      var connection_lost_future = Completer();
+      room.onConnectionLoss((p0) {
+        reconnectHandle = p0;
+        connection_lost_future.complete();
+      });
+
+      await connection_lost_future.future;
+
+      room.onConnectionLoss((p0) {
+        reconnectHandle = p0;
+      });
+    }
+  }
+
+  /// Closes the [WebSocket] connection.
+  Future<void> connection_loss() async {
+    var ws = MockWebSocket.get_socket(id)!;
+    await ws.close(9999);
   }
 }

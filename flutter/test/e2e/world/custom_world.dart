@@ -7,6 +7,7 @@ import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/native/platform/transport.dart';
 import '../api/callback.dart';
 import '../api/endpoint.dart';
 import '../api/member.dart' as api;
@@ -115,6 +116,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// [FlutterWidgetTesterWorld].
   Future<void> join_room(String member_id) async {
     await members[member_id]!.join_room(room_id);
+    MockWebSocket.add_member(member_id);
   }
 
   /// Closes a [Room] of the provided [Member].

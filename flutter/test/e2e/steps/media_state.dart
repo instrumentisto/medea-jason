@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
@@ -8,68 +10,58 @@ import '../world/more_args.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
+    given_gum_delay,
+    then_local_track_mute_state,
+    then_remote_media_direction_is,
+    then_track_is_stopped,
     when_enables_or_mutes,
     when_member_enables_remote_track,
-    then_remote_media_direction_is,
     when_member_frees_all_local_tracks,
-    then_track_is_stopped,
-    then_local_track_mute_state,
+    when_member_switches_device_with_latency
   ];
 }
 
 StepDefinitionGeneric when_enables_or_mutes =
     when4<String, String, String, String, CustomWorld>(
-  RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video)'
-      r'( and awaits it completes| and awaits it errors)?$'),
+  RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
+      r' (awaits it completes|awaits it errors|ignores the result)?$'),
   (id, action, audio_or_video, String awaits, context) async {
     var kind = parse_media_kind(audio_or_video);
     var member = context.world.members[id]!;
 
     var awaitable = awaits.contains('awaits');
     var error = awaits.contains('errors');
+    Future<void> future;
+    switch (action) {
+      case 'enables':
+        future = member.toggle_media(kind.item1, kind.item2, true);
+        break;
 
-    try {
-      switch (action) {
-        case 'enables':
-          {
-            var future = member.toggle_media(kind.item1, kind.item2, true);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      case 'disables':
+        future = member.toggle_media(kind.item1, kind.item2, false);
+        break;
 
-        case 'disables':
-          {
-            var future = member.toggle_media(kind.item1, kind.item2, false);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      case 'mutes':
+        future = member.toggle_mute(kind.item1, kind.item2, true);
+        break;
 
-        case 'mutes':
-          {
-            var future = member.toggle_mute(kind.item1, kind.item2, true);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+      default:
+        future = member.toggle_mute(kind.item1, kind.item2, false);
+        break;
+    }
 
-        default:
-          {
-            var future = member.toggle_mute(kind.item1, kind.item2, false);
-            if (awaitable) {
-              await future;
-            }
-          }
-          break;
+    if (awaitable) {
+      try {
+        await future;
+      } catch (e) {
+        if (!error) {
+          rethrow;
+        }
       }
-    } catch (e) {
-      if (!error) {
-        rethrow;
-      }
+    } else {
+      unawaited(future.catchError((e) => {
+            // suppress error
+          }));
     }
   },
 );
@@ -144,6 +136,7 @@ StepDefinitionGeneric then_track_is_stopped =
 
     var track_ = track.getTrack();
     track.free();
+    await Future.delayed(Duration(milliseconds: 100));
     expect(await track_.state(), fw.MediaStreamTrackState.ended);
   },
 );
@@ -154,5 +147,23 @@ StepDefinitionGeneric when_member_frees_all_local_tracks =
   (id, context) async {
     var member = context.world.members[id]!;
     await member.forget_local_tracks();
+  },
+);
+
+StepDefinitionGeneric when_member_switches_device_with_latency =
+    when1<String, CustomWorld>(
+  RegExp(r'(\S+) switches device with latency$'),
+  (id, context) async {
+    var member = context.world.members[id]!;
+    member.set_gum_latency(Duration(seconds: 3));
+    await member.switch_video_device();
+  },
+);
+
+StepDefinitionGeneric given_gum_delay = given1<String, CustomWorld>(
+  RegExp(r"(\S+)'s `getUserMedia\(\)` request has added latency$"),
+  (id, context) async {
+    var member = context.world.members[id]!;
+    member.set_gum_latency(Duration(milliseconds: 500));
   },
 );
