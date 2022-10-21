@@ -95,8 +95,8 @@ async fn then_remote_media_direction_is(
         .unwrap();
 }
 
-#[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video)\
-                 ( and (error|awaits it (complete|error)s))?$")]
+#[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video) and \
+                 (awaits it completes|awaits it errors|ignores the result)?$")]
 async fn when_enables_or_mutes(
     world: &mut World,
     id: String,

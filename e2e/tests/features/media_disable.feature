@@ -53,8 +53,8 @@ Feature: Media enabling/disabling
   Scenario: Member starts enabling video and instantly disables it
     Given room with joined members Alice and Bob
     And Bob's `getUserMedia()` request has added latency
-    When Bob disables video
+    When Bob disables video and ignores the result
     And Bob frees all local tracks
-    And Bob enables video and error
+    And Bob enables video and ignores the result
     And Bob disables video and awaits it completes
     Then Alice's device video remote track from Bob is disabled

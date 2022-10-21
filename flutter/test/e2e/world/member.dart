@@ -126,7 +126,7 @@ class Member {
   /// [RoomHandle]'s that this [Member] is intended to join.
   RoomHandle room;
 
-  /// Counter of failed local `getUserMedia`.
+  /// Counter of failed local `getUserMedia()` requests.
   int failed_local_stream_count = 0;
 
   /// Storage of [ConnectionHandle]s thrown by this [Member]'s [RoomHandle].
@@ -137,9 +137,8 @@ class Member {
 
   Member(this.id, this.is_send, this.is_recv, this.is_joined, this.send_state,
       this.recv_state, this.room) {
-    room.onConnectionLoss((p0) async {
+    room.onConnectionLoss((p0) {
       reconnectHandle = p0;
-      await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
     });
     room.onFailedLocalMedia((p0) {
       ++failed_local_stream_count;
@@ -247,6 +246,7 @@ class Member {
     connection_store.local_tracks.forEach((track) {
       track.free();
     });
+    await Future.delayed(Duration(milliseconds: 100));
   }
 
   /// Waits for a [ConnectionHandle] from the [Member] with the provided [id].
@@ -531,12 +531,12 @@ class Member {
     }
   }
 
-  /// Waits for the [Member] with the provided [id] to close.
+  /// Waits for a [Member] with the specified [id] to close.
   Future<void> wait_for_close(String id) {
     return connection_store.close_connect[id]!.future;
   }
 
-  /// Sets `getUserMedia` returns error.
+  /// Sets the `getUserMedia()` request to return error.
   void get_user_media_mock(bool audio, bool video) {
     MockMediaDevices.GUM = (constraints) async {
       if (audio) {
@@ -550,7 +550,7 @@ class Member {
     };
   }
 
-  /// Sets latency to `getUserMedia`.
+  /// Sets latency to the `getUserMedia()` request.
   void set_gum_latency(Duration time) {
     MockMediaDevices.GUM = (constraints) async {
       await Future.delayed(time);
@@ -567,7 +567,7 @@ class Member {
     await room.setLocalMediaSettings(constraints, true, false);
   }
 
-  /// Waits while [failed_local_stream_count] will be [times].
+  /// Waits for the [failed_local_stream_count] to become [times].
   Future<void> wait_failed_local_stream_count(int times) async {
     if (failed_local_stream_count != times) {
       var failed_local_stream_future = Completer();
@@ -575,17 +575,16 @@ class Member {
         ++failed_local_stream_count;
         if (failed_local_stream_count == times) {
           failed_local_stream_future.complete();
+          room.onFailedLocalMedia((p0) {
+            ++failed_local_stream_count;
+          });
         }
       });
-      await failed_local_stream_future.future;
-
-      room.onFailedLocalMedia((p0) {
-        ++failed_local_stream_count;
-      });
+      return failed_local_stream_future.future;
     }
   }
 
-  /// To restore connection.
+  /// Restores the connection.
   Future<void> reconnect() async {
     if (reconnectHandle != null) {
       await reconnectHandle!.reconnectWithBackoff(100, 2.0, 1000, 5000);
@@ -596,7 +595,7 @@ class Member {
     reconnectHandle = null;
   }
 
-  /// Waiting for connection loss.
+  /// Waits for the connection loss.
   Future<void> wait_connection_lost() async {
     if (reconnectHandle == null) {
       var connection_lost_future = Completer();
@@ -613,12 +612,9 @@ class Member {
     }
   }
 
-  /// Closes [WebSocket] connect.
+  /// Closes the [WebSocket] connection.
   Future<void> connection_loss() async {
     var ws = MockWebSocket.get_socket(id)!;
-    room.onConnectionLoss((p0) {
-      reconnectHandle = p0;
-    });
     await ws.close(9999);
   }
 }

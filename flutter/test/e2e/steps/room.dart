@@ -7,13 +7,13 @@ import '../world/custom_world.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
+    given_member_gum_will_error,
     then_on_close_fires,
+    then_room_failed_local_stream_fires,
     when_jason_object_disposes,
     when_room_closed_by_client,
-    when_member_joins_room,
-    given_member_gum_will_error,
-    then_room_failed_local_stream_fires,
-    when_member_enables_via_local_media_settings
+    when_member_enables_via_local_media_settings,
+    when_member_joins_room
   ];
 }
 
@@ -29,7 +29,6 @@ StepDefinitionGeneric when_member_joins_room = when1<String, CustomWorld>(
   RegExp(r'(\S+) joins the room$'),
   (id, context) async {
     await context.world.join_room(id);
-    // await context.world.wait_for_interconnection(id); todo
   },
 );
 
