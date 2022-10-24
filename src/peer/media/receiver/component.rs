@@ -13,9 +13,6 @@ use medea_reactive::{
     ProgressableCell,
 };
 
-#[cfg(doc)]
-use crate::platform;
-
 use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
     peer::{

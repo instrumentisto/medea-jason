@@ -55,7 +55,7 @@ final TestConfigs = FlutterTestConfiguration()
   ..defaultTimeout = const Duration(minutes: 10)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
-        clear_world();
+        await clear_world();
         await webrtc.enableFakeMedia();
 
         var world = CustomWorld();

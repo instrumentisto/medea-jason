@@ -1,3 +1,0 @@
-Running "flutter pub get" in example...                          2 512ms
-Running Gradle task 'assembleDebug'...                             14,5s
-✓  Built build/app/outputs/flutter-apk/app-debug.apk.

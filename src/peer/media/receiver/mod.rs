@@ -222,7 +222,6 @@ impl Receiver {
     ///
     /// Sets [`platform::MediaStreamTrack::enabled`] same as
     /// `enabled_individual` of this [`Receiver`].
-    #[allow(clippy::missing_panics_doc)]
     pub async fn set_remote_track(
         &self,
         transceiver: platform::Transceiver,

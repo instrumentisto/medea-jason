@@ -6,6 +6,7 @@
 // TODO: Remove once annoying false positive is fixed:
 //       https://github.com/rust-lang/rust-clippy/issues/6902
 #![allow(clippy::use_self)]
+
 #[cfg(feature = "client")]
 mod client;
 mod convert;
@@ -16,7 +17,7 @@ mod server;
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,
-    clippy::derive_partial_eq_without_eq,
+    clippy::style,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -39,8 +40,7 @@ pub mod api;
     clippy::nursery,
     clippy::pedantic,
     clippy::restriction,
-    clippy::same_name_method,
-    clippy::derive_partial_eq_without_eq,
+    clippy::style,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,

@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug)]
 struct Inner {
     /// Underlying platform-specific [`platform::MediaStreamTrack`].
-    track: Option<platform::MediaStreamTrack>,
+    track: platform::MediaStreamTrack,
 
     /// Underlying [`platform::MediaStreamTrack`] source kind.
     media_source_kind: proto::MediaSourceKind,
@@ -59,10 +59,6 @@ impl Track {
     /// Creates a new [`Track`] spawning a listener for its [`enabled`][1] and
     /// [`muted`][2] properties changes.
     ///
-    /// # Panics
-    ///
-    /// Will panic if `track` is None.
-    ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-muted
     #[allow(clippy::mut_mut)]
@@ -78,7 +74,7 @@ impl Track {
     {
         let track = platform::MediaStreamTrack::from(track);
         let track = Self(Rc::new(Inner {
-            track: Some(track),
+            track,
             media_source_kind,
             muted: ObservableCell::new(muted),
             on_media_direction_changed: platform::Callback::default(),
@@ -88,7 +84,7 @@ impl Track {
             on_unmuted: platform::Callback::default(),
         }));
 
-        track.0.track.as_ref().unwrap().on_ended({
+        track.0.track.on_ended({
             let weak_inner = Rc::downgrade(&track.0);
             Some(move || {
                 if let Some(inner) = weak_inner.upgrade() {
@@ -137,24 +133,16 @@ impl Track {
     /// Returns [`id`][1] of the underlying [`platform::MediaStreamTrack`] of
     /// this [`Track`].
     ///
-    /// # Panics
-    ///
-    /// Will panic if `track` is None.
-    ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> String {
-        self.0.track.as_ref().unwrap().id()
+        self.0.track.id()
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
-    ///
-    /// # Panics
-    ///
-    /// Will panic if `track` is None.
     #[must_use]
     pub fn kind(&self) -> MediaKind {
-        self.0.track.as_ref().unwrap().kind()
+        self.0.track.kind()
     }
 
     /// Returns this [`Track`]'s media source kind.
@@ -165,30 +153,17 @@ impl Track {
 
     /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
-    ///
-    /// # Panics
-    ///
-    /// Will panic if `track` is None.
     pub async fn stop(self) {
-        if self.0.track.as_ref().unwrap().ready_state().await
-            == MediaStreamTrackState::Live
-        {
-            #[cfg(not(target_family = "wasm"))]
-            {
-                self.0.track.as_ref().unwrap().stop().await;
-            }
+        if self.0.track.ready_state().await == MediaStreamTrackState::Live {
+            self.0.track.stop().await;
             self.0.on_stopped.call0();
         }
     }
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
-    ///
-    /// # Panics
-    ///
-    /// Will panic if `track` is None.
     #[must_use]
     pub fn get_track(&self) -> &platform::MediaStreamTrack {
-        self.0.track.as_ref().unwrap()
+        &self.0.track
     }
 
     /// Indicate whether this [`Track`] is muted.
@@ -226,15 +201,6 @@ impl Track {
     #[must_use]
     pub fn media_direction(&self) -> MediaDirection {
         self.0.media_direction.get()
-    }
-}
-
-impl Drop for Inner {
-    fn drop(&mut self) {
-        let track = self.track.take().unwrap();
-        platform::spawn(async move {
-            track.dispose().await;
-        });
     }
 }
 

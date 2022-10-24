@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
+import 'package:retry/retry.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -57,17 +58,12 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     await context.world.wait_for_interconnection(id);
     var live = (live_or_stopped == 'live');
 
-    var actual_count = 0;
-    while (true) {
-      actual_count =
+    // We might have to wait for Rust side for a little bit
+    await retry(() async {
+      var actual_count =
           member.connection_store.count_tracks_by_lived(live, remote_id);
-      if (actual_count == expected_count) {
-        break;
-      }
-      await Future.delayed(Duration(milliseconds: 200));
-    }
-
-    expect(actual_count, expected_count);
+      expect(actual_count, expected_count);
+    });
   },
 );
 
@@ -168,8 +164,7 @@ StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
     var member = context.world.members[id]!;
     var count = 0;
     member.connection_store.local_tracks.forEach((element) async {
-      if (await element.getTrack().state() ==
-          webrtc.MediaStreamTrackState.live) {
+      if (await element.getTrack().state() == fw.MediaStreamTrackState.live) {
         ++count;
       }
     });
