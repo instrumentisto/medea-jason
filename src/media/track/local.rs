@@ -112,10 +112,9 @@ impl Track {
 
 impl Drop for Track {
     fn drop(&mut self) {
-        let track = self.track.clone();
+        let stop = Box::pin(self.track.stop());
         platform::spawn(async move {
-            track.stop().await;
-            track.dispose().await;
+            stop.await;
         });
     }
 }

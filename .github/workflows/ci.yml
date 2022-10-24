@@ -294,12 +294,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: android
-            os: macos-latest
-    runs-on: ${{ matrix.os }}
+        # TODO: Run E2E test on Windows and macOS
+        platform:
+          - linux
+          - android
+    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
+              || (matrix.platform == 'android' && 'macos-latest') }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -322,14 +322,14 @@ jobs:
       - name: Download `medea-jason` lib
         uses: actions/download-artifact@v3
         with:
-          name: build-jason-${{ matrix.platform }}
+          name: build-jason-linux
           path: ./flutter/${{ matrix.platform }}/lib/
-        if: ${{ matrix.platform != 'android' }}
+        if: ${{ matrix.platform == 'linux' }}
 
       - name: Download `medea-jason` lib
         uses: actions/download-artifact@v3
         with:
-          name: build-jason-${{ matrix.platform }}
+          name: build-jason-android
           path: ./flutter/${{ matrix.platform }}/src/main/jniLibs/
         if: ${{ matrix.platform == 'android' }}
 
@@ -359,7 +359,7 @@ jobs:
           java-version: 11
         if: ${{ matrix.platform == 'android' }}
 
-      - name: Test on Android 
+      - name: Test on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 24
@@ -368,9 +368,9 @@ jobs:
           profile: Nexus 6
           cores: 3
           emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
-          script: make test.e2e.native up=yes 
+          script: make test.e2e.native up=yes
             debug=no dockerized=yes server="10.0.2.2"
-            medea-tag=${{ env.MEDEA_BRANCH }} 
+            medea-tag=${{ env.MEDEA_BRANCH }}
             control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
 

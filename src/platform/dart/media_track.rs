@@ -13,6 +13,7 @@ use crate::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
     platform::{
+        self,
         dart::utils::{
             callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
         },
@@ -309,17 +310,6 @@ impl MediaStreamTrack {
         }
     }
 
-    /// Disposes this [`MediaStreamTrack`].
-    pub async fn dispose(&self) {
-        unsafe {
-            FutureFromDart::execute::<()>(media_stream_track::dispose(
-                self.inner.get(),
-            ))
-            .await
-            .unwrap();
-        }
-    }
-
     /// Sets [`onended`][1] event handler of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
@@ -333,5 +323,20 @@ impl MediaStreamTrack {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
             };
         }
+    }
+}
+
+impl Drop for MediaStreamTrack {
+    fn drop(&mut self) {
+        let track = self.inner.get();
+        platform::spawn(async move {
+            unsafe {
+                FutureFromDart::execute::<()>(media_stream_track::dispose(
+                    track,
+                ))
+                .await
+                .unwrap();
+            }
+        });
     }
 }
