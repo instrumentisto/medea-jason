@@ -266,9 +266,11 @@ impl MediaStreamTrack {
         let inner = self.inner.clone();
         async move {
             unsafe {
-                FutureFromDart::execute::<()>(media_stream_track::stop(inner.get()))
-                    .await
-                    .unwrap();
+                FutureFromDart::execute::<()>(media_stream_track::stop(
+                    inner.get(),
+                ))
+                .await
+                .unwrap();
             }
         }
     }
@@ -331,11 +333,11 @@ impl Drop for MediaStreamTrack {
         let track = self.inner.clone();
         platform::spawn(async move {
             unsafe {
-                // Errors if already disposed.
-                let _ = FutureFromDart::execute::<()>(
-                    media_stream_track::dispose(track.get()),
-                )
-                .await;
+                FutureFromDart::execute::<()>(media_stream_track::dispose(
+                    track.get(),
+                ))
+                .await
+                .unwrap();
             }
         });
     }

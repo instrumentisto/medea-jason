@@ -67,12 +67,12 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Debug, Clone)]
-pub struct Transceiver(Rc<Inner>);
+#[derive(Clone, Debug, From)]
+pub struct Transceiver(Rc<DartHandle>);
 
 impl From<DartHandle> for Transceiver {
     fn from(from: DartHandle) -> Self {
-        Self(Rc::new(Inner(from)))
+        Self(Rc::new(from))
     }
 }
 
@@ -80,7 +80,7 @@ impl Transceiver {
     /// Changes the receive direction of the specified [`Transceiver`].
     #[must_use]
     pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0 .0.get();
+        let handle = self.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_recv(
@@ -95,7 +95,7 @@ impl Transceiver {
     /// Changes the send direction of the specified [`Transceiver`].
     #[must_use]
     pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0 .0.get();
+        let handle = self.0.get();
         Box::pin(async move {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::set_send(
@@ -130,7 +130,7 @@ impl Transceiver {
         if let Some(track) = new_track {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::replace_track(
-                    self.0 .0.get(),
+                    self.0.get(),
                     track.platform_track().handle(),
                 ))
                 .await?;
@@ -138,7 +138,7 @@ impl Transceiver {
         } else {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::drop_sender(
-                    self.0 .0.get(),
+                    self.0.get(),
                 ))
                 .await?;
             }
@@ -153,7 +153,7 @@ impl Transceiver {
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         unsafe {
-            let mid = transceiver::mid(self.0 .0.get());
+            let mid = transceiver::mid(self.0.get());
             (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
         }
     }
@@ -163,12 +163,12 @@ impl Transceiver {
     /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     #[must_use]
     pub fn is_stopped(&self) -> bool {
-        unsafe { transceiver::is_stopped(self.0 .0.get()) }
+        unsafe { transceiver::is_stopped(self.0.get()) }
     }
 
     /// Returns current [`TransceiverDirection`] of this [`Transceiver`].
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
-        let handle = self.0 .0.get();
+        let handle = self.0.get();
         async move {
             unsafe {
                 FutureFromDart::execute::<i32>(transceiver::get_direction(
@@ -182,22 +182,19 @@ impl Transceiver {
     }
 }
 
-// Wrapper for `Dart`-side handle that calls [`transceiver::dispose`] on
-// [`Drop`].
-#[derive(Debug, From)]
-struct Inner(DartHandle);
-
-impl Drop for Inner {
+impl Drop for Transceiver {
     fn drop(&mut self) {
-        let transceiver = self.0.clone();
-        platform::spawn(async move {
-            unsafe {
-                // Errors if already disposed.
-                let _ = FutureFromDart::execute::<()>(transceiver::dispose(
-                    transceiver.get(),
-                ))
-                .await;
-            }
-        });
+        if Rc::get_mut(&mut self.0).is_some() {
+            let transceiver = Rc::clone(&self.0);
+            platform::spawn(async move {
+                unsafe {
+                    FutureFromDart::execute::<()>(transceiver::dispose(
+                        transceiver.get(),
+                    ))
+                    .await
+                    .unwrap();
+                }
+            });
+        }
     }
 }
