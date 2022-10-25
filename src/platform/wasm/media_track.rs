@@ -188,7 +188,7 @@ impl MediaStreamTrack {
     pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         self.sys_track.stop();
         // for platform code uniformity
-        async {}
+        future::ready(())
     }
 
     /// Returns an [`enabled`][1] attribute of the underlying

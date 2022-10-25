@@ -15,7 +15,7 @@ void registerFunction(
   required Pointer<NativeFunction<Pointer Function(Handle)>> mid,
   required Pointer<NativeFunction<Handle Function(Handle, Bool)>> setRecv,
   required Pointer<NativeFunction<Handle Function(Handle, Bool)>> setSend,
-  required Pointer<NativeFunction<Void Function(Handle)>> dispose,
+  required Pointer<NativeFunction<Handle Function(Handle)>> dispose,
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,

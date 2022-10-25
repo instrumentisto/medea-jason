@@ -263,10 +263,10 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     #[inline]
     pub fn stop(&self) -> impl Future<Output = ()> + 'static {
-        let inner = self.inner.get();
+        let inner = self.inner.clone();
         async move {
             unsafe {
-                FutureFromDart::execute::<()>(media_stream_track::stop(inner))
+                FutureFromDart::execute::<()>(media_stream_track::stop(inner.get()))
                     .await
                     .unwrap();
             }
@@ -328,14 +328,14 @@ impl MediaStreamTrack {
 
 impl Drop for MediaStreamTrack {
     fn drop(&mut self) {
-        let track = self.inner.get();
+        let track = self.inner.clone();
         platform::spawn(async move {
             unsafe {
-                FutureFromDart::execute::<()>(media_stream_track::dispose(
-                    track,
-                ))
-                .await
-                .unwrap();
+                // Errors if already disposed.
+                let _ = FutureFromDart::execute::<()>(
+                    media_stream_track::dispose(track.get()),
+                )
+                .await;
             }
         });
     }

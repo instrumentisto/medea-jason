@@ -77,6 +77,6 @@ bool _isStopped(RtpTransceiver transceiver) {
 }
 
 /// Disposes of this [RtpTransceiver].
-void _dispose(RtpTransceiver transceiver) {
-  transceiver.dispose();
+Object _dispose(RtpTransceiver transceiver) {
+  return () => transceiver.dispose();
 }

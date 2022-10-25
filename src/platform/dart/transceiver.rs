@@ -59,19 +59,7 @@ mod transceiver {
         pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
 
         /// Disposes of this [`Transceiver`].
-        pub fn dispose(transceiver: Dart_Handle);
-    }
-}
-
-#[derive(Debug, From)]
-struct WrapDartHandle(DartHandle);
-
-impl Drop for WrapDartHandle {
-    fn drop(&mut self) {
-        let handle = self.0.get();
-        unsafe {
-            transceiver::dispose(handle);
-        }
+        pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -80,11 +68,11 @@ impl Drop for WrapDartHandle {
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 #[derive(Debug, Clone)]
-pub struct Transceiver(Rc<WrapDartHandle>);
+pub struct Transceiver(Rc<Inner>);
 
 impl From<DartHandle> for Transceiver {
     fn from(from: DartHandle) -> Self {
-        Self(Rc::new(WrapDartHandle(from)))
+        Self(Rc::new(Inner(from)))
     }
 }
 
@@ -192,12 +180,24 @@ impl Transceiver {
             .into()
         }
     }
+}
 
-    /// Disposes this [`Transceiver`].
-    pub fn dispose(&self) {
-        let handle = self.0 .0.get();
-        unsafe {
-            transceiver::dispose(handle);
-        }
+// Wrapper for `Dart`-side handle that calls [`transceiver::dispose`] on
+// [`Drop`].
+#[derive(Debug, From)]
+struct Inner(DartHandle);
+
+impl Drop for Inner {
+    fn drop(&mut self) {
+        let transceiver = self.0.clone();
+        platform::spawn(async move {
+            unsafe {
+                // Errors if already disposed.
+                let _ = FutureFromDart::execute::<()>(transceiver::dispose(
+                    transceiver.get(),
+                ))
+                .await;
+            }
+        });
     }
 }
