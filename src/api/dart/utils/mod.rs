@@ -1,5 +1,6 @@
 pub mod arrays;
 mod err;
+mod frb_adapter;
 mod result;
 mod string;
 
@@ -15,6 +16,7 @@ use crate::{
 pub use self::{
     arrays::PtrArray,
     err::{new_panic_error, ArgumentError, DartError},
+    frb_adapter::*,
     result::DartResult,
     string::{
         c_str_into_string, dart_string_into_rust, free_dart_native_string,
@@ -46,6 +48,9 @@ pub trait IntoDartFuture {
     /// __Note, that the Dart `Future` execution begins immediately and cannot
     /// be canceled.__
     fn into_dart_future(self) -> DartFuture<Self::Output>;
+
+    // todo
+    fn into_my_dart_future(self) -> MyDartFuture;
 }
 
 impl<Fut, Ok, Err> IntoDartFuture for Fut
@@ -70,6 +75,24 @@ where
             }
         });
         DartFuture(dart_future, PhantomData)
+    }
+
+    fn into_my_dart_future(self) -> MyDartFuture {
+        let completer = Completer::new();
+        let dart_future = completer.future();
+        spawn(async move {
+            match self.await {
+                Ok(ok) => {
+                    completer.complete(ok);
+                }
+                Err(e) => {
+                    completer.complete_error(e.into());
+                }
+            }
+        });
+        MyDartFuture {
+            handle: dart_future,
+        }
     }
 }
 

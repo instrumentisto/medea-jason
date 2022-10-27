@@ -13,11 +13,21 @@
     missing_docs
 )]
 
+pub mod audio_track_constraints_api;
+pub mod connection_handle_api;
+pub mod device_video_track_constraints_api;
+pub mod display_video_track_constraints_api;
+pub mod jason_api;
+pub mod local_media_track_api;
+pub mod media_device_info_api;
+pub mod media_display_info_api;
+pub mod media_manager_handle_api;
+pub mod media_stream_settings_api;
+
 pub mod audio_track_constraints;
 pub mod connection_handle;
 pub mod device_video_track_constraints;
 pub mod display_video_track_constraints;
-pub mod jason;
 pub mod local_media_track;
 pub mod media_device_info;
 pub mod media_display_info;
@@ -65,7 +75,7 @@ pub use self::{
     connection_handle::ConnectionHandle,
     device_video_track_constraints::DeviceVideoTrackConstraints,
     display_video_track_constraints::DisplayVideoTrackConstraints,
-    jason::Jason,
+    jason_api::Jason,
     local_media_track::LocalMediaTrack,
     media_device_info::MediaDeviceInfo,
     media_display_info::MediaDisplayInfo,

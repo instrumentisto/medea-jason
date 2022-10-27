@@ -96,9 +96,19 @@
 #[macro_use]
 pub mod utils;
 pub mod api;
+mod audio_track_constraints_api_g;
 pub mod connection;
+mod connection_handle_api_g;
+mod device_video_track_constraints_api_g;
+mod display_video_track_constraints_api_g;
 pub mod jason;
+mod jason_api_g;
+mod local_media_track_api_g;
 pub mod media;
+mod media_device_info_api_g;
+mod media_display_info_api_g;
+mod media_manager_handle_api_g;
+mod media_stream_settings_api_g;
 pub mod peer;
 pub mod platform;
 pub mod room;

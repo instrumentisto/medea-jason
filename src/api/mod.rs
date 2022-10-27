@@ -1,5 +1,4 @@
 //! External [`Jason`] API.
-
 pub mod err;
 
 cfg_if::cfg_if! {
@@ -7,7 +6,7 @@ cfg_if::cfg_if! {
         mod wasm;
         pub use self::wasm::*;
     } else {
-        mod dart;
+        pub mod dart;
         pub use self::dart::*;
     }
 }

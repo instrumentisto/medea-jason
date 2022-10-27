@@ -51,6 +51,10 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracerr = "0.3"
 url = "2.3"
+anyhow = "1.0.66"
+
+flutter_rust_bridge = { version = "1.49.0", path = "../flutter_rust_bridge/frb_rust" }
+flutter_rust_bridge_macros = { path = "../flutter_rust_bridge/frb_macros"}
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"
@@ -104,6 +108,8 @@ wee_alloc = { version = "0.4", optional = true }
 
 [build-dependencies]
 cc = "1.0"
+flutter_rust_bridge_codegen = { path = "../flutter_rust_bridge/frb_codegen" }
+
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }

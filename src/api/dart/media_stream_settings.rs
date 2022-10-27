@@ -1,12 +1,8 @@
 use std::ptr;
 
-use super::{
-    audio_track_constraints::AudioTrackConstraints,
-    device_video_track_constraints::DeviceVideoTrackConstraints,
-    display_video_track_constraints::DisplayVideoTrackConstraints,
-    propagate_panic, ForeignClass,
-};
+use super::{propagate_panic, AudioTrackConstraints, ForeignClass};
 
+use crate::api::{DeviceVideoTrackConstraints, DisplayVideoTrackConstraints};
 pub use crate::media::MediaStreamSettings;
 
 impl ForeignClass for MediaStreamSettings {}
