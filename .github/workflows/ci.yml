@@ -365,16 +365,17 @@ jobs:
       - name: Test on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 24
-          target: google_apis
+          api-level: 31
           arch: x86_64
-          profile: Nexus 6
           cores: 3
-          emulator-options: -no-window -netdelay none -netspeed full -camera-back none -camera-front emulated
-          script: make test.e2e.native up=yes
-            debug=no dockerized=yes server="10.0.2.2"
-            medea-tag=${{ env.MEDEA_BRANCH }}
-            control-tag=build-${{ github.run_number }}
+          profile: pixel_2
+          emulator-options: -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -partition-size 2048 -qemu -m 2048
+          script: |
+            $ANDROID_HOME/emulator/emulator -accel-check
+            make test.e2e.native up=yes
+              debug=no dockerized=yes server="10.0.2.2"
+              medea-tag=${{ env.MEDEA_BRANCH }}
+              control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
 
   test-flutter:
@@ -461,7 +462,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
-          target: google_apis
+          emulator-options: -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -partition-size 2048 -qemu -m 2048
           arch: x86_64
           cores: 3
           profile: pixel_2
@@ -471,7 +472,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
-          target: google_apis
+          emulator-options: -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -partition-size 2048 -qemu -m 2048
           arch: x86_64
           cores: 3
           profile: pixel_2
