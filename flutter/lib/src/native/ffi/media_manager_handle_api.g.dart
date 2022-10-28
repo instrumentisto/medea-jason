@@ -69,11 +69,25 @@ abstract class MediaManagerHandleApi {
 
   FlutterRustBridgeTaskConstMeta
       get kMediaManagerHandleMicrophoneVolumeConstMeta;
+
+  /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+  void mediaManagerHandleOnDeviceChange(
+      {required MediaManagerHandle manager,
+      required MediaManagerHandleDh cb,
+      dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kMediaManagerHandleOnDeviceChangeConstMeta;
 }
 
 @sealed
 class MediaManagerHandle extends FrbOpaque {
   MediaManagerHandle.fromRaw(int ptr, int drop, int share)
+      : super.unsafe(ptr, drop, share);
+}
+
+@sealed
+class MediaManagerHandleDh extends FrbOpaque {
+  MediaManagerHandleDh.fromRaw(int ptr, int drop, int share)
       : super.unsafe(ptr, drop, share);
 }
 
@@ -245,6 +259,29 @@ class MediaManagerHandleApiImpl implements MediaManagerHandleApi {
             argNames: ["manager"],
           );
 
+  void mediaManagerHandleOnDeviceChange(
+      {required MediaManagerHandle manager,
+      required MediaManagerHandleDh cb,
+      dynamic hint}) {
+    var arg0 = _platform.api2wire_MediaManagerHandle(manager);
+    var arg1 = _platform.api2wire_MediaManagerHandleDh(cb);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner
+          .wire_media_manager_handle_on_device_change(arg0, arg1),
+      parseSuccessData: _wire2api_SyncReturn_unit,
+      constMeta: kMediaManagerHandleOnDeviceChangeConstMeta,
+      argValues: [manager, cb],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta
+      get kMediaManagerHandleOnDeviceChangeConstMeta =>
+          const FlutterRustBridgeTaskConstMeta(
+            debugName: "media_manager_handle_on_device_change",
+            argNames: ["manager", "cb"],
+          );
+
 // Section: wire2api
 
   MyDartFuture _wire2api_MyDartFuture(dynamic raw) {
@@ -277,6 +314,14 @@ class MediaManagerHandleApiImpl implements MediaManagerHandleApi {
 
     return MyDartFuture.fromRaw(ptr, drop, lend);
   }
+
+  void _wire2api_SyncReturn_unit(dynamic raw) {
+    return;
+  }
+
+  void _wire2api_unit(dynamic raw) {
+    return;
+  }
 }
 
 // Section: api2wire
@@ -300,6 +345,17 @@ class MediaManagerHandleApiPlatform
     }
     final ptr = inner.new_MediaManagerHandle();
     _api_fill_to_wire_MediaManagerHandle(raw, ptr);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_MediaManagerHandleDh> api2wire_MediaManagerHandleDh(
+      MediaManagerHandleDh raw) {
+    if (raw.isStale()) {
+      throw 'Use after dispose.';
+    }
+    final ptr = inner.new_MediaManagerHandleDh();
+    _api_fill_to_wire_MediaManagerHandleDh(raw, ptr);
     return ptr;
   }
 
@@ -334,6 +390,11 @@ class MediaManagerHandleApiPlatform
 
   void _api_fill_to_wire_MediaManagerHandle(
       MediaManagerHandle apiObj, ffi.Pointer<wire_MediaManagerHandle> wireObj) {
+    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
+  }
+
+  void _api_fill_to_wire_MediaManagerHandleDh(MediaManagerHandleDh apiObj,
+      ffi.Pointer<wire_MediaManagerHandleDh> wireObj) {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 
@@ -527,6 +588,27 @@ class MediaManagerHandleApiWire implements FlutterRustBridgeWireBase {
           WireSyncReturnStruct Function(
               ffi.Pointer<wire_MediaManagerHandle>)>();
 
+  WireSyncReturnStruct wire_media_manager_handle_on_device_change(
+    ffi.Pointer<wire_MediaManagerHandle> manager,
+    ffi.Pointer<wire_MediaManagerHandleDh> cb,
+  ) {
+    return _wire_media_manager_handle_on_device_change(
+      manager,
+      cb,
+    );
+  }
+
+  late final _wire_media_manager_handle_on_device_changePtr = _lookup<
+          ffi.NativeFunction<
+              WireSyncReturnStruct Function(
+                  ffi.Pointer<wire_MediaManagerHandle>,
+                  ffi.Pointer<wire_MediaManagerHandleDh>)>>(
+      'wire_media_manager_handle_on_device_change');
+  late final _wire_media_manager_handle_on_device_change =
+      _wire_media_manager_handle_on_device_changePtr.asFunction<
+          WireSyncReturnStruct Function(ffi.Pointer<wire_MediaManagerHandle>,
+              ffi.Pointer<wire_MediaManagerHandleDh>)>();
+
   ffi.Pointer<wire_MediaManagerHandle> new_MediaManagerHandle() {
     return _new_MediaManagerHandle();
   }
@@ -536,6 +618,17 @@ class MediaManagerHandleApiWire implements FlutterRustBridgeWireBase {
       'new_MediaManagerHandle');
   late final _new_MediaManagerHandle = _new_MediaManagerHandlePtr
       .asFunction<ffi.Pointer<wire_MediaManagerHandle> Function()>();
+
+  ffi.Pointer<wire_MediaManagerHandleDh> new_MediaManagerHandleDh() {
+    return _new_MediaManagerHandleDh();
+  }
+
+  late final _new_MediaManagerHandleDhPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_MediaManagerHandleDh>
+              Function()>>('new_MediaManagerHandleDh');
+  late final _new_MediaManagerHandleDh = _new_MediaManagerHandleDhPtr
+      .asFunction<ffi.Pointer<wire_MediaManagerHandleDh> Function()>();
 
   ffi.Pointer<wire_MediaStreamSettings> new_MediaStreamSettings() {
     return _new_MediaStreamSettings();
@@ -576,6 +669,10 @@ class wire_uint_8_list extends ffi.Struct {
 
   @ffi.Int32()
   external int len;
+}
+
+class wire_MediaManagerHandleDh extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> ptr;
 }
 
 typedef DartPostCObjectFnType = ffi.Pointer<

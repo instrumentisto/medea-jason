@@ -14,7 +14,7 @@ abstract class ConnectionHandleApi {
   /// Sets callback, invoked when this `Connection` will close.
   void connectionHandleOnClose(
       {required ConnectionHandle connection,
-      required DartHandle f,
+      required ConnectionHandleDh f,
       dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kConnectionHandleOnCloseConstMeta;
@@ -26,7 +26,7 @@ abstract class ConnectionHandleApi {
   /// [`Connection`]: crate::connection::Connection
   void connectionHandleOnRemoteTrackAdded(
       {required ConnectionHandle connection,
-      required DartHandle f,
+      required ConnectionHandleDh f,
       dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
@@ -36,7 +36,7 @@ abstract class ConnectionHandleApi {
   /// a server.
   void connectionHandleOnQualityScoreUpdate(
       {required ConnectionHandle connection,
-      required DartHandle f,
+      required ConnectionHandleDh f,
       dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
@@ -93,8 +93,8 @@ class ConnectionHandle extends FrbOpaque {
 }
 
 @sealed
-class DartHandle extends FrbOpaque {
-  DartHandle.fromRaw(int ptr, int drop, int share)
+class ConnectionHandleDh extends FrbOpaque {
+  ConnectionHandleDh.fromRaw(int ptr, int drop, int share)
       : super.unsafe(ptr, drop, share);
 }
 
@@ -115,10 +115,10 @@ class ConnectionHandleApiImpl implements ConnectionHandleApi {
   ConnectionHandleApiImpl.raw(this._platform);
   void connectionHandleOnClose(
       {required ConnectionHandle connection,
-      required DartHandle f,
+      required ConnectionHandleDh f,
       dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_DartHandle(f);
+    var arg1 = _platform.api2wire_ConnectionHandleDh(f);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_connection_handle_on_close(arg0, arg1),
@@ -137,10 +137,10 @@ class ConnectionHandleApiImpl implements ConnectionHandleApi {
 
   void connectionHandleOnRemoteTrackAdded(
       {required ConnectionHandle connection,
-      required DartHandle f,
+      required ConnectionHandleDh f,
       dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_DartHandle(f);
+    var arg1 = _platform.api2wire_ConnectionHandleDh(f);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_connection_handle_on_remote_track_added(arg0, arg1),
@@ -160,10 +160,10 @@ class ConnectionHandleApiImpl implements ConnectionHandleApi {
 
   void connectionHandleOnQualityScoreUpdate(
       {required ConnectionHandle connection,
-      required DartHandle f,
+      required ConnectionHandleDh f,
       dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_DartHandle(f);
+    var arg1 = _platform.api2wire_ConnectionHandleDh(f);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_connection_handle_on_quality_score_update(arg0, arg1),
@@ -366,12 +366,13 @@ class ConnectionHandleApiPlatform
   }
 
   @protected
-  ffi.Pointer<wire_DartHandle> api2wire_DartHandle(DartHandle raw) {
+  ffi.Pointer<wire_ConnectionHandleDh> api2wire_ConnectionHandleDh(
+      ConnectionHandleDh raw) {
     if (raw.isStale()) {
       throw 'Use after dispose.';
     }
-    final ptr = inner.new_DartHandle();
-    _api_fill_to_wire_DartHandle(raw, ptr);
+    final ptr = inner.new_ConnectionHandleDh();
+    _api_fill_to_wire_ConnectionHandleDh(raw, ptr);
     return ptr;
   }
 
@@ -392,8 +393,8 @@ class ConnectionHandleApiPlatform
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 
-  void _api_fill_to_wire_DartHandle(
-      DartHandle apiObj, ffi.Pointer<wire_DartHandle> wireObj) {
+  void _api_fill_to_wire_ConnectionHandleDh(
+      ConnectionHandleDh apiObj, ffi.Pointer<wire_ConnectionHandleDh> wireObj) {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 }
@@ -436,7 +437,7 @@ class ConnectionHandleApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_connection_handle_on_close(
     ffi.Pointer<wire_ConnectionHandle> connection,
-    ffi.Pointer<wire_DartHandle> f,
+    ffi.Pointer<wire_ConnectionHandleDh> f,
   ) {
     return _wire_connection_handle_on_close(
       connection,
@@ -447,16 +448,16 @@ class ConnectionHandleApiWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_on_closePtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(ffi.Pointer<wire_ConnectionHandle>,
-                  ffi.Pointer<wire_DartHandle>)>>(
+                  ffi.Pointer<wire_ConnectionHandleDh>)>>(
       'wire_connection_handle_on_close');
   late final _wire_connection_handle_on_close =
       _wire_connection_handle_on_closePtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_ConnectionHandle>,
-              ffi.Pointer<wire_DartHandle>)>();
+              ffi.Pointer<wire_ConnectionHandleDh>)>();
 
   WireSyncReturnStruct wire_connection_handle_on_remote_track_added(
     ffi.Pointer<wire_ConnectionHandle> connection,
-    ffi.Pointer<wire_DartHandle> f,
+    ffi.Pointer<wire_ConnectionHandleDh> f,
   ) {
     return _wire_connection_handle_on_remote_track_added(
       connection,
@@ -467,16 +468,16 @@ class ConnectionHandleApiWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_on_remote_track_addedPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(ffi.Pointer<wire_ConnectionHandle>,
-                  ffi.Pointer<wire_DartHandle>)>>(
+                  ffi.Pointer<wire_ConnectionHandleDh>)>>(
       'wire_connection_handle_on_remote_track_added');
   late final _wire_connection_handle_on_remote_track_added =
       _wire_connection_handle_on_remote_track_addedPtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_ConnectionHandle>,
-              ffi.Pointer<wire_DartHandle>)>();
+              ffi.Pointer<wire_ConnectionHandleDh>)>();
 
   WireSyncReturnStruct wire_connection_handle_on_quality_score_update(
     ffi.Pointer<wire_ConnectionHandle> connection,
-    ffi.Pointer<wire_DartHandle> f,
+    ffi.Pointer<wire_ConnectionHandleDh> f,
   ) {
     return _wire_connection_handle_on_quality_score_update(
       connection,
@@ -487,12 +488,12 @@ class ConnectionHandleApiWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_on_quality_score_updatePtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(ffi.Pointer<wire_ConnectionHandle>,
-                  ffi.Pointer<wire_DartHandle>)>>(
+                  ffi.Pointer<wire_ConnectionHandleDh>)>>(
       'wire_connection_handle_on_quality_score_update');
   late final _wire_connection_handle_on_quality_score_update =
       _wire_connection_handle_on_quality_score_updatePtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_ConnectionHandle>,
-              ffi.Pointer<wire_DartHandle>)>();
+              ffi.Pointer<wire_ConnectionHandleDh>)>();
 
   WireSyncReturnStruct wire_connection_handle_get_remote_member_id(
     ffi.Pointer<wire_ConnectionHandle> connection,
@@ -595,15 +596,15 @@ class ConnectionHandleApiWire implements FlutterRustBridgeWireBase {
   late final _new_ConnectionHandle = _new_ConnectionHandlePtr
       .asFunction<ffi.Pointer<wire_ConnectionHandle> Function()>();
 
-  ffi.Pointer<wire_DartHandle> new_DartHandle() {
-    return _new_DartHandle();
+  ffi.Pointer<wire_ConnectionHandleDh> new_ConnectionHandleDh() {
+    return _new_ConnectionHandleDh();
   }
 
-  late final _new_DartHandlePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<wire_DartHandle> Function()>>(
-          'new_DartHandle');
-  late final _new_DartHandle =
-      _new_DartHandlePtr.asFunction<ffi.Pointer<wire_DartHandle> Function()>();
+  late final _new_ConnectionHandleDhPtr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<wire_ConnectionHandleDh> Function()>>(
+      'new_ConnectionHandleDh');
+  late final _new_ConnectionHandleDh = _new_ConnectionHandleDhPtr
+      .asFunction<ffi.Pointer<wire_ConnectionHandleDh> Function()>();
 
   ffi.Pointer<ffi.Uint8> new_box_autoadd_u8_2(
     int value,
@@ -652,7 +653,7 @@ class wire_ConnectionHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-class wire_DartHandle extends ffi.Struct {
+class wire_ConnectionHandleDh extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 

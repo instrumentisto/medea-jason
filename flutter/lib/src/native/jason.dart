@@ -14,6 +14,7 @@ import 'ffi/exception.dart' as exceptions;
 import 'ffi/executor.dart';
 import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
+import 'ffi/jason_api.g.dart' as api;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
 import 'ffi/native_string.dart' as native_string;
@@ -21,6 +22,10 @@ import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
+
+
+typedef _cast_C = Handle Function(IntPtr);
+typedef _cast_Dart = Object Function(int);
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();
@@ -41,6 +46,7 @@ typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
 final DynamicLibrary dl = _dl_load();
+late api.JasonApiImpl _api;
 
 /// [Executor] that drives Rust futures.
 ///
@@ -48,6 +54,7 @@ final DynamicLibrary dl = _dl_load();
 /// after that.
 var executor;
 
+final _cast = dl.lookupFunction<_cast_C, _cast_Dart>('int2handle');
 final _new = dl.lookupFunction<_new_C, _new_Dart>('Jason__new');
 
 final _media_manager = dl.lookupFunction<_mediaManager_C, _mediaManager_Dart>(
@@ -124,12 +131,14 @@ DynamicLibrary _dl_load() {
     }
   });
 
+  _api = api.JasonApiImpl(dl);
   return dl;
 }
 
 class Jason extends base.Jason {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+  final api.Jason jason = _api.jasonNew();
 
   Jason() {
     RustHandlesStorage().insertHandle(this);
@@ -143,6 +152,7 @@ class Jason extends base.Jason {
 
   @override
   RoomHandle initRoom() {
+    // var room_handle = _api.jasonInitRoom(jason: jason);
     return NativeRoomHandle(NullablePointer(_initRoom(ptr.getInnerPtr())));
   }
 
@@ -158,6 +168,7 @@ class Jason extends base.Jason {
   void free() {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
+      // jason.dispose();
       _free(ptr.getInnerPtr());
       ptr.free();
     }

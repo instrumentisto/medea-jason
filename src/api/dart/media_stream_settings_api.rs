@@ -2,16 +2,27 @@ pub use std::cell::RefCell;
 
 use flutter_rust_bridge::{Opaque, SyncReturn};
 
-pub use crate::api::{
-    AudioTrackConstraints, DeviceVideoTrackConstraints,
-    DisplayVideoTrackConstraints,
+pub use crate::{
+    api::{
+        AudioTrackConstraints, DeviceVideoTrackConstraints,
+        DisplayVideoTrackConstraints,
+    },
+    media::MediaStreamSettings,
 };
-pub use crate::media::MediaStreamSettings;
+
+use super::room_handle_api::RoomHandleMS;
 
 /// Creates new [`MediaStreamSettings`] with none constraints configured.
 pub fn media_stream_settings_new(
 ) -> SyncReturn<Opaque<RefCell<MediaStreamSettings>>> {
     SyncReturn(Opaque::new(RefCell::new(MediaStreamSettings::new())))
+}
+
+/// Creates new [`MediaStreamSettings`] with none constraints configured.
+pub fn media_stream_settings_cast(
+    media_stream_settings: Opaque<RefCell<MediaStreamSettings>>
+) -> SyncReturn<Opaque<RoomHandleMS>> {
+    SyncReturn(Opaque::new(MediaStreamSettings::clone(&media_stream_settings.borrow())))
 }
 
 /// Specifies a nature and settings of an audio [`MediaStreamTrack`].

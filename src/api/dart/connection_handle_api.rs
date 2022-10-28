@@ -1,6 +1,5 @@
 use crate::{
-    connection::ChangeMediaStateError, media::MediaSourceKind,
-    platform,
+    connection::ChangeMediaStateError, media::MediaSourceKind, platform,
 };
 pub use dart_sys::Dart_Handle;
 use flutter_rust_bridge::{Opaque, SyncReturn};
@@ -13,10 +12,12 @@ pub use self::mock::ConnectionHandle;
 #[cfg(not(feature = "mockable"))]
 pub use crate::connection::ConnectionHandle;
 
+pub type ConnectionHandleDH = Dart_Handle;
+
 /// Sets callback, invoked when this `Connection` will close.
 pub fn connection_handle_on_close(
     connection: Opaque<ConnectionHandle>,
-    f: Opaque<Dart_Handle>,
+    f: Opaque<ConnectionHandleDH>,
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_close(unsafe { platform::Function::new(Dart_Handle::clone(&f)) })
@@ -31,7 +32,7 @@ pub fn connection_handle_on_close(
 /// [`Connection`]: crate::connection::Connection
 pub fn connection_handle_on_remote_track_added(
     connection: Opaque<ConnectionHandle>,
-    f: Opaque<Dart_Handle>,
+    f: Opaque<ConnectionHandleDH>,
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_remote_track_added(unsafe {
@@ -45,7 +46,7 @@ pub fn connection_handle_on_remote_track_added(
 /// a server.
 pub fn connection_handle_on_quality_score_update(
     connection: Opaque<ConnectionHandle>,
-    f: Opaque<Dart_Handle>,
+    f: Opaque<ConnectionHandleDH>,
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_quality_score_update(unsafe {
@@ -60,7 +61,9 @@ pub fn connection_handle_get_remote_member_id(
     connection: Opaque<ConnectionHandle>,
 ) -> anyhow::Result<SyncReturn<String>> {
     Ok(SyncReturn(
-        connection.get_remote_member_id().map_err(|err| anyhow::anyhow!("{}", err))?
+        connection
+            .get_remote_member_id()
+            .map_err(|err| anyhow::anyhow!("{}", err))?,
     ))
 }
 

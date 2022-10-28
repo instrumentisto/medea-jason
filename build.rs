@@ -72,6 +72,11 @@ fn main() {
         "media_display_info",
         "media_manager_handle",
         "media_stream_settings",
+        "reconnect_handle",
+        "remote_media_track",
+        "room_close_reason",
+        "room_handle",
+        "cast_stuff"
     ]);
     // Tell Cargo that if the input Rust code changes, to rerun this build
     // script.

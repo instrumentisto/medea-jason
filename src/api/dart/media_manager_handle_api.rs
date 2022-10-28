@@ -2,14 +2,12 @@ pub use dart_sys::Dart_Handle;
 use flutter_rust_bridge::{Opaque, SyncReturn};
 use tracerr::Traced;
 
-use crate::{
-    api::utils::DartError,
-    media::{
-        EnumerateDevicesError, EnumerateDisplaysError, InitLocalTracksError,
-        InvalidOutputAudioDeviceIdError, MicVolumeError,
-    },
-    platform,
-};
+use crate::{media::{
+    EnumerateDevicesError, EnumerateDisplaysError, InitLocalTracksError,
+    InvalidOutputAudioDeviceIdError, MicVolumeError,
+}, platform};
+
+pub type MediaManagerHandleDH = Dart_Handle;
 
 pub use super::{
     media_stream_settings::MediaStreamSettings,
@@ -147,20 +145,18 @@ pub fn media_manager_handle_microphone_volume(
 
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
 
-// todo(rogurotus): all methods with opaque dart_handle must be inone file.
-
-// pub fn media_manager_handle_on_device_change(
-//     manager: Opaque<MediaManagerHandle>,
-//     cb: Opaque<Dart_Handle>,
-// ) -> anyhow::Result<SyncReturn<()>> {
-//     let manager = MediaManagerHandle::clone(&manager);
-//     manager
-//         .on_device_change(unsafe {
-//             platform::Function::new(Dart_Handle::clone(&cb))
-//         })
-//         .map_err(|err| anyhow::anyhow!("{}", err))?;
-//     Ok(SyncReturn(()))
-// }
+pub fn media_manager_handle_on_device_change(
+    manager: Opaque<MediaManagerHandle>,
+    cb: Opaque<MediaManagerHandleDH>,
+) -> anyhow::Result<SyncReturn<()>> {
+    let manager = MediaManagerHandle::clone(&manager);
+    manager
+        .on_device_change(unsafe {
+            platform::Function::new(Dart_Handle::clone(&cb))
+        })
+        .map_err(|err| anyhow::anyhow!("{}", err))?;
+    Ok(SyncReturn(()))
+}
 
 #[cfg(feature = "mockable")]
 mod mock {
@@ -263,7 +259,7 @@ mod mock {
     }
 
     pub fn returns_local_media_init_exception(
-        cause: Opaque<Dart_Handle>,
+        cause: Opaque<MediaManagerHandleDH>,
     ) -> DartResult {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetUserMediaFailed(
@@ -273,7 +269,7 @@ mod mock {
     }
 
     pub fn returns_future_with_local_media_init_exception(
-        cause: Opaque<Dart_Handle>,
+        cause: Opaque<MediaManagerHandleDH>,
     ) -> DartFuture<Result<(), Traced<InitLocalTracksError>>> {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetDisplayMediaFailed(
@@ -284,7 +280,7 @@ mod mock {
     }
 
     pub fn returns_enumerate_devices_exception(
-        cause: Opaque<Dart_Handle>,
+        cause: Opaque<MediaManagerHandleDH>,
     ) -> DartResult {
         let cause = platform::Error::from_handle(cause);
         DartError::from(tracerr::new!(EnumerateDevicesError::from(cause)))
@@ -292,7 +288,7 @@ mod mock {
     }
 
     pub fn returns_future_enumerate_devices_exception(
-        cause: Opaque<Dart_Handle>,
+        cause: Opaque<MediaManagerHandleDH>,
     ) -> DartFuture<Result<(), Traced<EnumerateDevicesError>>> {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(EnumerateDevicesError::from(cause));

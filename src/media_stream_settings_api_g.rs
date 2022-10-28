@@ -31,6 +31,22 @@ fn wire_media_stream_settings_new_impl() -> support::WireSyncReturnStruct {
         move || Ok(media_stream_settings_new()),
     )
 }
+fn wire_media_stream_settings_cast_impl(
+    media_stream_settings: impl Wire2Api<Opaque<RefCell<MediaStreamSettings>>>
+        + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "media_stream_settings_cast",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_media_stream_settings = media_stream_settings.wire2api();
+            Ok(media_stream_settings_cast(api_media_stream_settings))
+        },
+    )
+}
 fn wire_media_stream_settings_audio_impl(
     media_stream_settings: impl Wire2Api<Opaque<RefCell<MediaStreamSettings>>>
         + UnwindSafe,

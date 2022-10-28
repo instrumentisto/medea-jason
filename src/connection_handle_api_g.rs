@@ -23,7 +23,7 @@ use std::sync::RwLock;
 
 fn wire_connection_handle_on_close_impl(
     connection: impl Wire2Api<Opaque<ConnectionHandle>> + UnwindSafe,
-    f: impl Wire2Api<Opaque<Dart_Handle>> + UnwindSafe,
+    f: impl Wire2Api<Opaque<ConnectionHandleDH>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -40,7 +40,7 @@ fn wire_connection_handle_on_close_impl(
 }
 fn wire_connection_handle_on_remote_track_added_impl(
     connection: impl Wire2Api<Opaque<ConnectionHandle>> + UnwindSafe,
-    f: impl Wire2Api<Opaque<Dart_Handle>> + UnwindSafe,
+    f: impl Wire2Api<Opaque<ConnectionHandleDH>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -57,7 +57,7 @@ fn wire_connection_handle_on_remote_track_added_impl(
 }
 fn wire_connection_handle_on_quality_score_update_impl(
     connection: impl Wire2Api<Opaque<ConnectionHandle>> + UnwindSafe,
-    f: impl Wire2Api<Opaque<Dart_Handle>> + UnwindSafe,
+    f: impl Wire2Api<Opaque<ConnectionHandleDH>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {

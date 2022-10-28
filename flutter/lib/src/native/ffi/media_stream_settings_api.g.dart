@@ -16,6 +16,12 @@ abstract class MediaStreamSettingsApi {
 
   FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsNewConstMeta;
 
+  /// Creates new [`MediaStreamSettings`] with none constraints configured.
+  RoomHandleMs mediaStreamSettingsCast(
+      {required RefCellMediaStreamSettings mediaStreamSettings, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsCastConstMeta;
+
   /// Specifies a nature and settings of an audio [`MediaStreamTrack`].
   ///
   /// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
@@ -67,6 +73,12 @@ class RefCellMediaStreamSettings extends FrbOpaque {
       : super.unsafe(ptr, drop, share);
 }
 
+@sealed
+class RoomHandleMs extends FrbOpaque {
+  RoomHandleMs.fromRaw(int ptr, int drop, int share)
+      : super.unsafe(ptr, drop, share);
+}
+
 class MediaStreamSettingsApiImpl implements MediaStreamSettingsApi {
   final MediaStreamSettingsApiPlatform _platform;
   factory MediaStreamSettingsApiImpl(ExternalLibrary dylib) =>
@@ -90,6 +102,25 @@ class MediaStreamSettingsApiImpl implements MediaStreamSettingsApi {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "media_stream_settings_new",
         argNames: [],
+      );
+
+  RoomHandleMs mediaStreamSettingsCast(
+      {required RefCellMediaStreamSettings mediaStreamSettings, dynamic hint}) {
+    var arg0 =
+        _platform.api2wire_RefCellMediaStreamSettings(mediaStreamSettings);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_media_stream_settings_cast(arg0),
+      parseSuccessData: _wire2api_SyncReturn_RoomHandleMs,
+      constMeta: kMediaStreamSettingsCastConstMeta,
+      argValues: [mediaStreamSettings],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsCastConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "media_stream_settings_cast",
+        argNames: ["mediaStreamSettings"],
       );
 
   void mediaStreamSettingsAudio(
@@ -168,6 +199,10 @@ class MediaStreamSettingsApiImpl implements MediaStreamSettingsApi {
     return RefCellMediaStreamSettings.fromRaw(raw[0], raw[1], raw[2]);
   }
 
+  RoomHandleMs _wire2api_RoomHandleMs(dynamic raw) {
+    return RoomHandleMs.fromRaw(raw[0], raw[1], raw[2]);
+  }
+
   RefCellMediaStreamSettings _wire2api_SyncReturn_RefCellMediaStreamSettings(
       dynamic raw) {
     var pointBitLen = raw.length ~/ 3;
@@ -194,6 +229,33 @@ class MediaStreamSettingsApiImpl implements MediaStreamSettingsApi {
     }
 
     return RefCellMediaStreamSettings.fromRaw(ptr, drop, lend);
+  }
+
+  RoomHandleMs _wire2api_SyncReturn_RoomHandleMs(dynamic raw) {
+    var pointBitLen = raw.length ~/ 3;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RoomHandleMs.fromRaw(ptr, drop, lend);
   }
 
   void _wire2api_SyncReturn_unit(dynamic raw) {
@@ -342,6 +404,24 @@ class MediaStreamSettingsApiWire implements FlutterRustBridgeWireBase {
   late final _wire_media_stream_settings_new =
       _wire_media_stream_settings_newPtr
           .asFunction<WireSyncReturnStruct Function()>();
+
+  WireSyncReturnStruct wire_media_stream_settings_cast(
+    ffi.Pointer<wire_RefCellMediaStreamSettings> media_stream_settings,
+  ) {
+    return _wire_media_stream_settings_cast(
+      media_stream_settings,
+    );
+  }
+
+  late final _wire_media_stream_settings_castPtr = _lookup<
+          ffi.NativeFunction<
+              WireSyncReturnStruct Function(
+                  ffi.Pointer<wire_RefCellMediaStreamSettings>)>>(
+      'wire_media_stream_settings_cast');
+  late final _wire_media_stream_settings_cast =
+      _wire_media_stream_settings_castPtr.asFunction<
+          WireSyncReturnStruct Function(
+              ffi.Pointer<wire_RefCellMediaStreamSettings>)>();
 
   WireSyncReturnStruct wire_media_stream_settings_audio(
     ffi.Pointer<wire_RefCellMediaStreamSettings> media_stream_settings,

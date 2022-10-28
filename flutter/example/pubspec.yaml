@@ -8,6 +8,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_rust_bridge: 
+    path: /media/human/DE2466F72466D1D72/Work/Github/Test/flutter_rust_bridge/frb_dart/
 
   # When depending on this package from a real application you should use:
   #   medea_jason: ^x.y.z

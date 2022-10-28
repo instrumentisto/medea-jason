@@ -8,6 +8,13 @@ pub extern "C" fn wire_media_stream_settings_new(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_media_stream_settings_cast(
+    media_stream_settings: *mut wire_RefCellMediaStreamSettings,
+) -> support::WireSyncReturnStruct {
+    wire_media_stream_settings_cast_impl(media_stream_settings)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_media_stream_settings_audio(
     media_stream_settings: *mut wire_RefCellMediaStreamSettings,
     constraints: *mut wire_AudioTrackConstraints,

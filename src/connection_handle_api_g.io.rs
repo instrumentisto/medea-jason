@@ -4,7 +4,7 @@ use super::*;
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_on_close(
     connection: *mut wire_ConnectionHandle,
-    f: *mut wire_DartHandle,
+    f: *mut wire_ConnectionHandleDh,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_on_close_impl(connection, f)
 }
@@ -12,7 +12,7 @@ pub extern "C" fn wire_connection_handle_on_close(
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_on_remote_track_added(
     connection: *mut wire_ConnectionHandle,
-    f: *mut wire_DartHandle,
+    f: *mut wire_ConnectionHandleDh,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_on_remote_track_added_impl(connection, f)
 }
@@ -20,7 +20,7 @@ pub extern "C" fn wire_connection_handle_on_remote_track_added(
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_on_quality_score_update(
     connection: *mut wire_ConnectionHandle,
-    f: *mut wire_DartHandle,
+    f: *mut wire_ConnectionHandleDh,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_on_quality_score_update_impl(connection, f)
 }
@@ -70,8 +70,8 @@ pub extern "C" fn new_ConnectionHandle() -> *mut wire_ConnectionHandle {
 }
 
 #[no_mangle]
-pub extern "C" fn new_DartHandle() -> *mut wire_DartHandle {
-    support::new_leak_box_ptr(wire_DartHandle::new_with_null_ptr())
+pub extern "C" fn new_ConnectionHandleDh() -> *mut wire_ConnectionHandleDh {
+    support::new_leak_box_ptr(wire_ConnectionHandleDh::new_with_null_ptr())
 }
 
 #[no_mangle]
@@ -100,8 +100,8 @@ impl Wire2Api<Opaque<ConnectionHandle>> for *mut wire_ConnectionHandle {
         }
     }
 }
-impl Wire2Api<Opaque<Dart_Handle>> for *mut wire_DartHandle {
-    fn wire2api(self) -> Opaque<Dart_Handle> {
+impl Wire2Api<Opaque<ConnectionHandleDH>> for *mut wire_ConnectionHandleDh {
+    fn wire2api(self) -> Opaque<ConnectionHandleDH> {
         unsafe {
             let ans = support::box_from_leak_ptr(self);
             support::opaque_from_dart(ans.ptr as _)
@@ -119,7 +119,7 @@ pub struct wire_ConnectionHandle {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_DartHandle {
+pub struct wire_ConnectionHandleDh {
     ptr: *const core::ffi::c_void,
 }
 
@@ -142,7 +142,7 @@ impl NewWithNullPtr for wire_ConnectionHandle {
         }
     }
 }
-impl NewWithNullPtr for wire_DartHandle {
+impl NewWithNullPtr for wire_ConnectionHandleDh {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),

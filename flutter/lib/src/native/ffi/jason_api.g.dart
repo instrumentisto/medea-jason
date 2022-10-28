@@ -30,7 +30,7 @@ abstract class JasonApi {
 
   /// Closes the provided [`RoomHandle`].
   void jasonCloseRoom(
-      {required Jason jason, required RoomHandle roomToDelete, dynamic hint});
+      {required Jason jason, required JasonRh roomToDelete, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonCloseRoomConstMeta;
 }
@@ -38,6 +38,12 @@ abstract class JasonApi {
 @sealed
 class Jason extends FrbOpaque {
   Jason.fromRaw(int ptr, int drop, int share) : super.unsafe(ptr, drop, share);
+}
+
+@sealed
+class JasonRh extends FrbOpaque {
+  JasonRh.fromRaw(int ptr, int drop, int share)
+      : super.unsafe(ptr, drop, share);
 }
 
 @sealed
@@ -112,9 +118,9 @@ class JasonApiImpl implements JasonApi {
       );
 
   void jasonCloseRoom(
-      {required Jason jason, required RoomHandle roomToDelete, dynamic hint}) {
+      {required Jason jason, required JasonRh roomToDelete, dynamic hint}) {
     var arg0 = _platform.api2wire_Jason(jason);
-    var arg1 = _platform.api2wire_RoomHandle(roomToDelete);
+    var arg1 = _platform.api2wire_JasonRh(roomToDelete);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_jason_close_room(arg0, arg1),
       parseSuccessData: _wire2api_SyncReturn_unit,
@@ -251,12 +257,12 @@ class JasonApiPlatform extends FlutterRustBridgeBase<JasonApiWire> {
   }
 
   @protected
-  ffi.Pointer<wire_RoomHandle> api2wire_RoomHandle(RoomHandle raw) {
+  ffi.Pointer<wire_JasonRh> api2wire_JasonRh(JasonRh raw) {
     if (raw.isStale()) {
       throw 'Use after dispose.';
     }
-    final ptr = inner.new_RoomHandle();
-    _api_fill_to_wire_RoomHandle(raw, ptr);
+    final ptr = inner.new_JasonRh();
+    _api_fill_to_wire_JasonRh(raw, ptr);
     return ptr;
   }
 // Section: api_fill_to_wire
@@ -265,8 +271,8 @@ class JasonApiPlatform extends FlutterRustBridgeBase<JasonApiWire> {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 
-  void _api_fill_to_wire_RoomHandle(
-      RoomHandle apiObj, ffi.Pointer<wire_RoomHandle> wireObj) {
+  void _api_fill_to_wire_JasonRh(
+      JasonRh apiObj, ffi.Pointer<wire_JasonRh> wireObj) {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 }
@@ -349,7 +355,7 @@ class JasonApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_jason_close_room(
     ffi.Pointer<wire_Jason> jason,
-    ffi.Pointer<wire_RoomHandle> room_to_delete,
+    ffi.Pointer<wire_JasonRh> room_to_delete,
   ) {
     return _wire_jason_close_room(
       jason,
@@ -360,10 +366,10 @@ class JasonApiWire implements FlutterRustBridgeWireBase {
   late final _wire_jason_close_roomPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_Jason>,
-              ffi.Pointer<wire_RoomHandle>)>>('wire_jason_close_room');
+              ffi.Pointer<wire_JasonRh>)>>('wire_jason_close_room');
   late final _wire_jason_close_room = _wire_jason_close_roomPtr.asFunction<
       WireSyncReturnStruct Function(
-          ffi.Pointer<wire_Jason>, ffi.Pointer<wire_RoomHandle>)>();
+          ffi.Pointer<wire_Jason>, ffi.Pointer<wire_JasonRh>)>();
 
   ffi.Pointer<wire_Jason> new_Jason() {
     return _new_Jason();
@@ -375,15 +381,15 @@ class JasonApiWire implements FlutterRustBridgeWireBase {
   late final _new_Jason =
       _new_JasonPtr.asFunction<ffi.Pointer<wire_Jason> Function()>();
 
-  ffi.Pointer<wire_RoomHandle> new_RoomHandle() {
-    return _new_RoomHandle();
+  ffi.Pointer<wire_JasonRh> new_JasonRh() {
+    return _new_JasonRh();
   }
 
-  late final _new_RoomHandlePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<wire_RoomHandle> Function()>>(
-          'new_RoomHandle');
-  late final _new_RoomHandle =
-      _new_RoomHandlePtr.asFunction<ffi.Pointer<wire_RoomHandle> Function()>();
+  late final _new_JasonRhPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<wire_JasonRh> Function()>>(
+          'new_JasonRh');
+  late final _new_JasonRh =
+      _new_JasonRhPtr.asFunction<ffi.Pointer<wire_JasonRh> Function()>();
 
   void free_WireSyncReturnStruct(
     WireSyncReturnStruct val,
@@ -404,7 +410,7 @@ class wire_Jason extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-class wire_RoomHandle extends ffi.Struct {
+class wire_JasonRh extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 

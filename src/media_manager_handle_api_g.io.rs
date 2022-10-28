@@ -53,11 +53,24 @@ pub extern "C" fn wire_media_manager_handle_microphone_volume(
     wire_media_manager_handle_microphone_volume_impl(manager)
 }
 
+#[no_mangle]
+pub extern "C" fn wire_media_manager_handle_on_device_change(
+    manager: *mut wire_MediaManagerHandle,
+    cb: *mut wire_MediaManagerHandleDh,
+) -> support::WireSyncReturnStruct {
+    wire_media_manager_handle_on_device_change_impl(manager, cb)
+}
+
 // Section: allocate functions
 
 #[no_mangle]
 pub extern "C" fn new_MediaManagerHandle() -> *mut wire_MediaManagerHandle {
     support::new_leak_box_ptr(wire_MediaManagerHandle::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_MediaManagerHandleDh() -> *mut wire_MediaManagerHandleDh {
+    support::new_leak_box_ptr(wire_MediaManagerHandleDh::new_with_null_ptr())
 }
 
 #[no_mangle]
@@ -80,6 +93,14 @@ pub extern "C" fn new_uint_8_list_8(len: i32) -> *mut wire_uint_8_list {
 
 impl Wire2Api<Opaque<MediaManagerHandle>> for *mut wire_MediaManagerHandle {
     fn wire2api(self) -> Opaque<MediaManagerHandle> {
+        unsafe {
+            let ans = support::box_from_leak_ptr(self);
+            support::opaque_from_dart(ans.ptr as _)
+        }
+    }
+}
+impl Wire2Api<Opaque<MediaManagerHandleDH>> for *mut wire_MediaManagerHandleDh {
+    fn wire2api(self) -> Opaque<MediaManagerHandleDH> {
         unsafe {
             let ans = support::box_from_leak_ptr(self);
             support::opaque_from_dart(ans.ptr as _)
@@ -119,6 +140,12 @@ pub struct wire_MediaManagerHandle {
 
 #[repr(C)]
 #[derive(Clone)]
+pub struct wire_MediaManagerHandleDh {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
 pub struct wire_MediaStreamSettings {
     ptr: *const core::ffi::c_void,
 }
@@ -143,6 +170,13 @@ impl<T> NewWithNullPtr for *mut T {
 }
 
 impl NewWithNullPtr for wire_MediaManagerHandle {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
+impl NewWithNullPtr for wire_MediaManagerHandleDh {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),

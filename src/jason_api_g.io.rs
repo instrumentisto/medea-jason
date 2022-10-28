@@ -23,7 +23,7 @@ pub extern "C" fn wire_jason_media_manager(
 #[no_mangle]
 pub extern "C" fn wire_jason_close_room(
     jason: *mut wire_Jason,
-    room_to_delete: *mut wire_RoomHandle,
+    room_to_delete: *mut wire_JasonRh,
 ) -> support::WireSyncReturnStruct {
     wire_jason_close_room_impl(jason, room_to_delete)
 }
@@ -36,8 +36,8 @@ pub extern "C" fn new_Jason() -> *mut wire_Jason {
 }
 
 #[no_mangle]
-pub extern "C" fn new_RoomHandle() -> *mut wire_RoomHandle {
-    support::new_leak_box_ptr(wire_RoomHandle::new_with_null_ptr())
+pub extern "C" fn new_JasonRh() -> *mut wire_JasonRh {
+    support::new_leak_box_ptr(wire_JasonRh::new_with_null_ptr())
 }
 
 // Section: deallocate functions
@@ -52,8 +52,8 @@ impl Wire2Api<Opaque<Jason>> for *mut wire_Jason {
         }
     }
 }
-impl Wire2Api<Opaque<RoomHandle>> for *mut wire_RoomHandle {
-    fn wire2api(self) -> Opaque<RoomHandle> {
+impl Wire2Api<Opaque<JasonRH>> for *mut wire_JasonRh {
+    fn wire2api(self) -> Opaque<JasonRH> {
         unsafe {
             let ans = support::box_from_leak_ptr(self);
             support::opaque_from_dart(ans.ptr as _)
@@ -70,7 +70,7 @@ pub struct wire_Jason {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_RoomHandle {
+pub struct wire_JasonRh {
     ptr: *const core::ffi::c_void,
 }
 
@@ -93,7 +93,7 @@ impl NewWithNullPtr for wire_Jason {
         }
     }
 }
-impl NewWithNullPtr for wire_RoomHandle {
+impl NewWithNullPtr for wire_JasonRh {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),

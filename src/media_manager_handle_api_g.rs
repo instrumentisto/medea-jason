@@ -143,6 +143,23 @@ fn wire_media_manager_handle_microphone_volume_impl(
         },
     )
 }
+fn wire_media_manager_handle_on_device_change_impl(
+    manager: impl Wire2Api<Opaque<MediaManagerHandle>> + UnwindSafe,
+    cb: impl Wire2Api<Opaque<MediaManagerHandleDH>> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "media_manager_handle_on_device_change",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_manager = manager.wire2api();
+            let api_cb = cb.wire2api();
+            media_manager_handle_on_device_change(api_manager, api_cb)
+        },
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks

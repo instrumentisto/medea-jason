@@ -2,9 +2,16 @@ use flutter_rust_bridge::{Opaque, SyncReturn};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::Jason;
+use crate::api::Error;
 pub use crate::api::{MediaManagerHandle, RoomHandle};
 #[cfg(not(feature = "mockable"))]
 pub use crate::jason::Jason;
+
+pub use super::{
+    media_manager_handle_api::MyDartFuture, utils::IntoDartFuture,
+};
+
+pub type JasonRH = RoomHandle;
 
 /// Instantiates a new [`Jason`] interface to interact with this library.
 pub fn jason_new() -> SyncReturn<Opaque<Jason>> {
@@ -28,7 +35,7 @@ pub fn jason_media_manager(
 /// Closes the provided [`RoomHandle`].
 pub fn jason_close_room(
     jason: Opaque<Jason>,
-    room_to_delete: Opaque<RoomHandle>,
+    room_to_delete: Opaque<JasonRH>,
 ) -> SyncReturn<()> {
     jason.close_room(RoomHandle::clone(&room_to_delete));
     SyncReturn(())
