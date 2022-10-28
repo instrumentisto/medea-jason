@@ -447,6 +447,10 @@ jobs:
           java-version: 11
         if: ${{ matrix.platform == 'android' }}
 
+      - name: Install Haxm
+        run: brew install --cask intel-haxm
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Parse Android API versions
         id: api-version
         run: |
