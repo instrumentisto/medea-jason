@@ -358,6 +358,10 @@ jobs:
           java-version: 11
         if: ${{ matrix.platform == 'android' }}
 
+      - name: Install Haxm
+        run: brew install --cask intel-haxm
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Test on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
