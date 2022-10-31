@@ -367,9 +367,7 @@ jobs:
         with:
           api-level: 31
           arch: x86_64
-          cores: 3
-          profile: pixel_2
-          emulator-options: -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -partition-size 2048 -qemu -m 2048
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           script: |
             $ANDROID_HOME/emulator/emulator -accel-check
             make test.e2e.native up=yes
@@ -458,10 +456,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
-          emulator-options: -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -partition-size 2048 -qemu -m 2048
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           arch: x86_64
-          cores: 3
-          profile: pixel_2
           script: |
             $ANDROID_HOME/emulator/emulator -accel-check
             make test.flutter
@@ -470,10 +466,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
-          emulator-options: -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -partition-size 2048 -qemu -m 2048
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           arch: x86_64
-          cores: 3
-          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
