@@ -8,6 +8,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _reason_C = Pointer<Utf8> Function(Pointer);
 typedef _reason_Dart = Pointer<Utf8> Function(Pointer);
@@ -36,6 +37,7 @@ final _free = dl.lookupFunction<_free_C, _free_Dart>('RoomCloseReason__free');
 class NativeRoomCloseReason extends RoomCloseReason {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
+  late api.RoomCloseReason opaque;
 
   /// Constructs a new [RoomCloseReason] backed by the Rust struct behind the
   /// provided [Pointer].
@@ -43,18 +45,28 @@ class NativeRoomCloseReason extends RoomCloseReason {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeRoomCloseReason.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   String reason() {
+    impl_api.roomCloseReasonReason(roomCloseReason: opaque);
+
     return _reason(ptr.getInnerPtr()).nativeStringToDartString();
   }
 
   @override
   bool isClosedByServer() {
+    impl_api.roomCloseReasonIsClosedByServer(roomCloseReason: opaque);
+
     return _isClosedByServer(ptr.getInnerPtr()) > 0;
   }
 
   @override
   bool isErr() {
+    impl_api.roomCloseReasonIsErr(roomCloseReason: opaque);
+
     return _isErr(ptr.getInnerPtr()) > 0;
   }
 
@@ -65,6 +77,8 @@ class NativeRoomCloseReason extends RoomCloseReason {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

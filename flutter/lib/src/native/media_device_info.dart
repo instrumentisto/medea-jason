@@ -9,6 +9,7 @@ import 'ffi/foreign_value.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _deviceId_C = Pointer<Utf8> Function(Pointer);
 typedef _deviceId_Dart = Pointer<Utf8> Function(Pointer);
@@ -41,6 +42,7 @@ final _free = dl.lookupFunction<_free_C, _free_Dart>('MediaDeviceInfo__free');
 class NativeMediaDeviceInfo extends MediaDeviceInfo {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
+  late api.MediaDeviceInfo opaque;
 
   /// Constructs a new [MediaDeviceInfo] backed by a Rust struct behind the
   /// provided [Pointer].
@@ -48,24 +50,36 @@ class NativeMediaDeviceInfo extends MediaDeviceInfo {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeMediaDeviceInfo.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   String deviceId() {
+    impl_api.mediaDeviceInfoDeviceId(mediaDevice: opaque);
+
     return _deviceId(ptr.getInnerPtr()).nativeStringToDartString();
   }
 
   @override
   String label() {
+    impl_api.mediaDeviceInfoLabel(mediaDevice: opaque);
+
     return _label(ptr.getInnerPtr()).nativeStringToDartString();
   }
 
   @override
   MediaDeviceKind kind() {
+    MediaDeviceKind.values[impl_api.mediaDeviceInfoKind(mediaDevice: opaque)];
+
     var index = _kind(ptr.getInnerPtr());
     return MediaDeviceKind.values[index];
   }
 
   @override
   String? groupId() {
+    impl_api.mediaDeviceInfoGroupId(mediaDevice: opaque);
+
     return _nativeGroupId(ptr.getInnerPtr()).toDart();
   }
 

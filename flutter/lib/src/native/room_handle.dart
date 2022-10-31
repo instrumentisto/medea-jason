@@ -4,6 +4,7 @@ import 'package:ffi/ffi.dart';
 
 import '../interface/connection_handle.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
+import 'ffi/api_api.g.dart' as api;
 import '../interface/media_track.dart';
 import '../interface/reconnect_handle.dart';
 import '../interface/room_close_reason.dart';
@@ -154,6 +155,7 @@ final _enableRemoteVideo =
 class NativeRoomHandle extends RoomHandle {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
+  late api.RoomHandle opaque;
 
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [Pointer].
@@ -161,8 +163,14 @@ class NativeRoomHandle extends RoomHandle {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeRoomHandle.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   Future<void> join(String token) async {
+    await rust2dart(impl_api.roomHandleJoin(roomHandle: opaque, token: token));
+
     var tokenPtr = token.toNativeUtf8();
     try {
       await (_join(ptr.getInnerPtr(), tokenPtr) as Future);
@@ -174,6 +182,9 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
+    // todo
+    // await rust2dart(impl_api.roomHandleSetLocalMediaSettings(roomHandle: opaque,  stopFirst: stopFirst, rollbackOnFail: rollbackOnFail));
+
     await (_setLocalMediaSettings(
         ptr.getInnerPtr(),
         (settings as MediaStreamSettings).ptr.getInnerPtr(),
@@ -183,26 +194,37 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> muteAudio() async {
+    await rust2dart(impl_api.roomHandleMuteAudio(roomHandle: opaque));
+
     await (_muteAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> unmuteAudio() async {
+    await rust2dart(impl_api.roomHandleUnmuteAudio(roomHandle: opaque));
+
     await (_unmuteAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> enableAudio() async {
+    await rust2dart(impl_api.roomHandleEnableAudio(roomHandle: opaque));
+
     await (_enableAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> disableAudio() async {
+    await rust2dart(impl_api.roomHandleDisableAudio(roomHandle: opaque));
+
     await (_disableAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.roomHandleMuteVideo(
+        roomHandle: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -214,6 +236,9 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.roomHandleUnmuteVideo(
+        roomHandle: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -225,6 +250,9 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.roomHandleEnableVideo(
+        roomHandle: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -236,6 +264,9 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.roomHandleDisableVideo(
+        roomHandle: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -247,16 +278,23 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> enableRemoteAudio() async {
+    await rust2dart(impl_api.roomHandleEnableRemoteAudio(roomHandle: opaque));
+
     await (_enableRemoteAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
+    await rust2dart(impl_api.roomHandleDisableRemoteAudio(roomHandle: opaque));
+
     await (_disableRemoteAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.roomHandleEnableRemoteVideo(
+        roomHandle: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -268,6 +306,9 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.roomHandleDisableRemoteVideo(
+        roomHandle: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -279,6 +320,8 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
+    impl_api.roomHandleOnNewConnection(roomHandle: opaque, cb: handle2rust(f));
+
     _onNewConnection(ptr.getInnerPtr(), (t) {
       f(NativeConnectionHandle(NullablePointer(t)));
     }).unwrap();
@@ -286,6 +329,8 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
+    impl_api.roomHandleOnClose(roomHandle: opaque, cb: handle2rust(f));
+
     _onClose(ptr.getInnerPtr(), (t) {
       f(NativeRoomCloseReason(NullablePointer(t)));
     }).unwrap();
@@ -293,6 +338,8 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
+    impl_api.roomHandleOnLocalTrack(roomHandle: opaque, cb: handle2rust(f));
+
     _onLocalTrack(ptr.getInnerPtr(), (t) {
       f(NativeLocalMediaTrack(NullablePointer(t)));
     }).unwrap();
@@ -300,6 +347,8 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
+    impl_api.roomHandleOnConnectionLoss(roomHandle: opaque, cb: handle2rust(f));
+
     _onConnectionLoss(ptr.getInnerPtr(), (t) {
       f(NativeReconnectHandle(NullablePointer(t)));
     }).unwrap();
@@ -307,6 +356,9 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
+    impl_api.roomHandleOnFailedLocalMedia(
+        roomHandle: opaque, cb: handle2rust(f));
+
     _onFailedLocalMedia(ptr.getInnerPtr(), (err) {
       f(err);
     }).unwrap();
@@ -319,6 +371,8 @@ class NativeRoomHandle extends RoomHandle {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

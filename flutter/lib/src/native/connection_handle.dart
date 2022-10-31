@@ -9,6 +9,7 @@ import 'ffi/nullable_pointer.dart';
 import 'ffi/result.dart';
 import 'jason.dart';
 import 'remote_media_track.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _getRemoteMemberId_C = Result Function(Pointer);
 typedef _getRemoteMemberId_Dart = Result Function(Pointer);
@@ -75,6 +76,7 @@ final _enableRemoteVideo =
 class NativeConnectionHandle extends ConnectionHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
+  late api.ConnectionHandle opaque;
 
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
   /// provided [Pointer].
@@ -82,18 +84,29 @@ class NativeConnectionHandle extends ConnectionHandle {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeConnectionHandle.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   String getRemoteMemberId() {
+    impl_api.connectionHandleGetRemoteMemberId(connection: opaque);
+
     return _getRemoteMemberId(ptr.getInnerPtr()).unwrap();
   }
 
   @override
   void onClose(void Function() f) {
+    impl_api.connectionHandleOnClose(connection: opaque, f: handle2rust(f));
+
     _onClose(ptr.getInnerPtr(), f).unwrap();
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
+    impl_api.connectionHandleOnRemoteTrackAdded(
+        connection: opaque, f: handle2rust(f));
+
     _onRemoteTrackAdded(ptr.getInnerPtr(), (t) {
       f(NativeRemoteMediaTrack(NullablePointer(t)));
     }).unwrap();
@@ -101,6 +114,9 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
+    impl_api.connectionHandleOnQualityScoreUpdate(
+        connection: opaque, f: handle2rust(f));
+
     _onQualityScoreUpdate(ptr.getInnerPtr(), f).unwrap();
   }
 
@@ -111,21 +127,32 @@ class NativeConnectionHandle extends ConnectionHandle {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 
   @override
   Future<void> enableRemoteAudio() async {
+    await rust2dart(
+        impl_api.connectionHandleEnableRemoteAudio(connection: opaque));
+
     await (_enableRemoteAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
+    await rust2dart(
+        impl_api.connectionHandleDisableRemoteAudio(connection: opaque));
+
     await (_disableRemoteAudio(ptr.getInnerPtr()) as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.connectionHandleEnableRemoteVideo(
+        connection: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {
@@ -137,6 +164,9 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
+    await rust2dart(impl_api.connectionHandleDisableRemoteVideo(
+        connection: opaque, sourceKind: kind?.index));
+
     var kind_arg =
         kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
     try {

@@ -10,6 +10,7 @@ import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 import '../interface/display_video_track_constraints.dart'
     as base_display_video;
@@ -46,6 +47,8 @@ final _free =
 class MediaStreamSettings extends base.MediaStreamSettings {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+  final api.RefCellMediaStreamSettings opaque =
+      impl_api.mediaStreamSettingsNew();
 
   MediaStreamSettings() {
     RustHandlesStorage().insertHandle(this);
@@ -53,6 +56,11 @@ class MediaStreamSettings extends base.MediaStreamSettings {
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
+    impl_api.mediaStreamSettingsAudio(
+        mediaStreamSettings: opaque,
+        constraints: (constraints as AudioTrackConstraints).opaque);
+    constraints.opaque.dispose();
+
     _audio(ptr.getInnerPtr(),
         (constraints as AudioTrackConstraints).ptr.getInnerPtr());
     constraints.ptr.free();
@@ -62,6 +70,11 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void deviceVideo(
       @moveSemantics
           base_device_video.DeviceVideoTrackConstraints constraints) {
+    impl_api.mediaStreamSettingsDeviceVideo(
+        mediaStreamSettings: opaque,
+        constraints: (constraints as DeviceVideoTrackConstraints).opaque);
+    constraints.opaque.dispose();
+
     _deviceVideo(ptr.getInnerPtr(),
         (constraints as DeviceVideoTrackConstraints).ptr.getInnerPtr());
     constraints.ptr.free();
@@ -71,6 +84,11 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void displayVideo(
       @moveSemantics
           base_display_video.DisplayVideoTrackConstraints constraints) {
+    impl_api.mediaStreamSettingsDisplayVideo(
+        mediaStreamSettings: opaque,
+        constraints: (constraints as DisplayVideoTrackConstraints).opaque);
+    constraints.opaque.dispose();
+
     _displayVideo(ptr.getInnerPtr(),
         (constraints as DisplayVideoTrackConstraints).ptr.getInnerPtr());
     constraints.ptr.free();
@@ -83,6 +101,8 @@ class MediaStreamSettings extends base.MediaStreamSettings {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

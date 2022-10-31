@@ -8,6 +8,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'ffi/result.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();
@@ -68,6 +69,8 @@ final _free_Dart _free = dl
 class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
+  final api.RefCellDisplayVideoTrackConstraints opaque =
+      impl_api.displayVideoTrackConstraintsNew();
 
   DisplayVideoTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
@@ -75,36 +78,57 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
 
   @override
   void exactHeight(int height) {
+    impl_api.displayVideoTrackConstraintsExactHeight(
+        constraints: opaque, exactHeight: height);
+
     _exactHeight(ptr.getInnerPtr(), height).unwrap();
   }
 
   @override
   void idealHeight(int height) {
+    impl_api.displayVideoTrackConstraintsIdealHeight(
+        constraints: opaque, idealHeight: height);
+
     _idealHeight(ptr.getInnerPtr(), height).unwrap();
   }
 
   @override
   void exactWidth(int width) {
+    impl_api.displayVideoTrackConstraintsExactWidth(
+        constraints: opaque, exactWidth: width);
+
     _exactWidth(ptr.getInnerPtr(), width).unwrap();
   }
 
   @override
   void idealWidth(int width) {
+    impl_api.displayVideoTrackConstraintsIdealWidth(
+        constraints: opaque, idealWidth: width);
+
     _idealWidth(ptr.getInnerPtr(), width).unwrap();
   }
 
   @override
   void exactFrameRate(int frameRate) {
+    impl_api.displayVideoTrackConstraintsExactFrameRate(
+        constraints: opaque, exactFrameRate: frameRate);
+
     _exactFrameRate(ptr.getInnerPtr(), frameRate).unwrap();
   }
 
   @override
   void idealFrameRate(int frameRate) {
+    impl_api.displayVideoTrackConstraintsIdealFrameRate(
+        constraints: opaque, idealFrameRate: frameRate);
+
     _idealFrameRate(ptr.getInnerPtr(), frameRate).unwrap();
   }
 
   @override
   void deviceId(String deviceId) {
+    impl_api.displayVideoTrackConstraintsDeviceId(
+        constraints: opaque, deviceId: deviceId);
+
     var deviceIdPtr = deviceId.toNativeUtf8();
     try {
       _deviceId(ptr.getInnerPtr(), deviceIdPtr);
@@ -120,6 +144,8 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

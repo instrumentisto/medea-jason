@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../interface/audio_track_constraints.dart' as base;
+import 'ffi/api_api.g.dart' as api;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
@@ -31,12 +32,17 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
+  final api.RefCellAudioTrackConstraints opaque =
+      impl_api.audioTrackConstraintsNew();
+
   AudioTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   void deviceId(String deviceId) {
+    impl_api.audioTrackConstraintsDeviceId(track: opaque, deviceId: deviceId);
+
     var deviceIdPtr = deviceId.toNativeUtf8();
     try {
       _deviceId(ptr.getInnerPtr(), deviceIdPtr);
@@ -53,6 +59,8 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

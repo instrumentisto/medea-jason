@@ -13,21 +13,7 @@
     missing_docs
 )]
 
-pub mod audio_track_constraints_api;
-pub mod connection_handle_api;
-pub mod device_video_track_constraints_api;
-pub mod display_video_track_constraints_api;
-pub mod jason_api;
-pub mod local_media_track_api;
-pub mod media_device_info_api;
-pub mod media_display_info_api;
-pub mod media_manager_handle_api;
-pub mod media_stream_settings_api;
-pub mod reconnect_handle_api;
-pub mod remote_media_track_api;
-pub mod room_close_reason_api;
-pub mod room_handle_api;
-pub mod cast_stuff_api;
+pub mod api_api;
 
 pub mod audio_track_constraints;
 pub mod connection_handle;

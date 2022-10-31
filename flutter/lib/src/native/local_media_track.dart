@@ -7,6 +7,7 @@ import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _kind_C = Uint8 Function(Pointer);
 typedef _kind_Dart = int Function(Pointer);
@@ -34,6 +35,7 @@ final _free = dl.lookupFunction<_free_C, _free_Dart>('LocalMediaTrack__free');
 class NativeLocalMediaTrack extends LocalMediaTrack {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
+  late api.LocalMediaTrack opaque;
 
   /// Constructs a new [LocalMediaTrack] backed by the Rust struct behind the
   /// provided [Pointer].
@@ -41,20 +43,31 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeLocalMediaTrack.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   MediaKind kind() {
+    MediaKind.values[impl_api.localMediaTrackKind(track: opaque)];
+
     var index = _kind(ptr.getInnerPtr());
     return MediaKind.values[index];
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
+    MediaSourceKind
+        .values[impl_api.localMediaTrackMediaSourceKind(track: opaque)];
+
     var index = _sourceKind(ptr.getInnerPtr());
     return MediaSourceKind.values[index];
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
+    rust2dart2(impl_api.localMediaTrackGetTrack(track: opaque));
+
     return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
   }
 
@@ -65,6 +78,8 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

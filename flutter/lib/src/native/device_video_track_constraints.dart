@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
 import '../interface/device_video_track_constraints.dart' as base;
+import 'ffi/api_api.g.dart' as api;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
@@ -81,12 +82,18 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 
+  final api.RefCellDeviceVideoTrackConstraints opaque =
+      impl_api.deviceVideoTrackConstraintsNew();
+
   DeviceVideoTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   void deviceId(String deviceId) {
+    impl_api.deviceVideoTrackConstraintsDeviceId(
+        constraints: opaque, deviceId: deviceId);
+
     var deviceIdPtr = deviceId.toNativeUtf8();
     try {
       _deviceId(ptr.getInnerPtr(), deviceIdPtr);
@@ -97,41 +104,65 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
 
   @override
   void exactFacingMode(base.FacingMode facingMode) {
+    impl_api.deviceVideoTrackConstraintsExactFacingMode(
+        constraints: opaque, facingMode: facingMode.index);
+
     _exactFacingMode(ptr.getInnerPtr(), facingMode.index);
   }
 
   @override
   void idealFacingMode(base.FacingMode facingMode) {
+    impl_api.deviceVideoTrackConstraintsIdealFacingMode(
+        constraints: opaque, facingMode: facingMode.index);
+
     _idealFacingMode(ptr.getInnerPtr(), facingMode.index);
   }
 
   @override
   void exactHeight(int height) {
+    impl_api.deviceVideoTrackConstraintsExactHeight(
+        constraints: opaque, exactHeight: height);
+
     _exactHeight(ptr.getInnerPtr(), height).unwrap();
   }
 
   @override
   void idealHeight(int height) {
+    impl_api.deviceVideoTrackConstraintsIdealHeight(
+        constraints: opaque, idealHeight: height);
+
     _idealHeight(ptr.getInnerPtr(), height).unwrap();
   }
 
   @override
   void heightInRange(int min, int max) {
+    impl_api.deviceVideoTrackConstraintsHeightInRange(
+        constraints: opaque, min: min, max: max);
+
     _heightInRange(ptr.getInnerPtr(), min, max).unwrap();
   }
 
   @override
   void exactWidth(int width) {
+    impl_api.deviceVideoTrackConstraintsExactWidth(
+        constraints: opaque, exactWidth: width);
+
     _exactWidth(ptr.getInnerPtr(), width).unwrap();
   }
 
   @override
   void idealWidth(int width) {
+    impl_api.deviceVideoTrackConstraintsIdealWidth(
+        constraints: opaque, idealWidth: width);
+
     _idealWidth(ptr.getInnerPtr(), width).unwrap();
   }
 
   @override
   void widthInRange(int min, int max) {
+    impl_api.deviceVideoTrackConstraintsWidthInRange(
+        constraints: opaque, min: min, max: max);
+
     _widthInRange(ptr.getInnerPtr(), min, max).unwrap();
   }
 
@@ -142,6 +173,8 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

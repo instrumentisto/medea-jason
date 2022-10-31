@@ -18,6 +18,7 @@ import 'local_media_track.dart';
 import 'media_device_info.dart';
 import 'media_display_info.dart';
 import 'media_stream_settings.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _initLocalTracks_C = Handle Function(Pointer, Pointer);
 typedef _initLocalTracks_Dart = Object Function(Pointer, Pointer);
@@ -84,10 +85,15 @@ final _free =
 class NativeMediaManagerHandle extends MediaManagerHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
+  late api.MediaManagerHandle opaque;
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [Pointer].
   NativeMediaManagerHandle(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
+  NativeMediaManagerHandle.opaque(this.opaque) {
     RustHandlesStorage().insertHandle(this);
   }
 

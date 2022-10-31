@@ -7,6 +7,7 @@ import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _muted_C = Uint8 Function(Pointer);
 typedef _muted_Dart = int Function(Pointer);
@@ -73,6 +74,7 @@ final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
 class NativeRemoteMediaTrack extends RemoteMediaTrack {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
+  late api.RemoteMediaTrack opaque;
 
   /// Constructs a new [RemoteMediaTrack] backed by the Rust struct behind the
   /// provided [Pointer].
@@ -80,46 +82,68 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeRemoteMediaTrack.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   bool muted() {
+    impl_api.remoteMediaTrackMuted(track: opaque);
+
     return _muted(ptr.getInnerPtr()) > 0;
   }
 
   @override
   MediaKind kind() {
+    MediaKind.values[impl_api.remoteMediaTrackKind(track: opaque)];
+
     var index = _kind(ptr.getInnerPtr());
     return MediaKind.values[index];
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
+    MediaSourceKind
+        .values[impl_api.remoteMediaTrackMediaSourceKind(track: opaque)];
+
     var index = _mediaSourceKind(ptr.getInnerPtr());
     return MediaSourceKind.values[index];
   }
 
   @override
   TrackMediaDirection mediaDirection() {
+    TrackMediaDirection
+        .values[impl_api.remoteMediaTrackMediaDirection(track: opaque)];
+
     var index = _mediaDirectionKind(ptr.getInnerPtr());
     return TrackMediaDirection.values[index];
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
+    rust2dart2(impl_api.remoteMediaTrackGetTrack(track: opaque));
+
     return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
   }
 
   @override
   void onMuted(void Function() f) {
+    impl_api.remoteMediaTrackOnMuted(track: opaque, f: handle2rust(f));
+
     _onMuted(ptr.getInnerPtr(), f);
   }
 
   @override
   void onUnmuted(void Function() f) {
+    impl_api.remoteMediaTrackOnUnmuted(track: opaque, f: handle2rust(f));
+
     _onUnmuted(ptr.getInnerPtr(), f);
   }
 
   @override
   void onStopped(void Function() f) {
+    impl_api.remoteMediaTrackOnStopped(track: opaque, f: handle2rust(f));
+
     _onStopped(ptr.getInnerPtr(), f);
   }
 
@@ -130,11 +154,16 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+    impl_api.remoteMediaTrackOnMediaDirectionChanged(
+        track: opaque, f: handle2rust(f));
+
     _onMediaDirectionChanged(
         ptr.getInnerPtr(), (i) => f(TrackMediaDirection.values[i]));
   }

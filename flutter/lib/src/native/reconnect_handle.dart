@@ -6,6 +6,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
@@ -31,6 +32,7 @@ final _reconnect_with_backoff =
 class NativeReconnectHandle extends ReconnectHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
+  late api.ReconnectHandle opaque;
 
   /// Constructs a new [ReconnectHandle] backed by the Rust struct behind the
   /// provided [Pointer].
@@ -38,8 +40,15 @@ class NativeReconnectHandle extends ReconnectHandle {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeReconnectHandle.opaque(this.opaque) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
+    await rust2dart(impl_api.reconnectHandleReconnectWithDelay(
+        reconnectHandle: opaque, delayMs: delayMs));
+
     await (_reconnect_with_delay(ptr.getInnerPtr(), delayMs) as Future);
   }
 
@@ -52,6 +61,13 @@ class NativeReconnectHandle extends ReconnectHandle {
         : ForeignValue.fromInt(maxElapsedTimeMs);
 
     try {
+      await rust2dart(impl_api.reconnectHandleReconnectWithBackoff(
+          reconnectHandle: opaque,
+          startingDelay: startingDelayMs,
+          multiplier: multiplier,
+          maxDelay: maxDelay,
+          maxElapsedTimeMs: maxElapsedTimeMs));
+
       await (_reconnect_with_backoff(ptr.getInnerPtr(), startingDelayMs,
           multiplier, maxDelay, maxElapsedTimeMs_arg.ref) as Future);
     } finally {
@@ -66,6 +82,8 @@ class NativeReconnectHandle extends ReconnectHandle {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

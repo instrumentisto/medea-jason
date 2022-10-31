@@ -9,6 +9,7 @@ import 'ffi/foreign_value.dart';
 import 'ffi/native_string.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'ffi/api_api.g.dart' as api;
 
 typedef _deviceId_C = Pointer<Utf8> Function(Pointer);
 typedef _deviceId_Dart = Pointer<Utf8> Function(Pointer);
@@ -30,6 +31,7 @@ final _free = dl.lookupFunction<_free_C, _free_Dart>('MediaDisplayInfo__free');
 class NativeMediaDisplayInfo extends MediaDisplayInfo {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
+  late api.MediaDisplayInfo opaque;
 
   /// Constructs a new [MediaDisplayInfo] backed by a Rust struct behind the
   /// provided [Pointer].
@@ -37,13 +39,21 @@ class NativeMediaDisplayInfo extends MediaDisplayInfo {
     RustHandlesStorage().insertHandle(this);
   }
 
+  NativeMediaDisplayInfo.opaque(this.ptr) {
+    RustHandlesStorage().insertHandle(this);
+  }
+
   @override
   String deviceId() {
+    impl_api.mediaDisplayInfoDeviceId(mediaDisplay: opaque);
+
     return _deviceId(ptr.getInnerPtr()).nativeStringToDartString();
   }
 
   @override
   String? title() {
+    impl_api.mediaDisplayInfoTitle(mediaDisplay: opaque);
+
     return _title(ptr.getInnerPtr()).toDart();
   }
 
@@ -54,6 +64,8 @@ class NativeMediaDisplayInfo extends MediaDisplayInfo {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

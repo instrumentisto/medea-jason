@@ -14,7 +14,7 @@ import 'ffi/exception.dart' as exceptions;
 import 'ffi/executor.dart';
 import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
-import 'ffi/jason_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as api;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
 import 'ffi/native_string.dart' as native_string;
@@ -23,9 +23,11 @@ import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
-
 typedef _cast_C = Handle Function(IntPtr);
 typedef _cast_Dart = Object Function(int);
+
+typedef _cast_handle_C = IntPtr Function(Handle);
+typedef _cast_handle_Dart = int Function(Object);
 
 typedef _new_C = Pointer Function();
 typedef _new_Dart = Pointer Function();
@@ -46,7 +48,25 @@ typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
 final DynamicLibrary dl = _dl_load();
-late api.JasonApiImpl _api;
+late api.ApiApiImpl impl_api;
+
+//todo
+Future<dynamic> rust2dart(api.MyDartFuture future) {
+  var res = _cast(impl_api.dartFutureToUsize(handle: future)) as Future;
+  future.dispose();
+  return res;
+}
+
+Object rust2dart2(api.DartHandle handle) {
+  var res = _cast(impl_api.opaqueToUsize(handle: handle));
+  handle.dispose();
+  return res;
+}
+
+//todo
+api.DartHandle handle2rust(Object obj) {
+  return impl_api.dartHandleToOpaque(handle: _cast_handle(obj));
+}
 
 /// [Executor] that drives Rust futures.
 ///
@@ -55,6 +75,9 @@ late api.JasonApiImpl _api;
 var executor;
 
 final _cast = dl.lookupFunction<_cast_C, _cast_Dart>('int2handle');
+final _cast_handle =
+    dl.lookupFunction<_cast_handle_C, _cast_handle_Dart>('handle2int');
+
 final _new = dl.lookupFunction<_new_C, _new_Dart>('Jason__new');
 
 final _media_manager = dl.lookupFunction<_mediaManager_C, _mediaManager_Dart>(
@@ -131,14 +154,14 @@ DynamicLibrary _dl_load() {
     }
   });
 
-  _api = api.JasonApiImpl(dl);
+  impl_api = api.ApiApiImpl(dl);
   return dl;
 }
 
 class Jason extends base.Jason {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
-  final api.Jason jason = _api.jasonNew();
+  final api.Jason opaque = impl_api.jasonNew();
 
   Jason() {
     RustHandlesStorage().insertHandle(this);
@@ -152,12 +175,16 @@ class Jason extends base.Jason {
 
   @override
   RoomHandle initRoom() {
-    // var room_handle = _api.jasonInitRoom(jason: jason);
+    NativeRoomHandle.opaque(impl_api.jasonInitRoom(jason: opaque));
+
     return NativeRoomHandle(NullablePointer(_initRoom(ptr.getInnerPtr())));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
+    impl_api.jasonCloseRoom(
+        jason: opaque, roomToDelete: (room as NativeRoomHandle).opaque);
+
     _close_room(
         ptr.getInnerPtr(), (room as NativeRoomHandle).ptr.getInnerPtr());
     room.ptr.free();
@@ -168,9 +195,10 @@ class Jason extends base.Jason {
   void free() {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
-      // jason.dispose();
       _free(ptr.getInnerPtr());
       ptr.free();
+
+      opaque.dispose();
     }
   }
 }

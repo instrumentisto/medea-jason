@@ -61,23 +61,7 @@ fn gen_args(
 }
 
 fn main() {
-    let (rust_input, dart_output, rust_output, class_name) = gen_args(&[
-        "jason",
-        "audio_track_constraints",
-        "connection_handle",
-        "device_video_track_constraints",
-        "display_video_track_constraints",
-        "local_media_track",
-        "media_device_info",
-        "media_display_info",
-        "media_manager_handle",
-        "media_stream_settings",
-        "reconnect_handle",
-        "remote_media_track",
-        "room_close_reason",
-        "room_handle",
-        "cast_stuff"
-    ]);
+    let (rust_input, dart_output, rust_output, class_name) = gen_args(&["api"]);
     // Tell Cargo that if the input Rust code changes, to rerun this build
     // script.
     println!("cargo:rerun-if-changed={}", "src/lib.rs");
