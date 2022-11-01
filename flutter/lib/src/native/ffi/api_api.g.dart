@@ -23,6 +23,40 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kDartHandleToOpaqueConstMeta;
 
+  ConnectionHandle connectionHandleFromPtr({required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kConnectionHandleFromPtrConstMeta;
+
+  RefCellVecLocalMediaTrack vecLocalTracksFromPtr(
+      {required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecLocalTracksFromPtrConstMeta;
+
+  LocalMediaTrack? vecLocalTracksPop(
+      {required RefCellVecLocalMediaTrack vec, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecLocalTracksPopConstMeta;
+
+  RefCellVecMediaDisplayInfo vecMediaDisplayInfoFromPtr(
+      {required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta;
+
+  MediaDisplayInfo? vecMediaDisplayInfoPop(
+      {required RefCellVecMediaDisplayInfo vec, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoPopConstMeta;
+
+  RefCellVecMediaDeviceInfo vecMediaDeviceInfoFromPtr(
+      {required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoFromPtrConstMeta;
+
+  MediaDeviceInfo? vecMediaDeviceInfoPop(
+      {required RefCellVecMediaDeviceInfo vec, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoPopConstMeta;
+
   /// Creates new [`AudioTrackConstraints`] with none constraints configured.
   RefCellAudioTrackConstraints audioTrackConstraintsNew({dynamic hint});
 
@@ -311,27 +345,39 @@ abstract class ApiApi {
       get kDisplayVideoTrackConstraintsExactFrameRateConstMeta;
 
   /// Instantiates a new [`Jason`] interface to interact with this library.
-  Jason jasonNew({dynamic hint});
+  RefCellOptionJason jasonNew({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonNewConstMeta;
 
   /// Creates a new [`Room`] and returns its [`RoomHandle`].
   ///
   /// [`Room`]: crate::room::Room
-  RoomHandle jasonInitRoom({required Jason jason, dynamic hint});
+  RoomHandle jasonInitRoom({required RefCellOptionJason jason, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonInitRoomConstMeta;
 
   /// Returns a [`MediaManagerHandle`].
-  MediaManagerHandle jasonMediaManager({required Jason jason, dynamic hint});
+  MediaManagerHandle jasonMediaManager(
+      {required RefCellOptionJason jason, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonMediaManagerConstMeta;
 
   /// Closes the provided [`RoomHandle`].
   void jasonCloseRoom(
-      {required Jason jason, required RoomHandle roomToDelete, dynamic hint});
+      {required RefCellOptionJason jason,
+      required RoomHandle roomToDelete,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonCloseRoomConstMeta;
+
+  /// Closes the provided [`RoomHandle`].
+  void jasonDispose({required RefCellOptionJason jason, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kJasonDisposeConstMeta;
+
+  LocalMediaTrack localMediaTrackFromPtr({required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackFromPtrConstMeta;
 
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
   /// [`LocalMediaTrack`].
@@ -419,7 +465,7 @@ abstract class ApiApi {
   /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
   MyDartFuture mediaManagerHandleInitLocalTracks(
       {required MediaManagerHandle manager,
-      required MediaStreamSettings caps,
+      required RefCellMediaStreamSettings caps,
       dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
@@ -511,6 +557,10 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsDisplayVideoConstMeta;
 
+  ReconnectHandle reconnectHandleFromPtr({required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kReconnectHandleFromPtrConstMeta;
+
   /// Tries to reconnect a [`Room`] after the provided delay in milliseconds.
   ///
   /// If the [`Room`] is already reconnecting then new reconnection attempt won't
@@ -558,6 +608,10 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta
       get kReconnectHandleReconnectWithBackoffConstMeta;
+
+  RemoteMediaTrack remoteMediaTrackFromPtr({required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackFromPtrConstMeta;
 
   /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of track
   /// [`RemoteMediaTrack`].
@@ -616,6 +670,10 @@ abstract class ApiApi {
       {required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMediaDirectionConstMeta;
+
+  RoomCloseReason roomCloseReasonFromPtr({required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonFromPtrConstMeta;
 
   /// Returns a close reason of a [`Room`].
   ///
@@ -682,7 +740,7 @@ abstract class ApiApi {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   MyDartFuture roomHandleSetLocalMediaSettings(
       {required RoomHandle roomHandle,
-      required MediaStreamSettings settings,
+      required RefCellMediaStreamSettings settings,
       required bool stopFirst,
       required bool rollbackOnFail,
       dynamic hint});
@@ -860,12 +918,6 @@ class DartHandle extends FrbOpaque {
 }
 
 @sealed
-class Jason extends FrbOpaque {
-  Jason.fromRaw(int ptr, int drop, int share, int size)
-      : super.unsafe(ptr, drop, share, size);
-}
-
-@sealed
 class LocalMediaTrack extends FrbOpaque {
   LocalMediaTrack.fromRaw(int ptr, int drop, int share, int size)
       : super.unsafe(ptr, drop, share, size);
@@ -886,12 +938,6 @@ class MediaDisplayInfo extends FrbOpaque {
 @sealed
 class MediaManagerHandle extends FrbOpaque {
   MediaManagerHandle.fromRaw(int ptr, int drop, int share, int size)
-      : super.unsafe(ptr, drop, share, size);
-}
-
-@sealed
-class MediaStreamSettings extends FrbOpaque {
-  MediaStreamSettings.fromRaw(int ptr, int drop, int share, int size)
       : super.unsafe(ptr, drop, share, size);
 }
 
@@ -930,6 +976,30 @@ class RefCellDisplayVideoTrackConstraints extends FrbOpaque {
 @sealed
 class RefCellMediaStreamSettings extends FrbOpaque {
   RefCellMediaStreamSettings.fromRaw(int ptr, int drop, int share, int size)
+      : super.unsafe(ptr, drop, share, size);
+}
+
+@sealed
+class RefCellOptionJason extends FrbOpaque {
+  RefCellOptionJason.fromRaw(int ptr, int drop, int share, int size)
+      : super.unsafe(ptr, drop, share, size);
+}
+
+@sealed
+class RefCellVecLocalMediaTrack extends FrbOpaque {
+  RefCellVecLocalMediaTrack.fromRaw(int ptr, int drop, int share, int size)
+      : super.unsafe(ptr, drop, share, size);
+}
+
+@sealed
+class RefCellVecMediaDeviceInfo extends FrbOpaque {
+  RefCellVecMediaDeviceInfo.fromRaw(int ptr, int drop, int share, int size)
+      : super.unsafe(ptr, drop, share, size);
+}
+
+@sealed
+class RefCellVecMediaDisplayInfo extends FrbOpaque {
+  RefCellVecMediaDisplayInfo.fromRaw(int ptr, int drop, int share, int size)
       : super.unsafe(ptr, drop, share, size);
 }
 
@@ -1009,6 +1079,131 @@ class ApiApiImpl implements ApiApi {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "dart_handle_to_opaque",
         argNames: ["handle"],
+      );
+
+  ConnectionHandle connectionHandleFromPtr({required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_connection_handle_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_ConnectionHandle,
+      constMeta: kConnectionHandleFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kConnectionHandleFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "connection_handle_from_ptr",
+        argNames: ["ptr"],
+      );
+
+  RefCellVecLocalMediaTrack vecLocalTracksFromPtr(
+      {required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_vec_local_tracks_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_RefCellVecLocalMediaTrack,
+      constMeta: kVecLocalTracksFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kVecLocalTracksFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "vec_local_tracks_from_ptr",
+        argNames: ["ptr"],
+      );
+
+  LocalMediaTrack? vecLocalTracksPop(
+      {required RefCellVecLocalMediaTrack vec, dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellVecLocalMediaTrack(vec);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_vec_local_tracks_pop(arg0),
+      parseSuccessData: _wire2api_SyncReturn_Option_LocalMediaTrack,
+      constMeta: kVecLocalTracksPopConstMeta,
+      argValues: [vec],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kVecLocalTracksPopConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "vec_local_tracks_pop",
+        argNames: ["vec"],
+      );
+
+  RefCellVecMediaDisplayInfo vecMediaDisplayInfoFromPtr(
+      {required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_vec_media_display_info_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_RefCellVecMediaDisplayInfo,
+      constMeta: kVecMediaDisplayInfoFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "vec_media_display_info_from_ptr",
+        argNames: ["ptr"],
+      );
+
+  MediaDisplayInfo? vecMediaDisplayInfoPop(
+      {required RefCellVecMediaDisplayInfo vec, dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellVecMediaDisplayInfo(vec);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_vec_media_display_info_pop(arg0),
+      parseSuccessData: _wire2api_SyncReturn_Option_MediaDisplayInfo,
+      constMeta: kVecMediaDisplayInfoPopConstMeta,
+      argValues: [vec],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoPopConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "vec_media_display_info_pop",
+        argNames: ["vec"],
+      );
+
+  RefCellVecMediaDeviceInfo vecMediaDeviceInfoFromPtr(
+      {required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_vec_media_device_info_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_RefCellVecMediaDeviceInfo,
+      constMeta: kVecMediaDeviceInfoFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "vec_media_device_info_from_ptr",
+        argNames: ["ptr"],
+      );
+
+  MediaDeviceInfo? vecMediaDeviceInfoPop(
+      {required RefCellVecMediaDeviceInfo vec, dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellVecMediaDeviceInfo(vec);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_vec_media_device_info_pop(arg0),
+      parseSuccessData: _wire2api_SyncReturn_Option_MediaDeviceInfo,
+      constMeta: kVecMediaDeviceInfoPopConstMeta,
+      argValues: [vec],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoPopConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "vec_media_device_info_pop",
+        argNames: ["vec"],
       );
 
   RefCellAudioTrackConstraints audioTrackConstraintsNew({dynamic hint}) {
@@ -1662,10 +1857,10 @@ class ApiApiImpl implements ApiApi {
             argNames: ["constraints", "exactFrameRate"],
           );
 
-  Jason jasonNew({dynamic hint}) {
+  RefCellOptionJason jasonNew({dynamic hint}) {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_jason_new(),
-      parseSuccessData: _wire2api_SyncReturn_Jason,
+      parseSuccessData: _wire2api_SyncReturn_RefCellOptionJason,
       constMeta: kJasonNewConstMeta,
       argValues: [],
       hint: hint,
@@ -1678,8 +1873,8 @@ class ApiApiImpl implements ApiApi {
         argNames: [],
       );
 
-  RoomHandle jasonInitRoom({required Jason jason, dynamic hint}) {
-    var arg0 = _platform.api2wire_Jason(jason);
+  RoomHandle jasonInitRoom({required RefCellOptionJason jason, dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellOptionJason(jason);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_jason_init_room(arg0),
       parseSuccessData: _wire2api_SyncReturn_RoomHandle,
@@ -1695,8 +1890,9 @@ class ApiApiImpl implements ApiApi {
         argNames: ["jason"],
       );
 
-  MediaManagerHandle jasonMediaManager({required Jason jason, dynamic hint}) {
-    var arg0 = _platform.api2wire_Jason(jason);
+  MediaManagerHandle jasonMediaManager(
+      {required RefCellOptionJason jason, dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellOptionJason(jason);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_jason_media_manager(arg0),
       parseSuccessData: _wire2api_SyncReturn_MediaManagerHandle,
@@ -1713,8 +1909,10 @@ class ApiApiImpl implements ApiApi {
       );
 
   void jasonCloseRoom(
-      {required Jason jason, required RoomHandle roomToDelete, dynamic hint}) {
-    var arg0 = _platform.api2wire_Jason(jason);
+      {required RefCellOptionJason jason,
+      required RoomHandle roomToDelete,
+      dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellOptionJason(jason);
     var arg1 = _platform.api2wire_RoomHandle(roomToDelete);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_jason_close_room(arg0, arg1),
@@ -1729,6 +1927,40 @@ class ApiApiImpl implements ApiApi {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "jason_close_room",
         argNames: ["jason", "roomToDelete"],
+      );
+
+  void jasonDispose({required RefCellOptionJason jason, dynamic hint}) {
+    var arg0 = _platform.api2wire_RefCellOptionJason(jason);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_jason_dispose(arg0),
+      parseSuccessData: _wire2api_SyncReturn_unit,
+      constMeta: kJasonDisposeConstMeta,
+      argValues: [jason],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kJasonDisposeConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "jason_dispose",
+        argNames: ["jason"],
+      );
+
+  LocalMediaTrack localMediaTrackFromPtr({required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_local_media_track_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_LocalMediaTrack,
+      constMeta: kLocalMediaTrackFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "local_media_track_from_ptr",
+        argNames: ["ptr"],
       );
 
   DartHandle localMediaTrackGetTrack(
@@ -1895,10 +2127,10 @@ class ApiApiImpl implements ApiApi {
 
   MyDartFuture mediaManagerHandleInitLocalTracks(
       {required MediaManagerHandle manager,
-      required MediaStreamSettings caps,
+      required RefCellMediaStreamSettings caps,
       dynamic hint}) {
     var arg0 = _platform.api2wire_MediaManagerHandle(manager);
-    var arg1 = _platform.api2wire_MediaStreamSettings(caps);
+    var arg1 = _platform.api2wire_RefCellMediaStreamSettings(caps);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_media_manager_handle_init_local_tracks(arg0, arg1),
@@ -2151,6 +2383,23 @@ class ApiApiImpl implements ApiApi {
             argNames: ["mediaStreamSettings", "constraints"],
           );
 
+  ReconnectHandle reconnectHandleFromPtr({required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_reconnect_handle_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_ReconnectHandle,
+      constMeta: kReconnectHandleFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kReconnectHandleFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "reconnect_handle_from_ptr",
+        argNames: ["ptr"],
+      );
+
   MyDartFuture reconnectHandleReconnectWithDelay(
       {required ReconnectHandle reconnectHandle,
       required int delayMs,
@@ -2215,6 +2464,23 @@ class ApiApiImpl implements ApiApi {
               "maxElapsedTimeMs"
             ],
           );
+
+  RemoteMediaTrack remoteMediaTrackFromPtr({required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_remote_media_track_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_RemoteMediaTrack,
+      constMeta: kRemoteMediaTrackFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "remote_media_track_from_ptr",
+        argNames: ["ptr"],
+      );
 
   DartHandle remoteMediaTrackGetTrack(
       {required RemoteMediaTrack track, dynamic hint}) {
@@ -2388,6 +2654,23 @@ class ApiApiImpl implements ApiApi {
         argNames: ["track"],
       );
 
+  RoomCloseReason roomCloseReasonFromPtr({required int ptr, dynamic hint}) {
+    var arg0 = api2wire_usize(ptr);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_room_close_reason_from_ptr(arg0),
+      parseSuccessData: _wire2api_SyncReturn_RoomCloseReason,
+      constMeta: kRoomCloseReasonFromPtrConstMeta,
+      argValues: [ptr],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonFromPtrConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "room_close_reason_from_ptr",
+        argNames: ["ptr"],
+      );
+
   String roomCloseReasonReason(
       {required RoomCloseReason roomCloseReason, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomCloseReason(roomCloseReason);
@@ -2465,12 +2748,12 @@ class ApiApiImpl implements ApiApi {
 
   MyDartFuture roomHandleSetLocalMediaSettings(
       {required RoomHandle roomHandle,
-      required MediaStreamSettings settings,
+      required RefCellMediaStreamSettings settings,
       required bool stopFirst,
       required bool rollbackOnFail,
       dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_MediaStreamSettings(settings);
+    var arg1 = _platform.api2wire_RefCellMediaStreamSettings(settings);
     var arg2 = stopFirst;
     var arg3 = rollbackOnFail;
     return _platform.executeSync(FlutterRustBridgeSyncTask(
@@ -2820,12 +3103,24 @@ class ApiApiImpl implements ApiApi {
     return AudioTrackConstraints.fromRaw(raw[0], raw[1], raw[2], raw[3]);
   }
 
+  ConnectionHandle _wire2api_ConnectionHandle(dynamic raw) {
+    return ConnectionHandle.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
   DartHandle _wire2api_DartHandle(dynamic raw) {
     return DartHandle.fromRaw(raw[0], raw[1], raw[2], raw[3]);
   }
 
-  Jason _wire2api_Jason(dynamic raw) {
-    return Jason.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  LocalMediaTrack _wire2api_LocalMediaTrack(dynamic raw) {
+    return LocalMediaTrack.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  MediaDeviceInfo _wire2api_MediaDeviceInfo(dynamic raw) {
+    return MediaDeviceInfo.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  MediaDisplayInfo _wire2api_MediaDisplayInfo(dynamic raw) {
+    return MediaDisplayInfo.fromRaw(raw[0], raw[1], raw[2], raw[3]);
   }
 
   MediaManagerHandle _wire2api_MediaManagerHandle(dynamic raw) {
@@ -2834,6 +3129,10 @@ class ApiApiImpl implements ApiApi {
 
   MyDartFuture _wire2api_MyDartFuture(dynamic raw) {
     return MyDartFuture.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  ReconnectHandle _wire2api_ReconnectHandle(dynamic raw) {
+    return ReconnectHandle.fromRaw(raw[0], raw[1], raw[2], raw[3]);
   }
 
   RefCellAudioTrackConstraints _wire2api_RefCellAudioTrackConstraints(
@@ -2855,6 +3154,30 @@ class ApiApiImpl implements ApiApi {
 
   RefCellMediaStreamSettings _wire2api_RefCellMediaStreamSettings(dynamic raw) {
     return RefCellMediaStreamSettings.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  RefCellOptionJason _wire2api_RefCellOptionJason(dynamic raw) {
+    return RefCellOptionJason.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  RefCellVecLocalMediaTrack _wire2api_RefCellVecLocalMediaTrack(dynamic raw) {
+    return RefCellVecLocalMediaTrack.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  RefCellVecMediaDeviceInfo _wire2api_RefCellVecMediaDeviceInfo(dynamic raw) {
+    return RefCellVecMediaDeviceInfo.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  RefCellVecMediaDisplayInfo _wire2api_RefCellVecMediaDisplayInfo(dynamic raw) {
+    return RefCellVecMediaDisplayInfo.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  RemoteMediaTrack _wire2api_RemoteMediaTrack(dynamic raw) {
+    return RemoteMediaTrack.fromRaw(raw[0], raw[1], raw[2], raw[3]);
+  }
+
+  RoomCloseReason _wire2api_RoomCloseReason(dynamic raw) {
+    return RoomCloseReason.fromRaw(raw[0], raw[1], raw[2], raw[3]);
   }
 
   RoomHandle _wire2api_RoomHandle(dynamic raw) {
@@ -2898,6 +3221,38 @@ class ApiApiImpl implements ApiApi {
     return AudioTrackConstraints.fromRaw(ptr, drop, lend, size);
   }
 
+  ConnectionHandle _wire2api_SyncReturn_ConnectionHandle(dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return ConnectionHandle.fromRaw(ptr, drop, lend, size);
+  }
+
   DartHandle _wire2api_SyncReturn_DartHandle(dynamic raw) {
     var pointBitLen = raw.length ~/ 4;
     var ptrList = List.filled(pointBitLen, 0);
@@ -2930,7 +3285,7 @@ class ApiApiImpl implements ApiApi {
     return DartHandle.fromRaw(ptr, drop, lend, size);
   }
 
-  Jason _wire2api_SyncReturn_Jason(dynamic raw) {
+  LocalMediaTrack _wire2api_SyncReturn_LocalMediaTrack(dynamic raw) {
     var pointBitLen = raw.length ~/ 4;
     var ptrList = List.filled(pointBitLen, 0);
     var dropList = List.filled(pointBitLen, 0);
@@ -2959,7 +3314,7 @@ class ApiApiImpl implements ApiApi {
       size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
     }
 
-    return Jason.fromRaw(ptr, drop, lend, size);
+    return LocalMediaTrack.fromRaw(ptr, drop, lend, size);
   }
 
   MediaManagerHandle _wire2api_SyncReturn_MediaManagerHandle(dynamic raw) {
@@ -3026,10 +3381,148 @@ class ApiApiImpl implements ApiApi {
     return MyDartFuture.fromRaw(ptr, drop, lend, size);
   }
 
+  LocalMediaTrack? _wire2api_SyncReturn_Option_LocalMediaTrack(dynamic raw) {
+    if (raw == null) {
+      return null;
+    }
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return LocalMediaTrack.fromRaw(ptr, drop, lend, size);
+  }
+
+  MediaDeviceInfo? _wire2api_SyncReturn_Option_MediaDeviceInfo(dynamic raw) {
+    if (raw == null) {
+      return null;
+    }
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return MediaDeviceInfo.fromRaw(ptr, drop, lend, size);
+  }
+
+  MediaDisplayInfo? _wire2api_SyncReturn_Option_MediaDisplayInfo(dynamic raw) {
+    if (raw == null) {
+      return null;
+    }
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return MediaDisplayInfo.fromRaw(ptr, drop, lend, size);
+  }
+
   String? _wire2api_SyncReturn_Option_String(dynamic raw) {
-    print('HERE ${raw.runtimeType.toString()}');
-    if (raw == null || raw.runtimeType.toString() == 'JSNull') return null;
+    if (raw == null) {
+      return null;
+    }
     return utf8.decode(raw);
+  }
+
+  ReconnectHandle _wire2api_SyncReturn_ReconnectHandle(dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return ReconnectHandle.fromRaw(ptr, drop, lend, size);
   }
 
   RefCellAudioTrackConstraints
@@ -3164,6 +3657,201 @@ class ApiApiImpl implements ApiApi {
     return RefCellMediaStreamSettings.fromRaw(ptr, drop, lend, size);
   }
 
+  RefCellOptionJason _wire2api_SyncReturn_RefCellOptionJason(dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RefCellOptionJason.fromRaw(ptr, drop, lend, size);
+  }
+
+  RefCellVecLocalMediaTrack _wire2api_SyncReturn_RefCellVecLocalMediaTrack(
+      dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RefCellVecLocalMediaTrack.fromRaw(ptr, drop, lend, size);
+  }
+
+  RefCellVecMediaDeviceInfo _wire2api_SyncReturn_RefCellVecMediaDeviceInfo(
+      dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RefCellVecMediaDeviceInfo.fromRaw(ptr, drop, lend, size);
+  }
+
+  RefCellVecMediaDisplayInfo _wire2api_SyncReturn_RefCellVecMediaDisplayInfo(
+      dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RefCellVecMediaDisplayInfo.fromRaw(ptr, drop, lend, size);
+  }
+
+  RemoteMediaTrack _wire2api_SyncReturn_RemoteMediaTrack(dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RemoteMediaTrack.fromRaw(ptr, drop, lend, size);
+  }
+
+  RoomCloseReason _wire2api_SyncReturn_RoomCloseReason(dynamic raw) {
+    var pointBitLen = raw.length ~/ 4;
+    var ptrList = List.filled(pointBitLen, 0);
+    var dropList = List.filled(pointBitLen, 0);
+    var lendList = List.filled(pointBitLen, 0);
+    var sizeList = List.filled(pointBitLen, 0);
+
+    List.copyRange(ptrList, 0, raw, 0, pointBitLen);
+    List.copyRange(dropList, 0, raw, pointBitLen, pointBitLen * 2);
+    List.copyRange(lendList, 0, raw, pointBitLen * 2, pointBitLen * 3);
+    List.copyRange(sizeList, 0, raw, pointBitLen * 3);
+
+    int ptr = 0;
+    int drop = 0;
+    int lend = 0;
+    int size = 0;
+
+    if (pointBitLen == 8) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint64(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint64(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint64(0);
+    } else if (pointBitLen == 4) {
+      ptr = ByteData.view(Uint8List.fromList(ptrList).buffer).getUint32(0);
+      drop = ByteData.view(Uint8List.fromList(dropList).buffer).getUint32(0);
+      lend = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+      size = ByteData.view(Uint8List.fromList(lendList).buffer).getUint32(0);
+    }
+
+    return RoomCloseReason.fromRaw(ptr, drop, lend, size);
+  }
+
   RoomHandle _wire2api_SyncReturn_RoomHandle(dynamic raw) {
     var pointBitLen = raw.length ~/ 4;
     var ptrList = List.filled(pointBitLen, 0);
@@ -3233,6 +3921,18 @@ class ApiApiImpl implements ApiApi {
 
   bool _wire2api_bool(dynamic raw) {
     return raw as bool;
+  }
+
+  LocalMediaTrack? _wire2api_opt_LocalMediaTrack(dynamic raw) {
+    return raw == null ? null : _wire2api_LocalMediaTrack(raw);
+  }
+
+  MediaDeviceInfo? _wire2api_opt_MediaDeviceInfo(dynamic raw) {
+    return raw == null ? null : _wire2api_MediaDeviceInfo(raw);
+  }
+
+  MediaDisplayInfo? _wire2api_opt_MediaDisplayInfo(dynamic raw) {
+    return raw == null ? null : _wire2api_MediaDisplayInfo(raw);
   }
 
   String? _wire2api_opt_String(dynamic raw) {
@@ -3309,16 +4009,6 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
   }
 
   @protected
-  ffi.Pointer<wire_Jason> api2wire_Jason(Jason raw) {
-    if (raw.isStale()) {
-      throw StateError('Use after dispose.');
-    }
-    final ptr = inner.new_Jason();
-    _api_fill_to_wire_Jason(raw, ptr);
-    return ptr;
-  }
-
-  @protected
   ffi.Pointer<wire_LocalMediaTrack> api2wire_LocalMediaTrack(
       LocalMediaTrack raw) {
     if (raw.isStale()) {
@@ -3359,17 +4049,6 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
     }
     final ptr = inner.new_MediaManagerHandle();
     _api_fill_to_wire_MediaManagerHandle(raw, ptr);
-    return ptr;
-  }
-
-  @protected
-  ffi.Pointer<wire_MediaStreamSettings> api2wire_MediaStreamSettings(
-      MediaStreamSettings raw) {
-    if (raw.isStale()) {
-      throw StateError('Use after dispose.');
-    }
-    final ptr = inner.new_MediaStreamSettings();
-    _api_fill_to_wire_MediaStreamSettings(raw, ptr);
     return ptr;
   }
 
@@ -3437,6 +4116,50 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
     }
     final ptr = inner.new_RefCellMediaStreamSettings();
     _api_fill_to_wire_RefCellMediaStreamSettings(raw, ptr);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_RefCellOptionJason> api2wire_RefCellOptionJason(
+      RefCellOptionJason raw) {
+    if (raw.isStale()) {
+      throw StateError('Use after dispose.');
+    }
+    final ptr = inner.new_RefCellOptionJason();
+    _api_fill_to_wire_RefCellOptionJason(raw, ptr);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_RefCellVecLocalMediaTrack>
+      api2wire_RefCellVecLocalMediaTrack(RefCellVecLocalMediaTrack raw) {
+    if (raw.isStale()) {
+      throw StateError('Use after dispose.');
+    }
+    final ptr = inner.new_RefCellVecLocalMediaTrack();
+    _api_fill_to_wire_RefCellVecLocalMediaTrack(raw, ptr);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_RefCellVecMediaDeviceInfo>
+      api2wire_RefCellVecMediaDeviceInfo(RefCellVecMediaDeviceInfo raw) {
+    if (raw.isStale()) {
+      throw StateError('Use after dispose.');
+    }
+    final ptr = inner.new_RefCellVecMediaDeviceInfo();
+    _api_fill_to_wire_RefCellVecMediaDeviceInfo(raw, ptr);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_RefCellVecMediaDisplayInfo>
+      api2wire_RefCellVecMediaDisplayInfo(RefCellVecMediaDisplayInfo raw) {
+    if (raw.isStale()) {
+      throw StateError('Use after dispose.');
+    }
+    final ptr = inner.new_RefCellVecMediaDisplayInfo();
+    _api_fill_to_wire_RefCellVecMediaDisplayInfo(raw, ptr);
     return ptr;
   }
 
@@ -3521,10 +4244,6 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 
-  void _api_fill_to_wire_Jason(Jason apiObj, ffi.Pointer<wire_Jason> wireObj) {
-    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
-  }
-
   void _api_fill_to_wire_LocalMediaTrack(
       LocalMediaTrack apiObj, ffi.Pointer<wire_LocalMediaTrack> wireObj) {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
@@ -3542,11 +4261,6 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
 
   void _api_fill_to_wire_MediaManagerHandle(
       MediaManagerHandle apiObj, ffi.Pointer<wire_MediaManagerHandle> wireObj) {
-    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
-  }
-
-  void _api_fill_to_wire_MediaStreamSettings(MediaStreamSettings apiObj,
-      ffi.Pointer<wire_MediaStreamSettings> wireObj) {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 
@@ -3581,6 +4295,29 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
   void _api_fill_to_wire_RefCellMediaStreamSettings(
       RefCellMediaStreamSettings apiObj,
       ffi.Pointer<wire_RefCellMediaStreamSettings> wireObj) {
+    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
+  }
+
+  void _api_fill_to_wire_RefCellOptionJason(
+      RefCellOptionJason apiObj, ffi.Pointer<wire_RefCellOptionJason> wireObj) {
+    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
+  }
+
+  void _api_fill_to_wire_RefCellVecLocalMediaTrack(
+      RefCellVecLocalMediaTrack apiObj,
+      ffi.Pointer<wire_RefCellVecLocalMediaTrack> wireObj) {
+    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
+  }
+
+  void _api_fill_to_wire_RefCellVecMediaDeviceInfo(
+      RefCellVecMediaDeviceInfo apiObj,
+      ffi.Pointer<wire_RefCellVecMediaDeviceInfo> wireObj) {
+    wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
+  }
+
+  void _api_fill_to_wire_RefCellVecMediaDisplayInfo(
+      RefCellVecMediaDisplayInfo apiObj,
+      ffi.Pointer<wire_RefCellVecMediaDisplayInfo> wireObj) {
     wireObj.ref.ptr = FrbOpaque.share(apiObj).cast();
   }
 
@@ -3680,6 +4417,120 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
           'wire_dart_handle_to_opaque');
   late final _wire_dart_handle_to_opaque = _wire_dart_handle_to_opaquePtr
       .asFunction<WireSyncReturnStruct Function(int)>();
+
+  WireSyncReturnStruct wire_connection_handle_from_ptr(
+    int ptr,
+  ) {
+    return _wire_connection_handle_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_connection_handle_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_connection_handle_from_ptr');
+  late final _wire_connection_handle_from_ptr =
+      _wire_connection_handle_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
+
+  WireSyncReturnStruct wire_vec_local_tracks_from_ptr(
+    int ptr,
+  ) {
+    return _wire_vec_local_tracks_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_vec_local_tracks_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_vec_local_tracks_from_ptr');
+  late final _wire_vec_local_tracks_from_ptr =
+      _wire_vec_local_tracks_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
+
+  WireSyncReturnStruct wire_vec_local_tracks_pop(
+    ffi.Pointer<wire_RefCellVecLocalMediaTrack> vec,
+  ) {
+    return _wire_vec_local_tracks_pop(
+      vec,
+    );
+  }
+
+  late final _wire_vec_local_tracks_popPtr = _lookup<
+          ffi.NativeFunction<
+              WireSyncReturnStruct Function(
+                  ffi.Pointer<wire_RefCellVecLocalMediaTrack>)>>(
+      'wire_vec_local_tracks_pop');
+  late final _wire_vec_local_tracks_pop =
+      _wire_vec_local_tracks_popPtr.asFunction<
+          WireSyncReturnStruct Function(
+              ffi.Pointer<wire_RefCellVecLocalMediaTrack>)>();
+
+  WireSyncReturnStruct wire_vec_media_display_info_from_ptr(
+    int ptr,
+  ) {
+    return _wire_vec_media_display_info_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_vec_media_display_info_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_vec_media_display_info_from_ptr');
+  late final _wire_vec_media_display_info_from_ptr =
+      _wire_vec_media_display_info_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
+
+  WireSyncReturnStruct wire_vec_media_display_info_pop(
+    ffi.Pointer<wire_RefCellVecMediaDisplayInfo> vec,
+  ) {
+    return _wire_vec_media_display_info_pop(
+      vec,
+    );
+  }
+
+  late final _wire_vec_media_display_info_popPtr = _lookup<
+          ffi.NativeFunction<
+              WireSyncReturnStruct Function(
+                  ffi.Pointer<wire_RefCellVecMediaDisplayInfo>)>>(
+      'wire_vec_media_display_info_pop');
+  late final _wire_vec_media_display_info_pop =
+      _wire_vec_media_display_info_popPtr.asFunction<
+          WireSyncReturnStruct Function(
+              ffi.Pointer<wire_RefCellVecMediaDisplayInfo>)>();
+
+  WireSyncReturnStruct wire_vec_media_device_info_from_ptr(
+    int ptr,
+  ) {
+    return _wire_vec_media_device_info_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_vec_media_device_info_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_vec_media_device_info_from_ptr');
+  late final _wire_vec_media_device_info_from_ptr =
+      _wire_vec_media_device_info_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
+
+  WireSyncReturnStruct wire_vec_media_device_info_pop(
+    ffi.Pointer<wire_RefCellVecMediaDeviceInfo> vec,
+  ) {
+    return _wire_vec_media_device_info_pop(
+      vec,
+    );
+  }
+
+  late final _wire_vec_media_device_info_popPtr = _lookup<
+          ffi.NativeFunction<
+              WireSyncReturnStruct Function(
+                  ffi.Pointer<wire_RefCellVecMediaDeviceInfo>)>>(
+      'wire_vec_media_device_info_pop');
+  late final _wire_vec_media_device_info_pop =
+      _wire_vec_media_device_info_popPtr.asFunction<
+          WireSyncReturnStruct Function(
+              ffi.Pointer<wire_RefCellVecMediaDeviceInfo>)>();
 
   WireSyncReturnStruct wire_audio_track_constraints_new() {
     return _wire_audio_track_constraints_new();
@@ -4262,7 +5113,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       _wire_jason_newPtr.asFunction<WireSyncReturnStruct Function()>();
 
   WireSyncReturnStruct wire_jason_init_room(
-    ffi.Pointer<wire_Jason> jason,
+    ffi.Pointer<wire_RefCellOptionJason> jason,
   ) {
     return _wire_jason_init_room(
       jason,
@@ -4272,12 +5123,12 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_jason_init_roomPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(
-              ffi.Pointer<wire_Jason>)>>('wire_jason_init_room');
-  late final _wire_jason_init_room = _wire_jason_init_roomPtr
-      .asFunction<WireSyncReturnStruct Function(ffi.Pointer<wire_Jason>)>();
+              ffi.Pointer<wire_RefCellOptionJason>)>>('wire_jason_init_room');
+  late final _wire_jason_init_room = _wire_jason_init_roomPtr.asFunction<
+      WireSyncReturnStruct Function(ffi.Pointer<wire_RefCellOptionJason>)>();
 
   WireSyncReturnStruct wire_jason_media_manager(
-    ffi.Pointer<wire_Jason> jason,
+    ffi.Pointer<wire_RefCellOptionJason> jason,
   ) {
     return _wire_jason_media_manager(
       jason,
@@ -4285,14 +5136,17 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_jason_media_managerPtr = _lookup<
-      ffi.NativeFunction<
+          ffi.NativeFunction<
+              WireSyncReturnStruct Function(
+                  ffi.Pointer<wire_RefCellOptionJason>)>>(
+      'wire_jason_media_manager');
+  late final _wire_jason_media_manager =
+      _wire_jason_media_managerPtr.asFunction<
           WireSyncReturnStruct Function(
-              ffi.Pointer<wire_Jason>)>>('wire_jason_media_manager');
-  late final _wire_jason_media_manager = _wire_jason_media_managerPtr
-      .asFunction<WireSyncReturnStruct Function(ffi.Pointer<wire_Jason>)>();
+              ffi.Pointer<wire_RefCellOptionJason>)>();
 
   WireSyncReturnStruct wire_jason_close_room(
-    ffi.Pointer<wire_Jason> jason,
+    ffi.Pointer<wire_RefCellOptionJason> jason,
     ffi.Pointer<wire_RoomHandle> room_to_delete,
   ) {
     return _wire_jason_close_room(
@@ -4303,11 +5157,41 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
 
   late final _wire_jason_close_roomPtr = _lookup<
       ffi.NativeFunction<
-          WireSyncReturnStruct Function(ffi.Pointer<wire_Jason>,
+          WireSyncReturnStruct Function(ffi.Pointer<wire_RefCellOptionJason>,
               ffi.Pointer<wire_RoomHandle>)>>('wire_jason_close_room');
   late final _wire_jason_close_room = _wire_jason_close_roomPtr.asFunction<
-      WireSyncReturnStruct Function(
-          ffi.Pointer<wire_Jason>, ffi.Pointer<wire_RoomHandle>)>();
+      WireSyncReturnStruct Function(ffi.Pointer<wire_RefCellOptionJason>,
+          ffi.Pointer<wire_RoomHandle>)>();
+
+  WireSyncReturnStruct wire_jason_dispose(
+    ffi.Pointer<wire_RefCellOptionJason> jason,
+  ) {
+    return _wire_jason_dispose(
+      jason,
+    );
+  }
+
+  late final _wire_jason_disposePtr = _lookup<
+      ffi.NativeFunction<
+          WireSyncReturnStruct Function(
+              ffi.Pointer<wire_RefCellOptionJason>)>>('wire_jason_dispose');
+  late final _wire_jason_dispose = _wire_jason_disposePtr.asFunction<
+      WireSyncReturnStruct Function(ffi.Pointer<wire_RefCellOptionJason>)>();
+
+  WireSyncReturnStruct wire_local_media_track_from_ptr(
+    int ptr,
+  ) {
+    return _wire_local_media_track_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_local_media_track_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_local_media_track_from_ptr');
+  late final _wire_local_media_track_from_ptr =
+      _wire_local_media_track_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
 
   WireSyncReturnStruct wire_local_media_track_get_track(
     ffi.Pointer<wire_LocalMediaTrack> track,
@@ -4464,7 +5348,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_media_manager_handle_init_local_tracks(
     ffi.Pointer<wire_MediaManagerHandle> manager,
-    ffi.Pointer<wire_MediaStreamSettings> caps,
+    ffi.Pointer<wire_RefCellMediaStreamSettings> caps,
   ) {
     return _wire_media_manager_handle_init_local_tracks(
       manager,
@@ -4476,12 +5360,12 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
           ffi.NativeFunction<
               WireSyncReturnStruct Function(
                   ffi.Pointer<wire_MediaManagerHandle>,
-                  ffi.Pointer<wire_MediaStreamSettings>)>>(
+                  ffi.Pointer<wire_RefCellMediaStreamSettings>)>>(
       'wire_media_manager_handle_init_local_tracks');
   late final _wire_media_manager_handle_init_local_tracks =
       _wire_media_manager_handle_init_local_tracksPtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_MediaManagerHandle>,
-              ffi.Pointer<wire_MediaStreamSettings>)>();
+              ffi.Pointer<wire_RefCellMediaStreamSettings>)>();
 
   WireSyncReturnStruct wire_media_manager_handle_enumerate_devices(
     ffi.Pointer<wire_MediaManagerHandle> manager,
@@ -4694,6 +5578,21 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
               ffi.Pointer<wire_RefCellMediaStreamSettings>,
               ffi.Pointer<wire_RefCellDisplayVideoTrackConstraints>)>();
 
+  WireSyncReturnStruct wire_reconnect_handle_from_ptr(
+    int ptr,
+  ) {
+    return _wire_reconnect_handle_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_reconnect_handle_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_reconnect_handle_from_ptr');
+  late final _wire_reconnect_handle_from_ptr =
+      _wire_reconnect_handle_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
+
   WireSyncReturnStruct wire_reconnect_handle_reconnect_with_delay(
     ffi.Pointer<wire_ReconnectHandle> reconnect_handle,
     int delay_ms,
@@ -4738,6 +5637,21 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       _wire_reconnect_handle_reconnect_with_backoffPtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_ReconnectHandle>, int,
               double, int, ffi.Pointer<ffi.Uint32>)>();
+
+  WireSyncReturnStruct wire_remote_media_track_from_ptr(
+    int ptr,
+  ) {
+    return _wire_remote_media_track_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_remote_media_track_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_remote_media_track_from_ptr');
+  late final _wire_remote_media_track_from_ptr =
+      _wire_remote_media_track_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
 
   WireSyncReturnStruct wire_remote_media_track_get_track(
     ffi.Pointer<wire_RemoteMediaTrack> track,
@@ -4904,6 +5818,21 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       _wire_remote_media_track_media_directionPtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_RemoteMediaTrack>)>();
 
+  WireSyncReturnStruct wire_room_close_reason_from_ptr(
+    int ptr,
+  ) {
+    return _wire_room_close_reason_from_ptr(
+      ptr,
+    );
+  }
+
+  late final _wire_room_close_reason_from_ptrPtr =
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+          'wire_room_close_reason_from_ptr');
+  late final _wire_room_close_reason_from_ptr =
+      _wire_room_close_reason_from_ptrPtr
+          .asFunction<WireSyncReturnStruct Function(int)>();
+
   WireSyncReturnStruct wire_room_close_reason_reason(
     ffi.Pointer<wire_RoomCloseReason> room_close_reason,
   ) {
@@ -4975,7 +5904,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_room_handle_set_local_media_settings(
     ffi.Pointer<wire_RoomHandle> room_handle,
-    ffi.Pointer<wire_MediaStreamSettings> settings,
+    ffi.Pointer<wire_RefCellMediaStreamSettings> settings,
     bool stop_first,
     bool rollback_on_fail,
   ) {
@@ -4991,13 +5920,13 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       ffi.NativeFunction<
           WireSyncReturnStruct Function(
               ffi.Pointer<wire_RoomHandle>,
-              ffi.Pointer<wire_MediaStreamSettings>,
+              ffi.Pointer<wire_RefCellMediaStreamSettings>,
               ffi.Bool,
               ffi.Bool)>>('wire_room_handle_set_local_media_settings');
   late final _wire_room_handle_set_local_media_settings =
       _wire_room_handle_set_local_media_settingsPtr.asFunction<
           WireSyncReturnStruct Function(ffi.Pointer<wire_RoomHandle>,
-              ffi.Pointer<wire_MediaStreamSettings>, bool, bool)>();
+              ffi.Pointer<wire_RefCellMediaStreamSettings>, bool, bool)>();
 
   WireSyncReturnStruct wire_room_handle_mute_audio(
     ffi.Pointer<wire_RoomHandle> room_handle,
@@ -5329,16 +6258,6 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _new_DartHandle =
       _new_DartHandlePtr.asFunction<ffi.Pointer<wire_DartHandle> Function()>();
 
-  ffi.Pointer<wire_Jason> new_Jason() {
-    return _new_Jason();
-  }
-
-  late final _new_JasonPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<wire_Jason> Function()>>(
-          'new_Jason');
-  late final _new_Jason =
-      _new_JasonPtr.asFunction<ffi.Pointer<wire_Jason> Function()>();
-
   ffi.Pointer<wire_LocalMediaTrack> new_LocalMediaTrack() {
     return _new_LocalMediaTrack();
   }
@@ -5378,16 +6297,6 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       'new_MediaManagerHandle');
   late final _new_MediaManagerHandle = _new_MediaManagerHandlePtr
       .asFunction<ffi.Pointer<wire_MediaManagerHandle> Function()>();
-
-  ffi.Pointer<wire_MediaStreamSettings> new_MediaStreamSettings() {
-    return _new_MediaStreamSettings();
-  }
-
-  late final _new_MediaStreamSettingsPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<wire_MediaStreamSettings> Function()>>(
-      'new_MediaStreamSettings');
-  late final _new_MediaStreamSettings = _new_MediaStreamSettingsPtr
-      .asFunction<ffi.Pointer<wire_MediaStreamSettings> Function()>();
 
   ffi.Pointer<wire_MyDartFuture> new_MyDartFuture() {
     return _new_MyDartFuture();
@@ -5460,6 +6369,51 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _new_RefCellMediaStreamSettings =
       _new_RefCellMediaStreamSettingsPtr.asFunction<
           ffi.Pointer<wire_RefCellMediaStreamSettings> Function()>();
+
+  ffi.Pointer<wire_RefCellOptionJason> new_RefCellOptionJason() {
+    return _new_RefCellOptionJason();
+  }
+
+  late final _new_RefCellOptionJasonPtr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<wire_RefCellOptionJason> Function()>>(
+      'new_RefCellOptionJason');
+  late final _new_RefCellOptionJason = _new_RefCellOptionJasonPtr
+      .asFunction<ffi.Pointer<wire_RefCellOptionJason> Function()>();
+
+  ffi.Pointer<wire_RefCellVecLocalMediaTrack> new_RefCellVecLocalMediaTrack() {
+    return _new_RefCellVecLocalMediaTrack();
+  }
+
+  late final _new_RefCellVecLocalMediaTrackPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_RefCellVecLocalMediaTrack>
+              Function()>>('new_RefCellVecLocalMediaTrack');
+  late final _new_RefCellVecLocalMediaTrack = _new_RefCellVecLocalMediaTrackPtr
+      .asFunction<ffi.Pointer<wire_RefCellVecLocalMediaTrack> Function()>();
+
+  ffi.Pointer<wire_RefCellVecMediaDeviceInfo> new_RefCellVecMediaDeviceInfo() {
+    return _new_RefCellVecMediaDeviceInfo();
+  }
+
+  late final _new_RefCellVecMediaDeviceInfoPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_RefCellVecMediaDeviceInfo>
+              Function()>>('new_RefCellVecMediaDeviceInfo');
+  late final _new_RefCellVecMediaDeviceInfo = _new_RefCellVecMediaDeviceInfoPtr
+      .asFunction<ffi.Pointer<wire_RefCellVecMediaDeviceInfo> Function()>();
+
+  ffi.Pointer<wire_RefCellVecMediaDisplayInfo>
+      new_RefCellVecMediaDisplayInfo() {
+    return _new_RefCellVecMediaDisplayInfo();
+  }
+
+  late final _new_RefCellVecMediaDisplayInfoPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_RefCellVecMediaDisplayInfo>
+              Function()>>('new_RefCellVecMediaDisplayInfo');
+  late final _new_RefCellVecMediaDisplayInfo =
+      _new_RefCellVecMediaDisplayInfoPtr.asFunction<
+          ffi.Pointer<wire_RefCellVecMediaDisplayInfo> Function()>();
 
   ffi.Pointer<wire_RemoteMediaTrack> new_RemoteMediaTrack() {
     return _new_RemoteMediaTrack();
@@ -5585,6 +6539,18 @@ class wire_DartHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
+class wire_RefCellVecLocalMediaTrack extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> ptr;
+}
+
+class wire_RefCellVecMediaDisplayInfo extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> ptr;
+}
+
+class wire_RefCellVecMediaDeviceInfo extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> ptr;
+}
+
 class wire_RefCellAudioTrackConstraints extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
@@ -5608,7 +6574,7 @@ class wire_RefCellDisplayVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-class wire_Jason extends ffi.Struct {
+class wire_RefCellOptionJason extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
@@ -5629,10 +6595,6 @@ class wire_MediaDisplayInfo extends ffi.Struct {
 }
 
 class wire_MediaManagerHandle extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
-}
-
-class wire_MediaStreamSettings extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 

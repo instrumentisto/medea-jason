@@ -66,6 +66,111 @@ fn wire_dart_handle_to_opaque_impl(
         },
     )
 }
+fn wire_connection_handle_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "connection_handle_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(connection_handle_from_ptr(api_ptr))
+        },
+    )
+}
+fn wire_vec_local_tracks_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "vec_local_tracks_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(vec_local_tracks_from_ptr(api_ptr))
+        },
+    )
+}
+fn wire_vec_local_tracks_pop_impl(
+    vec: impl Wire2Api<Opaque<RefCell<Vec<LocalMediaTrack>>>> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "vec_local_tracks_pop",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_vec = vec.wire2api();
+            Ok(vec_local_tracks_pop(api_vec))
+        },
+    )
+}
+fn wire_vec_media_display_info_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "vec_media_display_info_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(vec_media_display_info_from_ptr(api_ptr))
+        },
+    )
+}
+fn wire_vec_media_display_info_pop_impl(
+    vec: impl Wire2Api<Opaque<RefCell<Vec<MediaDisplayInfo>>>> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "vec_media_display_info_pop",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_vec = vec.wire2api();
+            Ok(vec_media_display_info_pop(api_vec))
+        },
+    )
+}
+fn wire_vec_media_device_info_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "vec_media_device_info_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(vec_media_device_info_from_ptr(api_ptr))
+        },
+    )
+}
+fn wire_vec_media_device_info_pop_impl(
+    vec: impl Wire2Api<Opaque<RefCell<Vec<MediaDeviceInfo>>>> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "vec_media_device_info_pop",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_vec = vec.wire2api();
+            Ok(vec_media_device_info_pop(api_vec))
+        },
+    )
+}
 fn wire_audio_track_constraints_new_impl() -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -619,7 +724,7 @@ fn wire_jason_new_impl() -> support::WireSyncReturnStruct {
     )
 }
 fn wire_jason_init_room_impl(
-    jason: impl Wire2Api<Opaque<Jason>> + UnwindSafe,
+    jason: impl Wire2Api<Opaque<RefCell<Option<Jason>>>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -634,7 +739,7 @@ fn wire_jason_init_room_impl(
     )
 }
 fn wire_jason_media_manager_impl(
-    jason: impl Wire2Api<Opaque<Jason>> + UnwindSafe,
+    jason: impl Wire2Api<Opaque<RefCell<Option<Jason>>>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -649,7 +754,7 @@ fn wire_jason_media_manager_impl(
     )
 }
 fn wire_jason_close_room_impl(
-    jason: impl Wire2Api<Opaque<Jason>> + UnwindSafe,
+    jason: impl Wire2Api<Opaque<RefCell<Option<Jason>>>> + UnwindSafe,
     room_to_delete: impl Wire2Api<Opaque<RoomHandle>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
@@ -662,6 +767,36 @@ fn wire_jason_close_room_impl(
             let api_jason = jason.wire2api();
             let api_room_to_delete = room_to_delete.wire2api();
             Ok(jason_close_room(api_jason, api_room_to_delete))
+        },
+    )
+}
+fn wire_jason_dispose_impl(
+    jason: impl Wire2Api<Opaque<RefCell<Option<Jason>>>> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "jason_dispose",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_jason = jason.wire2api();
+            Ok(jason_dispose(api_jason))
+        },
+    )
+}
+fn wire_local_media_track_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "local_media_track_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(local_media_track_from_ptr(api_ptr))
         },
     )
 }
@@ -802,7 +937,7 @@ fn wire_media_display_info_title_impl(
 }
 fn wire_media_manager_handle_init_local_tracks_impl(
     manager: impl Wire2Api<Opaque<MediaManagerHandle>> + UnwindSafe,
-    caps: impl Wire2Api<Opaque<MediaStreamSettings>> + UnwindSafe,
+    caps: impl Wire2Api<Opaque<RefCell<MediaStreamSettings>>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1014,6 +1149,21 @@ fn wire_media_stream_settings_display_video_impl(
         },
     )
 }
+fn wire_reconnect_handle_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "reconnect_handle_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(reconnect_handle_from_ptr(api_ptr))
+        },
+    )
+}
 fn wire_reconnect_handle_reconnect_with_delay_impl(
     reconnect_handle: impl Wire2Api<Opaque<ReconnectHandle>> + UnwindSafe,
     delay_ms: impl Wire2Api<i64> + UnwindSafe,
@@ -1060,6 +1210,21 @@ fn wire_reconnect_handle_reconnect_with_backoff_impl(
                 api_max_delay,
                 api_max_elapsed_time_ms,
             ))
+        },
+    )
+}
+fn wire_remote_media_track_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "remote_media_track_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(remote_media_track_from_ptr(api_ptr))
         },
     )
 }
@@ -1208,6 +1373,21 @@ fn wire_remote_media_track_media_direction_impl(
         },
     )
 }
+fn wire_room_close_reason_from_ptr_impl(
+    ptr: impl Wire2Api<usize> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "room_close_reason_from_ptr",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_ptr = ptr.wire2api();
+            Ok(room_close_reason_from_ptr(api_ptr))
+        },
+    )
+}
 fn wire_room_close_reason_reason_impl(
     room_close_reason: impl Wire2Api<Opaque<RoomCloseReason>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
@@ -1272,7 +1452,7 @@ fn wire_room_handle_join_impl(
 }
 fn wire_room_handle_set_local_media_settings_impl(
     room_handle: impl Wire2Api<Opaque<RoomHandle>> + UnwindSafe,
-    settings: impl Wire2Api<Opaque<MediaStreamSettings>> + UnwindSafe,
+    settings: impl Wire2Api<Opaque<RefCell<MediaStreamSettings>>> + UnwindSafe,
     stop_first: impl Wire2Api<bool> + UnwindSafe,
     rollback_on_fail: impl Wire2Api<bool> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {

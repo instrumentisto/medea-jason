@@ -1,6 +1,10 @@
 use flutter_rust_bridge::{Opaque, SyncReturn};
 pub use std::cell::RefCell;
+use std::ptr;
+use super::ForeignClass;
 pub use super::utils::{IntoDartFuture, MyDartFuture};
+pub use crate::media::MediaStreamSettings;
+impl<T> ForeignClass for Opaque<T>  {}
 
 // -------------------------------------------------------------------
 
@@ -14,6 +18,53 @@ pub fn opaque_to_usize(handle: Opaque<Dart_Handle>) -> SyncReturn<usize> {
 
 pub fn dart_handle_to_opaque(handle: usize) -> SyncReturn<Opaque<Dart_Handle>> {
     SyncReturn(Opaque::new(handle as _))
+}
+
+// -------------------------------------------------------------------
+
+pub fn connection_handle_from_ptr(
+    ptr: usize,
+) -> SyncReturn<Opaque<ConnectionHandle>> {
+    SyncReturn(unsafe{Opaque::new(ConnectionHandle::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))})
+}
+
+// -------------------------------------------------------------------
+
+pub fn vec_local_tracks_from_ptr(
+    ptr: usize,
+) -> SyncReturn<Opaque<RefCell<Vec<LocalMediaTrack>>>> {
+    SyncReturn(unsafe{Opaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())})
+}
+
+pub fn vec_local_tracks_pop(
+    vec: Opaque<RefCell<Vec<LocalMediaTrack>>>,
+) -> SyncReturn<Option<Opaque<LocalMediaTrack>>> {
+    SyncReturn(vec.borrow_mut().pop().map(|v| Opaque::new(v)))
+}
+
+pub fn vec_media_display_info_from_ptr(
+    ptr: usize,
+) -> SyncReturn<Opaque<RefCell<Vec<MediaDisplayInfo>>>> {
+    SyncReturn(unsafe{Opaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())})
+}
+
+pub fn vec_media_display_info_pop(
+    vec: Opaque<RefCell<Vec<MediaDisplayInfo>>>,
+) -> SyncReturn<Option<Opaque<MediaDisplayInfo>>> {
+    SyncReturn(vec.borrow_mut().pop().map(|v| Opaque::new(v)))
+}
+
+
+pub fn vec_media_device_info_from_ptr(
+    ptr: usize,
+) -> SyncReturn<Opaque<RefCell<Vec<MediaDeviceInfo>>>> {
+    SyncReturn(unsafe{Opaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())})
+}
+
+pub fn vec_media_device_info_pop(
+    vec: Opaque<RefCell<Vec<MediaDeviceInfo>>>,
+) -> SyncReturn<Option<Opaque<MediaDeviceInfo>>> {
+    SyncReturn(vec.borrow_mut().pop().map(|v| Opaque::new(v)))
 }
 
 // -------------------------------------------------------------------
@@ -53,6 +104,8 @@ use tracerr::Traced;
 pub use self::mock::ConnectionHandle;
 #[cfg(not(feature = "mockable"))]
 pub use crate::connection::ConnectionHandle;
+
+impl ForeignClass for ConnectionHandle {}
 
 /// Sets callback, invoked when this `Connection` will close.
 pub fn connection_handle_on_close(
@@ -99,7 +152,8 @@ pub fn connection_handle_on_quality_score_update(
 /// Returns remote `Member` ID.
 pub fn connection_handle_get_remote_member_id(
     connection: Opaque<ConnectionHandle>,
-) -> anyhow::Result<SyncReturn<String>> {
+) -> anyhow::Result<SyncReturn<String>> { 
+   
     Ok(SyncReturn(
         connection
             .get_remote_member_id()
@@ -276,7 +330,7 @@ mod mock {
 
 
 pub use crate::media::DeviceVideoTrackConstraints;
-use crate::{media::{FacingMode, MediaSourceKind}, platform, api::Error, room::ChangeMediaStateError};
+use crate::{media::{FacingMode, MediaSourceKind, InitLocalTracksError}, platform, api::Error, room::ChangeMediaStateError};
 
 /// Creates new [`DeviceVideoTrackConstraints`] with none constraints
 /// configured.
@@ -487,30 +541,39 @@ pub use self::mock::Jason;
 pub use crate::jason::Jason;
 
 /// Instantiates a new [`Jason`] interface to interact with this library.
-pub fn jason_new() -> SyncReturn<Opaque<Jason>> {
-    SyncReturn(Opaque::new(Jason::new()))
+pub fn jason_new() -> SyncReturn<Opaque<RefCell<Option<Jason>>>> {
+    SyncReturn(Opaque::new(RefCell::new(Some(Jason::new()))))
 }
 
 /// Creates a new [`Room`] and returns its [`RoomHandle`].
 ///
 /// [`Room`]: crate::room::Room
-pub fn jason_init_room(jason: Opaque<Jason>) -> SyncReturn<Opaque<RoomHandle>> {
-    SyncReturn(Opaque::new(jason.init_room()))
+pub fn jason_init_room(jason: Opaque<RefCell<Option<Jason>>>) -> SyncReturn<Opaque<RoomHandle>> {
+    SyncReturn(Opaque::new(jason.borrow_mut().as_mut().unwrap().init_room()))
 }
 
 /// Returns a [`MediaManagerHandle`].
 pub fn jason_media_manager(
-    jason: Opaque<Jason>,
+    jason: Opaque<RefCell<Option<Jason>>>,
 ) -> SyncReturn<Opaque<MediaManagerHandle>> {
-    SyncReturn(Opaque::new(jason.media_manager()))
+    SyncReturn(Opaque::new(jason.borrow_mut().as_mut().unwrap().media_manager()))
 }
 
 /// Closes the provided [`RoomHandle`].
 pub fn jason_close_room(
-    jason: Opaque<Jason>,
+    jason: Opaque<RefCell<Option<Jason>>>,
     room_to_delete: Opaque<RoomHandle>,
 ) -> SyncReturn<()> {
-    jason.close_room(RoomHandle::clone(&room_to_delete));
+    jason.borrow_mut().as_mut().unwrap().close_room(RoomHandle::clone(&room_to_delete));
+    SyncReturn(())
+}
+
+/// Closes the provided [`RoomHandle`].
+pub fn jason_dispose(
+    jason: Opaque<RefCell<Option<Jason>>>,
+) -> SyncReturn<()> {
+    let jason = jason.borrow_mut().take().unwrap();
+    jason.dispose();
     SyncReturn(())
 }
 
@@ -520,6 +583,12 @@ pub fn jason_close_room(
 pub use self::mock::LocalMediaTrack;
 #[cfg(not(feature = "mockable"))]
 pub use crate::media::track::local::LocalMediaTrack;
+
+impl ForeignClass for LocalMediaTrack {}
+
+pub fn local_media_track_from_ptr(ptr: usize) -> SyncReturn<Opaque<LocalMediaTrack>> {
+    SyncReturn(unsafe{Opaque::new(LocalMediaTrack::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))})
+}
 
 /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
 /// [`LocalMediaTrack`].
@@ -723,15 +792,9 @@ mod mock {
 
 use crate::{
     media::{
-        EnumerateDevicesError, EnumerateDisplaysError, InitLocalTracksError,
+        EnumerateDevicesError, EnumerateDisplaysError,
         InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
-};
-
-
-pub use super::{
-    media_stream_settings::MediaStreamSettings,
-    utils::PtrArray,
 };
 
 #[cfg(feature = "mockable")]
@@ -743,18 +806,16 @@ pub use crate::media::MediaManagerHandle;
 /// [`MediaStreamSettings`].
 ///
 /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
-
 pub fn media_manager_handle_init_local_tracks(
     manager: Opaque<MediaManagerHandle>,
-    caps: Opaque<MediaStreamSettings>,
+    caps: Opaque<RefCell<MediaStreamSettings>>,
 ) -> SyncReturn<Opaque<MyDartFuture>> {
     SyncReturn(Opaque::new({
         let manager = MediaManagerHandle::clone(&manager);
-        let caps = MediaStreamSettings::clone(&caps);
+        let caps = MediaStreamSettings::clone(&caps.borrow());
         async move {
-            Ok::<PtrArray<_>, Traced<InitLocalTracksError>>(PtrArray::new(
-                manager.init_local_tracks(caps).await?,
-            ))
+            Ok::<Opaque<_>, Traced<InitLocalTracksError>>(Opaque::new(RefCell::new(
+            manager.init_local_tracks(caps).await?)))
         }
         .into_my_dart_future()
     }))
@@ -768,9 +829,8 @@ pub fn media_manager_handle_enumerate_devices(
     SyncReturn(Opaque::new({
         let manager = MediaManagerHandle::clone(&manager);
         async move {
-            Ok::<PtrArray<_>, Traced<EnumerateDevicesError>>(PtrArray::new(
-                manager.enumerate_devices().await?,
-            ))
+            Ok::<Opaque<_>, Traced<EnumerateDevicesError>>(Opaque::new(RefCell::new(
+                manager.enumerate_devices().await?)))
         }
         .into_my_dart_future()
     }))
@@ -786,9 +846,8 @@ pub fn media_manager_handle_enumerate_displays(
         let manager = MediaManagerHandle::clone(&manager);
 
         async move {
-            Ok::<PtrArray<_>, Traced<EnumerateDisplaysError>>(PtrArray::new(
-                manager.enumerate_displays().await?,
-            ))
+            Ok::<Opaque<_>, Traced<EnumerateDisplaysError>>(Opaque::new(RefCell::new(
+                manager.enumerate_displays().await?)))
         }
         .into_my_dart_future()
     }))
@@ -1071,6 +1130,13 @@ pub use self::mock::ReconnectHandle;
 #[cfg(not(feature = "mockable"))]
 pub use crate::rpc::ReconnectHandle;
 
+impl ForeignClass for ReconnectHandle {}
+
+pub fn reconnect_handle_from_ptr(ptr: usize) -> SyncReturn<Opaque<ReconnectHandle>> {
+    SyncReturn(unsafe{Opaque::new(ReconnectHandle::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))})
+}
+
+
 /// Tries to reconnect a [`Room`] after the provided delay in milliseconds.
 ///
 /// If the [`Room`] is already reconnecting then new reconnection attempt won't
@@ -1251,6 +1317,11 @@ pub use self::mock::RemoteMediaTrack;
 #[cfg(not(feature = "mockable"))]
 pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
+impl ForeignClass for RemoteMediaTrack {}
+
+pub fn remote_media_track_from_ptr(ptr: usize) -> SyncReturn<Opaque<RemoteMediaTrack>> {
+    SyncReturn(unsafe{Opaque::new(RemoteMediaTrack::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))})
+}
 
 /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of track
 /// [`RemoteMediaTrack`].
@@ -1422,6 +1493,11 @@ mod mock {
 // -------------------------------------------------------------------
 
 pub use crate::room::RoomCloseReason;
+impl ForeignClass for RoomCloseReason {}
+
+pub fn room_close_reason_from_ptr(ptr: usize) -> SyncReturn<Opaque<RoomCloseReason>> {
+    SyncReturn(unsafe{Opaque::new(RoomCloseReason::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))})
+}
 
 /// Returns a close reason of a [`Room`].
 ///
@@ -1514,12 +1590,12 @@ pub fn room_handle_join(
 
 pub fn room_handle_set_local_media_settings(
     room_handle: Opaque<RoomHandle>,
-    settings: Opaque<MediaStreamSettings>,
+    settings: Opaque<RefCell<MediaStreamSettings>>,
     stop_first: bool,
     rollback_on_fail: bool,
 ) -> SyncReturn<Opaque<MyDartFuture>> {
     let room_handle = RoomHandle::clone(&room_handle);
-    let settings = MediaStreamSettings::clone(&settings);
+    let settings = MediaStreamSettings::clone(&settings.borrow());
 
     SyncReturn(Opaque::new(
         async move {
@@ -1924,7 +2000,7 @@ mod mock {
             &self,
             cb: platform::Function<RoomCloseReason>,
         ) -> Result<(), Traced<HandleDetachedError>> {
-            cb.call1(RoomCloseReason::new(CloseReason::ByClient {
+            cb.call1(RoomCloseReason::new(CloseReason::ByClient { 
                 is_err: true,
                 reason: ClientDisconnect::RpcClientUnexpectedlyDropped,
             }));

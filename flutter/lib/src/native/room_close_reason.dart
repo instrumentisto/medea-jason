@@ -1,49 +1,17 @@
 import 'dart:ffi';
 
-import 'package:ffi/ffi.dart';
-
 import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/native_string.dart';
-import 'ffi/nullable_pointer.dart';
-import 'jason.dart';
 import 'ffi/api_api.g.dart' as api;
-
-typedef _reason_C = Pointer<Utf8> Function(Pointer);
-typedef _reason_Dart = Pointer<Utf8> Function(Pointer);
-
-typedef _isClosedByServer_C = Int8 Function(Pointer);
-typedef _isClosedByServer_Dart = int Function(Pointer);
-
-typedef _isErr_C = Int8 Function(Pointer);
-typedef _isErr_Dart = int Function(Pointer);
-
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
-
-final _reason =
-    dl.lookupFunction<_reason_C, _reason_Dart>('RoomCloseReason__reason');
-
-final _isClosedByServer =
-    dl.lookupFunction<_isClosedByServer_C, _isClosedByServer_Dart>(
-        'RoomCloseReason__is_closed_by_server');
-
-final _isErr =
-    dl.lookupFunction<_isErr_C, _isErr_Dart>('RoomCloseReason__is_err');
-
-final _free = dl.lookupFunction<_free_C, _free_Dart>('RoomCloseReason__free');
+import 'jason.dart';
 
 class NativeRoomCloseReason extends RoomCloseReason {
   /// [Pointer] to the Rust struct that backing this object.
-  late NullablePointer ptr;
   late api.RoomCloseReason opaque;
 
   /// Constructs a new [RoomCloseReason] backed by the Rust struct behind the
   /// provided [Pointer].
-  NativeRoomCloseReason(this.ptr) {
-    RustHandlesStorage().insertHandle(this);
-  }
 
   NativeRoomCloseReason.opaque(this.opaque) {
     RustHandlesStorage().insertHandle(this);
@@ -51,32 +19,24 @@ class NativeRoomCloseReason extends RoomCloseReason {
 
   @override
   String reason() {
-    impl_api.roomCloseReasonReason(roomCloseReason: opaque);
-
-    return _reason(ptr.getInnerPtr()).nativeStringToDartString();
+    return impl_api.roomCloseReasonReason(roomCloseReason: opaque);
   }
 
   @override
   bool isClosedByServer() {
-    impl_api.roomCloseReasonIsClosedByServer(roomCloseReason: opaque);
-
-    return _isClosedByServer(ptr.getInnerPtr()) > 0;
+    return impl_api.roomCloseReasonIsClosedByServer(roomCloseReason: opaque);
   }
 
   @override
   bool isErr() {
-    impl_api.roomCloseReasonIsErr(roomCloseReason: opaque);
-
-    return _isErr(ptr.getInnerPtr()) > 0;
+    return impl_api.roomCloseReasonIsErr(roomCloseReason: opaque);
   }
 
   @moveSemantics
   @override
   void free() {
-    if (!ptr.isFreed()) {
+    if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
-      ptr.free();
 
       opaque.dispose();
     }
