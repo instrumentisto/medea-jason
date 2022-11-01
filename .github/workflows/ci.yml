@@ -469,6 +469,7 @@ jobs:
           force-avd-creation: false
           arch: x86_64
           emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          script: echo "Generated AVD snapshot for caching."
         if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
 
       - name: Create AVD and generate snapshot for caching
@@ -478,6 +479,7 @@ jobs:
           force-avd-creation: false
           arch: x86_64
           emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          script: echo "Generated AVD snapshot for caching."
         if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
 
       - name: Test on min Android API version
@@ -485,7 +487,7 @@ jobs:
         with:
           api-level: ${{ steps.api-version.outputs.min }}
           force-avd-creation: false
-          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           arch: x86_64
           script: |
             $ANDROID_HOME/emulator/emulator -accel-check
@@ -497,7 +499,7 @@ jobs:
         with:
           api-level: ${{ steps.api-version.outputs.target }}
           force-avd-creation: false
-          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           arch: x86_64
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
