@@ -452,20 +452,51 @@ jobs:
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
+
+      - uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd
+        if: ${{ matrix.platform == 'android' }}
+
+      - name: Create AVD and generate snapshot for caching
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.min }}
+          force-avd-creation: false
+          arch: x86_64
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
+
+      - name: Create AVD and generate snapshot for caching
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.target }}
+          force-avd-creation: false
+          arch: x86_64
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
+
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
+          force-avd-creation: false
           emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           arch: x86_64
           script: |
             $ANDROID_HOME/emulator/emulator -accel-check
             make test.flutter
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
+          force-avd-creation: false
           emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           arch: x86_64
           script: make test.flutter
