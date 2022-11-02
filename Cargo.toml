@@ -60,7 +60,7 @@ flutter_rust_bridge_macros = { path = "../flutter_rust_bridge/frb_macros"}
 android_logger = "0.11"
 
 [target.'cfg(any(target_os = "ios", target_os = "linux", target_os = "macos", target_os = "windows"))'.dependencies]
-simple_logger = "2.3"
+simple_logger = "3.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "2.0"
