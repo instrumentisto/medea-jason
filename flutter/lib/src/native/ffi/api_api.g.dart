@@ -3382,6 +3382,7 @@ class ApiApiImpl implements ApiApi {
   }
 
   LocalMediaTrack? _wire2api_SyncReturn_Option_LocalMediaTrack(dynamic raw) {
+    print('HERE ${raw.runtimeType.toString()} - ${raw.toString()}');
     if (raw == null) {
       return null;
     }
@@ -3417,6 +3418,7 @@ class ApiApiImpl implements ApiApi {
   }
 
   MediaDeviceInfo? _wire2api_SyncReturn_Option_MediaDeviceInfo(dynamic raw) {
+    print('HERE ${raw.runtimeType.toString()} - ${raw.toString()}');
     if (raw == null) {
       return null;
     }
@@ -3452,6 +3454,7 @@ class ApiApiImpl implements ApiApi {
   }
 
   MediaDisplayInfo? _wire2api_SyncReturn_Option_MediaDisplayInfo(dynamic raw) {
+    print('HERE ${raw.runtimeType.toString()} - ${raw.toString()}');
     if (raw == null) {
       return null;
     }
@@ -3487,6 +3490,7 @@ class ApiApiImpl implements ApiApi {
   }
 
   String? _wire2api_SyncReturn_Option_String(dynamic raw) {
+    print('HERE ${raw.runtimeType.toString()} - ${raw.toString()}');
     if (raw == null) {
       return null;
     }

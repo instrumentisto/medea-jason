@@ -175,9 +175,11 @@ packages:
   flutter_rust_bridge:
     dependency: "direct main"
     description:
-      path: "../../../flutter_rust_bridge/frb_dart"
-      relative: true
-    source: path
+      path: frb_dart
+      ref: sync-opaque-type
+      resolved-ref: "8453db9928021bf3cbcab0e87a3efbeac8444451"
+      url: "https://github.com/rogurotus/flutter_rust_bridge.git"
+    source: git
     version: "1.49.0"
   flutter_test:
     dependency: "direct dev"
@@ -274,9 +276,11 @@ packages:
   medea_flutter_webrtc:
     dependency: transitive
     description:
-      path: "/media/human/DE2466F72466D1D72/Work/Github/Test/flutter-webrtc/"
-      relative: false
-    source: path
+      path: "."
+      ref: temp-frb-deps
+      resolved-ref: "0977110c9339d32dbe30adec624bb44c31e18ccf"
+      url: "https://github.com/instrumentisto/flutter-webrtc.git"
+    source: git
     version: "0.8.0-dev"
   medea_jason:
     dependency: "direct main"

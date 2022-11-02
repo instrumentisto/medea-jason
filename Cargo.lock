@@ -1169,6 +1169,7 @@ dependencies = [
 [[package]]
 name = "flutter_rust_bridge"
 version = "1.49.0"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=sync-opaque-type#8453db9928021bf3cbcab0e87a3efbeac8444451"
 dependencies = [
  "allo-isolate",
  "anyhow",
@@ -1188,6 +1189,7 @@ dependencies = [
 [[package]]
 name = "flutter_rust_bridge_codegen"
 version = "1.49.0"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=sync-opaque-type#8453db9928021bf3cbcab0e87a3efbeac8444451"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -1214,6 +1216,7 @@ dependencies = [
 [[package]]
 name = "flutter_rust_bridge_macros"
 version = "1.49.0"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=sync-opaque-type#8453db9928021bf3cbcab0e87a3efbeac8444451"
 
 [[package]]
 name = "fnv"

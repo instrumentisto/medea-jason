@@ -64,7 +64,7 @@ fn main() {
     let (rust_input, dart_output, rust_output, class_name) = gen_args(&["api"]);
     // Tell Cargo that if the input Rust code changes, to rerun this build
     // script.
-    println!("cargo:rerun-if-changed={}", "src/lib.rs");
+    println!("cargo:rerun-if-changed={}", "src/api/dart/api_api.rs");
     // Options for frb_codegen
     let raw_opts = RawOpts {
         // Path of input Rust code
