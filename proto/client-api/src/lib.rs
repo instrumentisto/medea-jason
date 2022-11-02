@@ -237,7 +237,7 @@ pub struct RpcSettings {
 }
 
 /// Possible commands sent by Web Client to Media Server.
-#[dispatchable(self: &Self, async_trait(?Send))]
+#[dispatchable(self: &mut Self, async_trait(?Send))]
 #[allow(unused_results)] // false positive: on `Deserialize`
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
