@@ -4,7 +4,8 @@ import 'dart:io';
 /// Use `10.0.2.2` for windows test in VM.
 ///
 /// Default: `127.0.0.1`
-final String IP_TEST_BASE = Platform.environment['IP_TEST_BASE'] ?? '127.0.0.1';
+final String IP_TEST_BASE =
+    Platform.environment['IP_TEST_BASE'] ?? '192.168.0.106';
 
 /// Address of a [WebDriver] client.
 ///

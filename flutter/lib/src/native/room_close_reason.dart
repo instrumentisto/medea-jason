@@ -1,35 +1,32 @@
-import 'dart:ffi';
-
 import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'jason.dart';
 
 class NativeRoomCloseReason extends RoomCloseReason {
-  /// [Pointer] to the Rust struct that backing this object.
-  late api.RoomCloseReason opaque;
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  late frb.RoomCloseReason opaque;
 
   /// Constructs a new [RoomCloseReason] backed by the Rust struct behind the
-  /// provided [Pointer].
-
-  NativeRoomCloseReason.opaque(this.opaque) {
+  /// provided [frb.RoomCloseReason].
+  NativeRoomCloseReason(this.opaque) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   String reason() {
-    return impl_api.roomCloseReasonReason(roomCloseReason: opaque);
+    return api.roomCloseReasonReason(roomCloseReason: opaque);
   }
 
   @override
   bool isClosedByServer() {
-    return impl_api.roomCloseReasonIsClosedByServer(roomCloseReason: opaque);
+    return api.roomCloseReasonIsClosedByServer(roomCloseReason: opaque);
   }
 
   @override
   bool isErr() {
-    return impl_api.roomCloseReasonIsErr(roomCloseReason: opaque);
+    return api.roomCloseReasonIsErr(roomCloseReason: opaque);
   }
 
   @moveSemantics

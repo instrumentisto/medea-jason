@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import '../interface/audio_track_constraints.dart' as base_audio;
 import '../interface/device_video_track_constraints.dart' as base_device_video;
 import '../interface/media_stream_settings.dart' as base;
@@ -8,24 +6,25 @@ import '/src/util/rust_handles_storage.dart';
 import 'audio_track_constraints.dart';
 import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'jason.dart';
 
 import '../interface/display_video_track_constraints.dart'
     as base_display_video;
 
 class MediaStreamSettings extends base.MediaStreamSettings {
-  /// [Pointer] to the Rust struct backing this object.
-  final api.RefCellMediaStreamSettings opaque =
-      impl_api.mediaStreamSettingsNew();
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final frb.RefCellMediaStreamSettings opaque = api.mediaStreamSettingsNew();
 
+  /// Constructs a new [MediaStreamSettings] backed by the Rust struct behind the
+  /// provided [frb.RefCellMediaStreamSettings].
   MediaStreamSettings() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
-    impl_api.mediaStreamSettingsAudio(
+    api.mediaStreamSettingsAudio(
         mediaStreamSettings: opaque,
         constraints: (constraints as AudioTrackConstraints).opaque);
     constraints.opaque.dispose();
@@ -35,7 +34,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void deviceVideo(
       @moveSemantics
           base_device_video.DeviceVideoTrackConstraints constraints) {
-    impl_api.mediaStreamSettingsDeviceVideo(
+    api.mediaStreamSettingsDeviceVideo(
         mediaStreamSettings: opaque,
         constraints: (constraints as DeviceVideoTrackConstraints).opaque);
     constraints.opaque.dispose();
@@ -45,7 +44,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void displayVideo(
       @moveSemantics
           base_display_video.DisplayVideoTrackConstraints constraints) {
-    impl_api.mediaStreamSettingsDisplayVideo(
+    api.mediaStreamSettingsDisplayVideo(
         mediaStreamSettings: opaque,
         constraints: (constraints as DisplayVideoTrackConstraints).opaque);
     constraints.opaque.dispose();

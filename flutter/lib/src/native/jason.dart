@@ -8,7 +8,7 @@ import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
 import 'ffi/exception.dart' as exceptions;
@@ -28,31 +28,34 @@ typedef _cast_Dart = Object Function(int);
 typedef _cast_handle_C = IntPtr Function(Handle);
 typedef _cast_handle_Dart = int Function(Object);
 
-typedef _cast_fn_handle_C = IntPtr Function(Handle);
-typedef _cast_fn_handle_Dart = int Function(void Function(Pointer));
-
 typedef _onPanic_C = Void Function(Handle);
 typedef _onPanic_Dart = void Function(Object);
 
-late api.ApiApiImpl impl_api = _dl_load();
+late frb.ApiApiImpl api = _api_load();
 late DynamicLibrary dl;
 
 //todo
-Future<dynamic> rust2dart(api.MyDartFuture future) {
-  var res = _cast(impl_api.dartFutureToUsize(handle: future)) as Future;
+Future<dynamic> rust_future_to_dart_future(frb.MyDartFuture future) {
+  var res = _address_to_handle(api.dartFutureToUsize(handle: future)) as Future;
   future.dispose();
   return res;
 }
 
-Object rust2dart2(api.DartHandle handle) {
-  var res = _cast(impl_api.opaqueToUsize(handle: handle));
+// todo
+Object rust_opaque_to_dart_object(frb.DartHandle handle) {
+  var res = _address_to_handle(api.opaqueToUsize(handle: handle));
   handle.dispose();
   return res;
 }
 
 //todo
-api.DartHandle handle2rust(Object obj) {
-  return impl_api.dartHandleToOpaque(handle: _cast_handle(obj));
+frb.DartHandle dart_object_to_rust_opaque(Object obj) {
+  return api.dartHandleToOpaque(handle: _handle_to_address(obj));
+}
+
+//todo
+frb.DartHandle dart_object_to_persistent_rust_opaque(Object obj) {
+  return api.dartHandleToOpaque(handle: _handle_to_persistent_address(obj));
 }
 
 /// [Executor] that drives Rust futures.
@@ -61,9 +64,16 @@ api.DartHandle handle2rust(Object obj) {
 /// after that.
 var executor;
 
-final _cast = dl.lookupFunction<_cast_C, _cast_Dart>('int2handle');
-final _cast_handle =
-    dl.lookupFunction<_cast_handle_C, _cast_handle_Dart>('handle2int');
+// todo
+final _address_to_handle =
+    dl.lookupFunction<_cast_C, _cast_Dart>('address_to_handle');
+// todo
+final _handle_to_persistent_address =
+    dl.lookupFunction<_cast_handle_C, _cast_handle_Dart>(
+        'handle_to_persistent_address');
+// todo
+final _handle_to_address =
+    dl.lookupFunction<_cast_handle_C, _cast_handle_Dart>('handle_to_address');
 
 /// Callback to be fired whenever Rust code panics.
 void Function(String)? _onPanicCallback;
@@ -76,7 +86,7 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
-api.ApiApiImpl _dl_load() {
+frb.ApiApiImpl _api_load() {
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -99,7 +109,7 @@ api.ApiApiImpl _dl_load() {
           ? DynamicLibrary.executable()
           : DynamicLibrary.open(path);
 
-  var impl_api = api.ApiApiImpl(_dl);
+  var api = frb.ApiApiImpl(_dl);
 
   var initResult = _dl.lookupFunction<
       IntPtr Function(Pointer<Void>),
@@ -130,31 +140,32 @@ api.ApiApiImpl _dl_load() {
     }
   });
   dl = _dl;
-  return impl_api;
+  return api;
 }
 
 class Jason extends base.Jason {
-  /// [Pointer] to the Rust struct backing this object.
-  final api.RefCellOptionJason opaque = impl_api.jasonNew();
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final frb.RefCellOptionJason opaque = api.jasonNew();
 
+  /// Constructs a new [Jason] backed by the Rust struct behind the
+  /// provided [api.RefCellOptionJason].
   Jason() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   MediaManagerHandle mediaManager() {
-    return NativeMediaManagerHandle.opaque(
-        impl_api.jasonMediaManager(jason: opaque));
+    return NativeMediaManagerHandle(api.jasonMediaManager(jason: opaque));
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle.opaque(impl_api.jasonInitRoom(jason: opaque));
+    return NativeRoomHandle(api.jasonInitRoom(jason: opaque));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    impl_api.jasonCloseRoom(
+    api.jasonCloseRoom(
         jason: opaque, roomToDelete: (room as NativeRoomHandle).opaque);
   }
 
@@ -163,7 +174,7 @@ class Jason extends base.Jason {
   void free() {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      impl_api.jasonDispose(jason: opaque);
+      api.jasonDispose(jason: opaque);
 
       opaque.dispose();
     }

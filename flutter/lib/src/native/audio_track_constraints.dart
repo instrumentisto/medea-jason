@@ -1,24 +1,23 @@
-import 'dart:ffi';
-
 import '../interface/audio_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'jason.dart';
 
 class AudioTrackConstraints extends base.AudioTrackConstraints {
-  /// [Pointer] to the Rust struct backing this object.
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final frb.RefCellAudioTrackConstraints opaque =
+      api.audioTrackConstraintsNew();
 
-  final api.RefCellAudioTrackConstraints opaque =
-      impl_api.audioTrackConstraintsNew();
-
+  /// Constructs a new [AudioTrackConstraints] backed by a Rust struct behind the
+  /// provided [frb.RefCellAudioTrackConstraints].
   AudioTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   void deviceId(String deviceId) {
-    impl_api.audioTrackConstraintsDeviceId(track: opaque, deviceId: deviceId);
+    api.audioTrackConstraintsDeviceId(track: opaque, deviceId: deviceId);
   }
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
@@ -27,6 +26,7 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   void free() {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
+
       opaque.dispose();
     }
   }

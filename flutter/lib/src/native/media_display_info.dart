@@ -1,30 +1,27 @@
-import 'dart:ffi';
-
 import '../interface/media_display_info.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'jason.dart';
 
 class NativeMediaDisplayInfo extends MediaDisplayInfo {
-  /// [Pointer] to the Rust struct backing this object.
-  late api.MediaDisplayInfo opaque;
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  late frb.MediaDisplayInfo opaque;
 
   /// Constructs a new [MediaDisplayInfo] backed by a Rust struct behind the
-  /// provided [Pointer].
-
-  NativeMediaDisplayInfo.opaque(this.opaque) {
+  /// provided [frb.MediaDisplayInfo].
+  NativeMediaDisplayInfo(this.opaque) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   String deviceId() {
-    return impl_api.mediaDisplayInfoDeviceId(mediaDisplay: opaque);
+    return api.mediaDisplayInfoDeviceId(mediaDisplay: opaque);
   }
 
   @override
   String? title() {
-    return impl_api.mediaDisplayInfoTitle(mediaDisplay: opaque);
+    return api.mediaDisplayInfoTitle(mediaDisplay: opaque);
   }
 
   @moveSemantics

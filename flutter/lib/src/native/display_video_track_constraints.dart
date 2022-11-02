@@ -1,59 +1,59 @@
-import 'dart:ffi';
-
 import '../interface/display_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'jason.dart';
 
 class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
-  /// [Pointer] to the Rust struct backing this object.
-  final api.RefCellDisplayVideoTrackConstraints opaque =
-      impl_api.displayVideoTrackConstraintsNew();
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final frb.RefCellDisplayVideoTrackConstraints opaque =
+      api.displayVideoTrackConstraintsNew();
 
+  /// Constructs a new [DisplayVideoTrackConstraints] backed by the Rust struct behind the
+  /// provided [frb.RefCellDisplayVideoTrackConstraints].
   DisplayVideoTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   void exactHeight(int height) {
-    impl_api.displayVideoTrackConstraintsExactHeight(
+    api.displayVideoTrackConstraintsExactHeight(
         constraints: opaque, exactHeight: height);
   }
 
   @override
   void idealHeight(int height) {
-    impl_api.displayVideoTrackConstraintsIdealHeight(
+    api.displayVideoTrackConstraintsIdealHeight(
         constraints: opaque, idealHeight: height);
   }
 
   @override
   void exactWidth(int width) {
-    impl_api.displayVideoTrackConstraintsExactWidth(
+    api.displayVideoTrackConstraintsExactWidth(
         constraints: opaque, exactWidth: width);
   }
 
   @override
   void idealWidth(int width) {
-    impl_api.displayVideoTrackConstraintsIdealWidth(
+    api.displayVideoTrackConstraintsIdealWidth(
         constraints: opaque, idealWidth: width);
   }
 
   @override
   void exactFrameRate(int frameRate) {
-    impl_api.displayVideoTrackConstraintsExactFrameRate(
+    api.displayVideoTrackConstraintsExactFrameRate(
         constraints: opaque, exactFrameRate: frameRate);
   }
 
   @override
   void idealFrameRate(int frameRate) {
-    impl_api.displayVideoTrackConstraintsIdealFrameRate(
+    api.displayVideoTrackConstraintsIdealFrameRate(
         constraints: opaque, idealFrameRate: frameRate);
   }
 
   @override
   void deviceId(String deviceId) {
-    impl_api.displayVideoTrackConstraintsDeviceId(
+    api.displayVideoTrackConstraintsDeviceId(
         constraints: opaque, deviceId: deviceId);
   }
 

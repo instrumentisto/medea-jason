@@ -90,9 +90,7 @@ where
                 }
             }
         });
-        MyDartFuture {
-            handle: dart_future,
-        }
+        MyDartFuture::new(dart_future)
     }
 }
 

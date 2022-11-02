@@ -1,41 +1,37 @@
-import 'dart:ffi';
-
 import '../interface/media_device_info.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as api;
+import 'ffi/api_api.g.dart' as frb;
 import 'jason.dart';
 
 class NativeMediaDeviceInfo extends MediaDeviceInfo {
-  /// [Pointer] to the Rust struct backing this object.
-  late api.MediaDeviceInfo opaque;
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  late frb.MediaDeviceInfo opaque;
 
   /// Constructs a new [MediaDeviceInfo] backed by a Rust struct behind the
-  /// provided [Pointer].
-
-  NativeMediaDeviceInfo.opaque(this.opaque) {
+  /// provided [frb.MediaDeviceInfo].
+  NativeMediaDeviceInfo(this.opaque) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   String deviceId() {
-    return impl_api.mediaDeviceInfoDeviceId(mediaDevice: opaque);
+    return api.mediaDeviceInfoDeviceId(mediaDevice: opaque);
   }
 
   @override
   String label() {
-    return impl_api.mediaDeviceInfoLabel(mediaDevice: opaque);
+    return api.mediaDeviceInfoLabel(mediaDevice: opaque);
   }
 
   @override
   MediaDeviceKind kind() {
-    return MediaDeviceKind
-        .values[impl_api.mediaDeviceInfoKind(mediaDevice: opaque)];
+    return MediaDeviceKind.values[api.mediaDeviceInfoKind(mediaDevice: opaque)];
   }
 
   @override
   String? groupId() {
-    return impl_api.mediaDeviceInfoGroupId(mediaDevice: opaque);
+    return api.mediaDeviceInfoGroupId(mediaDevice: opaque);
   }
 
   @moveSemantics
