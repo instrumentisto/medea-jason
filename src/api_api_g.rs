@@ -14,7 +14,8 @@
 use crate::api::dart::api_api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::sync::{Mutex, RwLock};
+use std::sync::Mutex;
+use std::sync::RwLock;
 
 // Section: imports
 
