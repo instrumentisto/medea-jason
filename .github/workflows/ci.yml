@@ -358,14 +358,30 @@ jobs:
           java-version: 11
         if: ${{ matrix.platform == 'android' }}
 
-      - name: Install Haxm
-        run: brew install --cask intel-haxm
+      - uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd
         if: ${{ matrix.platform == 'android' }}
+
+      - name: Create AVD and generate snapshot for caching
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          force-avd-creation: false
+          arch: x86_64
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          script: echo "Generated AVD snapshot for caching."
+        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
 
       - name: Test on Android
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
+          force-avd-creation: false
           arch: x86_64
           emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           script: |
