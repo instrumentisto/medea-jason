@@ -321,6 +321,32 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      - name: Set up JDK 11 for android testing
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+        if: ${{ matrix.platform == 'android' }}
+
+      - name: Use cached AVD for android testing
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd
+        if: ${{ matrix.platform == 'android' }}
+
+      - name: Create AVD and generate snapshot for caching
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          force-avd-creation: false
+          arch: x86_64
+          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          script: echo "Generated AVD snapshot for caching."
+        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
+
       - name: Download `medea-jason` lib
         uses: actions/download-artifact@v3
         with:
@@ -344,7 +370,8 @@ jobs:
                           -p ${{ secrets.MEDEA_DOCKER_PASS }}
                           hub.instrumentisto.com
 
-      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+      - name: Run tests on desktop
+        run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
              make test.e2e.native device=${{ matrix.platform }}
                                    up=yes debug=no dockerized=yes
@@ -352,32 +379,7 @@ jobs:
                                    control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform != 'android' }}
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-        if: ${{ matrix.platform == 'android' }}
-
-      - uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd
-        if: ${{ matrix.platform == 'android' }}
-
-      - name: Create AVD and generate snapshot for caching
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 31
-          force-avd-creation: false
-          arch: x86_64
-          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
-          script: echo "Generated AVD snapshot for caching."
-        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
-
-      - name: Test on Android
+      - name: Run tests on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
@@ -468,55 +470,24 @@ jobs:
           echo ::set-output name=min::$(make flutter.android.version.min)
           echo ::set-output name=target::$(make flutter.android.version.compile)
         if: ${{ matrix.platform == 'android' }}
-
-      - uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd
-        if: ${{ matrix.platform == 'android' }}
-
-      - name: Create AVD and generate snapshot for caching
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.api-version.outputs.min }}
-          force-avd-creation: false
-          arch: x86_64
-          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
-          script: echo "Generated AVD snapshot for caching."
-        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
-
-      - name: Create AVD and generate snapshot for caching
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.api-version.outputs.target }}
-          force-avd-creation: false
-          arch: x86_64
-          emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
-          script: echo "Generated AVD snapshot for caching."
-        if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
-
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          target: google_apis
           arch: x86_64
-          script: |
-            $ANDROID_HOME/emulator/emulator -accel-check
-            make test.flutter
+          cores: 3
+          profile: pixel_2
+          script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
+          target: google_apis
           arch: x86_64
+          cores: 3
+          profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 

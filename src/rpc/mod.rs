@@ -237,15 +237,10 @@ pub enum CloseMsg {
 impl From<(u16, String)> for CloseMsg {
     fn from((code, reason): (u16, String)) -> Self {
         match code {
-            1000 => {
-                if let Ok(desc) =
-                    serde_json::from_str::<CloseDescription>(&reason)
-                {
+            1000 => serde_json::from_str::<CloseDescription>(&reason)
+                .map_or(Self::Abnormal(code), |desc| {
                     Self::Normal(code, desc.reason)
-                } else {
-                    Self::Abnormal(code)
-                }
-            }
+                }),
             _ => Self::Abnormal(code),
         }
     }

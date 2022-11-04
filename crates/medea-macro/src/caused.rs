@@ -108,10 +108,10 @@ fn error_type(s: &Structure<'_>) -> Result<syn::Path> {
             }
         }
     }
-    match error_type {
-        Some(path) => Ok(path),
-        None => Err(Error::new_spanned(s.ast(), "Error type wasn't provided")),
-    }
+    error_type.map_or_else(
+        || Err(Error::new_spanned(s.ast(), "Error type wasn't provided")),
+        Ok,
+    )
 }
 
 /// Checks that enum variant has `#[cause]` attribute.

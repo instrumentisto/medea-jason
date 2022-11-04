@@ -74,8 +74,8 @@ impl RoomCloseReason {
     ///
     /// `is_closed_by_server` is `true` on [`CloseReason::ByServer`].
     #[must_use]
-    pub fn new(reason: CloseReason) -> Self {
-        match reason {
+    pub fn new(close_reason: CloseReason) -> Self {
+        match close_reason {
             CloseReason::ByServer(reason) => Self {
                 reason: reason.to_string(),
                 is_closed_by_server: true,

@@ -91,6 +91,7 @@ pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
     let res = panic::catch_unwind(panic::AssertUnwindSafe(f));
+    #[allow(clippy::option_if_let_else)]
     if let Ok(r) = res {
         r
     } else {
@@ -191,10 +192,7 @@ impl<T: ForeignClass> From<T> for DartValue {
 
 impl<T: ForeignClass> From<Option<T>> for DartValue {
     fn from(val: Option<T>) -> Self {
-        match val {
-            None => Self::None,
-            Some(t) => Self::from(t),
-        }
+        val.map_or(Self::None, |t| Self::from(t))
     }
 }
 
@@ -206,10 +204,7 @@ impl<T> From<PtrArray<T>> for DartValue {
 
 impl<T> From<Option<PtrArray<T>>> for DartValue {
     fn from(val: Option<PtrArray<T>>) -> Self {
-        match val {
-            None => Self::None,
-            Some(arr) => Self::from(arr),
-        }
+        val.map_or(Self::None, Self::from)
     }
 }
 
@@ -221,19 +216,13 @@ impl From<String> for DartValue {
 
 impl From<Option<String>> for DartValue {
     fn from(val: Option<String>) -> Self {
-        match val {
-            None => Self::None,
-            Some(string) => Self::from(string),
-        }
+        val.map_or(Self::None, Self::from)
     }
 }
 
 impl From<Option<i64>> for DartValue {
     fn from(val: Option<i64>) -> Self {
-        match val {
-            None => Self::None,
-            Some(i) => Self::from(i),
-        }
+        val.map_or(Self::None, Self::from)
     }
 }
 
@@ -245,10 +234,7 @@ impl From<ptr::NonNull<Dart_Handle>> for DartValue {
 
 impl From<Option<ptr::NonNull<Dart_Handle>>> for DartValue {
     fn from(val: Option<ptr::NonNull<Dart_Handle>>) -> Self {
-        match val {
-            None => Self::None,
-            Some(handle) => Self::from(handle),
-        }
+        val.map_or(Self::None, Self::from)
     }
 }
 
@@ -260,10 +246,7 @@ impl From<Dart_Handle> for DartValue {
 
 impl From<Option<Dart_Handle>> for DartValue {
     fn from(val: Option<Dart_Handle>) -> Self {
-        match val {
-            None => Self::None,
-            Some(handle) => Self::from(handle),
-        }
+        val.map_or(Self::None, Self::from)
     }
 }
 
@@ -275,10 +258,7 @@ impl From<DartError> for DartValue {
 
 impl From<Option<DartError>> for DartValue {
     fn from(val: Option<DartError>) -> Self {
-        match val {
-            None => Self::None,
-            Some(err) => Self::from(err),
-        }
+        val.map_or(Self::None, Self::from)
     }
 }
 

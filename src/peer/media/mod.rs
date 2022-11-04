@@ -270,11 +270,9 @@ impl InnerMediaConnections {
         self.senders
             .values()
             .filter(move |sender| sender.state().kind() == kind)
-            .filter(move |sender| match source_kind {
-                None => true,
-                Some(source_kind) => {
-                    sender.caps().media_source_kind() == source_kind
-                }
+            .filter(move |sender| {
+                source_kind
+                    .map_or(true, |sk| sender.caps().media_source_kind() == sk)
             })
     }
 
