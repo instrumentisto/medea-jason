@@ -186,7 +186,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          targets: wasm32-unknown-unknown
+          target: wasm32-unknown-unknown
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.wasm }}
       - uses: Swatinem/rust-cache@v1
@@ -236,7 +236,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          targets: wasm32-unknown-unknown
+          target: wasm32-unknown-unknown
       - uses: arduino/setup-protoc@v1
         with:
           version: ${{ env.PROTOC_VER }}
@@ -528,6 +528,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
+      # Container doesn't pick `~` (tilde) in `PATH`.
+      - run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
 
@@ -731,7 +733,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          targets: wasm32-unknown-unknown
+          target: wasm32-unknown-unknown
       - uses: jetli/wasm-pack-action@v0.3.0
 
       - name: Release ${{ steps.package.outputs.group2 }} version
