@@ -270,11 +270,9 @@ impl InnerMediaConnections {
         self.senders
             .values()
             .filter(move |sender| sender.state().kind() == kind)
-            .filter(move |sender| match source_kind {
-                None => true,
-                Some(source_kind) => {
-                    sender.caps().media_source_kind() == source_kind
-                }
+            .filter(move |sender| {
+                source_kind
+                    .map_or(true, |sk| sender.caps().media_source_kind() == sk)
             })
     }
 
@@ -296,6 +294,7 @@ impl InnerMediaConnections {
 
     /// Returns all [`TransceiverSide`]s by provided [`TrackDirection`],
     /// [`MediaKind`] and [`MediaSourceKind`].
+    #[allow(clippy::as_conversions)]
     fn get_transceivers_by_direction_and_kind(
         &self,
         direction: TrackDirection,
@@ -475,6 +474,7 @@ impl MediaConnections {
     ///
     /// Returns `None` if [`TransceiverSide`] with a provided [`TrackId`]
     /// doesn't exists in this [`MediaConnections`].
+    #[allow(clippy::as_conversions)]
     pub fn get_transceiver_side_by_id(
         &self,
         track_id: TrackId,
@@ -720,6 +720,7 @@ impl MediaConnections {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl MediaConnections {
     /// Indicates whether all [`Receiver`]s with [`MediaKind::Video`] are
     /// enabled.

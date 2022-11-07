@@ -541,7 +541,7 @@ impl PeerConnection {
     }
 
     /// Returns [`PeerId`] of this [`PeerConnection`].
-    pub fn id(&self) -> PeerId {
+    pub const fn id(&self) -> PeerId {
         self.id
     }
 
@@ -754,13 +754,11 @@ impl PeerConnection {
         &self,
         criteria: LocalStreamUpdateCriteria,
     ) -> Result<Option<SimpleTracksRequest>, Traced<TracksRequestError>> {
-        let request = if let Some(req) =
-            self.media_connections.get_tracks_request(criteria)
-        {
-            req
-        } else {
-            return Ok(None);
-        };
+        let Some(request) = self
+            .media_connections
+            .get_tracks_request(criteria) else {
+                return Ok(None);
+            };
         let mut required_caps = SimpleTracksRequest::try_from(request)
             .map_err(tracerr::from_and_wrap!())?;
         required_caps
@@ -955,6 +953,7 @@ impl PeerConnection {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl PeerConnection {
     /// Returns [`RtcStats`] of this [`PeerConnection`].
     ///

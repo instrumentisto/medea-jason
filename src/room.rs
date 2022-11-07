@@ -76,13 +76,16 @@ impl RoomCloseReason {
     #[must_use]
     pub fn new(reason: CloseReason) -> Self {
         match reason {
-            CloseReason::ByServer(reason) => Self {
-                reason: reason.to_string(),
+            CloseReason::ByServer(rsn) => Self {
+                reason: rsn.to_string(),
                 is_closed_by_server: true,
                 is_err: false,
             },
-            CloseReason::ByClient { reason, is_err } => Self {
-                reason: reason.to_string(),
+            CloseReason::ByClient {
+                reason: rsn,
+                is_err,
+            } => Self {
+                reason: rsn.to_string(),
                 is_closed_by_server: false,
                 is_err,
             },
@@ -97,13 +100,13 @@ impl RoomCloseReason {
 
     /// Indicates whether the [`Room`] was closed by server.
     #[must_use]
-    pub fn is_closed_by_server(&self) -> bool {
+    pub const fn is_closed_by_server(&self) -> bool {
         self.is_closed_by_server
     }
 
     /// Indicates whether the [`Room`]'s close reason is considered as an error.
     #[must_use]
-    pub fn is_err(&self) -> bool {
+    pub const fn is_err(&self) -> bool {
         self.is_err
     }
 }
@@ -1085,7 +1088,7 @@ impl ConstraintsUpdateError {
     }
 
     /// Returns a new [`ConstraintsUpdateError::Recovered`].
-    fn recovered(recover_reason: Traced<ChangeMediaStateError>) -> Self {
+    const fn recovered(recover_reason: Traced<ChangeMediaStateError>) -> Self {
         Self::Recovered(recover_reason)
     }
 
@@ -1117,7 +1120,7 @@ impl ConstraintsUpdateError {
 
     /// Returns a [`ConstraintsUpdateError::Errored`] with the provided
     /// [`ChangeMediaStateError`].
-    fn errored(err: Traced<ChangeMediaStateError>) -> Self {
+    const fn errored(err: Traced<ChangeMediaStateError>) -> Self {
         Self::Errored(err)
     }
 }
@@ -1900,6 +1903,7 @@ impl Drop for InnerRoom {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl Room {
     /// Returns [`PeerConnection`] stored in repository by its ID.
     ///

@@ -2,10 +2,12 @@
 
 // TODO: Remove allows when implementing platform code.
 #![allow(
+    clippy::as_conversions,
     clippy::missing_docs_in_private_items,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
     clippy::unused_self,
+    clippy::unwrap_used,
     clippy::needless_pass_by_value,
     unused_variables
 )]

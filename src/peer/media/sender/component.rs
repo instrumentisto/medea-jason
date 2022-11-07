@@ -298,7 +298,7 @@ impl State {
 
     /// Returns [`TrackId`] of this [`State`].
     #[must_use]
-    pub fn id(&self) -> TrackId {
+    pub const fn id(&self) -> TrackId {
         self.id
     }
 
@@ -310,14 +310,14 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub fn media_type(&self) -> MediaType {
+    pub const fn media_type(&self) -> MediaType {
         self.media_type
     }
 
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
     /// should send media data to.
     #[must_use]
-    pub fn receivers(&self) -> &Vec<MemberId> {
+    pub const fn receivers(&self) -> &Vec<MemberId> {
         &self.receivers
     }
 
@@ -406,7 +406,7 @@ impl State {
 
     /// Returns [`MediaKind`] of this [`State`].
     #[must_use]
-    pub fn media_kind(&self) -> MediaKind {
+    pub const fn media_kind(&self) -> MediaKind {
         match &self.media_type {
             MediaType::Audio(_) => MediaKind::Audio,
             MediaType::Video(_) => MediaKind::Video,
@@ -415,7 +415,7 @@ impl State {
 
     /// Returns [`MediaSourceKind`] of this [`State`].
     #[must_use]
-    pub fn media_source(&self) -> MediaSourceKind {
+    pub const fn media_source(&self) -> MediaSourceKind {
         match &self.media_type {
             MediaType::Audio(_) => MediaSourceKind::Device,
             MediaType::Video(video) => video.source_kind,
@@ -659,6 +659,7 @@ impl MediaStateControllable for State {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl State {
     /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
     pub fn synced(&self) {

@@ -22,14 +22,11 @@ use crate::api::{ws::Notification, Element, Subscribers};
 pub struct Fid(String);
 
 impl Fid {
-    /// Return `Room` id from this [`Fid`].
+    /// Returns `Room`'s ID from this [`Fid`].
     fn room_id(&self) -> &str {
-        match self.0.find('/') {
-            None => self.0.as_str(),
-            // PANIC: Slicing is OK here, as the index is taken from the source.
-            #[allow(clippy::string_slice)]
-            Some(i) => &self.0[..i],
-        }
+        // PANIC: Slicing is OK here, as the index is taken from the source.
+        #[allow(clippy::string_slice)]
+        self.0.find('/').map_or(self.0.as_str(), |i| &self.0[..i])
     }
 }
 
@@ -52,7 +49,7 @@ impl From<(String, String, String)> for Fid {
 }
 
 /// Returns new [`proto::IdRequest`] with provided FIDs.
-fn id_request(ids: Vec<String>) -> proto::IdRequest {
+const fn id_request(ids: Vec<String>) -> proto::IdRequest {
     proto::IdRequest { fid: ids }
 }
 

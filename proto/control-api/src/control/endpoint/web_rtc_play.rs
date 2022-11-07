@@ -125,15 +125,11 @@ impl FromStr for LocalSrcUri {
             return Err(LocalSrcUriParseError::NotLocal(val.into()));
         }
 
-        let room_id = match url.host_str() {
-            None => {
-                return Err(LocalSrcUriParseError::MissingPaths(val.into()))
-            }
-            Some(host) if host.is_empty() => {
-                return Err(LocalSrcUriParseError::MissingPaths(val.into()));
-            }
-            Some(host) => host.into(),
-        };
+        let room_id = url
+            .host_str()
+            .filter(|h| !h.is_empty())
+            .ok_or_else(|| LocalSrcUriParseError::MissingPaths(val.into()))?
+            .into();
 
         let mut path = url
             .path_segments()

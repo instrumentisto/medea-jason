@@ -136,13 +136,14 @@ impl From<LocalTrackIsEndedError> for GetUserMediaError {
 /// Error occurring when [getDisplayMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
+#[allow(variant_size_differences)] // `Box`ing still reports this
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = "platform::Error")]
 pub enum GetDisplayMediaError {
     /// [getDisplayMedia()][1] request failed.
     ///
     /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    #[display(fmt = "MediaDevices.getDisplayMedia() failed: {}", _0)]
+    #[display(fmt = "`MediaDevices.getDisplayMedia()` failed: {}", _0)]
     PlatformRequestFailed(platform::Error),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
@@ -300,7 +301,9 @@ impl InnerMediaManager {
             .borrow_mut()
             .retain(|_, track| Weak::strong_count(track) > 0);
 
-        let mut tracks = Vec::new();
+        // PANIC: It's OK to unwrap `Weak` here as we have cleaned the absent
+        //        ones in the line above.
+        #[allow(clippy::unwrap_used)]
         let storage: Vec<_> = self
             .tracks
             .borrow()
@@ -308,6 +311,7 @@ impl InnerMediaManager {
             .map(|(_, track)| Weak::upgrade(track).unwrap())
             .collect();
 
+        let mut tracks = Vec::new();
         if caps.is_audio_enabled() {
             for track in &storage {
                 if caps.get_audio().satisfies(track.as_ref()).await {
