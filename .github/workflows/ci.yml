@@ -171,10 +171,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: skip
-        run: echo ::set-output name=no::${{
+        run: echo "no=${{
                startsWith(github.ref, format('refs/tags/{0}-', matrix.crate))
                || !startsWith(github.ref, 'refs/tags/medea-')
-             }}
+             }}" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v3
         if: ${{ steps.skip.outputs.no == 'true' }}
@@ -200,15 +200,15 @@ jobs:
 
       - name: Parse wasm-bindgen-cli version from Cargo.lock
         id: wasm-cli
-        run: echo ::set-output
-                  name=VERSION::$(cargo pkgid wasm-bindgen | grep -o '#.*'
-                                                           | grep -o '[0-9\.]*')
+        run: echo "version=$(cargo pkgid wasm-bindgen | grep -o '#.*'
+                                                      | grep -o '[0-9\.]*')"
+             >> $GITHUB_OUTPUT
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.wasm }}
       - uses: actions-rs/install@v0.1
         with:
           crate: wasm-bindgen-cli
-          version: ${{ steps.wasm-cli.outputs.VERSION }}
+          version: ${{ steps.wasm-cli.outputs.version }}
           use-tool-cache: true
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.wasm }}
@@ -406,8 +406,10 @@ jobs:
       - name: Parse Android API versions
         id: api-version
         run: |
-          echo ::set-output name=min::$(make flutter.android.version.min)
-          echo ::set-output name=target::$(make flutter.android.version.compile)
+          echo "min=$(make flutter.android.version.min)" \
+          >> $GITHUB_OUTPUT
+          echo "target=$(make flutter.android.version.compile)" \
+          >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
@@ -665,10 +667,10 @@ jobs:
 
       - name: Parse CHANGELOG link
         id: changelog
-        run: echo ::set-output
-                  name=LINK::$(make cargo.changelog.link
-                                    crate=${{ steps.release.outputs.group1 }}
-                                    ver=${{ steps.release.outputs.group2 }})
+        run: echo "link=$(make cargo.changelog.link
+                               crate=${{ steps.release.outputs.group1 }}
+                               ver=${{ steps.release.outputs.group2 }})"
+             >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v1
         env:
@@ -677,7 +679,7 @@ jobs:
           name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
           body: |
             [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
-            [Changelog](${{ steps.changelog.outputs.LINK }})
+            [Changelog](${{ steps.changelog.outputs.link }})
           prerelease: ${{ contains(steps.release.outputs.group2, '-') }}
 
   release-cargo:
@@ -753,24 +755,24 @@ jobs:
       - uses: trilom/file-changes-action@v1.2.4
         id: changed
       - id: chart
-        run: echo ::set-output
-                  name=MANIFEST::$(make helm.dir
-                                        chart=${{ matrix.chart }})/Chart.yaml
+        run: echo "manifest=$(make helm.dir
+                                   chart=${{ matrix.chart }})/Chart.yaml"
+             >> $GITHUB_OUTPUT
 
       - uses: azure/setup-helm@v3
         if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.MANIFEST) }}
+                         steps.chart.outputs.manifest) }}
 
       - name: Prepare Git author for push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
         if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.MANIFEST) }}
+                         steps.chart.outputs.manifest) }}
 
       - run: make helm.package.release chart=${{ matrix.chart }} build=yes
         if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.MANIFEST) }}
+                         steps.chart.outputs.manifest) }}
 
   release-dart:
     name: Release on pub.dev
@@ -799,16 +801,18 @@ jobs:
       - name: Retrieve commit message and hash
         id: commit
         run: |
-          echo ::set-output name=message::$(git log --grep='\[publish\]' --format=%s)
-          echo ::set-output name=sha::${{ (github.event_name == 'pull_request'
-                                           && github.event.pull_request.head.sha)
-                                       ||  github.sha }}
+          echo "message=$(git log --grep='\[publish\]' --format=%s)" \
+          >> $GITHUB_OUTPUT
+          echo "sha=${{ (github.event_name == 'pull_request'
+                         && github.event.pull_request.head.sha)
+                     ||  github.sha }}" \
+          >> $GITHUB_OUTPUT
       - name: Check whether should be skipped
         id: skip
-        run: echo ::set-output name=no::${{!(
+        run: echo "no=${{ !(
                github.event_name == 'pull_request'
                && !contains(steps.commit.outputs.message, '[publish]')
-             )}}
+             ) }}" >> $GITHUB_OUTPUT
 
       - uses: dart-lang/setup-dart@v1.3
         if: ${{ steps.skip.outputs.no == 'true' }}
