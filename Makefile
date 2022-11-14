@@ -37,7 +37,7 @@ ANDROID_SDK_MIN_VERSION = $(strip \
 	        | awk '{print $$2}'))
 IOS_TARGETS := aarch64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
-MACOS_TARGETS := x86_64-apple-darwin
+MACOS_TARGETS := x86_64-apple-darwin aarch64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
@@ -221,6 +221,8 @@ cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
 cargo-build-targets-macos = $(or $(targets),$(MACOS_TARGETS))
 cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
+cargo-build-macos-libs = $(foreach target,$(subst $(comma), ,$(cargo-build-targets-macos)),\
+	target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib)
 
 cargo.build.jason:
 ifeq ($(platform),all)
@@ -278,6 +280,8 @@ endif
 ifeq ($(cargo-build-platform),macos)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-macos)),\
 		$(call cargo.build.medea-jason.macos,$(target),$(debug)))
+	@mkdir -p ./flutter/macos/rust/lib/
+	lipo -create $(cargo-build-macos-libs) -output ./flutter/macos/rust/lib/libmedea_jason.dylib
 endif
 ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
@@ -319,9 +323,6 @@ define cargo.build.medea-jason.macos
 	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
 	            --manifest-path=./Cargo.toml \
 	            $(args)
-	@mkdir -p ./flutter/macos/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib \
-	      ./flutter/macos/lib/$(target)/libmedea_jason.dylib
 endef
 define cargo.build.medea-jason.windows
 	$(eval target := $(strip $(1)))
