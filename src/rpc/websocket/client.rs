@@ -55,7 +55,7 @@ pub enum ClientDisconnect {
 impl ClientDisconnect {
     /// Indicates whether this [`ClientDisconnect`] is considered as error.
     #[must_use]
-    pub fn is_err(self) -> bool {
+    pub const fn is_err(self) -> bool {
         match self {
             Self::RoomUnexpectedlyDropped
             | Self::RpcClientUnexpectedlyDropped

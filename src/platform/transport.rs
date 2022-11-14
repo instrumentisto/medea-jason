@@ -34,7 +34,7 @@ pub enum TransportState {
 impl TransportState {
     /// Indicates whether the socket can be closed.
     #[must_use]
-    pub fn can_close(self) -> bool {
+    pub const fn can_close(self) -> bool {
         matches!(self, Self::Connecting | Self::Open)
     }
 }

@@ -54,6 +54,7 @@ where
     where
         F: FnMut(A) + 'static,
     {
+        #[allow(clippy::as_conversions)]
         let closure = Closure::wrap(Box::new(closure) as Box<dyn FnMut(A)>);
 
         target
@@ -111,6 +112,7 @@ where
     /// Drops [`EventListener`]'s closure and unregisters appropriate event
     /// handler.
     fn drop(&mut self) {
+        #[allow(clippy::as_conversions)]
         if let Err(err) = (self.target.as_ref() as &web_sys::EventTarget)
             .remove_event_listener_with_callback(
                 self.event_name,

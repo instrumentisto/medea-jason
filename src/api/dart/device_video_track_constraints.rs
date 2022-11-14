@@ -68,13 +68,11 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_height(
     height: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(height) {
-            Ok(h) => this.as_mut().exact_height(h),
-            Err(_) => {
-                return ArgumentError::new(height, "height", "Expected u32")
-                    .into();
-            }
+        let Ok(height) = u32::try_from(height) else {
+            return ArgumentError::new(height, "height", "Expected u32")
+                .into();
         };
+        this.as_mut().exact_height(height);
         Ok(()).into()
     })
 }
@@ -88,13 +86,11 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_height(
     height: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(height) {
-            Ok(h) => this.as_mut().ideal_height(h),
-            Err(_) => {
-                return ArgumentError::new(height, "height", "Expected u32")
-                    .into();
-            }
+        let Ok(height) = u32::try_from(height) else {
+            return ArgumentError::new(height, "height", "Expected u32")
+                .into();
         };
+        this.as_mut().ideal_height(height);
         Ok(()).into()
     })
 }
@@ -131,13 +127,11 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__exact_width(
     width: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(width) {
-            Ok(w) => this.as_mut().exact_width(w),
-            Err(_) => {
-                return ArgumentError::new(width, "width", "Expected u32")
-                    .into();
-            }
+        let Ok(width) = u32::try_from(width) else {
+            return ArgumentError::new(width, "width", "Expected u32")
+                .into();
         };
+        this.as_mut().exact_width(width);
         Ok(()).into()
     })
 }
@@ -151,13 +145,11 @@ pub unsafe extern "C" fn DeviceVideoTrackConstraints__ideal_width(
     width: i64,
 ) -> DartResult {
     propagate_panic(|| {
-        match u32::try_from(width) {
-            Ok(w) => this.as_mut().ideal_width(w),
-            Err(_) => {
-                return ArgumentError::new(width, "width", "Expected u32")
-                    .into();
-            }
+        let Ok(width) = u32::try_from(width) else {
+            return ArgumentError::new(width, "width", "Expected u32")
+                .into();
         };
+        this.as_mut().ideal_width(width);
         Ok(()).into()
     })
 }

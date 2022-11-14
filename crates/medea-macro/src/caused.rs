@@ -62,56 +62,48 @@ fn error_type(s: &Structure<'_>) -> Result<syn::Path> {
                         "Cannot have two #[cause(...)] attributes",
                     ));
                 }
-                if let syn::Meta::List(list) = meta {
-                    if list.nested.is_empty() {
-                        return Err(Error::new_spanned(
-                            list,
-                            "Expected at least one argument to #[cause(...)] \
-                             attribute",
-                        ));
-                    }
-                    error_type = match &list.nested[0] {
-                        syn::NestedMeta::Meta(syn::Meta::NameValue(nv))
-                            if nv.path.is_ident("error") =>
-                        {
-                            if let syn::MetaNameValue {
-                                lit: syn::Lit::Str(lit_str),
-                                ..
-                            } = nv
-                            {
-                                Some(
-                                    lit_str.parse_with(
-                                        syn::Path::parse_mod_style,
-                                    )?,
-                                )
-                            } else {
-                                return Err(Error::new_spanned(
-                                    nv,
-                                    "Expected `path::to::error`",
-                                ));
-                            }
-                        }
-                        syn::NestedMeta::Meta(_) | syn::NestedMeta::Lit(_) => {
-                            return Err(Error::new_spanned(
-                                list,
-                                "Expected attribute like #[cause(error = \
-                                 \"path::to::error\")]",
-                            ));
-                        }
-                    };
-                } else {
+                let syn::Meta::List(list) = meta else {
                     return Err(Error::new_spanned(
                         meta,
                         "#[cause] attribute must take a list in parentheses",
                     ));
                 };
+                if list.nested.is_empty() {
+                    return Err(Error::new_spanned(
+                        list,
+                        "Expected at least one argument to #[cause(...)] \
+                         attribute",
+                    ));
+                }
+                error_type = match &list.nested[0] {
+                    syn::NestedMeta::Meta(syn::Meta::NameValue(nv))
+                        if nv.path.is_ident("error") =>
+                    {
+                        let syn::MetaNameValue {
+                                lit: syn::Lit::Str(lit_str),
+                                ..
+                            } = nv else {
+                                return Err(Error::new_spanned(
+                                    nv,
+                                    "Expected `path::to::error`",
+                                ));
+                            };
+                        Some(lit_str.parse_with(syn::Path::parse_mod_style)?)
+                    }
+                    syn::NestedMeta::Meta(_) | syn::NestedMeta::Lit(_) => {
+                        return Err(Error::new_spanned(
+                            list,
+                            "Expected attribute like #[cause(error = \
+                             \"path::to::error\")]",
+                        ));
+                    }
+                };
             }
         }
     }
-    error_type.map_or_else(
-        || Err(Error::new_spanned(s.ast(), "Error type wasn't provided")),
-        Ok,
-    )
+    error_type.ok_or_else(|| {
+        Error::new_spanned(s.ast(), "Error type wasn't provided")
+    })
 }
 
 /// Checks that enum variant has `#[cause]` attribute.

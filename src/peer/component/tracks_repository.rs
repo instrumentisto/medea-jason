@@ -237,6 +237,7 @@ impl<S> TracksRepository<S> {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl TracksRepository<sender::State> {
     /// Sets [`SyncState`] of all [`sender::State`]s to the
     /// [`SyncState::Synced`].
