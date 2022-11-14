@@ -346,6 +346,14 @@ jobs:
           emulator-options: -no-window -accel on -gpu swiftshader_indirect -no-boot-anim
           script: echo "Generated AVD snapshot for caching."
         if: ${{ matrix.platform == 'android' && steps.avd-cache.outputs.cache-hit != 'true' }}
+      
+      - name: Start iOS simulator
+        id: simulator
+        uses: futureware-tech/simulator-action@v2
+        with:
+          os_version: '>=13.0'
+          os: iOS
+        if: ${{ matrix.platform == 'ios' }}
 
       - name: Download `medea-jason` lib
         uses: actions/download-artifact@v3
@@ -393,6 +401,13 @@ jobs:
               medea-tag=${{ env.MEDEA_BRANCH }}
               control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
+
+      - name: Run tests on iOS simulator
+        run: make test.e2e.native up=yes
+              debug=no dockerized=yes server="10.0.2.2"
+              medea-tag=${{ env.MEDEA_BRANCH }}
+              control-tag=build-${{ github.run_number }}
+        if: ${{ matrix.platform == 'ios' }}
 
   test-flutter:
     name: Flutter tests
