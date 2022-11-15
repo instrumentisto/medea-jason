@@ -305,7 +305,7 @@ jobs:
         with:
           toolchain: stable
       - uses: docker-practice/actions-setup-docker@master
-        if: ${{ matrix.platform == 'macos' || matrix.platform == 'ios' || matrix-platform == 'android' }}
+        if: ${{ matrix.platform == 'macos' || matrix.platform == 'ios' || matrix.platform == 'android' }}
 
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
