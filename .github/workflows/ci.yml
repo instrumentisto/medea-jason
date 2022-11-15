@@ -403,6 +403,7 @@ jobs:
               debug=no dockerized=yes server="10.0.2.2"
               medea-tag=${{ env.MEDEA_BRANCH }}
               control-tag=build-${{ github.run_number }}
+              device=${{ steps.simulator.outputs.udid }}
         if: ${{ matrix.platform == 'ios' }}
 
   test-flutter:
