@@ -35,7 +35,7 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-IOS_TARGETS := aarch64-apple-ios
+IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
@@ -270,6 +270,10 @@ endif
 ifeq ($(cargo-build-platform),ios)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
 		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+	@mkdir -p flutter/ios/lib/
+	lipo -create $(foreach t,$(cargo-build-targets-macos),\
+	             target/$(t)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib) \
+	     -output flutter/ios/lib/libmedea_jason.dylib
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
@@ -299,9 +303,6 @@ define cargo.build.medea-jason.ios
 	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
 	            --manifest-path=./Cargo.toml \
 	            $(args)
-	@mkdir -p ./flutter/ios/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
-	      ./flutter/ios/lib/$(target)/libmedea_jason.a
 endef
 define cargo.build.medea-jason.linux
 	$(eval target := $(strip $(1)))
