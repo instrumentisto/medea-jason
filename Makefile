@@ -272,8 +272,8 @@ ifeq ($(cargo-build-platform),ios)
 		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
 	@mkdir -p flutter/ios/lib/
 	lipo -create $(foreach t,$(cargo-build-targets-ios),\
-	             target/$(t)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib) \
-	     -output flutter/ios/lib/libmedea_jason.dylib
+	             target/$(t)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a) \
+	     -output flutter/ios/lib/libmedea_jason.a
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
