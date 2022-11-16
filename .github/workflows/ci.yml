@@ -358,9 +358,7 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ matrix.platform != 'windows'
              && env.CACHE == 'true' }}
-
-      - run: make rustup.targets only=android
-        if: ${{ matrix.platform == 'android' }}
+      - run: make rustup.targets only=${{ matrix.platform }}
       - uses: actions-rs/install@v0.1
         with:
           crate: cargo-ndk
