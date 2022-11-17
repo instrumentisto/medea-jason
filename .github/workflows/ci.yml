@@ -23,25 +23,25 @@ jobs:
   # Pull Request #
   ################
 
-  pr:
-    if: ${{ github.event_name == 'pull_request' }}
-    needs:
-      - clippy
-      - crate-jason
-      - crate-jason-linux
-      - dartanalyze
-      - dartfmt
-      - docker
-      - helm-lint
-      - rustdoc
-      - rustfmt
-      - test-e2e-browser
-      - test-e2e-native
-      - test-flutter
-      - test-unit
-    runs-on: ubuntu-latest
-    steps:
-      - run: true
+  # pr:
+  #   if: ${{ github.event_name == 'pull_request' }}
+  #   needs:
+  #     - clippy
+  #     - crate-jason
+  #     - crate-jason-linux
+  #     - dartanalyze
+  #     - dartfmt
+  #     - docker
+  #     - helm-lint
+  #     - rustdoc
+  #     - rustfmt
+  #     - test-e2e-browser
+  #     - test-e2e-native
+  #     - test-flutter
+  #     - test-unit
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - run: true
 
 
 
@@ -707,382 +707,382 @@ jobs:
 
 
 
-  #############
-  # Releasing #
-  #############
+  # #############
+  # # Releasing #
+  # #############
 
-  release-github:
-    name: Release on GitHub
-    needs:
-      - clippy
-      - rustdoc
-      - rustfmt
-      - test-e2e-browser
-      - test-e2e-native
-      - test-unit
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Parse crate/package name and version
-        id: release
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+  # release-github:
+  #   name: Release on GitHub
+  #   needs:
+  #     - clippy
+  #     - rustdoc
+  #     - rustfmt
+  #     - test-e2e-browser
+  #     - test-e2e-native
+  #     - test-unit
+  #   if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Parse crate/package name and version
+  #       id: release
+  #       uses: actions-ecosystem/action-regex-match@v2
+  #       with:
+  #         text: ${{ github.ref }}
+  #         regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
 
-      - name: Verify release version matches Cargo manifest
-        run: >-
-          test "${{ steps.release.outputs.group2 }}" \
-               == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
-        if: ${{ !startsWith(github.ref, 'refs/tags/medea-demo-') }}
-      - name: Verify release version matches Yarn manifest
-        run: >-
-          test "${{ steps.release.outputs.group2 }}" \
-               == $(make yarn.version pkg=${{ steps.release.outputs.group1 }})
-        if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
+  #     - name: Verify release version matches Cargo manifest
+  #       run: >-
+  #         test "${{ steps.release.outputs.group2 }}" \
+  #              == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
+  #       if: ${{ !startsWith(github.ref, 'refs/tags/medea-demo-') }}
+  #     - name: Verify release version matches Yarn manifest
+  #       run: >-
+  #         test "${{ steps.release.outputs.group2 }}" \
+  #              == $(make yarn.version pkg=${{ steps.release.outputs.group1 }})
+  #       if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
 
-      - name: Parse CHANGELOG link
-        id: changelog
-        run: echo "link=$(make cargo.changelog.link
-                               crate=${{ steps.release.outputs.group1 }}
-                               ver=${{ steps.release.outputs.group2 }})"
-             >> $GITHUB_OUTPUT
+  #     - name: Parse CHANGELOG link
+  #       id: changelog
+  #       run: echo "link=$(make cargo.changelog.link
+  #                              crate=${{ steps.release.outputs.group1 }}
+  #                              ver=${{ steps.release.outputs.group2 }})"
+  #            >> $GITHUB_OUTPUT
 
-      - uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
-          body: |
-            [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
-            [Changelog](${{ steps.changelog.outputs.link }})
-          prerelease: ${{ contains(steps.release.outputs.group2, '-') }}
+  #     - uses: softprops/action-gh-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
+  #         body: |
+  #           [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
+  #           [Changelog](${{ steps.changelog.outputs.link }})
+  #         prerelease: ${{ contains(steps.release.outputs.group2, '-') }}
 
-  release-cargo:
-    name: Release on crates.io
-    needs: ["release-github"]
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-')
-            && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
-            && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
+  # release-cargo:
+  #   name: Release on crates.io
+  #   needs: ["release-github"]
+  #   if: ${{ startsWith(github.ref, 'refs/tags/medea-')
+  #           && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
+  #           && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: dtolnay/rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
 
-      - name: Parse crate name and version
-        id: crate
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+  #     - name: Parse crate name and version
+  #       id: crate
+  #       uses: actions-ecosystem/action-regex-match@v2
+  #       with:
+  #         text: ${{ github.ref }}
+  #         regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
 
-      - name: Release ${{ steps.crate.outputs.group2 }} version
-              of '${{ steps.crate.outputs.group1 }}' crate
-        run: make release.crates crate=${{ steps.crate.outputs.group1 }}
-                                 publish=yes
-        env:
-          CARGO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
+  #     - name: Release ${{ steps.crate.outputs.group2 }} version
+  #             of '${{ steps.crate.outputs.group1 }}' crate
+  #       run: make release.crates crate=${{ steps.crate.outputs.group1 }}
+  #                                publish=yes
+  #       env:
+  #         CARGO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
 
-  release-npm:
-    name: Release on NPM
-    needs: ["release-github"]
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Parse package name and version
-        id: package
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$'
+  # release-npm:
+  #   name: Release on NPM
+  #   needs: ["release-github"]
+  #   if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Parse package name and version
+  #       id: package
+  #       uses: actions-ecosystem/action-regex-match@v2
+  #       with:
+  #         text: ${{ github.ref }}
+  #         regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$'
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "17"
-          registry-url: https://registry.npmjs.org
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: "17"
+  #         registry-url: https://registry.npmjs.org
 
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-      - uses: jetli/wasm-pack-action@v0.3.0
+  #     - uses: dtolnay/rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         target: wasm32-unknown-unknown
+  #     - uses: jetli/wasm-pack-action@v0.3.0
 
-      - name: Release ${{ steps.package.outputs.group2 }} version
-              of '${{ steps.package.outputs.group1 }}' package
-        run: make release.npm crate=${{ steps.package.outputs.group1 }}
-                              publish=yes
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
+  #     - name: Release ${{ steps.package.outputs.group2 }} version
+  #             of '${{ steps.package.outputs.group1 }}' package
+  #       run: make release.npm crate=${{ steps.package.outputs.group1 }}
+  #                             publish=yes
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
 
-  release-helm:
-    name: Release Helm chart
-    needs: ["helm-lint"]
-    if: ${{ github.ref == 'refs/heads/master' }}
-    strategy:
-      matrix:
-        chart:
-          - medea-demo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: trilom/file-changes-action@v1.2.4
-        id: changed
-      - id: chart
-        run: echo "manifest=$(make helm.dir
-                                   chart=${{ matrix.chart }})/Chart.yaml"
-             >> $GITHUB_OUTPUT
+  # release-helm:
+  #   name: Release Helm chart
+  #   needs: ["helm-lint"]
+  #   if: ${{ github.ref == 'refs/heads/master' }}
+  #   strategy:
+  #     matrix:
+  #       chart:
+  #         - medea-demo
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: trilom/file-changes-action@v1.2.4
+  #       id: changed
+  #     - id: chart
+  #       run: echo "manifest=$(make helm.dir
+  #                                  chart=${{ matrix.chart }})/Chart.yaml"
+  #            >> $GITHUB_OUTPUT
 
-      - uses: azure/setup-helm@v3
-        if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.manifest) }}
+  #     - uses: azure/setup-helm@v3
+  #       if: ${{ contains(steps.changed.outputs.files,
+  #                        steps.chart.outputs.manifest) }}
 
-      - name: Prepare Git author for push
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Actions"
-        if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.manifest) }}
+  #     - name: Prepare Git author for push
+  #       run: |
+  #         git config --local user.email "action@github.com"
+  #         git config --local user.name "GitHub Actions"
+  #       if: ${{ contains(steps.changed.outputs.files,
+  #                        steps.chart.outputs.manifest) }}
 
-      - run: make helm.package.release chart=${{ matrix.chart }} build=yes
-        if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.manifest) }}
+  #     - run: make helm.package.release chart=${{ matrix.chart }} build=yes
+  #       if: ${{ contains(steps.changed.outputs.files,
+  #                        steps.chart.outputs.manifest) }}
 
-  release-dart:
-    name: Release on pub.dev
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
-         || github.ref_name == 'master'
-         || (github.event_name == 'pull_request'
-             && github.event.pull_request.head.repo.owner.login == 'instrumentisto') }}
-    needs:
-      - clippy
-      - crate-jason
-      - crate-jason-linux
-      - dartanalyze
-      - dartfmt
-      - rustdoc
-      - rustfmt
-      - test-e2e-browser
-      - test-e2e-native
-      - test-flutter
-      - test-unit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2 # for PRs only
+  # release-dart:
+  #   name: Release on pub.dev
+  #   if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
+  #        || github.ref_name == 'master'
+  #        || (github.event_name == 'pull_request'
+  #            && github.event.pull_request.head.repo.owner.login == 'instrumentisto') }}
+  #   needs:
+  #     - clippy
+  #     - crate-jason
+  #     - crate-jason-linux
+  #     - dartanalyze
+  #     - dartfmt
+  #     - rustdoc
+  #     - rustfmt
+  #     - test-e2e-browser
+  #     - test-e2e-native
+  #     - test-flutter
+  #     - test-unit
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 2 # for PRs only
 
-      - name: Retrieve commit message and hash
-        id: commit
-        run: |
-          echo "message=$(git log --grep='\[publish\]' --format=%s)" \
-          >> $GITHUB_OUTPUT
-          echo "sha=${{ (github.event_name == 'pull_request'
-                         && github.event.pull_request.head.sha)
-                     ||  github.sha }}" \
-          >> $GITHUB_OUTPUT
-      - name: Check whether should be skipped
-        id: skip
-        run: echo "no=${{ !(
-               github.event_name == 'pull_request'
-               && !contains(steps.commit.outputs.message, '[publish]')
-             ) }}" >> $GITHUB_OUTPUT
+  #     - name: Retrieve commit message and hash
+  #       id: commit
+  #       run: |
+  #         echo "message=$(git log --grep='\[publish\]' --format=%s)" \
+  #         >> $GITHUB_OUTPUT
+  #         echo "sha=${{ (github.event_name == 'pull_request'
+  #                        && github.event.pull_request.head.sha)
+  #                    ||  github.sha }}" \
+  #         >> $GITHUB_OUTPUT
+  #     - name: Check whether should be skipped
+  #       id: skip
+  #       run: echo "no=${{ !(
+  #              github.event_name == 'pull_request'
+  #              && !contains(steps.commit.outputs.message, '[publish]')
+  #            ) }}" >> $GITHUB_OUTPUT
 
-      - uses: dart-lang/setup-dart@v1.3
-        if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: dart-lang/setup-dart@v1.3
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-jason-android
-          path: ./flutter/android/src/main/jniLibs
-        if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-jason-ios
-          path: ./flutter/ios/lib/
-        if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-jason-linux
-          path: ./flutter/linux/lib/
-        if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-jason-macos
-          path: ./flutter/macos/lib/
-        if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-jason-web
-          path: ./flutter/assets/pkg/
-        if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-jason-windows
-          path: ./flutter/windows/lib/
-        if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build-jason-android
+  #         path: ./flutter/android/src/main/jniLibs
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build-jason-ios
+  #         path: ./flutter/ios/lib/
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build-jason-linux
+  #         path: ./flutter/linux/lib/
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build-jason-macos
+  #         path: ./flutter/macos/lib/
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build-jason-web
+  #         path: ./flutter/assets/pkg/
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: build-jason-windows
+  #         path: ./flutter/windows/lib/
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - name: Append package version with commit SHA
-        run: |
-          sed -i "s/^version: \(.*\)$/version: \1+rev.${{ steps.commit.outputs.sha }}/g" \
-              flutter/pubspec.yaml
-        if: ${{ steps.skip.outputs.no == 'true'
-             && !startsWith(github.ref, 'refs/tags/') }}
+  #     - name: Append package version with commit SHA
+  #       run: |
+  #         sed -i "s/^version: \(.*\)$/version: \1+rev.${{ steps.commit.outputs.sha }}/g" \
+  #             flutter/pubspec.yaml
+  #       if: ${{ steps.skip.outputs.no == 'true'
+  #            && !startsWith(github.ref, 'refs/tags/') }}
 
-      - name: Login to pub.dev
-        run: |
-          echo "$PUB_CREDENTIALS" > ~/pub-credentials.json
-          mkdir -p ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/
-          cp -f ~/pub-credentials.json \
-                ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
-        env:
-          PUB_CREDENTIALS: ${{ secrets.PUBDEV_CREDS }}
-        if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - name: Login to pub.dev
+  #       run: |
+  #         echo "$PUB_CREDENTIALS" > ~/pub-credentials.json
+  #         mkdir -p ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/
+  #         cp -f ~/pub-credentials.json \
+  #               ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
+  #       env:
+  #         PUB_CREDENTIALS: ${{ secrets.PUBDEV_CREDS }}
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - run: dart pub publish --force
-        working-directory: flutter/
-        if: ${{ steps.skip.outputs.no == 'true' }}
+  #     - run: dart pub publish --force
+  #       working-directory: flutter/
+  #       if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - name: Logout from pub.dev
-        run: |
-          rm -rf ~/pub-credentials.json \
-                 ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
-        if: ${{ always()
-             && steps.skip.outputs.no == 'true' }}
+  #     - name: Logout from pub.dev
+  #       run: |
+  #         rm -rf ~/pub-credentials.json \
+  #                ${XDG_CONFIG_HOME:-${HOME:-default}}/dart/pub-credentials.json
+  #       if: ${{ always()
+  #            && steps.skip.outputs.no == 'true' }}
 
-  release-docker:
-    name: Release Docker image
-    needs: ["docker"]
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
-    strategy:
-      matrix:
-        include:
-          - image: medea-control-api-mock
-            tags: latest,@versions
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: mock/control-api/README.md
-            if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-mock-') }}
-          - image: medea-control-api-mock
-            tags: edge
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: mock/control-api/README.md
-            if: ${{ github.ref == 'refs/heads/master' }}
+  # release-docker:
+  #   name: Release Docker image
+  #   needs: ["docker"]
+  #   if: ${{ github.ref == 'refs/heads/master'
+  #           || startsWith(github.ref, 'refs/tags/medea-') }}
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - image: medea-control-api-mock
+  #           tags: latest,@versions
+  #           repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
+  #           readme_file: mock/control-api/README.md
+  #           if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-mock-') }}
+  #         - image: medea-control-api-mock
+  #           tags: edge
+  #           repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
+  #           readme_file: mock/control-api/README.md
+  #           if: ${{ github.ref == 'refs/heads/master' }}
 
-          - image: medea-demo
-            tags: latest,@versions
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: demo/README.md
-            if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
-          - image: medea-demo-edge
-            tags: edge
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: demo/README.md
-            if: ${{ github.ref == 'refs/heads/master' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        if: ${{ matrix.if }}
-      - uses: docker/setup-buildx-action@v2
-        if: ${{ matrix.if }}
+  #         - image: medea-demo
+  #           tags: latest,@versions
+  #           repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
+  #           readme_file: demo/README.md
+  #           if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
+  #         - image: medea-demo-edge
+  #           tags: edge
+  #           repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
+  #           readme_file: demo/README.md
+  #           if: ${{ github.ref == 'refs/heads/master' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       if: ${{ matrix.if }}
+  #     - uses: docker/setup-buildx-action@v2
+  #       if: ${{ matrix.if }}
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: docker-${{ matrix.image }}-${{ github.run_number }}
-        if: ${{ matrix.if }}
-      - run: make docker.untar from-file=image.tar
-        if: ${{ matrix.if }}
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: docker-${{ matrix.image }}-${{ github.run_number }}
+  #       if: ${{ matrix.if }}
+  #     - run: make docker.untar from-file=image.tar
+  #       if: ${{ matrix.if }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ matrix.if && contains(matrix.repos, 'ghcr.io') }}
-      - name: Login to Quay.io
-        uses: docker/login-action@v2
-        with:
-          registry: quay.io
-          username: instrumentisto+bot
-          password: ${{ secrets.QUAYIO_ROBOT_TOKEN }}
-        if: ${{ matrix.if && contains(matrix.repos, 'quay.io') }}
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: instrumentistobot
-          password: ${{ secrets.DOCKERHUB_BOT_PASS }}
-        if: ${{ matrix.if }}
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.repository_owner }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+  #       if: ${{ matrix.if && contains(matrix.repos, 'ghcr.io') }}
+  #     - name: Login to Quay.io
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: quay.io
+  #         username: instrumentisto+bot
+  #         password: ${{ secrets.QUAYIO_ROBOT_TOKEN }}
+  #       if: ${{ matrix.if && contains(matrix.repos, 'quay.io') }}
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: instrumentistobot
+  #         password: ${{ secrets.DOCKERHUB_BOT_PASS }}
+  #       if: ${{ matrix.if }}
 
-      - name: Parse semver versions
-        id: parsed
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ github.ref }}
-          regex: '^refs/tags/medea[a-z-]*-((([0-9]+)\.[0-9]+)\.[0-9]+(-.+)?)$'
-        if: ${{ matrix.if && contains(matrix.tags, '@versions')
-                && startsWith(github.ref, 'refs/tags/medea-') }}
-      - name: Form Docker version tags
-        id: versions
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            let versions = '${{ steps.parsed.outputs.group1 }}';
-            if ('${{ steps.parsed.outputs.group4 }}' === '') {
-              versions += ',${{ steps.parsed.outputs.group2 }}';
-              if ('${{ steps.parsed.outputs.group3 }}' !== '0') {
-                versions += ',${{ steps.parsed.outputs.group3 }}';
-              }
-            }
-            return versions;
-        if: ${{ matrix.if && contains(matrix.tags, '@versions')
-                && startsWith(github.ref, 'refs/tags/medea-') }}
-      - name: Prepare final image tags
-        id: tags
-        uses: bluwy/substitute-string-action@v2
-        with:
-          _input-text: ${{ matrix.tags }}
-          "@versions": ${{ steps.versions.outputs.result }}
-        if: ${{ matrix.if }}
+  #     - name: Parse semver versions
+  #       id: parsed
+  #       uses: actions-ecosystem/action-regex-match@v2
+  #       with:
+  #         text: ${{ github.ref }}
+  #         regex: '^refs/tags/medea[a-z-]*-((([0-9]+)\.[0-9]+)\.[0-9]+(-.+)?)$'
+  #       if: ${{ matrix.if && contains(matrix.tags, '@versions')
+  #               && startsWith(github.ref, 'refs/tags/medea-') }}
+  #     - name: Form Docker version tags
+  #       id: versions
+  #       uses: actions/github-script@v6
+  #       with:
+  #         result-encoding: string
+  #         script: |
+  #           let versions = '${{ steps.parsed.outputs.group1 }}';
+  #           if ('${{ steps.parsed.outputs.group4 }}' === '') {
+  #             versions += ',${{ steps.parsed.outputs.group2 }}';
+  #             if ('${{ steps.parsed.outputs.group3 }}' !== '0') {
+  #               versions += ',${{ steps.parsed.outputs.group3 }}';
+  #             }
+  #           }
+  #           return versions;
+  #       if: ${{ matrix.if && contains(matrix.tags, '@versions')
+  #               && startsWith(github.ref, 'refs/tags/medea-') }}
+  #     - name: Prepare final image tags
+  #       id: tags
+  #       uses: bluwy/substitute-string-action@v2
+  #       with:
+  #         _input-text: ${{ matrix.tags }}
+  #         "@versions": ${{ steps.versions.outputs.result }}
+  #       if: ${{ matrix.if }}
 
-      - run: make docker.tag tags=${{ steps.tags.outputs.result }}
-                  image=${{ matrix.image }} of=build-${{ github.run_number }}
-                  repos=${{ matrix.repos }}
-        if: ${{ matrix.if }}
-      - run: make docker.push tags=${{ steps.tags.outputs.result }}
-                  image=${{ matrix.image }} repos=${{ matrix.repos }}
-        if: ${{ matrix.if }}
+  #     - run: make docker.tag tags=${{ steps.tags.outputs.result }}
+  #                 image=${{ matrix.image }} of=build-${{ github.run_number }}
+  #                 repos=${{ matrix.repos }}
+  #       if: ${{ matrix.if }}
+  #     - run: make docker.push tags=${{ steps.tags.outputs.result }}
+  #                 image=${{ matrix.image }} repos=${{ matrix.repos }}
+  #       if: ${{ matrix.if }}
 
-      - name: Prepare real image name
-        id: image
-        uses: bluwy/substitute-string-action@v2
-        with:
-          _input-text: ${{ matrix.image }}
-          -edge: ""
-        if: ${{ matrix.if }}
-      # On GitHub Container Registry README is automatically updated on pushes.
-      - name: Update README on Quay.io
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_APIKEY: ${{ secrets.QUAYIO_API_TOKEN }}
-        with:
-          provider: quay
-          destination_container_repo: >-
-            quay.io/instrumentisto/${{ steps.image.outputs.result }}
-          readme_file: ${{ matrix.readme_file }}
-        if: ${{ matrix.if && contains(matrix.repos, 'quay.io') }}
-      - name: Update README on Docker Hub
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: instrumentistobot
-          DOCKER_PASS: ${{ secrets.DOCKERHUB_BOT_PASS }}
-        with:
-          provider: dockerhub
-          destination_container_repo: >-
-            instrumentisto/${{ steps.image.outputs.result }}
-          readme_file: ${{ matrix.readme_file }}
-        if: ${{ matrix.if }}
+  #     - name: Prepare real image name
+  #       id: image
+  #       uses: bluwy/substitute-string-action@v2
+  #       with:
+  #         _input-text: ${{ matrix.image }}
+  #         -edge: ""
+  #       if: ${{ matrix.if }}
+  #     # On GitHub Container Registry README is automatically updated on pushes.
+  #     - name: Update README on Quay.io
+  #       uses: christian-korneck/update-container-description-action@v1
+  #       env:
+  #         DOCKER_APIKEY: ${{ secrets.QUAYIO_API_TOKEN }}
+  #       with:
+  #         provider: quay
+  #         destination_container_repo: >-
+  #           quay.io/instrumentisto/${{ steps.image.outputs.result }}
+  #         readme_file: ${{ matrix.readme_file }}
+  #       if: ${{ matrix.if && contains(matrix.repos, 'quay.io') }}
+  #     - name: Update README on Docker Hub
+  #       uses: christian-korneck/update-container-description-action@v1
+  #       env:
+  #         DOCKER_USER: instrumentistobot
+  #         DOCKER_PASS: ${{ secrets.DOCKERHUB_BOT_PASS }}
+  #       with:
+  #         provider: dockerhub
+  #         destination_container_repo: >-
+  #           instrumentisto/${{ steps.image.outputs.result }}
+  #         readme_file: ${{ matrix.readme_file }}
+  #       if: ${{ matrix.if }}
