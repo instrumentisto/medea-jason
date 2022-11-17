@@ -268,12 +268,14 @@ ifeq ($(cargo-build-platform),android)
 		$(call cargo.build.medea-jason.android,$(target),$(debug)))
 endif
 ifeq ($(cargo-build-platform),ios)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
-		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
-	@mkdir -p flutter/ios/lib/
-	lipo -create $(foreach t,$(cargo-build-targets-ios),\
-	             target/$(t)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a) \
-	     -output flutter/ios/lib/libmedea_jason.a
+	cargo lipo --release
+	cp target/universal/release/libmedea_jason.a flutter/ios/lib/libmedea_jason.a
+	# $(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+	# 	$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+	# @mkdir -p flutter/ios/lib/
+	# lipo -create $(foreach t,$(cargo-build-targets-ios),\
+	#              target/$(t)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a) \
+	#      -output flutter/ios/lib/libmedea_jason.a
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
