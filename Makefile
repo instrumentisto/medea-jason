@@ -35,7 +35,7 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-IOS_TARGETS := x86_64-apple-ios aarch64-apple-ios-sim
+IOS_TARGETS := x86_64-apple-ios aarch64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
