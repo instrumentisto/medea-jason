@@ -1,5 +1,7 @@
 //! External API errors.
 
+#![allow(clippy::multiple_inherent_impl)] // for `wasm_bindgen`
+
 use std::borrow::Cow;
 
 #[cfg(target_family = "wasm")]
@@ -138,6 +140,8 @@ impl LocalMediaInitException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn kind(&self) -> LocalMediaInitExceptionKind {
         self.kind
@@ -177,7 +181,7 @@ impl EnumerateDevicesException {
     /// Creates a new [`EnumerateDevicesException`] from the provided error
     /// `cause` and `trace`.
     #[must_use]
-    pub fn new(cause: platform::Error, trace: Trace) -> Self {
+    pub const fn new(cause: platform::Error, trace: Trace) -> Self {
         Self { cause, trace }
     }
 }
@@ -210,7 +214,7 @@ impl InvalidOutputAudioDeviceIdException {
     /// Creates a new [`InvalidOutputAudioDeviceIdException`] from the provided
     /// error [`Trace`].
     #[must_use]
-    pub fn new(trace: Trace) -> Self {
+    pub const fn new(trace: Trace) -> Self {
         Self { trace }
     }
 }
@@ -239,7 +243,7 @@ pub struct MicVolumeException {
 impl MicVolumeException {
     /// Creates a new [`MicVolumeException`] from the provided error [`Trace`].
     #[must_use]
-    pub fn new(cause: platform::Error, trace: Trace) -> Self {
+    pub const fn new(cause: platform::Error, trace: Trace) -> Self {
         Self { cause, trace }
     }
 }
@@ -322,6 +326,7 @@ impl RpcClientException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
+    #[allow(clippy::missing_const_for_fn)] // because of `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> RpcClientExceptionKind {
         self.kind
@@ -491,6 +496,8 @@ impl MediaStateTransitionException {
     }
 
     /// Returns concrete error kind of this [`MediaStateTransitionException`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn kind(&self) -> MediaStateTransitionExceptionKind {
         self.kind
@@ -550,6 +557,8 @@ impl MediaSettingsUpdateException {
 
     /// Returns whether media settings were successfully rolled back after new
     /// settings application failed.
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn rolled_back(&self) -> bool {
         self.rolled_back

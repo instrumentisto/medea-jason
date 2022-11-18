@@ -218,7 +218,7 @@ pub mod tests {
         let future = DartHandle::new(future);
         async move {
             let val = FutureFromDart::execute::<i64>(future.get()).await;
-            Ok(if val.is_err() { 1 } else { 0 })
+            Ok(val.is_err().into())
         }
         .into_dart_future()
     }

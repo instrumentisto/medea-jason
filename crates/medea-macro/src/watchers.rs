@@ -78,6 +78,7 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
     };
 
     Ok(quote! {
+        #[allow(clippy::multiple_inherent_impl)]
         #input
 
         impl crate::utils::component::ComponentState<

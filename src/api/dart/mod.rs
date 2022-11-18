@@ -6,10 +6,12 @@
 
 // TODO: Improve documentation in this module.
 #![allow(
+    clippy::as_conversions,
     clippy::missing_docs_in_private_items,
     clippy::missing_safety_doc,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
+    clippy::unwrap_used,
     missing_docs
 )]
 
@@ -90,16 +92,12 @@ pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
-    let res = panic::catch_unwind(panic::AssertUnwindSafe(f));
-    #[allow(clippy::option_if_let_else)]
-    if let Ok(r) = res {
-        r
-    } else {
+    panic::catch_unwind(panic::AssertUnwindSafe(f)).unwrap_or_else(|_| {
         unsafe {
             Dart_PropagateError_DL_Trampolined(new_panic_error());
         }
         unreachable!("`Dart_PropagateError` should do early return")
-    }
+    })
 }
 
 /// Rust structure having wrapper class in Dart.
@@ -599,6 +597,8 @@ pub struct DartValueCastError {
 
 impl DartValueCastError {
     /// Returns [`DartValue`] that could not be casted.
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     fn into_value(self) -> DartValue {
         self.value
     }
@@ -674,6 +674,8 @@ impl TryFrom<i64> for MediaDirection {
 }
 
 /// Returns a [`Dart_Handle`] dereferenced from the provided pointer.
+// false positive: dereferencing raw mutable pointers in const is unstable
+#[allow(clippy::missing_const_for_fn)]
 #[no_mangle]
 pub unsafe extern "C" fn unbox_dart_handle(
     val: ptr::NonNull<Dart_Handle>,

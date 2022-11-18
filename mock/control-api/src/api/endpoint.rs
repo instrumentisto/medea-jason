@@ -228,6 +228,8 @@ pub struct WebRtcPlayEndpoint {
 impl WebRtcPlayEndpoint {
     /// Converts [`WebRtcPlayEndpoint`] into protobuf
     /// [`proto::WebRtcPlayEndpoint`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn into_proto(self, id: String) -> proto::WebRtcPlayEndpoint {
         proto::WebRtcPlayEndpoint {
@@ -277,7 +279,7 @@ impl Endpoint {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from, clippy::unwrap_used)]
 impl From<proto::member::Element> for Endpoint {
     fn from(proto: proto::member::Element) -> Self {
         match proto.el.unwrap() {

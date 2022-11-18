@@ -44,7 +44,7 @@ impl Track {
     /// Builds a new [`Track`] from the provided [`platform::MediaStreamTrack`]
     /// and [`proto::MediaSourceKind`].
     #[must_use]
-    pub fn new(
+    pub const fn new(
         track: platform::MediaStreamTrack,
         source_kind: proto::MediaSourceKind,
     ) -> Self {
@@ -57,7 +57,7 @@ impl Track {
 
     /// Returns the underlying [`platform::MediaStreamTrack`] of this [`Track`].
     #[must_use]
-    pub fn platform_track(&self) -> &platform::MediaStreamTrack {
+    pub const fn platform_track(&self) -> &platform::MediaStreamTrack {
         &self.track
     }
 
@@ -81,11 +81,12 @@ impl Track {
 
     /// Returns this [`Track`]'s media source kind.
     #[must_use]
-    pub fn media_source_kind(&self) -> proto::MediaSourceKind {
+    pub const fn media_source_kind(&self) -> proto::MediaSourceKind {
         self.source_kind
     }
 
     /// Returns this [`Track`]'s kind (audio/video).
+    #[allow(clippy::missing_const_for_fn)] // not all platforms allow this
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.track.kind()

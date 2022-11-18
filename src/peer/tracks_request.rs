@@ -294,6 +294,7 @@ impl TryFrom<TracksRequest> for SimpleTracksRequest {
             TooManyDisplayVideoTracks,
         };
 
+        #[allow(clippy::else_if_without_else)]
         if value.device_video.len() > 1 {
             return Err(TooManyDeviceVideoTracks);
         } else if value.display_video.len() > 1 {

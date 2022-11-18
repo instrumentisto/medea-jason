@@ -163,19 +163,19 @@ impl State {
 
     /// Returns [`Id`] of this [`State`].
     #[must_use]
-    pub fn id(&self) -> Id {
+    pub const fn id(&self) -> Id {
         self.id
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
     #[must_use]
-    pub fn ice_servers(&self) -> &Vec<IceServer> {
+    pub const fn ice_servers(&self) -> &Vec<IceServer> {
         &self.ice_servers
     }
 
     /// Indicates whether [`PeerConnection`] should be relayed forcibly.
     #[must_use]
-    pub fn force_relay(&self) -> bool {
+    pub const fn force_relay(&self) -> bool {
         self.force_relay
     }
 
@@ -501,6 +501,7 @@ impl Updatable for State {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl State {
     /// Waits for a [`State::remote_sdp`] change to be applied.
     pub async fn when_remote_sdp_processed(&self) {

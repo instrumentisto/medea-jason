@@ -168,7 +168,7 @@ impl Receiver {
 
     /// Returns [`TrackConstraints`] of this [`Receiver`].
     #[must_use]
-    pub fn caps(&self) -> &TrackConstraints {
+    pub const fn caps(&self) -> &TrackConstraints {
         &self.caps
     }
 
@@ -309,6 +309,7 @@ impl Receiver {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl Receiver {
     /// Returns the current `enabled_general` status of this [`Receiver`].
     #[must_use]

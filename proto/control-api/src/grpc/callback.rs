@@ -2,13 +2,13 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Request {
     /// FID (Full ID) of the media `Element`, the occurred event is related to.
-    #[prost(string, tag="1")]
+    #[prost(string, tag = "1")]
     pub fid: ::prost::alloc::string::String,
     /// Datetime when the event occurred.
-    #[prost(string, tag="2")]
+    #[prost(string, tag = "2")]
     pub at: ::prost::alloc::string::String,
     /// Occurred event.
-    #[prost(oneof="request::Event", tags="3, 4")]
+    #[prost(oneof = "request::Event", tags = "3, 4")]
     pub event: ::core::option::Option<request::Event>,
 }
 /// Nested message and enum types in `Request`.
@@ -16,9 +16,9 @@ pub mod request {
     /// Occurred event.
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Event {
-        #[prost(message, tag="3")]
+        #[prost(message, tag = "3")]
         OnJoin(super::OnJoin),
-        #[prost(message, tag="4")]
+        #[prost(message, tag = "4")]
         OnLeave(super::OnLeave),
     }
 }
@@ -27,23 +27,31 @@ pub mod request {
 /// We don't use `google.protobuf.Empty` to be able to add some fields (if
 /// necessary) in the future.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Response {
-}
+pub struct Response {}
 /// Event notifying about a `Member` joining a `Room`.
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OnJoin {
-}
+pub struct OnJoin {}
 /// Event notifying about a `Member` leaving its `Room`.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OnLeave {
     /// Reason of why the `Member` leaves.
-    #[prost(enumeration="on_leave::Reason", tag="1")]
+    #[prost(enumeration = "on_leave::Reason", tag = "1")]
     pub reason: i32,
 }
 /// Nested message and enum types in `OnLeave`.
 pub mod on_leave {
     /// Possible reasons of why a `Member` leaves its `Room`.
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[derive(
+        Clone,
+        Copy,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash,
+        PartialOrd,
+        Ord,
+        ::prost::Enumeration
+    )]
     #[repr(i32)]
     pub enum Reason {
         /// `Member` was disconnected normally.
