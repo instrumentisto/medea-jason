@@ -54,12 +54,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           components: clippy
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
       - uses: arduino/setup-protoc@v1
         with:
@@ -73,9 +72,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: nightly
           components: rustfmt
 
@@ -173,27 +171,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: skip
-        run: echo ::set-output name=no::${{
+        run: echo "no=${{
                startsWith(github.ref, format('refs/tags/{0}-', matrix.crate))
                || !startsWith(github.ref, 'refs/tags/medea-')
-             }}
+             }}" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v3
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
         if: ${{ steps.skip.outputs.no == 'true'
              && !matrix.wasm }}
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.wasm }}
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
         if: ${{ steps.skip.outputs.no == 'true'
              && env.CACHE == 'true' }}
       - uses: arduino/setup-protoc@v1
@@ -204,15 +200,15 @@ jobs:
 
       - name: Parse wasm-bindgen-cli version from Cargo.lock
         id: wasm-cli
-        run: echo ::set-output
-                  name=VERSION::$(cargo pkgid wasm-bindgen | grep -o '#.*'
-                                                           | grep -o '[0-9\.]*')
+        run: echo "version=$(cargo pkgid wasm-bindgen | grep -o '#.*'
+                                                      | grep -o '[0-9\.]*')"
+             >> $GITHUB_OUTPUT
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.wasm }}
       - uses: actions-rs/install@v0.1
         with:
           crate: wasm-bindgen-cli
-          version: ${{ steps.wasm-cli.outputs.VERSION }}
+          version: ${{ steps.wasm-cli.outputs.version }}
           use-tool-cache: true
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.wasm }}
@@ -237,16 +233,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
       - uses: arduino/setup-protoc@v1
         with:
           version: ${{ env.PROTOC_VER }}
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
       - uses: satackey/action-docker-layer-caching@v0.0.11
         with:
@@ -298,9 +293,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
       - uses: docker-practice/actions-setup-docker@master
         if: ${{ matrix.platform == 'macos' }}
@@ -358,11 +352,10 @@ jobs:
               ||                                  'macos-latest' }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
         if: ${{ matrix.platform != 'windows'
              && env.CACHE == 'true' }}
 
@@ -403,11 +396,20 @@ jobs:
                                          && 'targets=x86_64')
                                      ||     '' }}
 
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 11
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Parse Android API versions
         id: api-version
         run: |
-          echo ::set-output name=min::$(make flutter.android.version.min)
-          echo ::set-output name=target::$(make flutter.android.version.compile)
+          echo "min=$(make flutter.android.version.min)" \
+          >> $GITHUB_OUTPUT
+          echo "target=$(make flutter.android.version.compile)" \
+          >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
@@ -454,37 +456,28 @@ jobs:
       matrix:
         platform:
           - android
+          - ios
           - macos
           - web
           - windows
-    runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
+    runs-on: ${{ ((matrix.platform == 'ios' || matrix.platform == 'macos')
+                                               && 'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
-      - uses: Swatinem/rust-cache@v1
+      - run: make rustup.targets only=${{ matrix.platform }}
+      - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
 
-      - run: make rustup.targets only=android
-        if: ${{ matrix.platform == 'android' }}
       - uses: actions-rs/install@v0.1
         with:
           crate: cargo-ndk
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
-
-      - run: make rustup.targets only=web
-        if: ${{ matrix.platform == 'web' }}
-      - uses: jetli/wasm-pack-action@v0.3.0
-        if: ${{ matrix.platform == 'web' }}
-
-      - uses: dart-lang/setup-dart@v1
-        if: ${{ matrix.platform == 'windows' }}
-
       # TODO: Rust doesn't support NDK >= 23:
       #       https://github.com/rust-lang/rust/pull/85806
       #       https://github.com/actions/virtual-environments/issues/5595
@@ -498,6 +491,12 @@ jobs:
           ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
         if: ${{ matrix.platform == 'android' }}
 
+      - uses: jetli/wasm-pack-action@v0.3.0
+        if: ${{ matrix.platform == 'web' }}
+
+      - uses: dart-lang/setup-dart@v1
+        if: ${{ matrix.platform == 'windows' }}
+
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=no
       - run: make flutter.web.assets
@@ -507,6 +506,7 @@ jobs:
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
+                 || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
                  || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
                  || (matrix.platform == 'windows' && './flutter/windows/lib/')
                  ||                                  './flutter/assets/pkg/' }}
@@ -525,11 +525,12 @@ jobs:
         run: |
           apt update
           apt install -y curl xz-utils make clang
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
-      - uses: Swatinem/rust-cache@v1
+      # Container doesn't pick `~` (tilde) in `PATH`.
+      - run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
 
       - run: make cargo.build.jason platform=linux
@@ -544,11 +545,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
 
       # Run all task sequentially to not flood the jobs list.
@@ -669,10 +669,10 @@ jobs:
 
       - name: Parse CHANGELOG link
         id: changelog
-        run: echo ::set-output
-                  name=LINK::$(make cargo.changelog.link
-                                    crate=${{ steps.release.outputs.group1 }}
-                                    ver=${{ steps.release.outputs.group2 }})
+        run: echo "link=$(make cargo.changelog.link
+                               crate=${{ steps.release.outputs.group1 }}
+                               ver=${{ steps.release.outputs.group2 }})"
+             >> $GITHUB_OUTPUT
 
       - uses: softprops/action-gh-release@v1
         env:
@@ -681,7 +681,7 @@ jobs:
           name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
           body: |
             [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
-            [Changelog](${{ steps.changelog.outputs.LINK }})
+            [Changelog](${{ steps.changelog.outputs.link }})
           prerelease: ${{ contains(steps.release.outputs.group2, '-') }}
 
   release-cargo:
@@ -693,6 +693,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+
       - name: Parse crate name and version
         id: crate
         uses: actions-ecosystem/action-regex-match@v2
@@ -700,17 +704,12 @@ jobs:
           text: ${{ github.ref }}
           regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-
       - name: Release ${{ steps.crate.outputs.group2 }} version
               of '${{ steps.crate.outputs.group1 }}' crate
-        env:
-          CARGO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
         run: make release.crates crate=${{ steps.crate.outputs.group1 }}
                                  publish=yes
+        env:
+          CARGO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
 
   release-npm:
     name: Release on NPM
@@ -731,9 +730,8 @@ jobs:
           node-version: "17"
           registry-url: https://registry.npmjs.org
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           target: wasm32-unknown-unknown
       - uses: jetli/wasm-pack-action@v0.3.0
@@ -759,24 +757,24 @@ jobs:
       - uses: trilom/file-changes-action@v1.2.4
         id: changed
       - id: chart
-        run: echo ::set-output
-                  name=MANIFEST::$(make helm.dir
-                                        chart=${{ matrix.chart }})/Chart.yaml
+        run: echo "manifest=$(make helm.dir
+                                   chart=${{ matrix.chart }})/Chart.yaml"
+             >> $GITHUB_OUTPUT
 
       - uses: azure/setup-helm@v3
         if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.MANIFEST) }}
+                         steps.chart.outputs.manifest) }}
 
       - name: Prepare Git author for push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
         if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.MANIFEST) }}
+                         steps.chart.outputs.manifest) }}
 
       - run: make helm.package.release chart=${{ matrix.chart }} build=yes
         if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.MANIFEST) }}
+                         steps.chart.outputs.manifest) }}
 
   release-dart:
     name: Release on pub.dev
@@ -805,16 +803,18 @@ jobs:
       - name: Retrieve commit message and hash
         id: commit
         run: |
-          echo ::set-output name=message::$(git log --grep='\[publish\]' --format=%s)
-          echo ::set-output name=sha::${{ (github.event_name == 'pull_request'
-                                           && github.event.pull_request.head.sha)
-                                       ||  github.sha }}
+          echo "message=$(git log --grep='\[publish\]' --format=%s)" \
+          >> $GITHUB_OUTPUT
+          echo "sha=${{ (github.event_name == 'pull_request'
+                         && github.event.pull_request.head.sha)
+                     ||  github.sha }}" \
+          >> $GITHUB_OUTPUT
       - name: Check whether should be skipped
         id: skip
-        run: echo ::set-output name=no::${{!(
+        run: echo "no=${{ !(
                github.event_name == 'pull_request'
                && !contains(steps.commit.outputs.message, '[publish]')
-             )}}
+             ) }}" >> $GITHUB_OUTPUT
 
       - uses: dart-lang/setup-dart@v1.3
         if: ${{ steps.skip.outputs.no == 'true' }}
@@ -823,6 +823,11 @@ jobs:
         with:
           name: build-jason-android
           path: ./flutter/android/src/main/jniLibs
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-jason-ios
+          path: ./flutter/ios/lib/
         if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: actions/download-artifact@v3
         with:

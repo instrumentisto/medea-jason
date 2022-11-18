@@ -2,6 +2,8 @@
 //!
 //! [WebSocket]: https://developer.mozilla.org/ru/docs/WebSockets
 
+#![allow(clippy::unwrap_used)]
+
 use std::{cell::RefCell, rc::Rc};
 
 use async_trait::async_trait;
@@ -106,8 +108,10 @@ impl InnerSocket {
 impl Drop for InnerSocket {
     fn drop(&mut self) {
         if self.socket_state.borrow().can_close() {
-            let rsn = serde_json::to_string(&self.close_reason)
-                .expect("Could not serialize close message");
+            let rsn =
+                serde_json::to_string(&self.close_reason).unwrap_or_else(|e| {
+                    panic!("Could not serialize close message: {e}")
+                });
             if let Some(socket) = self.socket.borrow().as_ref() {
                 if let Err(e) = socket.close_with_code_and_reason(1000, &rsn) {
                     log::error!("Failed to normally close socket: {e:?}");

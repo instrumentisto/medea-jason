@@ -2,10 +2,12 @@
 
 // TODO: Remove allows when implementing platform code.
 #![allow(
+    clippy::as_conversions,
     clippy::missing_docs_in_private_items,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
     clippy::unused_self,
+    clippy::unwrap_used,
     clippy::needless_pass_by_value,
     unused_variables
 )]
@@ -75,7 +77,12 @@ pub fn init_logger() {
     );
 }
 
-#[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
+#[cfg(any(
+    target_os = "ios",
+    target_os = "linux",
+    target_os = "macos",
+    target_os = "windows"
+))]
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {

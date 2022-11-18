@@ -76,7 +76,7 @@ impl MediaState {
 
     /// Returns the opposite value to this [`mute_state::Stable`].
     #[must_use]
-    pub fn opposite(self) -> Self {
+    pub const fn opposite(self) -> Self {
         match self {
             Self::Mute(mute) => Self::Mute(mute.opposite()),
             Self::MediaExchange(media_exchange) => {

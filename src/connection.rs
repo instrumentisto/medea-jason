@@ -530,6 +530,7 @@ impl Connection {
     /// Updates [`ConnectionQualityScore`] of this [`Connection`].
     pub fn update_quality_score(&self, score: ConnectionQualityScore) {
         if self.0.quality_score.replace(Some(score)) != Some(score) {
+            #[allow(clippy::as_conversions)]
             self.0.on_quality_score_update.call1(score as u8);
         }
     }

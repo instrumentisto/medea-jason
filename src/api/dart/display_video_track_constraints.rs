@@ -27,13 +27,11 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_height(
     height: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(height) {
-            Ok(h) => this.as_mut().exact_height(h),
-            Err(_) => {
-                return ArgumentError::new(height, "height", "Expected u32")
-                    .into();
-            }
+        let Ok(height) = u32::try_from(height) else {
+            return ArgumentError::new(height, "height", "Expected u32")
+                .into();
         };
+        this.as_mut().exact_height(height);
         Ok(()).into()
     })
 }
@@ -47,13 +45,11 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_height(
     height: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(height) {
-            Ok(h) => this.as_mut().ideal_height(h),
-            Err(_) => {
-                return ArgumentError::new(height, "height", "Expected u32")
-                    .into();
-            }
+        let Ok(height) = u32::try_from(height) else {
+            return ArgumentError::new(height, "height", "Expected u32")
+                .into();
         };
+        this.as_mut().ideal_height(height);
         Ok(()).into()
     })
 }
@@ -67,17 +63,11 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_frame_rate(
     frame_rate: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(frame_rate) {
-            Ok(h) => this.as_mut().ideal_frame_rate(h),
-            Err(_) => {
-                return ArgumentError::new(
-                    frame_rate,
-                    "frame_rate",
-                    "Expected u32",
-                )
+        let Ok(rate) = u32::try_from(frame_rate) else {
+            return ArgumentError::new(frame_rate, "frame_rate", "Expected u32")
                 .into();
-            }
         };
+        this.as_mut().ideal_frame_rate(rate);
         Ok(()).into()
     })
 }
@@ -91,17 +81,11 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_frame_rate(
     frame_rate: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(frame_rate) {
-            Ok(h) => this.as_mut().exact_frame_rate(h),
-            Err(_) => {
-                return ArgumentError::new(
-                    frame_rate,
-                    "frame_rate",
-                    "Expected u32",
-                )
+        let Ok(rate) = u32::try_from(frame_rate) else {
+            return ArgumentError::new(frame_rate, "frame_rate", "Expected u32")
                 .into();
-            }
         };
+        this.as_mut().exact_frame_rate(rate);
         Ok(()).into()
     })
 }
@@ -115,13 +99,11 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__exact_width(
     width: i64,
 ) -> DartResult {
     propagate_panic(move || {
-        match u32::try_from(width) {
-            Ok(w) => this.as_mut().exact_width(w),
-            Err(_) => {
-                return ArgumentError::new(width, "width", "Expected u32")
-                    .into();
-            }
+        let Ok(width) = u32::try_from(width) else {
+            return ArgumentError::new(width, "width", "Expected u32")
+                .into();
         };
+        this.as_mut().exact_width(width);
         Ok(()).into()
     })
 }
@@ -135,13 +117,11 @@ pub unsafe extern "C" fn DisplayVideoTrackConstraints__ideal_width(
     width: i64,
 ) -> DartResult {
     propagate_panic(|| {
-        match u32::try_from(width) {
-            Ok(w) => this.as_mut().ideal_width(w),
-            Err(_) => {
-                return ArgumentError::new(width, "width", "Expected u32")
-                    .into();
-            }
+        let Ok(width) = u32::try_from(width) else {
+            return ArgumentError::new(width, "width", "Expected u32")
+                .into();
         };
+        this.as_mut().ideal_width(width);
         Ok(()).into()
     })
 }

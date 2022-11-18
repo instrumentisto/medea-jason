@@ -2,6 +2,8 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
 
+#![allow(clippy::unwrap_used)]
+
 use std::{
     cell::{Cell, RefCell},
     future::Future,

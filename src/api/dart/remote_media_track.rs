@@ -148,22 +148,22 @@ mod mock {
 
     impl RemoteMediaTrack {
         #[must_use]
-        pub fn enabled(&self) -> bool {
+        pub const fn enabled(&self) -> bool {
             true
         }
 
         #[must_use]
-        pub fn kind(&self) -> MediaKind {
+        pub const fn kind(&self) -> MediaKind {
             MediaKind::Video
         }
 
         #[must_use]
-        pub fn media_source_kind(&self) -> MediaSourceKind {
+        pub const fn media_source_kind(&self) -> MediaSourceKind {
             MediaSourceKind::Device
         }
 
         #[must_use]
-        pub fn muted(&self) -> bool {
+        pub const fn muted(&self) -> bool {
             false
         }
 
@@ -196,7 +196,7 @@ mod mock {
         }
 
         #[must_use]
-        pub fn media_direction(&self) -> MediaDirection {
+        pub const fn media_direction(&self) -> MediaDirection {
             MediaDirection::SendRecv
         }
 

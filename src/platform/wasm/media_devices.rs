@@ -2,6 +2,8 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
+#![allow(clippy::unwrap_used)]
+
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen_futures::JsFuture;
 
