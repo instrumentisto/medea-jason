@@ -295,9 +295,9 @@ jobs:
           - android
           - macos
     runs-on: ${{ ((matrix.platform == 'android' || matrix.platform == 'macos')
-                                               && 'ubuntu-latest')
+                                               && 'ubuntu-22.04')
               || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'ubuntu-latest' }}
+              ||                                  'ubuntu-22.04' }}
     steps:
       - uses: actions/checkout@v3
 #      - name: Setup docker and docker-compose
@@ -402,7 +402,7 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-latest')
+    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
               || (matrix.platform == 'windows' && 'windows-latest')
               || (matrix.platform == 'android' && 'ubuntu-latest')
               ||                                  'macos-latest' }}
@@ -572,7 +572,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/master'
          || startsWith(github.ref, 'refs/tags/medea-jason-')
          || !startsWith(github.ref, 'refs/tags/medea-') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     # Pin glibc to 2.28 for better compatibility.
     container: debian:buster
     steps:
