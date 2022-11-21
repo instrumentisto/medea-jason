@@ -37,7 +37,7 @@ SPEC CHECKSUMS:
   integration_test: a1e7d09bd98eca2fc37aefd79d4f41ad37bdbbe5
   libyuv-iOS: 5a154ccc84ec754029886ecb607512731fe30640
   medea_flutter_webrtc: c5f0b14bd07c960be7ea856ec489e8b0a9cd1f5b
-  medea_jason: b8cff822292ac4a03e09cc1dd38fa47479bce0b8
+  medea_jason: 2a205faf05b8d47cca08887fb225662a036a99b0
   WebRTC-SDK: 3f688dd6e2fd2d5282c7c643e328c21e62ab10e7
 
 PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b
