@@ -569,9 +569,6 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         if: ${{ matrix.platform == 'windows' }}
 
-      - run: cargo install cargo-lipo
-        if: ${{ matrix.platform == 'ios' }}
-
       - run: make cargo.build.jason platform=${{ matrix.platform }}
                                     dockerized=no debug=no
       - run: make flutter.web.assets
