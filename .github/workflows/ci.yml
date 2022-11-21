@@ -441,7 +441,7 @@ jobs:
       - name: Change NDK version to r22
         run: |
           ANDROID_HOME=/usr/local/lib/android
-          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          SDKMANAGER=$ANDROID_HOME/sdk/cmdline-tools/latest/bin/sdkmanager
           echo y | $SDKMANAGER "ndk;22.1.7171670"
           ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
         if: ${{ matrix.platform == 'android' }}
@@ -539,12 +539,10 @@ jobs:
       #       https://github.com/actions/virtual-environments/issues/5595
       - name: Change NDK version to r22
         run: |
-          ANDROID_ROOT=/usr/local/lib/android
-          ANDROID_SDK_ROOT=${ANDROID_ROOT}/sdk
-          SDKMANAGER=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager
-          ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
-          echo "y" | $SDKMANAGER "ndk;22.1.7171670"
-          ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
+          ANDROID_HOME=/usr/local/lib/android
+          SDKMANAGER=$ANDROID_HOME/sdk/cmdline-tools/latest/bin/sdkmanager
+          echo y | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
         if: ${{ matrix.platform == 'android' }}
 
       - uses: jetli/wasm-pack-action@v0.3.0
