@@ -280,8 +280,8 @@ endif
 ifeq ($(cargo-build-platform),macos)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-macos)),\
 		$(call cargo.build.medea-jason.macos,$(target),$(debug)))
-	@mkdir -p ./flutter/macos/rust/lib/
-	lipo -create $(cargo-build-macos-libs) -output ./flutter/macos/rust/lib/libmedea_jason.dylib
+	@mkdir -p ./flutter/macos/lib/
+	lipo -create $(cargo-build-macos-libs) -output ./flutter/macos/lib/libmedea_jason.dylib
 endif
 ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
