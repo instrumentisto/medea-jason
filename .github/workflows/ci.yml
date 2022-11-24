@@ -58,13 +58,12 @@ jobs:
         with:
           toolchain: stable
           components: clippy
+      - run: make rustup.targets
       - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
       - uses: arduino/setup-protoc@v1
         with:
           version: ${{ env.PROTOC_VER }}
-
-      - run: make rustup.targets
 
       - run: make cargo.lint
 
@@ -355,12 +354,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
+      - run: make rustup.targets only=${{ matrix.platform }}
       - uses: Swatinem/rust-cache@v2
         if: ${{ matrix.platform != 'windows'
              && env.CACHE == 'true' }}
 
-      - run: make rustup.targets only=android
-        if: ${{ matrix.platform == 'android' }}
       - uses: actions-rs/install@v0.1
         with:
           crate: cargo-ndk
