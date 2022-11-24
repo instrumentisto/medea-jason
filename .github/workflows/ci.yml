@@ -489,7 +489,7 @@ jobs:
           ln -sfn $ANDROID_SDK_ROOT/ndk/22.1.7171670 $ANDROID_NDK_ROOT
         if: ${{ matrix.platform == 'android' }}
 
-      - uses: jetli/wasm-pack-action@v0.3.0
+      - uses: jetli/wasm-pack-action@v0.4.0
         if: ${{ matrix.platform == 'web' }}
 
       - uses: dart-lang/setup-dart@v1
@@ -732,7 +732,7 @@ jobs:
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
-      - uses: jetli/wasm-pack-action@v0.3.0
+      - uses: jetli/wasm-pack-action@v0.4.0
 
       - name: Release ${{ steps.package.outputs.group2 }} version
               of '${{ steps.package.outputs.group1 }}' package
