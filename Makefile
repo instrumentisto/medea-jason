@@ -37,7 +37,7 @@ ANDROID_SDK_MIN_VERSION = $(strip \
 	        | awk '{print $$2}'))
 IOS_TARGETS := x86_64-apple-ios aarch64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
-MACOS_TARGETS := x86_64-apple-darwin
+MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
@@ -252,7 +252,7 @@ ifeq ($(cargo-build-platform),android)
 		-e XDG_CACHE_HOME=$(HOME) \
 		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
 			make cargo.build.jason debug=$(debug) dockerized=no \
-			                       platform=android args="$(args)"
+			                       platform=android args="$(args)" \
 			                       targets=$(targets)
 endif
 else
@@ -284,6 +284,11 @@ endif
 ifeq ($(cargo-build-platform),macos)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-macos)),\
 		$(call cargo.build.medea-jason.macos,$(target),$(debug)))
+	$(eval build := $(if $(call eq,$(debug),no),release,debug))
+	@mkdir -p ./flutter/macos/lib/
+	lipo -create $(foreach t,$(subst $(comma), ,$(cargo-build-targets-macos)),\
+	             target/$(t)/$(build)/libmedea_jason.dylib) \
+	     -output ./flutter/macos/lib/libmedea_jason.dylib
 endif
 ifeq ($(cargo-build-platform),windows)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
@@ -322,9 +327,6 @@ define cargo.build.medea-jason.macos
 	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
 	            --manifest-path=./Cargo.toml \
 	            $(args)
-	@mkdir -p ./flutter/macos/lib/$(target)/
-	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.dylib \
-	      ./flutter/macos/lib/$(target)/libmedea_jason.dylib
 endef
 define cargo.build.medea-jason.windows
 	$(eval target := $(strip $(1)))
