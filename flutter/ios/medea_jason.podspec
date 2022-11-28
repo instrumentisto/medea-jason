@@ -22,7 +22,8 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64',
-    "OTHER_LDFLAGS" => "-all_load"
+    "OTHER_LDFLAGS[arch=x86_64]" => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-x86_64-simulator/libmedea_jason.a",
+    "OTHER_LDFLAGS[arch=arm64]" => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-arm64/libmedea_jason.a"
   }
 
   s.swift_version = '5.0'
