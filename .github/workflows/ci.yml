@@ -545,6 +545,8 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         if: ${{ env.CACHE == 'true' }}
 
+      - run: uname -m
+
       - uses: actions-rs/install@v0.1
         with:
           crate: cargo-ndk
