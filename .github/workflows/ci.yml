@@ -400,7 +400,7 @@ jobs:
 
       - name: Run tests on iOS simulator
         run: make test.e2e.native up=yes
-              debug=no dockerized=yes server="10.0.2.2"
+              debug=no dockerized=yes server="127.0.0.1"
               medea-tag=${{ env.MEDEA_BRANCH }}
               control-tag=build-${{ github.run_number }}
               device=${{ steps.simulator.outputs.udid }}
