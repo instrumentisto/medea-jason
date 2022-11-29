@@ -25,7 +25,8 @@ Pod::Spec.new do |s|
     "OTHER_LDFLAGS[arch=x86_64]" => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-x86_64-simulator/libmedea_jason.a",
     "OTHER_LDFLAGS[arch=arm64]" => "-force_load $(PODS_TARGET_SRCROOT)/lib/MedeaJason.xcframework/ios-arm64/libmedea_jason.a",
     "VALID_ARCHS[sdk=iphonesimulator*]" => "x86_64",
-    "VALID_ARCHS[sdk=iphoneos*]" => "arm64 x86_64"
+    "VALID_ARCHS[sdk=iphoneos*]" => "arm64 x86_64",
+    "OTHER_LDFLAGS" => '-ObjC'
   }
 
   s.swift_version = '5.0'
