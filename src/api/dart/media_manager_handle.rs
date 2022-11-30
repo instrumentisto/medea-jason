@@ -184,6 +184,7 @@ pub unsafe extern "C" fn MediaManagerHandle__free(
 mod mock {
     #![allow(
         clippy::needless_pass_by_value,
+        clippy::unused_async,
         clippy::unused_self,
         missing_copy_implementations
     )]
@@ -212,7 +213,7 @@ mod mock {
     #[derive(Clone, Debug)]
     pub struct MediaManagerHandle(pub u8);
 
-    #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     impl MediaManagerHandle {
         pub async fn enumerate_devices(
             &self,

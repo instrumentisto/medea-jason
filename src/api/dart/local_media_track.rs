@@ -92,12 +92,12 @@ mod mock {
 
     impl LocalMediaTrack {
         #[must_use]
-        pub fn kind(&self) -> MediaKind {
+        pub const fn kind(&self) -> MediaKind {
             MediaKind::Video
         }
 
         #[must_use]
-        pub fn media_source_kind(&self) -> MediaSourceKind {
+        pub const fn media_source_kind(&self) -> MediaSourceKind {
             MediaSourceKind::Display
         }
 

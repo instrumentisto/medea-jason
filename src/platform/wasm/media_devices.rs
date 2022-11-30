@@ -2,6 +2,8 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
+#![allow(clippy::unwrap_used)]
+
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen_futures::JsFuture;
 
@@ -113,6 +115,7 @@ impl MediaDevices {
 
     /// Unimplemented on WASM targets.
     #[allow(clippy::missing_errors_doc)]
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {

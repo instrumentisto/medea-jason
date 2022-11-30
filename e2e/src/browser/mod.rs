@@ -131,7 +131,8 @@ pub struct WindowFactory(WebDriverClient);
 
 impl WindowFactory {
     /// Returns a new [`WindowFactory`] from [`WebDriverClient`].
-    pub async fn new(client: WebDriverClient) -> Self {
+    #[must_use]
+    pub const fn new(client: WebDriverClient) -> Self {
         Self(client)
     }
 

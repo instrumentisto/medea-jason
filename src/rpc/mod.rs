@@ -55,26 +55,26 @@ pub struct ConnectionInfo {
 impl ConnectionInfo {
     /// Returns [`ApiUrl`] to which transport layer will connect.
     #[must_use]
-    pub fn url(&self) -> &ApiUrl {
+    pub const fn url(&self) -> &ApiUrl {
         &self.url
     }
 
     /// Returns [`RoomId`] of the `Room` for which [`RpcSession`] is created.
     #[must_use]
-    pub fn room_id(&self) -> &RoomId {
+    pub const fn room_id(&self) -> &RoomId {
         &self.room_id
     }
 
     /// Returns [`MemberId`] of the `Member` for which [`RpcSession`] is
     /// created.
     #[must_use]
-    pub fn member_id(&self) -> &MemberId {
+    pub const fn member_id(&self) -> &MemberId {
         &self.member_id
     }
 
     /// Returns [`Credential`] for connecting [`RpcSession`].
     #[must_use]
-    pub fn credential(&self) -> &Credential {
+    pub const fn credential(&self) -> &Credential {
         &self.credential
     }
 }
@@ -237,15 +237,10 @@ pub enum CloseMsg {
 impl From<(u16, String)> for CloseMsg {
     fn from((code, reason): (u16, String)) -> Self {
         match code {
-            1000 => {
-                if let Ok(desc) =
-                    serde_json::from_str::<CloseDescription>(&reason)
-                {
+            1000 => serde_json::from_str::<CloseDescription>(&reason)
+                .map_or(Self::Abnormal(code), |desc| {
                     Self::Normal(code, desc.reason)
-                } else {
-                    Self::Abnormal(code)
-                }
-            }
+                }),
             _ => Self::Abnormal(code),
         }
     }

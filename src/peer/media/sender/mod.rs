@@ -184,7 +184,7 @@ impl Sender {
     }
 
     /// Returns [`TrackConstraints`] of this [`Sender`].
-    pub fn caps(&self) -> &TrackConstraints {
+    pub const fn caps(&self) -> &TrackConstraints {
         &self.caps
     }
 
@@ -305,6 +305,7 @@ impl Sender {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl Sender {
     /// Indicates whether general media exchange state of this [`Sender`] is in
     /// [`StableMediaExchangeState::Disabled`].
@@ -328,14 +329,12 @@ impl Sender {
 
 impl Drop for Sender {
     fn drop(&mut self) {
-        if !self.transceiver.is_stopped() {
-            let transceiver = self.transceiver.clone();
-            platform::spawn(async move {
-                transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND)
-                    .await;
+        let transceiver = self.transceiver.clone();
+        platform::spawn(async move {
+            if !transceiver.is_stopped() {
+                transceiver.set_send(false).await;
                 drop(transceiver.set_send_track(None).await);
-            });
-        }
+            }
+        });
     }
 }

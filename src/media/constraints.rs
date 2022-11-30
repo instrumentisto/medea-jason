@@ -100,8 +100,12 @@ impl RecvConstraints {
             MediaKind::Audio => {
                 self.is_audio_enabled.set(enabled);
             }
-            MediaKind::Video => match source_kind {
-                Some(source_kind) => match source_kind {
+            MediaKind::Video => source_kind.map_or_else(
+                || {
+                    self.is_video_device_enabled.set(enabled);
+                    self.is_video_display_enabled.set(enabled);
+                },
+                |sk| match sk {
                     MediaSourceKind::Device => {
                         self.is_video_device_enabled.set(enabled);
                     }
@@ -109,11 +113,7 @@ impl RecvConstraints {
                         self.is_video_display_enabled.set(enabled);
                     }
                 },
-                None => {
-                    self.is_video_device_enabled.set(enabled);
-                    self.is_video_display_enabled.set(enabled);
-                }
-            },
+            ),
         }
     }
 
@@ -326,7 +326,7 @@ impl<C> VideoTrackConstraints<C> {
     /// [`Room`] and constrained with [`VideoTrackConstraints::constraints`].
     ///
     /// [`Room`]: crate::room::Room
-    fn enabled(&self) -> bool {
+    const fn enabled(&self) -> bool {
         self.enabled && self.is_constrained()
     }
 
@@ -343,7 +343,7 @@ impl<C> VideoTrackConstraints<C> {
 
     /// Returns `true` if these [`VideoTrackConstraints::constraints`] are set
     /// to [`Some`] value.
-    fn is_constrained(&self) -> bool {
+    const fn is_constrained(&self) -> bool {
         self.constraints.is_some()
     }
 
@@ -453,9 +453,7 @@ impl MediaStreamSettings {
     pub fn display_video(&mut self, constraints: DisplayVideoTrackConstraints) {
         self.display_video.set(constraints);
     }
-}
 
-impl MediaStreamSettings {
     /// Indicates whether the provided [`platform::MediaStreamTrack`] satisfies
     /// some of the [`VideoTrackConstraints`] from this [`MediaStreamSettings`].
     ///
@@ -500,7 +498,7 @@ impl MediaStreamSettings {
 
     /// Returns only audio constraints.
     #[must_use]
-    pub fn get_audio(&self) -> &AudioTrackConstraints {
+    pub const fn get_audio(&self) -> &AudioTrackConstraints {
         &self.audio.constraints
     }
 
@@ -509,7 +507,9 @@ impl MediaStreamSettings {
     ///
     /// Returns [`None`] if [`DisplayVideoTrackConstraints`] is unconstrained.
     #[must_use]
-    pub fn get_display_video(&self) -> Option<&DisplayVideoTrackConstraints> {
+    pub const fn get_display_video(
+        &self,
+    ) -> Option<&DisplayVideoTrackConstraints> {
         self.display_video.constraints.as_ref()
     }
 
@@ -518,7 +518,9 @@ impl MediaStreamSettings {
     ///
     /// Returns [`None`] if [`DeviceVideoTrackConstraints`] is unconstrained.
     #[must_use]
-    pub fn get_device_video(&self) -> Option<&DeviceVideoTrackConstraints> {
+    pub const fn get_device_video(
+        &self,
+    ) -> Option<&DeviceVideoTrackConstraints> {
         self.device_video.constraints.as_ref()
     }
 
@@ -636,28 +638,28 @@ impl MediaStreamSettings {
 
     /// Indicates whether audio is enabled in this [`MediaStreamSettings`].
     #[must_use]
-    pub fn is_audio_enabled(&self) -> bool {
+    pub const fn is_audio_enabled(&self) -> bool {
         self.audio.enabled
     }
 
     /// Returns `true` if [`DeviceVideoTrackConstraints`] are currently
     /// constrained and enabled.
     #[must_use]
-    pub fn is_device_video_enabled(&self) -> bool {
+    pub const fn is_device_video_enabled(&self) -> bool {
         self.device_video.enabled()
     }
 
     /// Returns `true` if [`DisplayVideoTrackConstraints`] are currently
     /// constrained and enabled.
     #[must_use]
-    pub fn is_display_video_enabled(&self) -> bool {
+    pub const fn is_display_video_enabled(&self) -> bool {
         self.display_video.enabled()
     }
 
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
     #[must_use]
-    pub fn enabled(&self, kind: MediaType) -> bool {
+    pub const fn enabled(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => self.is_track_enabled_and_constrained(
                 MediaKind::Video,
@@ -673,7 +675,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
     #[must_use]
-    pub fn muted(&self, kind: MediaType) -> bool {
+    pub const fn muted(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => match video.source_kind {
                 MediaSourceKind::Device => self.device_video.muted,
@@ -686,7 +688,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled and constrained in this [`MediaStreamSettings`].
     #[must_use]
-    pub fn is_track_enabled_and_constrained(
+    pub const fn is_track_enabled_and_constrained(
         &self,
         kind: MediaKind,
         source: Option<MediaSourceKind>,
@@ -708,7 +710,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaKind`] and [`MediaSourceKind`] are
     /// enabled in this [`MediaStreamSettings`].
     #[must_use]
-    pub fn is_track_enabled(
+    pub const fn is_track_enabled(
         &self,
         kind: MediaKind,
         source: Option<MediaSourceKind>,
@@ -841,7 +843,7 @@ impl VideoSource {
     /// If this [`VideoSource`] is important then without this [`VideoSource`]
     /// call session can't be started.
     #[must_use]
-    pub fn required(&self) -> bool {
+    pub const fn required(&self) -> bool {
         match self {
             VideoSource::Device(device) => device.required,
             VideoSource::Display(display) => display.required,
@@ -916,7 +918,7 @@ impl TrackConstraints {
     /// If these [`TrackConstraints`] are important then without them a session
     /// call can't be started.
     #[must_use]
-    pub fn required(&self) -> bool {
+    pub const fn required(&self) -> bool {
         match self {
             TrackConstraints::Video(video) => video.required(),
             TrackConstraints::Audio(audio) => audio.required,
@@ -925,7 +927,7 @@ impl TrackConstraints {
 
     /// Returns these [`TrackConstraints`] media source kind.
     #[must_use]
-    pub fn media_source_kind(&self) -> MediaSourceKind {
+    pub const fn media_source_kind(&self) -> MediaSourceKind {
         match &self {
             TrackConstraints::Audio(_) => MediaSourceKind::Device,
             TrackConstraints::Video(VideoSource::Device(_)) => {
@@ -939,7 +941,7 @@ impl TrackConstraints {
 
     /// Returns [`MediaKind`] of these [`TrackConstraints`].
     #[must_use]
-    pub fn media_kind(&self) -> MediaKind {
+    pub const fn media_kind(&self) -> MediaKind {
         match &self {
             TrackConstraints::Audio(_) => MediaKind::Audio,
             TrackConstraints::Video(_) => MediaKind::Video,
@@ -1015,7 +1017,7 @@ impl AudioTrackConstraints {
     /// If these [`AudioTrackConstraints`] are important then without them a
     /// session call can't be started.
     #[must_use]
-    pub fn required(&self) -> bool {
+    pub const fn required(&self) -> bool {
         self.required
     }
 }
@@ -1246,7 +1248,7 @@ impl DeviceVideoTrackConstraints {
     /// If these [`DeviceVideoTrackConstraints`] are important then without them
     /// a session call can't be started.
     #[must_use]
-    pub fn required(&self) -> bool {
+    pub const fn required(&self) -> bool {
         self.required
     }
 }
@@ -1379,7 +1381,7 @@ impl DisplayVideoTrackConstraints {
     /// If these [`DisplayVideoTrackConstraints`] are important then without
     /// them a session call can't be started.
     #[must_use]
-    pub fn required(&self) -> bool {
+    pub const fn required(&self) -> bool {
         self.required
     }
 }

@@ -2,6 +2,8 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
 
+#![allow(clippy::unwrap_used)]
+
 use std::{
     cell::{Cell, RefCell},
     future::Future,
@@ -106,6 +108,7 @@ impl RtcPeerConnection {
     ///
     /// Errors with [`RtcPeerConnectionError::PeerCreationError`] if
     /// [`SysRtcPeerConnection`] creation fails.
+    #[allow(clippy::unused_async)] // for platform code uniformity
     pub async fn new<I>(ice_servers: I, is_force_relayed: bool) -> Result<Self>
     where
         I: IntoIterator<Item = IceServer>,

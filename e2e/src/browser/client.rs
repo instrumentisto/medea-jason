@@ -150,7 +150,7 @@ pub struct WebDriverClientBuilder<'a, Caps = AutoCapabilities> {
 impl<'a> WebDriverClientBuilder<'a> {
     /// Creates new [`WebDriverClientBuilder`].
     #[must_use]
-    pub fn new(webdriver_address: &'a str) -> Self {
+    pub const fn new(webdriver_address: &'a str) -> Self {
         Self {
             webdriver_address,
             capabilities: AutoCapabilities {
@@ -161,6 +161,8 @@ impl<'a> WebDriverClientBuilder<'a> {
     }
 
     /// Sets manually provided browser [`Capabilities`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn capabilities(
         self,
@@ -174,14 +176,14 @@ impl<'a> WebDriverClientBuilder<'a> {
 
     /// Sets `moz:firefoxOptions` `--headless` for Firefox browser.
     #[must_use]
-    pub fn headless_firefox(mut self, value: bool) -> Self {
+    pub const fn headless_firefox(mut self, value: bool) -> Self {
         self.capabilities.headless_firefox = value;
         self
     }
 
     /// Sets `goog:chromeOptions` `--headless` for Chrome browser.
     #[must_use]
-    pub fn headless_chrome(mut self, value: bool) -> Self {
+    pub const fn headless_chrome(mut self, value: bool) -> Self {
         self.capabilities.headless_chrome = value;
         self
     }
@@ -216,10 +218,7 @@ impl Inner {
     /// Creates a new [WebDriver] session.
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
-    pub async fn new(
-        webdriver_address: &str,
-        caps: Capabilities,
-    ) -> Result<Self> {
+    async fn new(webdriver_address: &str, caps: Capabilities) -> Result<Self> {
         Ok(Self(
             ClientBuilder::rustls()
                 .capabilities(caps)
@@ -234,7 +233,7 @@ impl Inner {
     ///
     /// - If JS exception was thrown while executing a JS code.
     /// - If failed to deserialize a result of the executed JS code.
-    pub async fn execute(&mut self, statement: Statement) -> Result<Json> {
+    async fn execute(&mut self, statement: Statement) -> Result<Json> {
         let (inner_js, args) = statement.prepare();
 
         // language=JavaScript
@@ -277,7 +276,7 @@ impl Inner {
     ///
     /// - If failed to create a new browser window.
     /// - If `index.html` wasn't found at `file_server_host`.
-    pub async fn new_window(
+    async fn new_window(
         &mut self,
         file_server_host: &str,
     ) -> Result<WindowHandle> {
@@ -310,7 +309,7 @@ impl Inner {
 
     /// Switches to the provided browser window and executes the provided
     /// [`Statement`].
-    pub async fn switch_to_window_and_execute(
+    async fn switch_to_window_and_execute(
         &mut self,
         window: WindowHandle,
         exec: Statement,
@@ -320,7 +319,7 @@ impl Inner {
     }
 
     /// Closes the provided browser window.
-    pub async fn close_window(&mut self, window: WindowHandle) {
+    async fn close_window(&mut self, window: WindowHandle) {
         if self.0.switch_to_window(window).await.is_ok() {
             drop(self.0.close_window().await);
         }

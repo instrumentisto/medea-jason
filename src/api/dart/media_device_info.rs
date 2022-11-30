@@ -88,7 +88,7 @@ mod mock {
         }
 
         #[must_use]
-        pub fn kind(&self) -> MediaDeviceKind {
+        pub const fn kind(&self) -> MediaDeviceKind {
             MediaDeviceKind::AudioInput
         }
 

@@ -18,6 +18,7 @@ mod server;
     clippy::pedantic,
     clippy::restriction,
     clippy::style,
+    let_underscore_drop,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -31,6 +32,7 @@ mod server;
     unused_lifetimes,
     unused_qualifications,
     unused_results,
+    unused_tuple_struct_fields,
     variant_size_differences
 )]
 #[rustfmt::skip]
@@ -40,6 +42,7 @@ pub mod api;
     clippy::pedantic,
     clippy::restriction,
     clippy::style,
+    let_underscore_drop,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -53,6 +56,7 @@ pub mod api;
     unused_lifetimes,
     unused_qualifications,
     unused_results,
+    unused_tuple_struct_fields,
     variant_size_differences
 )]
 #[rustfmt::skip]

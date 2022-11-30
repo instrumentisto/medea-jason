@@ -76,9 +76,8 @@ impl Task {
         let mut borrow = self.inner.borrow_mut();
 
         // Just ignore poll request if the `Future` is completed.
-        let inner = match borrow.as_mut() {
-            Some(inner) => inner,
-            None => return Poll::Ready(()),
+        let Some(inner) = borrow.as_mut() else {
+            return Poll::Ready(());
         };
 
         let poll = {

@@ -969,19 +969,23 @@ mod on_close_callback {
 
     use super::*;
 
-    #[wasm_bindgen(inline_js = "export function get_reason(closed) { return \
-                                closed.reason(); }")]
+    #[wasm_bindgen(inline_js = "export function get_reason(closed) { \
+                                  return closed.reason(); \
+                                }")]
     extern "C" {
         fn get_reason(closed: &JsValue) -> String;
     }
-    #[wasm_bindgen(inline_js = "export function \
-                                get_is_closed_by_server(reason) { return \
-                                reason.is_closed_by_server(); }")]
+    #[wasm_bindgen(inline_js = "export function get_is_closed_by_server(\
+                                  reason\
+                                ) { \
+                                  return reason.is_closed_by_server(); \
+                                }")]
     extern "C" {
         fn get_is_closed_by_server(reason: &JsValue) -> bool;
     }
-    #[wasm_bindgen(inline_js = "export function get_is_err(reason) { return \
-                                reason.is_err(); }")]
+    #[wasm_bindgen(inline_js = "export function get_is_err(reason) { \
+                                  return reason.is_err(); \
+                                }")]
     extern "C" {
         fn get_is_err(reason: &JsValue) -> bool;
     }
