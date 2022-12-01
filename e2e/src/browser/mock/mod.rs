@@ -13,16 +13,17 @@ pub async fn instantiate_mocks(window: &Window) {
     MediaDevices::instantiate(window).await;
 }
 
+#[allow(clippy::multiple_inherent_impl)] // better keep these functions here
 impl Window {
     /// Returns a `WebSocket` object mock for this [`Window`].
     #[must_use]
-    pub fn websocket_mock(&self) -> WebSocket<'_> {
+    pub const fn websocket_mock(&self) -> WebSocket<'_> {
         WebSocket(self)
     }
 
     /// Returns `MediaDevices` interface mock for this [`Window`].
     #[must_use]
-    pub fn media_devices_mock(&self) -> MediaDevices<'_> {
+    pub const fn media_devices_mock(&self) -> MediaDevices<'_> {
         MediaDevices(self)
     }
 }

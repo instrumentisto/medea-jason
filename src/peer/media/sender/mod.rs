@@ -184,7 +184,7 @@ impl Sender {
     }
 
     /// Returns [`TrackConstraints`] of this [`Sender`].
-    pub fn caps(&self) -> &TrackConstraints {
+    pub const fn caps(&self) -> &TrackConstraints {
         &self.caps
     }
 
@@ -305,6 +305,7 @@ impl Sender {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl Sender {
     /// Indicates whether general media exchange state of this [`Sender`] is in
     /// [`StableMediaExchangeState::Disabled`].

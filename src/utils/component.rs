@@ -182,6 +182,8 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
 
     /// Returns [`TaskHandle`]s for the watchers spawned by this
     /// [`WatchersSpawner`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     fn finish(self) -> Vec<TaskHandle> {
         self.spawned_watchers
     }

@@ -3,6 +3,7 @@
 use crate::api::dart::{utils::DartError, DartValue};
 
 /// FFI-compatible [`Result`] for Dart.
+#[allow(variant_size_differences)] // that's totally OK here
 #[derive(Debug)]
 #[repr(u8)]
 pub enum DartResult {

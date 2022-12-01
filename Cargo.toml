@@ -2,7 +2,7 @@
 name = "medea-jason"
 version = "0.3.0-dev"
 edition = "2021"
-rust-version = "1.64"
+rust-version = "1.65"
 description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
@@ -60,7 +60,7 @@ flutter_rust_bridge_macros = { git = "https://github.com/rogurotus/flutter_rust_
 android_logger = "0.11"
 
 [target.'cfg(any(target_os = "ios", target_os = "linux", target_os = "macos", target_os = "windows"))'.dependencies]
-simple_logger = "3.0"
+simple_logger = "4.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 dart-sys = "2.0"

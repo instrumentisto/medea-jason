@@ -224,26 +224,22 @@ impl FromStr for Fid {
             return Err(ParseFidError::MissingPath(val.into()));
         }
 
-        let member_id = if let Some(id) = splitted.next() {
-            if id.is_empty() {
-                return Err(ParseFidError::MissingPath(val.into()));
-            }
-            id
-        } else {
+        let Some(member_id) = splitted.next() else {
             return Ok(Self::Room { id: room_id.into() });
         };
+        if member_id.is_empty() {
+            return Err(ParseFidError::MissingPath(val.into()));
+        }
 
-        let endpoint_id = if let Some(id) = splitted.next() {
-            if id.is_empty() {
-                return Err(ParseFidError::MissingPath(val.into()));
-            }
-            id
-        } else {
+        let Some(endpoint_id) = splitted.next() else {
             return Ok(Self::Member {
                 id: member_id.into(),
                 room_id: room_id.into(),
             });
         };
+        if endpoint_id.is_empty() {
+            return Err(ParseFidError::MissingPath(val.into()));
+        }
 
         if splitted.next().is_some() {
             Err(ParseFidError::TooManyPaths(val.into()))

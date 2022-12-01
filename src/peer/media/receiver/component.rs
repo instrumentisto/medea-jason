@@ -223,7 +223,7 @@ impl State {
 
     /// Returns [`TrackId`] of this [`State`].
     #[must_use]
-    pub fn id(&self) -> TrackId {
+    pub const fn id(&self) -> TrackId {
         self.id
     }
 
@@ -235,14 +235,14 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub fn media_type(&self) -> MediaType {
+    pub const fn media_type(&self) -> MediaType {
         self.media_type
     }
 
     /// Returns current [`MemberId`] of the `Member` from which this
     /// [`State`] should receive media data.
     #[must_use]
-    pub fn sender_id(&self) -> &MemberId {
+    pub const fn sender_id(&self) -> &MemberId {
         &self.sender_id
     }
 
@@ -465,6 +465,7 @@ impl TransceiverSide for State {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl State {
     /// Stabilizes [`MediaExchangeState`] of this [`State`].
     pub fn stabilize(&self) {
