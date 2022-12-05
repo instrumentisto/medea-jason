@@ -26,136 +26,131 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    await rust_future_to_dart_future(
-        api.roomHandleJoin(roomHandle: opaque, token: token));
+    await (api.roomHandleJoin(roomHandle: opaque, token: token)
+        as Future<void>);
   }
 
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
-    await rust_future_to_dart_future(api.roomHandleSetLocalMediaSettings(
+    await (api.roomHandleSetLocalMediaSettings(
         roomHandle: opaque,
         settings: (settings as MediaStreamSettings).opaque,
         stopFirst: stopFirst,
-        rollbackOnFail: rollbackOnFail));
+        rollbackOnFail: rollbackOnFail) as Future<void>);
   }
 
   @override
   Future<void> muteAudio() async {
-    await rust_future_to_dart_future(
-        api.roomHandleMuteAudio(roomHandle: opaque));
+    await (api.roomHandleMuteAudio(roomHandle: opaque) as Future<void>);
   }
 
   @override
   Future<void> unmuteAudio() async {
-    await rust_future_to_dart_future(
-        api.roomHandleUnmuteAudio(roomHandle: opaque));
+    await (api.roomHandleUnmuteAudio(roomHandle: opaque) as Future<void>);
   }
 
   @override
   Future<void> enableAudio() async {
-    await rust_future_to_dart_future(
-        api.roomHandleEnableAudio(roomHandle: opaque));
+    await (api.roomHandleEnableAudio(roomHandle: opaque) as Future<void>);
   }
 
   @override
   Future<void> disableAudio() async {
-    await rust_future_to_dart_future(
-        api.roomHandleDisableAudio(roomHandle: opaque));
+    await (api.roomHandleDisableAudio(roomHandle: opaque) as Future<void>);
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(
-        api.roomHandleMuteVideo(roomHandle: opaque, sourceKind: kind?.index));
+    await (api.roomHandleMuteVideo(roomHandle: opaque, sourceKind: kind?.index)
+        as Future<void>);
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(
-        api.roomHandleUnmuteVideo(roomHandle: opaque, sourceKind: kind?.index));
+    await (api.roomHandleUnmuteVideo(
+        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(
-        api.roomHandleEnableVideo(roomHandle: opaque, sourceKind: kind?.index));
+    await (api.roomHandleEnableVideo(
+        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(api.roomHandleDisableVideo(
-        roomHandle: opaque, sourceKind: kind?.index));
+    await (api.roomHandleDisableVideo(
+        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await rust_future_to_dart_future(
-        api.roomHandleEnableRemoteAudio(roomHandle: opaque));
+    await (api.roomHandleEnableRemoteAudio(roomHandle: opaque) as Future<void>);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await rust_future_to_dart_future(
-        api.roomHandleDisableRemoteAudio(roomHandle: opaque));
+    await (api.roomHandleDisableRemoteAudio(roomHandle: opaque)
+        as Future<void>);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(api.roomHandleEnableRemoteVideo(
-        roomHandle: opaque, sourceKind: kind?.index));
+    await (api.roomHandleEnableRemoteVideo(
+        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(api.roomHandleDisableRemoteVideo(
-        roomHandle: opaque, sourceKind: kind?.index));
+    await (api.roomHandleDisableRemoteVideo(
+        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
   }
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
     api.roomHandleOnNewConnection(
         roomHandle: opaque,
-        cb: dart_object_to_persistent_rust_opaque((t) {
+        cb: (t) {
           f(NativeConnectionHandle(
               api.connectionHandleFromPtr(ptr: t.address)));
-        }));
+        });
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
     api.roomHandleOnClose(
         roomHandle: opaque,
-        cb: dart_object_to_persistent_rust_opaque((t) {
+        cb: (t) {
           f(NativeRoomCloseReason(api.roomCloseReasonFromPtr(ptr: t.address)));
-        }));
+        });
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
     api.roomHandleOnLocalTrack(
         roomHandle: opaque,
-        cb: dart_object_to_persistent_rust_opaque((t) {
+        cb: (t) {
           f(NativeLocalMediaTrack(api.localMediaTrackFromPtr(ptr: t.address)));
-        }));
+        });
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
     api.roomHandleOnConnectionLoss(
         roomHandle: opaque,
-        cb: dart_object_to_persistent_rust_opaque((t) {
+        cb: (t) {
           f(NativeReconnectHandle(api.reconnectHandleFromPtr(ptr: t.address)));
-        }));
+        });
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
     api.roomHandleOnFailedLocalMedia(
         roomHandle: opaque,
-        cb: dart_object_to_persistent_rust_opaque((err) {
+        cb: (err) {
           f(err);
-        }));
+        });
   }
 
   @moveSemantics

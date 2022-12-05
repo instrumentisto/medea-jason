@@ -111,7 +111,7 @@ extern "C" {
 ///
 /// [1]: https://api.dart.dev/dart-ffi/NativeApi/initializeApiDLData.html
 #[no_mangle]
-pub unsafe extern "C" fn init_dart_api_dl(
+pub unsafe extern "C" fn init_dart_api_dl_jason(
     obj: ptr::NonNull<c_void>,
 ) -> libc::intptr_t {
     Dart_InitializeApiDL(obj.as_ptr())

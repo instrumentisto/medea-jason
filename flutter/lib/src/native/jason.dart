@@ -22,58 +22,17 @@ import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
-typedef _cast_C = Handle Function(IntPtr);
-typedef _cast_Dart = Object Function(int);
-
-typedef _cast_handle_C = IntPtr Function(Handle);
-typedef _cast_handle_Dart = int Function(Object);
-
 typedef _onPanic_C = Void Function(Handle);
 typedef _onPanic_Dart = void Function(Object);
 
 late frb.ApiApiImpl api = _api_load();
 late DynamicLibrary dl;
 
-//todo
-Future<dynamic> rust_future_to_dart_future(frb.MyDartFuture future) {
-  var res = _address_to_handle(api.dartFutureToUsize(handle: future)) as Future;
-  future.dispose();
-  return res;
-}
-
-// todo
-Object rust_opaque_to_dart_object(frb.DartHandle handle) {
-  var res = _address_to_handle(api.opaqueToUsize(handle: handle));
-  handle.dispose();
-  return res;
-}
-
-//todo
-frb.DartHandle dart_object_to_rust_opaque(Object obj) {
-  return api.dartHandleToOpaque(handle: _handle_to_address(obj));
-}
-
-//todo
-frb.DartHandle dart_object_to_persistent_rust_opaque(Object obj) {
-  return api.dartHandleToOpaque(handle: _handle_to_persistent_address(obj));
-}
-
 /// [Executor] that drives Rust futures.
 ///
 /// Instantiated in the [_dl_load()] function, and must not be touched ever
 /// after that.
 var executor;
-
-// todo
-final _address_to_handle =
-    dl.lookupFunction<_cast_C, _cast_Dart>('address_to_handle');
-// todo
-final _handle_to_persistent_address =
-    dl.lookupFunction<_cast_handle_C, _cast_handle_Dart>(
-        'handle_to_persistent_address');
-// todo
-final _handle_to_address =
-    dl.lookupFunction<_cast_handle_C, _cast_handle_Dart>('handle_to_address');
 
 /// Callback to be fired whenever Rust code panics.
 void Function(String)? _onPanicCallback;
@@ -111,10 +70,9 @@ frb.ApiApiImpl _api_load() {
 
   var api = frb.ApiApiImpl(_dl);
 
-  var initResult = _dl.lookupFunction<
-      IntPtr Function(Pointer<Void>),
-      int Function(
-          Pointer<Void>)>('init_dart_api_dl')(NativeApi.initializeApiDLData);
+  var initResult = _dl.lookupFunction<IntPtr Function(Pointer<Void>),
+          int Function(Pointer<Void>)>('init_dart_api_dl_jason')(
+      NativeApi.initializeApiDLData);
 
   if (initResult != 0) {
     throw 'Failed to initialize Dart API. Code: $initResult';
@@ -145,7 +103,7 @@ frb.ApiApiImpl _api_load() {
 
 class Jason extends base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.RefCellOptionJason opaque = api.jasonNew();
+  final frb.Jason opaque = api.jasonNew();
 
   /// Constructs a new [Jason] backed by the Rust struct behind the
   /// provided [api.RefCellOptionJason].
@@ -174,9 +132,8 @@ class Jason extends base.Jason {
   void free() {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
+      opaque.move = true;
       api.jasonDispose(jason: opaque);
-
-      opaque.dispose();
     }
   }
 }

@@ -14,7 +14,7 @@ import '../interface/display_video_track_constraints.dart'
 
 class MediaStreamSettings extends base.MediaStreamSettings {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.RefCellMediaStreamSettings opaque = api.mediaStreamSettingsNew();
+  frb.MediaStreamSettings opaque = api.mediaStreamSettingsNew();
 
   /// Constructs a new [MediaStreamSettings] backed by the Rust struct behind the
   /// provided [frb.RefCellMediaStreamSettings].
@@ -24,7 +24,8 @@ class MediaStreamSettings extends base.MediaStreamSettings {
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
-    api.mediaStreamSettingsAudio(
+    opaque.move = true;
+    opaque = api.mediaStreamSettingsAudio(
         mediaStreamSettings: opaque,
         constraints: (constraints as AudioTrackConstraints).opaque);
     constraints.opaque.dispose();
@@ -34,20 +35,22 @@ class MediaStreamSettings extends base.MediaStreamSettings {
   void deviceVideo(
       @moveSemantics
           base_device_video.DeviceVideoTrackConstraints constraints) {
-    api.mediaStreamSettingsDeviceVideo(
-        mediaStreamSettings: opaque,
-        constraints: (constraints as DeviceVideoTrackConstraints).opaque);
-    constraints.opaque.dispose();
+    constraints as DeviceVideoTrackConstraints;
+    constraints.opaque.move = true;
+    opaque.move = true;
+    opaque = api.mediaStreamSettingsDeviceVideo(
+        mediaStreamSettings: opaque, constraints: constraints.opaque);
   }
 
   @override
   void displayVideo(
       @moveSemantics
           base_display_video.DisplayVideoTrackConstraints constraints) {
-    api.mediaStreamSettingsDisplayVideo(
-        mediaStreamSettings: opaque,
-        constraints: (constraints as DisplayVideoTrackConstraints).opaque);
-    constraints.opaque.dispose();
+    constraints as DisplayVideoTrackConstraints;
+    constraints.opaque.move = true;
+    opaque.move = true;
+    opaque = api.mediaStreamSettingsDisplayVideo(
+        mediaStreamSettings: opaque, constraints: constraints.opaque);
   }
 
   @moveSemantics

@@ -16,20 +16,20 @@ class NativeReconnectHandle extends ReconnectHandle {
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
-    await rust_future_to_dart_future(api.reconnectHandleReconnectWithDelay(
-        reconnectHandle: opaque, delayMs: delayMs));
+    await (api.reconnectHandleReconnectWithDelay(
+        reconnectHandle: opaque, delayMs: delayMs) as Future<void>);
   }
 
   @override
   Future<void> reconnectWithBackoff(
       int startingDelayMs, double multiplier, int maxDelay,
       [int? maxElapsedTimeMs]) async {
-    await rust_future_to_dart_future(api.reconnectHandleReconnectWithBackoff(
+    await (api.reconnectHandleReconnectWithBackoff(
         reconnectHandle: opaque,
         startingDelay: startingDelayMs,
         multiplier: multiplier,
         maxDelay: maxDelay,
-        maxElapsedTimeMs: maxElapsedTimeMs));
+        maxElapsedTimeMs: maxElapsedTimeMs) as Future<void>);
   }
 
   @moveSemantics

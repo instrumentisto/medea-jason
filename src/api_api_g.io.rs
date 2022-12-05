@@ -2,24 +2,8 @@ use super::*;
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_dart_future_to_usize(
-    handle: *mut wire_MyDartFuture,
-) -> support::WireSyncReturnStruct {
-    wire_dart_future_to_usize_impl(handle)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_opaque_to_usize(
-    handle: *mut wire_DartHandle,
-) -> support::WireSyncReturnStruct {
-    wire_opaque_to_usize_impl(handle)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_dart_handle_to_opaque(
-    handle: usize,
-) -> support::WireSyncReturnStruct {
-    wire_dart_handle_to_opaque_impl(handle)
+pub extern "C" fn wire_touch(port_: i64, _track: wire_AudioTrackConstraints) {
+    wire_touch_impl(port_, _track)
 }
 
 #[no_mangle]
@@ -38,7 +22,7 @@ pub extern "C" fn wire_vec_local_tracks_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_vec_local_tracks_pop(
-    vec: *mut wire_RefCellVecLocalMediaTrack,
+    vec: wire_ApiWrapVecLocalMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_vec_local_tracks_pop_impl(vec)
 }
@@ -52,7 +36,7 @@ pub extern "C" fn wire_vec_media_display_info_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_vec_media_display_info_pop(
-    vec: *mut wire_RefCellVecMediaDisplayInfo,
+    vec: wire_ApiWrapVecMediaDisplayInfo,
 ) -> support::WireSyncReturnStruct {
     wire_vec_media_display_info_pop_impl(vec)
 }
@@ -66,7 +50,7 @@ pub extern "C" fn wire_vec_media_device_info_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_vec_media_device_info_pop(
-    vec: *mut wire_RefCellVecMediaDeviceInfo,
+    vec: wire_ApiWrapVecMediaDeviceInfo,
 ) -> support::WireSyncReturnStruct {
     wire_vec_media_device_info_pop_impl(vec)
 }
@@ -78,15 +62,8 @@ pub extern "C" fn wire_audio_track_constraints_new(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_audio_track_constraints_cast(
-    track: *mut wire_RefCellAudioTrackConstraints,
-) -> support::WireSyncReturnStruct {
-    wire_audio_track_constraints_cast_impl(track)
-}
-
-#[no_mangle]
 pub extern "C" fn wire_audio_track_constraints_device_id(
-    track: *mut wire_RefCellAudioTrackConstraints,
+    track: wire_AudioTrackConstraints,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
     wire_audio_track_constraints_device_id_impl(track, device_id)
@@ -94,52 +71,52 @@ pub extern "C" fn wire_audio_track_constraints_device_id(
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_on_close(
-    connection: *mut wire_ConnectionHandle,
-    f: *mut wire_DartHandle,
+    connection: wire_ConnectionHandle,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_on_close_impl(connection, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_on_remote_track_added(
-    connection: *mut wire_ConnectionHandle,
-    f: *mut wire_DartHandle,
+    connection: wire_ConnectionHandle,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_on_remote_track_added_impl(connection, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_on_quality_score_update(
-    connection: *mut wire_ConnectionHandle,
-    f: *mut wire_DartHandle,
+    connection: wire_ConnectionHandle,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_on_quality_score_update_impl(connection, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_get_remote_member_id(
-    connection: *mut wire_ConnectionHandle,
+    connection: wire_ConnectionHandle,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_get_remote_member_id_impl(connection)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_enable_remote_audio(
-    connection: *mut wire_ConnectionHandle,
+    connection: wire_ConnectionHandle,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_enable_remote_audio_impl(connection)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_disable_remote_audio(
-    connection: *mut wire_ConnectionHandle,
+    connection: wire_ConnectionHandle,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_disable_remote_audio_impl(connection)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_enable_remote_video(
-    connection: *mut wire_ConnectionHandle,
+    connection: wire_ConnectionHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_enable_remote_video_impl(connection, source_kind)
@@ -147,7 +124,7 @@ pub extern "C" fn wire_connection_handle_enable_remote_video(
 
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_disable_remote_video(
-    connection: *mut wire_ConnectionHandle,
+    connection: wire_ConnectionHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_disable_remote_video_impl(connection, source_kind)
@@ -161,7 +138,7 @@ pub extern "C" fn wire_device_video_track_constraints_new(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_device_id(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_device_id_impl(constraints, device_id)
@@ -169,7 +146,7 @@ pub extern "C" fn wire_device_video_track_constraints_device_id(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_exact_facing_mode(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     facing_mode: u8,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_exact_facing_mode_impl(
@@ -180,7 +157,7 @@ pub extern "C" fn wire_device_video_track_constraints_exact_facing_mode(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_ideal_facing_mode(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     facing_mode: u8,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_ideal_facing_mode_impl(
@@ -191,7 +168,7 @@ pub extern "C" fn wire_device_video_track_constraints_ideal_facing_mode(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_exact_height(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     exact_height: u32,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_exact_height_impl(
@@ -202,7 +179,7 @@ pub extern "C" fn wire_device_video_track_constraints_exact_height(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_ideal_height(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     ideal_height: u32,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_ideal_height_impl(
@@ -213,7 +190,7 @@ pub extern "C" fn wire_device_video_track_constraints_ideal_height(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_exact_width(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     exact_width: u32,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_exact_width_impl(
@@ -224,7 +201,7 @@ pub extern "C" fn wire_device_video_track_constraints_exact_width(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_ideal_width(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     ideal_width: u32,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_ideal_width_impl(
@@ -235,7 +212,7 @@ pub extern "C" fn wire_device_video_track_constraints_ideal_width(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_height_in_range(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     min: u32,
     max: u32,
 ) -> support::WireSyncReturnStruct {
@@ -248,7 +225,7 @@ pub extern "C" fn wire_device_video_track_constraints_height_in_range(
 
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_width_in_range(
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    constraints: wire_DeviceVideoTrackConstraints,
     min: u32,
     max: u32,
 ) -> support::WireSyncReturnStruct {
@@ -267,7 +244,7 @@ pub extern "C" fn wire_display_video_track_constraints_new(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_device_id(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_device_id_impl(constraints, device_id)
@@ -275,7 +252,7 @@ pub extern "C" fn wire_display_video_track_constraints_device_id(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_exact_height(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     exact_height: u32,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_exact_height_impl(
@@ -286,7 +263,7 @@ pub extern "C" fn wire_display_video_track_constraints_exact_height(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_ideal_height(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     ideal_height: u32,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_ideal_height_impl(
@@ -297,7 +274,7 @@ pub extern "C" fn wire_display_video_track_constraints_ideal_height(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_exact_width(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     exact_width: u32,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_exact_width_impl(
@@ -308,7 +285,7 @@ pub extern "C" fn wire_display_video_track_constraints_exact_width(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_ideal_width(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     ideal_width: u32,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_ideal_width_impl(
@@ -319,7 +296,7 @@ pub extern "C" fn wire_display_video_track_constraints_ideal_width(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_ideal_frame_rate(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     ideal_frame_rate: u32,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_ideal_frame_rate_impl(
@@ -330,7 +307,7 @@ pub extern "C" fn wire_display_video_track_constraints_ideal_frame_rate(
 
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_exact_frame_rate(
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    constraints: wire_DisplayVideoTrackConstraints,
     exact_frame_rate: u32,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_exact_frame_rate_impl(
@@ -346,29 +323,29 @@ pub extern "C" fn wire_jason_new() -> support::WireSyncReturnStruct {
 
 #[no_mangle]
 pub extern "C" fn wire_jason_init_room(
-    jason: *mut wire_RefCellOptionJason,
+    jason: wire_Jason,
 ) -> support::WireSyncReturnStruct {
     wire_jason_init_room_impl(jason)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_jason_media_manager(
-    jason: *mut wire_RefCellOptionJason,
+    jason: wire_Jason,
 ) -> support::WireSyncReturnStruct {
     wire_jason_media_manager_impl(jason)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_jason_close_room(
-    jason: *mut wire_RefCellOptionJason,
-    room_to_delete: *mut wire_RoomHandle,
+    jason: wire_Jason,
+    room_to_delete: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_jason_close_room_impl(jason, room_to_delete)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_jason_dispose(
-    jason: *mut wire_RefCellOptionJason,
+    jason: wire_Jason,
 ) -> support::WireSyncReturnStruct {
     wire_jason_dispose_impl(jason)
 }
@@ -382,92 +359,92 @@ pub extern "C" fn wire_local_media_track_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_local_media_track_get_track(
-    track: *mut wire_LocalMediaTrack,
+    track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_local_media_track_get_track_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_local_media_track_kind(
-    track: *mut wire_LocalMediaTrack,
+    track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_local_media_track_kind_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_local_media_track_media_source_kind(
-    track: *mut wire_LocalMediaTrack,
+    track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_local_media_track_media_source_kind_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_device_info_device_id(
-    media_device: *mut wire_MediaDeviceInfo,
+    media_device: wire_MediaDeviceInfo,
 ) -> support::WireSyncReturnStruct {
     wire_media_device_info_device_id_impl(media_device)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_device_info_kind(
-    media_device: *mut wire_MediaDeviceInfo,
+    media_device: wire_MediaDeviceInfo,
 ) -> support::WireSyncReturnStruct {
     wire_media_device_info_kind_impl(media_device)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_device_info_label(
-    media_device: *mut wire_MediaDeviceInfo,
+    media_device: wire_MediaDeviceInfo,
 ) -> support::WireSyncReturnStruct {
     wire_media_device_info_label_impl(media_device)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_device_info_group_id(
-    media_device: *mut wire_MediaDeviceInfo,
+    media_device: wire_MediaDeviceInfo,
 ) -> support::WireSyncReturnStruct {
     wire_media_device_info_group_id_impl(media_device)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_display_info_device_id(
-    media_display: *mut wire_MediaDisplayInfo,
+    media_display: wire_MediaDisplayInfo,
 ) -> support::WireSyncReturnStruct {
     wire_media_display_info_device_id_impl(media_display)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_display_info_title(
-    media_display: *mut wire_MediaDisplayInfo,
+    media_display: wire_MediaDisplayInfo,
 ) -> support::WireSyncReturnStruct {
     wire_media_display_info_title_impl(media_display)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_init_local_tracks(
-    manager: *mut wire_MediaManagerHandle,
-    caps: *mut wire_RefCellMediaStreamSettings,
+    manager: wire_MediaManagerHandle,
+    caps: wire_MediaStreamSettings,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_init_local_tracks_impl(manager, caps)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_enumerate_devices(
-    manager: *mut wire_MediaManagerHandle,
+    manager: wire_MediaManagerHandle,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_enumerate_devices_impl(manager)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_enumerate_displays(
-    manager: *mut wire_MediaManagerHandle,
+    manager: wire_MediaManagerHandle,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_enumerate_displays_impl(manager)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_set_output_audio_id(
-    manager: *mut wire_MediaManagerHandle,
+    manager: wire_MediaManagerHandle,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_set_output_audio_id_impl(manager, device_id)
@@ -475,7 +452,7 @@ pub extern "C" fn wire_media_manager_handle_set_output_audio_id(
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_set_microphone_volume(
-    manager: *mut wire_MediaManagerHandle,
+    manager: wire_MediaManagerHandle,
     level: i64,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_set_microphone_volume_impl(manager, level)
@@ -483,22 +460,22 @@ pub extern "C" fn wire_media_manager_handle_set_microphone_volume(
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_microphone_volume_is_available(
-    manager: *mut wire_MediaManagerHandle,
+    manager: wire_MediaManagerHandle,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_microphone_volume_is_available_impl(manager)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_microphone_volume(
-    manager: *mut wire_MediaManagerHandle,
+    manager: wire_MediaManagerHandle,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_microphone_volume_impl(manager)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_manager_handle_on_device_change(
-    manager: *mut wire_MediaManagerHandle,
-    cb: *mut wire_DartHandle,
+    manager: wire_MediaManagerHandle,
+    cb: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_media_manager_handle_on_device_change_impl(manager, cb)
 }
@@ -511,16 +488,16 @@ pub extern "C" fn wire_media_stream_settings_new(
 
 #[no_mangle]
 pub extern "C" fn wire_media_stream_settings_audio(
-    media_stream_settings: *mut wire_RefCellMediaStreamSettings,
-    constraints: *mut wire_RefCellAudioTrackConstraints,
+    media_stream_settings: wire_MediaStreamSettings,
+    constraints: wire_AudioTrackConstraints,
 ) -> support::WireSyncReturnStruct {
     wire_media_stream_settings_audio_impl(media_stream_settings, constraints)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_stream_settings_device_video(
-    media_stream_settings: *mut wire_RefCellMediaStreamSettings,
-    constraints: *mut wire_RefCellDeviceVideoTrackConstraints,
+    media_stream_settings: wire_MediaStreamSettings,
+    constraints: wire_DeviceVideoTrackConstraints,
 ) -> support::WireSyncReturnStruct {
     wire_media_stream_settings_device_video_impl(
         media_stream_settings,
@@ -530,8 +507,8 @@ pub extern "C" fn wire_media_stream_settings_device_video(
 
 #[no_mangle]
 pub extern "C" fn wire_media_stream_settings_display_video(
-    media_stream_settings: *mut wire_RefCellMediaStreamSettings,
-    constraints: *mut wire_RefCellDisplayVideoTrackConstraints,
+    media_stream_settings: wire_MediaStreamSettings,
+    constraints: wire_DisplayVideoTrackConstraints,
 ) -> support::WireSyncReturnStruct {
     wire_media_stream_settings_display_video_impl(
         media_stream_settings,
@@ -548,7 +525,7 @@ pub extern "C" fn wire_reconnect_handle_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_reconnect_handle_reconnect_with_delay(
-    reconnect_handle: *mut wire_ReconnectHandle,
+    reconnect_handle: wire_ReconnectHandle,
     delay_ms: i64,
 ) -> support::WireSyncReturnStruct {
     wire_reconnect_handle_reconnect_with_delay_impl(reconnect_handle, delay_ms)
@@ -556,7 +533,7 @@ pub extern "C" fn wire_reconnect_handle_reconnect_with_delay(
 
 #[no_mangle]
 pub extern "C" fn wire_reconnect_handle_reconnect_with_backoff(
-    reconnect_handle: *mut wire_ReconnectHandle,
+    reconnect_handle: wire_ReconnectHandle,
     starting_delay: i64,
     multiplier: f64,
     max_delay: u32,
@@ -580,67 +557,67 @@ pub extern "C" fn wire_remote_media_track_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_get_track(
-    track: *mut wire_RemoteMediaTrack,
+    track: wire_RemoteMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_get_track_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_on_muted(
-    track: *mut wire_RemoteMediaTrack,
-    f: *mut wire_DartHandle,
+    track: wire_RemoteMediaTrack,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_on_muted_impl(track, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_on_unmuted(
-    track: *mut wire_RemoteMediaTrack,
-    f: *mut wire_DartHandle,
+    track: wire_RemoteMediaTrack,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_on_unmuted_impl(track, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_on_stopped(
-    track: *mut wire_RemoteMediaTrack,
-    f: *mut wire_DartHandle,
+    track: wire_RemoteMediaTrack,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_on_stopped_impl(track, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_on_media_direction_changed(
-    track: *mut wire_RemoteMediaTrack,
-    f: *mut wire_DartHandle,
+    track: wire_RemoteMediaTrack,
+    f: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_on_media_direction_changed_impl(track, f)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_muted(
-    track: *mut wire_RemoteMediaTrack,
+    track: wire_RemoteMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_muted_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_kind(
-    track: *mut wire_RemoteMediaTrack,
+    track: wire_RemoteMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_kind_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_media_source_kind(
-    track: *mut wire_RemoteMediaTrack,
+    track: wire_RemoteMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_media_source_kind_impl(track)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_remote_media_track_media_direction(
-    track: *mut wire_RemoteMediaTrack,
+    track: wire_RemoteMediaTrack,
 ) -> support::WireSyncReturnStruct {
     wire_remote_media_track_media_direction_impl(track)
 }
@@ -654,28 +631,28 @@ pub extern "C" fn wire_room_close_reason_from_ptr(
 
 #[no_mangle]
 pub extern "C" fn wire_room_close_reason_reason(
-    room_close_reason: *mut wire_RoomCloseReason,
+    room_close_reason: wire_RoomCloseReason,
 ) -> support::WireSyncReturnStruct {
     wire_room_close_reason_reason_impl(room_close_reason)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_close_reason_is_closed_by_server(
-    room_close_reason: *mut wire_RoomCloseReason,
+    room_close_reason: wire_RoomCloseReason,
 ) -> support::WireSyncReturnStruct {
     wire_room_close_reason_is_closed_by_server_impl(room_close_reason)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_close_reason_is_err(
-    room_close_reason: *mut wire_RoomCloseReason,
+    room_close_reason: wire_RoomCloseReason,
 ) -> support::WireSyncReturnStruct {
     wire_room_close_reason_is_err_impl(room_close_reason)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_join(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     token: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_join_impl(room_handle, token)
@@ -683,8 +660,8 @@ pub extern "C" fn wire_room_handle_join(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_set_local_media_settings(
-    room_handle: *mut wire_RoomHandle,
-    settings: *mut wire_RefCellMediaStreamSettings,
+    room_handle: wire_RoomHandle,
+    settings: wire_MediaStreamSettings,
     stop_first: bool,
     rollback_on_fail: bool,
 ) -> support::WireSyncReturnStruct {
@@ -698,35 +675,35 @@ pub extern "C" fn wire_room_handle_set_local_media_settings(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_mute_audio(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_mute_audio_impl(room_handle)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_unmute_audio(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_unmute_audio_impl(room_handle)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_audio(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_enable_audio_impl(room_handle)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_audio(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_disable_audio_impl(room_handle)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_mute_video(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_mute_video_impl(room_handle, source_kind)
@@ -734,7 +711,7 @@ pub extern "C" fn wire_room_handle_mute_video(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_unmute_video(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_unmute_video_impl(room_handle, source_kind)
@@ -742,7 +719,7 @@ pub extern "C" fn wire_room_handle_unmute_video(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_video(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_enable_video_impl(room_handle, source_kind)
@@ -750,7 +727,7 @@ pub extern "C" fn wire_room_handle_enable_video(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_video(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_disable_video_impl(room_handle, source_kind)
@@ -758,21 +735,21 @@ pub extern "C" fn wire_room_handle_disable_video(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_remote_audio(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_enable_remote_audio_impl(room_handle)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_remote_audio(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_disable_remote_audio_impl(room_handle)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_remote_video(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_enable_remote_video_impl(room_handle, source_kind)
@@ -780,7 +757,7 @@ pub extern "C" fn wire_room_handle_enable_remote_video(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_remote_video(
-    room_handle: *mut wire_RoomHandle,
+    room_handle: wire_RoomHandle,
     source_kind: *mut u8,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_disable_remote_video_impl(room_handle, source_kind)
@@ -788,40 +765,40 @@ pub extern "C" fn wire_room_handle_disable_remote_video(
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_on_new_connection(
-    room_handle: *mut wire_RoomHandle,
-    cb: *mut wire_DartHandle,
+    room_handle: wire_RoomHandle,
+    cb: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_on_new_connection_impl(room_handle, cb)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_on_close(
-    room_handle: *mut wire_RoomHandle,
-    cb: *mut wire_DartHandle,
+    room_handle: wire_RoomHandle,
+    cb: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_on_close_impl(room_handle, cb)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_on_local_track(
-    room_handle: *mut wire_RoomHandle,
-    cb: *mut wire_DartHandle,
+    room_handle: wire_RoomHandle,
+    cb: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_on_local_track_impl(room_handle, cb)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_on_connection_loss(
-    room_handle: *mut wire_RoomHandle,
-    cb: *mut wire_DartHandle,
+    room_handle: wire_RoomHandle,
+    cb: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_on_connection_loss_impl(room_handle, cb)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_room_handle_on_failed_local_media(
-    room_handle: *mut wire_RoomHandle,
-    cb: *mut wire_DartHandle,
+    room_handle: wire_RoomHandle,
+    cb: wire_DartOpaque,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_on_failed_local_media_impl(room_handle, cb)
 }
@@ -829,119 +806,98 @@ pub extern "C" fn wire_room_handle_on_failed_local_media(
 // Section: allocate functions
 
 #[no_mangle]
-pub extern "C" fn new_ConnectionHandle() -> *mut wire_ConnectionHandle {
-    support::new_leak_box_ptr(wire_ConnectionHandle::new_with_null_ptr())
+pub extern "C" fn new_ApiWrapVecLocalMediaTrack(
+) -> wire_ApiWrapVecLocalMediaTrack {
+    wire_ApiWrapVecLocalMediaTrack::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_DartHandle() -> *mut wire_DartHandle {
-    support::new_leak_box_ptr(wire_DartHandle::new_with_null_ptr())
+pub extern "C" fn new_ApiWrapVecMediaDeviceInfo(
+) -> wire_ApiWrapVecMediaDeviceInfo {
+    wire_ApiWrapVecMediaDeviceInfo::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_LocalMediaTrack() -> *mut wire_LocalMediaTrack {
-    support::new_leak_box_ptr(wire_LocalMediaTrack::new_with_null_ptr())
+pub extern "C" fn new_ApiWrapVecMediaDisplayInfo(
+) -> wire_ApiWrapVecMediaDisplayInfo {
+    wire_ApiWrapVecMediaDisplayInfo::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_MediaDeviceInfo() -> *mut wire_MediaDeviceInfo {
-    support::new_leak_box_ptr(wire_MediaDeviceInfo::new_with_null_ptr())
+pub extern "C" fn new_AudioTrackConstraints() -> wire_AudioTrackConstraints {
+    wire_AudioTrackConstraints::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_MediaDisplayInfo() -> *mut wire_MediaDisplayInfo {
-    support::new_leak_box_ptr(wire_MediaDisplayInfo::new_with_null_ptr())
+pub extern "C" fn new_ConnectionHandle() -> wire_ConnectionHandle {
+    wire_ConnectionHandle::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_MediaManagerHandle() -> *mut wire_MediaManagerHandle {
-    support::new_leak_box_ptr(wire_MediaManagerHandle::new_with_null_ptr())
+pub extern "C" fn new_DartObject() -> wire_DartOpaque {
+    wire_DartOpaque::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_MyDartFuture() -> *mut wire_MyDartFuture {
-    support::new_leak_box_ptr(wire_MyDartFuture::new_with_null_ptr())
+pub extern "C" fn new_DeviceVideoTrackConstraints(
+) -> wire_DeviceVideoTrackConstraints {
+    wire_DeviceVideoTrackConstraints::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_ReconnectHandle() -> *mut wire_ReconnectHandle {
-    support::new_leak_box_ptr(wire_ReconnectHandle::new_with_null_ptr())
+pub extern "C" fn new_DisplayVideoTrackConstraints(
+) -> wire_DisplayVideoTrackConstraints {
+    wire_DisplayVideoTrackConstraints::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellAudioTrackConstraints(
-) -> *mut wire_RefCellAudioTrackConstraints {
-    support::new_leak_box_ptr(
-        wire_RefCellAudioTrackConstraints::new_with_null_ptr(),
-    )
+pub extern "C" fn new_Jason() -> wire_Jason {
+    wire_Jason::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellDeviceVideoTrackConstraints(
-) -> *mut wire_RefCellDeviceVideoTrackConstraints {
-    support::new_leak_box_ptr(
-        wire_RefCellDeviceVideoTrackConstraints::new_with_null_ptr(),
-    )
+pub extern "C" fn new_LocalMediaTrack() -> wire_LocalMediaTrack {
+    wire_LocalMediaTrack::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellDisplayVideoTrackConstraints(
-) -> *mut wire_RefCellDisplayVideoTrackConstraints {
-    support::new_leak_box_ptr(
-        wire_RefCellDisplayVideoTrackConstraints::new_with_null_ptr(),
-    )
+pub extern "C" fn new_MediaDeviceInfo() -> wire_MediaDeviceInfo {
+    wire_MediaDeviceInfo::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellMediaStreamSettings(
-) -> *mut wire_RefCellMediaStreamSettings {
-    support::new_leak_box_ptr(
-        wire_RefCellMediaStreamSettings::new_with_null_ptr(),
-    )
+pub extern "C" fn new_MediaDisplayInfo() -> wire_MediaDisplayInfo {
+    wire_MediaDisplayInfo::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellOptionJason() -> *mut wire_RefCellOptionJason {
-    support::new_leak_box_ptr(wire_RefCellOptionJason::new_with_null_ptr())
+pub extern "C" fn new_MediaManagerHandle() -> wire_MediaManagerHandle {
+    wire_MediaManagerHandle::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellVecLocalMediaTrack(
-) -> *mut wire_RefCellVecLocalMediaTrack {
-    support::new_leak_box_ptr(
-        wire_RefCellVecLocalMediaTrack::new_with_null_ptr(),
-    )
+pub extern "C" fn new_MediaStreamSettings() -> wire_MediaStreamSettings {
+    wire_MediaStreamSettings::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellVecMediaDeviceInfo(
-) -> *mut wire_RefCellVecMediaDeviceInfo {
-    support::new_leak_box_ptr(
-        wire_RefCellVecMediaDeviceInfo::new_with_null_ptr(),
-    )
+pub extern "C" fn new_ReconnectHandle() -> wire_ReconnectHandle {
+    wire_ReconnectHandle::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RefCellVecMediaDisplayInfo(
-) -> *mut wire_RefCellVecMediaDisplayInfo {
-    support::new_leak_box_ptr(
-        wire_RefCellVecMediaDisplayInfo::new_with_null_ptr(),
-    )
+pub extern "C" fn new_RemoteMediaTrack() -> wire_RemoteMediaTrack {
+    wire_RemoteMediaTrack::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RemoteMediaTrack() -> *mut wire_RemoteMediaTrack {
-    support::new_leak_box_ptr(wire_RemoteMediaTrack::new_with_null_ptr())
+pub extern "C" fn new_RoomCloseReason() -> wire_RoomCloseReason {
+    wire_RoomCloseReason::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RoomCloseReason() -> *mut wire_RoomCloseReason {
-    support::new_leak_box_ptr(wire_RoomCloseReason::new_with_null_ptr())
-}
-
-#[no_mangle]
-pub extern "C" fn new_RoomHandle() -> *mut wire_RoomHandle {
-    support::new_leak_box_ptr(wire_RoomHandle::new_with_null_ptr())
+pub extern "C" fn new_RoomHandle() -> wire_RoomHandle {
+    wire_RoomHandle::new_with_null_ptr()
 }
 
 #[no_mangle]
@@ -963,192 +919,395 @@ pub extern "C" fn new_uint_8_list_0(len: i32) -> *mut wire_uint_8_list {
     support::new_leak_box_ptr(ans)
 }
 
-// Section: deallocate functions
+// Section: related functions
 
 #[no_mangle]
-pub extern "C" fn drop_box_autoadd_u32_0(raw: *mut u32) {
+pub extern "C" fn drop_opaque_ApiWrapVecLocalMediaTrack(ptr: *const c_void) {
     unsafe {
-        {
-            drop(support::box_from_leak_ptr(raw));
-        }
+        Arc::<ApiWrapVec<LocalMediaTrack>>::decrement_strong_count(ptr as _);
     }
 }
 
 #[no_mangle]
-pub extern "C" fn drop_box_autoadd_u8_0(raw: *mut u8) {
+pub extern "C" fn share_opaque_ApiWrapVecLocalMediaTrack(
+    ptr: *const c_void,
+) -> *const c_void {
     unsafe {
-        {
-            drop(support::box_from_leak_ptr(raw));
-        }
+        Arc::<ApiWrapVec<LocalMediaTrack>>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_ApiWrapVecMediaDeviceInfo(ptr: *const c_void) {
+    unsafe {
+        Arc::<ApiWrapVec<MediaDeviceInfo>>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_ApiWrapVecMediaDeviceInfo(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<ApiWrapVec<MediaDeviceInfo>>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_ApiWrapVecMediaDisplayInfo(ptr: *const c_void) {
+    unsafe {
+        Arc::<ApiWrapVec<MediaDisplayInfo>>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_ApiWrapVecMediaDisplayInfo(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<ApiWrapVec<MediaDisplayInfo>>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_AudioTrackConstraints(ptr: *const c_void) {
+    unsafe {
+        Arc::<AudioTrackConstraints>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_AudioTrackConstraints(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<AudioTrackConstraints>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_ConnectionHandle(ptr: *const c_void) {
+    unsafe {
+        Arc::<ConnectionHandle>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_ConnectionHandle(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<ConnectionHandle>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_DeviceVideoTrackConstraints(ptr: *const c_void) {
+    unsafe {
+        Arc::<DeviceVideoTrackConstraints>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_DeviceVideoTrackConstraints(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<DeviceVideoTrackConstraints>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_DisplayVideoTrackConstraints(ptr: *const c_void) {
+    unsafe {
+        Arc::<DisplayVideoTrackConstraints>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_DisplayVideoTrackConstraints(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<DisplayVideoTrackConstraints>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_Jason(ptr: *const c_void) {
+    unsafe {
+        Arc::<Jason>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_Jason(ptr: *const c_void) -> *const c_void {
+    unsafe {
+        Arc::<Jason>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_LocalMediaTrack(ptr: *const c_void) {
+    unsafe {
+        Arc::<LocalMediaTrack>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_LocalMediaTrack(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<LocalMediaTrack>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_MediaDeviceInfo(ptr: *const c_void) {
+    unsafe {
+        Arc::<MediaDeviceInfo>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_MediaDeviceInfo(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<MediaDeviceInfo>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_MediaDisplayInfo(ptr: *const c_void) {
+    unsafe {
+        Arc::<MediaDisplayInfo>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_MediaDisplayInfo(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<MediaDisplayInfo>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_MediaManagerHandle(ptr: *const c_void) {
+    unsafe {
+        Arc::<MediaManagerHandle>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_MediaManagerHandle(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<MediaManagerHandle>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_MediaStreamSettings(ptr: *const c_void) {
+    unsafe {
+        Arc::<MediaStreamSettings>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_MediaStreamSettings(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<MediaStreamSettings>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_ReconnectHandle(ptr: *const c_void) {
+    unsafe {
+        Arc::<ReconnectHandle>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_ReconnectHandle(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<ReconnectHandle>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_RemoteMediaTrack(ptr: *const c_void) {
+    unsafe {
+        Arc::<RemoteMediaTrack>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_RemoteMediaTrack(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<RemoteMediaTrack>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_RoomCloseReason(ptr: *const c_void) {
+    unsafe {
+        Arc::<RoomCloseReason>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_RoomCloseReason(
+    ptr: *const c_void,
+) -> *const c_void {
+    unsafe {
+        Arc::<RoomCloseReason>::increment_strong_count(ptr as _);
+        ptr
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn drop_opaque_RoomHandle(ptr: *const c_void) {
+    unsafe {
+        Arc::<RoomHandle>::decrement_strong_count(ptr as _);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn share_opaque_RoomHandle(ptr: *const c_void) -> *const c_void {
+    unsafe {
+        Arc::<RoomHandle>::increment_strong_count(ptr as _);
+        ptr
     }
 }
 
 // Section: impl Wire2Api
 
-impl Wire2Api<Opaque<ConnectionHandle>> for *mut wire_ConnectionHandle {
-    fn wire2api(self) -> Opaque<ConnectionHandle> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<Dart_Handle>> for *mut wire_DartHandle {
-    fn wire2api(self) -> Opaque<Dart_Handle> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<LocalMediaTrack>> for *mut wire_LocalMediaTrack {
-    fn wire2api(self) -> Opaque<LocalMediaTrack> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<MediaDeviceInfo>> for *mut wire_MediaDeviceInfo {
-    fn wire2api(self) -> Opaque<MediaDeviceInfo> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<MediaDisplayInfo>> for *mut wire_MediaDisplayInfo {
-    fn wire2api(self) -> Opaque<MediaDisplayInfo> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<MediaManagerHandle>> for *mut wire_MediaManagerHandle {
-    fn wire2api(self) -> Opaque<MediaManagerHandle> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<MyDartFuture>> for *mut wire_MyDartFuture {
-    fn wire2api(self) -> Opaque<MyDartFuture> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<ReconnectHandle>> for *mut wire_ReconnectHandle {
-    fn wire2api(self) -> Opaque<ReconnectHandle> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
-    }
-}
-impl Wire2Api<Opaque<RefCell<AudioTrackConstraints>>>
-    for *mut wire_RefCellAudioTrackConstraints
+impl Wire2Api<RustOpaque<ApiWrapVec<LocalMediaTrack>>>
+    for wire_ApiWrapVecLocalMediaTrack
 {
-    fn wire2api(self) -> Opaque<RefCell<AudioTrackConstraints>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+    fn wire2api(self) -> RustOpaque<ApiWrapVec<LocalMediaTrack>> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<DeviceVideoTrackConstraints>>>
-    for *mut wire_RefCellDeviceVideoTrackConstraints
+impl Wire2Api<RustOpaque<ApiWrapVec<MediaDeviceInfo>>>
+    for wire_ApiWrapVecMediaDeviceInfo
 {
-    fn wire2api(self) -> Opaque<RefCell<DeviceVideoTrackConstraints>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+    fn wire2api(self) -> RustOpaque<ApiWrapVec<MediaDeviceInfo>> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<DisplayVideoTrackConstraints>>>
-    for *mut wire_RefCellDisplayVideoTrackConstraints
+impl Wire2Api<RustOpaque<ApiWrapVec<MediaDisplayInfo>>>
+    for wire_ApiWrapVecMediaDisplayInfo
 {
-    fn wire2api(self) -> Opaque<RefCell<DisplayVideoTrackConstraints>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+    fn wire2api(self) -> RustOpaque<ApiWrapVec<MediaDisplayInfo>> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<MediaStreamSettings>>>
-    for *mut wire_RefCellMediaStreamSettings
+impl Wire2Api<RustOpaque<AudioTrackConstraints>>
+    for wire_AudioTrackConstraints
 {
-    fn wire2api(self) -> Opaque<RefCell<MediaStreamSettings>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+    fn wire2api(self) -> RustOpaque<AudioTrackConstraints> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<Option<Jason>>>> for *mut wire_RefCellOptionJason {
-    fn wire2api(self) -> Opaque<RefCell<Option<Jason>>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+impl Wire2Api<RustOpaque<ConnectionHandle>> for wire_ConnectionHandle {
+    fn wire2api(self) -> RustOpaque<ConnectionHandle> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<Vec<LocalMediaTrack>>>>
-    for *mut wire_RefCellVecLocalMediaTrack
+impl Wire2Api<DartOpaque> for wire_DartOpaque {
+    fn wire2api(self) -> DartOpaque {
+        DartOpaque::new(self.handle as _, self.port)
+    }
+}
+impl Wire2Api<RustOpaque<DeviceVideoTrackConstraints>>
+    for wire_DeviceVideoTrackConstraints
 {
-    fn wire2api(self) -> Opaque<RefCell<Vec<LocalMediaTrack>>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+    fn wire2api(self) -> RustOpaque<DeviceVideoTrackConstraints> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<Vec<MediaDeviceInfo>>>>
-    for *mut wire_RefCellVecMediaDeviceInfo
+impl Wire2Api<RustOpaque<DisplayVideoTrackConstraints>>
+    for wire_DisplayVideoTrackConstraints
 {
-    fn wire2api(self) -> Opaque<RefCell<Vec<MediaDeviceInfo>>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+    fn wire2api(self) -> RustOpaque<DisplayVideoTrackConstraints> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RefCell<Vec<MediaDisplayInfo>>>>
-    for *mut wire_RefCellVecMediaDisplayInfo
-{
-    fn wire2api(self) -> Opaque<RefCell<Vec<MediaDisplayInfo>>> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+impl Wire2Api<RustOpaque<Jason>> for wire_Jason {
+    fn wire2api(self) -> RustOpaque<Jason> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RemoteMediaTrack>> for *mut wire_RemoteMediaTrack {
-    fn wire2api(self) -> Opaque<RemoteMediaTrack> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+impl Wire2Api<RustOpaque<LocalMediaTrack>> for wire_LocalMediaTrack {
+    fn wire2api(self) -> RustOpaque<LocalMediaTrack> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RoomCloseReason>> for *mut wire_RoomCloseReason {
-    fn wire2api(self) -> Opaque<RoomCloseReason> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+impl Wire2Api<RustOpaque<MediaDeviceInfo>> for wire_MediaDeviceInfo {
+    fn wire2api(self) -> RustOpaque<MediaDeviceInfo> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<Opaque<RoomHandle>> for *mut wire_RoomHandle {
-    fn wire2api(self) -> Opaque<RoomHandle> {
-        unsafe {
-            let ans = support::box_from_leak_ptr(self);
-            support::opaque_from_dart(ans.ptr as _)
-        }
+impl Wire2Api<RustOpaque<MediaDisplayInfo>> for wire_MediaDisplayInfo {
+    fn wire2api(self) -> RustOpaque<MediaDisplayInfo> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
+    }
+}
+impl Wire2Api<RustOpaque<MediaManagerHandle>> for wire_MediaManagerHandle {
+    fn wire2api(self) -> RustOpaque<MediaManagerHandle> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
+    }
+}
+impl Wire2Api<RustOpaque<MediaStreamSettings>> for wire_MediaStreamSettings {
+    fn wire2api(self) -> RustOpaque<MediaStreamSettings> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
+    }
+}
+impl Wire2Api<RustOpaque<ReconnectHandle>> for wire_ReconnectHandle {
+    fn wire2api(self) -> RustOpaque<ReconnectHandle> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
+    }
+}
+impl Wire2Api<RustOpaque<RemoteMediaTrack>> for wire_RemoteMediaTrack {
+    fn wire2api(self) -> RustOpaque<RemoteMediaTrack> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
+    }
+}
+impl Wire2Api<RustOpaque<RoomCloseReason>> for wire_RoomCloseReason {
+    fn wire2api(self) -> RustOpaque<RoomCloseReason> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
+    }
+}
+impl Wire2Api<RustOpaque<RoomHandle>> for wire_RoomHandle {
+    fn wire2api(self) -> RustOpaque<RoomHandle> {
+        unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
 impl Wire2Api<String> for *mut wire_uint_8_list {
@@ -1171,13 +1330,56 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
 
 #[repr(C)]
 #[derive(Clone)]
+pub struct wire_ApiWrapVecLocalMediaTrack {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiWrapVecMediaDeviceInfo {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiWrapVecMediaDisplayInfo {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_AudioTrackConstraints {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
 pub struct wire_ConnectionHandle {
     ptr: *const core::ffi::c_void,
 }
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_DartHandle {
+pub struct wire_DartOpaque {
+    port: i64,
+    handle: usize,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_DeviceVideoTrackConstraints {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_DisplayVideoTrackConstraints {
+    ptr: *const core::ffi::c_void,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_Jason {
     ptr: *const core::ffi::c_void,
 }
 
@@ -1207,61 +1409,13 @@ pub struct wire_MediaManagerHandle {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_MyDartFuture {
+pub struct wire_MediaStreamSettings {
     ptr: *const core::ffi::c_void,
 }
 
 #[repr(C)]
 #[derive(Clone)]
 pub struct wire_ReconnectHandle {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellAudioTrackConstraints {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellDeviceVideoTrackConstraints {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellDisplayVideoTrackConstraints {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellMediaStreamSettings {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellOptionJason {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellVecLocalMediaTrack {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellVecMediaDeviceInfo {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_RefCellVecMediaDisplayInfo {
     ptr: *const core::ffi::c_void,
 }
 
@@ -1302,6 +1456,34 @@ impl<T> NewWithNullPtr for *mut T {
     }
 }
 
+impl NewWithNullPtr for wire_ApiWrapVecLocalMediaTrack {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
+impl NewWithNullPtr for wire_ApiWrapVecMediaDeviceInfo {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
+impl NewWithNullPtr for wire_ApiWrapVecMediaDisplayInfo {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
+impl NewWithNullPtr for wire_AudioTrackConstraints {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
 impl NewWithNullPtr for wire_ConnectionHandle {
     fn new_with_null_ptr() -> Self {
         Self {
@@ -1309,7 +1491,26 @@ impl NewWithNullPtr for wire_ConnectionHandle {
         }
     }
 }
-impl NewWithNullPtr for wire_DartHandle {
+impl NewWithNullPtr for wire_DartOpaque {
+    fn new_with_null_ptr() -> Self {
+        Self { port: 0, handle: 0 }
+    }
+}
+impl NewWithNullPtr for wire_DeviceVideoTrackConstraints {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
+impl NewWithNullPtr for wire_DisplayVideoTrackConstraints {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            ptr: core::ptr::null(),
+        }
+    }
+}
+impl NewWithNullPtr for wire_Jason {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),
@@ -1344,7 +1545,7 @@ impl NewWithNullPtr for wire_MediaManagerHandle {
         }
     }
 }
-impl NewWithNullPtr for wire_MyDartFuture {
+impl NewWithNullPtr for wire_MediaStreamSettings {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),
@@ -1352,62 +1553,6 @@ impl NewWithNullPtr for wire_MyDartFuture {
     }
 }
 impl NewWithNullPtr for wire_ReconnectHandle {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellAudioTrackConstraints {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellDeviceVideoTrackConstraints {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellDisplayVideoTrackConstraints {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellMediaStreamSettings {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellOptionJason {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellVecLocalMediaTrack {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellVecMediaDeviceInfo {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_RefCellVecMediaDisplayInfo {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),

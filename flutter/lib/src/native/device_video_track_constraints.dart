@@ -6,8 +6,7 @@ import 'jason.dart';
 
 class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.RefCellDeviceVideoTrackConstraints opaque =
-      api.deviceVideoTrackConstraintsNew();
+  frb.DeviceVideoTrackConstraints opaque = api.deviceVideoTrackConstraintsNew();
 
   /// Constructs a new [DeviceVideoTrackConstraints] backed by the Rust struct behind the
   /// provided [frb.RefCellDeviceVideoTrackConstraints].
@@ -17,55 +16,64 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    api.deviceVideoTrackConstraintsDeviceId(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsDeviceId(
         constraints: opaque, deviceId: deviceId);
   }
 
   @override
   void exactFacingMode(base.FacingMode facingMode) {
-    api.deviceVideoTrackConstraintsExactFacingMode(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsExactFacingMode(
         constraints: opaque, facingMode: facingMode.index);
   }
 
   @override
   void idealFacingMode(base.FacingMode facingMode) {
-    api.deviceVideoTrackConstraintsIdealFacingMode(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsIdealFacingMode(
         constraints: opaque, facingMode: facingMode.index);
   }
 
   @override
   void exactHeight(int height) {
-    api.deviceVideoTrackConstraintsExactHeight(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsExactHeight(
         constraints: opaque, exactHeight: height);
   }
 
   @override
   void idealHeight(int height) {
-    api.deviceVideoTrackConstraintsIdealHeight(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsIdealHeight(
         constraints: opaque, idealHeight: height);
   }
 
   @override
   void heightInRange(int min, int max) {
-    api.deviceVideoTrackConstraintsHeightInRange(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsHeightInRange(
         constraints: opaque, min: min, max: max);
   }
 
   @override
   void exactWidth(int width) {
-    api.deviceVideoTrackConstraintsExactWidth(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsExactWidth(
         constraints: opaque, exactWidth: width);
   }
 
   @override
   void idealWidth(int width) {
-    api.deviceVideoTrackConstraintsIdealWidth(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsIdealWidth(
         constraints: opaque, idealWidth: width);
   }
 
   @override
   void widthInRange(int min, int max) {
-    api.deviceVideoTrackConstraintsWidthInRange(
+    opaque.move = true;
+    opaque = api.deviceVideoTrackConstraintsWidthInRange(
         constraints: opaque, min: min, max: max);
   }
 

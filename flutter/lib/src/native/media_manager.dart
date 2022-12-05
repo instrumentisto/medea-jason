@@ -28,9 +28,9 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    Pointer tracks = await rust_future_to_dart_future(
-        api.mediaManagerHandleInitLocalTracks(
-            manager: opaque, caps: (caps as MediaStreamSettings).opaque));
+    var tracks = await (api.mediaManagerHandleInitLocalTracks(
+        manager: opaque,
+        caps: (caps as MediaStreamSettings).opaque) as Future<Pointer>);
     var vec = api.vecLocalTracksFromPtr(ptr: tracks.address);
 
     var res = List<LocalMediaTrack>.empty(growable: true);
@@ -46,8 +46,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
-    Pointer devices = await rust_future_to_dart_future(
-        api.mediaManagerHandleEnumerateDevices(manager: opaque));
+    var devices = await (api.mediaManagerHandleEnumerateDevices(manager: opaque)
+        as Future<Pointer>);
     var vec = api.vecMediaDeviceInfoFromPtr(ptr: devices.address);
 
     var res = List<MediaDeviceInfo>.empty(growable: true);
@@ -68,8 +68,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
           'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
     }
 
-    Pointer devices = await rust_future_to_dart_future(
-        api.mediaManagerHandleEnumerateDisplays(manager: opaque));
+    var devices = await (api.mediaManagerHandleEnumerateDisplays(
+        manager: opaque) as Future<Pointer>);
     var vec = api.vecMediaDisplayInfoFromPtr(ptr: devices.address);
 
     var res = List<MediaDisplayInfo>.empty(growable: true);
@@ -85,32 +85,31 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<void> setOutputAudioId(String deviceId) async {
-    await rust_future_to_dart_future(api.mediaManagerHandleSetOutputAudioId(
-        manager: opaque, deviceId: deviceId));
+    await (api.mediaManagerHandleSetOutputAudioId(
+        manager: opaque, deviceId: deviceId) as Future<void>);
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
-    await rust_future_to_dart_future(api.mediaManagerHandleSetMicrophoneVolume(
-        manager: opaque, level: level));
+    await (api.mediaManagerHandleSetMicrophoneVolume(
+        manager: opaque, level: level) as Future<void>);
   }
 
   @override
   Future<int> microphoneVolume() async {
-    return await rust_future_to_dart_future(
-        api.mediaManagerHandleMicrophoneVolume(manager: opaque));
+    return await (api.mediaManagerHandleMicrophoneVolume(manager: opaque)
+        as Future<int>);
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    return await rust_future_to_dart_future(
-        api.mediaManagerHandleMicrophoneVolumeIsAvailable(manager: opaque));
+    return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
+        manager: opaque) as Future<bool>);
   }
 
   @override
   void onDeviceChange(void Function() cb) {
-    api.mediaManagerHandleOnDeviceChange(
-        manager: opaque, cb: dart_object_to_persistent_rust_opaque(cb));
+    api.mediaManagerHandleOnDeviceChange(manager: opaque, cb: cb);
   }
 
   @moveSemantics

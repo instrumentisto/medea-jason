@@ -23,24 +23,22 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   void onClose(void Function() f) {
-    api.connectionHandleOnClose(
-        connection: opaque, f: dart_object_to_persistent_rust_opaque(f));
+    api.connectionHandleOnClose(connection: opaque, f: f);
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
     api.connectionHandleOnRemoteTrackAdded(
         connection: opaque,
-        f: dart_object_to_persistent_rust_opaque((t) {
+        f: (t) {
           f(NativeRemoteMediaTrack(
               api.remoteMediaTrackFromPtr(ptr: t.address)));
-        }));
+        });
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    api.connectionHandleOnQualityScoreUpdate(
-        connection: opaque, f: dart_object_to_persistent_rust_opaque(f));
+    api.connectionHandleOnQualityScoreUpdate(connection: opaque, f: f);
   }
 
   @moveSemantics
@@ -55,25 +53,25 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   Future<void> enableRemoteAudio() async {
-    await rust_future_to_dart_future(
-        api.connectionHandleEnableRemoteAudio(connection: opaque));
+    await (api.connectionHandleEnableRemoteAudio(connection: opaque)
+        as Future<void>);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await rust_future_to_dart_future(
-        api.connectionHandleDisableRemoteAudio(connection: opaque));
+    await (api.connectionHandleDisableRemoteAudio(connection: opaque)
+        as Future<void>);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(api.connectionHandleEnableRemoteVideo(
-        connection: opaque, sourceKind: kind?.index));
+    await (api.connectionHandleEnableRemoteVideo(connection: opaque)
+        as Future<void>);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await rust_future_to_dart_future(api.connectionHandleDisableRemoteVideo(
-        connection: opaque, sourceKind: kind?.index));
+    await (api.connectionHandleDisableRemoteVideo(connection: opaque)
+        as Future<void>);
   }
 }

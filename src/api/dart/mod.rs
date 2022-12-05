@@ -80,7 +80,9 @@ pub use self::{
 /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
 #[no_mangle]
 pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
-    platform::set_panic_callback(platform::Function::new(cb));
+    platform::set_panic_callback(platform::Function::new(
+        Dart_NewPersistentHandle_DL_Trampolined(cb),
+    ));
 }
 
 /// Wraps the provided function to catch all the Rust panics and propagate them

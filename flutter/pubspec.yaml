@@ -23,7 +23,7 @@ dependencies:
   flutter_rust_bridge: 
     git: 
       url: https://github.com/rogurotus/flutter_rust_bridge.git
-      ref: sync-opaque-type
+      ref: temp-smdr
       path: frb_dart
 
 dev_dependencies:

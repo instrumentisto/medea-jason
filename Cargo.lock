@@ -1168,18 +1168,22 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge"
-version = "1.49.0"
-source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=sync-opaque-type#8453db9928021bf3cbcab0e87a3efbeac8444451"
+version = "1.51.0"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=temp-smdr#ed3da33d0ba7634be175c4c1bc5e83305276b3f2"
 dependencies = [
  "allo-isolate",
  "anyhow",
  "build-target",
  "bytemuck",
+ "cc",
  "chrono",
  "console_error_panic_hook",
+ "dart-sys",
  "flutter_rust_bridge_macros",
  "js-sys",
  "lazy_static",
+ "libc",
+ "log",
  "parking_lot",
  "threadpool",
  "wasm-bindgen",
@@ -1188,8 +1192,8 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge_codegen"
-version = "1.49.0"
-source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=sync-opaque-type#8453db9928021bf3cbcab0e87a3efbeac8444451"
+version = "1.51.0"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=temp-smdr#ed3da33d0ba7634be175c4c1bc5e83305276b3f2"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -1215,8 +1219,8 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge_macros"
-version = "1.49.0"
-source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=sync-opaque-type#8453db9928021bf3cbcab0e87a3efbeac8444451"
+version = "1.51.0"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=temp-smdr#ed3da33d0ba7634be175c4c1bc5e83305276b3f2"
 
 [[package]]
 name = "fnv"

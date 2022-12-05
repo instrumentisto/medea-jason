@@ -1,33 +1,45 @@
-pub use super::utils::{IntoDartFuture, MyDartFuture};
+pub use super::utils::{ApiWrapVec, IntoDartFuture, MyDartFuture};
 use super::ForeignClass;
 pub use crate::media::MediaStreamSettings;
-use flutter_rust_bridge::{Opaque, SyncReturn};
-pub use std::cell::RefCell;
+use crate::platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined;
+use flutter_rust_bridge::{DartOpaque, RustOpaque, SyncReturn};
 use std::ptr;
 
-impl<T> ForeignClass for Opaque<T> {}
+use flutter_rust_bridge::DartSafe;
+impl<T: DartSafe> ForeignClass for RustOpaque<T> {}
+
+use std::panic::{RefUnwindSafe, UnwindSafe};
+
+impl RefUnwindSafe for Jason {}
+impl UnwindSafe for Jason {}
+
+impl RefUnwindSafe for RoomHandle {}
+impl UnwindSafe for RoomHandle {}
+
+impl RefUnwindSafe for ConnectionHandle {}
+impl UnwindSafe for ConnectionHandle {}
+
+impl RefUnwindSafe for RemoteMediaTrack {}
+impl UnwindSafe for RemoteMediaTrack {}
+
+impl RefUnwindSafe for ReconnectHandle {}
+impl UnwindSafe for ReconnectHandle {}
+
+impl RefUnwindSafe for MediaManagerHandle {}
+impl UnwindSafe for MediaManagerHandle {}
+
+/// todo
+pub fn touch(_track: RustOpaque<AudioTrackConstraints>) {}
 
 // -------------------------------------------------------------------
-
-pub fn dart_future_to_usize(handle: Opaque<MyDartFuture>) -> SyncReturn<usize> {
-    SyncReturn(handle.address())
-}
-
-pub fn opaque_to_usize(handle: Opaque<Dart_Handle>) -> SyncReturn<usize> {
-    SyncReturn(Dart_Handle::clone(&handle) as _)
-}
-
-pub fn dart_handle_to_opaque(handle: usize) -> SyncReturn<Opaque<Dart_Handle>> {
-    SyncReturn(Opaque::new(handle as _))
-}
 
 // -------------------------------------------------------------------
 
 pub fn connection_handle_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<ConnectionHandle>> {
+) -> SyncReturn<RustOpaque<ConnectionHandle>> {
     SyncReturn(unsafe {
-        Opaque::new(ConnectionHandle::from_ptr(
+        RustOpaque::new(ConnectionHandle::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         ))
     })
@@ -37,44 +49,44 @@ pub fn connection_handle_from_ptr(
 
 pub fn vec_local_tracks_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<RefCell<Vec<LocalMediaTrack>>>> {
+) -> SyncReturn<RustOpaque<ApiWrapVec<LocalMediaTrack>>> {
     SyncReturn(unsafe {
-        Opaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+        RustOpaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
     })
 }
 
 pub fn vec_local_tracks_pop(
-    vec: Opaque<RefCell<Vec<LocalMediaTrack>>>,
-) -> SyncReturn<Option<Opaque<LocalMediaTrack>>> {
-    SyncReturn(vec.borrow_mut().pop().map(|v| Opaque::new(v)))
+    vec: RustOpaque<ApiWrapVec<LocalMediaTrack>>,
+) -> SyncReturn<Option<RustOpaque<LocalMediaTrack>>> {
+    SyncReturn(vec.borrow_mut().pop().map(|v| RustOpaque::new(v)))
 }
 
 pub fn vec_media_display_info_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<RefCell<Vec<MediaDisplayInfo>>>> {
+) -> SyncReturn<RustOpaque<ApiWrapVec<MediaDisplayInfo>>> {
     SyncReturn(unsafe {
-        Opaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+        RustOpaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
     })
 }
 
 pub fn vec_media_display_info_pop(
-    vec: Opaque<RefCell<Vec<MediaDisplayInfo>>>,
-) -> SyncReturn<Option<Opaque<MediaDisplayInfo>>> {
-    SyncReturn(vec.borrow_mut().pop().map(|v| Opaque::new(v)))
+    vec: RustOpaque<ApiWrapVec<MediaDisplayInfo>>,
+) -> SyncReturn<Option<RustOpaque<MediaDisplayInfo>>> {
+    SyncReturn(vec.borrow_mut().pop().map(|v| RustOpaque::new(v)))
 }
 
 pub fn vec_media_device_info_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<RefCell<Vec<MediaDeviceInfo>>>> {
+) -> SyncReturn<RustOpaque<ApiWrapVec<MediaDeviceInfo>>> {
     SyncReturn(unsafe {
-        Opaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+        RustOpaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
     })
 }
 
 pub fn vec_media_device_info_pop(
-    vec: Opaque<RefCell<Vec<MediaDeviceInfo>>>,
-) -> SyncReturn<Option<Opaque<MediaDeviceInfo>>> {
-    SyncReturn(vec.borrow_mut().pop().map(|v| Opaque::new(v)))
+    vec: RustOpaque<ApiWrapVec<MediaDeviceInfo>>,
+) -> SyncReturn<Option<RustOpaque<MediaDeviceInfo>>> {
+    SyncReturn(vec.borrow_mut().pop().map(|v| RustOpaque::new(v)))
 }
 
 // -------------------------------------------------------------------
@@ -82,26 +94,20 @@ pub fn vec_media_device_info_pop(
 pub use crate::media::AudioTrackConstraints;
 /// Creates new [`AudioTrackConstraints`] with none constraints configured.
 pub fn audio_track_constraints_new(
-) -> SyncReturn<Opaque<RefCell<AudioTrackConstraints>>> {
-    SyncReturn(Opaque::new(RefCell::new(AudioTrackConstraints::new())))
-}
-
-/// todo
-pub fn audio_track_constraints_cast(
-    track: Opaque<RefCell<AudioTrackConstraints>>,
-) -> SyncReturn<Opaque<AudioTrackConstraints>> {
-    SyncReturn(Opaque::new(AudioTrackConstraints::clone(&track.borrow())))
+) -> SyncReturn<RustOpaque<AudioTrackConstraints>> {
+    SyncReturn(RustOpaque::new(AudioTrackConstraints::new()))
 }
 
 /// Sets an exact [deviceId][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
 pub fn audio_track_constraints_device_id(
-    track: Opaque<RefCell<AudioTrackConstraints>>,
+    track: RustOpaque<AudioTrackConstraints>,
     device_id: String,
-) -> SyncReturn<()> {
-    track.borrow_mut().device_id(device_id);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<AudioTrackConstraints>> {
+    let mut track = track.try_unwrap().unwrap();
+    track.device_id(device_id);
+    SyncReturn(RustOpaque::new(track))
 }
 
 // -------------------------------------------------------------------
@@ -119,11 +125,13 @@ impl ForeignClass for ConnectionHandle {}
 
 /// Sets callback, invoked when this `Connection` will close.
 pub fn connection_handle_on_close(
-    connection: Opaque<ConnectionHandle>,
-    f: Opaque<Dart_Handle>,
+    connection: RustOpaque<ConnectionHandle>,
+    f: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
-        .on_close(unsafe { platform::Function::new(Dart_Handle::clone(&f)) })
+        .on_close(unsafe {
+            platform::Function::new(f.try_unwrap().unwrap().into_raw())
+        })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
 }
@@ -134,12 +142,12 @@ pub fn connection_handle_on_close(
 /// [`remote::Track`]: crate::media::track::remote::Track
 /// [`Connection`]: crate::connection::Connection
 pub fn connection_handle_on_remote_track_added(
-    connection: Opaque<ConnectionHandle>,
-    f: Opaque<Dart_Handle>,
+    connection: RustOpaque<ConnectionHandle>,
+    f: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_remote_track_added(unsafe {
-            platform::Function::new(Dart_Handle::clone(&f))
+            platform::Function::new(f.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
@@ -148,12 +156,12 @@ pub fn connection_handle_on_remote_track_added(
 /// Sets callback, invoked when a connection quality score is updated by
 /// a server.
 pub fn connection_handle_on_quality_score_update(
-    connection: Opaque<ConnectionHandle>,
-    f: Opaque<Dart_Handle>,
+    connection: RustOpaque<ConnectionHandle>,
+    f: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_quality_score_update(unsafe {
-            platform::Function::new(Dart_Handle::clone(&f))
+            platform::Function::new(f.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
@@ -161,7 +169,7 @@ pub fn connection_handle_on_quality_score_update(
 
 /// Returns remote `Member` ID.
 pub fn connection_handle_get_remote_member_id(
-    connection: Opaque<ConnectionHandle>,
+    connection: RustOpaque<ConnectionHandle>,
 ) -> anyhow::Result<SyncReturn<String>> {
     Ok(SyncReturn(
         connection
@@ -174,70 +182,88 @@ pub fn connection_handle_get_remote_member_id(
 ///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 pub fn connection_handle_enable_remote_audio(
-    connection: Opaque<ConnectionHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    connection: RustOpaque<ConnectionHandle>,
+) -> SyncReturn<DartOpaque> {
     let fut = connection.enable_remote_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Disables inbound audio in this [`ConnectionHandle`].
 ///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 pub fn connection_handle_disable_remote_audio(
-    connection: Opaque<ConnectionHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    connection: RustOpaque<ConnectionHandle>,
+) -> SyncReturn<DartOpaque> {
     let fut = connection.disable_remote_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Enables inbound video in this [`ConnectionHandle`].
 ///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 pub fn connection_handle_enable_remote_video(
-    connection: Opaque<ConnectionHandle>,
+    connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let fut = connection.enable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Disables inbound video in this [`ConnectionHandle`].
 ///
 /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
 pub fn connection_handle_disable_remote_video(
-    connection: Opaque<ConnectionHandle>,
+    connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let fut = connection.disable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<(), Traced<crate::connection::ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 #[cfg(feature = "mockable")]
@@ -348,115 +374,120 @@ use crate::{
 /// Creates new [`DeviceVideoTrackConstraints`] with none constraints
 /// configured.
 pub fn device_video_track_constraints_new(
-) -> SyncReturn<Opaque<RefCell<DeviceVideoTrackConstraints>>> {
-    SyncReturn(Opaque::new(
-        RefCell::new(DeviceVideoTrackConstraints::new()),
-    ))
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    SyncReturn(RustOpaque::new(DeviceVideoTrackConstraints::new()))
 }
 
 /// Sets an exact [deviceId][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
 pub fn device_video_track_constraints_device_id(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     device_id: String,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().device_id(device_id);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.device_id(device_id);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an exact [facingMode][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
 pub fn device_video_track_constraints_exact_facing_mode(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     facing_mode: u8,
-) -> SyncReturn<()> {
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
     constraints
-        .borrow_mut()
         .exact_facing_mode(FacingMode::try_from(facing_mode as i64).unwrap());
-    SyncReturn(())
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an ideal [facingMode][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
 pub fn device_video_track_constraints_ideal_facing_mode(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     facing_mode: u8,
-) -> SyncReturn<()> {
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
     constraints
-        .borrow_mut()
         .ideal_facing_mode(FacingMode::try_from(facing_mode as i64).unwrap());
-    SyncReturn(())
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an exact [height][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
 pub fn device_video_track_constraints_exact_height(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     exact_height: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().exact_height(exact_height);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.exact_height(exact_height);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an ideal [height][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
 pub fn device_video_track_constraints_ideal_height(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     ideal_height: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().ideal_height(ideal_height);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.ideal_height(ideal_height);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an exact [width][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
 pub fn device_video_track_constraints_exact_width(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     exact_width: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().exact_width(exact_width);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.exact_width(exact_width);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an ideal [width][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
 pub fn device_video_track_constraints_ideal_width(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     ideal_width: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().ideal_width(ideal_width);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.ideal_width(ideal_width);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets a range of a [height][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
 pub fn device_video_track_constraints_height_in_range(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     min: u32,
     max: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().height_in_range(min, max);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.height_in_range(min, max);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets a range of a [width][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
 pub fn device_video_track_constraints_width_in_range(
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
     min: u32,
     max: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().width_in_range(min, max);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DeviceVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.width_in_range(min, max);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 // -------------------------------------------------------------------
@@ -466,87 +497,92 @@ pub use crate::media::DisplayVideoTrackConstraints;
 /// Creates new [`DisplayVideoTrackConstraints`] with none constraints
 /// configured.
 pub fn display_video_track_constraints_new(
-) -> SyncReturn<Opaque<RefCell<DisplayVideoTrackConstraints>>> {
-    SyncReturn(Opaque::new(RefCell::new(
-        DisplayVideoTrackConstraints::new(),
-    )))
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    SyncReturn(RustOpaque::new(DisplayVideoTrackConstraints::new()))
 }
 
 /// Sets an exact [deviceId][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
 pub fn display_video_track_constraints_device_id(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     device_id: String,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().device_id(device_id);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.device_id(device_id);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an exact [height][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
 pub fn display_video_track_constraints_exact_height(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     exact_height: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().exact_height(exact_height);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.exact_height(exact_height);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an ideal [height][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
 pub fn display_video_track_constraints_ideal_height(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     ideal_height: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().ideal_height(ideal_height);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.ideal_height(ideal_height);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an exact [width][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
 pub fn display_video_track_constraints_exact_width(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     exact_width: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().exact_width(exact_width);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.exact_width(exact_width);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an ideal [width][1] constraint.
 ///
 /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
 pub fn display_video_track_constraints_ideal_width(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     ideal_width: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().ideal_width(ideal_width);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.ideal_width(ideal_width);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an ideal [frameRate][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
 pub fn display_video_track_constraints_ideal_frame_rate(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     ideal_frame_rate: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().ideal_frame_rate(ideal_frame_rate);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.ideal_frame_rate(ideal_frame_rate);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 /// Sets an exact [frameRate][1] constraint.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
 pub fn display_video_track_constraints_exact_frame_rate(
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
     exact_frame_rate: u32,
-) -> SyncReturn<()> {
-    constraints.borrow_mut().exact_frame_rate(exact_frame_rate);
-    SyncReturn(())
+) -> SyncReturn<RustOpaque<DisplayVideoTrackConstraints>> {
+    let mut constraints = constraints.try_unwrap().unwrap();
+    constraints.exact_frame_rate(exact_frame_rate);
+    SyncReturn(RustOpaque::new(constraints))
 }
 
 // -------------------------------------------------------------------
@@ -557,46 +593,38 @@ pub use self::mock::Jason;
 pub use crate::jason::Jason;
 
 /// Instantiates a new [`Jason`] interface to interact with this library.
-pub fn jason_new() -> SyncReturn<Opaque<RefCell<Option<Jason>>>> {
-    SyncReturn(Opaque::new(RefCell::new(Some(Jason::new()))))
+pub fn jason_new() -> SyncReturn<RustOpaque<Jason>> {
+    SyncReturn(RustOpaque::new(Jason::new()))
 }
 
 /// Creates a new [`Room`] and returns its [`RoomHandle`].
 ///
 /// [`Room`]: crate::room::Room
 pub fn jason_init_room(
-    jason: Opaque<RefCell<Option<Jason>>>,
-) -> SyncReturn<Opaque<RoomHandle>> {
-    SyncReturn(Opaque::new(
-        jason.borrow_mut().as_mut().unwrap().init_room(),
-    ))
+    jason: RustOpaque<Jason>,
+) -> SyncReturn<RustOpaque<RoomHandle>> {
+    SyncReturn(RustOpaque::new(jason.init_room()))
 }
 
 /// Returns a [`MediaManagerHandle`].
 pub fn jason_media_manager(
-    jason: Opaque<RefCell<Option<Jason>>>,
-) -> SyncReturn<Opaque<MediaManagerHandle>> {
-    SyncReturn(Opaque::new(
-        jason.borrow_mut().as_mut().unwrap().media_manager(),
-    ))
+    jason: RustOpaque<Jason>,
+) -> SyncReturn<RustOpaque<MediaManagerHandle>> {
+    SyncReturn(RustOpaque::new(jason.media_manager()))
 }
 
 /// Closes the provided [`RoomHandle`].
 pub fn jason_close_room(
-    jason: Opaque<RefCell<Option<Jason>>>,
-    room_to_delete: Opaque<RoomHandle>,
+    jason: RustOpaque<Jason>,
+    room_to_delete: RustOpaque<RoomHandle>,
 ) -> SyncReturn<()> {
-    jason
-        .borrow_mut()
-        .as_mut()
-        .unwrap()
-        .close_room(RoomHandle::clone(&room_to_delete));
+    jason.close_room(RoomHandle::clone(&room_to_delete));
     SyncReturn(())
 }
 
 /// Closes the provided [`RoomHandle`].
-pub fn jason_dispose(jason: Opaque<RefCell<Option<Jason>>>) -> SyncReturn<()> {
-    let jason = jason.borrow_mut().take().unwrap();
+pub fn jason_dispose(jason: RustOpaque<Jason>) -> SyncReturn<()> {
+    let jason = jason.try_unwrap().unwrap();
     jason.dispose();
     SyncReturn(())
 }
@@ -612,9 +640,9 @@ impl ForeignClass for LocalMediaTrack {}
 
 pub fn local_media_track_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<LocalMediaTrack>> {
+) -> SyncReturn<RustOpaque<LocalMediaTrack>> {
     SyncReturn(unsafe {
-        Opaque::new(LocalMediaTrack::from_ptr(
+        RustOpaque::new(LocalMediaTrack::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         ))
     })
@@ -625,9 +653,12 @@ pub fn local_media_track_from_ptr(
 ///
 /// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
 pub fn local_media_track_get_track(
-    track: Opaque<LocalMediaTrack>,
-) -> SyncReturn<Opaque<Dart_Handle>> {
-    SyncReturn(Opaque::new(track.get_track().handle()))
+    track: RustOpaque<LocalMediaTrack>,
+) -> SyncReturn<DartOpaque> {
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(track.get_track().handle())
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
@@ -636,7 +667,7 @@ pub fn local_media_track_get_track(
 /// [`MediaKind::Audio`]: crate::media::MediaKind::Audio
 /// [`MediaKind::Video`]: crate::media::MediaKind::Video
 pub fn local_media_track_kind(
-    track: Opaque<LocalMediaTrack>,
+    track: RustOpaque<LocalMediaTrack>,
 ) -> SyncReturn<u8> {
     SyncReturn(track.kind() as u8)
 }
@@ -650,7 +681,7 @@ pub fn local_media_track_kind(
 /// [`MediaSourceKind::Device`]: crate::media::MediaSourceKind::Device
 /// [`MediaSourceKind::Display`]: crate::media::MediaSourceKind::Display
 pub fn local_media_track_media_source_kind(
-    track: Opaque<LocalMediaTrack>,
+    track: RustOpaque<LocalMediaTrack>,
 ) -> SyncReturn<u8> {
     SyncReturn(track.media_source_kind() as u8)
 }
@@ -703,7 +734,7 @@ pub use crate::platform::MediaDeviceInfo;
 
 /// Returns unique identifier of the represented device.
 pub fn media_device_info_device_id(
-    media_device: Opaque<MediaDeviceInfo>,
+    media_device: RustOpaque<MediaDeviceInfo>,
 ) -> SyncReturn<String> {
     SyncReturn(media_device.device_id())
 }
@@ -714,7 +745,7 @@ pub fn media_device_info_device_id(
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
 pub fn media_device_info_kind(
-    media_device: Opaque<MediaDeviceInfo>,
+    media_device: RustOpaque<MediaDeviceInfo>,
 ) -> SyncReturn<u8> {
     SyncReturn(media_device.kind() as u8)
 }
@@ -724,7 +755,7 @@ pub fn media_device_info_kind(
 ///
 /// If the device has no associated label, then returns an empty string.
 pub fn media_device_info_label(
-    media_device: Opaque<MediaDeviceInfo>,
+    media_device: RustOpaque<MediaDeviceInfo>,
 ) -> SyncReturn<String> {
     SyncReturn(media_device.label())
 }
@@ -738,7 +769,7 @@ pub fn media_device_info_label(
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
 pub fn media_device_info_group_id(
-    media_device: Opaque<MediaDeviceInfo>,
+    media_device: RustOpaque<MediaDeviceInfo>,
 ) -> SyncReturn<Option<String>> {
     SyncReturn(media_device.group_id())
 }
@@ -784,14 +815,14 @@ pub use crate::platform::MediaDisplayInfo;
 
 /// Returns a unique identifier of the represented display.
 pub fn media_display_info_device_id(
-    media_display: Opaque<MediaDisplayInfo>,
+    media_display: RustOpaque<MediaDisplayInfo>,
 ) -> SyncReturn<String> {
     SyncReturn(media_display.device_id())
 }
 
 /// Returns a title describing the represented display.
 pub fn media_display_info_title(
-    media_display: Opaque<MediaDisplayInfo>,
+    media_display: RustOpaque<MediaDisplayInfo>,
 ) -> SyncReturn<Option<String>> {
     SyncReturn(media_display.title())
 }
@@ -833,136 +864,164 @@ pub use crate::media::MediaManagerHandle;
 ///
 /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
 pub fn media_manager_handle_init_local_tracks(
-    manager: Opaque<MediaManagerHandle>,
-    caps: Opaque<RefCell<MediaStreamSettings>>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
-        let caps = MediaStreamSettings::clone(&caps.borrow());
-        async move {
-            Ok::<Opaque<_>, Traced<InitLocalTracksError>>(Opaque::new(
-                RefCell::new(manager.init_local_tracks(caps).await?),
-            ))
-        }
-        .into_my_dart_future()
-    }))
+    manager: RustOpaque<MediaManagerHandle>,
+    caps: RustOpaque<MediaStreamSettings>,
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
+    let caps = MediaStreamSettings::clone(&caps);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                Ok::<RustOpaque<_>, Traced<InitLocalTracksError>>(
+                    RustOpaque::new(ApiWrapVec::new(
+                        manager.init_local_tracks(caps).await?,
+                    )),
+                )
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Returns a list of [`MediaDeviceInfo`] objects representing available media
 /// input and devices, such as microphones, cameras, and so forth.
 pub fn media_manager_handle_enumerate_devices(
-    manager: Opaque<MediaManagerHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
-        async move {
-            Ok::<Opaque<_>, Traced<EnumerateDevicesError>>(Opaque::new(
-                RefCell::new(manager.enumerate_devices().await?),
-            ))
-        }
-        .into_my_dart_future()
-    }))
+    manager: RustOpaque<MediaManagerHandle>,
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                Ok::<RustOpaque<_>, Traced<EnumerateDevicesError>>(
+                    RustOpaque::new(ApiWrapVec::new(
+                        manager.enumerate_devices().await?,
+                    )),
+                )
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Returns a list of [`MediaDisplayInfo`] objects representing available
 /// sources that can be used for screen capturing.
 
 pub fn media_manager_handle_enumerate_displays(
-    manager: Opaque<MediaManagerHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
-
-        async move {
-            Ok::<Opaque<_>, Traced<EnumerateDisplaysError>>(Opaque::new(
-                RefCell::new(manager.enumerate_displays().await?),
-            ))
-        }
-        .into_my_dart_future()
-    }))
+    manager: RustOpaque<MediaManagerHandle>,
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                Ok::<RustOpaque<_>, Traced<EnumerateDisplaysError>>(
+                    RustOpaque::new(manager.enumerate_displays().await?),
+                )
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Switches the current output audio device to the device with the provided
 /// `device_id`.
 
 pub fn media_manager_handle_set_output_audio_id(
-    manager: Opaque<MediaManagerHandle>,
+    manager: RustOpaque<MediaManagerHandle>,
     device_id: String,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
-
-        async move {
-            manager
-                .set_output_audio_id(device_id)
-                .await
-                .map_err(tracerr::map_from_and_wrap!())?;
-            Ok::<_, Traced<InvalidOutputAudioDeviceIdError>>(())
-        }
-        .into_my_dart_future()
-    }))
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                manager
+                    .set_output_audio_id(device_id)
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())?;
+                Ok::<_, Traced<InvalidOutputAudioDeviceIdError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Sets the microphone volume level in percents.
 
 pub fn media_manager_handle_set_microphone_volume(
-    manager: Opaque<MediaManagerHandle>,
+    manager: RustOpaque<MediaManagerHandle>,
     level: i64,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
-
-        async move {
-            manager
-                .set_microphone_volume(level)
-                .await
-                .map_err(tracerr::map_from_and_wrap!())?;
-            Ok::<_, Traced<MicVolumeError>>(())
-        }
-        .into_my_dart_future()
-    }))
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                manager
+                    .set_microphone_volume(level)
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())?;
+                Ok::<_, Traced<MicVolumeError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Indicates whether it's possible to access microphone volume settings.
 
 pub fn media_manager_handle_microphone_volume_is_available(
-    manager: Opaque<MediaManagerHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
-
-        async move { manager.microphone_volume_is_available().await }
-            .into_my_dart_future()
-    }))
+    manager: RustOpaque<MediaManagerHandle>,
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move { manager.microphone_volume_is_available().await }
+                .into_my_dart_future()
+                .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Returns the current microphone volume level in percents.
 pub fn media_manager_handle_microphone_volume(
-    manager: Opaque<MediaManagerHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
-    SyncReturn(Opaque::new({
-        let manager = MediaManagerHandle::clone(&manager);
+    manager: RustOpaque<MediaManagerHandle>,
+) -> SyncReturn<DartOpaque> {
+    let manager = MediaManagerHandle::clone(&manager);
 
-        async move {
-            let res = manager.microphone_volume().await;
-            let res: Result<_, Traced<MicVolumeError>> =
-                res.map_err(tracerr::map_from_and_wrap!());
-            res
-        }
-        .into_my_dart_future()
-    }))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                let res = manager.microphone_volume().await;
+                let res: Result<_, Traced<MicVolumeError>> =
+                    res.map_err(tracerr::map_from_and_wrap!());
+                res
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
 
 pub fn media_manager_handle_on_device_change(
-    manager: Opaque<MediaManagerHandle>,
-    cb: Opaque<Dart_Handle>,
+    manager: RustOpaque<MediaManagerHandle>,
+    cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     let manager = MediaManagerHandle::clone(&manager);
     manager
         .on_device_change(unsafe {
-            platform::Function::new(Dart_Handle::clone(&cb))
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
@@ -1069,7 +1128,7 @@ mod mock {
     }
 
     pub fn returns_local_media_init_exception(
-        cause: Opaque<MediaManagerHandleDH>,
+        cause: RustOpaque<MediaManagerHandleDH>,
     ) -> DartResult {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetUserMediaFailed(
@@ -1079,7 +1138,7 @@ mod mock {
     }
 
     pub fn returns_future_with_local_media_init_exception(
-        cause: Opaque<MediaManagerHandleDH>,
+        cause: RustOpaque<MediaManagerHandleDH>,
     ) -> DartFuture<Result<(), Traced<InitLocalTracksError>>> {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(InitLocalTracksError::GetDisplayMediaFailed(
@@ -1090,7 +1149,7 @@ mod mock {
     }
 
     pub fn returns_enumerate_devices_exception(
-        cause: Opaque<MediaManagerHandleDH>,
+        cause: RustOpaque<MediaManagerHandleDH>,
     ) -> DartResult {
         let cause = platform::Error::from_handle(cause);
         DartError::from(tracerr::new!(EnumerateDevicesError::from(cause)))
@@ -1098,7 +1157,7 @@ mod mock {
     }
 
     pub fn returns_future_enumerate_devices_exception(
-        cause: Opaque<MediaManagerHandleDH>,
+        cause: RustOpaque<MediaManagerHandleDH>,
     ) -> DartFuture<Result<(), Traced<EnumerateDevicesError>>> {
         let cause = platform::Error::from_handle(cause);
         let err = tracerr::new!(EnumerateDevicesError::from(cause));
@@ -1110,44 +1169,43 @@ mod mock {
 // -------------------------------------------------------------------
 
 /// Creates new [`MediaStreamSettings`] with none constraints configured.
-pub fn media_stream_settings_new(
-) -> SyncReturn<Opaque<RefCell<MediaStreamSettings>>> {
-    SyncReturn(Opaque::new(RefCell::new(MediaStreamSettings::new())))
+pub fn media_stream_settings_new() -> SyncReturn<RustOpaque<MediaStreamSettings>>
+{
+    SyncReturn(RustOpaque::new(MediaStreamSettings::new()))
 }
 
 /// Specifies a nature and settings of an audio [`MediaStreamTrack`].
 ///
 /// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
 pub fn media_stream_settings_audio(
-    media_stream_settings: Opaque<RefCell<MediaStreamSettings>>,
-    constraints: Opaque<RefCell<AudioTrackConstraints>>,
-) -> SyncReturn<()> {
-    media_stream_settings
-        .borrow_mut()
-        .audio(AudioTrackConstraints::clone(&constraints.borrow()));
-    SyncReturn(())
+    media_stream_settings: RustOpaque<MediaStreamSettings>,
+    constraints: RustOpaque<AudioTrackConstraints>,
+) -> SyncReturn<RustOpaque<MediaStreamSettings>> {
+    let mut media_stream_settings = media_stream_settings.try_unwrap().unwrap();
+    media_stream_settings.audio(AudioTrackConstraints::clone(&constraints));
+    SyncReturn(RustOpaque::new(media_stream_settings))
 }
 
 /// Set constraints for obtaining a local video sourced from a media device.
 pub fn media_stream_settings_device_video(
-    media_stream_settings: Opaque<RefCell<MediaStreamSettings>>,
-    constraints: Opaque<RefCell<DeviceVideoTrackConstraints>>,
-) -> SyncReturn<()> {
-    media_stream_settings.borrow_mut().device_video(
-        DeviceVideoTrackConstraints::clone(&constraints.borrow()),
-    );
-    SyncReturn(())
+    media_stream_settings: RustOpaque<MediaStreamSettings>,
+    constraints: RustOpaque<DeviceVideoTrackConstraints>,
+) -> SyncReturn<RustOpaque<MediaStreamSettings>> {
+    let mut media_stream_settings = media_stream_settings.try_unwrap().unwrap();
+    media_stream_settings
+        .device_video(DeviceVideoTrackConstraints::clone(&constraints));
+    SyncReturn(RustOpaque::new(media_stream_settings))
 }
 
 /// Set constraints for capturing a local video from user's display.
 pub fn media_stream_settings_display_video(
-    media_stream_settings: Opaque<RefCell<MediaStreamSettings>>,
-    constraints: Opaque<RefCell<DisplayVideoTrackConstraints>>,
-) -> SyncReturn<()> {
-    media_stream_settings.borrow_mut().display_video(
-        DisplayVideoTrackConstraints::clone(&constraints.borrow()),
-    );
-    SyncReturn(())
+    media_stream_settings: RustOpaque<MediaStreamSettings>,
+    constraints: RustOpaque<DisplayVideoTrackConstraints>,
+) -> SyncReturn<RustOpaque<MediaStreamSettings>> {
+    let mut media_stream_settings = media_stream_settings.try_unwrap().unwrap();
+    media_stream_settings
+        .display_video(DisplayVideoTrackConstraints::clone(&constraints));
+    SyncReturn(RustOpaque::new(media_stream_settings))
 }
 
 // -------------------------------------------------------------------
@@ -1162,9 +1220,9 @@ impl ForeignClass for ReconnectHandle {}
 
 pub fn reconnect_handle_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<ReconnectHandle>> {
+) -> SyncReturn<RustOpaque<ReconnectHandle>> {
     SyncReturn(unsafe {
-        Opaque::new(ReconnectHandle::from_ptr(
+        RustOpaque::new(ReconnectHandle::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         ))
     })
@@ -1178,22 +1236,26 @@ pub fn reconnect_handle_from_ptr(
 ///
 /// [`Room`]: crate::room::Room
 pub fn reconnect_handle_reconnect_with_delay(
-    reconnect_handle: Opaque<ReconnectHandle>,
+    reconnect_handle: RustOpaque<ReconnectHandle>,
     delay_ms: i64,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let reconnect_handle = ReconnectHandle::clone(&reconnect_handle);
-    SyncReturn(Opaque::new(
-        async move {
-            #[allow(clippy::map_err_ignore)]
-            let delay_ms = u32::try_from(delay_ms).map_err(|_| {
-                ArgumentError::new(delay_ms, "delayMs", "Expected u32")
-            })?;
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                #[allow(clippy::map_err_ignore)]
+                let delay_ms = u32::try_from(delay_ms).map_err(|_| {
+                    ArgumentError::new(delay_ms, "delayMs", "Expected u32")
+                })?;
 
-            reconnect_handle.reconnect_with_delay(delay_ms).await?;
-            Ok::<_, Error>(())
-        }
-        .into_my_dart_future(),
-    ))
+                reconnect_handle.reconnect_with_delay(delay_ms).await?;
+                Ok::<_, Error>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Tries to reconnect a [`Room`] in a loop with a growing backoff delay.
@@ -1219,51 +1281,54 @@ pub fn reconnect_handle_reconnect_with_delay(
 ///
 /// [`Room`]: crate::room::Room
 pub fn reconnect_handle_reconnect_with_backoff(
-    reconnect_handle: Opaque<ReconnectHandle>,
+    reconnect_handle: RustOpaque<ReconnectHandle>,
     starting_delay: i64,
     multiplier: f64,
     max_delay: u32,
     max_elapsed_time_ms: Option<u32>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let reconnect_handle = ReconnectHandle::clone(&reconnect_handle);
-
-    SyncReturn(Opaque::new(
-        async move {
-            #[allow(clippy::map_err_ignore)]
-            let starting_delay =
-                u32::try_from(starting_delay).map_err(|_| {
-                    ArgumentError::new(
-                        starting_delay,
-                        "startingDelayMs",
-                        "Expected u32",
-                    )
-                })?;
-            #[allow(clippy::map_err_ignore)]
-            let max_elapsed_time_ms = max_elapsed_time_ms
-                .map(|v| {
-                    #[allow(clippy::map_err_ignore)]
-                    u32::try_from(v).map_err(|_| {
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                #[allow(clippy::map_err_ignore)]
+                let starting_delay =
+                    u32::try_from(starting_delay).map_err(|_| {
                         ArgumentError::new(
-                            v,
-                            "maxElapsedTimeMs",
+                            starting_delay,
+                            "startingDelayMs",
                             "Expected u32",
                         )
+                    })?;
+                #[allow(clippy::map_err_ignore)]
+                let max_elapsed_time_ms = max_elapsed_time_ms
+                    .map(|v| {
+                        #[allow(clippy::map_err_ignore)]
+                        u32::try_from(v).map_err(|_| {
+                            ArgumentError::new(
+                                v,
+                                "maxElapsedTimeMs",
+                                "Expected u32",
+                            )
+                        })
                     })
-                })
-                .transpose()?;
+                    .transpose()?;
 
-            reconnect_handle
-                .reconnect_with_backoff(
-                    starting_delay,
-                    multiplier,
-                    max_delay,
-                    max_elapsed_time_ms,
-                )
-                .await?;
-            Ok::<_, Error>(())
-        }
-        .into_my_dart_future(),
-    ))
+                reconnect_handle
+                    .reconnect_with_backoff(
+                        starting_delay,
+                        multiplier,
+                        max_delay,
+                        max_elapsed_time_ms,
+                    )
+                    .await?;
+                Ok::<_, Error>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 #[cfg(feature = "mockable")]
@@ -1330,7 +1395,7 @@ mod mock {
 
     pub fn returns_future_rpc_client_exception(
         cause: Dart_Handle,
-    ) -> SyncReturn<Opaque<MyDartFuture>> {
+    ) -> SyncReturn<DartOpaque> {
         let err = RpcClientException::new(
             RpcClientExceptionKind::SessionFinished,
             "RpcClientException::SessionFinished",
@@ -1338,7 +1403,12 @@ mod mock {
             Trace::new(vec![tracerr::new_frame!()]),
         );
 
-        future::err(err.into()).into_my_dart_future()
+        let persistent_handle = unsafe {
+            Dart_NewPersistentHandle_DL_Trampolined(
+                future::err(err.into()).into_my_dart_future().into_raw(),
+            )
+        };
+        SyncReturn(DartOpaque::new(persistent_handle, 0))
     }
 }
 
@@ -1353,9 +1423,9 @@ impl ForeignClass for RemoteMediaTrack {}
 
 pub fn remote_media_track_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<RemoteMediaTrack>> {
+) -> SyncReturn<RustOpaque<RemoteMediaTrack>> {
     SyncReturn(unsafe {
-        Opaque::new(RemoteMediaTrack::from_ptr(
+        RustOpaque::new(RemoteMediaTrack::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         ))
     })
@@ -1366,69 +1436,76 @@ pub fn remote_media_track_from_ptr(
 ///
 /// [`MediaStreamTrack`]: platform::MediaStreamTrack
 pub fn remote_media_track_get_track(
-    track: Opaque<RemoteMediaTrack>,
-) -> SyncReturn<Opaque<Dart_Handle>> {
-    SyncReturn(Opaque::new(track.get_track().handle()))
+    track: RustOpaque<RemoteMediaTrack>,
+) -> SyncReturn<DartOpaque> {
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(track.get_track().handle())
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Sets callback to invoke when track [`RemoteMediaTrack`] is muted.
 pub fn remote_media_track_on_muted(
-    track: Opaque<RemoteMediaTrack>,
-    f: Opaque<Dart_Handle>,
+    track: RustOpaque<RemoteMediaTrack>,
+    f: DartOpaque,
 ) -> SyncReturn<()> {
-    track.on_muted(unsafe { platform::Function::new(Dart_Handle::clone(&f)) });
+    track.on_muted(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+    });
     SyncReturn(())
 }
 
 /// Sets callback to invoke when track [`RemoteMediaTrack`] is unmuted.
 pub fn remote_media_track_on_unmuted(
-    track: Opaque<RemoteMediaTrack>,
-    f: Opaque<Dart_Handle>,
+    track: RustOpaque<RemoteMediaTrack>,
+    f: DartOpaque,
 ) -> SyncReturn<()> {
-    track
-        .on_unmuted(unsafe { platform::Function::new(Dart_Handle::clone(&f)) });
+    track.on_unmuted(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+    });
     SyncReturn(())
 }
 
 /// Sets callback to invoke when track [`RemoteMediaTrack`] is stopped.
 pub fn remote_media_track_on_stopped(
-    track: Opaque<RemoteMediaTrack>,
-    f: Opaque<Dart_Handle>,
+    track: RustOpaque<RemoteMediaTrack>,
+    f: DartOpaque,
 ) -> SyncReturn<()> {
-    track
-        .on_stopped(unsafe { platform::Function::new(Dart_Handle::clone(&f)) });
+    track.on_stopped(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+    });
     SyncReturn(())
 }
 
 /// Sets callback to invoke whenever track [`RemoteMediaTrack`]'s general
 /// [`MediaDirection`] is changed.
 pub fn remote_media_track_on_media_direction_changed(
-    track: Opaque<RemoteMediaTrack>,
-    f: Opaque<Dart_Handle>,
+    track: RustOpaque<RemoteMediaTrack>,
+    f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_media_direction_changed(unsafe {
-        platform::Function::new(Dart_Handle::clone(&f))
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
     });
     SyncReturn(())
 }
 
 /// Indicate whether track [`RemoteMediaTrack`] is muted.
 pub fn remote_media_track_muted(
-    track: Opaque<RemoteMediaTrack>,
+    track: RustOpaque<RemoteMediaTrack>,
 ) -> SyncReturn<bool> {
     SyncReturn(track.muted())
 }
 
 /// Returns track [`RemoteMediaTrack`]'s kind (audio/video).
 pub fn remote_media_track_kind(
-    track: Opaque<RemoteMediaTrack>,
+    track: RustOpaque<RemoteMediaTrack>,
 ) -> SyncReturn<u8> {
     SyncReturn(track.kind() as u8)
 }
 
 /// Returns track [`RemoteMediaTrack`]'s media source kind.
 pub fn remote_media_track_media_source_kind(
-    track: Opaque<RemoteMediaTrack>,
+    track: RustOpaque<RemoteMediaTrack>,
 ) -> SyncReturn<u8> {
     SyncReturn(track.media_source_kind() as u8)
 }
@@ -1436,7 +1513,7 @@ pub fn remote_media_track_media_source_kind(
 /// Returns the current general [`MediaDirection`] of track
 /// [`RemoteMediaTrack`].
 pub fn remote_media_track_media_direction(
-    track: Opaque<RemoteMediaTrack>,
+    track: RustOpaque<RemoteMediaTrack>,
 ) -> SyncReturn<u8> {
     SyncReturn(track.media_direction() as u8)
 }
@@ -1535,9 +1612,9 @@ impl ForeignClass for RoomCloseReason {}
 
 pub fn room_close_reason_from_ptr(
     ptr: usize,
-) -> SyncReturn<Opaque<RoomCloseReason>> {
+) -> SyncReturn<RustOpaque<RoomCloseReason>> {
     SyncReturn(unsafe {
-        Opaque::new(RoomCloseReason::from_ptr(
+        RustOpaque::new(RoomCloseReason::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         ))
     })
@@ -1547,7 +1624,7 @@ pub fn room_close_reason_from_ptr(
 ///
 /// [`Room`]: crate::room::Room
 pub fn room_close_reason_reason(
-    room_close_reason: Opaque<RoomCloseReason>,
+    room_close_reason: RustOpaque<RoomCloseReason>,
 ) -> SyncReturn<String> {
     SyncReturn(room_close_reason.reason())
 }
@@ -1556,7 +1633,7 @@ pub fn room_close_reason_reason(
 ///
 /// [`Room`]: crate::room::Room
 pub fn room_close_reason_is_closed_by_server(
-    room_close_reason: Opaque<RoomCloseReason>,
+    room_close_reason: RustOpaque<RoomCloseReason>,
 ) -> SyncReturn<bool> {
     SyncReturn(room_close_reason.is_closed_by_server())
 }
@@ -1565,7 +1642,7 @@ pub fn room_close_reason_is_closed_by_server(
 ///
 /// [`Room`]: crate::room::Room
 pub fn room_close_reason_is_err(
-    room_close_reason: Opaque<RoomCloseReason>,
+    room_close_reason: RustOpaque<RoomCloseReason>,
 ) -> SyncReturn<bool> {
     SyncReturn(room_close_reason.is_err())
 }
@@ -1587,18 +1664,22 @@ use crate::room::{ConstraintsUpdateError, RoomJoinError};
 ///
 /// [`Room`]: crate::room::Room
 pub fn room_handle_join(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     token: String,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                room_handle.join(token).await?;
+                Ok::<_, Traced<RoomJoinError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
 
-    SyncReturn(Opaque::new(
-        async move {
-            room_handle.join(token).await?;
-            Ok::<_, Traced<RoomJoinError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Updates room_handle [`Room`]'s [`MediaStreamSettings`]. room_handle affects
@@ -1629,27 +1710,31 @@ pub fn room_handle_join(
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 
 pub fn room_handle_set_local_media_settings(
-    room_handle: Opaque<RoomHandle>,
-    settings: Opaque<RefCell<MediaStreamSettings>>,
+    room_handle: RustOpaque<RoomHandle>,
+    settings: RustOpaque<MediaStreamSettings>,
     stop_first: bool,
     rollback_on_fail: bool,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
-    let settings = MediaStreamSettings::clone(&settings.borrow());
+    let settings = MediaStreamSettings::clone(&settings);
 
-    SyncReturn(Opaque::new(
-        async move {
-            room_handle
-                .set_local_media_settings(
-                    settings,
-                    stop_first,
-                    rollback_on_fail,
-                )
-                .await?;
-            Ok::<_, ConstraintsUpdateError>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                room_handle
+                    .set_local_media_settings(
+                        settings,
+                        stop_first,
+                        rollback_on_fail,
+                    )
+                    .await?;
+                Ok::<_, ConstraintsUpdateError>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Mutes outbound audio in room_handle [`Room`].
@@ -1657,18 +1742,22 @@ pub fn room_handle_set_local_media_settings(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_mute_audio(
-    room_handle: Opaque<RoomHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    room_handle: RustOpaque<RoomHandle>,
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.mute_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Unmutes outbound audio in room_handle [`Room`].
@@ -1676,18 +1765,21 @@ pub fn room_handle_mute_audio(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_unmute_audio(
-    room_handle: Opaque<RoomHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    room_handle: RustOpaque<RoomHandle>,
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
-
     let fut = room_handle.unmute_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Enables outbound audio in room_handle [`Room`].
@@ -1695,18 +1787,22 @@ pub fn room_handle_unmute_audio(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_enable_audio(
-    room_handle: Opaque<RoomHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    room_handle: RustOpaque<RoomHandle>,
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.enable_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Disables outbound audio in room_handle [`Room`].
@@ -1714,18 +1810,22 @@ pub fn room_handle_enable_audio(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_disable_audio(
-    room_handle: Opaque<RoomHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    room_handle: RustOpaque<RoomHandle>,
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.disable_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Mutes outbound video in room_handle [`Room`].
@@ -1735,21 +1835,25 @@ pub fn room_handle_disable_audio(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_mute_video(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.mute_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Unmutes outbound video in room_handle [`Room`].
@@ -1759,21 +1863,25 @@ pub fn room_handle_mute_video(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_unmute_video(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.unmute_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Enables outbound video.
@@ -1781,21 +1889,25 @@ pub fn room_handle_unmute_video(
 /// Affects only video with specific [`MediaSourceKind`] if specified.
 
 pub fn room_handle_enable_video(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.enable_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Disables outbound video.
@@ -1803,21 +1915,25 @@ pub fn room_handle_enable_video(
 /// Affects only video with specific [`MediaSourceKind`] if specified.
 
 pub fn room_handle_disable_video(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.disable_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Enables inbound audio in room_handle [`Room`].
@@ -1825,18 +1941,22 @@ pub fn room_handle_disable_video(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_enable_remote_audio(
-    room_handle: Opaque<RoomHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    room_handle: RustOpaque<RoomHandle>,
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.enable_remote_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Disables inbound audio in room_handle [`Room`].
@@ -1844,18 +1964,22 @@ pub fn room_handle_enable_remote_audio(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_disable_remote_audio(
-    room_handle: Opaque<RoomHandle>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+    room_handle: RustOpaque<RoomHandle>,
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.disable_remote_audio();
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Enables inbound video in room_handle [`Room`].
@@ -1865,21 +1989,25 @@ pub fn room_handle_disable_remote_audio(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_enable_remote_video(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.enable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Disables inbound video in room_handle [`Room`].
@@ -1889,21 +2017,25 @@ pub fn room_handle_enable_remote_video(
 /// [`Room`]: crate::room::Room
 
 pub fn room_handle_disable_remote_video(
-    room_handle: Opaque<RoomHandle>,
+    room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<u8>,
-) -> SyncReturn<Opaque<MyDartFuture>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
     let fut = room_handle.disable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v as i64).unwrap()),
     );
-    SyncReturn(Opaque::new(
-        async move {
-            fut.await?;
-            Ok::<_, Traced<ChangeMediaStateError>>(())
-        }
-        .into_my_dart_future(),
-    ))
+    let persistent_handle = unsafe {
+        Dart_NewPersistentHandle_DL_Trampolined(
+            async move {
+                fut.await?;
+                Ok::<_, Traced<ChangeMediaStateError>>(())
+            }
+            .into_my_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(DartOpaque::new(persistent_handle, 0))
 }
 
 /// Sets callback, invoked when a new [`Connection`] with some remote `Peer`
@@ -1912,13 +2044,13 @@ pub fn room_handle_disable_remote_video(
 /// [`Connection`]: crate::connection::Connection
 
 pub fn room_handle_on_new_connection(
-    room_handle: Opaque<RoomHandle>,
-    cb: Opaque<Dart_Handle>,
+    room_handle: RustOpaque<RoomHandle>,
+    cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     Ok(SyncReturn(
         room_handle
             .on_new_connection(unsafe {
-                platform::Function::new(Dart_Handle::clone(&cb))
+                platform::Function::new(cb.try_unwrap().unwrap().into_raw())
             })
             .map_err(|err| anyhow::anyhow!("{}", err))?,
     ))
@@ -1931,11 +2063,13 @@ pub fn room_handle_on_new_connection(
 /// [`RoomCloseReason`]: crate::room::RoomCloseReason
 
 pub fn room_handle_on_close(
-    room_handle: Opaque<RoomHandle>,
-    cb: Opaque<Dart_Handle>,
+    room_handle: RustOpaque<RoomHandle>,
+    cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
-        .on_close(unsafe { platform::Function::new(Dart_Handle::clone(&cb)) })
+        .on_close(unsafe {
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+        })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
 }
@@ -1953,12 +2087,12 @@ pub fn room_handle_on_close(
 /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
 
 pub fn room_handle_on_local_track(
-    room_handle: Opaque<RoomHandle>,
-    cb: Opaque<Dart_Handle>,
+    room_handle: RustOpaque<RoomHandle>,
+    cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_local_track(unsafe {
-            platform::Function::new(Dart_Handle::clone(&cb))
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
@@ -1967,12 +2101,12 @@ pub fn room_handle_on_local_track(
 /// Sets callback, invoked when a connection with server is lost.
 
 pub fn room_handle_on_connection_loss(
-    room_handle: Opaque<RoomHandle>,
-    cb: Opaque<Dart_Handle>,
+    room_handle: RustOpaque<RoomHandle>,
+    cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_connection_loss(unsafe {
-            platform::Function::new(Dart_Handle::clone(&cb))
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))
@@ -1980,12 +2114,12 @@ pub fn room_handle_on_connection_loss(
 
 /// Sets callback, invoked on local media acquisition failures.
 pub fn room_handle_on_failed_local_media(
-    room_handle: Opaque<RoomHandle>,
-    cb: Opaque<Dart_Handle>,
+    room_handle: RustOpaque<RoomHandle>,
+    cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_failed_local_media(unsafe {
-            platform::Function::new(Dart_Handle::clone(&cb))
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{}", err))?;
     Ok(SyncReturn(()))

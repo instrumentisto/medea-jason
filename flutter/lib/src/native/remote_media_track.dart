@@ -40,26 +40,23 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return rust_opaque_to_dart_object(
-        api.remoteMediaTrackGetTrack(track: opaque)) as webrtc.MediaStreamTrack;
+    return api.remoteMediaTrackGetTrack(track: opaque)
+        as webrtc.MediaStreamTrack;
   }
 
   @override
   void onMuted(void Function() f) {
-    return api.remoteMediaTrackOnMuted(
-        track: opaque, f: dart_object_to_persistent_rust_opaque(f));
+    return api.remoteMediaTrackOnMuted(track: opaque, f: f);
   }
 
   @override
   void onUnmuted(void Function() f) {
-    return api.remoteMediaTrackOnUnmuted(
-        track: opaque, f: dart_object_to_persistent_rust_opaque(f));
+    return api.remoteMediaTrackOnUnmuted(track: opaque, f: f);
   }
 
   @override
   void onStopped(void Function() f) {
-    return api.remoteMediaTrackOnStopped(
-        track: opaque, f: dart_object_to_persistent_rust_opaque(f));
+    return api.remoteMediaTrackOnStopped(track: opaque, f: f);
   }
 
   @moveSemantics
@@ -75,8 +72,6 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
   @override
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
     api.remoteMediaTrackOnMediaDirectionChanged(
-        track: opaque,
-        f: dart_object_to_persistent_rust_opaque(
-            (i) => f(TrackMediaDirection.values[i])));
+        track: opaque, f: (i) => f(TrackMediaDirection.values[i]));
   }
 }

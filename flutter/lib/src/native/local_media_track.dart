@@ -29,8 +29,8 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return rust_opaque_to_dart_object(
-        api.localMediaTrackGetTrack(track: opaque)) as webrtc.MediaStreamTrack;
+    return api.localMediaTrackGetTrack(track: opaque)
+        as webrtc.MediaStreamTrack;
   }
 
   @moveSemantics

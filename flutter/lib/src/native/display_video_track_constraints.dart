@@ -6,7 +6,7 @@ import 'jason.dart';
 
 class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.RefCellDisplayVideoTrackConstraints opaque =
+  frb.DisplayVideoTrackConstraints opaque =
       api.displayVideoTrackConstraintsNew();
 
   /// Constructs a new [DisplayVideoTrackConstraints] backed by the Rust struct behind the
@@ -17,43 +17,50 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
 
   @override
   void exactHeight(int height) {
-    api.displayVideoTrackConstraintsExactHeight(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsExactHeight(
         constraints: opaque, exactHeight: height);
   }
 
   @override
   void idealHeight(int height) {
-    api.displayVideoTrackConstraintsIdealHeight(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsIdealHeight(
         constraints: opaque, idealHeight: height);
   }
 
   @override
   void exactWidth(int width) {
-    api.displayVideoTrackConstraintsExactWidth(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsExactWidth(
         constraints: opaque, exactWidth: width);
   }
 
   @override
   void idealWidth(int width) {
-    api.displayVideoTrackConstraintsIdealWidth(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsIdealWidth(
         constraints: opaque, idealWidth: width);
   }
 
   @override
   void exactFrameRate(int frameRate) {
-    api.displayVideoTrackConstraintsExactFrameRate(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsExactFrameRate(
         constraints: opaque, exactFrameRate: frameRate);
   }
 
   @override
   void idealFrameRate(int frameRate) {
-    api.displayVideoTrackConstraintsIdealFrameRate(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsIdealFrameRate(
         constraints: opaque, idealFrameRate: frameRate);
   }
 
   @override
   void deviceId(String deviceId) {
-    api.displayVideoTrackConstraintsDeviceId(
+    opaque.move = true;
+    opaque = api.displayVideoTrackConstraintsDeviceId(
         constraints: opaque, deviceId: deviceId);
   }
 
