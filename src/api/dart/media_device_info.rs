@@ -72,6 +72,15 @@ pub unsafe extern "C" fn MediaDeviceInfo__free(
     });
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn MediaDeviceInfo__is_failed(
+    this: ptr::NonNull<MediaDeviceInfo>,
+) -> bool {
+    propagate_panic(move || {
+        this.as_ref().is_failed()
+    })
+}
+
 #[cfg(feature = "mockable")]
 mod mock {
     #![allow(missing_copy_implementations, clippy::unused_self)]

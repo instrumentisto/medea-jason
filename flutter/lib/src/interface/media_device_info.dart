@@ -41,4 +41,6 @@ abstract class MediaDeviceInfo implements PlatformHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   String? groupId();
+
+  bool isFailed();
 }

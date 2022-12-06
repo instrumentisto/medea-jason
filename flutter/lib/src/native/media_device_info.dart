@@ -22,6 +22,9 @@ typedef _kind_Dart = int Function(Pointer);
 typedef _nativeGroupId_C = ForeignValue Function(Pointer);
 typedef _nativeGroupId_Dart = ForeignValue Function(Pointer);
 
+typedef _nativeIsFailed_C = Bool Function(Pointer);
+typedef _nativeIsFailed_Dart = bool Function(Pointer);
+
 typedef _free_C = Void Function(Pointer);
 typedef _free_Dart = void Function(Pointer);
 
@@ -35,6 +38,9 @@ final _label =
 
 final _deviceId = dl
     .lookupFunction<_deviceId_C, _deviceId_Dart>('MediaDeviceInfo__device_id');
+
+final _isFailed = dl.lookupFunction<_nativeIsFailed_C, _nativeIsFailed_Dart>(
+    'MediaDeviceInfo__is_failed');
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('MediaDeviceInfo__free');
 
@@ -67,6 +73,13 @@ class NativeMediaDeviceInfo extends MediaDeviceInfo {
   @override
   String? groupId() {
     return _nativeGroupId(ptr.getInnerPtr()).toDart();
+  }
+
+  @override
+  bool isFailed() {
+    var isFailed = _isFailed(ptr.getInnerPtr());
+    print("isFailed: $isFailed");
+    return isFailed;
   }
 
   @moveSemantics

@@ -36,6 +36,8 @@ mod media_device_info {
         pub fn group_id(
             info: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        pub fn is_failed(info: Dart_Handle) -> bool;
     }
 }
 
@@ -96,6 +98,12 @@ impl MediaDeviceInfo {
             media_device_info::group_id(self.handle.get()).unbox()
         })
         .unwrap()
+    }
+
+    pub fn is_failed(&self) -> bool {
+        unsafe {
+            media_device_info::is_failed(self.handle.get())
+        }
     }
 }
 

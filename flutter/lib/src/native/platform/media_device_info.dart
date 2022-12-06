@@ -14,6 +14,7 @@ void registerFunctions(DynamicLibrary dl) {
     label: Pointer.fromFunction(_label),
     groupId: Pointer.fromFunction(_groupId),
     kind: Pointer.fromFunction(_kind, 2),
+    isFailed: Pointer.fromFunction(_isFailed, true),
   );
 }
 
@@ -30,6 +31,10 @@ Pointer<Utf8> _label(MediaDeviceInfo deviceInfo) {
 /// Returns [MediaDeviceInfo.groupId] value.
 Pointer _groupId(MediaDeviceInfo deviceInfo) {
   return ForeignValue.none().intoRustOwned();
+}
+
+bool _isFailed(MediaDeviceInfo deviceInfo) {
+  return deviceInfo.isFailed;
 }
 
 /// Returns [MediaDeviceInfo.kind] value.
