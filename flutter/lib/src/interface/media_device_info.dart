@@ -42,5 +42,6 @@ abstract class MediaDeviceInfo implements PlatformHandle {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   String? groupId();
 
+  /// Returns flag which indicates that last attempt to use this device was failed.
   bool isFailed();
 }

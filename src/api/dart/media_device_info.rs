@@ -72,13 +72,13 @@ pub unsafe extern "C" fn MediaDeviceInfo__free(
     });
 }
 
+/// Returns flag which indicates that last attempt to use this device was
+/// failed.
 #[no_mangle]
 pub unsafe extern "C" fn MediaDeviceInfo__is_failed(
     this: ptr::NonNull<MediaDeviceInfo>,
 ) -> bool {
-    propagate_panic(move || {
-        this.as_ref().is_failed()
-    })
+    propagate_panic(move || this.as_ref().is_failed())
 }
 
 #[cfg(feature = "mockable")]
@@ -109,6 +109,11 @@ mod mock {
         #[must_use]
         pub fn group_id(&self) -> Option<String> {
             Some(String::from("MediaDeviceInfo.group_id"))
+        }
+
+        #[must_use]
+        pub const fn is_failed(&self) -> bool {
+            false
         }
     }
 }

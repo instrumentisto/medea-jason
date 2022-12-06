@@ -37,6 +37,8 @@ mod media_device_info {
             info: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
+        /// Returns flag which indicates that last attempt to use this device
+        /// was failed.
         pub fn is_failed(info: Dart_Handle) -> bool;
     }
 }
@@ -100,10 +102,11 @@ impl MediaDeviceInfo {
         .unwrap()
     }
 
+    /// Returns flag which indicates that last attempt to use this device was
+    /// failed.
+    #[must_use]
     pub fn is_failed(&self) -> bool {
-        unsafe {
-            media_device_info::is_failed(self.handle.get())
-        }
+        unsafe { media_device_info::is_failed(self.handle.get()) }
     }
 }
 

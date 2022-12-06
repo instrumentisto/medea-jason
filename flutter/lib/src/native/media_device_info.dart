@@ -78,7 +78,6 @@ class NativeMediaDeviceInfo extends MediaDeviceInfo {
   @override
   bool isFailed() {
     var isFailed = _isFailed(ptr.getInnerPtr());
-    print("isFailed: $isFailed");
     return isFailed;
   }
 
