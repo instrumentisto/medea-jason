@@ -857,6 +857,7 @@ impl PeerConnection {
         &self,
         offer: String,
     ) -> Result<(), Traced<RtcPeerConnectionError>> {
+        log::error!("set_remote_offer");
         self.set_remote_description(platform::SdpType::Offer(offer))
             .await
             .map_err(tracerr::wrap!())

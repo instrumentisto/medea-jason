@@ -75,6 +75,7 @@ impl Component {
         state: Rc<State>,
         description: Guarded<String>,
     ) -> Result<(), Traced<RtcPeerConnectionError>> {
+        log::error!("remote_sdp_changed 111");
         let (description, _guard) = description.into_parts();
         if let Some(role) = state.negotiation_role.get() {
             match role {
@@ -87,6 +88,7 @@ impl Component {
                     state.negotiation_role.set(None);
                 }
                 NegotiationRole::Answerer(_) => {
+                    log::error!("remote_sdp_changed 222");
                     peer.set_remote_offer(description)
                         .await
                         .map_err(tracerr::map_from_and_wrap!())?;
@@ -143,6 +145,10 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<sender::State>)>,
     ) -> Result<(), Traced<PeerWatcherError>> {
+        log::error!("sender_added 111");
+        let a = state.remote_sdp.when_all_processed().await;
+        let a = state.negotiation_role.when_all_processed().await;
+        log::error!("sender_added 222");
         let mut wait_futs = vec![state.when_all_receivers_processed().into()];
         if matches!(
             state.negotiation_role.get(),
@@ -383,12 +389,13 @@ impl Component {
     /// Waits for [`sender::Component`]s' and [`receiver::Component`]s'
     /// creation/update, updates local `MediaStream` (if required) and
     /// renegotiates [`PeerConnection`].
-    #[watch(self.negotiation_role.subscribe().filter_map(future::ready))]
+    #[watch(self.negotiation_role.subscribe().filter_map(transpose_guarded))]
     async fn negotiation_role_changed(
         _: Rc<PeerConnection>,
         state: Rc<State>,
-        role: NegotiationRole,
+        role: Guarded<NegotiationRole>,
     ) {
+        let (role, guard) = role.into_parts();
         match role {
             NegotiationRole::Offerer => {
                 medea_reactive::when_all_processed(vec![
@@ -406,15 +413,16 @@ impl Component {
             }
             NegotiationRole::Answerer(remote_sdp) => {
                 state.when_all_receivers_processed().await;
+                log::error!("negotiation_role_changed");
                 state.set_remote_sdp(remote_sdp);
 
-                medea_reactive::when_all_processed(vec![
-                    state.receivers.when_updated().into(),
-                    state.senders.when_all_processed().into(),
-                    state.remote_sdp.when_all_processed().into(),
-                    state.senders.when_updated().into(),
-                ])
-                .await;
+                // medea_reactive::when_all_processed(vec![
+                //     state.receivers.when_updated().into(),
+                //     state.senders.when_all_processed().into(),
+                //     state.remote_sdp.when_all_processed().into(),
+                //     state.senders.when_updated().into(),
+                // ])
+                // .await;
 
                 medea_reactive::when_all_processed(vec![
                     state.senders.when_stabilized().into(),
