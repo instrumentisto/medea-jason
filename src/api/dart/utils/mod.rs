@@ -35,6 +35,13 @@ pub struct DartFuture<O>(
     PhantomData<*const O>,
 );
 
+impl<O> DartFuture<O> {
+    // todo
+    pub fn into_raw(self) -> Dart_Handle {
+        self.0
+    }
+}
+
 /// Extension trait for a [`Future`] allowing to convert Rust [`Future`]s to
 /// [`DartFuture`]s.
 pub trait IntoDartFuture {
@@ -48,9 +55,6 @@ pub trait IntoDartFuture {
     /// __Note, that the Dart `Future` execution begins immediately and cannot
     /// be canceled.__
     fn into_dart_future(self) -> DartFuture<Self::Output>;
-
-    // todo
-    fn into_my_dart_future(self) -> MyDartFuture;
 }
 
 impl<Fut, Ok, Err> IntoDartFuture for Fut
@@ -75,22 +79,6 @@ where
             }
         });
         DartFuture(dart_future, PhantomData)
-    }
-
-    fn into_my_dart_future(self) -> MyDartFuture {
-        let completer = Completer::new();
-        let dart_future = completer.future();
-        spawn(async move {
-            match self.await {
-                Ok(ok) => {
-                    completer.complete(ok);
-                }
-                Err(e) => {
-                    completer.complete_error(e.into());
-                }
-            }
-        });
-        MyDartFuture::new(dart_future)
     }
 }
 

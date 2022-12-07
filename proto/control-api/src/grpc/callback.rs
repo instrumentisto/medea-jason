@@ -82,7 +82,7 @@ pub mod on_leave {
 pub mod callback_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with CallbackServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with CallbackServer.
     #[async_trait]
     pub trait Callback: Send + Sync + 'static {
         /// Fires when a certain callback event happens on a media server.

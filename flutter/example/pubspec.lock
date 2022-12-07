@@ -177,10 +177,10 @@ packages:
     description:
       path: frb_dart
       ref: temp-smdr
-      resolved-ref: ed3da33d0ba7634be175c4c1bc5e83305276b3f2
+      resolved-ref: "3d8fac2f694ac74709a51bfdf7e556dbe97ab20b"
       url: "https://github.com/rogurotus/flutter_rust_bridge.git"
     source: git
-    version: "1.51.0"
+    version: "1.53.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -278,7 +278,7 @@ packages:
     description:
       path: "."
       ref: temp-frb-deps
-      resolved-ref: "2a136943a1b76481ac63765de47e67e9aa411346"
+      resolved-ref: "8b9e8006ffd9b15f85d961469006825e316ef422"
       url: "https://github.com/instrumentisto/flutter-webrtc.git"
     source: git
     version: "0.8.0-dev"
