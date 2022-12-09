@@ -29,7 +29,6 @@ use medea_jason::{
     media::MediaKind,
     peer::PeerConnection,
     platform,
-    platform::TransceiverDirection,
     room::Room,
     rpc::MockRpcSession,
     utils::Updatable,
@@ -2737,8 +2736,6 @@ async fn intentions_are_sent_on_reconnect() {
 
 #[wasm_bindgen_test]
 async fn sender_answerer() {
-    wasm_logger::init(wasm_logger::Config::default());
-
     let (event_tx, event_rx) = mpsc::unbounded();
     let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
     let room_handle = api::RoomHandle::from(room.new_handle());

@@ -143,7 +143,6 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<sender::State>)>,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        // let a = state.negotiation_role.when_all_processed().await;
         let mut wait_futs = vec![
             state.negotiation_role.when_all_processed().into(),
             state.when_all_receivers_processed().into(),
@@ -195,7 +194,6 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) {
-        log::error!("receiver_added 1111");
         let ((_, rcvr_state), _guard) = val.into_parts();
         let conn = peer
             .connections
@@ -207,7 +205,6 @@ impl Component {
             &peer.recv_constraints,
         )
         .await;
-        log::error!("receiver_added 22222");
         peer.media_connections
             .insert_receiver(receiver::Component::new(
                 Rc::new(receiver),
@@ -413,7 +410,6 @@ impl Component {
                 .await;
             }
             NegotiationRole::Answerer(remote_sdp) => {
-                // state.when_all_receivers_processed().await;
                 state.set_remote_sdp(remote_sdp);
                 drop(guard);
 

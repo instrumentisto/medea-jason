@@ -190,7 +190,6 @@ impl State {
         track_id: TrackId,
         receiver: Rc<receiver::State>,
     ) {
-        log::error!("insert_receiver");
         self.receivers.insert(track_id, receiver);
     }
 
@@ -349,7 +348,6 @@ impl State {
                 );
             }
             proto::Direction::Recv { sender, mid } => {
-                log::error!("insert_track proto::Direction::Recv");
                 self.receivers.insert(
                     track.id,
                     Rc::new(receiver::State::new(
@@ -367,7 +365,7 @@ impl State {
     /// removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    fn when_all_senders_processed(&self) -> AllProcessed<'static> {
+    pub fn when_all_senders_processed(&self) -> AllProcessed<'static> {
         self.senders.when_all_processed()
     }
 

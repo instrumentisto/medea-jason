@@ -398,7 +398,8 @@ impl PeerConnection {
             peer.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
                     platform::spawn(async move {
-                        if let Err(mid) = c.add_remote_track(track, transceiver).await
+                        if let Err(mid) =
+                            c.add_remote_track(track, transceiver).await
                         {
                             log::error!(
                                 "Cannot add new remote track with mid={mid}",

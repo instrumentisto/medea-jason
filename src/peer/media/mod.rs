@@ -266,7 +266,7 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Iterator<Item=&sender::Component> {
+    ) -> impl Iterator<Item = &sender::Component> {
         self.senders
             .values()
             .filter(move |sender| sender.state().kind() == kind)
@@ -282,7 +282,7 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         source_kind: Option<MediaSourceKind>,
-    ) -> impl Iterator<Item=&receiver::Component> {
+    ) -> impl Iterator<Item = &receiver::Component> {
         self.receivers
             .values()
             .filter(move |s| s.state().kind() == kind)
@@ -319,7 +319,7 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         direction: platform::TransceiverDirection,
-    ) -> impl Future<Output=platform::Transceiver> + 'static {
+    ) -> impl Future<Output = platform::Transceiver> + 'static {
         self.peer.add_transceiver(kind, direction)
     }
 
@@ -329,7 +329,7 @@ impl InnerMediaConnections {
     fn get_transceiver_by_mid(
         &self,
         mid: String,
-    ) -> impl Future<Output=Option<platform::Transceiver>> + 'static {
+    ) -> impl Future<Output = Option<platform::Transceiver>> + 'static {
         self.peer.get_transceiver_by_mid(mid)
     }
 }
@@ -450,7 +450,7 @@ impl MediaConnections {
     /// from these [`MediaConnections`].
     pub fn get_transceivers_statuses(
         &self,
-    ) -> impl Future<Output=HashMap<TrackId, bool>> + 'static {
+    ) -> impl Future<Output = HashMap<TrackId, bool>> + 'static {
         let inner = self.0.borrow();
         let transceivers = inner
             .senders
@@ -504,7 +504,6 @@ impl MediaConnections {
 
     /// Inserts new [`receiver::Component`] into [`MediaConnections`].
     pub fn insert_receiver(&self, receiver: receiver::Component) {
-        log::error!("insert_receiver"); // asdasd
         drop(
             self.0
                 .borrow_mut()
@@ -592,9 +591,9 @@ impl MediaConnections {
                 Rc::clone(&sender).insert_track(track).await
             },
         ))
-            .await
-            .map(drop)
-            .map_err(tracerr::map_from_and_wrap!())?;
+        .await
+        .map(drop)
+        .map_err(tracerr::map_from_and_wrap!())?;
 
         Ok(media_exchange_state_updates)
     }
@@ -621,20 +620,12 @@ impl MediaConnections {
         // Cannot fail, since transceiver is guaranteed to be negotiated at this
         // point.
         let mid = transceiver.mid().ok_or("No Transceiver::mid found")?;
-        log::error!("asdasdasddas {}", self
-            .0
-            .borrow()
-            .receivers.values().count());
-
         let receiver = self
             .0
             .borrow()
             .receivers
             .values()
-            .find(|rcvr| {
-                log::error!("asdasd {:?} != {}", rcvr.mid(), mid);
-                rcvr.mid().as_ref() == Some(&mid)
-            })
+            .find(|rcvr| rcvr.mid().as_ref() == Some(&mid))
             .map(Component::obj);
 
         if let Some(rcvr) = receiver {
@@ -651,7 +642,7 @@ impl MediaConnections {
     /// insert it into the [`Receiver`].
     ///
     /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
-    pub fn sync_receivers(&self) -> impl Future<Output=()> + 'static {
+    pub fn sync_receivers(&self) -> impl Future<Output = ()> + 'static {
         future::join_all({
             self.0
                 .borrow()
@@ -678,7 +669,7 @@ impl MediaConnections {
                 })
                 .collect::<Vec<_>>()
         })
-            .map(drop)
+        .map(drop)
     }
 
     /// Returns all [`Sender`]s which are matches provided
@@ -695,7 +686,7 @@ impl MediaConnections {
                 (kinds.has(s.state().kind(), s.state().source_kind())
                     && s.state().enabled()
                     && !s.has_track())
-                    .then_some(s.state().id())
+                .then_some(s.state().id())
             })
             .collect()
     }
@@ -841,7 +832,7 @@ impl MediaConnections {
             send_constraints.clone(),
             mpsc::unbounded().0,
         )
-            .await?;
+        .await?;
 
         Ok(sender::Component::new(sender, Rc::new(sender_state)))
     }
@@ -862,7 +853,7 @@ impl MediaConnections {
             mpsc::unbounded().0,
             recv_constraints,
         )
-            .await;
+        .await;
 
         receiver::Component::new(Rc::new(receiver), Rc::new(state))
     }
@@ -906,7 +897,6 @@ impl MediaConnections {
                             recv_constraints,
                         )
                         .await;
-                    log::error!("create_tracks");
                     drop(
                         self.0
                             .borrow_mut()
