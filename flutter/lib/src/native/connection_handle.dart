@@ -1,3 +1,5 @@
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import 'package:medea_jason/src/native/remote_media_track.dart';
 import '../interface/connection_handle.dart';
 import '../interface/media_track.dart';
@@ -18,27 +20,43 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   String getRemoteMemberId() {
-    return api.connectionHandleGetRemoteMemberId(connection: opaque);
+    try {
+      return api.connectionHandleGetRemoteMemberId(connection: opaque);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onClose(void Function() f) {
-    api.connectionHandleOnClose(connection: opaque, f: f);
+    try {
+      api.connectionHandleOnClose(connection: opaque, f: f);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    api.connectionHandleOnRemoteTrackAdded(
-        connection: opaque,
-        f: (t) {
-          f(NativeRemoteMediaTrack(
-              api.remoteMediaTrackFromPtr(ptr: t.address)));
-        });
+    try {
+      api.connectionHandleOnRemoteTrackAdded(
+          connection: opaque,
+          f: (t) {
+            f(NativeRemoteMediaTrack(
+                api.remoteMediaTrackFromPtr(ptr: t.address)));
+          });
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    api.connectionHandleOnQualityScoreUpdate(connection: opaque, f: f);
+    try {
+      api.connectionHandleOnQualityScoreUpdate(connection: opaque, f: f);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @moveSemantics

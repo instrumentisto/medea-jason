@@ -82,6 +82,8 @@ abstract class ApiApi {
 
   /// Enables inbound video in this [`ConnectionHandle`].
   ///
+  /// Affects only video with the specific [`MediaSourceKind`], if specified.
+  ///
   /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
   Object connectionHandleEnableRemoteVideo(
       {required ConnectionHandle connection, int? sourceKind, dynamic hint});
@@ -90,6 +92,8 @@ abstract class ApiApi {
       get kConnectionHandleEnableRemoteVideoConstMeta;
 
   /// Disables inbound video in this [`ConnectionHandle`].
+  ///
+  /// Affects only video with the specific [`MediaSourceKind`], if specified.
   ///
   /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
   Object connectionHandleDisableRemoteVideo(
@@ -559,7 +563,7 @@ abstract class ApiApi {
   /// multiplied by the given `multiplier` until it reaches `max_delay_ms`.
   ///
   /// If `multiplier` is a negative number then it will be considered as `0.0`.
-  /// reconnect_handle might cause a busy loop, so it's not recommended.
+  /// This might cause a busy loop, so it's not recommended.
   ///
   /// Max elapsed time can be limited with an optional `max_elapsed_time_ms`
   /// argument.
@@ -584,7 +588,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackFromPtrConstMeta;
 
-  /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of track
+  /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
   /// [`RemoteMediaTrack`].
   ///
   /// [`MediaStreamTrack`]: platform::MediaStreamTrack
@@ -593,25 +597,25 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackGetTrackConstMeta;
 
-  /// Sets callback to invoke when track [`RemoteMediaTrack`] is muted.
+  /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
   void remoteMediaTrackOnMuted(
       {required RemoteMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnMutedConstMeta;
 
-  /// Sets callback to invoke when track [`RemoteMediaTrack`] is unmuted.
+  /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.
   void remoteMediaTrackOnUnmuted(
       {required RemoteMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnUnmutedConstMeta;
 
-  /// Sets callback to invoke when track [`RemoteMediaTrack`] is stopped.
+  /// Sets callback to invoke when this [`RemoteMediaTrack`] is stopped.
   void remoteMediaTrackOnStopped(
       {required RemoteMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnStoppedConstMeta;
 
-  /// Sets callback to invoke whenever track [`RemoteMediaTrack`]'s general
+  /// Sets callback to invoke whenever this [`RemoteMediaTrack`]'s general
   /// [`MediaDirection`] is changed.
   void remoteMediaTrackOnMediaDirectionChanged(
       {required RemoteMediaTrack track, required Object f, dynamic hint});
@@ -619,24 +623,23 @@ abstract class ApiApi {
   FlutterRustBridgeTaskConstMeta
       get kRemoteMediaTrackOnMediaDirectionChangedConstMeta;
 
-  /// Indicate whether track [`RemoteMediaTrack`] is muted.
+  /// Indicate whether this [`RemoteMediaTrack`] is muted.
   bool remoteMediaTrackMuted({required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMutedConstMeta;
 
-  /// Returns track [`RemoteMediaTrack`]'s kind (audio/video).
+  /// Returns this [`RemoteMediaTrack`]'s kind (audio/video).
   int remoteMediaTrackKind({required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackKindConstMeta;
 
-  /// Returns track [`RemoteMediaTrack`]'s media source kind.
+  /// Returns this [`RemoteMediaTrack`]'s media source kind.
   int remoteMediaTrackMediaSourceKind(
       {required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMediaSourceKindConstMeta;
 
-  /// Returns the current general [`MediaDirection`] of track
-  /// [`RemoteMediaTrack`].
+  /// Returns the current general [`MediaDirection`] of this [`RemoteMediaTrack`].
   int remoteMediaTrackMediaDirection(
       {required RemoteMediaTrack track, dynamic hint});
 
@@ -683,20 +686,20 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleJoinConstMeta;
 
-  /// Updates room_handle [`Room`]'s [`MediaStreamSettings`]. room_handle affects
-  /// all the [`PeerConnection`]s in room_handle [`Room`]. If
-  /// [`MediaStreamSettings`] are configured for some [`Room`], then room_handle
-  /// [`Room`] can only send media tracks that correspond to these settings.
-  /// [`MediaStreamSettings`] update will change media tracks in all sending
-  /// peers, so that might cause a new [getUserMedia()][1] request to happen.
+  /// Updates this [`Room`]'s [`MediaStreamSettings`]. This affects all the
+  /// [`PeerConnection`]s in this [`Room`]. If [`MediaStreamSettings`] are
+  /// configured for some [`Room`], then this [`Room`] can only send media tracks
+  /// that correspond to these settings. [`MediaStreamSettings`] update will
+  /// change media tracks in all sending peers, so that might cause a new
+  /// [getUserMedia()][1] request to happen.
   ///
   /// Media obtaining/injection errors are additionally fired to
   /// `on_failed_local_media` callback.
   ///
   /// If `stop_first` set to `true` then affected local `Tracks` will be
-  /// dropped before new [`MediaStreamSettings`] are applied. room_handle is
-  /// usually required when changing video source device due to hardware
-  /// limitations, e.g. having an active track sourced from device `A` may hinder
+  /// dropped before new [`MediaStreamSettings`] are applied. This is usually
+  /// required when changing video source device due to hardware limitations,
+  /// e.g. having an active track sourced from device `A` may hinder
   /// [getUserMedia()][1] requests to device `B`.
   ///
   /// `rollback_on_fail` option configures [`MediaStreamSettings`] update request
@@ -718,35 +721,35 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleSetLocalMediaSettingsConstMeta;
 
-  /// Mutes outbound audio in room_handle [`Room`].
+  /// Mutes outbound audio in this [`Room`].
   ///
   /// [`Room`]: crate::room::Room
   Object roomHandleMuteAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleMuteAudioConstMeta;
 
-  /// Unmutes outbound audio in room_handle [`Room`].
+  /// Unmutes outbound audio in this [`Room`].
   ///
   /// [`Room`]: crate::room::Room
   Object roomHandleUnmuteAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleUnmuteAudioConstMeta;
 
-  /// Enables outbound audio in room_handle [`Room`].
+  /// Enables outbound audio in this [`Room`].
   ///
   /// [`Room`]: crate::room::Room
   Object roomHandleEnableAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableAudioConstMeta;
 
-  /// Disables outbound audio in room_handle [`Room`].
+  /// Disables outbound audio in this [`Room`].
   ///
   /// [`Room`]: crate::room::Room
   Object roomHandleDisableAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableAudioConstMeta;
 
-  /// Mutes outbound video in room_handle [`Room`].
+  /// Mutes outbound video in this [`Room`].
   ///
   /// Affects only video with specific [`MediaSourceKind`] if specified.
   ///
@@ -756,7 +759,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleMuteVideoConstMeta;
 
-  /// Unmutes outbound video in room_handle [`Room`].
+  /// Unmutes outbound video in this [`Room`].
   ///
   /// Affects only video with specific [`MediaSourceKind`] if specified.
   ///
@@ -782,7 +785,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableVideoConstMeta;
 
-  /// Enables inbound audio in room_handle [`Room`].
+  /// Enables inbound audio in this [`Room`].
   ///
   /// [`Room`]: crate::room::Room
   Object roomHandleEnableRemoteAudio(
@@ -790,7 +793,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableRemoteAudioConstMeta;
 
-  /// Disables inbound audio in room_handle [`Room`].
+  /// Disables inbound audio in this [`Room`].
   ///
   /// [`Room`]: crate::room::Room
   Object roomHandleDisableRemoteAudio(
@@ -798,7 +801,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableRemoteAudioConstMeta;
 
-  /// Enables inbound video in room_handle [`Room`].
+  /// Enables inbound video in this [`Room`].
   ///
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
   ///
@@ -808,7 +811,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableRemoteVideoConstMeta;
 
-  /// Disables inbound video in room_handle [`Room`].
+  /// Disables inbound video in this [`Room`].
   ///
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
   ///
@@ -827,7 +830,7 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnNewConnectionConstMeta;
 
-  /// Sets callback, invoked on room_handle [`Room`] close, providing a
+  /// Sets callback, invoked on this [`Room`] close, providing a
   /// [`RoomCloseReason`].
   ///
   /// [`Room`]: crate::room::Room
@@ -837,10 +840,10 @@ abstract class ApiApi {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnCloseConstMeta;
 
-  /// Sets callback, invoked when a new [`LocalMediaTrack`] is added to
-  /// room_handle [`Room`].
+  /// Sets callback, invoked when a new [`LocalMediaTrack`] is added to this
+  /// [`Room`].
   ///
-  /// room_handle might happen in such cases:
+  /// This might happen in such cases:
   /// 1. Media server initiates a media request.
   /// 2. `enable_audio`/`enable_video` is called.
   /// 3. [`MediaStreamSettings`] updated via `set_local_media_settings`.
@@ -1385,7 +1388,7 @@ class ApiApiImpl implements ApiApi {
   Object connectionHandleEnableRemoteVideo(
       {required ConnectionHandle connection, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_connection_handle_enable_remote_video(arg0, arg1),
@@ -1406,7 +1409,7 @@ class ApiApiImpl implements ApiApi {
   Object connectionHandleDisableRemoteVideo(
       {required ConnectionHandle connection, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_connection_handle_disable_remote_video(arg0, arg1),
@@ -1471,7 +1474,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u8(facingMode);
+    var arg1 = _platform.api2wire_i64(facingMode);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_device_video_track_constraints_exact_facing_mode(arg0, arg1),
@@ -1519,7 +1522,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(exactHeight);
+    var arg1 = _platform.api2wire_i64(exactHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_device_video_track_constraints_exact_height(arg0, arg1),
@@ -1543,7 +1546,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(idealHeight);
+    var arg1 = _platform.api2wire_i64(idealHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_device_video_track_constraints_ideal_height(arg0, arg1),
@@ -1567,7 +1570,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(exactWidth);
+    var arg1 = _platform.api2wire_i64(exactWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_device_video_track_constraints_exact_width(arg0, arg1),
@@ -1591,7 +1594,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(idealWidth);
+    var arg1 = _platform.api2wire_i64(idealWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_device_video_track_constraints_ideal_width(arg0, arg1),
@@ -1643,8 +1646,8 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(min);
-    var arg2 = api2wire_u32(max);
+    var arg1 = _platform.api2wire_i64(min);
+    var arg2 = _platform.api2wire_i64(max);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_device_video_track_constraints_width_in_range(arg0, arg1, arg2),
@@ -1711,7 +1714,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(exactHeight);
+    var arg1 = _platform.api2wire_i64(exactHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_display_video_track_constraints_exact_height(arg0, arg1),
@@ -1735,7 +1738,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(idealHeight);
+    var arg1 = _platform.api2wire_i64(idealHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_display_video_track_constraints_ideal_height(arg0, arg1),
@@ -1759,7 +1762,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(exactWidth);
+    var arg1 = _platform.api2wire_i64(exactWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_display_video_track_constraints_exact_width(arg0, arg1),
@@ -1783,7 +1786,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(idealWidth);
+    var arg1 = _platform.api2wire_i64(idealWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_display_video_track_constraints_ideal_width(arg0, arg1),
@@ -1807,7 +1810,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(idealFrameRate);
+    var arg1 = _platform.api2wire_i64(idealFrameRate);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_display_video_track_constraints_ideal_frame_rate(arg0, arg1),
@@ -1831,7 +1834,7 @@ class ApiApiImpl implements ApiApi {
       dynamic hint}) {
     var arg0 =
         _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constraints);
-    var arg1 = api2wire_u32(exactFrameRate);
+    var arg1 = _platform.api2wire_i64(exactFrameRate);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_display_video_track_constraints_exact_frame_rate(arg0, arg1),
@@ -2525,8 +2528,8 @@ class ApiApiImpl implements ApiApi {
     var arg0 = _platform.api2wire_ReconnectHandle(reconnectHandle);
     var arg1 = _platform.api2wire_i64(startingDelay);
     var arg2 = api2wire_f64(multiplier);
-    var arg3 = api2wire_u32(maxDelay);
-    var arg4 = _platform.api2wire_opt_box_autoadd_u32(maxElapsedTimeMs);
+    var arg3 = _platform.api2wire_i64(maxDelay);
+    var arg4 = _platform.api2wire_opt_box_autoadd_i64(maxElapsedTimeMs);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_reconnect_handle_reconnect_with_backoff(
@@ -2937,7 +2940,7 @@ class ApiApiImpl implements ApiApi {
   Object roomHandleMuteVideo(
       {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_mute_video(arg0, arg1),
       parseSuccessData: _wire2api_SyncReturn_Object,
@@ -2956,7 +2959,7 @@ class ApiApiImpl implements ApiApi {
   Object roomHandleUnmuteVideo(
       {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_unmute_video(arg0, arg1),
       parseSuccessData: _wire2api_SyncReturn_Object,
@@ -2975,7 +2978,7 @@ class ApiApiImpl implements ApiApi {
   Object roomHandleEnableVideo(
       {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_enable_video(arg0, arg1),
       parseSuccessData: _wire2api_SyncReturn_Object,
@@ -2994,7 +2997,7 @@ class ApiApiImpl implements ApiApi {
   Object roomHandleDisableVideo(
       {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_disable_video(arg0, arg1),
       parseSuccessData: _wire2api_SyncReturn_Object,
@@ -3050,7 +3053,7 @@ class ApiApiImpl implements ApiApi {
   Object roomHandleEnableRemoteVideo(
       {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_room_handle_enable_remote_video(arg0, arg1),
@@ -3070,7 +3073,7 @@ class ApiApiImpl implements ApiApi {
   Object roomHandleDisableRemoteVideo(
       {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_u8(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_room_handle_disable_remote_video(arg0, arg1),
@@ -3555,11 +3558,6 @@ double api2wire_f64(double raw) {
 }
 
 @protected
-int api2wire_u32(int raw) {
-  return raw;
-}
-
-@protected
 int api2wire_u8(int raw) {
   return raw;
 }
@@ -3717,13 +3715,8 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
   }
 
   @protected
-  ffi.Pointer<ffi.Uint32> api2wire_box_autoadd_u32(int raw) {
-    return inner.new_box_autoadd_u32_0(api2wire_u32(raw));
-  }
-
-  @protected
-  ffi.Pointer<ffi.Uint8> api2wire_box_autoadd_u8(int raw) {
-    return inner.new_box_autoadd_u8_0(api2wire_u8(raw));
+  ffi.Pointer<ffi.Int64> api2wire_box_autoadd_i64(int raw) {
+    return inner.new_box_autoadd_i64_0(api2wire_i64(raw));
   }
 
   @protected
@@ -3732,13 +3725,8 @@ class ApiApiPlatform extends FlutterRustBridgeBase<ApiApiWire> {
   }
 
   @protected
-  ffi.Pointer<ffi.Uint32> api2wire_opt_box_autoadd_u32(int? raw) {
-    return raw == null ? ffi.nullptr : api2wire_box_autoadd_u32(raw);
-  }
-
-  @protected
-  ffi.Pointer<ffi.Uint8> api2wire_opt_box_autoadd_u8(int? raw) {
-    return raw == null ? ffi.nullptr : api2wire_box_autoadd_u8(raw);
+  ffi.Pointer<ffi.Int64> api2wire_opt_box_autoadd_i64(int? raw) {
+    return raw == null ? ffi.nullptr : api2wire_box_autoadd_i64(raw);
   }
 
   @protected
@@ -4161,7 +4149,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_connection_handle_enable_remote_video(
     wire_ConnectionHandle connection,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_connection_handle_enable_remote_video(
       connection,
@@ -4172,16 +4160,16 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_enable_remote_videoPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(
-                  wire_ConnectionHandle, ffi.Pointer<ffi.Uint8>)>>(
+                  wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>>(
       'wire_connection_handle_enable_remote_video');
   late final _wire_connection_handle_enable_remote_video =
       _wire_connection_handle_enable_remote_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_ConnectionHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_connection_handle_disable_remote_video(
     wire_ConnectionHandle connection,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_connection_handle_disable_remote_video(
       connection,
@@ -4192,12 +4180,12 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_disable_remote_videoPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(
-                  wire_ConnectionHandle, ffi.Pointer<ffi.Uint8>)>>(
+                  wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>>(
       'wire_connection_handle_disable_remote_video');
   late final _wire_connection_handle_disable_remote_video =
       _wire_connection_handle_disable_remote_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_ConnectionHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_device_video_track_constraints_new() {
     return _wire_device_video_track_constraints_new();
@@ -4245,7 +4233,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       _lookup<
               ffi.NativeFunction<
                   WireSyncReturnStruct Function(
-                      wire_ApiWrapDeviceVideoTrackConstraints, ffi.Uint8)>>(
+                      wire_ApiWrapDeviceVideoTrackConstraints, ffi.Int64)>>(
           'wire_device_video_track_constraints_exact_facing_mode');
   late final _wire_device_video_track_constraints_exact_facing_mode =
       _wire_device_video_track_constraints_exact_facing_modePtr.asFunction<
@@ -4286,7 +4274,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_device_video_track_constraints_exact_heightPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Uint32)>>('wire_device_video_track_constraints_exact_height');
+              ffi.Int64)>>('wire_device_video_track_constraints_exact_height');
   late final _wire_device_video_track_constraints_exact_height =
       _wire_device_video_track_constraints_exact_heightPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4305,7 +4293,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_device_video_track_constraints_ideal_heightPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Uint32)>>('wire_device_video_track_constraints_ideal_height');
+              ffi.Int64)>>('wire_device_video_track_constraints_ideal_height');
   late final _wire_device_video_track_constraints_ideal_height =
       _wire_device_video_track_constraints_ideal_heightPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4324,7 +4312,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_device_video_track_constraints_exact_widthPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Uint32)>>('wire_device_video_track_constraints_exact_width');
+              ffi.Int64)>>('wire_device_video_track_constraints_exact_width');
   late final _wire_device_video_track_constraints_exact_width =
       _wire_device_video_track_constraints_exact_widthPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4343,7 +4331,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_device_video_track_constraints_ideal_widthPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Uint32)>>('wire_device_video_track_constraints_ideal_width');
+              ffi.Int64)>>('wire_device_video_track_constraints_ideal_width');
   late final _wire_device_video_track_constraints_ideal_width =
       _wire_device_video_track_constraints_ideal_widthPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4389,8 +4377,8 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
           ffi.NativeFunction<
               WireSyncReturnStruct Function(
                   wire_ApiWrapDeviceVideoTrackConstraints,
-                  ffi.Uint32,
-                  ffi.Uint32)>>(
+                  ffi.Int64,
+                  ffi.Int64)>>(
       'wire_device_video_track_constraints_width_in_range');
   late final _wire_device_video_track_constraints_width_in_range =
       _wire_device_video_track_constraints_width_in_rangePtr.asFunction<
@@ -4441,10 +4429,10 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_display_video_track_constraints_exact_heightPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturnStruct Function(
-                  wire_ApiWrapDisplayVideoTrackConstraints, ffi.Uint32)>>(
-      'wire_display_video_track_constraints_exact_height');
+      ffi.NativeFunction<
+          WireSyncReturnStruct Function(
+              wire_ApiWrapDisplayVideoTrackConstraints,
+              ffi.Int64)>>('wire_display_video_track_constraints_exact_height');
   late final _wire_display_video_track_constraints_exact_height =
       _wire_display_video_track_constraints_exact_heightPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4461,10 +4449,10 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_display_video_track_constraints_ideal_heightPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturnStruct Function(
-                  wire_ApiWrapDisplayVideoTrackConstraints, ffi.Uint32)>>(
-      'wire_display_video_track_constraints_ideal_height');
+      ffi.NativeFunction<
+          WireSyncReturnStruct Function(
+              wire_ApiWrapDisplayVideoTrackConstraints,
+              ffi.Int64)>>('wire_display_video_track_constraints_ideal_height');
   late final _wire_display_video_track_constraints_ideal_height =
       _wire_display_video_track_constraints_ideal_heightPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4484,7 +4472,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       ffi.NativeFunction<
           WireSyncReturnStruct Function(
               wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Uint32)>>('wire_display_video_track_constraints_exact_width');
+              ffi.Int64)>>('wire_display_video_track_constraints_exact_width');
   late final _wire_display_video_track_constraints_exact_width =
       _wire_display_video_track_constraints_exact_widthPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4504,7 +4492,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       ffi.NativeFunction<
           WireSyncReturnStruct Function(
               wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Uint32)>>('wire_display_video_track_constraints_ideal_width');
+              ffi.Int64)>>('wire_display_video_track_constraints_ideal_width');
   late final _wire_display_video_track_constraints_ideal_width =
       _wire_display_video_track_constraints_ideal_widthPtr.asFunction<
           WireSyncReturnStruct Function(
@@ -4524,7 +4512,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       _lookup<
               ffi.NativeFunction<
                   WireSyncReturnStruct Function(
-                      wire_ApiWrapDisplayVideoTrackConstraints, ffi.Uint32)>>(
+                      wire_ApiWrapDisplayVideoTrackConstraints, ffi.Int64)>>(
           'wire_display_video_track_constraints_ideal_frame_rate');
   late final _wire_display_video_track_constraints_ideal_frame_rate =
       _wire_display_video_track_constraints_ideal_frame_ratePtr.asFunction<
@@ -4545,7 +4533,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
       _lookup<
               ffi.NativeFunction<
                   WireSyncReturnStruct Function(
-                      wire_ApiWrapDisplayVideoTrackConstraints, ffi.Uint32)>>(
+                      wire_ApiWrapDisplayVideoTrackConstraints, ffi.Int64)>>(
           'wire_display_video_track_constraints_exact_frame_rate');
   late final _wire_display_video_track_constraints_exact_frame_rate =
       _wire_display_video_track_constraints_exact_frame_ratePtr.asFunction<
@@ -5119,7 +5107,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
     int starting_delay,
     double multiplier,
     int max_delay,
-    ffi.Pointer<ffi.Uint32> max_elapsed_time_ms,
+    ffi.Pointer<ffi.Int64> max_elapsed_time_ms,
   ) {
     return _wire_reconnect_handle_reconnect_with_backoff(
       reconnect_handle,
@@ -5133,12 +5121,12 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_reconnect_handle_reconnect_with_backoffPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(wire_ReconnectHandle, ffi.Int64,
-                  ffi.Double, ffi.Uint32, ffi.Pointer<ffi.Uint32>)>>(
+                  ffi.Double, ffi.Int64, ffi.Pointer<ffi.Int64>)>>(
       'wire_reconnect_handle_reconnect_with_backoff');
   late final _wire_reconnect_handle_reconnect_with_backoff =
       _wire_reconnect_handle_reconnect_with_backoffPtr.asFunction<
           WireSyncReturnStruct Function(wire_ReconnectHandle, int, double, int,
-              ffi.Pointer<ffi.Uint32>)>();
+              ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_remote_media_track_from_ptr(
     int ptr,
@@ -5474,7 +5462,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_room_handle_mute_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_room_handle_mute_video(
       room_handle,
@@ -5485,15 +5473,15 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_mute_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Uint8>)>>('wire_room_handle_mute_video');
+              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_mute_video');
   late final _wire_room_handle_mute_video =
       _wire_room_handle_mute_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_room_handle_unmute_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_room_handle_unmute_video(
       room_handle,
@@ -5504,15 +5492,15 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_unmute_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Uint8>)>>('wire_room_handle_unmute_video');
+              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_unmute_video');
   late final _wire_room_handle_unmute_video =
       _wire_room_handle_unmute_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_room_handle_enable_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_room_handle_enable_video(
       room_handle,
@@ -5523,15 +5511,15 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_enable_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Uint8>)>>('wire_room_handle_enable_video');
+              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_enable_video');
   late final _wire_room_handle_enable_video =
       _wire_room_handle_enable_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_room_handle_disable_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_room_handle_disable_video(
       room_handle,
@@ -5542,11 +5530,11 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_disable_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Uint8>)>>('wire_room_handle_disable_video');
+              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_disable_video');
   late final _wire_room_handle_disable_video =
       _wire_room_handle_disable_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_room_handle_enable_remote_audio(
     wire_RoomHandle room_handle,
@@ -5580,7 +5568,7 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturnStruct wire_room_handle_enable_remote_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_room_handle_enable_remote_video(
       room_handle,
@@ -5591,15 +5579,15 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_enable_remote_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturnStruct Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Uint8>)>>('wire_room_handle_enable_remote_video');
+              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_enable_remote_video');
   late final _wire_room_handle_enable_remote_video =
       _wire_room_handle_enable_remote_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_room_handle_disable_remote_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Uint8> source_kind,
+    ffi.Pointer<ffi.Int64> source_kind,
   ) {
     return _wire_room_handle_disable_remote_video(
       room_handle,
@@ -5610,12 +5598,12 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_disable_remote_videoPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturnStruct Function(
-                  wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>>(
+                  wire_RoomHandle, ffi.Pointer<ffi.Int64>)>>(
       'wire_room_handle_disable_remote_video');
   late final _wire_room_handle_disable_remote_video =
       _wire_room_handle_disable_remote_videoPtr.asFunction<
           WireSyncReturnStruct Function(
-              wire_RoomHandle, ffi.Pointer<ffi.Uint8>)>();
+              wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
 
   WireSyncReturnStruct wire_room_handle_on_new_connection(
     wire_RoomHandle room_handle,
@@ -5890,33 +5878,19 @@ class ApiApiWire implements FlutterRustBridgeWireBase {
   late final _new_RoomHandle =
       _new_RoomHandlePtr.asFunction<wire_RoomHandle Function()>();
 
-  ffi.Pointer<ffi.Uint32> new_box_autoadd_u32_0(
+  ffi.Pointer<ffi.Int64> new_box_autoadd_i64_0(
     int value,
   ) {
-    return _new_box_autoadd_u32_0(
+    return _new_box_autoadd_i64_0(
       value,
     );
   }
 
-  late final _new_box_autoadd_u32_0Ptr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Uint32> Function(ffi.Uint32)>>(
-          'new_box_autoadd_u32_0');
-  late final _new_box_autoadd_u32_0 = _new_box_autoadd_u32_0Ptr
-      .asFunction<ffi.Pointer<ffi.Uint32> Function(int)>();
-
-  ffi.Pointer<ffi.Uint8> new_box_autoadd_u8_0(
-    int value,
-  ) {
-    return _new_box_autoadd_u8_0(
-      value,
-    );
-  }
-
-  late final _new_box_autoadd_u8_0Ptr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Uint8> Function(ffi.Uint8)>>(
-          'new_box_autoadd_u8_0');
-  late final _new_box_autoadd_u8_0 = _new_box_autoadd_u8_0Ptr
-      .asFunction<ffi.Pointer<ffi.Uint8> Function(int)>();
+  late final _new_box_autoadd_i64_0Ptr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int64> Function(ffi.Int64)>>(
+          'new_box_autoadd_i64_0');
+  late final _new_box_autoadd_i64_0 = _new_box_autoadd_i64_0Ptr
+      .asFunction<ffi.Pointer<ffi.Int64> Function(int)>();
 
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,

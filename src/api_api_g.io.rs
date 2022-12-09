@@ -70,7 +70,7 @@ pub extern "C" fn wire_connection_handle_disable_remote_audio(
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_enable_remote_video(
     connection: wire_ConnectionHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_enable_remote_video_impl(connection, source_kind)
 }
@@ -78,7 +78,7 @@ pub extern "C" fn wire_connection_handle_enable_remote_video(
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_disable_remote_video(
     connection: wire_ConnectionHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_connection_handle_disable_remote_video_impl(connection, source_kind)
 }
@@ -100,7 +100,7 @@ pub extern "C" fn wire_device_video_track_constraints_device_id(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_exact_facing_mode(
     constraints: wire_ApiWrapDeviceVideoTrackConstraints,
-    facing_mode: u8,
+    facing_mode: i64,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_exact_facing_mode_impl(
         constraints,
@@ -122,7 +122,7 @@ pub extern "C" fn wire_device_video_track_constraints_ideal_facing_mode(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_exact_height(
     constraints: wire_ApiWrapDeviceVideoTrackConstraints,
-    exact_height: u32,
+    exact_height: i64,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_exact_height_impl(
         constraints,
@@ -133,7 +133,7 @@ pub extern "C" fn wire_device_video_track_constraints_exact_height(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_ideal_height(
     constraints: wire_ApiWrapDeviceVideoTrackConstraints,
-    ideal_height: u32,
+    ideal_height: i64,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_ideal_height_impl(
         constraints,
@@ -144,7 +144,7 @@ pub extern "C" fn wire_device_video_track_constraints_ideal_height(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_exact_width(
     constraints: wire_ApiWrapDeviceVideoTrackConstraints,
-    exact_width: u32,
+    exact_width: i64,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_exact_width_impl(
         constraints,
@@ -155,7 +155,7 @@ pub extern "C" fn wire_device_video_track_constraints_exact_width(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_ideal_width(
     constraints: wire_ApiWrapDeviceVideoTrackConstraints,
-    ideal_width: u32,
+    ideal_width: i64,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_ideal_width_impl(
         constraints,
@@ -179,8 +179,8 @@ pub extern "C" fn wire_device_video_track_constraints_height_in_range(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constraints_width_in_range(
     constraints: wire_ApiWrapDeviceVideoTrackConstraints,
-    min: u32,
-    max: u32,
+    min: i64,
+    max: i64,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constraints_width_in_range_impl(
         constraints,
@@ -206,7 +206,7 @@ pub extern "C" fn wire_display_video_track_constraints_device_id(
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_exact_height(
     constraints: wire_ApiWrapDisplayVideoTrackConstraints,
-    exact_height: u32,
+    exact_height: i64,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_exact_height_impl(
         constraints,
@@ -217,7 +217,7 @@ pub extern "C" fn wire_display_video_track_constraints_exact_height(
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_ideal_height(
     constraints: wire_ApiWrapDisplayVideoTrackConstraints,
-    ideal_height: u32,
+    ideal_height: i64,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_ideal_height_impl(
         constraints,
@@ -228,7 +228,7 @@ pub extern "C" fn wire_display_video_track_constraints_ideal_height(
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_exact_width(
     constraints: wire_ApiWrapDisplayVideoTrackConstraints,
-    exact_width: u32,
+    exact_width: i64,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_exact_width_impl(
         constraints,
@@ -239,7 +239,7 @@ pub extern "C" fn wire_display_video_track_constraints_exact_width(
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_ideal_width(
     constraints: wire_ApiWrapDisplayVideoTrackConstraints,
-    ideal_width: u32,
+    ideal_width: i64,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_ideal_width_impl(
         constraints,
@@ -250,7 +250,7 @@ pub extern "C" fn wire_display_video_track_constraints_ideal_width(
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_ideal_frame_rate(
     constraints: wire_ApiWrapDisplayVideoTrackConstraints,
-    ideal_frame_rate: u32,
+    ideal_frame_rate: i64,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_ideal_frame_rate_impl(
         constraints,
@@ -261,7 +261,7 @@ pub extern "C" fn wire_display_video_track_constraints_ideal_frame_rate(
 #[no_mangle]
 pub extern "C" fn wire_display_video_track_constraints_exact_frame_rate(
     constraints: wire_ApiWrapDisplayVideoTrackConstraints,
-    exact_frame_rate: u32,
+    exact_frame_rate: i64,
 ) -> support::WireSyncReturnStruct {
     wire_display_video_track_constraints_exact_frame_rate_impl(
         constraints,
@@ -531,8 +531,8 @@ pub extern "C" fn wire_reconnect_handle_reconnect_with_backoff(
     reconnect_handle: wire_ReconnectHandle,
     starting_delay: i64,
     multiplier: f64,
-    max_delay: u32,
-    max_elapsed_time_ms: *mut u32,
+    max_delay: i64,
+    max_elapsed_time_ms: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_reconnect_handle_reconnect_with_backoff_impl(
         reconnect_handle,
@@ -699,7 +699,7 @@ pub extern "C" fn wire_room_handle_disable_audio(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_mute_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_mute_video_impl(room_handle, source_kind)
 }
@@ -707,7 +707,7 @@ pub extern "C" fn wire_room_handle_mute_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_unmute_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_unmute_video_impl(room_handle, source_kind)
 }
@@ -715,7 +715,7 @@ pub extern "C" fn wire_room_handle_unmute_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_enable_video_impl(room_handle, source_kind)
 }
@@ -723,7 +723,7 @@ pub extern "C" fn wire_room_handle_enable_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_disable_video_impl(room_handle, source_kind)
 }
@@ -745,7 +745,7 @@ pub extern "C" fn wire_room_handle_disable_remote_audio(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_remote_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_enable_remote_video_impl(room_handle, source_kind)
 }
@@ -753,7 +753,7 @@ pub extern "C" fn wire_room_handle_enable_remote_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_remote_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut u8,
+    source_kind: *mut i64,
 ) -> support::WireSyncReturnStruct {
     wire_room_handle_disable_remote_video_impl(room_handle, source_kind)
 }
@@ -896,12 +896,7 @@ pub extern "C" fn new_RoomHandle() -> wire_RoomHandle {
 }
 
 #[no_mangle]
-pub extern "C" fn new_box_autoadd_u32_0(value: u32) -> *mut u32 {
-    support::new_leak_box_ptr(value)
-}
-
-#[no_mangle]
-pub extern "C" fn new_box_autoadd_u8_0(value: u8) -> *mut u8 {
+pub extern "C" fn new_box_autoadd_i64_0(value: i64) -> *mut i64 {
     support::new_leak_box_ptr(value)
 }
 

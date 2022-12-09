@@ -161,7 +161,7 @@ fn wire_connection_handle_disable_remote_audio_impl(
 }
 fn wire_connection_handle_enable_remote_video_impl(
     connection: impl Wire2Api<RustOpaque<ConnectionHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -181,7 +181,7 @@ fn wire_connection_handle_enable_remote_video_impl(
 }
 fn wire_connection_handle_disable_remote_video_impl(
     connection: impl Wire2Api<RustOpaque<ConnectionHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -234,7 +234,7 @@ fn wire_device_video_track_constraints_device_id_impl(
 fn wire_device_video_track_constraints_exact_facing_mode_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    facing_mode: impl Wire2Api<u8> + UnwindSafe,
+    facing_mode: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -266,17 +266,17 @@ fn wire_device_video_track_constraints_ideal_facing_mode_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            device_video_track_constraints_ideal_facing_mode(
+            Ok(device_video_track_constraints_ideal_facing_mode(
                 api_constraints,
                 api_facing_mode,
-            )
+            ))
         },
     )
 }
 fn wire_device_video_track_constraints_exact_height_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    exact_height: impl Wire2Api<u32> + UnwindSafe,
+    exact_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -287,17 +287,17 @@ fn wire_device_video_track_constraints_exact_height_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_exact_height = exact_height.wire2api();
-            Ok(device_video_track_constraints_exact_height(
+            device_video_track_constraints_exact_height(
                 api_constraints,
                 api_exact_height,
-            ))
+            )
         },
     )
 }
 fn wire_device_video_track_constraints_ideal_height_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    ideal_height: impl Wire2Api<u32> + UnwindSafe,
+    ideal_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -308,17 +308,17 @@ fn wire_device_video_track_constraints_ideal_height_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_ideal_height = ideal_height.wire2api();
-            Ok(device_video_track_constraints_ideal_height(
+            device_video_track_constraints_ideal_height(
                 api_constraints,
                 api_ideal_height,
-            ))
+            )
         },
     )
 }
 fn wire_device_video_track_constraints_exact_width_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    exact_width: impl Wire2Api<u32> + UnwindSafe,
+    exact_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -329,17 +329,17 @@ fn wire_device_video_track_constraints_exact_width_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_exact_width = exact_width.wire2api();
-            Ok(device_video_track_constraints_exact_width(
+            device_video_track_constraints_exact_width(
                 api_constraints,
                 api_exact_width,
-            ))
+            )
         },
     )
 }
 fn wire_device_video_track_constraints_ideal_width_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    ideal_width: impl Wire2Api<u32> + UnwindSafe,
+    ideal_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -350,10 +350,10 @@ fn wire_device_video_track_constraints_ideal_width_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_ideal_width = ideal_width.wire2api();
-            Ok(device_video_track_constraints_ideal_width(
+            device_video_track_constraints_ideal_width(
                 api_constraints,
                 api_ideal_width,
-            ))
+            )
         },
     )
 }
@@ -384,8 +384,8 @@ fn wire_device_video_track_constraints_height_in_range_impl(
 fn wire_device_video_track_constraints_width_in_range_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    min: impl Wire2Api<u32> + UnwindSafe,
-    max: impl Wire2Api<u32> + UnwindSafe,
+    min: impl Wire2Api<i64> + UnwindSafe,
+    max: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -397,11 +397,11 @@ fn wire_device_video_track_constraints_width_in_range_impl(
             let api_constraints = constraints.wire2api();
             let api_min = min.wire2api();
             let api_max = max.wire2api();
-            Ok(device_video_track_constraints_width_in_range(
+            device_video_track_constraints_width_in_range(
                 api_constraints,
                 api_min,
                 api_max,
-            ))
+            )
         },
     )
 }
@@ -440,7 +440,7 @@ fn wire_display_video_track_constraints_device_id_impl(
 fn wire_display_video_track_constraints_exact_height_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
-    exact_height: impl Wire2Api<u32> + UnwindSafe,
+    exact_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -451,17 +451,17 @@ fn wire_display_video_track_constraints_exact_height_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_exact_height = exact_height.wire2api();
-            Ok(display_video_track_constraints_exact_height(
+            display_video_track_constraints_exact_height(
                 api_constraints,
                 api_exact_height,
-            ))
+            )
         },
     )
 }
 fn wire_display_video_track_constraints_ideal_height_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
-    ideal_height: impl Wire2Api<u32> + UnwindSafe,
+    ideal_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -472,17 +472,17 @@ fn wire_display_video_track_constraints_ideal_height_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_ideal_height = ideal_height.wire2api();
-            Ok(display_video_track_constraints_ideal_height(
+            display_video_track_constraints_ideal_height(
                 api_constraints,
                 api_ideal_height,
-            ))
+            )
         },
     )
 }
 fn wire_display_video_track_constraints_exact_width_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
-    exact_width: impl Wire2Api<u32> + UnwindSafe,
+    exact_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -493,17 +493,17 @@ fn wire_display_video_track_constraints_exact_width_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_exact_width = exact_width.wire2api();
-            Ok(display_video_track_constraints_exact_width(
+            display_video_track_constraints_exact_width(
                 api_constraints,
                 api_exact_width,
-            ))
+            )
         },
     )
 }
 fn wire_display_video_track_constraints_ideal_width_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
-    ideal_width: impl Wire2Api<u32> + UnwindSafe,
+    ideal_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -514,17 +514,17 @@ fn wire_display_video_track_constraints_ideal_width_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_ideal_width = ideal_width.wire2api();
-            Ok(display_video_track_constraints_ideal_width(
+            display_video_track_constraints_ideal_width(
                 api_constraints,
                 api_ideal_width,
-            ))
+            )
         },
     )
 }
 fn wire_display_video_track_constraints_ideal_frame_rate_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
-    ideal_frame_rate: impl Wire2Api<u32> + UnwindSafe,
+    ideal_frame_rate: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -535,17 +535,17 @@ fn wire_display_video_track_constraints_ideal_frame_rate_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_ideal_frame_rate = ideal_frame_rate.wire2api();
-            Ok(display_video_track_constraints_ideal_frame_rate(
+            display_video_track_constraints_ideal_frame_rate(
                 api_constraints,
                 api_ideal_frame_rate,
-            ))
+            )
         },
     )
 }
 fn wire_display_video_track_constraints_exact_frame_rate_impl(
     constraints: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
-    exact_frame_rate: impl Wire2Api<u32> + UnwindSafe,
+    exact_frame_rate: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -556,10 +556,10 @@ fn wire_display_video_track_constraints_exact_frame_rate_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_exact_frame_rate = exact_frame_rate.wire2api();
-            Ok(display_video_track_constraints_exact_frame_rate(
+            display_video_track_constraints_exact_frame_rate(
                 api_constraints,
                 api_exact_frame_rate,
-            ))
+            )
         },
     )
 }
@@ -1128,8 +1128,8 @@ fn wire_reconnect_handle_reconnect_with_backoff_impl(
     reconnect_handle: impl Wire2Api<RustOpaque<ReconnectHandle>> + UnwindSafe,
     starting_delay: impl Wire2Api<i64> + UnwindSafe,
     multiplier: impl Wire2Api<f64> + UnwindSafe,
-    max_delay: impl Wire2Api<u32> + UnwindSafe,
-    max_elapsed_time_ms: impl Wire2Api<Option<u32>> + UnwindSafe,
+    max_delay: impl Wire2Api<i64> + UnwindSafe,
+    max_elapsed_time_ms: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1478,7 +1478,7 @@ fn wire_room_handle_disable_audio_impl(
 }
 fn wire_room_handle_mute_video_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1495,7 +1495,7 @@ fn wire_room_handle_mute_video_impl(
 }
 fn wire_room_handle_unmute_video_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1512,7 +1512,7 @@ fn wire_room_handle_unmute_video_impl(
 }
 fn wire_room_handle_enable_video_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1529,7 +1529,7 @@ fn wire_room_handle_enable_video_impl(
 }
 fn wire_room_handle_disable_video_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1576,7 +1576,7 @@ fn wire_room_handle_disable_remote_audio_impl(
 }
 fn wire_room_handle_enable_remote_video_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1596,7 +1596,7 @@ fn wire_room_handle_enable_remote_video_impl(
 }
 fn wire_room_handle_disable_remote_video_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    source_kind: impl Wire2Api<Option<u8>> + UnwindSafe,
+    source_kind: impl Wire2Api<Option<i64>> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -1727,13 +1727,8 @@ impl Wire2Api<bool> for bool {
         self
     }
 }
-impl Wire2Api<u32> for *mut u32 {
-    fn wire2api(self) -> u32 {
-        unsafe { *support::box_from_leak_ptr(self) }
-    }
-}
-impl Wire2Api<u8> for *mut u8 {
-    fn wire2api(self) -> u8 {
+impl Wire2Api<i64> for *mut i64 {
+    fn wire2api(self) -> i64 {
         unsafe { *support::box_from_leak_ptr(self) }
     }
 }
@@ -1748,11 +1743,6 @@ impl Wire2Api<i64> for i64 {
     }
 }
 
-impl Wire2Api<u32> for u32 {
-    fn wire2api(self) -> u32 {
-        self
-    }
-}
 impl Wire2Api<u8> for u8 {
     fn wire2api(self) -> u8 {
         self

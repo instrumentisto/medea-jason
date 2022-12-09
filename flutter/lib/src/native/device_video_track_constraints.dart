@@ -1,3 +1,5 @@
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import '../interface/device_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
@@ -6,7 +8,8 @@ import 'jason.dart';
 
 class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  frb.ApiWrapDeviceVideoTrackConstraints opaque = api.deviceVideoTrackConstraintsNew();
+  frb.ApiWrapDeviceVideoTrackConstraints opaque =
+      api.deviceVideoTrackConstraintsNew();
 
   /// Constructs a new [DeviceVideoTrackConstraints] backed by the Rust struct behind the
   /// provided [frb.RefCellDeviceVideoTrackConstraints].
@@ -34,38 +37,62 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
 
   @override
   void exactHeight(int height) {
-    api.deviceVideoTrackConstraintsExactHeight(
-        constraints: opaque, exactHeight: height);
+    try {
+      api.deviceVideoTrackConstraintsExactHeight(
+          constraints: opaque, exactHeight: height);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void idealHeight(int height) {
-    api.deviceVideoTrackConstraintsIdealHeight(
-        constraints: opaque, idealHeight: height);
+    try {
+      api.deviceVideoTrackConstraintsIdealHeight(
+          constraints: opaque, idealHeight: height);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void heightInRange(int min, int max) {
-    api.deviceVideoTrackConstraintsHeightInRange(
-        constraints: opaque, min: min, max: max);
+    try {
+      api.deviceVideoTrackConstraintsHeightInRange(
+          constraints: opaque, min: min, max: max);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void exactWidth(int width) {
-    api.deviceVideoTrackConstraintsExactWidth(
-        constraints: opaque, exactWidth: width);
+    try {
+      api.deviceVideoTrackConstraintsExactWidth(
+          constraints: opaque, exactWidth: width);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void idealWidth(int width) {
-    api.deviceVideoTrackConstraintsIdealWidth(
-        constraints: opaque, idealWidth: width);
+    try {
+      api.deviceVideoTrackConstraintsIdealWidth(
+          constraints: opaque, idealWidth: width);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void widthInRange(int min, int max) {
-    api.deviceVideoTrackConstraintsWidthInRange(
-        constraints: opaque, min: min, max: max);
+    try {
+      api.deviceVideoTrackConstraintsWidthInRange(
+          constraints: opaque, min: min, max: max);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @moveSemantics

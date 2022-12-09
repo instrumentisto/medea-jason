@@ -1,6 +1,8 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import '../interface/media_device_info.dart';
 import '../interface/media_display_info.dart';
 import '../interface/media_manager.dart';
@@ -109,7 +111,11 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   void onDeviceChange(void Function() cb) {
-    api.mediaManagerHandleOnDeviceChange(manager: opaque, cb: cb);
+    try {
+      api.mediaManagerHandleOnDeviceChange(manager: opaque, cb: cb);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @moveSemantics

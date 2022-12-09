@@ -9,6 +9,7 @@ import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/api_api.g.dart' as frb;
+import 'ffi/box_handle.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
 import 'ffi/exception.dart' as exceptions;
@@ -43,6 +44,16 @@ void Function(String)? _onPanicCallback;
 /// NOT be used.
 void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
+}
+
+Object objectFromAnyhow(String handle) {
+  // todo regex
+  handle =
+      handle.replaceFirst('RESULT_ERROR: DartError(', '').replaceFirst(')', '');
+  var err_ptr = Pointer<Handle>.fromAddress(int.parse(handle));
+  var err = unboxDartHandle(err_ptr);
+  freeBoxedDartHandle(err_ptr);
+  return err;
 }
 
 frb.ApiApiImpl _api_load() {
@@ -123,8 +134,8 @@ class Jason extends base.Jason {
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    api.jasonCloseRoom(
-        jason: opaque, roomToDelete: (room as NativeRoomHandle).opaque);
+    (room as NativeRoomHandle).opaque.move = true;
+    api.jasonCloseRoom(jason: opaque, roomToDelete: room.opaque);
   }
 
   @override

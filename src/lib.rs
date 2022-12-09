@@ -124,4 +124,5 @@ pub mod platform;
 pub mod room;
 pub mod rpc;
 
+// #[cfg(not(feature = "mockable"))]
 mod api_api_g;

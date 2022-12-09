@@ -1,3 +1,5 @@
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import '../interface/display_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
@@ -17,38 +19,62 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
 
   @override
   void exactHeight(int height) {
-    api.displayVideoTrackConstraintsExactHeight(
-        constraints: opaque, exactHeight: height);
+    try {
+      api.displayVideoTrackConstraintsExactHeight(
+          constraints: opaque, exactHeight: height);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void idealHeight(int height) {
-    api.displayVideoTrackConstraintsIdealHeight(
-        constraints: opaque, idealHeight: height);
+    try {
+      api.displayVideoTrackConstraintsIdealHeight(
+          constraints: opaque, idealHeight: height);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void exactWidth(int width) {
-    api.displayVideoTrackConstraintsExactWidth(
-        constraints: opaque, exactWidth: width);
+    try {
+      api.displayVideoTrackConstraintsExactWidth(
+          constraints: opaque, exactWidth: width);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void idealWidth(int width) {
-    api.displayVideoTrackConstraintsIdealWidth(
-        constraints: opaque, idealWidth: width);
+    try {
+      api.displayVideoTrackConstraintsIdealWidth(
+          constraints: opaque, idealWidth: width);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void exactFrameRate(int frameRate) {
-    api.displayVideoTrackConstraintsExactFrameRate(
-        constraints: opaque, exactFrameRate: frameRate);
+    try {
+      api.displayVideoTrackConstraintsExactFrameRate(
+          constraints: opaque, exactFrameRate: frameRate);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void idealFrameRate(int frameRate) {
-    api.displayVideoTrackConstraintsIdealFrameRate(
-        constraints: opaque, idealFrameRate: frameRate);
+    try {
+      api.displayVideoTrackConstraintsIdealFrameRate(
+          constraints: opaque, idealFrameRate: frameRate);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override

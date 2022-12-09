@@ -1,3 +1,5 @@
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import '../interface/connection_handle.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/media_track.dart';
@@ -109,48 +111,71 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    api.roomHandleOnNewConnection(
-        roomHandle: opaque,
-        cb: (t) {
-          f(NativeConnectionHandle(
-              api.connectionHandleFromPtr(ptr: t.address)));
-        });
+    try {
+      api.roomHandleOnNewConnection(
+          roomHandle: opaque,
+          cb: (t) {
+            f(NativeConnectionHandle(
+                api.connectionHandleFromPtr(ptr: t.address)));
+          });
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    api.roomHandleOnClose(
-        roomHandle: opaque,
-        cb: (t) {
-          f(NativeRoomCloseReason(api.roomCloseReasonFromPtr(ptr: t.address)));
-        });
+    try {
+      api.roomHandleOnClose(
+          roomHandle: opaque,
+          cb: (t) {
+            f(NativeRoomCloseReason(
+                api.roomCloseReasonFromPtr(ptr: t.address)));
+          });
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    api.roomHandleOnLocalTrack(
-        roomHandle: opaque,
-        cb: (t) {
-          f(NativeLocalMediaTrack(api.localMediaTrackFromPtr(ptr: t.address)));
-        });
+    try {
+      api.roomHandleOnLocalTrack(
+          roomHandle: opaque,
+          cb: (t) {
+            f(NativeLocalMediaTrack(
+                api.localMediaTrackFromPtr(ptr: t.address)));
+          });
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    api.roomHandleOnConnectionLoss(
-        roomHandle: opaque,
-        cb: (t) {
-          f(NativeReconnectHandle(api.reconnectHandleFromPtr(ptr: t.address)));
-        });
+    try {
+      api.roomHandleOnConnectionLoss(
+          roomHandle: opaque,
+          cb: (t) {
+            f(NativeReconnectHandle(
+                api.reconnectHandleFromPtr(ptr: t.address)));
+          });
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    api.roomHandleOnFailedLocalMedia(
-        roomHandle: opaque,
-        cb: (err) {
-          f(err);
-        });
+    try {
+      api.roomHandleOnFailedLocalMedia(
+          roomHandle: opaque,
+          cb: (err) {
+            f(err);
+          });
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow.message);
+    }
   }
 
   @moveSemantics
