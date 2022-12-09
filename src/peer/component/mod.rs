@@ -361,8 +361,8 @@ impl State {
         }
     }
 
-    /// Returns [`Future`] resolving once all [`State::senders`]' inserts and
-    /// removes are processed.
+    /// Returns [`Future`] resolving once all senders inserts and removes are
+    /// processed.
     ///
     /// [`Future`]: std::future::Future
     pub fn when_all_senders_processed(&self) -> AllProcessed<'static> {
