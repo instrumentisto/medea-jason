@@ -23,7 +23,7 @@ class NativeConnectionHandle extends ConnectionHandle {
     try {
       return api.connectionHandleGetRemoteMemberId(connection: opaque);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -32,7 +32,7 @@ class NativeConnectionHandle extends ConnectionHandle {
     try {
       api.connectionHandleOnClose(connection: opaque, f: f);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -46,7 +46,7 @@ class NativeConnectionHandle extends ConnectionHandle {
                 api.remoteMediaTrackFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -55,7 +55,7 @@ class NativeConnectionHandle extends ConnectionHandle {
     try {
       api.connectionHandleOnQualityScoreUpdate(connection: opaque, f: f);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -72,24 +72,24 @@ class NativeConnectionHandle extends ConnectionHandle {
   @override
   Future<void> enableRemoteAudio() async {
     await (api.connectionHandleEnableRemoteAudio(connection: opaque)
-        as Future<void>);
+        as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
     await (api.connectionHandleDisableRemoteAudio(connection: opaque)
-        as Future<void>);
+        as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
     await (api.connectionHandleEnableRemoteVideo(connection: opaque)
-        as Future<void>);
+        as Future);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     await (api.connectionHandleDisableRemoteVideo(connection: opaque)
-        as Future<void>);
+        as Future);
   }
 }

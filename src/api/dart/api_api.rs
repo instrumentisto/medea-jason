@@ -1,5 +1,8 @@
 pub use super::utils::{ApiWrap, IntoDartFuture};
-use super::{utils::new_dart_opaque, ForeignClass};
+use super::{
+    utils::{dart_enum_try_into, new_dart_opaque},
+    ForeignClass,
+};
 use crate::{api::dart::DartError, room::ChangeMediaStateError};
 use flutter_rust_bridge::{DartOpaque, RustOpaque, SyncReturn};
 use std::{
@@ -160,6 +163,7 @@ pub fn connection_handle_enable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<i64>,
 ) -> SyncReturn<DartOpaque> {
+    // here
     let fut = connection.enable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
     );
@@ -185,6 +189,7 @@ pub fn connection_handle_disable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<i64>,
 ) -> SyncReturn<DartOpaque> {
+    // here
     let fut = connection.disable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
     );
@@ -206,7 +211,7 @@ pub fn connection_handle_disable_remote_video(
 pub use crate::media::DeviceVideoTrackConstraints;
 use crate::{
     api::Error,
-    media::{FacingMode, InitLocalTracksError, MediaSourceKind},
+    media::{InitLocalTracksError, MediaSourceKind},
     platform,
 };
 
@@ -235,10 +240,19 @@ pub fn device_video_track_constraints_device_id(
 pub fn device_video_track_constraints_exact_facing_mode(
     constraints: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     facing_mode: i64,
-) -> SyncReturn<()> {
+) -> anyhow::Result<SyncReturn<()>> {
     let mut constraints = constraints.borrow_mut();
-    constraints.exact_facing_mode(FacingMode::try_from(facing_mode).unwrap());
-    SyncReturn(())
+    constraints.exact_facing_mode(facing_mode.try_into().map_err(|v| {
+        anyhow::anyhow!(
+            "{:?}",
+            DartError::from(ArgumentError::new(
+                v,
+                "facing_mode",
+                "Invalid value"
+            ))
+        )
+    })?);
+    Ok(SyncReturn(()))
 }
 
 /// Sets an ideal [facingMode][1] constraint.
@@ -247,10 +261,19 @@ pub fn device_video_track_constraints_exact_facing_mode(
 pub fn device_video_track_constraints_ideal_facing_mode(
     constraints: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     facing_mode: i64,
-) -> SyncReturn<()> {
+) -> anyhow::Result<SyncReturn<()>> {
     let mut constraints = constraints.borrow_mut();
-    constraints.ideal_facing_mode(FacingMode::try_from(facing_mode).unwrap());
-    SyncReturn(())
+    constraints.ideal_facing_mode(facing_mode.try_into().map_err(|v| {
+        anyhow::anyhow!(
+            "{:?}",
+            DartError::from(ArgumentError::new(
+                v,
+                "facing_mode",
+                "Invalid value"
+            ))
+        )
+    })?);
+    Ok(SyncReturn(()))
 }
 
 /// Sets an exact [height][1] constraint.
@@ -559,7 +582,7 @@ pub fn vec_local_tracks_from_ptr(
     ptr: usize,
 ) -> SyncReturn<RustOpaque<ApiWrap<Vec<LocalMediaTrack>>>> {
     SyncReturn(unsafe {
-        RustOpaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+        RustOpaque::new(ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))
     })
 }
 
@@ -620,7 +643,7 @@ pub fn vec_media_device_info_from_ptr(
     ptr: usize,
 ) -> SyncReturn<RustOpaque<ApiWrap<Vec<MediaDeviceInfo>>>> {
     SyncReturn(unsafe {
-        RustOpaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+        RustOpaque::new(ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))
     })
 }
 
@@ -685,9 +708,7 @@ pub use crate::platform::MediaDisplayInfo;
 pub fn vec_media_display_info_from_ptr(
     ptr: usize,
 ) -> SyncReturn<RustOpaque<ApiWrap<Vec<MediaDisplayInfo>>>> {
-    SyncReturn(unsafe {
-        RustOpaque::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-    })
+    SyncReturn(RustOpaque::new(unsafe{ ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap())}))
 }
 
 // todo
@@ -739,10 +760,10 @@ pub fn media_manager_handle_init_local_tracks(
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
-                Ok::<RustOpaque<_>, Traced<InitLocalTracksError>>(
-                    RustOpaque::new(ApiWrap::new(
+                Ok::<ApiWrap<_>, Traced<InitLocalTracksError>>(
+                    ApiWrap::new(
                         manager.init_local_tracks(caps).await?,
-                    )),
+                    ),
                 )
             }
             .into_dart_future()
@@ -761,10 +782,10 @@ pub fn media_manager_handle_enumerate_devices(
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
-                Ok::<RustOpaque<_>, Traced<EnumerateDevicesError>>(
-                    RustOpaque::new(ApiWrap::new(
+                Ok::<ApiWrap<_>, Traced<EnumerateDevicesError>>(
+                    ApiWrap::new(
                         manager.enumerate_devices().await?,
-                    )),
+                    ),
                 )
             }
             .into_dart_future()
@@ -783,8 +804,8 @@ pub fn media_manager_handle_enumerate_displays(
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
-                Ok::<RustOpaque<_>, Traced<EnumerateDisplaysError>>(
-                    RustOpaque::new(manager.enumerate_displays().await?),
+                Ok::<ApiWrap<_>, Traced<EnumerateDisplaysError>>(
+                    ApiWrap::new(manager.enumerate_displays().await?),
                 )
             }
             .into_dart_future()
@@ -1400,11 +1421,13 @@ pub fn room_handle_disable_audio(
 pub fn room_handle_mute_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<i64>,
-) -> SyncReturn<DartOpaque> {
+) -> anyhow::Result<SyncReturn<DartOpaque>> {
     let room_handle = RoomHandle::clone(&room_handle);
-
-    let fut = room_handle
-        .mute_video(source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()));
+    let fut = room_handle.mute_video(dart_enum_try_into!(
+        source_kind,
+        "kind",
+        "Invalid value"
+    ));
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
@@ -1415,7 +1438,7 @@ pub fn room_handle_mute_video(
             .into_raw(),
         )
     };
-    SyncReturn(dart_opaque)
+    Ok(SyncReturn(dart_opaque))
 }
 
 /// Unmutes outbound video in this [`Room`].
@@ -1426,12 +1449,14 @@ pub fn room_handle_mute_video(
 pub fn room_handle_unmute_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<i64>,
-) -> SyncReturn<DartOpaque> {
+) -> anyhow::Result<SyncReturn<DartOpaque>> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    let fut = room_handle.unmute_video(
-        source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
-    );
+    let fut = room_handle.unmute_video(dart_enum_try_into!(
+        source_kind,
+        "kind",
+        "Invalid value"
+    ));
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
@@ -1442,7 +1467,7 @@ pub fn room_handle_unmute_video(
             .into_raw(),
         )
     };
-    SyncReturn(dart_opaque)
+    Ok(SyncReturn(dart_opaque))
 }
 
 /// Enables outbound video.
@@ -1451,12 +1476,14 @@ pub fn room_handle_unmute_video(
 pub fn room_handle_enable_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<i64>,
-) -> SyncReturn<DartOpaque> {
+) -> anyhow::Result<SyncReturn<DartOpaque>> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    let fut = room_handle.enable_video(
-        source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
-    );
+    let fut = room_handle.enable_video(dart_enum_try_into!(
+        source_kind,
+        "kind",
+        "Invalid value"
+    ));
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
@@ -1467,7 +1494,7 @@ pub fn room_handle_enable_video(
             .into_raw(),
         )
     };
-    SyncReturn(dart_opaque)
+    Ok(SyncReturn(dart_opaque))
 }
 
 /// Disables outbound video.
@@ -1476,12 +1503,14 @@ pub fn room_handle_enable_video(
 pub fn room_handle_disable_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<i64>,
-) -> SyncReturn<DartOpaque> {
+) -> anyhow::Result<SyncReturn<DartOpaque>> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    let fut = room_handle.disable_video(
-        source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
-    );
+    let fut = room_handle.disable_video(dart_enum_try_into!(
+        source_kind,
+        "kind",
+        "Invalid value"
+    ));
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
@@ -1492,7 +1521,7 @@ pub fn room_handle_disable_video(
             .into_raw(),
         )
     };
-    SyncReturn(dart_opaque)
+    Ok(SyncReturn(dart_opaque))
 }
 
 /// Enables inbound audio in this [`Room`].
@@ -1547,12 +1576,14 @@ pub fn room_handle_disable_remote_audio(
 pub fn room_handle_enable_remote_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<i64>,
-) -> SyncReturn<DartOpaque> {
+) -> anyhow::Result<SyncReturn<DartOpaque>> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    let fut = room_handle.enable_remote_video(
-        source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
-    );
+    let fut = room_handle.enable_remote_video(dart_enum_try_into!(
+        source_kind,
+        "kind",
+        "Invalid value"
+    ));
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
@@ -1563,7 +1594,7 @@ pub fn room_handle_enable_remote_video(
             .into_raw(),
         )
     };
-    SyncReturn(dart_opaque)
+    Ok(SyncReturn(dart_opaque))
 }
 
 /// Disables inbound video in this [`Room`].
@@ -1574,13 +1605,15 @@ pub fn room_handle_enable_remote_video(
 pub fn room_handle_disable_remote_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<i64>,
-) -> SyncReturn<DartOpaque> {
+) -> anyhow::Result<SyncReturn<DartOpaque>> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    let fut = room_handle.disable_remote_video(
-        source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
-    );
-    SyncReturn(unsafe {
+    let fut = room_handle.disable_remote_video(dart_enum_try_into!(
+        source_kind,
+        "kind",
+        "Invalid value"
+    ));
+    Ok(SyncReturn(unsafe {
         new_dart_opaque(
             async move {
                 fut.await?;
@@ -1589,7 +1622,7 @@ pub fn room_handle_disable_remote_video(
             .into_dart_future()
             .into_raw(),
         )
-    })
+    }))
 }
 
 /// Sets callback, invoked when a new [`Connection`] with some remote `Peer`

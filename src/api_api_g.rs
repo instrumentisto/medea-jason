@@ -245,10 +245,10 @@ fn wire_device_video_track_constraints_exact_facing_mode_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            Ok(device_video_track_constraints_exact_facing_mode(
+            device_video_track_constraints_exact_facing_mode(
                 api_constraints,
                 api_facing_mode,
-            ))
+            )
         },
     )
 }
@@ -266,10 +266,10 @@ fn wire_device_video_track_constraints_ideal_facing_mode_impl(
         move || {
             let api_constraints = constraints.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            Ok(device_video_track_constraints_ideal_facing_mode(
+            device_video_track_constraints_ideal_facing_mode(
                 api_constraints,
                 api_facing_mode,
-            ))
+            )
         },
     )
 }
@@ -1489,7 +1489,7 @@ fn wire_room_handle_mute_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            Ok(room_handle_mute_video(api_room_handle, api_source_kind))
+            room_handle_mute_video(api_room_handle, api_source_kind)
         },
     )
 }
@@ -1506,7 +1506,7 @@ fn wire_room_handle_unmute_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            Ok(room_handle_unmute_video(api_room_handle, api_source_kind))
+            room_handle_unmute_video(api_room_handle, api_source_kind)
         },
     )
 }
@@ -1523,7 +1523,7 @@ fn wire_room_handle_enable_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            Ok(room_handle_enable_video(api_room_handle, api_source_kind))
+            room_handle_enable_video(api_room_handle, api_source_kind)
         },
     )
 }
@@ -1540,7 +1540,7 @@ fn wire_room_handle_disable_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            Ok(room_handle_disable_video(api_room_handle, api_source_kind))
+            room_handle_disable_video(api_room_handle, api_source_kind)
         },
     )
 }
@@ -1587,10 +1587,7 @@ fn wire_room_handle_enable_remote_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            Ok(room_handle_enable_remote_video(
-                api_room_handle,
-                api_source_kind,
-            ))
+            room_handle_enable_remote_video(api_room_handle, api_source_kind)
         },
     )
 }
@@ -1607,10 +1604,7 @@ fn wire_room_handle_disable_remote_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            Ok(room_handle_disable_remote_video(
-                api_room_handle,
-                api_source_kind,
-            ))
+            room_handle_disable_remote_video(api_room_handle, api_source_kind)
         },
     )
 }

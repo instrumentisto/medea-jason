@@ -97,4 +97,21 @@ macro_rules! dart_arg_try_into {
     };
 }
 
+// todo
+macro_rules! dart_enum_try_into {
+    ($k:expr, $name:expr, $message:expr) => {
+        if let Some(kind) = $k {
+            Some(kind.try_into().map_err(|err| {
+                anyhow::anyhow!(
+                    "{:?}",
+                    DartError::from(ArgumentError::new(err, $name, $message))
+                )
+            })?)
+        } else {
+            None
+        }
+    };
+}
+
 pub(crate) use dart_arg_try_into;
+pub(crate) use dart_enum_try_into;

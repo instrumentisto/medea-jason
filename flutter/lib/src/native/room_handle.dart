@@ -29,7 +29,7 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> join(String token) async {
     await (api.roomHandleJoin(roomHandle: opaque, token: token)
-        as Future<void>);
+        as Future);
   }
 
   @override
@@ -39,74 +39,74 @@ class NativeRoomHandle extends RoomHandle {
         roomHandle: opaque,
         settings: (settings as MediaStreamSettings).opaque,
         stopFirst: stopFirst,
-        rollbackOnFail: rollbackOnFail) as Future<void>);
+        rollbackOnFail: rollbackOnFail) as Future);
   }
 
   @override
   Future<void> muteAudio() async {
-    await (api.roomHandleMuteAudio(roomHandle: opaque) as Future<void>);
+    await (api.roomHandleMuteAudio(roomHandle: opaque) as Future);
   }
 
   @override
   Future<void> unmuteAudio() async {
-    await (api.roomHandleUnmuteAudio(roomHandle: opaque) as Future<void>);
+    await (api.roomHandleUnmuteAudio(roomHandle: opaque) as Future);
   }
 
   @override
   Future<void> enableAudio() async {
-    await (api.roomHandleEnableAudio(roomHandle: opaque) as Future<void>);
+    await (api.roomHandleEnableAudio(roomHandle: opaque) as Future);
   }
 
   @override
   Future<void> disableAudio() async {
-    await (api.roomHandleDisableAudio(roomHandle: opaque) as Future<void>);
+    await (api.roomHandleDisableAudio(roomHandle: opaque) as Future);
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
     await (api.roomHandleMuteVideo(roomHandle: opaque, sourceKind: kind?.index)
-        as Future<void>);
+        as Future);
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
     await (api.roomHandleUnmuteVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
+        roomHandle: opaque, sourceKind: kind?.index) as Future);
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
     await (api.roomHandleEnableVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
+        roomHandle: opaque, sourceKind: kind?.index) as Future);
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
     await (api.roomHandleDisableVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
+        roomHandle: opaque, sourceKind: kind?.index) as Future);
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (api.roomHandleEnableRemoteAudio(roomHandle: opaque) as Future<void>);
+    await (api.roomHandleEnableRemoteAudio(roomHandle: opaque) as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
     await (api.roomHandleDisableRemoteAudio(roomHandle: opaque)
-        as Future<void>);
+        as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
     await (api.roomHandleEnableRemoteVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
+        roomHandle: opaque, sourceKind: kind?.index) as Future);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     await (api.roomHandleDisableRemoteVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future<void>);
+        roomHandle: opaque, sourceKind: kind?.index) as Future);
   }
 
   @override
@@ -119,7 +119,7 @@ class NativeRoomHandle extends RoomHandle {
                 api.connectionHandleFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -133,7 +133,7 @@ class NativeRoomHandle extends RoomHandle {
                 api.roomCloseReasonFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -147,7 +147,7 @@ class NativeRoomHandle extends RoomHandle {
                 api.localMediaTrackFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -161,7 +161,7 @@ class NativeRoomHandle extends RoomHandle {
                 api.reconnectHandleFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -174,7 +174,7 @@ class NativeRoomHandle extends RoomHandle {
             f(err);
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 

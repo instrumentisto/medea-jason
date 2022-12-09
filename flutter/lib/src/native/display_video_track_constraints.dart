@@ -23,7 +23,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstraintsExactHeight(
           constraints: opaque, exactHeight: height);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -33,7 +33,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstraintsIdealHeight(
           constraints: opaque, idealHeight: height);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -43,7 +43,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstraintsExactWidth(
           constraints: opaque, exactWidth: width);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -53,7 +53,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstraintsIdealWidth(
           constraints: opaque, idealWidth: width);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -63,7 +63,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstraintsExactFrameRate(
           constraints: opaque, exactFrameRate: frameRate);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -73,7 +73,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstraintsIdealFrameRate(
           constraints: opaque, idealFrameRate: frameRate);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 

@@ -3,6 +3,8 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
@@ -26,6 +28,7 @@ import 'room_handle.dart';
 typedef _onPanic_C = Void Function(Handle);
 typedef _onPanic_Dart = void Function(Object);
 
+// todo ?
 late frb.ApiApiImpl api = _api_load();
 late DynamicLibrary dl;
 
@@ -46,7 +49,11 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
-Object objectFromAnyhow(String handle) {
+Object objectFromAnyhow(FfiException error) {
+  if (!error.message.contains('RESULT_ERROR: DartError')) {
+    throw error;
+  }
+  var handle = error.message;
   // todo regex
   handle =
       handle.replaceFirst('RESULT_ERROR: DartError(', '').replaceFirst(')', '');

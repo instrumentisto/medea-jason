@@ -17,7 +17,7 @@ class NativeReconnectHandle extends ReconnectHandle {
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
     await (api.reconnectHandleReconnectWithDelay(
-        reconnectHandle: opaque, delayMs: delayMs) as Future<void>);
+        reconnectHandle: opaque, delayMs: delayMs) as Future);
   }
 
   @override
@@ -29,7 +29,7 @@ class NativeReconnectHandle extends ReconnectHandle {
         startingDelay: startingDelayMs,
         multiplier: multiplier,
         maxDelay: maxDelay,
-        maxElapsedTimeMs: maxElapsedTimeMs) as Future<void>);
+        maxElapsedTimeMs: maxElapsedTimeMs) as Future);
   }
 
   @moveSemantics

@@ -6,7 +6,7 @@ use std::{
     panic::{RefUnwindSafe, UnwindSafe},
 };
 
-use crate::platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined;
+use crate::{platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined, api::ForeignClass};
 
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
     DartOpaque::new_non_dropable(Dart_NewPersistentHandle_DL_Trampolined(
@@ -34,3 +34,4 @@ impl<T> From<T> for ApiWrap<T> {
 
 impl<T> UnwindSafe for ApiWrap<T> {}
 impl<T> RefUnwindSafe for ApiWrap<T> {}
+impl<T> ForeignClass for ApiWrap<T> {}

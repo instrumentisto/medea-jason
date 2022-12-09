@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
@@ -21,7 +22,7 @@ void main() {
 
     expect(() => jason.mediaManager(), returnsNormally);
     expect(() => jason.closeRoom(room), returnsNormally);
-    expect(() => jason.closeRoom(room), throwsStateError);
+    expect(() => jason.closeRoom(room), throwsA(isA<FfiException>()));
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
@@ -58,13 +59,13 @@ void main() {
     expect(devices.first.label(), equals('MediaDeviceInfo.label'));
 
     devices.first.free();
-    expect(() => devices.first.label(), throwsStateError);
+    expect(() => devices.first.label(), throwsA(isA<FfiException>()));
 
     expect(tracks.first.kind(), equals(MediaKind.Video));
     expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
 
     tracks.first.free();
-    expect(() => tracks.first.kind(), throwsStateError);
+    expect(() => tracks.first.kind(), throwsA(isA<FfiException>()));
 
     expect(
         () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
@@ -136,13 +137,15 @@ void main() {
     expect(() => constraints.widthInRange(200, -1), throwsArgumentError);
 
     constraints.free();
-    expect(() => constraints.deviceId('deviceId'), throwsStateError);
+    expect(
+        () => constraints.deviceId('deviceId'), throwsA(isA<FfiException>()));
 
     var constraints2 = DeviceVideoTrackConstraints();
     var settings = MediaStreamSettings();
     constraints2.deviceId('deviceId');
     settings.deviceVideo(constraints2);
-    expect(() => constraints2.deviceId('deviceId'), throwsStateError);
+    expect(
+        () => constraints2.deviceId('deviceId'), throwsA(isA<FfiException>()));
   });
 
   testWidgets('DisplayVideoTrackConstraints', (WidgetTester tester) async {
@@ -152,20 +155,23 @@ void main() {
     var constraints2 = DisplayVideoTrackConstraints();
     var settings = MediaStreamSettings();
     settings.displayVideo(constraints2);
-    expect(() => settings.displayVideo(constraints2), throwsStateError);
+    expect(() => settings.displayVideo(constraints2),
+        throwsA(isA<FfiException>()));
   });
 
   testWidgets('AudioTrackConstraints', (WidgetTester tester) async {
     var constraints = AudioTrackConstraints();
     constraints.deviceId('deviceId');
     constraints.free();
-    expect(() => constraints.deviceId('deviceId'), throwsStateError);
+    expect(
+        () => constraints.deviceId('deviceId'), throwsA(isA<FfiException>()));
 
     var constraints2 = AudioTrackConstraints();
     var settings = MediaStreamSettings();
     constraints2.deviceId('deviceId');
     settings.audio(constraints2);
-    expect(() => constraints2.deviceId('deviceId'), throwsStateError);
+    expect(
+        () => constraints2.deviceId('deviceId'), throwsA(isA<FfiException>()));
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
@@ -195,7 +201,7 @@ void main() {
 
     room.free();
 
-    expect(() => room.onNewConnection((_) {}), throwsStateError);
+    expect(() => room.onNewConnection((_) {}), throwsA(isA<FfiException>()));
   });
 
   testWidgets('RoomCloseReason', (WidgetTester tester) async {
@@ -213,7 +219,7 @@ void main() {
     expect(reason.isClosedByServer(), equals(false));
     expect(reason.isErr(), equals(true));
     reason.free();
-    expect(() => reason.isErr(), throwsStateError);
+    expect(() => reason.isErr(), throwsA(isA<FfiException>()));
   });
 
   testWidgets('ConnectionHandle', (WidgetTester tester) async {
@@ -284,7 +290,7 @@ void main() {
         .timeout(Duration(seconds: 1));
 
     track.free();
-    expect(() => track.kind(), throwsStateError);
+    expect(() => track.kind(), throwsA(isA<FfiException>()));
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
@@ -427,7 +433,8 @@ void main() {
             e.cause() == 'Dart err cause2' &&
             e.trace().contains('at src')));
   });
-
+  // todo
+  var temp = api;
   final returnsInputDevicePtr =
       dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
           'returns_media_device_info_ptr');
@@ -529,23 +536,18 @@ void main() {
   });
 
   testWidgets('Complex arguments validation', (WidgetTester tester) async {
-    final _muteVideo = dl.lookupFunction<Handle Function(Pointer, ForeignValue),
-        Object Function(Pointer, ForeignValue)>('RoomHandle__mute_video');
-
     var jason = Jason();
     var room = jason.initRoom();
-
     var err;
-    var arg = ForeignValue.fromInt(123);
-    // todo
-    // try {
-    //   await (_muteVideo((room as NativeRoomHandle).ptr.getInnerPtr(), arg.ref)
-    //       as Future);
-    // } catch (e) {
-    //   err = e as ArgumentError;
-    // } finally {
-    //   arg.free();
-    // }
+    var arg = 123;
+
+    try {
+      await (api.roomHandleMuteVideo(
+          roomHandle: (room as NativeRoomHandle).opaque,
+          sourceKind: arg) as Future);
+    } on FfiException catch (e) {
+      err = objectFromAnyhow(e) as ArgumentError;
+    }
     expect(err.invalidValue, equals(123));
     expect(err.name, 'kind');
   });

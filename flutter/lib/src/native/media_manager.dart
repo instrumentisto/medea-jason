@@ -31,8 +31,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
     var tracks = await (api.mediaManagerHandleInitLocalTracks(
-        manager: opaque,
-        caps: (caps as MediaStreamSettings).opaque) as Future<Pointer>);
+            manager: opaque, caps: (caps as MediaStreamSettings).opaque)
+        as Future) as Pointer;
     var vec = api.vecLocalTracksFromPtr(ptr: tracks.address);
 
     var res = List<LocalMediaTrack>.empty(growable: true);
@@ -49,7 +49,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
     var devices = await (api.mediaManagerHandleEnumerateDevices(manager: opaque)
-        as Future<Pointer>);
+        as Future) as Pointer;
+
     var vec = api.vecMediaDeviceInfoFromPtr(ptr: devices.address);
 
     var res = List<MediaDeviceInfo>.empty(growable: true);
@@ -71,7 +72,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
     }
 
     var devices = await (api.mediaManagerHandleEnumerateDisplays(
-        manager: opaque) as Future<Pointer>);
+        manager: opaque) as Future) as Pointer;
     var vec = api.vecMediaDisplayInfoFromPtr(ptr: devices.address);
 
     var res = List<MediaDisplayInfo>.empty(growable: true);
@@ -88,25 +89,26 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<void> setOutputAudioId(String deviceId) async {
     await (api.mediaManagerHandleSetOutputAudioId(
-        manager: opaque, deviceId: deviceId) as Future<void>);
+        manager: opaque, deviceId: deviceId) as Future);
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
     await (api.mediaManagerHandleSetMicrophoneVolume(
-        manager: opaque, level: level) as Future<void>);
+        manager: opaque, level: level) as Future);
   }
 
   @override
   Future<int> microphoneVolume() async {
     return await (api.mediaManagerHandleMicrophoneVolume(manager: opaque)
-        as Future<int>);
+        as Future) as int;
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
+    // todo
     return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
-        manager: opaque) as Future<bool>);
+        manager: opaque) as Future) as int == 1;
   }
 
   @override
@@ -114,7 +116,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
     try {
       api.mediaManagerHandleOnDeviceChange(manager: opaque, cb: cb);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 

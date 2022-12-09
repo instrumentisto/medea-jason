@@ -41,7 +41,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstraintsExactHeight(
           constraints: opaque, exactHeight: height);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -51,7 +51,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstraintsIdealHeight(
           constraints: opaque, idealHeight: height);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -61,7 +61,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstraintsHeightInRange(
           constraints: opaque, min: min, max: max);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -71,7 +71,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstraintsExactWidth(
           constraints: opaque, exactWidth: width);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -81,7 +81,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstraintsIdealWidth(
           constraints: opaque, idealWidth: width);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
@@ -91,7 +91,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstraintsWidthInRange(
           constraints: opaque, min: min, max: max);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow.message);
+      throw objectFromAnyhow(anyhow);
     }
   }
 
