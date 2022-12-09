@@ -398,8 +398,7 @@ impl PeerConnection {
             peer.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
                     platform::spawn(async move {
-                        if let Err(mid) =
-                            c.add_remote_track(track, transceiver).await
+                        if let Err(mid) = c.add_remote_track(track, transceiver).await
                         {
                             log::error!(
                                 "Cannot add new remote track with mid={mid}",
@@ -857,7 +856,6 @@ impl PeerConnection {
         &self,
         offer: String,
     ) -> Result<(), Traced<RtcPeerConnectionError>> {
-        log::error!("set_remote_offer");
         self.set_remote_description(platform::SdpType::Offer(offer))
             .await
             .map_err(tracerr::wrap!())

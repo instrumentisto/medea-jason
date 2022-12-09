@@ -75,7 +75,6 @@ impl Component {
         state: Rc<State>,
         description: Guarded<String>,
     ) -> Result<(), Traced<RtcPeerConnectionError>> {
-        log::error!("remote_sdp_changed 111");
         let (description, _guard) = description.into_parts();
         if let Some(role) = state.negotiation_role.get() {
             match role {
@@ -88,7 +87,6 @@ impl Component {
                     state.negotiation_role.set(None);
                 }
                 NegotiationRole::Answerer(_) => {
-                    log::error!("remote_sdp_changed 222");
                     peer.set_remote_offer(description)
                         .await
                         .map_err(tracerr::map_from_and_wrap!())?;
@@ -145,11 +143,11 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<sender::State>)>,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        log::error!("sender_added 111");
-        let a = state.remote_sdp.when_all_processed().await;
-        let a = state.negotiation_role.when_all_processed().await;
-        log::error!("sender_added 222");
-        let mut wait_futs = vec![state.when_all_receivers_processed().into()];
+        // let a = state.negotiation_role.when_all_processed().await;
+        let mut wait_futs = vec![
+            state.negotiation_role.when_all_processed().into(),
+            state.when_all_receivers_processed().into(),
+        ];
         if matches!(
             state.negotiation_role.get(),
             Some(NegotiationRole::Answerer(_))
@@ -197,6 +195,7 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) {
+        log::error!("receiver_added 1111");
         let ((_, rcvr_state), _guard) = val.into_parts();
         let conn = peer
             .connections
@@ -208,6 +207,7 @@ impl Component {
             &peer.recv_constraints,
         )
         .await;
+        log::error!("receiver_added 22222");
         peer.media_connections
             .insert_receiver(receiver::Component::new(
                 Rc::new(receiver),
@@ -398,6 +398,7 @@ impl Component {
         let (role, guard) = role.into_parts();
         match role {
             NegotiationRole::Offerer => {
+                drop(guard);
                 medea_reactive::when_all_processed(vec![
                     state.when_all_senders_processed().into(),
                     state.when_all_receivers_processed().into(),
@@ -412,17 +413,17 @@ impl Component {
                 .await;
             }
             NegotiationRole::Answerer(remote_sdp) => {
-                state.when_all_receivers_processed().await;
-                log::error!("negotiation_role_changed");
+                // state.when_all_receivers_processed().await;
                 state.set_remote_sdp(remote_sdp);
+                drop(guard);
 
-                // medea_reactive::when_all_processed(vec![
-                //     state.receivers.when_updated().into(),
-                //     state.senders.when_all_processed().into(),
-                //     state.remote_sdp.when_all_processed().into(),
-                //     state.senders.when_updated().into(),
-                // ])
-                // .await;
+                medea_reactive::when_all_processed(vec![
+                    state.receivers.when_updated().into(),
+                    state.senders.when_all_processed().into(),
+                    state.remote_sdp.when_all_processed().into(),
+                    state.senders.when_updated().into(),
+                ])
+                .await;
 
                 medea_reactive::when_all_processed(vec![
                     state.senders.when_stabilized().into(),

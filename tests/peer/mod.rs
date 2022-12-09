@@ -175,6 +175,7 @@ async fn new_with_disable_audio() {
         Rc::new(peer_state),
     );
     peer.state().when_all_updated().await;
+    delay_for(111).await;
 
     assert!(!peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));

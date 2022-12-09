@@ -7,7 +7,7 @@ mod watchers;
 
 use std::{cell::Cell, collections::HashSet, rc::Rc};
 
-use futures::{future::LocalBoxFuture, StreamExt, TryFutureExt as _};
+use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
@@ -181,7 +181,6 @@ impl State {
 
     /// Inserts a new [`sender::State`] into this [`State`].
     pub fn insert_sender(&self, track_id: TrackId, sender: Rc<sender::State>) {
-        log::error!("insert_sender");
         self.senders.insert(track_id, sender);
     }
 
@@ -191,6 +190,7 @@ impl State {
         track_id: TrackId,
         receiver: Rc<receiver::State>,
     ) {
+        log::error!("insert_receiver");
         self.receivers.insert(track_id, receiver);
     }
 
@@ -214,8 +214,11 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        // let _ = self.negotiation_role.when(Option::is_none).await;
-        let _ = self.negotiation_role.subscribe().any(|val| async move {val.is_none()}).await;
+        let _ = self
+            .negotiation_role
+            .subscribe()
+            .any(|val| async move { val.is_none() })
+            .await;
         self.negotiation_role.set(Some(negotiation_role));
     }
 
@@ -234,7 +237,6 @@ impl State {
 
     /// Sets remote SDP offer to the provided value.
     pub fn set_remote_sdp(&self, sdp: String) {
-        log::error!("set_remote_sdp");
         self.remote_sdp.set(Some(sdp));
     }
 
@@ -333,10 +335,8 @@ impl State {
         track: &proto::Track,
         send_constraints: LocalTracksConstraints,
     ) {
-        log::error!("insert_track 111");
         match &track.direction {
             proto::Direction::Send { receivers, mid } => {
-                log::error!("insert_track 222");
                 self.senders.insert(
                     track.id,
                     Rc::new(sender::State::new(
@@ -349,6 +349,7 @@ impl State {
                 );
             }
             proto::Direction::Recv { sender, mid } => {
+                log::error!("insert_track proto::Direction::Recv");
                 self.receivers.insert(
                     track.id,
                     Rc::new(receiver::State::new(

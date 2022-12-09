@@ -106,7 +106,6 @@ impl Sender {
         send_constraints: LocalTracksConstraints,
         track_events_sender: mpsc::UnboundedSender<TrackEvent>,
     ) -> Result<Rc<Self>, Traced<CreateError>> {
-        log::error!("Sender::new 111");
         let enabled_in_cons = send_constraints.enabled(state.media_type());
         let muted_in_cons = send_constraints.muted(state.media_type());
         let media_disabled = state.is_muted()
@@ -118,7 +117,7 @@ impl Sender {
                 CreateError::CannotDisableRequiredSender
             ));
         }
-        log::error!("Sender::new 222");
+
         let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
         let transceiver = match state.mid() {
@@ -147,19 +146,17 @@ impl Sender {
                 }
             }
             Some(mid) => {
-                log::error!("Sender::new 222 111");
                 let get_transceiver = media_connections
                     .0
                     .borrow()
                     .get_transceiver_by_mid(mid.into());
-                log::error!("Sender::new 222 222");
                 get_transceiver
                     .await
                     .ok_or_else(|| CreateError::TransceiverNotFound(mid.into()))
                     .map_err(tracerr::wrap!())?
             }
         };
-        log::error!("Sender::new 333");
+
         let this = Rc::new(Self {
             track_id: state.id(),
             caps,
@@ -182,7 +179,7 @@ impl Sender {
                 .mute_state_controller()
                 .transition_to(mute_state::Stable::from(muted_in_cons));
         }
-        log::error!("Sender::new 444");
+
         Ok(this)
     }
 

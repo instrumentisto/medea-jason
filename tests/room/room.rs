@@ -14,10 +14,10 @@ use futures::{
     stream::{self, BoxStream, LocalBoxStream, StreamExt as _},
 };
 use medea_client_api_proto::{
-    self as proto, Command, Direction, Event, IceConnectionState,
-    MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
-    PeerId, PeerMetrics, PeerUpdate, Track, TrackId, TrackPatchCommand,
-    TrackPatchEvent, VideoSettings,
+    self as proto, AudioSettings, Command, Direction, Event,
+    IceConnectionState, MediaDirection, MediaSourceKind, MediaType, MemberId,
+    NegotiationRole, PeerId, PeerMetrics, PeerUpdate, Track, TrackId,
+    TrackPatchCommand, TrackPatchEvent, VideoSettings,
 };
 use medea_jason::{
     api::{
@@ -28,6 +28,8 @@ use medea_jason::{
     },
     media::MediaKind,
     peer::PeerConnection,
+    platform,
+    platform::TransceiverDirection,
     room::Room,
     rpc::MockRpcSession,
     utils::Updatable,
@@ -2731,4 +2733,90 @@ async fn intentions_are_sent_on_reconnect() {
     })
     .await
     .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn sender_answerer() {
+    wasm_logger::init(wasm_logger::Config::default());
+
+    let (event_tx, event_rx) = mpsc::unbounded();
+    let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
+    let room_handle = api::RoomHandle::from(room.new_handle());
+    JsFuture::from(room_handle.set_local_media_settings(
+        &media_stream_settings(true, true),
+        false,
+        false,
+    ))
+    .await
+    .unwrap();
+
+    let peer = platform::RtcPeerConnection::new(Vec::new(), false)
+        .await
+        .unwrap();
+
+    peer.add_transceiver(
+        MediaKind::Audio,
+        platform::TransceiverDirection::RECV,
+    )
+    .await;
+    peer.add_transceiver(
+        MediaKind::Video,
+        platform::TransceiverDirection::RECV,
+    )
+    .await;
+    let offer = peer.create_offer().await.unwrap();
+
+    event_tx
+        .unbounded_send(Event::PeerCreated {
+            peer_id: PeerId(1),
+            negotiation_role: NegotiationRole::Answerer(offer),
+            tracks: vec![
+                Track {
+                    id: TrackId(1),
+                    direction: Direction::Send {
+                        receivers: Vec::new(),
+                        mid: Some("0".to_owned()),
+                    },
+                    media_type: MediaType::Audio(AudioSettings {
+                        required: true,
+                    }),
+                },
+                Track {
+                    id: TrackId(2),
+                    direction: Direction::Send {
+                        receivers: Vec::new(),
+                        mid: Some("1".to_owned()),
+                    },
+                    media_type: MediaType::Video(VideoSettings {
+                        required: true,
+                        source_kind: MediaSourceKind::Device,
+                    }),
+                },
+            ],
+            ice_servers: Vec::new(),
+            force_relay: false,
+        })
+        .unwrap();
+
+    loop {
+        let command = timeout(200, commands_rx.next()).await.unwrap().unwrap();
+
+        match command {
+            Command::MakeSdpAnswer {
+                sdp_answer,
+                transceivers_statuses,
+                ..
+            } => {
+                assert!(sdp_answer.contains("a=mid:0"));
+                assert!(sdp_answer.contains("a=mid:1"));
+                assert_eq!(sdp_answer.match_indices("a=sendonly").count(), 2);
+
+                assert_eq!(transceivers_statuses.get(&TrackId(1)), Some(&true));
+                assert_eq!(transceivers_statuses.get(&TrackId(2)), Some(&true));
+
+                break;
+            }
+            _ => continue,
+        }
+    }
 }

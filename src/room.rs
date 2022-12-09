@@ -1578,18 +1578,16 @@ impl EventHandler for InnerRoom {
         ice_servers: Vec<IceServer>,
         is_force_relayed: bool,
     ) -> Self::Output {
-        log::error!("on_peer_created 111");
         let peer_state = peer::State::new(
             peer_id,
             ice_servers,
             is_force_relayed,
             Some(negotiation_role),
         );
-        log::error!("on_peer_created 222");
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
         }
-        log::error!("on_peer_created 333"); // asdasdasd
+
         self.peers.state().insert(peer_id, peer_state);
 
         Ok(())
@@ -1606,7 +1604,6 @@ impl EventHandler for InnerRoom {
             .state()
             .get(peer_id)
             .ok_or_else(|| tracerr::new!(UnknownPeerIdError(peer_id)))?;
-        log::error!("on_sdp_answer_made");
         peer.set_remote_sdp(sdp_answer);
 
         Ok(())
