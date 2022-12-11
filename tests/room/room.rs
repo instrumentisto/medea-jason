@@ -2751,17 +2751,14 @@ async fn sender_answerer() {
         .await
         .unwrap();
 
-    peer.add_transceiver(
-        MediaKind::Audio,
-        platform::TransceiverDirection::RECV,
-    )
-    .await;
-    peer.add_transceiver(
-        MediaKind::Video,
-        platform::TransceiverDirection::RECV,
-    )
-    .await;
+    let a_tr = peer
+        .add_transceiver(MediaKind::Audio, platform::TransceiverDirection::RECV)
+        .await;
+    let v_tr = peer
+        .add_transceiver(MediaKind::Video, platform::TransceiverDirection::RECV)
+        .await;
     let offer = peer.create_offer().await.unwrap();
+    peer.set_offer(&offer).await.unwrap();
 
     event_tx
         .unbounded_send(Event::PeerCreated {
@@ -2772,7 +2769,7 @@ async fn sender_answerer() {
                     id: TrackId(1),
                     direction: Direction::Send {
                         receivers: Vec::new(),
-                        mid: Some("0".to_owned()),
+                        mid: Some(a_tr.mid().unwrap()),
                     },
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
@@ -2782,7 +2779,7 @@ async fn sender_answerer() {
                     id: TrackId(2),
                     direction: Direction::Send {
                         receivers: Vec::new(),
-                        mid: Some("1".to_owned()),
+                        mid: Some(v_tr.mid().unwrap()),
                     },
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
@@ -2804,8 +2801,10 @@ async fn sender_answerer() {
                 transceivers_statuses,
                 ..
             } => {
-                assert!(sdp_answer.contains("a=mid:0"));
-                assert!(sdp_answer.contains("a=mid:1"));
+                assert!(sdp_answer
+                    .contains(&format!("a=mid:{}", a_tr.mid().unwrap())));
+                assert!(sdp_answer
+                    .contains(&format!("a=mid:{}", v_tr.mid().unwrap())));
                 assert_eq!(sdp_answer.match_indices("a=sendonly").count(), 2);
 
                 assert_eq!(transceivers_statuses.get(&TrackId(1)), Some(&true));
