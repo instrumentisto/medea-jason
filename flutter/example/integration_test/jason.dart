@@ -26,6 +26,7 @@ void main() {
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
+    print(1);
     final returnsLocalMediaInitException =
         dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
             'returns_local_media_init_exception');
@@ -38,35 +39,53 @@ void main() {
     final returnsFutureWithEnumerateDevicesException =
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
             'returns_future_enumerate_devices_exception');
-
+    print(2);
     var jason = Jason();
+    print(3);
     var mediaManager = jason.mediaManager();
 
+    print(4);
     var devices = await mediaManager.enumerateDevices();
+    print(5);
     var tracks = await mediaManager.initLocalTracks(MediaStreamSettings());
 
+    print(6);
     expect(devices.length, equals(3));
+    print(7);
     expect(tracks.length, equals(3));
 
+    print(8);
     expect((devices.first as NativeMediaDeviceInfo).opaque,
         isNot(equals((devices.last as NativeMediaDeviceInfo).opaque)));
+    print(9);
     expect((tracks.first as NativeLocalMediaTrack).opaque,
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 
+    print(10);
     expect(devices.first.deviceId(), equals('MediaDeviceInfo.device_id'));
+    print(11);
     expect(devices.first.groupId(), equals('MediaDeviceInfo.group_id'));
+    print(12);
     expect(devices.first.kind(), equals(MediaDeviceKind.audioinput));
+    print(13);
     expect(devices.first.label(), equals('MediaDeviceInfo.label'));
 
+    print(14);
     devices.first.free();
+    print(15);
     expect(() => devices.first.label(), throwsA(isA<FfiException>()));
 
+    print(16);
     expect(tracks.first.kind(), equals(MediaKind.Video));
+    print(17);
     expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
 
+    print(18);
     tracks.first.free();
+    print(19);
     expect(() => tracks.first.kind(), throwsA(isA<FfiException>()));
 
+    print(20);
     expect(
         () => returnsLocalMediaInitException('Dart err cause1').unwrap(),
         throwsA(predicate((e) =>
@@ -76,12 +95,14 @@ void main() {
             e.trace().contains('at src'))));
 
     var err;
+    print(21);
     try {
       await (returnsFutureWithLocalMediaInitException('Dart err cause2')
           as Future);
     } catch (e) {
       err = e as LocalMediaInitException;
     }
+    print(22);
     expect(
         err,
         predicate((e) =>
@@ -90,6 +111,7 @@ void main() {
             e.cause() == 'Dart err cause2' &&
             e.trace().contains('at src')));
 
+    print(23);
     expect(
         () => returnsEnumerateDevicesException('Dart err cause3').unwrap(),
         throwsA(predicate((e) =>
@@ -97,6 +119,7 @@ void main() {
             e.cause() == 'Dart err cause3' &&
             e.trace().contains('at src'))));
 
+    print(24);
     var err2;
     try {
       await (returnsFutureWithEnumerateDevicesException('Dart err cause4')
@@ -104,6 +127,7 @@ void main() {
     } catch (e) {
       err2 = e as EnumerateDevicesException;
     }
+    print(25);
     expect(
         err2,
         predicate((e) =>
@@ -175,32 +199,42 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
+    print('rh 1');
     var jason = Jason();
+    print('rh 2');
     var room = jason.initRoom();
 
+    print('rh 3');
     var allFired = List<Completer>.generate(4, (_) => Completer());
 
+    print('rh 4');
     room.onClose((reason) {
       allFired[0].complete();
     });
 
+    print('rh 5');
     room.onConnectionLoss((reconnectHandle) {
       allFired[1].complete();
     });
 
+    print('rh 6');
     room.onLocalTrack((localTrack) {
       allFired[2].complete();
     });
 
+    print('rh 7');
     room.onNewConnection((connection) {
       allFired[3].complete();
     });
 
+    print('rh 8');
     await Future.wait(allFired.map((e) => e.future))
         .timeout(Duration(seconds: 1));
 
+    print('rh 9');
     room.free();
 
+    print('rh 10');
     expect(() => room.onNewConnection((_) {}), throwsA(isA<FfiException>()));
   });
 
