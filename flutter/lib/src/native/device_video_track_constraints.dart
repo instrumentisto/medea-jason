@@ -12,7 +12,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
       api.deviceVideoTrackConstrNew();
 
   /// Constructs a new [DeviceVideoTrackConstraints] backed by the Rust struct behind the
-  /// provided [frb.RefCellDeviceVideoTrackConstraints].
+  /// provided [frb.ApiWrapDeviceVideoTrackConstraints].
   DeviceVideoTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }

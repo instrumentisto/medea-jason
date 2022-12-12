@@ -12,7 +12,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrNew();
 
   /// Constructs a new [DisplayVideoTrackConstraints] backed by the Rust struct behind the
-  /// provided [frb.RefCellDisplayVideoTrackConstraints].
+  /// provided [frb.ApiWrapDisplayVideoTrackConstraints].
   DisplayVideoTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }

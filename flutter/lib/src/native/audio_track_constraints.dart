@@ -9,7 +9,7 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   frb.AudioTrackConstraints opaque = api.audioTrackConstrNew();
 
   /// Constructs a new [AudioTrackConstraints] backed by a Rust struct behind the
-  /// provided [frb.RefCellAudioTrackConstraints].
+  /// provided [frb.AudioTrackConstraints].
   AudioTrackConstraints() {
     RustHandlesStorage().insertHandle(this);
   }
