@@ -26,6 +26,7 @@ void main() {
   });
 
   testWidgets('MediaManager', (WidgetTester tester) async {
+    try {
     print(1);
     final returnsLocalMediaInitException =
         dl.lookupFunction<Result Function(Handle), Result Function(Object)>(
@@ -134,6 +135,10 @@ void main() {
             e is EnumerateDevicesException &&
             e.cause() == 'Dart err cause4' &&
             e.trace().contains('at src')));
+    }
+    catch (e) {
+      print('BBBBBB ${e}');
+    }
   });
 
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
@@ -199,6 +204,7 @@ void main() {
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {
+    try {
     print('rh 1');
     var jason = Jason();
     print('rh 2');
@@ -236,6 +242,10 @@ void main() {
 
     print('rh 10');
     expect(() => room.onNewConnection((_) {}), throwsA(isA<FfiException>()));
+    }
+    catch (e) {
+      print('AAAA ${e}');
+    }
   });
 
   testWidgets('RoomCloseReason', (WidgetTester tester) async {
