@@ -524,6 +524,17 @@ flutter.run:
 		$(if $(call eq,$(device),),,-d $(device))
 
 
+# Adds a sha256sum hash parameter to medea_jason_bg.wasm.
+#
+# Usage:
+#	make flutter.add.wasm.hash
+
+flutter.add.wasm.hash:
+	sed -i "s/medea_jason_bg.wasm/medea_jason_bg.wasm?\
+	$(shell sha256sum flutter/assets/pkg/medea_jason_bg.wasm | cut -f 1 -d " ")\
+	/g" flutter/assets/pkg/medea_jason.js
+
+
 # Generates assets required for Flutter Web Jason plugin.
 #
 # Usage:
@@ -532,10 +543,8 @@ flutter.run:
 flutter.web.assets:
 	@rm -rf flutter/assets/pkg
 	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
-		
-	sed -i "s/medea_jason_bg.wasm/medea_jason_bg.wasm?\
-	$(shell sha256sum flutter/assets/pkg/medea_jason_bg.wasm | cut -f 1 -d " ")\
-	/g" flutter/assets/pkg/medea_jason.js
+
+	@make flutter.add.wasm.hash
 
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
