@@ -222,6 +222,7 @@ cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.build.jason:
+	cd flutter && flutter pub get
 ifeq ($(platform),all)
 	@make cargo.build.jason platform=android
 	@make cargo.build.jason platform=ios
@@ -383,6 +384,7 @@ endif
 #	make cargo.lint
 
 cargo.lint:
+	cd flutter && flutter pub get
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
 		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \

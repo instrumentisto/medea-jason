@@ -28,8 +28,7 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    await (api.roomHandleJoin(roomHandle: opaque, token: token)
-        as Future);
+    await (api.roomHandleJoin(roomHandle: opaque, token: token) as Future);
   }
 
   @override
@@ -93,8 +92,7 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> disableRemoteAudio() async {
-    await (api.roomHandleDisableRemoteAudio(roomHandle: opaque)
-        as Future);
+    await (api.roomHandleDisableRemoteAudio(roomHandle: opaque) as Future);
   }
 
   @override

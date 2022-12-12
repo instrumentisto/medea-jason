@@ -31,8 +31,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
     var tracks = await (api.mediaManagerHandleInitLocalTracks(
-            manager: opaque, caps: (caps as MediaStreamSettings).opaque)
-        as Future) as Pointer;
+        manager: opaque,
+        caps: (caps as MediaStreamSettings).opaque) as Future) as Pointer;
     var vec = api.vecLocalTracksFromPtr(ptr: tracks.address);
 
     var res = List<LocalMediaTrack>.empty(growable: true);
@@ -107,7 +107,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
     return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
-        manager: opaque) as Future) as int == 1;
+            manager: opaque) as Future) as int ==
+        1;
   }
 
   @override

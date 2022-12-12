@@ -19,8 +19,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    api.deviceVideoTrackConstrDeviceId(
-        constr: opaque, deviceId: deviceId);
+    api.deviceVideoTrackConstrDeviceId(constr: opaque, deviceId: deviceId);
   }
 
   @override
@@ -68,8 +67,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void exactWidth(int width) {
     try {
-      api.deviceVideoTrackConstrExactWidth(
-          constr: opaque, exactWidth: width);
+      api.deviceVideoTrackConstrExactWidth(constr: opaque, exactWidth: width);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -78,8 +76,7 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void idealWidth(int width) {
     try {
-      api.deviceVideoTrackConstrIdealWidth(
-          constr: opaque, idealWidth: width);
+      api.deviceVideoTrackConstrIdealWidth(constr: opaque, idealWidth: width);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }

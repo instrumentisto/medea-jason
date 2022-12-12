@@ -433,7 +433,7 @@ void main() {
             e.cause() == 'Dart err cause2' &&
             e.trace().contains('at src')));
   });
-  
+
   final returnsInputDevicePtr =
       dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
           'returns_media_device_info_ptr');

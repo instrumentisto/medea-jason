@@ -17,8 +17,7 @@ class AudioTrackConstraints extends base.AudioTrackConstraints {
   @override
   void deviceId(String deviceId) {
     opaque.move = true;
-    opaque =
-        api.audioTrackConstrDeviceId(track: opaque, deviceId: deviceId);
+    opaque = api.audioTrackConstrDeviceId(track: opaque, deviceId: deviceId);
   }
 
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.

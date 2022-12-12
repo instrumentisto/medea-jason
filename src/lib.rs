@@ -124,6 +124,7 @@ pub mod platform;
 pub mod room;
 pub mod rpc;
 
+#[cfg(not(target_family = "wasm"))]
 #[allow(unused_qualifications)]
 #[allow(clippy::as_conversions)]
 #[allow(clippy::undocumented_unsafe_blocks)]

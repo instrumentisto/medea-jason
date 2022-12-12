@@ -40,8 +40,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   @override
   void exactWidth(int width) {
     try {
-      api.displayVideoTrackConstrExactWidth(
-          constr: opaque, exactWidth: width);
+      api.displayVideoTrackConstrExactWidth(constr: opaque, exactWidth: width);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -50,8 +49,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
   @override
   void idealWidth(int width) {
     try {
-      api.displayVideoTrackConstrIdealWidth(
-          constr: opaque, idealWidth: width);
+      api.displayVideoTrackConstrIdealWidth(constr: opaque, idealWidth: width);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -79,8 +77,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    api.displayVideoTrackConstrDeviceId(
-        constr: opaque, deviceId: deviceId);
+    api.displayVideoTrackConstrDeviceId(constr: opaque, deviceId: deviceId);
   }
 
   @moveSemantics

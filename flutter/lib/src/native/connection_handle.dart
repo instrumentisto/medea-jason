@@ -71,8 +71,7 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (api.connectionHandleEnableRemoteAudio(connection: opaque)
-        as Future);
+    await (api.connectionHandleEnableRemoteAudio(connection: opaque) as Future);
   }
 
   @override
@@ -83,8 +82,7 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.connectionHandleEnableRemoteVideo(connection: opaque)
-        as Future);
+    await (api.connectionHandleEnableRemoteVideo(connection: opaque) as Future);
   }
 
   @override
