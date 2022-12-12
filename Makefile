@@ -8,14 +8,6 @@ comma := ,
 eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
                                 $(findstring $(2),$(1))),1)
 
-# todo
-farsh: 
-	@make test.e2e.desktop device=linux up=yes debug=no dockerized=yes medea-tag=edge
-
-# todo
-farsh2: 
-	@make test.e2e.desktop up=yes debug=no dockerized=yes medea-tag=edge
-
 
 
 ######################

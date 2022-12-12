@@ -106,7 +106,6 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    // todo
     return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
         manager: opaque) as Future) as int == 1;
   }
