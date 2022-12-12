@@ -10,7 +10,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:meta/meta.dart';
 import 'package:meta/meta.dart';
 
-abstract class JasonApi {
+abstract class MedeaJason {
   /// Creates new [`AudioTrackConstraints`] with none constr configured.
   AudioTrackConstraints audioTrackConstrNew({dynamic hint});
 
@@ -1080,7 +1080,7 @@ abstract class JasonApi {
 
 @sealed
 class ApiWrapDeviceVideoTrackConstraints extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ApiWrapDeviceVideoTrackConstraints.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1097,7 +1097,7 @@ class ApiWrapDeviceVideoTrackConstraints extends FrbOpaque {
 
 @sealed
 class ApiWrapDisplayVideoTrackConstraints extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ApiWrapDisplayVideoTrackConstraints.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1114,7 +1114,7 @@ class ApiWrapDisplayVideoTrackConstraints extends FrbOpaque {
 
 @sealed
 class ApiWrapVecLocalMediaTrack extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ApiWrapVecLocalMediaTrack.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1130,7 +1130,7 @@ class ApiWrapVecLocalMediaTrack extends FrbOpaque {
 
 @sealed
 class ApiWrapVecMediaDeviceInfo extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ApiWrapVecMediaDeviceInfo.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1146,7 +1146,7 @@ class ApiWrapVecMediaDeviceInfo extends FrbOpaque {
 
 @sealed
 class ApiWrapVecMediaDisplayInfo extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ApiWrapVecMediaDisplayInfo.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1162,7 +1162,7 @@ class ApiWrapVecMediaDisplayInfo extends FrbOpaque {
 
 @sealed
 class AudioTrackConstraints extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   AudioTrackConstraints.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1178,7 +1178,7 @@ class AudioTrackConstraints extends FrbOpaque {
 
 @sealed
 class ConnectionHandle extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ConnectionHandle.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1193,7 +1193,7 @@ class ConnectionHandle extends FrbOpaque {
 
 @sealed
 class Jason extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   Jason.fromRaw(int ptr, int size, this.bridge) : super.unsafe(ptr, size);
   @override
   DropFnType get dropFn => bridge.dropOpaqueJason;
@@ -1207,7 +1207,7 @@ class Jason extends FrbOpaque {
 
 @sealed
 class LocalMediaTrack extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   LocalMediaTrack.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1222,7 +1222,7 @@ class LocalMediaTrack extends FrbOpaque {
 
 @sealed
 class MediaDeviceInfo extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   MediaDeviceInfo.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1237,7 +1237,7 @@ class MediaDeviceInfo extends FrbOpaque {
 
 @sealed
 class MediaDisplayInfo extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   MediaDisplayInfo.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1252,7 +1252,7 @@ class MediaDisplayInfo extends FrbOpaque {
 
 @sealed
 class MediaManagerHandle extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   MediaManagerHandle.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1267,7 +1267,7 @@ class MediaManagerHandle extends FrbOpaque {
 
 @sealed
 class MediaStreamSettings extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   MediaStreamSettings.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1283,7 +1283,7 @@ class MediaStreamSettings extends FrbOpaque {
 
 @sealed
 class ReconnectHandle extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   ReconnectHandle.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1298,7 +1298,7 @@ class ReconnectHandle extends FrbOpaque {
 
 @sealed
 class RemoteMediaTrack extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   RemoteMediaTrack.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1313,7 +1313,7 @@ class RemoteMediaTrack extends FrbOpaque {
 
 @sealed
 class RoomCloseReason extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   RoomCloseReason.fromRaw(int ptr, int size, this.bridge)
       : super.unsafe(ptr, size);
   @override
@@ -1328,7 +1328,7 @@ class RoomCloseReason extends FrbOpaque {
 
 @sealed
 class RoomHandle extends FrbOpaque {
-  final JasonApi bridge;
+  final MedeaJason bridge;
   RoomHandle.fromRaw(int ptr, int size, this.bridge) : super.unsafe(ptr, size);
   @override
   DropFnType get dropFn => bridge.dropOpaqueRoomHandle;
@@ -1340,15 +1340,15 @@ class RoomHandle extends FrbOpaque {
   OpaqueTypeFinalizer get staticFinalizer => bridge.RoomHandleFinalizer;
 }
 
-class JasonApiImpl implements JasonApi {
-  final JasonApiPlatform _platform;
-  factory JasonApiImpl(ExternalLibrary dylib) =>
-      JasonApiImpl.raw(JasonApiPlatform(dylib));
+class MedeaJasonImpl implements MedeaJason {
+  final MedeaJasonPlatform _platform;
+  factory MedeaJasonImpl(ExternalLibrary dylib) =>
+      MedeaJasonImpl.raw(MedeaJasonPlatform(dylib));
 
   /// Only valid on web/WASM platforms.
-  factory JasonApiImpl.wasm(FutureOr<WasmModule> module) =>
-      JasonApiImpl(module as ExternalLibrary);
-  JasonApiImpl.raw(this._platform);
+  factory MedeaJasonImpl.wasm(FutureOr<WasmModule> module) =>
+      MedeaJasonImpl(module as ExternalLibrary);
+  MedeaJasonImpl.raw(this._platform);
   AudioTrackConstraints audioTrackConstrNew({dynamic hint}) {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_audio_track_constr_new(),
@@ -3696,8 +3696,8 @@ int api2wire_usize(int raw) {
 }
 // Section: finalizer
 
-class JasonApiPlatform extends FlutterRustBridgeBase<JasonApiWire> {
-  JasonApiPlatform(ffi.DynamicLibrary dylib) : super(JasonApiWire(dylib));
+class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
+  MedeaJasonPlatform(ffi.DynamicLibrary dylib) : super(MedeaJasonWire(dylib));
 
 // Section: api2wire
 
@@ -4034,7 +4034,7 @@ class JasonApiPlatform extends FlutterRustBridgeBase<JasonApiWire> {
 // Generated by `package:ffigen`.
 
 /// generated by flutter_rust_bridge
-class JasonApiWire implements FlutterRustBridgeWireBase {
+class MedeaJasonWire implements FlutterRustBridgeWireBase {
   @internal
   late final dartApi = DartApiDl(init_frb_dart_api_dl);
 
@@ -4043,11 +4043,11 @@ class JasonApiWire implements FlutterRustBridgeWireBase {
       _lookup;
 
   /// The symbols are looked up in [dynamicLibrary].
-  JasonApiWire(ffi.DynamicLibrary dynamicLibrary)
+  MedeaJasonWire(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
 
   /// The symbols are looked up with [lookup].
-  JasonApiWire.fromLookup(
+  MedeaJasonWire.fromLookup(
       ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
           lookup)
       : _lookup = lookup;

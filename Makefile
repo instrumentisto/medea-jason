@@ -39,6 +39,10 @@ LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
+FLUTTER_RUST_BRIDGE_VER ?= $(strip \
+	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
+	        | grep -v 'flutter_rust_bridge' \
+	        | cut -d'"' -f2))
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -376,6 +380,39 @@ ifeq ($(crate),medea-jason)
 	make flutter.fmt
 endif
 
+
+# Generates Rust and Dart side interop bridge.
+#
+# Usage:
+#	make cargo.bridge.gen
+
+cargo.bridge.gen:
+ifeq ($(shell which flutter_rust_bridge_codegen),)
+	cargo install flutter_rust_bridge_codegen --vers=$(FLUTTER_RUST_BRIDGE_VER)
+else
+ifneq ($(strip $(shell flutter_rust_bridge_codegen --version | cut -d ' ' -f2)),$(FLUTTER_RUST_BRIDGE_VER))
+	cargo install flutter_rust_bridge_codegen --force \
+	                                          --vers=$(FLUTTER_RUST_BRIDGE_VER)
+endif
+endif
+ifeq ($(shell which cbindgen),)
+	cargo install cbindgen
+endif
+ifeq ($(CURRENT_OS),macos)
+ifeq ($(shell brew list | grep -Fx llvm),)
+	brew install llvm
+endif
+endif
+	flutter_rust_bridge_codegen \
+		--rust-input=src/api/dart/jason_api.rs \
+		--rust-output=src/jason_api_g.rs \
+		--dart-output=flutter/lib/src/native/ffi/jason_api.g.dart \
+		--skip-add-mod-to-lib \
+		--no-build-runner \
+		--dart-format-line-length=80
+
+	cd flutter && \
+	flutter pub run build_runner build --delete-conflicting-outputs
 
 # Lint Rust sources with Clippy.
 #

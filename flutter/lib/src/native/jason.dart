@@ -29,7 +29,7 @@ typedef _onPanic_C = Void Function(Handle);
 typedef _onPanic_Dart = void Function(Object);
 
 /// Bindings to the Rust side API.
-late frb.JasonApi api = frb.JasonApiImpl(dl);
+late frb.MedeaJason api = frb.MedeaJasonImpl(dl);
 late DynamicLibrary dl = _dl_load();
 
 /// [Executor] that drives Rust futures.
