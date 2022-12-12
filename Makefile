@@ -383,7 +383,6 @@ endif
 #	make cargo.lint
 
 cargo.lint:
-	cd flutter && flutter pub get
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
 		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
