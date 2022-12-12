@@ -222,7 +222,6 @@ cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
 cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.build.jason:
-	cd flutter && flutter pub get
 ifeq ($(platform),all)
 	@make cargo.build.jason platform=android
 	@make cargo.build.jason platform=ios
