@@ -660,7 +660,6 @@ version = "3.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71655c45cb9845d3270c9d6df84ebe72b4dad3c2ba3f7023ad47c144e4e473a5"
 dependencies = [
- "atty",
  "bitflags",
  "clap_derive 3.2.18",
  "clap_lex 0.2.4",
@@ -1786,9 +1785,21 @@ dependencies = [
 
 [[package]]
 name = "ipnet"
-version = "2.5.1"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f88c5561171189e69df9d98bcf18fd5f9558300f7ea7b801eb8a0fd748bd8745"
+checksum = "ec947b7a4ce12e3b87e353abae7ce124d025b6c7d6c5aea5cc0bcf92e9510ded"
+
+[[package]]
+name = "is-terminal"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "927609f78c2913a6f6ac3c27a4fe87f43e2a35367c0c4b0f8265e8f49a104330"
+dependencies = [
+ "hermit-abi 0.2.6",
+ "io-lifetimes",
+ "rustix",
+ "windows-sys 0.42.0",
+]
 
 [[package]]
 name = "is-terminal"

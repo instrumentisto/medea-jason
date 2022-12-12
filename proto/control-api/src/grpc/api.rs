@@ -1,4 +1,5 @@
 /// Request for creating a new `Element` on a media server.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateRequest {
     /// FID (Full ID) of the parent `Element` to create the provided `Element` in.
@@ -11,6 +12,7 @@ pub struct CreateRequest {
 /// Nested message and enum types in `CreateRequest`.
 pub mod create_request {
     /// Spec of the created `Element`.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum El {
         #[prost(message, tag = "2")]
@@ -24,6 +26,7 @@ pub mod create_request {
     }
 }
 /// Request with many FIDs (Full IDs) of `Element`s.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct IdRequest {
     /// List of `Element`s FIDs.
@@ -31,6 +34,7 @@ pub struct IdRequest {
     pub fid: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Request for applying a spec to an exiting `Element` on a media server.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ApplyRequest {
     /// FID (full ID) of the parent `Element` to apply the provided spec to.
@@ -43,6 +47,7 @@ pub struct ApplyRequest {
 /// Nested message and enum types in `ApplyRequest`.
 pub mod apply_request {
     /// Spec of the `Element` to be applied.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum El {
         #[prost(message, tag = "2")]
@@ -60,6 +65,7 @@ pub mod apply_request {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Response {
     /// Error of this `Response`.
@@ -70,6 +76,7 @@ pub struct Response {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateResponse {
     /// Hashmap with IDs (key) and URIs (value) of `Element`s, which should be used
@@ -89,6 +96,7 @@ pub struct CreateResponse {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetResponse {
     /// Hashmap with IDs (key) and specs (value) of the requested `Elements`.
@@ -103,6 +111,7 @@ pub struct GetResponse {
 /// Error of a failed request.
 ///
 /// If an `Error` is not returned then a request is considered as successful.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Error {
     /// Concrete unique code of this `Error`.
@@ -125,6 +134,7 @@ pub struct Error {
     pub element: ::prost::alloc::string::String,
 }
 /// Possible media elements forming a media pipeline.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Element {
     #[prost(oneof = "element::El", tags = "1, 2, 3, 4")]
@@ -132,6 +142,7 @@ pub struct Element {
 }
 /// Nested message and enum types in `Element`.
 pub mod element {
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum El {
         #[prost(message, tag = "1")]
@@ -146,6 +157,7 @@ pub mod element {
 }
 /// Media element representing a single space where multiple `Member`s can
 /// interact with each other.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Room {
     /// ID of this `Room`.
@@ -161,6 +173,7 @@ pub struct Room {
 /// Nested message and enum types in `Room`.
 pub mod room {
     /// Possible media elements forming a `Room` pipeline.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Element {
         #[prost(oneof = "element::El", tags = "1, 2, 3")]
@@ -168,6 +181,7 @@ pub mod room {
     }
     /// Nested message and enum types in `Element`.
     pub mod element {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum El {
             #[prost(message, tag = "1")]
@@ -181,6 +195,7 @@ pub mod room {
 }
 /// Media element representing a client authorized to participate in some bigger
 /// media pipeline (`Room`, for example).
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Member {
     /// ID of this `Member`.
@@ -229,6 +244,7 @@ pub struct Member {
 /// Nested message and enum types in `Member`.
 pub mod member {
     /// Elements which Member's pipeline can contain.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Element {
         #[prost(oneof = "element::El", tags = "1, 2")]
@@ -236,6 +252,7 @@ pub mod member {
     }
     /// Nested message and enum types in `Element`.
     pub mod element {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum El {
             #[prost(message, tag = "1")]
@@ -253,6 +270,7 @@ pub mod member {
     /// Hashed variant only supports Argon2 hash at the moment.
     /// `Member` sid won't contain a `token` query parameter if hashed credentials
     /// are used, so it should be appended manually on a client side.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Credentials {
         /// Argon2 hash of credentials.
@@ -265,6 +283,7 @@ pub mod member {
 }
 /// Media element receiving media data from a client via WebRTC (allows to
 /// publish media data).
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WebRtcPublishEndpoint {
     /// ID of this `WebRtcPublishEndpoint`.
@@ -292,6 +311,7 @@ pub struct WebRtcPublishEndpoint {
 /// Nested message and enum types in `WebRtcPublishEndpoint`.
 pub mod web_rtc_publish_endpoint {
     /// Audio media type settings of a `WebRtcPublishEndpoint`.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct AudioSettings {
         /// Policy to publish the audio media type with.
@@ -299,6 +319,7 @@ pub mod web_rtc_publish_endpoint {
         pub publish_policy: i32,
     }
     /// Video media type settings of `WebRtcPublishEndpoint`.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct VideoSettings {
         /// Policy to publish the video media type with.
@@ -391,6 +412,7 @@ pub mod web_rtc_publish_endpoint {
     }
 }
 /// Media element playing media data for a client via WebRTC.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WebRtcPlayEndpoint {
     /// ID of this `WebRtcPlayEndpoint`.
@@ -411,6 +433,7 @@ pub struct WebRtcPlayEndpoint {
 }
 /// Ping message received by a media server periodically for probing its
 /// healthiness.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Ping {
     /// Each new `Ping` should increment its nonce, starting with 0.
@@ -418,6 +441,7 @@ pub struct Ping {
     pub nonce: u32,
 }
 /// Pong message sent by a media server in response to a received `Ping` message.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Pong {
     /// / Nonce of the answered `Ping` message.
@@ -600,5 +624,333 @@ pub mod control_api_client {
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
             self.inner.unary(request.into_request(), path, codec).await
         }
+    }
+}
+/// Generated server implementations.
+pub mod control_api_server {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    /// Generated trait containing gRPC methods that should be implemented for use with ControlApiServer.
+    #[async_trait]
+    pub trait ControlApi: Send + Sync + 'static {
+        /// Creates a new `Element` on the media server.
+        ///
+        /// Non-idempotent. Errors if an `Element` with such ID already exists.
+        async fn create(
+            &self,
+            request: tonic::Request<super::CreateRequest>,
+        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        /// Removes `Element`s from the media server.
+        /// Allows referring multiple `Element`s on the last two levels of a FID.
+        ///
+        /// Idempotent. If no `Element`s with such FIDs exist, then succeeds.
+        async fn delete(
+            &self,
+            request: tonic::Request<super::IdRequest>,
+        ) -> Result<tonic::Response<super::Response>, tonic::Status>;
+        /// Lookups `Element`s by their FIDs on the media server.
+        /// If no FIDs are specified, then returns all the current `Element`s on the
+        /// media server.
+        async fn get(
+            &self,
+            request: tonic::Request<super::IdRequest>,
+        ) -> Result<tonic::Response<super::GetResponse>, tonic::Status>;
+        /// Applies changes to an existing `Element` on the media server, or creates a
+        /// new one in case there is no `Element` with such ID.
+        ///
+        /// Idempotent. If no `Element` with such ID exists, then it will be created,
+        /// otherwise it will be reconfigured. `Element`s that exist on the same
+        /// hierarchy level, but are not specified in the provided spec, will be
+        /// removed.
+        async fn apply(
+            &self,
+            request: tonic::Request<super::ApplyRequest>,
+        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        /// Checks healthiness of the media server.
+        /// Caller should assert that the returned `Pong` has the same nonce as the
+        /// sent `Ping`.
+        async fn healthz(
+            &self,
+            request: tonic::Request<super::Ping>,
+        ) -> Result<tonic::Response<super::Pong>, tonic::Status>;
+    }
+    /// Service allowing to control a media server dynamically, by creating, updating
+    /// and destroying pipelines of media `Element`s on it.
+    #[derive(Debug)]
+    pub struct ControlApiServer<T: ControlApi> {
+        inner: _Inner<T>,
+        accept_compression_encodings: EnabledCompressionEncodings,
+        send_compression_encodings: EnabledCompressionEncodings,
+    }
+    struct _Inner<T>(Arc<T>);
+    impl<T: ControlApi> ControlApiServer<T> {
+        pub fn new(inner: T) -> Self {
+            Self::from_arc(Arc::new(inner))
+        }
+        pub fn from_arc(inner: Arc<T>) -> Self {
+            let inner = _Inner(inner);
+            Self {
+                inner,
+                accept_compression_encodings: Default::default(),
+                send_compression_encodings: Default::default(),
+            }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> InterceptedService<Self, F>
+        where
+            F: tonic::service::Interceptor,
+        {
+            InterceptedService::new(Self::new(inner), interceptor)
+        }
+        /// Enable decompressing requests with the given encoding.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.accept_compression_encodings.enable(encoding);
+            self
+        }
+        /// Compress responses with the given encoding, if the client supports it.
+        #[must_use]
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.send_compression_encodings.enable(encoding);
+            self
+        }
+    }
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for ControlApiServer<T>
+    where
+        T: ControlApi,
+        B: Body + Send + 'static,
+        B::Error: Into<StdError> + Send + 'static,
+    {
+        type Response = http::Response<tonic::body::BoxBody>;
+        type Error = std::convert::Infallible;
+        type Future = BoxFuture<Self::Response, Self::Error>;
+        fn poll_ready(
+            &mut self,
+            _cx: &mut Context<'_>,
+        ) -> Poll<Result<(), Self::Error>> {
+            Poll::Ready(Ok(()))
+        }
+        fn call(&mut self, req: http::Request<B>) -> Self::Future {
+            let inner = self.inner.clone();
+            match req.uri().path() {
+                "/api.ControlApi/Create" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateSvc<T: ControlApi>(pub Arc<T>);
+                    impl<T: ControlApi> tonic::server::UnaryService<super::CreateRequest>
+                    for CreateSvc<T> {
+                        type Response = super::CreateResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).create(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/api.ControlApi/Delete" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteSvc<T: ControlApi>(pub Arc<T>);
+                    impl<T: ControlApi> tonic::server::UnaryService<super::IdRequest>
+                    for DeleteSvc<T> {
+                        type Response = super::Response;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::IdRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).delete(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/api.ControlApi/Get" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetSvc<T: ControlApi>(pub Arc<T>);
+                    impl<T: ControlApi> tonic::server::UnaryService<super::IdRequest>
+                    for GetSvc<T> {
+                        type Response = super::GetResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::IdRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).get(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/api.ControlApi/Apply" => {
+                    #[allow(non_camel_case_types)]
+                    struct ApplySvc<T: ControlApi>(pub Arc<T>);
+                    impl<T: ControlApi> tonic::server::UnaryService<super::ApplyRequest>
+                    for ApplySvc<T> {
+                        type Response = super::CreateResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ApplyRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).apply(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ApplySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/api.ControlApi/Healthz" => {
+                    #[allow(non_camel_case_types)]
+                    struct HealthzSvc<T: ControlApi>(pub Arc<T>);
+                    impl<T: ControlApi> tonic::server::UnaryService<super::Ping>
+                    for HealthzSvc<T> {
+                        type Response = super::Pong;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::Ping>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).healthz(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = HealthzSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                _ => {
+                    Box::pin(async move {
+                        Ok(
+                            http::Response::builder()
+                                .status(200)
+                                .header("grpc-status", "12")
+                                .header("content-type", "application/grpc")
+                                .body(empty_body())
+                                .unwrap(),
+                        )
+                    })
+                }
+            }
+        }
+    }
+    impl<T: ControlApi> Clone for ControlApiServer<T> {
+        fn clone(&self) -> Self {
+            let inner = self.inner.clone();
+            Self {
+                inner,
+                accept_compression_encodings: self.accept_compression_encodings,
+                send_compression_encodings: self.send_compression_encodings,
+            }
+        }
+    }
+    impl<T: ControlApi> Clone for _Inner<T> {
+        fn clone(&self) -> Self {
+            Self(self.0.clone())
+        }
+    }
+    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{:?}", self.0)
+        }
+    }
+    impl<T: ControlApi> tonic::server::NamedService for ControlApiServer<T> {
+        const NAME: &'static str = "api.ControlApi";
     }
 }
