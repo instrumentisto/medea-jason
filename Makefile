@@ -21,8 +21,8 @@ IMAGE_NAME := $(strip \
 	$(or $(image),medea-control-api-mock)))
 
 RUST_VER := 1.65
-CHROME_VERSION := 102.0
-FIREFOX_VERSION := 106.0-driver0.32.0
+CHROME_VERSION := 104.0
+FIREFOX_VERSION := 107.0.1-driver0.32.0
 
 CARGO_NDK_VER := 2.8.0-ndkr23b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
