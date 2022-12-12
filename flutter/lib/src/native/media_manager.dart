@@ -10,7 +10,7 @@ import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_device_info.dart';

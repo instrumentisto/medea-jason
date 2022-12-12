@@ -5,7 +5,7 @@ import '../interface/connection_handle.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
 class NativeConnectionHandle extends ConnectionHandle {

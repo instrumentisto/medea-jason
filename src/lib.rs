@@ -124,5 +124,13 @@ pub mod platform;
 pub mod room;
 pub mod rpc;
 
-// #[cfg(not(feature = "mockable"))]
-mod api_api_g;
+#[allow(unused_qualifications)]
+#[allow(clippy::as_conversions)]
+#[allow(clippy::undocumented_unsafe_blocks)]
+#[allow(clippy::wildcard_imports)]
+#[allow(clippy::missing_docs_in_private_items)]
+#[allow(clippy::default_trait_access)]
+#[allow(clippy::ptr_as_ptr)]
+#[allow(clippy::let_underscore_drop)]
+#[allow(let_underscore_drop)]
+mod jason_api_g;

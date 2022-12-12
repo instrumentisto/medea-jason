@@ -175,12 +175,10 @@ packages:
   flutter_rust_bridge:
     dependency: "direct main"
     description:
-      path: frb_dart
-      ref: temp-smdr
-      resolved-ref: "3d8fac2f694ac74709a51bfdf7e556dbe97ab20b"
-      url: "https://github.com/rogurotus/flutter_rust_bridge.git"
-    source: git
-    version: "1.53.0"
+      name: flutter_rust_bridge
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.54.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -276,12 +274,10 @@ packages:
   medea_flutter_webrtc:
     dependency: transitive
     description:
-      path: "."
-      ref: temp-frb-deps
-      resolved-ref: "8b9e8006ffd9b15f85d961469006825e316ef422"
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
-    version: "0.8.0-dev"
+      name: medea_flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0-dev+rev.0ef956e098dfe3ef20c108e6b60ca5f285310409"
   medea_jason:
     dependency: "direct main"
     description:

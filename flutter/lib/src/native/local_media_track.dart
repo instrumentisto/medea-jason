@@ -3,7 +3,7 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
 class NativeLocalMediaTrack extends LocalMediaTrack {

@@ -15,25 +15,11 @@
     missing_docs
 )]
 
-pub mod api_api;
-
 #[cfg(feature = "mockable")]
 pub mod mock;
 
-// pub mod audio_track_constraints;
-// pub mod connection_handle;
-// pub mod device_video_track_constraints;
-// pub mod display_video_track_constraints;
-// pub mod jason;
-// pub mod local_media_track;
-// pub mod media_device_info;
-// pub mod media_display_info;
-// pub mod media_manager_handle;
-// pub mod media_stream_settings;
-// pub mod reconnect_handle;
-// pub mod remote_media_track;
-// pub mod room_close_reason;
-// pub mod room_handle;
+#[allow(clippy::needless_pass_by_value)]
+pub mod jason_api;
 pub mod utils;
 
 use std::{
@@ -68,7 +54,7 @@ use crate::{
 pub use crate::media::MediaDirection;
 
 pub use self::{
-    api_api::{
+    jason_api::{
         AudioTrackConstraints, ConnectionHandle, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints, Jason, LocalMediaTrack, MediaDeviceInfo,
         MediaDisplayInfo, MediaManagerHandle, MediaStreamSettings,
@@ -592,15 +578,6 @@ pub struct DartValueCastError {
 
     /// [`DartValue`] that cannot be casted.
     value: DartValue,
-}
-
-impl DartValueCastError {
-    /// Returns [`DartValue`] that could not be casted.
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
-    fn into_value(self) -> DartValue {
-        self.value
-    }
 }
 
 impl PrimitiveEnum for MediaSourceKind {}

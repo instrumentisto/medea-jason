@@ -9,7 +9,7 @@ import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'connection_handle.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_stream_settings.dart';

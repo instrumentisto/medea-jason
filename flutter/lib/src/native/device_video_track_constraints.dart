@@ -3,13 +3,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import '../interface/device_video_track_constraints.dart' as base;
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
 class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   frb.ApiWrapDeviceVideoTrackConstraints opaque =
-      api.deviceVideoTrackConstraintsNew();
+      api.deviceVideoTrackConstrNew();
 
   /// Constructs a new [DeviceVideoTrackConstraints] backed by the Rust struct behind the
   /// provided [frb.RefCellDeviceVideoTrackConstraints].
@@ -19,27 +19,27 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
 
   @override
   void deviceId(String deviceId) {
-    api.deviceVideoTrackConstraintsDeviceId(
-        constraints: opaque, deviceId: deviceId);
+    api.deviceVideoTrackConstrDeviceId(
+        constr: opaque, deviceId: deviceId);
   }
 
   @override
   void exactFacingMode(base.FacingMode facingMode) {
-    api.deviceVideoTrackConstraintsExactFacingMode(
-        constraints: opaque, facingMode: facingMode.index);
+    api.deviceVideoTrackConstrExactFacingMode(
+        constr: opaque, facingMode: facingMode.index);
   }
 
   @override
   void idealFacingMode(base.FacingMode facingMode) {
-    api.deviceVideoTrackConstraintsIdealFacingMode(
-        constraints: opaque, facingMode: facingMode.index);
+    api.deviceVideoTrackConstrIdealFacingMode(
+        constr: opaque, facingMode: facingMode.index);
   }
 
   @override
   void exactHeight(int height) {
     try {
-      api.deviceVideoTrackConstraintsExactHeight(
-          constraints: opaque, exactHeight: height);
+      api.deviceVideoTrackConstrExactHeight(
+          constr: opaque, exactHeight: height);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -48,8 +48,8 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void idealHeight(int height) {
     try {
-      api.deviceVideoTrackConstraintsIdealHeight(
-          constraints: opaque, idealHeight: height);
+      api.deviceVideoTrackConstrIdealHeight(
+          constr: opaque, idealHeight: height);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -58,8 +58,8 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void heightInRange(int min, int max) {
     try {
-      api.deviceVideoTrackConstraintsHeightInRange(
-          constraints: opaque, min: min, max: max);
+      api.deviceVideoTrackConstrHeightInRange(
+          constr: opaque, min: min, max: max);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -68,8 +68,8 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void exactWidth(int width) {
     try {
-      api.deviceVideoTrackConstraintsExactWidth(
-          constraints: opaque, exactWidth: width);
+      api.deviceVideoTrackConstrExactWidth(
+          constr: opaque, exactWidth: width);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -78,8 +78,8 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void idealWidth(int width) {
     try {
-      api.deviceVideoTrackConstraintsIdealWidth(
-          constraints: opaque, idealWidth: width);
+      api.deviceVideoTrackConstrIdealWidth(
+          constr: opaque, idealWidth: width);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -88,8 +88,8 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void widthInRange(int min, int max) {
     try {
-      api.deviceVideoTrackConstraintsWidthInRange(
-          constraints: opaque, min: min, max: max);
+      api.deviceVideoTrackConstrWidthInRange(
+          constr: opaque, min: min, max: max);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }

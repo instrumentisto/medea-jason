@@ -2,17 +2,17 @@ use super::*;
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_audio_track_constraints_new(
-) -> support::WireSyncReturnStruct {
-    wire_audio_track_constraints_new_impl()
+pub extern "C" fn wire_audio_track_constr_new() -> support::WireSyncReturnStruct
+{
+    wire_audio_track_constr_new_impl()
 }
 
 #[no_mangle]
-pub extern "C" fn wire_audio_track_constraints_device_id(
+pub extern "C" fn wire_audio_track_constr_device_id(
     track: wire_AudioTrackConstraints,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
-    wire_audio_track_constraints_device_id_impl(track, device_id)
+    wire_audio_track_constr_device_id_impl(track, device_id)
 }
 
 #[no_mangle]
@@ -84,187 +84,149 @@ pub extern "C" fn wire_connection_handle_disable_remote_video(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_new(
+pub extern "C" fn wire_device_video_track_constr_new(
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_new_impl()
+    wire_device_video_track_constr_new_impl()
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_device_id(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_device_id(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_device_id_impl(constraints, device_id)
+    wire_device_video_track_constr_device_id_impl(constr, device_id)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_exact_facing_mode(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_exact_facing_mode(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     facing_mode: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_exact_facing_mode_impl(
-        constraints,
-        facing_mode,
-    )
+    wire_device_video_track_constr_exact_facing_mode_impl(constr, facing_mode)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_ideal_facing_mode(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_ideal_facing_mode(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     facing_mode: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_ideal_facing_mode_impl(
-        constraints,
-        facing_mode,
-    )
+    wire_device_video_track_constr_ideal_facing_mode_impl(constr, facing_mode)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_exact_height(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_exact_height(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     exact_height: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_exact_height_impl(
-        constraints,
-        exact_height,
-    )
+    wire_device_video_track_constr_exact_height_impl(constr, exact_height)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_ideal_height(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_ideal_height(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     ideal_height: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_ideal_height_impl(
-        constraints,
-        ideal_height,
-    )
+    wire_device_video_track_constr_ideal_height_impl(constr, ideal_height)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_exact_width(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_exact_width(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     exact_width: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_exact_width_impl(
-        constraints,
-        exact_width,
-    )
+    wire_device_video_track_constr_exact_width_impl(constr, exact_width)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_ideal_width(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_ideal_width(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     ideal_width: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_ideal_width_impl(
-        constraints,
-        ideal_width,
-    )
+    wire_device_video_track_constr_ideal_width_impl(constr, ideal_width)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_height_in_range(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_height_in_range(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     min: i64,
     max: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_height_in_range_impl(
-        constraints,
-        min,
-        max,
-    )
+    wire_device_video_track_constr_height_in_range_impl(constr, min, max)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_device_video_track_constraints_width_in_range(
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+pub extern "C" fn wire_device_video_track_constr_width_in_range(
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
     min: i64,
     max: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_device_video_track_constraints_width_in_range_impl(
-        constraints,
-        min,
-        max,
-    )
+    wire_device_video_track_constr_width_in_range_impl(constr, min, max)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_new(
+pub extern "C" fn wire_display_video_track_constr_new(
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_new_impl()
+    wire_display_video_track_constr_new_impl()
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_device_id(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_device_id(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     device_id: *mut wire_uint_8_list,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_device_id_impl(constraints, device_id)
+    wire_display_video_track_constr_device_id_impl(constr, device_id)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_exact_height(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_exact_height(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     exact_height: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_exact_height_impl(
-        constraints,
-        exact_height,
-    )
+    wire_display_video_track_constr_exact_height_impl(constr, exact_height)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_ideal_height(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_ideal_height(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     ideal_height: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_ideal_height_impl(
-        constraints,
-        ideal_height,
-    )
+    wire_display_video_track_constr_ideal_height_impl(constr, ideal_height)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_exact_width(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_exact_width(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     exact_width: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_exact_width_impl(
-        constraints,
-        exact_width,
-    )
+    wire_display_video_track_constr_exact_width_impl(constr, exact_width)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_ideal_width(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_ideal_width(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     ideal_width: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_ideal_width_impl(
-        constraints,
-        ideal_width,
-    )
+    wire_display_video_track_constr_ideal_width_impl(constr, ideal_width)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_ideal_frame_rate(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_ideal_frame_rate(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     ideal_frame_rate: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_ideal_frame_rate_impl(
-        constraints,
+    wire_display_video_track_constr_ideal_frame_rate_impl(
+        constr,
         ideal_frame_rate,
     )
 }
 
 #[no_mangle]
-pub extern "C" fn wire_display_video_track_constraints_exact_frame_rate(
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+pub extern "C" fn wire_display_video_track_constr_exact_frame_rate(
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
     exact_frame_rate: i64,
 ) -> support::WireSyncReturnStruct {
-    wire_display_video_track_constraints_exact_frame_rate_impl(
-        constraints,
+    wire_display_video_track_constr_exact_frame_rate_impl(
+        constr,
         exact_frame_rate,
     )
 }
@@ -484,31 +446,25 @@ pub extern "C" fn wire_media_stream_settings_new(
 #[no_mangle]
 pub extern "C" fn wire_media_stream_settings_audio(
     media_stream_settings: wire_MediaStreamSettings,
-    constraints: wire_AudioTrackConstraints,
+    constr: wire_AudioTrackConstraints,
 ) -> support::WireSyncReturnStruct {
-    wire_media_stream_settings_audio_impl(media_stream_settings, constraints)
+    wire_media_stream_settings_audio_impl(media_stream_settings, constr)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_stream_settings_device_video(
     media_stream_settings: wire_MediaStreamSettings,
-    constraints: wire_ApiWrapDeviceVideoTrackConstraints,
+    constr: wire_ApiWrapDeviceVideoTrackConstraints,
 ) -> support::WireSyncReturnStruct {
-    wire_media_stream_settings_device_video_impl(
-        media_stream_settings,
-        constraints,
-    )
+    wire_media_stream_settings_device_video_impl(media_stream_settings, constr)
 }
 
 #[no_mangle]
 pub extern "C" fn wire_media_stream_settings_display_video(
     media_stream_settings: wire_MediaStreamSettings,
-    constraints: wire_ApiWrapDisplayVideoTrackConstraints,
+    constr: wire_ApiWrapDisplayVideoTrackConstraints,
 ) -> support::WireSyncReturnStruct {
-    wire_media_stream_settings_display_video_impl(
-        media_stream_settings,
-        constraints,
-    )
+    wire_media_stream_settings_display_video_impl(media_stream_settings, constr)
 }
 
 #[no_mangle]

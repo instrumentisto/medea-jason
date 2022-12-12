@@ -10,7 +10,7 @@ import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'ffi/box_handle.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
@@ -29,8 +29,8 @@ typedef _onPanic_C = Void Function(Handle);
 typedef _onPanic_Dart = void Function(Object);
 
 // todo ?
-late frb.ApiApiImpl api = _api_load();
-late DynamicLibrary dl;
+late frb.JasonApi api = frb.JasonApiImpl(dl);
+late DynamicLibrary dl = _dl_load();
 
 /// [Executor] that drives Rust futures.
 ///
@@ -63,7 +63,7 @@ Object objectFromAnyhow(FfiException error) {
   return err;
 }
 
-frb.ApiApiImpl _api_load() {
+DynamicLibrary _dl_load() {
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -85,8 +85,6 @@ frb.ApiApiImpl _api_load() {
       : Platform.isMacOS
           ? DynamicLibrary.executable()
           : DynamicLibrary.open(path);
-
-  var api = frb.ApiApiImpl(_dl);
 
   var initResult = _dl.lookupFunction<IntPtr Function(Pointer<Void>),
           int Function(Pointer<Void>)>('init_dart_api_dl_jason')(
@@ -115,8 +113,7 @@ frb.ApiApiImpl _api_load() {
       _onPanicCallback!(msg);
     }
   });
-  dl = _dl;
-  return api;
+  return _dl;
 }
 
 class Jason extends base.Jason {

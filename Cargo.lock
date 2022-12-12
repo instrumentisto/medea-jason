@@ -1233,8 +1233,9 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge"
-version = "1.53.0"
-source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=temp-smdr#3d8fac2f694ac74709a51bfdf7e556dbe97ab20b"
+version = "1.54.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5df8e5ef5f0e51bc20a0f4f4dc9b84f08256f9fec19098fd66ef098cc77c30b3"
 dependencies = [
  "allo-isolate",
  "anyhow",
@@ -1257,8 +1258,9 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge_codegen"
-version = "1.53.0"
-source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=temp-smdr#3d8fac2f694ac74709a51bfdf7e556dbe97ab20b"
+version = "1.54.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c46fb09a35c5b4b505d1bb5941f29e03ea3c0cacd4de0c9dec21a84ba3cb95b6"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -1284,8 +1286,9 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge_macros"
-version = "1.53.0"
-source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=temp-smdr#3d8fac2f694ac74709a51bfdf7e556dbe97ab20b"
+version = "1.54.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aee137f8da06658835df7984db8a4cce338750e15bad19bca680004ccbfa0623"
 
 [[package]]
 name = "fnv"

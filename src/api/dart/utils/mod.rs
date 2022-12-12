@@ -36,8 +36,9 @@ pub struct DartFuture<O>(
 );
 
 impl<O> DartFuture<O> {
-    // todo
-    pub fn into_raw(self) -> Dart_Handle {
+    /// Returns inner [`Dart_Handle`].
+    #[must_use]
+    pub const fn into_raw(self) -> Dart_Handle {
         self.0
     }
 }
@@ -82,22 +83,10 @@ where
     }
 }
 
-/// Tries to convert the provided [`DartValueArg`] using [`TryInto`].
+/// Tries to convert the provided [i64] using [`TryInto`].
 ///
 /// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
-/// [`DartFuture`].
-macro_rules! dart_arg_try_into {
-    ($k:expr) => {
-        match $k.try_into().map_err(|err: DartValueCastError| {
-            ArgumentError::new(err.value, "kind", err.expectation)
-        }) {
-            Ok(s) => s,
-            Err(e) => return async move { Err(e.into()) }.into_dart_future(),
-        }
-    };
-}
-
-// todo
+/// anyhow [`DartError`].
 macro_rules! dart_enum_try_into {
     ($k:expr, $name:expr, $message:expr) => {
         if let Some(kind) = $k {
@@ -113,5 +102,4 @@ macro_rules! dart_enum_try_into {
     };
 }
 
-pub(crate) use dart_arg_try_into;
 pub(crate) use dart_enum_try_into;

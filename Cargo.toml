@@ -53,8 +53,8 @@ tracerr = "0.3"
 url = "2.3"
 anyhow = "1.0.66"
 
-flutter_rust_bridge = { git = "https://github.com/rogurotus/flutter_rust_bridge", branch = "temp-smdr"}
-flutter_rust_bridge_macros = { git = "https://github.com/rogurotus/flutter_rust_bridge", branch = "temp-smdr" }
+flutter_rust_bridge = "=1.54.0"
+flutter_rust_bridge_macros = "=1.54.0"
 
 [target.'cfg(target_os = "android")'.dependencies]
 android_logger = "0.11"
@@ -108,7 +108,7 @@ wee_alloc = { version = "0.4", optional = true }
 
 [build-dependencies]
 cc = "1.0"
-flutter_rust_bridge_codegen = { git = "https://github.com/rogurotus/flutter_rust_bridge", branch = "temp-smdr" }
+flutter_rust_bridge_codegen = "=1.54.0"
 
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]

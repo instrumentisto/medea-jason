@@ -1,7 +1,7 @@
 import '../interface/media_display_info.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
 class NativeMediaDisplayInfo extends MediaDisplayInfo {

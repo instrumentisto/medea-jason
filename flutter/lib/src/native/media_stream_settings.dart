@@ -6,7 +6,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'audio_track_constraints.dart';
 import 'device_video_track_constraints.dart';
 import 'display_video_track_constraints.dart';
-import 'ffi/api_api.g.dart' as frb;
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
 import '../interface/display_video_track_constraints.dart'
@@ -27,7 +27,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
     opaque.move = true;
     opaque = api.mediaStreamSettingsAudio(
         mediaStreamSettings: opaque,
-        constraints: (constraints as AudioTrackConstraints).opaque);
+        constr: (constraints as AudioTrackConstraints).opaque);
     constraints.opaque.dispose();
   }
 
@@ -39,7 +39,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
     constraints.opaque.move = true;
     opaque.move = true;
     opaque = api.mediaStreamSettingsDeviceVideo(
-        mediaStreamSettings: opaque, constraints: constraints.opaque);
+        mediaStreamSettings: opaque, constr: constraints.opaque);
   }
 
   @override
@@ -50,7 +50,7 @@ class MediaStreamSettings extends base.MediaStreamSettings {
     constraints.opaque.move = true;
     opaque.move = true;
     opaque = api.mediaStreamSettingsDisplayVideo(
-        mediaStreamSettings: opaque, constraints: constraints.opaque);
+        mediaStreamSettings: opaque, constr: constraints.opaque);
   }
 
   @moveSemantics

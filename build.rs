@@ -8,73 +8,21 @@ use lib_flutter_rust_bridge_codegen::{
     config_parse, frb_codegen, get_symbols_if_no_duplicates, RawOpts,
 };
 
-fn case(str: &str) -> String {
-    let mut res = String::new();
-    let mut first = true;
-    let mut space = false;
-    for i in str.chars() {
-        if first {
-            res.push_str(&i.to_uppercase().to_string());
-            first = false;
-            continue;
-        }
-        if space {
-            res.push_str(&i.to_uppercase().to_string());
-            space = false;
-            continue;
-        }
-        if i == '_' {
-            space = true;
-            continue;
-        } else {
-            res.push(i);
-        }
-    }
-    res
-}
-
-fn gen_args(
-    files: &[&str],
-) -> (Vec<String>, Vec<String>, Vec<String>, Vec<String>) {
-    let args = files
-        .iter()
-        .map(|file| {
-            (
-                format!("src/api/dart/{}_api.rs", file),
-                format!("flutter/lib/src/native/ffi/{}_api.g.dart", file),
-                format!("src/{}_api_g.rs", file),
-                format!("{}Api", case(file)),
-            )
-        })
-        .collect::<Vec<_>>();
-    let mut a1 = vec![];
-    let mut a2 = vec![];
-    let mut a3 = vec![];
-    let mut a4 = vec![];
-    for (a, b, c, d) in args {
-        a1.push(a);
-        a2.push(b);
-        a3.push(c);
-        a4.push(d);
-    }
-    (a1, a2, a3, a4)
-}
-
 fn main() {
-    let (rust_input, dart_output, rust_output, class_name) = gen_args(&["api"]);
     // Tell Cargo that if the input Rust code changes, to rerun this build
     // script.
-    println!("cargo:rerun-if-changed=src/api/dart/api_api.rs");
+    println!("cargo:rerun-if-changed=src/api/dart/jason_api.rs");
     // Options for frb_codegen
     let raw_opts = RawOpts {
         // Path of input Rust code
-        rust_input,
+        rust_input: vec!["src/api/dart/jason_api.rs".to_owned()],
+        
         // Path of output generated Dart code
-        dart_output,
+        dart_output: vec!["flutter/lib/src/native/ffi/jason_api.g.dart".to_owned()],
         // Path of output Rust code
-        rust_output: Some(rust_output),
+        rust_output: Some(vec!["src/jason_api_g.rs".to_owned()]),
         // Class name of each Rust block of api
-        class_name: Some(class_name),
+        class_name: Some(vec!["JasonApi".to_owned()]),
         dart_format_line_length: 80,
         skip_add_mod_to_lib: true,
         // for other options use defaults

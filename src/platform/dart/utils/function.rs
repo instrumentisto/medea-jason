@@ -61,7 +61,7 @@ impl<T> Function<T> {
     ///
     /// The provided [`Dart_Handle`] should be non-`null` and correct.
     #[must_use]
-    pub unsafe fn new(dart_fn: Dart_PersistentHandle) -> Self {
+    pub const unsafe fn new(dart_fn: Dart_PersistentHandle) -> Self {
         Self {
             dart_fn,
             _arg: PhantomData,

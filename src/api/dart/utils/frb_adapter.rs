@@ -6,29 +6,32 @@ use std::{
     panic::{RefUnwindSafe, UnwindSafe},
 };
 
-use crate::{platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined, api::ForeignClass};
+use crate::{
+    api::ForeignClass,
+    platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
+};
 
+/// Creates a new [`DartOpaque`].
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
-    DartOpaque::new_non_dropable(Dart_NewPersistentHandle_DL_Trampolined(
+    DartOpaque::new_non_droppable(Dart_NewPersistentHandle_DL_Trampolined(
         handle,
     ))
 }
 
 #[derive(Deref, Debug)]
+/// Panic-unsafe wrapper [`RefCell`].
+/// Used in `flutter_rust_bridge` API.
 pub struct ApiWrap<T>(RefCell<T>);
 
 impl<T> ApiWrap<T> {
-    pub fn new(data: T) -> Self {
-        data.into()
+    /// Creates a new [`ApiWrap`].
+    pub const unsafe fn new(data: T) -> Self {
+        Self(RefCell::new(data))
     }
 
+    /// Returns inner [`T`] data.
     pub fn into_inner(self) -> T {
         self.0.into_inner()
-    }
-}
-impl<T> From<T> for ApiWrap<T> {
-    fn from(data: T) -> Self {
-        Self(RefCell::new(data))
     }
 }
 
