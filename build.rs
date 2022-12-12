@@ -16,9 +16,11 @@ fn main() {
     let raw_opts = RawOpts {
         // Path of input Rust code
         rust_input: vec!["src/api/dart/jason_api.rs".to_owned()],
-        
+
         // Path of output generated Dart code
-        dart_output: vec!["flutter/lib/src/native/ffi/jason_api.g.dart".to_owned()],
+        dart_output: vec![
+            "flutter/lib/src/native/ffi/jason_api.g.dart".to_owned()
+        ],
         // Path of output Rust code
         rust_output: Some(vec!["src/jason_api_g.rs".to_owned()]),
         // Class name of each Rust block of api

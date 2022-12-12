@@ -3,9 +3,9 @@ use super::{
     utils::{dart_enum_try_into, new_dart_opaque},
     ForeignClass,
 };
-use flutter_rust_bridge_macros as _;
 use crate::{api::dart::DartError, room::ChangeMediaStateError};
 use flutter_rust_bridge::{DartOpaque, RustOpaque, SyncReturn};
+use flutter_rust_bridge_macros as _;
 use std::{
     panic::{RefUnwindSafe, UnwindSafe},
     ptr,
