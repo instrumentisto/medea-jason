@@ -14,6 +14,7 @@ import 'package:medea_jason/src/native/media_device_info.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 
 void main() {
+  try {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('Jason', (WidgetTester tester) async {
@@ -742,6 +743,10 @@ void main() {
       expect(err is UnsupportedError, true);
     }
   });
+  }
+  catch (e) {
+    print('EEEEEEEEEEE ${e}');
+  }
 }
 
 class TestObj {

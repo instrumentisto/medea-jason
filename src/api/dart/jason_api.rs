@@ -967,10 +967,13 @@ pub fn media_manager_handle_init_local_tracks(
 pub fn media_manager_handle_enumerate_devices(
     manager: RustOpaque<MediaManagerHandle>,
 ) -> SyncReturn<DartOpaque> {
+    println!("CALL");
     let manager = MediaManagerHandle::clone(&manager);
+    println!("CALL2");
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
+                println!("CALL3");
                 Ok::<ApiWrap<_>, Traced<EnumerateDevicesError>>(ApiWrap::new(
                     manager.enumerate_devices().await?,
                 ))
@@ -979,6 +982,7 @@ pub fn media_manager_handle_enumerate_devices(
             .into_raw(),
         )
     };
+    println!("CALL4");
     SyncReturn(dart_opaque)
 }
 

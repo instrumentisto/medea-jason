@@ -50,7 +50,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
     print("HERE");
     var devices = await (api.mediaManagerHandleEnumerateDevices(manager: opaque)
-        as Future) as Pointer;
+        as Future);
     print("HERE2");
     var vec = api.vecMediaDeviceInfoFromPtr(ptr: devices.address);
     print("HERE3");

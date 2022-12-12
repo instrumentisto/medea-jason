@@ -123,14 +123,18 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
+    print('RAZ');
     try {
+      print('dwa');
       api.roomHandleOnClose(
           roomHandle: opaque,
           cb: (t) {
             f(NativeRoomCloseReason(
                 api.roomCloseReasonFromPtr(ptr: t.address)));
           });
+    print('TREE');
     } on FfiException catch (anyhow) {
+    print('CHET');
       throw objectFromAnyhow(anyhow);
     }
   }
