@@ -678,6 +678,7 @@ impl RefUnwindSafe for Jason {}
 impl UnwindSafe for Jason {}
 
 /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
+#[must_use]
 pub fn on_panic(cb: DartOpaque) -> SyncReturn<()> {
     platform::set_panic_callback(unsafe{platform::Function::new(cb.try_unwrap().unwrap().into_raw())});
     SyncReturn(())
@@ -1924,11 +1925,14 @@ pub fn room_handle_on_close(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
+    println!("RAZ CALL");
     room_handle
         .on_close(unsafe {
+            println!("RAZ CALL2");
             platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+    println!("RAZ CALL3");
     Ok(SyncReturn(()))
 }
 
