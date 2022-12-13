@@ -14,7 +14,8 @@
 use crate::api::dart::jason_api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::{ffi::c_void, sync::Arc};
+use std::ffi::c_void;
+use std::sync::Arc;
 
 // Section: imports
 
@@ -535,6 +536,21 @@ fn wire_display_video_track_constr_exact_frame_rate_impl(
                 api_constr,
                 api_exact_frame_rate,
             )
+        },
+    )
+}
+fn wire_on_panic_impl(
+    cb: impl Wire2Api<DartOpaque> + UnwindSafe,
+) -> support::WireSyncReturnStruct {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "on_panic",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_cb = cb.wire2api();
+            Ok(on_panic(api_cb))
         },
     )
 }
@@ -1728,8 +1744,7 @@ impl Wire2Api<usize> for usize {
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
-        Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]

@@ -232,6 +232,13 @@ pub extern "C" fn wire_display_video_track_constr_exact_frame_rate(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_on_panic(
+    cb: wire_DartOpaque,
+) -> support::WireSyncReturnStruct {
+    wire_on_panic_impl(cb)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_jason_new() -> support::WireSyncReturnStruct {
     wire_jason_new_impl()
 }

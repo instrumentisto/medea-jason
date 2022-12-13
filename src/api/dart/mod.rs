@@ -39,7 +39,6 @@ use crate::{
     },
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::{
-        self,
         utils::{
             dart_api::{
                 Dart_DeletePersistentHandle_DL_Trampolined,
@@ -65,15 +64,6 @@ pub use self::{
         string_into_c_str, ArgumentError, DartError as Error,
     },
 };
-
-// TODO(alexlapa): why we dont use frb here?
-/// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
-#[no_mangle]
-pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
-    platform::set_panic_callback(platform::Function::new(
-        Dart_NewPersistentHandle_DL_Trampolined(cb),
-    ));
-}
 
 // TODO(alexlapa): does this even work now?
 /// Wraps the provided function to catch all the Rust panics and propagate them

@@ -25,11 +25,8 @@ import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
-typedef _onPanic_C = Void Function(Handle);
-typedef _onPanic_Dart = void Function(Object);
-
 /// Bindings to the Rust side API.
-late frb.MedeaJason api = frb.MedeaJasonImpl(dl);
+late frb.MedeaJason api = _init_api();
 late DynamicLibrary dl = _dl_load();
 
 /// [Executor] that drives Rust futures.
@@ -104,16 +101,19 @@ DynamicLibrary _dl_load() {
   native_string.registerFunctions(_dl);
 
   executor = Executor(_dl);
+  return _dl;
+}
 
-  final _onPanic = _dl.lookupFunction<_onPanic_C, _onPanic_Dart>('on_panic');
-  _onPanic((msg) {
+frb.MedeaJason _init_api() {
+  var api = frb.MedeaJasonImpl(dl);
+  api.onPanic(cb: (msg) {
     msg as String;
     RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {
       _onPanicCallback!(msg);
     }
   });
-  return _dl;
+  return api;
 }
 
 class Jason extends base.Jason {

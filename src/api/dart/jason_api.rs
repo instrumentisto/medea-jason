@@ -679,6 +679,12 @@ pub use crate::jason::Jason;
 impl RefUnwindSafe for Jason {}
 impl UnwindSafe for Jason {}
 
+/// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
+pub fn on_panic(cb: DartOpaque) -> SyncReturn<()> {
+    platform::set_panic_callback(unsafe{platform::Function::new(cb.try_unwrap().unwrap().into_raw())});
+    SyncReturn(())
+}
+
 /// Instantiates a new [`Jason`] interface to interact with this library.
 #[must_use]
 pub fn jason_new() -> SyncReturn<RustOpaque<Jason>> {
