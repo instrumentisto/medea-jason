@@ -20,7 +20,7 @@ use crate::{
 };
 
 /// Timeout for a [`LocalSdp`] being approved by the Media Server.
-const DESCRIPTION_APPROVE_TIMEOUT: Duration = Duration::from_secs(10);
+const DESCRIPTION_APPROVE_TIMEOUT: Duration = Duration::from_secs(50);
 
 /// Local session description wrapper.
 ///
