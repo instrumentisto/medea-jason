@@ -66,6 +66,7 @@ pub use self::{
     },
 };
 
+// TODO(alexlapa): why we dont use frb here?
 /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
 #[no_mangle]
 pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
@@ -74,6 +75,7 @@ pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
     ));
 }
 
+// TODO(alexlapa): does this even work now?
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {

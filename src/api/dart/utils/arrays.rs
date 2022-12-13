@@ -4,6 +4,7 @@ use std::{ffi::c_void, marker::PhantomData, ptr, slice};
 
 use crate::api::{propagate_panic, ForeignClass};
 
+// TODO(alexlapa): I dont think we need this atm
 /// Array of pointers to [`ForeignClass`] structs.
 ///
 /// Can be safely returned from extern functions. Foreign code must manually

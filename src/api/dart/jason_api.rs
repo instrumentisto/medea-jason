@@ -464,6 +464,8 @@ pub fn device_video_track_constr_width_in_range(
     max: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
     let mut constr = constr.borrow_mut();
+    // TODO(alexlapa): maybe frb does some bounds checking thus we dont need
+    //                 this checks?
     match (u32::try_from(min), u32::try_from(max)) {
         (Ok(min), Ok(max)) => {
             constr.width_in_range(min, max);
@@ -1469,6 +1471,7 @@ pub use super::mock::RoomHandle;
 pub use crate::room::RoomHandle;
 use crate::room::{ConstraintsUpdateError, RoomJoinError};
 
+// TODO(alexlapa): do we need this impl?
 impl ForeignClass for RoomHandle {}
 impl RefUnwindSafe for RoomHandle {}
 impl UnwindSafe for RoomHandle {}

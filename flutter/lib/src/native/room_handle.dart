@@ -103,6 +103,7 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
+    // TODO(alexlapa): why dont we just pass MediaSourceKind enum instead of u8?
     await (api.roomHandleDisableRemoteVideo(
         roomHandle: opaque, sourceKind: kind?.index) as Future);
   }
@@ -132,9 +133,9 @@ class NativeRoomHandle extends RoomHandle {
             f(NativeRoomCloseReason(
                 api.roomCloseReasonFromPtr(ptr: t.address)));
           });
-    print('TREE');
+      print('TREE');
     } on FfiException catch (anyhow) {
-    print('CHET');
+      print('CHET');
       throw objectFromAnyhow(anyhow);
     }
   }

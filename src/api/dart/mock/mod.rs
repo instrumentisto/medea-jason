@@ -8,6 +8,8 @@ pub mod reconnect_handle;
 pub mod remote_media_track;
 pub mod room_handle;
 
+// TODO(alexlapa): Can be deleted? We dont really need FFI tests if we use
+//                 frb. mockable trait can also be removed.
 pub use super::mock::{
     connection_handle::ConnectionHandle, jason::Jason,
     local_media_track::LocalMediaTrack, media_device_info::MediaDeviceInfo,

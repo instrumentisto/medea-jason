@@ -1,3 +1,5 @@
+// TODO(alexlapa): if we dont use this in api, maybe we should move this to
+//                 platform?
 pub mod arrays;
 mod err;
 mod frb_adapter;
