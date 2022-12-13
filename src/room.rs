@@ -297,7 +297,10 @@ impl RoomHandle {
         &self,
         f: platform::Function<api::RoomCloseReason>,
     ) -> Result<(), Traced<HandleDetachedError>> {
-        upgrade_inner!(self.0).map(|inner| inner.on_close.set_func(f))
+        println!("RAZ CALL5");
+        let a = upgrade_inner!(self.0).map(|inner| inner.on_close.set_func(f));
+        println!("RAZ CALL6");
+        a
     }
 
     /// Sets callback, invoked when a new [`local::Track`] is added to this

@@ -1929,10 +1929,12 @@ pub fn room_handle_on_close(
     room_handle
         .on_close(unsafe {
             println!("RAZ CALL2");
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+            let a = cb.try_unwrap().unwrap().into_raw();
+            println!("RAZ CALL3");
+            platform::Function::new(a)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
-    println!("RAZ CALL3");
+    println!("RAZ CALL10");
     Ok(SyncReturn(()))
 }
 
