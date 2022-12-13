@@ -1,6 +1,3 @@
-// TODO(alexlapa): if we dont use this in api, maybe we should move this to
-//                 platform?
-pub mod arrays;
 mod err;
 mod frb_adapter;
 mod result;
@@ -16,7 +13,6 @@ use crate::{
 };
 
 pub use self::{
-    arrays::PtrArray,
     err::{new_panic_error, ArgumentError, DartError},
     frb_adapter::*,
     result::DartResult,

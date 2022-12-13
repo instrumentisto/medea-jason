@@ -34,7 +34,7 @@ use libc::c_char;
 
 use crate::{
     api::{
-        dart::utils::{DartError, PtrArray},
+        dart::utils::DartError,
         utils::new_panic_error,
     },
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
@@ -65,7 +65,6 @@ pub use self::{
     },
 };
 
-// TODO(alexlapa): does this even work now?
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
@@ -168,18 +167,6 @@ impl<T: ForeignClass> From<T> for DartValue {
 impl<T: ForeignClass> From<Option<T>> for DartValue {
     fn from(val: Option<T>) -> Self {
         val.map_or(Self::None, |t| Self::from(t))
-    }
-}
-
-impl<T> From<PtrArray<T>> for DartValue {
-    fn from(val: PtrArray<T>) -> Self {
-        Self::Ptr(ptr::NonNull::from(Box::leak(Box::new(val))).cast())
-    }
-}
-
-impl<T> From<Option<PtrArray<T>>> for DartValue {
-    fn from(val: Option<PtrArray<T>>) -> Self {
-        val.map_or(Self::None, Self::from)
     }
 }
 
