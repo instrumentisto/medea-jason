@@ -130,6 +130,7 @@ class NativeRoomHandle extends RoomHandle {
       api.roomHandleOnClose(
           roomHandle: opaque,
           cb: (t) {
+            print('ASDASD ${t}');
             f(NativeRoomCloseReason(
                 api.roomCloseReasonFromPtr(ptr: t.address)));
           });

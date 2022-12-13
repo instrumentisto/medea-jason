@@ -3,7 +3,7 @@ use super::{
     utils::{dart_enum_try_into, new_dart_opaque},
     ForeignClass,
 };
-use crate::{api::dart::DartError, room::ChangeMediaStateError};
+use crate::{api::{dart::DartError, self}, room::ChangeMediaStateError};
 use flutter_rust_bridge::{DartOpaque, RustOpaque, SyncReturn};
 use flutter_rust_bridge_macros as _;
 use std::{
@@ -1926,13 +1926,13 @@ pub fn room_handle_on_close(
     cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
     println!("RAZ CALL");
+    let a = cb.try_unwrap().unwrap().into_raw();
+    println!("RAZ CALL2");
+    let b = unsafe{platform::Function::<api::RoomCloseReason>::new(a)};
+    println!("RAZ CALL3");
+
     room_handle
-        .on_close(unsafe {
-            println!("RAZ CALL2");
-            let a = cb.try_unwrap().unwrap().into_raw();
-            println!("RAZ CALL3");
-            platform::Function::new(a)
-        })
+        .on_close(b)
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     println!("RAZ CALL10");
     Ok(SyncReturn(()))
