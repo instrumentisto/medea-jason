@@ -277,7 +277,7 @@ packages:
       name: medea_flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0-dev+rev.ba21f0dd8d75b59a8ff93b4daf1b55bfc54e75f8"
+    version: "0.8.0-dev+rev.722252aa1836b9f647f541f5cf6792a9768f92b2"
   medea_jason:
     dependency: "direct main"
     description:
@@ -369,13 +369,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.14.0"
-  retry:
-    dependency: transitive
-    description:
-      name: retry
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.0"
   shelf:
     dependency: transitive
     description:
@@ -485,7 +478,7 @@ packages:
       name: uuid
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.6"
+    version: "3.0.7"
   vector_math:
     dependency: transitive
     description:
