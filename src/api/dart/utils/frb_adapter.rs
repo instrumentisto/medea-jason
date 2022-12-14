@@ -29,7 +29,7 @@ impl<T> ApiWrap<T> {
         Self(RefCell::new(data))
     }
 
-    /// Returns inner [`T`] data.
+    /// Returns inner data.
     pub fn into_inner(self) -> T {
         self.0.into_inner()
     }

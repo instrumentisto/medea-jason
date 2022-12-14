@@ -1,7 +1,7 @@
 pub use super::utils::{ApiWrap, IntoDartFuture};
 use super::{
     utils::{dart_enum_try_into, new_dart_opaque},
-    ForeignClass,
+    ForeignClass, MediaDirection,
 };
 use crate::{
     api::dart::DartError, media::FacingMode, room::ChangeMediaStateError,
@@ -1359,7 +1359,9 @@ pub fn remote_media_track_on_media_direction_changed(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_media_direction_changed(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+        platform::Function::<MediaDirection>::new(
+            f.try_unwrap().unwrap().into_raw(),
+        )
     });
     SyncReturn(())
 }

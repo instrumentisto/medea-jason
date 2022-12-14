@@ -50,6 +50,18 @@ Object objectFromAnyhow(FfiException error) {
   if (!error.message.contains('RESULT_ERROR: DartError')) {
     throw error;
   }
+
+  // var regex = RegExp('\((.*)\)');
+
+  // // todo regex
+  // print('|${error.message}| A ${regex.firstMatch(error.message)?.group(0)}');
+  // var handle = regex.firstMatch(error.message).toString();
+
+  // var regex = RegExp('\((.*)\)');
+
+  // todo regex
+  // print('|${error.message}| A ${regex.firstMatch(error.message)?.group(0)}');
+  // var handle = regex.firstMatch(error.message).toString();
   var handle = error.message;
   // todo regex
   handle =

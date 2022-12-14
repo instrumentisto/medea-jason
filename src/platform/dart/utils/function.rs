@@ -18,6 +18,8 @@ use super::dart_api::{
     Dart_DeletePersistentHandle_DL_Trampolined,
     Dart_HandleFromPersistent_DL_Trampolined,
 };
+#[allow(unused_imports)]
+use dart_sys::Dart_Handle;
 
 #[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
 mod function {
