@@ -71,23 +71,41 @@ class NativeConnectionHandle extends ConnectionHandle {
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (api.connectionHandleEnableRemoteAudio(connection: opaque) as Future);
+    try {
+      await (api.connectionHandleEnableRemoteAudio(connection: opaque)
+          as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await (api.connectionHandleDisableRemoteAudio(connection: opaque)
-        as Future);
+    try {
+      await (api.connectionHandleDisableRemoteAudio(connection: opaque)
+          as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.connectionHandleEnableRemoteVideo(connection: opaque) as Future);
+    try {
+      await (api.connectionHandleEnableRemoteVideo(connection: opaque)
+          as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.connectionHandleDisableRemoteVideo(connection: opaque)
-        as Future);
+    try {
+      await (api.connectionHandleDisableRemoteVideo(connection: opaque)
+          as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 }

@@ -14,10 +14,11 @@
 use crate::api::dart::jason_api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::ffi::c_void;
-use std::sync::Arc;
+use std::{ffi::c_void, sync::Arc};
 
 // Section: imports
+
+use crate::media::constraints::FacingMode;
 
 // Section: wire functions
 
@@ -233,7 +234,7 @@ fn wire_device_video_track_constr_device_id_impl(
 fn wire_device_video_track_constr_exact_facing_mode_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    facing_mode: impl Wire2Api<i64> + UnwindSafe,
+    facing_mode: impl Wire2Api<FacingMode> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -244,17 +245,17 @@ fn wire_device_video_track_constr_exact_facing_mode_impl(
         move || {
             let api_constr = constr.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            device_video_track_constr_exact_facing_mode(
+            Ok(device_video_track_constr_exact_facing_mode(
                 api_constr,
                 api_facing_mode,
-            )
+            ))
         },
     )
 }
 fn wire_device_video_track_constr_ideal_facing_mode_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
-    facing_mode: impl Wire2Api<i64> + UnwindSafe,
+    facing_mode: impl Wire2Api<FacingMode> + UnwindSafe,
 ) -> support::WireSyncReturnStruct {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -265,10 +266,10 @@ fn wire_device_video_track_constr_ideal_facing_mode_impl(
         move || {
             let api_constr = constr.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            device_video_track_constr_ideal_facing_mode(
+            Ok(device_video_track_constr_ideal_facing_mode(
                 api_constr,
                 api_facing_mode,
-            )
+            ))
         },
     )
 }
@@ -1722,6 +1723,22 @@ impl Wire2Api<f64> for f64 {
         self
     }
 }
+impl Wire2Api<FacingMode> for i32 {
+    fn wire2api(self) -> FacingMode {
+        match self {
+            0 => FacingMode::User,
+            1 => FacingMode::Environment,
+            2 => FacingMode::Left,
+            3 => FacingMode::Right,
+            _ => unreachable!("Invalid variant for FacingMode: {}", self),
+        }
+    }
+}
+impl Wire2Api<i32> for i32 {
+    fn wire2api(self) -> i32 {
+        self
+    }
+}
 impl Wire2Api<i64> for i64 {
     fn wire2api(self) -> i64 {
         self
@@ -1744,7 +1761,8 @@ impl Wire2Api<usize> for usize {
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
+        Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]

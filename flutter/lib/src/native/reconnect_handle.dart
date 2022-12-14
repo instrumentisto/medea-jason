@@ -1,3 +1,5 @@
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
@@ -16,20 +18,28 @@ class NativeReconnectHandle extends ReconnectHandle {
 
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
-    await (api.reconnectHandleReconnectWithDelay(
-        reconnectHandle: opaque, delayMs: delayMs) as Future);
+    try {
+      await (api.reconnectHandleReconnectWithDelay(
+          reconnectHandle: opaque, delayMs: delayMs) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> reconnectWithBackoff(
       int startingDelayMs, double multiplier, int maxDelay,
       [int? maxElapsedTimeMs]) async {
-    await (api.reconnectHandleReconnectWithBackoff(
-        reconnectHandle: opaque,
-        startingDelay: startingDelayMs,
-        multiplier: multiplier,
-        maxDelay: maxDelay,
-        maxElapsedTimeMs: maxElapsedTimeMs) as Future);
+    try {
+      await (api.reconnectHandleReconnectWithBackoff(
+          reconnectHandle: opaque,
+          startingDelay: startingDelayMs,
+          multiplier: multiplier,
+          maxDelay: maxDelay,
+          maxElapsedTimeMs: maxElapsedTimeMs) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @moveSemantics

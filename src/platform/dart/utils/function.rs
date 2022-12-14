@@ -80,14 +80,10 @@ impl<T: Into<DartValue>> Function<T> {
     /// Calls the underlying Dart closure with the provided argument.
     pub fn call1(&self, arg: T) {
         unsafe {
-            println!("GOTCHA");
             let fn_handle =
                 Dart_HandleFromPersistent_DL_Trampolined(self.dart_fn);
-            println!("GOTCHA1");
             let a = arg.into();
-            println!("GOTCHA2");
             function::caller(fn_handle, a);
-            println!("GOTCHA3");
         }
     }
 }

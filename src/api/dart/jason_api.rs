@@ -3,9 +3,10 @@ use super::{
     utils::{dart_enum_try_into, new_dart_opaque},
     ForeignClass,
 };
-use crate::{api::dart::DartError, room::ChangeMediaStateError};
+use crate::{
+    api::dart::DartError, media::FacingMode, room::ChangeMediaStateError,
+};
 use flutter_rust_bridge::{DartOpaque, RustOpaque, SyncReturn};
-use flutter_rust_bridge_macros as _;
 use std::{
     panic::{RefUnwindSafe, UnwindSafe},
     ptr,
@@ -188,7 +189,6 @@ pub fn connection_handle_enable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<i64>,
 ) -> SyncReturn<DartOpaque> {
-    // here
     let fut = connection.enable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
     );
@@ -215,7 +215,6 @@ pub fn connection_handle_disable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<i64>,
 ) -> SyncReturn<DartOpaque> {
-    // here
     let fut = connection.disable_remote_video(
         source_kind.map(|v| MediaSourceKind::try_from(v).unwrap()),
     );
@@ -271,22 +270,14 @@ pub fn device_video_track_constr_device_id(
 /// # Errors
 ///
 /// If `facing_mode` is not [`FacingMode`] index.
+#[must_use]
 pub fn device_video_track_constr_exact_facing_mode(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
-    facing_mode: i64,
-) -> anyhow::Result<SyncReturn<()>> {
+    facing_mode: FacingMode,
+) -> SyncReturn<()> {
     let mut constr = constr.borrow_mut();
-    constr.exact_facing_mode(facing_mode.try_into().map_err(|v| {
-        anyhow::anyhow!(
-            "{:?}",
-            DartError::from(ArgumentError::new(
-                v,
-                "facing_mode",
-                "Invalid value"
-            ))
-        )
-    })?);
-    Ok(SyncReturn(()))
+    constr.exact_facing_mode(facing_mode);
+    SyncReturn(())
 }
 
 /// Sets an ideal [facingMode][1] constraint.
@@ -296,22 +287,14 @@ pub fn device_video_track_constr_exact_facing_mode(
 /// # Errors
 ///
 /// If `facing_mode` is not [`FacingMode`] index.
+#[must_use]
 pub fn device_video_track_constr_ideal_facing_mode(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
-    facing_mode: i64,
-) -> anyhow::Result<SyncReturn<()>> {
+    facing_mode: FacingMode,
+) -> SyncReturn<()> {
     let mut constr = constr.borrow_mut();
-    constr.ideal_facing_mode(facing_mode.try_into().map_err(|v| {
-        anyhow::anyhow!(
-            "{:?}",
-            DartError::from(ArgumentError::new(
-                v,
-                "facing_mode",
-                "Invalid value"
-            ))
-        )
-    })?);
-    Ok(SyncReturn(()))
+    constr.ideal_facing_mode(facing_mode);
+    SyncReturn(())
 }
 
 /// Sets an exact [height][1] constraint.
@@ -680,7 +663,9 @@ impl UnwindSafe for Jason {}
 /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
 #[must_use]
 pub fn on_panic(cb: DartOpaque) -> SyncReturn<()> {
-    platform::set_panic_callback(unsafe{platform::Function::new(cb.try_unwrap().unwrap().into_raw())});
+    platform::set_panic_callback(unsafe {
+        platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+    });
     SyncReturn(())
 }
 
@@ -1082,14 +1067,9 @@ pub fn media_manager_handle_microphone_volume(
 
     let dart_opaque = unsafe {
         new_dart_opaque(
-            async move {
-                let res = manager.microphone_volume().await;
-                let res: Result<_, Traced<MicVolumeError>> =
-                    res.map_err(tracerr::map_from_and_wrap!());
-                res
-            }
-            .into_dart_future()
-            .into_raw(),
+            async move { manager.microphone_volume().await }
+                .into_dart_future()
+                .into_raw(),
         )
     };
     SyncReturn(dart_opaque)
@@ -1921,16 +1901,11 @@ pub fn room_handle_on_close(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
-    println!("RAZ CALL");
-    let a = cb.try_unwrap().unwrap().into_raw();
-    println!("RAZ CALL2");
-    let b = unsafe{platform::Function::new(a)};
-    println!("RAZ CALL3");
-
     room_handle
-        .on_close(b)
+        .on_close(unsafe {
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+        })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
-    println!("RAZ CALL10");
     Ok(SyncReturn(()))
 }
 

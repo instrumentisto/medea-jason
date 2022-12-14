@@ -28,84 +28,139 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    await (api.roomHandleJoin(roomHandle: opaque, token: token) as Future);
+    try {
+      await (api.roomHandleJoin(roomHandle: opaque, token: token) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
-    await (api.roomHandleSetLocalMediaSettings(
-        roomHandle: opaque,
-        settings: (settings as MediaStreamSettings).opaque,
-        stopFirst: stopFirst,
-        rollbackOnFail: rollbackOnFail) as Future);
+    try {
+      await (api.roomHandleSetLocalMediaSettings(
+          roomHandle: opaque,
+          settings: (settings as MediaStreamSettings).opaque,
+          stopFirst: stopFirst,
+          rollbackOnFail: rollbackOnFail) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> muteAudio() async {
-    await (api.roomHandleMuteAudio(roomHandle: opaque) as Future);
+    try {
+      await (api.roomHandleMuteAudio(roomHandle: opaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> unmuteAudio() async {
-    await (api.roomHandleUnmuteAudio(roomHandle: opaque) as Future);
+    try {
+      await (api.roomHandleUnmuteAudio(roomHandle: opaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> enableAudio() async {
-    await (api.roomHandleEnableAudio(roomHandle: opaque) as Future);
+    try {
+      await (api.roomHandleEnableAudio(roomHandle: opaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> disableAudio() async {
-    await (api.roomHandleDisableAudio(roomHandle: opaque) as Future);
+    try {
+      await (api.roomHandleDisableAudio(roomHandle: opaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleMuteVideo(roomHandle: opaque, sourceKind: kind?.index)
-        as Future);
+    try {
+      await (api.roomHandleMuteVideo(
+          roomHandle: opaque, sourceKind: kind?.index) as Future);
+    } on FfiException catch (anyhow) {
+      objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleUnmuteVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future);
+    try {
+      await (api.roomHandleUnmuteVideo(
+          roomHandle: opaque, sourceKind: kind?.index) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleEnableVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future);
+    try {
+      await (api.roomHandleEnableVideo(
+          roomHandle: opaque, sourceKind: kind?.index) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleDisableVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future);
+    try {
+      await (api.roomHandleDisableVideo(
+          roomHandle: opaque, sourceKind: kind?.index) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (api.roomHandleEnableRemoteAudio(roomHandle: opaque) as Future);
+    try {
+      await (api.roomHandleEnableRemoteAudio(roomHandle: opaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await (api.roomHandleDisableRemoteAudio(roomHandle: opaque) as Future);
+    try {
+      await (api.roomHandleDisableRemoteAudio(roomHandle: opaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    await (api.roomHandleEnableRemoteVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future);
+    try {
+      await (api.roomHandleEnableRemoteVideo(
+          roomHandle: opaque, sourceKind: kind?.index) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    // TODO(alexlapa): why dont we just pass MediaSourceKind enum instead of u8?
-    await (api.roomHandleDisableRemoteVideo(
-        roomHandle: opaque, sourceKind: kind?.index) as Future);
+    try {
+      await (api.roomHandleDisableRemoteVideo(
+          roomHandle: opaque, sourceKind: kind?.index) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
@@ -124,19 +179,14 @@ class NativeRoomHandle extends RoomHandle {
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    print('RAZ');
     try {
-      print('dwa');
       api.roomHandleOnClose(
           roomHandle: opaque,
           cb: (t) {
-            print('ASDASD ${t}');
             f(NativeRoomCloseReason(
                 api.roomCloseReasonFromPtr(ptr: t.address)));
           });
-      print('TREE');
     } on FfiException catch (anyhow) {
-      print('CHET');
       throw objectFromAnyhow(anyhow);
     }
   }

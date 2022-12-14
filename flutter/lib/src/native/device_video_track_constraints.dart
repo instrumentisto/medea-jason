@@ -25,13 +25,13 @@ class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
   @override
   void exactFacingMode(base.FacingMode facingMode) {
     api.deviceVideoTrackConstrExactFacingMode(
-        constr: opaque, facingMode: facingMode.index);
+        constr: opaque, facingMode: facingMode);
   }
 
   @override
   void idealFacingMode(base.FacingMode facingMode) {
     api.deviceVideoTrackConstrIdealFacingMode(
-        constr: opaque, facingMode: facingMode.index);
+        constr: opaque, facingMode: facingMode);
   }
 
   @override

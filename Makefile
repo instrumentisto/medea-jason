@@ -422,8 +422,7 @@ endif
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
-		$(WINDOWS_TARGETS)),\
+		$(WEB_TARGETS)),\
 			$(call cargo.lint.medea-jason,$(target)))
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
@@ -1362,8 +1361,3 @@ endef
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
-
-#todo
-# flutter_rust_bridge_codegen --rust-input=src/api/dart/jason_api.rs --rust-output=src/jason_api_g.rs --dart-output=flutter/lib/src/native/ffi/jason_api.g.dart --skip-add-mod-to-lib --no-build-runner --dart-format-line-length=80
-# make test.e2e.desktop device=windows up=yes debug=no dockerized=yes medea-tag=edge
-# cd flutter/example/ && flutter drive --driver=test_driver/integration_test.dart --target=integration_test/jason.dart

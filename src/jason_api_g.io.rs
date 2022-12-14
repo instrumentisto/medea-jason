@@ -100,7 +100,7 @@ pub extern "C" fn wire_device_video_track_constr_device_id(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constr_exact_facing_mode(
     constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    facing_mode: i64,
+    facing_mode: i32,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constr_exact_facing_mode_impl(constr, facing_mode)
 }
@@ -108,7 +108,7 @@ pub extern "C" fn wire_device_video_track_constr_exact_facing_mode(
 #[no_mangle]
 pub extern "C" fn wire_device_video_track_constr_ideal_facing_mode(
     constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    facing_mode: i64,
+    facing_mode: i32,
 ) -> support::WireSyncReturnStruct {
     wire_device_video_track_constr_ideal_facing_mode_impl(constr, facing_mode)
 }

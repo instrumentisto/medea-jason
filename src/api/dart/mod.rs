@@ -33,20 +33,15 @@ use derive_more::Display;
 use libc::c_char;
 
 use crate::{
-    api::{
-        dart::utils::DartError,
-        utils::new_panic_error,
-    },
+    api::{dart::utils::DartError, utils::new_panic_error},
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
-    platform::{
-        utils::{
-            dart_api::{
-                Dart_DeletePersistentHandle_DL_Trampolined,
-                Dart_NewPersistentHandle_DL_Trampolined,
-                Dart_PropagateError_DL_Trampolined,
-            },
-            handle::DartHandle,
+    platform::utils::{
+        dart_api::{
+            Dart_DeletePersistentHandle_DL_Trampolined,
+            Dart_NewPersistentHandle_DL_Trampolined,
+            Dart_PropagateError_DL_Trampolined,
         },
+        handle::DartHandle,
     },
 };
 

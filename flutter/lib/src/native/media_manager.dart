@@ -30,9 +30,15 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    var tracks = await (api.mediaManagerHandleInitLocalTracks(
-        manager: opaque,
-        caps: (caps as MediaStreamSettings).opaque) as Future) as Pointer;
+    var tracks;
+    try {
+      tracks = await (api.mediaManagerHandleInitLocalTracks(
+          manager: opaque,
+          caps: (caps as MediaStreamSettings).opaque) as Future) as Pointer;
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
+
     var vec = api.vecLocalTracksFromPtr(ptr: tracks.address);
 
     var res = List<LocalMediaTrack>.empty(growable: true);
@@ -48,12 +54,15 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
-    print("HERE");
-    var devices = await (api.mediaManagerHandleEnumerateDevices(manager: opaque)
-        as Future);
-    print("HERE2");
+    var devices;
+    try {
+      devices = await (api.mediaManagerHandleEnumerateDevices(manager: opaque)
+          as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
+
     var vec = api.vecMediaDeviceInfoFromPtr(ptr: devices.address);
-    print("HERE3");
 
     var res = List<MediaDeviceInfo>.empty(growable: true);
 
@@ -73,8 +82,14 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
           'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
     }
 
-    var devices = await (api.mediaManagerHandleEnumerateDisplays(
-        manager: opaque) as Future) as Pointer;
+    var devices;
+    try {
+      devices = await (api.mediaManagerHandleEnumerateDisplays(manager: opaque)
+          as Future) as Pointer;
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
+
     var vec = api.vecMediaDisplayInfoFromPtr(ptr: devices.address);
 
     var res = List<MediaDisplayInfo>.empty(growable: true);
@@ -90,27 +105,43 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
   @override
   Future<void> setOutputAudioId(String deviceId) async {
-    await (api.mediaManagerHandleSetOutputAudioId(
-        manager: opaque, deviceId: deviceId) as Future);
+    try {
+      await (api.mediaManagerHandleSetOutputAudioId(
+          manager: opaque, deviceId: deviceId) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
-    await (api.mediaManagerHandleSetMicrophoneVolume(
-        manager: opaque, level: level) as Future);
+    try {
+      await (api.mediaManagerHandleSetMicrophoneVolume(
+          manager: opaque, level: level) as Future);
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<int> microphoneVolume() async {
-    return await (api.mediaManagerHandleMicrophoneVolume(manager: opaque)
-        as Future) as int;
+    try {
+      return await (api.mediaManagerHandleMicrophoneVolume(manager: opaque)
+          as Future) as int;
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
-            manager: opaque) as Future) as int ==
-        1;
+    try {
+      return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
+              manager: opaque) as Future) as int ==
+          1;
+    } on FfiException catch (anyhow) {
+      throw objectFromAnyhow(anyhow);
+    }
   }
 
   @override
