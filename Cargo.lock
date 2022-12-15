@@ -1112,8 +1112,7 @@ dependencies = [
 [[package]]
 name = "flutter_rust_bridge"
 version = "1.54.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5df8e5ef5f0e51bc20a0f4f4dc9b84f08256f9fec19098fd66ef098cc77c30b3"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=fix-dart-api-dl#9e264eb6e9dd3b5de44213b82077ef48d3061e62"
 dependencies = [
  "allo-isolate",
  "anyhow",
@@ -1137,8 +1136,7 @@ dependencies = [
 [[package]]
 name = "flutter_rust_bridge_macros"
 version = "1.54.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aee137f8da06658835df7984db8a4cce338750e15bad19bca680004ccbfa0623"
+source = "git+https://github.com/rogurotus/flutter_rust_bridge?branch=fix-dart-api-dl#9e264eb6e9dd3b5de44213b82077ef48d3061e62"
 
 [[package]]
 name = "fnv"

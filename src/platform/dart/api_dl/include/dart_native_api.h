@@ -50,7 +50,6 @@ typedef enum {
   Dart_CObject_kArray,
   Dart_CObject_kTypedData,
   Dart_CObject_kExternalTypedData,
-  Dart_CObject_kUnmodifiableExternalTypedData,
   Dart_CObject_kSendPort,
   Dart_CObject_kCapability,
   Dart_CObject_kNativePointer,
@@ -80,7 +79,7 @@ typedef struct _Dart_CObject {
     struct {
       Dart_TypedData_Type type;
       intptr_t length; /* in elements, not bytes */
-      const uint8_t* values;
+      uint8_t* values;
     } as_typed_data;
     struct {
       Dart_TypedData_Type type;
