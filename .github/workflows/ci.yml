@@ -37,7 +37,6 @@ jobs:
       - rustfmt
       - test-e2e-browser
       - test-e2e-desktop
-      - test-flutter
       - test-unit
     runs-on: ubuntu-latest
     steps:
@@ -684,7 +683,6 @@ jobs:
       - rustfmt
       - test-e2e-browser
       - test-e2e-desktop
-      - test-flutter
       - test-unit
     runs-on: ubuntu-latest
     steps:
