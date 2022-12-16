@@ -27,18 +27,18 @@ const DESCRIPTION_APPROVE_TIMEOUT: Duration = Duration::from_secs(10);
 /// Stores current and previous descriptions and may rollback to the previous
 /// one if new description won't be approved in a configured timeout.
 #[derive(Clone, Debug, Default)]
-pub struct LocalSdp(Rc<Inner>);
+pub(crate) struct LocalSdp(Rc<Inner>);
 
 impl LocalSdp {
     /// Returns new empty [`LocalSdp`].
     #[must_use]
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self::default()
     }
 
     /// Returns [`LocalBoxStream`] into which all current SDP offer updates will
     /// be sent.
-    pub fn subscribe(&self) -> LocalBoxStream<'static, Option<String>> {
+    pub(crate) fn subscribe(&self) -> LocalBoxStream<'static, Option<String>> {
         self.0.current_sdp.subscribe()
     }
 
@@ -46,7 +46,7 @@ impl LocalSdp {
     /// approved by Media Server.
     ///
     /// [`Future`]: std::future::Future
-    pub fn when_approved(&self) -> LocalBoxFuture<'static, ()> {
+    pub(crate) fn when_approved(&self) -> LocalBoxFuture<'static, ()> {
         let approved = Rc::clone(&self.0.approved);
         Box::pin(async move {
             let _ = approved.when_eq(true).await;
@@ -57,7 +57,7 @@ impl LocalSdp {
     /// approve.
     ///
     /// [`Stream`]: futures::Stream
-    pub fn on_approve(&self) -> LocalBoxStream<'static, ()> {
+    pub(crate) fn on_approve(&self) -> LocalBoxStream<'static, ()> {
         Box::pin(
             self.0
                 .approved
@@ -67,14 +67,14 @@ impl LocalSdp {
     }
 
     /// Rollbacks [`LocalSdp`] to the previous one.
-    pub fn rollback(&self) {
+    pub(crate) fn rollback(&self) {
         self.0.current_sdp.set(self.0.prev_sdp.borrow().clone());
         self.0.approved.set(true);
     }
 
     /// Sets the provided SDP as the current one, marks it as unapproved and
     /// schedules task to wait for a SDP approval.
-    pub fn unapproved_set(&self, sdp: String) {
+    pub(crate) fn unapproved_set(&self, sdp: String) {
         let prev_sdp = self.0.current_sdp.replace(Some(sdp));
         drop(self.0.prev_sdp.replace(prev_sdp));
         self.0.approved.set(false);
@@ -82,7 +82,7 @@ impl LocalSdp {
     }
 
     /// Approves the current [`LocalSdp`] offer.
-    pub fn approved_set(&self, sdp: String) {
+    pub(crate) fn approved_set(&self, sdp: String) {
         let is_current_approved =
             self.0.current_sdp.borrow().as_ref() == Some(&sdp);
 
@@ -104,14 +104,14 @@ impl LocalSdp {
 
     /// Returns the current SDP offer.
     #[must_use]
-    pub fn current(&self) -> Option<String> {
+    pub(crate) fn current(&self) -> Option<String> {
         self.0.current_sdp.get()
     }
 
     /// Indicates whether current [`LocalSdp`] state is rollback, meaning that
     /// the current SDP equals to the previous SDP.
     #[must_use]
-    pub fn is_rollback(&self) -> bool {
+    pub(crate) fn is_rollback(&self) -> bool {
         self.0
             .current_sdp
             .borrow()
@@ -127,7 +127,7 @@ impl LocalSdp {
     }
 
     /// Stops the current SDP rollback task countdown, if any.
-    pub fn stop_timeout(&self) {
+    pub(crate) fn stop_timeout(&self) {
         self.0.is_rollback_timeout_stopped.set(true);
         if let Some(handle) = self.0.rollback_task_handle.borrow().as_ref() {
             handle.stop();
@@ -135,7 +135,7 @@ impl LocalSdp {
     }
 
     /// Resets the current SDP rollback task countdown, if any.
-    pub fn resume_timeout(&self) {
+    pub(crate) fn resume_timeout(&self) {
         self.0.is_rollback_timeout_stopped.set(false);
         if let Some(handle) = self.0.rollback_task_handle.borrow().as_ref() {
             handle.reset();
@@ -166,7 +166,7 @@ impl LocalSdp {
 
     /// Indicates whether a new SDP offer is needed after rollback's completion.
     #[must_use]
-    pub fn is_restart_needed(&self) -> bool {
+    pub(crate) fn is_restart_needed(&self) -> bool {
         self.0.restart_needed.get()
     }
 }

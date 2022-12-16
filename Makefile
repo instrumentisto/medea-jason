@@ -414,9 +414,6 @@ endif
 	cd flutter && \
 	flutter pub run build_runner build --delete-conflicting-outputs
 
-#TODO: Remove after fix https://github.com/dart-lang/ffigen/issues/497
-	sed -i -e 's/^typedef uintptr_t =.*/typedef uintptr_t = ffi.UintPtr;/g' flutter/lib/src/native/ffi/jason_api.g.dart
-
 # Lint Rust sources with Clippy.
 #
 # Usage:
@@ -1364,3 +1361,7 @@ endef
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
+
+
+farsh: 
+	make test.e2e.desktop up=yes debug=no dockerized=yes medea-tag=edge

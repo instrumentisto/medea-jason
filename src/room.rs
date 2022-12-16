@@ -120,16 +120,16 @@ pub enum RoomJoinError {
     Detached,
 
     /// Returned if the mandatory callback wasn't set.
-    #[display(fmt = "`{}` callback isn't set.", _0)]
+    #[display(fmt = "`{_0}` callback isn't set.")]
     #[from(ignore)]
     CallbackNotSet(&'static str),
 
     /// [`ConnectionInfo`] parsing failed.
-    #[display(fmt = "Failed to parse ConnectionInfo: {}", _0)]
+    #[display(fmt = "Failed to parse ConnectionInfo: {_0}")]
     ConnectionInfoParse(ConnectionInfoParseError),
 
     /// [`RpcSession`] returned [`SessionError`].
-    #[display(fmt = "WebSocketSession error occurred: {}", _0)]
+    #[display(fmt = "WebSocketSession error occurred: {_0}")]
     SessionError(#[cause] SessionError),
 }
 
@@ -297,10 +297,7 @@ impl RoomHandle {
         &self,
         f: platform::Function<api::RoomCloseReason>,
     ) -> Result<(), Traced<HandleDetachedError>> {
-        println!("RAZ CALL5");
-        let a = upgrade_inner!(self.0).map(|inner| inner.on_close.set_func(f));
-        println!("RAZ CALL6");
-        a
+        upgrade_inner!(self.0).map(|inner| inner.on_close.set_func(f))
     }
 
     /// Sets callback, invoked when a new [`local::Track`] is added to this
@@ -1558,7 +1555,7 @@ impl InnerRoom {
 /// Error of a [`RpcEvent`] containing a [`PeerId`] that a [`Room`] is not aware
 /// of.
 #[derive(Clone, Copy, Debug, Display)]
-#[display(fmt = "Peer with id {} doesnt exist", _0)]
+#[display(fmt = "Peer with id {_0} doesnt exist")]
 struct UnknownPeerIdError(PeerId);
 
 /// RPC events handling.

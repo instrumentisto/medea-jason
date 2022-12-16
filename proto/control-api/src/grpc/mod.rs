@@ -8,6 +8,7 @@
 #![allow(clippy::use_self)]
 
 #[cfg(feature = "client")]
+#[allow(clippy::use_debug)]
 mod client;
 mod convert;
 #[cfg(feature = "server")]
@@ -89,7 +90,7 @@ pub use self::{
 /// [`CallbackApi`]: crate::CallbackApi
 /// [gRPC]: https://grpc.io
 #[derive(Clone, Debug, Display, Eq, Hash, Into, PartialEq)]
-#[display(fmt = "grpc://{}", _0)]
+#[display(fmt = "grpc://{_0}")]
 #[into(owned(types(String)))]
 pub struct CallbackUrl(Url);
 
@@ -122,7 +123,7 @@ impl FromStr for CallbackUrl {
 #[derive(Clone, Copy, Debug, Display, Error, From)]
 pub enum CallbackUrlParseError {
     /// Error of parsing the provided [`Url`].
-    #[display(fmt = "Invalid URL: {}", _0)]
+    #[display(fmt = "Invalid URL: {_0}")]
     UrlParseErr(url::ParseError),
 
     /// [`Url`] is missing host.

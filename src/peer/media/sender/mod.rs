@@ -38,7 +38,7 @@ pub enum CreateError {
     CannotDisableRequiredSender,
 
     /// Could not find a [`platform::Transceiver`] by `mid`.
-    #[display(fmt = "Unable to find Transceiver with mid: {}", _0)]
+    #[display(fmt = "Unable to find Transceiver with mid: {_0}")]
     TransceiverNotFound(String),
 }
 

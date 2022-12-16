@@ -165,26 +165,26 @@ where
 #[derive(Debug, Display, From, Error)]
 pub enum ControlApiClientError {
     /// Failed to parse [`member::Sid`].
-    #[display(fmt = "Invalid SID: {}", _0)]
+    #[display(fmt = "Invalid SID: {_0}")]
     InvalidSid(ParseSidError),
 
     /// Failed to parse [`Fid`].
-    #[display(fmt = "Invalid FID: {}", _0)]
+    #[display(fmt = "Invalid FID: {_0}")]
     InvalidFid(ParseFidError),
 
     /// [gRPC] server errored.
     ///
     /// [gRPC]: https://grpc.io
-    #[display(fmt = "gRPC server errored: {}", _0)]
+    #[display(fmt = "gRPC server errored: {_0}")]
     Tonic(tonic::Status),
 
     /// Failed to convert from [gRPC] response.
     ///
     /// [gRPC]: https://grpc.io
-    #[display(fmt = "Failed to convert from gRPC response: {}", _0)]
+    #[display(fmt = "Failed to convert from gRPC response: {_0}")]
     InvalidProtobuf(ProtobufError),
 
     /// [`ControlApi`] server implementation errored.
-    #[display(fmt = "Control API server errored: {:?}", _0)]
+    #[display(fmt = "Control API server errored: {_0:?}")]
     ControlError(#[error(not(source))] control_proto::Error),
 }

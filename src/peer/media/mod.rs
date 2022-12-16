@@ -18,7 +18,6 @@ use medea_client_api_proto as proto;
 use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
-
 use crate::{
     media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},

@@ -4127,7 +4127,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _get_dart_objectPtr =
-      _lookup<ffi.NativeFunction<ffi.Handle Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.UintPtr)>>(
           'get_dart_object');
   late final _get_dart_object =
       _get_dart_objectPtr.asFunction<Object Function(int)>();
@@ -4141,7 +4141,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _drop_dart_objectPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.UintPtr)>>(
           'drop_dart_object');
   late final _drop_dart_object =
       _drop_dart_objectPtr.asFunction<void Function(int)>();
@@ -4155,7 +4155,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _new_dart_opaquePtr =
-      _lookup<ffi.NativeFunction<uintptr_t Function(ffi.Handle)>>(
+      _lookup<ffi.NativeFunction<ffi.UintPtr Function(ffi.Handle)>>(
           'new_dart_opaque');
   late final _new_dart_opaque =
       _new_dart_opaquePtr.asFunction<int Function(Object)>();
@@ -4213,7 +4213,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_connection_handle_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_connection_handle_from_ptr');
   late final _wire_connection_handle_from_ptr =
       _wire_connection_handle_from_ptrPtr
@@ -4803,7 +4803,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_local_media_track_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_local_media_track_from_ptr');
   late final _wire_local_media_track_from_ptr =
       _wire_local_media_track_from_ptrPtr
@@ -4818,7 +4818,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_vec_local_tracks_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_vec_local_tracks_from_ptr');
   late final _wire_vec_local_tracks_from_ptr =
       _wire_vec_local_tracks_from_ptrPtr
@@ -4896,7 +4896,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_vec_media_device_info_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_vec_media_device_info_from_ptr');
   late final _wire_vec_media_device_info_from_ptr =
       _wire_vec_media_device_info_from_ptrPtr
@@ -4989,7 +4989,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_vec_media_display_info_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_vec_media_display_info_from_ptr');
   late final _wire_vec_media_display_info_from_ptr =
       _wire_vec_media_display_info_from_ptrPtr
@@ -5263,7 +5263,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_reconnect_handle_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_reconnect_handle_from_ptr');
   late final _wire_reconnect_handle_from_ptr =
       _wire_reconnect_handle_from_ptrPtr
@@ -5322,7 +5322,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_remote_media_track_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_remote_media_track_from_ptr');
   late final _wire_remote_media_track_from_ptr =
       _wire_remote_media_track_from_ptrPtr
@@ -5492,7 +5492,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _wire_room_close_reason_from_ptrPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(uintptr_t)>>(
+      _lookup<ffi.NativeFunction<WireSyncReturnStruct Function(ffi.UintPtr)>>(
           'wire_room_close_reason_from_ptr');
   late final _wire_room_close_reason_from_ptr =
       _wire_room_close_reason_from_ptrPtr
@@ -6637,11 +6637,9 @@ class wire_DartOpaque extends ffi.Struct {
   @ffi.Int64()
   external int port;
 
-  @uintptr_t()
+  @ffi.UintPtr()
   external int handle;
 }
-
-typedef uintptr_t = ffi.UintPtr;
 
 class wire_ApiWrapDeviceVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;

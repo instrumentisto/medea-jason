@@ -159,7 +159,7 @@ mod tests {
                 const DELAYED_PROCESSED_UPDATE: u8 = 2;
 
                 let updatable_cell = Rc::new(ProgressableCell::new(0));
-                let _ = spawn_local({
+                drop(spawn_local({
                     let updatable_cell = Rc::clone(&updatable_cell);
                     let mut updatable_cell_rx =
                         updatable_cell.subscribe().skip(1).fuse();
@@ -183,7 +183,7 @@ mod tests {
                                 .into_inner(),
                         );
                     }
-                });
+                }));
 
                 when_all_processed(vec![
                     updatable_cell.when_all_processed().into(),

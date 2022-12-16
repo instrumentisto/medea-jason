@@ -24,13 +24,13 @@ pub enum ProtobufError {
     /// [`Element`]: crate::Element
     /// [`LocalSrcUri`]: crate::endpoint::web_rtc_play::LocalSrcUri
     /// [`WebRtcPlay`]: crate::endpoint::WebRtcPlay
-    #[display(fmt = "Source URI parse error: {}", _0)]
+    #[display(fmt = "Source URI parse error: {_0}")]
     LocalSrcUriParseErr(LocalSrcUriParseError),
 
     /// [`Element`] is expected to be of another type.
     ///
     /// [`Element`]: crate::Element
-    #[display(fmt = "`{}` media element expected to be of type `{}`", _1, _0)]
+    #[display(fmt = "`{_1}` media element expected to be of type `{_0}`")]
     #[from(ignore)]
     ExpectedElement(&'static str, Box<str>),
 
@@ -44,14 +44,14 @@ pub enum ProtobufError {
     ///
     /// [`Element`]: crate::Element
     /// [`Fid`]: crate::Fid
-    #[display(fmt = "Expected media element for `{}`, but none specified", _0)]
+    #[display(fmt = "Expected media element for `{_0}`, but none specified")]
     #[from(ignore)]
     NoElementForId(#[error(not(source))] Box<str>),
 
     /// Error of parsing a [`CallbackUrl`].
     ///
     /// [`CallbackUrl`]: super::CallbackUrl
-    #[display(fmt = "gRPC callback URL parse error: {}", _0)]
+    #[display(fmt = "gRPC callback URL parse error: {_0}")]
     CallbackUrlParseErr(CallbackUrlParseError),
 
     /// Some [`Element`] specifies invalid [`Duration`].
@@ -69,13 +69,13 @@ pub enum ProtobufError {
     /// Error of parsing a [`Fid`].
     ///
     /// [`Fid`]: crate::Fid
-    #[display(fmt = "FID parse error: {}", _0)]
+    #[display(fmt = "FID parse error: {_0}")]
     ParseFidErr(ParseFidError),
 
     /// Error of parsing a [`DateTime`].
     ///
     /// [`DateTime`]: time::OffsetDateTime
-    #[display(fmt = "`DateTime` parse error: {}", _0)]
+    #[display(fmt = "`DateTime` parse error: {_0}")]
     TimeParseErr(time::error::Parse),
 
     /// Such API call is unimplemented.

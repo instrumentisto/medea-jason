@@ -103,10 +103,11 @@
     variant_size_differences,
     missing_docs
 )]
-
 // TODO: Remove once annoying false positive is fixed:
 //       https://github.com/rust-lang/rust-clippy/issues/6902
 #![allow(clippy::use_self)]
+#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::use_debug)]
 
 #[macro_use]
 pub mod utils;
@@ -129,4 +130,5 @@ pub mod rpc;
 #[allow(clippy::ptr_as_ptr)]
 #[allow(clippy::let_underscore_drop)]
 #[allow(let_underscore_drop)]
+#[allow(unreachable_pub)]
 mod jason_api_g;

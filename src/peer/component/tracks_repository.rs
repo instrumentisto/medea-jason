@@ -31,39 +31,39 @@ use super::sender;
 /// [`Component`]: super::Component
 /// [`receiver::State`]: super::receiver::State
 #[derive(Debug, From)]
-pub struct TracksRepository<S: 'static>(
+pub(crate) struct TracksRepository<S: 'static>(
     RefCell<ProgressableHashMap<TrackId, Rc<S>>>,
 );
 
 impl<S> TracksRepository<S> {
     /// Creates a new [`TracksRepository`].
     #[must_use]
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self(RefCell::new(ProgressableHashMap::new()))
     }
 
     /// Returns [`Future`] resolving once all inserts/removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    pub fn when_all_processed(&self) -> AllProcessed<'static> {
+    pub(crate) fn when_all_processed(&self) -> AllProcessed<'static> {
         self.0.borrow().when_all_processed()
     }
 
     /// Inserts the provided track identified by the given `id`.
-    pub fn insert(&self, id: TrackId, track: Rc<S>) {
+    pub(crate) fn insert(&self, id: TrackId, track: Rc<S>) {
         drop(self.0.borrow_mut().insert(id, track));
     }
 
     /// Returns a track with the provided `id`.
     #[must_use]
-    pub fn get(&self, id: TrackId) -> Option<Rc<S>> {
+    pub(crate) fn get(&self, id: TrackId) -> Option<Rc<S>> {
         self.0.borrow().get(&id).cloned()
     }
 
     /// Returns a [`Stream`] streaming all the [`TracksRepository::insert`]ions.
     ///
     /// [`Stream`]: futures::Stream
-    pub fn on_insert(
+    pub(crate) fn on_insert(
         &self,
     ) -> LocalBoxStream<'static, Guarded<(TrackId, Rc<S>)>> {
         self.0.borrow().on_insert_with_replay()
@@ -72,7 +72,7 @@ impl<S> TracksRepository<S> {
     /// Returns a [`Stream`] streaming all the [`TracksRepository::remove`]s.
     ///
     /// [`Stream`]: futures::Stream
-    pub fn on_remove(
+    pub(crate) fn on_remove(
         &self,
     ) -> LocalBoxStream<'static, Guarded<(TrackId, Rc<S>)>> {
         self.0.borrow().on_remove()
@@ -80,7 +80,7 @@ impl<S> TracksRepository<S> {
 
     /// Removes a track with the provided [`TrackId`], reporting whether it has
     /// been removed or it hasn't existed at all.
-    pub fn remove(&self, id: TrackId) -> bool {
+    pub(crate) fn remove(&self, id: TrackId) -> bool {
         self.0.borrow_mut().remove(&id).is_some()
     }
 }
@@ -89,7 +89,7 @@ impl TracksRepository<sender::State> {
     /// Returns all the [`sender::State`]s which require a local `MediaStream`
     /// update.
     #[must_use]
-    pub fn get_outdated(&self) -> Vec<Rc<sender::State>> {
+    pub(crate) fn get_outdated(&self) -> Vec<Rc<sender::State>> {
         self.0
             .borrow()
             .values()
@@ -112,7 +112,7 @@ impl TracksRepository<sender::State> {
     /// [`Future`]: std::future::Future
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    pub fn local_stream_update_result(
+    pub(crate) fn local_stream_update_result(
         &self,
         tracks_ids: HashSet<TrackId>,
     ) -> LocalBoxFuture<'static, Result<(), Traced<UpdateLocalStreamError>>>
