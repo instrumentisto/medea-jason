@@ -6641,7 +6641,7 @@ class wire_DartOpaque extends ffi.Struct {
   external int handle;
 }
 
-typedef uintptr_t = ffi.UnsignedLong;
+typedef uintptr_t = ffi.UintPtr;
 
 class wire_ApiWrapDeviceVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
