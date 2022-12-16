@@ -6,7 +6,6 @@ use medea_macro::dart_bridge;
 use tracerr::Traced;
 
 use crate::{
-    api::string_into_c_str,
     media::MediaSourceKind,
     platform::{
         dart::utils::{
@@ -22,6 +21,7 @@ use super::{
     media_device_info::MediaDeviceInfo,
     media_display_info::MediaDisplayInfo,
     media_track::MediaStreamTrack,
+    utils::string_into_c_str,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/media_devices.g.dart")]

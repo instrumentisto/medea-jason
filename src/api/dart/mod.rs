@@ -30,20 +30,23 @@ use derive_more::Display;
 use libc::c_char;
 
 use crate::{
-    api::{dart::utils::DartError, utils::new_panic_error},
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::utils::{
+        c_str_into_string,
         dart_api::{
             Dart_DeletePersistentHandle_DL_Trampolined,
             Dart_NewPersistentHandle_DL_Trampolined,
             Dart_PropagateError_DL_Trampolined,
         },
+        free_dart_native_string,
         handle::DartHandle,
+        string_into_c_str,
     },
 };
 
 pub use crate::media::MediaDirection;
 
+use self::utils::new_panic_error;
 pub use self::{
     jason_api::{
         AudioTrackConstraints, ConnectionHandle, DeviceVideoTrackConstraints,
@@ -51,10 +54,7 @@ pub use self::{
         MediaDisplayInfo, MediaManagerHandle, MediaStreamSettings,
         ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
-    utils::{
-        c_str_into_string, dart_string_into_rust, free_dart_native_string,
-        string_into_c_str, ArgumentError, DartError as Error,
-    },
+    utils::{ArgumentError, DartError as Error},
 };
 
 /// Wraps the provided function to catch all the Rust panics and propagate them
@@ -204,14 +204,14 @@ impl From<Option<Dart_Handle>> for DartValue {
     }
 }
 
-impl From<DartError> for DartValue {
-    fn from(err: DartError) -> Self {
+impl From<Error> for DartValue {
+    fn from(err: Error) -> Self {
         Self::Handle(err.into())
     }
 }
 
-impl From<Option<DartError>> for DartValue {
-    fn from(val: Option<DartError>) -> Self {
+impl From<Option<Error>> for DartValue {
+    fn from(val: Option<Error>) -> Self {
         val.map_or(Self::None, Self::from)
     }
 }

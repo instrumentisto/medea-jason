@@ -8,6 +8,13 @@ pub mod function;
 pub mod handle;
 pub mod list;
 pub mod map;
+pub mod result;
+pub mod string;
+
+pub use self::string::{
+    c_str_into_string, dart_string_into_rust, free_dart_native_string,
+    string_into_c_str,
+};
 
 use std::ptr;
 

@@ -1,10 +1,12 @@
-pub use super::utils::{ApiWrap, IntoDartFuture};
-use super::{
-    utils::{dart_enum_try_into, new_dart_opaque},
-    ForeignClass, MediaDirection,
-};
+use super::{utils::new_dart_opaque, ForeignClass, MediaDirection};
+
+pub use super::utils::ApiWrap;
+
 use crate::{
-    api::dart::DartError, media::FacingMode, room::ChangeMediaStateError,
+    api::{ArgumentError, Error as DartError},
+    media::FacingMode,
+    platform::utils::dart_future::{dart_enum_try_into, IntoDartFuture},
+    room::ChangeMediaStateError,
 };
 use flutter_rust_bridge::{DartOpaque, RustOpaque, SyncReturn};
 use std::{
@@ -232,7 +234,6 @@ pub fn connection_handle_disable_remote_video(
 
 pub use crate::media::DeviceVideoTrackConstraints;
 use crate::{
-    api::Error,
     media::{InitLocalTracksError, MediaSourceKind},
     platform,
 };
@@ -1130,7 +1131,6 @@ pub fn media_stream_settings_display_video(
 
 // -------------------------------------------------------------------
 
-use crate::api::dart::utils::ArgumentError;
 pub use crate::rpc::ReconnectHandle;
 
 impl ForeignClass for ReconnectHandle {}
@@ -1172,7 +1172,7 @@ pub fn reconnect_handle_reconnect_with_delay(
                 })?;
 
                 reconnect_handle.reconnect_with_delay(delay_ms).await?;
-                Ok::<_, Error>(())
+                Ok::<_, DartError>(())
             }
             .into_dart_future()
             .into_raw(),

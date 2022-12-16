@@ -8,7 +8,6 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::dart_string_into_rust,
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
@@ -19,6 +18,8 @@ use crate::{
         utils::dart_future::FutureFromDart,
     },
 };
+
+use super::utils::dart_string_into_rust;
 
 #[dart_bridge("flutter/lib/src/native/platform/media_track.g.dart")]
 mod media_stream_track {

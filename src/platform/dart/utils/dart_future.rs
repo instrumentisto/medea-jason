@@ -2,15 +2,16 @@
 //!
 //! [0]: https://api.dart.dev/stable/dart-async/Future-class.html
 
-use std::{fmt, future::Future, ptr};
+use std::{fmt, future::Future, marker::PhantomData, ptr};
 
 use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
+use super::Completer;
 use crate::{
-    api::{propagate_panic, DartValue, DartValueArg},
-    platform::{dart::error::Error, utils::handle::DartHandle},
+    api::{propagate_panic, DartValue, DartValueArg, Error as DartError},
+    platform::{dart::error::Error, spawn, utils::handle::DartHandle},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/future.g.dart")]
@@ -140,3 +141,83 @@ impl FutureFromDart {
         (self.0)(Err(err));
     }
 }
+
+/// Rust representation of a Dart [`Future`].
+///
+/// [`Future`]: https://api.dart.dev/dart-async/Future-class.html
+
+#[derive(Debug)]
+#[repr(transparent)]
+pub struct DartFuture<O>(
+    #[allow(unused_tuple_struct_fields)] Dart_Handle, // read by Dart side
+    PhantomData<*const O>,
+);
+
+impl<O> DartFuture<O> {
+    /// Returns inner [`Dart_Handle`].
+    #[must_use]
+    pub const fn into_raw(self) -> Dart_Handle {
+        self.0
+    }
+}
+
+/// Extension trait for a [`Future`] allowing to convert Rust [`Future`]s to
+/// [`DartFuture`]s.
+pub trait IntoDartFuture {
+    /// The type of the value produced on the [`DartFuture`]'s completion.
+    type Output;
+
+    /// Converts this [`Future`] into a Dart `Future`.
+    ///
+    /// Returns a [`Dart_Handle`] to the created Dart `Future`.
+    ///
+    /// __Note, that the Dart `Future` execution begins immediately and cannot
+    /// be canceled.__
+    fn into_dart_future(self) -> DartFuture<Self::Output>;
+}
+
+impl<Fut, Ok, Err> IntoDartFuture for Fut
+where
+    Fut: Future<Output = Result<Ok, Err>> + 'static,
+    Ok: Into<DartValue> + 'static,
+    Err: Into<DartError>,
+{
+    type Output = Fut::Output;
+
+    fn into_dart_future(self) -> DartFuture<Fut::Output> {
+        let completer = Completer::new();
+        let dart_future = completer.future();
+        spawn(async move {
+            match self.await {
+                Ok(ok) => {
+                    completer.complete(ok);
+                }
+                Err(e) => {
+                    completer.complete_error(e.into());
+                }
+            }
+        });
+        DartFuture(dart_future, PhantomData)
+    }
+}
+
+/// Tries to convert the provided [i64] using [`TryInto`].
+///
+/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
+/// anyhow [`DartError`].
+macro_rules! dart_enum_try_into {
+    ($k:expr, $name:expr, $message:expr) => {
+        if let Some(kind) = $k {
+            Some(kind.try_into().map_err(|err| {
+                anyhow::anyhow!(
+                    "{:?}",
+                    DartError::from(ArgumentError::new(err, $name, $message))
+                )
+            })?)
+        } else {
+            None
+        }
+    };
+}
+
+pub(crate) use dart_enum_try_into;

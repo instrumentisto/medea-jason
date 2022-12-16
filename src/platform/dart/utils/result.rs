@@ -1,6 +1,6 @@
 //! FFI-compatible [`Result`] for Dart.
 
-use crate::api::dart::{utils::DartError, DartValue};
+use crate::{api::dart::DartValue, platform::Error};
 
 /// FFI-compatible [`Result`] for Dart.
 #[allow(variant_size_differences)] // that's totally OK here
@@ -11,11 +11,11 @@ pub enum DartResult {
     Ok(DartValue),
 
     /// [`DartError`] value.
-    Err(DartError),
+    Err(Error),
 }
 
-impl<T: Into<DartValue>> From<Result<T, DartError>> for DartResult {
-    fn from(res: Result<T, DartError>) -> Self {
+impl<T: Into<DartValue>> From<Result<T, Error>> for DartResult {
+    fn from(res: Result<T, Error>) -> Self {
         match res {
             Ok(val) => Self::Ok(val.into()),
             Err(e) => Self::Err(e),
@@ -23,7 +23,7 @@ impl<T: Into<DartValue>> From<Result<T, DartError>> for DartResult {
     }
 }
 
-impl<T: Into<DartError>> From<T> for DartResult {
+impl<T: Into<Error>> From<T> for DartResult {
     fn from(err: T) -> Self {
         Self::Err(err.into())
     }

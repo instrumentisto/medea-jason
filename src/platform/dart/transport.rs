@@ -11,7 +11,6 @@ use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::{dart_string_into_rust, string_into_c_str},
     platform::{
         dart::utils::{
             callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
@@ -20,6 +19,8 @@ use crate::{
     },
     rpc::{ApiUrl, ClientDisconnect, CloseMsg},
 };
+
+use super::utils::{dart_string_into_rust, string_into_c_str};
 
 type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
 

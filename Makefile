@@ -404,9 +404,9 @@ ifeq ($(shell brew list | grep -Fx llvm),)
 endif
 endif
 	flutter_rust_bridge_codegen \
-		--rust-input=src/api/dart/jason_api.rs \
-		--rust-output=src/jason_api_g.rs \
-		--dart-output=flutter/lib/src/native/ffi/jason_api.g.dart \
+		--rust-input src/api/dart/jason_api.rs \
+		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
+		--rust-output src/jason_api_g.rs \
 		--skip-add-mod-to-lib \
 		--no-build-runner \
 		--dart-format-line-length=80
@@ -415,7 +415,6 @@ endif
 	flutter pub run build_runner build --delete-conflicting-outputs
 
 # Lint Rust sources with Clippy.
-#
 # Usage:
 #	make cargo.lint
 
@@ -1362,6 +1361,3 @@ endef
         wait.port \
         yarn yarn.version
 
-
-farsh: 
-	make test.e2e.desktop up=yes debug=no dockerized=yes medea-tag=edge

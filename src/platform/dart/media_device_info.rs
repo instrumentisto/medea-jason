@@ -5,10 +5,11 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::dart_string_into_rust,
     media::MediaDeviceKind,
     platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
+
+use super::utils::dart_string_into_rust;
 
 #[dart_bridge("flutter/lib/src/native/platform/media_device_info.g.dart")]
 mod media_device_info {
