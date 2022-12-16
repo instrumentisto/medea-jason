@@ -227,35 +227,3 @@ where
             .collect()
     }
 }
-
-#[cfg(feature = "mockable")]
-impl<S> TracksRepository<S> {
-    /// Waits until all the track inserts will be processed.
-    pub fn when_insert_processed(&self) -> medea_reactive::Processed<'static> {
-        self.0.borrow().when_insert_processed()
-    }
-}
-
-#[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
-impl TracksRepository<sender::State> {
-    /// Sets [`SyncState`] of all [`sender::State`]s to the
-    /// [`SyncState::Synced`].
-    pub fn synced(&self) {
-        self.0.borrow().values().for_each(|s| s.synced());
-    }
-}
-
-#[cfg(feature = "mockable")]
-impl TracksRepository<super::receiver::State> {
-    /// Stabilize all [`receiver::State`] from this [`State`].
-    pub fn stabilize_all(&self) {
-        self.0.borrow().values().for_each(|r| r.stabilize());
-    }
-
-    /// Sets [`SyncState`] of all [`receiver::State`]s to the
-    /// [`SyncState::Synced`].
-    pub fn synced(&self) {
-        self.0.borrow().values().for_each(|r| r.synced());
-    }
-}

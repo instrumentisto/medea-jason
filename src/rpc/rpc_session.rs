@@ -92,8 +92,6 @@ impl Caused for ConnectionLostReason {
 
 /// Client to talk with server via Client API RPC.
 #[async_trait(?Send)]
-#[cfg_attr(feature = "mockable", mockall::automock)]
-#[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcSession {
     /// Tries to upgrade [`SessionState`] of this [`RpcSession`] to
     /// [`SessionState::Opened`].

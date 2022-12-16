@@ -308,22 +308,6 @@ impl Receiver {
     }
 }
 
-#[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
-impl Receiver {
-    /// Returns the current `enabled_general` status of this [`Receiver`].
-    #[must_use]
-    pub fn enabled_general(&self) -> bool {
-        self.enabled_general.get()
-    }
-
-    /// Returns the current `media_direction` status of this [`Receiver`].
-    #[must_use]
-    pub fn direction(&self) -> MediaDirection {
-        self.media_direction.get()
-    }
-}
-
 impl Drop for Receiver {
     fn drop(&mut self) {
         let transceiver = self.transceiver.borrow_mut().take();

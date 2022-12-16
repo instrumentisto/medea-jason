@@ -52,16 +52,7 @@ where
     T: InTransition<Stable = S> + Into<TransitableState<S, T>> + 'static,
 {
     /// Timeout for the current state to transit into the desired one.
-    const TRANSITION_TIMEOUT: Duration = {
-        #[cfg(not(feature = "mockable"))]
-        {
-            Duration::from_secs(10)
-        }
-        #[cfg(feature = "mockable")]
-        {
-            Duration::from_millis(500)
-        }
-    };
+    const TRANSITION_TIMEOUT: Duration = Duration::from_secs(10);
 
     /// Returns new [`TransitableStateController`] with the provided
     /// stable state.

@@ -28,9 +28,6 @@ pub use self::{
     transport::{RpcTransport, TransportError, TransportState},
 };
 
-#[cfg(feature = "mockable")]
-pub use self::transport::MockRpcTransport;
-
 /// [`Error`] appeared on [getUserMedia()][1] request, differentiated by its
 /// cause.
 ///

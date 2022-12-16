@@ -45,9 +45,6 @@ pub use dart_sys::Dart_Handle;
 
 use tracerr::Traced;
 
-#[cfg(feature = "mockable")]
-pub use super::mock::ConnectionHandle;
-#[cfg(not(feature = "mockable"))]
 pub use crate::connection::ConnectionHandle;
 
 impl ForeignClass for ConnectionHandle {}
@@ -652,9 +649,6 @@ pub fn display_video_track_constr_exact_frame_rate(
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::Jason;
-#[cfg(not(feature = "mockable"))]
 pub use crate::jason::Jason;
 
 impl RefUnwindSafe for Jason {}
@@ -714,9 +708,6 @@ pub fn jason_dispose(jason: RustOpaque<Jason>) -> SyncReturn<()> {
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::LocalMediaTrack;
-#[cfg(not(feature = "mockable"))]
 pub use crate::media::track::local::LocalMediaTrack;
 
 impl ForeignClass for LocalMediaTrack {}
@@ -795,9 +786,6 @@ pub fn local_media_track_media_source_kind(
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::MediaDeviceInfo;
-#[cfg(not(feature = "mockable"))]
 pub use crate::platform::MediaDeviceInfo;
 
 impl ForeignClass for MediaDeviceInfo {}
@@ -871,9 +859,6 @@ pub fn media_device_info_group_id(
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::MediaDisplayInfo;
-#[cfg(not(feature = "mockable"))]
 pub use crate::platform::MediaDisplayInfo;
 
 /// Returns the [`ApiWrap<Vec<MediaDisplayInfo>>`] from the address
@@ -920,9 +905,6 @@ use crate::media::{
     InvalidOutputAudioDeviceIdError, MicVolumeError,
 };
 
-#[cfg(feature = "mockable")]
-pub use super::mock::MediaManagerHandle;
-#[cfg(not(feature = "mockable"))]
 pub use crate::media::MediaManagerHandle;
 
 impl RefUnwindSafe for MediaManagerHandle {}
@@ -1148,10 +1130,7 @@ pub fn media_stream_settings_display_video(
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::ReconnectHandle;
 use crate::api::dart::utils::ArgumentError;
-#[cfg(not(feature = "mockable"))]
 pub use crate::rpc::ReconnectHandle;
 
 impl ForeignClass for ReconnectHandle {}
@@ -1281,9 +1260,6 @@ pub fn reconnect_handle_reconnect_with_backoff(
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::RemoteMediaTrack;
-#[cfg(not(feature = "mockable"))]
 pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
@@ -1448,9 +1424,6 @@ pub fn room_close_reason_is_err(
 
 // -------------------------------------------------------------------
 
-#[cfg(feature = "mockable")]
-pub use super::mock::RoomHandle;
-#[cfg(not(feature = "mockable"))]
 pub use crate::room::RoomHandle;
 use crate::room::{ConstraintsUpdateError, RoomJoinError};
 

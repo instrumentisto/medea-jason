@@ -42,8 +42,6 @@ impl TransportState {
 /// RPC transport between a client and a server.
 #[allow(unused_lifetimes)]
 #[async_trait(?Send)]
-#[cfg_attr(feature = "mockable", mockall::automock)]
-#[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcTransport {
     /// Initiates a new [WebSocket] connection to the provided `url`.
     ///

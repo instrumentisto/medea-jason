@@ -155,13 +155,6 @@ impl RecvConstraints {
     }
 }
 
-#[cfg(feature = "mockable")]
-impl From<MediaStreamSettings> for LocalTracksConstraints {
-    fn from(from: MediaStreamSettings) -> Self {
-        Self(Rc::new(RefCell::new(from)))
-    }
-}
-
 impl LocalTracksConstraints {
     /// Returns [`LocalStreamUpdateCriteria`] with [`MediaKind`] and
     /// [`MediaSourceKind`] which are different in the provided

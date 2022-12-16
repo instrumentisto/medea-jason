@@ -304,29 +304,6 @@ impl Sender {
     }
 }
 
-#[cfg(feature = "mockable")]
-#[allow(clippy::multiple_inherent_impl)]
-impl Sender {
-    /// Indicates whether general media exchange state of this [`Sender`] is in
-    /// [`StableMediaExchangeState::Disabled`].
-    #[must_use]
-    pub fn general_disabled(&self) -> bool {
-        !self.enabled_general.get()
-    }
-
-    /// Indicates whether this [`Sender`] is disabled.
-    #[must_use]
-    pub fn disabled(&self) -> bool {
-        !self.enabled_individual.get()
-    }
-
-    /// Indicates whether this [`Sender`] is muted.
-    #[must_use]
-    pub fn muted(&self) -> bool {
-        self.muted.get()
-    }
-}
-
 impl Drop for Sender {
     fn drop(&mut self) {
         let transceiver = self.transceiver.clone();

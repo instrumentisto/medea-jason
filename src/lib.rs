@@ -100,15 +100,10 @@
     unused_qualifications,
     unused_results,
     unused_tuple_struct_fields,
-    variant_size_differences
+    variant_size_differences,
+    missing_docs
 )]
-#![cfg_attr(not(feature = "mockable"), warn(missing_docs))]
-#![cfg_attr(feature = "mockable", allow(missing_docs))]
-#![allow(
-    clippy::module_name_repetitions,
-    clippy::unimplemented,
-    unreachable_pub
-)]
+
 // TODO: Remove once annoying false positive is fixed:
 //       https://github.com/rust-lang/rust-clippy/issues/6902
 #![allow(clippy::use_self)]
