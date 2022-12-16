@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:medea_jason/src/native/ffi/nullable_pointer.dart';
 import 'package:medea_jason/src/native/ffi/result.dart';
 import 'package:medea_jason/src/native/room_handle.dart';
 import 'package:medea_jason/src/native/media_device_info.dart';
@@ -305,52 +304,6 @@ void main() {
             e.message() == 'RpcClientException::SessionFinished' &&
             e.cause() == 'Dart err cause2' &&
             e.trace().contains('at src')));
-  });
-
-  final returnsInputDevicePtr =
-      dl.lookupFunction<ForeignValue Function(), ForeignValue Function()>(
-          'returns_media_device_info_ptr');
-
-  testWidgets('ForeignValue', (WidgetTester tester) async {
-    Pointer rustPtr1 = returnsInputDevicePtr().toDart();
-
-    var fvN = ForeignValue.none();
-    var fvI = ForeignValue.fromInt(145);
-    var fvS = ForeignValue.fromString('my string');
-    var fvH = ForeignValue.fromHandle(TestObj(333));
-    var fvR = ForeignValue.fromPtr(NullablePointer(rustPtr1));
-
-    expect(fvN.ref.toDart(), null);
-    expect(fvI.ref.toDart(), 145);
-    expect(fvS.ref.toDart(), 'my string');
-    expect((fvH.ref.toDart() as TestObj).val, 333);
-    expect((fvR.ref.toDart() as Pointer).address, rustPtr1.address);
-
-    fvN.free();
-    fvI.free();
-    fvS.free();
-    fvH.free();
-    fvR.free();
-
-    Pointer rustPtr2 = returnsInputDevicePtr().toDart();
-
-    var fvN2 = ForeignValue.fromDart(null);
-    var fvI2 = ForeignValue.fromDart(555);
-    var fvS2 = ForeignValue.fromDart('my string');
-    var fvH2 = ForeignValue.fromDart(TestObj(666));
-    var fvR2 = ForeignValue.fromDart(NullablePointer(rustPtr2));
-
-    expect(fvN2.ref.toDart(), null);
-    expect(fvI2.ref.toDart(), 555);
-    expect(fvS2.ref.toDart(), 'my string');
-    expect((fvH2.ref.toDart() as TestObj).val, 666);
-    expect((fvR2.ref.toDart() as Pointer).address, rustPtr2.address);
-
-    fvN2.free();
-    fvI2.free();
-    fvS2.free();
-    fvH2.free();
-    fvR2.free();
   });
 
   testWidgets('Complex arguments validation', (WidgetTester tester) async {
