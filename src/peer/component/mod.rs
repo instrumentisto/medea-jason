@@ -504,7 +504,6 @@ impl Updatable for State {
     }
 }
 
-
 #[cfg(feature = "mockable")]
 #[allow(clippy::multiple_inherent_impl)]
 impl State {

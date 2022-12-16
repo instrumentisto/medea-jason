@@ -9,10 +9,14 @@ use futures::future;
 use tracerr::{Trace, Traced};
 
 use crate::{
-    api::{
-        err::{RpcClientException, RpcClientExceptionKind},
+    api::err::{RpcClientException, RpcClientExceptionKind},
+    platform::{
+        self,
+        utils::{
+            dart_future::{DartFuture, IntoDartFuture},
+            result::DartResult,
+        },
     },
-    platform::{self, utils::{dart_future::{IntoDartFuture, DartFuture}, result::DartResult}},
     rpc::{ReconnectError, ReconnectHandle as CoreReconnectHandle},
 };
 

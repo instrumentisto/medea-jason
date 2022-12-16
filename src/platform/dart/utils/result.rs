@@ -1,6 +1,6 @@
 //! FFI-compatible [`Result`] for Dart.
 
-use crate::{api::{dart::DartValue, Error}};
+use crate::api::{dart::DartValue, Error};
 
 /// FFI-compatible [`Result`] for Dart.
 #[allow(variant_size_differences)] // that's totally OK here

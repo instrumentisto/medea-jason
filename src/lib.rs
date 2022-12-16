@@ -111,7 +111,6 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::use_debug)]
 
-
 #[macro_use]
 pub mod utils;
 pub mod api;

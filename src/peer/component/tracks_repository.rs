@@ -231,7 +231,9 @@ where
 #[cfg(feature = "mockable")]
 impl<S> TracksRepository<S> {
     /// Waits until all the track inserts will be processed.
-    pub(crate) fn when_insert_processed(&self) -> medea_reactive::Processed<'static> {
+    pub(crate) fn when_insert_processed(
+        &self,
+    ) -> medea_reactive::Processed<'static> {
         self.0.borrow().when_insert_processed()
     }
 }

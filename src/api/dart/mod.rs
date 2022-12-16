@@ -22,7 +22,6 @@ pub mod utils;
 #[cfg(feature = "mockable")]
 pub mod mock;
 
-
 use std::{
     ffi::{c_void, CString},
     marker::PhantomData,
@@ -660,7 +659,6 @@ pub unsafe extern "C" fn box_foreign_value(
 ) -> ptr::NonNull<DartValue> {
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
-
 
 #[cfg(feature = "mockable")]
 mod dart_value_extern_tests_helpers {

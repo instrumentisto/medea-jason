@@ -45,16 +45,10 @@ impl RoomHandle {
         &self,
         cb: platform::Function<RoomCloseReason>,
     ) -> Result<(), Traced<HandleDetachedError>> {
-        println!("RAZ CALL5");
-        let a = CloseReason::ByClient {
+        cb.call1(RoomCloseReason::new(CloseReason::ByClient {
             is_err: true,
             reason: ClientDisconnect::RpcClientUnexpectedlyDropped,
-        };
-        println!("RAZ CALL6");
-        let b = RoomCloseReason::new(a);
-        println!("RAZ CALL7");
-        cb.call1(b);
-        println!("RAZ CALL8");
+        }));
         Ok(())
     }
 

@@ -222,7 +222,6 @@ macro_rules! dart_enum_try_into {
 
 pub(crate) use dart_enum_try_into;
 
-
 #[cfg(feature = "mockable")]
 pub mod tests {
     #![allow(clippy::missing_safety_doc)]

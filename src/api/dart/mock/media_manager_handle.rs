@@ -11,16 +11,21 @@ use tracerr::Traced;
 
 use crate::{
     api::{
-        LocalMediaTrack, MediaDeviceInfo, MediaDisplayInfo,
-        MediaStreamSettings, Error as DartError,
+        Error as DartError, LocalMediaTrack, MediaDeviceInfo, MediaDisplayInfo,
+        MediaStreamSettings,
     },
     media::{
         EnumerateDevicesError, EnumerateDisplaysError, HandleDetachedError,
-        InvalidOutputAudioDeviceIdError, MicVolumeError, InitLocalTracksError,
+        InitLocalTracksError, InvalidOutputAudioDeviceIdError, MicVolumeError,
     },
-    platform::{self, utils::{result::DartResult, dart_future::{DartFuture, IntoDartFuture}}},
+    platform::{
+        self,
+        utils::{
+            dart_future::{DartFuture, IntoDartFuture},
+            result::DartResult,
+        },
+    },
 };
-
 
 #[derive(Clone, Debug)]
 pub struct MediaManagerHandle(pub u8);
