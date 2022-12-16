@@ -460,8 +460,6 @@ impl SynchronizableState for State {
     fn apply(&self, state: Self::Input, send_cons: &LocalTracksConstraints) {
         if state.negotiation_role.is_some() {
             self.negotiation_role.set(state.negotiation_role);
-        } else {
-            self.negotiation_role.set(None);
         }
         if state.restart_ice {
             self.restart_ice.set(true);
