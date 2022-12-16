@@ -10,7 +10,7 @@ pub enum DartResult {
     /// Success [`DartValue`].
     Ok(DartValue),
 
-    /// [`DartError`] value.
+    /// [`Error`] value.
     Err(Error),
 }
 
