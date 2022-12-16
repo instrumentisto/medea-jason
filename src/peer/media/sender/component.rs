@@ -657,3 +657,12 @@ impl MediaStateControllable for State {
         }
     }
 }
+
+#[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
+impl State {
+    /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
+    pub fn synced(&self) {
+        self.sync_state.set(SyncState::Synced);
+    }
+}

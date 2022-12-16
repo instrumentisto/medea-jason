@@ -221,3 +221,86 @@ macro_rules! dart_enum_try_into {
 }
 
 pub(crate) use dart_enum_try_into;
+
+
+#[cfg(feature = "mockable")]
+pub mod tests {
+    #![allow(clippy::missing_safety_doc)]
+
+    use dart_sys::Dart_Handle;
+
+    use crate::{
+        api::err::FormatException,
+        platform::dart::utils::{
+            dart_future::FutureFromDart, handle::DartHandle,
+        },
+    };
+
+    use super::{DartFuture, IntoDartFuture};
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__future_from_dart__int(
+        future: Dart_Handle,
+    ) -> DartFuture<Result<i64, FormatException>> {
+        let future = DartHandle::new(future);
+        async move {
+            let val =
+                FutureFromDart::execute::<i64>(future.get()).await.unwrap();
+            Ok(val)
+        }
+        .into_dart_future()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__future_from_dart__string(
+        future: Dart_Handle,
+    ) -> DartFuture<Result<String, FormatException>> {
+        let future = DartHandle::new(future);
+        async move {
+            let val = FutureFromDart::execute::<String>(future.get())
+                .await
+                .unwrap();
+            Ok(val)
+        }
+        .into_dart_future()
+    }
+
+    type TestFutureHandleFunction = extern "C" fn(Dart_Handle);
+
+    static mut TEST_FUTURE_HANDLE_FUNCTION: Option<TestFutureHandleFunction> =
+        None;
+
+    #[no_mangle]
+    pub unsafe extern "C" fn register__test__future_from_dart_handle_fn(
+        f: TestFutureHandleFunction,
+    ) {
+        TEST_FUTURE_HANDLE_FUNCTION = Some(f);
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__future_from_dart__handle(
+        future: Dart_Handle,
+    ) -> DartFuture<Result<(), FormatException>> {
+        let future = DartHandle::new(future);
+        async move {
+            let val = FutureFromDart::execute::<DartHandle>(future.get())
+                .await
+                .unwrap();
+            (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get());
+            Ok(())
+        }
+        .into_dart_future()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test__future_from_dart__fails(
+        future: Dart_Handle,
+    ) -> DartFuture<Result<i64, FormatException>> {
+        let future = DartHandle::new(future);
+        async move {
+            let val = FutureFromDart::execute::<i64>(future.get()).await;
+            Ok(val.is_err().into())
+        }
+        .into_dart_future()
+    }
+}

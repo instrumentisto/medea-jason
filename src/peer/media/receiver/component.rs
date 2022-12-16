@@ -463,3 +463,22 @@ impl TransceiverSide for State {
         true
     }
 }
+
+#[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
+impl State {
+    /// Stabilizes [`MediaExchangeState`] of this [`State`].
+    pub fn stabilize(&self) {
+        if let crate::peer::MediaExchangeState::Transition(transition) =
+            self.enabled_individual.state()
+        {
+            self.enabled_individual.update(transition.intended());
+            self.enabled_general.set(transition.intended());
+        }
+    }
+
+    /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
+    pub fn synced(&self) {
+        self.sync_state.set(SyncState::Synced);
+    }
+}

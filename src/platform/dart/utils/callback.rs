@@ -230,3 +230,81 @@ extern "C" fn callback_finalizer(_: *mut c_void, cb: *mut c_void) {
         });
     });
 }
+
+
+#[cfg(feature = "mockable")]
+pub mod tests {
+    #![allow(clippy::missing_safety_doc)]
+
+    use dart_sys::Dart_Handle;
+
+    use crate::api::DartValueArg;
+
+    use super::Callback;
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test_callback_listener_int(
+        expects: DartValueArg<i64>,
+    ) -> Dart_Handle {
+        let expects: i64 = expects.try_into().unwrap();
+        Callback::from_once(move |val: i64| {
+            assert_eq!(val, expects);
+        })
+        .into_dart()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test_callback_listener_string(
+        expects: DartValueArg<String>,
+    ) -> Dart_Handle {
+        let expects: String = expects.try_into().unwrap();
+        Callback::from_once(move |val: String| {
+            assert_eq!(val, expects);
+        })
+        .into_dart()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test_callback_listener_optional_int(
+        expects: DartValueArg<Option<i64>>,
+    ) -> Dart_Handle {
+        let expects: Option<i64> = expects.try_into().unwrap();
+        Callback::from_once(move |val: Option<i64>| {
+            assert_eq!(val, expects);
+        })
+        .into_dart()
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test_callback_listener_optional_string(
+        expects: DartValueArg<Option<String>>,
+    ) -> Dart_Handle {
+        let expects: Option<String> = expects.try_into().unwrap();
+        Callback::from_once(move |val: Option<String>| {
+            assert_eq!(val, expects);
+        })
+        .into_dart()
+    }
+
+    type TestCallbackHandleFunction = extern "C" fn(Dart_Handle);
+
+    static mut TEST_CALLBACK_HANDLE_FUNCTION: Option<
+        TestCallbackHandleFunction,
+    > = None;
+
+    #[no_mangle]
+    pub unsafe extern "C" fn register__test__test_callback_handle_function(
+        f: TestCallbackHandleFunction,
+    ) {
+        TEST_CALLBACK_HANDLE_FUNCTION = Some(f);
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
+    {
+        Callback::from_once(move |val: Dart_Handle| {
+            (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val);
+        })
+        .into_dart()
+    }
+}

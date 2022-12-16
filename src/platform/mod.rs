@@ -18,6 +18,9 @@ cfg_if::cfg_if! {
 
 use derive_more::Display;
 
+#[cfg(feature = "mockable")]
+pub use self::transport::MockRpcTransport;
+
 use crate::utils::Caused;
 
 pub use self::{

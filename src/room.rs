@@ -1901,3 +1901,33 @@ impl Drop for InnerRoom {
             .call1(RoomCloseReason::new(*self.close_reason.borrow()));
     }
 }
+
+#[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
+impl Room {
+    /// Returns [`PeerConnection`] stored in repository by its ID.
+    ///
+    /// Used to inspect [`Room`]'s inner state in integration tests.
+    #[must_use]
+    pub fn get_peer_by_id(
+        &self,
+        peer_id: PeerId,
+    ) -> Option<Rc<PeerConnection>> {
+        self.0.peers.get(peer_id)
+    }
+
+    /// Returns reference to the [`peer::repo::State`] of this [`Room`].
+    #[must_use]
+    pub fn peers_state(&self) -> Rc<peer::repo::State> {
+        self.0.peers.state()
+    }
+
+    /// Lookups [`peer::State`] by the provided [`PeerId`].
+    #[must_use]
+    pub fn get_peer_state_by_id(
+        &self,
+        peer_id: PeerId,
+    ) -> Option<Rc<peer::State>> {
+        self.0.peers.state().get(peer_id)
+    }
+}

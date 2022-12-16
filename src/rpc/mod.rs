@@ -18,6 +18,8 @@ use url::Url;
 
 use crate::{platform, utils::Caused};
 
+#[cfg(feature = "mockable")]
+pub use self::rpc_session::MockRpcSession;
 #[doc(inline)]
 pub use self::{
     backoff_delayer::BackoffDelayer,

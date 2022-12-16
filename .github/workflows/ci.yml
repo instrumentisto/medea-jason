@@ -37,6 +37,7 @@ jobs:
       - rustfmt
       - test-e2e-browser
       - test-e2e-desktop
+      - test-flutter
       - test-unit
     runs-on: ubuntu-latest
     steps:
@@ -331,6 +332,112 @@ jobs:
                                    up=yes debug=no dockerized=yes
                                    medea-tag=${{ env.MEDEA_BRANCH }}
                                    control-tag=build-${{ github.run_number }}
+
+  test-flutter:
+    name: Flutter tests
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/medea-jason-')
+            || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - android
+          - linux
+          - macos
+          - windows
+    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'macos-latest' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+      - run: make rustup.targets only=${{ matrix.platform }}
+      - uses: Swatinem/rust-cache@v2
+        if: ${{ matrix.platform != 'windows'
+             && env.CACHE == 'true' }}
+
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.platform == 'android' }}
+
+      - uses: subosito/flutter-action@v2
+      - run: flutter config --enable-linux-desktop
+        if: ${{ matrix.platform == 'linux' }}
+      - name: Install Flutter Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+                       cmake \
+                       libgtk-3-dev liblzma-dev libpulse-dev \
+                       ninja-build pkg-config xvfb
+        if: ${{ matrix.platform == 'linux' }}
+
+      # TODO: Rust doesn't support NDK >= 23:
+      #       https://github.com/rust-lang/rust/pull/85806
+      #       https://github.com/actions/virtual-environments/issues/5595
+      - name: Change NDK version to r22
+        run: |
+          ANDROID_HOME=$HOME/Library/Android/sdk
+          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          echo y | $SDKMANAGER "ndk;22.1.7171670"
+          ln -sfn $ANDROID_HOME/ndk/22.1.7171670 $ANDROID_HOME/ndk-bundle
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: make cargo.build.jason platform=${{ matrix.platform }}
+                                    args="--features mockable"
+                                    ${{ (matrix.platform == 'android'
+                                         && 'targets=x86_64')
+                                     ||     '' }}
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 11
+        if: ${{ matrix.platform == 'android' }}
+
+      - name: Parse Android API versions
+        id: api-version
+        run: |
+          echo "min=$(make flutter.android.version.min)" \
+          >> $GITHUB_OUTPUT
+          echo "target=$(make flutter.android.version.compile)" \
+          >> $GITHUB_OUTPUT
+        if: ${{ matrix.platform == 'android' }}
+      - name: Test on min Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.min }}
+          target: google_apis
+          arch: x86_64
+          cores: 3
+          profile: pixel_2
+          script: make test.flutter
+        if: ${{ matrix.platform == 'android' }}
+      - name: Test on target Android API version
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.target }}
+          target: google_apis
+          arch: x86_64
+          cores: 3
+          profile: pixel_2
+          script: make test.flutter
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: xvfb-run -a make test.flutter device=linux
+        if: ${{ matrix.platform == 'linux' }}
+
+      - run: make test.flutter device=${{ matrix.platform }}
+        if: ${{ matrix.platform == 'macos'
+             || matrix.platform == 'windows' }}
+
+
 
 
   ############
@@ -683,6 +790,7 @@ jobs:
       - rustfmt
       - test-e2e-browser
       - test-e2e-desktop
+      - test-flutter
       - test-unit
     runs-on: ubuntu-latest
     steps:

@@ -19,6 +19,10 @@
 pub mod jason_api;
 pub mod utils;
 
+#[cfg(feature = "mockable")]
+pub mod mock;
+
+
 use std::{
     ffi::{c_void, CString},
     marker::PhantomData,
@@ -655,4 +659,73 @@ pub unsafe extern "C" fn box_foreign_value(
     val: DartValue,
 ) -> ptr::NonNull<DartValue> {
     ptr::NonNull::from(Box::leak(Box::new(val)))
+}
+
+
+#[cfg(feature = "mockable")]
+mod dart_value_extern_tests_helpers {
+    use super::*;
+
+    use crate::platform::set_panic_hook;
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn returns_none() -> DartValueArg<String> {
+        DartValueArg::from(())
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn returns_media_device_info_ptr(
+    ) -> DartValueArg<MediaDeviceInfo> {
+        DartValueArg::from(MediaDeviceInfo(0))
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn returns_handle_ptr(
+        handle: Dart_Handle,
+    ) -> DartValueArg<Dart_Handle> {
+        DartValueArg::from(handle)
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn returns_string() -> DartValueArg<String> {
+        DartValueArg::from(String::from("QWERTY"))
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn returns_int() -> DartValueArg<i64> {
+        DartValueArg::from(333)
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn accepts_none(none: DartValueArg<String>) {
+        assert!(matches!(none.0, DartValue::None));
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn accepts_media_device_info_pointer(
+        ptr: DartValueArg<MediaDeviceInfo>,
+    ) {
+        let ptr: ptr::NonNull<c_void> = ptr.try_into().unwrap();
+        let info = MediaDeviceInfo::from_ptr(ptr.cast());
+
+        assert_eq!(info.device_id(), "MediaDeviceInfo.device_id");
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn accepts_string(str: DartValueArg<String>) {
+        let string = String::try_from(str).unwrap();
+        assert_eq!(string, "my string");
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn accepts_int(int: DartValueArg<i64>) {
+        let int: i64 = int.try_into().unwrap();
+        assert_eq!(int, 235);
+    }
+
+    #[no_mangle]
+    pub(crate) unsafe extern "C" fn fire_panic() {
+        set_panic_hook();
+        propagate_panic(|| panic!("Panicking"));
+    }
 }
