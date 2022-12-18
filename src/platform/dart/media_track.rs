@@ -236,7 +236,6 @@ impl MediaStreamTrack {
     /// Returns [readiness state][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-    #[allow(clippy::unused_self)]
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let handle = self.inner.get();
         let state = unsafe {
@@ -270,7 +269,6 @@ impl MediaStreamTrack {
     /// Only works in Chrome browser at the moment.
     ///
     /// [1]: https://w3.org/TR/screen-capture#extensions-to-mediatracksettings
-    #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
         self.source_kind == Some(MediaSourceKind::Display)
