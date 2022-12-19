@@ -666,7 +666,7 @@ mod dart_value_extern_tests_helpers {
     use crate::platform::set_panic_hook;
 
     #[no_mangle]
-    pub(crate) unsafe extern "C" fn fire_panic() {
+    pub unsafe extern "C" fn fire_panic() {
         set_panic_hook();
         propagate_panic(|| panic!("Panicking"));
     }

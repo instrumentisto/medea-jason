@@ -1368,7 +1368,7 @@ impl InnerRoom {
     ///
     /// [`Sender`]: peer::media::Sender
     /// [`Receiver`]: peer::media::Receiver
-    pub(crate) fn is_all_peers_in_media_state(
+    pub fn is_all_peers_in_media_state(
         &self,
         kind: MediaKind,
         direction: TrackDirection,
