@@ -50,23 +50,10 @@ Object objectFromAnyhow(FfiException error) {
   if (!error.message.contains('RESULT_ERROR: DartError')) {
     throw error;
   }
-
-  // var regex = RegExp('\((.*)\)');
-
-  // // todo regex
-  // print('|${error.message}| A ${regex.firstMatch(error.message)?.group(0)}');
-  // var handle = regex.firstMatch(error.message).toString();
-
-  // var regex = RegExp('\((.*)\)');
-
-  // todo regex
-  // print('|${error.message}| A ${regex.firstMatch(error.message)?.group(0)}');
-  // var handle = regex.firstMatch(error.message).toString();
   var handle = error.message;
-  // todo regex
-  handle =
-      handle.replaceFirst('RESULT_ERROR: DartError(', '').replaceFirst(')', '');
-  var err_ptr = Pointer<Handle>.fromAddress(int.parse(handle));
+  var reg = RegExp(r'\(([^]*?)\)');
+  var err_ptr =
+      Pointer<Handle>.fromAddress(int.parse(reg.firstMatch(handle)![1]!));
   var err = unboxDartHandle(err_ptr);
   freeBoxedDartHandle(err_ptr);
   return err;

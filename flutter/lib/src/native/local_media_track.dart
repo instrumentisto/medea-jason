@@ -18,7 +18,6 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    // TODO(alexlapa): why dont we just return MediaKind enum instead of u8?
     return MediaKind.values[api.localMediaTrackKind(track: opaque)];
   }
 
