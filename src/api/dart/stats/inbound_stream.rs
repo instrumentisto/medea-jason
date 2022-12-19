@@ -152,12 +152,6 @@ struct RTCInboundRTPStreamFfiStatsVideo {
     /// Number of decoded frames in the last second.
     frames_per_second: ptr::NonNull<DartValueArg<Option<f64>>>,
 
-    /// Bit depth per pixel of the last decoded frame.
-    ///
-    /// Typical values are 24, 30, or 36 bits. Before the first frame is
-    /// decoded this attribute is missing.
-    frame_bit_depth: ptr::NonNull<DartValueArg<Option<u32>>>,
-
     /// Total number of Full Intra Request (FIR) packets sent by this
     /// receiver.
     fir_count: ptr::NonNull<DartValueArg<Option<u32>>>,
@@ -315,11 +309,7 @@ impl From<RTCInboundRTPStreamMediaType> for RtcInboundRtpStreamMediaType {
                     })
                     .unwrap()
                     .map(|v| v as u64),
-                    frame_bit_depth: Option::<u32>::try_from(unsafe {
-                        video.frame_bit_depth.unbox()
-                    })
-                    .unwrap()
-                    .map(u64::from),
+                    frame_bit_depth: None,
                     fir_count: Option::<u32>::try_from(unsafe {
                         video.fir_count.unbox()
                     })

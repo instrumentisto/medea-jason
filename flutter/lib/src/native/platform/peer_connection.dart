@@ -165,7 +165,7 @@ Object getTransceivers(PeerConnection conn) {
   return () => conn.getTransceivers();
 }
 
-/// Returns all the [RTCStats] of the provided [PeerConnection].
+/// Returns all the [RtcStats] of the provided [PeerConnection].
 Object _getStats(PeerConnection conn) {
   return () => conn.getStats();
 }
@@ -173,8 +173,8 @@ Object _getStats(PeerConnection conn) {
 /// Transfers [RTCFfiStats] ownership to Rust.
 ///
 /// Frees Dart side [RTCFfiStats].
-Pointer<NativeType> _toOwnedStats(RTCStats stats) {
-  var ffi = RTCFfiStats.fromDartStats(stats);
+Pointer<NativeType> _toOwnedStats(RtcStats stats) {
+  var ffi = RtcFfiStats.fromDartStats(stats);
   return ffi.intoRustOwned();
 }
 

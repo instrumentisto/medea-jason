@@ -8,27 +8,27 @@ import '../../util/move_semantic.dart';
 import '../ffi/foreign_value.dart';
 import '../jason.dart';
 
-typedef _boxForeignStats_C = Pointer Function(RTCFfiStats);
-typedef _boxForeignStats_Dart = Pointer Function(RTCFfiStats);
+typedef _boxForeignStats_C = Pointer Function(RtcFfiStats);
+typedef _boxForeignStats_Dart = Pointer Function(RtcFfiStats);
 
 final _boxForeignStats_Dart _boxForeignStats =
     dl.lookupFunction<_boxForeignStats_C, _boxForeignStats_Dart>(
         'box_foreign_stats');
 
-class RTCFfiStats extends Struct {
-  RTCFfiStats._();
+class RtcFfiStats extends Struct {
+  RtcFfiStats._();
 
   /// Unique ID that is associated with the object that was inspected to
-  /// produce this [RTCStats] object.
+  /// produce this [RtcStats] object.
   ///
-  /// [RTCStats]: https://w3.org/TR/webrtc#dom-rtcstats
+  /// [RtcStats]: https://w3.org/TR/webrtc#dom-rtcstats
   external Pointer<Utf8> id;
 
   /// Timestamp associated with this object.
   ///
   /// The time is relative to the UNIX epoch (Jan 1, 1970, UTC).
   ///
-  /// For statistics that came from a remote source (e.g., from received RTCP
+  /// For statistics that came from a remote source (e.g., from received RtcP
   /// packets), timestamp represents the time at which the information
   /// arrived at the local endpoint. The remote timestamp can be found in an
   /// additional field in an [`RtcStat`]-derived dictionary, if applicable.
@@ -38,25 +38,25 @@ class RTCFfiStats extends Struct {
   /// Actual stats of this [`RtcStat`].
   ///
   /// All possible stats are described in the [`RtcStatsType`] enum.
-  external Pointer<RTCStatsType> type;
+  external Pointer<RtcStatsType> type;
 
   /// Allocates a new [ForeignValue] with the provided pointer to some Rust
   /// object.
-  static Pointer<RTCFfiStats> fromDartStats(medea.RTCStats stats) {
-    var fVal = calloc<RTCFfiStats>();
+  static Pointer<RtcFfiStats> fromDartStats(medea.RtcStats stats) {
+    var fVal = calloc<RtcFfiStats>();
 
     fVal.ref.id = stats.id.toNativeUtf8();
     fVal.ref.timestampUs = stats.timestampUs;
-    fVal.ref.type = RTCStatsType.fromDartStats(stats.type);
+    fVal.ref.type = RtcStatsType.fromDartStats(stats.type);
 
     return fVal;
   }
 }
 
-extension RTCStatsPointer on Pointer<RTCFfiStats> {
-  /// Transfers [RTCFfiStats] ownership to Rust.
+extension RtcStatsPointer on Pointer<RtcFfiStats> {
+  /// Transfers [RtcFfiStats] ownership to Rust.
   ///
-  /// Frees Dart side [RTCFfiStats].
+  /// Frees Dart side [RtcFfiStats].
   Pointer<NativeType> intoRustOwned() {
     var out = _boxForeignStats(ref);
     calloc.free(this);
@@ -70,8 +70,8 @@ extension RTCStatsPointer on Pointer<RTCFfiStats> {
   }
 }
 
-class RTCStatsType extends Struct {
-  RTCStatsType._();
+class RtcStatsType extends Struct {
+  RtcStatsType._();
 
   /// 0 -> Unimplemented.
   @Int32()
@@ -83,82 +83,82 @@ class RTCStatsType extends Struct {
   /// All possible stats are described in the [`RtcStatsType`] enum.
   external _ForeignValueStats _payload;
 
-  static Pointer<RTCStatsType> fromDartStats(medea.RtcStatsType? type) {
-    var fVal = calloc<RTCStatsType>();
+  static Pointer<RtcStatsType> fromDartStats(medea.RtcStatsType? type) {
+    var fVal = calloc<RtcStatsType>();
     var strType = type.runtimeType.toString();
     switch (strType) {
       case 'RtcTransportStats':
         {
           fVal.ref._tag = 1;
           fVal.ref._payload.transport =
-              RTCTransportStats.fromDartStats(type as medea.RtcTransportStats);
+              RtcTransportStats.fromDartStats(type as medea.RtcTransportStats);
           return fVal;
         }
       case 'RtcAudioSourceStats':
         {
           fVal.ref._tag = 2;
-          fVal.ref._payload.mediaSource = RTCMediaSourceStats.fromDartStats(
+          fVal.ref._payload.mediaSource = RtcMediaSourceStats.fromDartStats(
               type as medea.RtcMediaSourceStats);
           return fVal;
         }
       case 'RtcVideoSourceStats':
         {
           fVal.ref._tag = 2;
-          fVal.ref._payload.mediaSource = RTCMediaSourceStats.fromDartStats(
+          fVal.ref._payload.mediaSource = RtcMediaSourceStats.fromDartStats(
               type as medea.RtcMediaSourceStats);
           return fVal;
         }
       case 'RtcRemoteIceCandidateStats':
         {
           fVal.ref._tag = 3;
-          fVal.ref._payload.iceCandidate = RTCIceCandidateStats.fromDartStats(
+          fVal.ref._payload.iceCandidate = RtcIceCandidateStats.fromDartStats(
               type as medea.RtcIceCandidateStats);
           return fVal;
         }
       case 'RtcLocalIceCandidateStats':
         {
           fVal.ref._tag = 3;
-          fVal.ref._payload.iceCandidate = RTCIceCandidateStats.fromDartStats(
+          fVal.ref._payload.iceCandidate = RtcIceCandidateStats.fromDartStats(
               type as medea.RtcIceCandidateStats);
           return fVal;
         }
-      case 'RtcOutboundRTPStreamStats':
+      case 'RtcOutboundRtpStreamStats':
         {
           fVal.ref._tag = 4;
-          fVal.ref._payload.outboundRTPStream =
-              RTCOutboundRTPStreamStats.fromDartStats(
-                  type as medea.RtcOutboundRTPStreamStats);
+          fVal.ref._payload.outboundRtpStream =
+              RtcOutboundRtpStreamStats.fromDartStats(
+                  type as medea.RtcOutboundRtpStreamStats);
           return fVal;
         }
-      case 'RtcInboundRTPStreamStats':
+      case 'RtcInboundRtpStreamStats':
         {
           fVal.ref._tag = 5;
-          fVal.ref._payload.inboundRTPStream =
-              RTCInboundRTPStreamStats.fromDartStats(
-                  type as medea.RtcInboundRTPStreamStats);
+          fVal.ref._payload.inboundRtpStream =
+              RtcInboundRtpStreamStats.fromDartStats(
+                  type as medea.RtcInboundRtpStreamStats);
           return fVal;
         }
       case 'RtcIceCandidatePairStats':
         {
           fVal.ref._tag = 6;
           fVal.ref._payload.iceCandidatePair =
-              RTCIceCandidatePairStats.fromDartStats(
+              RtcIceCandidatePairStats.fromDartStats(
                   type as medea.RtcIceCandidatePairStats);
           return fVal;
         }
       case 'RtcRemoteInboundRtpStreamStats':
         {
           fVal.ref._tag = 7;
-          fVal.ref._payload.remoteInboundRTPStream =
-              RTCRemoteInboundRtpStreamStats.fromDartStats(
+          fVal.ref._payload.remoteInboundRtpStream =
+              RtcRemoteInboundRtpStreamStats.fromDartStats(
                   type as medea.RtcRemoteInboundRtpStreamStats);
           return fVal;
         }
       case 'RtcRemoteOutboundRtpStreamStats':
         {
           fVal.ref._tag = 8;
-          fVal.ref._payload.remoteOutboundRTPStream =
-              RTCRemoteOutboundRtpStreamStats.fromDartStats(
+          fVal.ref._payload.remoteOutboundRtpStream =
+              RtcRemoteOutboundRtpStreamStats.fromDartStats(
                   type as medea.RtcRemoteOutboundRtpStreamStats);
           return fVal;
         }
@@ -171,11 +171,11 @@ class RTCStatsType extends Struct {
   }
 }
 
-/// Transport statistics related to the [RTCPeerConnection] object.
+/// Transport statistics related to the [RtcPeerConnection] object.
 ///
-/// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-class RTCTransportStats extends Struct {
-  RTCTransportStats._();
+/// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+class RtcTransportStats extends Struct {
+  RtcTransportStats._();
 
   /// Total number of packets sent over this transport.
   external Pointer<ForeignValue> packetsSent;
@@ -183,28 +183,28 @@ class RTCTransportStats extends Struct {
   /// Total number of packets received on this transport.
   external Pointer<ForeignValue> packetsReceived;
 
-  /// Total number of payload bytes sent on this [RTCPeerConnection], i.e.
+  /// Total number of payload bytes sent on this [RtcPeerConnection], i.e.
   /// not including headers or padding.
   ///
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
   external Pointer<ForeignValue> bytesSent;
 
-  /// Total number of bytes received on this [RTCPeerConnection], i.e. not
+  /// Total number of bytes received on this [RtcPeerConnection], i.e. not
   /// including headers or padding.
   ///
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
   external Pointer<ForeignValue> bytesReceived;
 
   /// Set to the current value of the [`role` attribute][1] of the
-  /// [underlying RTCDtlsTransport's `transport`][2].
+  /// [underlying RtcDtlsTransport's `transport`][2].
   ///
   /// [1]: https://w3.org/TR/webrtc#dom-icetransport-role
   /// [2]: https://w3.org/TR/webrtc#dom-rtcdtlstransport-icetransport
   external Pointer<ForeignValue> iceRole;
 
-  static Pointer<RTCTransportStats> fromDartStats(
+  static Pointer<RtcTransportStats> fromDartStats(
       medea.RtcTransportStats stats) {
-    var fVal = calloc<RTCTransportStats>();
+    var fVal = calloc<RtcTransportStats>();
     fVal.ref.packetsSent = ForeignValue.fromDart(stats.packetsSent);
     fVal.ref.packetsReceived = ForeignValue.fromDart(stats.packetsReceived);
     fVal.ref.bytesSent = ForeignValue.fromDart(stats.bytesSent);
@@ -215,16 +215,16 @@ class RTCTransportStats extends Struct {
 }
 
 /// Statistics for the media produced by a [MediaStreamTrack][1] that
-/// is currently attached to an [RTCRtpSender]. This reflects
+/// is currently attached to an [RtcRtpSender]. This reflects
 /// the media that is fed to the encoder after [getUserMedia]
 /// constraints have been applied (i.e. not the raw media
 /// produced by the camera).
 ///
-/// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+/// [RtcRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
 /// [getUserMedia]: https://tinyurl.com/sngpyr6
 /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-class RTCMediaSourceStats extends Struct {
-  RTCMediaSourceStats._();
+class RtcMediaSourceStats extends Struct {
+  RtcMediaSourceStats._();
 
   /// Value of the [MediaStreamTrack][1]'s ID attribute.
   ///
@@ -232,39 +232,39 @@ class RTCMediaSourceStats extends Struct {
   external Pointer<ForeignValue> trackIdentifier;
 
   /// Fields which should be in the [`RtcStat`] based on `kind`.
-  external Pointer<RTCMediaSourceStatsMediaType> kind;
+  external Pointer<RtcMediaSourceStatsMediaType> kind;
 
-  static Pointer<RTCMediaSourceStats> fromDartStats(
+  static Pointer<RtcMediaSourceStats> fromDartStats(
       medea.RtcMediaSourceStats stats) {
-    var fVal = calloc<RTCMediaSourceStats>();
+    var fVal = calloc<RtcMediaSourceStats>();
     fVal.ref.trackIdentifier = ForeignValue.fromDart(stats.trackIdentifier);
-    fVal.ref.kind = RTCMediaSourceStatsMediaType.fromDartStats(stats);
+    fVal.ref.kind = RtcMediaSourceStatsMediaType.fromDartStats(stats);
     return fVal;
   }
 }
 
-class RTCMediaSourceStatsMediaType extends Struct {
+class RtcMediaSourceStatsMediaType extends Struct {
   @Int32()
   // ignore: unused_field
   external int _tag;
-  external _RTCMediaSourceStatsMediaTypeFields _payload;
+  external _RtcMediaSourceStatsMediaTypeFields _payload;
 
-  static Pointer<RTCMediaSourceStatsMediaType> fromDartStats(
+  static Pointer<RtcMediaSourceStatsMediaType> fromDartStats(
       medea.RtcMediaSourceStats stats) {
-    var fVal = calloc<RTCMediaSourceStatsMediaType>();
+    var fVal = calloc<RtcMediaSourceStatsMediaType>();
     if (stats is medea.RtcVideoSourceStats) {
       fVal.ref._tag = 0;
-      fVal.ref._payload.video = RTCVideoSourceStats.fromDartStats(stats);
+      fVal.ref._payload.video = RtcVideoSourceStats.fromDartStats(stats);
     } else if (stats is medea.RtcAudioSourceStats) {
       fVal.ref._tag = 1;
-      fVal.ref._payload.audio = RTCAudioSourceStats.fromDartStats(stats);
+      fVal.ref._payload.audio = RtcAudioSourceStats.fromDartStats(stats);
     }
     return fVal;
   }
 }
 
-class RTCVideoSourceStats extends Struct {
-  RTCVideoSourceStats._();
+class RtcVideoSourceStats extends Struct {
+  RtcVideoSourceStats._();
 
   /// Width (in pixels) of the last frame originating from the source.
   /// Before a frame has been produced this attribute is missing.
@@ -282,9 +282,9 @@ class RTCVideoSourceStats extends Struct {
   /// attribute is missing.
   external Pointer<ForeignValue> framesPerSecond;
 
-  static Pointer<RTCVideoSourceStats> fromDartStats(
+  static Pointer<RtcVideoSourceStats> fromDartStats(
       medea.RtcVideoSourceStats stats) {
-    var fVal = calloc<RTCVideoSourceStats>();
+    var fVal = calloc<RtcVideoSourceStats>();
     fVal.ref.width = ForeignValue.fromDart(stats.width);
     fVal.ref.height = ForeignValue.fromDart(stats.height);
     fVal.ref.frames = ForeignValue.fromDart(stats.frames);
@@ -294,8 +294,8 @@ class RTCVideoSourceStats extends Struct {
   }
 }
 
-class RTCAudioSourceStats extends Struct {
-  RTCAudioSourceStats._();
+class RtcAudioSourceStats extends Struct {
+  RtcAudioSourceStats._();
 
   /// Audio level of the media source.
   external Pointer<ForeignValue> audioLevel;
@@ -315,9 +315,9 @@ class RTCAudioSourceStats extends Struct {
   /// echo cancellation is applied.
   external Pointer<ForeignValue> echoReturnLossEnhancement;
 
-  static Pointer<RTCAudioSourceStats> fromDartStats(
+  static Pointer<RtcAudioSourceStats> fromDartStats(
       medea.RtcAudioSourceStats stats) {
-    var fVal = calloc<RTCAudioSourceStats>();
+    var fVal = calloc<RtcAudioSourceStats>();
     fVal.ref.audioLevel = ForeignValue.fromDart(stats.audioLevel);
     fVal.ref.totalAudioEnergy = ForeignValue.fromDart(stats.totalAudioEnergy);
     fVal.ref.totalSamplesDuration =
@@ -329,27 +329,27 @@ class RTCAudioSourceStats extends Struct {
   }
 }
 
-/// ICE candidate statistics related to the [RTCIceTransport]
+/// ICE candidate statistics related to the [RtcIceTransport]
 /// objects.
 ///
-/// A local candidate is [deleted][1] when the [RTCIceTransport] does
+/// A local candidate is [deleted][1] when the [RtcIceTransport] does
 /// an ICE restart, and the candidate is no longer a member of
 /// any non-deleted candidate pair.
 ///
-/// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+/// [RtcIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
 /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-class RTCIceCandidateStats extends Struct {
-  RTCIceCandidateStats._();
+class RtcIceCandidateStats extends Struct {
+  RtcIceCandidateStats._();
 
   @Int32()
   // ignore: unused_field
   external int _tag;
 
-  external _RTCIceCandidateStats _payload;
+  external _RtcIceCandidateStats _payload;
 
-  static Pointer<RTCIceCandidateStats> fromDartStats(
+  static Pointer<RtcIceCandidateStats> fromDartStats(
       medea.RtcIceCandidateStats stats) {
-    var fVal = calloc<RTCIceCandidateStats>();
+    var fVal = calloc<RtcIceCandidateStats>();
     if (stats is medea.RtcRemoteIceCandidateStats) {
       fVal.ref._tag = 0;
       fVal.ref._payload.remote = IceCandidateStats.fromDartStats(stats);
@@ -365,7 +365,7 @@ class IceCandidateStats extends Struct {
   IceCandidateStats._();
 
   /// Unique ID that is associated to the object that was inspected to
-  /// produce the [RTCTransportStats][1] associated with this candidate.
+  /// produce the [RtcTransportStats][1] associated with this candidate.
   ///
   /// [1]: https://w3.org/TR/webrtc-stats/#transportstats-dict%2A
   external Pointer<ForeignValue> transportId;
@@ -392,7 +392,7 @@ class IceCandidateStats extends Struct {
 
   /// For local candidates this is the URL of the ICE server from which the
   /// candidate was obtained. It is the same as the
-  /// [url surfaced in the RTCPeerConnectionIceEvent][1].
+  /// [url surfaced in the RtcPeerConnectionIceEvent][1].
   ///
   /// `None` for remote candidates.
   ///
@@ -419,27 +419,27 @@ class IceCandidateStats extends Struct {
   }
 }
 
-/// Statistics for an outbound [RTP] stream that is currently sent with
-/// [RTCPeerConnection] object.
+/// Statistics for an outbound [Rtp] stream that is currently sent with
+/// [RtcPeerConnection] object.
 ///
-/// When there are multiple [RTP] streams connected to the same sender,
+/// When there are multiple [Rtp] streams connected to the same sender,
 /// such as when using simulcast or RTX, there will be one
-/// [`RtcOutboundRtpStreamStats`] per RTP stream, with distinct values
+/// [`RtcOutboundRtpStreamStats`] per Rtp stream, with distinct values
 /// of the `ssrc` attribute, and all these senders will have a
 /// reference to the same "sender" object (of type
-/// [RTCAudioSenderStats][1] or [RTCVideoSenderStats][2]) and
+/// [RtcAudioSenderStats][1] or [RtcVideoSenderStats][2]) and
 /// "track" object (of type
-/// [RTCSenderAudioTrackAttachmentStats][3] or
-/// [RTCSenderVideoTrackAttachmentStats][4]).
+/// [RtcSenderAudioTrackAttachmentStats][3] or
+/// [RtcSenderVideoTrackAttachmentStats][4]).
 ///
-/// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-/// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+/// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+/// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcaudiosenderstats
 /// [2]: https://w3.org/TR/webrtc-stats/#dom-rtcvideosenderstats
 /// [3]: https://tinyurl.com/sefa5z4
 /// [4]: https://tinyurl.com/rkuvpl4
-class RTCOutboundRTPStreamStats extends Struct {
-  RTCOutboundRTPStreamStats._();
+class RtcOutboundRtpStreamStats extends Struct {
+  RtcOutboundRtpStreamStats._();
 
   /// ID of the stats object representing the current track attachment
   /// to the sender of this stream.
@@ -448,7 +448,7 @@ class RTCOutboundRTPStreamStats extends Struct {
   /// Total number of bytes sent for this SSRC.
   external Pointer<ForeignValue> bytesSent;
 
-  /// Total number of RTP packets sent for this SSRC.
+  /// Total number of Rtp packets sent for this SSRC.
   external Pointer<ForeignValue> packetsSent;
 
   /// ID of the stats object representing the track currently
@@ -458,15 +458,15 @@ class RTCOutboundRTPStreamStats extends Struct {
   /// Fields which should be in the [`RtcStat`] based on `mediaType`.
   external Pointer<ForeignValue> mediaType;
 
-  static Pointer<RTCOutboundRTPStreamStats> fromDartStats(
-      medea.RtcOutboundRTPStreamStats stats) {
-    var fVal = calloc<RTCOutboundRTPStreamStats>();
+  static Pointer<RtcOutboundRtpStreamStats> fromDartStats(
+      medea.RtcOutboundRtpStreamStats stats) {
+    var fVal = calloc<RtcOutboundRtpStreamStats>();
     fVal.ref.trackId = ForeignValue.fromDart(stats.trackId);
     fVal.ref.bytesSent = ForeignValue.fromDart(stats.bytesSent);
     fVal.ref.packetsSent = ForeignValue.fromDart(stats.packetsSent);
     fVal.ref.mediaSourceId = ForeignValue.fromDart(stats.mediaSourceId);
     var mediaType =
-        RTCOutboundRTPStreamStatsMediaType.fromDartStats(stats.mediaType);
+        RtcOutboundRtpStreamStatsMediaType.fromDartStats(stats.mediaType);
     if (mediaType == null) {
       fVal.ref.mediaType = ForeignValue.none();
     } else {
@@ -477,32 +477,32 @@ class RTCOutboundRTPStreamStats extends Struct {
   }
 }
 
-class RTCOutboundRTPStreamStatsAudio extends Struct {
-  RTCOutboundRTPStreamStatsAudio._();
+class RtcOutboundRtpStreamStatsAudio extends Struct {
+  RtcOutboundRtpStreamStatsAudio._();
 
-  /// Total number of samples that have been sent over this RTP stream.
+  /// Total number of samples that have been sent over this Rtp stream.
   external Pointer<ForeignValue> totalSamplesSent;
 
-  /// Whether the last RTP packet sent contained voice activity or not
+  /// Whether the last Rtp packet sent contained voice activity or not
   /// based on the presence of the V bit in the extension header.
   external Pointer<ForeignValue> voiceActivityFlag;
 
-  static Pointer<RTCOutboundRTPStreamStatsAudio> fromDartStats(
-      medea.RtcOutboundRTPStreamStatsAudio stats) {
-    var fVal = calloc<RTCOutboundRTPStreamStatsAudio>();
+  static Pointer<RtcOutboundRtpStreamStatsAudio> fromDartStats(
+      medea.RtcOutboundRtpStreamStatsAudio stats) {
+    var fVal = calloc<RtcOutboundRtpStreamStatsAudio>();
     fVal.ref.totalSamplesSent = ForeignValue.fromDart(stats.totalSamplesSent);
     fVal.ref.voiceActivityFlag = ForeignValue.fromDart(stats.voiceActivityFlag);
     return fVal;
   }
 }
 
-class RTCOutboundRTPStreamStatsVideo extends Struct {
-  RTCOutboundRTPStreamStatsVideo._();
+class RtcOutboundRtpStreamStatsVideo extends Struct {
+  RtcOutboundRtpStreamStatsVideo._();
 
   /// Width of the last encoded frame.
   ///
   /// The resolution of the encoded frame may be lower than the media
-  /// source (see [RTCVideoSourceStats.width][1]).
+  /// source (see [RtcVideoSourceStats.width][1]).
   ///
   /// Before the first frame is encoded this attribute is missing.
   ///
@@ -512,7 +512,7 @@ class RTCOutboundRTPStreamStatsVideo extends Struct {
   /// Height of the last encoded frame.
   ///
   /// The resolution of the encoded frame may be lower than the media
-  /// source (see [RTCVideoSourceStats.height][1]).
+  /// source (see [RtcVideoSourceStats.height][1]).
   ///
   /// Before the first frame is encoded this attribute is missing.
   ///
@@ -522,14 +522,14 @@ class RTCOutboundRTPStreamStatsVideo extends Struct {
   /// Number of encoded frames during the last second.
   ///
   /// This may be lower than the media source frame rate (see
-  /// [RTCVideoSourceStats.framesPerSecond][1]).
+  /// [RtcVideoSourceStats.framesPerSecond][1]).
   ///
   /// [1]: https://tinyurl.com/rrmkrfk
   external Pointer<ForeignValue> framesPerSecond;
 
-  static Pointer<RTCOutboundRTPStreamStatsVideo> fromDartStats(
-      medea.RtcOutboundRTPStreamStatsVideo stats) {
-    var fVal = calloc<RTCOutboundRTPStreamStatsVideo>();
+  static Pointer<RtcOutboundRtpStreamStatsVideo> fromDartStats(
+      medea.RtcOutboundRtpStreamStatsVideo stats) {
+    var fVal = calloc<RtcOutboundRtpStreamStatsVideo>();
     fVal.ref.frameWidth = ForeignValue.fromDart(stats.frameWidth);
     fVal.ref.frameHeight = ForeignValue.fromDart(stats.frameHeight);
     fVal.ref.framesPerSecond = ForeignValue.fromDart(stats.framesPerSecond);
@@ -537,13 +537,13 @@ class RTCOutboundRTPStreamStatsVideo extends Struct {
   }
 }
 
-/// Statistics for an inbound [RTP] stream that is currently received
-/// with [RTCPeerConnection] object.
+/// Statistics for an inbound [Rtp] stream that is currently received
+/// with [RtcPeerConnection] object.
 ///
-/// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-/// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-class RTCInboundRTPStreamStats extends Struct {
-  RTCInboundRTPStreamStats._();
+/// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+/// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+class RtcInboundRtpStreamStats extends Struct {
+  RtcInboundRtpStreamStats._();
 
   /// ID of the stats object representing the receiving track.
   external Pointer<ForeignValue> remoteId;
@@ -551,10 +551,10 @@ class RTCInboundRTPStreamStats extends Struct {
   /// Total number of bytes received for this SSRC.
   external Pointer<ForeignValue> bytesReceived;
 
-  /// Total number of RTP data packets received for this SSRC.
+  /// Total number of Rtp data packets received for this SSRC.
   external Pointer<ForeignValue> packetsReceived;
 
-  /// Total number of RTP data packets for this SSRC that have been lost
+  /// Total number of Rtp data packets for this SSRC that have been lost
   /// since the beginning of reception.
   ///
   /// This number is defined to be the number of packets expected less the
@@ -588,11 +588,11 @@ class RTCInboundRTPStreamStats extends Struct {
   external Pointer<ForeignValue> jitterBufferEmittedCount;
 
   /// Fields which should be in the [`RtcStat`] based on `mediaType`.
-  external Pointer<RTCInboundRTPStreamMediaType> mediaType;
+  external Pointer<RtcInboundRtpStreamMediaType> mediaType;
 
-  static Pointer<RTCInboundRTPStreamStats> fromDartStats(
-      medea.RtcInboundRTPStreamStats stats) {
-    var fVal = calloc<RTCInboundRTPStreamStats>();
+  static Pointer<RtcInboundRtpStreamStats> fromDartStats(
+      medea.RtcInboundRtpStreamStats stats) {
+    var fVal = calloc<RtcInboundRtpStreamStats>();
     fVal.ref.remoteId = ForeignValue.fromDart(stats.remoteId);
     fVal.ref.bytesReceived = ForeignValue.fromDart(stats.bytesReceived);
     fVal.ref.packetsReceived = ForeignValue.fromDart(stats.packetsReceived);
@@ -602,76 +602,76 @@ class RTCInboundRTPStreamStats extends Struct {
     fVal.ref.jitterBufferEmittedCount =
         ForeignValue.fromDart(stats.jitterBufferEmittedCount);
     fVal.ref.mediaType =
-        RTCInboundRTPStreamMediaType.fromDartStats(stats.mediaType!);
+        RtcInboundRtpStreamMediaType.fromDartStats(stats.mediaType!);
     return fVal;
   }
 }
 
-class RTCInboundRTPStreamMediaType extends Struct {
-  RTCInboundRTPStreamMediaType._();
+class RtcInboundRtpStreamMediaType extends Struct {
+  RtcInboundRtpStreamMediaType._();
 
   @Int32()
   // ignore: unused_field
   external int _tag;
 
-  external _RTCInboundRTPStreamMediaType _payload;
+  external _RtcInboundRtpStreamMediaType _payload;
 
-  static Pointer<RTCInboundRTPStreamMediaType> fromDartStats(
-      medea.RtcInboundRTPStreamMediaType stats) {
-    var fVal = calloc<RTCInboundRTPStreamMediaType>();
-    if (stats is medea.RtcInboundRTPStreamVideo) {
+  static Pointer<RtcInboundRtpStreamMediaType> fromDartStats(
+      medea.RtcInboundRtpStreamMediaType stats) {
+    var fVal = calloc<RtcInboundRtpStreamMediaType>();
+    if (stats is medea.RtcInboundRtpStreamVideo) {
       fVal.ref._tag = 0;
-      fVal.ref._payload.video = RTCInboundRTPStreamVideo.fromDartStats(stats);
-    } else if (stats is medea.RtcInboundRTPStreamAudio) {
+      fVal.ref._payload.video = RtcInboundRtpStreamVideo.fromDartStats(stats);
+    } else if (stats is medea.RtcInboundRtpStreamAudio) {
       fVal.ref._tag = 1;
-      fVal.ref._payload.audio = RTCInboundRTPStreamAudio.fromDartStats(stats);
+      fVal.ref._payload.audio = RtcInboundRtpStreamAudio.fromDartStats(stats);
     }
     return fVal;
   }
 }
 
-class RTCOutboundRTPStreamStatsMediaType extends Struct {
-  RTCOutboundRTPStreamStatsMediaType._();
+class RtcOutboundRtpStreamStatsMediaType extends Struct {
+  RtcOutboundRtpStreamStatsMediaType._();
 
   @Int32()
   // ignore: unused_field
   external int _tag;
 
-  external _RTCOutboundRTPStreamStatsMediaType _payload;
+  external _RtcOutboundRtpStreamStatsMediaType _payload;
 
-  static Pointer<RTCOutboundRTPStreamStatsMediaType>? fromDartStats(
-      medea.RtcOutboundRTPStreamStatsMediaType? stats) {
+  static Pointer<RtcOutboundRtpStreamStatsMediaType>? fromDartStats(
+      medea.RtcOutboundRtpStreamStatsMediaType? stats) {
     if (stats == null) {
       return null;
     }
-    var fVal = calloc<RTCOutboundRTPStreamStatsMediaType>();
-    if (stats is medea.RtcOutboundRTPStreamStatsVideo) {
+    var fVal = calloc<RtcOutboundRtpStreamStatsMediaType>();
+    if (stats is medea.RtcOutboundRtpStreamStatsVideo) {
       fVal.ref._tag = 0;
       fVal.ref._payload.video =
-          RTCOutboundRTPStreamStatsVideo.fromDartStats(stats);
-    } else if (stats is medea.RtcOutboundRTPStreamStatsAudio) {
+          RtcOutboundRtpStreamStatsVideo.fromDartStats(stats);
+    } else if (stats is medea.RtcOutboundRtpStreamStatsAudio) {
       fVal.ref._tag = 1;
       fVal.ref._payload.audio =
-          RTCOutboundRTPStreamStatsAudio.fromDartStats(stats);
+          RtcOutboundRtpStreamStatsAudio.fromDartStats(stats);
     }
     return fVal;
   }
 }
 
-class RTCInboundRTPStreamAudio extends Struct {
-  RTCInboundRTPStreamAudio._();
+class RtcInboundRtpStreamAudio extends Struct {
+  RtcInboundRtpStreamAudio._();
 
-  /// Indicator whether the last RTP packet whose frame was delivered to
-  /// the [RTCRtpReceiver]'s [MediaStreamTrack][1] for playout contained
+  /// Indicator whether the last Rtp packet whose frame was delivered to
+  /// the [RtcRtpReceiver]'s [MediaStreamTrack][1] for playout contained
   /// voice activity or not based on the presence of the V bit in the
   /// extension header, as defined in [RFC 6464].
   ///
-  /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#rtcrtpreceiver-interface
+  /// [RtcRtpReceiver]: https://w3.org/TR/webrtc#rtcrtpreceiver-interface
   /// [RFC 6464]: https://tools.ietf.org/html/rfc6464#page-3
   /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
   external Pointer<ForeignValue> voiceActivityFlag;
 
-  /// Total number of samples that have been received on this RTP stream.
+  /// Total number of samples that have been received on this Rtp stream.
   /// This includes [`concealedSamples`].
   ///
   /// [`concealedSamples`]: https://tinyurl.com/s6c4qe4
@@ -707,14 +707,14 @@ class RTCInboundRTPStreamAudio extends Struct {
   /// Audio duration of the receiving track.
   ///
   /// For audio durations of tracks attached locally, see
-  /// [RTCAudioSourceStats][1] instead.
+  /// [RtcAudioSourceStats][1] instead.
   ///
   /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcaudiosourcestats
   external Pointer<ForeignValue> totalSamplesDuration;
 
-  static Pointer<RTCInboundRTPStreamAudio> fromDartStats(
-      medea.RtcInboundRTPStreamAudio stats) {
-    var fVal = calloc<RTCInboundRTPStreamAudio>();
+  static Pointer<RtcInboundRtpStreamAudio> fromDartStats(
+      medea.RtcInboundRtpStreamAudio stats) {
+    var fVal = calloc<RtcInboundRtpStreamAudio>();
     fVal.ref.totalSamplesReceived =
         ForeignValue.fromDart(stats.totalSamplesReceived);
     fVal.ref.concealedSamples = ForeignValue.fromDart(stats.concealedSamples);
@@ -729,15 +729,15 @@ class RTCInboundRTPStreamAudio extends Struct {
   }
 }
 
-class RTCInboundRTPStreamVideo extends Struct {
-  RTCInboundRTPStreamVideo._();
+class RtcInboundRtpStreamVideo extends Struct {
+  RtcInboundRtpStreamVideo._();
 
-  /// Total number of frames correctly decoded for this RTP stream, i.e.
+  /// Total number of frames correctly decoded for this Rtp stream, i.e.
   /// frames that would be displayed if no frames are dropped.
   external Pointer<ForeignValue> framesDecoded;
 
   /// Total number of key frames, such as key frames in VP8 [RFC 6386] or
-  /// IDR-frames in H.264 [RFC 6184], successfully decoded for this RTP
+  /// IDR-frames in H.264 [RFC 6184], successfully decoded for this Rtp
   /// media stream.
   ///
   /// This is a subset of [`framesDecoded`].
@@ -767,12 +767,6 @@ class RTCInboundRTPStreamVideo extends Struct {
   /// Number of decoded frames in the last second.
   external Pointer<ForeignValue> framesPerSecond;
 
-  /// Bit depth per pixel of the last decoded frame.
-  ///
-  /// Typical values are 24, 30, or 36 bits. Before the first frame is
-  /// decoded this attribute is missing.
-  external Pointer<ForeignValue> frameBitDepth;
-
   /// Total number of Full Intra Request (FIR) packets sent by this
   /// receiver.
   external Pointer<ForeignValue> firCount;
@@ -791,7 +785,7 @@ class RTCInboundRTPStreamVideo extends Struct {
   /// [`concealedSamples`]: https://tinyurl.com/s6c4qe4
   external Pointer<ForeignValue> concealmentEvents;
 
-  /// Total number of complete frames received on this RTP stream.
+  /// Total number of complete frames received on this Rtp stream.
   ///
   /// This metric is incremented when the complete frame is received.
   external Pointer<ForeignValue> framesReceived;
@@ -800,9 +794,9 @@ class RTCInboundRTPStreamVideo extends Struct {
   /// receiver.
   external Pointer<ForeignValue> sliCount;
 
-  static Pointer<RTCInboundRTPStreamVideo> fromDartStats(
-      medea.RtcInboundRTPStreamVideo stats) {
-    var fVal = calloc<RTCInboundRTPStreamVideo>();
+  static Pointer<RtcInboundRtpStreamVideo> fromDartStats(
+      medea.RtcInboundRtpStreamVideo stats) {
+    var fVal = calloc<RtcInboundRtpStreamVideo>();
     fVal.ref.framesDecoded = ForeignValue.fromDart(stats.framesDecoded);
     fVal.ref.keyFramesDecoded = ForeignValue.fromDart(stats.keyFramesDecoded);
     fVal.ref.frameWidth = ForeignValue.fromDart(stats.frameWidth);
@@ -810,7 +804,6 @@ class RTCInboundRTPStreamVideo extends Struct {
     fVal.ref.totalInterFrameDelay =
         ForeignValue.fromDart(stats.totalInterFrameDelay);
     fVal.ref.framesPerSecond = ForeignValue.fromDart(stats.framesPerSecond);
-    fVal.ref.frameBitDepth = ForeignValue.fromDart(stats.frameBitDepth);
     fVal.ref.firCount = ForeignValue.fromDart(stats.firCount);
     fVal.ref.pliCount = ForeignValue.fromDart(stats.pliCount);
     fVal.ref.concealmentEvents = ForeignValue.fromDart(stats.concealmentEvents);
@@ -820,23 +813,23 @@ class RTCInboundRTPStreamVideo extends Struct {
   }
 }
 
-/// ICE candidate pair statistics related to the [RTCIceTransport]
+/// ICE candidate pair statistics related to the [RtcIceTransport]
 /// objects.
 ///
 /// A candidate pair that is not the current pair for a transport is
-/// [deleted][1] when the [RTCIceTransport] does an ICE restart, at the
+/// [deleted][1] when the [RtcIceTransport] does an ICE restart, at the
 /// time the state changes to `new`.
 ///
 /// The candidate pair that is the current pair for a transport is
-/// deleted after an ICE restart when the [RTCIceTransport]
+/// deleted after an ICE restart when the [RtcIceTransport]
 /// switches to using a candidate pair generated from the new
 /// candidates; this time doesn't correspond to any other
 /// externally observable event.
 ///
-/// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+/// [RtcIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
 /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-class RTCIceCandidatePairStats extends Struct {
-  RTCIceCandidatePairStats._();
+class RtcIceCandidatePairStats extends Struct {
+  RtcIceCandidatePairStats._();
 
   /// State of the checklist for the local
   /// and remote candidates in a pair.
@@ -882,7 +875,7 @@ class RTCIceCandidatePairStats extends Struct {
   external Pointer<ForeignValue> currentRoundTripTime;
 
   /// Calculated by the underlying congestion control by combining the
-  /// available bitrate for all the outgoing RTP streams using
+  /// available bitrate for all the outgoing Rtp streams using
   /// this candidate pair.
   /// The bitrate measurement does not count the size of the IP or
   /// other transport layers like TCP or UDP. It is similar to the TIAS
@@ -902,9 +895,9 @@ class RTCIceCandidatePairStats extends Struct {
   /// [1]: https://tinyurl.com/rfc72eh
   external Pointer<ForeignValue> availableOutgoingBitrate;
 
-  static Pointer<RTCIceCandidatePairStats> fromDartStats(
+  static Pointer<RtcIceCandidatePairStats> fromDartStats(
       medea.RtcIceCandidatePairStats stats) {
-    var fVal = calloc<RTCIceCandidatePairStats>();
+    var fVal = calloc<RtcIceCandidatePairStats>();
     fVal.ref.state = stats.state.index;
     fVal.ref.nominated = ForeignValue.fromDart(stats.nominated);
     fVal.ref.bytesSent = ForeignValue.fromDart(stats.bytesSent);
@@ -919,23 +912,23 @@ class RTCIceCandidatePairStats extends Struct {
   }
 }
 
-/// Statistics for the remote endpoint's inbound [RTP] stream
+/// Statistics for the remote endpoint's inbound [Rtp] stream
 /// corresponding to an outbound stream that is currently sent with
-/// [RTCPeerConnection] object.
+/// [RtcPeerConnection] object.
 ///
-/// It is measured at the remote endpoint and reported in a RTCP
-/// Receiver Report (RR) or RTCP Extended Report (XR).
+/// It is measured at the remote endpoint and reported in a RtcP
+/// Receiver Report (RR) or RtcP Extended Report (XR).
 ///
-/// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-/// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-class RTCRemoteInboundRtpStreamStats extends Struct {
-  RTCRemoteInboundRtpStreamStats._();
+/// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+/// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+class RtcRemoteInboundRtpStreamStats extends Struct {
+  RtcRemoteInboundRtpStreamStats._();
 
   /// [`localId`] is used for looking up the local
-  /// [RTCOutboundRtpStreamStats] object for the same SSRC.
+  /// [RtcOutboundRtpStreamStats] object for the same SSRC.
   ///
   /// [`localId`]: https://tinyurl.com/r8uhbo9
-  /// [RTCOutBoundRtpStreamStats]: https://tinyurl.com/r6f5vqg
+  /// [RtcOutBoundRtpStreamStats]: https://tinyurl.com/r6f5vqg
   external Pointer<ForeignValue> localId;
 
   /// Packet [jitter] measured in seconds for this SSRC.
@@ -944,10 +937,10 @@ class RTCRemoteInboundRtpStreamStats extends Struct {
   external Pointer<ForeignValue> jitter;
 
   /// Estimated round trip time for this SSRC based on
-  /// the RTCP timestamps in
-  /// the RTCP Receiver Report (RR) and measured in seconds.
+  /// the RtcP timestamps in
+  /// the RtcP Receiver Report (RR) and measured in seconds.
   /// Calculated as defined in [Section 6.4.1 of RFC 3550][1].
-  /// If no RTCP Receiver Report
+  /// If no RtcP Receiver Report
   /// is received with a DLSR value other than 0, the round trip time is
   /// left undefined.
   ///
@@ -962,19 +955,19 @@ class RTCRemoteInboundRtpStreamStats extends Struct {
   /// [2]: https://tools.ietf.org/html/rfc3550#appendix-A.3
   external Pointer<ForeignValue> fractionLost;
 
-  /// Total number of RTCP RR blocks received for this SSRC.
+  /// Total number of RtcP RR blocks received for this SSRC.
   external Pointer<ForeignValue> reportsReceived;
 
-  /// Total number of RTCP RR blocks received for this SSRC that contain a
+  /// Total number of RtcP RR blocks received for this SSRC that contain a
   /// valid round trip time. This counter will increment if the
   /// [`roundTripTime`] is undefined.
   ///
   /// [`roundTripTime`]: https://tinyurl.com/ssg83hq
   external Pointer<ForeignValue> roundTripTimeMeasurements;
 
-  static Pointer<RTCRemoteInboundRtpStreamStats> fromDartStats(
+  static Pointer<RtcRemoteInboundRtpStreamStats> fromDartStats(
       medea.RtcRemoteInboundRtpStreamStats stats) {
-    var fVal = calloc<RTCRemoteInboundRtpStreamStats>();
+    var fVal = calloc<RtcRemoteInboundRtpStreamStats>();
     fVal.ref.localId = ForeignValue.fromDart(stats.localId);
     fVal.ref.jitter = ForeignValue.fromDart(stats.jitter);
     fVal.ref.roundTripTime = ForeignValue.fromDart(stats.roundTripTime);
@@ -986,20 +979,20 @@ class RTCRemoteInboundRtpStreamStats extends Struct {
   }
 }
 
-/// Statistics for the remote endpoint's outbound [RTP] stream
+/// Statistics for the remote endpoint's outbound [Rtp] stream
 /// corresponding to an inbound stream that is currently received with
-/// [RTCPeerConnection] object.
+/// [RtcPeerConnection] object.
 ///
-/// It is measured at the remote endpoint and reported in an RTCP
+/// It is measured at the remote endpoint and reported in an RtcP
 /// Sender Report (SR).
 ///
-/// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-/// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-class RTCRemoteOutboundRtpStreamStats extends Struct {
-  RTCRemoteOutboundRtpStreamStats._();
+/// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+/// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+class RtcRemoteOutboundRtpStreamStats extends Struct {
+  RtcRemoteOutboundRtpStreamStats._();
 
   /// [`localId`] is used for looking up the local
-  /// [RTCInboundRtpStreamStats][1] object for the same SSRC.
+  /// [RtcInboundRtpStreamStats][1] object for the same SSRC.
   ///
   /// [`localId`]: https://tinyurl.com/vu9tb2e
   /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
@@ -1010,7 +1003,7 @@ class RTCRemoteOutboundRtpStreamStats extends Struct {
   /// differs from timestamp, which represents the time at which the
   /// statistics were generated or received by the local endpoint. The
   /// [`remoteTimestamp`], if present, is derived from the NTP timestamp
-  /// in an RTCP Sender Report (SR) block, which reflects the remote
+  /// in an RtcP Sender Report (SR) block, which reflects the remote
   /// endpoint's clock. That clock may not be synchronized with the local
   /// clock.
   ///
@@ -1018,12 +1011,12 @@ class RTCRemoteOutboundRtpStreamStats extends Struct {
   /// [HIGRES-TIME]: https://w3.org/TR/webrtc-stats/#bib-highres-time
   external Pointer<ForeignValue> remoteTimestamp;
 
-  /// Total number of RTCP SR blocks sent for this SSRC.
+  /// Total number of RtcP SR blocks sent for this SSRC.
   external Pointer<ForeignValue> reportsSent;
 
-  static Pointer<RTCRemoteOutboundRtpStreamStats> fromDartStats(
+  static Pointer<RtcRemoteOutboundRtpStreamStats> fromDartStats(
       medea.RtcRemoteOutboundRtpStreamStats stats) {
-    var fVal = calloc<RTCRemoteOutboundRtpStreamStats>();
+    var fVal = calloc<RtcRemoteOutboundRtpStreamStats>();
     fVal.ref.localId = ForeignValue.fromDart(stats.localId);
     fVal.ref.remoteTimestamp = ForeignValue.fromDart(stats.remoteTimestamp);
     fVal.ref.reportsSent = ForeignValue.fromDart(stats.reportsSent);
@@ -1031,124 +1024,124 @@ class RTCRemoteOutboundRtpStreamStats extends Struct {
   }
 }
 
-class _RTCInboundRTPStreamMediaType extends Union {
-  external Pointer<RTCInboundRTPStreamVideo> video;
-  external Pointer<RTCInboundRTPStreamAudio> audio;
+class _RtcInboundRtpStreamMediaType extends Union {
+  external Pointer<RtcInboundRtpStreamVideo> video;
+  external Pointer<RtcInboundRtpStreamAudio> audio;
 }
 
-class _RTCOutboundRTPStreamStatsMediaType extends Union {
-  external Pointer<RTCOutboundRTPStreamStatsVideo> video;
-  external Pointer<RTCOutboundRTPStreamStatsAudio> audio;
+class _RtcOutboundRtpStreamStatsMediaType extends Union {
+  external Pointer<RtcOutboundRtpStreamStatsVideo> video;
+  external Pointer<RtcOutboundRtpStreamStatsAudio> audio;
 }
 
-class _RTCMediaSourceStatsMediaTypeFields extends Union {
-  external Pointer<RTCVideoSourceStats> video;
-  external Pointer<RTCAudioSourceStats> audio;
+class _RtcMediaSourceStatsMediaTypeFields extends Union {
+  external Pointer<RtcVideoSourceStats> video;
+  external Pointer<RtcAudioSourceStats> audio;
 }
 
-class _RTCIceCandidateStats extends Union {
+class _RtcIceCandidateStats extends Union {
   external Pointer<IceCandidateStats> remote;
   external Pointer<IceCandidateStats> local;
 }
 
 /// All known types of [`RtcStat`]s.
 ///
-/// [List of all RTCStats types on W3C][1].
+/// [List of all RtcStats types on W3C][1].
 ///
 /// [1]: https://w3.org/TR/webrtc-stats/#rtctatstype-%2A
 /// [`RtcStat`]: super::RtcStat
 class _ForeignValueStats extends Union {
-  /// Transport statistics related to the [RTCPeerConnection] object.
+  /// Transport statistics related to the [RtcPeerConnection] object.
   ///
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-  external Pointer<RTCTransportStats> transport;
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  external Pointer<RtcTransportStats> transport;
 
   /// Statistics for the media produced by a [MediaStreamTrack][1] that
-  /// is currently attached to an [RTCRtpSender]. This reflects
+  /// is currently attached to an [RtcRtpSender]. This reflects
   /// the media that is fed to the encoder after [getUserMedia]
   /// constraints have been applied (i.e. not the raw media
   /// produced by the camera).
   ///
-  /// [RTCRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
+  /// [RtcRtpSender]: https://w3.org/TR/webrtc#rtcrtpsender-interface
   /// [getUserMedia]: https://tinyurl.com/sngpyr6
   /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-  external Pointer<RTCMediaSourceStats> mediaSource;
+  external Pointer<RtcMediaSourceStats> mediaSource;
 
-  /// ICE candidate statistics related to the [RTCIceTransport]
+  /// ICE candidate statistics related to the [RtcIceTransport]
   /// objects.
   ///
-  /// A local candidate is [deleted][1] when the [RTCIceTransport] does
+  /// A local candidate is [deleted][1] when the [RtcIceTransport] does
   /// an ICE restart, and the candidate is no longer a member of
   /// any non-deleted candidate pair.
   ///
-  /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+  /// [RtcIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
   /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-  external Pointer<RTCIceCandidateStats> iceCandidate;
+  external Pointer<RtcIceCandidateStats> iceCandidate;
 
-  /// Statistics for an outbound [RTP] stream that is currently sent with
-  /// [RTCPeerConnection] object.
+  /// Statistics for an outbound [Rtp] stream that is currently sent with
+  /// [RtcPeerConnection] object.
   ///
-  /// When there are multiple [RTP] streams connected to the same sender,
+  /// When there are multiple [Rtp] streams connected to the same sender,
   /// such as when using simulcast or RTX, there will be one
-  /// [`RtcOutboundRtpStreamStats`] per RTP stream, with distinct values
+  /// [`RtcOutboundRtpStreamStats`] per Rtp stream, with distinct values
   /// of the `ssrc` attribute, and all these senders will have a
   /// reference to the same "sender" object (of type
-  /// [RTCAudioSenderStats][1] or [RTCVideoSenderStats][2]) and
+  /// [RtcAudioSenderStats][1] or [RtcVideoSenderStats][2]) and
   /// "track" object (of type
-  /// [RTCSenderAudioTrackAttachmentStats][3] or
-  /// [RTCSenderVideoTrackAttachmentStats][4]).
+  /// [RtcSenderAudioTrackAttachmentStats][3] or
+  /// [RtcSenderVideoTrackAttachmentStats][4]).
   ///
-  /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  /// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
   /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcaudiosenderstats
   /// [2]: https://w3.org/TR/webrtc-stats/#dom-rtcvideosenderstats
   /// [3]: https://tinyurl.com/sefa5z4
   /// [4]: https://tinyurl.com/rkuvpl4
-  external Pointer<RTCOutboundRTPStreamStats> outboundRTPStream;
+  external Pointer<RtcOutboundRtpStreamStats> outboundRtpStream;
 
-  /// Statistics for an inbound [RTP] stream that is currently received
-  /// with [RTCPeerConnection] object.
+  /// Statistics for an inbound [Rtp] stream that is currently received
+  /// with [RtcPeerConnection] object.
   ///
-  /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-  external Pointer<RTCInboundRTPStreamStats> inboundRTPStream;
+  /// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  external Pointer<RtcInboundRtpStreamStats> inboundRtpStream;
 
-  /// ICE candidate pair statistics related to the [RTCIceTransport]
+  /// ICE candidate pair statistics related to the [RtcIceTransport]
   /// objects.
   ///
   /// A candidate pair that is not the current pair for a transport is
-  /// [deleted][1] when the [RTCIceTransport] does an ICE restart, at the
+  /// [deleted][1] when the [RtcIceTransport] does an ICE restart, at the
   /// time the state changes to `new`.
   ///
   /// The candidate pair that is the current pair for a transport is
-  /// deleted after an ICE restart when the [RTCIceTransport]
+  /// deleted after an ICE restart when the [RtcIceTransport]
   /// switches to using a candidate pair generated from the new
   /// candidates; this time doesn't correspond to any other
   /// externally observable event.
   ///
-  /// [RTCIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
+  /// [RtcIceTransport]: https://w3.org/TR/webrtc#dom-rtcicetransport
   /// [1]: https://w3.org/TR/webrtc-stats/#dfn-deleted
-  external Pointer<RTCIceCandidatePairStats> iceCandidatePair;
+  external Pointer<RtcIceCandidatePairStats> iceCandidatePair;
 
-  /// Statistics for the remote endpoint's inbound [RTP] stream
+  /// Statistics for the remote endpoint's inbound [Rtp] stream
   /// corresponding to an outbound stream that is currently sent with
-  /// [RTCPeerConnection] object.
+  /// [RtcPeerConnection] object.
   ///
-  /// It is measured at the remote endpoint and reported in a RTCP
-  /// Receiver Report (RR) or RTCP Extended Report (XR).
+  /// It is measured at the remote endpoint and reported in a RtcP
+  /// Receiver Report (RR) or RtcP Extended Report (XR).
   ///
-  /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-  external Pointer<RTCRemoteInboundRtpStreamStats> remoteInboundRTPStream;
+  /// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  external Pointer<RtcRemoteInboundRtpStreamStats> remoteInboundRtpStream;
 
-  /// Statistics for the remote endpoint's outbound [RTP] stream
+  /// Statistics for the remote endpoint's outbound [Rtp] stream
   /// corresponding to an inbound stream that is currently received with
-  /// [RTCPeerConnection] object.
+  /// [RtcPeerConnection] object.
   ///
-  /// It is measured at the remote endpoint and reported in an RTCP
+  /// It is measured at the remote endpoint and reported in an RtcP
   /// Sender Report (SR).
   ///
-  /// [RTP]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
-  /// [RTCPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-  external Pointer<RTCRemoteOutboundRtpStreamStats> remoteOutboundRTPStream;
+  /// [Rtp]: https://en.wikipedia.org/wiki/Real-time_Transport_Protocol
+  /// [RtcPeerConnection]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
+  external Pointer<RtcRemoteOutboundRtpStreamStats> remoteOutboundRtpStream;
 }
