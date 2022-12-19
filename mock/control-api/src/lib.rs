@@ -10,6 +10,7 @@
 #![forbid(non_ascii_idents)]
 #![warn(
     clippy::as_conversions,
+    clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
     clippy::branches_sharing_code,
     clippy::clone_on_ref_ptr,
@@ -18,6 +19,7 @@
     clippy::debug_assert_with_mut_call,
     clippy::decimal_literal_representation,
     clippy::default_union_representation,
+    clippy::derive_partial_eq_without_eq,
     clippy::else_if_without_else,
     clippy::empty_drop,
     clippy::empty_line_after_outer_attr,
@@ -50,6 +52,7 @@
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
     clippy::panic_in_result_fn,
+    clippy::partial_pub_fields,
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
@@ -108,10 +111,6 @@
     clippy::unwrap_used,
     unreachable_pub
 )]
-// TODO: Make this unnecessary.
-// TODO: Remove once annoying false positive is fixed:
-//       https://github.com/rust-lang/rust-clippy/issues/6902
-#![allow(clippy::use_self)]
 
 pub mod api;
 pub mod callback;

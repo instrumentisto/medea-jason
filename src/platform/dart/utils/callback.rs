@@ -165,9 +165,6 @@ impl Callback {
     /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two
     /// arguments, that can be converted to a [`Dart_Handle`] and passed to
     /// Dart.
-    // TODO: False positive: complex bounds.
-    //       https://github.com/rust-lang/rust-clippy/issues/9076
-    #[allow(clippy::trait_duplication_in_bounds)]
     pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
     where
         F: FnMut(T, S) + 'static,
