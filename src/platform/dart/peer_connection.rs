@@ -539,7 +539,7 @@ impl Drop for RtcPeerConnection {
 
 /// Representation of a Dart SDP type.
 #[derive(Display)]
-pub(crate) enum RtcSdpType {
+pub enum RtcSdpType {
     /// Description is an initial proposal in an offer/answer exchange.
     #[display(fmt = "offer")]
     Offer,

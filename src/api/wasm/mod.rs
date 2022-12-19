@@ -4,7 +4,7 @@
 //! [`Jason`]: crate::api::Jason
 
 pub mod connection_handle;
-pub(crate) mod err;
+pub mod err;
 pub mod jason;
 pub mod local_media_track;
 pub mod media_device_info;

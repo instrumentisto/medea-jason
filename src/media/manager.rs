@@ -187,7 +187,7 @@ struct InnerMediaManager {
 
 impl InnerMediaManager {
     /// Subscribes onto the `devicechange` event of this [`InnerMediaManager`].
-    pub(crate) fn on_device_change(&self, cb: platform::Function<()>) {
+    pub fn on_device_change(&self, cb: platform::Function<()>) {
         self.media_devices.on_device_change(Some(move || {
             cb.call0();
         }));

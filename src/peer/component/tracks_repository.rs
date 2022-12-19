@@ -31,39 +31,39 @@ use super::sender;
 /// [`Component`]: super::Component
 /// [`receiver::State`]: super::receiver::State
 #[derive(Debug, From)]
-pub(crate) struct TracksRepository<S: 'static>(
+pub struct TracksRepository<S: 'static>(
     RefCell<ProgressableHashMap<TrackId, Rc<S>>>,
 );
 
 impl<S> TracksRepository<S> {
     /// Creates a new [`TracksRepository`].
     #[must_use]
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self(RefCell::new(ProgressableHashMap::new()))
     }
 
     /// Returns [`Future`] resolving once all inserts/removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    pub(crate) fn when_all_processed(&self) -> AllProcessed<'static> {
+    pub fn when_all_processed(&self) -> AllProcessed<'static> {
         self.0.borrow().when_all_processed()
     }
 
     /// Inserts the provided track identified by the given `id`.
-    pub(crate) fn insert(&self, id: TrackId, track: Rc<S>) {
+    pub fn insert(&self, id: TrackId, track: Rc<S>) {
         drop(self.0.borrow_mut().insert(id, track));
     }
 
     /// Returns a track with the provided `id`.
     #[must_use]
-    pub(crate) fn get(&self, id: TrackId) -> Option<Rc<S>> {
+    pub fn get(&self, id: TrackId) -> Option<Rc<S>> {
         self.0.borrow().get(&id).cloned()
     }
 
     /// Returns a [`Stream`] streaming all the [`TracksRepository::insert`]ions.
     ///
     /// [`Stream`]: futures::Stream
-    pub(crate) fn on_insert(
+    pub fn on_insert(
         &self,
     ) -> LocalBoxStream<'static, Guarded<(TrackId, Rc<S>)>> {
         self.0.borrow().on_insert_with_replay()
@@ -72,7 +72,7 @@ impl<S> TracksRepository<S> {
     /// Returns a [`Stream`] streaming all the [`TracksRepository::remove`]s.
     ///
     /// [`Stream`]: futures::Stream
-    pub(crate) fn on_remove(
+    pub fn on_remove(
         &self,
     ) -> LocalBoxStream<'static, Guarded<(TrackId, Rc<S>)>> {
         self.0.borrow().on_remove()
@@ -80,7 +80,7 @@ impl<S> TracksRepository<S> {
 
     /// Removes a track with the provided [`TrackId`], reporting whether it has
     /// been removed or it hasn't existed at all.
-    pub(crate) fn remove(&self, id: TrackId) -> bool {
+    pub fn remove(&self, id: TrackId) -> bool {
         self.0.borrow_mut().remove(&id).is_some()
     }
 }
@@ -89,7 +89,7 @@ impl TracksRepository<sender::State> {
     /// Returns all the [`sender::State`]s which require a local `MediaStream`
     /// update.
     #[must_use]
-    pub(crate) fn get_outdated(&self) -> Vec<Rc<sender::State>> {
+    pub fn get_outdated(&self) -> Vec<Rc<sender::State>> {
         self.0
             .borrow()
             .values()
@@ -112,7 +112,7 @@ impl TracksRepository<sender::State> {
     /// [`Future`]: std::future::Future
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    pub(crate) fn local_stream_update_result(
+    pub fn local_stream_update_result(
         &self,
         tracks_ids: HashSet<TrackId>,
     ) -> LocalBoxFuture<'static, Result<(), Traced<UpdateLocalStreamError>>>
@@ -231,7 +231,7 @@ where
 #[cfg(feature = "mockable")]
 impl<S> TracksRepository<S> {
     /// Waits until all the track inserts will be processed.
-    pub(crate) fn when_insert_processed(
+    pub fn when_insert_processed(
         &self,
     ) -> medea_reactive::Processed<'static> {
         self.0.borrow().when_insert_processed()
@@ -243,7 +243,7 @@ impl<S> TracksRepository<S> {
 impl TracksRepository<sender::State> {
     /// Sets [`SyncState`] of all [`sender::State`]s to the
     /// [`SyncState::Synced`].
-    pub(crate) fn synced(&self) {
+    pub fn synced(&self) {
         self.0.borrow().values().for_each(|s| s.synced());
     }
 }
@@ -251,13 +251,13 @@ impl TracksRepository<sender::State> {
 #[cfg(feature = "mockable")]
 impl TracksRepository<super::receiver::State> {
     /// Stabilize all [`receiver::State`] from this [`State`].
-    pub(crate) fn stabilize_all(&self) {
+    pub fn stabilize_all(&self) {
         self.0.borrow().values().for_each(|r| r.stabilize());
     }
 
     /// Sets [`SyncState`] of all [`receiver::State`]s to the
     /// [`SyncState::Synced`].
-    pub(crate) fn synced(&self) {
+    pub fn synced(&self) {
         self.0.borrow().values().for_each(|r| r.synced());
     }
 }

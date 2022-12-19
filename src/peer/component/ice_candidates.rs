@@ -15,23 +15,23 @@ use crate::{
 ///
 /// [`peer::Component`]: super::Component
 #[derive(Debug)]
-pub(crate) struct IceCandidates(RefCell<ObservableHashSet<IceCandidate>>);
+pub struct IceCandidates(RefCell<ObservableHashSet<IceCandidate>>);
 
 impl IceCandidates {
     /// Returns a new empty [`IceCandidates`] store.
     #[must_use]
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self(RefCell::new(ObservableHashSet::new()))
     }
 
     /// Adds a new [`IceCandidate`] to this [`IceCandidates`] store.
-    pub(crate) fn add(&self, candidate: IceCandidate) {
+    pub fn add(&self, candidate: IceCandidate) {
         let _ = self.0.borrow_mut().insert(candidate);
     }
 
     /// Returns [`LocalBoxStream`] with all the already added [`IceCandidate`]s
     /// and the [`IceCandidate`]s which will be added in future.
-    pub(crate) fn on_add(&self) -> LocalBoxStream<'static, IceCandidate> {
+    pub fn on_add(&self) -> LocalBoxStream<'static, IceCandidate> {
         let this = self.0.borrow();
         Box::pin(stream::select(this.replay_on_insert(), this.on_insert()))
     }

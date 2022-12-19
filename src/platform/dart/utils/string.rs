@@ -66,7 +66,7 @@ pub unsafe fn dart_string_into_rust(
 ///
 /// Same as for [`CString::from_raw()`].
 #[no_mangle]
-pub(crate) unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
+pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
     propagate_panic(move || {
         drop(CString::from_raw(s.as_ptr()));
     });
@@ -79,7 +79,7 @@ pub(crate) unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
 ///
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
-pub(crate) unsafe extern "C" fn register_free_dart_native_string(
+pub unsafe extern "C" fn register_free_dart_native_string(
     f: FreeDartNativeStringFunction,
 ) {
     FREE_DART_NATIVE_STRING = Some(f);
