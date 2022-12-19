@@ -138,4 +138,5 @@ pub mod rpc;
 #[allow(clippy::let_underscore_drop)]
 #[allow(let_underscore_drop)]
 #[allow(unreachable_pub)]
+#[allow(clippy::use_self)]
 mod jason_api_g;
