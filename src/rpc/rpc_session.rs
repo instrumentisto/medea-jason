@@ -84,8 +84,8 @@ impl Caused for ConnectionLostReason {
 
     fn cause(self) -> Option<Self::Error> {
         match self {
-            ConnectionLostReason::ConnectError(err) => err.into_inner().cause(),
-            ConnectionLostReason::Lost(_) => None,
+            Self::ConnectError(err) => err.into_inner().cause(),
+            Self::Lost(_) => None,
         }
     }
 }

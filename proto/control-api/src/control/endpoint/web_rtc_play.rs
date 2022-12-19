@@ -68,17 +68,10 @@ pub struct Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types(String))]
+#[from(types("&str", String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
 pub struct Id(Box<str>);
-
-// TODO: Derive via `derive::From` once it's capable to.
-impl<'a> From<&'a str> for Id {
-    fn from(s: &'a str) -> Self {
-        Self(s.into())
-    }
-}
 
 impl AsRef<endpoint::Id> for Id {
     fn as_ref(&self) -> &endpoint::Id {

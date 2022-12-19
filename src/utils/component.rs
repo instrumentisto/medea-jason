@@ -157,7 +157,6 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
     ///
     /// You can stop all listeners tasks spawned by this function by
     /// [`Drop`]ping the [`Component`].
-    #[allow(clippy::trait_duplication_in_bounds)] // false positive
     pub fn spawn_sync<R, V, F, Obj, St, H>(&mut self, rx: R, handle: F)
     where
         R: Stream<Item = V> + Unpin + 'static,

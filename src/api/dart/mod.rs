@@ -1,7 +1,6 @@
 //! External [`Jason`] API exposing functions that can be called via FFI and
 //! designed to be integrated into a [Flutter] plugin.
 //!
-//! [`Jason`]: crate::api::Jason
 //! [Flutter]: https://flutter.dev
 
 // TODO: Improve documentation in this module.
@@ -99,7 +98,7 @@ pub trait ForeignClass: Sized {
 pub trait PrimitiveEnum: TryFrom<i64> {}
 
 /// Owner of some allocated memory.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum MemoryOwner {
     /// Memory is allocated on Rust side.

@@ -496,7 +496,7 @@ impl From<proto::GetResponse> for SingleGetResponse {
         proto.error.map_or(
             Self {
                 error: None,
-                element: proto.elements.into_values().map(Into::into).next(),
+                element: proto.elements.into_values().map(Element::from).next(),
             },
             |error| Self {
                 element: None,

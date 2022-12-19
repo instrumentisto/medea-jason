@@ -3,10 +3,6 @@
 //! [gRPC]: https://grpc.io
 //! [Control API]: https://tinyurl.com/yxsqplq7
 
-// TODO: Remove once annoying false positive is fixed:
-//       https://github.com/rust-lang/rust-clippy/issues/6902
-#![allow(clippy::use_self)]
-
 #[cfg(feature = "client")]
 #[allow(clippy::use_debug)]
 mod client;

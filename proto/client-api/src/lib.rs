@@ -12,6 +12,7 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 #![warn(
     clippy::as_conversions,
+    clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
     clippy::branches_sharing_code,
     clippy::clone_on_ref_ptr,
@@ -20,6 +21,7 @@
     clippy::debug_assert_with_mut_call,
     clippy::decimal_literal_representation,
     clippy::default_union_representation,
+    clippy::derive_partial_eq_without_eq,
     clippy::else_if_without_else,
     clippy::empty_drop,
     clippy::empty_line_after_outer_attr,
@@ -52,6 +54,7 @@
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
     clippy::panic_in_result_fn,
+    clippy::partial_pub_fields,
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
@@ -104,9 +107,6 @@
     unused_tuple_struct_fields,
     variant_size_differences
 )]
-// TODO: Remove once annoying false positive is fixed:
-//       https://github.com/rust-lang/rust-clippy/issues/6902
-#![allow(clippy::use_self)]
 
 pub mod state;
 pub mod stats;
@@ -242,7 +242,6 @@ pub struct RpcSettings {
 
 /// Possible commands sent by Web Client to Media Server.
 #[dispatchable]
-#[allow(unused_results)] // false positive: on `Deserialize`
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Debug, PartialEq)]

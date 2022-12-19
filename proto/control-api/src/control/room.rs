@@ -72,17 +72,10 @@ pub enum PipelineSpec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types(String))]
+#[from(types("&str", String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
 pub struct Id(Box<str>);
-
-// TODO: Derive via `derive::From` once it's capable to.
-impl<'a> From<&'a str> for Id {
-    fn from(s: &'a str) -> Self {
-        Self(s.into())
-    }
-}
 
 #[cfg(feature = "client-api")]
 impl From<medea_client_api_proto::RoomId> for Id {
