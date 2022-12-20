@@ -8,10 +8,13 @@ use dart_sys::Dart_Handle;
 use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
-use super::Completer;
 use crate::{
     api::{propagate_panic, DartValue, DartValueArg, Error as DartError},
-    platform::{dart::error::Error, spawn, utils::handle::DartHandle},
+    platform::{
+        dart::{error::Error, utils::Completer},
+        spawn,
+        utils::handle::DartHandle,
+    },
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/future.g.dart")]

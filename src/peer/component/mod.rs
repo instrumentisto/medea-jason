@@ -31,7 +31,7 @@ use self::{
 
 /// Synchronization state of a [`Component`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum SyncState {
+pub enum SyncState {
     /// State desynced, and should be synced on a RPC reconnection.
     Desynced,
 

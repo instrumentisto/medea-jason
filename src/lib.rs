@@ -103,8 +103,7 @@
     unused_qualifications,
     unused_results,
     unused_tuple_struct_fields,
-    variant_size_differences,
-    missing_docs
+    variant_size_differences
 )]
 #![cfg_attr(not(feature = "mockable"), warn(missing_docs))]
 #![cfg_attr(feature = "mockable", allow(missing_docs))]
@@ -128,15 +127,16 @@ pub mod room;
 pub mod rpc;
 
 #[cfg(not(target_family = "wasm"))]
-#[allow(unused_qualifications)]
-#[allow(clippy::as_conversions)]
-#[allow(clippy::undocumented_unsafe_blocks)]
-#[allow(clippy::wildcard_imports)]
-#[allow(clippy::missing_docs_in_private_items)]
-#[allow(clippy::default_trait_access)]
-#[allow(clippy::ptr_as_ptr)]
-#[allow(clippy::let_underscore_drop)]
-#[allow(let_underscore_drop)]
-#[allow(unreachable_pub)]
-#[allow(clippy::use_self)]
+#[allow(
+    clippy::as_conversions,
+    clippy::default_trait_access,
+    clippy::let_underscore_drop,
+    clippy::missing_docs_in_private_items,
+    clippy::ptr_as_ptr,
+    clippy::undocumented_unsafe_blocks,
+    clippy::use_self,
+    clippy::wildcard_imports,
+    let_underscore_drop,
+    unused_qualifications
+)]
 mod jason_api_g;

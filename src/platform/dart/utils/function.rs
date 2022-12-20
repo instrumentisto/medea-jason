@@ -18,8 +18,6 @@ use super::dart_api::{
     Dart_DeletePersistentHandle_DL_Trampolined,
     Dart_HandleFromPersistent_DL_Trampolined,
 };
-#[allow(unused_imports)]
-use dart_sys::Dart_Handle;
 
 #[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
 mod function {
@@ -84,8 +82,7 @@ impl<T: Into<DartValue>> Function<T> {
         unsafe {
             let fn_handle =
                 Dart_HandleFromPersistent_DL_Trampolined(self.dart_fn);
-            let a = arg.into();
-            function::caller(fn_handle, a);
+            function::caller(fn_handle, arg.into());
         }
     }
 }

@@ -13,14 +13,13 @@ use tracerr::Traced;
 use crate::{
     platform::{
         dart::utils::{
-            callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
+            callback::Callback, dart_future::FutureFromDart,
+            dart_string_into_rust, handle::DartHandle, string_into_c_str,
         },
         RpcTransport, TransportError, TransportState,
     },
     rpc::{ApiUrl, ClientDisconnect, CloseMsg},
 };
-
-use super::utils::{dart_string_into_rust, string_into_c_str};
 
 type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
 

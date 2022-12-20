@@ -10,6 +10,7 @@ use crate::{
     platform::{
         dart::utils::{
             dart_future::FutureFromDart, handle::DartHandle, list::DartList,
+            string_into_c_str,
         },
         utils::callback::Callback,
         Error, GetUserMediaError,
@@ -21,7 +22,6 @@ use super::{
     media_device_info::MediaDeviceInfo,
     media_display_info::MediaDisplayInfo,
     media_track::MediaStreamTrack,
-    utils::string_into_c_str,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/media_devices.g.dart")]

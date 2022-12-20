@@ -18,9 +18,9 @@ pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
     ))
 }
 
-#[derive(Deref, Debug)]
 /// Panic-unsafe wrapper [`RefCell`].
 /// Used in `flutter_rust_bridge` API.
+#[derive(Deref, Debug)]
 pub struct ApiWrap<T>(RefCell<T>);
 
 impl<T> ApiWrap<T> {

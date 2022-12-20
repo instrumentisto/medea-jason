@@ -6,9 +6,7 @@ use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::handle::DartHandle;
-
-use super::utils::dart_string_into_rust;
+use crate::platform::dart::utils::{dart_string_into_rust, handle::DartHandle};
 
 #[dart_bridge("flutter/lib/src/native/platform/ice_candidate.g.dart")]
 mod ice_candidate {

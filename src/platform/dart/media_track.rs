@@ -13,13 +13,12 @@ use crate::{
     },
     platform::{
         dart::utils::{
-            callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
+            callback::Callback, dart_string_into_rust, handle::DartHandle,
+            NonNullDartValueArgExt as _,
         },
         utils::dart_future::FutureFromDart,
     },
 };
-
-use super::utils::dart_string_into_rust;
 
 #[dart_bridge("flutter/lib/src/native/platform/media_track.g.dart")]
 mod media_stream_track {

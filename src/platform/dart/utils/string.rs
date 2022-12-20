@@ -48,7 +48,8 @@ pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
 ///
 /// # Safety
 ///
-/// `dart_string` must be from a Dart String.
+/// The provided string must be a valid c-string (`Pointer<Utf8>` allocated
+/// on Dart-side.
 #[must_use]
 pub unsafe fn dart_string_into_rust(
     dart_string: ptr::NonNull<c_char>,

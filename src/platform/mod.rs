@@ -18,9 +18,6 @@ cfg_if::cfg_if! {
 
 use derive_more::Display;
 
-#[cfg(feature = "mockable")]
-pub use self::transport::MockRpcTransport;
-
 use crate::utils::Caused;
 
 pub use self::{
@@ -30,6 +27,9 @@ pub use self::{
     transceiver::Direction as TransceiverDirection,
     transport::{RpcTransport, TransportError, TransportState},
 };
+
+#[cfg(feature = "mockable")]
+pub use self::transport::MockRpcTransport;
 
 /// [`Error`] appeared on [getUserMedia()][1] request, differentiated by its
 /// cause.

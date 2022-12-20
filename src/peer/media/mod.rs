@@ -21,7 +21,6 @@ use tracerr::Traced;
 
 #[cfg(feature = "mockable")]
 use crate::media::{LocalTracksConstraints, RecvConstraints};
-
 use crate::{
     media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},

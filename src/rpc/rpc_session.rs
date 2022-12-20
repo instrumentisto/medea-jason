@@ -36,7 +36,7 @@ use crate::{
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't
     /// be used.
-    #[display(fmt = "RPC Session finished with {_0:?} close reason")]
+    #[display(fmt = "RPC Session finished with {:?} close reason", _0)]
     SessionFinished(CloseReason),
 
     /// [`WebSocketRpcSession`] doesn't have any credentials to authorize with.
@@ -50,7 +50,7 @@ pub enum SessionError {
     AuthorizationFailed,
 
     /// [`WebSocketRpcClient`] returned [`RpcClientError`].
-    #[display(fmt = "RpcClientError: {_0}")]
+    #[display(fmt = "RpcClientError: {}", _0)]
     RpcClient(#[cause] RpcClientError),
 
     /// [`WebSocketRpcSession`] was unexpectedly dropped.
@@ -58,7 +58,7 @@ pub enum SessionError {
     SessionUnexpectedlyDropped,
 
     /// [`WebSocketRpcClient`] lost connection with a server.
-    #[display(fmt = "Connection with a server was lost: {_0}")]
+    #[display(fmt = "Connection with a server was lost: {}", _0)]
     ConnectionLost(ConnectionLostReason),
 
     /// [`WebSocketRpcSession::connect`] called while connecting to the server.
@@ -402,7 +402,6 @@ impl RpcSession for WebSocketRpcSession {
                     self.state.set(S::Initialized(Rc::new(connection_info)));
                 }
             }
-            #[allow(clippy::unimplemented)]
             S::Authorizing(info) | S::Opened(info) => {
                 if info.as_ref() != &connection_info {
                     unimplemented!(

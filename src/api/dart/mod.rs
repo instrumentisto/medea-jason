@@ -32,6 +32,7 @@ use derive_more::Display;
 use libc::c_char;
 
 use crate::{
+    api::dart::utils::new_panic_error,
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::utils::{
         c_str_into_string,
@@ -48,7 +49,6 @@ use crate::{
 
 pub use crate::media::MediaDirection;
 
-use self::utils::new_panic_error;
 pub use self::{
     jason_api::{
         AudioTrackConstraints, ConnectionHandle, DeviceVideoTrackConstraints,
@@ -544,7 +544,7 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<Self>> for Option<T> {
 
 /// Error of converting a [`DartValue`] to the concrete type.
 #[derive(Debug, Display)]
-#[display(fmt = "expected `{expectation}`, but got: `{value:?}`")]
+#[display(fmt = "expected `{}`, but got: `{:?}`", expectation, value)]
 pub struct DartValueCastError {
     /// Expected type description. Like a [`String`] or an `Option<i64>`.
     expectation: &'static str,

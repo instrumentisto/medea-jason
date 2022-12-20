@@ -12,12 +12,12 @@ use crate::platform::{
         Dart_HandleFromPersistent_DL_Trampolined,
         Dart_NewPersistentHandle_DL_Trampolined,
     },
-    utils::dart_api::{
-        Dart_GetError_DL_Trampolined, Dart_IsError_DL_Trampolined,
+    utils::{
+        c_str_into_string,
+        dart_api::{Dart_GetError_DL_Trampolined, Dart_IsError_DL_Trampolined},
+        dart_string_into_rust,
     },
 };
-
-use super::{c_str_into_string, dart_string_into_rust};
 
 #[dart_bridge("flutter/lib/src/native/platform/object.g.dart")]
 mod handle {
