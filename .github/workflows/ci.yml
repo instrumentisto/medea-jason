@@ -399,7 +399,7 @@ jobs:
         if: ${{ matrix.platform == 'android' }}
 
       - name: Run tests on iOS simulator
-        run: make test.e2e.native up=yes
+        run: make test.e2e.desktop up=yes
               debug=no dockerized=yes server="127.0.0.1"
               background=yes
               medea-tag=${{ env.MEDEA_BRANCH }}
