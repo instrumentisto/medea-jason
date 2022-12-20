@@ -290,7 +290,7 @@ jobs:
       matrix:
         platform:
           - linux
-          - android
+          - windows
           - macos
     runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
               || (matrix.platform == 'windows' && 'windows-latest')
