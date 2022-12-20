@@ -60,6 +60,8 @@ impl<T> Function<T> {
     /// # Safety
     ///
     /// The provided [`Dart_Handle`] should be non-`null` and correct.
+    ///
+    /// [`Dart_Handle`]: dart_sys::Dart_Handle
     #[must_use]
     pub const unsafe fn new(dart_fn: Dart_PersistentHandle) -> Self {
         Self {

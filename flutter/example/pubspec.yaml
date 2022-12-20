@@ -8,7 +8,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_rust_bridge: 1.54.0 # should be the same as in `Cargo.lock`
 
   # When depending on this package from a real application you should use:
   #   medea_jason: ^x.y.z

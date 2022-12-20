@@ -173,7 +173,7 @@ packages:
     source: hosted
     version: "3.0.0-rc.9"
   flutter_rust_bridge:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
