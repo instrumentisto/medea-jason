@@ -9,7 +9,7 @@
 
 typedef struct {
   const char* name;
-  void (*function)(void);
+  void (*function)();
 } DartApiEntry;
 
 typedef struct {

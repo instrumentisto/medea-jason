@@ -169,7 +169,7 @@ DART_EXPORT void Dart_SetEmbedderInformationCallback(
  * \param response_json_length The length of the returned json response.
  * \param error An optional error, must be free()ed by caller.
  *
- * \return Whether the call was successfully performed.
+ * \return Whether the call was sucessfully performed.
  *
  * NOTE: This method does not need a current isolate and must not have the
  * vm-isolate being the current isolate. It must be called after
@@ -220,6 +220,25 @@ typedef void (*Dart_ServiceStreamCancelCallback)(const char* stream_id);
 DART_EXPORT char* Dart_SetServiceStreamCallbacks(
     Dart_ServiceStreamListenCallback listen_callback,
     Dart_ServiceStreamCancelCallback cancel_callback);
+
+/**
+ * A callback invoked when the VM service receives an event.
+ */
+typedef void (*Dart_NativeStreamConsumer)(const uint8_t* event_json,
+                                          intptr_t event_json_length);
+
+/**
+ * Sets the native VM service stream callbacks for a particular stream.
+ * Note: The function may be called on multiple threads concurrently.
+ *
+ * \param consumer A function pointer to an event handler callback function.
+ *   A NULL value removes the existing listen callback function if any.
+ *
+ * \param stream_id The ID of the stream on which to set the callback.
+ */
+DART_EXPORT void Dart_SetNativeServiceStreamCallback(
+    Dart_NativeStreamConsumer consumer,
+    const char* stream_id);
 
 /**
  * Sends a data event to clients of the VM Service.
@@ -290,8 +309,7 @@ typedef struct {
 typedef struct {
   const char* type;
   const char* reason;
-
-  Dart_IsolateGroupId isolate_group_id;
+  const char* isolate_id;
 
   Dart_GCStats new_space;
   Dart_GCStats old_space;
@@ -345,37 +363,6 @@ DART_EXPORT bool Dart_IsReloading();
  */
 
 /**
- * Enable tracking of specified timeline category. This is operational
- * only when systrace timeline functionality is turned on.
- *
- * \param categories A comma separated list of categories that need to
- *   be enabled, the categories are
- *   "all" : All categories
- *   "API" - Execution of Dart C API functions
- *   "Compiler" - Execution of Dart JIT compiler
- *   "CompilerVerbose" - More detailed Execution of Dart JIT compiler
- *   "Dart" - Execution of Dart code
- *   "Debugger" - Execution of Dart debugger
- *   "Embedder" - Execution of Dart embedder code
- *   "GC" - Execution of Dart Garbage Collector
- *   "Isolate" - Dart Isolate lifecycle execution
- *   "VM" - Excution in Dart VM runtime code
- *   "" - None
- *
- *  When "all" is specified all the categories are enabled.
- *  When a comma separated list of categories is specified, the categories
- *   that are specified will be enabled and the rest will be disabled. 
- *  When "" is specified all the categories are disabled.
- *  The category names are case sensitive.
- *  eg:  Dart_EnableTimelineCategory("all");
- *       Dart_EnableTimelineCategory("GC,API,Isolate");
- *       Dart_EnableTimelineCategory("GC,Debugger,Dart");
- *
- * \return True if the categories were successfully enabled, False otherwise.
- */
-DART_EXPORT bool Dart_SetEnabledTimelineCategory(const char* categories);
-
-/**
  * Returns a timestamp in microseconds. This timestamp is suitable for
  * passing into the timeline system, and uses the same monotonic clock
  * as dart:developer's Timeline.now.
@@ -384,19 +371,41 @@ DART_EXPORT bool Dart_SetEnabledTimelineCategory(const char* categories);
  */
 DART_EXPORT int64_t Dart_TimelineGetMicros();
 
-/**
- * Returns a raw timestamp in from the monotonic clock.
- *
- * \return A raw timestamp from the monotonic clock.
- */
-DART_EXPORT int64_t Dart_TimelineGetTicks();
+/** Timeline stream for Dart API calls */
+#define DART_TIMELINE_STREAM_API (1 << 0)
+/** Timeline stream for compiler events */
+#define DART_TIMELINE_STREAM_COMPILER (1 << 1)
+/** Timeline stream for Dart provided events */
+#define DART_TIMELINE_STREAM_DART (1 << 2)
+/** Timeline stream for debugger provided events */
+#define DART_TIMELINE_STREAM_DEBUGGER (1 << 3)
+/** Timeline stream for embedder provided events */
+#define DART_TIMELINE_STREAM_EMBEDDER (1 << 4)
+/** Timeline stream for GC events */
+#define DART_TIMELINE_STREAM_GC (1 << 5)
+/** Timeline stream for isolate events */
+#define DART_TIMELINE_STREAM_ISOLATE (1 << 6)
+/** Timeline stream for VM events */
+#define DART_TIMELINE_STREAM_VM (1 << 7)
+
+/** All timeline streams */
+#define DART_TIMELINE_STREAM_ALL                                               \
+  (DART_TIMELINE_STREAM_API | DART_TIMELINE_STREAM_COMPILER |                  \
+   DART_TIMELINE_STREAM_DART | DART_TIMELINE_STREAM_DEBUGGER |                 \
+   DART_TIMELINE_STREAM_EMBEDDER | DART_TIMELINE_STREAM_GC |                   \
+   DART_TIMELINE_STREAM_ISOLATE | DART_TIMELINE_STREAM_VM)
+
+/** Disable all timeline stream recording */
+#define DART_TIMELINE_STREAM_DISABLE 0
 
 /**
- * Returns the frequency of the monotonic clock.
+ * Start recording timeline events for the entire VM (including all isolates).
  *
- * \return The frequency of the monotonic clock.
+ * \param stream_mask A bitmask of streams that should be recorded.
+ *
+ * NOTE: Calling with 0 disables recording of all streams.
  */
-DART_EXPORT int64_t Dart_TimelineGetTicksFrequency();
+DART_EXPORT void Dart_GlobalTimelineSetRecordedStreams(int64_t stream_mask);
 
 typedef enum {
   Dart_Timeline_Event_Begin,          // Phase = 'B'.
@@ -459,81 +468,32 @@ DART_EXPORT int64_t Dart_VMIsolateCountMetric();  // Counter
 DART_EXPORT int64_t Dart_VMCurrentRSSMetric();    // Byte
 DART_EXPORT int64_t Dart_VMPeakRSSMetric();       // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapOldUsedMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapOldUsedMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapOldUsedMaxMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapOldUsedMaxMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapOldCapacityMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapOldCapacityMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapOldCapacityMaxMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapOldCapacityMaxMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapOldExternalMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapOldExternalMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapNewUsedMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapNewUsedMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapNewUsedMaxMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapNewUsedMaxMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapNewCapacityMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapNewCapacityMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapNewCapacityMaxMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapNewCapacityMaxMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapNewExternalMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapNewExternalMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapGlobalUsedMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapGlobalUsedMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
-Dart_IsolateGroupHeapGlobalUsedMaxMetric(Dart_IsolateGroup group);  // Byte
+Dart_IsolateHeapGlobalUsedMaxMetric(Dart_Isolate isolate);  // Byte
 DART_EXPORT int64_t
 Dart_IsolateRunnableLatencyMetric(Dart_Isolate isolate);  // Microsecond
 DART_EXPORT int64_t
 Dart_IsolateRunnableHeapSizeMetric(Dart_Isolate isolate);  // Byte
-
-/*
- * ========
- * UserTags
- * ========
- */
-
-/*
- * Gets the current isolate's currently set UserTag instance.
- *
- * \return The currently set UserTag instance.
- */
-DART_EXPORT Dart_Handle Dart_GetCurrentUserTag();
-
-/*
- * Gets the current isolate's default UserTag instance.
- *
- * \return The default UserTag with label 'Default'
- */
-DART_EXPORT Dart_Handle Dart_GetDefaultUserTag();
-
-/*
- * Creates a new UserTag instance.
- *
- * \param label The name of the new UserTag.
- *
- * \return The newly created UserTag instance or an error handle.
- */
-DART_EXPORT Dart_Handle Dart_NewUserTag(const char* label);
-
-/*
- * Updates the current isolate's UserTag to a new value.
- *
- * \param user_tag The UserTag to be set as the current UserTag.
- *
- * \return The previously set UserTag instance or an error handle.
- */
-DART_EXPORT Dart_Handle Dart_SetCurrentUserTag(Dart_Handle user_tag);
-
-/*
- * Returns the label of a given UserTag instance.
- *
- * \param user_tag The UserTag from which the label will be retrieved.
- *
- * \return The UserTag's label. NULL if the user_tag is invalid. The caller is
- *   responsible for freeing the returned label.
- */
-DART_EXPORT DART_WARN_UNUSED_RESULT char* Dart_GetUserTagLabel(
-    Dart_Handle user_tag);
 
 #endif  // RUNTIME_INCLUDE_DART_TOOLS_API_H_
