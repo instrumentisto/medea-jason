@@ -377,7 +377,7 @@ jobs:
       - name: Run tests on desktop
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
-             make test.e2e.native device=${{ matrix.platform }}
+             make test.e2e.desktop device=${{ matrix.platform }}
                                    up=yes debug=no dockerized=yes
                                    medea-tag=${{ env.MEDEA_BRANCH }}
                                    control-tag=build-${{ github.run_number }}
