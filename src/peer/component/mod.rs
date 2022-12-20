@@ -7,7 +7,7 @@ mod watchers;
 
 use std::{cell::Cell, collections::HashSet, rc::Rc};
 
-use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
+use futures::{future::LocalBoxFuture, TryFutureExt as _};
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
@@ -110,7 +110,7 @@ pub struct State {
     ice_servers: Vec<IceServer>,
 
     /// Current [`NegotiationRole`] of this [`Component`].
-    negotiation_role: ProgressableCell<Option<NegotiationRole>>,
+    negotiation_role: ObservableCell<Option<NegotiationRole>>,
 
     /// Negotiation state of this [`Component`].
     negotiation_state: ObservableCell<NegotiationState>,
@@ -152,7 +152,7 @@ impl State {
             force_relay,
             remote_sdp: ProgressableCell::new(None),
             local_sdp: LocalSdp::new(),
-            negotiation_role: ProgressableCell::new(negotiation_role),
+            negotiation_role: ObservableCell::new(negotiation_role),
             negotiation_state: ObservableCell::new(NegotiationState::Stable),
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
@@ -213,11 +213,7 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let _ = self
-            .negotiation_role
-            .subscribe()
-            .any(|val| async move { val.is_none() })
-            .await;
+        let _ = self.negotiation_role.when(Option::is_none).await;
         self.negotiation_role.set(Some(negotiation_role));
     }
 
@@ -361,11 +357,11 @@ impl State {
         }
     }
 
-    /// Returns [`Future`] resolving once all senders inserts and removes are
-    /// processed.
+    /// Returns [`Future`] resolving once all [`State::senders`]' inserts and
+    /// removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    pub fn when_all_senders_processed(&self) -> AllProcessed<'static> {
+    fn when_all_senders_processed(&self) -> AllProcessed<'static> {
         self.senders.when_all_processed()
     }
 
