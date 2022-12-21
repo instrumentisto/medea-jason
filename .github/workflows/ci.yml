@@ -291,10 +291,9 @@ jobs:
         # TODO: Run E2E test on Windows
         platform:
           - linux
-          - android
           - ios
           - macos
-    runs-on: ${{ ((matrix.platform == 'android' || matrix.platform == 'macos' || matrix.platform == 'ios')
+    runs-on: ${{ ((matrix.platform == 'macos' || matrix.platform == 'ios')
                                                && 'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
