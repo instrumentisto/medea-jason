@@ -140,8 +140,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<bool> microphoneVolumeIsAvailable() async {
     try {
       return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
-              manager: opaque.innerOpaque) as Future) as int ==
-          1;
+          manager: opaque.innerOpaque) as Future) as bool;
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
