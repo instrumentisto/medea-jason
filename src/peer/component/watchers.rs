@@ -237,6 +237,8 @@ impl Component {
         let _ = state.sync_state.when_eq(SyncState::Synced).await;
         if let Some(role) = state.negotiation_role.get() {
             if state.local_sdp.is_rollback() {
+                // TODO: Temporary fix that allows us to ignore rollback
+                //       since it won't work anyway.
                 if state.negotiation_state.get() != NegotiationState::Stable {
                     peer.peer
                         .rollback()

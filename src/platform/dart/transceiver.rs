@@ -4,7 +4,6 @@
 
 use std::{future::Future, rc::Rc};
 
-use derive_more::From;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -67,7 +66,7 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Clone, Debug, From)]
+#[derive(Clone, Debug)]
 pub struct Transceiver(Rc<DartHandle>);
 
 impl From<DartHandle> for Transceiver {
