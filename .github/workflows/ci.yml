@@ -628,24 +628,34 @@ jobs:
 
       # Run all task sequentially to not flood the jobs list.
       - run: make docs.rust crate=medea-macro open=no
+        env:
+          RUSTFLAGS: -D warnings
         if: ${{ startsWith(github.ref, 'refs/tags/medea-macro-')
-                || !startsWith(github.ref, 'refs/tags/medea-') }}
+             || !startsWith(github.ref, 'refs/tags/medea-') }}
 
       - run: make docs.rust crate=medea-reactive open=no
+        env:
+          RUSTFLAGS: -D warnings
         if: ${{ startsWith(github.ref, 'refs/tags/medea-reactive-')
-                || !startsWith(github.ref, 'refs/tags/medea-') }}
+             || !startsWith(github.ref, 'refs/tags/medea-') }}
 
       - run: make docs.rust crate=medea-client-api-proto open=no
+        env:
+          RUSTFLAGS: -D warnings
         if: ${{ startsWith(github.ref, 'refs/tags/medea-client-api-proto-')
-                || !startsWith(github.ref, 'refs/tags/medea-') }}
+             || !startsWith(github.ref, 'refs/tags/medea-') }}
 
       - run: make docs.rust crate=medea-control-api-proto open=no
+        env:
+          RUSTFLAGS: -D warnings
         if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-proto-')
-                || !startsWith(github.ref, 'refs/tags/medea-') }}
+             || !startsWith(github.ref, 'refs/tags/medea-') }}
 
       - run: make docs.rust crate=medea-jason open=no
+        env:
+          RUSTFLAGS: -D warnings
         if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
-                || !startsWith(github.ref, 'refs/tags/medea-') }}
+             || !startsWith(github.ref, 'refs/tags/medea-') }}
 
   docker:
     name: Docker image

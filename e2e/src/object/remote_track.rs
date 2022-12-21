@@ -24,7 +24,7 @@ pub enum MediaDirection {
 impl From<MediaDirection> for u8 {
     #[allow(clippy::as_conversions)] // it's safe conversion
     fn from(d: MediaDirection) -> Self {
-        d as u8
+        d as Self
     }
 }
 

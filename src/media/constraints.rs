@@ -842,6 +842,7 @@ impl VideoSource {
     ///
     /// If this [`VideoSource`] is important then without this [`VideoSource`]
     /// call session can't be started.
+    #[allow(clippy::use_self)] // because of `const` only
     #[must_use]
     pub const fn required(&self) -> bool {
         match self {
@@ -857,8 +858,8 @@ impl VideoSource {
         track: T,
     ) -> bool {
         match self {
-            VideoSource::Display(display) => display.satisfies(&track).await,
-            VideoSource::Device(device) => device.satisfies(track).await,
+            Self::Display(display) => display.satisfies(&track).await,
+            Self::Device(device) => device.satisfies(track).await,
         }
     }
 }
@@ -917,6 +918,7 @@ impl TrackConstraints {
     ///
     /// If these [`TrackConstraints`] are important then without them a session
     /// call can't be started.
+    #[allow(clippy::use_self)] // because of `const` only
     #[must_use]
     pub const fn required(&self) -> bool {
         match self {
@@ -926,6 +928,7 @@ impl TrackConstraints {
     }
 
     /// Returns these [`TrackConstraints`] media source kind.
+    #[allow(clippy::use_self)] // because of `const` only
     #[must_use]
     pub const fn media_source_kind(&self) -> MediaSourceKind {
         match &self {
@@ -940,6 +943,7 @@ impl TrackConstraints {
     }
 
     /// Returns [`MediaKind`] of these [`TrackConstraints`].
+    #[allow(clippy::use_self)] // because of `const` only
     #[must_use]
     pub const fn media_kind(&self) -> MediaKind {
         match &self {
@@ -959,6 +963,7 @@ impl From<ProtoTrackConstraints> for TrackConstraints {
 }
 
 /// Constraints applicable to audio tracks.
+#[allow(clippy::partial_pub_fields)] // TODO: refactor this
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct AudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
@@ -1034,10 +1039,10 @@ impl From<ProtoAudioConstraints> for AudioTrackConstraints {
 impl AsRef<str> for FacingMode {
     fn as_ref(&self) -> &str {
         match self {
-            FacingMode::User => "user",
-            FacingMode::Environment => "environment",
-            FacingMode::Left => "left",
-            FacingMode::Right => "right",
+            Self::User => "user",
+            Self::Environment => "environment",
+            Self::Left => "left",
+            Self::Right => "right",
         }
     }
 }
@@ -1066,11 +1071,11 @@ impl ConstrainU32 {
         // It's up to `<T as Constraint>::TRACK_SETTINGS_FIELD_NAME` to
         // guarantee that such casts are safe.
         match this {
-            None | Some(ConstrainU32::Ideal(_)) => true,
-            Some(ConstrainU32::Exact(exact)) => {
+            None | Some(Self::Ideal(_)) => true,
+            Some(Self::Exact(exact)) => {
                 setting.map_or(false, |val| val == exact)
             }
-            Some(ConstrainU32::Range(start, end)) => {
+            Some(Self::Range(start, end)) => {
                 setting.map_or(false, |val| val >= start && val <= end)
             }
         }
@@ -1097,8 +1102,8 @@ impl<T: AsRef<str>> ConstrainString<T> {
     /// `setting`.
     fn satisfies(this: &Option<Self>, setting: &Option<T>) -> bool {
         match this {
-            None | Some(ConstrainString::Ideal(_)) => true,
-            Some(ConstrainString::Exact(constrain)) => setting
+            None | Some(Self::Ideal(_)) => true,
+            Some(Self::Exact(constrain)) => setting
                 .as_ref()
                 .map_or(false, |val| val.as_ref() == constrain.as_ref()),
         }
@@ -1107,6 +1112,7 @@ impl<T: AsRef<str>> ConstrainString<T> {
 
 /// Constraints applicable to video tracks that are sourced from some media
 /// device.
+#[allow(clippy::partial_pub_fields)] // TODO: refactor this
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DeviceVideoTrackConstraints {
     /// Importance of this [`DeviceVideoTrackConstraints`].
@@ -1254,6 +1260,7 @@ impl DeviceVideoTrackConstraints {
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
+#[allow(clippy::partial_pub_fields)] // TODO: refactor this
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DisplayVideoTrackConstraints {
     /// Importance of this [`DisplayVideoTrackConstraints`].

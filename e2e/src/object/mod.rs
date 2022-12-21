@@ -1,9 +1,5 @@
 //! Browser-side objects.
 
-// TODO: Remove once annoying false positive is fixed:
-//       https://github.com/rust-lang/rust-clippy/issues/6902
-#![allow(clippy::use_self)]
-
 pub mod connection;
 pub mod connections_store;
 pub mod jason;

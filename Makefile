@@ -20,11 +20,7 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-<<<<<<< HEAD
 RUST_VER := 1.66
-=======
-RUST_VER := 1.65
->>>>>>> parent of 6c5faae (Revert "Fix "sender is answerer" scenario in negotiation (#98)")
 CHROME_VERSION := 104.0
 FIREFOX_VERSION := 107.0.1-driver0.32.0
 
