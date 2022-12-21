@@ -54,52 +54,52 @@ void main() {
     // expect(() => tracks.first.kind(), throwsA(isA<FfiException>()));
   });
 
-  // testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
-  //   var constraints = DeviceVideoTrackConstraints();
-  //   constraints.deviceId('deviceId');
-  //   constraints.exactFacingMode(FacingMode.User);
-  //   constraints.idealFacingMode(FacingMode.Right);
-  //   constraints.exactHeight(444);
-  //   constraints.idealHeight(111);
-  //   constraints.heightInRange(55, 66);
-  //   constraints.exactWidth(444);
-  //   constraints.idealWidth(111);
-  //   constraints.widthInRange(55, 66);
-  //
-  //   expect(() => constraints.exactHeight(-1), throwsArgumentError);
-  //   expect(() => constraints.idealHeight(-1), throwsArgumentError);
-  //   expect(() => constraints.exactHeight(1 << 32 + 1), throwsArgumentError);
-  //   expect(() => constraints.heightInRange(-1, 200), throwsArgumentError);
-  //   expect(() => constraints.heightInRange(200, -1), throwsArgumentError);
-  //
-  //   expect(() => constraints.exactWidth(-1), throwsArgumentError);
-  //   expect(() => constraints.idealWidth(-1), throwsArgumentError);
-  //   expect(() => constraints.exactWidth(1 << 32 + 1), throwsArgumentError);
-  //   expect(() => constraints.widthInRange(-1, 200), throwsArgumentError);
-  //   expect(() => constraints.widthInRange(200, -1), throwsArgumentError);
-  //
-  //   constraints.free();
-  //   expect(
-  //       () => constraints.deviceId('deviceId'), throwsA(isA<FfiException>()));
-  //
-  //   var constraints2 = DeviceVideoTrackConstraints();
-  //   var settings = MediaStreamSettings();
-  //   constraints2.deviceId('deviceId');
-  //   settings.deviceVideo(constraints2);
-  //   expect(
-  //       () => constraints2.deviceId('deviceId'), throwsA(isA<FfiException>()));
-  // });
-  //
+  testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
+    var constraints = DeviceVideoTrackConstraints();
+    constraints.deviceId('deviceId');
+    constraints.exactFacingMode(FacingMode.User);
+    constraints.idealFacingMode(FacingMode.Right);
+    constraints.exactHeight(444);
+    constraints.idealHeight(111);
+    constraints.heightInRange(55, 66);
+    constraints.exactWidth(444);
+    constraints.idealWidth(111);
+    constraints.widthInRange(55, 66);
+
+    expect(() => constraints.exactHeight(-1), throwsArgumentError);
+    expect(() => constraints.idealHeight(-1), throwsArgumentError);
+    expect(() => constraints.exactHeight(1 << 32 + 1), throwsArgumentError);
+    expect(() => constraints.heightInRange(-1, 200), throwsArgumentError);
+    expect(() => constraints.heightInRange(200, -1), throwsArgumentError);
+
+    expect(() => constraints.exactWidth(-1), throwsArgumentError);
+    expect(() => constraints.idealWidth(-1), throwsArgumentError);
+    expect(() => constraints.exactWidth(1 << 32 + 1), throwsArgumentError);
+    expect(() => constraints.widthInRange(-1, 200), throwsArgumentError);
+    expect(() => constraints.widthInRange(200, -1), throwsArgumentError);
+
+    constraints.free();
+    expect(
+        () => constraints.deviceId('deviceId'), throwsA(isA<FfiException>()));
+
+    var constraints2 = DeviceVideoTrackConstraints();
+    var settings = MediaStreamSettings();
+    constraints2.deviceId('deviceId');
+    settings.deviceVideo(constraints2);
+    expect(
+        () => constraints2.deviceId('deviceId'), throwsA(isA<FfiException>()));
+  });
+
   // testWidgets('ConnectionHandle', (WidgetTester tester) async {
   //   var jason = Jason();
   //   var room = jason.initRoom();
-  //
+
   //   var connFut = Completer<ConnectionHandle>();
   //   room.onNewConnection((conn) {
   //     connFut.complete(conn);
   //   });
   //   var conn = await connFut.future;
-  //
+
   //   expect(
   //       () => conn.getRemoteMemberId(),
   //       throwsA(predicate((e) =>
@@ -112,67 +112,67 @@ void main() {
   //   conn.onClose(() {
   //     allFired[1].complete();
   //   });
-  //
+
   //   var res = await Future.wait(allFired.map((e) => e.future))
   //       .timeout(Duration(seconds: 1));
   //   expect(res[0], 4);
   // });
   //
-  // testWidgets('RoomHandle', (WidgetTester tester) async {
-  //   var jason = Jason();
-  //   var room = jason.initRoom();
-  //
-  //   await room.join('wss://example.com/room/Alice?token=777');
-  //   await room.setLocalMediaSettings(MediaStreamSettings(), true, false);
-  //   await room.muteAudio();
-  //   await room.unmuteAudio();
-  //   await room.muteVideo();
-  //   await room.unmuteVideo(MediaSourceKind.Display);
-  //   await room.disableVideo(MediaSourceKind.Display);
-  //   await room.enableVideo(MediaSourceKind.Device);
-  //   await room.disableAudio();
-  //   await room.enableAudio();
-  //   await room.disableRemoteAudio();
-  //   await room.enableRemoteAudio();
-  //   await room.disableRemoteVideo(MediaSourceKind.Device);
-  //
-  //   var stateErr;
-  //   try {
-  //     await room.enableRemoteVideo();
-  //   } catch (e) {
-  //     stateErr = e;
-  //   }
-  //   expect(
-  //       stateErr,
-  //       allOf(predicate((e) =>
-  //           e is StateError &&
-  //           e.message == 'RoomHandle is in detached state')));
-  //
-  //   var formatExc;
-  //   try {
-  //     await room.join('obviously bad url');
-  //   } catch (e) {
-  //     formatExc = e;
-  //   }
-  //   expect(
-  //       formatExc,
-  //       allOf(predicate((e) =>
-  //           e is FormatException &&
-  //           e.message.contains('relative URL without a base'))));
-  //
-  //   var localMediaErr = Completer<Object>();
-  //   room.onFailedLocalMedia((err) {
-  //     localMediaErr.complete(err);
-  //   });
-  //   var err = await localMediaErr.future;
-  //   expect(
-  //       err,
-  //       predicate((e) =>
-  //           e is InternalException &&
-  //           e.message() ==
-  //               'SimpleTracksRequest should have at least one track' &&
-  //           e.trace().contains('at src')));
-  // });
+  testWidgets('RoomHandle', (WidgetTester tester) async {
+    var jason = Jason();
+    var room = jason.initRoom();
+
+    // await room.join('wss://example.com/room/Alice?token=777');
+    await room.setLocalMediaSettings(MediaStreamSettings(), true, false);
+    await room.muteAudio();
+    await room.unmuteAudio();
+    await room.muteVideo();
+    await room.unmuteVideo(MediaSourceKind.Display);
+    await room.disableVideo(MediaSourceKind.Display);
+    await room.enableVideo(MediaSourceKind.Device);
+    await room.disableAudio();
+    await room.enableAudio();
+    await room.disableRemoteAudio();
+    await room.enableRemoteAudio();
+    await room.disableRemoteVideo(MediaSourceKind.Device);
+
+    var stateErr;
+    try {
+      await room.enableRemoteVideo();
+    } catch (e) {
+      stateErr = e;
+    }
+    expect(
+        stateErr,
+        allOf(predicate((e) =>
+            e is StateError &&
+            e.message == 'RoomHandle is in detached state')));
+
+    var formatExc;
+    try {
+      await room.join('obviously bad url');
+    } catch (e) {
+      formatExc = e;
+    }
+    expect(
+        formatExc,
+        allOf(predicate((e) =>
+            e is FormatException &&
+            e.message.contains('relative URL without a base'))));
+
+    var localMediaErr = Completer<Object>();
+    room.onFailedLocalMedia((err) {
+      localMediaErr.complete(err);
+    });
+    var err = await localMediaErr.future;
+    expect(
+        err,
+        predicate((e) =>
+            e is InternalException &&
+            e.message() ==
+                'SimpleTracksRequest should have at least one track' &&
+            e.trace().contains('at src')));
+  });
   //
   // testWidgets('ReconnectHandle', (WidgetTester tester) async {
   //   var jason = Jason();
@@ -361,28 +361,28 @@ void main() {
   //   throw Exception('Exception not fired on panic');
   // });
   //
-  // testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
-  //   var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
-  //
-  //   var jason = Jason();
-  //   var media = jason.mediaManager();
-  //
-  //   if (shouldWork) {
-  //     var displays = await media.enumerateDisplays();
-  //
-  //     expect(displays.length, 1);
-  //     expect(displays[0].deviceId(), 'device_id');
-  //     expect(displays[0].title(), 'title');
-  //   } else {
-  //     var err;
-  //     try {
-  //       await media.enumerateDisplays();
-  //     } catch (e) {
-  //       err = e;
-  //     }
-  //     expect(err is UnsupportedError, true);
-  //   }
-  // });
+//   testWidgets('Enumerate displays', (WidgetTester widgetTester) async {
+//     var shouldWork = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+
+//     var jason = Jason();
+//     var media = jason.mediaManager();
+
+//     if (!shouldWork) {
+//       var displays = await media.enumerateDisplays();
+
+//       expect(displays.length, 1);
+//       expect(displays[0].deviceId(), 'device_id');
+//       expect(displays[0].title(), 'title');
+//     } else {
+//       var err;
+//       try {
+//         await media.enumerateDisplays();
+//       } catch (e) {
+//         err = e;
+//       }
+//       expect(err is UnsupportedError, true);
+//     }
+//   });
 }
 
 class TestObj {

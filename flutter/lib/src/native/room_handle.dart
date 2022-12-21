@@ -7,6 +7,7 @@ import '../interface/reconnect_handle.dart';
 import '../interface/room_close_reason.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'connection_handle.dart';
 import 'ffi/jason_api.g.dart' as frb;
@@ -18,18 +19,20 @@ import 'room_close_reason.dart';
 
 class NativeRoomHandle extends RoomHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late frb.RoomHandle opaque;
+  late RustOpaque<frb.RoomHandle> opaque;
 
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [frb.RoomHandle].
-  NativeRoomHandle(this.opaque) {
+  NativeRoomHandle(frb.RoomHandle roomHandle)
+      : opaque = RustOpaque(roomHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   Future<void> join(String token) async {
     try {
-      await (api.roomHandleJoin(roomHandle: opaque, token: token) as Future);
+      await (api.roomHandleJoin(roomHandle: opaque.innerOpaque, token: token)
+          as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -40,8 +43,8 @@ class NativeRoomHandle extends RoomHandle {
       bool stopFirst, bool rollbackOnFail) async {
     try {
       await (api.roomHandleSetLocalMediaSettings(
-          roomHandle: opaque,
-          settings: (settings as MediaStreamSettings).opaque,
+          roomHandle: opaque.innerOpaque,
+          settings: (settings as MediaStreamSettings).opaque.innerOpaque,
           stopFirst: stopFirst,
           rollbackOnFail: rollbackOnFail) as Future);
     } on FfiException catch (anyhow) {
@@ -52,7 +55,7 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> muteAudio() async {
     try {
-      await (api.roomHandleMuteAudio(roomHandle: opaque) as Future);
+      await (api.roomHandleMuteAudio(roomHandle: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -61,7 +64,8 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> unmuteAudio() async {
     try {
-      await (api.roomHandleUnmuteAudio(roomHandle: opaque) as Future);
+      await (api.roomHandleUnmuteAudio(roomHandle: opaque.innerOpaque)
+          as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -70,7 +74,8 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> enableAudio() async {
     try {
-      await (api.roomHandleEnableAudio(roomHandle: opaque) as Future);
+      await (api.roomHandleEnableAudio(roomHandle: opaque.innerOpaque)
+          as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -79,7 +84,8 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> disableAudio() async {
     try {
-      await (api.roomHandleDisableAudio(roomHandle: opaque) as Future);
+      await (api.roomHandleDisableAudio(roomHandle: opaque.innerOpaque)
+          as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -89,7 +95,7 @@ class NativeRoomHandle extends RoomHandle {
   Future<void> muteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleMuteVideo(
-          roomHandle: opaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
     } on FfiException catch (anyhow) {
       objectFromAnyhow(anyhow);
     }
@@ -99,7 +105,7 @@ class NativeRoomHandle extends RoomHandle {
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleUnmuteVideo(
-          roomHandle: opaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -109,7 +115,7 @@ class NativeRoomHandle extends RoomHandle {
   Future<void> enableVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleEnableVideo(
-          roomHandle: opaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -119,7 +125,7 @@ class NativeRoomHandle extends RoomHandle {
   Future<void> disableVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleDisableVideo(
-          roomHandle: opaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -128,7 +134,8 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> enableRemoteAudio() async {
     try {
-      await (api.roomHandleEnableRemoteAudio(roomHandle: opaque) as Future);
+      await (api.roomHandleEnableRemoteAudio(roomHandle: opaque.innerOpaque)
+          as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -137,7 +144,8 @@ class NativeRoomHandle extends RoomHandle {
   @override
   Future<void> disableRemoteAudio() async {
     try {
-      await (api.roomHandleDisableRemoteAudio(roomHandle: opaque) as Future);
+      await (api.roomHandleDisableRemoteAudio(roomHandle: opaque.innerOpaque)
+          as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -147,7 +155,7 @@ class NativeRoomHandle extends RoomHandle {
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleEnableRemoteVideo(
-          roomHandle: opaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -157,7 +165,7 @@ class NativeRoomHandle extends RoomHandle {
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleDisableRemoteVideo(
-          roomHandle: opaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -167,7 +175,7 @@ class NativeRoomHandle extends RoomHandle {
   void onNewConnection(void Function(ConnectionHandle) f) {
     try {
       api.roomHandleOnNewConnection(
-          roomHandle: opaque,
+          roomHandle: opaque.innerOpaque,
           cb: (t) {
             f(NativeConnectionHandle(
                 api.connectionHandleFromPtr(ptr: t.address)));
@@ -181,7 +189,7 @@ class NativeRoomHandle extends RoomHandle {
   void onClose(void Function(RoomCloseReason) f) {
     try {
       api.roomHandleOnClose(
-          roomHandle: opaque,
+          roomHandle: opaque.innerOpaque,
           cb: (t) {
             f(NativeRoomCloseReason(
                 api.roomCloseReasonFromPtr(ptr: t.address)));
@@ -195,7 +203,7 @@ class NativeRoomHandle extends RoomHandle {
   void onLocalTrack(void Function(LocalMediaTrack) f) {
     try {
       api.roomHandleOnLocalTrack(
-          roomHandle: opaque,
+          roomHandle: opaque.innerOpaque,
           cb: (t) {
             f(NativeLocalMediaTrack(
                 api.localMediaTrackFromPtr(ptr: t.address)));
@@ -209,7 +217,7 @@ class NativeRoomHandle extends RoomHandle {
   void onConnectionLoss(void Function(ReconnectHandle) f) {
     try {
       api.roomHandleOnConnectionLoss(
-          roomHandle: opaque,
+          roomHandle: opaque.innerOpaque,
           cb: (t) {
             f(NativeReconnectHandle(
                 api.reconnectHandleFromPtr(ptr: t.address)));
@@ -223,7 +231,7 @@ class NativeRoomHandle extends RoomHandle {
   void onFailedLocalMedia(void Function(Object) f) {
     try {
       api.roomHandleOnFailedLocalMedia(
-          roomHandle: opaque,
+          roomHandle: opaque.innerOpaque,
           cb: (err) {
             f(err);
           });

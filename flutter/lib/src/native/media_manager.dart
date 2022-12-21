@@ -9,6 +9,7 @@ import '../interface/media_manager.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
@@ -19,11 +20,12 @@ import 'media_stream_settings.dart';
 
 class NativeMediaManagerHandle extends MediaManagerHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late frb.MediaManagerHandle opaque;
+  late RustOpaque<frb.MediaManagerHandle> opaque;
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [frb.MediaManagerHandle].
-  NativeMediaManagerHandle(this.opaque) {
+  NativeMediaManagerHandle(frb.MediaManagerHandle mediaManager)
+      : opaque = RustOpaque(mediaManager) {
     RustHandlesStorage().insertHandle(this);
   }
 
@@ -33,8 +35,9 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
     var tracks;
     try {
       tracks = await (api.mediaManagerHandleInitLocalTracks(
-          manager: opaque,
-          caps: (caps as MediaStreamSettings).opaque) as Future) as Pointer;
+              manager: opaque.innerOpaque,
+              caps: (caps as MediaStreamSettings).opaque.innerOpaque) as Future)
+          as Pointer;
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -56,8 +59,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
     var devices;
     try {
-      devices = await (api.mediaManagerHandleEnumerateDevices(manager: opaque)
-          as Future);
+      devices = await (api.mediaManagerHandleEnumerateDevices(
+          manager: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -84,8 +87,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
 
     var devices;
     try {
-      devices = await (api.mediaManagerHandleEnumerateDisplays(manager: opaque)
-          as Future) as Pointer;
+      devices = await (api.mediaManagerHandleEnumerateDisplays(
+          manager: opaque.innerOpaque) as Future) as Pointer;
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -107,7 +110,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<void> setOutputAudioId(String deviceId) async {
     try {
       await (api.mediaManagerHandleSetOutputAudioId(
-          manager: opaque, deviceId: deviceId) as Future);
+          manager: opaque.innerOpaque, deviceId: deviceId) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -117,7 +120,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<void> setMicrophoneVolume(int level) async {
     try {
       await (api.mediaManagerHandleSetMicrophoneVolume(
-          manager: opaque, level: level) as Future);
+          manager: opaque.innerOpaque, level: level) as Future);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -126,8 +129,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   Future<int> microphoneVolume() async {
     try {
-      return await (api.mediaManagerHandleMicrophoneVolume(manager: opaque)
-          as Future) as int;
+      return await (api.mediaManagerHandleMicrophoneVolume(
+          manager: opaque.innerOpaque) as Future) as int;
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }
@@ -137,7 +140,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   Future<bool> microphoneVolumeIsAvailable() async {
     try {
       return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
-              manager: opaque) as Future) as int ==
+              manager: opaque.innerOpaque) as Future) as int ==
           1;
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
@@ -147,7 +150,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
   @override
   void onDeviceChange(void Function() cb) {
     try {
-      api.mediaManagerHandleOnDeviceChange(manager: opaque, cb: cb);
+      api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
     } on FfiException catch (anyhow) {
       throw objectFromAnyhow(anyhow);
     }

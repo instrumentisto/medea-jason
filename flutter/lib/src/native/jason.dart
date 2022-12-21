@@ -9,6 +9,7 @@ import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/box_handle.dart';
 import 'ffi/callback.dart' as callback;
@@ -118,7 +119,7 @@ frb.MedeaJason _init_api() {
 
 class Jason extends base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.Jason opaque = api.jasonNew();
+  final RustOpaque<frb.Jason> opaque = RustOpaque(api.jasonNew());
 
   /// Constructs a new [Jason] backed by the Rust struct behind the
   /// provided [api.RefCellOptionJason].
@@ -128,18 +129,20 @@ class Jason extends base.Jason {
 
   @override
   MediaManagerHandle mediaManager() {
-    return NativeMediaManagerHandle(api.jasonMediaManager(jason: opaque));
+    return NativeMediaManagerHandle(
+        api.jasonMediaManager(jason: opaque.innerOpaque));
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle(api.jasonInitRoom(jason: opaque));
+    return NativeRoomHandle(api.jasonInitRoom(jason: opaque.innerOpaque));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    (room as NativeRoomHandle).opaque.move = true;
-    api.jasonCloseRoom(jason: opaque, roomToDelete: room.opaque);
+    api.jasonCloseRoom(
+        jason: opaque.innerOpaque,
+        roomToDelete: (room as NativeRoomHandle).opaque.moveOpaque);
   }
 
   @override
@@ -147,8 +150,7 @@ class Jason extends base.Jason {
   void free() {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      opaque.move = true;
-      api.jasonDispose(jason: opaque);
+      api.jasonDispose(jason: opaque.moveOpaque);
     }
   }
 }

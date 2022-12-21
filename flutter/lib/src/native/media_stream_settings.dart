@@ -2,6 +2,7 @@ import '../interface/audio_track_constraints.dart' as base_audio;
 import '../interface/device_video_track_constraints.dart' as base_device_video;
 import '../interface/media_stream_settings.dart' as base;
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'audio_track_constraints.dart';
 import 'device_video_track_constraints.dart';
@@ -14,21 +15,20 @@ import '../interface/display_video_track_constraints.dart'
 
 class MediaStreamSettings extends base.MediaStreamSettings {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  frb.MediaStreamSettings opaque = api.mediaStreamSettingsNew();
+  RustOpaque<frb.MediaStreamSettings> opaque =
+      RustOpaque(api.mediaStreamSettingsNew());
 
   /// Constructs a new [MediaStreamSettings] backed by the Rust struct behind the
-  /// provided [frb.RefCellMediaStreamSettings].
+  /// provided [frb.MediaStreamSettings].
   MediaStreamSettings() {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   void audio(@moveSemantics base_audio.AudioTrackConstraints constraints) {
-    opaque.move = true;
-    opaque = api.mediaStreamSettingsAudio(
-        mediaStreamSettings: opaque,
-        constr: (constraints as AudioTrackConstraints).opaque);
-    constraints.opaque.dispose();
+    opaque.innerOpaque = api.mediaStreamSettingsAudio(
+        mediaStreamSettings: opaque.moveOpaque,
+        constr: (constraints as AudioTrackConstraints).opaque.moveOpaque);
   }
 
   @override
@@ -36,10 +36,9 @@ class MediaStreamSettings extends base.MediaStreamSettings {
       @moveSemantics
           base_device_video.DeviceVideoTrackConstraints constraints) {
     constraints as DeviceVideoTrackConstraints;
-    constraints.opaque.move = true;
-    opaque.move = true;
-    opaque = api.mediaStreamSettingsDeviceVideo(
-        mediaStreamSettings: opaque, constr: constraints.opaque);
+    opaque.innerOpaque = api.mediaStreamSettingsDeviceVideo(
+        mediaStreamSettings: opaque.moveOpaque,
+        constr: constraints.opaque.moveOpaque);
   }
 
   @override
@@ -47,10 +46,9 @@ class MediaStreamSettings extends base.MediaStreamSettings {
       @moveSemantics
           base_display_video.DisplayVideoTrackConstraints constraints) {
     constraints as DisplayVideoTrackConstraints;
-    constraints.opaque.move = true;
-    opaque.move = true;
-    opaque = api.mediaStreamSettingsDisplayVideo(
-        mediaStreamSettings: opaque, constr: constraints.opaque);
+    opaque.innerOpaque = api.mediaStreamSettingsDisplayVideo(
+        mediaStreamSettings: opaque.moveOpaque,
+        constr: constraints.opaque.moveOpaque);
   }
 
   @moveSemantics
