@@ -288,9 +288,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # TODO: Run E2E test on Windows
         platform:
           - linux
-          - windows
           - macos
     runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
               || (matrix.platform == 'windows' && 'windows-latest')
@@ -321,12 +321,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-jason-${{ matrix.platform }}
-          path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs/')
-                 || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
-                 || (matrix.platform == 'linux' &&     './flutter/linux/lib/')
-                 || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
+          path: ${{ (matrix.platform == 'linux' &&   './flutter/linux/lib/')
                  || (matrix.platform == 'windows' && './flutter/windows/lib/')
-                 ||                                  './flutter/assets/pkg/' }}
+                 ||                                  './flutter/macos/lib/' }}
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v3
