@@ -16,6 +16,7 @@ dependencies:
   # the parent directory to use the current plugin's version.
   medea_jason:
     path: ../
+  medea_flutter_webrtc: ^0.8.0-dev
 
   cupertino_icons: ^1.0.2
 

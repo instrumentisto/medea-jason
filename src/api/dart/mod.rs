@@ -18,9 +18,6 @@
 pub mod jason_api;
 pub mod utils;
 
-#[cfg(feature = "mockable")]
-pub mod mock;
-
 use std::{
     ffi::{c_void, CString},
     marker::PhantomData,

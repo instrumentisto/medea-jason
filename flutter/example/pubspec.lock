@@ -272,7 +272,7 @@ packages:
     source: hosted
     version: "0.1.5"
   medea_flutter_webrtc:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: medea_flutter_webrtc
       url: "https://pub.dartlang.org"
