@@ -35,7 +35,7 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-IOS_TARGETS := aarch64-apple-ios
+IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
@@ -270,6 +270,13 @@ endif
 ifeq ($(cargo-build-platform),ios)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
 		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+	$(eval build := $(if $(call eq,$(debug),no),release,debug))
+	@rm -rf flutter/ios/lib/MedeaJason.xcframework
+	@mkdir -p flutter/ios/lib/
+	xcodebuild -create-xcframework \
+	           $(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+	           -library target/$(t)/$(build)/libmedea_jason.a) \
+	           -output flutter/ios/lib/MedeaJason.xcframework
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
@@ -686,11 +693,12 @@ ifeq ($(up),yes)
 endif
 
 
-# Run E2E desktop tests of project.
+# Run E2E native tests of project.
 #
 # Usage:
-#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
 # 		[device=<device-id>]
+#		[server=<server-ip>]
 #		[( [up=no]
 #		 | up=yes [( [dockerized=no]
 #		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
@@ -698,7 +706,7 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e.desktop:
+test.e2e.native:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -716,6 +724,7 @@ endif
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \
+		$(if $(call eq,$(server),),,--dart-define=IP_TEST_BASE=$(server)) \
 		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e
@@ -1321,7 +1330,7 @@ endef
         minikube.boot \
         release release.cargo release.helm release.npm \
         rustup.targets \
-        test test.e2e test.e2e.browser test.e2e.desktop test.flutter test.unit \
+        test test.e2e test.e2e.browser test.e2e.native test.flutter test.unit \
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
