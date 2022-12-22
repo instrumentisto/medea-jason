@@ -26,19 +26,19 @@ jobs:
   pr:
     if: ${{ github.event_name == 'pull_request' }}
     needs:
+      - build-jason
+      - build-jason-linux
       - clippy
-      - crate-jason
-      - crate-jason-linux
       - dartanalyze
       - dartfmt
       - docker
       - helm-lint
       - rustdoc
       - rustfmt
+      - test
       - test-e2e-browser
       - test-e2e-desktop
       - test-flutter
-      - test-unit
     runs-on: ubuntu-latest
     steps:
       - run: true
@@ -67,6 +67,44 @@ jobs:
 
       - run: make cargo.lint
 
+  dartanalyze:
+    if: ${{ github.ref == 'refs/heads/master'
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+
+      - run: make flutter
+
+      - run: make flutter.lint
+
+  dartfmt:
+    if: ${{ github.ref == 'refs/heads/master'
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+
+      - run: make flutter.fmt check=yes
+
+  helm-lint:
+    name: helm lint
+    if: ${{ github.ref == 'refs/heads/master'
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
+    strategy:
+      matrix:
+        chart: ["medea-demo"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/setup-helm@v3
+
+      - run: make helm.lint chart=${{ matrix.chart }}
+
   rustfmt:
     runs-on: ubuntu-latest
     steps:
@@ -78,45 +116,6 @@ jobs:
 
       - run: make cargo.fmt check=yes
 
-  helm-lint:
-    name: Lint Helm chart
-    if: ${{ github.ref == 'refs/heads/master'
-            || !startsWith(github.ref, 'refs/tags/medea-') }}
-    strategy:
-      matrix:
-        chart:
-          - medea-demo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: azure/setup-helm@v3
-
-      - run: make helm.lint chart=${{ matrix.chart }}
-
-  dartfmt:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || !startsWith(github.ref, 'refs/tags/medea-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-
-      - run: make flutter.fmt check=yes
-
-  dartanalyze:
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || !startsWith(github.ref, 'refs/tags/medea-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-
-      - run: make flutter
-
-      - run: make flutter.lint
-
 
 
 
@@ -124,8 +123,7 @@ jobs:
   # Testing #
   ###########
 
-  test-unit:
-    name: Unit tests
+  test:
     strategy:
       matrix:
         include:
@@ -166,7 +164,7 @@ jobs:
             features: ["grpc", "client", "server"]
 
           - crate: medea-jason
-            wasm: true
+            browsers: ["chrome", "firefox"]
     runs-on: ubuntu-latest
     steps:
       - id: skip
@@ -180,14 +178,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - run: rustup target add wasm32-unknown-unknown
         if: ${{ steps.skip.outputs.no == 'true'
-             && !matrix.wasm }}
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-        if: ${{ steps.skip.outputs.no == 'true'
-             && matrix.wasm }}
+             && matrix.crate == 'medea-jason' }}
       - uses: Swatinem/rust-cache@v2
         if: ${{ steps.skip.outputs.no == 'true'
              && env.CACHE == 'true' }}
@@ -203,23 +197,23 @@ jobs:
                                                       | grep -o '[0-9\.]*')"
              >> $GITHUB_OUTPUT
         if: ${{ steps.skip.outputs.no == 'true'
-             && matrix.wasm }}
+             && matrix.crate == 'medea-jason' }}
       - uses: actions-rs/install@v0.1
         with:
           crate: wasm-bindgen-cli
           version: ${{ steps.wasm-cli.outputs.version }}
           use-tool-cache: true
         if: ${{ steps.skip.outputs.no == 'true'
-             && matrix.wasm }}
+             && matrix.crate == 'medea-jason' }}
 
-      - name: Chrome
-        run: make test.unit crate=${{ matrix.crate }} browser=chrome
+      - run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ steps.skip.outputs.no == 'true'
-             && matrix.crate == 'medea-jason' }}
-      - name: Firefox
-        run: make test.unit crate=${{ matrix.crate }} browser=firefox
+             && matrix.crate == 'medea-jason'
+             && contains('chrome', matrix.browsers) }}
+      - run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
-             && matrix.crate == 'medea-jason' }}
+             && matrix.crate == 'medea-jason'
+             && contains('firefox', matrix.browsers) }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
@@ -227,7 +221,7 @@ jobs:
              && matrix.crate != 'medea-jason' }}
 
   test-e2e-browser:
-    name: E2E tests (chrome, firefox)
+    name: test (E2E, chrome, firefox)
     needs: ["docker"]
     runs-on: ubuntu-latest
     steps:
@@ -258,13 +252,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
+          path: .cache/
       - name: Unpack `medea-control-api-mock` Docker image
-        run: make docker.untar from-file=image.tar
+        run: make docker.untar from-file=.cache/image.tar
 
       - name: Login to Medea Docker registry
-        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-                          -p ${{ secrets.MEDEA_DOCKER_PASS }}
-                          hub.instrumentisto.com
+        uses: docker/login-action@v2
+        with:
+          registry: hub.instrumentisto.com
+          username: ${{ secrets.MEDEA_DOCKER_USER }}
+          password: ${{ secrets.MEDEA_DOCKER_PASS }}
 
       - name: Pull edge Medea Docker image
         run: docker pull hub.instrumentisto.com/streaming/medea:edge
@@ -283,8 +280,8 @@ jobs:
                            control-tag=build-${{ github.run_number }}
 
   test-e2e-desktop:
-    name: E2E tests
-    needs: ["crate-jason", "crate-jason-linux", "docker"]
+    name: test (E2E, ${{ matrix.platform }})
+    needs: ["build-jason", "build-jason-linux", "docker"]
     strategy:
       fail-fast: false
       matrix:
@@ -329,13 +326,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: docker-medea-control-api-mock-${{ github.run_number }}
+          path: .cache/
       - name: Unpack `medea-control-api-mock` Docker image
-        run: make docker.untar from-file=image.tar
+        run: make docker.untar from-file=.cache/image.tar
 
       - name: Login to Medea Docker registry
-        run: docker login -u ${{ secrets.MEDEA_DOCKER_USER }}
-                          -p ${{ secrets.MEDEA_DOCKER_PASS }}
-                          hub.instrumentisto.com
+        uses: docker/login-action@v2
+        with:
+          registry: hub.instrumentisto.com
+          username: ${{ secrets.MEDEA_DOCKER_USER }}
+          password: ${{ secrets.MEDEA_DOCKER_PASS }}
 
       - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
@@ -345,10 +345,10 @@ jobs:
                                    control-tag=build-${{ github.run_number }}
 
   test-flutter:
-    name: Flutter tests
+    name: test (Flutter, ${{ matrix.platform }})
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-jason-')
-            || !startsWith(github.ref, 'refs/tags/medea-') }}
+         || startsWith(github.ref, 'refs/tags/medea-jason-')
+         || !startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
       fail-fast: false
       matrix:
@@ -367,8 +367,8 @@ jobs:
           toolchain: stable
       - run: make rustup.targets only=${{ matrix.platform }}
       - uses: Swatinem/rust-cache@v2
-        if: ${{ matrix.platform != 'windows'
-             && env.CACHE == 'true' }}
+        if: ${{ env.CACHE == 'true'
+             && matrix.platform != 'windows' }}
 
       - uses: actions-rs/install@v0.1
         with:
@@ -441,12 +441,10 @@ jobs:
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
-      - run: xvfb-run -a make test.flutter device=linux
-        if: ${{ matrix.platform == 'linux' }}
-
-      - run: make test.flutter device=${{ matrix.platform }}
-        if: ${{ matrix.platform == 'macos'
-             || matrix.platform == 'windows' }}
+      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+              ||                                '' }}
+             make test.flutter device=${{ matrix.platform }}
+        if: ${{ contains(matrix.platform, 'linux macos windows') }}
 
 
 
@@ -455,8 +453,8 @@ jobs:
   # Building #
   ############
 
-  crate-jason:
-    name: Build medea-jason
+  build-jason:
+    name: build (medea-jason, ${{ matrix.platform }})
     if: ${{ github.ref == 'refs/heads/master'
          || startsWith(github.ref, 'refs/tags/medea-jason-')
          || !startsWith(github.ref, 'refs/tags/medea-') }}
@@ -520,8 +518,8 @@ jobs:
                  || (matrix.platform == 'windows' && './flutter/windows/lib/')
                  ||                                  './flutter/assets/pkg/' }}
 
-  crate-jason-linux:
-    name: Build medea-jason (linux)
+  build-jason-linux:
+    name: build (medea-jason, linux)
     if: ${{ github.ref == 'refs/heads/master'
          || startsWith(github.ref, 'refs/tags/medea-jason-')
          || !startsWith(github.ref, 'refs/tags/medea-') }}
@@ -549,6 +547,53 @@ jobs:
         with:
           name: build-jason-linux
           path: ./flutter/linux/lib/
+
+  docker:
+    name: docker build
+    strategy:
+      matrix:
+        image:
+          - medea-control-api-mock
+          - medea-demo
+          - medea-demo-edge
+    runs-on: ubuntu-latest
+    steps:
+      - id: skip
+        run: echo "no=${{ (matrix.image == 'medea-control-api-mock')
+                       || (matrix.image == 'medea-demo'
+                           && (startsWith(github.ref, 'refs/tags/medea-demo-')
+                               || !startsWith(github.ref, 'refs/tags/medea-')))
+                       || (matrix.image == 'medea-demo-edge'
+                           && !startsWith(github.ref, 'refs/tags/medea-')) }}"
+             >> $GITHUB_OUTPUT
+      - id: export
+        run: echo "yes=${{ (matrix.image == 'medea-control-api-mock')
+                        || (matrix.image == 'medea-demo'
+                            && startsWith(github.ref, 'refs/tags/medea-demo-'))
+                        || (matrix.image == 'medea-demo-edge'
+                            && github.ref == 'refs/heads/master') }}"
+             >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v3
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - uses: docker/setup-buildx-action@v2
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - run: make docker.build debug=no no-cache=yes
+                  image=${{ matrix.image }} tag=build-${{ github.run_number }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - run: make docker.tar to-file=.cache/image.tar
+                  image=${{ matrix.image }} tags=build-${{ github.run_number }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && steps.export.outputs.yes == 'true' }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: docker-${{ matrix.image }}-${{ github.run_number }}
+          path: .cache/image.tar
+          retention-days: 1
+        if: ${{ steps.skip.outputs.no == 'true'
+             && steps.export.outputs.yes == 'true' }}
 
   rustdoc:
     runs-on: ubuntu-latest
@@ -591,63 +636,6 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
              || !startsWith(github.ref, 'refs/tags/medea-') }}
 
-  docker:
-    name: Docker image
-    strategy:
-      matrix:
-        include:
-          - image: medea-control-api-mock
-            cache: ${{ github.ref != 'refs/heads/master'
-                       && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
-                       && !contains(github.event.head_commit.message, '[fresh ci]') }}
-            export: true  # required for E2E tests
-            if: true
-
-          - image: medea-demo
-            cache: ${{ github.ref != 'refs/heads/master'
-                       && !startsWith(github.ref, 'refs/tags/medea-demo-')
-                       && !contains(github.event.head_commit.message, '[fresh ci]') }}
-            export: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
-            if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-')
-                    || !startsWith(github.ref, 'refs/tags/medea-') }}
-          - image: medea-demo-edge
-            cache: false  # temporary disable caching due to CI issues
-            #cache: ${{ github.ref != 'refs/heads/master'
-            #           && !contains(github.event.head_commit.message, '[fresh ci]') }}
-            export: ${{ github.ref == 'refs/heads/master' }}
-            if: ${{ !startsWith(github.ref, 'refs/tags/medea-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        if: ${{ matrix.if }}
-      - uses: docker/setup-buildx-action@v2
-        if: ${{ matrix.if }}
-
-      - run: make docker.build debug=no no-cache=yes
-                  image=${{ matrix.image }} tag=build-${{ github.run_number }}
-        if: ${{ matrix.if && !matrix.cache }}
-
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        with:
-          key: docker-${{ matrix.image }}-build-{hash}
-          restore-keys: docker-${{ matrix.image }}-build-
-        continue-on-error: true
-        timeout-minutes: 10
-        if: ${{ matrix.if && matrix.cache }}
-      - run: make docker.build debug=yes no-cache=no
-                  image=${{ matrix.image }} tag=build-${{ github.run_number }}
-        if: ${{ matrix.if && matrix.cache }}
-
-      - run: make docker.tar to-file=image.tar
-                  image=${{ matrix.image }} tags=build-${{ github.run_number }}
-        if: ${{ matrix.if && matrix.export }}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: docker-${{ matrix.image }}-${{ github.run_number }}
-          path: image.tar
-          retention-days: 1
-        if: ${{ matrix.if && matrix.export }}
-
 
 
 
@@ -655,60 +643,12 @@ jobs:
   # Releasing #
   #############
 
-  release-github:
-    name: Release on GitHub
-    needs:
-      - clippy
-      - rustdoc
-      - rustfmt
-      - test-e2e-browser
-      - test-e2e-desktop
-      - test-unit
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Parse crate/package name and version
-        id: release
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
-
-      - name: Verify release version matches Cargo manifest
-        run: >-
-          test "${{ steps.release.outputs.group2 }}" \
-               == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
-        if: ${{ !startsWith(github.ref, 'refs/tags/medea-demo-') }}
-      - name: Verify release version matches Yarn manifest
-        run: >-
-          test "${{ steps.release.outputs.group2 }}" \
-               == $(make yarn.version pkg=${{ steps.release.outputs.group1 }})
-        if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
-
-      - name: Parse CHANGELOG link
-        id: changelog
-        run: echo "link=$(make cargo.changelog.link
-                               crate=${{ steps.release.outputs.group1 }}
-                               ver=${{ steps.release.outputs.group2 }})"
-             >> $GITHUB_OUTPUT
-
-      - uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: ${{ steps.release.outputs.group1 }}-${{ steps.release.outputs.group2 }}
-          body: |
-            [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
-            [Changelog](${{ steps.changelog.outputs.link }})
-          prerelease: ${{ contains(steps.release.outputs.group2, '-') }}
-
-  release-cargo:
-    name: Release on crates.io
-    needs: ["release-github"]
+  cargo-publish:
+    name: cargo publish (crates.io)
     if: ${{ startsWith(github.ref, 'refs/tags/medea-')
-            && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
-            && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
+         && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
+         && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
+    needs: ["release-github"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -725,94 +665,29 @@ jobs:
 
       - name: Release ${{ steps.crate.outputs.group2 }} version
               of '${{ steps.crate.outputs.group1 }}' crate
-        run: make release.crates crate=${{ steps.crate.outputs.group1 }}
-                                 publish=yes
+        run: make release.cargo crate=${{ steps.crate.outputs.group1 }}
+                                publish=yes
         env:
-          CARGO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
 
-  release-npm:
-    name: Release on NPM
-    needs: ["release-github"]
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Parse package name and version
-        id: package
-        uses: actions-ecosystem/action-regex-match@v2
-        with:
-          text: ${{ github.ref }}
-          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$'
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "17"
-          registry-url: https://registry.npmjs.org
-
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-      - uses: jetli/wasm-pack-action@v0.4.0
-
-      - name: Release ${{ steps.package.outputs.group2 }} version
-              of '${{ steps.package.outputs.group1 }}' package
-        run: make release.npm crate=${{ steps.package.outputs.group1 }}
-                              publish=yes
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
-
-  release-helm:
-    name: Release Helm chart
-    needs: ["helm-lint"]
-    if: ${{ github.ref == 'refs/heads/master' }}
-    strategy:
-      matrix:
-        chart:
-          - medea-demo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: trilom/file-changes-action@v1.2.4
-        id: changed
-      - id: chart
-        run: echo "manifest=$(make helm.dir
-                                   chart=${{ matrix.chart }})/Chart.yaml"
-             >> $GITHUB_OUTPUT
-
-      - uses: azure/setup-helm@v3
-        if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.manifest) }}
-
-      - name: Prepare Git author for push
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Actions"
-        if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.manifest) }}
-
-      - run: make helm.package.release chart=${{ matrix.chart }} build=yes
-        if: ${{ contains(steps.changed.outputs.files,
-                         steps.chart.outputs.manifest) }}
-
-  release-dart:
-    name: Release on pub.dev
+  dart-pub-publish:
+    name: dart pub publish (pub.dev)
     if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
          || github.ref_name == 'master'
          || (github.event_name == 'pull_request'
              && github.event.pull_request.head.repo.owner.login == 'instrumentisto') }}
     needs:
+      - build-jason
+      - build-jason-linux
       - clippy
-      - crate-jason
-      - crate-jason-linux
       - dartanalyze
       - dartfmt
       - rustdoc
       - rustfmt
+      - test
       - test-e2e-browser
       - test-e2e-desktop
       - test-flutter
-      - test-unit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -841,7 +716,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: build-jason-android
-          path: ./flutter/android/src/main/jniLibs
+          path: ./flutter/android/src/main/jniLibs/
         if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: actions/download-artifact@v3
         with:
@@ -897,69 +772,72 @@ jobs:
         if: ${{ always()
              && steps.skip.outputs.no == 'true' }}
 
-  release-docker:
-    name: Release Docker image
+  docker-push:
+    name: docker push
+    if: ${{ github.event_name == 'push'
+         && (github.ref == 'refs/heads/master'
+             || startsWith(github.ref, 'refs/tags/medea-')) }}
     needs: ["docker"]
-    if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/medea-') }}
     strategy:
+      fail-fast: false
       matrix:
-        include:
-          - image: medea-control-api-mock
-            tags: latest,@versions
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: mock/control-api/README.md
-            if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-mock-') }}
-          - image: medea-control-api-mock
-            tags: edge
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: mock/control-api/README.md
-            if: ${{ github.ref == 'refs/heads/master' }}
-
-          - image: medea-demo
-            tags: latest,@versions
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: demo/README.md
-            if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
-          - image: medea-demo-edge
-            tags: edge
-            repos: instrumentisto,ghcr.io/instrumentisto,quay.io/instrumentisto
-            readme_file: demo/README.md
-            if: ${{ github.ref == 'refs/heads/master' }}
+        image:
+          - medea-control-api-mock
+          - medea-demo
+          - medea-demo-edge
+        registry: ["docker.io", "ghcr.io", "quay.io"]
     runs-on: ubuntu-latest
     steps:
+      # Skip if this is fork and no credentials are provided.
+      - id: skip-fork
+        run: echo "no=${{ !(
+               github.repository_owner != 'instrumentisto'
+               && ((matrix.registry == 'quay.io'
+                    && secrets.QUAYIO_ROBOT_USER == '')
+                || (matrix.registry == 'docker.io'
+                    && secrets.DOCKERHUB_BOT_USER == ''))
+             ) }}" >> $GITHUB_OUTPUT
+      - id: skip-image
+        run: echo "no=${{ (matrix.image == 'medea-control-api-mock'
+                           && (startsWith(github.ref,
+                                          'refs/tags/medea-control-api-mock-')
+                               || github.ref == 'refs/heads/master'))
+                       || (matrix.image == 'medea-demo'
+                           && startsWith(github.ref, 'refs/tags/medea-demo-'))
+                       || (matrix.image == 'medea-demo-edge'
+                           && github.ref == 'refs/heads/master') }}"
+             >> $GITHUB_OUTPUT
+      - id: skip
+        run: echo "no=${{ steps.skip-fork.outputs.no == 'true'
+                       && steps.skip-image.outputs.no == 'true' }}"
+             >> $GITHUB_OUTPUT
+
       - uses: actions/checkout@v3
-        if: ${{ matrix.if }}
-      - uses: docker/setup-buildx-action@v2
-        if: ${{ matrix.if }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
 
       - uses: actions/download-artifact@v3
         with:
           name: docker-${{ matrix.image }}-${{ github.run_number }}
-        if: ${{ matrix.if }}
-      - run: make docker.untar from-file=image.tar
-        if: ${{ matrix.if }}
+          path: .cache/
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - run: make docker.untar from-file=.cache/image.tar
+        if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - name: Login to GitHub Container Registry
+      - name: Login to ${{ matrix.registry }} container registry
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ matrix.if && contains(matrix.repos, 'ghcr.io') }}
-      - name: Login to Quay.io
-        uses: docker/login-action@v2
-        with:
-          registry: quay.io
-          username: instrumentisto+bot
-          password: ${{ secrets.QUAYIO_ROBOT_TOKEN }}
-        if: ${{ matrix.if && contains(matrix.repos, 'quay.io') }}
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: instrumentistobot
-          password: ${{ secrets.DOCKERHUB_BOT_PASS }}
-        if: ${{ matrix.if }}
+          registry: ${{ matrix.registry }}
+          username: ${{ (matrix.registry == 'docker.io'
+                         && secrets.DOCKERHUB_BOT_USER)
+                     || (matrix.registry == 'quay.io'
+                         && secrets.QUAYIO_ROBOT_USER)
+                     || github.repository_owner }}
+          password: ${{ (matrix.registry == 'docker.io'
+                         && secrets.DOCKERHUB_BOT_PASS)
+                     || (matrix.registry == 'quay.io'
+                         && secrets.QUAYIO_ROBOT_TOKEN)
+                     || secrets.GITHUB_TOKEN }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
 
       - name: Parse semver versions
         id: parsed
@@ -967,8 +845,8 @@ jobs:
         with:
           text: ${{ github.ref }}
           regex: '^refs/tags/medea[a-z-]*-((([0-9]+)\.[0-9]+)\.[0-9]+(-.+)?)$'
-        if: ${{ matrix.if && contains(matrix.tags, '@versions')
-                && startsWith(github.ref, 'refs/tags/medea-') }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && startsWith(github.ref, 'refs/tags/medea-') }}
       - name: Form Docker version tags
         id: versions
         uses: actions/github-script@v6
@@ -983,50 +861,169 @@ jobs:
               }
             }
             return versions;
-        if: ${{ matrix.if && contains(matrix.tags, '@versions')
-                && startsWith(github.ref, 'refs/tags/medea-') }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && startsWith(github.ref, 'refs/tags/medea-') }}
       - name: Prepare final image tags
         id: tags
         uses: bluwy/substitute-string-action@v2
         with:
-          _input-text: ${{ matrix.tags }}
+          _input-text: ${{ (startsWith(github.ref, 'refs/tags/medea-')
+                            && 'latest,@versions')
+                        ||     'edge' }}
           "@versions": ${{ steps.versions.outputs.result }}
-        if: ${{ matrix.if }}
-
-      - run: make docker.tag tags=${{ steps.tags.outputs.result }}
-                  image=${{ matrix.image }} of=build-${{ github.run_number }}
-                  repos=${{ matrix.repos }}
-        if: ${{ matrix.if }}
-      - run: make docker.push tags=${{ steps.tags.outputs.result }}
-                  image=${{ matrix.image }} repos=${{ matrix.repos }}
-        if: ${{ matrix.if }}
-
+        if: ${{ steps.skip.outputs.no == 'true' }}
       - name: Prepare real image name
         id: image
         uses: bluwy/substitute-string-action@v2
         with:
           _input-text: ${{ matrix.image }}
           -edge: ""
-        if: ${{ matrix.if }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
+      - run: make docker.tag tags=${{ steps.tags.outputs.result }}
+                  image=${{ matrix.image }} of=build-${{ github.run_number }}
+                  repos=${{ matrix.registry }}/${{ github.repository_owner }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
+      - run: make docker.push tags=${{ steps.tags.outputs.result }}
+                  image=${{ matrix.image }}
+                  repos=${{ matrix.registry }}/${{ github.repository_owner }}
+        if: ${{ steps.skip.outputs.no == 'true' }}
+
       # On GitHub Container Registry README is automatically updated on pushes.
-      - name: Update README on Quay.io
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_APIKEY: ${{ secrets.QUAYIO_API_TOKEN }}
-        with:
-          provider: quay
-          destination_container_repo: >-
-            quay.io/instrumentisto/${{ steps.image.outputs.result }}
-          readme_file: ${{ matrix.readme_file }}
-        if: ${{ matrix.if && contains(matrix.repos, 'quay.io') }}
       - name: Update README on Docker Hub
         uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: instrumentistobot
-          DOCKER_PASS: ${{ secrets.DOCKERHUB_BOT_PASS }}
         with:
           provider: dockerhub
           destination_container_repo: >-
-            instrumentisto/${{ steps.image.outputs.result }}
-          readme_file: ${{ matrix.readme_file }}
-        if: ${{ matrix.if }}
+            ${{ github.repository_owner }}/${{ steps.image.outputs.result }}
+          readme_file: ${{ (matrix.image == 'medea-control-api-mock'
+                            && 'mock/control-api/README.md')
+                        ||     'demo/README.md' }}
+        env:
+          DOCKER_USER: ${{ secrets.DOCKERHUB_BOT_USER }}
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_BOT_PASS }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && matrix.registry == 'docker.io' }}
+      - name: Update README on Quay.io
+        uses: christian-korneck/update-container-description-action@v1
+        with:
+          provider: quay
+          destination_container_repo: >-
+            ${{ matrix.registry }}/${{ github.repository_owner }}/${{ steps.image.outputs.result }}
+          readme_file: ${{ (matrix.image == 'medea-control-api-mock'
+                            && 'mock/control-api/README.md')
+                        ||     'demo/README.md' }}
+        env:
+          DOCKER_APIKEY: ${{ secrets.QUAYIO_API_TOKEN }}
+        if: ${{ steps.skip.outputs.no == 'true'
+             && matrix.registry == 'quay.io' }}
+
+  helm-push:
+    name: helm push
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: ["helm-lint"]
+    strategy:
+      matrix:
+        chart: ["medea-demo"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: trilom/file-changes-action@v1.2.4
+        id: changed
+      - id: chart
+        run: echo "manifest=$(make helm.dir
+                                   chart=${{ matrix.chart }})/Chart.yaml"
+             >> $GITHUB_OUTPUT
+
+      - uses: azure/setup-helm@v3
+        if: ${{ contains(steps.changed.outputs.files,
+                         steps.chart.outputs.manifest) }}
+
+      - name: Prepare Git author for push
+        run: |
+          git config --local user.email 'actions+${{ github.run_number }}@github.com'
+          git config --local user.name 'GitHub Actions'
+        if: ${{ contains(steps.changed.outputs.files,
+                         steps.chart.outputs.manifest) }}
+
+      - run: make helm.package.release chart=${{ matrix.chart }} build=yes
+        if: ${{ contains(steps.changed.outputs.files,
+                         steps.chart.outputs.manifest) }}
+
+  npm-publish:
+    name: npm publish (npm.js)
+    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
+    needs: ["release-github"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Parse package name and version
+        id: package
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ github.ref }}
+          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+(-.+)?)$'
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "19"
+          registry-url: https://registry.npmjs.org
+
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Release ${{ steps.package.outputs.group2 }} version
+              of '${{ steps.package.outputs.group1 }}' package
+        run: make release.npm crate=${{ steps.package.outputs.group1 }}
+                              publish=yes
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
+
+  release-github:
+    name: release (GitHub)
+    if: ${{ startsWith(github.ref, 'refs/tags/medea-') }}
+    needs:
+      - clippy
+      - rustdoc
+      - rustfmt
+      - test
+      - test-e2e-browser
+      - test-e2e-desktop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Parse crate/package name and version
+        id: release
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ github.ref }}
+          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+      - name: Verify release version matches Cargo manifest
+        run: |
+          test "${{ steps.release.outputs.group2 }}" \
+            == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
+        if: ${{ !startsWith(github.ref, 'refs/tags/medea-demo-') }}
+      - name: Verify release version matches Yarn manifest
+        run: |
+          test "${{ steps.release.outputs.group2 }}" \
+            == $(make yarn.version pkg=${{ steps.release.outputs.group1 }})
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-demo-') }}
+
+      - name: Parse CHANGELOG link
+        id: changelog
+        run: echo "link=$(make cargo.changelog.link
+                               crate=${{ steps.release.outputs.group1 }}
+                               ver=${{ steps.release.outputs.group2 }})"
+             >> $GITHUB_OUTPUT
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.release.outputs.group1 }} ${{ steps.release.outputs.group2 }}
+          body: |
+            [API docs](https://docs.rs/${{ steps.release.outputs.group1 }}/${{ steps.release.outputs.group2 }})
+            [Changelog](${{ steps.changelog.outputs.link }})
+          prerelease: ${{ contains(steps.release.outputs.group2, '-') }}
