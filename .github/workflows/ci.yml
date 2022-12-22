@@ -293,7 +293,7 @@ jobs:
           - linux
           - ios
           - macos
-    runs-on: ${{ ((matrix.platform == 'macos' || matrix.platform == 'ios')
+    runs-on: ${{ ((matrix.platform == 'ios' || matrix.platform == 'macos')
                                                && 'macos-latest')
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'ubuntu-latest' }}
@@ -303,7 +303,7 @@ jobs:
         with:
           toolchain: stable
       - uses: docker-practice/actions-setup-docker@master
-        if: ${{ matrix.platform == 'macos' || matrix.platform == 'ios' }}
+        if: ${{ matrix.platform == 'ios' || matrix.platform == 'macos' }}
 
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
@@ -343,20 +343,15 @@ jobs:
 
       - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
-             make test.e2e.native device=${{ matrix.platform }}
-                                   up=yes debug=no dockerized=yes
-                                   medea-tag=${{ env.MEDEA_BRANCH }}
-                                   control-tag=build-${{ github.run_number }}
-        if: ${{ matrix.platform != 'ios' }}
-
-      - name: Run tests on iOS simulator
-        run: make test.e2e.native up=yes
-              debug=no dockerized=yes server="127.0.0.1"
-              background=yes
-              medea-tag=${{ env.MEDEA_BRANCH }}
-              control-tag=build-${{ github.run_number }}
-              device=${{ steps.simulator.outputs.udid }}
-        if: ${{ matrix.platform == 'ios' }}
+             make test.e2e.native
+                  device=${{ (matrix.platform == 'ios'
+                              && steps.simulator.outputs.udid)
+                          ||     matrix.platform }}
+                  up=yes debug=no dockerized=yes
+                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  control-tag=build-${{ github.run_number }}
+             ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
+              ||                              '' }}
 
   test-flutter:
     name: Flutter tests

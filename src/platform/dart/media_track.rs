@@ -103,11 +103,15 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
         pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
 
-        /// Creates a new instance of [`MediaStreamTrack`] depending on the same
-        /// media source as this [`MediaStreamTrack`].
+        /// Creates a new instance of [MediaStreamTrack][0] depending on the
+        /// same media source as the provided one has.
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
 
-        /// Disposes of this [`MediaStreamTrack`].
+        /// Disposes the provided [MediaStreamTrack][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn dispose(track: Dart_Handle) -> Dart_Handle;
     }
 }

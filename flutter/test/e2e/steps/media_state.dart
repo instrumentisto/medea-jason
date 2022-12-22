@@ -138,7 +138,7 @@ StepDefinitionGeneric then_track_is_stopped =
     var track_ = track.getTrack();
     track.free();
 
-    // We might have to wait for Rust side for a little bit
+    // We might have to wait for Rust side for a little bit.
     await retry(() async {
       expect(await track_.state(), fw.MediaStreamTrackState.ended);
     });

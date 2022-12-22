@@ -35,7 +35,7 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-IOS_TARGETS := x86_64-apple-ios aarch64-apple-ios
+IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
@@ -270,12 +270,13 @@ endif
 ifeq ($(cargo-build-platform),ios)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
 		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
-	-rm -rf flutter/ios/lib/MedeaJason.xcframework
+	$(eval build := $(if $(call eq,$(debug),no),release,debug))
+	@rm -rf flutter/ios/lib/MedeaJason.xcframework
 	@mkdir -p flutter/ios/lib/
 	xcodebuild -create-xcframework \
-			   -library target/x86_64-apple-ios/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a	 \
-			   -library target/aarch64-apple-ios/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
-			   -output flutter/ios/lib/MedeaJason.xcframework
+	           $(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+	           -library target/$(t)/$(build)/libmedea_jason.a) \
+	           -output flutter/ios/lib/MedeaJason.xcframework
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\

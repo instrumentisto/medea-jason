@@ -58,7 +58,7 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     await context.world.wait_for_interconnection(id);
     var live = (live_or_stopped == 'live');
 
-    // We might have to wait for Rust side for a little bit
+    // We might have to wait for Rust side for a little bit.
     await retry(() async {
       var actual_count =
           member.connection_store.count_tracks_by_lived(live, remote_id);

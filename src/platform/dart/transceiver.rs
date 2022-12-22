@@ -57,7 +57,7 @@ mod transceiver {
         /// Changes the send direction of the specified [`Transceiver`].
         pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
 
-        /// Disposes of this [`Transceiver`].
+        /// Disposes the provided [`Transceiver`].
         pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
     }
 }

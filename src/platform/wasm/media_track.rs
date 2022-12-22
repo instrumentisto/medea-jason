@@ -196,7 +196,7 @@ impl MediaStreamTrack {
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
     pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         self.sys_track.stop();
-        // for platform code uniformity
+        // For platform code uniformity.
         future::ready(())
     }
 
