@@ -104,7 +104,7 @@ lint: cargo.lint flutter.lint
 #	make release crate=(medea-jason|<crate-name>)
 #	             [publish=(no|yes)]
 
-release: release.crates release.npm
+release: release.cargo release.npm
 
 
 # Run all project tests.
@@ -758,15 +758,15 @@ wait.port:
 # Build and publish project crate to crates.io.
 #
 # Usage:
-#	make release.crates crate=(medea-jason|<crate-name>)
-#	                    [token=($CARGO_TOKEN|<cargo-token>)]
-#	                    [publish=(no|yes)]
+#	make release.cargo crate=(medea-jason|<crate-name>)
+#	                   [token=($CARGO_REGISTRY_TOKEN|<cargo-token>)]
+#	                   [publish=(no|yes)]
 
-release.crates:
+release.cargo:
 ifneq ($(filter $(crate),medea-jason medea-client-api-proto medea-control-api-proto medea-macro medea-reactive),)
 	cd $(crate-dir)/ && \
 	$(if $(call eq,$(publish),yes),\
-		cargo publish --token $(or $(token),${CARGO_TOKEN}) ,\
+		cargo publish --token $(or $(token),$$CARGO_REGISTRY_TOKEN) ,\
 		cargo package --allow-dirty )
 endif
 
@@ -1319,7 +1319,7 @@ endef
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
-        release release.crates release.helm release.npm \
+        release release.cargo release.helm release.npm \
         rustup.targets \
         test test.e2e test.e2e.browser test.e2e.desktop test.flutter test.unit \
         up up.control up.demo up.dev up.jason up.medea \
