@@ -209,11 +209,11 @@ jobs:
       - run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason'
-             && contains('chrome', matrix.browsers) }}
+             && contains(matrix.browsers, 'chrome') }}
       - run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason'
-             && contains('firefox', matrix.browsers) }}
+             && contains(matrix.browsers, 'firefox') }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
@@ -290,7 +290,7 @@ jobs:
           - ios
           - linux
           - macos
-    runs-on: ${{ (contains(matrix.platform, 'ios macos') && 'macos-latest')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -299,7 +299,7 @@ jobs:
         with:
           toolchain: stable
       - uses: docker-practice/actions-setup-docker@master
-        if: ${{ contains(matrix.platform, 'ios macos') }}
+        if: ${{ contains('ios macos', matrix.platform) }}
 
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
@@ -452,7 +452,7 @@ jobs:
       - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
              make test.flutter device=${{ matrix.platform }}
-        if: ${{ contains(matrix.platform, 'linux macos windows') }}
+        if: ${{ contains('linux macos windows', matrix.platform) }}
 
 
 
@@ -475,7 +475,7 @@ jobs:
           - macos
           - web
           - windows
-    runs-on: ${{ (contains(matrix.platform, 'ios macos') && 'macos-latest')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
