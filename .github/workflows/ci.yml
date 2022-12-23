@@ -37,7 +37,7 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      - test-e2e-desktop
+      - test-e2e-native
       - test-flutter
     runs-on: ubuntu-latest
     steps:
@@ -209,11 +209,11 @@ jobs:
       - run: make test.unit crate=${{ matrix.crate }} browser=chrome
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason'
-             && contains('chrome', matrix.browsers) }}
+             && contains(matrix.browsers, 'chrome') }}
       - run: make test.unit crate=${{ matrix.crate }} browser=firefox
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate == 'medea-jason'
-             && contains('firefox', matrix.browsers) }}
+             && contains(matrix.browsers, 'firefox') }}
 
       - run: make test.unit crate=${{ matrix.crate }}
                             features=${{ join(matrix.features, ',') }}
@@ -279,7 +279,7 @@ jobs:
                            medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
-  test-e2e-desktop:
+  test-e2e-native:
     name: test (E2E, ${{ matrix.platform }})
     needs: ["build-jason", "build-jason-linux", "docker"]
     strategy:
@@ -287,22 +287,22 @@ jobs:
       matrix:
         # TODO: Run E2E test on Windows
         platform:
+          - ios
           - linux
           - macos
-    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
-              || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'macos-latest' }}
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
+              || (matrix.platform == 'windows' &&           'windows-latest')
+              ||                                            'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-
       - name: Setup docker and docker-compose
         run: |
           brew install docker docker-compose
           colima start
-        if: ${{ matrix.platform == 'macos' }}
+        if: ${{ contains('ios macos', matrix.platform) }}
 
       - uses: subosito/flutter-action@v2
       - name: Install Flutter Linux dependencies
@@ -314,13 +314,19 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      - name: Start iOS simulator
+        id: simulator
+        uses: futureware-tech/simulator-action@v2
+        with:
+          os_version: '>=13.0'
+          os: iOS
+        if: ${{ matrix.platform == 'ios' }}
+
       - name: Download `medea-jason` lib
         uses: actions/download-artifact@v3
         with:
           name: build-jason-${{ matrix.platform }}
-          path: ${{ (matrix.platform == 'linux' &&   './flutter/linux/lib/')
-                 || (matrix.platform == 'windows' && './flutter/windows/lib/')
-                 ||                                  './flutter/macos/lib/' }}
+          path: ./flutter/${{ matrix.platform }}/lib/
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v3
@@ -339,13 +345,18 @@ jobs:
 
       - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
-             make test.e2e.desktop device=${{ matrix.platform }}
-                                   up=yes debug=no dockerized=yes
-                                   medea-tag=${{ env.MEDEA_BRANCH }}
-                                   control-tag=build-${{ github.run_number }}
+             make test.e2e.native
+                  device=${{ (matrix.platform == 'ios'
+                              && steps.simulator.outputs.udid)
+                          ||     matrix.platform }}
+                  up=yes debug=no dockerized=yes
+                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  control-tag=build-${{ github.run_number }}
+             ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
+              ||                              '' }}
 
   test-flutter:
-    name: test (Flutter, ${{ matrix.platform }})
+    name: test (medea-jason, ${{ matrix.platform }})
     if: ${{ github.ref == 'refs/heads/master'
          || startsWith(github.ref, 'refs/tags/medea-jason-')
          || !startsWith(github.ref, 'refs/tags/medea-') }}
@@ -444,7 +455,7 @@ jobs:
       - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
              make test.flutter device=${{ matrix.platform }}
-        if: ${{ contains(matrix.platform, 'linux macos windows') }}
+        if: ${{ contains('linux macos windows', matrix.platform) }}
 
 
 
@@ -467,10 +478,9 @@ jobs:
           - macos
           - web
           - windows
-    runs-on: ${{ ((matrix.platform == 'ios' || matrix.platform == 'macos')
-                                               && 'macos-latest')
-              || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'ubuntu-latest' }}
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
+              || (matrix.platform == 'windows' &&           'windows-latest')
+              ||                                            'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@v1
@@ -686,7 +696,7 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      - test-e2e-desktop
+      - test-e2e-native
       - test-flutter
     runs-on: ubuntu-latest
     steps:
@@ -991,7 +1001,7 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      - test-e2e-desktop
+      - test-e2e-native
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

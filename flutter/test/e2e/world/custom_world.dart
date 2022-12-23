@@ -235,6 +235,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await other_member.wait_for_connect(member.id);
       await other_member.wait_for_track_count(member.id, send_count);
+      await Future.delayed(const Duration(milliseconds: 500));
     }
   }
 

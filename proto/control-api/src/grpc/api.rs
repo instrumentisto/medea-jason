@@ -371,6 +371,15 @@ pub mod web_rtc_publish_endpoint {
                 PublishPolicy::Disabled => "DISABLED",
             }
         }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "OPTIONAL" => Some(Self::Optional),
+                "REQUIRED" => Some(Self::Required),
+                "DISABLED" => Some(Self::Disabled),
+                _ => None,
+            }
+        }
     }
     /// Possible peer-to-peer modes of WebRTC interaction in a
     /// `WebRtcPublishEndpoint`.
@@ -407,6 +416,15 @@ pub mod web_rtc_publish_endpoint {
                 P2p::Never => "NEVER",
                 P2p::IfPossible => "IF_POSSIBLE",
                 P2p::Always => "ALWAYS",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "NEVER" => Some(Self::Never),
+                "IF_POSSIBLE" => Some(Self::IfPossible),
+                "ALWAYS" => Some(Self::Always),
+                _ => None,
             }
         }
     }

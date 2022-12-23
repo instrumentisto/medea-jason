@@ -81,6 +81,16 @@ pub mod on_leave {
                 Reason::Shutdown => "SHUTDOWN",
             }
         }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "DISCONNECTED" => Some(Self::Disconnected),
+                "LOST" => Some(Self::Lost),
+                "KICKED" => Some(Self::Kicked),
+                "SHUTDOWN" => Some(Self::Shutdown),
+                _ => None,
+            }
+        }
     }
 }
 /// Generated client implementations.
