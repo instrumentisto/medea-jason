@@ -963,7 +963,6 @@ impl From<ProtoTrackConstraints> for TrackConstraints {
 }
 
 /// Constraints applicable to audio tracks.
-#[allow(clippy::partial_pub_fields)] // TODO: refactor this
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct AudioTrackConstraints {
     /// Identifier of the device generating the content for the media track.
@@ -973,7 +972,7 @@ pub struct AudioTrackConstraints {
     ///
     /// If `true` then without this [`AudioTrackConstraints`] call session
     /// can't be started.
-    required: bool,
+    pub required: bool,
 }
 
 impl AudioTrackConstraints {
@@ -1112,14 +1111,13 @@ impl<T: AsRef<str>> ConstrainString<T> {
 
 /// Constraints applicable to video tracks that are sourced from some media
 /// device.
-#[allow(clippy::partial_pub_fields)] // TODO: refactor this
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DeviceVideoTrackConstraints {
     /// Importance of this [`DeviceVideoTrackConstraints`].
     ///
     /// If `true` then without this [`DeviceVideoTrackConstraints`] call
     /// session can't be started.
-    required: bool,
+    pub required: bool,
 
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,
@@ -1260,14 +1258,13 @@ impl DeviceVideoTrackConstraints {
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-#[allow(clippy::partial_pub_fields)] // TODO: refactor this
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DisplayVideoTrackConstraints {
     /// Importance of this [`DisplayVideoTrackConstraints`].
     ///
     /// If `true` then without these [`DisplayVideoTrackConstraints`] a session
     /// call can't be started.
-    required: bool,
+    pub required: bool,
 
     /// Identifier of the device generating the content for the media track.
     pub device_id: Option<ConstrainString<String>>,

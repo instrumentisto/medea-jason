@@ -1,1 +1,6 @@
 # Overrides the `.gitignore` file since we want to publish the `lib/` dir.
+
+# Intermediate binaries that are later bundled into an XCFrameworks
+/lib/aarch64-apple-ios/libmedea_jason.a
+/lib/x86_64-apple-ios/libmedea_jason.a
+/lib/aarch64-apple-ios-sim/libmedea_jason.a

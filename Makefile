@@ -550,9 +550,7 @@ flutter.add.wasm.hash:
 flutter.web.assets:
 	@rm -rf flutter/assets/pkg
 	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
-
 	@make flutter.add.wasm.hash
-
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
 	       flutter/assets/pkg/package.json
