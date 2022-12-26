@@ -17,13 +17,18 @@ import 'world/custom_world.dart';
 part 'suite.g.dart';
 
 CustomWorld? old_world;
-void clear_world() {
+Future<void> clear_world() async {
   MockMediaDevices.resetGUM();
 
   if (old_world != null) {
     old_world!.jasons.values.forEach((element) {
       element.free();
     });
+
+    var members = old_world!.members.values;
+    for (var member in members) {
+      await member.forget_local_tracks();
+    }
   }
 }
 
@@ -47,10 +52,10 @@ final TestConfigs = FlutterTestConfiguration()
       ..setWriteFn(print),
     FlutterDriverReporter(logInfoMessages: true),
   ]
-  ..defaultTimeout = const Duration(seconds: 120)
+  ..defaultTimeout = const Duration(minutes: 10)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
-        clear_world();
+        await clear_world();
         await webrtc.enableFakeMedia();
 
         var world = CustomWorld();

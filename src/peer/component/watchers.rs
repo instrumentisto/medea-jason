@@ -237,10 +237,14 @@ impl Component {
         let _ = state.sync_state.when_eq(SyncState::Synced).await;
         if let Some(role) = state.negotiation_role.get() {
             if state.local_sdp.is_rollback() {
-                peer.peer
-                    .rollback()
-                    .await
-                    .map_err(tracerr::map_from_and_wrap!())?;
+                // TODO: Temporary fix that allows us to ignore rollback
+                //       since it won't work anyway.
+                if state.negotiation_state.get() != NegotiationState::Stable {
+                    peer.peer
+                        .rollback()
+                        .await
+                        .map_err(tracerr::map_from_and_wrap!())?;
+                }
                 if state.local_sdp.is_restart_needed() {
                     state.negotiation_state.set(NegotiationState::WaitLocalSdp);
                 } else {

@@ -20,7 +20,7 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.65
+RUST_VER := 1.66
 CHROME_VERSION := 104.0
 FIREFOX_VERSION := 107.0.1-driver0.32.0
 
@@ -35,7 +35,7 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
-IOS_TARGETS := aarch64-apple-ios
+IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
@@ -104,7 +104,7 @@ lint: cargo.lint flutter.lint
 #	make release crate=(medea-jason|<crate-name>)
 #	             [publish=(no|yes)]
 
-release: release.crates release.npm
+release: release.cargo release.npm
 
 
 # Run all project tests.
@@ -270,6 +270,13 @@ endif
 ifeq ($(cargo-build-platform),ios)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
 		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+	$(eval build := $(if $(call eq,$(debug),no),release,debug))
+	@rm -rf flutter/ios/lib/MedeaJason.xcframework
+	@mkdir -p flutter/ios/lib/
+	xcodebuild -create-xcframework \
+	           $(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+	           -library target/$(t)/$(build)/libmedea_jason.a) \
+	           -output flutter/ios/lib/MedeaJason.xcframework
 endif
 ifeq ($(cargo-build-platform),linux)
 	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
@@ -700,11 +707,12 @@ ifeq ($(up),yes)
 endif
 
 
-# Run E2E desktop tests of project.
+# Run E2E native tests of project.
 #
 # Usage:
-#	make test.e2e.desktop [(only=<regex>|only-tags=<tag-expression>)]
+#	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
 # 		[device=<device-id>]
+#		[server=<server-ip>]
 #		[( [up=no]
 #		 | up=yes [( [dockerized=no]
 #		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
@@ -712,7 +720,7 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e.desktop:
+test.e2e.native:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -730,6 +738,7 @@ endif
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \
+		$(if $(call eq,$(server),),,--dart-define=IP_TEST_BASE=$(server)) \
 		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e
@@ -772,15 +781,15 @@ wait.port:
 # Build and publish project crate to crates.io.
 #
 # Usage:
-#	make release.crates crate=(medea-jason|<crate-name>)
-#	                    [token=($CARGO_TOKEN|<cargo-token>)]
-#	                    [publish=(no|yes)]
+#	make release.cargo crate=(medea-jason|<crate-name>)
+#	                   [token=($CARGO_REGISTRY_TOKEN|<cargo-token>)]
+#	                   [publish=(no|yes)]
 
-release.crates:
+release.cargo:
 ifneq ($(filter $(crate),medea-jason medea-client-api-proto medea-control-api-proto medea-macro medea-reactive),)
 	cd $(crate-dir)/ && \
 	$(if $(call eq,$(publish),yes),\
-		cargo publish --token $(or $(token),${CARGO_TOKEN}) ,\
+		cargo publish --token $(or $(token),$$CARGO_REGISTRY_TOKEN) ,\
 		cargo package --allow-dirty )
 endif
 
@@ -1333,9 +1342,9 @@ endef
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
-        release release.crates release.helm release.npm \
+        release release.cargo release.helm release.npm \
         rustup.targets \
-        test test.e2e test.e2e.browser test.e2e.desktop test.flutter test.unit \
+        test test.e2e test.e2e.browser test.e2e.native test.flutter test.unit \
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
