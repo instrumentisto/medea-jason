@@ -47,17 +47,20 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
-Object objectFromAnyhow(FfiException error) {
-  if (!error.message.contains('RESULT_ERROR: DartError')) {
-    throw error;
+extension FfiExceptionParse on FfiException {
+  Object parse() {
+    if (!message.contains('RESULT_ERROR: DartError')) {
+      return this;
+    }
+    var handle = message;
+    var reg = RegExp(r'\(([^]*?)\)');
+    var err_ptr =
+        Pointer<Handle>.fromAddress(int.parse(reg.firstMatch(handle)![1]!));
+    var err = unboxDartHandle(err_ptr);
+    freeBoxedDartHandle(err_ptr);
+
+    return err;
   }
-  var handle = error.message;
-  var reg = RegExp(r'\(([^]*?)\)');
-  var err_ptr =
-      Pointer<Handle>.fromAddress(int.parse(reg.firstMatch(handle)![1]!));
-  var err = unboxDartHandle(err_ptr);
-  freeBoxedDartHandle(err_ptr);
-  return err;
 }
 
 DynamicLibrary _dl_load() {

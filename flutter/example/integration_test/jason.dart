@@ -131,8 +131,9 @@ void main() {
           roomHandle: (room as NativeRoomHandle).opaque.innerOpaque,
           sourceKind: arg) as Future);
     } on FfiException catch (e) {
-      err = objectFromAnyhow(e) as ArgumentError;
+      err = e.parse();
     }
+    err is ArgumentError;
     expect(err.invalidValue, equals(123));
     expect(err.name, 'kind');
   });

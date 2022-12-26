@@ -24,7 +24,7 @@ class NativeReconnectHandle extends ReconnectHandle {
       await (api.reconnectHandleReconnectWithDelay(
           reconnectHandle: opaque.innerOpaque, delayMs: delayMs) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -40,7 +40,7 @@ class NativeReconnectHandle extends ReconnectHandle {
           maxDelay: maxDelay,
           maxElapsedTimeMs: maxElapsedTimeMs) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 

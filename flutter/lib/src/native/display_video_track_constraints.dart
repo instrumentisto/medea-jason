@@ -24,7 +24,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrExactHeight(
           constr: opaque.innerOpaque, exactHeight: height);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -34,7 +34,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrIdealHeight(
           constr: opaque.innerOpaque, idealHeight: height);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -44,7 +44,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrExactWidth(
           constr: opaque.innerOpaque, exactWidth: width);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -54,7 +54,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrIdealWidth(
           constr: opaque.innerOpaque, idealWidth: width);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -64,7 +64,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrExactFrameRate(
           constr: opaque.innerOpaque, exactFrameRate: frameRate);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -74,7 +74,7 @@ class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
       api.displayVideoTrackConstrIdealFrameRate(
           constr: opaque.innerOpaque, idealFrameRate: frameRate);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 

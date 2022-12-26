@@ -39,7 +39,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
               caps: (caps as MediaStreamSettings).opaque.innerOpaque) as Future)
           as Pointer;
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
 
     var vec = api.vecLocalTracksFromPtr(ptr: tracks.address);
@@ -62,7 +62,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       devices = await (api.mediaManagerHandleEnumerateDevices(
           manager: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
 
     var vec = api.vecMediaDeviceInfoFromPtr(ptr: devices.address);
@@ -90,7 +90,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       devices = await (api.mediaManagerHandleEnumerateDisplays(
           manager: opaque.innerOpaque) as Future) as Pointer;
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
 
     var vec = api.vecMediaDisplayInfoFromPtr(ptr: devices.address);
@@ -112,7 +112,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       await (api.mediaManagerHandleSetOutputAudioId(
           manager: opaque.innerOpaque, deviceId: deviceId) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -122,7 +122,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       await (api.mediaManagerHandleSetMicrophoneVolume(
           manager: opaque.innerOpaque, level: level) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -132,7 +132,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       return await (api.mediaManagerHandleMicrophoneVolume(
           manager: opaque.innerOpaque) as Future) as int;
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -142,7 +142,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
           manager: opaque.innerOpaque) as Future) as bool;
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -151,7 +151,7 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
     try {
       api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 

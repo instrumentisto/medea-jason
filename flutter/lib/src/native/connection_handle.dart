@@ -26,7 +26,7 @@ class NativeConnectionHandle extends ConnectionHandle {
       return api.connectionHandleGetRemoteMemberId(
           connection: opaque.innerOpaque);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -35,7 +35,7 @@ class NativeConnectionHandle extends ConnectionHandle {
     try {
       api.connectionHandleOnClose(connection: opaque.innerOpaque, f: f);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -49,7 +49,7 @@ class NativeConnectionHandle extends ConnectionHandle {
                 api.remoteMediaTrackFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -59,7 +59,7 @@ class NativeConnectionHandle extends ConnectionHandle {
       api.connectionHandleOnQualityScoreUpdate(
           connection: opaque.innerOpaque, f: f);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -79,7 +79,7 @@ class NativeConnectionHandle extends ConnectionHandle {
       await (api.connectionHandleEnableRemoteAudio(
           connection: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -89,7 +89,7 @@ class NativeConnectionHandle extends ConnectionHandle {
       await (api.connectionHandleDisableRemoteAudio(
           connection: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -99,7 +99,7 @@ class NativeConnectionHandle extends ConnectionHandle {
       await (api.connectionHandleEnableRemoteVideo(
           connection: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 
@@ -109,7 +109,7 @@ class NativeConnectionHandle extends ConnectionHandle {
       await (api.connectionHandleDisableRemoteVideo(
           connection: opaque.innerOpaque) as Future);
     } on FfiException catch (anyhow) {
-      throw objectFromAnyhow(anyhow);
+      throw anyhow.parse();
     }
   }
 }

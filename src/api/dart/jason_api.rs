@@ -760,6 +760,7 @@ pub fn local_media_track_get_track(
     SyncReturn(dart_opaque)
 }
 
+// TODO(alexlapa): can we return MediaKind directly?
 /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
 /// audio track, or a [`MediaKind::Video`] if it represents a video track.
 ///
@@ -772,6 +773,7 @@ pub fn local_media_track_kind(
     SyncReturn(track.kind() as u8)
 }
 
+// TODO(alexlapa): can we return MediaKind directly?
 /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
 /// sourced from some device (webcam/microphone), or a
 /// [`MediaSourceKind::Display`] if it's captured via
@@ -793,20 +795,22 @@ pub use crate::platform::MediaDeviceInfo;
 
 impl ForeignClass for MediaDeviceInfo {}
 
+// TODO(alexlapa): try rework
 /// Returns the [`ApiWrap<Vec<MediaDeviceInfo>>`] from the address
 /// [`ForeignClass`].
 #[must_use]
 pub fn vec_media_device_info_from_ptr(
     ptr: usize,
 ) -> SyncReturn<RustOpaque<ApiWrap<Vec<MediaDeviceInfo>>>> {
+    // ) -> SyncReturn<Vec<RustOpaque<MediaDeviceInfo>>> { ||
+    // ) -> SyncReturn<Vec<MediaDeviceInfo>> {
     SyncReturn(unsafe {
         RustOpaque::new(ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))
     })
 }
 
-/// Removes the last element from a
-/// [`ApiWrap<Vec<MediaDeviceInfo>>`] and returns it,
-/// or [`None`] if it is empty.
+/// Removes the last element from a [`ApiWrap<Vec<MediaDeviceInfo>>`] and
+/// returns it, or [`None`] if it is empty.
 #[must_use]
 pub fn vec_media_device_info_pop(
     vec: RustOpaque<ApiWrap<Vec<MediaDeviceInfo>>>,
@@ -822,6 +826,7 @@ pub fn media_device_info_device_id(
     SyncReturn(media_device.device_id())
 }
 
+// TODO(alexlapa): can we return MediaKind directly?
 /// Returns kind of the represented device.
 ///
 /// This representation of [MediaDeviceInfo][1] ONLY for input device.
@@ -980,6 +985,8 @@ pub fn media_manager_handle_enumerate_displays(
     SyncReturn(dart_opaque)
 }
 
+// TODO(alexlapa): can we change this to SyncReturn<Into<DartOpaque>> and
+//                 impl Into<DartOpaque> for DartFuture<Asd>?
 /// Switches the current output audio device to the device with the provided
 /// `device_id`.
 #[must_use]
