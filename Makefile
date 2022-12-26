@@ -1064,6 +1064,8 @@ docker.up.e2e: docker.down.e2e
 ifeq ($(rebuild),yes)
 	@make build.jason target=web debug=$(debug) dockerized=no
 endif
+    # So docker-compose won't have to create this dir with su owner.
+	@mkdir -p pkg
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
