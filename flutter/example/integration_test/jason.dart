@@ -38,13 +38,13 @@ void main() {
     expect((tracks.first as NativeLocalMediaTrack).opaque,
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 
-    expect(devices.first.deviceId(), equals('fake camera id'));
-    expect(devices.first.groupId(), isNull);
-    expect(devices.first.kind(), equals(MediaDeviceKind.videoinput));
-    expect(devices.first.label(), equals('fake camera'));
+    var video_device = devices.firstWhere((d) => d.kind() == MediaDeviceKind.videoinput);
+    expect(video_device.deviceId(), equals('fake camera id'));
+    expect(video_device.groupId(), isNull);
+    expect(video_device.label(), equals('fake camera'));
 
-    devices.first.free();
-    expect(() => devices.first.label(), throwsA(isA<StateError>()));
+    video_device.free();
+    expect(() => video_device.label(), throwsA(isA<StateError>()));
 
     var video = tracks.where((element) => element.kind() == MediaKind.Video);
     expect(video.isNotEmpty, isTrue);

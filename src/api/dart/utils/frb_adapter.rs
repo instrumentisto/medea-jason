@@ -15,7 +15,7 @@ use crate::{
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
     DartOpaque::new_non_droppable(Dart_NewPersistentHandle_DL_Trampolined(
         handle,
-    ))
+    ) as _)
 }
 
 /// Panic-unsafe wrapper [`RefCell`].
@@ -38,3 +38,5 @@ impl<T> ApiWrap<T> {
 impl<T> UnwindSafe for ApiWrap<T> {}
 impl<T> RefUnwindSafe for ApiWrap<T> {}
 impl<T> ForeignClass for ApiWrap<T> {}
+
+impl<T> ForeignClass for Vec<T> {}

@@ -1,7 +1,10 @@
-use super::{utils::new_dart_opaque, ForeignClass, MediaDirection};
+//! TODO doc.
 
-pub use super::utils::ApiWrap;
+pub use crate::api::utils::ApiWrap;
+use crate::api::utils::new_dart_opaque;
+use crate::api::ForeignClass;
 
+use crate::media::MediaDirection;
 use crate::{
     api::{ArgumentError, Error as DartError},
     media::FacingMode,
@@ -78,7 +81,7 @@ pub fn connection_handle_on_close(
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_close(unsafe {
-            platform::Function::new(f.try_unwrap().unwrap().into_raw())
+            platform::Function::new(f.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -100,7 +103,7 @@ pub fn connection_handle_on_remote_track_added(
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_remote_track_added(unsafe {
-            platform::Function::new(f.try_unwrap().unwrap().into_raw())
+            platform::Function::new(f.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -118,7 +121,7 @@ pub fn connection_handle_on_quality_score_update(
 ) -> anyhow::Result<SyncReturn<()>> {
     connection
         .on_quality_score_update(unsafe {
-            platform::Function::new(f.try_unwrap().unwrap().into_raw())
+            platform::Function::new(f.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -661,7 +664,7 @@ impl UnwindSafe for Jason {}
 #[must_use]
 pub fn on_panic(cb: DartOpaque) -> SyncReturn<()> {
     platform::set_panic_callback(unsafe {
-        platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+        platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
     });
     SyncReturn(())
 }
@@ -732,20 +735,10 @@ pub fn local_media_track_from_ptr(
 #[must_use]
 pub fn vec_local_tracks_from_ptr(
     ptr: usize,
-) -> SyncReturn<RustOpaque<ApiWrap<Vec<LocalMediaTrack>>>> {
+) -> SyncReturn<Vec<RustOpaque<LocalMediaTrack>>> {
     SyncReturn(unsafe {
-        RustOpaque::new(ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))
+        Vec::<LocalMediaTrack>::from_ptr(ptr::NonNull::new(ptr as _).unwrap()).into_iter().map(RustOpaque::new).collect()
     })
-}
-
-/// Removes the last element from a
-/// [`ApiWrap<Vec<LocalMediaTrack>>`] and returns it,
-/// or [`None`] if it is empty.
-#[must_use]
-pub fn vec_local_tracks_pop(
-    vec: RustOpaque<ApiWrap<Vec<LocalMediaTrack>>>,
-) -> SyncReturn<Option<RustOpaque<LocalMediaTrack>>> {
-    SyncReturn(vec.borrow_mut().pop().map(RustOpaque::new))
 }
 
 /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
@@ -801,21 +794,10 @@ impl ForeignClass for MediaDeviceInfo {}
 #[must_use]
 pub fn vec_media_device_info_from_ptr(
     ptr: usize,
-) -> SyncReturn<RustOpaque<ApiWrap<Vec<MediaDeviceInfo>>>> {
-    // ) -> SyncReturn<Vec<RustOpaque<MediaDeviceInfo>>> { ||
-    // ) -> SyncReturn<Vec<MediaDeviceInfo>> {
+) -> SyncReturn<Vec<RustOpaque<MediaDeviceInfo>>> {
     SyncReturn(unsafe {
-        RustOpaque::new(ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap()))
+        Vec::<MediaDeviceInfo>::from_ptr(ptr::NonNull::new(ptr as _).unwrap()).into_iter().map(RustOpaque::new).collect()
     })
-}
-
-/// Removes the last element from a [`ApiWrap<Vec<MediaDeviceInfo>>`] and
-/// returns it, or [`None`] if it is empty.
-#[must_use]
-pub fn vec_media_device_info_pop(
-    vec: RustOpaque<ApiWrap<Vec<MediaDeviceInfo>>>,
-) -> SyncReturn<Option<RustOpaque<MediaDeviceInfo>>> {
-    SyncReturn(vec.borrow_mut().pop().map(RustOpaque::new))
 }
 
 /// Returns unique identifier of the represented device.
@@ -874,20 +856,10 @@ pub use crate::platform::MediaDisplayInfo;
 #[must_use]
 pub fn vec_media_display_info_from_ptr(
     ptr: usize,
-) -> SyncReturn<RustOpaque<ApiWrap<Vec<MediaDisplayInfo>>>> {
-    SyncReturn(RustOpaque::new(unsafe {
-        ApiWrap::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
-    }))
-}
-
-/// Removes the last element from a
-/// [`ApiWrap<Vec<MediaDisplayInfo>>`] and returns it,
-/// or [`None`] if it is empty.
-#[must_use]
-pub fn vec_media_display_info_pop(
-    vec: RustOpaque<ApiWrap<Vec<MediaDisplayInfo>>>,
-) -> SyncReturn<Option<RustOpaque<MediaDisplayInfo>>> {
-    SyncReturn(vec.borrow_mut().pop().map(RustOpaque::new))
+) -> SyncReturn<Vec<RustOpaque<MediaDisplayInfo>>> {
+    SyncReturn(unsafe {
+        Vec::<MediaDisplayInfo>::from_ptr(ptr::NonNull::new(ptr as _).unwrap()).into_iter().map(RustOpaque::new).collect()
+    })
 }
 
 /// Returns a unique identifier of the represented display.
@@ -932,9 +904,9 @@ pub fn media_manager_handle_init_local_tracks(
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
-                Ok::<ApiWrap<_>, Traced<InitLocalTracksError>>(ApiWrap::new(
+                Ok::<_, Traced<InitLocalTracksError>>(
                     manager.init_local_tracks(caps).await?,
-                ))
+                )
             }
             .into_dart_future()
             .into_raw(),
@@ -953,9 +925,9 @@ pub fn media_manager_handle_enumerate_devices(
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
-                Ok::<ApiWrap<_>, Traced<EnumerateDevicesError>>(ApiWrap::new(
+                Ok::<_, Traced<EnumerateDevicesError>>(
                     manager.enumerate_devices().await?,
-                ))
+                )
             }
             .into_dart_future()
             .into_raw(),
@@ -974,9 +946,9 @@ pub fn media_manager_handle_enumerate_displays(
     let dart_opaque = unsafe {
         new_dart_opaque(
             async move {
-                Ok::<ApiWrap<_>, Traced<EnumerateDisplaysError>>(ApiWrap::new(
+                Ok::<_, Traced<EnumerateDisplaysError>>(
                     manager.enumerate_displays().await?,
-                ))
+                )
             }
             .into_dart_future()
             .into_raw(),
@@ -1082,7 +1054,7 @@ pub fn media_manager_handle_on_device_change(
     let manager = MediaManagerHandle::clone(&manager);
     manager
         .on_device_change(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -1307,7 +1279,7 @@ pub fn remote_media_track_on_muted(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_muted(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw() as _)
     });
     SyncReturn(())
 }
@@ -1319,7 +1291,7 @@ pub fn remote_media_track_on_unmuted(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_unmuted(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw() as _)
     });
     SyncReturn(())
 }
@@ -1331,7 +1303,7 @@ pub fn remote_media_track_on_stopped(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_stopped(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw() as _)
     });
     SyncReturn(())
 }
@@ -1345,7 +1317,7 @@ pub fn remote_media_track_on_media_direction_changed(
 ) -> SyncReturn<()> {
     track.on_media_direction_changed(unsafe {
         platform::Function::<MediaDirection>::new(
-            f.try_unwrap().unwrap().into_raw(),
+            f.try_unwrap().unwrap().into_raw() as _,
         )
     });
     SyncReturn(())
@@ -1866,7 +1838,7 @@ pub fn room_handle_on_new_connection(
     Ok(SyncReturn(
         room_handle
             .on_new_connection(unsafe {
-                platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+                platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
             })
             .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?,
     ))
@@ -1887,7 +1859,7 @@ pub fn room_handle_on_close(
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_close(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -1914,7 +1886,7 @@ pub fn room_handle_on_local_track(
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_local_track(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -1931,7 +1903,7 @@ pub fn room_handle_on_connection_loss(
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_connection_loss(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))
@@ -1948,7 +1920,7 @@ pub fn room_handle_on_failed_local_media(
 ) -> anyhow::Result<SyncReturn<()>> {
     room_handle
         .on_failed_local_media(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
         })
         .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
     Ok(SyncReturn(()))

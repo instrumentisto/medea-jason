@@ -412,7 +412,7 @@ ifeq ($(shell brew list | grep -Fx llvm),)
 endif
 endif
 	flutter_rust_bridge_codegen \
-		--rust-input src/api/dart/jason_api.rs \
+		--rust-input src/jason_api.rs \
 		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
 		--rust-output src/jason_api_g.rs \
 		--skip-add-mod-to-lib \

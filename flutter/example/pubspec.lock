@@ -178,7 +178,7 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.54.0"
+    version: "1.58.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -274,10 +274,12 @@ packages:
   medea_flutter_webrtc:
     dependency: "direct main"
     description:
-      name: medea_flutter_webrtc
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.8.0-dev+rev.39f8181e33a20db445d16c1bfedd7d337a777fe3"
+      path: "."
+      ref: temp-frb-deps
+      resolved-ref: "9b0958e6b744e6ac43ae0526cd26e7d301c9765f"
+      url: "https://github.com/instrumentisto/flutter-webrtc.git"
+    source: git
+    version: "0.8.0-dev"
   medea_jason:
     dependency: "direct main"
     description:
@@ -368,7 +370,7 @@ packages:
       name: puppeteer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.19.0"
+    version: "2.20.0"
   retry:
     dependency: transitive
     description:

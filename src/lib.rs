@@ -125,6 +125,7 @@ pub mod peer;
 pub mod platform;
 pub mod room;
 pub mod rpc;
+pub mod jason_api;
 
 #[cfg(not(target_family = "wasm"))]
 #[allow(

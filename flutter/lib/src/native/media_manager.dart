@@ -42,17 +42,10 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       throw anyhow.parse();
     }
 
-    var vec = api.vecLocalTracksFromPtr(ptr: tracks.address);
-
-    var res = List<LocalMediaTrack>.empty(growable: true);
-
-    var track = api.vecLocalTracksPop(vec: vec);
-    while (track != null) {
-      res.add(NativeLocalMediaTrack(track));
-      track = api.vecLocalTracksPop(vec: vec);
-    }
-    vec.dispose();
-    return res;
+    return api
+        .vecLocalTracksFromPtr(ptr: tracks.address)
+        .map((track) => NativeLocalMediaTrack(track))
+        .toList();
   }
 
   @override
@@ -65,17 +58,10 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       throw anyhow.parse();
     }
 
-    var vec = api.vecMediaDeviceInfoFromPtr(ptr: devices.address);
-
-    var res = List<MediaDeviceInfo>.empty(growable: true);
-
-    var device = api.vecMediaDeviceInfoPop(vec: vec);
-    while (device != null) {
-      res.add(NativeMediaDeviceInfo(device));
-      device = api.vecMediaDeviceInfoPop(vec: vec);
-    }
-    vec.dispose();
-    return res;
+    return api
+        .vecMediaDeviceInfoFromPtr(ptr: devices.address)
+        .map((info) => NativeMediaDeviceInfo(info))
+        .toList();
   }
 
   @override
@@ -93,17 +79,10 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
       throw anyhow.parse();
     }
 
-    var vec = api.vecMediaDisplayInfoFromPtr(ptr: devices.address);
-
-    var res = List<MediaDisplayInfo>.empty(growable: true);
-
-    var device = api.vecMediaDisplayInfoPop(vec: vec);
-    while (device != null) {
-      res.add(NativeMediaDisplayInfo(device));
-      device = api.vecMediaDisplayInfoPop(vec: vec);
-    }
-    vec.dispose();
-    return res;
+    return api
+        .vecMediaDisplayInfoFromPtr(ptr: devices.address)
+        .map((info) => NativeMediaDisplayInfo(info))
+        .toList();
   }
 
   @override

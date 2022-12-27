@@ -15,7 +15,7 @@
 )]
 
 #[allow(clippy::needless_pass_by_value)]
-pub mod jason_api;
+pub use crate::jason_api;
 pub mod utils;
 
 use std::{
