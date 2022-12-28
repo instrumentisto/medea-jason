@@ -272,14 +272,12 @@ packages:
     source: hosted
     version: "0.1.5"
   medea_flutter_webrtc:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      path: "."
-      ref: temp-frb-deps
-      resolved-ref: "9b0958e6b744e6ac43ae0526cd26e7d301c9765f"
-      url: "https://github.com/instrumentisto/flutter-webrtc.git"
-    source: git
-    version: "0.8.0-dev"
+      name: medea_flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0-dev+rev.f41943bb2e00fbeac92946cc89652fe04185a394"
   medea_jason:
     dependency: "direct main"
     description:

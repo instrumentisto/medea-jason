@@ -13,10 +13,7 @@ dependencies:
   ffi: ^2.0.1
   http: ^0.13.5
   js: ^0.6.5
-  medea_flutter_webrtc:
-    git:
-      url: https://github.com/instrumentisto/flutter-webrtc.git
-      ref: temp-frb-deps
+  medea_flutter_webrtc: 0.8.0-dev+rev.f41943bb2e00fbeac92946cc89652fe04185a394
   retry: ^3.1.0
   tuple: ^2.0.1
   uuid: ^3.0.7
