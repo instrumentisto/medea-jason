@@ -1,16 +1,6 @@
 import '/src/util/rust_handles_storage.dart';
-
-/// Kind of a media device.
-enum MediaDeviceKind {
-  /// Audio input device (for example, a microphone).
-  audioinput,
-
-  /// Video input device (for example, a webcam).
-  videoinput,
-
-  /// Audio output device (for example, a pair of headphones).
-  audiooutput,
-}
+export '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
+import '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
 
 /// [`MediaDeviceInfo`][1] interface.
 ///

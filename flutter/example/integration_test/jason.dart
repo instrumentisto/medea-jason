@@ -38,7 +38,7 @@ void main() {
     expect((tracks.first as NativeLocalMediaTrack).opaque,
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 
-    var video_device = devices.firstWhere((d) => d.kind() == MediaDeviceKind.videoinput);
+    var video_device = devices.firstWhere((d) => d.kind() == MediaDeviceKind.VideoInput);
     expect(video_device.deviceId(), equals('fake camera id'));
     expect(video_device.groupId(), isNull);
     expect(video_device.label(), equals('fake camera'));

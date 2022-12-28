@@ -1,41 +1,9 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-
+export '../native/ffi/jason_api.g.dart' show MediaKind, MediaSourceKind;
+import '../native/ffi/jason_api.g.dart' show MediaKind, MediaSourceKind, MediaDirection;
 import '../util/rust_handles_storage.dart';
 
-/// Representation of a [`MediaStreamTrack.kind`][1].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
-enum MediaKind {
-  /// Audio track.
-  Audio,
-
-  /// Video track.
-  Video,
-}
-
-/// Media source type.
-enum MediaSourceKind {
-  /// Media is sourced from some media device (webcam or microphone).
-  Device,
-
-  /// Media is obtained via screen capturing.
-  Display,
-}
-
-/// Media exchange direction of a [RemoteMediaTrack].
-enum TrackMediaDirection {
-  /// [RemoteMediaTrack] is enabled on both receiver and sender sides.
-  SendRecv,
-
-  /// [RemoteMediaTrack] is enabled on sender side only.
-  SendOnly,
-
-  /// [RemoteMediaTrack] is enabled on receiver side only.
-  RecvOnly,
-
-  /// [RemoteMediaTrack] is disabled on both sides.
-  Inactive,
-}
+typedef TrackMediaDirection = MediaDirection;
 
 /// Abstraction of a handle to an object allocated on the Rust side.
 abstract class MediaTrack implements PlatformHandle {

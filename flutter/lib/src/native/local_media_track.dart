@@ -20,13 +20,12 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   @override
   MediaKind kind() {
-    return MediaKind.values[api.localMediaTrackKind(track: opaque.innerOpaque)];
+    return api.localMediaTrackKind(track: opaque.innerOpaque);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return MediaSourceKind
-        .values[api.localMediaTrackMediaSourceKind(track: opaque.innerOpaque)];
+    return api.localMediaTrackMediaSourceKind(track: opaque.innerOpaque);
   }
 
   @override

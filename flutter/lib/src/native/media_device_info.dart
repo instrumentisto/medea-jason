@@ -28,8 +28,7 @@ class NativeMediaDeviceInfo extends MediaDeviceInfo {
 
   @override
   MediaDeviceKind kind() {
-    return MediaDeviceKind
-        .values[api.mediaDeviceInfoKind(mediaDevice: opaque.innerOpaque)];
+    return api.mediaDeviceInfoKind(mediaDevice: opaque.innerOpaque);
   }
 
   @override

@@ -400,7 +400,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackFromPtrConstMeta;
 
-  /// Returns the [`ApiWrap<Vec<LocalMediaTrack>>`] from the address
+  /// Returns the [`Vec<RustOpaque<LocalMediaTrack>>`] from the address
   /// [`ForeignClass`].
   List<LocalMediaTrack> vecLocalTracksFromPtr({required int ptr, dynamic hint});
 
@@ -420,7 +420,7 @@ abstract class MedeaJason {
   ///
   /// [`MediaKind::Audio`]: crate::media::MediaKind::Audio
   /// [`MediaKind::Video`]: crate::media::MediaKind::Video
-  int localMediaTrackKind({required LocalMediaTrack track, dynamic hint});
+  MediaKind localMediaTrackKind({required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackKindConstMeta;
 
@@ -432,12 +432,12 @@ abstract class MedeaJason {
   /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
   /// [`MediaSourceKind::Device`]: crate::media::MediaSourceKind::Device
   /// [`MediaSourceKind::Display`]: crate::media::MediaSourceKind::Display
-  int localMediaTrackMediaSourceKind(
+  MediaSourceKind localMediaTrackMediaSourceKind(
       {required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackMediaSourceKindConstMeta;
 
-  /// Returns the [`ApiWrap<Vec<MediaDeviceInfo>>`] from the address
+  /// Returns the [`Vec<RustOpaque<MediaDeviceInfo>>`] from the address
   /// [`ForeignClass`].
   List<MediaDeviceInfo> vecMediaDeviceInfoFromPtr(
       {required int ptr, dynamic hint});
@@ -455,7 +455,8 @@ abstract class MedeaJason {
   /// This representation of [MediaDeviceInfo][1] ONLY for input device.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-  int mediaDeviceInfoKind({required MediaDeviceInfo mediaDevice, dynamic hint});
+  MediaDeviceKind mediaDeviceInfoKind(
+      {required MediaDeviceInfo mediaDevice, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoKindConstMeta;
 
@@ -481,7 +482,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoGroupIdConstMeta;
 
-  /// Returns the [`ApiWrap<Vec<MediaDisplayInfo>>`] from the address
+  /// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the address
   /// [`ForeignClass`].
   List<MediaDisplayInfo> vecMediaDisplayInfoFromPtr(
       {required int ptr, dynamic hint});
@@ -704,18 +705,19 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMutedConstMeta;
 
   /// Returns this [`RemoteMediaTrack`]'s kind (audio/video).
-  int remoteMediaTrackKind({required RemoteMediaTrack track, dynamic hint});
+  MediaKind remoteMediaTrackKind(
+      {required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackKindConstMeta;
 
   /// Returns this [`RemoteMediaTrack`]'s media source kind.
-  int remoteMediaTrackMediaSourceKind(
+  MediaSourceKind remoteMediaTrackMediaSourceKind(
       {required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMediaSourceKindConstMeta;
 
   /// Returns the current general [`MediaDirection`] of this [`RemoteMediaTrack`].
-  int remoteMediaTrackMediaDirection(
+  MediaDirection remoteMediaTrackMediaDirection(
       {required RemoteMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMediaDirectionConstMeta;
@@ -1280,6 +1282,55 @@ enum FacingMode {
   Right,
 }
 
+/// [MediaDeviceInfo.kind][1] representation.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
+enum MediaDeviceKind {
+  /// Audio input device (for example, a microphone).
+  AudioInput,
+
+  /// Video input device (for example, a webcam).
+  VideoInput,
+
+  /// Audio output device (for example, a pair of headphones).
+  AudioOutput,
+}
+
+/// Media exchange direction of a [`Track`].
+enum MediaDirection {
+  /// [`Track`] is enabled on both receiver and sender sides.
+  SendRecv,
+
+  /// [`Track`] is enabled on sender side only.
+  SendOnly,
+
+  /// [`Track`] is enabled on receiver side only.
+  RecvOnly,
+
+  /// [`Track`] is disabled on both sides.
+  Inactive,
+}
+
+/// [MediaStreamTrack.kind][1] representation.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
+enum MediaKind {
+  /// Audio track.
+  Audio,
+
+  /// Video track.
+  Video,
+}
+
+/// Media source type.
+enum MediaSourceKind {
+  /// Media is sourced from some media device (webcam or microphone).
+  Device,
+
+  /// Media is obtained with screen-capture.
+  Display,
+}
+
 class MedeaJasonImpl implements MedeaJason {
   final MedeaJasonPlatform _platform;
   factory MedeaJasonImpl(ExternalLibrary dylib) =>
@@ -1291,7 +1342,7 @@ class MedeaJasonImpl implements MedeaJason {
   MedeaJasonImpl.raw(this._platform);
   AudioTrackConstraints audioTrackConstrNew({dynamic hint}) {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_audio_track_constr_new(),
+      callFfi: () => _platform.inner.wire_audioTrack_constr_new(),
       parseSuccessData: _wire2api_AudioTrackConstraints,
       constMeta: kAudioTrackConstrNewConstMeta,
       argValues: [],
@@ -1301,7 +1352,7 @@ class MedeaJasonImpl implements MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kAudioTrackConstrNewConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "audio_track_constr_new",
+        debugName: "audioTrack_constr_new",
         argNames: [],
       );
 
@@ -1313,7 +1364,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_String(deviceId);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
-          _platform.inner.wire_audio_track_constr_device_id(arg0, arg1),
+          _platform.inner.wire_audioTrack_constr_device_id(arg0, arg1),
       parseSuccessData: _wire2api_AudioTrackConstraints,
       constMeta: kAudioTrackConstrDeviceIdConstMeta,
       argValues: [track, deviceId],
@@ -1323,7 +1374,7 @@ class MedeaJasonImpl implements MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kAudioTrackConstrDeviceIdConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "audio_track_constr_device_id",
+        debugName: "audioTrack_constr_device_id",
         argNames: ["track", "deviceId"],
       );
 
@@ -1510,7 +1561,7 @@ class MedeaJasonImpl implements MedeaJason {
 
   ApiWrapDeviceVideoTrackConstraints deviceVideoTrackConstrNew({dynamic hint}) {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_device_video_track_constr_new(),
+      callFfi: () => _platform.inner.wire_deviceVideoTrack_constr_new(),
       parseSuccessData: _wire2api_ApiWrapDeviceVideoTrackConstraints,
       constMeta: kDeviceVideoTrackConstrNewConstMeta,
       argValues: [],
@@ -1520,7 +1571,7 @@ class MedeaJasonImpl implements MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrNewConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "device_video_track_constr_new",
+        debugName: "deviceVideoTrack_constr_new",
         argNames: [],
       );
 
@@ -1532,7 +1583,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_String(deviceId);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
-          _platform.inner.wire_device_video_track_constr_device_id(arg0, arg1),
+          _platform.inner.wire_deviceVideoTrack_constr_device_id(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrDeviceIdConstMeta,
       argValues: [constr, deviceId],
@@ -1542,7 +1593,7 @@ class MedeaJasonImpl implements MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrDeviceIdConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "device_video_track_constr_device_id",
+        debugName: "deviceVideoTrack_constr_device_id",
         argNames: ["constr", "deviceId"],
       );
 
@@ -1554,7 +1605,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = api2wire_facing_mode(facingMode);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_device_video_track_constr_exact_facing_mode(arg0, arg1),
+          .wire_deviceVideoTrack_constr_exact_facing_mode(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrExactFacingModeConstMeta,
       argValues: [constr, facingMode],
@@ -1565,7 +1616,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrExactFacingModeConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_exact_facing_mode",
+            debugName: "deviceVideoTrack_constr_exact_facing_mode",
             argNames: ["constr", "facingMode"],
           );
 
@@ -1577,7 +1628,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = api2wire_facing_mode(facingMode);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_device_video_track_constr_ideal_facing_mode(arg0, arg1),
+          .wire_deviceVideoTrack_constr_ideal_facing_mode(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrIdealFacingModeConstMeta,
       argValues: [constr, facingMode],
@@ -1588,7 +1639,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrIdealFacingModeConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_ideal_facing_mode",
+            debugName: "deviceVideoTrack_constr_ideal_facing_mode",
             argNames: ["constr", "facingMode"],
           );
 
@@ -1599,8 +1650,8 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
     var arg1 = _platform.api2wire_i64(exactHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_device_video_track_constr_exact_height(arg0, arg1),
+      callFfi: () =>
+          _platform.inner.wire_deviceVideoTrack_constr_exact_height(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrExactHeightConstMeta,
       argValues: [constr, exactHeight],
@@ -1611,7 +1662,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrExactHeightConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_exact_height",
+            debugName: "deviceVideoTrack_constr_exact_height",
             argNames: ["constr", "exactHeight"],
           );
 
@@ -1622,8 +1673,8 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
     var arg1 = _platform.api2wire_i64(idealHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_device_video_track_constr_ideal_height(arg0, arg1),
+      callFfi: () =>
+          _platform.inner.wire_deviceVideoTrack_constr_ideal_height(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrIdealHeightConstMeta,
       argValues: [constr, idealHeight],
@@ -1634,7 +1685,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrIdealHeightConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_ideal_height",
+            debugName: "deviceVideoTrack_constr_ideal_height",
             argNames: ["constr", "idealHeight"],
           );
 
@@ -1645,8 +1696,8 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
     var arg1 = _platform.api2wire_i64(exactWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_device_video_track_constr_exact_width(arg0, arg1),
+      callFfi: () =>
+          _platform.inner.wire_deviceVideoTrack_constr_exact_width(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrExactWidthConstMeta,
       argValues: [constr, exactWidth],
@@ -1657,7 +1708,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrExactWidthConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_exact_width",
+            debugName: "deviceVideoTrack_constr_exact_width",
             argNames: ["constr", "exactWidth"],
           );
 
@@ -1668,8 +1719,8 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
     var arg1 = _platform.api2wire_i64(idealWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_device_video_track_constr_ideal_width(arg0, arg1),
+      callFfi: () =>
+          _platform.inner.wire_deviceVideoTrack_constr_ideal_width(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrIdealWidthConstMeta,
       argValues: [constr, idealWidth],
@@ -1680,7 +1731,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrIdealWidthConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_ideal_width",
+            debugName: "deviceVideoTrack_constr_ideal_width",
             argNames: ["constr", "idealWidth"],
           );
 
@@ -1694,7 +1745,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg2 = _platform.api2wire_i64(max);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_device_video_track_constr_height_in_range(arg0, arg1, arg2),
+          .wire_deviceVideoTrack_constr_height_in_range(arg0, arg1, arg2),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrHeightInRangeConstMeta,
       argValues: [constr, min, max],
@@ -1705,7 +1756,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrHeightInRangeConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_height_in_range",
+            debugName: "deviceVideoTrack_constr_height_in_range",
             argNames: ["constr", "min", "max"],
           );
 
@@ -1719,7 +1770,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg2 = _platform.api2wire_i64(max);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_device_video_track_constr_width_in_range(arg0, arg1, arg2),
+          .wire_deviceVideoTrack_constr_width_in_range(arg0, arg1, arg2),
       parseSuccessData: _wire2api_unit,
       constMeta: kDeviceVideoTrackConstrWidthInRangeConstMeta,
       argValues: [constr, min, max],
@@ -1730,14 +1781,14 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDeviceVideoTrackConstrWidthInRangeConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "device_video_track_constr_width_in_range",
+            debugName: "deviceVideoTrack_constr_width_in_range",
             argNames: ["constr", "min", "max"],
           );
 
   ApiWrapDisplayVideoTrackConstraints displayVideoTrackConstrNew(
       {dynamic hint}) {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_display_video_track_constr_new(),
+      callFfi: () => _platform.inner.wire_displayVideoTrack_constr_new(),
       parseSuccessData: _wire2api_ApiWrapDisplayVideoTrackConstraints,
       constMeta: kDisplayVideoTrackConstrNewConstMeta,
       argValues: [],
@@ -1747,7 +1798,7 @@ class MedeaJasonImpl implements MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kDisplayVideoTrackConstrNewConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "display_video_track_constr_new",
+        debugName: "displayVideoTrack_constr_new",
         argNames: [],
       );
 
@@ -1759,7 +1810,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_String(deviceId);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
-          _platform.inner.wire_display_video_track_constr_device_id(arg0, arg1),
+          _platform.inner.wire_displayVideoTrack_constr_device_id(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrDeviceIdConstMeta,
       argValues: [constr, deviceId],
@@ -1770,7 +1821,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrDeviceIdConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_device_id",
+            debugName: "displayVideoTrack_constr_device_id",
             argNames: ["constr", "deviceId"],
           );
 
@@ -1782,7 +1833,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_i64(exactHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_display_video_track_constr_exact_height(arg0, arg1),
+          .wire_displayVideoTrack_constr_exact_height(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrExactHeightConstMeta,
       argValues: [constr, exactHeight],
@@ -1793,7 +1844,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrExactHeightConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_exact_height",
+            debugName: "displayVideoTrack_constr_exact_height",
             argNames: ["constr", "exactHeight"],
           );
 
@@ -1805,7 +1856,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_i64(idealHeight);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_display_video_track_constr_ideal_height(arg0, arg1),
+          .wire_displayVideoTrack_constr_ideal_height(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrIdealHeightConstMeta,
       argValues: [constr, idealHeight],
@@ -1816,7 +1867,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrIdealHeightConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_ideal_height",
+            debugName: "displayVideoTrack_constr_ideal_height",
             argNames: ["constr", "idealHeight"],
           );
 
@@ -1827,8 +1878,8 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
     var arg1 = _platform.api2wire_i64(exactWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_display_video_track_constr_exact_width(arg0, arg1),
+      callFfi: () =>
+          _platform.inner.wire_displayVideoTrack_constr_exact_width(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrExactWidthConstMeta,
       argValues: [constr, exactWidth],
@@ -1839,7 +1890,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrExactWidthConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_exact_width",
+            debugName: "displayVideoTrack_constr_exact_width",
             argNames: ["constr", "exactWidth"],
           );
 
@@ -1850,8 +1901,8 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
     var arg1 = _platform.api2wire_i64(idealWidth);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_display_video_track_constr_ideal_width(arg0, arg1),
+      callFfi: () =>
+          _platform.inner.wire_displayVideoTrack_constr_ideal_width(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrIdealWidthConstMeta,
       argValues: [constr, idealWidth],
@@ -1862,7 +1913,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrIdealWidthConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_ideal_width",
+            debugName: "displayVideoTrack_constr_ideal_width",
             argNames: ["constr", "idealWidth"],
           );
 
@@ -1874,7 +1925,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_i64(idealFrameRate);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_display_video_track_constr_ideal_frame_rate(arg0, arg1),
+          .wire_displayVideoTrack_constr_ideal_frame_rate(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrIdealFrameRateConstMeta,
       argValues: [constr, idealFrameRate],
@@ -1885,7 +1936,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrIdealFrameRateConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_ideal_frame_rate",
+            debugName: "displayVideoTrack_constr_ideal_frame_rate",
             argNames: ["constr", "idealFrameRate"],
           );
 
@@ -1897,7 +1948,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg1 = _platform.api2wire_i64(exactFrameRate);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
-          .wire_display_video_track_constr_exact_frame_rate(arg0, arg1),
+          .wire_displayVideoTrack_constr_exact_frame_rate(arg0, arg1),
       parseSuccessData: _wire2api_unit,
       constMeta: kDisplayVideoTrackConstrExactFrameRateConstMeta,
       argValues: [constr, exactFrameRate],
@@ -1908,7 +1959,7 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kDisplayVideoTrackConstrExactFrameRateConstMeta =>
           const FlutterRustBridgeTaskConstMeta(
-            debugName: "display_video_track_constr_exact_frame_rate",
+            debugName: "displayVideoTrack_constr_exact_frame_rate",
             argNames: ["constr", "exactFrameRate"],
           );
 
@@ -2068,11 +2119,12 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track"],
       );
 
-  int localMediaTrackKind({required LocalMediaTrack track, dynamic hint}) {
+  MediaKind localMediaTrackKind(
+      {required LocalMediaTrack track, dynamic hint}) {
     var arg0 = _platform.api2wire_LocalMediaTrack(track);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_local_media_track_kind(arg0),
-      parseSuccessData: _wire2api_u8,
+      parseSuccessData: _wire2api_media_kind,
       constMeta: kLocalMediaTrackKindConstMeta,
       argValues: [track],
       hint: hint,
@@ -2085,13 +2137,13 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track"],
       );
 
-  int localMediaTrackMediaSourceKind(
+  MediaSourceKind localMediaTrackMediaSourceKind(
       {required LocalMediaTrack track, dynamic hint}) {
     var arg0 = _platform.api2wire_LocalMediaTrack(track);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_local_media_track_media_source_kind(arg0),
-      parseSuccessData: _wire2api_u8,
+      parseSuccessData: _wire2api_media_source_kind,
       constMeta: kLocalMediaTrackMediaSourceKindConstMeta,
       argValues: [track],
       hint: hint,
@@ -2140,12 +2192,12 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["mediaDevice"],
       );
 
-  int mediaDeviceInfoKind(
+  MediaDeviceKind mediaDeviceInfoKind(
       {required MediaDeviceInfo mediaDevice, dynamic hint}) {
     var arg0 = _platform.api2wire_MediaDeviceInfo(mediaDevice);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_media_device_info_kind(arg0),
-      parseSuccessData: _wire2api_u8,
+      parseSuccessData: _wire2api_media_device_kind,
       constMeta: kMediaDeviceInfoKindConstMeta,
       argValues: [mediaDevice],
       hint: hint,
@@ -2714,11 +2766,12 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track"],
       );
 
-  int remoteMediaTrackKind({required RemoteMediaTrack track, dynamic hint}) {
+  MediaKind remoteMediaTrackKind(
+      {required RemoteMediaTrack track, dynamic hint}) {
     var arg0 = _platform.api2wire_RemoteMediaTrack(track);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_remote_media_track_kind(arg0),
-      parseSuccessData: _wire2api_u8,
+      parseSuccessData: _wire2api_media_kind,
       constMeta: kRemoteMediaTrackKindConstMeta,
       argValues: [track],
       hint: hint,
@@ -2731,13 +2784,13 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track"],
       );
 
-  int remoteMediaTrackMediaSourceKind(
+  MediaSourceKind remoteMediaTrackMediaSourceKind(
       {required RemoteMediaTrack track, dynamic hint}) {
     var arg0 = _platform.api2wire_RemoteMediaTrack(track);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_remote_media_track_media_source_kind(arg0),
-      parseSuccessData: _wire2api_u8,
+      parseSuccessData: _wire2api_media_source_kind,
       constMeta: kRemoteMediaTrackMediaSourceKindConstMeta,
       argValues: [track],
       hint: hint,
@@ -2751,13 +2804,13 @@ class MedeaJasonImpl implements MedeaJason {
             argNames: ["track"],
           );
 
-  int remoteMediaTrackMediaDirection(
+  MediaDirection remoteMediaTrackMediaDirection(
       {required RemoteMediaTrack track, dynamic hint}) {
     var arg0 = _platform.api2wire_RemoteMediaTrack(track);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_remote_media_track_media_direction(arg0),
-      parseSuccessData: _wire2api_u8,
+      parseSuccessData: _wire2api_media_direction,
       constMeta: kRemoteMediaTrackMediaDirectionConstMeta,
       argValues: [track],
       hint: hint,
@@ -3378,6 +3431,10 @@ class MedeaJasonImpl implements MedeaJason {
     return raw as bool;
   }
 
+  int _wire2api_i32(dynamic raw) {
+    return raw as int;
+  }
+
   List<LocalMediaTrack> _wire2api_list_LocalMediaTrack(dynamic raw) {
     return (raw as List<dynamic>).map(_wire2api_LocalMediaTrack).toList();
   }
@@ -3388,6 +3445,22 @@ class MedeaJasonImpl implements MedeaJason {
 
   List<MediaDisplayInfo> _wire2api_list_MediaDisplayInfo(dynamic raw) {
     return (raw as List<dynamic>).map(_wire2api_MediaDisplayInfo).toList();
+  }
+
+  MediaDeviceKind _wire2api_media_device_kind(dynamic raw) {
+    return MediaDeviceKind.values[raw];
+  }
+
+  MediaDirection _wire2api_media_direction(dynamic raw) {
+    return MediaDirection.values[raw];
+  }
+
+  MediaKind _wire2api_media_kind(dynamic raw) {
+    return MediaKind.values[raw];
+  }
+
+  MediaSourceKind _wire2api_media_source_kind(dynamic raw) {
+    return MediaSourceKind.values[raw];
   }
 
   String? _wire2api_opt_String(dynamic raw) {
@@ -3812,33 +3885,33 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
       .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
 
-  WireSyncReturn wire_audio_track_constr_new() {
-    return _wire_audio_track_constr_new();
+  WireSyncReturn wire_audioTrack_constr_new() {
+    return _wire_audioTrack_constr_new();
   }
 
-  late final _wire_audio_track_constr_newPtr =
+  late final _wire_audioTrack_constr_newPtr =
       _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_audio_track_constr_new');
-  late final _wire_audio_track_constr_new =
-      _wire_audio_track_constr_newPtr.asFunction<WireSyncReturn Function()>();
+          'wire_audioTrack_constr_new');
+  late final _wire_audioTrack_constr_new =
+      _wire_audioTrack_constr_newPtr.asFunction<WireSyncReturn Function()>();
 
-  WireSyncReturn wire_audio_track_constr_device_id(
+  WireSyncReturn wire_audioTrack_constr_device_id(
     wire_AudioTrackConstraints track,
     ffi.Pointer<wire_uint_8_list> device_id,
   ) {
-    return _wire_audio_track_constr_device_id(
+    return _wire_audioTrack_constr_device_id(
       track,
       device_id,
     );
   }
 
-  late final _wire_audio_track_constr_device_idPtr = _lookup<
+  late final _wire_audioTrack_constr_device_idPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturn Function(
                   wire_AudioTrackConstraints, ffi.Pointer<wire_uint_8_list>)>>(
-      'wire_audio_track_constr_device_id');
-  late final _wire_audio_track_constr_device_id =
-      _wire_audio_track_constr_device_idPtr.asFunction<
+      'wire_audioTrack_constr_device_id');
+  late final _wire_audioTrack_constr_device_id =
+      _wire_audioTrack_constr_device_idPtr.asFunction<
           WireSyncReturn Function(
               wire_AudioTrackConstraints, ffi.Pointer<wire_uint_8_list>)>();
 
@@ -3996,339 +4069,339 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           WireSyncReturn Function(
               wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>();
 
-  WireSyncReturn wire_device_video_track_constr_new() {
-    return _wire_device_video_track_constr_new();
+  WireSyncReturn wire_deviceVideoTrack_constr_new() {
+    return _wire_deviceVideoTrack_constr_new();
   }
 
-  late final _wire_device_video_track_constr_newPtr =
+  late final _wire_deviceVideoTrack_constr_newPtr =
       _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_device_video_track_constr_new');
-  late final _wire_device_video_track_constr_new =
-      _wire_device_video_track_constr_newPtr
+          'wire_deviceVideoTrack_constr_new');
+  late final _wire_deviceVideoTrack_constr_new =
+      _wire_deviceVideoTrack_constr_newPtr
           .asFunction<WireSyncReturn Function()>();
 
-  WireSyncReturn wire_device_video_track_constr_device_id(
+  WireSyncReturn wire_deviceVideoTrack_constr_device_id(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     ffi.Pointer<wire_uint_8_list> device_id,
   ) {
-    return _wire_device_video_track_constr_device_id(
+    return _wire_deviceVideoTrack_constr_device_id(
       constr,
       device_id,
     );
   }
 
-  late final _wire_device_video_track_constr_device_idPtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_device_idPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
                   ffi.Pointer<wire_uint_8_list>)>>(
-      'wire_device_video_track_constr_device_id');
-  late final _wire_device_video_track_constr_device_id =
-      _wire_device_video_track_constr_device_idPtr.asFunction<
+      'wire_deviceVideoTrack_constr_device_id');
+  late final _wire_deviceVideoTrack_constr_device_id =
+      _wire_deviceVideoTrack_constr_device_idPtr.asFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
               ffi.Pointer<wire_uint_8_list>)>();
 
-  WireSyncReturn wire_device_video_track_constr_exact_facing_mode(
+  WireSyncReturn wire_deviceVideoTrack_constr_exact_facing_mode(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int facing_mode,
   ) {
-    return _wire_device_video_track_constr_exact_facing_mode(
+    return _wire_deviceVideoTrack_constr_exact_facing_mode(
       constr,
       facing_mode,
     );
   }
 
-  late final _wire_device_video_track_constr_exact_facing_modePtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_exact_facing_modePtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int32)>>('wire_device_video_track_constr_exact_facing_mode');
-  late final _wire_device_video_track_constr_exact_facing_mode =
-      _wire_device_video_track_constr_exact_facing_modePtr.asFunction<
+              ffi.Int32)>>('wire_deviceVideoTrack_constr_exact_facing_mode');
+  late final _wire_deviceVideoTrack_constr_exact_facing_mode =
+      _wire_deviceVideoTrack_constr_exact_facing_modePtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_ideal_facing_mode(
+  WireSyncReturn wire_deviceVideoTrack_constr_ideal_facing_mode(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int facing_mode,
   ) {
-    return _wire_device_video_track_constr_ideal_facing_mode(
+    return _wire_deviceVideoTrack_constr_ideal_facing_mode(
       constr,
       facing_mode,
     );
   }
 
-  late final _wire_device_video_track_constr_ideal_facing_modePtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_ideal_facing_modePtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int32)>>('wire_device_video_track_constr_ideal_facing_mode');
-  late final _wire_device_video_track_constr_ideal_facing_mode =
-      _wire_device_video_track_constr_ideal_facing_modePtr.asFunction<
+              ffi.Int32)>>('wire_deviceVideoTrack_constr_ideal_facing_mode');
+  late final _wire_deviceVideoTrack_constr_ideal_facing_mode =
+      _wire_deviceVideoTrack_constr_ideal_facing_modePtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_exact_height(
+  WireSyncReturn wire_deviceVideoTrack_constr_exact_height(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int exact_height,
   ) {
-    return _wire_device_video_track_constr_exact_height(
+    return _wire_deviceVideoTrack_constr_exact_height(
       constr,
       exact_height,
     );
   }
 
-  late final _wire_device_video_track_constr_exact_heightPtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_exact_heightPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_device_video_track_constr_exact_height');
-  late final _wire_device_video_track_constr_exact_height =
-      _wire_device_video_track_constr_exact_heightPtr.asFunction<
+              ffi.Int64)>>('wire_deviceVideoTrack_constr_exact_height');
+  late final _wire_deviceVideoTrack_constr_exact_height =
+      _wire_deviceVideoTrack_constr_exact_heightPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_ideal_height(
+  WireSyncReturn wire_deviceVideoTrack_constr_ideal_height(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int ideal_height,
   ) {
-    return _wire_device_video_track_constr_ideal_height(
+    return _wire_deviceVideoTrack_constr_ideal_height(
       constr,
       ideal_height,
     );
   }
 
-  late final _wire_device_video_track_constr_ideal_heightPtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_ideal_heightPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_device_video_track_constr_ideal_height');
-  late final _wire_device_video_track_constr_ideal_height =
-      _wire_device_video_track_constr_ideal_heightPtr.asFunction<
+              ffi.Int64)>>('wire_deviceVideoTrack_constr_ideal_height');
+  late final _wire_deviceVideoTrack_constr_ideal_height =
+      _wire_deviceVideoTrack_constr_ideal_heightPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_exact_width(
+  WireSyncReturn wire_deviceVideoTrack_constr_exact_width(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int exact_width,
   ) {
-    return _wire_device_video_track_constr_exact_width(
+    return _wire_deviceVideoTrack_constr_exact_width(
       constr,
       exact_width,
     );
   }
 
-  late final _wire_device_video_track_constr_exact_widthPtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_exact_widthPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_device_video_track_constr_exact_width');
-  late final _wire_device_video_track_constr_exact_width =
-      _wire_device_video_track_constr_exact_widthPtr.asFunction<
+              ffi.Int64)>>('wire_deviceVideoTrack_constr_exact_width');
+  late final _wire_deviceVideoTrack_constr_exact_width =
+      _wire_deviceVideoTrack_constr_exact_widthPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_ideal_width(
+  WireSyncReturn wire_deviceVideoTrack_constr_ideal_width(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int ideal_width,
   ) {
-    return _wire_device_video_track_constr_ideal_width(
+    return _wire_deviceVideoTrack_constr_ideal_width(
       constr,
       ideal_width,
     );
   }
 
-  late final _wire_device_video_track_constr_ideal_widthPtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_ideal_widthPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_device_video_track_constr_ideal_width');
-  late final _wire_device_video_track_constr_ideal_width =
-      _wire_device_video_track_constr_ideal_widthPtr.asFunction<
+              ffi.Int64)>>('wire_deviceVideoTrack_constr_ideal_width');
+  late final _wire_deviceVideoTrack_constr_ideal_width =
+      _wire_deviceVideoTrack_constr_ideal_widthPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_height_in_range(
+  WireSyncReturn wire_deviceVideoTrack_constr_height_in_range(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int min,
     int max,
   ) {
-    return _wire_device_video_track_constr_height_in_range(
+    return _wire_deviceVideoTrack_constr_height_in_range(
       constr,
       min,
       max,
     );
   }
 
-  late final _wire_device_video_track_constr_height_in_rangePtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_height_in_rangePtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints,
               ffi.Int64,
-              ffi.Int64)>>('wire_device_video_track_constr_height_in_range');
-  late final _wire_device_video_track_constr_height_in_range =
-      _wire_device_video_track_constr_height_in_rangePtr.asFunction<
+              ffi.Int64)>>('wire_deviceVideoTrack_constr_height_in_range');
+  late final _wire_deviceVideoTrack_constr_height_in_range =
+      _wire_deviceVideoTrack_constr_height_in_rangePtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int, int)>();
 
-  WireSyncReturn wire_device_video_track_constr_width_in_range(
+  WireSyncReturn wire_deviceVideoTrack_constr_width_in_range(
     wire_ApiWrapDeviceVideoTrackConstraints constr,
     int min,
     int max,
   ) {
-    return _wire_device_video_track_constr_width_in_range(
+    return _wire_deviceVideoTrack_constr_width_in_range(
       constr,
       min,
       max,
     );
   }
 
-  late final _wire_device_video_track_constr_width_in_rangePtr = _lookup<
+  late final _wire_deviceVideoTrack_constr_width_in_rangePtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints,
               ffi.Int64,
-              ffi.Int64)>>('wire_device_video_track_constr_width_in_range');
-  late final _wire_device_video_track_constr_width_in_range =
-      _wire_device_video_track_constr_width_in_rangePtr.asFunction<
+              ffi.Int64)>>('wire_deviceVideoTrack_constr_width_in_range');
+  late final _wire_deviceVideoTrack_constr_width_in_range =
+      _wire_deviceVideoTrack_constr_width_in_rangePtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDeviceVideoTrackConstraints, int, int)>();
 
-  WireSyncReturn wire_display_video_track_constr_new() {
-    return _wire_display_video_track_constr_new();
+  WireSyncReturn wire_displayVideoTrack_constr_new() {
+    return _wire_displayVideoTrack_constr_new();
   }
 
-  late final _wire_display_video_track_constr_newPtr =
+  late final _wire_displayVideoTrack_constr_newPtr =
       _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_display_video_track_constr_new');
-  late final _wire_display_video_track_constr_new =
-      _wire_display_video_track_constr_newPtr
+          'wire_displayVideoTrack_constr_new');
+  late final _wire_displayVideoTrack_constr_new =
+      _wire_displayVideoTrack_constr_newPtr
           .asFunction<WireSyncReturn Function()>();
 
-  WireSyncReturn wire_display_video_track_constr_device_id(
+  WireSyncReturn wire_displayVideoTrack_constr_device_id(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     ffi.Pointer<wire_uint_8_list> device_id,
   ) {
-    return _wire_display_video_track_constr_device_id(
+    return _wire_displayVideoTrack_constr_device_id(
       constr,
       device_id,
     );
   }
 
-  late final _wire_display_video_track_constr_device_idPtr = _lookup<
+  late final _wire_displayVideoTrack_constr_device_idPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
                   ffi.Pointer<wire_uint_8_list>)>>(
-      'wire_display_video_track_constr_device_id');
-  late final _wire_display_video_track_constr_device_id =
-      _wire_display_video_track_constr_device_idPtr.asFunction<
+      'wire_displayVideoTrack_constr_device_id');
+  late final _wire_displayVideoTrack_constr_device_id =
+      _wire_displayVideoTrack_constr_device_idPtr.asFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
               ffi.Pointer<wire_uint_8_list>)>();
 
-  WireSyncReturn wire_display_video_track_constr_exact_height(
+  WireSyncReturn wire_displayVideoTrack_constr_exact_height(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     int exact_height,
   ) {
-    return _wire_display_video_track_constr_exact_height(
+    return _wire_displayVideoTrack_constr_exact_height(
       constr,
       exact_height,
     );
   }
 
-  late final _wire_display_video_track_constr_exact_heightPtr = _lookup<
+  late final _wire_displayVideoTrack_constr_exact_heightPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_display_video_track_constr_exact_height');
-  late final _wire_display_video_track_constr_exact_height =
-      _wire_display_video_track_constr_exact_heightPtr.asFunction<
+              ffi.Int64)>>('wire_displayVideoTrack_constr_exact_height');
+  late final _wire_displayVideoTrack_constr_exact_height =
+      _wire_displayVideoTrack_constr_exact_heightPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_display_video_track_constr_ideal_height(
+  WireSyncReturn wire_displayVideoTrack_constr_ideal_height(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     int ideal_height,
   ) {
-    return _wire_display_video_track_constr_ideal_height(
+    return _wire_displayVideoTrack_constr_ideal_height(
       constr,
       ideal_height,
     );
   }
 
-  late final _wire_display_video_track_constr_ideal_heightPtr = _lookup<
+  late final _wire_displayVideoTrack_constr_ideal_heightPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_display_video_track_constr_ideal_height');
-  late final _wire_display_video_track_constr_ideal_height =
-      _wire_display_video_track_constr_ideal_heightPtr.asFunction<
+              ffi.Int64)>>('wire_displayVideoTrack_constr_ideal_height');
+  late final _wire_displayVideoTrack_constr_ideal_height =
+      _wire_displayVideoTrack_constr_ideal_heightPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_display_video_track_constr_exact_width(
+  WireSyncReturn wire_displayVideoTrack_constr_exact_width(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     int exact_width,
   ) {
-    return _wire_display_video_track_constr_exact_width(
+    return _wire_displayVideoTrack_constr_exact_width(
       constr,
       exact_width,
     );
   }
 
-  late final _wire_display_video_track_constr_exact_widthPtr = _lookup<
+  late final _wire_displayVideoTrack_constr_exact_widthPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_display_video_track_constr_exact_width');
-  late final _wire_display_video_track_constr_exact_width =
-      _wire_display_video_track_constr_exact_widthPtr.asFunction<
+              ffi.Int64)>>('wire_displayVideoTrack_constr_exact_width');
+  late final _wire_displayVideoTrack_constr_exact_width =
+      _wire_displayVideoTrack_constr_exact_widthPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_display_video_track_constr_ideal_width(
+  WireSyncReturn wire_displayVideoTrack_constr_ideal_width(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     int ideal_width,
   ) {
-    return _wire_display_video_track_constr_ideal_width(
+    return _wire_displayVideoTrack_constr_ideal_width(
       constr,
       ideal_width,
     );
   }
 
-  late final _wire_display_video_track_constr_ideal_widthPtr = _lookup<
+  late final _wire_displayVideoTrack_constr_ideal_widthPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_display_video_track_constr_ideal_width');
-  late final _wire_display_video_track_constr_ideal_width =
-      _wire_display_video_track_constr_ideal_widthPtr.asFunction<
+              ffi.Int64)>>('wire_displayVideoTrack_constr_ideal_width');
+  late final _wire_displayVideoTrack_constr_ideal_width =
+      _wire_displayVideoTrack_constr_ideal_widthPtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_display_video_track_constr_ideal_frame_rate(
+  WireSyncReturn wire_displayVideoTrack_constr_ideal_frame_rate(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     int ideal_frame_rate,
   ) {
-    return _wire_display_video_track_constr_ideal_frame_rate(
+    return _wire_displayVideoTrack_constr_ideal_frame_rate(
       constr,
       ideal_frame_rate,
     );
   }
 
-  late final _wire_display_video_track_constr_ideal_frame_ratePtr = _lookup<
+  late final _wire_displayVideoTrack_constr_ideal_frame_ratePtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_display_video_track_constr_ideal_frame_rate');
-  late final _wire_display_video_track_constr_ideal_frame_rate =
-      _wire_display_video_track_constr_ideal_frame_ratePtr.asFunction<
+              ffi.Int64)>>('wire_displayVideoTrack_constr_ideal_frame_rate');
+  late final _wire_displayVideoTrack_constr_ideal_frame_rate =
+      _wire_displayVideoTrack_constr_ideal_frame_ratePtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 
-  WireSyncReturn wire_display_video_track_constr_exact_frame_rate(
+  WireSyncReturn wire_displayVideoTrack_constr_exact_frame_rate(
     wire_ApiWrapDisplayVideoTrackConstraints constr,
     int exact_frame_rate,
   ) {
-    return _wire_display_video_track_constr_exact_frame_rate(
+    return _wire_displayVideoTrack_constr_exact_frame_rate(
       constr,
       exact_frame_rate,
     );
   }
 
-  late final _wire_display_video_track_constr_exact_frame_ratePtr = _lookup<
+  late final _wire_displayVideoTrack_constr_exact_frame_ratePtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_display_video_track_constr_exact_frame_rate');
-  late final _wire_display_video_track_constr_exact_frame_rate =
-      _wire_display_video_track_constr_exact_frame_ratePtr.asFunction<
+              ffi.Int64)>>('wire_displayVideoTrack_constr_exact_frame_rate');
+  late final _wire_displayVideoTrack_constr_exact_frame_rate =
+      _wire_displayVideoTrack_constr_exact_frame_ratePtr.asFunction<
           WireSyncReturn Function(
               wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 

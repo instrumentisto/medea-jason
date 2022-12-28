@@ -14,39 +14,42 @@
 use crate::jason_api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::ffi::c_void;
-use std::sync::Arc;
+use std::{ffi::c_void, sync::Arc};
 
 // Section: imports
 
-use crate::media::constraints::FacingMode;
+use crate::media::{
+    constraints::FacingMode,
+    track::{remote::MediaDirection, MediaSourceKind},
+    MediaDeviceKind, MediaKind,
+};
 
 // Section: wire functions
 
-fn wire_audio_track_constr_new_impl() -> support::WireSyncReturn {
+fn wire_audioTrack_constr_new_impl() -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "audio_track_constr_new",
+            debug_name: "audioTrack_constr_new",
             port: None,
             mode: FfiCallMode::Sync,
         },
-        move || Ok(audio_track_constr_new()),
+        move || Ok(audioTrack_constr_new()),
     )
 }
-fn wire_audio_track_constr_device_id_impl(
+fn wire_audioTrack_constr_device_id_impl(
     track: impl Wire2Api<RustOpaque<AudioTrackConstraints>> + UnwindSafe,
     device_id: impl Wire2Api<String> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "audio_track_constr_device_id",
+            debug_name: "audioTrack_constr_device_id",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_track = track.wire2api();
             let api_device_id = device_id.wire2api();
-            Ok(audio_track_constr_device_id(api_track, api_device_id))
+            Ok(audioTrack_constr_device_id(api_track, api_device_id))
         },
     )
 }
@@ -201,152 +204,149 @@ fn wire_connection_handle_disable_remote_video_impl(
         },
     )
 }
-fn wire_device_video_track_constr_new_impl() -> support::WireSyncReturn {
+fn wire_deviceVideoTrack_constr_new_impl() -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_new",
+            debug_name: "deviceVideoTrack_constr_new",
             port: None,
             mode: FfiCallMode::Sync,
         },
-        move || Ok(device_video_track_constr_new()),
+        move || Ok(deviceVideoTrack_constr_new()),
     )
 }
-fn wire_device_video_track_constr_device_id_impl(
+fn wire_deviceVideoTrack_constr_device_id_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     device_id: impl Wire2Api<String> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_device_id",
+            debug_name: "deviceVideoTrack_constr_device_id",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_device_id = device_id.wire2api();
-            Ok(device_video_track_constr_device_id(
-                api_constr,
-                api_device_id,
-            ))
+            Ok(deviceVideoTrack_constr_device_id(api_constr, api_device_id))
         },
     )
 }
-fn wire_device_video_track_constr_exact_facing_mode_impl(
+fn wire_deviceVideoTrack_constr_exact_facing_mode_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     facing_mode: impl Wire2Api<FacingMode> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_exact_facing_mode",
+            debug_name: "deviceVideoTrack_constr_exact_facing_mode",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            Ok(device_video_track_constr_exact_facing_mode(
+            Ok(deviceVideoTrack_constr_exact_facing_mode(
                 api_constr,
                 api_facing_mode,
             ))
         },
     )
 }
-fn wire_device_video_track_constr_ideal_facing_mode_impl(
+fn wire_deviceVideoTrack_constr_ideal_facing_mode_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     facing_mode: impl Wire2Api<FacingMode> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_ideal_facing_mode",
+            debug_name: "deviceVideoTrack_constr_ideal_facing_mode",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_facing_mode = facing_mode.wire2api();
-            Ok(device_video_track_constr_ideal_facing_mode(
+            Ok(deviceVideoTrack_constr_ideal_facing_mode(
                 api_constr,
                 api_facing_mode,
             ))
         },
     )
 }
-fn wire_device_video_track_constr_exact_height_impl(
+fn wire_deviceVideoTrack_constr_exact_height_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     exact_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_exact_height",
+            debug_name: "deviceVideoTrack_constr_exact_height",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_exact_height = exact_height.wire2api();
-            device_video_track_constr_exact_height(api_constr, api_exact_height)
+            deviceVideoTrack_constr_exact_height(api_constr, api_exact_height)
         },
     )
 }
-fn wire_device_video_track_constr_ideal_height_impl(
+fn wire_deviceVideoTrack_constr_ideal_height_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     ideal_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_ideal_height",
+            debug_name: "deviceVideoTrack_constr_ideal_height",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_ideal_height = ideal_height.wire2api();
-            device_video_track_constr_ideal_height(api_constr, api_ideal_height)
+            deviceVideoTrack_constr_ideal_height(api_constr, api_ideal_height)
         },
     )
 }
-fn wire_device_video_track_constr_exact_width_impl(
+fn wire_deviceVideoTrack_constr_exact_width_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     exact_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_exact_width",
+            debug_name: "deviceVideoTrack_constr_exact_width",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_exact_width = exact_width.wire2api();
-            device_video_track_constr_exact_width(api_constr, api_exact_width)
+            deviceVideoTrack_constr_exact_width(api_constr, api_exact_width)
         },
     )
 }
-fn wire_device_video_track_constr_ideal_width_impl(
+fn wire_deviceVideoTrack_constr_ideal_width_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     ideal_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_ideal_width",
+            debug_name: "deviceVideoTrack_constr_ideal_width",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_ideal_width = ideal_width.wire2api();
-            device_video_track_constr_ideal_width(api_constr, api_ideal_width)
+            deviceVideoTrack_constr_ideal_width(api_constr, api_ideal_width)
         },
     )
 }
-fn wire_device_video_track_constr_height_in_range_impl(
+fn wire_deviceVideoTrack_constr_height_in_range_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     min: impl Wire2Api<i64> + UnwindSafe,
@@ -354,7 +354,7 @@ fn wire_device_video_track_constr_height_in_range_impl(
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_height_in_range",
+            debug_name: "deviceVideoTrack_constr_height_in_range",
             port: None,
             mode: FfiCallMode::Sync,
         },
@@ -362,13 +362,13 @@ fn wire_device_video_track_constr_height_in_range_impl(
             let api_constr = constr.wire2api();
             let api_min = min.wire2api();
             let api_max = max.wire2api();
-            device_video_track_constr_height_in_range(
+            deviceVideoTrack_constr_height_in_range(
                 api_constr, api_min, api_max,
             )
         },
     )
 }
-fn wire_device_video_track_constr_width_in_range_impl(
+fn wire_deviceVideoTrack_constr_width_in_range_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
         + UnwindSafe,
     min: impl Wire2Api<i64> + UnwindSafe,
@@ -376,7 +376,7 @@ fn wire_device_video_track_constr_width_in_range_impl(
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "device_video_track_constr_width_in_range",
+            debug_name: "deviceVideoTrack_constr_width_in_range",
             port: None,
             mode: FfiCallMode::Sync,
         },
@@ -384,157 +384,149 @@ fn wire_device_video_track_constr_width_in_range_impl(
             let api_constr = constr.wire2api();
             let api_min = min.wire2api();
             let api_max = max.wire2api();
-            device_video_track_constr_width_in_range(
-                api_constr, api_min, api_max,
-            )
+            deviceVideoTrack_constr_width_in_range(api_constr, api_min, api_max)
         },
     )
 }
-fn wire_display_video_track_constr_new_impl() -> support::WireSyncReturn {
+fn wire_displayVideoTrack_constr_new_impl() -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_new",
+            debug_name: "displayVideoTrack_constr_new",
             port: None,
             mode: FfiCallMode::Sync,
         },
-        move || Ok(display_video_track_constr_new()),
+        move || Ok(displayVideoTrack_constr_new()),
     )
 }
-fn wire_display_video_track_constr_device_id_impl(
+fn wire_displayVideoTrack_constr_device_id_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     device_id: impl Wire2Api<String> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_device_id",
+            debug_name: "displayVideoTrack_constr_device_id",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_device_id = device_id.wire2api();
-            Ok(display_video_track_constr_device_id(
+            Ok(displayVideoTrack_constr_device_id(
                 api_constr,
                 api_device_id,
             ))
         },
     )
 }
-fn wire_display_video_track_constr_exact_height_impl(
+fn wire_displayVideoTrack_constr_exact_height_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     exact_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_exact_height",
+            debug_name: "displayVideoTrack_constr_exact_height",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_exact_height = exact_height.wire2api();
-            display_video_track_constr_exact_height(
-                api_constr,
-                api_exact_height,
-            )
+            displayVideoTrack_constr_exact_height(api_constr, api_exact_height)
         },
     )
 }
-fn wire_display_video_track_constr_ideal_height_impl(
+fn wire_displayVideoTrack_constr_ideal_height_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     ideal_height: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_ideal_height",
+            debug_name: "displayVideoTrack_constr_ideal_height",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_ideal_height = ideal_height.wire2api();
-            display_video_track_constr_ideal_height(
-                api_constr,
-                api_ideal_height,
-            )
+            displayVideoTrack_constr_ideal_height(api_constr, api_ideal_height)
         },
     )
 }
-fn wire_display_video_track_constr_exact_width_impl(
+fn wire_displayVideoTrack_constr_exact_width_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     exact_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_exact_width",
+            debug_name: "displayVideoTrack_constr_exact_width",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_exact_width = exact_width.wire2api();
-            display_video_track_constr_exact_width(api_constr, api_exact_width)
+            displayVideoTrack_constr_exact_width(api_constr, api_exact_width)
         },
     )
 }
-fn wire_display_video_track_constr_ideal_width_impl(
+fn wire_displayVideoTrack_constr_ideal_width_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     ideal_width: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_ideal_width",
+            debug_name: "displayVideoTrack_constr_ideal_width",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_ideal_width = ideal_width.wire2api();
-            display_video_track_constr_ideal_width(api_constr, api_ideal_width)
+            displayVideoTrack_constr_ideal_width(api_constr, api_ideal_width)
         },
     )
 }
-fn wire_display_video_track_constr_ideal_frame_rate_impl(
+fn wire_displayVideoTrack_constr_ideal_frame_rate_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     ideal_frame_rate: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_ideal_frame_rate",
+            debug_name: "displayVideoTrack_constr_ideal_frame_rate",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_ideal_frame_rate = ideal_frame_rate.wire2api();
-            display_video_track_constr_ideal_frame_rate(
+            displayVideoTrack_constr_ideal_frame_rate(
                 api_constr,
                 api_ideal_frame_rate,
             )
         },
     )
 }
-fn wire_display_video_track_constr_exact_frame_rate_impl(
+fn wire_displayVideoTrack_constr_exact_frame_rate_impl(
     constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
         + UnwindSafe,
     exact_frame_rate: impl Wire2Api<i64> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "display_video_track_constr_exact_frame_rate",
+            debug_name: "displayVideoTrack_constr_exact_frame_rate",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_constr = constr.wire2api();
             let api_exact_frame_rate = exact_frame_rate.wire2api();
-            display_video_track_constr_exact_frame_rate(
+            displayVideoTrack_constr_exact_frame_rate(
                 api_constr,
                 api_exact_frame_rate,
             )
@@ -1714,10 +1706,51 @@ impl Wire2Api<usize> for usize {
 }
 // Section: impl IntoDart
 
+impl support::IntoDart for MediaDeviceKind {
+    fn into_dart(self) -> support::DartAbi {
+        match self {
+            Self::AudioInput => 0,
+            Self::VideoInput => 1,
+            Self::AudioOutput => 2,
+        }
+        .into_dart()
+    }
+}
+impl support::IntoDart for MediaDirection {
+    fn into_dart(self) -> support::DartAbi {
+        match self {
+            Self::SendRecv => 0,
+            Self::SendOnly => 1,
+            Self::RecvOnly => 2,
+            Self::Inactive => 3,
+        }
+        .into_dart()
+    }
+}
+impl support::IntoDart for MediaKind {
+    fn into_dart(self) -> support::DartAbi {
+        match self {
+            Self::Audio => 0,
+            Self::Video => 1,
+        }
+        .into_dart()
+    }
+}
+impl support::IntoDart for MediaSourceKind {
+    fn into_dart(self) -> support::DartAbi {
+        match self {
+            Self::Device => 0,
+            Self::Display => 1,
+        }
+        .into_dart()
+    }
+}
+
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
+        Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]

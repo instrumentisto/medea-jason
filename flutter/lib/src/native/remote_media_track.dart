@@ -25,20 +25,17 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   @override
   MediaKind kind() {
-    return MediaKind
-        .values[api.remoteMediaTrackKind(track: opaque.innerOpaque)];
+    return api.remoteMediaTrackKind(track: opaque.innerOpaque);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    return MediaSourceKind
-        .values[api.remoteMediaTrackMediaSourceKind(track: opaque.innerOpaque)];
+    return api.remoteMediaTrackMediaSourceKind(track: opaque.innerOpaque);
   }
 
   @override
   TrackMediaDirection mediaDirection() {
-    return TrackMediaDirection
-        .values[api.remoteMediaTrackMediaDirection(track: opaque.innerOpaque)];
+    return api.remoteMediaTrackMediaDirection(track: opaque.innerOpaque);
   }
 
   @override

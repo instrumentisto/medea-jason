@@ -1,13 +1,11 @@
-//! TODO doc.
+//! todo doc.
 
 pub use crate::api::utils::ApiWrap;
-use crate::api::utils::new_dart_opaque;
-use crate::api::ForeignClass;
+use crate::api::{utils::new_dart_opaque, ForeignClass};
 
-use crate::media::MediaDirection;
 use crate::{
     api::{ArgumentError, Error as DartError},
-    media::FacingMode,
+    media::{FacingMode, MediaDeviceKind, MediaDirection, MediaKind},
     platform::utils::dart_future::{dart_enum_try_into, IntoDartFuture},
     room::ChangeMediaStateError,
 };
@@ -27,7 +25,7 @@ pub use crate::media::AudioTrackConstraints;
 
 /// Creates new [`AudioTrackConstraints`] with none constr configured.
 #[must_use]
-pub fn audio_track_constr_new() -> SyncReturn<RustOpaque<AudioTrackConstraints>>
+pub fn audioTrack_constr_new() -> SyncReturn<RustOpaque<AudioTrackConstraints>>
 {
     SyncReturn(RustOpaque::new(AudioTrackConstraints::new()))
 }
@@ -36,7 +34,7 @@ pub fn audio_track_constr_new() -> SyncReturn<RustOpaque<AudioTrackConstraints>>
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
 #[must_use]
-pub fn audio_track_constr_device_id(
+pub fn audioTrack_constr_device_id(
     track: RustOpaque<AudioTrackConstraints>,
     device_id: String,
 ) -> SyncReturn<RustOpaque<AudioTrackConstraints>> {
@@ -246,7 +244,7 @@ use crate::{
 /// Creates new [`DeviceVideoTrackConstraints`] with none constr
 /// configured.
 #[must_use]
-pub fn device_video_track_constr_new(
+pub fn deviceVideoTrack_constr_new(
 ) -> SyncReturn<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>> {
     SyncReturn(RustOpaque::new(unsafe {
         ApiWrap::new(DeviceVideoTrackConstraints::new())
@@ -257,7 +255,7 @@ pub fn device_video_track_constr_new(
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
 #[must_use]
-pub fn device_video_track_constr_device_id(
+pub fn deviceVideoTrack_constr_device_id(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     device_id: String,
 ) -> SyncReturn<()> {
@@ -274,7 +272,7 @@ pub fn device_video_track_constr_device_id(
 ///
 /// If `facing_mode` is not [`FacingMode`] index.
 #[must_use]
-pub fn device_video_track_constr_exact_facing_mode(
+pub fn deviceVideoTrack_constr_exact_facing_mode(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     facing_mode: FacingMode,
 ) -> SyncReturn<()> {
@@ -291,7 +289,7 @@ pub fn device_video_track_constr_exact_facing_mode(
 ///
 /// If `facing_mode` is not [`FacingMode`] index.
 #[must_use]
-pub fn device_video_track_constr_ideal_facing_mode(
+pub fn deviceVideoTrack_constr_ideal_facing_mode(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     facing_mode: FacingMode,
 ) -> SyncReturn<()> {
@@ -307,7 +305,7 @@ pub fn device_video_track_constr_ideal_facing_mode(
 /// # Errors
 ///
 /// If `exact_height` is not [u32].
-pub fn device_video_track_constr_exact_height(
+pub fn deviceVideoTrack_constr_exact_height(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     exact_height: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -333,7 +331,7 @@ pub fn device_video_track_constr_exact_height(
 /// # Errors
 ///
 /// If `ideal_height` is not [u32].
-pub fn device_video_track_constr_ideal_height(
+pub fn deviceVideoTrack_constr_ideal_height(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     ideal_height: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -359,7 +357,7 @@ pub fn device_video_track_constr_ideal_height(
 /// # Errors
 ///
 /// If `exact_width` is not [u32].
-pub fn device_video_track_constr_exact_width(
+pub fn deviceVideoTrack_constr_exact_width(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     exact_width: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -385,7 +383,7 @@ pub fn device_video_track_constr_exact_width(
 /// # Errors
 ///
 /// If `ideal_width` is not [u32].
-pub fn device_video_track_constr_ideal_width(
+pub fn deviceVideoTrack_constr_ideal_width(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     ideal_width: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -411,7 +409,7 @@ pub fn device_video_track_constr_ideal_width(
 /// # Errors
 ///
 /// If `min` or `max` is not [u32].
-pub fn device_video_track_constr_height_in_range(
+pub fn deviceVideoTrack_constr_height_in_range(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     min: i64,
     max: i64,
@@ -444,7 +442,7 @@ pub fn device_video_track_constr_height_in_range(
 /// # Errors
 ///
 /// If `min` or `max` is not [u32].
-pub fn device_video_track_constr_width_in_range(
+pub fn deviceVideoTrack_constr_width_in_range(
     constr: RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>,
     min: i64,
     max: i64,
@@ -477,7 +475,7 @@ pub use crate::media::DisplayVideoTrackConstraints;
 /// Creates new [`DisplayVideoTrackConstraints`] with none constr
 /// configured.
 #[must_use]
-pub fn display_video_track_constr_new(
+pub fn displayVideoTrack_constr_new(
 ) -> SyncReturn<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>> {
     SyncReturn(RustOpaque::new(unsafe {
         ApiWrap::new(DisplayVideoTrackConstraints::new())
@@ -488,7 +486,7 @@ pub fn display_video_track_constr_new(
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
 #[must_use]
-pub fn display_video_track_constr_device_id(
+pub fn displayVideoTrack_constr_device_id(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     device_id: String,
 ) -> SyncReturn<()> {
@@ -504,7 +502,7 @@ pub fn display_video_track_constr_device_id(
 /// # Errors
 ///
 /// If `exact_height` is not [u32].
-pub fn display_video_track_constr_exact_height(
+pub fn displayVideoTrack_constr_exact_height(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     exact_height: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -530,7 +528,7 @@ pub fn display_video_track_constr_exact_height(
 /// # Errors
 ///
 /// If `ideal_height` is not [u32].
-pub fn display_video_track_constr_ideal_height(
+pub fn displayVideoTrack_constr_ideal_height(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     ideal_height: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -556,7 +554,7 @@ pub fn display_video_track_constr_ideal_height(
 /// # Errors
 ///
 /// If `exact_width` is not [u32].
-pub fn display_video_track_constr_exact_width(
+pub fn displayVideoTrack_constr_exact_width(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     exact_width: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -582,7 +580,7 @@ pub fn display_video_track_constr_exact_width(
 /// # Errors
 ///
 /// If `ideal_width` is not [u32].
-pub fn display_video_track_constr_ideal_width(
+pub fn displayVideoTrack_constr_ideal_width(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     ideal_width: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -608,7 +606,7 @@ pub fn display_video_track_constr_ideal_width(
 /// # Errors
 ///
 /// If `ideal_frame_rate` is not [u32].
-pub fn display_video_track_constr_ideal_frame_rate(
+pub fn displayVideoTrack_constr_ideal_frame_rate(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     ideal_frame_rate: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -634,7 +632,7 @@ pub fn display_video_track_constr_ideal_frame_rate(
 /// # Errors
 ///
 /// If `exact_frame_rate` is not [u32].
-pub fn display_video_track_constr_exact_frame_rate(
+pub fn displayVideoTrack_constr_exact_frame_rate(
     constr: RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>,
     exact_frame_rate: i64,
 ) -> anyhow::Result<SyncReturn<()>> {
@@ -730,14 +728,17 @@ pub fn local_media_track_from_ptr(
     })
 }
 
-/// Returns the [`ApiWrap<Vec<LocalMediaTrack>>`] from the address
+/// Returns the [`Vec<RustOpaque<LocalMediaTrack>>`] from the address
 /// [`ForeignClass`].
 #[must_use]
 pub fn vec_local_tracks_from_ptr(
     ptr: usize,
 ) -> SyncReturn<Vec<RustOpaque<LocalMediaTrack>>> {
     SyncReturn(unsafe {
-        Vec::<LocalMediaTrack>::from_ptr(ptr::NonNull::new(ptr as _).unwrap()).into_iter().map(RustOpaque::new).collect()
+        Vec::<LocalMediaTrack>::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+            .into_iter()
+            .map(RustOpaque::new)
+            .collect()
     })
 }
 
@@ -753,7 +754,6 @@ pub fn local_media_track_get_track(
     SyncReturn(dart_opaque)
 }
 
-// TODO(alexlapa): can we return MediaKind directly?
 /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
 /// audio track, or a [`MediaKind::Video`] if it represents a video track.
 ///
@@ -762,11 +762,10 @@ pub fn local_media_track_get_track(
 #[must_use]
 pub fn local_media_track_kind(
     track: RustOpaque<LocalMediaTrack>,
-) -> SyncReturn<u8> {
-    SyncReturn(track.kind() as u8)
+) -> SyncReturn<MediaKind> {
+    SyncReturn(track.kind())
 }
 
-// TODO(alexlapa): can we return MediaKind directly?
 /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
 /// sourced from some device (webcam/microphone), or a
 /// [`MediaSourceKind::Display`] if it's captured via
@@ -778,8 +777,8 @@ pub fn local_media_track_kind(
 #[must_use]
 pub fn local_media_track_media_source_kind(
     track: RustOpaque<LocalMediaTrack>,
-) -> SyncReturn<u8> {
-    SyncReturn(track.media_source_kind() as u8)
+) -> SyncReturn<MediaSourceKind> {
+    SyncReturn(track.media_source_kind())
 }
 
 // -------------------------------------------------------------------
@@ -788,15 +787,17 @@ pub use crate::platform::MediaDeviceInfo;
 
 impl ForeignClass for MediaDeviceInfo {}
 
-// TODO(alexlapa): try rework
-/// Returns the [`ApiWrap<Vec<MediaDeviceInfo>>`] from the address
+/// Returns the [`Vec<RustOpaque<MediaDeviceInfo>>`] from the address
 /// [`ForeignClass`].
 #[must_use]
 pub fn vec_media_device_info_from_ptr(
     ptr: usize,
 ) -> SyncReturn<Vec<RustOpaque<MediaDeviceInfo>>> {
     SyncReturn(unsafe {
-        Vec::<MediaDeviceInfo>::from_ptr(ptr::NonNull::new(ptr as _).unwrap()).into_iter().map(RustOpaque::new).collect()
+        Vec::<MediaDeviceInfo>::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+            .into_iter()
+            .map(RustOpaque::new)
+            .collect()
     })
 }
 
@@ -808,7 +809,6 @@ pub fn media_device_info_device_id(
     SyncReturn(media_device.device_id())
 }
 
-// TODO(alexlapa): can we return MediaKind directly?
 /// Returns kind of the represented device.
 ///
 /// This representation of [MediaDeviceInfo][1] ONLY for input device.
@@ -817,8 +817,8 @@ pub fn media_device_info_device_id(
 #[must_use]
 pub fn media_device_info_kind(
     media_device: RustOpaque<MediaDeviceInfo>,
-) -> SyncReturn<u8> {
-    SyncReturn(media_device.kind() as u8)
+) -> SyncReturn<MediaDeviceKind> {
+    SyncReturn(media_device.kind())
 }
 
 /// Returns label describing the represented device (for example "External USB
@@ -851,14 +851,17 @@ pub fn media_device_info_group_id(
 
 pub use crate::platform::MediaDisplayInfo;
 
-/// Returns the [`ApiWrap<Vec<MediaDisplayInfo>>`] from the address
+/// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the address
 /// [`ForeignClass`].
 #[must_use]
 pub fn vec_media_display_info_from_ptr(
     ptr: usize,
 ) -> SyncReturn<Vec<RustOpaque<MediaDisplayInfo>>> {
     SyncReturn(unsafe {
-        Vec::<MediaDisplayInfo>::from_ptr(ptr::NonNull::new(ptr as _).unwrap()).into_iter().map(RustOpaque::new).collect()
+        Vec::<MediaDisplayInfo>::from_ptr(ptr::NonNull::new(ptr as _).unwrap())
+            .into_iter()
+            .map(RustOpaque::new)
+            .collect()
     })
 }
 
@@ -957,8 +960,6 @@ pub fn media_manager_handle_enumerate_displays(
     SyncReturn(dart_opaque)
 }
 
-// TODO(alexlapa): can we change this to SyncReturn<Into<DartOpaque>> and
-//                 impl Into<DartOpaque> for DartFuture<Asd>?
 /// Switches the current output audio device to the device with the provided
 /// `device_id`.
 #[must_use]
@@ -1335,24 +1336,24 @@ pub fn remote_media_track_muted(
 #[must_use]
 pub fn remote_media_track_kind(
     track: RustOpaque<RemoteMediaTrack>,
-) -> SyncReturn<u8> {
-    SyncReturn(track.kind() as u8)
+) -> SyncReturn<MediaKind> {
+    SyncReturn(track.kind())
 }
 
 /// Returns this [`RemoteMediaTrack`]'s media source kind.
 #[must_use]
 pub fn remote_media_track_media_source_kind(
     track: RustOpaque<RemoteMediaTrack>,
-) -> SyncReturn<u8> {
-    SyncReturn(track.media_source_kind() as u8)
+) -> SyncReturn<MediaSourceKind> {
+    SyncReturn(track.media_source_kind())
 }
 
 /// Returns the current general [`MediaDirection`] of this [`RemoteMediaTrack`].
 #[must_use]
 pub fn remote_media_track_media_direction(
     track: RustOpaque<RemoteMediaTrack>,
-) -> SyncReturn<u8> {
-    SyncReturn(track.media_direction() as u8)
+) -> SyncReturn<MediaDirection> {
+    SyncReturn(track.media_direction())
 }
 
 // -------------------------------------------------------------------
@@ -1835,13 +1836,17 @@ pub fn room_handle_on_new_connection(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
 ) -> anyhow::Result<SyncReturn<()>> {
-    Ok(SyncReturn(
-        room_handle
-            .on_new_connection(unsafe {
-                platform::Function::new(cb.try_unwrap().unwrap().into_raw() as _)
-            })
-            .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?,
-    ))
+    Ok(
+        SyncReturn(
+            room_handle
+                .on_new_connection(unsafe {
+                    platform::Function::new(
+                        cb.try_unwrap().unwrap().into_raw() as _
+                    )
+                })
+                .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?,
+        ),
+    )
 }
 
 /// Sets callback, invoked on this [`Room`] close, providing a

@@ -120,12 +120,13 @@ pub mod utils;
 pub mod api;
 pub mod connection;
 pub mod jason;
+#[allow(non_snake_case)]
+pub mod jason_api;
 pub mod media;
 pub mod peer;
 pub mod platform;
 pub mod room;
 pub mod rpc;
-pub mod jason_api;
 
 #[cfg(not(target_family = "wasm"))]
 #[allow(
