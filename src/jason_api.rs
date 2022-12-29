@@ -9,8 +9,11 @@ pub use crate::api::{
     },
     utils::ApiWrap,
 };
-use crate::{api::Error, media::MediaSourceKind, platform};
-use crate::api::{utils::new_dart_opaque, ForeignClass};
+use crate::{
+    api::{utils::new_dart_opaque, Error, ForeignClass},
+    media::MediaSourceKind,
+    platform,
+};
 
 use crate::{
     api::{ArgumentError, Error as DartError},
