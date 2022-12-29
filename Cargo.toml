@@ -32,6 +32,9 @@ default = ["console_error_panic_hook", "wee_alloc"]
 dart-codegen = ["medea-macro/dart-codegen"]
 mockable = ["mockall"]
 
+[profile.release]
+lto = true
+
 [dependencies]
 async-recursion = "1.0"
 async-trait = "0.1"
