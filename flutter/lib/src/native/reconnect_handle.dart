@@ -9,7 +9,7 @@ import 'jason.dart';
 
 class NativeReconnectHandle extends ReconnectHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.ReconnectHandle> opaque;
+  final RustOpaque<frb.ReconnectHandle> opaque;
 
   /// Constructs a new [ReconnectHandle] backed by the Rust struct behind the
   /// provided [frb.ReconnectHandle].

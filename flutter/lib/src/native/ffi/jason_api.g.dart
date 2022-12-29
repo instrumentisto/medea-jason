@@ -5,27 +5,15 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 
 import 'package:meta/meta.dart';
 import 'package:meta/meta.dart';
 import 'dart:ffi' as ffi;
 
+part 'jason_api.g.freezed.dart';
+
 abstract class MedeaJason {
-  /// Creates new [`AudioTrackConstraints`] with none constr configured.
-  AudioTrackConstraints audioTrackConstrNew({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kAudioTrackConstrNewConstMeta;
-
-  /// Sets an exact [deviceId][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
-  AudioTrackConstraints audioTrackConstrDeviceId(
-      {required AudioTrackConstraints track,
-      required String deviceId,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kAudioTrackConstrDeviceIdConstMeta;
-
   /// Returns the [`ConnectionHandle`] from the address [`ForeignClass`].
   ConnectionHandle connectionHandleFromPtr({required int ptr, dynamic hint});
 
@@ -119,249 +107,6 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleDisableRemoteVideoConstMeta;
 
-  /// Creates new [`DeviceVideoTrackConstraints`] with none constr
-  /// configured.
-  ApiWrapDeviceVideoTrackConstraints deviceVideoTrackConstrNew({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrNewConstMeta;
-
-  /// Sets an exact [deviceId][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
-  void deviceVideoTrackConstrDeviceId(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required String deviceId,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrDeviceIdConstMeta;
-
-  /// Sets an exact [facingMode][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
-  ///
-  /// # Errors
-  ///
-  /// If `facing_mode` is not [`FacingMode`] index.
-  void deviceVideoTrackConstrExactFacingMode(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required FacingMode facingMode,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrExactFacingModeConstMeta;
-
-  /// Sets an ideal [facingMode][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dom-constraindomstring
-  ///
-  /// # Errors
-  ///
-  /// If `facing_mode` is not [`FacingMode`] index.
-  void deviceVideoTrackConstrIdealFacingMode(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required FacingMode facingMode,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrIdealFacingModeConstMeta;
-
-  /// Sets an exact [height][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  ///
-  /// # Errors
-  ///
-  /// If `exact_height` is not [u32].
-  void deviceVideoTrackConstrExactHeight(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int exactHeight,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrExactHeightConstMeta;
-
-  /// Sets an ideal [height][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  ///
-  /// # Errors
-  ///
-  /// If `ideal_height` is not [u32].
-  void deviceVideoTrackConstrIdealHeight(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int idealHeight,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrIdealHeightConstMeta;
-
-  /// Sets an exact [width][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  ///
-  /// # Errors
-  ///
-  /// If `exact_width` is not [u32].
-  void deviceVideoTrackConstrExactWidth(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int exactWidth,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrExactWidthConstMeta;
-
-  /// Sets an ideal [width][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  ///
-  /// # Errors
-  ///
-  /// If `ideal_width` is not [u32].
-  void deviceVideoTrackConstrIdealWidth(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int idealWidth,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrIdealWidthConstMeta;
-
-  /// Sets a range of a [height][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  ///
-  /// # Errors
-  ///
-  /// If `min` or `max` is not [u32].
-  void deviceVideoTrackConstrHeightInRange(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int min,
-      required int max,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrHeightInRangeConstMeta;
-
-  /// Sets a range of a [width][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  ///
-  /// # Errors
-  ///
-  /// If `min` or `max` is not [u32].
-  void deviceVideoTrackConstrWidthInRange(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int min,
-      required int max,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrWidthInRangeConstMeta;
-
-  /// Creates new [`DisplayVideoTrackConstraints`] with none constr
-  /// configured.
-  ApiWrapDisplayVideoTrackConstraints displayVideoTrackConstrNew(
-      {dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDisplayVideoTrackConstrNewConstMeta;
-
-  /// Sets an exact [deviceId][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId
-  void displayVideoTrackConstrDeviceId(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required String deviceId,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDisplayVideoTrackConstrDeviceIdConstMeta;
-
-  /// Sets an exact [height][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  ///
-  /// # Errors
-  ///
-  /// If `exact_height` is not [u32].
-  void displayVideoTrackConstrExactHeight(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int exactHeight,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrExactHeightConstMeta;
-
-  /// Sets an ideal [height][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  ///
-  /// # Errors
-  ///
-  /// If `ideal_height` is not [u32].
-  void displayVideoTrackConstrIdealHeight(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int idealHeight,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrIdealHeightConstMeta;
-
-  /// Sets an exact [width][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  ///
-  /// # Errors
-  ///
-  /// If `exact_width` is not [u32].
-  void displayVideoTrackConstrExactWidth(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int exactWidth,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrExactWidthConstMeta;
-
-  /// Sets an ideal [width][1] constraint.
-  ///
-  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  ///
-  /// # Errors
-  ///
-  /// If `ideal_width` is not [u32].
-  void displayVideoTrackConstrIdealWidth(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int idealWidth,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrIdealWidthConstMeta;
-
-  /// Sets an ideal [frameRate][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-  ///
-  /// # Errors
-  ///
-  /// If `ideal_frame_rate` is not [u32].
-  void displayVideoTrackConstrIdealFrameRate(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int idealFrameRate,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrIdealFrameRateConstMeta;
-
-  /// Sets an exact [frameRate][1] constraint.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-  ///
-  /// # Errors
-  ///
-  /// If `exact_frame_rate` is not [u32].
-  void displayVideoTrackConstrExactFrameRate(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int exactFrameRate,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrExactFrameRateConstMeta;
-
   /// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
   void onPanic({required Object cb, dynamic hint});
 
@@ -437,69 +182,19 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackMediaSourceKindConstMeta;
 
-  /// Returns the [`Vec<RustOpaque<MediaDeviceInfo>>`] from the address
+  /// Returns the [`Vec<MediaDeviceInfo>`] from the address
   /// [`ForeignClass`].
-  List<MediaDeviceInfo> vecMediaDeviceInfoFromPtr(
+  List<ApiMediaDeviceInfo> vecMediaDeviceInfoFromPtr(
       {required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoFromPtrConstMeta;
 
-  /// Returns unique identifier of the represented device.
-  String mediaDeviceInfoDeviceId(
-      {required MediaDeviceInfo mediaDevice, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoDeviceIdConstMeta;
-
-  /// Returns kind of the represented device.
-  ///
-  /// This representation of [MediaDeviceInfo][1] ONLY for input device.
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#device-info
-  MediaDeviceKind mediaDeviceInfoKind(
-      {required MediaDeviceInfo mediaDevice, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoKindConstMeta;
-
-  /// Returns label describing the represented device (for example "External USB
-  /// Webcam").
-  ///
-  /// If the device has no associated label, then returns an empty string.
-  String mediaDeviceInfoLabel(
-      {required MediaDeviceInfo mediaDevice, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoLabelConstMeta;
-
-  /// Returns group identifier of the represented device.
-  ///
-  /// Two devices have the same group identifier if they belong to the same
-  /// physical device. For example, the audio input and output devices
-  /// representing the speaker and microphone of the same headset have the
-  /// same [groupId][1].
-  ///
-  /// [1]: https://w3.org/TR/mediacapture-streams/#dom-mediadeviceinfo-groupid
-  String? mediaDeviceInfoGroupId(
-      {required MediaDeviceInfo mediaDevice, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoGroupIdConstMeta;
-
   /// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the address
   /// [`ForeignClass`].
-  List<MediaDisplayInfo> vecMediaDisplayInfoFromPtr(
+  List<ApiMediaDisplayInfo> vecMediaDisplayInfoFromPtr(
       {required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta;
-
-  /// Returns a unique identifier of the represented display.
-  String mediaDisplayInfoDeviceId(
-      {required MediaDisplayInfo mediaDisplay, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaDisplayInfoDeviceIdConstMeta;
-
-  /// Returns a title describing the represented display.
-  String? mediaDisplayInfoTitle(
-      {required MediaDisplayInfo mediaDisplay, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaDisplayInfoTitleConstMeta;
 
   /// Returns [`LocalMediaTrack`]s objects, built from the provided
   /// [`MediaStreamSettings`].
@@ -507,7 +202,7 @@ abstract class MedeaJason {
   /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
   Object mediaManagerHandleInitLocalTracks(
       {required MediaManagerHandle manager,
-      required MediaStreamSettings caps,
+      required ApiMediaStreamSettings caps,
       dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
@@ -572,37 +267,6 @@ abstract class MedeaJason {
       {required MediaManagerHandle manager, required Object cb, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kMediaManagerHandleOnDeviceChangeConstMeta;
-
-  /// Creates new [`MediaStreamSettings`] with none constr configured.
-  MediaStreamSettings mediaStreamSettingsNew({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsNewConstMeta;
-
-  /// Specifies a nature and settings of an audio [`MediaStreamTrack`].
-  ///
-  /// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
-  MediaStreamSettings mediaStreamSettingsAudio(
-      {required MediaStreamSettings mediaStreamSettings,
-      required AudioTrackConstraints constr,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsAudioConstMeta;
-
-  /// Set constr for obtaining a local video sourced from a media device.
-  MediaStreamSettings mediaStreamSettingsDeviceVideo(
-      {required MediaStreamSettings mediaStreamSettings,
-      required ApiWrapDeviceVideoTrackConstraints constr,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsDeviceVideoConstMeta;
-
-  /// Set constr for capturing a local video from user's display.
-  MediaStreamSettings mediaStreamSettingsDisplayVideo(
-      {required MediaStreamSettings mediaStreamSettings,
-      required ApiWrapDisplayVideoTrackConstraints constr,
-      dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsDisplayVideoConstMeta;
 
   /// Returns the [`ReconnectHandle`] from the address
   /// [`ForeignClass`].
@@ -728,30 +392,6 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomCloseReasonFromPtrConstMeta;
 
-  /// Returns a close reason of a [`Room`].
-  ///
-  /// [`Room`]: crate::room::Room
-  String roomCloseReasonReason(
-      {required RoomCloseReason roomCloseReason, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonReasonConstMeta;
-
-  /// Indicates whether a [`Room`] was closed by server.
-  ///
-  /// [`Room`]: crate::room::Room
-  bool roomCloseReasonIsClosedByServer(
-      {required RoomCloseReason roomCloseReason, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonIsClosedByServerConstMeta;
-
-  /// Indicates whether a [`Room`]'s close reason is considered as an error.
-  ///
-  /// [`Room`]: crate::room::Room
-  bool roomCloseReasonIsErr(
-      {required RoomCloseReason roomCloseReason, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonIsErrConstMeta;
-
   /// Connects to a media server and joins the [`Room`] with the provided
   /// authorization `token`.
   ///
@@ -793,7 +433,7 @@ abstract class MedeaJason {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   Object roomHandleSetLocalMediaSettings(
       {required RoomHandle roomHandle,
-      required MediaStreamSettings settings,
+      required ApiMediaStreamSettings settings,
       required bool stopFirst,
       required bool rollbackOnFail,
       dynamic hint});
@@ -991,18 +631,6 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnFailedLocalMediaConstMeta;
 
-  DropFnType get dropOpaqueApiWrapDeviceVideoTrackConstraints;
-  ShareFnType get shareOpaqueApiWrapDeviceVideoTrackConstraints;
-  OpaqueTypeFinalizer get ApiWrapDeviceVideoTrackConstraintsFinalizer;
-
-  DropFnType get dropOpaqueApiWrapDisplayVideoTrackConstraints;
-  ShareFnType get shareOpaqueApiWrapDisplayVideoTrackConstraints;
-  OpaqueTypeFinalizer get ApiWrapDisplayVideoTrackConstraintsFinalizer;
-
-  DropFnType get dropOpaqueAudioTrackConstraints;
-  ShareFnType get shareOpaqueAudioTrackConstraints;
-  OpaqueTypeFinalizer get AudioTrackConstraintsFinalizer;
-
   DropFnType get dropOpaqueConnectionHandle;
   ShareFnType get shareOpaqueConnectionHandle;
   OpaqueTypeFinalizer get ConnectionHandleFinalizer;
@@ -1015,21 +643,9 @@ abstract class MedeaJason {
   ShareFnType get shareOpaqueLocalMediaTrack;
   OpaqueTypeFinalizer get LocalMediaTrackFinalizer;
 
-  DropFnType get dropOpaqueMediaDeviceInfo;
-  ShareFnType get shareOpaqueMediaDeviceInfo;
-  OpaqueTypeFinalizer get MediaDeviceInfoFinalizer;
-
-  DropFnType get dropOpaqueMediaDisplayInfo;
-  ShareFnType get shareOpaqueMediaDisplayInfo;
-  OpaqueTypeFinalizer get MediaDisplayInfoFinalizer;
-
   DropFnType get dropOpaqueMediaManagerHandle;
   ShareFnType get shareOpaqueMediaManagerHandle;
   OpaqueTypeFinalizer get MediaManagerHandleFinalizer;
-
-  DropFnType get dropOpaqueMediaStreamSettings;
-  ShareFnType get shareOpaqueMediaStreamSettings;
-  OpaqueTypeFinalizer get MediaStreamSettingsFinalizer;
 
   DropFnType get dropOpaqueReconnectHandle;
   ShareFnType get shareOpaqueReconnectHandle;
@@ -1039,63 +655,9 @@ abstract class MedeaJason {
   ShareFnType get shareOpaqueRemoteMediaTrack;
   OpaqueTypeFinalizer get RemoteMediaTrackFinalizer;
 
-  DropFnType get dropOpaqueRoomCloseReason;
-  ShareFnType get shareOpaqueRoomCloseReason;
-  OpaqueTypeFinalizer get RoomCloseReasonFinalizer;
-
   DropFnType get dropOpaqueRoomHandle;
   ShareFnType get shareOpaqueRoomHandle;
   OpaqueTypeFinalizer get RoomHandleFinalizer;
-}
-
-@sealed
-class ApiWrapDeviceVideoTrackConstraints extends FrbOpaque {
-  final MedeaJason bridge;
-  ApiWrapDeviceVideoTrackConstraints.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueApiWrapDeviceVideoTrackConstraints;
-
-  @override
-  ShareFnType get shareFn =>
-      bridge.shareOpaqueApiWrapDeviceVideoTrackConstraints;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer =>
-      bridge.ApiWrapDeviceVideoTrackConstraintsFinalizer;
-}
-
-@sealed
-class ApiWrapDisplayVideoTrackConstraints extends FrbOpaque {
-  final MedeaJason bridge;
-  ApiWrapDisplayVideoTrackConstraints.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueApiWrapDisplayVideoTrackConstraints;
-
-  @override
-  ShareFnType get shareFn =>
-      bridge.shareOpaqueApiWrapDisplayVideoTrackConstraints;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer =>
-      bridge.ApiWrapDisplayVideoTrackConstraintsFinalizer;
-}
-
-@sealed
-class AudioTrackConstraints extends FrbOpaque {
-  final MedeaJason bridge;
-  AudioTrackConstraints.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueAudioTrackConstraints;
-
-  @override
-  ShareFnType get shareFn => bridge.shareOpaqueAudioTrackConstraints;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer =>
-      bridge.AudioTrackConstraintsFinalizer;
 }
 
 @sealed
@@ -1143,36 +705,6 @@ class LocalMediaTrack extends FrbOpaque {
 }
 
 @sealed
-class MediaDeviceInfo extends FrbOpaque {
-  final MedeaJason bridge;
-  MediaDeviceInfo.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueMediaDeviceInfo;
-
-  @override
-  ShareFnType get shareFn => bridge.shareOpaqueMediaDeviceInfo;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer => bridge.MediaDeviceInfoFinalizer;
-}
-
-@sealed
-class MediaDisplayInfo extends FrbOpaque {
-  final MedeaJason bridge;
-  MediaDisplayInfo.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueMediaDisplayInfo;
-
-  @override
-  ShareFnType get shareFn => bridge.shareOpaqueMediaDisplayInfo;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer => bridge.MediaDisplayInfoFinalizer;
-}
-
-@sealed
 class MediaManagerHandle extends FrbOpaque {
   final MedeaJason bridge;
   MediaManagerHandle.fromRaw(int ptr, int size, this.bridge)
@@ -1185,22 +717,6 @@ class MediaManagerHandle extends FrbOpaque {
 
   @override
   OpaqueTypeFinalizer get staticFinalizer => bridge.MediaManagerHandleFinalizer;
-}
-
-@sealed
-class MediaStreamSettings extends FrbOpaque {
-  final MedeaJason bridge;
-  MediaStreamSettings.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueMediaStreamSettings;
-
-  @override
-  ShareFnType get shareFn => bridge.shareOpaqueMediaStreamSettings;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer =>
-      bridge.MediaStreamSettingsFinalizer;
 }
 
 @sealed
@@ -1234,21 +750,6 @@ class RemoteMediaTrack extends FrbOpaque {
 }
 
 @sealed
-class RoomCloseReason extends FrbOpaque {
-  final MedeaJason bridge;
-  RoomCloseReason.fromRaw(int ptr, int size, this.bridge)
-      : super.unsafe(ptr, size);
-  @override
-  DropFnType get dropFn => bridge.dropOpaqueRoomCloseReason;
-
-  @override
-  ShareFnType get shareFn => bridge.shareOpaqueRoomCloseReason;
-
-  @override
-  OpaqueTypeFinalizer get staticFinalizer => bridge.RoomCloseReasonFinalizer;
-}
-
-@sealed
 class RoomHandle extends FrbOpaque {
   final MedeaJason bridge;
   RoomHandle.fromRaw(int ptr, int size, this.bridge) : super.unsafe(ptr, size);
@@ -1260,6 +761,190 @@ class RoomHandle extends FrbOpaque {
 
   @override
   OpaqueTypeFinalizer get staticFinalizer => bridge.RoomHandleFinalizer;
+}
+
+class ApiAudioTrackConstraints {
+  /// Identifier of the device generating the content for the media track.
+  String? deviceId;
+
+  ApiAudioTrackConstraints({
+    this.deviceId,
+  });
+}
+
+@freezed
+class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
+  /// Exact value required for this property.
+  const factory ApiConstrainFacingMode.exact(
+    FacingMode field0,
+  ) = ApiConstrainFacingMode_Exact;
+
+  /// Ideal (target) value for this property.
+  const factory ApiConstrainFacingMode.ideal(
+    FacingMode field0,
+  ) = ApiConstrainFacingMode_Ideal;
+}
+
+/// Constraints applicable to video tracks that are sourced from some media
+/// device.
+class ApiDeviceVideoTrackConstraints {
+  /// Identifier of the device generating the content for the media track.
+  String? deviceId;
+
+  /// Describes the directions that the camera can face, as seen from the
+  /// user's perspective.
+  ApiOptionConstrainFacingMode facingMode;
+
+  /// Height of the video in pixels.
+  ApiOptionConstrainU32 height;
+
+  /// Width of the video in pixels.
+  ApiOptionConstrainU32 width;
+
+  ApiDeviceVideoTrackConstraints({
+    this.deviceId,
+    required this.facingMode,
+    required this.height,
+    required this.width,
+  });
+}
+
+/// Constraints applicable to video tracks sourced from a screen capturing.
+class ApiDisplayVideoTrackConstraints {
+  /// Identifier of the device generating the content for the media track.
+  String? deviceId;
+
+  /// [Height][1] of the video in pixels.
+  ///
+  /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
+  ApiOptionConstrainU32 height;
+
+  /// [Width][1] of the video in pixels.
+  ///
+  /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
+  ApiOptionConstrainU32 width;
+
+  /// [Frame rate][1] of the video.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
+  ApiOptionConstrainU32 frameRate;
+
+  ApiDisplayVideoTrackConstraints({
+    this.deviceId,
+    required this.height,
+    required this.width,
+    required this.frameRate,
+  });
+}
+
+/// Representation of a [ApiMediaDeviceInfo][0] ONLY for input devices.
+/// [0]: https://w3.org/TR/mediacapture-streams#device-info
+class ApiMediaDeviceInfo {
+  /// [`MediaDeviceKind`] of this [`ApiMediaDeviceInfo`].
+  final MediaDeviceKind kind;
+
+  /// Unique identifier of the device represented by this
+  /// [`ApiMediaDeviceInfo`].
+  final String deviceId;
+
+  /// Label describing the device represented by this
+  /// [`ApiMediaDeviceInfo`] (for example, "External USB Webcam").
+  final String label;
+
+  /// Group identifier of the device represented by this
+  /// [`ApiMediaDeviceInfo`]
+  ///
+  /// Two devices have the same group identifier if they belong to the same
+  /// physical device. For example, the audio input and output devices
+  /// representing the speaker and microphone of the same headset have the
+  /// same [groupId][1].
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
+  final String? groupId;
+
+  ApiMediaDeviceInfo({
+    required this.kind,
+    required this.deviceId,
+    required this.label,
+    this.groupId,
+  });
+}
+
+/// Representation of a display source.
+class ApiMediaDisplayInfo {
+  /// Unique identifier of the display represented by this
+  /// [`ApiMediaDisplayInfo`].
+  final String deviceId;
+
+  /// Title describing the represented display.
+  final String? title;
+
+  ApiMediaDisplayInfo({
+    required this.deviceId,
+    this.title,
+  });
+}
+
+/// [MediaStreamConstraints][1] wrapper.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+class ApiMediaStreamSettings {
+  /// [MediaStreamConstraints][1] for the audio media type.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+  ApiAudioTrackConstraints audio;
+
+  /// [MediaStreamConstraints][1] for the device video media type.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+  ApiDeviceVideoTrackConstraints? deviceVideo;
+
+  /// [MediaStreamConstraints][1] for the display video media type.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
+  ApiDisplayVideoTrackConstraints? displayVideo;
+
+  ApiMediaStreamSettings({
+    required this.audio,
+    this.deviceVideo,
+    this.displayVideo,
+  });
+}
+
+@freezed
+class ApiOptionConstrainFacingMode with _$ApiOptionConstrainFacingMode {
+  const factory ApiOptionConstrainFacingMode.some(
+    ApiConstrainFacingMode field0,
+  ) = ApiOptionConstrainFacingMode_Some;
+  const factory ApiOptionConstrainFacingMode.none() =
+      ApiOptionConstrainFacingMode_None;
+}
+
+@freezed
+class ApiOptionConstrainU32 with _$ApiOptionConstrainU32 {
+  const factory ApiOptionConstrainU32.some(
+    ConstrainU32 field0,
+  ) = ApiOptionConstrainU32_Some;
+  const factory ApiOptionConstrainU32.none() = ApiOptionConstrainU32_None;
+}
+
+@freezed
+class ConstrainU32 with _$ConstrainU32 {
+  /// Must be the parameter's value.
+  const factory ConstrainU32.exact(
+    int field0,
+  ) = ConstrainU32_Exact;
+
+  /// Should be used if possible.
+  const factory ConstrainU32.ideal(
+    int field0,
+  ) = ConstrainU32_Ideal;
+
+  /// Parameter's value must be in this range.
+  const factory ConstrainU32.range(
+    int field0,
+    int field1,
+  ) = ConstrainU32_Range;
 }
 
 /// Describes directions that a camera can face, as seen from a user's
@@ -1331,6 +1016,30 @@ enum MediaSourceKind {
   Display,
 }
 
+/// Reason of why [`Room`] has been closed.
+///
+/// This struct is passed into [`RoomHandle::on_close`] callback.
+class RoomCloseReason {
+  /// Indicator if [`Room`] is closed by server.
+  ///
+  /// `true` if [`CloseReason::ByServer`].
+  final bool isClosedByServer;
+
+  /// Reason of closing.
+  final String reason;
+
+  /// Indicator if closing is considered as error.
+  ///
+  /// This field may be `true` only on closing by client.
+  final bool isErr;
+
+  RoomCloseReason({
+    required this.isClosedByServer,
+    required this.reason,
+    required this.isErr,
+  });
+}
+
 class MedeaJasonImpl implements MedeaJason {
   final MedeaJasonPlatform _platform;
   factory MedeaJasonImpl(ExternalLibrary dylib) =>
@@ -1340,44 +1049,6 @@ class MedeaJasonImpl implements MedeaJason {
   factory MedeaJasonImpl.wasm(FutureOr<WasmModule> module) =>
       MedeaJasonImpl(module as ExternalLibrary);
   MedeaJasonImpl.raw(this._platform);
-  AudioTrackConstraints audioTrackConstrNew({dynamic hint}) {
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_audioTrack_constr_new(),
-      parseSuccessData: _wire2api_AudioTrackConstraints,
-      constMeta: kAudioTrackConstrNewConstMeta,
-      argValues: [],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kAudioTrackConstrNewConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "audioTrack_constr_new",
-        argNames: [],
-      );
-
-  AudioTrackConstraints audioTrackConstrDeviceId(
-      {required AudioTrackConstraints track,
-      required String deviceId,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_AudioTrackConstraints(track);
-    var arg1 = _platform.api2wire_String(deviceId);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_audioTrack_constr_device_id(arg0, arg1),
-      parseSuccessData: _wire2api_AudioTrackConstraints,
-      constMeta: kAudioTrackConstrDeviceIdConstMeta,
-      argValues: [track, deviceId],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kAudioTrackConstrDeviceIdConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "audioTrack_constr_device_id",
-        argNames: ["track", "deviceId"],
-      );
-
   ConnectionHandle connectionHandleFromPtr({required int ptr, dynamic hint}) {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
@@ -1557,410 +1228,6 @@ class MedeaJasonImpl implements MedeaJason {
           const FlutterRustBridgeTaskConstMeta(
             debugName: "connection_handle_disable_remote_video",
             argNames: ["connection", "sourceKind"],
-          );
-
-  ApiWrapDeviceVideoTrackConstraints deviceVideoTrackConstrNew({dynamic hint}) {
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_deviceVideoTrack_constr_new(),
-      parseSuccessData: _wire2api_ApiWrapDeviceVideoTrackConstraints,
-      constMeta: kDeviceVideoTrackConstrNewConstMeta,
-      argValues: [],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrNewConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "deviceVideoTrack_constr_new",
-        argNames: [],
-      );
-
-  void deviceVideoTrackConstrDeviceId(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required String deviceId,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_String(deviceId);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_deviceVideoTrack_constr_device_id(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrDeviceIdConstMeta,
-      argValues: [constr, deviceId],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kDeviceVideoTrackConstrDeviceIdConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "deviceVideoTrack_constr_device_id",
-        argNames: ["constr", "deviceId"],
-      );
-
-  void deviceVideoTrackConstrExactFacingMode(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required FacingMode facingMode,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = api2wire_facing_mode(facingMode);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_deviceVideoTrack_constr_exact_facing_mode(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrExactFacingModeConstMeta,
-      argValues: [constr, facingMode],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrExactFacingModeConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_exact_facing_mode",
-            argNames: ["constr", "facingMode"],
-          );
-
-  void deviceVideoTrackConstrIdealFacingMode(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required FacingMode facingMode,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = api2wire_facing_mode(facingMode);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_deviceVideoTrack_constr_ideal_facing_mode(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrIdealFacingModeConstMeta,
-      argValues: [constr, facingMode],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrIdealFacingModeConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_ideal_facing_mode",
-            argNames: ["constr", "facingMode"],
-          );
-
-  void deviceVideoTrackConstrExactHeight(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int exactHeight,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(exactHeight);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_deviceVideoTrack_constr_exact_height(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrExactHeightConstMeta,
-      argValues: [constr, exactHeight],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrExactHeightConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_exact_height",
-            argNames: ["constr", "exactHeight"],
-          );
-
-  void deviceVideoTrackConstrIdealHeight(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int idealHeight,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(idealHeight);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_deviceVideoTrack_constr_ideal_height(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrIdealHeightConstMeta,
-      argValues: [constr, idealHeight],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrIdealHeightConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_ideal_height",
-            argNames: ["constr", "idealHeight"],
-          );
-
-  void deviceVideoTrackConstrExactWidth(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int exactWidth,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(exactWidth);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_deviceVideoTrack_constr_exact_width(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrExactWidthConstMeta,
-      argValues: [constr, exactWidth],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrExactWidthConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_exact_width",
-            argNames: ["constr", "exactWidth"],
-          );
-
-  void deviceVideoTrackConstrIdealWidth(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int idealWidth,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(idealWidth);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_deviceVideoTrack_constr_ideal_width(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrIdealWidthConstMeta,
-      argValues: [constr, idealWidth],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrIdealWidthConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_ideal_width",
-            argNames: ["constr", "idealWidth"],
-          );
-
-  void deviceVideoTrackConstrHeightInRange(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int min,
-      required int max,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(min);
-    var arg2 = _platform.api2wire_i64(max);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_deviceVideoTrack_constr_height_in_range(arg0, arg1, arg2),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrHeightInRangeConstMeta,
-      argValues: [constr, min, max],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrHeightInRangeConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_height_in_range",
-            argNames: ["constr", "min", "max"],
-          );
-
-  void deviceVideoTrackConstrWidthInRange(
-      {required ApiWrapDeviceVideoTrackConstraints constr,
-      required int min,
-      required int max,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(min);
-    var arg2 = _platform.api2wire_i64(max);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_deviceVideoTrack_constr_width_in_range(arg0, arg1, arg2),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDeviceVideoTrackConstrWidthInRangeConstMeta,
-      argValues: [constr, min, max],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDeviceVideoTrackConstrWidthInRangeConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "deviceVideoTrack_constr_width_in_range",
-            argNames: ["constr", "min", "max"],
-          );
-
-  ApiWrapDisplayVideoTrackConstraints displayVideoTrackConstrNew(
-      {dynamic hint}) {
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_displayVideoTrack_constr_new(),
-      parseSuccessData: _wire2api_ApiWrapDisplayVideoTrackConstraints,
-      constMeta: kDisplayVideoTrackConstrNewConstMeta,
-      argValues: [],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kDisplayVideoTrackConstrNewConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "displayVideoTrack_constr_new",
-        argNames: [],
-      );
-
-  void displayVideoTrackConstrDeviceId(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required String deviceId,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_String(deviceId);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_displayVideoTrack_constr_device_id(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrDeviceIdConstMeta,
-      argValues: [constr, deviceId],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrDeviceIdConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_device_id",
-            argNames: ["constr", "deviceId"],
-          );
-
-  void displayVideoTrackConstrExactHeight(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int exactHeight,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(exactHeight);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_displayVideoTrack_constr_exact_height(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrExactHeightConstMeta,
-      argValues: [constr, exactHeight],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrExactHeightConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_exact_height",
-            argNames: ["constr", "exactHeight"],
-          );
-
-  void displayVideoTrackConstrIdealHeight(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int idealHeight,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(idealHeight);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_displayVideoTrack_constr_ideal_height(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrIdealHeightConstMeta,
-      argValues: [constr, idealHeight],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrIdealHeightConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_ideal_height",
-            argNames: ["constr", "idealHeight"],
-          );
-
-  void displayVideoTrackConstrExactWidth(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int exactWidth,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(exactWidth);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_displayVideoTrack_constr_exact_width(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrExactWidthConstMeta,
-      argValues: [constr, exactWidth],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrExactWidthConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_exact_width",
-            argNames: ["constr", "exactWidth"],
-          );
-
-  void displayVideoTrackConstrIdealWidth(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int idealWidth,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(idealWidth);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_displayVideoTrack_constr_ideal_width(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrIdealWidthConstMeta,
-      argValues: [constr, idealWidth],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrIdealWidthConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_ideal_width",
-            argNames: ["constr", "idealWidth"],
-          );
-
-  void displayVideoTrackConstrIdealFrameRate(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int idealFrameRate,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(idealFrameRate);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_displayVideoTrack_constr_ideal_frame_rate(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrIdealFrameRateConstMeta,
-      argValues: [constr, idealFrameRate],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrIdealFrameRateConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_ideal_frame_rate",
-            argNames: ["constr", "idealFrameRate"],
-          );
-
-  void displayVideoTrackConstrExactFrameRate(
-      {required ApiWrapDisplayVideoTrackConstraints constr,
-      required int exactFrameRate,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    var arg1 = _platform.api2wire_i64(exactFrameRate);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner
-          .wire_displayVideoTrack_constr_exact_frame_rate(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kDisplayVideoTrackConstrExactFrameRateConstMeta,
-      argValues: [constr, exactFrameRate],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kDisplayVideoTrackConstrExactFrameRateConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "displayVideoTrack_constr_exact_frame_rate",
-            argNames: ["constr", "exactFrameRate"],
           );
 
   void onPanic({required Object cb, dynamic hint}) {
@@ -2156,12 +1423,12 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track"],
       );
 
-  List<MediaDeviceInfo> vecMediaDeviceInfoFromPtr(
+  List<ApiMediaDeviceInfo> vecMediaDeviceInfoFromPtr(
       {required int ptr, dynamic hint}) {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_vec_media_device_info_from_ptr(arg0),
-      parseSuccessData: _wire2api_list_MediaDeviceInfo,
+      parseSuccessData: _wire2api_list_api_media_device_info,
       constMeta: kVecMediaDeviceInfoFromPtrConstMeta,
       argValues: [ptr],
       hint: hint,
@@ -2174,84 +1441,12 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["ptr"],
       );
 
-  String mediaDeviceInfoDeviceId(
-      {required MediaDeviceInfo mediaDevice, dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaDeviceInfo(mediaDevice);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_device_info_device_id(arg0),
-      parseSuccessData: _wire2api_String,
-      constMeta: kMediaDeviceInfoDeviceIdConstMeta,
-      argValues: [mediaDevice],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoDeviceIdConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_device_info_device_id",
-        argNames: ["mediaDevice"],
-      );
-
-  MediaDeviceKind mediaDeviceInfoKind(
-      {required MediaDeviceInfo mediaDevice, dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaDeviceInfo(mediaDevice);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_device_info_kind(arg0),
-      parseSuccessData: _wire2api_media_device_kind,
-      constMeta: kMediaDeviceInfoKindConstMeta,
-      argValues: [mediaDevice],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoKindConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_device_info_kind",
-        argNames: ["mediaDevice"],
-      );
-
-  String mediaDeviceInfoLabel(
-      {required MediaDeviceInfo mediaDevice, dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaDeviceInfo(mediaDevice);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_device_info_label(arg0),
-      parseSuccessData: _wire2api_String,
-      constMeta: kMediaDeviceInfoLabelConstMeta,
-      argValues: [mediaDevice],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoLabelConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_device_info_label",
-        argNames: ["mediaDevice"],
-      );
-
-  String? mediaDeviceInfoGroupId(
-      {required MediaDeviceInfo mediaDevice, dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaDeviceInfo(mediaDevice);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_device_info_group_id(arg0),
-      parseSuccessData: _wire2api_opt_String,
-      constMeta: kMediaDeviceInfoGroupIdConstMeta,
-      argValues: [mediaDevice],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaDeviceInfoGroupIdConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_device_info_group_id",
-        argNames: ["mediaDevice"],
-      );
-
-  List<MediaDisplayInfo> vecMediaDisplayInfoFromPtr(
+  List<ApiMediaDisplayInfo> vecMediaDisplayInfoFromPtr(
       {required int ptr, dynamic hint}) {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_vec_media_display_info_from_ptr(arg0),
-      parseSuccessData: _wire2api_list_MediaDisplayInfo,
+      parseSuccessData: _wire2api_list_api_media_display_info,
       constMeta: kVecMediaDisplayInfoFromPtrConstMeta,
       argValues: [ptr],
       hint: hint,
@@ -2264,48 +1459,12 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["ptr"],
       );
 
-  String mediaDisplayInfoDeviceId(
-      {required MediaDisplayInfo mediaDisplay, dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaDisplayInfo(mediaDisplay);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_display_info_device_id(arg0),
-      parseSuccessData: _wire2api_String,
-      constMeta: kMediaDisplayInfoDeviceIdConstMeta,
-      argValues: [mediaDisplay],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaDisplayInfoDeviceIdConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_display_info_device_id",
-        argNames: ["mediaDisplay"],
-      );
-
-  String? mediaDisplayInfoTitle(
-      {required MediaDisplayInfo mediaDisplay, dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaDisplayInfo(mediaDisplay);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_display_info_title(arg0),
-      parseSuccessData: _wire2api_opt_String,
-      constMeta: kMediaDisplayInfoTitleConstMeta,
-      argValues: [mediaDisplay],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaDisplayInfoTitleConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_display_info_title",
-        argNames: ["mediaDisplay"],
-      );
-
   Object mediaManagerHandleInitLocalTracks(
       {required MediaManagerHandle manager,
-      required MediaStreamSettings caps,
+      required ApiMediaStreamSettings caps,
       dynamic hint}) {
     var arg0 = _platform.api2wire_MediaManagerHandle(manager);
-    var arg1 = _platform.api2wire_MediaStreamSettings(caps);
+    var arg1 = _platform.api2wire_box_autoadd_api_media_stream_settings(caps);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_media_manager_handle_init_local_tracks(arg0, arg1),
@@ -2466,89 +1625,6 @@ class MedeaJasonImpl implements MedeaJason {
           const FlutterRustBridgeTaskConstMeta(
             debugName: "media_manager_handle_on_device_change",
             argNames: ["manager", "cb"],
-          );
-
-  MediaStreamSettings mediaStreamSettingsNew({dynamic hint}) {
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_media_stream_settings_new(),
-      parseSuccessData: _wire2api_MediaStreamSettings,
-      constMeta: kMediaStreamSettingsNewConstMeta,
-      argValues: [],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsNewConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_stream_settings_new",
-        argNames: [],
-      );
-
-  MediaStreamSettings mediaStreamSettingsAudio(
-      {required MediaStreamSettings mediaStreamSettings,
-      required AudioTrackConstraints constr,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaStreamSettings(mediaStreamSettings);
-    var arg1 = _platform.api2wire_AudioTrackConstraints(constr);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_media_stream_settings_audio(arg0, arg1),
-      parseSuccessData: _wire2api_MediaStreamSettings,
-      constMeta: kMediaStreamSettingsAudioConstMeta,
-      argValues: [mediaStreamSettings, constr],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsAudioConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_stream_settings_audio",
-        argNames: ["mediaStreamSettings", "constr"],
-      );
-
-  MediaStreamSettings mediaStreamSettingsDeviceVideo(
-      {required MediaStreamSettings mediaStreamSettings,
-      required ApiWrapDeviceVideoTrackConstraints constr,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaStreamSettings(mediaStreamSettings);
-    var arg1 = _platform.api2wire_ApiWrapDeviceVideoTrackConstraints(constr);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_media_stream_settings_device_video(arg0, arg1),
-      parseSuccessData: _wire2api_MediaStreamSettings,
-      constMeta: kMediaStreamSettingsDeviceVideoConstMeta,
-      argValues: [mediaStreamSettings, constr],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kMediaStreamSettingsDeviceVideoConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "media_stream_settings_device_video",
-        argNames: ["mediaStreamSettings", "constr"],
-      );
-
-  MediaStreamSettings mediaStreamSettingsDisplayVideo(
-      {required MediaStreamSettings mediaStreamSettings,
-      required ApiWrapDisplayVideoTrackConstraints constr,
-      dynamic hint}) {
-    var arg0 = _platform.api2wire_MediaStreamSettings(mediaStreamSettings);
-    var arg1 = _platform.api2wire_ApiWrapDisplayVideoTrackConstraints(constr);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_media_stream_settings_display_video(arg0, arg1),
-      parseSuccessData: _wire2api_MediaStreamSettings,
-      constMeta: kMediaStreamSettingsDisplayVideoConstMeta,
-      argValues: [mediaStreamSettings, constr],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kMediaStreamSettingsDisplayVideoConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "media_stream_settings_display_video",
-            argNames: ["mediaStreamSettings", "constr"],
           );
 
   ReconnectHandle reconnectHandleFromPtr({required int ptr, dynamic hint}) {
@@ -2827,7 +1903,7 @@ class MedeaJasonImpl implements MedeaJason {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_close_reason_from_ptr(arg0),
-      parseSuccessData: _wire2api_RoomCloseReason,
+      parseSuccessData: _wire2api_room_close_reason,
       constMeta: kRoomCloseReasonFromPtrConstMeta,
       argValues: [ptr],
       hint: hint,
@@ -2838,62 +1914,6 @@ class MedeaJasonImpl implements MedeaJason {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "room_close_reason_from_ptr",
         argNames: ["ptr"],
-      );
-
-  String roomCloseReasonReason(
-      {required RoomCloseReason roomCloseReason, dynamic hint}) {
-    var arg0 = _platform.api2wire_RoomCloseReason(roomCloseReason);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_room_close_reason_reason(arg0),
-      parseSuccessData: _wire2api_String,
-      constMeta: kRoomCloseReasonReasonConstMeta,
-      argValues: [roomCloseReason],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonReasonConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "room_close_reason_reason",
-        argNames: ["roomCloseReason"],
-      );
-
-  bool roomCloseReasonIsClosedByServer(
-      {required RoomCloseReason roomCloseReason, dynamic hint}) {
-    var arg0 = _platform.api2wire_RoomCloseReason(roomCloseReason);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () =>
-          _platform.inner.wire_room_close_reason_is_closed_by_server(arg0),
-      parseSuccessData: _wire2api_bool,
-      constMeta: kRoomCloseReasonIsClosedByServerConstMeta,
-      argValues: [roomCloseReason],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta
-      get kRoomCloseReasonIsClosedByServerConstMeta =>
-          const FlutterRustBridgeTaskConstMeta(
-            debugName: "room_close_reason_is_closed_by_server",
-            argNames: ["roomCloseReason"],
-          );
-
-  bool roomCloseReasonIsErr(
-      {required RoomCloseReason roomCloseReason, dynamic hint}) {
-    var arg0 = _platform.api2wire_RoomCloseReason(roomCloseReason);
-    return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_room_close_reason_is_err(arg0),
-      parseSuccessData: _wire2api_bool,
-      constMeta: kRoomCloseReasonIsErrConstMeta,
-      argValues: [roomCloseReason],
-      hint: hint,
-    ));
-  }
-
-  FlutterRustBridgeTaskConstMeta get kRoomCloseReasonIsErrConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "room_close_reason_is_err",
-        argNames: ["roomCloseReason"],
       );
 
   Object roomHandleJoin(
@@ -2917,12 +1937,13 @@ class MedeaJasonImpl implements MedeaJason {
 
   Object roomHandleSetLocalMediaSettings(
       {required RoomHandle roomHandle,
-      required MediaStreamSettings settings,
+      required ApiMediaStreamSettings settings,
       required bool stopFirst,
       required bool rollbackOnFail,
       dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_MediaStreamSettings(settings);
+    var arg1 =
+        _platform.api2wire_box_autoadd_api_media_stream_settings(settings);
     var arg2 = stopFirst;
     var arg3 = rollbackOnFail;
     return _platform.executeSync(FlutterRustBridgeSyncTask(
@@ -3263,27 +2284,6 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["roomHandle", "cb"],
       );
 
-  DropFnType get dropOpaqueApiWrapDeviceVideoTrackConstraints =>
-      _platform.inner.drop_opaque_ApiWrapDeviceVideoTrackConstraints;
-  ShareFnType get shareOpaqueApiWrapDeviceVideoTrackConstraints =>
-      _platform.inner.share_opaque_ApiWrapDeviceVideoTrackConstraints;
-  OpaqueTypeFinalizer get ApiWrapDeviceVideoTrackConstraintsFinalizer =>
-      _platform.ApiWrapDeviceVideoTrackConstraintsFinalizer;
-
-  DropFnType get dropOpaqueApiWrapDisplayVideoTrackConstraints =>
-      _platform.inner.drop_opaque_ApiWrapDisplayVideoTrackConstraints;
-  ShareFnType get shareOpaqueApiWrapDisplayVideoTrackConstraints =>
-      _platform.inner.share_opaque_ApiWrapDisplayVideoTrackConstraints;
-  OpaqueTypeFinalizer get ApiWrapDisplayVideoTrackConstraintsFinalizer =>
-      _platform.ApiWrapDisplayVideoTrackConstraintsFinalizer;
-
-  DropFnType get dropOpaqueAudioTrackConstraints =>
-      _platform.inner.drop_opaque_AudioTrackConstraints;
-  ShareFnType get shareOpaqueAudioTrackConstraints =>
-      _platform.inner.share_opaque_AudioTrackConstraints;
-  OpaqueTypeFinalizer get AudioTrackConstraintsFinalizer =>
-      _platform.AudioTrackConstraintsFinalizer;
-
   DropFnType get dropOpaqueConnectionHandle =>
       _platform.inner.drop_opaque_ConnectionHandle;
   ShareFnType get shareOpaqueConnectionHandle =>
@@ -3302,33 +2302,12 @@ class MedeaJasonImpl implements MedeaJason {
   OpaqueTypeFinalizer get LocalMediaTrackFinalizer =>
       _platform.LocalMediaTrackFinalizer;
 
-  DropFnType get dropOpaqueMediaDeviceInfo =>
-      _platform.inner.drop_opaque_MediaDeviceInfo;
-  ShareFnType get shareOpaqueMediaDeviceInfo =>
-      _platform.inner.share_opaque_MediaDeviceInfo;
-  OpaqueTypeFinalizer get MediaDeviceInfoFinalizer =>
-      _platform.MediaDeviceInfoFinalizer;
-
-  DropFnType get dropOpaqueMediaDisplayInfo =>
-      _platform.inner.drop_opaque_MediaDisplayInfo;
-  ShareFnType get shareOpaqueMediaDisplayInfo =>
-      _platform.inner.share_opaque_MediaDisplayInfo;
-  OpaqueTypeFinalizer get MediaDisplayInfoFinalizer =>
-      _platform.MediaDisplayInfoFinalizer;
-
   DropFnType get dropOpaqueMediaManagerHandle =>
       _platform.inner.drop_opaque_MediaManagerHandle;
   ShareFnType get shareOpaqueMediaManagerHandle =>
       _platform.inner.share_opaque_MediaManagerHandle;
   OpaqueTypeFinalizer get MediaManagerHandleFinalizer =>
       _platform.MediaManagerHandleFinalizer;
-
-  DropFnType get dropOpaqueMediaStreamSettings =>
-      _platform.inner.drop_opaque_MediaStreamSettings;
-  ShareFnType get shareOpaqueMediaStreamSettings =>
-      _platform.inner.share_opaque_MediaStreamSettings;
-  OpaqueTypeFinalizer get MediaStreamSettingsFinalizer =>
-      _platform.MediaStreamSettingsFinalizer;
 
   DropFnType get dropOpaqueReconnectHandle =>
       _platform.inner.drop_opaque_ReconnectHandle;
@@ -3344,13 +2323,6 @@ class MedeaJasonImpl implements MedeaJason {
   OpaqueTypeFinalizer get RemoteMediaTrackFinalizer =>
       _platform.RemoteMediaTrackFinalizer;
 
-  DropFnType get dropOpaqueRoomCloseReason =>
-      _platform.inner.drop_opaque_RoomCloseReason;
-  ShareFnType get shareOpaqueRoomCloseReason =>
-      _platform.inner.share_opaque_RoomCloseReason;
-  OpaqueTypeFinalizer get RoomCloseReasonFinalizer =>
-      _platform.RoomCloseReasonFinalizer;
-
   DropFnType get dropOpaqueRoomHandle => _platform.inner.drop_opaque_RoomHandle;
   ShareFnType get shareOpaqueRoomHandle =>
       _platform.inner.share_opaque_RoomHandle;
@@ -3360,20 +2332,6 @@ class MedeaJasonImpl implements MedeaJason {
     _platform.dispose();
   }
 // Section: wire2api
-
-  ApiWrapDeviceVideoTrackConstraints
-      _wire2api_ApiWrapDeviceVideoTrackConstraints(dynamic raw) {
-    return ApiWrapDeviceVideoTrackConstraints.fromRaw(raw[0], raw[1], this);
-  }
-
-  ApiWrapDisplayVideoTrackConstraints
-      _wire2api_ApiWrapDisplayVideoTrackConstraints(dynamic raw) {
-    return ApiWrapDisplayVideoTrackConstraints.fromRaw(raw[0], raw[1], this);
-  }
-
-  AudioTrackConstraints _wire2api_AudioTrackConstraints(dynamic raw) {
-    return AudioTrackConstraints.fromRaw(raw[0], raw[1], this);
-  }
 
   ConnectionHandle _wire2api_ConnectionHandle(dynamic raw) {
     return ConnectionHandle.fromRaw(raw[0], raw[1], this);
@@ -3391,20 +2349,8 @@ class MedeaJasonImpl implements MedeaJason {
     return LocalMediaTrack.fromRaw(raw[0], raw[1], this);
   }
 
-  MediaDeviceInfo _wire2api_MediaDeviceInfo(dynamic raw) {
-    return MediaDeviceInfo.fromRaw(raw[0], raw[1], this);
-  }
-
-  MediaDisplayInfo _wire2api_MediaDisplayInfo(dynamic raw) {
-    return MediaDisplayInfo.fromRaw(raw[0], raw[1], this);
-  }
-
   MediaManagerHandle _wire2api_MediaManagerHandle(dynamic raw) {
     return MediaManagerHandle.fromRaw(raw[0], raw[1], this);
-  }
-
-  MediaStreamSettings _wire2api_MediaStreamSettings(dynamic raw) {
-    return MediaStreamSettings.fromRaw(raw[0], raw[1], this);
   }
 
   ReconnectHandle _wire2api_ReconnectHandle(dynamic raw) {
@@ -3415,16 +2361,34 @@ class MedeaJasonImpl implements MedeaJason {
     return RemoteMediaTrack.fromRaw(raw[0], raw[1], this);
   }
 
-  RoomCloseReason _wire2api_RoomCloseReason(dynamic raw) {
-    return RoomCloseReason.fromRaw(raw[0], raw[1], this);
-  }
-
   RoomHandle _wire2api_RoomHandle(dynamic raw) {
     return RoomHandle.fromRaw(raw[0], raw[1], this);
   }
 
   String _wire2api_String(dynamic raw) {
     return raw as String;
+  }
+
+  ApiMediaDeviceInfo _wire2api_api_media_device_info(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ApiMediaDeviceInfo(
+      kind: _wire2api_media_device_kind(arr[0]),
+      deviceId: _wire2api_String(arr[1]),
+      label: _wire2api_String(arr[2]),
+      groupId: _wire2api_opt_String(arr[3]),
+    );
+  }
+
+  ApiMediaDisplayInfo _wire2api_api_media_display_info(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ApiMediaDisplayInfo(
+      deviceId: _wire2api_String(arr[0]),
+      title: _wire2api_opt_String(arr[1]),
+    );
   }
 
   bool _wire2api_bool(dynamic raw) {
@@ -3439,12 +2403,14 @@ class MedeaJasonImpl implements MedeaJason {
     return (raw as List<dynamic>).map(_wire2api_LocalMediaTrack).toList();
   }
 
-  List<MediaDeviceInfo> _wire2api_list_MediaDeviceInfo(dynamic raw) {
-    return (raw as List<dynamic>).map(_wire2api_MediaDeviceInfo).toList();
+  List<ApiMediaDeviceInfo> _wire2api_list_api_media_device_info(dynamic raw) {
+    return (raw as List<dynamic>).map(_wire2api_api_media_device_info).toList();
   }
 
-  List<MediaDisplayInfo> _wire2api_list_MediaDisplayInfo(dynamic raw) {
-    return (raw as List<dynamic>).map(_wire2api_MediaDisplayInfo).toList();
+  List<ApiMediaDisplayInfo> _wire2api_list_api_media_display_info(dynamic raw) {
+    return (raw as List<dynamic>)
+        .map(_wire2api_api_media_display_info)
+        .toList();
   }
 
   MediaDeviceKind _wire2api_media_device_kind(dynamic raw) {
@@ -3465,6 +2431,17 @@ class MedeaJasonImpl implements MedeaJason {
 
   String? _wire2api_opt_String(dynamic raw) {
     return raw == null ? null : _wire2api_String(raw);
+  }
+
+  RoomCloseReason _wire2api_room_close_reason(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return RoomCloseReason(
+      isClosedByServer: _wire2api_bool(arr[0]),
+      reason: _wire2api_String(arr[1]),
+      isErr: _wire2api_bool(arr[2]),
+    );
   }
 
   int _wire2api_u8(dynamic raw) {
@@ -3503,6 +2480,11 @@ int api2wire_i32(int raw) {
 }
 
 @protected
+int api2wire_u32(int raw) {
+  return raw;
+}
+
+@protected
 int api2wire_u8(int raw) {
   return raw;
 }
@@ -3517,32 +2499,6 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   MedeaJasonPlatform(ffi.DynamicLibrary dylib) : super(MedeaJasonWire(dylib));
 
 // Section: api2wire
-
-  @protected
-  wire_ApiWrapDeviceVideoTrackConstraints
-      api2wire_ApiWrapDeviceVideoTrackConstraints(
-          ApiWrapDeviceVideoTrackConstraints raw) {
-    final ptr = inner.new_ApiWrapDeviceVideoTrackConstraints();
-    _api_fill_to_wire_ApiWrapDeviceVideoTrackConstraints(raw, ptr);
-    return ptr;
-  }
-
-  @protected
-  wire_ApiWrapDisplayVideoTrackConstraints
-      api2wire_ApiWrapDisplayVideoTrackConstraints(
-          ApiWrapDisplayVideoTrackConstraints raw) {
-    final ptr = inner.new_ApiWrapDisplayVideoTrackConstraints();
-    _api_fill_to_wire_ApiWrapDisplayVideoTrackConstraints(raw, ptr);
-    return ptr;
-  }
-
-  @protected
-  wire_AudioTrackConstraints api2wire_AudioTrackConstraints(
-      AudioTrackConstraints raw) {
-    final ptr = inner.new_AudioTrackConstraints();
-    _api_fill_to_wire_AudioTrackConstraints(raw, ptr);
-    return ptr;
-  }
 
   @protected
   wire_ConnectionHandle api2wire_ConnectionHandle(ConnectionHandle raw) {
@@ -3574,31 +2530,9 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  wire_MediaDeviceInfo api2wire_MediaDeviceInfo(MediaDeviceInfo raw) {
-    final ptr = inner.new_MediaDeviceInfo();
-    _api_fill_to_wire_MediaDeviceInfo(raw, ptr);
-    return ptr;
-  }
-
-  @protected
-  wire_MediaDisplayInfo api2wire_MediaDisplayInfo(MediaDisplayInfo raw) {
-    final ptr = inner.new_MediaDisplayInfo();
-    _api_fill_to_wire_MediaDisplayInfo(raw, ptr);
-    return ptr;
-  }
-
-  @protected
   wire_MediaManagerHandle api2wire_MediaManagerHandle(MediaManagerHandle raw) {
     final ptr = inner.new_MediaManagerHandle();
     _api_fill_to_wire_MediaManagerHandle(raw, ptr);
-    return ptr;
-  }
-
-  @protected
-  wire_MediaStreamSettings api2wire_MediaStreamSettings(
-      MediaStreamSettings raw) {
-    final ptr = inner.new_MediaStreamSettings();
-    _api_fill_to_wire_MediaStreamSettings(raw, ptr);
     return ptr;
   }
 
@@ -3617,13 +2551,6 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  wire_RoomCloseReason api2wire_RoomCloseReason(RoomCloseReason raw) {
-    final ptr = inner.new_RoomCloseReason();
-    _api_fill_to_wire_RoomCloseReason(raw, ptr);
-    return ptr;
-  }
-
-  @protected
   wire_RoomHandle api2wire_RoomHandle(RoomHandle raw) {
     final ptr = inner.new_RoomHandle();
     _api_fill_to_wire_RoomHandle(raw, ptr);
@@ -3636,6 +2563,75 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
+  ffi.Pointer<wire_ApiAudioTrackConstraints>
+      api2wire_box_api_audio_track_constraints(ApiAudioTrackConstraints raw) {
+    final ptr = inner.new_box_api_audio_track_constraints_0();
+    _api_fill_to_wire_api_audio_track_constraints(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiOptionConstrainFacingMode>
+      api2wire_box_api_option_constrain_facing_mode(
+          ApiOptionConstrainFacingMode raw) {
+    final ptr = inner.new_box_api_option_constrain_facing_mode_0();
+    _api_fill_to_wire_api_option_constrain_facing_mode(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiOptionConstrainU32>
+      api2wire_box_api_option_constrain_u_32(ApiOptionConstrainU32 raw) {
+    final ptr = inner.new_box_api_option_constrain_u_32_0();
+    _api_fill_to_wire_api_option_constrain_u_32(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiConstrainFacingMode>
+      api2wire_box_autoadd_api_constrain_facing_mode(
+          ApiConstrainFacingMode raw) {
+    final ptr = inner.new_box_autoadd_api_constrain_facing_mode_0();
+    _api_fill_to_wire_api_constrain_facing_mode(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiDeviceVideoTrackConstraints>
+      api2wire_box_autoadd_api_device_video_track_constraints(
+          ApiDeviceVideoTrackConstraints raw) {
+    final ptr = inner.new_box_autoadd_api_device_video_track_constraints_0();
+    _api_fill_to_wire_api_device_video_track_constraints(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+      api2wire_box_autoadd_api_display_video_track_constraints(
+          ApiDisplayVideoTrackConstraints raw) {
+    final ptr = inner.new_box_autoadd_api_display_video_track_constraints_0();
+    _api_fill_to_wire_api_display_video_track_constraints(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiMediaStreamSettings>
+      api2wire_box_autoadd_api_media_stream_settings(
+          ApiMediaStreamSettings raw) {
+    final ptr = inner.new_box_autoadd_api_media_stream_settings_0();
+    _api_fill_to_wire_api_media_stream_settings(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_ConstrainU32> api2wire_box_autoadd_constrain_u_32(
+      ConstrainU32 raw) {
+    final ptr = inner.new_box_autoadd_constrain_u_32_0();
+    _api_fill_to_wire_constrain_u_32(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
   ffi.Pointer<ffi.Int64> api2wire_box_autoadd_i64(int raw) {
     return inner.new_box_autoadd_i64_0(api2wire_i64(raw));
   }
@@ -3643,6 +2639,29 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   @protected
   int api2wire_i64(int raw) {
     return raw;
+  }
+
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_opt_String(String? raw) {
+    return raw == null ? ffi.nullptr : api2wire_String(raw);
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiDeviceVideoTrackConstraints>
+      api2wire_opt_box_autoadd_api_device_video_track_constraints(
+          ApiDeviceVideoTrackConstraints? raw) {
+    return raw == null
+        ? ffi.nullptr
+        : api2wire_box_autoadd_api_device_video_track_constraints(raw);
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+      api2wire_opt_box_autoadd_api_display_video_track_constraints(
+          ApiDisplayVideoTrackConstraints? raw) {
+    return raw == null
+        ? ffi.nullptr
+        : api2wire_box_autoadd_api_display_video_track_constraints(raw);
   }
 
   @protected
@@ -3659,20 +2678,6 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
 
 // Section: finalizer
 
-  late final OpaqueTypeFinalizer _ApiWrapDeviceVideoTrackConstraintsFinalizer =
-      OpaqueTypeFinalizer(
-          inner._drop_opaque_ApiWrapDeviceVideoTrackConstraintsPtr);
-  OpaqueTypeFinalizer get ApiWrapDeviceVideoTrackConstraintsFinalizer =>
-      _ApiWrapDeviceVideoTrackConstraintsFinalizer;
-  late final OpaqueTypeFinalizer _ApiWrapDisplayVideoTrackConstraintsFinalizer =
-      OpaqueTypeFinalizer(
-          inner._drop_opaque_ApiWrapDisplayVideoTrackConstraintsPtr);
-  OpaqueTypeFinalizer get ApiWrapDisplayVideoTrackConstraintsFinalizer =>
-      _ApiWrapDisplayVideoTrackConstraintsFinalizer;
-  late final OpaqueTypeFinalizer _AudioTrackConstraintsFinalizer =
-      OpaqueTypeFinalizer(inner._drop_opaque_AudioTrackConstraintsPtr);
-  OpaqueTypeFinalizer get AudioTrackConstraintsFinalizer =>
-      _AudioTrackConstraintsFinalizer;
   late final OpaqueTypeFinalizer _ConnectionHandleFinalizer =
       OpaqueTypeFinalizer(inner._drop_opaque_ConnectionHandlePtr);
   OpaqueTypeFinalizer get ConnectionHandleFinalizer =>
@@ -3683,21 +2688,10 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   late final OpaqueTypeFinalizer _LocalMediaTrackFinalizer =
       OpaqueTypeFinalizer(inner._drop_opaque_LocalMediaTrackPtr);
   OpaqueTypeFinalizer get LocalMediaTrackFinalizer => _LocalMediaTrackFinalizer;
-  late final OpaqueTypeFinalizer _MediaDeviceInfoFinalizer =
-      OpaqueTypeFinalizer(inner._drop_opaque_MediaDeviceInfoPtr);
-  OpaqueTypeFinalizer get MediaDeviceInfoFinalizer => _MediaDeviceInfoFinalizer;
-  late final OpaqueTypeFinalizer _MediaDisplayInfoFinalizer =
-      OpaqueTypeFinalizer(inner._drop_opaque_MediaDisplayInfoPtr);
-  OpaqueTypeFinalizer get MediaDisplayInfoFinalizer =>
-      _MediaDisplayInfoFinalizer;
   late final OpaqueTypeFinalizer _MediaManagerHandleFinalizer =
       OpaqueTypeFinalizer(inner._drop_opaque_MediaManagerHandlePtr);
   OpaqueTypeFinalizer get MediaManagerHandleFinalizer =>
       _MediaManagerHandleFinalizer;
-  late final OpaqueTypeFinalizer _MediaStreamSettingsFinalizer =
-      OpaqueTypeFinalizer(inner._drop_opaque_MediaStreamSettingsPtr);
-  OpaqueTypeFinalizer get MediaStreamSettingsFinalizer =>
-      _MediaStreamSettingsFinalizer;
   late final OpaqueTypeFinalizer _ReconnectHandleFinalizer =
       OpaqueTypeFinalizer(inner._drop_opaque_ReconnectHandlePtr);
   OpaqueTypeFinalizer get ReconnectHandleFinalizer => _ReconnectHandleFinalizer;
@@ -3705,30 +2699,10 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
       OpaqueTypeFinalizer(inner._drop_opaque_RemoteMediaTrackPtr);
   OpaqueTypeFinalizer get RemoteMediaTrackFinalizer =>
       _RemoteMediaTrackFinalizer;
-  late final OpaqueTypeFinalizer _RoomCloseReasonFinalizer =
-      OpaqueTypeFinalizer(inner._drop_opaque_RoomCloseReasonPtr);
-  OpaqueTypeFinalizer get RoomCloseReasonFinalizer => _RoomCloseReasonFinalizer;
   late final OpaqueTypeFinalizer _RoomHandleFinalizer =
       OpaqueTypeFinalizer(inner._drop_opaque_RoomHandlePtr);
   OpaqueTypeFinalizer get RoomHandleFinalizer => _RoomHandleFinalizer;
 // Section: api_fill_to_wire
-
-  void _api_fill_to_wire_ApiWrapDeviceVideoTrackConstraints(
-      ApiWrapDeviceVideoTrackConstraints apiObj,
-      wire_ApiWrapDeviceVideoTrackConstraints wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
-
-  void _api_fill_to_wire_ApiWrapDisplayVideoTrackConstraints(
-      ApiWrapDisplayVideoTrackConstraints apiObj,
-      wire_ApiWrapDisplayVideoTrackConstraints wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
-
-  void _api_fill_to_wire_AudioTrackConstraints(
-      AudioTrackConstraints apiObj, wire_AudioTrackConstraints wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
 
   void _api_fill_to_wire_ConnectionHandle(
       ConnectionHandle apiObj, wire_ConnectionHandle wireObj) {
@@ -3749,23 +2723,8 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     wireObj.ptr = apiObj.shareOrMove();
   }
 
-  void _api_fill_to_wire_MediaDeviceInfo(
-      MediaDeviceInfo apiObj, wire_MediaDeviceInfo wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
-
-  void _api_fill_to_wire_MediaDisplayInfo(
-      MediaDisplayInfo apiObj, wire_MediaDisplayInfo wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
-
   void _api_fill_to_wire_MediaManagerHandle(
       MediaManagerHandle apiObj, wire_MediaManagerHandle wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
-
-  void _api_fill_to_wire_MediaStreamSettings(
-      MediaStreamSettings apiObj, wire_MediaStreamSettings wireObj) {
     wireObj.ptr = apiObj.shareOrMove();
   }
 
@@ -3779,14 +2738,185 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     wireObj.ptr = apiObj.shareOrMove();
   }
 
-  void _api_fill_to_wire_RoomCloseReason(
-      RoomCloseReason apiObj, wire_RoomCloseReason wireObj) {
-    wireObj.ptr = apiObj.shareOrMove();
-  }
-
   void _api_fill_to_wire_RoomHandle(
       RoomHandle apiObj, wire_RoomHandle wireObj) {
     wireObj.ptr = apiObj.shareOrMove();
+  }
+
+  void _api_fill_to_wire_api_audio_track_constraints(
+      ApiAudioTrackConstraints apiObj, wire_ApiAudioTrackConstraints wireObj) {
+    wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
+  }
+
+  void _api_fill_to_wire_api_constrain_facing_mode(
+      ApiConstrainFacingMode apiObj, wire_ApiConstrainFacingMode wireObj) {
+    if (apiObj is ApiConstrainFacingMode_Exact) {
+      var pre_field0 = api2wire_facing_mode(apiObj.field0);
+      wireObj.tag = 0;
+      wireObj.kind = inner.inflate_ApiConstrainFacingMode_Exact();
+      wireObj.kind.ref.Exact.ref.field0 = pre_field0;
+      return;
+    }
+    if (apiObj is ApiConstrainFacingMode_Ideal) {
+      var pre_field0 = api2wire_facing_mode(apiObj.field0);
+      wireObj.tag = 1;
+      wireObj.kind = inner.inflate_ApiConstrainFacingMode_Ideal();
+      wireObj.kind.ref.Ideal.ref.field0 = pre_field0;
+      return;
+    }
+  }
+
+  void _api_fill_to_wire_api_device_video_track_constraints(
+      ApiDeviceVideoTrackConstraints apiObj,
+      wire_ApiDeviceVideoTrackConstraints wireObj) {
+    wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
+    wireObj.facing_mode =
+        api2wire_box_api_option_constrain_facing_mode(apiObj.facingMode);
+    wireObj.height = api2wire_box_api_option_constrain_u_32(apiObj.height);
+    wireObj.width = api2wire_box_api_option_constrain_u_32(apiObj.width);
+  }
+
+  void _api_fill_to_wire_api_display_video_track_constraints(
+      ApiDisplayVideoTrackConstraints apiObj,
+      wire_ApiDisplayVideoTrackConstraints wireObj) {
+    wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
+    wireObj.height = api2wire_box_api_option_constrain_u_32(apiObj.height);
+    wireObj.width = api2wire_box_api_option_constrain_u_32(apiObj.width);
+    wireObj.frame_rate =
+        api2wire_box_api_option_constrain_u_32(apiObj.frameRate);
+  }
+
+  void _api_fill_to_wire_api_media_stream_settings(
+      ApiMediaStreamSettings apiObj, wire_ApiMediaStreamSettings wireObj) {
+    wireObj.audio = api2wire_box_api_audio_track_constraints(apiObj.audio);
+    wireObj.device_video =
+        api2wire_opt_box_autoadd_api_device_video_track_constraints(
+            apiObj.deviceVideo);
+    wireObj.display_video =
+        api2wire_opt_box_autoadd_api_display_video_track_constraints(
+            apiObj.displayVideo);
+  }
+
+  void _api_fill_to_wire_api_option_constrain_facing_mode(
+      ApiOptionConstrainFacingMode apiObj,
+      wire_ApiOptionConstrainFacingMode wireObj) {
+    if (apiObj is ApiOptionConstrainFacingMode_Some) {
+      var pre_field0 =
+          api2wire_box_autoadd_api_constrain_facing_mode(apiObj.field0);
+      wireObj.tag = 0;
+      wireObj.kind = inner.inflate_ApiOptionConstrainFacingMode_Some();
+      wireObj.kind.ref.Some.ref.field0 = pre_field0;
+      return;
+    }
+    if (apiObj is ApiOptionConstrainFacingMode_None) {
+      wireObj.tag = 1;
+      return;
+    }
+  }
+
+  void _api_fill_to_wire_api_option_constrain_u_32(
+      ApiOptionConstrainU32 apiObj, wire_ApiOptionConstrainU32 wireObj) {
+    if (apiObj is ApiOptionConstrainU32_Some) {
+      var pre_field0 = api2wire_box_autoadd_constrain_u_32(apiObj.field0);
+      wireObj.tag = 0;
+      wireObj.kind = inner.inflate_ApiOptionConstrainU32_Some();
+      wireObj.kind.ref.Some.ref.field0 = pre_field0;
+      return;
+    }
+    if (apiObj is ApiOptionConstrainU32_None) {
+      wireObj.tag = 1;
+      return;
+    }
+  }
+
+  void _api_fill_to_wire_box_api_audio_track_constraints(
+      ApiAudioTrackConstraints apiObj,
+      ffi.Pointer<wire_ApiAudioTrackConstraints> wireObj) {
+    _api_fill_to_wire_api_audio_track_constraints(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_api_option_constrain_facing_mode(
+      ApiOptionConstrainFacingMode apiObj,
+      ffi.Pointer<wire_ApiOptionConstrainFacingMode> wireObj) {
+    _api_fill_to_wire_api_option_constrain_facing_mode(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_api_option_constrain_u_32(
+      ApiOptionConstrainU32 apiObj,
+      ffi.Pointer<wire_ApiOptionConstrainU32> wireObj) {
+    _api_fill_to_wire_api_option_constrain_u_32(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_autoadd_api_constrain_facing_mode(
+      ApiConstrainFacingMode apiObj,
+      ffi.Pointer<wire_ApiConstrainFacingMode> wireObj) {
+    _api_fill_to_wire_api_constrain_facing_mode(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_autoadd_api_device_video_track_constraints(
+      ApiDeviceVideoTrackConstraints apiObj,
+      ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> wireObj) {
+    _api_fill_to_wire_api_device_video_track_constraints(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_autoadd_api_display_video_track_constraints(
+      ApiDisplayVideoTrackConstraints apiObj,
+      ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> wireObj) {
+    _api_fill_to_wire_api_display_video_track_constraints(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_autoadd_api_media_stream_settings(
+      ApiMediaStreamSettings apiObj,
+      ffi.Pointer<wire_ApiMediaStreamSettings> wireObj) {
+    _api_fill_to_wire_api_media_stream_settings(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_box_autoadd_constrain_u_32(
+      ConstrainU32 apiObj, ffi.Pointer<wire_ConstrainU32> wireObj) {
+    _api_fill_to_wire_constrain_u_32(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_constrain_u_32(
+      ConstrainU32 apiObj, wire_ConstrainU32 wireObj) {
+    if (apiObj is ConstrainU32_Exact) {
+      var pre_field0 = api2wire_u32(apiObj.field0);
+      wireObj.tag = 0;
+      wireObj.kind = inner.inflate_ConstrainU32_Exact();
+      wireObj.kind.ref.Exact.ref.field0 = pre_field0;
+      return;
+    }
+    if (apiObj is ConstrainU32_Ideal) {
+      var pre_field0 = api2wire_u32(apiObj.field0);
+      wireObj.tag = 1;
+      wireObj.kind = inner.inflate_ConstrainU32_Ideal();
+      wireObj.kind.ref.Ideal.ref.field0 = pre_field0;
+      return;
+    }
+    if (apiObj is ConstrainU32_Range) {
+      var pre_field0 = api2wire_u32(apiObj.field0);
+      var pre_field1 = api2wire_u32(apiObj.field1);
+      wireObj.tag = 2;
+      wireObj.kind = inner.inflate_ConstrainU32_Range();
+      wireObj.kind.ref.Range.ref.field0 = pre_field0;
+      wireObj.kind.ref.Range.ref.field1 = pre_field1;
+      return;
+    }
+  }
+
+  void _api_fill_to_wire_opt_box_autoadd_api_device_video_track_constraints(
+      ApiDeviceVideoTrackConstraints? apiObj,
+      ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> wireObj) {
+    if (apiObj != null)
+      _api_fill_to_wire_box_autoadd_api_device_video_track_constraints(
+          apiObj, wireObj);
+  }
+
+  void _api_fill_to_wire_opt_box_autoadd_api_display_video_track_constraints(
+      ApiDisplayVideoTrackConstraints? apiObj,
+      ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> wireObj) {
+    if (apiObj != null)
+      _api_fill_to_wire_box_autoadd_api_display_video_track_constraints(
+          apiObj, wireObj);
   }
 }
 
@@ -3814,6 +2944,284 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
           lookup)
       : _lookup = lookup;
+
+  Object unbox_dart_handle(
+    ffi.Pointer<ffi.Handle> val,
+  ) {
+    return _unbox_dart_handle(
+      val,
+    );
+  }
+
+  late final _unbox_dart_handlePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Handle>)>>(
+          'unbox_dart_handle');
+  late final _unbox_dart_handle = _unbox_dart_handlePtr
+      .asFunction<Object Function(ffi.Pointer<ffi.Handle>)>();
+
+  void free_boxed_dart_handle(
+    ffi.Pointer<ffi.Handle> val,
+  ) {
+    return _free_boxed_dart_handle(
+      val,
+    );
+  }
+
+  late final _free_boxed_dart_handlePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Handle>)>>(
+          'free_boxed_dart_handle');
+  late final _free_boxed_dart_handle = _free_boxed_dart_handlePtr
+      .asFunction<void Function(ffi.Pointer<ffi.Handle>)>();
+
+  ffi.Pointer<ffi.Handle> box_dart_handle(
+    Object val,
+  ) {
+    return _box_dart_handle(
+      val,
+    );
+  }
+
+  late final _box_dart_handlePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Handle> Function(ffi.Handle)>>(
+          'box_dart_handle');
+  late final _box_dart_handle = _box_dart_handlePtr
+      .asFunction<ffi.Pointer<ffi.Handle> Function(Object)>();
+
+  ffi.Pointer<DartValue> box_foreign_value(
+    DartValue val,
+  ) {
+    return _box_foreign_value(
+      val,
+    );
+  }
+
+  late final _box_foreign_valuePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<DartValue> Function(DartValue)>>(
+          'box_foreign_value');
+  late final _box_foreign_value = _box_foreign_valuePtr
+      .asFunction<ffi.Pointer<DartValue> Function(DartValue)>();
+
+  Object new_argument_error(
+    DartValue value,
+    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> message,
+  ) {
+    return _new_argument_error(
+      value,
+      name,
+      message,
+    );
+  }
+
+  late final _new_argument_errorPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(DartValue, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('new_argument_error');
+  late final _new_argument_error = _new_argument_errorPtr.asFunction<
+      Object Function(
+          DartValue, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
+
+  Object new_state_error(
+    ffi.Pointer<ffi.Char> message,
+  ) {
+    return _new_state_error(
+      message,
+    );
+  }
+
+  late final _new_state_errorPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Char>)>>(
+          'new_state_error');
+  late final _new_state_error =
+      _new_state_errorPtr.asFunction<Object Function(ffi.Pointer<ffi.Char>)>();
+
+  Object new_format_exception(
+    ffi.Pointer<ffi.Char> message,
+  ) {
+    return _new_format_exception(
+      message,
+    );
+  }
+
+  late final _new_format_exceptionPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Char>)>>(
+          'new_format_exception');
+  late final _new_format_exception = _new_format_exceptionPtr
+      .asFunction<Object Function(ffi.Pointer<ffi.Char>)>();
+
+  Object new_local_media_init_exception(
+    int kind,
+    ffi.Pointer<ffi.Char> message,
+    DartValue cause,
+    ffi.Pointer<ffi.Char> stacktrace,
+  ) {
+    return _new_local_media_init_exception(
+      kind,
+      message,
+      cause,
+      stacktrace,
+    );
+  }
+
+  late final _new_local_media_init_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Int64, ffi.Pointer<ffi.Char>, DartValue,
+              ffi.Pointer<ffi.Char>)>>('new_local_media_init_exception');
+  late final _new_local_media_init_exception =
+      _new_local_media_init_exceptionPtr.asFunction<
+          Object Function(
+              int, ffi.Pointer<ffi.Char>, DartValue, ffi.Pointer<ffi.Char>)>();
+
+  Object new_enumerate_devices_exception(
+    DartError cause,
+    ffi.Pointer<ffi.Char> stacktrace,
+  ) {
+    return _new_enumerate_devices_exception(
+      cause,
+      stacktrace,
+    );
+  }
+
+  late final _new_enumerate_devices_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(DartError,
+              ffi.Pointer<ffi.Char>)>>('new_enumerate_devices_exception');
+  late final _new_enumerate_devices_exception =
+      _new_enumerate_devices_exceptionPtr
+          .asFunction<Object Function(DartError, ffi.Pointer<ffi.Char>)>();
+
+  Object new_rpc_client_exception(
+    int kind,
+    ffi.Pointer<ffi.Char> message,
+    DartValue cause,
+    ffi.Pointer<ffi.Char> stacktrace,
+  ) {
+    return _new_rpc_client_exception(
+      kind,
+      message,
+      cause,
+      stacktrace,
+    );
+  }
+
+  late final _new_rpc_client_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Int64, ffi.Pointer<ffi.Char>, DartValue,
+              ffi.Pointer<ffi.Char>)>>('new_rpc_client_exception');
+  late final _new_rpc_client_exception =
+      _new_rpc_client_exceptionPtr.asFunction<
+          Object Function(
+              int, ffi.Pointer<ffi.Char>, DartValue, ffi.Pointer<ffi.Char>)>();
+
+  Object new_media_state_transition_exception(
+    ffi.Pointer<ffi.Char> message,
+    ffi.Pointer<ffi.Char> stacktrace,
+    int kind,
+  ) {
+    return _new_media_state_transition_exception(
+      message,
+      stacktrace,
+      kind,
+    );
+  }
+
+  late final _new_media_state_transition_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Int64)>>('new_media_state_transition_exception');
+  late final _new_media_state_transition_exception =
+      _new_media_state_transition_exceptionPtr.asFunction<
+          Object Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, int)>();
+
+  Object new_internal_exception(
+    ffi.Pointer<ffi.Char> message,
+    DartValue cause,
+    ffi.Pointer<ffi.Char> stacktrace,
+  ) {
+    return _new_internal_exception(
+      message,
+      cause,
+      stacktrace,
+    );
+  }
+
+  late final _new_internal_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Pointer<ffi.Char>, DartValue,
+              ffi.Pointer<ffi.Char>)>>('new_internal_exception');
+  late final _new_internal_exception = _new_internal_exceptionPtr.asFunction<
+      Object Function(
+          ffi.Pointer<ffi.Char>, DartValue, ffi.Pointer<ffi.Char>)>();
+
+  Object new_media_settings_update_exception(
+    ffi.Pointer<ffi.Char> message,
+    DartError cause,
+    bool rolled_back,
+  ) {
+    return _new_media_settings_update_exception(
+      message,
+      cause,
+      rolled_back,
+    );
+  }
+
+  late final _new_media_settings_update_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Pointer<ffi.Char>, DartError,
+              ffi.Bool)>>('new_media_settings_update_exception');
+  late final _new_media_settings_update_exception =
+      _new_media_settings_update_exceptionPtr.asFunction<
+          Object Function(ffi.Pointer<ffi.Char>, DartError, bool)>();
+
+  Object new_invalid_output_audio_device_id_exception(
+    ffi.Pointer<ffi.Char> trace,
+  ) {
+    return _new_invalid_output_audio_device_id_exception(
+      trace,
+    );
+  }
+
+  late final _new_invalid_output_audio_device_id_exceptionPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Char>)>>(
+          'new_invalid_output_audio_device_id_exception');
+  late final _new_invalid_output_audio_device_id_exception =
+      _new_invalid_output_audio_device_id_exceptionPtr
+          .asFunction<Object Function(ffi.Pointer<ffi.Char>)>();
+
+  Object new_mic_volume_exception(
+    DartError cause,
+    ffi.Pointer<ffi.Char> trace,
+  ) {
+    return _new_mic_volume_exception(
+      cause,
+      trace,
+    );
+  }
+
+  late final _new_mic_volume_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(
+              DartError, ffi.Pointer<ffi.Char>)>>('new_mic_volume_exception');
+  late final _new_mic_volume_exception = _new_mic_volume_exceptionPtr
+      .asFunction<Object Function(DartError, ffi.Pointer<ffi.Char>)>();
+
+  Object throw_panic_exception() {
+    return _throw_panic_exception();
+  }
+
+  late final _throw_panic_exceptionPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'throw_panic_exception');
+  late final _throw_panic_exception =
+      _throw_panic_exceptionPtr.asFunction<Object Function()>();
+
+  void fire_panic() {
+    return _fire_panic();
+  }
+
+  late final _fire_panicPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('fire_panic');
+  late final _fire_panic = _fire_panicPtr.asFunction<void Function()>();
 
   void store_dart_post_cobject(
     DartPostCObjectFnType ptr,
@@ -3884,36 +3292,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           'init_frb_dart_api_dl');
   late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
       .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
-
-  WireSyncReturn wire_audioTrack_constr_new() {
-    return _wire_audioTrack_constr_new();
-  }
-
-  late final _wire_audioTrack_constr_newPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_audioTrack_constr_new');
-  late final _wire_audioTrack_constr_new =
-      _wire_audioTrack_constr_newPtr.asFunction<WireSyncReturn Function()>();
-
-  WireSyncReturn wire_audioTrack_constr_device_id(
-    wire_AudioTrackConstraints track,
-    ffi.Pointer<wire_uint_8_list> device_id,
-  ) {
-    return _wire_audioTrack_constr_device_id(
-      track,
-      device_id,
-    );
-  }
-
-  late final _wire_audioTrack_constr_device_idPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturn Function(
-                  wire_AudioTrackConstraints, ffi.Pointer<wire_uint_8_list>)>>(
-      'wire_audioTrack_constr_device_id');
-  late final _wire_audioTrack_constr_device_id =
-      _wire_audioTrack_constr_device_idPtr.asFunction<
-          WireSyncReturn Function(
-              wire_AudioTrackConstraints, ffi.Pointer<wire_uint_8_list>)>();
 
   WireSyncReturn wire_connection_handle_from_ptr(
     int ptr,
@@ -4068,342 +3446,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_connection_handle_disable_remote_videoPtr.asFunction<
           WireSyncReturn Function(
               wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_new() {
-    return _wire_deviceVideoTrack_constr_new();
-  }
-
-  late final _wire_deviceVideoTrack_constr_newPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_deviceVideoTrack_constr_new');
-  late final _wire_deviceVideoTrack_constr_new =
-      _wire_deviceVideoTrack_constr_newPtr
-          .asFunction<WireSyncReturn Function()>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_device_id(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    ffi.Pointer<wire_uint_8_list> device_id,
-  ) {
-    return _wire_deviceVideoTrack_constr_device_id(
-      constr,
-      device_id,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_device_idPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-                  ffi.Pointer<wire_uint_8_list>)>>(
-      'wire_deviceVideoTrack_constr_device_id');
-  late final _wire_deviceVideoTrack_constr_device_id =
-      _wire_deviceVideoTrack_constr_device_idPtr.asFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Pointer<wire_uint_8_list>)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_exact_facing_mode(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int facing_mode,
-  ) {
-    return _wire_deviceVideoTrack_constr_exact_facing_mode(
-      constr,
-      facing_mode,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_exact_facing_modePtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int32)>>('wire_deviceVideoTrack_constr_exact_facing_mode');
-  late final _wire_deviceVideoTrack_constr_exact_facing_mode =
-      _wire_deviceVideoTrack_constr_exact_facing_modePtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_ideal_facing_mode(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int facing_mode,
-  ) {
-    return _wire_deviceVideoTrack_constr_ideal_facing_mode(
-      constr,
-      facing_mode,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_ideal_facing_modePtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int32)>>('wire_deviceVideoTrack_constr_ideal_facing_mode');
-  late final _wire_deviceVideoTrack_constr_ideal_facing_mode =
-      _wire_deviceVideoTrack_constr_ideal_facing_modePtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_exact_height(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int exact_height,
-  ) {
-    return _wire_deviceVideoTrack_constr_exact_height(
-      constr,
-      exact_height,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_exact_heightPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_deviceVideoTrack_constr_exact_height');
-  late final _wire_deviceVideoTrack_constr_exact_height =
-      _wire_deviceVideoTrack_constr_exact_heightPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_ideal_height(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int ideal_height,
-  ) {
-    return _wire_deviceVideoTrack_constr_ideal_height(
-      constr,
-      ideal_height,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_ideal_heightPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_deviceVideoTrack_constr_ideal_height');
-  late final _wire_deviceVideoTrack_constr_ideal_height =
-      _wire_deviceVideoTrack_constr_ideal_heightPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_exact_width(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int exact_width,
-  ) {
-    return _wire_deviceVideoTrack_constr_exact_width(
-      constr,
-      exact_width,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_exact_widthPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_deviceVideoTrack_constr_exact_width');
-  late final _wire_deviceVideoTrack_constr_exact_width =
-      _wire_deviceVideoTrack_constr_exact_widthPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_ideal_width(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int ideal_width,
-  ) {
-    return _wire_deviceVideoTrack_constr_ideal_width(
-      constr,
-      ideal_width,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_ideal_widthPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64)>>('wire_deviceVideoTrack_constr_ideal_width');
-  late final _wire_deviceVideoTrack_constr_ideal_width =
-      _wire_deviceVideoTrack_constr_ideal_widthPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_height_in_range(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int min,
-    int max,
-  ) {
-    return _wire_deviceVideoTrack_constr_height_in_range(
-      constr,
-      min,
-      max,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_height_in_rangePtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64,
-              ffi.Int64)>>('wire_deviceVideoTrack_constr_height_in_range');
-  late final _wire_deviceVideoTrack_constr_height_in_range =
-      _wire_deviceVideoTrack_constr_height_in_rangePtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int, int)>();
-
-  WireSyncReturn wire_deviceVideoTrack_constr_width_in_range(
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-    int min,
-    int max,
-  ) {
-    return _wire_deviceVideoTrack_constr_width_in_range(
-      constr,
-      min,
-      max,
-    );
-  }
-
-  late final _wire_deviceVideoTrack_constr_width_in_rangePtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints,
-              ffi.Int64,
-              ffi.Int64)>>('wire_deviceVideoTrack_constr_width_in_range');
-  late final _wire_deviceVideoTrack_constr_width_in_range =
-      _wire_deviceVideoTrack_constr_width_in_rangePtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDeviceVideoTrackConstraints, int, int)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_new() {
-    return _wire_displayVideoTrack_constr_new();
-  }
-
-  late final _wire_displayVideoTrack_constr_newPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_displayVideoTrack_constr_new');
-  late final _wire_displayVideoTrack_constr_new =
-      _wire_displayVideoTrack_constr_newPtr
-          .asFunction<WireSyncReturn Function()>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_device_id(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    ffi.Pointer<wire_uint_8_list> device_id,
-  ) {
-    return _wire_displayVideoTrack_constr_device_id(
-      constr,
-      device_id,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_device_idPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-                  ffi.Pointer<wire_uint_8_list>)>>(
-      'wire_displayVideoTrack_constr_device_id');
-  late final _wire_displayVideoTrack_constr_device_id =
-      _wire_displayVideoTrack_constr_device_idPtr.asFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Pointer<wire_uint_8_list>)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_exact_height(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    int exact_height,
-  ) {
-    return _wire_displayVideoTrack_constr_exact_height(
-      constr,
-      exact_height,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_exact_heightPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_displayVideoTrack_constr_exact_height');
-  late final _wire_displayVideoTrack_constr_exact_height =
-      _wire_displayVideoTrack_constr_exact_heightPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDisplayVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_ideal_height(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    int ideal_height,
-  ) {
-    return _wire_displayVideoTrack_constr_ideal_height(
-      constr,
-      ideal_height,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_ideal_heightPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_displayVideoTrack_constr_ideal_height');
-  late final _wire_displayVideoTrack_constr_ideal_height =
-      _wire_displayVideoTrack_constr_ideal_heightPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDisplayVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_exact_width(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    int exact_width,
-  ) {
-    return _wire_displayVideoTrack_constr_exact_width(
-      constr,
-      exact_width,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_exact_widthPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_displayVideoTrack_constr_exact_width');
-  late final _wire_displayVideoTrack_constr_exact_width =
-      _wire_displayVideoTrack_constr_exact_widthPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDisplayVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_ideal_width(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    int ideal_width,
-  ) {
-    return _wire_displayVideoTrack_constr_ideal_width(
-      constr,
-      ideal_width,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_ideal_widthPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_displayVideoTrack_constr_ideal_width');
-  late final _wire_displayVideoTrack_constr_ideal_width =
-      _wire_displayVideoTrack_constr_ideal_widthPtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDisplayVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_ideal_frame_rate(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    int ideal_frame_rate,
-  ) {
-    return _wire_displayVideoTrack_constr_ideal_frame_rate(
-      constr,
-      ideal_frame_rate,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_ideal_frame_ratePtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_displayVideoTrack_constr_ideal_frame_rate');
-  late final _wire_displayVideoTrack_constr_ideal_frame_rate =
-      _wire_displayVideoTrack_constr_ideal_frame_ratePtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDisplayVideoTrackConstraints, int)>();
-
-  WireSyncReturn wire_displayVideoTrack_constr_exact_frame_rate(
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-    int exact_frame_rate,
-  ) {
-    return _wire_displayVideoTrack_constr_exact_frame_rate(
-      constr,
-      exact_frame_rate,
-    );
-  }
-
-  late final _wire_displayVideoTrack_constr_exact_frame_ratePtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_ApiWrapDisplayVideoTrackConstraints,
-              ffi.Int64)>>('wire_displayVideoTrack_constr_exact_frame_rate');
-  late final _wire_displayVideoTrack_constr_exact_frame_rate =
-      _wire_displayVideoTrack_constr_exact_frame_ratePtr.asFunction<
-          WireSyncReturn Function(
-              wire_ApiWrapDisplayVideoTrackConstraints, int)>();
 
   WireSyncReturn wire_on_panic(
     wire_DartOpaque cb,
@@ -4576,64 +3618,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_vec_media_device_info_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
-  WireSyncReturn wire_media_device_info_device_id(
-    wire_MediaDeviceInfo media_device,
-  ) {
-    return _wire_media_device_info_device_id(
-      media_device,
-    );
-  }
-
-  late final _wire_media_device_info_device_idPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>>(
-      'wire_media_device_info_device_id');
-  late final _wire_media_device_info_device_id =
-      _wire_media_device_info_device_idPtr
-          .asFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>();
-
-  WireSyncReturn wire_media_device_info_kind(
-    wire_MediaDeviceInfo media_device,
-  ) {
-    return _wire_media_device_info_kind(
-      media_device,
-    );
-  }
-
-  late final _wire_media_device_info_kindPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>>(
-      'wire_media_device_info_kind');
-  late final _wire_media_device_info_kind = _wire_media_device_info_kindPtr
-      .asFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>();
-
-  WireSyncReturn wire_media_device_info_label(
-    wire_MediaDeviceInfo media_device,
-  ) {
-    return _wire_media_device_info_label(
-      media_device,
-    );
-  }
-
-  late final _wire_media_device_info_labelPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>>(
-      'wire_media_device_info_label');
-  late final _wire_media_device_info_label = _wire_media_device_info_labelPtr
-      .asFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>();
-
-  WireSyncReturn wire_media_device_info_group_id(
-    wire_MediaDeviceInfo media_device,
-  ) {
-    return _wire_media_device_info_group_id(
-      media_device,
-    );
-  }
-
-  late final _wire_media_device_info_group_idPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>>(
-      'wire_media_device_info_group_id');
-  late final _wire_media_device_info_group_id =
-      _wire_media_device_info_group_idPtr
-          .asFunction<WireSyncReturn Function(wire_MediaDeviceInfo)>();
-
   WireSyncReturn wire_vec_media_display_info_from_ptr(
     int ptr,
   ) {
@@ -4649,38 +3633,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_vec_media_display_info_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
-  WireSyncReturn wire_media_display_info_device_id(
-    wire_MediaDisplayInfo media_display,
-  ) {
-    return _wire_media_display_info_device_id(
-      media_display,
-    );
-  }
-
-  late final _wire_media_display_info_device_idPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_MediaDisplayInfo)>>(
-      'wire_media_display_info_device_id');
-  late final _wire_media_display_info_device_id =
-      _wire_media_display_info_device_idPtr
-          .asFunction<WireSyncReturn Function(wire_MediaDisplayInfo)>();
-
-  WireSyncReturn wire_media_display_info_title(
-    wire_MediaDisplayInfo media_display,
-  ) {
-    return _wire_media_display_info_title(
-      media_display,
-    );
-  }
-
-  late final _wire_media_display_info_titlePtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_MediaDisplayInfo)>>(
-      'wire_media_display_info_title');
-  late final _wire_media_display_info_title = _wire_media_display_info_titlePtr
-      .asFunction<WireSyncReturn Function(wire_MediaDisplayInfo)>();
-
   WireSyncReturn wire_media_manager_handle_init_local_tracks(
     wire_MediaManagerHandle manager,
-    wire_MediaStreamSettings caps,
+    ffi.Pointer<wire_ApiMediaStreamSettings> caps,
   ) {
     return _wire_media_manager_handle_init_local_tracks(
       manager,
@@ -4690,13 +3645,13 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   late final _wire_media_manager_handle_init_local_tracksPtr = _lookup<
           ffi.NativeFunction<
-              WireSyncReturn Function(
-                  wire_MediaManagerHandle, wire_MediaStreamSettings)>>(
+              WireSyncReturn Function(wire_MediaManagerHandle,
+                  ffi.Pointer<wire_ApiMediaStreamSettings>)>>(
       'wire_media_manager_handle_init_local_tracks');
   late final _wire_media_manager_handle_init_local_tracks =
       _wire_media_manager_handle_init_local_tracksPtr.asFunction<
-          WireSyncReturn Function(
-              wire_MediaManagerHandle, wire_MediaStreamSettings)>();
+          WireSyncReturn Function(wire_MediaManagerHandle,
+              ffi.Pointer<wire_ApiMediaStreamSettings>)>();
 
   WireSyncReturn wire_media_manager_handle_enumerate_devices(
     wire_MediaManagerHandle manager,
@@ -4815,76 +3770,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_media_manager_handle_on_device_change =
       _wire_media_manager_handle_on_device_changePtr.asFunction<
           WireSyncReturn Function(wire_MediaManagerHandle, wire_DartOpaque)>();
-
-  WireSyncReturn wire_media_stream_settings_new() {
-    return _wire_media_stream_settings_new();
-  }
-
-  late final _wire_media_stream_settings_newPtr =
-      _lookup<ffi.NativeFunction<WireSyncReturn Function()>>(
-          'wire_media_stream_settings_new');
-  late final _wire_media_stream_settings_new =
-      _wire_media_stream_settings_newPtr
-          .asFunction<WireSyncReturn Function()>();
-
-  WireSyncReturn wire_media_stream_settings_audio(
-    wire_MediaStreamSettings media_stream_settings,
-    wire_AudioTrackConstraints constr,
-  ) {
-    return _wire_media_stream_settings_audio(
-      media_stream_settings,
-      constr,
-    );
-  }
-
-  late final _wire_media_stream_settings_audioPtr = _lookup<
-      ffi.NativeFunction<
-          WireSyncReturn Function(wire_MediaStreamSettings,
-              wire_AudioTrackConstraints)>>('wire_media_stream_settings_audio');
-  late final _wire_media_stream_settings_audio =
-      _wire_media_stream_settings_audioPtr.asFunction<
-          WireSyncReturn Function(
-              wire_MediaStreamSettings, wire_AudioTrackConstraints)>();
-
-  WireSyncReturn wire_media_stream_settings_device_video(
-    wire_MediaStreamSettings media_stream_settings,
-    wire_ApiWrapDeviceVideoTrackConstraints constr,
-  ) {
-    return _wire_media_stream_settings_device_video(
-      media_stream_settings,
-      constr,
-    );
-  }
-
-  late final _wire_media_stream_settings_device_videoPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturn Function(wire_MediaStreamSettings,
-                  wire_ApiWrapDeviceVideoTrackConstraints)>>(
-      'wire_media_stream_settings_device_video');
-  late final _wire_media_stream_settings_device_video =
-      _wire_media_stream_settings_device_videoPtr.asFunction<
-          WireSyncReturn Function(wire_MediaStreamSettings,
-              wire_ApiWrapDeviceVideoTrackConstraints)>();
-
-  WireSyncReturn wire_media_stream_settings_display_video(
-    wire_MediaStreamSettings media_stream_settings,
-    wire_ApiWrapDisplayVideoTrackConstraints constr,
-  ) {
-    return _wire_media_stream_settings_display_video(
-      media_stream_settings,
-      constr,
-    );
-  }
-
-  late final _wire_media_stream_settings_display_videoPtr = _lookup<
-          ffi.NativeFunction<
-              WireSyncReturn Function(wire_MediaStreamSettings,
-                  wire_ApiWrapDisplayVideoTrackConstraints)>>(
-      'wire_media_stream_settings_display_video');
-  late final _wire_media_stream_settings_display_video =
-      _wire_media_stream_settings_display_videoPtr.asFunction<
-          WireSyncReturn Function(wire_MediaStreamSettings,
-              wire_ApiWrapDisplayVideoTrackConstraints)>();
 
   WireSyncReturn wire_reconnect_handle_from_ptr(
     int ptr,
@@ -5120,49 +4005,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_room_close_reason_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
-  WireSyncReturn wire_room_close_reason_reason(
-    wire_RoomCloseReason room_close_reason,
-  ) {
-    return _wire_room_close_reason_reason(
-      room_close_reason,
-    );
-  }
-
-  late final _wire_room_close_reason_reasonPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_RoomCloseReason)>>(
-      'wire_room_close_reason_reason');
-  late final _wire_room_close_reason_reason = _wire_room_close_reason_reasonPtr
-      .asFunction<WireSyncReturn Function(wire_RoomCloseReason)>();
-
-  WireSyncReturn wire_room_close_reason_is_closed_by_server(
-    wire_RoomCloseReason room_close_reason,
-  ) {
-    return _wire_room_close_reason_is_closed_by_server(
-      room_close_reason,
-    );
-  }
-
-  late final _wire_room_close_reason_is_closed_by_serverPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_RoomCloseReason)>>(
-      'wire_room_close_reason_is_closed_by_server');
-  late final _wire_room_close_reason_is_closed_by_server =
-      _wire_room_close_reason_is_closed_by_serverPtr
-          .asFunction<WireSyncReturn Function(wire_RoomCloseReason)>();
-
-  WireSyncReturn wire_room_close_reason_is_err(
-    wire_RoomCloseReason room_close_reason,
-  ) {
-    return _wire_room_close_reason_is_err(
-      room_close_reason,
-    );
-  }
-
-  late final _wire_room_close_reason_is_errPtr = _lookup<
-          ffi.NativeFunction<WireSyncReturn Function(wire_RoomCloseReason)>>(
-      'wire_room_close_reason_is_err');
-  late final _wire_room_close_reason_is_err = _wire_room_close_reason_is_errPtr
-      .asFunction<WireSyncReturn Function(wire_RoomCloseReason)>();
-
   WireSyncReturn wire_room_handle_join(
     wire_RoomHandle room_handle,
     ffi.Pointer<wire_uint_8_list> token,
@@ -5183,7 +4025,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturn wire_room_handle_set_local_media_settings(
     wire_RoomHandle room_handle,
-    wire_MediaStreamSettings settings,
+    ffi.Pointer<wire_ApiMediaStreamSettings> settings,
     bool stop_first,
     bool rollback_on_fail,
   ) {
@@ -5199,13 +4041,13 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       ffi.NativeFunction<
           WireSyncReturn Function(
               wire_RoomHandle,
-              wire_MediaStreamSettings,
+              ffi.Pointer<wire_ApiMediaStreamSettings>,
               ffi.Bool,
               ffi.Bool)>>('wire_room_handle_set_local_media_settings');
   late final _wire_room_handle_set_local_media_settings =
       _wire_room_handle_set_local_media_settingsPtr.asFunction<
-          WireSyncReturn Function(
-              wire_RoomHandle, wire_MediaStreamSettings, bool, bool)>();
+          WireSyncReturn Function(wire_RoomHandle,
+              ffi.Pointer<wire_ApiMediaStreamSettings>, bool, bool)>();
 
   WireSyncReturn wire_room_handle_mute_audio(
     wire_RoomHandle room_handle,
@@ -5492,42 +4334,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_room_handle_on_failed_local_mediaPtr.asFunction<
           WireSyncReturn Function(wire_RoomHandle, wire_DartOpaque)>();
 
-  wire_ApiWrapDeviceVideoTrackConstraints
-      new_ApiWrapDeviceVideoTrackConstraints() {
-    return _new_ApiWrapDeviceVideoTrackConstraints();
-  }
-
-  late final _new_ApiWrapDeviceVideoTrackConstraintsPtr = _lookup<
-      ffi.NativeFunction<
-          wire_ApiWrapDeviceVideoTrackConstraints
-              Function()>>('new_ApiWrapDeviceVideoTrackConstraints');
-  late final _new_ApiWrapDeviceVideoTrackConstraints =
-      _new_ApiWrapDeviceVideoTrackConstraintsPtr
-          .asFunction<wire_ApiWrapDeviceVideoTrackConstraints Function()>();
-
-  wire_ApiWrapDisplayVideoTrackConstraints
-      new_ApiWrapDisplayVideoTrackConstraints() {
-    return _new_ApiWrapDisplayVideoTrackConstraints();
-  }
-
-  late final _new_ApiWrapDisplayVideoTrackConstraintsPtr = _lookup<
-      ffi.NativeFunction<
-          wire_ApiWrapDisplayVideoTrackConstraints
-              Function()>>('new_ApiWrapDisplayVideoTrackConstraints');
-  late final _new_ApiWrapDisplayVideoTrackConstraints =
-      _new_ApiWrapDisplayVideoTrackConstraintsPtr
-          .asFunction<wire_ApiWrapDisplayVideoTrackConstraints Function()>();
-
-  wire_AudioTrackConstraints new_AudioTrackConstraints() {
-    return _new_AudioTrackConstraints();
-  }
-
-  late final _new_AudioTrackConstraintsPtr =
-      _lookup<ffi.NativeFunction<wire_AudioTrackConstraints Function()>>(
-          'new_AudioTrackConstraints');
-  late final _new_AudioTrackConstraints = _new_AudioTrackConstraintsPtr
-      .asFunction<wire_AudioTrackConstraints Function()>();
-
   wire_ConnectionHandle new_ConnectionHandle() {
     return _new_ConnectionHandle();
   }
@@ -5565,26 +4371,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _new_LocalMediaTrack =
       _new_LocalMediaTrackPtr.asFunction<wire_LocalMediaTrack Function()>();
 
-  wire_MediaDeviceInfo new_MediaDeviceInfo() {
-    return _new_MediaDeviceInfo();
-  }
-
-  late final _new_MediaDeviceInfoPtr =
-      _lookup<ffi.NativeFunction<wire_MediaDeviceInfo Function()>>(
-          'new_MediaDeviceInfo');
-  late final _new_MediaDeviceInfo =
-      _new_MediaDeviceInfoPtr.asFunction<wire_MediaDeviceInfo Function()>();
-
-  wire_MediaDisplayInfo new_MediaDisplayInfo() {
-    return _new_MediaDisplayInfo();
-  }
-
-  late final _new_MediaDisplayInfoPtr =
-      _lookup<ffi.NativeFunction<wire_MediaDisplayInfo Function()>>(
-          'new_MediaDisplayInfo');
-  late final _new_MediaDisplayInfo =
-      _new_MediaDisplayInfoPtr.asFunction<wire_MediaDisplayInfo Function()>();
-
   wire_MediaManagerHandle new_MediaManagerHandle() {
     return _new_MediaManagerHandle();
   }
@@ -5594,16 +4380,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           'new_MediaManagerHandle');
   late final _new_MediaManagerHandle = _new_MediaManagerHandlePtr
       .asFunction<wire_MediaManagerHandle Function()>();
-
-  wire_MediaStreamSettings new_MediaStreamSettings() {
-    return _new_MediaStreamSettings();
-  }
-
-  late final _new_MediaStreamSettingsPtr =
-      _lookup<ffi.NativeFunction<wire_MediaStreamSettings Function()>>(
-          'new_MediaStreamSettings');
-  late final _new_MediaStreamSettings = _new_MediaStreamSettingsPtr
-      .asFunction<wire_MediaStreamSettings Function()>();
 
   wire_ReconnectHandle new_ReconnectHandle() {
     return _new_ReconnectHandle();
@@ -5625,16 +4401,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _new_RemoteMediaTrack =
       _new_RemoteMediaTrackPtr.asFunction<wire_RemoteMediaTrack Function()>();
 
-  wire_RoomCloseReason new_RoomCloseReason() {
-    return _new_RoomCloseReason();
-  }
-
-  late final _new_RoomCloseReasonPtr =
-      _lookup<ffi.NativeFunction<wire_RoomCloseReason Function()>>(
-          'new_RoomCloseReason');
-  late final _new_RoomCloseReason =
-      _new_RoomCloseReasonPtr.asFunction<wire_RoomCloseReason Function()>();
-
   wire_RoomHandle new_RoomHandle() {
     return _new_RoomHandle();
   }
@@ -5643,6 +4409,110 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _lookup<ffi.NativeFunction<wire_RoomHandle Function()>>('new_RoomHandle');
   late final _new_RoomHandle =
       _new_RoomHandlePtr.asFunction<wire_RoomHandle Function()>();
+
+  ffi.Pointer<wire_ApiAudioTrackConstraints>
+      new_box_api_audio_track_constraints_0() {
+    return _new_box_api_audio_track_constraints_0();
+  }
+
+  late final _new_box_api_audio_track_constraints_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_ApiAudioTrackConstraints>
+              Function()>>('new_box_api_audio_track_constraints_0');
+  late final _new_box_api_audio_track_constraints_0 =
+      _new_box_api_audio_track_constraints_0Ptr
+          .asFunction<ffi.Pointer<wire_ApiAudioTrackConstraints> Function()>();
+
+  ffi.Pointer<wire_ApiOptionConstrainFacingMode>
+      new_box_api_option_constrain_facing_mode_0() {
+    return _new_box_api_option_constrain_facing_mode_0();
+  }
+
+  late final _new_box_api_option_constrain_facing_mode_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_ApiOptionConstrainFacingMode>
+              Function()>>('new_box_api_option_constrain_facing_mode_0');
+  late final _new_box_api_option_constrain_facing_mode_0 =
+      _new_box_api_option_constrain_facing_mode_0Ptr.asFunction<
+          ffi.Pointer<wire_ApiOptionConstrainFacingMode> Function()>();
+
+  ffi.Pointer<wire_ApiOptionConstrainU32>
+      new_box_api_option_constrain_u_32_0() {
+    return _new_box_api_option_constrain_u_32_0();
+  }
+
+  late final _new_box_api_option_constrain_u_32_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_ApiOptionConstrainU32>
+              Function()>>('new_box_api_option_constrain_u_32_0');
+  late final _new_box_api_option_constrain_u_32_0 =
+      _new_box_api_option_constrain_u_32_0Ptr
+          .asFunction<ffi.Pointer<wire_ApiOptionConstrainU32> Function()>();
+
+  ffi.Pointer<wire_ApiConstrainFacingMode>
+      new_box_autoadd_api_constrain_facing_mode_0() {
+    return _new_box_autoadd_api_constrain_facing_mode_0();
+  }
+
+  late final _new_box_autoadd_api_constrain_facing_mode_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_ApiConstrainFacingMode>
+              Function()>>('new_box_autoadd_api_constrain_facing_mode_0');
+  late final _new_box_autoadd_api_constrain_facing_mode_0 =
+      _new_box_autoadd_api_constrain_facing_mode_0Ptr
+          .asFunction<ffi.Pointer<wire_ApiConstrainFacingMode> Function()>();
+
+  ffi.Pointer<wire_ApiDeviceVideoTrackConstraints>
+      new_box_autoadd_api_device_video_track_constraints_0() {
+    return _new_box_autoadd_api_device_video_track_constraints_0();
+  }
+
+  late final _new_box_autoadd_api_device_video_track_constraints_0Ptr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> Function()>>(
+      'new_box_autoadd_api_device_video_track_constraints_0');
+  late final _new_box_autoadd_api_device_video_track_constraints_0 =
+      _new_box_autoadd_api_device_video_track_constraints_0Ptr.asFunction<
+          ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> Function()>();
+
+  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+      new_box_autoadd_api_display_video_track_constraints_0() {
+    return _new_box_autoadd_api_display_video_track_constraints_0();
+  }
+
+  late final _new_box_autoadd_api_display_video_track_constraints_0Ptr =
+      _lookup<
+              ffi.NativeFunction<
+                  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+                      Function()>>(
+          'new_box_autoadd_api_display_video_track_constraints_0');
+  late final _new_box_autoadd_api_display_video_track_constraints_0 =
+      _new_box_autoadd_api_display_video_track_constraints_0Ptr.asFunction<
+          ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> Function()>();
+
+  ffi.Pointer<wire_ApiMediaStreamSettings>
+      new_box_autoadd_api_media_stream_settings_0() {
+    return _new_box_autoadd_api_media_stream_settings_0();
+  }
+
+  late final _new_box_autoadd_api_media_stream_settings_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_ApiMediaStreamSettings>
+              Function()>>('new_box_autoadd_api_media_stream_settings_0');
+  late final _new_box_autoadd_api_media_stream_settings_0 =
+      _new_box_autoadd_api_media_stream_settings_0Ptr
+          .asFunction<ffi.Pointer<wire_ApiMediaStreamSettings> Function()>();
+
+  ffi.Pointer<wire_ConstrainU32> new_box_autoadd_constrain_u_32_0() {
+    return _new_box_autoadd_constrain_u_32_0();
+  }
+
+  late final _new_box_autoadd_constrain_u_32_0Ptr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<wire_ConstrainU32> Function()>>(
+          'new_box_autoadd_constrain_u_32_0');
+  late final _new_box_autoadd_constrain_u_32_0 =
+      _new_box_autoadd_constrain_u_32_0Ptr
+          .asFunction<ffi.Pointer<wire_ConstrainU32> Function()>();
 
   ffi.Pointer<ffi.Int64> new_box_autoadd_i64_0(
     int value,
@@ -5672,99 +4542,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
               ffi.Int32)>>('new_uint_8_list_0');
   late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
       .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
-
-  void drop_opaque_ApiWrapDeviceVideoTrackConstraints(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_ApiWrapDeviceVideoTrackConstraints(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_ApiWrapDeviceVideoTrackConstraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_ApiWrapDeviceVideoTrackConstraints');
-  late final _drop_opaque_ApiWrapDeviceVideoTrackConstraints =
-      _drop_opaque_ApiWrapDeviceVideoTrackConstraintsPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_ApiWrapDeviceVideoTrackConstraints(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_ApiWrapDeviceVideoTrackConstraints(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_ApiWrapDeviceVideoTrackConstraintsPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>>(
-      'share_opaque_ApiWrapDeviceVideoTrackConstraints');
-  late final _share_opaque_ApiWrapDeviceVideoTrackConstraints =
-      _share_opaque_ApiWrapDeviceVideoTrackConstraintsPtr
-          .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
-
-  void drop_opaque_ApiWrapDisplayVideoTrackConstraints(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_ApiWrapDisplayVideoTrackConstraints(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_ApiWrapDisplayVideoTrackConstraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_ApiWrapDisplayVideoTrackConstraints');
-  late final _drop_opaque_ApiWrapDisplayVideoTrackConstraints =
-      _drop_opaque_ApiWrapDisplayVideoTrackConstraintsPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_ApiWrapDisplayVideoTrackConstraints(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_ApiWrapDisplayVideoTrackConstraints(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_ApiWrapDisplayVideoTrackConstraintsPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>>(
-      'share_opaque_ApiWrapDisplayVideoTrackConstraints');
-  late final _share_opaque_ApiWrapDisplayVideoTrackConstraints =
-      _share_opaque_ApiWrapDisplayVideoTrackConstraintsPtr
-          .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
-
-  void drop_opaque_AudioTrackConstraints(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_AudioTrackConstraints(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_AudioTrackConstraintsPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_AudioTrackConstraints');
-  late final _drop_opaque_AudioTrackConstraints =
-      _drop_opaque_AudioTrackConstraintsPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_AudioTrackConstraints(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_AudioTrackConstraints(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_AudioTrackConstraintsPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<ffi.Void>)>>('share_opaque_AudioTrackConstraints');
-  late final _share_opaque_AudioTrackConstraints =
-      _share_opaque_AudioTrackConstraintsPtr
-          .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
 
   void drop_opaque_ConnectionHandle(
     ffi.Pointer<ffi.Void> ptr,
@@ -5853,64 +4630,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _share_opaque_LocalMediaTrack = _share_opaque_LocalMediaTrackPtr
       .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
 
-  void drop_opaque_MediaDeviceInfo(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_MediaDeviceInfo(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_MediaDeviceInfoPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_MediaDeviceInfo');
-  late final _drop_opaque_MediaDeviceInfo = _drop_opaque_MediaDeviceInfoPtr
-      .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_MediaDeviceInfo(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_MediaDeviceInfo(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_MediaDeviceInfoPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<ffi.Void>)>>('share_opaque_MediaDeviceInfo');
-  late final _share_opaque_MediaDeviceInfo = _share_opaque_MediaDeviceInfoPtr
-      .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
-
-  void drop_opaque_MediaDisplayInfo(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_MediaDisplayInfo(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_MediaDisplayInfoPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_MediaDisplayInfo');
-  late final _drop_opaque_MediaDisplayInfo = _drop_opaque_MediaDisplayInfoPtr
-      .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_MediaDisplayInfo(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_MediaDisplayInfo(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_MediaDisplayInfoPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<ffi.Void>)>>('share_opaque_MediaDisplayInfo');
-  late final _share_opaque_MediaDisplayInfo = _share_opaque_MediaDisplayInfoPtr
-      .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
-
   void drop_opaque_MediaManagerHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
@@ -5940,37 +4659,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
               ffi.Pointer<ffi.Void>)>>('share_opaque_MediaManagerHandle');
   late final _share_opaque_MediaManagerHandle =
       _share_opaque_MediaManagerHandlePtr
-          .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
-
-  void drop_opaque_MediaStreamSettings(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_MediaStreamSettings(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_MediaStreamSettingsPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_MediaStreamSettings');
-  late final _drop_opaque_MediaStreamSettings =
-      _drop_opaque_MediaStreamSettingsPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_MediaStreamSettings(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_MediaStreamSettings(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_MediaStreamSettingsPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<ffi.Void>)>>('share_opaque_MediaStreamSettings');
-  late final _share_opaque_MediaStreamSettings =
-      _share_opaque_MediaStreamSettingsPtr
           .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
 
   void drop_opaque_ReconnectHandle(
@@ -6031,35 +4719,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _share_opaque_RemoteMediaTrack = _share_opaque_RemoteMediaTrackPtr
       .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
 
-  void drop_opaque_RoomCloseReason(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _drop_opaque_RoomCloseReason(
-      ptr,
-    );
-  }
-
-  late final _drop_opaque_RoomCloseReasonPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-          'drop_opaque_RoomCloseReason');
-  late final _drop_opaque_RoomCloseReason = _drop_opaque_RoomCloseReasonPtr
-      .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  ffi.Pointer<ffi.Void> share_opaque_RoomCloseReason(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _share_opaque_RoomCloseReason(
-      ptr,
-    );
-  }
-
-  late final _share_opaque_RoomCloseReasonPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<ffi.Void>)>>('share_opaque_RoomCloseReason');
-  late final _share_opaque_RoomCloseReason = _share_opaque_RoomCloseReasonPtr
-      .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
-
   void drop_opaque_RoomHandle(
     ffi.Pointer<ffi.Void> ptr,
   ) {
@@ -6089,6 +4748,87 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _share_opaque_RoomHandle = _share_opaque_RoomHandlePtr
       .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<ffi.Void>)>();
 
+  ffi.Pointer<ApiConstrainFacingModeKind>
+      inflate_ApiConstrainFacingMode_Exact() {
+    return _inflate_ApiConstrainFacingMode_Exact();
+  }
+
+  late final _inflate_ApiConstrainFacingMode_ExactPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ApiConstrainFacingModeKind>
+              Function()>>('inflate_ApiConstrainFacingMode_Exact');
+  late final _inflate_ApiConstrainFacingMode_Exact =
+      _inflate_ApiConstrainFacingMode_ExactPtr
+          .asFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>();
+
+  ffi.Pointer<ApiConstrainFacingModeKind>
+      inflate_ApiConstrainFacingMode_Ideal() {
+    return _inflate_ApiConstrainFacingMode_Ideal();
+  }
+
+  late final _inflate_ApiConstrainFacingMode_IdealPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ApiConstrainFacingModeKind>
+              Function()>>('inflate_ApiConstrainFacingMode_Ideal');
+  late final _inflate_ApiConstrainFacingMode_Ideal =
+      _inflate_ApiConstrainFacingMode_IdealPtr
+          .asFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>();
+
+  ffi.Pointer<ApiOptionConstrainFacingModeKind>
+      inflate_ApiOptionConstrainFacingMode_Some() {
+    return _inflate_ApiOptionConstrainFacingMode_Some();
+  }
+
+  late final _inflate_ApiOptionConstrainFacingMode_SomePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ApiOptionConstrainFacingModeKind>
+              Function()>>('inflate_ApiOptionConstrainFacingMode_Some');
+  late final _inflate_ApiOptionConstrainFacingMode_Some =
+      _inflate_ApiOptionConstrainFacingMode_SomePtr.asFunction<
+          ffi.Pointer<ApiOptionConstrainFacingModeKind> Function()>();
+
+  ffi.Pointer<ApiOptionConstrainU32Kind> inflate_ApiOptionConstrainU32_Some() {
+    return _inflate_ApiOptionConstrainU32_Some();
+  }
+
+  late final _inflate_ApiOptionConstrainU32_SomePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ApiOptionConstrainU32Kind>
+              Function()>>('inflate_ApiOptionConstrainU32_Some');
+  late final _inflate_ApiOptionConstrainU32_Some =
+      _inflate_ApiOptionConstrainU32_SomePtr
+          .asFunction<ffi.Pointer<ApiOptionConstrainU32Kind> Function()>();
+
+  ffi.Pointer<ConstrainU32Kind> inflate_ConstrainU32_Exact() {
+    return _inflate_ConstrainU32_Exact();
+  }
+
+  late final _inflate_ConstrainU32_ExactPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ConstrainU32Kind> Function()>>(
+          'inflate_ConstrainU32_Exact');
+  late final _inflate_ConstrainU32_Exact = _inflate_ConstrainU32_ExactPtr
+      .asFunction<ffi.Pointer<ConstrainU32Kind> Function()>();
+
+  ffi.Pointer<ConstrainU32Kind> inflate_ConstrainU32_Ideal() {
+    return _inflate_ConstrainU32_Ideal();
+  }
+
+  late final _inflate_ConstrainU32_IdealPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ConstrainU32Kind> Function()>>(
+          'inflate_ConstrainU32_Ideal');
+  late final _inflate_ConstrainU32_Ideal = _inflate_ConstrainU32_IdealPtr
+      .asFunction<ffi.Pointer<ConstrainU32Kind> Function()>();
+
+  ffi.Pointer<ConstrainU32Kind> inflate_ConstrainU32_Range() {
+    return _inflate_ConstrainU32_Range();
+  }
+
+  late final _inflate_ConstrainU32_RangePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ConstrainU32Kind> Function()>>(
+          'inflate_ConstrainU32_Range');
+  late final _inflate_ConstrainU32_Range = _inflate_ConstrainU32_RangePtr
+      .asFunction<ffi.Pointer<ConstrainU32Kind> Function()>();
+
   void free_WireSyncReturn(
     WireSyncReturn ptr,
   ) {
@@ -6106,15 +4846,39 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
 class _Dart_Handle extends ffi.Opaque {}
 
-class wire_AudioTrackConstraints extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
+abstract class MemoryOwner {
+  static const int Rust = 0;
+  static const int Dart = 1;
 }
 
-class wire_uint_8_list extends ffi.Struct {
-  external ffi.Pointer<ffi.Uint8> ptr;
+abstract class DartValue_Tag {
+  static const int None = 0;
+  static const int Ptr = 1;
+  static const int Handle = 2;
+  static const int String = 3;
+  static const int Int = 4;
+  static const int Float = 5;
+  static const int Bool = 6;
+}
 
-  @ffi.Int32()
-  external int len;
+class String_Body extends ffi.Struct {
+  @DartValue_Tag1()
+  external int tag;
+
+  external ffi.Pointer<ffi.Char> _0;
+
+  @MemoryOwner1()
+  external int _1;
+}
+
+typedef DartValue_Tag1 = ffi.Uint8;
+typedef MemoryOwner1 = ffi.Uint8;
+
+class DartValue extends ffi.Union {
+  @DartValue_Tag1()
+  external int tag;
+
+  external String_Body string;
 }
 
 class wire_ConnectionHandle extends ffi.Struct {
@@ -6129,14 +4893,6 @@ class wire_DartOpaque extends ffi.Struct {
   external int handle;
 }
 
-class wire_ApiWrapDeviceVideoTrackConstraints extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
-}
-
-class wire_ApiWrapDisplayVideoTrackConstraints extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
-}
-
 class wire_Jason extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
@@ -6149,20 +4905,141 @@ class wire_LocalMediaTrack extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-class wire_MediaDeviceInfo extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
-}
-
-class wire_MediaDisplayInfo extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
-}
-
 class wire_MediaManagerHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-class wire_MediaStreamSettings extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
+class wire_uint_8_list extends ffi.Struct {
+  external ffi.Pointer<ffi.Uint8> ptr;
+
+  @ffi.Int32()
+  external int len;
+}
+
+class wire_ApiAudioTrackConstraints extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> device_id;
+}
+
+class wire_ApiConstrainFacingMode_Exact extends ffi.Struct {
+  @ffi.Int32()
+  external int field0;
+}
+
+class wire_ApiConstrainFacingMode_Ideal extends ffi.Struct {
+  @ffi.Int32()
+  external int field0;
+}
+
+class ApiConstrainFacingModeKind extends ffi.Union {
+  external ffi.Pointer<wire_ApiConstrainFacingMode_Exact> Exact;
+
+  external ffi.Pointer<wire_ApiConstrainFacingMode_Ideal> Ideal;
+}
+
+class wire_ApiConstrainFacingMode extends ffi.Struct {
+  @ffi.Int32()
+  external int tag;
+
+  external ffi.Pointer<ApiConstrainFacingModeKind> kind;
+}
+
+class wire_ApiOptionConstrainFacingMode_Some extends ffi.Struct {
+  external ffi.Pointer<wire_ApiConstrainFacingMode> field0;
+}
+
+class wire_ApiOptionConstrainFacingMode_None extends ffi.Opaque {}
+
+class ApiOptionConstrainFacingModeKind extends ffi.Union {
+  external ffi.Pointer<wire_ApiOptionConstrainFacingMode_Some> Some;
+
+  external ffi.Pointer<wire_ApiOptionConstrainFacingMode_None> None;
+}
+
+class wire_ApiOptionConstrainFacingMode extends ffi.Struct {
+  @ffi.Int32()
+  external int tag;
+
+  external ffi.Pointer<ApiOptionConstrainFacingModeKind> kind;
+}
+
+class wire_ConstrainU32_Exact extends ffi.Struct {
+  @ffi.Uint32()
+  external int field0;
+}
+
+class wire_ConstrainU32_Ideal extends ffi.Struct {
+  @ffi.Uint32()
+  external int field0;
+}
+
+class wire_ConstrainU32_Range extends ffi.Struct {
+  @ffi.Uint32()
+  external int field0;
+
+  @ffi.Uint32()
+  external int field1;
+}
+
+class ConstrainU32Kind extends ffi.Union {
+  external ffi.Pointer<wire_ConstrainU32_Exact> Exact;
+
+  external ffi.Pointer<wire_ConstrainU32_Ideal> Ideal;
+
+  external ffi.Pointer<wire_ConstrainU32_Range> Range;
+}
+
+class wire_ConstrainU32 extends ffi.Struct {
+  @ffi.Int32()
+  external int tag;
+
+  external ffi.Pointer<ConstrainU32Kind> kind;
+}
+
+class wire_ApiOptionConstrainU32_Some extends ffi.Struct {
+  external ffi.Pointer<wire_ConstrainU32> field0;
+}
+
+class wire_ApiOptionConstrainU32_None extends ffi.Opaque {}
+
+class ApiOptionConstrainU32Kind extends ffi.Union {
+  external ffi.Pointer<wire_ApiOptionConstrainU32_Some> Some;
+
+  external ffi.Pointer<wire_ApiOptionConstrainU32_None> None;
+}
+
+class wire_ApiOptionConstrainU32 extends ffi.Struct {
+  @ffi.Int32()
+  external int tag;
+
+  external ffi.Pointer<ApiOptionConstrainU32Kind> kind;
+}
+
+class wire_ApiDeviceVideoTrackConstraints extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> device_id;
+
+  external ffi.Pointer<wire_ApiOptionConstrainFacingMode> facing_mode;
+
+  external ffi.Pointer<wire_ApiOptionConstrainU32> height;
+
+  external ffi.Pointer<wire_ApiOptionConstrainU32> width;
+}
+
+class wire_ApiDisplayVideoTrackConstraints extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> device_id;
+
+  external ffi.Pointer<wire_ApiOptionConstrainU32> height;
+
+  external ffi.Pointer<wire_ApiOptionConstrainU32> width;
+
+  external ffi.Pointer<wire_ApiOptionConstrainU32> frame_rate;
+}
+
+class wire_ApiMediaStreamSettings extends ffi.Struct {
+  external ffi.Pointer<wire_ApiAudioTrackConstraints> audio;
+
+  external ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> device_video;
+
+  external ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> display_video;
 }
 
 class wire_ReconnectHandle extends ffi.Struct {
@@ -6173,10 +5050,7 @@ class wire_RemoteMediaTrack extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-class wire_RoomCloseReason extends ffi.Struct {
-  external ffi.Pointer<ffi.Void> ptr;
-}
-
+typedef DartError = ffi.Pointer<ffi.Handle>;
 typedef DartPostCObjectFnType = ffi.Pointer<
     ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;
 typedef DartPort = ffi.Int64;

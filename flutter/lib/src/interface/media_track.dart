@@ -1,7 +1,10 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-export '../native/ffi/jason_api.g.dart' show MediaKind, MediaSourceKind;
-import '../native/ffi/jason_api.g.dart' show MediaKind, MediaSourceKind, MediaDirection;
+
 import '../util/rust_handles_storage.dart';
+
+export '../native/ffi/jason_api.g.dart' show MediaKind, MediaSourceKind;
+import '../native/ffi/jason_api.g.dart'
+    show MediaKind, MediaSourceKind, MediaDirection;
 
 typedef TrackMediaDirection = MediaDirection;
 

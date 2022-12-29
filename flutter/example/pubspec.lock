@@ -171,7 +171,7 @@ packages:
       name: flutter_gherkin
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0-rc.9"
+    version: "3.0.0-rc.17"
   flutter_rust_bridge:
     dependency: transitive
     description:
@@ -185,7 +185,7 @@ packages:
     source: sdk
     version: "0.0.0"
   freezed_annotation:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: freezed_annotation
       url: "https://pub.dartlang.org"
@@ -202,7 +202,7 @@ packages:
       name: gherkin
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.8"
+    version: "3.1.0"
   glob:
     dependency: transitive
     description:

@@ -11,7 +11,7 @@ import 'jason.dart';
 
 class NativeConnectionHandle extends ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.ConnectionHandle> opaque;
+  final RustOpaque<frb.ConnectionHandle> opaque;
 
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
   /// provided [frb.ConnectionHandle].

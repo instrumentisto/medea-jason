@@ -430,8 +430,7 @@ endif
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
-		$(WINDOWS_TARGETS)),\
+		$(LINUX_TARGETS) $(WEB_TARGETS)),\
 			$(call cargo.lint.medea-jason,$(target)))
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
@@ -1373,3 +1372,6 @@ endef
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
+
+
+# make test.e2e.native device=linux up=yes debug=no dockerized=yes medea-tag=edge

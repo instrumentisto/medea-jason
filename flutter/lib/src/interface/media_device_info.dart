@@ -1,6 +1,7 @@
-import '/src/util/rust_handles_storage.dart';
-export '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
 import '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
+import '/src/util/rust_handles_storage.dart';
+
+export '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
 
 /// [`MediaDeviceInfo`][1] interface.
 ///

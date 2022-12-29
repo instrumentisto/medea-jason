@@ -2,19 +2,6 @@ use super::*;
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_audioTrack_constr_new() -> support::WireSyncReturn {
-    wire_audioTrack_constr_new_impl()
-}
-
-#[no_mangle]
-pub extern "C" fn wire_audioTrack_constr_device_id(
-    track: wire_AudioTrackConstraints,
-    device_id: *mut wire_uint_8_list,
-) -> support::WireSyncReturn {
-    wire_audioTrack_constr_device_id_impl(track, device_id)
-}
-
-#[no_mangle]
 pub extern "C" fn wire_connection_handle_from_ptr(
     ptr: usize,
 ) -> support::WireSyncReturn {
@@ -80,154 +67,6 @@ pub extern "C" fn wire_connection_handle_disable_remote_video(
     source_kind: *mut i64,
 ) -> support::WireSyncReturn {
     wire_connection_handle_disable_remote_video_impl(connection, source_kind)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_new() -> support::WireSyncReturn
-{
-    wire_deviceVideoTrack_constr_new_impl()
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_device_id(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    device_id: *mut wire_uint_8_list,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_device_id_impl(constr, device_id)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_exact_facing_mode(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    facing_mode: i32,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_exact_facing_mode_impl(constr, facing_mode)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_ideal_facing_mode(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    facing_mode: i32,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_ideal_facing_mode_impl(constr, facing_mode)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_exact_height(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    exact_height: i64,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_exact_height_impl(constr, exact_height)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_ideal_height(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    ideal_height: i64,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_ideal_height_impl(constr, ideal_height)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_exact_width(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    exact_width: i64,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_exact_width_impl(constr, exact_width)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_ideal_width(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    ideal_width: i64,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_ideal_width_impl(constr, ideal_width)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_height_in_range(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    min: i64,
-    max: i64,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_height_in_range_impl(constr, min, max)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_deviceVideoTrack_constr_width_in_range(
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-    min: i64,
-    max: i64,
-) -> support::WireSyncReturn {
-    wire_deviceVideoTrack_constr_width_in_range_impl(constr, min, max)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_new() -> support::WireSyncReturn
-{
-    wire_displayVideoTrack_constr_new_impl()
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_device_id(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    device_id: *mut wire_uint_8_list,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_device_id_impl(constr, device_id)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_exact_height(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    exact_height: i64,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_exact_height_impl(constr, exact_height)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_ideal_height(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    ideal_height: i64,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_ideal_height_impl(constr, ideal_height)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_exact_width(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    exact_width: i64,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_exact_width_impl(constr, exact_width)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_ideal_width(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    ideal_width: i64,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_ideal_width_impl(constr, ideal_width)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_ideal_frame_rate(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    ideal_frame_rate: i64,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_ideal_frame_rate_impl(
-        constr,
-        ideal_frame_rate,
-    )
-}
-
-#[no_mangle]
-pub extern "C" fn wire_displayVideoTrack_constr_exact_frame_rate(
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-    exact_frame_rate: i64,
-) -> support::WireSyncReturn {
-    wire_displayVideoTrack_constr_exact_frame_rate_impl(
-        constr,
-        exact_frame_rate,
-    )
 }
 
 #[no_mangle]
@@ -314,34 +153,6 @@ pub extern "C" fn wire_vec_media_device_info_from_ptr(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_media_device_info_device_id(
-    media_device: wire_MediaDeviceInfo,
-) -> support::WireSyncReturn {
-    wire_media_device_info_device_id_impl(media_device)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_device_info_kind(
-    media_device: wire_MediaDeviceInfo,
-) -> support::WireSyncReturn {
-    wire_media_device_info_kind_impl(media_device)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_device_info_label(
-    media_device: wire_MediaDeviceInfo,
-) -> support::WireSyncReturn {
-    wire_media_device_info_label_impl(media_device)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_device_info_group_id(
-    media_device: wire_MediaDeviceInfo,
-) -> support::WireSyncReturn {
-    wire_media_device_info_group_id_impl(media_device)
-}
-
-#[no_mangle]
 pub extern "C" fn wire_vec_media_display_info_from_ptr(
     ptr: usize,
 ) -> support::WireSyncReturn {
@@ -349,23 +160,9 @@ pub extern "C" fn wire_vec_media_display_info_from_ptr(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_media_display_info_device_id(
-    media_display: wire_MediaDisplayInfo,
-) -> support::WireSyncReturn {
-    wire_media_display_info_device_id_impl(media_display)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_display_info_title(
-    media_display: wire_MediaDisplayInfo,
-) -> support::WireSyncReturn {
-    wire_media_display_info_title_impl(media_display)
-}
-
-#[no_mangle]
 pub extern "C" fn wire_media_manager_handle_init_local_tracks(
     manager: wire_MediaManagerHandle,
-    caps: wire_MediaStreamSettings,
+    caps: *mut wire_ApiMediaStreamSettings,
 ) -> support::WireSyncReturn {
     wire_media_manager_handle_init_local_tracks_impl(manager, caps)
 }
@@ -420,35 +217,6 @@ pub extern "C" fn wire_media_manager_handle_on_device_change(
     cb: wire_DartOpaque,
 ) -> support::WireSyncReturn {
     wire_media_manager_handle_on_device_change_impl(manager, cb)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_stream_settings_new() -> support::WireSyncReturn {
-    wire_media_stream_settings_new_impl()
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_stream_settings_audio(
-    media_stream_settings: wire_MediaStreamSettings,
-    constr: wire_AudioTrackConstraints,
-) -> support::WireSyncReturn {
-    wire_media_stream_settings_audio_impl(media_stream_settings, constr)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_stream_settings_device_video(
-    media_stream_settings: wire_MediaStreamSettings,
-    constr: wire_ApiWrapDeviceVideoTrackConstraints,
-) -> support::WireSyncReturn {
-    wire_media_stream_settings_device_video_impl(media_stream_settings, constr)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_media_stream_settings_display_video(
-    media_stream_settings: wire_MediaStreamSettings,
-    constr: wire_ApiWrapDisplayVideoTrackConstraints,
-) -> support::WireSyncReturn {
-    wire_media_stream_settings_display_video_impl(media_stream_settings, constr)
 }
 
 #[no_mangle]
@@ -565,27 +333,6 @@ pub extern "C" fn wire_room_close_reason_from_ptr(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_room_close_reason_reason(
-    room_close_reason: wire_RoomCloseReason,
-) -> support::WireSyncReturn {
-    wire_room_close_reason_reason_impl(room_close_reason)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_room_close_reason_is_closed_by_server(
-    room_close_reason: wire_RoomCloseReason,
-) -> support::WireSyncReturn {
-    wire_room_close_reason_is_closed_by_server_impl(room_close_reason)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_room_close_reason_is_err(
-    room_close_reason: wire_RoomCloseReason,
-) -> support::WireSyncReturn {
-    wire_room_close_reason_is_err_impl(room_close_reason)
-}
-
-#[no_mangle]
 pub extern "C" fn wire_room_handle_join(
     room_handle: wire_RoomHandle,
     token: *mut wire_uint_8_list,
@@ -596,7 +343,7 @@ pub extern "C" fn wire_room_handle_join(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_set_local_media_settings(
     room_handle: wire_RoomHandle,
-    settings: wire_MediaStreamSettings,
+    settings: *mut wire_ApiMediaStreamSettings,
     stop_first: bool,
     rollback_on_fail: bool,
 ) -> support::WireSyncReturn {
@@ -741,23 +488,6 @@ pub extern "C" fn wire_room_handle_on_failed_local_media(
 // Section: allocate functions
 
 #[no_mangle]
-pub extern "C" fn new_ApiWrapDeviceVideoTrackConstraints(
-) -> wire_ApiWrapDeviceVideoTrackConstraints {
-    wire_ApiWrapDeviceVideoTrackConstraints::new_with_null_ptr()
-}
-
-#[no_mangle]
-pub extern "C" fn new_ApiWrapDisplayVideoTrackConstraints(
-) -> wire_ApiWrapDisplayVideoTrackConstraints {
-    wire_ApiWrapDisplayVideoTrackConstraints::new_with_null_ptr()
-}
-
-#[no_mangle]
-pub extern "C" fn new_AudioTrackConstraints() -> wire_AudioTrackConstraints {
-    wire_AudioTrackConstraints::new_with_null_ptr()
-}
-
-#[no_mangle]
 pub extern "C" fn new_ConnectionHandle() -> wire_ConnectionHandle {
     wire_ConnectionHandle::new_with_null_ptr()
 }
@@ -778,23 +508,8 @@ pub extern "C" fn new_LocalMediaTrack() -> wire_LocalMediaTrack {
 }
 
 #[no_mangle]
-pub extern "C" fn new_MediaDeviceInfo() -> wire_MediaDeviceInfo {
-    wire_MediaDeviceInfo::new_with_null_ptr()
-}
-
-#[no_mangle]
-pub extern "C" fn new_MediaDisplayInfo() -> wire_MediaDisplayInfo {
-    wire_MediaDisplayInfo::new_with_null_ptr()
-}
-
-#[no_mangle]
 pub extern "C" fn new_MediaManagerHandle() -> wire_MediaManagerHandle {
     wire_MediaManagerHandle::new_with_null_ptr()
-}
-
-#[no_mangle]
-pub extern "C" fn new_MediaStreamSettings() -> wire_MediaStreamSettings {
-    wire_MediaStreamSettings::new_with_null_ptr()
 }
 
 #[no_mangle]
@@ -808,13 +523,61 @@ pub extern "C" fn new_RemoteMediaTrack() -> wire_RemoteMediaTrack {
 }
 
 #[no_mangle]
-pub extern "C" fn new_RoomCloseReason() -> wire_RoomCloseReason {
-    wire_RoomCloseReason::new_with_null_ptr()
+pub extern "C" fn new_RoomHandle() -> wire_RoomHandle {
+    wire_RoomHandle::new_with_null_ptr()
 }
 
 #[no_mangle]
-pub extern "C" fn new_RoomHandle() -> wire_RoomHandle {
-    wire_RoomHandle::new_with_null_ptr()
+pub extern "C" fn new_box_api_audio_track_constraints_0(
+) -> *mut wire_ApiAudioTrackConstraints {
+    support::new_leak_box_ptr(wire_ApiAudioTrackConstraints::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_api_option_constrain_facing_mode_0(
+) -> *mut wire_ApiOptionConstrainFacingMode {
+    support::new_leak_box_ptr(
+        wire_ApiOptionConstrainFacingMode::new_with_null_ptr(),
+    )
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_api_option_constrain_u_32_0(
+) -> *mut wire_ApiOptionConstrainU32 {
+    support::new_leak_box_ptr(wire_ApiOptionConstrainU32::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_api_constrain_facing_mode_0(
+) -> *mut wire_ApiConstrainFacingMode {
+    support::new_leak_box_ptr(wire_ApiConstrainFacingMode::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_api_device_video_track_constraints_0(
+) -> *mut wire_ApiDeviceVideoTrackConstraints {
+    support::new_leak_box_ptr(
+        wire_ApiDeviceVideoTrackConstraints::new_with_null_ptr(),
+    )
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_api_display_video_track_constraints_0(
+) -> *mut wire_ApiDisplayVideoTrackConstraints {
+    support::new_leak_box_ptr(
+        wire_ApiDisplayVideoTrackConstraints::new_with_null_ptr(),
+    )
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_api_media_stream_settings_0(
+) -> *mut wire_ApiMediaStreamSettings {
+    support::new_leak_box_ptr(wire_ApiMediaStreamSettings::new_with_null_ptr())
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_constrain_u_32_0() -> *mut wire_ConstrainU32 {
+    support::new_leak_box_ptr(wire_ConstrainU32::new_with_null_ptr())
 }
 
 #[no_mangle]
@@ -832,69 +595,6 @@ pub extern "C" fn new_uint_8_list_0(len: i32) -> *mut wire_uint_8_list {
 }
 
 // Section: related functions
-
-#[no_mangle]
-pub extern "C" fn drop_opaque_ApiWrapDeviceVideoTrackConstraints(
-    ptr: *const c_void,
-) {
-    unsafe {
-        Arc::<ApiWrap<DeviceVideoTrackConstraints>>::decrement_strong_count(
-            ptr as _,
-        );
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_ApiWrapDeviceVideoTrackConstraints(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<ApiWrap<DeviceVideoTrackConstraints>>::increment_strong_count(
-            ptr as _,
-        );
-        ptr
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn drop_opaque_ApiWrapDisplayVideoTrackConstraints(
-    ptr: *const c_void,
-) {
-    unsafe {
-        Arc::<ApiWrap<DisplayVideoTrackConstraints>>::decrement_strong_count(
-            ptr as _,
-        );
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_ApiWrapDisplayVideoTrackConstraints(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<ApiWrap<DisplayVideoTrackConstraints>>::increment_strong_count(
-            ptr as _,
-        );
-        ptr
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn drop_opaque_AudioTrackConstraints(ptr: *const c_void) {
-    unsafe {
-        Arc::<AudioTrackConstraints>::decrement_strong_count(ptr as _);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_AudioTrackConstraints(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<AudioTrackConstraints>::increment_strong_count(ptr as _);
-        ptr
-    }
-}
 
 #[no_mangle]
 pub extern "C" fn drop_opaque_ConnectionHandle(ptr: *const c_void) {
@@ -946,40 +646,6 @@ pub extern "C" fn share_opaque_LocalMediaTrack(
 }
 
 #[no_mangle]
-pub extern "C" fn drop_opaque_MediaDeviceInfo(ptr: *const c_void) {
-    unsafe {
-        Arc::<MediaDeviceInfo>::decrement_strong_count(ptr as _);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_MediaDeviceInfo(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<MediaDeviceInfo>::increment_strong_count(ptr as _);
-        ptr
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn drop_opaque_MediaDisplayInfo(ptr: *const c_void) {
-    unsafe {
-        Arc::<MediaDisplayInfo>::decrement_strong_count(ptr as _);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_MediaDisplayInfo(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<MediaDisplayInfo>::increment_strong_count(ptr as _);
-        ptr
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn drop_opaque_MediaManagerHandle(ptr: *const c_void) {
     unsafe {
         Arc::<MediaManagerHandle>::decrement_strong_count(ptr as _);
@@ -992,23 +658,6 @@ pub extern "C" fn share_opaque_MediaManagerHandle(
 ) -> *const c_void {
     unsafe {
         Arc::<MediaManagerHandle>::increment_strong_count(ptr as _);
-        ptr
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn drop_opaque_MediaStreamSettings(ptr: *const c_void) {
-    unsafe {
-        Arc::<MediaStreamSettings>::decrement_strong_count(ptr as _);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_MediaStreamSettings(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<MediaStreamSettings>::increment_strong_count(ptr as _);
         ptr
     }
 }
@@ -1048,23 +697,6 @@ pub extern "C" fn share_opaque_RemoteMediaTrack(
 }
 
 #[no_mangle]
-pub extern "C" fn drop_opaque_RoomCloseReason(ptr: *const c_void) {
-    unsafe {
-        Arc::<RoomCloseReason>::decrement_strong_count(ptr as _);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn share_opaque_RoomCloseReason(
-    ptr: *const c_void,
-) -> *const c_void {
-    unsafe {
-        Arc::<RoomCloseReason>::increment_strong_count(ptr as _);
-        ptr
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn drop_opaque_RoomHandle(ptr: *const c_void) {
     unsafe {
         Arc::<RoomHandle>::decrement_strong_count(ptr as _);
@@ -1081,27 +713,6 @@ pub extern "C" fn share_opaque_RoomHandle(ptr: *const c_void) -> *const c_void {
 
 // Section: impl Wire2Api
 
-impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-    for wire_ApiWrapDeviceVideoTrackConstraints
-{
-    fn wire2api(self) -> RustOpaque<ApiWrap<DeviceVideoTrackConstraints>> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
-impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-    for wire_ApiWrapDisplayVideoTrackConstraints
-{
-    fn wire2api(self) -> RustOpaque<ApiWrap<DisplayVideoTrackConstraints>> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
-impl Wire2Api<RustOpaque<AudioTrackConstraints>>
-    for wire_AudioTrackConstraints
-{
-    fn wire2api(self) -> RustOpaque<AudioTrackConstraints> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
 impl Wire2Api<RustOpaque<ConnectionHandle>> for wire_ConnectionHandle {
     fn wire2api(self) -> RustOpaque<ConnectionHandle> {
         unsafe { support::opaque_from_dart(self.ptr as _) }
@@ -1122,23 +733,8 @@ impl Wire2Api<RustOpaque<LocalMediaTrack>> for wire_LocalMediaTrack {
         unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
-impl Wire2Api<RustOpaque<MediaDeviceInfo>> for wire_MediaDeviceInfo {
-    fn wire2api(self) -> RustOpaque<MediaDeviceInfo> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
-impl Wire2Api<RustOpaque<MediaDisplayInfo>> for wire_MediaDisplayInfo {
-    fn wire2api(self) -> RustOpaque<MediaDisplayInfo> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
 impl Wire2Api<RustOpaque<MediaManagerHandle>> for wire_MediaManagerHandle {
     fn wire2api(self) -> RustOpaque<MediaManagerHandle> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
-impl Wire2Api<RustOpaque<MediaStreamSettings>> for wire_MediaStreamSettings {
-    fn wire2api(self) -> RustOpaque<MediaStreamSettings> {
         unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
@@ -1149,11 +745,6 @@ impl Wire2Api<RustOpaque<ReconnectHandle>> for wire_ReconnectHandle {
 }
 impl Wire2Api<RustOpaque<RemoteMediaTrack>> for wire_RemoteMediaTrack {
     fn wire2api(self) -> RustOpaque<RemoteMediaTrack> {
-        unsafe { support::opaque_from_dart(self.ptr as _) }
-    }
-}
-impl Wire2Api<RustOpaque<RoomCloseReason>> for wire_RoomCloseReason {
-    fn wire2api(self) -> RustOpaque<RoomCloseReason> {
         unsafe { support::opaque_from_dart(self.ptr as _) }
     }
 }
@@ -1168,6 +759,174 @@ impl Wire2Api<String> for *mut wire_uint_8_list {
         String::from_utf8_lossy(&vec).into_owned()
     }
 }
+impl Wire2Api<ApiAudioTrackConstraints> for wire_ApiAudioTrackConstraints {
+    fn wire2api(self) -> ApiAudioTrackConstraints {
+        ApiAudioTrackConstraints {
+            device_id: self.device_id.wire2api(),
+        }
+    }
+}
+impl Wire2Api<ApiConstrainFacingMode> for wire_ApiConstrainFacingMode {
+    fn wire2api(self) -> ApiConstrainFacingMode {
+        match self.tag {
+            0 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Exact);
+                ApiConstrainFacingMode::Exact(ans.field0.wire2api())
+            },
+            1 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Ideal);
+                ApiConstrainFacingMode::Ideal(ans.field0.wire2api())
+            },
+            _ => unreachable!(),
+        }
+    }
+}
+impl Wire2Api<ApiDeviceVideoTrackConstraints>
+    for wire_ApiDeviceVideoTrackConstraints
+{
+    fn wire2api(self) -> ApiDeviceVideoTrackConstraints {
+        ApiDeviceVideoTrackConstraints {
+            device_id: self.device_id.wire2api(),
+            facing_mode: self.facing_mode.wire2api(),
+            height: self.height.wire2api(),
+            width: self.width.wire2api(),
+        }
+    }
+}
+impl Wire2Api<ApiDisplayVideoTrackConstraints>
+    for wire_ApiDisplayVideoTrackConstraints
+{
+    fn wire2api(self) -> ApiDisplayVideoTrackConstraints {
+        ApiDisplayVideoTrackConstraints {
+            device_id: self.device_id.wire2api(),
+            height: self.height.wire2api(),
+            width: self.width.wire2api(),
+            frame_rate: self.frame_rate.wire2api(),
+        }
+    }
+}
+impl Wire2Api<ApiMediaStreamSettings> for wire_ApiMediaStreamSettings {
+    fn wire2api(self) -> ApiMediaStreamSettings {
+        ApiMediaStreamSettings {
+            audio: self.audio.wire2api(),
+            device_video: self.device_video.wire2api(),
+            display_video: self.display_video.wire2api(),
+        }
+    }
+}
+impl Wire2Api<ApiOptionConstrainFacingMode>
+    for wire_ApiOptionConstrainFacingMode
+{
+    fn wire2api(self) -> ApiOptionConstrainFacingMode {
+        match self.tag {
+            0 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Some);
+                ApiOptionConstrainFacingMode::Some(ans.field0.wire2api())
+            },
+            1 => ApiOptionConstrainFacingMode::None,
+            _ => unreachable!(),
+        }
+    }
+}
+impl Wire2Api<ApiOptionConstrainU32> for wire_ApiOptionConstrainU32 {
+    fn wire2api(self) -> ApiOptionConstrainU32 {
+        match self.tag {
+            0 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Some);
+                ApiOptionConstrainU32::Some(ans.field0.wire2api())
+            },
+            1 => ApiOptionConstrainU32::None,
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl Wire2Api<Box<ApiAudioTrackConstraints>>
+    for *mut wire_ApiAudioTrackConstraints
+{
+    fn wire2api(self) -> Box<ApiAudioTrackConstraints> {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiAudioTrackConstraints>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<Box<ApiOptionConstrainFacingMode>>
+    for *mut wire_ApiOptionConstrainFacingMode
+{
+    fn wire2api(self) -> Box<ApiOptionConstrainFacingMode> {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiOptionConstrainFacingMode>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<Box<ApiOptionConstrainU32>> for *mut wire_ApiOptionConstrainU32 {
+    fn wire2api(self) -> Box<ApiOptionConstrainU32> {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiOptionConstrainU32>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<ApiConstrainFacingMode> for *mut wire_ApiConstrainFacingMode {
+    fn wire2api(self) -> ApiConstrainFacingMode {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiConstrainFacingMode>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<ApiDeviceVideoTrackConstraints>
+    for *mut wire_ApiDeviceVideoTrackConstraints
+{
+    fn wire2api(self) -> ApiDeviceVideoTrackConstraints {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiDeviceVideoTrackConstraints>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<ApiDisplayVideoTrackConstraints>
+    for *mut wire_ApiDisplayVideoTrackConstraints
+{
+    fn wire2api(self) -> ApiDisplayVideoTrackConstraints {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiDisplayVideoTrackConstraints>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<ApiMediaStreamSettings> for *mut wire_ApiMediaStreamSettings {
+    fn wire2api(self) -> ApiMediaStreamSettings {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ApiMediaStreamSettings>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<ConstrainU32> for *mut wire_ConstrainU32 {
+    fn wire2api(self) -> ConstrainU32 {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<ConstrainU32>::wire2api(*wrap).into()
+    }
+}
+
+impl Wire2Api<ConstrainU32> for wire_ConstrainU32 {
+    fn wire2api(self) -> ConstrainU32 {
+        match self.tag {
+            0 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Exact);
+                ConstrainU32::Exact(ans.field0.wire2api())
+            },
+            1 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Ideal);
+                ConstrainU32::Ideal(ans.field0.wire2api())
+            },
+            2 => unsafe {
+                let ans = support::box_from_leak_ptr(self.kind);
+                let ans = support::box_from_leak_ptr(ans.Range);
+                ConstrainU32::Range(
+                    ans.field0.wire2api(),
+                    ans.field1.wire2api(),
+                )
+            },
+            _ => unreachable!(),
+        }
+    }
+}
 
 impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
     fn wire2api(self) -> Vec<u8> {
@@ -1179,24 +938,6 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
 }
 
 // Section: wire structs
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiWrapDeviceVideoTrackConstraints {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiWrapDisplayVideoTrackConstraints {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_AudioTrackConstraints {
-    ptr: *const core::ffi::c_void,
-}
 
 #[repr(C)]
 #[derive(Clone)]
@@ -1225,25 +966,7 @@ pub struct wire_LocalMediaTrack {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_MediaDeviceInfo {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_MediaDisplayInfo {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
 pub struct wire_MediaManagerHandle {
-    ptr: *const core::ffi::c_void,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_MediaStreamSettings {
     ptr: *const core::ffi::c_void,
 }
 
@@ -1261,14 +984,40 @@ pub struct wire_RemoteMediaTrack {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_RoomCloseReason {
+pub struct wire_RoomHandle {
     ptr: *const core::ffi::c_void,
 }
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_RoomHandle {
-    ptr: *const core::ffi::c_void,
+pub struct wire_ApiAudioTrackConstraints {
+    device_id: *mut wire_uint_8_list,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiDeviceVideoTrackConstraints {
+    device_id: *mut wire_uint_8_list,
+    facing_mode: *mut wire_ApiOptionConstrainFacingMode,
+    height: *mut wire_ApiOptionConstrainU32,
+    width: *mut wire_ApiOptionConstrainU32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiDisplayVideoTrackConstraints {
+    device_id: *mut wire_uint_8_list,
+    height: *mut wire_ApiOptionConstrainU32,
+    width: *mut wire_ApiOptionConstrainU32,
+    frame_rate: *mut wire_ApiOptionConstrainU32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiMediaStreamSettings {
+    audio: *mut wire_ApiAudioTrackConstraints,
+    device_video: *mut wire_ApiDeviceVideoTrackConstraints,
+    display_video: *mut wire_ApiDisplayVideoTrackConstraints,
 }
 
 #[repr(C)]
@@ -1276,6 +1025,109 @@ pub struct wire_RoomHandle {
 pub struct wire_uint_8_list {
     ptr: *mut u8,
     len: i32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiConstrainFacingMode {
+    tag: i32,
+    kind: *mut ApiConstrainFacingModeKind,
+}
+
+#[repr(C)]
+pub union ApiConstrainFacingModeKind {
+    Exact: *mut wire_ApiConstrainFacingMode_Exact,
+    Ideal: *mut wire_ApiConstrainFacingMode_Ideal,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiConstrainFacingMode_Exact {
+    field0: i32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiConstrainFacingMode_Ideal {
+    field0: i32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiOptionConstrainFacingMode {
+    tag: i32,
+    kind: *mut ApiOptionConstrainFacingModeKind,
+}
+
+#[repr(C)]
+pub union ApiOptionConstrainFacingModeKind {
+    Some: *mut wire_ApiOptionConstrainFacingMode_Some,
+    None: *mut wire_ApiOptionConstrainFacingMode_None,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiOptionConstrainFacingMode_Some {
+    field0: *mut wire_ApiConstrainFacingMode,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiOptionConstrainFacingMode_None {}
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiOptionConstrainU32 {
+    tag: i32,
+    kind: *mut ApiOptionConstrainU32Kind,
+}
+
+#[repr(C)]
+pub union ApiOptionConstrainU32Kind {
+    Some: *mut wire_ApiOptionConstrainU32_Some,
+    None: *mut wire_ApiOptionConstrainU32_None,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiOptionConstrainU32_Some {
+    field0: *mut wire_ConstrainU32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ApiOptionConstrainU32_None {}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ConstrainU32 {
+    tag: i32,
+    kind: *mut ConstrainU32Kind,
+}
+
+#[repr(C)]
+pub union ConstrainU32Kind {
+    Exact: *mut wire_ConstrainU32_Exact,
+    Ideal: *mut wire_ConstrainU32_Ideal,
+    Range: *mut wire_ConstrainU32_Range,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ConstrainU32_Exact {
+    field0: u32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ConstrainU32_Ideal {
+    field0: u32,
+}
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_ConstrainU32_Range {
+    field0: u32,
+    field1: u32,
 }
 
 // Section: impl NewWithNullPtr
@@ -1290,27 +1142,6 @@ impl<T> NewWithNullPtr for *mut T {
     }
 }
 
-impl NewWithNullPtr for wire_ApiWrapDeviceVideoTrackConstraints {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_ApiWrapDisplayVideoTrackConstraints {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_AudioTrackConstraints {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
 impl NewWithNullPtr for wire_ConnectionHandle {
     fn new_with_null_ptr() -> Self {
         Self {
@@ -1337,28 +1168,7 @@ impl NewWithNullPtr for wire_LocalMediaTrack {
         }
     }
 }
-impl NewWithNullPtr for wire_MediaDeviceInfo {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_MediaDisplayInfo {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
 impl NewWithNullPtr for wire_MediaManagerHandle {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
-impl NewWithNullPtr for wire_MediaStreamSettings {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),
@@ -1379,19 +1189,158 @@ impl NewWithNullPtr for wire_RemoteMediaTrack {
         }
     }
 }
-impl NewWithNullPtr for wire_RoomCloseReason {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            ptr: core::ptr::null(),
-        }
-    }
-}
 impl NewWithNullPtr for wire_RoomHandle {
     fn new_with_null_ptr() -> Self {
         Self {
             ptr: core::ptr::null(),
         }
     }
+}
+
+impl NewWithNullPtr for wire_ApiAudioTrackConstraints {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            device_id: core::ptr::null_mut(),
+        }
+    }
+}
+
+impl NewWithNullPtr for wire_ApiConstrainFacingMode {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            tag: -1,
+            kind: core::ptr::null_mut(),
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ApiConstrainFacingMode_Exact(
+) -> *mut ApiConstrainFacingModeKind {
+    support::new_leak_box_ptr(ApiConstrainFacingModeKind {
+        Exact: support::new_leak_box_ptr(wire_ApiConstrainFacingMode_Exact {
+            field0: Default::default(),
+        }),
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ApiConstrainFacingMode_Ideal(
+) -> *mut ApiConstrainFacingModeKind {
+    support::new_leak_box_ptr(ApiConstrainFacingModeKind {
+        Ideal: support::new_leak_box_ptr(wire_ApiConstrainFacingMode_Ideal {
+            field0: Default::default(),
+        }),
+    })
+}
+
+impl NewWithNullPtr for wire_ApiDeviceVideoTrackConstraints {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            device_id: core::ptr::null_mut(),
+            facing_mode: core::ptr::null_mut(),
+            height: core::ptr::null_mut(),
+            width: core::ptr::null_mut(),
+        }
+    }
+}
+
+impl NewWithNullPtr for wire_ApiDisplayVideoTrackConstraints {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            device_id: core::ptr::null_mut(),
+            height: core::ptr::null_mut(),
+            width: core::ptr::null_mut(),
+            frame_rate: core::ptr::null_mut(),
+        }
+    }
+}
+
+impl NewWithNullPtr for wire_ApiMediaStreamSettings {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            audio: core::ptr::null_mut(),
+            device_video: core::ptr::null_mut(),
+            display_video: core::ptr::null_mut(),
+        }
+    }
+}
+
+impl NewWithNullPtr for wire_ApiOptionConstrainFacingMode {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            tag: -1,
+            kind: core::ptr::null_mut(),
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ApiOptionConstrainFacingMode_Some(
+) -> *mut ApiOptionConstrainFacingModeKind {
+    support::new_leak_box_ptr(ApiOptionConstrainFacingModeKind {
+        Some: support::new_leak_box_ptr(
+            wire_ApiOptionConstrainFacingMode_Some {
+                field0: core::ptr::null_mut(),
+            },
+        ),
+    })
+}
+
+impl NewWithNullPtr for wire_ApiOptionConstrainU32 {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            tag: -1,
+            kind: core::ptr::null_mut(),
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ApiOptionConstrainU32_Some(
+) -> *mut ApiOptionConstrainU32Kind {
+    support::new_leak_box_ptr(ApiOptionConstrainU32Kind {
+        Some: support::new_leak_box_ptr(wire_ApiOptionConstrainU32_Some {
+            field0: core::ptr::null_mut(),
+        }),
+    })
+}
+
+impl NewWithNullPtr for wire_ConstrainU32 {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            tag: -1,
+            kind: core::ptr::null_mut(),
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ConstrainU32_Exact() -> *mut ConstrainU32Kind {
+    support::new_leak_box_ptr(ConstrainU32Kind {
+        Exact: support::new_leak_box_ptr(wire_ConstrainU32_Exact {
+            field0: Default::default(),
+        }),
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ConstrainU32_Ideal() -> *mut ConstrainU32Kind {
+    support::new_leak_box_ptr(ConstrainU32Kind {
+        Ideal: support::new_leak_box_ptr(wire_ConstrainU32_Ideal {
+            field0: Default::default(),
+        }),
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn inflate_ConstrainU32_Range() -> *mut ConstrainU32Kind {
+    support::new_leak_box_ptr(ConstrainU32Kind {
+        Range: support::new_leak_box_ptr(wire_ConstrainU32_Range {
+            field0: Default::default(),
+            field1: Default::default(),
+        }),
+    })
 }
 
 // Section: sync execution mode utility

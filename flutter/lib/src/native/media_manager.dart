@@ -3,24 +3,19 @@ import 'dart:io';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 
-import '../interface/media_device_info.dart';
-import '../interface/media_display_info.dart';
-import '../interface/media_manager.dart';
+import '../../medea_jason.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
-import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
-import 'jason.dart';
 import 'local_media_track.dart';
 import 'media_device_info.dart';
 import 'media_display_info.dart';
-import 'media_stream_settings.dart';
 
 class NativeMediaManagerHandle extends MediaManagerHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.MediaManagerHandle> opaque;
+  final RustOpaque<frb.MediaManagerHandle> opaque;
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
   /// provided [frb.MediaManagerHandle].
@@ -35,9 +30,8 @@ class NativeMediaManagerHandle extends MediaManagerHandle {
     var tracks;
     try {
       tracks = await (api.mediaManagerHandleInitLocalTracks(
-              manager: opaque.innerOpaque,
-              caps: (caps as MediaStreamSettings).opaque.innerOpaque) as Future)
-          as Pointer;
+          manager: opaque.innerOpaque,
+          caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }

@@ -14,45 +14,30 @@
 use crate::jason_api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::{ffi::c_void, sync::Arc};
+use std::ffi::c_void;
+use std::sync::Arc;
 
 // Section: imports
 
-use crate::media::{
-    constraints::FacingMode,
-    track::{remote::MediaDirection, MediaSourceKind},
-    MediaDeviceKind, MediaKind,
-};
+use crate::api::dart::api_struct::ApiAudioTrackConstraints;
+use crate::api::dart::api_struct::ApiConstrainFacingMode;
+use crate::api::dart::api_struct::ApiDeviceVideoTrackConstraints;
+use crate::api::dart::api_struct::ApiDisplayVideoTrackConstraints;
+use crate::api::dart::api_struct::ApiMediaDeviceInfo;
+use crate::api::dart::api_struct::ApiMediaDisplayInfo;
+use crate::api::dart::api_struct::ApiMediaStreamSettings;
+use crate::api::dart::api_struct::ApiOptionConstrainFacingMode;
+use crate::api::dart::api_struct::ApiOptionConstrainU32;
+use crate::media::constraints::ConstrainU32;
+use crate::media::constraints::FacingMode;
+use crate::media::track::remote::MediaDirection;
+use crate::media::track::MediaSourceKind;
+use crate::media::MediaDeviceKind;
+use crate::media::MediaKind;
+use crate::room::RoomCloseReason;
 
 // Section: wire functions
 
-fn wire_audioTrack_constr_new_impl() -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "audioTrack_constr_new",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || Ok(audioTrack_constr_new()),
-    )
-}
-fn wire_audioTrack_constr_device_id_impl(
-    track: impl Wire2Api<RustOpaque<AudioTrackConstraints>> + UnwindSafe,
-    device_id: impl Wire2Api<String> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "audioTrack_constr_device_id",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_track = track.wire2api();
-            let api_device_id = device_id.wire2api();
-            Ok(audioTrack_constr_device_id(api_track, api_device_id))
-        },
-    )
-}
 fn wire_connection_handle_from_ptr_impl(
     ptr: impl Wire2Api<usize> + UnwindSafe,
 ) -> support::WireSyncReturn {
@@ -201,335 +186,6 @@ fn wire_connection_handle_disable_remote_video_impl(
                 api_connection,
                 api_source_kind,
             ))
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_new_impl() -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_new",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || Ok(deviceVideoTrack_constr_new()),
-    )
-}
-fn wire_deviceVideoTrack_constr_device_id_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    device_id: impl Wire2Api<String> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_device_id",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_device_id = device_id.wire2api();
-            Ok(deviceVideoTrack_constr_device_id(api_constr, api_device_id))
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_exact_facing_mode_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    facing_mode: impl Wire2Api<FacingMode> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_exact_facing_mode",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_facing_mode = facing_mode.wire2api();
-            Ok(deviceVideoTrack_constr_exact_facing_mode(
-                api_constr,
-                api_facing_mode,
-            ))
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_ideal_facing_mode_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    facing_mode: impl Wire2Api<FacingMode> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_ideal_facing_mode",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_facing_mode = facing_mode.wire2api();
-            Ok(deviceVideoTrack_constr_ideal_facing_mode(
-                api_constr,
-                api_facing_mode,
-            ))
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_exact_height_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    exact_height: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_exact_height",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_exact_height = exact_height.wire2api();
-            deviceVideoTrack_constr_exact_height(api_constr, api_exact_height)
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_ideal_height_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    ideal_height: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_ideal_height",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_ideal_height = ideal_height.wire2api();
-            deviceVideoTrack_constr_ideal_height(api_constr, api_ideal_height)
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_exact_width_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    exact_width: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_exact_width",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_exact_width = exact_width.wire2api();
-            deviceVideoTrack_constr_exact_width(api_constr, api_exact_width)
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_ideal_width_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    ideal_width: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_ideal_width",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_ideal_width = ideal_width.wire2api();
-            deviceVideoTrack_constr_ideal_width(api_constr, api_ideal_width)
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_height_in_range_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    min: impl Wire2Api<i64> + UnwindSafe,
-    max: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_height_in_range",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_min = min.wire2api();
-            let api_max = max.wire2api();
-            deviceVideoTrack_constr_height_in_range(
-                api_constr, api_min, api_max,
-            )
-        },
-    )
-}
-fn wire_deviceVideoTrack_constr_width_in_range_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-    min: impl Wire2Api<i64> + UnwindSafe,
-    max: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "deviceVideoTrack_constr_width_in_range",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_min = min.wire2api();
-            let api_max = max.wire2api();
-            deviceVideoTrack_constr_width_in_range(api_constr, api_min, api_max)
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_new_impl() -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_new",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || Ok(displayVideoTrack_constr_new()),
-    )
-}
-fn wire_displayVideoTrack_constr_device_id_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    device_id: impl Wire2Api<String> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_device_id",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_device_id = device_id.wire2api();
-            Ok(displayVideoTrack_constr_device_id(
-                api_constr,
-                api_device_id,
-            ))
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_exact_height_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    exact_height: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_exact_height",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_exact_height = exact_height.wire2api();
-            displayVideoTrack_constr_exact_height(api_constr, api_exact_height)
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_ideal_height_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    ideal_height: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_ideal_height",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_ideal_height = ideal_height.wire2api();
-            displayVideoTrack_constr_ideal_height(api_constr, api_ideal_height)
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_exact_width_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    exact_width: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_exact_width",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_exact_width = exact_width.wire2api();
-            displayVideoTrack_constr_exact_width(api_constr, api_exact_width)
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_ideal_width_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    ideal_width: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_ideal_width",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_ideal_width = ideal_width.wire2api();
-            displayVideoTrack_constr_ideal_width(api_constr, api_ideal_width)
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_ideal_frame_rate_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    ideal_frame_rate: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_ideal_frame_rate",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_ideal_frame_rate = ideal_frame_rate.wire2api();
-            displayVideoTrack_constr_ideal_frame_rate(
-                api_constr,
-                api_ideal_frame_rate,
-            )
-        },
-    )
-}
-fn wire_displayVideoTrack_constr_exact_frame_rate_impl(
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-    exact_frame_rate: impl Wire2Api<i64> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "displayVideoTrack_constr_exact_frame_rate",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_constr = constr.wire2api();
-            let api_exact_frame_rate = exact_frame_rate.wire2api();
-            displayVideoTrack_constr_exact_frame_rate(
-                api_constr,
-                api_exact_frame_rate,
-            )
         },
     )
 }
@@ -710,66 +366,6 @@ fn wire_vec_media_device_info_from_ptr_impl(
         },
     )
 }
-fn wire_media_device_info_device_id_impl(
-    media_device: impl Wire2Api<RustOpaque<MediaDeviceInfo>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_device_info_device_id",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_device = media_device.wire2api();
-            Ok(media_device_info_device_id(api_media_device))
-        },
-    )
-}
-fn wire_media_device_info_kind_impl(
-    media_device: impl Wire2Api<RustOpaque<MediaDeviceInfo>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_device_info_kind",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_device = media_device.wire2api();
-            Ok(media_device_info_kind(api_media_device))
-        },
-    )
-}
-fn wire_media_device_info_label_impl(
-    media_device: impl Wire2Api<RustOpaque<MediaDeviceInfo>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_device_info_label",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_device = media_device.wire2api();
-            Ok(media_device_info_label(api_media_device))
-        },
-    )
-}
-fn wire_media_device_info_group_id_impl(
-    media_device: impl Wire2Api<RustOpaque<MediaDeviceInfo>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_device_info_group_id",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_device = media_device.wire2api();
-            Ok(media_device_info_group_id(api_media_device))
-        },
-    )
-}
 fn wire_vec_media_display_info_from_ptr_impl(
     ptr: impl Wire2Api<usize> + UnwindSafe,
 ) -> support::WireSyncReturn {
@@ -785,39 +381,9 @@ fn wire_vec_media_display_info_from_ptr_impl(
         },
     )
 }
-fn wire_media_display_info_device_id_impl(
-    media_display: impl Wire2Api<RustOpaque<MediaDisplayInfo>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_display_info_device_id",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_display = media_display.wire2api();
-            Ok(media_display_info_device_id(api_media_display))
-        },
-    )
-}
-fn wire_media_display_info_title_impl(
-    media_display: impl Wire2Api<RustOpaque<MediaDisplayInfo>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_display_info_title",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_display = media_display.wire2api();
-            Ok(media_display_info_title(api_media_display))
-        },
-    )
-}
 fn wire_media_manager_handle_init_local_tracks_impl(
     manager: impl Wire2Api<RustOpaque<MediaManagerHandle>> + UnwindSafe,
-    caps: impl Wire2Api<RustOpaque<MediaStreamSettings>> + UnwindSafe,
+    caps: impl Wire2Api<ApiMediaStreamSettings> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
@@ -951,81 +517,6 @@ fn wire_media_manager_handle_on_device_change_impl(
             let api_manager = manager.wire2api();
             let api_cb = cb.wire2api();
             media_manager_handle_on_device_change(api_manager, api_cb)
-        },
-    )
-}
-fn wire_media_stream_settings_new_impl() -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_stream_settings_new",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || Ok(media_stream_settings_new()),
-    )
-}
-fn wire_media_stream_settings_audio_impl(
-    media_stream_settings: impl Wire2Api<RustOpaque<MediaStreamSettings>>
-        + UnwindSafe,
-    constr: impl Wire2Api<RustOpaque<AudioTrackConstraints>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_stream_settings_audio",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_stream_settings = media_stream_settings.wire2api();
-            let api_constr = constr.wire2api();
-            Ok(media_stream_settings_audio(
-                api_media_stream_settings,
-                api_constr,
-            ))
-        },
-    )
-}
-fn wire_media_stream_settings_device_video_impl(
-    media_stream_settings: impl Wire2Api<RustOpaque<MediaStreamSettings>>
-        + UnwindSafe,
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DeviceVideoTrackConstraints>>>
-        + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_stream_settings_device_video",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_stream_settings = media_stream_settings.wire2api();
-            let api_constr = constr.wire2api();
-            Ok(media_stream_settings_device_video(
-                api_media_stream_settings,
-                api_constr,
-            ))
-        },
-    )
-}
-fn wire_media_stream_settings_display_video_impl(
-    media_stream_settings: impl Wire2Api<RustOpaque<MediaStreamSettings>>
-        + UnwindSafe,
-    constr: impl Wire2Api<RustOpaque<ApiWrap<DisplayVideoTrackConstraints>>>
-        + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "media_stream_settings_display_video",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_media_stream_settings = media_stream_settings.wire2api();
-            let api_constr = constr.wire2api();
-            Ok(media_stream_settings_display_video(
-                api_media_stream_settings,
-                api_constr,
-            ))
         },
     )
 }
@@ -1268,51 +759,6 @@ fn wire_room_close_reason_from_ptr_impl(
         },
     )
 }
-fn wire_room_close_reason_reason_impl(
-    room_close_reason: impl Wire2Api<RustOpaque<RoomCloseReason>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "room_close_reason_reason",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_room_close_reason = room_close_reason.wire2api();
-            Ok(room_close_reason_reason(api_room_close_reason))
-        },
-    )
-}
-fn wire_room_close_reason_is_closed_by_server_impl(
-    room_close_reason: impl Wire2Api<RustOpaque<RoomCloseReason>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "room_close_reason_is_closed_by_server",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_room_close_reason = room_close_reason.wire2api();
-            Ok(room_close_reason_is_closed_by_server(api_room_close_reason))
-        },
-    )
-}
-fn wire_room_close_reason_is_err_impl(
-    room_close_reason: impl Wire2Api<RustOpaque<RoomCloseReason>> + UnwindSafe,
-) -> support::WireSyncReturn {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
-        WrapInfo {
-            debug_name: "room_close_reason_is_err",
-            port: None,
-            mode: FfiCallMode::Sync,
-        },
-        move || {
-            let api_room_close_reason = room_close_reason.wire2api();
-            Ok(room_close_reason_is_err(api_room_close_reason))
-        },
-    )
-}
 fn wire_room_handle_join_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
     token: impl Wire2Api<String> + UnwindSafe,
@@ -1332,7 +778,7 @@ fn wire_room_handle_join_impl(
 }
 fn wire_room_handle_set_local_media_settings_impl(
     room_handle: impl Wire2Api<RustOpaque<RoomHandle>> + UnwindSafe,
-    settings: impl Wire2Api<RustOpaque<MediaStreamSettings>> + UnwindSafe,
+    settings: impl Wire2Api<ApiMediaStreamSettings> + UnwindSafe,
     stop_first: impl Wire2Api<bool> + UnwindSafe,
     rollback_on_fail: impl Wire2Api<bool> + UnwindSafe,
 ) -> support::WireSyncReturn {
@@ -1661,11 +1107,13 @@ impl Wire2Api<bool> for bool {
         self
     }
 }
+
 impl Wire2Api<i64> for *mut i64 {
     fn wire2api(self) -> i64 {
         unsafe { *support::box_from_leak_ptr(self) }
     }
 }
+
 impl Wire2Api<f64> for f64 {
     fn wire2api(self) -> f64 {
         self
@@ -1693,6 +1141,11 @@ impl Wire2Api<i64> for i64 {
     }
 }
 
+impl Wire2Api<u32> for u32 {
+    fn wire2api(self) -> u32 {
+        self
+    }
+}
 impl Wire2Api<u8> for u8 {
     fn wire2api(self) -> u8 {
         self
@@ -1705,6 +1158,26 @@ impl Wire2Api<usize> for usize {
     }
 }
 // Section: impl IntoDart
+
+impl support::IntoDart for ApiMediaDeviceInfo {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.kind.into_dart(),
+            self.device_id.into_dart(),
+            self.label.into_dart(),
+            self.group_id.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for ApiMediaDeviceInfo {}
+
+impl support::IntoDart for ApiMediaDisplayInfo {
+    fn into_dart(self) -> support::DartAbi {
+        vec![self.device_id.into_dart(), self.title.into_dart()].into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for ApiMediaDisplayInfo {}
 
 impl support::IntoDart for MediaDeviceKind {
     fn into_dart(self) -> support::DartAbi {
@@ -1746,11 +1219,22 @@ impl support::IntoDart for MediaSourceKind {
     }
 }
 
+impl support::IntoDart for RoomCloseReason {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.is_closed_by_server.into_dart(),
+            self.reason.into_dart(),
+            self.is_err.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for RoomCloseReason {}
+
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
-        Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]

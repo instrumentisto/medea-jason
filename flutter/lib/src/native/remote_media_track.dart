@@ -9,7 +9,7 @@ import 'jason.dart';
 
 class NativeRemoteMediaTrack extends RemoteMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.RemoteMediaTrack> opaque;
+  final RustOpaque<frb.RemoteMediaTrack> opaque;
 
   /// Constructs a new [RemoteMediaTrack] backed by the Rust struct behind the
   /// provided [frb.RemoteMediaTrack].

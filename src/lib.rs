@@ -120,7 +120,15 @@ pub mod utils;
 pub mod api;
 pub mod connection;
 pub mod jason;
-#[allow(non_snake_case)]
+#[cfg(not(target_family = "wasm"))]
+#[allow(
+    clippy::as_conversions,
+    clippy::missing_panics_doc,
+    clippy::undocumented_unsafe_blocks,
+    clippy::unwrap_used,
+    clippy::needless_pass_by_value,
+    non_snake_case
+)]
 pub mod jason_api;
 pub mod media;
 pub mod peer;

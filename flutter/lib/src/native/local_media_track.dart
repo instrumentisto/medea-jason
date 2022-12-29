@@ -9,7 +9,7 @@ import 'jason.dart';
 
 class NativeLocalMediaTrack extends LocalMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.LocalMediaTrack> opaque;
+  final RustOpaque<frb.LocalMediaTrack> opaque;
 
   /// Constructs a new [LocalMediaTrack] backed by the Rust struct behind the
   /// provided [frb.LocalMediaTrack].

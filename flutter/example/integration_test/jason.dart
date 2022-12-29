@@ -33,19 +33,18 @@ void main() {
     expect(devices.length, equals(2));
     expect(tracks.length, equals(2));
 
-    expect((devices.first as NativeMediaDeviceInfo).opaque,
-        isNot(equals((devices.last as NativeMediaDeviceInfo).opaque)));
+    expect((devices.first as NativeMediaDeviceInfo),
+        isNot(equals((devices.last as NativeMediaDeviceInfo))));
     expect((tracks.first as NativeLocalMediaTrack).opaque,
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 
-    var video_device = devices.firstWhere((d) => d.kind() == MediaDeviceKind.VideoInput);
+    var video_device =
+        devices.firstWhere((d) => d.kind() == MediaDeviceKind.VideoInput);
     expect(video_device.deviceId(), equals('fake camera id'));
     expect(video_device.groupId(), isNull);
     expect(video_device.label(), equals('fake camera'));
 
     video_device.free();
-    expect(() => video_device.label(), throwsA(isA<StateError>()));
-
     var video = tracks.where((element) => element.kind() == MediaKind.Video);
     expect(video.isNotEmpty, isTrue);
     expect(video.first.mediaSourceKind(), equals(MediaSourceKind.Device));
@@ -78,14 +77,10 @@ void main() {
     expect(() => constraints.widthInRange(-1, 200), throwsArgumentError);
     expect(() => constraints.widthInRange(200, -1), throwsArgumentError);
 
-    constraints.free();
-    expect(() => constraints.deviceId('deviceId'), throwsA(isA<StateError>()));
-
     var constraints2 = DeviceVideoTrackConstraints();
     var settings = MediaStreamSettings();
     constraints2.deviceId('deviceId');
     settings.deviceVideo(constraints2);
-    expect(() => constraints2.deviceId('deviceId'), throwsA(isA<StateError>()));
   });
 
   testWidgets('RoomHandle', (WidgetTester tester) async {

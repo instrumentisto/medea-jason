@@ -19,7 +19,7 @@ import 'room_close_reason.dart';
 
 class NativeRoomHandle extends RoomHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
-  late RustOpaque<frb.RoomHandle> opaque;
+  final RustOpaque<frb.RoomHandle> opaque;
 
   /// Constructs a new [RoomHandle] backed by the Rust struct behind the
   /// provided [frb.RoomHandle].
@@ -44,7 +44,7 @@ class NativeRoomHandle extends RoomHandle {
     try {
       await (api.roomHandleSetLocalMediaSettings(
           roomHandle: opaque.innerOpaque,
-          settings: (settings as MediaStreamSettings).opaque.innerOpaque,
+          settings: (settings as MediaStreamSettings).setting,
           stopFirst: stopFirst,
           rollbackOnFail: rollbackOnFail) as Future);
     } on FfiException catch (anyhow) {

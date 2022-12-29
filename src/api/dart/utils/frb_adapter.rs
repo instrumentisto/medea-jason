@@ -13,9 +13,9 @@ use crate::{
 
 /// Creates a new [`DartOpaque`].
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
-    DartOpaque::new_non_droppable(Dart_NewPersistentHandle_DL_Trampolined(
-        handle,
-    ) as _)
+    DartOpaque::new_non_droppable(
+        Dart_NewPersistentHandle_DL_Trampolined(handle).cast(),
+    )
 }
 
 /// Panic-unsafe wrapper [`RefCell`].

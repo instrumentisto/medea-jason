@@ -14,9 +14,10 @@
     missing_docs
 )]
 
-#[allow(clippy::needless_pass_by_value)]
 pub use crate::jason_api;
+pub mod api_struct;
 pub mod utils;
+pub use api_struct::*;
 
 use std::{
     ffi::{c_void, CString},
@@ -48,9 +49,7 @@ pub use crate::media::MediaDirection;
 
 pub use self::{
     jason_api::{
-        AudioTrackConstraints, ConnectionHandle, DeviceVideoTrackConstraints,
-        DisplayVideoTrackConstraints, Jason, LocalMediaTrack, MediaDeviceInfo,
-        MediaDisplayInfo, MediaManagerHandle, MediaStreamSettings,
+        ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
         ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
     utils::{ArgumentError, DartError as Error},
