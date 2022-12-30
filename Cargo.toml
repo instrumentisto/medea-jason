@@ -25,7 +25,7 @@ members = [
 ]
 
 [lib]
-crate-type = ["cdylib", "rlib", "staticlib"]
+crate-type = ["cdylib", "staticlib"]
 
 [features]
 default = ["console_error_panic_hook", "wee_alloc"]
@@ -33,7 +33,7 @@ dart-codegen = ["medea-macro/dart-codegen"]
 mockable = ["mockall"]
 
 [profile.release]
-lto = true
+lto = "fat"
 
 [dependencies]
 async-recursion = "1.0"
