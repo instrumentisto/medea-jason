@@ -28,7 +28,7 @@
 #define DART_EXTERN extern
 #endif
 
-DART_EXTERN intptr_t Dart_InitializeApiDL(void* data);
+DART_EXTERN intptr_t Dart_InitializeApiDL_Jason(void* data);
 
 // ============================================================================
 // IMPORTANT! Never update these signatures without properly updating
@@ -116,7 +116,7 @@ typedef void (*Dart_NativeMessageHandler_DL)(Dart_Port_DL dest_port_id,
 
 #define DART_API_DL_DECLARATIONS(name, R, A)                                   \
   typedef R(*name##_Type) A;                                                   \
-  DART_EXTERN name##_Type name##_DL;
+  DART_EXTERN name##_Type name##_DL_Jason;
 
 DART_API_ALL_DL_SYMBOLS(DART_API_DL_DECLARATIONS)
 
