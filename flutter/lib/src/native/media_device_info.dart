@@ -3,11 +3,11 @@ import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class NativeMediaDeviceInfo extends MediaDeviceInfo {
-  /// `flutter_rust_bridge` Rust type backing this object. todo
+  /// Rust `flutter_rust_bridge` api representation.
   final frb.ApiMediaDeviceInfo _info;
 
   /// Constructs a new [MediaDeviceInfo] backed by a Rust struct behind the
-  /// provided [frb.MediaDeviceInfo].
+  /// provided [frb.ApiMediaDeviceInfo].
   NativeMediaDeviceInfo(this._info);
 
   @override

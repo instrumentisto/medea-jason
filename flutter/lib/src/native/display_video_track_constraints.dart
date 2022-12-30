@@ -3,13 +3,12 @@ import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
-  /// `flutter_rust_bridge` Rust opaque type backing this object.
-  frb.ApiDisplayVideoTrackConstraints constraints =
-      frb.ApiDisplayVideoTrackConstraints(
-          deviceId: null,
-          height: frb.ApiOptionConstrainU32_None(),
-          width: frb.ApiOptionConstrainU32_None(),
-          frameRate: frb.ApiOptionConstrainU32_None());
+  /// Rust `flutter_rust_bridge` api representation.
+  frb.ApiDisplayVideoTrackConstrs constraints = frb.ApiDisplayVideoTrackConstrs(
+      deviceId: null,
+      height: frb.ApiOptionConstrainU32_None(),
+      width: frb.ApiOptionConstrainU32_None(),
+      frameRate: frb.ApiOptionConstrainU32_None());
 
   @override
   void exactHeight(int height) {

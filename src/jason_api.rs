@@ -393,7 +393,7 @@ impl RefUnwindSafe for MediaManagerHandle {}
 impl UnwindSafe for MediaManagerHandle {}
 
 /// Returns [`LocalMediaTrack`]s objects, built from the provided
-/// [`MediaStreamSettings`].
+/// [`ApiMediaStreamSettings`].
 ///
 /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
 #[must_use]
@@ -412,8 +412,8 @@ pub fn media_manager_handle_init_local_tracks(
     SyncReturn(dart_opaque)
 }
 
-/// Returns a list of [`MediaDeviceInfo`] objects representing available media
-/// input and devices, such as microphones, cameras, and so forth.
+/// Returns a list of [`ApiMediaDeviceInfo`] objects representing available
+/// media input and devices, such as microphones, cameras, and so forth.
 #[must_use]
 pub fn media_manager_handle_enumerate_devices(
     manager: RustOpaque<MediaManagerHandle>,
@@ -443,7 +443,7 @@ pub fn media_manager_handle_enumerate_devices(
     SyncReturn(dart_opaque)
 }
 
-/// Returns a list of [`MediaDisplayInfo`] objects representing available
+/// Returns a list of [`ApiMediaDisplayInfo`] objects representing available
 /// sources that can be used for screen capturing.
 #[must_use]
 pub fn media_manager_handle_enumerate_displays(
@@ -868,10 +868,10 @@ pub fn room_handle_join(
     SyncReturn(dart_opaque)
 }
 
-/// Updates this [`Room`]'s [`MediaStreamSettings`]. This affects all the
-/// [`PeerConnection`]s in this [`Room`]. If [`MediaStreamSettings`] are
+/// Updates this [`Room`]'s [`ApiMediaStreamSettings`]. This affects all the
+/// [`PeerConnection`]s in this [`Room`]. If [`ApiMediaStreamSettings`] are
 /// configured for some [`Room`], then this [`Room`] can only send media tracks
-/// that correspond to these settings. [`MediaStreamSettings`] update will
+/// that correspond to these settings. [`ApiMediaStreamSettings`] update will
 /// change media tracks in all sending peers, so that might cause a new
 /// [getUserMedia()][1] request to happen.
 ///
@@ -879,14 +879,14 @@ pub fn room_handle_join(
 /// `on_failed_local_media` callback.
 ///
 /// If `stop_first` set to `true` then affected local `Tracks` will be
-/// dropped before new [`MediaStreamSettings`] are applied. This is usually
+/// dropped before new [`ApiMediaStreamSettings`] are applied. This is usually
 /// required when changing video source device due to hardware limitations,
 /// e.g. having an active track sourced from device `A` may hinder
 /// [getUserMedia()][1] requests to device `B`.
 ///
-/// `rollback_on_fail` option configures [`MediaStreamSettings`] update request
-/// to automatically rollback to previous settings if new settings cannot be
-/// applied.
+/// `rollback_on_fail` option configures [`ApiMediaStreamSettings`] update
+/// request to automatically rollback to previous settings if new settings
+/// cannot be applied.
 ///
 /// If recovering from fail state isn't possible then affected media types will
 /// be disabled.

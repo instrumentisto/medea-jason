@@ -2,9 +2,9 @@ import '../interface/audio_track_constraints.dart' as base;
 import 'ffi/jason_api.g.dart' as frb;
 
 class AudioTrackConstraints extends base.AudioTrackConstraints {
-  /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.ApiAudioTrackConstraints constraints =
-      frb.ApiAudioTrackConstraints(deviceId: null);
+  /// Rust `flutter_rust_bridge` api representation.
+  final frb.ApiAudioTrackConstrs constraints =
+      frb.ApiAudioTrackConstrs(deviceId: null);
 
   @override
   void deviceId(String deviceId) {

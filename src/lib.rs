@@ -144,6 +144,7 @@ pub mod rpc;
     clippy::missing_docs_in_private_items,
     clippy::ptr_as_ptr,
     clippy::undocumented_unsafe_blocks,
+    clippy::empty_structs_with_brackets,
     clippy::use_self,
     clippy::wildcard_imports,
     let_underscore_drop,

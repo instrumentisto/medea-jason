@@ -20,8 +20,8 @@ use std::{ffi::c_void, sync::Arc};
 
 use crate::{
     api::dart::api_struct::{
-        ApiAudioTrackConstraints, ApiConstrainFacingMode,
-        ApiDeviceVideoTrackConstraints, ApiDisplayVideoTrackConstraints,
+        ApiAudioTrackConstrs, ApiConstrainFacingMode,
+        ApiDeviceVideoTrackConstrs, ApiDisplayVideoTrackConstrs,
         ApiMediaDeviceInfo, ApiMediaDisplayInfo, ApiMediaStreamSettings,
         ApiOptionConstrainFacingMode, ApiOptionConstrainU32,
     },

@@ -528,9 +528,9 @@ pub extern "C" fn new_RoomHandle() -> wire_RoomHandle {
 }
 
 #[no_mangle]
-pub extern "C" fn new_box_api_audio_track_constraints_0(
-) -> *mut wire_ApiAudioTrackConstraints {
-    support::new_leak_box_ptr(wire_ApiAudioTrackConstraints::new_with_null_ptr())
+pub extern "C" fn new_box_api_audio_track_constrs_0(
+) -> *mut wire_ApiAudioTrackConstrs {
+    support::new_leak_box_ptr(wire_ApiAudioTrackConstrs::new_with_null_ptr())
 }
 
 #[no_mangle]
@@ -554,18 +554,18 @@ pub extern "C" fn new_box_autoadd_api_constrain_facing_mode_0(
 }
 
 #[no_mangle]
-pub extern "C" fn new_box_autoadd_api_device_video_track_constraints_0(
-) -> *mut wire_ApiDeviceVideoTrackConstraints {
+pub extern "C" fn new_box_autoadd_api_device_video_track_constrs_0(
+) -> *mut wire_ApiDeviceVideoTrackConstrs {
     support::new_leak_box_ptr(
-        wire_ApiDeviceVideoTrackConstraints::new_with_null_ptr(),
+        wire_ApiDeviceVideoTrackConstrs::new_with_null_ptr(),
     )
 }
 
 #[no_mangle]
-pub extern "C" fn new_box_autoadd_api_display_video_track_constraints_0(
-) -> *mut wire_ApiDisplayVideoTrackConstraints {
+pub extern "C" fn new_box_autoadd_api_display_video_track_constrs_0(
+) -> *mut wire_ApiDisplayVideoTrackConstrs {
     support::new_leak_box_ptr(
-        wire_ApiDisplayVideoTrackConstraints::new_with_null_ptr(),
+        wire_ApiDisplayVideoTrackConstrs::new_with_null_ptr(),
     )
 }
 
@@ -759,9 +759,9 @@ impl Wire2Api<String> for *mut wire_uint_8_list {
         String::from_utf8_lossy(&vec).into_owned()
     }
 }
-impl Wire2Api<ApiAudioTrackConstraints> for wire_ApiAudioTrackConstraints {
-    fn wire2api(self) -> ApiAudioTrackConstraints {
-        ApiAudioTrackConstraints {
+impl Wire2Api<ApiAudioTrackConstrs> for wire_ApiAudioTrackConstrs {
+    fn wire2api(self) -> ApiAudioTrackConstrs {
+        ApiAudioTrackConstrs {
             device_id: self.device_id.wire2api(),
         }
     }
@@ -783,11 +783,9 @@ impl Wire2Api<ApiConstrainFacingMode> for wire_ApiConstrainFacingMode {
         }
     }
 }
-impl Wire2Api<ApiDeviceVideoTrackConstraints>
-    for wire_ApiDeviceVideoTrackConstraints
-{
-    fn wire2api(self) -> ApiDeviceVideoTrackConstraints {
-        ApiDeviceVideoTrackConstraints {
+impl Wire2Api<ApiDeviceVideoTrackConstrs> for wire_ApiDeviceVideoTrackConstrs {
+    fn wire2api(self) -> ApiDeviceVideoTrackConstrs {
+        ApiDeviceVideoTrackConstrs {
             device_id: self.device_id.wire2api(),
             facing_mode: self.facing_mode.wire2api(),
             height: self.height.wire2api(),
@@ -795,11 +793,11 @@ impl Wire2Api<ApiDeviceVideoTrackConstraints>
         }
     }
 }
-impl Wire2Api<ApiDisplayVideoTrackConstraints>
-    for wire_ApiDisplayVideoTrackConstraints
+impl Wire2Api<ApiDisplayVideoTrackConstrs>
+    for wire_ApiDisplayVideoTrackConstrs
 {
-    fn wire2api(self) -> ApiDisplayVideoTrackConstraints {
-        ApiDisplayVideoTrackConstraints {
+    fn wire2api(self) -> ApiDisplayVideoTrackConstrs {
+        ApiDisplayVideoTrackConstrs {
             device_id: self.device_id.wire2api(),
             height: self.height.wire2api(),
             width: self.width.wire2api(),
@@ -845,12 +843,10 @@ impl Wire2Api<ApiOptionConstrainU32> for wire_ApiOptionConstrainU32 {
     }
 }
 
-impl Wire2Api<Box<ApiAudioTrackConstraints>>
-    for *mut wire_ApiAudioTrackConstraints
-{
-    fn wire2api(self) -> Box<ApiAudioTrackConstraints> {
+impl Wire2Api<Box<ApiAudioTrackConstrs>> for *mut wire_ApiAudioTrackConstrs {
+    fn wire2api(self) -> Box<ApiAudioTrackConstrs> {
         let wrap = unsafe { support::box_from_leak_ptr(self) };
-        Wire2Api::<ApiAudioTrackConstraints>::wire2api(*wrap).into()
+        Wire2Api::<ApiAudioTrackConstrs>::wire2api(*wrap).into()
     }
 }
 impl Wire2Api<Box<ApiOptionConstrainFacingMode>>
@@ -873,20 +869,20 @@ impl Wire2Api<ApiConstrainFacingMode> for *mut wire_ApiConstrainFacingMode {
         Wire2Api::<ApiConstrainFacingMode>::wire2api(*wrap).into()
     }
 }
-impl Wire2Api<ApiDeviceVideoTrackConstraints>
-    for *mut wire_ApiDeviceVideoTrackConstraints
+impl Wire2Api<ApiDeviceVideoTrackConstrs>
+    for *mut wire_ApiDeviceVideoTrackConstrs
 {
-    fn wire2api(self) -> ApiDeviceVideoTrackConstraints {
+    fn wire2api(self) -> ApiDeviceVideoTrackConstrs {
         let wrap = unsafe { support::box_from_leak_ptr(self) };
-        Wire2Api::<ApiDeviceVideoTrackConstraints>::wire2api(*wrap).into()
+        Wire2Api::<ApiDeviceVideoTrackConstrs>::wire2api(*wrap).into()
     }
 }
-impl Wire2Api<ApiDisplayVideoTrackConstraints>
-    for *mut wire_ApiDisplayVideoTrackConstraints
+impl Wire2Api<ApiDisplayVideoTrackConstrs>
+    for *mut wire_ApiDisplayVideoTrackConstrs
 {
-    fn wire2api(self) -> ApiDisplayVideoTrackConstraints {
+    fn wire2api(self) -> ApiDisplayVideoTrackConstrs {
         let wrap = unsafe { support::box_from_leak_ptr(self) };
-        Wire2Api::<ApiDisplayVideoTrackConstraints>::wire2api(*wrap).into()
+        Wire2Api::<ApiDisplayVideoTrackConstrs>::wire2api(*wrap).into()
     }
 }
 impl Wire2Api<ApiMediaStreamSettings> for *mut wire_ApiMediaStreamSettings {
@@ -990,13 +986,13 @@ pub struct wire_RoomHandle {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_ApiAudioTrackConstraints {
+pub struct wire_ApiAudioTrackConstrs {
     device_id: *mut wire_uint_8_list,
 }
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_ApiDeviceVideoTrackConstraints {
+pub struct wire_ApiDeviceVideoTrackConstrs {
     device_id: *mut wire_uint_8_list,
     facing_mode: *mut wire_ApiOptionConstrainFacingMode,
     height: *mut wire_ApiOptionConstrainU32,
@@ -1005,7 +1001,7 @@ pub struct wire_ApiDeviceVideoTrackConstraints {
 
 #[repr(C)]
 #[derive(Clone)]
-pub struct wire_ApiDisplayVideoTrackConstraints {
+pub struct wire_ApiDisplayVideoTrackConstrs {
     device_id: *mut wire_uint_8_list,
     height: *mut wire_ApiOptionConstrainU32,
     width: *mut wire_ApiOptionConstrainU32,
@@ -1015,9 +1011,9 @@ pub struct wire_ApiDisplayVideoTrackConstraints {
 #[repr(C)]
 #[derive(Clone)]
 pub struct wire_ApiMediaStreamSettings {
-    audio: *mut wire_ApiAudioTrackConstraints,
-    device_video: *mut wire_ApiDeviceVideoTrackConstraints,
-    display_video: *mut wire_ApiDisplayVideoTrackConstraints,
+    audio: *mut wire_ApiAudioTrackConstrs,
+    device_video: *mut wire_ApiDeviceVideoTrackConstrs,
+    display_video: *mut wire_ApiDisplayVideoTrackConstrs,
 }
 
 #[repr(C)]
@@ -1197,7 +1193,7 @@ impl NewWithNullPtr for wire_RoomHandle {
     }
 }
 
-impl NewWithNullPtr for wire_ApiAudioTrackConstraints {
+impl NewWithNullPtr for wire_ApiAudioTrackConstrs {
     fn new_with_null_ptr() -> Self {
         Self {
             device_id: core::ptr::null_mut(),
@@ -1234,7 +1230,7 @@ pub extern "C" fn inflate_ApiConstrainFacingMode_Ideal(
     })
 }
 
-impl NewWithNullPtr for wire_ApiDeviceVideoTrackConstraints {
+impl NewWithNullPtr for wire_ApiDeviceVideoTrackConstrs {
     fn new_with_null_ptr() -> Self {
         Self {
             device_id: core::ptr::null_mut(),
@@ -1245,7 +1241,7 @@ impl NewWithNullPtr for wire_ApiDeviceVideoTrackConstraints {
     }
 }
 
-impl NewWithNullPtr for wire_ApiDisplayVideoTrackConstraints {
+impl NewWithNullPtr for wire_ApiDisplayVideoTrackConstrs {
     fn new_with_null_ptr() -> Self {
         Self {
             device_id: core::ptr::null_mut(),

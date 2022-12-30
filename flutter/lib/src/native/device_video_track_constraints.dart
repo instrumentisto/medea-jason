@@ -3,9 +3,9 @@ import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
-  /// `flutter_rust_bridge` Rust opaque type backing this object.
-  final frb.ApiDeviceVideoTrackConstraints constraints =
-      frb.ApiDeviceVideoTrackConstraints(
+  /// Rust `flutter_rust_bridge` api representation.
+  final frb.ApiDeviceVideoTrackConstrs constraints =
+      frb.ApiDeviceVideoTrackConstrs(
           deviceId: null,
           facingMode: frb.ApiOptionConstrainFacingMode_None(),
           height: frb.ApiOptionConstrainU32_None(),

@@ -125,7 +125,7 @@ class Jason extends base.Jason {
   final RustOpaque<frb.Jason> opaque = RustOpaque(api.jasonNew());
 
   /// Constructs a new [Jason] backed by the Rust struct behind the
-  /// provided [api.RefCellOptionJason].
+  /// provided [frb.Jason].
   Jason() {
     RustHandlesStorage().insertHandle(this);
   }

@@ -3,7 +3,7 @@ import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class NativeRoomCloseReason extends RoomCloseReason {
-  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  /// Rust `flutter_rust_bridge` api representation.
   final frb.RoomCloseReason _closeReason;
 
   /// Constructs a new [RoomCloseReason] backed by the Rust struct behind the
