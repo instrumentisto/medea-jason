@@ -308,8 +308,8 @@ endef
 define cargo.build.medea-jason.ios
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=staticlib --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/ios/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
@@ -318,8 +318,8 @@ endef
 define cargo.build.medea-jason.linux
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/linux/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.so \
@@ -328,15 +328,15 @@ endef
 define cargo.build.medea-jason.macos
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
 	            $(args)
 endef
 define cargo.build.medea-jason.windows
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/windows/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
