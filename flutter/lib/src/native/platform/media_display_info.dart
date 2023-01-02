@@ -15,12 +15,12 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns [MediaDeviceInfo.deviceId] value.
-Pointer<Utf8> _deviceId(MediaDeviceInfo deviceInfo) {
-  return deviceInfo.deviceId.toNativeUtf8();
+/// Returns [MediaDisplayInfo.deviceId] value.
+Pointer<Utf8> _deviceId(MediaDisplayInfo displayInfo) {
+  return displayInfo.deviceId.toNativeUtf8();
 }
 
-/// Returns [MediaDeviceInfo.title] value.
+/// Returns [MediaDisplayInfo.title] value.
 Pointer _title(MediaDisplayInfo displayInfo) {
   if (displayInfo.title != null) {
     return ForeignValue.fromString(displayInfo.title!).intoRustOwned();
