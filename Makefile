@@ -531,17 +531,6 @@ flutter.run:
 		$(if $(call eq,$(device),),,-d $(device))
 
 
-# Adds a sha256sum hash parameter to medea_jason_bg.wasm.
-#
-# Usage:
-#	make flutter.add.wasm.hash
-
-flutter.add.wasm.hash:
-	sed -i "s/medea_jason_bg.wasm/medea_jason_bg.wasm?\
-	$(shell sha256sum flutter/assets/pkg/medea_jason_bg.wasm | cut -f 1 -d " ")\
-	/g" flutter/assets/pkg/medea_jason.js
-
-
 # Generates assets required for Flutter Web Jason plugin.
 #
 # Usage:
@@ -550,9 +539,14 @@ flutter.add.wasm.hash:
 flutter.web.assets:
 	@rm -rf flutter/assets/pkg
 	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
-	@make flutter.add.wasm.hash
+	sed "s/medea_jason_bg.wasm/medea_jason_bg.wasm?$(strip \
+			$$(sha256sum flutter/assets/pkg/medea_jason_bg.wasm \
+			   | cut -f 1 -d ' '))/g" \
+		flutter/assets/pkg/medea_jason.js > flutter/assets/pkg/.tmp.js
+	cp -f flutter/assets/pkg/.tmp.js flutter/assets/pkg/medea_jason.js
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
+	       flutter/assets/pkg/.tmp.js \
 	       flutter/assets/pkg/package.json
 	@touch flutter/assets/pkg/.gitkeep
 
@@ -1064,8 +1058,7 @@ docker.up.e2e: docker.down.e2e
 ifeq ($(rebuild),yes)
 	@make build.jason target=web debug=$(debug) dockerized=no
 endif
-    # So docker-compose won't have to create this dir with su owner.
-	@mkdir -p pkg
+	@mkdir -p pkg/
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
