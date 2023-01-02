@@ -312,8 +312,8 @@ endef
 define cargo.build.medea-jason.ios
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=staticlib --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/ios/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
@@ -322,8 +322,8 @@ endef
 define cargo.build.medea-jason.linux
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/linux/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.so \
@@ -332,15 +332,15 @@ endef
 define cargo.build.medea-jason.macos
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
 	            $(args)
 endef
 define cargo.build.medea-jason.windows
 	$(eval target := $(strip $(1)))
 	$(eval debug := $(strip $(2)))
-	cargo build --target $(target) $(if $(call eq,$(debug),no),--release,) \
-	            --manifest-path=./Cargo.toml \
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
 	            $(args)
 	@mkdir -p ./flutter/windows/lib/$(target)/
 	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
@@ -576,8 +576,14 @@ flutter.run:
 flutter.web.assets:
 	@rm -rf flutter/assets/pkg
 	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
+	sed "s/medea_jason_bg.wasm/medea_jason_bg.wasm?$(strip \
+			$$(sha256sum flutter/assets/pkg/medea_jason_bg.wasm \
+			   | cut -f 1 -d ' '))/g" \
+		flutter/assets/pkg/medea_jason.js > flutter/assets/pkg/.tmp.js
+	cp -f flutter/assets/pkg/.tmp.js flutter/assets/pkg/medea_jason.js
 	rm -rf flutter/assets/pkg/*.md \
 	       flutter/assets/pkg/.gitignore \
+	       flutter/assets/pkg/.tmp.js \
 	       flutter/assets/pkg/package.json
 	@touch flutter/assets/pkg/.gitkeep
 
@@ -1089,7 +1095,7 @@ docker.up.e2e: docker.down.e2e
 ifeq ($(rebuild),yes)
 	@make build.jason target=web debug=$(debug) dockerized=no
 endif
-	@mkdir -p pkg
+	@mkdir -p pkg/
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
@@ -1372,6 +1378,3 @@ endef
         up up.control up.demo up.dev up.jason up.medea \
         wait.port \
         yarn yarn.version
-
-
-# make test.e2e.native device=linux up=yes debug=no dockerized=yes medea-tag=edge

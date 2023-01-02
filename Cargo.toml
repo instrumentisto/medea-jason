@@ -27,6 +27,9 @@ members = [
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
 
+[profile.release]
+lto = "fat"
+
 [features]
 default = ["console_error_panic_hook", "wee_alloc"]
 dart-codegen = ["medea-macro/dart-codegen"]
