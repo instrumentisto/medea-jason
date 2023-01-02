@@ -125,12 +125,13 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());
       ptr.free();
     }
+    return Future.value();
   }
 
   @override

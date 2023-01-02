@@ -56,8 +56,9 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() {
     obj.free();
+    return Future.value();
   }
 
   @override

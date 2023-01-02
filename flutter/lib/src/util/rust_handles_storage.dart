@@ -6,14 +6,14 @@ import 'move_semantic.dart';
 abstract class _BasePlatformHandle {}
 
 /// Abstraction of a handle with async drop to an object allocated in the Rust side.
-abstract class AsyncPlatformHandle implements _BasePlatformHandle {
+abstract class AsyncPlatformHandle extends _BasePlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   Future<void> free();
 }
 
 /// Abstraction of a handle with sync to an object allocated in the Rust side.
-abstract class SyncPlatformHandle implements _BasePlatformHandle {
+abstract class SyncPlatformHandle extends _BasePlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   void free();
@@ -48,7 +48,7 @@ class RustHandlesStorage {
   }
 
   /// Disposes all the Rust handles registered in this [RustHandlesStorage].
-  void freeAll() async {
+  Future<void> freeAll() async {
     _isFreeingAll = true;
     for (var h in _handles.toList()) {
       if (h is AsyncPlatformHandle) {

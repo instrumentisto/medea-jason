@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
-import 'package:retry/retry.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';

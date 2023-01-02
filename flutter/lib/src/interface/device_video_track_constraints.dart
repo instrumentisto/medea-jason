@@ -20,7 +20,7 @@ enum FacingMode {
   Right,
 }
 
-abstract class DeviceVideoTrackConstraints implements SyncPlatformHandle {
+abstract class DeviceVideoTrackConstraints extends SyncPlatformHandle {
   /// Sets an exact [`deviceId`][1] constraint.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId

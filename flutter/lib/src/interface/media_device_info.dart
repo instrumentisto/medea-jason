@@ -15,7 +15,7 @@ enum MediaDeviceKind {
 /// [`MediaDeviceInfo`][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
-abstract class MediaDeviceInfo implements SyncPlatformHandle {
+abstract class MediaDeviceInfo extends SyncPlatformHandle {
   /// Returns an unique identifier of the represented device.
   String deviceId();
 

@@ -116,9 +116,9 @@ DynamicLibrary _dl_load() {
   executor = Executor(dl);
 
   final _onPanic = dl.lookupFunction<_onPanic_C, _onPanic_Dart>('on_panic');
-  _onPanic((msg) {
+  _onPanic((msg) async {
     msg as String;
-    RustHandlesStorage().freeAll();
+    await RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {
       _onPanicCallback!(msg);
     }

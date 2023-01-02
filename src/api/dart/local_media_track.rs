@@ -2,7 +2,10 @@ use std::ptr;
 
 use dart_sys::Dart_Handle;
 
-use super::{ForeignClass, utils::{DartFuture, IntoDartFuture}};
+use super::{
+    utils::{DartFuture, IntoDartFuture},
+    ForeignClass,
+};
 
 use crate::{
     api::{dart::propagate_panic, Error},
@@ -66,7 +69,11 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
 ) -> DartFuture<Result<(), Error>> {
     propagate_panic(move || {
         let track = LocalMediaTrack::from_ptr(this);
-        async move {Ok::<_, Error>(track.get_track().stop().await)}.into_dart_future()
+        async move {
+            track.get_track().stop().await;
+            Ok::<_, Error>(())
+        }
+        .into_dart_future()
     })
 }
 

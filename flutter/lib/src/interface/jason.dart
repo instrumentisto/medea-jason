@@ -7,7 +7,7 @@ import 'room_handle.dart';
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-abstract class Jason implements SyncPlatformHandle {
+abstract class Jason extends SyncPlatformHandle {
   /// Returns a [MediaManagerHandle] to the `MediaManager` of this [Jason].
   MediaManagerHandle mediaManager();
 

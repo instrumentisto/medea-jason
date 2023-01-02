@@ -67,7 +67,7 @@ void main() {
     expect(tracks.first.kind(), equals(MediaKind.Video));
     expect(tracks.first.mediaSourceKind(), equals(MediaSourceKind.Display));
 
-    tracks.first.free();
+    await tracks.first.free();
     expect(() => tracks.first.kind(), throwsStateError);
 
     expect(
@@ -287,7 +287,7 @@ void main() {
     await Future.wait(allFired.map((e) => e.future))
         .timeout(Duration(seconds: 1));
 
-    track.free();
+    await track.free();
     expect(() => track.kind(), throwsStateError);
   });
 

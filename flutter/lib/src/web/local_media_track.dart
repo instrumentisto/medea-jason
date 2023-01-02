@@ -29,7 +29,8 @@ class WebLocalMediaTrack extends LocalMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() {
     obj.free();
+    return Future.value();
   }
 }
