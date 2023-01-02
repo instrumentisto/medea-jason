@@ -3,11 +3,8 @@
 //!
 //! [Flutter]: https://flutter.dev
 
-pub use crate::api::{
-    api_struct::{
-        ApiMediaDeviceInfo, ApiMediaDisplayInfo, ApiMediaStreamSettings,
-    },
-    utils::ApiWrap,
+pub use crate::api::api_struct::{
+    ApiMediaDeviceInfo, ApiMediaDisplayInfo, ApiMediaStreamSettings,
 };
 use crate::{
     api::{utils::new_dart_opaque, Error, ForeignClass},
