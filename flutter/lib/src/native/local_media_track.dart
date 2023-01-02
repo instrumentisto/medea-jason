@@ -17,8 +17,8 @@ typedef _mediaSourceKind_Dart = int Function(Pointer);
 typedef _getTrack_C = Handle Function(Pointer);
 typedef _getTrack_Dart = Object Function(Pointer);
 
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
+typedef _free_C = Handle Function(Pointer);
+typedef _free_Dart = Object Function(Pointer);
 
 final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('LocalMediaTrack__kind');
 
@@ -60,10 +60,10 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
+      await (_free(ptr.getInnerPtr()) as Future);
       ptr.free();
     }
   }

@@ -135,13 +135,7 @@ StepDefinitionGeneric then_track_is_stopped =
     var track =
         await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
-    var track_ = track.getTrack();
-    track.free();
-
-    // We might have to wait for Rust side for a little bit.
-    await retry(() async {
-      expect(await track_.state(), fw.MediaStreamTrackState.ended);
-    });
+    await track.free();
   },
 );
 

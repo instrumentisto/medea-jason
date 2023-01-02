@@ -2,10 +2,10 @@ use std::ptr;
 
 use dart_sys::Dart_Handle;
 
-use super::ForeignClass;
+use super::{ForeignClass, utils::{DartFuture, IntoDartFuture}};
 
 use crate::{
-    api::dart::propagate_panic,
+    api::{dart::propagate_panic, Error},
     media::{MediaKind, MediaSourceKind},
 };
 
@@ -63,10 +63,11 @@ pub unsafe extern "C" fn LocalMediaTrack__media_source_kind(
 #[no_mangle]
 pub unsafe extern "C" fn LocalMediaTrack__free(
     this: ptr::NonNull<LocalMediaTrack>,
-) {
+) -> DartFuture<Result<(), Error>> {
     propagate_panic(move || {
-        drop(LocalMediaTrack::from_ptr(this));
-    });
+        let track = LocalMediaTrack::from_ptr(this);
+        async move {Ok::<_, Error>(track.get_track().stop().await)}.into_dart_future()
+    })
 }
 
 #[cfg(feature = "mockable")]

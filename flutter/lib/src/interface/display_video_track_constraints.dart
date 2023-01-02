@@ -1,7 +1,7 @@
 import '/src/util/rust_handles_storage.dart';
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-abstract class DisplayVideoTrackConstraints implements PlatformHandle {
+abstract class DisplayVideoTrackConstraints implements SyncPlatformHandle {
   /// Sets an exact [`height`][1] constraint.
   ///
   /// Converts the provided [height] into an `u32`. Throws an [ArgumentError] if
