@@ -32,4 +32,7 @@ class WebLocalMediaTrack extends LocalMediaTrack {
   void free() {
     obj.free();
   }
+
+  @override
+  Future<void> wait_free() async {}
 }

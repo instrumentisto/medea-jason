@@ -138,4 +138,7 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
     _onMediaDirectionChanged(
         ptr.getInnerPtr(), (i) => f(TrackMediaDirection.values[i]));
   }
+
+  @override
+  Future<void> wait_free() async {}
 }

@@ -65,4 +65,7 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
     fallibleFunction(() => obj.on_media_direction_changed(
         allowInterop((i) => f(TrackMediaDirection.values[i]))));
   }
+
+  @override
+  Future<void> wait_free() async {}
 }

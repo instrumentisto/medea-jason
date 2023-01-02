@@ -52,6 +52,9 @@ abstract class MediaTrack implements PlatformHandle {
 
   /// Returns the underlying [MediaStreamTrack] of this [LocalMediaTrack].
   webrtc.MediaStreamTrack getTrack();
+
+  //todo doc
+  Future<void> wait_free();
 }
 
 /// Strongly referenced media track received from a

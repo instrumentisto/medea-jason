@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
-import 'package:retry/retry.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -135,13 +133,7 @@ StepDefinitionGeneric then_track_is_stopped =
     var track =
         await member.wait_local_track(parsedKind.item2, parsedKind.item1);
 
-    var track_ = track.getTrack();
-    track.free();
-
-    // We might have to wait for Rust side for a little bit.
-    await retry(() async {
-      expect(await track_.state(), fw.MediaStreamTrackState.ended);
-    });
+    await track.wait_free();
   },
 );
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
@@ -82,9 +83,18 @@ void _setEnabled(MediaStreamTrack track, bool enabled) {
   track.setEnabled(enabled);
 }
 
+//todo doc
+var completers = <MediaStreamTrack, Completer>{};
+
 /// Stops the provided [MediaStreamTrack].
 Object _stop(MediaStreamTrack track) {
-  return () => track.stop();
+  var compl = Completer();
+  completers.addAll({track: compl});
+  return () async {
+    await track.stop();
+    compl.complete();
+    completers.remove(track);
+  };
 }
 
 /// Indicates whether the provided [MediaStreamTrack] is enabled.

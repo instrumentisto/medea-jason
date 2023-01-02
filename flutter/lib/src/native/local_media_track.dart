@@ -7,6 +7,7 @@ import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
 import 'jason.dart';
+import 'platform/media_track.dart';
 
 typedef _kind_C = Uint8 Function(Pointer);
 typedef _kind_Dart = int Function(Pointer);
@@ -56,6 +57,19 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
   @override
   webrtc.MediaStreamTrack getTrack() {
     return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
+  }
+
+  @override
+  @moveSemantics
+  Future<void> wait_free() async {
+    if (!ptr.isFreed()) {
+      var track = getTrack();
+      free();
+      var fut = completers.remove(track);
+      if (fut != null) {
+        await fut.future;
+      }
+    }
   }
 
   @moveSemantics

@@ -17,7 +17,13 @@ use crate::{
         dart::utils::{
             callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
         },
-        utils::dart_future::FutureFromDart,
+        utils::{
+            dart_api::{
+                Dart_DeletePersistentHandle_DL_Trampolined,
+                Dart_NewPersistentHandle_DL_Trampolined,
+            },
+            dart_future::FutureFromDart,
+        },
     },
 };
 
@@ -267,13 +273,13 @@ impl MediaStreamTrack {
     #[inline]
     pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         let inner = self.inner.clone();
+        let fut = unsafe { media_stream_track::stop(inner.get()) };
+
+        let fut = unsafe { Dart_NewPersistentHandle_DL_Trampolined(fut) };
         async move {
             unsafe {
-                FutureFromDart::execute::<()>(media_stream_track::stop(
-                    inner.get(),
-                ))
-                .await
-                .unwrap();
+                FutureFromDart::execute::<()>(fut).await.unwrap();
+                Dart_DeletePersistentHandle_DL_Trampolined(fut);
             }
         }
     }
