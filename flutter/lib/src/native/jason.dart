@@ -127,7 +127,7 @@ DynamicLibrary _dl_load() {
   return dl;
 }
 
-class Jason extends base.Jason {
+class Jason implements base.Jason {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 

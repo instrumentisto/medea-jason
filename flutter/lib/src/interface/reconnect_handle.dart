@@ -3,7 +3,7 @@ import '/src/util/rust_handles_storage.dart';
 /// External handle used to reconnect to a media server when connection is lost.
 ///
 /// This handle is passed to the `RoomHandle.onConnectionLoss()` callback.
-abstract class ReconnectHandle extends SyncPlatformHandle {
+abstract class ReconnectHandle implements SyncPlatformHandle {
   /// Tries to reconnect a `Room` after the provided delay in milliseconds.
   ///
   /// If the `Room` is already reconnecting then new reconnection attempt won't

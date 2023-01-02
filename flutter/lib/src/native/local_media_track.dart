@@ -31,7 +31,7 @@ final _getTrack = dl
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('LocalMediaTrack__free');
 
-class NativeLocalMediaTrack extends LocalMediaTrack {
+class NativeLocalMediaTrack implements LocalMediaTrack {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 
@@ -63,8 +63,9 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
   Future<void> free() async {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
-      await (_free(ptr.getInnerPtr()) as Future);
+      var innerPtr = ptr.getInnerPtr();
       ptr.free();
+      await (_free(innerPtr) as Future);
     }
   }
 }

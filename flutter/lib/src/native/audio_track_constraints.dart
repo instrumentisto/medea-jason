@@ -27,7 +27,7 @@ final _deviceId = dl.lookupFunction<_deviceId_C, _deviceId_Dart>(
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('AudioTrackConstraints__free');
 
-class AudioTrackConstraints extends base.AudioTrackConstraints {
+class AudioTrackConstraints implements base.AudioTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 

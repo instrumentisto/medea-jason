@@ -3,17 +3,17 @@ import 'dart:collection';
 import 'move_semantic.dart';
 
 /// Abstraction of a handle to an object allocated in the Rust side.
-abstract class _BasePlatformHandle {}
+abstract class PlatformHandle {}
 
-/// Abstraction of a handle with async drop to an object allocated in the Rust side.
-abstract class AsyncPlatformHandle extends _BasePlatformHandle {
+/// A [PlatformHandle] with an async destructor.
+abstract class AsyncPlatformHandle implements PlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   Future<void> free();
 }
 
-/// Abstraction of a handle with sync to an object allocated in the Rust side.
-abstract class SyncPlatformHandle extends _BasePlatformHandle {
+/// A [PlatformHandle] with a sync destructor.
+abstract class SyncPlatformHandle implements PlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   void free();
@@ -24,7 +24,7 @@ class RustHandlesStorage {
   static final RustHandlesStorage _singleton = RustHandlesStorage._internal();
 
   /// All handles given for the Dart side from the Rust side.
-  final HashSet<_BasePlatformHandle> _handles = HashSet();
+  final HashSet<PlatformHandle> _handles = HashSet();
 
   /// Indicator whether this [RustHandlesStorage] frees all the [_handles].
   bool _isFreeingAll = false;
@@ -36,12 +36,12 @@ class RustHandlesStorage {
   RustHandlesStorage._internal();
 
   /// Insert the provided [handle] to this [RustHandlesStorage].
-  void insertHandle(_BasePlatformHandle handle) {
+  void insertHandle(PlatformHandle handle) {
     _handles.add(handle);
   }
 
   /// Removes the provided [handle] from this [RustHandlesStorage].
-  void removeHandle(_BasePlatformHandle handle) {
+  void removeHandle(PlatformHandle handle) {
     if (!_isFreeingAll) {
       _handles.remove(handle);
     }

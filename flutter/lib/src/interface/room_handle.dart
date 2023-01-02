@@ -6,7 +6,7 @@ import 'reconnect_handle.dart';
 import 'room_close_reason.dart';
 
 /// External handle to a `Room`.
-abstract class RoomHandle extends SyncPlatformHandle {
+abstract class RoomHandle implements SyncPlatformHandle {
   /// Connects to a media server and joins the `Room` with the provided
   /// authorization [token].
   ///

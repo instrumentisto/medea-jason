@@ -7,7 +7,7 @@ import 'display_video_track_constraints.dart';
 /// Representation of [`MediaStreamConstraints`][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-abstract class MediaStreamSettings extends SyncPlatformHandle {
+abstract class MediaStreamSettings implements SyncPlatformHandle {
   /// Specifies a nature and settings of the audio `LocalMediaTrack`.
   void audio(@moveSemantics AudioTrackConstraints constraints);
 
