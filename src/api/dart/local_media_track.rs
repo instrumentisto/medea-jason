@@ -70,7 +70,7 @@ pub unsafe extern "C" fn LocalMediaTrack__free(
     propagate_panic(move || {
         let track = LocalMediaTrack::from_ptr(this);
         async move {
-            track.get_track().stop().await;
+            track.maybe_stop().await;
             Ok::<_, Error>(())
         }
         .into_dart_future()
@@ -112,6 +112,10 @@ mod mock {
         #[must_use]
         pub fn get_track(&self) -> platform::MediaStreamTrack {
             unreachable!()
+        }
+
+        pub async fn maybe_stop(self) {
+            // no-op
         }
     }
 }
