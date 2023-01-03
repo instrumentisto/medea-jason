@@ -114,6 +114,7 @@ mod mock {
             unreachable!()
         }
 
+        #[allow(clippy::unused_async)]
         pub async fn maybe_stop(self) {
             // no-op
         }
