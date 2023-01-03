@@ -14,8 +14,7 @@ use medea_macro::dart_bridge;
 use crate::{
     api::{propagate_panic, DartValue, DartValueArg},
     platform::{
-        self,
-        dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Jason_Trampolined,
+        self, dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Trampolined,
     },
 };
 
@@ -201,7 +200,7 @@ impl Callback {
             };
 
             if is_finalizable {
-                let _ = Dart_NewFinalizableHandle_DL_Jason_Trampolined(
+                let _ = Dart_NewFinalizableHandle_DL_Trampolined(
                     handle,
                     f.as_ptr().cast::<c_void>(),
                     mem::size_of::<Self>() as libc::intptr_t,

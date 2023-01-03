@@ -8,15 +8,15 @@ use medea_macro::dart_bridge;
 
 use crate::platform::{
     dart::utils::dart_api::{
-        Dart_DeletePersistentHandle_DL_Jason_Trampolined,
-        Dart_HandleFromPersistent_DL_Jason_Trampolined,
-        Dart_NewPersistentHandle_DL_Jason_Trampolined,
+        Dart_DeletePersistentHandle_DL_Trampolined,
+        Dart_HandleFromPersistent_DL_Trampolined,
+        Dart_NewPersistentHandle_DL_Trampolined,
     },
     utils::{
         c_str_into_string,
         dart_api::{
-            Dart_GetError_DL_Jason_Trampolined,
-            Dart_IsError_DL_Jason_Trampolined,
+            Dart_GetError_DL_Trampolined,
+            Dart_IsError_DL_Trampolined,
         },
         dart_string_into_rust,
     },
@@ -59,12 +59,12 @@ impl DartHandle {
     /// unexpected situation.
     #[must_use]
     pub unsafe fn new(handle: Dart_Handle) -> Self {
-        if Dart_IsError_DL_Jason_Trampolined(handle) {
+        if Dart_IsError_DL_Trampolined(handle) {
             let err_msg =
-                c_str_into_string(Dart_GetError_DL_Jason_Trampolined(handle));
+                c_str_into_string(Dart_GetError_DL_Trampolined(handle));
             panic!("Unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(Dart_NewPersistentHandle_DL_Jason_Trampolined(
+        Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(
             handle,
         )))
     }
@@ -74,7 +74,7 @@ impl DartHandle {
     pub fn get(&self) -> Dart_Handle {
         // SAFETY: We don't expose the inner `Dart_PersistentHandle` anywhere,
         //         so we're sure that it's valid at this point.
-        unsafe { Dart_HandleFromPersistent_DL_Jason_Trampolined(*self.0) }
+        unsafe { Dart_HandleFromPersistent_DL_Trampolined(*self.0) }
     }
 
     /// Returns string representation of a runtime Dart type behind this
@@ -98,7 +98,7 @@ impl Drop for DartHandle {
     fn drop(&mut self) {
         if let Some(handle) = Rc::get_mut(&mut self.0) {
             unsafe {
-                Dart_DeletePersistentHandle_DL_Jason_Trampolined(*handle);
+                Dart_DeletePersistentHandle_DL_Trampolined(*handle);
             }
         }
     }

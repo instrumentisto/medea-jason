@@ -3,13 +3,13 @@ use flutter_rust_bridge::DartOpaque;
 
 use crate::{
     api::ForeignClass,
-    platform::utils::dart_api::Dart_NewPersistentHandle_DL_Jason_Trampolined,
+    platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
 };
 
 /// Creates a new [`DartOpaque`].
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
     DartOpaque::new_non_droppable(
-        Dart_NewPersistentHandle_DL_Jason_Trampolined(handle).cast(),
+        Dart_NewPersistentHandle_DL_Trampolined(handle).cast(),
     )
 }
 

@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#define DART_API_DL_DEFINITIONS(name, R, A) name##_Type name##_DL_Jason = NULL;
+#define DART_API_DL_DEFINITIONS(name, R, A) name##_Type name##_DL = NULL;
 
 DART_API_ALL_DL_SYMBOLS(DART_API_DL_DEFINITIONS)
 
@@ -18,7 +18,7 @@ DART_API_ALL_DL_SYMBOLS(DART_API_DL_DEFINITIONS)
 
 typedef void* DartApiEntry_function;
 
-DartApiEntry_function FindFunctionPointer_Jason(const DartApiEntry* entries,
+DartApiEntry_function FindFunctionPointer(const DartApiEntry* entries,
                                           const char* name) {
   while (entries->name != NULL) {
     if (strcmp(entries->name, name) == 0) return entries->function;
@@ -27,7 +27,7 @@ DartApiEntry_function FindFunctionPointer_Jason(const DartApiEntry* entries,
   return NULL;
 }
 
-intptr_t Dart_InitializeApiDL_Jason(void* data) {
+intptr_t Dart_InitializeApiDL(void* data) {
   DartApi* dart_api_data = (DartApi*)data;
 
   if (dart_api_data->major != DART_API_DL_MAJOR_VERSION) {
@@ -50,8 +50,8 @@ intptr_t Dart_InitializeApiDL_Jason(void* data) {
   const DartApiEntry* dart_api_function_pointers = dart_api_data->functions;
 
 #define DART_API_DL_INIT(name, R, A)                                           \
-  name##_DL_Jason =                                                                  \
-      (name##_Type)(FindFunctionPointer_Jason(dart_api_function_pointers, #name));
+  name##_DL =                                                                  \
+      (name##_Type)(FindFunctionPointer(dart_api_function_pointers, #name));
   DART_API_ALL_DL_SYMBOLS(DART_API_DL_INIT)
 #undef DART_API_DL_INIT
 

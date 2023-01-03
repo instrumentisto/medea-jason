@@ -8,7 +8,7 @@ use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
 
 use crate::{
     api::propagate_panic,
-    platform::dart::utils::dart_api::Dart_PostCObject_DL_Jason_Trampolined,
+    platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined,
 };
 
 pub use self::task::Task;
@@ -66,9 +66,8 @@ fn task_wake(task: Rc<Task>) {
         },
     };
 
-    let enqueued = unsafe {
-        Dart_PostCObject_DL_Jason_Trampolined(wake_port, &mut task_addr)
-    };
+    let enqueued =
+        unsafe { Dart_PostCObject_DL_Trampolined(wake_port, &mut task_addr) };
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {

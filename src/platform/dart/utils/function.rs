@@ -15,8 +15,8 @@ use medea_macro::dart_bridge;
 use crate::{api::DartValue, platform::Callback};
 
 use super::dart_api::{
-    Dart_DeletePersistentHandle_DL_Jason_Trampolined,
-    Dart_HandleFromPersistent_DL_Jason_Trampolined,
+    Dart_DeletePersistentHandle_DL_Trampolined,
+    Dart_HandleFromPersistent_DL_Trampolined,
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
@@ -83,7 +83,7 @@ impl<T: Into<DartValue>> Function<T> {
     pub fn call1(&self, arg: T) {
         unsafe {
             let fn_handle =
-                Dart_HandleFromPersistent_DL_Jason_Trampolined(self.dart_fn);
+                Dart_HandleFromPersistent_DL_Trampolined(self.dart_fn);
             function::caller(fn_handle, arg.into());
         }
     }
@@ -93,7 +93,7 @@ impl<T> Drop for Function<T> {
     /// Manually deallocates saved [`Dart_PersistentHandle`] so it won't leak.
     fn drop(&mut self) {
         unsafe {
-            Dart_DeletePersistentHandle_DL_Jason_Trampolined(self.dart_fn);
+            Dart_DeletePersistentHandle_DL_Trampolined(self.dart_fn);
         }
     }
 }
