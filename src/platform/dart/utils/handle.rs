@@ -14,10 +14,7 @@ use crate::platform::{
     },
     utils::{
         c_str_into_string,
-        dart_api::{
-            Dart_GetError_DL_Trampolined,
-            Dart_IsError_DL_Trampolined,
-        },
+        dart_api::{Dart_GetError_DL_Trampolined, Dart_IsError_DL_Trampolined},
         dart_string_into_rust,
     },
 };
@@ -64,9 +61,7 @@ impl DartHandle {
                 c_str_into_string(Dart_GetError_DL_Trampolined(handle));
             panic!("Unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(
-            handle,
-        )))
+        Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(handle)))
     }
 
     /// Returns the underlying [`Dart_Handle`].
