@@ -13,6 +13,10 @@ const DEFAULT_MEMBER_ID = 'caller';
 class _JoinRouteState extends State<JoinRoute> {
   String _roomId = DEFAULT_ROOM_ID;
   String _memberId = DEFAULT_MEMBER_ID;
+  bool isPublish = true;
+  bool publishAudio = true;
+  bool publishVideo = true;
+  bool fakeMedia = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +53,30 @@ class _JoinRouteState extends State<JoinRoute> {
                       hintText: 'Member ID',
                     ),
                   ),
+                  SwitchListTile(
+                      title: Text('Publish'),
+                      value: isPublish,
+                      onChanged: (v) => setState(() {
+                            isPublish = v;
+                          })),
+                  SwitchListTile(
+                      title: Text('Publish Video'),
+                      value: publishVideo,
+                      onChanged: (v) => setState(() {
+                            publishVideo = v;
+                          })),
+                  SwitchListTile(
+                      title: Text('Publish Audio'),
+                      value: publishAudio,
+                      onChanged: (v) => setState(() {
+                            publishAudio = v;
+                          })),
+                  SwitchListTile(
+                      title: Text('FakeMedia'),
+                      value: fakeMedia,
+                      onChanged: (v) => setState(() {
+                            fakeMedia = v;
+                          })),
                   TextButton(
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -60,8 +88,13 @@ class _JoinRouteState extends State<JoinRoute> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  CallRoute(_roomId, _memberId)));
+                              builder: (context) => CallRoute(
+                                  _roomId,
+                                  _memberId,
+                                  isPublish,
+                                  publishVideo,
+                                  publishAudio,
+                                  fakeMedia)));
                     },
                     child: Text('Join Room'),
                   )
