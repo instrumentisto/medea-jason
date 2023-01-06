@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
+import 'package:medea_jason/medea_jason.dart' as jason;
 
 import 'call.dart';
 
@@ -25,6 +26,10 @@ class _CallState extends State {
   late bool _publishVideo;
   late bool _fakeMedia;
 
+  String? display;
+  String? videoDevice;
+  String? audioDevice;
+
   bool _screenShare = false;
 
   bool _videoEnabled = true;
@@ -35,7 +40,10 @@ class _CallState extends State {
   bool _audioSend = true;
   bool _audioRecv = true;
 
-  final List<VideoView> _videos = List.empty(growable: true);
+  VideoView? displayView;
+  VideoView? deviceView;
+
+  final Map<String, List<VideoView>> _videos = {};
   final Call _call = Call();
   late String _roomId;
   late String _memberId;
@@ -52,21 +60,60 @@ class _CallState extends State {
 
   @override
   void initState() {
-    _call.onNewRemoteStream((track) async {
+    _call.onNewRemoteStream((track, remoteId) async {
       var renderer = createVideoRenderer();
       await renderer.initialize();
       await renderer.setSrcObject(track);
+      var remoteTracks = _videos[remoteId];
+      if (remoteTracks == null) {
+        remoteTracks = List.empty(growable: true);
+        remoteTracks.add(VideoView(renderer, mirror: true));
+      } else {
+        remoteTracks.add(VideoView(renderer, mirror: true));
+      }
       setState(() {
-        _videos.add(VideoView(renderer));
+        _videos[remoteId] = remoteTracks!;
       });
     });
-    _call.onLocalStream((track) async {
-      var renderer = createVideoRenderer();
-      await renderer.initialize();
-      await renderer.setSrcObject(track);
-      setState(() {
-        _videos.add(VideoView(renderer, mirror: true));
-      });
+    _call.onLocalDeviceStream((track) async {
+      if (deviceView == null) {
+        var renderer = createVideoRenderer();
+        await renderer.initialize();
+        await renderer.setSrcObject(track);
+        var localTracks = _videos['I'];
+        deviceView = VideoView(renderer, mirror: true);
+        if (localTracks == null) {
+          localTracks = List.empty(growable: true);
+          localTracks.add(deviceView!);
+        } else {
+          localTracks.add(deviceView!);
+        }
+        setState(() {
+          _videos['I'] = localTracks!;
+        });
+      } else {
+        await deviceView!.videoRenderer.setSrcObject(track);
+      }
+    });
+    _call.onLocalDisplayStream((track) async {
+      if (displayView == null) {
+        var renderer = createVideoRenderer();
+        await renderer.initialize();
+        await renderer.setSrcObject(track);
+        var localTracks = _videos['I'];
+        displayView = VideoView(renderer, mirror: true);
+        if (localTracks == null) {
+          localTracks = List.empty(growable: true);
+          localTracks.add(displayView!);
+        } else {
+          localTracks.add(displayView!);
+        }
+        setState(() {
+          _videos['I'] = localTracks!;
+        });
+      } else {
+        await displayView!.videoRenderer.setSrcObject(track);
+      }
     });
     _call.start(_roomId, _memberId, _isPublish, _publishVideo, _publishAudio,
         _fakeMedia);
@@ -82,10 +129,11 @@ class _CallState extends State {
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue,
               ),
-              child: Text('Device'),
+              child: Text('Display'),
               onPressed: () async {
                 setState(() {});
-
+                var displayList = await _call.enumerateDisplay();
+                var d = jason.DisplayVideoTrackConstraints();
                 await showDialog<void>(
                   context: context,
                   builder: (BuildContext context) {
@@ -102,6 +150,252 @@ class _CallState extends State {
                                   onChanged: (v) => setStateSb(() {
                                         _screenShare = v;
                                       })),
+                              DropdownButton<String>(
+                                value: display,
+                                icon: const Icon(Icons.arrow_downward),
+                                elevation: 16,
+                                style:
+                                    const TextStyle(color: Colors.deepPurple),
+                                underline: Container(
+                                  height: 2,
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                                onChanged: (String? value) {
+                                  // This is called when the user selects an item.
+                                  setStateSb(() {
+                                    display = value;
+                                  });
+                                },
+                                items: displayList
+                                    .map<DropdownMenuItem<String>>((value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value.title() == null
+                                        ? value.deviceId()
+                                        : value.title()!,
+                                    child: Text(value.title() == null
+                                        ? value.deviceId()
+                                        : value.title()!),
+                                  );
+                                }).toList(),
+                              ),
+                              TextFormField(
+                                initialValue: '30',
+                                keyboardType: TextInputType.number,
+                                onChanged: (text) {
+                                  try {
+                                    d.idealFrameRate(int.parse(text));
+                                    // ignore: empty_catches
+                                  } catch (e) {}
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Display FPS',
+                                ),
+                              ),
+                              TextFormField(
+                                initialValue: '640',
+                                keyboardType: TextInputType.number,
+                                onChanged: (text) {
+                                  try {
+                                    d.idealWidth(int.parse(text));
+                                    // ignore: empty_catches
+                                  } catch (e) {}
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Display width',
+                                ),
+                              ),
+                              TextFormField(
+                                initialValue: '480',
+                                keyboardType: TextInputType.number,
+                                onChanged: (text) {
+                                  try {
+                                    d.idealHeight(int.parse(text));
+                                    // ignore: empty_catches
+                                  } catch (e) {}
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Display height',
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+                await _call.toggleScreenShare(_screenShare, d);
+              }),
+
+          TextButton(
+                          style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue,
+              ),
+              child: Text('SendRecv'),
+              onPressed: () async {
+                await showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: StatefulBuilder(
+                        builder:
+                            (BuildContext context, StateSetter setStateSb) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextButton(
+                                  onPressed: () async {
+                                    await _call.setSendAudio(!_audioSend);
+                                    setStateSb(() {
+                                      _audioSend = !_audioSend;
+                                    });
+                                  },
+                                  child: Text(
+                                      (_audioSend ? 'Disable' : 'Enable') +
+                                          ' Audio Send')),
+                              TextButton(
+                                  onPressed: () async {
+                                    await _call.setRecvAudio(!_audioSend);
+                                    setStateSb(() {
+                                      _audioRecv = !_audioRecv;
+                                    });
+                                  },
+                                  child: Text(
+                                      (_audioRecv ? 'Disable' : 'Enable') +
+                                          ' Audio Recv')),
+                              TextButton(
+                                  onPressed: () async {
+                                    await _call.setSendVideo(!_videoSend);
+                                    setStateSb(() {
+                                      _videoSend = !_videoSend;
+                                    });
+                                  },
+                                  child: Text(
+                                      (_videoSend ? 'Disable' : 'Enable') +
+                                          ' Video Send')),
+                              TextButton(
+                                  onPressed: () async {
+                                    await _call.setRecvVideo(!_videoRecv);
+                                    setStateSb(() {
+                                      _videoRecv = !_videoRecv;
+                                    });
+                                  },
+                                  child: Text(
+                                      (_videoRecv ? 'Disable' : 'Enable') +
+                                          ' Video Recv')),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+              }),
+          TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue,
+              ),
+              child: Text('Device'),
+              onPressed: () async {
+                setState(() {});
+                var deviceList = await _call.enumerateDevice();
+                var videoDevices = deviceList
+                    .where((element) =>
+                        element.kind() == jason.MediaDeviceKind.videoinput)
+                    .toList();
+                var audioDevices = deviceList
+                    .where((element) =>
+                        element.kind() == jason.MediaDeviceKind.audioinput)
+                    .toList();
+                var d = jason.DeviceVideoTrackConstraints();
+                var vd = jason.AudioTrackConstraints();
+                await showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: StatefulBuilder(
+                        builder:
+                            (BuildContext context, StateSetter setStateSb) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              DropdownButton<String>(
+                                value: videoDevice,
+                                icon: const Icon(Icons.arrow_downward),
+                                elevation: 16,
+                                style:
+                                    const TextStyle(color: Colors.deepPurple),
+                                underline: Container(
+                                  height: 2,
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                                onChanged: (String? value) {
+                                  // This is called when the user selects an item.
+                                  setStateSb(() {
+                                    videoDevice = value;
+                                  });
+                                },
+                                items: videoDevices
+                                    .map<DropdownMenuItem<String>>((value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value.label(),
+                                    child: Text(value.label()),
+                                  );
+                                }).toList(),
+                              ),
+                              DropdownButton<String>(
+                                value: audioDevice,
+                                icon: const Icon(Icons.arrow_downward),
+                                elevation: 16,
+                                style:
+                                    const TextStyle(color: Colors.deepPurple),
+                                underline: Container(
+                                  height: 2,
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                                onChanged: (String? value) {
+                                  // This is called when the user selects an item.
+                                  setStateSb(() {
+                                    audioDevice = value;
+                                    vd.deviceId(value!);
+                                  });
+                                },
+                                items: audioDevices
+                                    .map<DropdownMenuItem<String>>((value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value.label(),
+                                    child: Text(value.label()),
+                                  );
+                                }).toList(),
+                              ),
+                              TextFormField(
+                                initialValue: '640',
+                                keyboardType: TextInputType.number,
+                                onChanged: (text) {
+                                  try {
+                                    d.idealWidth(int.parse(text));
+                                    // ignore: empty_catches
+                                  } catch (e) {}
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Device width',
+                                ),
+                              ),
+                              TextFormField(
+                                initialValue: '480',
+                                keyboardType: TextInputType.number,
+                                onChanged: (text) {
+                                  try {
+                                    d.idealHeight(int.parse(text));
+                                    // ignore: empty_catches
+                                  } catch (e) {}
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Device height',
+                                ),
+                              ),
                             ],
                           );
                         },
@@ -110,52 +404,68 @@ class _CallState extends State {
                   },
                 );
 
-                await _call.toggleScreenShare(_screenShare);
+                await _call.setVideoDevices(d);
+                // await _call.setAudioDevices(vd);
               }),
         ]),
         body: Center(
             child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
-                child: Column(
-                  children:
-                      _videos.map((video) => Expanded(child: video)).toList(),
+                child: Row(
+                  children: _videos.values
+                      .map((videoList) => Expanded(
+                          child: Column(
+                              children: videoList
+                                  .map((video) => Expanded(child: video))
+                                  .toList())))
+                      .toList(),
                 ))),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        persistentFooterButtons: [
-          TextButton(
-              onPressed: () async {
-                await _call.setSendAudio(!_audioSend);
-                setState(() {
-                  _audioSend = !_audioSend;
-                });
-              },
-              child: Text((_audioSend ? 'Disable' : 'Enable') + ' Audio Send')),
-          TextButton(
-              onPressed: () async {
-                await _call.setRecvAudio(!_audioSend);
-                setState(() {
-                  _audioRecv = !_audioRecv;
-                });
-              },
-              child: Text((_audioRecv ? 'Disable' : 'Enable') + ' Audio Recv')),
-          TextButton(
-              onPressed: () async {
-                await _call.setSendVideo(!_videoSend);
-                setState(() {
-                  _videoSend = !_videoSend;
-                });
-              },
-              child: Text((_videoSend ? 'Disable' : 'Enable') + ' Video Send')),
-          TextButton(
-              onPressed: () async {
-                await _call.setRecvVideo(!_videoRecv);
-                setState(() {
-                  _videoRecv = !_videoRecv;
-                });
-              },
-              child: Text((_videoRecv ? 'Disable' : 'Enable') + ' Video Recv')),
-        ],
+        // bottomNavigationBar: ListView(
+        //   scrollDirection: Axis.horizontal,
+        //   children: [
+        //     TextButton(
+        //       onPressed: () async {
+        //         await _call.setSendAudio(!_audioSend);
+        //         setState(() {
+        //           _audioSend = !_audioSend;
+        //         });
+        //       },
+        //       child: Text((_audioSend ? 'Disable' : 'Enable') + ' Audio Send')),
+        //   TextButton(
+        //       onPressed: () async {
+        //         await _call.setSendAudio(!_audioSend);
+        //         setState(() {
+        //           _audioSend = !_audioSend;
+        //         });
+        //       },
+        //       child: Text((_audioSend ? 'Disable' : 'Enable') + ' Audio Send')),
+        //   TextButton(
+        //       onPressed: () async {
+        //         await _call.setRecvAudio(!_audioSend);
+        //         setState(() {
+        //           _audioRecv = !_audioRecv;
+        //         });
+        //       },
+        //       child: Text((_audioRecv ? 'Disable' : 'Enable') + ' Audio Recv')),
+        //   TextButton(
+        //       onPressed: () async {
+        //         await _call.setSendVideo(!_videoSend);
+        //         setState(() {
+        //           _videoSend = !_videoSend;
+        //         });
+        //       },
+        //       child: Text((_videoSend ? 'Disable' : 'Enable') + ' Video Send')),
+        //   TextButton(
+        //       onPressed: () async {
+        //         await _call.setRecvVideo(!_videoRecv);
+        //         setState(() {
+        //           _videoRecv = !_videoRecv;
+        //         });
+        //       },
+        //       child: Text((_videoRecv ? 'Disable' : 'Enable') + ' Video Recv')),
+        // ]),
         floatingActionButton: Padding(
             padding: EdgeInsets.only(bottom: 50.0),
             child: Row(

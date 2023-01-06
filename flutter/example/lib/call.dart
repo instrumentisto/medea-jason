@@ -18,7 +18,8 @@ class Call {
   final Jason _jason = Jason();
   late RoomHandle _room;
   var client = Client(CONTROL_API_ADDR);
-  late Function(webrtc.MediaStreamTrack) _onLocalTrack;
+  late Function(webrtc.MediaStreamTrack) _onLocalDeviceTrack;
+  late Function(webrtc.MediaStreamTrack) _onLocalDisplayTrack;
   var constraints = MediaStreamSettings();
   List<LocalMediaTrack> _tracks = [];
 
@@ -47,7 +48,7 @@ class Call {
 
     tracks.forEach((track) async {
       if (track.kind() == MediaKind.Video) {
-        _onLocalTrack(track.getTrack());
+        _onLocalDeviceTrack(track.getTrack());
       }
     });
 
@@ -76,44 +77,83 @@ class Call {
     }
   }
 
-  Future<void> toggleScreenShare(bool enabled) async {
+  Future<void> toggleScreenShare(
+      bool enabled, DisplayVideoTrackConstraints display) async {
+    _tracks = _tracks.where((element) {
+      if (element.mediaSourceKind() == MediaSourceKind.Display) {
+        element.free();
+        return false;
+      }
+      return true;
+    }).toList();
+
+
     if (enabled) {
-      constraints.displayVideo(DisplayVideoTrackConstraints());
-      await _room.setLocalMediaSettings(constraints, false, false);
-      var tracks = await _jason.mediaManager().initLocalTracks(constraints);
-      _tracks = tracks;
-      tracks.forEach((track) async {
+      constraints.displayVideo(display);
+      _tracks = await _jason.mediaManager().initLocalTracks(constraints);
+      _tracks.forEach((track) async {
         if (track.kind() == MediaKind.Video &&
             track.mediaSourceKind() == MediaSourceKind.Display) {
-          _onLocalTrack(track.getTrack());
+          _onLocalDisplayTrack(track.getTrack());
         }
       });
-    } else {
-      var t = _tracks.firstWhere(
-          (element) => element.mediaSourceKind() == MediaSourceKind.Display);
-      t.free();
-      _tracks.remove(t);
     }
+    await Future.delayed(Duration(seconds: 1));
+    await _room.setLocalMediaSettings(constraints, false, false);
+  }
+
+  Future<void> setVideoDevices(DeviceVideoTrackConstraints device) async {
+    for (var t in _tracks) {
+      if (t.mediaSourceKind() == MediaSourceKind.Device &&
+          t.kind() == MediaKind.Video) {
+        t.free();
+      }
+    }
+
+    constraints.deviceVideo(device);
+    await _room.setLocalMediaSettings(constraints, false, false);
+    _tracks = await _jason.mediaManager().initLocalTracks(constraints);
+    _tracks.forEach((track) async {
+      if (track.kind() == MediaKind.Video &&
+          track.mediaSourceKind() == MediaSourceKind.Device) {
+        _onLocalDeviceTrack(track.getTrack());
+      }
+    });
+  }
+
+  Future<void> setAudioDevices(AudioTrackConstraints device) async {
+    for (var t in _tracks) {
+      if (t.mediaSourceKind() == MediaSourceKind.Device &&
+          t.kind() == MediaKind.Audio) {
+        t.free();
+      }
+    }
+    constraints.audio(device);
+    await _room.setLocalMediaSettings(constraints, false, false);
+    _tracks = await _jason.mediaManager().initLocalTracks(constraints);
   }
 
   Future<void> dispose() async {
     _tracks.forEach((t) => t.free());
     _jason.closeRoom(_room);
-    await Future.delayed(Duration(seconds: 1));
   }
 
-  void onLocalStream(Function(webrtc.MediaStreamTrack) f) {
-    _onLocalTrack = f;
+  void onLocalDeviceStream(Function(webrtc.MediaStreamTrack) f) {
+    _onLocalDeviceTrack = f;
   }
 
-  void onNewRemoteStream(Function(webrtc.MediaStreamTrack) f) {
+  void onLocalDisplayStream(Function(webrtc.MediaStreamTrack) f) {
+    _onLocalDisplayTrack = f;
+  }
+
+  void onNewRemoteStream(Function(webrtc.MediaStreamTrack, String) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
         if (track.kind() == MediaKind.Audio && !kIsWeb) {
           return;
         }
         var sysTrack = track.getTrack();
-        f(sysTrack);
+        f(sysTrack, conn.getRemoteMemberId());
       });
     });
   }
@@ -233,5 +273,13 @@ class Call {
     } else {
       await _room.disableRemoteAudio();
     }
+  }
+
+  Future<List<MediaDisplayInfo>> enumerateDisplay() async {
+    return _jason.mediaManager().enumerateDisplays();
+  }
+
+  Future<List<MediaDeviceInfo>> enumerateDevice() async {
+    return _jason.mediaManager().enumerateDevices();
   }
 }
