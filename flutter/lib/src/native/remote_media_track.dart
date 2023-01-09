@@ -70,7 +70,7 @@ final _getTrack = dl
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
 
-class NativeRemoteMediaTrack extends RemoteMediaTrack {
+class NativeRemoteMediaTrack implements RemoteMediaTrack {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
 
@@ -125,7 +125,7 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());

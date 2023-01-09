@@ -109,6 +109,13 @@ impl Track {
             _parent: Some(parent),
         }
     }
+
+    /// [Stops][1] this [`Track`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
+    pub async fn stop(&self) {
+        self.track.stop().await;
+    }
 }
 
 impl Drop for Track {
@@ -155,5 +162,15 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()
+    }
+
+    /// [Stops][1] this [`LocalMediaTrack`] if this is the last wrapper for the
+    /// underlying [`Track`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
+    pub async fn maybe_stop(mut self) {
+        if let Some(track) = Rc::get_mut(&mut self.0) {
+            track.stop().await;
+        }
     }
 }

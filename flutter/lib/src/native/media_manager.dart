@@ -81,7 +81,7 @@ final _onDeviceChange =
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('MediaManagerHandle__free');
 
-class NativeMediaManagerHandle extends MediaManagerHandle {
+class NativeMediaManagerHandle implements MediaManagerHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 

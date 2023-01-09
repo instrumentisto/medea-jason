@@ -72,7 +72,7 @@ final _enableRemoteVideo =
     dl.lookupFunction<_enableRemoteVideo_C, _enableRemoteVideo_Dart>(
         'ConnectionHandle__enable_remote_video');
 
-class NativeConnectionHandle extends ConnectionHandle {
+class NativeConnectionHandle implements ConnectionHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 

@@ -12,7 +12,7 @@ import 'media_track.dart';
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class MediaManagerHandle implements PlatformHandle {
+abstract class MediaManagerHandle implements SyncPlatformHandle {
   /// Obtains [LocalMediaTrack]s objects from local media devices (or screen
   /// capture) basing on the provided [MediaStreamSettings].
   ///

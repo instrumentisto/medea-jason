@@ -3,7 +3,8 @@ import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
+class DisplayVideoTrackConstraints
+    implements base.DisplayVideoTrackConstraints {
   final wasm.DisplayVideoTrackConstraints obj =
       wasm.DisplayVideoTrackConstraints();
 
