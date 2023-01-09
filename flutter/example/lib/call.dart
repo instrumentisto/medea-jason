@@ -117,8 +117,8 @@ class Call {
   }
 
   Future<void> toggleScreenShare(DisplayVideoTrackConstraints? display) async {
-    _tracks.forEach((element) {
-      element.free();
+    _tracks.forEach((element) async {
+      await element.free();
     });
 
     var constraints = buildConstraints();
@@ -141,8 +141,8 @@ class Call {
 
   Future<void> setDevices(
       DeviceVideoTrackConstraints video, AudioTrackConstraints audio) async {
-    _tracks.forEach((element) {
-      element.free();
+    _tracks.forEach((element) async {
+      await element.free();
     });
 
     var constraints = buildConstraints();
@@ -162,8 +162,8 @@ class Call {
     });
   }
 
-  void dispose() {
-    _tracks.forEach((t) => t.free());
+  Future<void> dispose() async {
+    _tracks.forEach((t) async => await t.free());
     _jason.closeRoom(_room);
   }
 
