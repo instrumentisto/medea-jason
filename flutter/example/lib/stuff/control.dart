@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:retry/retry.dart';
 
-
 Map<String, String> headers = {'Content-Type': 'application/json'};
 
 /// Client of a Control API.
