@@ -5,14 +5,14 @@ import 'move_semantic.dart';
 /// Abstraction of a handle to an object allocated in the Rust side.
 abstract class PlatformHandle {}
 
-/// A [PlatformHandle] with an async destructor.
+/// [PlatformHandle] with an async destructor.
 abstract class AsyncPlatformHandle implements PlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics
   Future<void> free();
 }
 
-/// A [PlatformHandle] with a sync destructor.
+/// [PlatformHandle] with a sync destructor.
 abstract class SyncPlatformHandle implements PlatformHandle {
   /// Drops the associated Rust struct and nulls the local [Pointer] to it.
   @moveSemantics

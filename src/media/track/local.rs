@@ -164,7 +164,7 @@ impl LocalMediaTrack {
         self.0.media_source_kind().into()
     }
 
-    /// [Stops][1] this [`LocalMediaTrack`] if this is the last wrapper for an
+    /// [Stops][1] this [`LocalMediaTrack`] if this is the last wrapper for the
     /// underlying [`Track`].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
