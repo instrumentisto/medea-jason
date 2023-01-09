@@ -1,11 +1,10 @@
 import 'dart:convert';
 
+import 'package:medea_jason_example/stuff/api/callback.dart';
 import 'package:medea_jason_example/stuff/api/endpoint.dart';
 import 'package:medea_jason_example/stuff/api/member.dart';
 import 'package:medea_jason_example/stuff/api/room.dart';
 import 'package:medea_jason_example/stuff/control.dart';
-
-import 'call.dart';
 
 class ControlApi {
   final Client _client;
@@ -15,7 +14,7 @@ class ControlApi {
     try {
       await _client.create(roomId, Room(roomId, {}));
     } catch (e) {
-      print('Control api createRoom error: $e');
+      print('Control api createRoom error: ${jsonDecode(e.toString())}');
     }
   }
 
@@ -23,7 +22,7 @@ class ControlApi {
     try {
       await _client.create(roomId + '/' + member.id, member);
     } catch (e) {
-      print('Control api createMember error: $e');
+      print('Control api createMember error: ${jsonDecode(e.toString())}');
     }
   }
 
@@ -34,7 +33,8 @@ class ControlApi {
           roomId + '/' + memberId + '/' + endpoint.id, endpoint);
       return true;
     } catch (e) {
-      print('Control api createPlayEndpoint error: $e');
+      print(
+          'Control api createPlayEndpoint error: ${jsonDecode(e.toString())}');
       return false;
     }
   }
@@ -46,18 +46,19 @@ class ControlApi {
           roomId + '/' + memberId + '/' + endpoint.id, endpoint);
       return true;
     } catch (e) {
-      print('Control api createPublishEndpoint error: $e');
+      print(
+          'Control api createPublishEndpoint error: ${jsonDecode(e.toString())}');
       return false;
     }
   }
 
   Future<String> getUrlForElement(
       String roomId, String? memberId, String? endpointId) async {
-    var url = CONTROL_API_ADDR + roomId;
+    var url = roomId;
     if (memberId != null && endpointId != null) {
-      url = CONTROL_API_ADDR + roomId + '/' + memberId + '/' + endpointId;
+      url = roomId + '/' + memberId + '/' + endpointId;
     } else if (memberId != null) {
-      url = CONTROL_API_ADDR + roomId + '/' + memberId;
+      url = roomId + '/' + memberId;
     }
     return url;
   }
@@ -68,7 +69,7 @@ class ControlApi {
       var resp = await _client.delete(url);
       return jsonDecode(resp.body);
     } catch (e) {
-      print('Control api delete error: $e');
+      print('Control api delete error: ${jsonDecode(e.toString())}');
     }
   }
 
@@ -78,19 +79,20 @@ class ControlApi {
       var resp = await _client.get(url);
       return resp.body;
     } catch (e) {
-      print('Control api get error: $e');
-      rethrow;
+      print('Control api get error: ${jsonDecode(e.toString())}');
+      return '';
     }
   }
 
-  Future<String> getCallbacks(
-      String roomId, String memberId, String endpointId) async {
+  Future<List<CallbackItem>> getCallbacks() async {
     try {
-      var resp = await _client.get(CONTROL_API_ADDR + '/callbacks');
-      return resp.body;
+      var resp = await _client.callbacks();
+      return (json.decode(resp.body) as List)
+          .map((item) => CallbackItem.fromJson(item))
+          .toList();
     } catch (e) {
-      print('Control api getCallbacks error: $e');
-      rethrow;
+      print('Control api getCallbacks error: ${jsonDecode(e.toString())}');
+      return [];
     }
   }
 }

@@ -185,6 +185,15 @@ up.medea: docker.up.medea
 up.jason:
 	npm run start --prefix=./e2e-demo
 
+# Run Jason E2E demo in development mode on native platform.
+#
+# Usage:
+#	make up.jason.native [debug=(yes|no)] [device=<device-id>]
+
+up.jason.native:
+	cd flutter/example && flutter run $(if $(call eq,$(debug),no),--release,) \
+		$(if $(call eq,$(device),),,-d $(device))
+
 
 
 
