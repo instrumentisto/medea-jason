@@ -65,7 +65,8 @@ final _deviceId = dl.lookupFunction<_deviceId_C, _deviceId_Dart>(
 final _free_Dart _free = dl
     .lookupFunction<_free_C, _free_Dart>('DisplayVideoTrackConstraints__free');
 
-class DisplayVideoTrackConstraints extends base.DisplayVideoTrackConstraints {
+class DisplayVideoTrackConstraints
+    implements base.DisplayVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 

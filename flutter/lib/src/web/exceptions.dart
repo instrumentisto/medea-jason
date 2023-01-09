@@ -70,7 +70,7 @@ Future<T> fallibleFuture<T>(Future<T> f) async {
 }
 
 /// Exception thrown when cannot get info of available media devices.
-class WebEnumerateDevicesException extends EnumerateDevicesException {
+class WebEnumerateDevicesException implements EnumerateDevicesException {
   late dynamic _cause;
   late String _trace;
 
@@ -97,7 +97,7 @@ class WebEnumerateDevicesException extends EnumerateDevicesException {
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-class WebInternalException extends InternalException {
+class WebInternalException implements InternalException {
   late String _message;
   late dynamic _cause;
   late String _trace;
@@ -129,7 +129,7 @@ class WebInternalException extends InternalException {
 }
 
 /// Exception thrown when accessing media devices.
-class WebLocalMediaInitException extends LocalMediaInitException {
+class WebLocalMediaInitException implements LocalMediaInitException {
   late LocalMediaInitExceptionKind _kind;
   late String _message;
   late dynamic _cause;
@@ -169,7 +169,7 @@ class WebLocalMediaInitException extends LocalMediaInitException {
 }
 
 /// Errors occurring in `RoomHandle::set_local_media_settings()` method.
-class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
+class WebMediaSettingsUpdateException implements MediaSettingsUpdateException {
   late String _message;
   late dynamic _cause;
   late bool _rolledBack;
@@ -203,7 +203,8 @@ class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-class WebMediaStateTransitionException extends MediaStateTransitionException {
+class WebMediaStateTransitionException
+    implements MediaStateTransitionException {
   late String _message;
   late String _trace;
   late MediaStateTransitionExceptionKind _kind;
@@ -236,7 +237,7 @@ class WebMediaStateTransitionException extends MediaStateTransitionException {
 
 /// Exceptions thrown from an RPC client that implements messaging with a media
 /// server.
-class WebRpcClientException extends RpcClientException {
+class WebRpcClientException implements RpcClientException {
   late RpcClientExceptionKind _kind;
   late String _message;
   late dynamic _cause;

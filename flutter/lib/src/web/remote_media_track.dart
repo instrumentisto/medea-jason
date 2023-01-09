@@ -7,7 +7,7 @@ import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class WebRemoteMediaTrack extends RemoteMediaTrack {
+class WebRemoteMediaTrack implements RemoteMediaTrack {
   late wasm.RemoteMediaTrack obj;
 
   WebRemoteMediaTrack(this.obj);
@@ -56,7 +56,7 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     obj.free();
   }
 

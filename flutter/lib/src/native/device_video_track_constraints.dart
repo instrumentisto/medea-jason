@@ -77,7 +77,7 @@ final _widthInRange = dl.lookupFunction<_widthInRange_C, _widthInRange_Dart>(
 final _free =
     dl.lookupFunction<_free_C, _free_Dart>('DeviceVideoTrackConstraints__free');
 
-class DeviceVideoTrackConstraints extends base.DeviceVideoTrackConstraints {
+class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   /// [Pointer] to the Rust struct backing this object.
   final NullablePointer ptr = NullablePointer(_new());
 

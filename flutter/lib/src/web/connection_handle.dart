@@ -9,7 +9,7 @@ import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 import 'remote_media_track.dart';
 
-class WebConnectionHandle extends ConnectionHandle {
+class WebConnectionHandle implements ConnectionHandle {
   late wasm.ConnectionHandle obj;
 
   WebConnectionHandle(this.obj);
