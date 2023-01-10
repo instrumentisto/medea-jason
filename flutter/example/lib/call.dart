@@ -4,21 +4,25 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
-import 'package:medea_jason_example/control_api.dart';
 
-import 'stuff/api/endpoint.dart';
-import 'stuff/api/member.dart';
-import 'stuff/api/room.dart';
-import 'stuff/control.dart';
+import 'control_api/entities/endpoint.dart';
+import 'control_api/entities/member.dart';
+import 'control_api/entities/room.dart';
+import 'control_api/client.dart';
+import 'control_api/http.dart';
 
 const controlDomain = 'http://127.0.0.1:8000';
 const baseUrl = 'ws://127.0.0.1:8080/ws/';
 
+// TODO: add at least some docs
 class Call {
+  var client = HttpClient(controlDomain);
+  late ControlApi controlApi = ControlApi(client);
+
   final Jason _jason = Jason();
-  late RoomHandle _room;
-  var client = Client(controlDomain);
-  late ControlApi controlApi;
+  late final MediaManagerHandle _mediaManager = _jason.mediaManager();
+  late final RoomHandle _room = _jason.initRoom();
+
   late Function(webrtc.MediaStreamTrack) _onLocalDeviceTrack;
   late Function(webrtc.MediaStreamTrack) _onLocalDisplayTrack;
 
@@ -28,11 +32,7 @@ class Call {
 
   List<LocalMediaTrack> _tracks = [];
 
-  Call() {
-    controlApi = ControlApi(client);
-    _room = _jason.initRoom();
-  }
-
+  // TODO: watch for onDeviceChange and update devices list
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
     if (fakeMedia) {
@@ -41,7 +41,7 @@ class Call {
 
     var constraints = MediaStreamSettings();
 
-    var id = await _jason.mediaManager().enumerateDevices();
+    var id = await _mediaManager.enumerateDevices();
 
     if (publishVideo) {
       videoDeviceId = id
@@ -57,8 +57,9 @@ class Call {
       constraints.audio(AudioTrackConstraints());
     }
 
-    var tracks = await _jason.mediaManager().initLocalTracks(constraints);
+    var tracks = await _mediaManager.initLocalTracks(constraints);
     _room.onFailedLocalMedia((e) {
+      // TODO: show such info in some kind of a popup
       print('onFailedLocalMedia');
     });
     _room.onConnectionLoss((e) {
@@ -126,7 +127,7 @@ class Call {
       constraints.displayVideo(display);
     }
 
-    _tracks = await _jason.mediaManager().initLocalTracks(constraints);
+    _tracks = await _mediaManager.initLocalTracks(constraints);
     await _room.setLocalMediaSettings(constraints, true, true);
     _tracks.forEach((track) async {
       if (track.kind() == MediaKind.Video) {
@@ -149,7 +150,7 @@ class Call {
     constraints.deviceVideo(video);
     constraints.audio(audio);
 
-    _tracks = await _jason.mediaManager().initLocalTracks(constraints);
+    _tracks = await _mediaManager.initLocalTracks(constraints);
     await _room.setLocalMediaSettings(constraints, true, true);
     _tracks.forEach((track) async {
       if (track.kind() == MediaKind.Video) {
@@ -164,6 +165,7 @@ class Call {
 
   Future<void> dispose() async {
     _tracks.forEach((t) async => await t.free());
+    _mediaManager.free();
     _jason.closeRoom(_room);
   }
 
@@ -243,10 +245,9 @@ class Call {
     var anotherMembers = controlRoom.pipeline.values;
 
     for (var m in anotherMembers) {
-      var memberId = m.id;
       if (m.pipeline.keys.where((element) => element == 'publish').isNotEmpty) {
-        pipeline['play-' + memberId] = WebRtcPlayEndpoint('play-' + memberId,
-            'local://' + roomId + '/' + memberId + '/publish');
+        pipeline['play-' + m.id] = WebRtcPlayEndpoint(
+            'play-' + m.id, 'local://' + roomId + '/' + m.id + '/publish');
       }
     }
 
@@ -256,16 +257,11 @@ class Call {
             'grpc://127.0.0.1:9099'));
 
     if (isPublish) {
-      try {
-        for (var m in anotherMembers) {
-          var id = m.id;
-          await client.create(
-              roomId + '/' + id + '/' + 'play-' + memberId,
-              WebRtcPlayEndpoint(
-                  id, 'local://' + roomId + '/' + memberId + '/publish'));
-        }
-      } catch (e) {
-        print(e);
+      for (var m in anotherMembers) {
+        await client.create(
+            roomId + '/' + m.id + '/' + 'play-' + memberId,
+            WebRtcPlayEndpoint(
+                m.id, 'local://' + roomId + '/' + memberId + '/publish'));
       }
     }
 
@@ -305,15 +301,10 @@ class Call {
   }
 
   Future<List<MediaDisplayInfo>> enumerateDisplay() async {
-    try {
-      return _jason.mediaManager().enumerateDisplays();
-    } catch (e) {
-      print(e);
-      return [];
-    }
+    return _mediaManager.enumerateDisplays();
   }
 
   Future<List<MediaDeviceInfo>> enumerateDevice() async {
-    return _jason.mediaManager().enumerateDevices();
+    return _mediaManager.enumerateDevices();
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 import 'package:medea_jason/medea_jason.dart' as jason;
-import 'package:medea_jason_example/stuff/api/endpoint.dart';
-import 'package:medea_jason_example/stuff/api/member.dart';
+import 'package:medea_jason_example/control_api/entities/endpoint.dart';
+import 'package:medea_jason_example/control_api/entities/member.dart';
 
 import 'call.dart';
 
@@ -77,8 +77,9 @@ class _CallState extends State {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track);
-        var localTracks = _videos['I'];
         deviceView = VideoView(renderer, mirror: true);
+
+        var localTracks = _videos['I'];
         if (localTracks == null) {
           localTracks = List.empty(growable: true);
           localTracks.add(deviceView!);
@@ -97,8 +98,9 @@ class _CallState extends State {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track);
-        var localTracks = _videos['I'];
         displayView = VideoView(renderer, mirror: true);
+
+        var localTracks = _videos['I'];
         if (localTracks == null) {
           localTracks = List.empty(growable: true);
           localTracks.add(displayView!);
@@ -429,8 +431,11 @@ Future controlApiGetDialog(BuildContext context, Call call) async {
                 SizedBox(height: 10),
                 TextButton(
                     onPressed: () async {
-                      print(await call.controlApi
-                          .get(roomId, memberId, endpointId));
+                      var resp = await call.controlApi
+                          .get(roomId, memberId, endpointId);
+
+                      print(resp);
+
                       Navigator.pop(context);
                     },
                     child: Text('Get'))
@@ -519,6 +524,7 @@ Future controlApiDeleteDialog(BuildContext context, Call call) async {
   );
 }
 
+/// TODO: combine sendrecv display devices into a single settings menu
 Future sendRecvSettingDialog(BuildContext context, Call call) async {
   await showDialog<void>(
     context: context,

@@ -6,12 +6,12 @@ import 'package:retry/retry.dart';
 Map<String, String> headers = {'Content-Type': 'application/json'};
 
 /// Client of a Control API.
-class Client {
+class HttpClient {
   http.Client inner = http.Client();
   late String control_api_address;
 
-  /// Returns a new Control API [Client].
-  Client(this.control_api_address);
+  /// Returns a new Control API [HttpClient].
+  HttpClient(this.control_api_address);
 
   /// Creates the provided media `Element` in the provided [path] on a media
   /// server.
