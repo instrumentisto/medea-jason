@@ -232,6 +232,7 @@ mod mock {
             unreachable!()
         }
 
+        #[allow(clippy::unused_async)]
         pub async fn wait_track(&self) -> Ref<'_, platform::MediaStreamTrack> {
             unreachable!()
         }

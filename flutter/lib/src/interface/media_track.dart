@@ -49,9 +49,6 @@ abstract class MediaTrack implements AsyncPlatformHandle {
   ///
   /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
   MediaSourceKind mediaSourceKind();
-
-  /// Returns the underlying [MediaStreamTrack] of this [LocalMediaTrack].
-  webrtc.MediaStreamTrack getTrack();
 }
 
 /// Strongly referenced media track received from a
@@ -59,7 +56,10 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class LocalMediaTrack implements MediaTrack {}
+abstract class LocalMediaTrack implements MediaTrack {
+  /// Returns the underlying [MediaStreamTrack] of this [LocalMediaTrack].
+  webrtc.MediaStreamTrack getTrack();
+}
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///
@@ -84,4 +84,12 @@ abstract class RemoteMediaTrack implements MediaTrack {
   /// Sets callback to be invoked whenever this [RemoteMediaTrack]'s general
   /// [TrackMediaDirection] is changed.
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f);
+
+  /// Returns the underlying [webrtc.MediaStreamTrack] of this
+  /// [RemoteMediaTrack].
+  webrtc.MediaStreamTrack? getTrack();
+
+  /// Waits and returns the underlying [webrtc.MediaStreamTrack] of this
+  /// [RemoteMediaTrack].
+  Future<webrtc.MediaStreamTrack> waitTrack();
 }
