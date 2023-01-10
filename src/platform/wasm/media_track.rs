@@ -194,8 +194,10 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    pub fn stop(&self) {
+    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         self.sys_track.stop();
+        // For platform code uniformity.
+        future::ready(())
     }
 
     /// Returns an [`enabled`][1] attribute of the underlying

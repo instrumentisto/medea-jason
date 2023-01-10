@@ -11,7 +11,7 @@ import 'jason_wasm.dart' as wasm;
 import '../interface/display_video_track_constraints.dart'
     as base_display_video;
 
-class MediaStreamSettings extends base.MediaStreamSettings {
+class MediaStreamSettings implements base.MediaStreamSettings {
   final wasm.MediaStreamSettings obj = wasm.MediaStreamSettings();
 
   @override

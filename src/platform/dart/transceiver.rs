@@ -4,7 +4,6 @@
 
 use std::{future::Future, rc::Rc};
 
-use derive_more::From;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -57,6 +56,9 @@ mod transceiver {
 
         /// Changes the send direction of the specified [`Transceiver`].
         pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
+
+        /// Disposes the provided [`Transceiver`].
+        pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -64,8 +66,14 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Clone, Debug, From)]
-pub struct Transceiver(DartHandle);
+#[derive(Clone, Debug)]
+pub struct Transceiver(Rc<DartHandle>);
+
+impl From<DartHandle> for Transceiver {
+    fn from(from: DartHandle) -> Self {
+        Self(Rc::new(from))
+    }
+}
 
 impl Transceiver {
     /// Changes the receive direction of the specified [`Transceiver`].
@@ -169,6 +177,23 @@ impl Transceiver {
             }
             .unwrap()
             .into()
+        }
+    }
+}
+
+impl Drop for Transceiver {
+    fn drop(&mut self) {
+        if Rc::get_mut(&mut self.0).is_some() {
+            let transceiver = Rc::clone(&self.0);
+            platform::spawn(async move {
+                unsafe {
+                    FutureFromDart::execute::<()>(transceiver::dispose(
+                        transceiver.get(),
+                    ))
+                    .await
+                    .unwrap();
+                }
+            });
         }
     }
 }

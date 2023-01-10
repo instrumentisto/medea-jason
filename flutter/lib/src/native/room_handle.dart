@@ -151,7 +151,7 @@ final _enableRemoteVideo =
     dl.lookupFunction<_enableRemoteVideo_C, _enableRemoteVideo_Dart>(
         'RoomHandle__enable_remote_video');
 
-class NativeRoomHandle extends RoomHandle {
+class NativeRoomHandle implements RoomHandle {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
 

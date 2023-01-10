@@ -13,6 +13,7 @@ use crate::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
     platform::{
+        self,
         dart::utils::{
             callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
         },
@@ -93,7 +94,7 @@ mod media_stream_track {
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-stop
-        pub fn stop(track: Dart_Handle);
+        pub fn stop(track: Dart_Handle) -> Dart_Handle;
 
         /// Sets [`onended`][1] event handler of the provided
         /// [MediaStreamTrack][0].
@@ -102,9 +103,16 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
         pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
 
-        /// Creates a new instance of [`MediaStreamTrack`] depending on the same
-        /// media source as this [`MediaStreamTrack`].
+        /// Creates a new instance of [MediaStreamTrack][0] depending on the
+        /// same media source as the provided one has.
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
+
+        /// Disposes the provided [MediaStreamTrack][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+        pub fn dispose(track: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -257,9 +265,16 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
     #[inline]
-    pub fn stop(&self) {
-        unsafe {
-            media_stream_track::stop(self.inner.get());
+    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
+        let inner = self.inner.clone();
+        async move {
+            unsafe {
+                FutureFromDart::execute::<()>(media_stream_track::stop(
+                    inner.get(),
+                ))
+                .await
+                .unwrap();
+            }
         }
     }
 
@@ -312,5 +327,20 @@ impl MediaStreamTrack {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
             };
         }
+    }
+}
+
+impl Drop for MediaStreamTrack {
+    fn drop(&mut self) {
+        let track = self.inner.clone();
+        platform::spawn(async move {
+            unsafe {
+                FutureFromDart::execute::<()>(media_stream_track::dispose(
+                    track.get(),
+                ))
+                .await
+                .unwrap();
+            }
+        });
     }
 }

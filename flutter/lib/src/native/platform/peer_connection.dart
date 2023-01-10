@@ -87,11 +87,15 @@ void _onConnectionStateChange(PeerConnection conn, Function f) {
 Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
   return () => peer.getTransceivers().then((transceivers) {
         var mMid = mid.nativeStringToDartString();
+        RtpTransceiver? result;
         for (var transceiver in transceivers) {
           if (transceiver.mid == mMid) {
-            return transceiver;
+            result = transceiver;
+          } else {
+            transceiver.dispose();
           }
         }
+        return result;
       });
 }
 

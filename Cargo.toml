@@ -27,6 +27,9 @@ members = [
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
 
+[profile.release]
+lto = "fat"
+
 [features]
 default = ["console_error_panic_hook", "wee_alloc"]
 dart-codegen = ["medea-macro/dart-codegen"]
@@ -53,9 +56,7 @@ tracerr = "0.3"
 url = "2.3"
 
 [target.'cfg(target_os = "android")'.dependencies]
-# TODO: Switch back to version range after this issue is fixed and released:
-#       https://github.com/Nercury/android_logger-rs/issues/58
-android_logger = "=0.11.1"
+android_logger = "0.11"
 
 [target.'cfg(any(target_os = "ios", target_os = "linux", target_os = "macos", target_os = "windows"))'.dependencies]
 simple_logger = "4.0"
@@ -73,7 +74,7 @@ wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.47"
+    version = "0.3.60"
     features = [
         "console",
         "ConstrainDomStringParameters", "ConstrainDoubleRange",
