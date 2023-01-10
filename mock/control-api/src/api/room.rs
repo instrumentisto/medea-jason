@@ -57,7 +57,7 @@ impl RoomElement {
     }
 }
 
-#[allow(clippy::fallible_impl_from)]
+#[allow(clippy::fallible_impl_from, clippy::unwrap_used)]
 impl From<proto::room::Element> for RoomElement {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {

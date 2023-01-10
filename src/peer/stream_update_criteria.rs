@@ -24,13 +24,13 @@ impl LocalStreamUpdateCriteria {
     /// Creates [`LocalStreamUpdateCriteria`] with all possible [`MediaKind`] +
     /// [`MediaSourceKind`] combinations.
     #[must_use]
-    pub fn all() -> Self {
+    pub const fn all() -> Self {
         Self(Inner::all())
     }
 
     /// Creates empty [`LocalStreamUpdateCriteria`].
     #[must_use]
-    pub fn empty() -> Self {
+    pub const fn empty() -> Self {
         Self(Inner::empty())
     }
 

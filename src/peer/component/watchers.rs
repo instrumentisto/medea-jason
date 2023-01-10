@@ -1,6 +1,6 @@
 //! Implementation of a [`Component`] watchers.
 
-use std::{convert::Infallible, rc::Rc};
+use std::rc::Rc;
 
 use derive_more::{Display, From};
 use futures::{future, StreamExt as _};
@@ -101,28 +101,26 @@ impl Component {
     ///
     /// Removes a [`sender::Component`] from the [`PeerConnection`].
     #[watch(self.senders.on_remove())]
-    async fn sender_removed(
-        peer: Rc<PeerConnection>,
-        _: Rc<State>,
+    fn sender_removed(
+        peer: &PeerConnection,
+        _: &State,
         val: Guarded<(TrackId, Rc<sender::State>)>,
-    ) -> Result<(), Infallible> {
+    ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
-        Ok(())
     }
 
     /// Watcher for the [`State::receivers`] remove update.
     ///
     /// Removes a [`receiver::Component`] from the [`PeerConnection`].
     #[watch(self.receivers.on_remove())]
-    async fn receiver_removed(
-        peer: Rc<PeerConnection>,
-        _: Rc<State>,
+    fn receiver_removed(
+        peer: &PeerConnection,
+        _: &State,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
-    ) -> Result<(), Infallible> {
+    ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
-        Ok(())
     }
 
     /// Watcher for the [`State::senders`] insert update.
@@ -145,7 +143,10 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<sender::State>)>,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        let mut wait_futs = vec![state.when_all_receivers_processed().into()];
+        let mut wait_futs = vec![
+            state.negotiation_role.when_all_processed().into(),
+            state.when_all_receivers_processed().into(),
+        ];
         if matches!(
             state.negotiation_role.get(),
             Some(NegotiationRole::Answerer(_))
@@ -192,7 +193,7 @@ impl Component {
         peer: Rc<PeerConnection>,
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
-    ) -> Result<(), Infallible> {
+    ) {
         let ((_, rcvr_state), _guard) = val.into_parts();
         let conn = peer
             .connections
@@ -213,7 +214,6 @@ impl Component {
                 Rc::clone(&rcvr_state),
             ));
         conn.add_receiver(rcvr_state);
-        Ok(())
     }
 
     /// Watcher for the [`State::local_sdp`] updates.
@@ -240,10 +240,14 @@ impl Component {
         let _ = state.sync_state.when_eq(SyncState::Synced).await;
         if let Some(role) = state.negotiation_role.get() {
             if state.local_sdp.is_rollback() {
-                peer.peer
-                    .rollback()
-                    .await
-                    .map_err(tracerr::map_from_and_wrap!())?;
+                // TODO: Temporary fix that allows us to ignore rollback
+                //       since it won't work anyway.
+                if state.negotiation_state.get() != NegotiationState::Stable {
+                    peer.peer
+                        .rollback()
+                        .await
+                        .map_err(tracerr::map_from_and_wrap!())?;
+                }
                 if state.local_sdp.is_restart_needed() {
                     state.negotiation_state.set(NegotiationState::WaitLocalSdp);
                 } else {
@@ -314,11 +318,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
-    async fn local_sdp_approved(
-        _: Rc<PeerConnection>,
-        state: Rc<State>,
-        _: (),
-    ) -> Result<(), Infallible> {
+    fn local_sdp_approved(_: &PeerConnection, state: &State, _: ()) {
         if let Some(negotiation_role) = state.negotiation_role.get() {
             match negotiation_role {
                 NegotiationRole::Offerer => {
@@ -332,7 +332,6 @@ impl Component {
                 }
             }
         }
-        Ok(())
     }
 
     /// Watcher for the [`NegotiationState`] change.
@@ -394,14 +393,16 @@ impl Component {
     /// Waits for [`sender::Component`]s' and [`receiver::Component`]s'
     /// creation/update, updates local `MediaStream` (if required) and
     /// renegotiates [`PeerConnection`].
-    #[watch(self.negotiation_role.subscribe().filter_map(future::ready))]
+    #[watch(self.negotiation_role.subscribe().filter_map(transpose_guarded))]
     async fn negotiation_role_changed(
         _: Rc<PeerConnection>,
         state: Rc<State>,
-        role: NegotiationRole,
-    ) -> Result<(), Infallible> {
+        role: Guarded<NegotiationRole>,
+    ) {
+        let (role, guard) = role.into_parts();
         match role {
             NegotiationRole::Offerer => {
+                drop(guard);
                 medea_reactive::when_all_processed(vec![
                     state.when_all_senders_processed().into(),
                     state.when_all_receivers_processed().into(),
@@ -416,8 +417,8 @@ impl Component {
                 .await;
             }
             NegotiationRole::Answerer(remote_sdp) => {
-                state.when_all_receivers_processed().await;
                 state.set_remote_sdp(remote_sdp);
+                drop(guard);
 
                 medea_reactive::when_all_processed(vec![
                     state.receivers.when_updated().into(),
@@ -439,8 +440,6 @@ impl Component {
         let _ = state.maybe_update_local_stream.when_eq(false).await;
 
         state.negotiation_state.set(NegotiationState::WaitLocalSdp);
-
-        Ok(())
     }
 
     /// Watcher for the [`State::sync_state`] updates.
@@ -448,15 +447,14 @@ impl Component {
     /// Sends [`PeerConnection`]'s connection state and ICE connection state to
     /// the server.
     #[watch(self.sync_state.subscribe().skip(1))]
-    async fn sync_state_changed(
-        peer: Rc<PeerConnection>,
-        _: Rc<State>,
+    fn sync_state_changed(
+        peer: &PeerConnection,
+        _: &State,
         sync_state: SyncState,
-    ) -> Result<(), Infallible> {
+    ) {
         if sync_state == SyncState::Synced {
             peer.send_current_connection_states();
         }
-        Ok(())
     }
 
     /// Watcher for the [`State::maybe_update_local_stream`] `true` updates.
@@ -470,11 +468,10 @@ impl Component {
         peer: Rc<PeerConnection>,
         state: Rc<State>,
         _: bool,
-    ) -> Result<(), Infallible> {
+    ) {
         state.senders.when_updated().await;
         drop(state.update_local_stream(&peer).await);
 
         state.maybe_update_local_stream.set(false);
-        Ok(())
     }
 }

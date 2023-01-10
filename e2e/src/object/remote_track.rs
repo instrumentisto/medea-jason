@@ -21,6 +21,13 @@ pub enum MediaDirection {
     Inactive = 3,
 }
 
+impl From<MediaDirection> for u8 {
+    #[allow(clippy::as_conversions)] // it's safe conversion
+    fn from(d: MediaDirection) -> Self {
+        d as Self
+    }
+}
+
 /// Representation of a `RemoteMediaTrack` object.
 #[derive(Clone, Copy, Debug)]
 pub struct RemoteTrack;
@@ -254,7 +261,7 @@ impl Object<RemoteTrack> {
                 }
             }
             "#,
-            [(direction as u8).into()],
+            [u8::from(direction).into()],
         ))
         .await
         .map(drop)

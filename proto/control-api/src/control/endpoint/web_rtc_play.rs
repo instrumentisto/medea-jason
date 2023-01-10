@@ -68,17 +68,10 @@ pub struct Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types(String))]
+#[from(types("&str", String))]
 #[into(owned(types(String)))]
 #[repr(transparent)]
 pub struct Id(Box<str>);
-
-// TODO: Derive via `derive::From` once it's capable to.
-impl<'a> From<&'a str> for Id {
-    fn from(s: &'a str) -> Self {
-        Self(s.into())
-    }
-}
 
 impl AsRef<endpoint::Id> for Id {
     fn as_ref(&self) -> &endpoint::Id {
@@ -125,15 +118,11 @@ impl FromStr for LocalSrcUri {
             return Err(LocalSrcUriParseError::NotLocal(val.into()));
         }
 
-        let room_id = match url.host_str() {
-            None => {
-                return Err(LocalSrcUriParseError::MissingPaths(val.into()))
-            }
-            Some(host) if host.is_empty() => {
-                return Err(LocalSrcUriParseError::MissingPaths(val.into()));
-            }
-            Some(host) => host.into(),
-        };
+        let room_id = url
+            .host_str()
+            .filter(|h| !h.is_empty())
+            .ok_or_else(|| LocalSrcUriParseError::MissingPaths(val.into()))?
+            .into();
 
         let mut path = url
             .path_segments()

@@ -8,12 +8,13 @@ server:
     repository: ghcr.io/instrumentisto/medea
     tag: 0.2.0
     pullPolicy: IfNotPresent
+    #credentials:
+    #  registry: docker.io
+    #  username: changeme
+    #  password: changeme
 
   # Medea media server configuration:
   # https://github.com/instrumentisto/medea/blob/master/config.toml
-  # NOTE: Options declared by 'coturn' and 'coturn-db' services below (like
-  #       ports and passwords) are auto-wired and specifying them in this
-  #       configuration will have no effect.
   conf:
     server:
       client:
@@ -23,12 +24,12 @@ server:
       control:
         grpc:
           bind_port: 6565
-    turn:
-      user: USER
-      pass: PASS
-      db:
-        redis:
-          db_number: 0
+    ice:
+      embedded:
+        # External IP address to be used by embedded TURN server as relay.
+        # If empty, then `status.hostIP` of Pod is used.
+        public_host: ""
+        bind_port: 3478
 
   deployment:
     revisionHistoryLimit: 0
@@ -72,55 +73,6 @@ server:
       bind_port: 8000
       log:
         level: DEBUG
-
-  coturn:
-    image:
-      repository: ghcr.io/coturn/coturn
-      tag: 4.5-alpine
-      pullPolicy: IfNotPresent
-
-    # Coturn TURN server configuration.
-    conf:
-      listening-port: 3478
-      # Admin interface (CLI management) configuration.
-      cli-port: 5766
-      cli-password: turn
-      # IP address to be used by Coturn as external.
-      # If empty then `status.hostIP` of Pod will be used.
-      external-ip: ""
-
-    extraArgs: []
-      # - --verbose
-
-    resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 128Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 128Mi
-
-  coturn-db:
-    image:
-      repository: redis
-      tag: alpine
-      pullPolicy: IfNotPresent
-
-    # Redis server configuration:
-    # http://download.redis.io/redis-stable/redis.conf
-    conf:
-      port: 6379
-      requirepass: turn
-      timeout: 0
-      tcp-keepalive: 60
-
-    resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 128Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 128Mi
 
 
 web-client:

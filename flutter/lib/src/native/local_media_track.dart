@@ -2,8 +2,7 @@ import 'dart:ffi';
 
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
-import '../interface/local_media_track.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/nullable_pointer.dart';
@@ -18,8 +17,8 @@ typedef _mediaSourceKind_Dart = int Function(Pointer);
 typedef _getTrack_C = Handle Function(Pointer);
 typedef _getTrack_Dart = Object Function(Pointer);
 
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
+typedef _free_C = Handle Function(Pointer);
+typedef _free_Dart = Object Function(Pointer);
 
 final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('LocalMediaTrack__kind');
 
@@ -32,7 +31,7 @@ final _getTrack = dl
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('LocalMediaTrack__free');
 
-class NativeLocalMediaTrack extends LocalMediaTrack {
+class NativeLocalMediaTrack implements LocalMediaTrack {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 
@@ -61,11 +60,12 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
+      var innerPtr = ptr.getInnerPtr();
       ptr.free();
+      await (_free(innerPtr) as Future);
     }
   }
 }

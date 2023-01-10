@@ -15,14 +15,20 @@ void registerFunctions(DynamicLibrary dl) {
     dropSender: Pointer.fromFunction(_dropSender),
     isStopped: Pointer.fromFunction(_isStopped, true),
     mid: Pointer.fromFunction(_mid),
-    setDirection: Pointer.fromFunction(_setDirection),
+    setRecv: Pointer.fromFunction(_setRecv),
+    setSend: Pointer.fromFunction(_setSend),
+    dispose: Pointer.fromFunction(_dispose),
   );
 }
 
-/// Sets [TransceiverDirection] of the provided [RtpTransceiver] to the provided
-/// one.
-Object _setDirection(RtpTransceiver transceiver, int direction) {
-  return () => transceiver.setDirection(TransceiverDirection.values[direction]);
+/// Changes the receive direction of the provided [RtpTransceiver].
+Object _setRecv(RtpTransceiver transceiver, bool active) {
+  return () => transceiver.setRecv(active);
+}
+
+/// Changes the send direction of the provided [RtpTransceiver].
+Object _setSend(RtpTransceiver transceiver, bool active) {
+  return () => transceiver.setSend(active);
 }
 
 /// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].
@@ -68,4 +74,9 @@ Object _dropSender(RtpTransceiver transceiver) {
 /// stopped.
 bool _isStopped(RtpTransceiver transceiver) {
   return transceiver.isStopped();
+}
+
+/// Disposes of this [RtpTransceiver].
+Object _dispose(RtpTransceiver transceiver) {
+  return () => transceiver.dispose();
 }

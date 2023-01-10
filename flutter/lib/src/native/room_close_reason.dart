@@ -33,7 +33,7 @@ final _isErr =
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RoomCloseReason__free');
 
-class NativeRoomCloseReason extends RoomCloseReason {
+class NativeRoomCloseReason implements RoomCloseReason {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
 

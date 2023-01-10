@@ -2,10 +2,13 @@ use std::ptr;
 
 use dart_sys::Dart_Handle;
 
-use super::ForeignClass;
+use super::{
+    utils::{DartFuture, IntoDartFuture},
+    ForeignClass,
+};
 
 use crate::{
-    api::dart::propagate_panic,
+    api::{dart::propagate_panic, Error},
     media::{MediaKind, MediaSourceKind},
 };
 
@@ -63,10 +66,15 @@ pub unsafe extern "C" fn LocalMediaTrack__media_source_kind(
 #[no_mangle]
 pub unsafe extern "C" fn LocalMediaTrack__free(
     this: ptr::NonNull<LocalMediaTrack>,
-) {
+) -> DartFuture<Result<(), Error>> {
     propagate_panic(move || {
-        drop(LocalMediaTrack::from_ptr(this));
-    });
+        let track = LocalMediaTrack::from_ptr(this);
+        async move {
+            track.maybe_stop().await;
+            Ok::<_, Error>(())
+        }
+        .into_dart_future()
+    })
 }
 
 #[cfg(feature = "mockable")]
@@ -92,18 +100,23 @@ mod mock {
 
     impl LocalMediaTrack {
         #[must_use]
-        pub fn kind(&self) -> MediaKind {
+        pub const fn kind(&self) -> MediaKind {
             MediaKind::Video
         }
 
         #[must_use]
-        pub fn media_source_kind(&self) -> MediaSourceKind {
+        pub const fn media_source_kind(&self) -> MediaSourceKind {
             MediaSourceKind::Display
         }
 
         #[must_use]
         pub fn get_track(&self) -> platform::MediaStreamTrack {
             unreachable!()
+        }
+
+        #[allow(clippy::unused_async)]
+        pub async fn maybe_stop(self) {
+            // no-op
         }
     }
 }

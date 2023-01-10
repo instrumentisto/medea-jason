@@ -160,6 +160,7 @@ impl Track {
     pub async fn stop(self) {
         if let Some(track) = self.0.track.get().as_ref() {
             if track.ready_state().await == MediaStreamTrackState::Live {
+                track.stop().await;
                 self.0.on_stopped.call0();
             }
         }
@@ -179,6 +180,7 @@ impl Track {
     ///
     /// Unwrapping `MediaStreamTrack` conversion is OK here, because its
     /// values are not expected to be `None`.
+    #[allow(clippy::unwrap_used)]
     pub async fn wait_track(&self) -> Ref<'_, platform::MediaStreamTrack> {
         if self.0.track.borrow().as_ref().is_none() {
             let _ = self.0.track.when(|track| track.is_some()).await;

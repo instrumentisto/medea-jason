@@ -2,7 +2,7 @@ Medea Client API protocol
 =========================
 
 [![Latest version](https://img.shields.io/crates/v/medea-client-api-proto "Latest version")](https://crates.io/crates/medea-client-api-proto)
-[![Rust 1.62+](https://img.shields.io/badge/rustc-1.62+-lightgray.svg "Rust 1.62+")](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html)
+[![Rust 1.65+](https://img.shields.io/badge/rustc-1.65+-lightgray.svg "Rust 1.65+")](https://blog.rust-lang.org/2022/11/03/Rust-1.65.0.html)
 [![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
 [![Rust docs](https://docs.rs/medea-client-api-proto/badge.svg "Rust docs")](https://docs.rs/medea-client-api-proto)
 
@@ -34,7 +34,7 @@ So, it's better to keep protocol 64-bit-types-clean to avoid things breaking by 
 
 ## License
 
-Copyright © 2019-2021 Instrumentisto Team, <https://github.com/instrumentisto>
+Copyright © 2019-2023 Instrumentisto Team, <https://github.com/instrumentisto>
 
 This software is subject to the terms of the [Blue Oak Model License 1.0.0](https://github.com/instrumentisto/medea-jason/blob/master/proto/client-api/LICENSE.md). If a copy of the [BlueOak-1.0.0](https://spdx.org/licenses/BlueOak-1.0.0.html) license was not distributed with this file, You can obtain one at <https://blueoakcouncil.org/license/1.0.0>.
 

@@ -1,10 +1,11 @@
 //! Implementation of the [`Component`].
 
-use std::{fmt::Display, rc::Rc};
+use std::{borrow::Borrow, convert::Infallible, fmt::Display, rc::Rc};
 
 use derive_more::Deref;
 use futures::{future, Future, FutureExt as _, Stream, StreamExt};
 use medea_reactive::AllProcessed;
+use sealed::sealed;
 
 use crate::{media::LocalTracksConstraints, platform, utils::TaskHandle};
 
@@ -123,20 +124,22 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
     /// log.
     ///
     /// You can stop all listeners tasks spawned by this function by
-    /// [`Drop`]ping [`Component`].
-    pub fn spawn<R, V, F, H, E>(&mut self, mut rx: R, handle: F)
+    /// [`Drop`]ping the [`Component`].
+    pub fn spawn<R, V, F, H>(&mut self, mut rx: R, handle: F)
     where
-        F: Fn(Rc<O>, Rc<S>, V) -> H + 'static,
         R: Stream<Item = V> + Unpin + 'static,
-        H: Future<Output = Result<(), E>> + 'static,
-        E: Display,
+        F: Fn(Rc<O>, Rc<S>, V) -> H + 'static,
+        H: Future + 'static,
+        <H as Future>::Output: IntoResult,
     {
         let obj = Rc::clone(&self.obj);
         let state = Rc::clone(&self.state);
         let (fut, handle) = future::abortable(async move {
             while let Some(value) = rx.next().await {
                 if let Err(e) =
-                    (handle)(Rc::clone(&obj), Rc::clone(&state), value).await
+                    (handle)(Rc::clone(&obj), Rc::clone(&state), value)
+                        .await
+                        .into_result()
                 {
                     log::error!("{e}");
                 }
@@ -145,6 +148,26 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
         platform::spawn(fut.map(drop));
 
         self.spawned_watchers.push(handle.into());
+    }
+
+    /// Spawns synchronous watchers for the provided [`Stream`].
+    ///
+    /// If watcher returns an error then this error will be printed to the error
+    /// log.
+    ///
+    /// You can stop all listeners tasks spawned by this function by
+    /// [`Drop`]ping the [`Component`].
+    pub fn spawn_sync<R, V, F, Obj, St, H>(&mut self, rx: R, handle: F)
+    where
+        R: Stream<Item = V> + Unpin + 'static,
+        F: Fn(&Obj, &St, V) -> H + 'static,
+        Rc<O>: Borrow<Obj>,
+        Rc<S>: Borrow<St>,
+        H: IntoResult + 'static,
+    {
+        self.spawn(rx, move |o, s, v| {
+            future::ready(handle(o.borrow(), s.borrow(), v))
+        });
     }
 
     /// Creates new [`WatchersSpawner`] for the provided object and state.
@@ -158,6 +181,8 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
 
     /// Returns [`TaskHandle`]s for the watchers spawned by this
     /// [`WatchersSpawner`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     fn finish(self) -> Vec<TaskHandle> {
         self.spawned_watchers
     }
@@ -183,4 +208,33 @@ pub trait ComponentTypes {
 impl<S, O> ComponentTypes for Component<S, O> {
     type Obj = O;
     type State = S;
+}
+
+/// [`Result`] coercion for a `handle` accepted by the
+/// [`WatchersSpawner::spawn()`] method.
+#[sealed]
+pub trait IntoResult {
+    /// Type of the coerced [`Result::Err`].
+    type Error: Display;
+
+    /// Coerces into the [`Result`].
+    fn into_result(self) -> Result<(), Self::Error>;
+}
+
+#[sealed]
+impl IntoResult for () {
+    type Error = Infallible;
+
+    fn into_result(self) -> Result<Self, Self::Error> {
+        Ok(self)
+    }
+}
+
+#[sealed]
+impl<E: Display> IntoResult for Result<(), E> {
+    type Error = E;
+
+    fn into_result(self) -> Result<(), Self::Error> {
+        self
+    }
 }

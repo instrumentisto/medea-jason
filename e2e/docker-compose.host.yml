@@ -11,29 +11,10 @@ services:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ../pkg/:/usr/share/nginx/html/pkg/:ro
     network_mode: host
-  coturn:
-    container_name: ${COMPOSE_PROJECT_NAME}-coturn
-    image: ghcr.io/coturn/coturn:4.5-alpine
-    depends_on: ["coturn-db"]
-    command:
-      - --log-file=stdout
-    volumes:
-      - ../_dev/coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
-      - ../.cache/coturn/data/:/var/lib/coturn/
-    network_mode: host
-  coturn-db:
-    container_name: ${COMPOSE_PROJECT_NAME}-coturn-db
-    image: redis:alpine
-    command: ["redis-server", "/etc/redis.conf"]
-    #ports:
-    #  - "6379:6379"      # coturn redis
-    volumes:
-      - ../_dev/coturn/redis.conf:/etc/redis.conf:ro
-    network_mode: host
   webdriver:
     container_name: ${COMPOSE_PROJECT_NAME}-webdriver
     image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
-    depends_on: ["coturn", "frontend"]
+    depends_on: ["frontend"]
     #ports:
     #  - "4444:4444"      # browser webdriver
     entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}

@@ -33,6 +33,9 @@ pub use self::{
     utils::Function,
 };
 
+/// Unimplemented on WASM targets.
+pub type MediaDisplayInfo = ();
+
 #[cfg(feature = "wee_alloc")]
 /// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 /// allocator.
@@ -70,6 +73,7 @@ where
 /// If fails to interact with JS side.
 ///
 /// [`Future`]: std::future::Future
+#[allow(clippy::unwrap_used)]
 pub async fn delay_for(delay: Duration) {
     let delay_ms = delay.as_millis().try_into().unwrap_or(i32::MAX);
     JsFuture::from(Promise::new(&mut |yes, _| {
@@ -109,6 +113,7 @@ where
 pub fn window() -> Window {
     // Cannot use `lazy_static` since `window` is `!Sync`.
     // Safe to unwrap.
+    #![allow(clippy::unwrap_used)]
     web_sys::window().unwrap()
 }
 

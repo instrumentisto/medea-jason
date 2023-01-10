@@ -67,10 +67,12 @@ pub struct AppContext {
 /// [Control API]: https://tinyurl.com/yxsqplq7
 pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
     let subscribers = Arc::new(Mutex::new(HashMap::new()));
-    let client =
-        ControlClient::new(opts.medea_addr.clone(), Arc::clone(&subscribers))
-            .await
-            .unwrap();
+    let client = ControlClient::new(
+        opts.medea_addr.clone().into(),
+        Arc::clone(&subscribers),
+    )
+    .await
+    .unwrap();
     let app_data = Data::new(AppContext {
         client,
         subscribers,
@@ -111,7 +113,7 @@ pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
                 web::resource("/callbacks").route(web::get().to(get_callbacks)),
             )
     })
-    .bind(&opts.addr)
+    .bind(&*opts.addr)
     .unwrap()
     .run()
     .await
@@ -408,7 +410,7 @@ impl From<proto::CreateResponse> for CreateResponse {
 #[serde(tag = "kind")]
 pub enum Element {
     /// [`Member`] element.
-    Member(Member),
+    Member(Box<Member>),
 
     /// [`WebRtcPublishEndpoint`] element.
     WebRtcPublishEndpoint(WebRtcPublishEndpoint),
@@ -447,7 +449,7 @@ impl From<proto::Element> for Element {
 
         match proto.el.unwrap() {
             El::Room(room) => Self::Room(room.into()),
-            El::Member(member) => Self::Member(member.into()),
+            El::Member(member) => Self::Member(Box::new(member.into())),
             El::WebrtcPub(webrtc_pub) => {
                 Self::WebRtcPublishEndpoint(webrtc_pub.into())
             }
@@ -463,7 +465,7 @@ impl From<proto::room::Element> for Element {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {
             proto::room::element::El::Member(member) => {
-                Self::Member(member.into())
+                Self::Member(Box::new(member.into()))
             }
             proto::room::element::El::WebrtcPlay(_)
             | proto::room::element::El::WebrtcPub(_) => unimplemented!(
@@ -494,11 +496,7 @@ impl From<proto::GetResponse> for SingleGetResponse {
         proto.error.map_or(
             Self {
                 error: None,
-                element: proto
-                    .elements
-                    .into_iter()
-                    .map(|(_, e)| e.into())
-                    .next(),
+                element: proto.elements.into_values().map(Element::from).next(),
             },
             |error| Self {
                 element: None,

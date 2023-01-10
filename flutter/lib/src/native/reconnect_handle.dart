@@ -28,7 +28,7 @@ final _reconnect_with_backoff =
     dl.lookupFunction<_reconnect_with_backoff_C, _reconnect_with_backoff_Dart>(
         'ReconnectHandle__reconnect_with_backoff');
 
-class NativeReconnectHandle extends ReconnectHandle {
+class NativeReconnectHandle implements ReconnectHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 

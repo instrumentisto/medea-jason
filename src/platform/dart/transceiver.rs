@@ -4,7 +4,6 @@
 
 use std::{future::Future, rc::Rc};
 
-use derive_more::From;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -52,11 +51,14 @@ mod transceiver {
             transceiver: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
 
-        /// Sets `direction` of this [`Transceiver`].
-        pub fn set_direction(
-            transceiver: Dart_Handle,
-            direction: i64,
-        ) -> Dart_Handle;
+        /// Changes the receive direction of the specified [`Transceiver`].
+        pub fn set_recv(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
+
+        /// Changes the send direction of the specified [`Transceiver`].
+        pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
+
+        /// Disposes the provided [`Transceiver`].
+        pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -64,33 +66,43 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Clone, Debug, From)]
-pub struct Transceiver(DartHandle);
+#[derive(Clone, Debug)]
+pub struct Transceiver(Rc<DartHandle>);
+
+impl From<DartHandle> for Transceiver {
+    fn from(from: DartHandle) -> Self {
+        Self(Rc::new(from))
+    }
+}
 
 impl Transceiver {
-    /// Disables provided [`TransceiverDirection`] of this [`Transceiver`].
+    /// Changes the receive direction of the specified [`Transceiver`].
     #[must_use]
-    pub fn sub_direction(
-        &self,
-        disabled_direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let this = self.clone();
+    pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
+        let handle = self.0.get();
         Box::pin(async move {
-            this.set_direction(this.direction().await - disabled_direction)
-                .await;
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::set_recv(
+                    handle, active,
+                ))
+                .await
+                .unwrap();
+            }
         })
     }
 
-    /// Enables provided [`TransceiverDirection`] of this [`Transceiver`].
+    /// Changes the send direction of the specified [`Transceiver`].
     #[must_use]
-    pub fn add_direction(
-        &self,
-        enabled_direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let this = self.clone();
+    pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
+        let handle = self.0.get();
         Box::pin(async move {
-            this.set_direction(this.direction().await | enabled_direction)
-                .await;
+            unsafe {
+                FutureFromDart::execute::<()>(transceiver::set_send(
+                    handle, active,
+                ))
+                .await
+                .unwrap();
+            }
         })
     }
 
@@ -120,17 +132,15 @@ impl Transceiver {
                     self.0.get(),
                     track.platform_track().handle(),
                 ))
-                .await
+                .await?;
             }
-            .unwrap();
         } else {
             unsafe {
                 FutureFromDart::execute::<()>(transceiver::drop_sender(
                     self.0.get(),
                 ))
-                .await
+                .await?;
             }
-            .unwrap();
         }
         Ok(())
     }
@@ -169,22 +179,21 @@ impl Transceiver {
             .into()
         }
     }
+}
 
-    /// Sets this [`Transceiver`] to the provided [`TransceiverDirection`].
-    fn set_direction(
-        &self,
-        direction: TransceiverDirection,
-    ) -> LocalBoxFuture<'static, ()> {
-        let handle = self.0.get();
-        Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_direction(
-                    handle,
-                    direction.into(),
-                ))
-                .await
-            }
-            .unwrap();
-        })
+impl Drop for Transceiver {
+    fn drop(&mut self) {
+        if Rc::get_mut(&mut self.0).is_some() {
+            let transceiver = Rc::clone(&self.0);
+            platform::spawn(async move {
+                unsafe {
+                    FutureFromDart::execute::<()>(transceiver::dispose(
+                        transceiver.get(),
+                    ))
+                    .await
+                    .unwrap();
+                }
+            });
+        }
     }
 }

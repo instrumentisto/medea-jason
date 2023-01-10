@@ -2,7 +2,7 @@
 name = "medea-reactive"
 version = "0.1.2-dev"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.64"
 description = "Reactive mutable data containers."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"
@@ -17,4 +17,4 @@ categories = ["asynchronous", "data-structures"]
 futures = "0.3"
 
 [dev-dependencies]
-tokio = { version = "1.5", features = ["macros", "rt", "test-util", "time"] }
+tokio = { version = "1.21", features = ["macros", "rt", "test-util", "time"] }

@@ -11,6 +11,8 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 #![warn(
     clippy::as_conversions,
+    clippy::as_ptr_cast_mut,
+    clippy::assertions_on_result_states,
     clippy::branches_sharing_code,
     clippy::clone_on_ref_ptr,
     clippy::create_dir,
@@ -18,6 +20,7 @@
     clippy::debug_assert_with_mut_call,
     clippy::decimal_literal_representation,
     clippy::default_union_representation,
+    clippy::derive_partial_eq_without_eq,
     clippy::else_if_without_else,
     clippy::empty_drop,
     clippy::empty_line_after_outer_attr,
@@ -35,9 +38,10 @@
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
+    clippy::iter_on_empty_collections,
+    clippy::iter_on_single_items,
     clippy::iter_with_drain,
     clippy::large_include_file,
-    clippy::let_underscore_must_use,
     clippy::lossy_float_literal,
     clippy::map_err_ignore,
     clippy::mem_forget,
@@ -47,9 +51,9 @@
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::nonstandard_macro_braces,
-    clippy::only_used_in_recursion,
     clippy::option_if_let_else,
     clippy::panic_in_result_fn,
+    clippy::partial_pub_fields,
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
@@ -58,6 +62,7 @@
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
     clippy::shadow_unrelated,
+    clippy::significant_drop_in_scrutinee,
     clippy::str_to_string,
     clippy::string_add,
     clippy::string_lit_as_bytes,
@@ -74,6 +79,7 @@
     clippy::unimplemented,
     clippy::unnecessary_self_imports,
     clippy::unneeded_field_pattern,
+    clippy::unused_peekable,
     clippy::unwrap_in_result,
     clippy::unwrap_used,
     clippy::use_debug,
@@ -82,6 +88,7 @@
     clippy::verbose_file_reads,
     clippy::wildcard_enum_match_arm,
     future_incompatible,
+    let_underscore_drop,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
@@ -96,6 +103,7 @@
     unused_lifetimes,
     unused_qualifications,
     unused_results,
+    unused_tuple_struct_fields,
     variant_size_differences
 )]
 
@@ -190,7 +198,6 @@ use medea_jason as _;
 /// assert_eq!(peer.mutable_function(), 10);
 /// assert_eq!(peer.some_value(), 1000);
 /// ```
-#[allow(clippy::needless_pass_by_value)]
 #[proc_macro_attribute]
 pub fn enum_delegate(args: TokenStream, input: TokenStream) -> TokenStream {
     enum_delegate::derive(&args, input)

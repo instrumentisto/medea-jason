@@ -18,8 +18,8 @@ pub use self::{
         VideoSource, VideoTrackConstraints,
     },
     manager::{
-        EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        HandleDetachedError, InitLocalTracksError,
+        EnumerateDevicesError, EnumerateDisplaysError, GetDisplayMediaError,
+        GetUserMediaError, HandleDetachedError, InitLocalTracksError,
         InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
         MicVolumeError,
     },
@@ -44,7 +44,7 @@ pub enum MediaKind {
 impl MediaKind {
     /// Returns string representation of a [`MediaKind`].
     #[must_use]
-    pub fn as_str(self) -> &'static str {
+    pub const fn as_str(self) -> &'static str {
         match self {
             Self::Audio => "audio",
             Self::Video => "video",

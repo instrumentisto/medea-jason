@@ -1,8 +1,7 @@
 import 'dart:ffi';
 
 import '../interface/connection_handle.dart';
-import '../interface/remote_media_track.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
@@ -73,7 +72,7 @@ final _enableRemoteVideo =
     dl.lookupFunction<_enableRemoteVideo_C, _enableRemoteVideo_Dart>(
         'ConnectionHandle__enable_remote_video');
 
-class NativeConnectionHandle extends ConnectionHandle {
+class NativeConnectionHandle implements ConnectionHandle {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 

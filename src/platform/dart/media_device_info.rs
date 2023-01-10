@@ -65,7 +65,7 @@ impl MediaDeviceInfo {
 
     /// Returns a kind of the device represented by this [`MediaDeviceInfo`].
     #[must_use]
-    pub fn kind(&self) -> MediaDeviceKind {
+    pub const fn kind(&self) -> MediaDeviceKind {
         self.kind
     }
 

@@ -1,6 +1,6 @@
 //! [`Component`] for `MediaTrack` with a `Send` direction.
 
-use std::{cell::Cell, convert::Infallible, rc::Rc};
+use std::{cell::Cell, rc::Rc};
 
 use futures::{future::LocalBoxFuture, StreamExt as _};
 use medea_client_api_proto::{
@@ -22,7 +22,6 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -81,7 +80,7 @@ pub struct State {
 
     /// [MID] of the [`Sender`]'s [`Transceiver`].
     ///
-    /// [`Transceiver`]: platform::Transceiver
+    /// [`Transceiver`]: crate::platform::Transceiver
     /// [MID]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     mid: Option<String>,
 
@@ -299,7 +298,7 @@ impl State {
 
     /// Returns [`TrackId`] of this [`State`].
     #[must_use]
-    pub fn id(&self) -> TrackId {
+    pub const fn id(&self) -> TrackId {
         self.id
     }
 
@@ -311,14 +310,14 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub fn media_type(&self) -> MediaType {
+    pub const fn media_type(&self) -> MediaType {
         self.media_type
     }
 
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
     /// should send media data to.
     #[must_use]
-    pub fn receivers(&self) -> &Vec<MemberId> {
+    pub const fn receivers(&self) -> &Vec<MemberId> {
         &self.receivers
     }
 
@@ -407,7 +406,7 @@ impl State {
 
     /// Returns [`MediaKind`] of this [`State`].
     #[must_use]
-    pub fn media_kind(&self) -> MediaKind {
+    pub const fn media_kind(&self) -> MediaKind {
         match &self.media_type {
             MediaType::Audio(_) => MediaKind::Audio,
             MediaType::Video(_) => MediaKind::Video,
@@ -416,7 +415,7 @@ impl State {
 
     /// Returns [`MediaSourceKind`] of this [`State`].
     #[must_use]
-    pub fn media_source(&self) -> MediaSourceKind {
+    pub const fn media_source(&self) -> MediaSourceKind {
         match &self.media_type {
             MediaType::Audio(_) => MediaSourceKind::Device,
             MediaType::Video(video) => video.source_kind,
@@ -434,13 +433,12 @@ impl Component {
     ///
     /// [1]: crate::peer::TrackEvent::MediaExchangeIntention
     #[watch(self.enabled_individual.subscribe_transition())]
-    async fn enabled_individual_transition_started(
-        sender: Rc<Sender>,
-        _: Rc<State>,
+    fn enabled_individual_transition_started(
+        sender: &Sender,
+        _: &State,
         new_state: media_exchange_state::Transition,
-    ) -> Result<(), Infallible> {
+    ) {
         sender.send_media_exchange_state_intention(new_state);
-        Ok(())
     }
 
     /// Watcher for mute state [`mute_state::Transition`] updates.
@@ -450,28 +448,27 @@ impl Component {
     ///
     /// [1]: crate::peer::TrackEvent::MuteUpdateIntention
     #[watch(self.mute_state.subscribe_transition())]
-    async fn mute_state_transition_watcher(
-        sender: Rc<Sender>,
-        _: Rc<State>,
+    fn mute_state_transition_watcher(
+        sender: &Sender,
+        _: &State,
         new_state: mute_state::Transition,
-    ) -> Result<(), Infallible> {
+    ) {
         sender.send_mute_state_intention(new_state);
-        Ok(())
     }
 
     /// Watcher for the [`State::enabled_general`] update.
     ///
     /// Updates [`Sender`]'s general media exchange state. Adds or removes
-    /// [`TransceiverDirection::SEND`] from the [`platform::Transceiver`] of
-    /// this [`Sender`].
+    /// [`SEND`] direction from the [`Transceiver`] of this [`Sender`].
     ///
-    /// [`TransceiverDirection::SEND`]: platform::TransceiverDirection::SEND
+    /// [`SEND`]: crate::platform::TransceiverDirection::SEND
+    /// [`Transceiver`]: crate::platform::Transceiver
     #[watch(self.enabled_general.subscribe())]
     async fn enabled_general_state_changed(
         sender: Rc<Sender>,
         _: Rc<State>,
         new_state: Guarded<media_exchange_state::Stable>,
-    ) -> Result<(), Infallible> {
+    ) {
         let (new_state, _guard) = new_state.into_parts();
         sender
             .enabled_general
@@ -479,21 +476,13 @@ impl Component {
         match new_state {
             media_exchange_state::Stable::Enabled => {
                 if sender.enabled_in_cons() {
-                    sender
-                        .transceiver
-                        .add_direction(platform::TransceiverDirection::SEND)
-                        .await;
+                    sender.transceiver.set_send(true).await;
                 }
             }
             media_exchange_state::Stable::Disabled => {
-                sender
-                    .transceiver
-                    .sub_direction(platform::TransceiverDirection::SEND)
-                    .await;
+                sender.transceiver.set_send(false).await;
             }
         }
-
-        Ok(())
     }
 
     /// Watcher for [`media_exchange_state::Stable`] media exchange state
@@ -511,7 +500,7 @@ impl Component {
         sender: Rc<Sender>,
         state: Rc<State>,
         new_state: media_exchange_state::Stable,
-    ) -> Result<(), Infallible> {
+    ) {
         sender
             .enabled_individual
             .set(new_state == media_exchange_state::Stable::Enabled);
@@ -523,7 +512,6 @@ impl Component {
                 sender.remove_track().await;
             }
         }
-        Ok(())
     }
 
     /// Watcher for the [`mute_state::Stable`] updates.
@@ -533,11 +521,11 @@ impl Component {
     /// Updates [`Sender`]'s [`platform::Transceiver`] `MediaTrack.enabled`
     /// property.
     #[watch(self.mute_state.subscribe_stable())]
-    async fn mute_state_stable_watcher(
-        sender: Rc<Sender>,
-        _: Rc<State>,
+    fn mute_state_stable_watcher(
+        sender: &Sender,
+        _: &State,
         new_state: mute_state::Stable,
-    ) -> Result<(), Infallible> {
+    ) {
         sender.muted.set(new_state == mute_state::Stable::Muted);
         if let Some(track) = sender.track.borrow().as_ref() {
             match new_state {
@@ -549,8 +537,6 @@ impl Component {
                 }
             }
         }
-
-        Ok(())
     }
 
     /// Stops transition timeouts on a [`SyncState::Desynced`].
@@ -558,11 +544,11 @@ impl Component {
     /// Sends media state intentions and resets transition timeouts on a
     /// [`SyncState::Synced`].
     #[watch(self.sync_state.subscribe().skip(1))]
-    async fn sync_state_watcher(
-        sender: Rc<Sender>,
-        state: Rc<State>,
+    fn sync_state_watcher(
+        sender: &Sender,
+        state: &State,
         sync_state: SyncState,
-    ) -> Result<(), Infallible> {
+    ) {
         match sync_state {
             SyncState::Synced => {
                 if let MediaExchangeState::Transition(transition) =
@@ -584,14 +570,14 @@ impl Component {
             }
             SyncState::Syncing => (),
         }
-        Ok(())
     }
 
     /// Disables media exchange on a local track acquisition error.
+    #[allow(clippy::needless_pass_by_value)]
     #[watch(self.local_track_state.subscribe())]
-    async fn local_track_state_changed(
-        _: Rc<Sender>,
-        state: Rc<State>,
+    fn local_track_state_changed(
+        _: &Sender,
+        state: &State,
         new_state: LocalTrackState,
     ) -> Result<(), Traced<ProhibitedStateError>> {
         if matches!(new_state, LocalTrackState::Failed(_)) {
@@ -673,6 +659,7 @@ impl MediaStateControllable for State {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl State {
     /// Sets the [`State::sync_state`] to a [`SyncState::Synced`].
     pub fn synced(&self) {

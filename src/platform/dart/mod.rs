@@ -2,10 +2,12 @@
 
 // TODO: Remove allows when implementing platform code.
 #![allow(
+    clippy::as_conversions,
     clippy::missing_docs_in_private_items,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
     clippy::unused_self,
+    clippy::unwrap_used,
     clippy::needless_pass_by_value,
     unused_variables
 )]
@@ -17,6 +19,7 @@ pub mod ice_candidate;
 pub mod ice_server;
 pub mod media_device_info;
 pub mod media_devices;
+pub mod media_display_info;
 pub mod media_track;
 pub mod peer_connection;
 pub mod rtc_stats;
@@ -32,6 +35,7 @@ pub use self::{
     executor::spawn,
     media_device_info::MediaDeviceInfo,
     media_devices::MediaDevices,
+    media_display_info::MediaDisplayInfo,
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
@@ -73,7 +77,12 @@ pub fn init_logger() {
     );
 }
 
-#[cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))]
+#[cfg(any(
+    target_os = "ios",
+    target_os = "linux",
+    target_os = "macos",
+    target_os = "windows"
+))]
 /// Initializes [`simple_logger`] as the default application logger with filter
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {

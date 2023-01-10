@@ -2,8 +2,7 @@ import 'dart:ffi';
 
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
-import '../interface/remote_media_track.dart';
-import '../interface/track_kinds.dart';
+import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/foreign_value.dart';
@@ -78,7 +77,7 @@ final _waitTrack = dl.lookupFunction<_waitTrack_C, _waitTrack_Dart>(
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
 
-class NativeRemoteMediaTrack extends RemoteMediaTrack {
+class NativeRemoteMediaTrack implements RemoteMediaTrack {
   /// [Pointer] to the Rust struct that backing this object.
   late NullablePointer ptr;
 
@@ -138,7 +137,7 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());

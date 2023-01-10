@@ -58,10 +58,17 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
             if let Some(index) = watch_attr_index {
                 drop(method.attrs.remove(index));
             }
+
             let watcher_ident = &method.sig.ident;
 
+            let spawner = if method.sig.asyncness.is_some() {
+                quote! { spawn }
+            } else {
+                quote! { spawn_sync }
+            };
+
             Ok(quote! {
-                s.spawn(#stream_expr, #component_ty::#watcher_ident);
+                s.#spawner(#stream_expr, #component_ty::#watcher_ident);
             })
         })
         .collect::<Result<Vec<_>>>()?;
@@ -71,6 +78,7 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
     };
 
     Ok(quote! {
+        #[allow(clippy::multiple_inherent_impl)]
         #input
 
         impl crate::utils::component::ComponentState<

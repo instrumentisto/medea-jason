@@ -40,7 +40,7 @@ impl FromStr for MediaKind {
 impl MediaKind {
     /// Converts this [`MediaKind`] to the JS code for this enum variant.
     #[must_use]
-    pub fn as_js(self) -> &'static str {
+    pub const fn as_js(self) -> &'static str {
         match self {
             Self::Audio => "window.rust.MediaKind.Audio",
             Self::Video => "window.rust.MediaKind.Video",
@@ -75,7 +75,7 @@ impl FromStr for MediaSourceKind {
 impl MediaSourceKind {
     /// Converts this [`MediaSourceKind`] to a JS code for this enum variant.
     #[must_use]
-    pub fn as_js(self) -> &'static str {
+    pub const fn as_js(self) -> &'static str {
         match self {
             Self::Device => "window.rust.MediaSourceKind.Device",
             Self::Display => "window.rust.MediaSourceKind.Display",

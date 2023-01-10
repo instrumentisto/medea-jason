@@ -21,7 +21,7 @@ pub enum Stable {
 impl Stable {
     /// Returns the opposite value to this [`Stable`].
     #[must_use]
-    pub fn opposite(self) -> Self {
+    pub const fn opposite(self) -> Self {
         match self {
             Self::Muted => Self::Unmuted,
             Self::Unmuted => Self::Muted,

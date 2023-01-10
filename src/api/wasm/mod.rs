@@ -211,7 +211,8 @@ impl From<media::MediaDirection> for MediaDirection {
 }
 
 impl From<MediaDirection> for JsValue {
+    #[allow(clippy::as_conversions)]
     fn from(val: MediaDirection) -> Self {
-        JsValue::from(val as u8)
+        Self::from(val as u8)
     }
 }
