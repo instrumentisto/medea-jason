@@ -2,12 +2,16 @@ use std::ptr;
 
 use dart_sys::Dart_Handle;
 
-use crate::{
-    media::{MediaDirection, MediaKind, MediaSourceKind},
-    platform,
+use super::{
+    propagate_panic,
+    utils::{DartFuture, IntoDartFuture},
+    DartValueArg, ForeignClass,
 };
-
-use super::{propagate_panic, ForeignClass};
+use crate::{
+    api::err::InternalException,
+    media::{MediaDirection, MediaKind, MediaSourceKind},
+    platform::{self},
+};
 
 #[cfg(feature = "mockable")]
 pub use self::mock::RemoteMediaTrack;
@@ -16,15 +20,37 @@ pub use crate::media::track::remote::Track as RemoteMediaTrack;
 
 impl ForeignClass for RemoteMediaTrack {}
 
-/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
+/// Returns a [`DartValueArg`] to the underlying [`MediaStreamTrack`] of this
 /// [`RemoteMediaTrack`].
 ///
 /// [`MediaStreamTrack`]: platform::MediaStreamTrack
 #[no_mangle]
 pub unsafe extern "C" fn RemoteMediaTrack__get_track(
     this: ptr::NonNull<RemoteMediaTrack>,
-) -> Dart_Handle {
-    propagate_panic(move || this.as_ref().get_track().handle())
+) -> DartValueArg<Option<Dart_Handle>> {
+    propagate_panic(move || {
+        DartValueArg::from(
+            this.as_ref()
+                .get_track()
+                .as_ref()
+                .as_ref()
+                .map(|tr| tr.handle()),
+        )
+    })
+}
+
+/// Returns a [`DartFuture`] to the underlying [`MediaStreamTrack`] of this
+/// [`RemoteMediaTrack`].
+///
+/// [`MediaStreamTrack`]: platform::MediaStreamTrack
+#[no_mangle]
+pub unsafe extern "C" fn RemoteMediaTrack__wait_track(
+    this: ptr::NonNull<RemoteMediaTrack>,
+) -> DartFuture<Result<Dart_Handle, InternalException>> {
+    propagate_panic(move || {
+        let this = this.as_ref().clone();
+        async move { Ok(this.wait_track().await.handle()) }.into_dart_future()
+    })
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is muted.
@@ -136,6 +162,7 @@ mod mock {
         },
         platform,
     };
+    use std::cell::Ref;
 
     #[derive(Clone, Debug)]
     pub struct RemoteMediaTrack(pub u8);
@@ -201,7 +228,12 @@ mod mock {
         }
 
         #[must_use]
-        pub fn get_track(&self) -> platform::MediaStreamTrack {
+        pub fn get_track(&self) -> Ref<'_, Option<platform::MediaStreamTrack>> {
+            unreachable!()
+        }
+
+        #[allow(clippy::unused_async)]
+        pub async fn wait_track(&self) -> Ref<'_, platform::MediaStreamTrack> {
             unreachable!()
         }
     }

@@ -156,8 +156,8 @@ class Member {
       connection_store.connections.addAll({remote_member_id: connection});
       connection_store.close_connect.addAll({remote_member_id: Completer()});
 
-      connection.onRemoteTrackAdded((remote_track) {
-        var remote_track_id = remote_track.getTrack().id();
+      connection.onRemoteTrackAdded((remote_track) async {
+        var remote_track_id = (await remote_track.waitTrack()).id();
         if (connection_store
                 .remote_tracks[remote_member_id]![remote_track_id] ==
             null) {
@@ -478,7 +478,7 @@ class Member {
   /// the provided `count` times.
   Future<void> wait_for_track_cb_fire_count(
       String callback_kind, RemoteMediaTrack track, int count) async {
-    var id = track.getTrack().id();
+    var id = (await track.waitTrack()).id();
     if (connection_store.callback_counter[id]![callback_kind] != count) {
       var fires_future = Completer();
       connection_store.OnCallbackCounter[id]![callback_kind] = (f) {
@@ -493,14 +493,14 @@ class Member {
 
   /// Waits for the [RemoteMediaTrack]'s disabled state.
   Future<void> wait_disabled_track(RemoteMediaTrack track) async {
-    var id = track.getTrack().id();
+    var id = (await track.waitTrack()).id();
     if (track.mediaDirection() == TrackMediaDirection.SendRecv) {
       var direction_future = Completer();
-      connection_store.OnMediaDirectionChanged[id] = (d) {
+      connection_store.OnMediaDirectionChanged[id] = (d) async {
         if (d != TrackMediaDirection.SendRecv) {
           direction_future.complete();
           connection_store.OnMediaDirectionChanged.remove(
-              track.getTrack().id());
+              (await track.waitTrack()).id());
         }
       };
       return direction_future.future;
@@ -516,14 +516,14 @@ class Member {
   /// [direction].
   Future<void> wait_media_direction_track(
       TrackMediaDirection direction, RemoteMediaTrack track) async {
-    var id = track.getTrack().id();
+    var id = (await track.waitTrack()).id();
     if (track.mediaDirection() != direction) {
       var direction_future = Completer();
-      connection_store.OnMediaDirectionChanged[id] = (d) {
+      connection_store.OnMediaDirectionChanged[id] = (d) async {
         if (d == direction) {
           direction_future.complete();
           connection_store.OnMediaDirectionChanged.remove(
-              track.getTrack().id());
+              (await track.waitTrack()).id());
         }
       };
       return direction_future.future;

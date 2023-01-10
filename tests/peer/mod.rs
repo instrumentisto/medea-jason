@@ -1299,14 +1299,9 @@ async fn new_remote_track() {
             .await
             .unwrap(),
             FinalTrack {
-                has_audio: audio_tx_enabled && audio_rx_enabled,
-                has_video: video_tx_enabled && video_rx_enabled,
+                has_audio: true,
+                has_video: true,
             },
-            "{} {} {} {}",
-            audio_tx_enabled,
-            video_tx_enabled,
-            audio_rx_enabled,
-            video_rx_enabled,
         );
     }
 }
