@@ -14,25 +14,38 @@ import 'control_api/http.dart';
 const controlDomain = 'http://127.0.0.1:8000';
 const baseUrl = 'ws://127.0.0.1:8080/ws/';
 
-// TODO: add at least some docs
 class Call {
   var client = HttpClient(controlDomain);
+
+  /// Provides access to the control api.
   late ControlApi controlApi = ControlApi(client);
 
   final Jason _jason = Jason();
   late final MediaManagerHandle _mediaManager = _jason.mediaManager();
   late final RoomHandle _room = _jason.initRoom();
 
+  /// Used to create/change a render from a local video device track.
   late Function(webrtc.MediaStreamTrack) _onLocalDeviceTrack;
+
+  /// Used to create/change a render from a local video display track.
   late Function(webrtc.MediaStreamTrack) _onLocalDisplayTrack;
 
+  /// Used to handle error.
+  Function(String) _onError = (p0) {};
+
+  /// Saved selected audio device id.
   String? audioDeviceId;
+
+  /// Saved selected video device id.
   String? videoDeviceId;
+
+  /// Saved selected display id.
   String? videoDisplayId;
 
+  /// All local track for current member.
   List<LocalMediaTrack> _tracks = [];
 
-  // TODO: watch for onDeviceChange and update devices list
+  /// Starts a call to the room.
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
     if (fakeMedia) {
@@ -59,11 +72,10 @@ class Call {
 
     var tracks = await _mediaManager.initLocalTracks(constraints);
     _room.onFailedLocalMedia((e) {
-      // TODO: show such info in some kind of a popup
-      print('onFailedLocalMedia');
+      _onError('onFailedLocalMedia: $e');
     });
     _room.onConnectionLoss((e) {
-      print('onConnectionLoss');
+      _onError('onConnectionLoss: $e');
     });
     await _room.setLocalMediaSettings(constraints, false, false);
     _tracks = tracks;
@@ -99,6 +111,7 @@ class Call {
     }
   }
 
+  /// Creates media settings considering the old ones.
   MediaStreamSettings buildConstraints() {
     var constraints = MediaStreamSettings();
 
@@ -117,19 +130,26 @@ class Call {
     return constraints;
   }
 
-  Future<void> toggleScreenShare(DisplayVideoTrackConstraints? display) async {
-    _tracks.forEach((element) async {
-      await element.free();
-    });
+  /// Sets media tracks according to the passed settings.
+  Future<void> setMedia(
+      DeviceVideoTrackConstraints video,
+      AudioTrackConstraints audio,
+      DisplayVideoTrackConstraints? display) async {
+    for (var t in _tracks) {
+      await t.free();
+    }
 
     var constraints = buildConstraints();
+    constraints.deviceVideo(video);
+    constraints.audio(audio);
     if (display != null) {
       constraints.displayVideo(display);
     }
 
     _tracks = await _mediaManager.initLocalTracks(constraints);
+
     await _room.setLocalMediaSettings(constraints, true, true);
-    _tracks.forEach((track) async {
+    for (var track in _tracks) {
       if (track.kind() == MediaKind.Video) {
         if (track.mediaSourceKind() == MediaSourceKind.Display) {
           _onLocalDisplayTrack(track.getTrack());
@@ -137,46 +157,28 @@ class Call {
           _onLocalDeviceTrack(track.getTrack());
         }
       }
-    });
+    }
+    ;
   }
 
-  Future<void> setDevices(
-      DeviceVideoTrackConstraints video, AudioTrackConstraints audio) async {
-    _tracks.forEach((element) async {
-      await element.free();
-    });
-
-    var constraints = buildConstraints();
-    constraints.deviceVideo(video);
-    constraints.audio(audio);
-
-    _tracks = await _mediaManager.initLocalTracks(constraints);
-    await _room.setLocalMediaSettings(constraints, true, true);
-    _tracks.forEach((track) async {
-      if (track.kind() == MediaKind.Video) {
-        if (track.mediaSourceKind() == MediaSourceKind.Display) {
-          _onLocalDisplayTrack(track.getTrack());
-        } else {
-          _onLocalDeviceTrack(track.getTrack());
-        }
-      }
-    });
-  }
-
+  /// Сlears the media and closes the room.
   Future<void> dispose() async {
     _tracks.forEach((t) async => await t.free());
     _mediaManager.free();
     _jason.closeRoom(_room);
   }
 
+  /// Sets a callback for new local device track.
   void onLocalDeviceStream(Function(webrtc.MediaStreamTrack) f) {
     _onLocalDeviceTrack = f;
   }
 
+  /// Sets a callback for new local display track.
   void onLocalDisplayStream(Function(webrtc.MediaStreamTrack) f) {
     _onLocalDisplayTrack = f;
   }
 
+  /// Sets a callback for new video remote track.
   void onNewRemoteStream(Function(webrtc.MediaStreamTrack, String) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
@@ -189,6 +191,17 @@ class Call {
     });
   }
 
+  /// Sets a callback for the `onDeviceСhange` event.
+  void onDeviceChange(Function() f) {
+    _mediaManager.onDeviceChange(f);
+  }
+
+  /// Sets a callback for for error handling.
+  void onError(Function(String err) f) {
+    _onError = f;
+  }
+
+  /// mute / unmute audio.
   Future<void> toggleAudio(bool enabled) async {
     if (enabled) {
       await _room.unmuteAudio();
@@ -197,6 +210,7 @@ class Call {
     }
   }
 
+  /// mute / unmute video.
   Future<void> toggleVideo(bool enabled) async {
     if (enabled) {
       await _room.unmuteVideo(MediaSourceKind.Device);
@@ -205,6 +219,8 @@ class Call {
     }
   }
 
+  /// Creates a new room.
+  /// Returns url for join.
   Future<String> createRoom(String roomId, String memberId, bool isPublish,
       bool publishAudio, bool publishVideo) async {
     var pipeline = HashMap<String, Endpoint>();
@@ -227,6 +243,8 @@ class Call {
     return jsonDecode(resp.body)['sids'][memberId];
   }
 
+  /// Creates a member for the room.
+  /// Returns url for join.
   Future<String> createMember(String roomId, String memberId, bool isPublish,
       bool publishAudio, bool publishVideo) async {
     var pipeline = HashMap<String, Endpoint>();
@@ -268,6 +286,7 @@ class Call {
     return jsonDecode(resp.body)['sids'][memberId];
   }
 
+  /// Sets video send.
   Future<void> setSendVideo(bool enabled, [MediaSourceKind? kind]) async {
     if (enabled) {
       await _room.enableVideo(kind);
@@ -276,6 +295,7 @@ class Call {
     }
   }
 
+  /// Sets video reception.
   Future<void> setRecvVideo(bool enabled, [MediaSourceKind? kind]) async {
     if (enabled) {
       await _room.enableRemoteVideo(kind);
@@ -284,6 +304,7 @@ class Call {
     }
   }
 
+  /// Sets audio send.
   Future<void> setSendAudio(bool enabled) async {
     if (enabled) {
       await _room.enableAudio();
@@ -292,6 +313,7 @@ class Call {
     }
   }
 
+  /// Sets audio reception.
   Future<void> setRecvAudio(bool enabled) async {
     if (enabled) {
       await _room.enableRemoteAudio();
@@ -300,10 +322,12 @@ class Call {
     }
   }
 
+  /// Returns a list of current displays.
   Future<List<MediaDisplayInfo>> enumerateDisplay() async {
     return _mediaManager.enumerateDisplays();
   }
 
+  /// Returns a list of current devices.
   Future<List<MediaDeviceInfo>> enumerateDevice() async {
     return _mediaManager.enumerateDevices();
   }

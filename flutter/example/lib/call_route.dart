@@ -114,6 +114,14 @@ class _CallState extends State {
         await displayView!.videoRenderer.setSrcObject(track);
       }
     });
+    _call.onDeviceChange(() {
+      var snackBar = SnackBar(content: Text('On device change'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
+    _call.onError((err) {
+      var snackBar = SnackBar(content: Text(err));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
     _call.start(_roomId, _memberId, _isPublish, _publishVideo, _publishAudio,
         _fakeMedia);
     super.initState();
@@ -128,9 +136,9 @@ class _CallState extends State {
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue,
               ),
-              child: Text('SendRecv'),
+              child: Text('MediaSetting'),
               onPressed: () async {
-                await sendRecvSettingDialog(context, _call);
+                await mediaSettingDialog(context, _call);
               }),
           TextButton(
               style: TextButton.styleFrom(
@@ -167,24 +175,6 @@ class _CallState extends State {
               child: Text('Callbacks'),
               onPressed: () async {
                 await showCallbacks(context, _call);
-              }),
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: Text('Display'),
-              onPressed: () async {
-                await displaySettingDialog(context, _call);
-              }),
-          TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue,
-              ),
-              child: Text('Device'),
-              onPressed: () async {
-                await deviceSettingDialog(context, _call);
               }),
         ]),
         body: Center(
@@ -268,105 +258,6 @@ Future showCallbacks(BuildContext context, Call call) async {
                       .toList(),
                 )));
       });
-}
-
-Future displaySettingDialog(BuildContext context, Call call) async {
-  var displayList = await call.enumerateDisplay();
-
-  var displayTrack = jason.DisplayVideoTrackConstraints();
-  if (call.videoDisplayId != null) {
-    displayTrack.deviceId(call.videoDisplayId!);
-  }
-
-  await showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setStateSb) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SwitchListTile(
-                    title: Text('Screen share'),
-                    value: _screenShare,
-                    onChanged: (v) => setStateSb(() {
-                          _screenShare = v;
-                        })),
-                DropdownButton<String>(
-                  value: call.videoDisplayId,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  onChanged: (String? value) {
-                    // This is called when the user selects an item.
-                    setStateSb(() {
-                      call.videoDisplayId = value!;
-                      displayTrack.deviceId(value);
-                    });
-                  },
-                  items: displayList.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value.title() == null
-                          ? value.deviceId()
-                          : value.title()!,
-                      child: Text(value.title() == null
-                          ? value.deviceId()
-                          : value.title()!),
-                    );
-                  }).toList(),
-                ),
-                TextFormField(
-                  initialValue: '30',
-                  keyboardType: TextInputType.number,
-                  onChanged: (text) {
-                    try {
-                      displayTrack.idealFrameRate(int.parse(text));
-                      // ignore: empty_catches
-                    } catch (e) {}
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Display FPS',
-                  ),
-                ),
-                TextFormField(
-                  initialValue: '640',
-                  keyboardType: TextInputType.number,
-                  onChanged: (text) {
-                    try {
-                      displayTrack.idealWidth(int.parse(text));
-                      // ignore: empty_catches
-                    } catch (e) {}
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Display width',
-                  ),
-                ),
-                TextFormField(
-                  initialValue: '480',
-                  keyboardType: TextInputType.number,
-                  onChanged: (text) {
-                    try {
-                      displayTrack.idealHeight(int.parse(text));
-                      // ignore: empty_catches
-                    } catch (e) {}
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Display height',
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    },
-  );
-  await call.toggleScreenShare(_screenShare ? displayTrack : null);
 }
 
 Future controlApiGetDialog(BuildContext context, Call call) async {
@@ -524,63 +415,14 @@ Future controlApiDeleteDialog(BuildContext context, Call call) async {
   );
 }
 
-/// TODO: combine sendrecv display devices into a single settings menu
-Future sendRecvSettingDialog(BuildContext context, Call call) async {
-  await showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setStateSb) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                    onPressed: () async {
-                      await call.setSendAudio(!_audioSend);
-                      setStateSb(() {
-                        _audioSend = !_audioSend;
-                      });
-                    },
-                    child: Text(
-                        (_audioSend ? 'Disable' : 'Enable') + ' Audio Send')),
-                TextButton(
-                    onPressed: () async {
-                      await call.setRecvAudio(!_audioSend);
-                      setStateSb(() {
-                        _audioRecv = !_audioRecv;
-                      });
-                    },
-                    child: Text(
-                        (_audioRecv ? 'Disable' : 'Enable') + ' Audio Recv')),
-                TextButton(
-                    onPressed: () async {
-                      await call.setSendVideo(!_videoSend);
-                      setStateSb(() {
-                        _videoSend = !_videoSend;
-                      });
-                    },
-                    child: Text(
-                        (_videoSend ? 'Disable' : 'Enable') + ' Video Send')),
-                TextButton(
-                    onPressed: () async {
-                      await call.setRecvVideo(!_videoRecv);
-                      setStateSb(() {
-                        _videoRecv = !_videoRecv;
-                      });
-                    },
-                    child: Text(
-                        (_videoRecv ? 'Disable' : 'Enable') + ' Video Recv')),
-              ],
-            );
-          },
-        ),
-      );
-    },
-  );
-}
+Future mediaSettingDialog(BuildContext context, Call call) async {
+  var displayList = await call.enumerateDisplay();
 
-Future deviceSettingDialog(BuildContext context, Call call) async {
+  var displayTrack = jason.DisplayVideoTrackConstraints();
+  if (call.videoDisplayId != null) {
+    displayTrack.deviceId(call.videoDisplayId!);
+  }
+
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
       .where((element) => element.kind() == jason.MediaDeviceKind.videoinput)
@@ -608,6 +450,76 @@ Future deviceSettingDialog(BuildContext context, Call call) async {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                SwitchListTile(
+                    title: Text('Screen share'),
+                    value: _screenShare,
+                    onChanged: (v) => setStateSb(() {
+                          _screenShare = v;
+                        })),
+                DropdownButton<String>(
+                  value: call.videoDisplayId,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (String? value) {
+                    // This is called when the user selects an item.
+                    setStateSb(() {
+                      call.videoDisplayId = value!;
+                      displayTrack.deviceId(value);
+                    });
+                  },
+                  items: displayList.map<DropdownMenuItem<String>>((value) {
+                    return DropdownMenuItem<String>(
+                      value: value.deviceId(),
+                      child: Text(value.title() == null
+                          ? value.deviceId()
+                          : value.title()!),
+                    );
+                  }).toList(),
+                ),
+                TextFormField(
+                  initialValue: '30',
+                  keyboardType: TextInputType.number,
+                  onChanged: (text) {
+                    try {
+                      displayTrack.idealFrameRate(int.parse(text));
+                      // ignore: empty_catches
+                    } catch (e) {}
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Display FPS',
+                  ),
+                ),
+                TextFormField(
+                  initialValue: '640',
+                  keyboardType: TextInputType.number,
+                  onChanged: (text) {
+                    try {
+                      displayTrack.idealWidth(int.parse(text));
+                      // ignore: empty_catches
+                    } catch (e) {}
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Display width',
+                  ),
+                ),
+                TextFormField(
+                  initialValue: '480',
+                  keyboardType: TextInputType.number,
+                  onChanged: (text) {
+                    try {
+                      displayTrack.idealHeight(int.parse(text));
+                      // ignore: empty_catches
+                    } catch (e) {}
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Display height',
+                  ),
+                ),
                 DropdownButton<String>(
                   value: call.videoDeviceId,
                   icon: const Icon(Icons.arrow_downward),
@@ -680,6 +592,42 @@ Future deviceSettingDialog(BuildContext context, Call call) async {
                     labelText: 'Device height',
                   ),
                 ),
+                TextButton(
+                    onPressed: () async {
+                      await call.setSendAudio(!_audioSend);
+                      setStateSb(() {
+                        _audioSend = !_audioSend;
+                      });
+                    },
+                    child: Text(
+                        (_audioSend ? 'Disable' : 'Enable') + ' Audio Send')),
+                TextButton(
+                    onPressed: () async {
+                      await call.setRecvAudio(!_audioSend);
+                      setStateSb(() {
+                        _audioRecv = !_audioRecv;
+                      });
+                    },
+                    child: Text(
+                        (_audioRecv ? 'Disable' : 'Enable') + ' Audio Recv')),
+                TextButton(
+                    onPressed: () async {
+                      await call.setSendVideo(!_videoSend);
+                      setStateSb(() {
+                        _videoSend = !_videoSend;
+                      });
+                    },
+                    child: Text(
+                        (_videoSend ? 'Disable' : 'Enable') + ' Video Send')),
+                TextButton(
+                    onPressed: () async {
+                      await call.setRecvVideo(!_videoRecv);
+                      setStateSb(() {
+                        _videoRecv = !_videoRecv;
+                      });
+                    },
+                    child: Text(
+                        (_videoRecv ? 'Disable' : 'Enable') + ' Video Recv')),
               ],
             );
           },
@@ -687,8 +635,8 @@ Future deviceSettingDialog(BuildContext context, Call call) async {
       );
     },
   );
-
-  await call.setDevices(videoTrack, audioTrack);
+  await call.setMedia(
+      videoTrack, audioTrack, _screenShare ? displayTrack : null);
 }
 
 Future controlApiCreateDialog(BuildContext context, Call call) {
