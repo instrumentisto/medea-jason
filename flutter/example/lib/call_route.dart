@@ -10,7 +10,6 @@ bool _videoSend = true;
 bool _videoRecv = true;
 bool _audioSend = true;
 bool _audioRecv = true;
-bool _screenShare = false;
 
 class CallRoute extends StatefulWidget {
   final String _roomId;
@@ -458,9 +457,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
               children: [
                 SwitchListTile(
                     title: Text('Screen share'),
-                    value: _screenShare,
+                    value: call.screenShare,
                     onChanged: (v) => setStateSb(() {
-                          _screenShare = v;
+                          call.screenShare = v;
                         })),
                 DropdownButton<String>(
                   value: call.videoDisplayId,
@@ -598,42 +597,58 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                     labelText: 'Device height',
                   ),
                 ),
+                Row(
+                  children: [
+                    TextButton(
+                        onPressed: () async {
+                          await call.setSendAudio(!_audioSend);
+                          setStateSb(() {
+                            _audioSend = !_audioSend;
+                          });
+                        },
+                        child: Text((_audioSend ? 'Disable' : 'Enable') +
+                            ' Audio Send')),
+                    TextButton(
+                        onPressed: () async {
+                          await call.setSendVideo(!_videoSend);
+                          setStateSb(() {
+                            _videoSend = !_videoSend;
+                          });
+                        },
+                        child: Text((_videoSend ? 'Disable' : 'Enable') +
+                            ' Video Send')),
+                  ],
+                ),
+                Row(
+                  children: [
+                    TextButton(
+                        onPressed: () async {
+                          await call.setRecvAudio(!_audioRecv);
+                          setStateSb(() {
+                            _audioRecv = !_audioRecv;
+                          });
+                        },
+                        child: Text((_audioRecv ? 'Disable' : 'Enable') +
+                            ' Audio Recv')),
+                    TextButton(
+                        onPressed: () async {
+                          await call.setRecvVideo(!_videoRecv);
+                          setStateSb(() {
+                            _videoRecv = !_videoRecv;
+                          });
+                        },
+                        child: Text((_videoRecv ? 'Disable' : 'Enable') +
+                            ' Video Recv')),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 TextButton(
                     onPressed: () async {
-                      await call.setSendAudio(!_audioSend);
-                      setStateSb(() {
-                        _audioSend = !_audioSend;
-                      });
+                      await call.setMedia(videoTrack, audioTrack, displayTrack);
                     },
-                    child: Text(
-                        (_audioSend ? 'Disable' : 'Enable') + ' Audio Send')),
-                TextButton(
-                    onPressed: () async {
-                      await call.setRecvAudio(!_audioSend);
-                      setStateSb(() {
-                        _audioRecv = !_audioRecv;
-                      });
-                    },
-                    child: Text(
-                        (_audioRecv ? 'Disable' : 'Enable') + ' Audio Recv')),
-                TextButton(
-                    onPressed: () async {
-                      await call.setSendVideo(!_videoSend);
-                      setStateSb(() {
-                        _videoSend = !_videoSend;
-                      });
-                    },
-                    child: Text(
-                        (_videoSend ? 'Disable' : 'Enable') + ' Video Send')),
-                TextButton(
-                    onPressed: () async {
-                      await call.setRecvVideo(!_videoRecv);
-                      setStateSb(() {
-                        _videoRecv = !_videoRecv;
-                      });
-                    },
-                    child: Text(
-                        (_videoRecv ? 'Disable' : 'Enable') + ' Video Recv')),
+                    child: Text('Set media setting')),
               ],
             );
           },
@@ -641,8 +656,6 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
       );
     },
   );
-  await call.setMedia(
-      videoTrack, audioTrack, _screenShare ? displayTrack : null);
 }
 
 Future controlApiCreateDialog(BuildContext context, Call call) {

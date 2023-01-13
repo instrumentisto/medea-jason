@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'call_route.dart';
+import 'package:faker_dart/faker_dart.dart';
 
 class JoinRoute extends StatefulWidget {
   @override
   _JoinRouteState createState() => _JoinRouteState();
 }
 
+final _faker = Faker.instance;
 const DEFAULT_ROOM_ID = 'pub-pub-video-call';
-const DEFAULT_MEMBER_ID = 'caller';
+final DEFAULT_MEMBER_ID = _faker.name.firstName();
 
 class _JoinRouteState extends State<JoinRoute> {
   String _roomId = DEFAULT_ROOM_ID;

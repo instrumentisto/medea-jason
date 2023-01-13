@@ -45,6 +45,9 @@ class Call {
   /// All local track for current member.
   List<LocalMediaTrack> _tracks = [];
 
+  /// Indicates screen share.
+  bool screenShare = false;
+
   /// Starts a call to the room.
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
@@ -54,17 +57,17 @@ class Call {
 
     var constraints = MediaStreamSettings();
 
-    var id = await _mediaManager.enumerateDevices();
+    var devices = await _mediaManager.enumerateDevices();
 
     if (publishVideo) {
-      videoDeviceId = id
+      videoDeviceId = devices
           .firstWhere((element) => element.kind() == MediaDeviceKind.videoinput)
           .deviceId();
       constraints.deviceVideo(DeviceVideoTrackConstraints());
     }
 
     if (publishAudio) {
-      audioDeviceId = id
+      audioDeviceId = devices
           .firstWhere((element) => element.kind() == MediaDeviceKind.audioinput)
           .deviceId();
       constraints.audio(AudioTrackConstraints());
@@ -83,6 +86,17 @@ class Call {
     tracks.forEach((track) async {
       if (track.kind() == MediaKind.Video) {
         _onLocalDeviceTrack(track.getTrack());
+      }
+    });
+
+    _room.onLocalTrack((track) {
+      _tracks.add(track);
+      if (track.kind() == MediaKind.Video) {
+        if (track.mediaSourceKind() == MediaSourceKind.Device) {
+          _onLocalDeviceTrack(track.getTrack());
+        } else {
+          _onLocalDisplayTrack(track.getTrack());
+        }
       }
     });
 
@@ -111,38 +125,17 @@ class Call {
     }
   }
 
-  /// Creates media settings considering the old ones.
-  MediaStreamSettings buildConstraints() {
-    var constraints = MediaStreamSettings();
-
-    if (videoDeviceId != null) {
-      var vSetting = DeviceVideoTrackConstraints();
-      vSetting.deviceId(videoDeviceId!);
-      constraints.deviceVideo(vSetting);
-    }
-
-    if (audioDeviceId != null) {
-      var aSetting = AudioTrackConstraints();
-      aSetting.deviceId(audioDeviceId!);
-      constraints.audio(aSetting);
-    }
-
-    return constraints;
-  }
-
   /// Sets media tracks according to the passed settings.
-  Future<void> setMedia(
-      DeviceVideoTrackConstraints video,
-      AudioTrackConstraints audio,
-      DisplayVideoTrackConstraints? display) async {
+  Future<void> setMedia(DeviceVideoTrackConstraints video,
+      AudioTrackConstraints audio, DisplayVideoTrackConstraints display) async {
     for (var t in _tracks) {
       await t.free();
     }
 
-    var constraints = buildConstraints();
+    var constraints = MediaStreamSettings();
     constraints.deviceVideo(video);
     constraints.audio(audio);
-    if (display != null) {
+    if (screenShare) {
       constraints.displayVideo(display);
     }
 
@@ -289,6 +282,13 @@ class Call {
     if (enabled) {
       await _room.enableVideo(kind);
     } else {
+      for (var track in _tracks) {
+        try {
+          if (track.kind() == MediaKind.Video) {
+            await track.free();
+          }
+        } catch (_) {}
+      }
       await _room.disableVideo(kind);
     }
   }
@@ -307,6 +307,13 @@ class Call {
     if (enabled) {
       await _room.enableAudio();
     } else {
+      for (var track in _tracks) {
+        try {
+          if (track.kind() == MediaKind.Video) {
+            await track.free();
+          }
+        } catch (_) {}
+      }
       await _room.disableAudio();
     }
   }
