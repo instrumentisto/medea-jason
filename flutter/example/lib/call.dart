@@ -147,7 +147,6 @@ class Call {
     }
 
     _tracks = await _mediaManager.initLocalTracks(constraints);
-
     await _room.setLocalMediaSettings(constraints, true, true);
     for (var track in _tracks) {
       if (track.kind() == MediaKind.Video) {
@@ -158,7 +157,6 @@ class Call {
         }
       }
     }
-    ;
   }
 
   /// Сlears the media and closes the room.

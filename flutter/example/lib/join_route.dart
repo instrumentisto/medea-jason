@@ -13,6 +13,7 @@ const DEFAULT_MEMBER_ID = 'caller';
 class _JoinRouteState extends State<JoinRoute> {
   String _roomId = DEFAULT_ROOM_ID;
   String _memberId = DEFAULT_MEMBER_ID;
+
   bool isPublish = true;
   bool publishAudio = true;
   bool publishVideo = true;

@@ -37,8 +37,8 @@ class _CallState extends State {
   bool _videoEnabled = true;
   bool _audioEnabled = true;
 
-  VideoView? displayView;
-  VideoView? deviceView;
+  VideoView? localScreenVideo;
+  VideoView? localCameraVideo;
 
   final Map<String, List<VideoView>> _videos = {};
   final Call _call = Call();
@@ -61,6 +61,7 @@ class _CallState extends State {
       var renderer = createVideoRenderer();
       await renderer.initialize();
       await renderer.setSrcObject(track);
+
       var remoteTracks = _videos[remoteId];
       if (remoteTracks == null) {
         remoteTracks = List.empty(growable: true);
@@ -72,56 +73,61 @@ class _CallState extends State {
         _videos[remoteId] = remoteTracks!;
       });
     });
+
     _call.onLocalDeviceStream((track) async {
-      if (deviceView == null) {
+      if (localCameraVideo == null) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track);
-        deviceView = VideoView(renderer, mirror: true);
+        localCameraVideo = VideoView(renderer, mirror: true);
 
         var localTracks = _videos['I'];
         if (localTracks == null) {
           localTracks = List.empty(growable: true);
-          localTracks.add(deviceView!);
+          localTracks.add(localCameraVideo!);
         } else {
-          localTracks.add(deviceView!);
+          localTracks.add(localCameraVideo!);
         }
         setState(() {
           _videos['I'] = localTracks!;
         });
       } else {
-        await deviceView!.videoRenderer.setSrcObject(track);
+        await localCameraVideo!.videoRenderer.setSrcObject(track);
       }
     });
+
     _call.onLocalDisplayStream((track) async {
-      if (displayView == null) {
+      if (localScreenVideo == null) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track);
-        displayView = VideoView(renderer, mirror: true);
+        localScreenVideo = VideoView(renderer, mirror: true);
 
         var localTracks = _videos['I'];
         if (localTracks == null) {
           localTracks = List.empty(growable: true);
-          localTracks.add(displayView!);
+          localTracks.add(localScreenVideo!);
         } else {
-          localTracks.add(displayView!);
+          localTracks.add(localScreenVideo!);
         }
         setState(() {
           _videos['I'] = localTracks!;
         });
       } else {
-        await displayView!.videoRenderer.setSrcObject(track);
+        await localScreenVideo!.videoRenderer.setSrcObject(track);
       }
     });
+
     _call.onDeviceChange(() {
       var snackBar = SnackBar(content: Text('On device change'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
+
     _call.onError((err) {
       var snackBar = SnackBar(content: Text(err));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
+
     _call.start(_roomId, _memberId, _isPublish, _publishVideo, _publishAudio,
         _fakeMedia);
     super.initState();

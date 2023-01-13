@@ -117,7 +117,7 @@ test:
 	@make test.e2e up=yes dockerized=no
 
 
-up: up.dev
+up: up.web
 
 
 
@@ -165,13 +165,22 @@ up.control:
 up.demo: docker.up.demo
 
 
-# Run Medea and Jason development environment.
+# Run Medea and Jason web version locally.
 #
 # Usage:
-#	make up.dev
+#	make up.web
 
-up.dev:
-	$(MAKE) -j3 up.jason docker.up.medea up.control
+up.web:
+	$(MAKE) -j3 up.jason.web docker.up.medea up.control
+
+
+# Run Medea and Jason flutter version locally.
+#
+# Usage:
+#	make up.flutter [device=<device-id>]
+
+up.flutter:
+	$(MAKE) -j3 up.jason.flutter docker.up.medea up.control
 
 
 up.medea: docker.up.medea
@@ -182,7 +191,7 @@ up.medea: docker.up.medea
 # Usage:
 #	make up.jason
 
-up.jason:
+up.jason.web:
 	npm run start --prefix=./e2e-demo
 
 # Run Jason E2E demo in development mode on native platform.
@@ -190,7 +199,7 @@ up.jason:
 # Usage:
 #	make up.jason.native [debug=(yes|no)] [device=<device-id>]
 
-up.jason.native:
+up.jason.flutter:
 	cd flutter/example && flutter run $(if $(call eq,$(debug),no),--release,) \
 		$(if $(call eq,$(device),),,-d $(device))
 
@@ -1347,6 +1356,6 @@ endef
         release release.cargo release.helm release.npm \
         rustup.targets \
         test test.e2e test.e2e.browser test.e2e.native test.flutter test.unit \
-        up up.control up.demo up.dev up.jason up.medea \
+        up up.control up.demo up.web up.flutter up.jason.web up.jason.flutter up.medea \
         wait.port \
         yarn yarn.version
