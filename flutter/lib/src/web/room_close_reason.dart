@@ -3,7 +3,7 @@ import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class WebRoomCloseReason extends RoomCloseReason {
+class WebRoomCloseReason implements RoomCloseReason {
   late wasm.RoomCloseReason obj;
 
   WebRoomCloseReason(this.obj);

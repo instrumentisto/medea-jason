@@ -143,7 +143,10 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<sender::State>)>,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        let mut wait_futs = vec![state.when_all_receivers_processed().into()];
+        let mut wait_futs = vec![
+            state.negotiation_role.when_all_processed().into(),
+            state.when_all_receivers_processed().into(),
+        ];
         if matches!(
             state.negotiation_role.get(),
             Some(NegotiationRole::Answerer(_))
@@ -234,10 +237,14 @@ impl Component {
         let _ = state.sync_state.when_eq(SyncState::Synced).await;
         if let Some(role) = state.negotiation_role.get() {
             if state.local_sdp.is_rollback() {
-                peer.peer
-                    .rollback()
-                    .await
-                    .map_err(tracerr::map_from_and_wrap!())?;
+                // TODO: Temporary fix that allows us to ignore rollback
+                //       since it won't work anyway.
+                if state.negotiation_state.get() != NegotiationState::Stable {
+                    peer.peer
+                        .rollback()
+                        .await
+                        .map_err(tracerr::map_from_and_wrap!())?;
+                }
                 if state.local_sdp.is_restart_needed() {
                     state.negotiation_state.set(NegotiationState::WaitLocalSdp);
                 } else {
@@ -383,14 +390,16 @@ impl Component {
     /// Waits for [`sender::Component`]s' and [`receiver::Component`]s'
     /// creation/update, updates local `MediaStream` (if required) and
     /// renegotiates [`PeerConnection`].
-    #[watch(self.negotiation_role.subscribe().filter_map(future::ready))]
+    #[watch(self.negotiation_role.subscribe().filter_map(transpose_guarded))]
     async fn negotiation_role_changed(
         _: Rc<PeerConnection>,
         state: Rc<State>,
-        role: NegotiationRole,
+        role: Guarded<NegotiationRole>,
     ) {
+        let (role, guard) = role.into_parts();
         match role {
             NegotiationRole::Offerer => {
+                drop(guard);
                 medea_reactive::when_all_processed(vec![
                     state.when_all_senders_processed().into(),
                     state.when_all_receivers_processed().into(),
@@ -405,8 +414,8 @@ impl Component {
                 .await;
             }
             NegotiationRole::Answerer(remote_sdp) => {
-                state.when_all_receivers_processed().await;
                 state.set_remote_sdp(remote_sdp);
+                drop(guard);
 
                 medea_reactive::when_all_processed(vec![
                     state.receivers.when_updated().into(),

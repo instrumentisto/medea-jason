@@ -15,7 +15,7 @@ import 'media_stream_settings.dart';
 import 'reconnect_handle.dart';
 import 'room_close_reason.dart';
 
-class WebRoomHandle extends RoomHandle {
+class WebRoomHandle implements RoomHandle {
   late wasm.RoomHandle obj;
 
   WebRoomHandle(this.obj);

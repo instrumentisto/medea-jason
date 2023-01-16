@@ -1,4 +1,5 @@
 /// Request with a fired callback event and its meta information.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Request {
     /// FID (Full ID) of the media `Element`, the occurred event is related to.
@@ -14,6 +15,7 @@ pub struct Request {
 /// Nested message and enum types in `Request`.
 pub mod request {
     /// Occurred event.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Event {
         #[prost(message, tag = "3")]
@@ -26,12 +28,15 @@ pub mod request {
 ///
 /// We don't use `google.protobuf.Empty` to be able to add some fields (if
 /// necessary) in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Response {}
 /// Event notifying about a `Member` joining a `Room`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OnJoin {}
 /// Event notifying about a `Member` leaving its `Room`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OnLeave {
     /// Reason of why the `Member` leaves.
@@ -74,6 +79,16 @@ pub mod on_leave {
                 Reason::Lost => "LOST",
                 Reason::Kicked => "KICKED",
                 Reason::Shutdown => "SHUTDOWN",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "DISCONNECTED" => Some(Self::Disconnected),
+                "LOST" => Some(Self::Lost),
+                "KICKED" => Some(Self::Kicked),
+                "SHUTDOWN" => Some(Self::Shutdown),
+                _ => None,
             }
         }
     }
@@ -174,7 +189,7 @@ pub mod callback_client {
 pub mod callback_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with CallbackServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with CallbackServer.
     #[async_trait]
     pub trait Callback: Send + Sync + 'static {
         /// Fires when a certain callback event happens on a media server.

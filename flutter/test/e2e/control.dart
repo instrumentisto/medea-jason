@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:retry/retry.dart';
 
 Map<String, String> headers = {'Content-Type': 'application/json'};
 
@@ -12,13 +13,13 @@ class Client {
   /// Returns a new Control API [Client].
   Client(this.control_api_address);
 
-  /// Creates the provided media `Element` in the provided `path` on a media
+  /// Creates the provided media `Element` in the provided [path] on a media
   /// server.
   Future<http.Response> create(String path, Object element) async {
-    var response = await inner.post(
+    var response = await retry(() => inner.post(
         Uri.parse(get_url(control_api_address, path)),
         headers: headers,
-        body: json.encode(element));
+        body: json.encode(element)));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -27,8 +28,8 @@ class Client {
 
   /// Deletes a media `Element` identified by the provided [path].
   Future<http.Response> delete(String path) async {
-    var response =
-        await inner.delete(Uri.parse(get_url(control_api_address, path)));
+    var response = await retry(
+        () => inner.delete(Uri.parse(get_url(control_api_address, path))));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -37,8 +38,8 @@ class Client {
 
   /// Returns a media `Element` identified by the provided [path].
   Future<http.Response> get(String path) async {
-    var response =
-        await inner.get(Uri.parse(get_url(control_api_address, path)));
+    var response = await retry(
+        () => inner.get(Uri.parse(get_url(control_api_address, path))));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -48,10 +49,10 @@ class Client {
   /// Applies on a media server the provided media `Element` identified by the
   /// provided [path].
   Future<http.Response> apply(String path, Object element) async {
-    var response = await inner.put(
+    var response = await retry(() => inner.put(
         Uri.parse(get_url(control_api_address, path)),
         headers: headers,
-        body: json.encode(element));
+        body: json.encode(element)));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -60,7 +61,8 @@ class Client {
 
   /// Fetches all callbacks received by Control API mock server.
   Future<http.Response> callbacks() async {
-    var response = await inner.get(Uri.parse('$control_api_address/callbacks'));
+    var response = await retry(
+        () => inner.get(Uri.parse('$control_api_address/callbacks')));
     if (response.statusCode != 200) {
       throw response.body;
     }

@@ -15,13 +15,12 @@ use medea_e2e::object::{
 
 use crate::world::{member::Builder as MemberBuilder, World};
 
-#[allow(clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments, clippy::too_many_lines)]
 #[given(regex = "^(?:room with )?(joined )?member(?:s)? (\\S+)\
                   (?:(?:, | and )(\\S+)(?: and (\\S+)?)?)?\
                   (?: with (no (play |publish )?WebRTC endpoints\
                           |(?:disabled|muted) (media|audio|video) \
                                               (publishing|playing)?))?$")]
-#[allow(clippy::too_many_lines)]
 #[async_recursion(?Send)]
 async fn new_given_member(
     world: &mut World,

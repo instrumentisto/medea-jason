@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
+import 'package:retry/retry.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -57,14 +58,12 @@ StepDefinitionGeneric then_member_has_n_remote_tracks_from =
     await context.world.wait_for_interconnection(id);
     var live = (live_or_stopped == 'live');
 
-    var actual_count = 0;
-    for (var i = 0; i < 10 && actual_count != expected_count; ++i) {
-      actual_count =
+    // We might have to wait for Rust side for a little bit.
+    await retry(() async {
+      var actual_count =
           member.connection_store.count_tracks_by_lived(live, remote_id);
-      await Future.delayed(Duration(milliseconds: 500));
-    }
-
-    expect(actual_count, expected_count);
+      expect(actual_count, expected_count);
+    });
   },
 );
 
@@ -146,6 +145,8 @@ StepDefinitionGeneric then_callback_fires_on_remote_track =
       r'remote (audio|(?:device|display) video) track from (\S+)$'),
   (callback_kind, int times, id, kind, remote_id, context) async {
     var member = context.world.members[id]!;
+    await member.wait_for_connect(remote_id);
+
     await member.wait_for_connect(remote_id);
 
     var parsedKind = parse_media_kind(kind);

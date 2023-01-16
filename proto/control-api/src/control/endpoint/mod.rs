@@ -48,7 +48,6 @@ impl From<WebRtcPublish> for Endpoint {
 /// Spec of an [`Endpoint`] media [`Element`].
 ///
 /// [`Element`]: crate::Element
-#[allow(variant_size_differences)]
 #[derive(Clone, Debug, Eq, From, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(tag = "kind", content = "spec"))]
@@ -83,17 +82,10 @@ pub enum Spec {
 )]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-#[from(types(String, web_rtc_play::Id, web_rtc_publish::Id))]
+#[from(types("&str", String, web_rtc_play::Id, web_rtc_publish::Id))]
 #[into(owned(types(String, web_rtc_play::Id, web_rtc_publish::Id)))]
 #[repr(transparent)]
 pub struct Id(Box<str>);
-
-// TODO: Derive via `derive::From` once it's capable to.
-impl<'a> From<&'a str> for Id {
-    fn from(s: &'a str) -> Self {
-        Self(s.into())
-    }
-}
 
 impl AsRef<web_rtc_play::Id> for Id {
     fn as_ref(&self) -> &web_rtc_play::Id {

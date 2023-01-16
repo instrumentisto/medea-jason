@@ -27,7 +27,7 @@ final _deviceId = dl
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('MediaDisplayInfo__free');
 
-class NativeMediaDisplayInfo extends MediaDisplayInfo {
+class NativeMediaDisplayInfo implements MediaDisplayInfo {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 

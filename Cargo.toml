@@ -27,6 +27,9 @@ members = [
 [lib]
 crate-type = ["cdylib", "rlib", "staticlib"]
 
+[profile.release]
+lto = "fat"
+
 [features]
 default = ["console_error_panic_hook", "wee_alloc"]
 dart-codegen = ["medea-macro/dart-codegen"]
@@ -71,7 +74,7 @@ wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.47"
+    version = "0.3.60"
     features = [
         "console",
         "ConstrainDomStringParameters", "ConstrainDoubleRange",

@@ -44,7 +44,7 @@ final _isFailed = dl.lookupFunction<_nativeIsFailed_C, _nativeIsFailed_Dart>(
 
 final _free = dl.lookupFunction<_free_C, _free_Dart>('MediaDeviceInfo__free');
 
-class NativeMediaDeviceInfo extends MediaDeviceInfo {
+class NativeMediaDeviceInfo implements MediaDeviceInfo {
   /// [Pointer] to the Rust struct backing this object.
   late NullablePointer ptr;
 
