@@ -38,21 +38,24 @@ class Call {
 
   /// Saved selected video device id.
   String? videoDeviceId;
+
   /// Saved selected video device width.
   int? selectedDeviceWidth;
+
   /// Saved selected video device height.
   int? selectedDeviceHeight;
 
   /// Saved selected display id.
   String? videoDisplayId;
+
   /// Saved selected display width.
   int? selectedDisplayWidth;
+
   /// Saved selected display height.
   int? selectedDisplayHeight;
+
   /// Saved selected display framerate.
   int? selectedDisplayFrameRate;
-
-
 
   /// All local track for current member.
   List<LocalMediaTrack> _tracks = [];

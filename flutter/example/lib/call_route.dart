@@ -431,7 +431,6 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
       .where((element) => element.kind() == jason.MediaDeviceKind.audioinput)
       .toList();
 
-
   await showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -472,7 +471,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   }).toList(),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDisplayFrameRate == null ? '30' : call.selectedDisplayFrameRate.toString(),
+                  initialValue: call.selectedDisplayFrameRate == null
+                      ? '30'
+                      : call.selectedDisplayFrameRate.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -485,7 +486,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   ),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDisplayWidth == null ? '640' : call.selectedDisplayWidth.toString(),
+                  initialValue: call.selectedDisplayWidth == null
+                      ? '640'
+                      : call.selectedDisplayWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -498,7 +501,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   ),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDisplayHeight == null ? '480' : call.selectedDisplayHeight.toString(),
+                  initialValue: call.selectedDisplayHeight == null
+                      ? '480'
+                      : call.selectedDisplayHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -555,7 +560,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   }).toList(),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDeviceWidth == null ? '640' : call.selectedDeviceWidth.toString(),
+                  initialValue: call.selectedDeviceWidth == null
+                      ? '640'
+                      : call.selectedDeviceWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -568,7 +575,9 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   ),
                 ),
                 TextFormField(
-                  initialValue: call.selectedDeviceHeight == null ? '480' : call.selectedDeviceHeight.toString(),
+                  initialValue: call.selectedDeviceHeight == null
+                      ? '480'
+                      : call.selectedDeviceHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
@@ -649,7 +658,8 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                         displayTrack.exactWidth(call.selectedDisplayWidth!);
                       }
                       if (call.selectedDisplayFrameRate != null) {
-                        displayTrack.exactFrameRate(call.selectedDisplayFrameRate!);
+                        displayTrack
+                            .exactFrameRate(call.selectedDisplayFrameRate!);
                       }
 
                       var audioTrack = jason.AudioTrackConstraints();
