@@ -423,11 +423,6 @@ Future controlApiDeleteDialog(BuildContext context, Call call) async {
 Future mediaSettingDialog(BuildContext context, Call call) async {
   var displayList = await call.enumerateDisplay();
 
-  var displayTrack = jason.DisplayVideoTrackConstraints();
-  if (call.videoDisplayId != null) {
-    displayTrack.deviceId(call.videoDisplayId!);
-  }
-
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
       .where((element) => element.kind() == jason.MediaDeviceKind.videoinput)
@@ -436,15 +431,6 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
       .where((element) => element.kind() == jason.MediaDeviceKind.audioinput)
       .toList();
 
-  var videoTrack = jason.DeviceVideoTrackConstraints();
-  if (call.videoDeviceId != null) {
-    videoTrack.deviceId(call.videoDeviceId!);
-  }
-
-  var audioTrack = jason.AudioTrackConstraints();
-  if (call.audioDeviceId != null) {
-    audioTrack.deviceId(call.audioDeviceId!);
-  }
 
   await showDialog<void>(
     context: context,
@@ -474,7 +460,6 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                     // This is called when the user selects an item.
                     setStateSb(() {
                       call.videoDisplayId = value!;
-                      displayTrack.deviceId(value);
                     });
                   },
                   items: displayList.map<DropdownMenuItem<String>>((value) {
@@ -487,11 +472,11 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   }).toList(),
                 ),
                 TextFormField(
-                  initialValue: '30',
+                  initialValue: call.selectedDisplayFrameRate == null ? '30' : call.selectedDisplayFrameRate.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
-                      displayTrack.idealFrameRate(int.parse(text));
+                      call.selectedDisplayFrameRate = int.parse(text);
                       // ignore: empty_catches
                     } catch (e) {}
                   },
@@ -500,11 +485,11 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   ),
                 ),
                 TextFormField(
-                  initialValue: '640',
+                  initialValue: call.selectedDisplayWidth == null ? '640' : call.selectedDisplayWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
-                      displayTrack.idealWidth(int.parse(text));
+                      call.selectedDisplayWidth = int.parse(text);
                       // ignore: empty_catches
                     } catch (e) {}
                   },
@@ -513,11 +498,11 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   ),
                 ),
                 TextFormField(
-                  initialValue: '480',
+                  initialValue: call.selectedDisplayHeight == null ? '480' : call.selectedDisplayHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
-                      displayTrack.idealHeight(int.parse(text));
+                      call.selectedDisplayHeight = int.parse(text);
                       // ignore: empty_catches
                     } catch (e) {}
                   },
@@ -538,7 +523,6 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                     // This is called when the user selects an item.
                     setStateSb(() {
                       call.videoDeviceId = value;
-                      videoTrack.deviceId(value!);
                     });
                   },
                   items: videoDevices.map<DropdownMenuItem<String>>((value) {
@@ -561,7 +545,6 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                     // This is called when the user selects an item.
                     setStateSb(() {
                       call.audioDeviceId = value;
-                      audioTrack.deviceId(value!);
                     });
                   },
                   items: audioDevices.map<DropdownMenuItem<String>>((value) {
@@ -572,11 +555,11 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   }).toList(),
                 ),
                 TextFormField(
-                  initialValue: '640',
+                  initialValue: call.selectedDeviceWidth == null ? '640' : call.selectedDeviceWidth.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
-                      videoTrack.idealWidth(int.parse(text));
+                      call.selectedDeviceWidth = int.parse(text);
                       // ignore: empty_catches
                     } catch (e) {}
                   },
@@ -585,11 +568,11 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                   ),
                 ),
                 TextFormField(
-                  initialValue: '480',
+                  initialValue: call.selectedDeviceHeight == null ? '480' : call.selectedDeviceHeight.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (text) {
                     try {
-                      videoTrack.idealHeight(int.parse(text));
+                      call.selectedDeviceHeight = int.parse(text);
                       // ignore: empty_catches
                     } catch (e) {}
                   },
@@ -646,6 +629,32 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
                 ),
                 TextButton(
                     onPressed: () async {
+                      var videoTrack = jason.DeviceVideoTrackConstraints();
+                      videoTrack.deviceId(call.videoDeviceId!);
+                      if (call.selectedDeviceHeight != null) {
+                        videoTrack.exactHeight(call.selectedDeviceHeight!);
+                      }
+                      if (call.selectedDeviceWidth != null) {
+                        videoTrack.exactWidth(call.selectedDeviceWidth!);
+                      }
+
+                      var displayTrack = jason.DisplayVideoTrackConstraints();
+                      if (call.videoDisplayId != null) {
+                        displayTrack.deviceId(call.videoDisplayId!);
+                      }
+                      if (call.selectedDisplayHeight != null) {
+                        displayTrack.exactHeight(call.selectedDisplayHeight!);
+                      }
+                      if (call.selectedDisplayWidth != null) {
+                        displayTrack.exactWidth(call.selectedDisplayWidth!);
+                      }
+                      if (call.selectedDisplayFrameRate != null) {
+                        displayTrack.exactFrameRate(call.selectedDisplayFrameRate!);
+                      }
+
+                      var audioTrack = jason.AudioTrackConstraints();
+                      audioTrack.deviceId(call.audioDeviceId!);
+
                       await call.setMedia(videoTrack, audioTrack, displayTrack);
                     },
                     child: Text('Set media setting')),
