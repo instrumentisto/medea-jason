@@ -17,26 +17,26 @@ const baseUrl = 'ws://127.0.0.1:8080/ws/';
 class Call {
   var client = HttpClient(controlDomain);
 
-  /// Provides access to the control api.
+  /// Provides access to Control API of the media server.
   late ControlApi controlApi = ControlApi(client);
 
   final Jason _jason = Jason();
   late final MediaManagerHandle _mediaManager = _jason.mediaManager();
   late final RoomHandle _room = _jason.initRoom();
 
-  /// Used to create/change a render from a local video device track.
+  /// Callback for creating/changing a render from a local video device track.
   late Function(webrtc.MediaStreamTrack) _onLocalDeviceTrack;
 
-  /// Used to create/change a render from a local video display track.
+  /// Callback for creating/changing a render from a local video display track.
   late Function(webrtc.MediaStreamTrack) _onLocalDisplayTrack;
 
-  /// Used to handle error.
+  /// Errors handler.
   Function(String) _onError = (p0) {};
 
-  /// Saved selected audio device id.
+  /// Saved selected audio device ID.
   String? audioDeviceId;
 
-  /// Saved selected video device id.
+  /// Saved selected video device ID.
   String? videoDeviceId;
 
   /// Saved selected video device width.
@@ -45,7 +45,7 @@ class Call {
   /// Saved selected video device height.
   int? selectedDeviceHeight;
 
-  /// Saved selected display id.
+  /// Saved selected display ID.
   String? videoDisplayId;
 
   /// Saved selected display width.
@@ -60,10 +60,10 @@ class Call {
   /// All local track for current member.
   List<LocalMediaTrack> _tracks = [];
 
-  /// Indicates screen share.
+  /// Indicator of screen sharing.
   bool screenShare = false;
 
-  /// Starts a call to the room.
+  /// Starts a call in the specified room.
   Future<void> start(String roomId, String memberId, bool isPublish,
       bool publishVideo, bool publishAudio, bool fakeMedia) async {
     if (fakeMedia) {
@@ -167,24 +167,24 @@ class Call {
     }
   }
 
-  /// Сlears the media and closes the room.
+  /// Clears the media and closes the room.
   Future<void> dispose() async {
     _tracks.forEach((t) async => await t.free());
     _mediaManager.free();
     _jason.closeRoom(_room);
   }
 
-  /// Sets a callback for new local device track.
+  /// Sets the callback for a new local device track.
   void onLocalDeviceStream(Function(webrtc.MediaStreamTrack) f) {
     _onLocalDeviceTrack = f;
   }
 
-  /// Sets a callback for new local display track.
+  /// Sets the callback for a new local display track.
   void onLocalDisplayStream(Function(webrtc.MediaStreamTrack) f) {
     _onLocalDisplayTrack = f;
   }
 
-  /// Sets a callback for new video remote track.
+  /// Sets the callback for a new video remote track.
   void onNewRemoteStream(Function(webrtc.MediaStreamTrack, String) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
@@ -197,17 +197,17 @@ class Call {
     });
   }
 
-  /// Sets a callback for the `onDeviceСhange` event.
+  /// Sets the callback for `onDeviceСhange` events.
   void onDeviceChange(Function() f) {
     _mediaManager.onDeviceChange(f);
   }
 
-  /// Sets a callback for for error handling.
+  /// Sets the callback for errors handling.
   void onError(Function(String err) f) {
     _onError = f;
   }
 
-  /// mute / unmute audio.
+  /// Mutes or unmutes audio.
   Future<void> toggleAudio(bool enabled) async {
     if (enabled) {
       await _room.unmuteAudio();
@@ -216,7 +216,7 @@ class Call {
     }
   }
 
-  /// mute / unmute video.
+  /// Mutes or unmutes video.
   Future<void> toggleVideo(bool enabled) async {
     if (enabled) {
       await _room.unmuteVideo(MediaSourceKind.Device);
@@ -225,8 +225,7 @@ class Call {
     }
   }
 
-  /// Creates a new room.
-  /// Returns url for join.
+  /// Creates a new room. Returns an URL for joining.
   Future<String> createRoom(String roomId, String memberId, bool isPublish,
       bool publishAudio, bool publishVideo) async {
     var pipeline = HashMap<String, Endpoint>();
@@ -249,8 +248,7 @@ class Call {
     return jsonDecode(resp.body)['sids'][memberId];
   }
 
-  /// Creates a member for the room.
-  /// Returns url for join.
+  /// Creates a member for the specified room. Returns an URL for joining.
   Future<String> createMember(String roomId, String memberId, bool isPublish,
       bool publishAudio, bool publishVideo) async {
     var pipeline = HashMap<String, Endpoint>();
@@ -342,12 +340,12 @@ class Call {
     }
   }
 
-  /// Returns a list of current displays.
+  /// Returns a list of the current displays.
   Future<List<MediaDisplayInfo>> enumerateDisplay() async {
     return _mediaManager.enumerateDisplays();
   }
 
-  /// Returns a list of current devices.
+  /// Returns a list of the current devices.
   Future<List<MediaDeviceInfo>> enumerateDevice() async {
     return _mediaManager.enumerateDevices();
   }

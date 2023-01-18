@@ -165,6 +165,15 @@ up.control:
 up.demo: docker.up.demo
 
 
+# Run Medea and Jason Flutter version locally.
+#
+# Usage:
+#	make up.flutter [device=<device-id>]
+
+up.flutter:
+	$(MAKE) -j3 up.jason.flutter docker.up.medea up.control
+
+
 # Run Medea and Jason web version locally.
 #
 # Usage:
@@ -174,16 +183,18 @@ up.web:
 	$(MAKE) -j3 up.jason.web docker.up.medea up.control
 
 
-# Run Medea and Jason flutter version locally.
+up.medea: docker.up.medea
+
+
+# Run Jason E2E demo in development mode on native platform.
 #
 # Usage:
-#	make up.flutter [device=<device-id>]
+#	make up.jason.native [debug=(yes|no)] [device=<device-id>]
 
-up.flutter:
-	$(MAKE) -j3 up.jason.flutter docker.up.medea up.control
-
-
-up.medea: docker.up.medea
+up.jason.flutter:
+	cd flutter/example/ && \
+	flutter run $(if $(call eq,$(debug),no),--release,) \
+	            $(if $(call eq,$(device),),,-d $(device))
 
 
 # Run Jason E2E demo in development mode.
@@ -193,15 +204,6 @@ up.medea: docker.up.medea
 
 up.jason.web:
 	npm run start --prefix=./e2e-demo
-
-# Run Jason E2E demo in development mode on native platform.
-#
-# Usage:
-#	make up.jason.native [debug=(yes|no)] [device=<device-id>]
-
-up.jason.flutter:
-	cd flutter/example && flutter run $(if $(call eq,$(debug),no),--release,) \
-		$(if $(call eq,$(device),),,-d $(device))
 
 
 
@@ -1356,6 +1358,7 @@ endef
         release release.cargo release.helm release.npm \
         rustup.targets \
         test test.e2e test.e2e.browser test.e2e.native test.flutter test.unit \
-        up up.control up.demo up.web up.flutter up.jason.web up.jason.flutter up.medea \
+        up up.control up.demo up.flutter up.web up.jason.flutter up.jason.web \
+        	up.medea \
         wait.port \
         yarn yarn.version
