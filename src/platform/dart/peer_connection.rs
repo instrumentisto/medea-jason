@@ -6,7 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState,
+    stats::RtcStat, IceConnectionState, IceServer, PeerConnectionState,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -24,14 +24,15 @@ use crate::{
                 peer_connection_state_from_int,
             },
         },
-        IceCandidate, RtcPeerConnectionError, RtcStats, SdpType,
-        TransceiverDirection,
+        IceCandidate, RtcPeerConnectionError, SdpType, TransceiverDirection,
     },
 };
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
     media_track::MediaStreamTrack,
+    rtc_stats::RtcStats,
+    utils::{list::DartList, NonNullDartValueArgExt},
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
@@ -131,6 +132,14 @@ mod peer_connection {
 
         /// Closes the provided [`PeerConnection`].
         pub fn close(peer: Dart_Handle);
+
+        /// Returns stats of the provided [`PeerConnection`].
+        pub fn get_stats(peer: Dart_Handle) -> Dart_Handle;
+
+        /// Gets owned `Dart` stats by rust.
+        pub fn to_owned_stats(
+            stats: Dart_Handle,
+        ) -> ptr::NonNull<crate::api::stats::RTCFfiStats>;
     }
 }
 
@@ -170,8 +179,28 @@ impl RtcPeerConnection {
     /// Returns [`RtcStats`] of this [`RtcPeerConnection`].
     #[allow(clippy::missing_errors_doc, clippy::unused_async)]
     pub async fn get_stats(&self) -> Result<RtcStats> {
-        // TODO: Correct implementation requires `flutter_webrtc`-side rework.
-        Ok(RtcStats(Vec::new()))
+        let handle = self.handle.get();
+
+        let list = unsafe {
+            FutureFromDart::execute::<DartHandle>(peer_connection::get_stats(
+                handle,
+            ))
+            .await
+            .map(DartList::from)
+            .unwrap()
+        };
+
+        let len = list.length();
+        let mut result = Vec::with_capacity(len);
+        for i in 0..len {
+            let handle_stats = list.get(i).unwrap();
+            let val = RtcStat::from(unsafe {
+                peer_connection::to_owned_stats(handle_stats.get()).unbox()
+            });
+            result.push(val);
+        }
+
+        Ok(RtcStats(result))
     }
 
     /// Sets `handler` for a [RTCTrackEvent][1] (see [`ontrack` callback][2]).

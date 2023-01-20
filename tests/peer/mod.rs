@@ -820,14 +820,16 @@ async fn get_traffic_stats() {
     let mut firs_peer_succeeded_pairs_count = 0;
     for stat in first_peer_stats.unwrap().0 {
         match stat.stats {
-            RtcStatsType::OutboundRtp(outbound) => match outbound.media_type {
-                RtcOutboundRtpStreamMediaType::Audio { .. } => {
-                    first_peer_audio_outbound_stats_count += 1
+            RtcStatsType::OutboundRtp(outbound) => {
+                match outbound.media_type.unwrap() {
+                    RtcOutboundRtpStreamMediaType::Audio { .. } => {
+                        first_peer_audio_outbound_stats_count += 1
+                    }
+                    RtcOutboundRtpStreamMediaType::Video { .. } => {
+                        first_peer_video_outbound_stats_count += 1
+                    }
                 }
-                RtcOutboundRtpStreamMediaType::Video { .. } => {
-                    first_peer_video_outbound_stats_count += 1
-                }
-            },
+            }
             RtcStatsType::InboundRtp(_) => {
                 unreachable!(
                     "First `Peer` shouldn't have any `InboundRtp` stats",
@@ -862,7 +864,7 @@ async fn get_traffic_stats() {
                     RtcInboundRtpStreamMediaType::Video { .. } => {
                         second_peer_video_inbound_stats_count += 1
                     }
-                }
+                };
             }
             RtcStatsType::OutboundRtp(_) => unreachable!(
                 "Second Peer shouldn't have any OutboundRtp stats."

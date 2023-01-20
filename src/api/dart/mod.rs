@@ -28,6 +28,7 @@ pub mod reconnect_handle;
 pub mod remote_media_track;
 pub mod room_close_reason;
 pub mod room_handle;
+pub mod stats;
 pub mod utils;
 
 use std::{
@@ -48,6 +49,9 @@ use crate::{
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::{
         self,
+        rtc_stats::{
+            CandidateType, IceRole, Protocol, RTCStatsIceCandidatePairState,
+        },
         utils::{
             dart_api::{
                 Dart_DeletePersistentHandle_DL_Trampolined,
@@ -159,12 +163,23 @@ pub enum DartValue {
     ///
     /// This can also be used to transfer boolean values and C-like enums.
     Int(i64),
+
+    /// Float value.
+    Float(f64),
+
+    /// Boolean value.
+    Bool(bool),
 }
 
 impl Drop for DartValue {
     fn drop(&mut self) {
         match self {
-            Self::Int(_) | Self::Ptr(_) | Self::Handle(_) | Self::None => {}
+            Self::Float(_)
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Ptr(_)
+            | Self::Handle(_)
+            | Self::None => {}
             Self::String(ptr, MemoryOwner::Dart) => unsafe {
                 free_dart_native_string(*ptr);
             },
@@ -312,7 +327,9 @@ impl<T> TryFrom<DartValueArg<T>> for ptr::NonNull<c_void> {
             DartValue::None
             | DartValue::Handle(_)
             | DartValue::String(_, _)
-            | DartValue::Int(_) => Err(DartValueCastError {
+            | DartValue::Int(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_) => Err(DartValueCastError {
                 expectation: "NonNull<c_void>",
                 value: value.0,
             }),
@@ -329,6 +346,8 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<c_void>> {
             DartValue::Ptr(ptr) => Ok(Some(ptr)),
             DartValue::Handle(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "Option<NonNull<c_void>>",
                 value: value.0,
@@ -348,6 +367,8 @@ impl TryFrom<DartValueArg<Self>> for String {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::Handle(_)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "String",
                 value: value.0,
@@ -365,6 +386,8 @@ impl TryFrom<DartValueArg<()>> for () {
             DartValue::Ptr(_)
             | DartValue::Handle(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "()",
                 value: value.0,
@@ -382,12 +405,14 @@ impl TryFrom<DartValueArg<Self>> for Option<DartHandle> {
             DartValue::Handle(handle) => {
                 Ok(Some(unsafe { DartHandle::new(*handle.as_ptr()) }))
             }
-            DartValue::Ptr(_) | DartValue::String(_, _) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<DartHandle>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_)
+            | DartValue::String(_, _)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<DartHandle>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -401,12 +426,14 @@ impl TryFrom<DartValueArg<Self>> for Option<String> {
             DartValue::String(c_str, _) => unsafe {
                 Ok(Some(c_str_into_string(c_str)))
             },
-            DartValue::Ptr(_) | DartValue::Handle(_) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<String>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_)
+            | DartValue::Handle(_)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<String>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -420,6 +447,8 @@ impl<T> TryFrom<DartValueArg<T>> for Dart_Handle {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "Dart_Handle",
                 value: value.0,
@@ -439,6 +468,8 @@ impl TryFrom<DartValueArg<Self>> for DartHandle {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "DartHandle",
                 value: value.0,
@@ -456,6 +487,8 @@ impl<T> TryFrom<DartValueArg<T>> for ptr::NonNull<Dart_Handle> {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "NonNull<Dart_Handle>",
                 value: value.0,
@@ -471,12 +504,14 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<Dart_Handle>> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(c_str) => Ok(Some(c_str)),
-            DartValue::Ptr(_) | DartValue::String(_, _) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<NonNull<Dart_Handle>>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_)
+            | DartValue::String(_, _)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<NonNull<Dart_Handle>>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -541,7 +576,7 @@ macro_rules! impl_primitive_dart_value_try_from {
     }
 }
 
-impl_primitive_dart_value_try_from![i8, i16, i32, i64, u8, u16, u32];
+impl_primitive_dart_value_try_from![i8, i16, i32, i64, u8, u16, u32, u64];
 
 impl<T: PrimitiveEnum> TryFrom<DartValueArg<T>> for i64 {
     type Error = DartValueCastError;
@@ -552,6 +587,8 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<T>> for i64 {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::Handle(_)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::String(_, _) => Err(DartValueCastError {
                 expectation: "i64",
                 value: value.0,
@@ -574,9 +611,49 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<Self>> for Option<T> {
                 }),
             },
             DartValue::Ptr(_)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Handle(_)
             | DartValue::String(_, _) => Err(DartValueCastError {
                 expectation: "Option<i64>",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Self>> for Option<f64> {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Float(num) => Ok(Some(num)),
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Bool(_) => Err(DartValueCastError {
+                expectation: concat!("Option<f64>"),
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Self>> for Option<bool> {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Bool(num) => Ok(Some(num)),
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Float(_) => Err(DartValueCastError {
+                expectation: concat!("Option<f64>"),
                 value: value.0,
             }),
         }
@@ -640,6 +717,61 @@ impl TryFrom<i64> for MediaKind {
         match value {
             0 => Ok(Self::Audio),
             1 => Ok(Self::Video),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for IceRole {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        let res = match value {
+            0 => Self::Unknown,
+            1 => Self::Controlled,
+            2 => Self::Controlling,
+            _ => return Err(value),
+        };
+        Ok(res)
+    }
+}
+
+impl TryFrom<i64> for Protocol {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Tcp),
+            1 => Ok(Self::Udp),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for RTCStatsIceCandidatePairState {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Frozen),
+            1 => Ok(Self::Waiting),
+            2 => Ok(Self::InProgress),
+            3 => Ok(Self::Failed),
+            4 => Ok(Self::Succeeded),
+            _ => Err(value),
+        }
+    }
+}
+
+impl TryFrom<i64> for CandidateType {
+    type Error = i64;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Host),
+            1 => Ok(Self::Srlfx),
+            2 => Ok(Self::Prflx),
+            3 => Ok(Self::Relay),
             _ => Err(value),
         }
     }
