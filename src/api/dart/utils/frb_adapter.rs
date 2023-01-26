@@ -1,15 +1,12 @@
-use dart_sys::Dart_Handle;
+use dart_sys::{Dart_Handle, Dart_NewPersistentHandle_DL};
 use flutter_rust_bridge::DartOpaque;
 
-use crate::{
-    api::ForeignClass,
-    platform::utils::dart_api::Dart_NewPersistentHandle_DL_Trampolined,
-};
+use crate::api::ForeignClass;
 
 /// Creates a new [`DartOpaque`].
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
     DartOpaque::new_non_droppable(
-        Dart_NewPersistentHandle_DL_Trampolined(handle).cast(),
+        Dart_NewPersistentHandle_DL.expect("dart_api_dl has not been initialized")(handle).cast(),
     )
 }
 

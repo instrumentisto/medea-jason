@@ -2,7 +2,6 @@
 
 pub mod callback;
 pub mod completer;
-pub mod dart_api;
 pub mod dart_future;
 pub mod function;
 pub mod handle;

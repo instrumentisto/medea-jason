@@ -22,9 +22,4 @@ fn main() {
     if let Ok("wasm32-unknown-unknown") = env::var("TARGET").as_deref() {
         return;
     }
-
-    println!("cargo:rerun-if-changed=src/platform/dart/api_dl/trampoline.c");
-    cc::Build::new()
-        .file("src/platform/dart/api_dl/trampoline.c")
-        .compile("trampoline");
 }

@@ -25,7 +25,7 @@ use std::{
     panic, ptr,
 };
 
-use dart_sys::{Dart_Handle, _Dart_Handle};
+use dart_sys::{Dart_Handle, _Dart_Handle, Dart_NewPersistentHandle_DL, Dart_DeletePersistentHandle_DL, Dart_PropagateError_DL};
 use derive_more::Display;
 use libc::c_char;
 
@@ -34,11 +34,6 @@ use crate::{
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::utils::{
         c_str_into_string,
-        dart_api::{
-            Dart_DeletePersistentHandle_DL_Trampolined,
-            Dart_NewPersistentHandle_DL_Trampolined,
-            Dart_PropagateError_DL_Trampolined,
-        },
         free_dart_native_string,
         handle::DartHandle,
         string_into_c_str,
@@ -60,7 +55,7 @@ pub use self::{
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
     panic::catch_unwind(panic::AssertUnwindSafe(f)).unwrap_or_else(|_| {
         unsafe {
-            Dart_PropagateError_DL_Trampolined(new_panic_error());
+            Dart_PropagateError_DL.expect("dart_api_dl has not been initialized")(new_panic_error());
         }
         unreachable!("`Dart_PropagateError` should do early return")
     })
@@ -724,7 +719,7 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) {
     let handle = Box::from_raw(val.as_ptr());
-    Dart_DeletePersistentHandle_DL_Trampolined(*handle);
+    Dart_DeletePersistentHandle_DL.expect("dart_api_dl has not been initialized")(*handle);
 }
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
@@ -733,7 +728,7 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
-    let persisted = Dart_NewPersistentHandle_DL_Trampolined(val);
+    let persisted = Dart_NewPersistentHandle_DL.expect("dart_api_dl has not been initialized")(val);
     ptr::NonNull::from(Box::leak(Box::new(persisted)))
 }
 

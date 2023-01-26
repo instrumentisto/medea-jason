@@ -62,7 +62,7 @@ android_logger = "0.11"
 simple_logger = "4.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-dart-sys = "2.0"
+dart-sys = { version = "3.1.12", features = ["dart_api_dl"] }
 libc = "0.2"
 anyhow = "1.0.66"
 flutter_rust_bridge = "=1.58.2"
