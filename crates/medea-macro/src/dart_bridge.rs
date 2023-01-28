@@ -64,8 +64,6 @@ impl TryFrom<syn::ItemMod> for ModExpander {
         let mut use_items = Vec::new();
         let register_prefix = &module.ident;
         for item in parser::try_unwrap_mod_content(module.content)? {
-            // false positive: non_exhaustive
-            #[allow(clippy::wildcard_enum_match_arm)]
             match item {
                 syn::Item::ForeignMod(r#mod) => {
                     for i in r#mod.items {
@@ -78,10 +76,30 @@ impl TryFrom<syn::ItemMod> for ModExpander {
                 syn::Item::Use(r#use) => {
                     use_items.push(r#use);
                 }
-                _ => {
+                syn::Item::Const(_)
+                | syn::Item::Enum(_)
+                | syn::Item::ExternCrate(_)
+                | syn::Item::Fn(_)
+                | syn::Item::Impl(_)
+                | syn::Item::Macro(_)
+                | syn::Item::Macro2(_)
+                | syn::Item::Mod(_)
+                | syn::Item::Static(_)
+                | syn::Item::Struct(_)
+                | syn::Item::Trait(_)
+                | syn::Item::TraitAlias(_)
+                | syn::Item::Type(_)
+                | syn::Item::Union(_)
+                | syn::Item::Verbatim(_) => {
                     return Err(syn::Error::new(
                         item.span(),
                         "Module contains unsupported content",
+                    ));
+                }
+                _ => {
+                    return Err(syn::Error::new(
+                        item.span(),
+                        "Module contains unknown content",
                     ));
                 }
             }

@@ -43,6 +43,7 @@
     clippy::iter_with_drain,
     clippy::large_include_file,
     clippy::lossy_float_literal,
+    clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_const_for_fn,
@@ -50,8 +51,10 @@
     clippy::multiple_inherent_impl,
     clippy::mutex_atomic,
     clippy::mutex_integer,
+    clippy::needless_collect,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
+    clippy::or_fun_call,
     clippy::panic_in_result_fn,
     clippy::partial_pub_fields,
     clippy::pedantic,
@@ -70,6 +73,7 @@
     clippy::string_to_string,
     clippy::suboptimal_flops,
     clippy::suspicious_operation_groupings,
+    clippy::suspicious_xor_used_as_pow,
     clippy::todo,
     clippy::trailing_empty_array,
     clippy::transmute_undefined_repr,
@@ -77,6 +81,8 @@
     clippy::try_err,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
+    clippy::unnecessary_safety_comment,
+    clippy::unnecessary_safety_doc,
     clippy::unnecessary_self_imports,
     clippy::unneeded_field_pattern,
     clippy::unused_peekable,
@@ -116,7 +122,6 @@ mod enum_delegate;
 mod watchers;
 
 use proc_macro::TokenStream;
-use synstructure::decl_derive;
 
 #[cfg(test)]
 use async_trait as _;
@@ -482,7 +487,6 @@ pub fn watchers(_: TokenStream, input: TokenStream) -> TokenStream {
         .unwrap_or_else(|e| e.to_compile_error().into())
 }
 
-decl_derive!([Caused, attributes(cause)] =>
 /// Generate implementation of `Caused` trait for errors represented as enum.
 ///
 /// # How to use
@@ -539,7 +543,16 @@ decl_derive!([Caused, attributes(cause)] =>
 /// let err = BarError::Foo(FooError::MyError(MyError {}));
 /// assert!(err.cause().is_some());
 /// ```
-caused::derive);
+#[proc_macro_derive(Caused, attributes(cause))]
+pub fn derive_caused(input: TokenStream) -> TokenStream {
+    syn::parse::<syn::DeriveInput>(input)
+        .and_then(|i| {
+            synstructure::Structure::try_new(&i)
+                .and_then(|mut s| caused::derive(&mut s))
+        })
+        .unwrap_or_else(|e| e.to_compile_error())
+        .into()
+}
 
 /// Generates code for `extern` Dart functions registration and calling.
 ///

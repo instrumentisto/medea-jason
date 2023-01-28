@@ -16,9 +16,8 @@ use synstructure::{BindStyle, Structure};
 ///     - otherwise returns `None`.
 /// 3. Generate implementation of `Caused` trait for this enum with generated
 ///    methods from step 1 and 2.
-#[allow(clippy::needless_pass_by_value)]
-pub(crate) fn derive(mut s: Structure<'_>) -> Result<TokenStream> {
-    let error_type = error_type(&s)?;
+pub(crate) fn derive(s: &mut Structure<'_>) -> Result<TokenStream> {
+    let error_type = error_type(s)?;
 
     let cause_body = s.bind_with(|_| BindStyle::Move).each_variant(|v| {
         v.bindings().iter().find(|&bi| is_caused(bi)).map_or_else(
