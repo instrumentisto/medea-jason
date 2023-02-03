@@ -61,7 +61,6 @@ impl Track {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-muted
-    #[allow(clippy::mut_mut)]
     #[must_use]
     pub fn new<T>(
         track: T,

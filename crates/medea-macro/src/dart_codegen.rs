@@ -157,7 +157,6 @@ impl DartType {
 impl TryFrom<syn::Type> for DartType {
     type Error = syn::Error;
 
-    #[allow(clippy::wildcard_enum_match_arm)] // false positive: non_exhaustive
     fn try_from(value: syn::Type) -> syn::Result<Self> {
         Ok(match value {
             syn::Type::Path(p) => {
@@ -185,8 +184,24 @@ impl TryFrom<syn::Type> for DartType {
                     }
                 }
             }
-            _ => {
+            syn::Type::Array(_)
+            | syn::Type::BareFn(_)
+            | syn::Type::Group(_)
+            | syn::Type::ImplTrait(_)
+            | syn::Type::Infer(_)
+            | syn::Type::Macro(_)
+            | syn::Type::Never(_)
+            | syn::Type::Paren(_)
+            | syn::Type::Ptr(_)
+            | syn::Type::Reference(_)
+            | syn::Type::Slice(_)
+            | syn::Type::TraitObject(_)
+            | syn::Type::Tuple(_)
+            | syn::Type::Verbatim(_) => {
                 return Err(syn::Error::new(value.span(), "Unsupported type"));
+            }
+            _ => {
+                return Err(syn::Error::new(value.span(), "Unknown type"));
             }
         })
     }
