@@ -544,7 +544,7 @@ jobs:
       - name: Install linux dependencies
         run: |
           apt update
-          apt install -y curl xz-utils make clang
+          apt install -y clang curl make xz-utils
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -1033,7 +1033,8 @@ jobs:
                                ver=${{ steps.release.outputs.group2 }})"
              >> $GITHUB_OUTPUT
 
-      - uses: softprops/action-gh-release@v1
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
         with:
           name: ${{ steps.release.outputs.group1 }} ${{ steps.release.outputs.group2 }}
           body: |

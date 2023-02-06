@@ -897,7 +897,11 @@ impl Wire2Api<ConstrainU32> for *mut wire_ConstrainU32 {
         Wire2Api::<ConstrainU32>::wire2api(*wrap).into()
     }
 }
-
+impl Wire2Api<i64> for *mut i64 {
+    fn wire2api(self) -> i64 {
+        unsafe { *support::box_from_leak_ptr(self) }
+    }
+}
 impl Wire2Api<ConstrainU32> for wire_ConstrainU32 {
     fn wire2api(self) -> ConstrainU32 {
         match self.tag {
