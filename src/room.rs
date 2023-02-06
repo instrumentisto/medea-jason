@@ -817,7 +817,6 @@ pub struct Room(Rc<InnerRoom>);
 
 impl Room {
     /// Creates new [`Room`] and associates it with the provided [`RpcSession`].
-    #[allow(clippy::mut_mut)]
     pub fn new(
         rpc: Rc<dyn RpcSession>,
         media_manager: Rc<MediaManager>,

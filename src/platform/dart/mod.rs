@@ -68,12 +68,13 @@ pub fn set_panic_callback(cb: Function<String>) {
 }
 
 #[cfg(target_os = "android")]
-/// Initializes [`android_logger`] as the default application logger with
-/// minimal log level set to [`log::Level::Debug`].
+/// Initializes [`android_logger`] as the default application logger with filter
+/// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
     // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
-        android_logger::Config::default().with_min_level(log::Level::Debug),
+        android_logger::Config::default()
+            .with_max_level(log::LevelFilter::Debug),
     );
 }
 

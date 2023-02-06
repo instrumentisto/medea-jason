@@ -50,7 +50,7 @@ impl TryFrom<&JsValue> for RtcStats {
                 .map_err(Rc::new)
                 .map_err(tracerr::from_and_wrap!())?;
 
-            if let RtcStatsType::Other = &rtc_stat.stats {
+            if matches!(rtc_stat.stats, RtcStatsType::Other) {
                 continue;
             }
 

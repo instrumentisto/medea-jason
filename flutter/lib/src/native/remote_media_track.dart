@@ -7,7 +7,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
-class NativeRemoteMediaTrack extends RemoteMediaTrack {
+class NativeRemoteMediaTrack implements RemoteMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.RemoteMediaTrack> opaque;
 
@@ -67,7 +67,7 @@ class NativeRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
 

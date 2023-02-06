@@ -9,7 +9,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
-class NativeConnectionHandle extends ConnectionHandle {
+class NativeConnectionHandle implements ConnectionHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.ConnectionHandle> opaque;
 

@@ -22,6 +22,7 @@ dependencies:
 
 
 dev_dependencies:
+  faker_dart: ^0.1.11
   flutter_gherkin: 3.0.0-rc.17
   flutter_test:
     sdk: flutter

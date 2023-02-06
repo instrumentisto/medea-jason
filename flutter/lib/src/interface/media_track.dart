@@ -9,7 +9,7 @@ import '../native/ffi/jason_api.g.dart'
 typedef TrackMediaDirection = MediaDirection;
 
 /// Abstraction of a handle to an object allocated on the Rust side.
-abstract class MediaTrack implements PlatformHandle {
+abstract class MediaTrack implements AsyncPlatformHandle {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
   /// audio track, or the [MediaKind.Video] if it represents a video track.
   MediaKind kind();

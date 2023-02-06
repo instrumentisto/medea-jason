@@ -10,7 +10,7 @@ import 'ffi/jason_api.g.dart' as frb;
 import '../interface/display_video_track_constraints.dart'
     as base_display_video;
 
-class MediaStreamSettings extends base.MediaStreamSettings {
+class MediaStreamSettings implements base.MediaStreamSettings {
   /// Rust `flutter_rust_bridge` api representation.
   final frb.ApiMediaStreamSettings setting = frb.ApiMediaStreamSettings(
       audio: frb.ApiAudioTrackConstrs(), deviceVideo: null, displayVideo: null);

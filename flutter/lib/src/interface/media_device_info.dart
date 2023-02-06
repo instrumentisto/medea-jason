@@ -6,7 +6,7 @@ export '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
 /// [`MediaDeviceInfo`][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
-abstract class MediaDeviceInfo implements PlatformHandle {
+abstract class MediaDeviceInfo implements SyncPlatformHandle {
   /// Returns an unique identifier of the represented device.
   String deviceId();
 

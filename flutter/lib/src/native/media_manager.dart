@@ -13,7 +13,7 @@ import 'local_media_track.dart';
 import 'media_device_info.dart';
 import 'media_display_info.dart';
 
-class NativeMediaManagerHandle extends MediaManagerHandle {
+class NativeMediaManagerHandle implements MediaManagerHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.MediaManagerHandle> opaque;
 

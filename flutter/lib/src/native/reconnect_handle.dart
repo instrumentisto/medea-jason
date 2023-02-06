@@ -7,7 +7,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
-class NativeReconnectHandle extends ReconnectHandle {
+class NativeReconnectHandle implements ReconnectHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.ReconnectHandle> opaque;
 

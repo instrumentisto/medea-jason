@@ -3,7 +3,7 @@ import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class WebMediaDeviceInfo extends MediaDeviceInfo {
+class WebMediaDeviceInfo implements MediaDeviceInfo {
   late wasm.MediaDeviceInfo obj;
 
   WebMediaDeviceInfo(this.obj);

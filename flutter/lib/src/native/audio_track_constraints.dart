@@ -1,7 +1,7 @@
 import '../interface/audio_track_constraints.dart' as base;
 import 'ffi/jason_api.g.dart' as frb;
 
-class AudioTrackConstraints extends base.AudioTrackConstraints {
+class AudioTrackConstraints implements base.AudioTrackConstraints {
   /// Rust `flutter_rust_bridge` api representation.
   final frb.ApiAudioTrackConstrs constraints =
       frb.ApiAudioTrackConstrs(deviceId: null);

@@ -7,7 +7,7 @@ import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
-class NativeLocalMediaTrack extends LocalMediaTrack {
+class NativeLocalMediaTrack implements LocalMediaTrack {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.LocalMediaTrack> opaque;
 
@@ -36,11 +36,10 @@ class NativeLocalMediaTrack extends LocalMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-
-      opaque.dispose();
+      await (api.localMediaTrackFree(track: opaque.moveOpaque) as Future);
     }
   }
 }

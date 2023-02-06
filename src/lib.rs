@@ -42,6 +42,7 @@
     clippy::iter_with_drain,
     clippy::large_include_file,
     clippy::lossy_float_literal,
+    clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_const_for_fn,
@@ -49,8 +50,10 @@
     clippy::multiple_inherent_impl,
     clippy::mutex_atomic,
     clippy::mutex_integer,
+    clippy::needless_collect,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
+    clippy::or_fun_call,
     clippy::panic_in_result_fn,
     clippy::partial_pub_fields,
     clippy::pedantic,
@@ -69,6 +72,7 @@
     clippy::string_to_string,
     clippy::suboptimal_flops,
     clippy::suspicious_operation_groupings,
+    clippy::suspicious_xor_used_as_pow,
     clippy::todo,
     clippy::trailing_empty_array,
     clippy::transmute_undefined_repr,
@@ -76,6 +80,8 @@
     clippy::try_err,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
+    clippy::unnecessary_safety_comment,
+    clippy::unnecessary_safety_doc,
     clippy::unnecessary_self_imports,
     clippy::unneeded_field_pattern,
     clippy::unused_peekable,
@@ -110,6 +116,8 @@
 #![allow(
     clippy::module_name_repetitions,
     clippy::unimplemented,
+    clippy::unnecessary_safety_comment,
+    clippy::unnecessary_safety_doc,
     unreachable_pub
 )]
 // TODO: Remove on next `derive_more` major version.

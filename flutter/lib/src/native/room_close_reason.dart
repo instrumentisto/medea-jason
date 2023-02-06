@@ -2,7 +2,7 @@ import '../interface/room_close_reason.dart';
 import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
-class NativeRoomCloseReason extends RoomCloseReason {
+class NativeRoomCloseReason implements RoomCloseReason {
   /// Rust `flutter_rust_bridge` api representation.
   final frb.RoomCloseReason _closeReason;
 

@@ -49,7 +49,7 @@ void main() {
     expect(video.isNotEmpty, isTrue);
     expect(video.first.mediaSourceKind(), equals(MediaSourceKind.Device));
 
-    tracks.first.free();
+    await tracks.first.free();
     expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
   });
 

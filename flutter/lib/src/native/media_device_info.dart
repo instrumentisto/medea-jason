@@ -2,7 +2,7 @@ import '../interface/media_device_info.dart';
 import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
-class NativeMediaDeviceInfo extends MediaDeviceInfo {
+class NativeMediaDeviceInfo implements MediaDeviceInfo {
   /// Rust `flutter_rust_bridge` api representation.
   final frb.ApiMediaDeviceInfo _info;
 

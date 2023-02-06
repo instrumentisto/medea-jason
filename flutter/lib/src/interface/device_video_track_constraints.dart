@@ -3,7 +3,7 @@ import '/src/util/rust_handles_storage.dart';
 
 export '../native/ffi/jason_api.g.dart' show FacingMode;
 
-abstract class DeviceVideoTrackConstraints implements PlatformHandle {
+abstract class DeviceVideoTrackConstraints implements SyncPlatformHandle {
   /// Sets an exact [`deviceId`][1] constraint.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId

@@ -103,9 +103,9 @@ DynamicLibrary _dl_load() {
 
 frb.MedeaJason _init_api() {
   var api = frb.MedeaJasonImpl(dl);
-  api.onPanic(cb: (msg) {
+  api.onPanic(cb: (msg) async {
     msg as String;
-    RustHandlesStorage().freeAll();
+    await RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {
       _onPanicCallback!(msg);
     }
@@ -113,7 +113,7 @@ frb.MedeaJason _init_api() {
   return api;
 }
 
-class Jason extends base.Jason {
+class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.Jason> opaque = RustOpaque(api.jasonNew());
 

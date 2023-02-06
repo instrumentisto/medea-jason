@@ -17,7 +17,7 @@ import 'media_stream_settings.dart';
 import 'reconnect_handle.dart';
 import 'room_close_reason.dart';
 
-class NativeRoomHandle extends RoomHandle {
+class NativeRoomHandle implements RoomHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.RoomHandle> opaque;
 
