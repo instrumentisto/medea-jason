@@ -4,7 +4,10 @@ mod task;
 
 use std::{future::Future, ptr, rc::Rc};
 
-use dart_sys::{Dart_CObject, Dart_Port, Dart_PostCObject_DL, Dart_CObject_Type_Dart_CObject_kInt64, _Dart_CObject__bindgen_ty_1};
+use dart_sys::{
+    Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
+    Dart_PostCObject_DL, _Dart_CObject__bindgen_ty_1,
+};
 
 use crate::api::propagate_panic;
 
@@ -52,20 +55,24 @@ pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
 /// Sends command that contains the provided [`Task`] to the configured
 /// [`WAKE_PORT`]. When received, Dart must poll it by calling the
 /// [`rust_executor_poll_task()`] function.
+#[allow(clippy::expect_used)]
 fn task_wake(task: Rc<Task>) {
     let wake_port = unsafe { WAKE_PORT }.unwrap();
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
         type_: Dart_CObject_Type_Dart_CObject_kInt64,
-        value: _Dart_CObject__bindgen_ty_1
-        {
-            as_int64: task as i64
-        }
+        value: _Dart_CObject__bindgen_ty_1 {
+            as_int64: task as i64,
+        },
     };
 
-    let enqueued =
-        unsafe { Dart_PostCObject_DL.expect("dart_api_dl has not been initialized")(wake_port, &mut task_addr) };
+    let enqueued = unsafe {
+        Dart_PostCObject_DL.expect("dart_api_dl has not been initialized")(
+            wake_port,
+            &mut task_addr,
+        )
+    };
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {

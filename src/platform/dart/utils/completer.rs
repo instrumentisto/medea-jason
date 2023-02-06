@@ -12,7 +12,10 @@
 
 use std::{marker::PhantomData, time::Duration};
 
-use dart_sys::{Dart_Handle, Dart_PersistentHandle, Dart_NewPersistentHandle_DL, Dart_HandleFromPersistent_DL};
+use dart_sys::{
+    Dart_Handle, Dart_HandleFromPersistent_DL, Dart_NewPersistentHandle_DL,
+    Dart_PersistentHandle,
+};
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -114,7 +117,10 @@ impl<T, E> Completer<T, E> {
     pub fn new() -> Self {
         let handle = unsafe {
             let completer = completer::init();
-            Dart_NewPersistentHandle_DL.expect("dart_api_dl has not been initialized")(completer)
+            Dart_NewPersistentHandle_DL
+                .expect("dart_api_dl has not been initialized")(
+                completer
+            )
         };
         Self {
             handle,
@@ -130,7 +136,10 @@ impl<T, E> Completer<T, E> {
     #[must_use]
     pub fn future(&self) -> Dart_Handle {
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL.expect("dart_api_dl has not been initialized")(self.handle);
+            let handle = Dart_HandleFromPersistent_DL
+                .expect("dart_api_dl has not been initialized")(
+                self.handle
+            );
             completer::future(handle)
         }
     }
@@ -149,7 +158,10 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete(&self, arg: T) {
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL.expect("dart_api_dl has not been initialized")(self.handle);
+            let handle = Dart_HandleFromPersistent_DL
+                .expect("dart_api_dl has not been initialized")(
+                self.handle
+            );
             completer::complete(handle, arg.into());
         }
     }
@@ -161,7 +173,10 @@ impl<T> Completer<T, DartError> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete_error(&self, e: DartError) {
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL.expect("dart_api_dl has not been initialized")(self.handle);
+            let handle = Dart_HandleFromPersistent_DL
+                .expect("dart_api_dl has not been initialized")(
+                self.handle
+            );
             completer::complete_error(handle, e);
         }
     }

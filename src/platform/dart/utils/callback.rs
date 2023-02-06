@@ -198,7 +198,8 @@ impl Callback {
             };
 
             if is_finalizable {
-                let _ = Dart_NewFinalizableHandle_DL.expect("dart_api_dl has not been initialized")(
+                let _ = Dart_NewFinalizableHandle_DL
+                    .expect("dart_api_dl has not been initialized")(
                     handle,
                     f.as_ptr().cast::<c_void>(),
                     mem::size_of::<Self>() as libc::intptr_t,

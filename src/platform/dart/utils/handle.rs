@@ -3,15 +3,14 @@
 
 use std::{fmt, rc::Rc};
 
-use dart_sys::{Dart_Handle, Dart_PersistentHandle, Dart_IsError_DL, Dart_GetError_DL, Dart_NewPersistentHandle_DL, Dart_HandleFromPersistent_DL, Dart_DeletePersistentHandle_DL};
+use dart_sys::{
+    Dart_DeletePersistentHandle_DL, Dart_GetError_DL, Dart_Handle,
+    Dart_HandleFromPersistent_DL, Dart_IsError_DL, Dart_NewPersistentHandle_DL,
+    Dart_PersistentHandle,
+};
 use medea_macro::dart_bridge;
 
-use crate::platform::{
-    utils::{
-        c_str_into_string,
-        dart_string_into_rust,
-    },
-};
+use crate::platform::utils::{c_str_into_string, dart_string_into_rust};
 
 #[dart_bridge("flutter/lib/src/native/platform/object.g.dart")]
 mod handle {
@@ -50,13 +49,20 @@ impl DartHandle {
     /// unexpected situation.
     #[must_use]
     pub unsafe fn new(handle: Dart_Handle) -> Self {
-        if Dart_IsError_DL.expect("dart_api_dl has not been initialized")(handle) {
-            let pointer = Dart_GetError_DL.expect("dart_api_dl has not been initialized")(handle);
-            let err_msg =
-                c_str_into_string(pointer.as_ref().unwrap().into());
+        if Dart_IsError_DL.expect("dart_api_dl has not been initialized")(
+            handle,
+        ) {
+            let pointer = Dart_GetError_DL
+                .expect("dart_api_dl has not been initialized")(
+                handle
+            );
+            let err_msg = c_str_into_string(pointer.as_ref().unwrap().into());
             panic!("Unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(Dart_NewPersistentHandle_DL.expect("dart_api_dl has not been initialized")(handle)))
+        Self(Rc::new(Dart_NewPersistentHandle_DL
+            .expect("dart_api_dl has not been initialized")(
+            handle
+        )))
     }
 
     /// Returns the underlying [`Dart_Handle`].
@@ -64,7 +70,12 @@ impl DartHandle {
     pub fn get(&self) -> Dart_Handle {
         // SAFETY: We don't expose the inner `Dart_PersistentHandle` anywhere,
         //         so we're sure that it's valid at this point.
-        unsafe { Dart_HandleFromPersistent_DL.expect("dart_api_dl has not been initialized")(*self.0) }
+        unsafe {
+            Dart_HandleFromPersistent_DL
+                .expect("dart_api_dl has not been initialized")(
+                *self.0
+            )
+        }
     }
 
     /// Returns string representation of a runtime Dart type behind this
@@ -88,7 +99,10 @@ impl Drop for DartHandle {
     fn drop(&mut self) {
         if let Some(handle) = Rc::get_mut(&mut self.0) {
             unsafe {
-                Dart_DeletePersistentHandle_DL.expect("dart_api_dl has not been initialized")(*handle);
+                Dart_DeletePersistentHandle_DL
+                    .expect("dart_api_dl has not been initialized")(
+                    *handle
+                );
             }
         }
     }

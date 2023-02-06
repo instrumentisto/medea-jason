@@ -347,6 +347,25 @@ pub fn local_media_track_media_source_kind(
     SyncReturn(track.media_source_kind())
 }
 
+/// Frees the data behind the provided opaque local track.
+#[must_use]
+pub fn local_media_track_free(
+    track: RustOpaque<LocalMediaTrack>,
+) -> SyncReturn<DartOpaque> {
+    let track = track.try_unwrap().unwrap();
+    let dart_opaque = unsafe {
+        new_dart_opaque(
+            async move {
+                track.maybe_stop().await;
+                Ok::<_, Error>(())
+            }
+            .into_dart_future()
+            .into_raw(),
+        )
+    };
+    SyncReturn(dart_opaque)
+}
+
 // -------------------------------------------------------------------
 
 /// Returns the [`Vec<MediaDeviceInfo>`] from the address

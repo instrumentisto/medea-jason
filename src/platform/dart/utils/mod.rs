@@ -1,3 +1,4 @@
+#![allow(clippy::expect_used)]
 //! Multiplatform Dart runtime specific utility structs and functions.
 
 pub mod callback;

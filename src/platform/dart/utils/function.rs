@@ -9,7 +9,10 @@
 
 use std::marker::PhantomData;
 
-use dart_sys::{Dart_PersistentHandle, Dart_HandleFromPersistent_DL, Dart_DeletePersistentHandle_DL};
+use dart_sys::{
+    Dart_DeletePersistentHandle_DL, Dart_HandleFromPersistent_DL,
+    Dart_PersistentHandle,
+};
 use medea_macro::dart_bridge;
 
 use crate::{api::DartValue, platform::Callback};
@@ -77,8 +80,10 @@ impl<T: Into<DartValue>> Function<T> {
     /// Calls the underlying Dart closure with the provided argument.
     pub fn call1(&self, arg: T) {
         unsafe {
-            let fn_handle =
-                Dart_HandleFromPersistent_DL.expect("dart_api_dl has not been initialized")(self.dart_fn);
+            let fn_handle = Dart_HandleFromPersistent_DL
+                .expect("dart_api_dl has not been initialized")(
+                self.dart_fn
+            );
             function::caller(fn_handle, arg.into());
         }
     }
@@ -88,7 +93,10 @@ impl<T> Drop for Function<T> {
     /// Manually deallocates saved [`Dart_PersistentHandle`] so it won't leak.
     fn drop(&mut self) {
         unsafe {
-            Dart_DeletePersistentHandle_DL.expect("dart_api_dl has not been initialized")(self.dart_fn);
+            Dart_DeletePersistentHandle_DL
+                .expect("dart_api_dl has not been initialized")(
+                self.dart_fn
+            );
         }
     }
 }

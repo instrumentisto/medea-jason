@@ -148,7 +148,6 @@ pub mod rpc;
 #[allow(
     clippy::as_conversions,
     clippy::default_trait_access,
-    clippy::let_underscore_drop,
     clippy::missing_docs_in_private_items,
     clippy::ptr_as_ptr,
     clippy::undocumented_unsafe_blocks,

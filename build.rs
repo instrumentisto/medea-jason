@@ -18,8 +18,4 @@ fn main() {
              @rpath/libmedea_jason.dylib"
         );
     }
-
-    if let Ok("wasm32-unknown-unknown") = env::var("TARGET").as_deref() {
-        return;
-    }
 }

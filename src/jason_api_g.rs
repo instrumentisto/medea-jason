@@ -14,27 +14,24 @@
 use crate::jason_api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::ffi::c_void;
-use std::sync::Arc;
+use std::{ffi::c_void, sync::Arc};
 
 // Section: imports
 
-use crate::api::dart::api_struct::ApiAudioTrackConstrs;
-use crate::api::dart::api_struct::ApiConstrainFacingMode;
-use crate::api::dart::api_struct::ApiDeviceVideoTrackConstrs;
-use crate::api::dart::api_struct::ApiDisplayVideoTrackConstrs;
-use crate::api::dart::api_struct::ApiMediaDeviceInfo;
-use crate::api::dart::api_struct::ApiMediaDisplayInfo;
-use crate::api::dart::api_struct::ApiMediaStreamSettings;
-use crate::api::dart::api_struct::ApiOptionConstrainFacingMode;
-use crate::api::dart::api_struct::ApiOptionConstrainU32;
-use crate::media::constraints::ConstrainU32;
-use crate::media::constraints::FacingMode;
-use crate::media::track::remote::MediaDirection;
-use crate::media::track::MediaSourceKind;
-use crate::media::MediaDeviceKind;
-use crate::media::MediaKind;
-use crate::room::RoomCloseReason;
+use crate::{
+    api::dart::api_struct::{
+        ApiAudioTrackConstrs, ApiConstrainFacingMode,
+        ApiDeviceVideoTrackConstrs, ApiDisplayVideoTrackConstrs,
+        ApiMediaDeviceInfo, ApiMediaDisplayInfo, ApiMediaStreamSettings,
+        ApiOptionConstrainFacingMode, ApiOptionConstrainU32,
+    },
+    media::{
+        constraints::{ConstrainU32, FacingMode},
+        track::{remote::MediaDirection, MediaSourceKind},
+        MediaDeviceKind, MediaKind,
+    },
+    room::RoomCloseReason,
+};
 
 // Section: wire functions
 
@@ -348,6 +345,21 @@ fn wire_local_media_track_media_source_kind_impl(
         move || {
             let api_track = track.wire2api();
             Ok(local_media_track_media_source_kind(api_track))
+        },
+    )
+}
+fn wire_local_media_track_free_impl(
+    track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "local_media_track_free",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_track = track.wire2api();
+            Ok(local_media_track_free(api_track))
         },
     )
 }
@@ -1228,7 +1240,8 @@ impl support::IntoDartExceptPrimitive for RoomCloseReason {}
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
+        Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]

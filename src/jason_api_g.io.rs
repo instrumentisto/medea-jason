@@ -146,6 +146,13 @@ pub extern "C" fn wire_local_media_track_media_source_kind(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_local_media_track_free(
+    track: wire_LocalMediaTrack,
+) -> support::WireSyncReturn {
+    wire_local_media_track_free_impl(track)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_vec_media_device_info_from_ptr(
     ptr: usize,
 ) -> support::WireSyncReturn {
