@@ -47,6 +47,8 @@ pub use self::{
     utils::{completer::delay_for, Function},
 };
 
+/// Function to initialize `dart_api_dl` functions.
+///
 /// # Safety
 ///
 /// This function should never be called manually.

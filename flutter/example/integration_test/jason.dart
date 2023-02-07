@@ -30,7 +30,12 @@ void main() {
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
 
-    expect(devices.length, equals(2));
+    var deviceLenght = 2;
+    if (Platform.isAndroid) {
+      deviceLenght = 3;
+    }
+
+    expect(devices.length, equals(deviceLenght));
     expect(tracks.length, equals(2));
 
     expect((devices.first as NativeMediaDeviceInfo),

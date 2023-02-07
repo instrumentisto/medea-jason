@@ -785,7 +785,6 @@ ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
 endif
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
-		-v \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \
 		$(if $(call eq,$(server),),,--dart-define=IP_TEST_BASE=$(server)) \
@@ -803,7 +802,6 @@ endif
 test.flutter:
 	cd flutter/example/ && \
 	flutter drive --driver=test_driver/integration_test.dart \
-				  -v \
 	              --target=integration_test/jason.dart \
 	              $(if $(call eq,$(device),),,-d $(device))
 
