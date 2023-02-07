@@ -29,6 +29,9 @@ pub mod utils;
 
 use std::panic;
 
+use dart_sys::Dart_InitializeApiDL;
+use libc::c_void;
+
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
@@ -43,6 +46,14 @@ pub use self::{
     transport::WebSocketRpcTransport,
     utils::{completer::delay_for, Function},
 };
+
+/// # Safety
+///
+/// This function should never be called manually.
+#[no_mangle]
+pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
+    Dart_InitializeApiDL(data)
+}
 
 /// Sets Rust's [`panic!`] hook providing backtrace of the occurred panic to
 /// Dart's functions.

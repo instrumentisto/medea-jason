@@ -86,6 +86,14 @@ DynamicLibrary _dl_load() {
           ? DynamicLibrary.executable()
           : DynamicLibrary.open(path);
 
+  var initResult = _dl.lookupFunction<IntPtr Function(Pointer<Void>),
+          int Function(Pointer<Void>)>('init_jason_dart_api_dl')(
+      NativeApi.initializeApiDLData);
+
+  if (initResult != 0) {
+    throw 'Failed to initialize Dart API. Code: $initResult';
+  }
+
   callback.registerFunctions(_dl);
   completer.registerFunctions(_dl);
   exceptions.registerFunctions(_dl);
@@ -105,7 +113,6 @@ frb.MedeaJason _init_api() {
   var api = frb.MedeaJasonImpl(dl);
   api.onPanic(cb: (msg) async {
     msg as String;
-    print(msg);
     await RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {
       _onPanicCallback!(msg);
