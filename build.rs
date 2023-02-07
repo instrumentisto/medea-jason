@@ -12,7 +12,7 @@ fn main() {
 
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     if target_os == "macos" {
-        println!("cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET=10.11");
+        println!("cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET=10.14");
         println!(
             "cargo:rustc-link-arg=-Wl,-install_name,\
              @rpath/libmedea_jason.dylib"
