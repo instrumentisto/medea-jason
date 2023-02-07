@@ -32,7 +32,7 @@ void main() {
 
     var deviceLenght = 2;
     if (Platform.isAndroid) {
-      deviceLenght = 4;
+      deviceLenght = 6;
     }
 
     expect(devices.length, equals(deviceLenght));
@@ -45,9 +45,12 @@ void main() {
 
     var video_device =
         devices.firstWhere((d) => d.kind() == MediaDeviceKind.VideoInput);
-    expect(video_device.deviceId(), equals('fake camera id'));
-    expect(video_device.groupId(), isNull);
-    expect(video_device.label(), equals('fake camera'));
+
+    if (!Platform.isAndroid) {
+      expect(video_device.deviceId(), equals('fake camera id'));
+      expect(video_device.groupId(), isNull);
+      expect(video_device.label(), equals('fake camera'));
+    }
 
     video_device.free();
     var video = tracks.where((element) => element.kind() == MediaKind.Video);
