@@ -32,7 +32,7 @@ void main() {
 
     var deviceLenght = 2;
     if (Platform.isAndroid) {
-      deviceLenght = 3;
+      deviceLenght = 4;
     }
 
     expect(devices.length, equals(deviceLenght));
