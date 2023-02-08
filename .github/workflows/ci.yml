@@ -307,7 +307,10 @@ jobs:
           colima start
         if: ${{ contains('ios macos', matrix.platform) }}
 
+      # TODO: Upgrade Flutter to 3.7.0 version.
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
       - name: Install Flutter Linux dependencies
         run: |
           sudo apt-get update
@@ -390,7 +393,10 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
 
+      # TODO: Upgrade Flutter to 3.7.0 version.
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
       - run: flutter config --enable-linux-desktop
         if: ${{ matrix.platform == 'linux' }}
       - name: Install Flutter Linux dependencies
