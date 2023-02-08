@@ -33,4 +33,9 @@ class WebMediaDeviceInfo implements MediaDeviceInfo {
   void free() {
     obj.free();
   }
+
+  @override
+  bool isFailed() {
+    return false;
+  }
 }

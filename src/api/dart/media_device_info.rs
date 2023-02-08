@@ -72,6 +72,14 @@ pub unsafe extern "C" fn MediaDeviceInfo__free(
     });
 }
 
+/// Indicates whether the last attempt to use `this` device failed.
+#[no_mangle]
+pub unsafe extern "C" fn MediaDeviceInfo__is_failed(
+    this: ptr::NonNull<MediaDeviceInfo>,
+) -> bool {
+    propagate_panic(move || this.as_ref().is_failed())
+}
+
 #[cfg(feature = "mockable")]
 mod mock {
     #![allow(missing_copy_implementations, clippy::unused_self)]
@@ -100,6 +108,11 @@ mod mock {
         #[must_use]
         pub fn group_id(&self) -> Option<String> {
             Some(String::from("MediaDeviceInfo.group_id"))
+        }
+
+        #[must_use]
+        pub const fn is_failed(&self) -> bool {
+            false
         }
     }
 }

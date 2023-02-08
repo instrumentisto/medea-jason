@@ -28,7 +28,7 @@ packages:
       name: args
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.1"
+    version: "2.3.2"
   async:
     dependency: transitive
     description:
@@ -263,7 +263,7 @@ packages:
       name: logging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   matcher:
     dependency: transitive
     description:
@@ -284,7 +284,7 @@ packages:
       name: medea_flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0-dev+rev.39f8181e33a20db445d16c1bfedd7d337a777fe3"
+    version: "0.8.0-dev+rev.0f4533782a6f92060a465fec918b16567b9c6dd6"
   medea_jason:
     dependency: "direct main"
     description:
@@ -375,7 +375,7 @@ packages:
       name: puppeteer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.21.0"
+    version: "2.22.0"
   retry:
     dependency: transitive
     description:

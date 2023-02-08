@@ -75,7 +75,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      # TODO: Upgrade Flutter to 3.7.0 version.
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
 
       - run: make flutter
 
@@ -307,7 +310,10 @@ jobs:
           colima start
         if: ${{ contains('ios macos', matrix.platform) }}
 
+      # TODO: Upgrade Flutter to 3.7.0 version.
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
       - name: Install Flutter Linux dependencies
         run: |
           sudo apt-get update
@@ -390,7 +396,10 @@ jobs:
           use-tool-cache: true
         if: ${{ matrix.platform == 'android' }}
 
+      # TODO: Upgrade Flutter to 3.7.0 version.
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
       - run: flutter config --enable-linux-desktop
         if: ${{ matrix.platform == 'linux' }}
       - name: Install Flutter Linux dependencies
@@ -723,7 +732,10 @@ jobs:
                && !contains(steps.commit.outputs.message, '[publish]')
              ) }}" >> $GITHUB_OUTPUT
 
+      # TODO: Upgrade Flutter to 3.7.0 version.
       - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: 2.18.6
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - uses: actions/download-artifact@v3
