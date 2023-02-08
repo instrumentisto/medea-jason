@@ -33,7 +33,7 @@ Pointer _groupId(MediaDeviceInfo deviceInfo) {
   return ForeignValue.none().intoRustOwned();
 }
 
-/// Returns flag which indicates that last attempt to use this device was failed.
+/// Indicates whether the last attempt to use the provided device failed.
 bool _isFailed(MediaDeviceInfo deviceInfo) {
   return deviceInfo.isFailed;
 }

@@ -72,8 +72,7 @@ pub unsafe extern "C" fn MediaDeviceInfo__free(
     });
 }
 
-/// Returns flag which indicates that last attempt to use this device was
-/// failed.
+/// Indicates whether the last attempt to use `this` device failed.
 #[no_mangle]
 pub unsafe extern "C" fn MediaDeviceInfo__is_failed(
     this: ptr::NonNull<MediaDeviceInfo>,
