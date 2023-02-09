@@ -2,6 +2,7 @@
 //! [`Dart_PersistentHandle`].
 
 use std::{fmt, rc::Rc};
+use std::thread::ThreadId;
 
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 use medea_macro::dart_bridge;
@@ -39,7 +40,7 @@ mod handle {
 /// Reference-counting based [`Dart_Handle`] wrapper taking care of its
 /// lifetime management.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct DartHandle(Rc<Dart_PersistentHandle>);
+pub struct DartHandle(Rc<(ThreadId, Dart_PersistentHandle)>);
 
 impl DartHandle {
     /// Wraps the provided [`Dart_Handle`].
@@ -62,15 +63,19 @@ impl DartHandle {
                 c_str_into_string(Dart_GetError_DL_Trampolined(handle));
             panic!("Unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(handle)))
+        Self(Rc::new((std::thread::current().id(), Dart_NewPersistentHandle_DL_Trampolined(handle))))
     }
 
     /// Returns the underlying [`Dart_Handle`].
     #[must_use]
     pub fn get(&self) -> Dart_Handle {
+        if self.0.0 != std::thread::current().id() {
+            println!("DartHandle get on wrong thread");
+            panic!("DartHandle get on wrong thread")
+        }
         // SAFETY: We don't expose the inner `Dart_PersistentHandle` anywhere,
         //         so we're sure that it's valid at this point.
-        unsafe { Dart_HandleFromPersistent_DL_Trampolined(*self.0) }
+        unsafe { Dart_HandleFromPersistent_DL_Trampolined((*self.0).1) }
     }
 
     /// Returns string representation of a runtime Dart type behind this
@@ -92,7 +97,7 @@ impl fmt::Display for DartHandle {
 
 impl Drop for DartHandle {
     fn drop(&mut self) {
-        if let Some(handle) = Rc::get_mut(&mut self.0) {
+        if let Some((thread_id, handle)) = Rc::get_mut(&mut self.0) {
             unsafe {
                 Dart_DeletePersistentHandle_DL_Trampolined(*handle);
             }

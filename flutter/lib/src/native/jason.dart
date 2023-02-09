@@ -72,7 +72,10 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
+final loadTimestamp = DateTime.now().millisecondsSinceEpoch;
+
 DynamicLibrary _dl_load() {
+  print("Jason creating");
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -137,17 +140,20 @@ class Jason implements base.Jason {
 
   @override
   MediaManagerHandle mediaManager() {
+    print("Running something on Jason with ID: ${loadTimestamp}");
     return NativeMediaManagerHandle(
         NullablePointer(_media_manager(ptr.getInnerPtr())));
   }
 
   @override
   RoomHandle initRoom() {
+    print("Running something on Jason with ID: ${loadTimestamp}");
     return NativeRoomHandle(NullablePointer(_initRoom(ptr.getInnerPtr())));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
+    print("Running something on Jason with ID: ${loadTimestamp}");
     _close_room(
         ptr.getInnerPtr(), (room as NativeRoomHandle).ptr.getInnerPtr());
     room.ptr.free();
@@ -156,6 +162,7 @@ class Jason implements base.Jason {
   @override
   @moveSemantics
   void free() {
+    print("Running something on Jason with ID: ${loadTimestamp}");
     if (!ptr.isFreed()) {
       RustHandlesStorage().removeHandle(this);
       _free(ptr.getInnerPtr());

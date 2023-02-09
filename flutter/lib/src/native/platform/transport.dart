@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:developer';
+import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 
@@ -117,7 +119,10 @@ Object _connect(Pointer<Utf8> addr, Function onMessage, Function onClose) {
 
 /// Sends the provided [message] to the provided [WebSocket].
 void _send(WebSocket ws, Pointer<Utf8> message) {
+  print("Sending message to webSocket");
+  print("Using isolate: ${Service.getIsolateID(Isolate.current)}");
   ws.add(message.nativeStringToDartString());
+  print("After WebSocket send");
 }
 
 /// Closes the provided [WebSocket] connection with the provided

@@ -413,7 +413,9 @@ impl FnExpander {
         let ident = &self.ident;
 
         parse_quote! {
-            #fn_static_mut.write(#ident)
+            #fn_static_mut.with(|macro_f| {
+                macro_f.borrow_mut().write(#ident);
+            })
         }
     }
 
@@ -449,8 +451,10 @@ impl FnExpander {
         let type_alias = &self.type_alias_ident;
 
         quote! {
-            static mut #name: ::std::mem::MaybeUninit<#type_alias> =
-                ::std::mem::MaybeUninit::uninit();
+            ::std::thread_local! {
+                static #name: ::std::cell::RefCell<::std::mem::MaybeUninit<#type_alias>> =
+                    ::std::cell::RefCell::new(::std::mem::MaybeUninit::uninit());
+            }
         }
     }
 
@@ -476,7 +480,9 @@ impl FnExpander {
         quote! {
             #( #doc_attrs )*
             pub unsafe fn #name(#args) #ret_ty {
-                (#static_mut.assume_init_ref())(#( #args_idents ),*)
+                #static_mut.with(move |macro_f| {
+                     (macro_f.borrow_mut().assume_init_ref())(#( #args_idents ),*)
+                })
             }
         }
     }

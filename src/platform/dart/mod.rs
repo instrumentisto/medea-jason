@@ -28,6 +28,7 @@ pub mod transport;
 pub mod utils;
 
 use std::panic;
+use std::cell::RefCell;
 
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
@@ -48,14 +49,18 @@ pub use self::{
 /// Dart's functions.
 pub fn set_panic_hook() {
     panic::set_hook(Box::new(|bt| {
-        if let Some(f) = unsafe { PANIC_FN.as_ref() } {
-            f.call1(format!("{bt}"));
-        }
+        PANIC_FN.with(|static_f| {
+            if let Some(f) = unsafe { static_f.borrow().as_ref() } {
+                f.call1(format!("{bt}"));
+            }
+        })
     }));
 }
 
-/// [`Function`] being called whenever Rust code [`panic`]s.
-static mut PANIC_FN: Option<Function<String>> = None;
+std::thread_local! {
+    /// [`Function`] being called whenever Rust code [`panic`]s.
+    static PANIC_FN: RefCell<Option<Function<String>>> = RefCell::new(None);
+}
 
 /// Sets the provided [`Function`] as a callback to be called whenever Rust code
 /// [`panic`]s.
@@ -63,7 +68,9 @@ static mut PANIC_FN: Option<Function<String>> = None;
 /// [`panic`]: panic!
 pub fn set_panic_callback(cb: Function<String>) {
     unsafe {
-        PANIC_FN = Some(cb);
+        PANIC_FN.with(|static_f| {
+            static_f.replace(Some(cb));
+        });
     }
 }
 

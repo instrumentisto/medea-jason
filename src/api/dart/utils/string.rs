@@ -5,6 +5,7 @@ use std::{
     os::raw::c_char,
     ptr,
 };
+use std::cell::RefCell;
 
 use crate::api::propagate_panic;
 
@@ -14,7 +15,9 @@ type FreeDartNativeStringFunction = extern "C" fn(ptr::NonNull<c_char>);
 /// Stores a pointer to the [`FreeDartNativeStringFunction`] extern function.
 ///
 /// Must be initialized by Dart during FFI initialization phase.
-static mut FREE_DART_NATIVE_STRING: Option<FreeDartNativeStringFunction> = None;
+std::thread_local! {
+    static FREE_DART_NATIVE_STRING: RefCell<Option<FreeDartNativeStringFunction>> = RefCell::new(None);
+}
 
 /// Constructs a Rust [`String`] from the provided raw C string.
 ///
@@ -78,7 +81,9 @@ pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
 pub unsafe extern "C" fn register_free_dart_native_string(
     f: FreeDartNativeStringFunction,
 ) {
-    FREE_DART_NATIVE_STRING = Some(f);
+    FREE_DART_NATIVE_STRING.with(|static_f| {
+        static_f.replace(Some(f));
+    });
 }
 
 /// Calls Dart to release memory allocated for the provided native string.
@@ -91,5 +96,7 @@ pub unsafe extern "C" fn register_free_dart_native_string(
 /// `FREE_DART_NATIVE_STRING` function must be registered and the provided
 /// pointer must be a valid native string.
 pub unsafe fn free_dart_native_string(s: ptr::NonNull<c_char>) {
-    FREE_DART_NATIVE_STRING.unwrap()(s);
+    FREE_DART_NATIVE_STRING.with(|f| {
+        f.borrow().unwrap()(s);
+    });
 }

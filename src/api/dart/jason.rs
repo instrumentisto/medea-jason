@@ -15,6 +15,8 @@ impl ForeignClass for Jason {}
 /// Instantiates a new [`Jason`] interface to interact with this library.
 #[no_mangle]
 pub extern "C" fn Jason__new() -> ptr::NonNull<Jason> {
+    let id = std::thread::current().id();
+    println!("Creating Jason on Thread with ID: {:?}", id);
     propagate_panic(|| Jason::new().into_ptr())
 }
 
