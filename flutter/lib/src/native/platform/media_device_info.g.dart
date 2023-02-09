@@ -10,14 +10,16 @@ void registerFunction(
   required Pointer<NativeFunction<Int64 Function(Handle)>> kind,
   required Pointer<NativeFunction<Pointer<Utf8> Function(Handle)>> label,
   required Pointer<NativeFunction<Pointer Function(Handle)>> groupId,
+  required Pointer<NativeFunction<Bool Function(Handle)>> isFailed,
 }) {
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer),
-      void Function(
-          Pointer, Pointer, Pointer, Pointer)>('register_media_device_info')(
+      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
+      void Function(Pointer, Pointer, Pointer, Pointer,
+          Pointer)>('register_media_device_info')(
     deviceId,
     kind,
     label,
     groupId,
+    isFailed,
   );
 }

@@ -32,4 +32,7 @@ abstract class MediaDeviceInfo implements SyncPlatformHandle {
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   String? groupId();
+
+  /// Indicates whether the last attempt to use this device failed.
+  bool isFailed();
 }

@@ -30,6 +30,11 @@ class NativeMediaDeviceInfo implements MediaDeviceInfo {
     return _info.groupId;
   }
 
+  @override
+  bool isFailed() {
+    return _info.isFailed;
+  }
+
   @moveSemantics
   @override
   void free() {}
