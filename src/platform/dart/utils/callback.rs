@@ -8,12 +8,12 @@ use std::{
     ptr,
 };
 
-use dart_sys::{Dart_Handle, Dart_NewFinalizableHandle_DL};
+use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
     api::{propagate_panic, DartValue, DartValueArg},
-    platform,
+    platform::{self, utils::dart_api},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
@@ -198,8 +198,7 @@ impl Callback {
             };
 
             if is_finalizable {
-                let _ = Dart_NewFinalizableHandle_DL
-                    .expect("dart_api_dl has not been initialized")(
+                let _ = dart_api::new_finalizable_handle(
                     handle,
                     f.as_ptr().cast::<c_void>(),
                     mem::size_of::<Self>() as libc::intptr_t,

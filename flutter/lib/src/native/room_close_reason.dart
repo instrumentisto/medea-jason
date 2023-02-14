@@ -1,5 +1,4 @@
 import '../interface/room_close_reason.dart';
-import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class NativeRoomCloseReason implements RoomCloseReason {
@@ -25,7 +24,6 @@ class NativeRoomCloseReason implements RoomCloseReason {
     return _closeReason.isErr;
   }
 
-  @moveSemantics
   @override
   void free() {}
 }

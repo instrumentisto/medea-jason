@@ -2,12 +2,10 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:medea_jason/src/native/room_handle.dart';
 import 'package:medea_jason/src/native/media_device_info.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
@@ -121,24 +119,6 @@ void main() {
         allOf(predicate((e) =>
             e is FormatException &&
             e.message.contains('relative URL without a base'))));
-  });
-
-  testWidgets('Complex arguments validation', (WidgetTester tester) async {
-    var jason = Jason();
-    var room = jason.initRoom();
-    var err;
-    var arg = 123;
-
-    try {
-      await (api.roomHandleMuteVideo(
-          roomHandle: (room as NativeRoomHandle).opaque.innerOpaque,
-          sourceKind: arg) as Future);
-    } on FfiException catch (e) {
-      err = e.parse();
-    }
-    err is ArgumentError;
-    expect(err.invalidValue, equals(123));
-    expect(err.name, 'kind');
   });
 
   testWidgets('Primitive arguments Callback validation',

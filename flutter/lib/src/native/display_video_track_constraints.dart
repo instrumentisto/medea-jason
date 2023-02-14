@@ -1,23 +1,18 @@
 import '../interface/display_video_track_constraints.dart' as base;
-import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class DisplayVideoTrackConstraints
     implements base.DisplayVideoTrackConstraints {
   /// Rust `flutter_rust_bridge` api representation.
   frb.ApiDisplayVideoTrackConstrs constraints = frb.ApiDisplayVideoTrackConstrs(
-      deviceId: null,
-      height: frb.ApiOptionConstrainU32_None(),
-      width: frb.ApiOptionConstrainU32_None(),
-      frameRate: frb.ApiOptionConstrainU32_None());
+      deviceId: null, height: null, width: null, frameRate: null);
 
   @override
   void exactHeight(int height) {
     if (height.isNegative || height.bitLength > 32) {
       throw ArgumentError.value(height, 'height', 'Expected u32');
     }
-    constraints.height =
-        frb.ApiOptionConstrainU32_Some(frb.ConstrainU32_Exact(height));
+    constraints.height = frb.ConstrainU32_Exact(height);
   }
 
   @override
@@ -25,8 +20,7 @@ class DisplayVideoTrackConstraints
     if (height.isNegative || height.bitLength > 32) {
       throw ArgumentError.value(height, 'height', 'Expected u32');
     }
-    constraints.height =
-        frb.ApiOptionConstrainU32_Some(frb.ConstrainU32_Ideal(height));
+    constraints.height = frb.ConstrainU32_Ideal(height);
   }
 
   @override
@@ -34,8 +28,7 @@ class DisplayVideoTrackConstraints
     if (width.isNegative || width.bitLength > 32) {
       throw ArgumentError.value(width, 'width', 'Expected u32');
     }
-    constraints.width =
-        frb.ApiOptionConstrainU32_Some(frb.ConstrainU32_Exact(width));
+    constraints.width = frb.ConstrainU32_Exact(width);
   }
 
   @override
@@ -43,8 +36,7 @@ class DisplayVideoTrackConstraints
     if (width.isNegative || width.bitLength > 32) {
       throw ArgumentError.value(width, 'width', 'Expected u32');
     }
-    constraints.width =
-        frb.ApiOptionConstrainU32_Some(frb.ConstrainU32_Ideal(width));
+    constraints.width = frb.ConstrainU32_Ideal(width);
   }
 
   @override
@@ -52,8 +44,7 @@ class DisplayVideoTrackConstraints
     if (frameRate.isNegative || frameRate.bitLength > 32) {
       throw ArgumentError.value(frameRate, 'frameRate', 'Expected u32');
     }
-    constraints.frameRate =
-        frb.ApiOptionConstrainU32_Some(frb.ConstrainU32_Exact(frameRate));
+    constraints.frameRate = frb.ConstrainU32_Exact(frameRate);
   }
 
   @override
@@ -61,8 +52,7 @@ class DisplayVideoTrackConstraints
     if (frameRate.isNegative || frameRate.bitLength > 32) {
       throw ArgumentError.value(frameRate, 'frameRate', 'Expected u32');
     }
-    constraints.frameRate =
-        frb.ApiOptionConstrainU32_Some(frb.ConstrainU32_Ideal(frameRate));
+    constraints.frameRate = frb.ConstrainU32_Ideal(frameRate);
   }
 
   @override
@@ -70,7 +60,6 @@ class DisplayVideoTrackConstraints
     constraints.deviceId = deviceId;
   }
 
-  @moveSemantics
   @override
   void free() {}
 }

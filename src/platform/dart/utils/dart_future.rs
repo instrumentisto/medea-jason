@@ -5,11 +5,15 @@
 use std::{fmt, future::Future, marker::PhantomData, ptr};
 
 use dart_sys::Dart_Handle;
+use flutter_rust_bridge::DartOpaque;
 use futures::channel::oneshot;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{propagate_panic, DartValue, DartValueArg, Error as DartError},
+    api::{
+        propagate_panic, utils::new_dart_opaque, DartValue, DartValueArg,
+        Error as DartError,
+    },
     platform::{
         dart::{error::Error, utils::Completer},
         spawn,
@@ -157,10 +161,11 @@ pub struct DartFuture<O>(
 );
 
 impl<O> DartFuture<O> {
-    /// Returns inner [`Dart_Handle`].
+    /// Wraps the given [`DartFuture`] into a [`DartOpaque`] so it can be
+    /// transferred to Dart side via `flutter_rust_bridge` bindings.
     #[must_use]
-    pub const fn into_raw(self) -> Dart_Handle {
-        self.0
+    pub fn into_dart_opaque(self) -> DartOpaque {
+        unsafe { new_dart_opaque(self.0) }
     }
 }
 
@@ -203,27 +208,6 @@ where
         DartFuture(dart_future, PhantomData)
     }
 }
-
-/// Tries to convert the provided [i64] using [`TryInto`].
-///
-/// If the conversion fails, then [`ArgumentError`] is [`return`]ed as a
-/// anyhow [`DartError`].
-macro_rules! dart_enum_try_into {
-    ($k:expr, $name:expr, $message:expr) => {
-        if let Some(kind) = $k {
-            Some(kind.try_into().map_err(|err| {
-                anyhow::anyhow!(
-                    "{:?}",
-                    DartError::from(ArgumentError::new(err, $name, $message))
-                )
-            })?)
-        } else {
-            None
-        }
-    };
-}
-
-pub(crate) use dart_enum_try_into;
 
 #[cfg(feature = "mockable")]
 pub mod tests {

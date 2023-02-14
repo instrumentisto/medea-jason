@@ -14,10 +14,34 @@
     missing_docs
 )]
 
-pub use crate::jason_api;
 pub mod api_struct;
+#[cfg(not(target_family = "wasm"))]
+#[allow(
+    clippy::as_conversions,
+    clippy::missing_panics_doc,
+    clippy::undocumented_unsafe_blocks,
+    clippy::unwrap_used,
+    clippy::needless_pass_by_value,
+    non_snake_case
+)]
+pub mod jason_api;
 pub mod utils;
 pub use api_struct::*;
+
+#[cfg(not(target_family = "wasm"))]
+#[allow(
+    clippy::as_conversions,
+    clippy::default_trait_access,
+    clippy::missing_docs_in_private_items,
+    clippy::ptr_as_ptr,
+    clippy::undocumented_unsafe_blocks,
+    clippy::empty_structs_with_brackets,
+    clippy::use_self,
+    clippy::wildcard_imports,
+    let_underscore_drop,
+    unused_qualifications
+)]
+mod jason_api_g;
 
 use std::{
     ffi::{c_void, CString},
@@ -25,10 +49,7 @@ use std::{
     panic, ptr,
 };
 
-use dart_sys::{
-    Dart_DeletePersistentHandle_DL, Dart_Handle, Dart_NewPersistentHandle_DL,
-    Dart_PropagateError_DL, _Dart_Handle,
-};
+use dart_sys::{Dart_Handle, _Dart_Handle};
 use derive_more::Display;
 use libc::c_char;
 
@@ -36,8 +57,8 @@ use crate::{
     api::dart::utils::new_panic_error,
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
     platform::utils::{
-        c_str_into_string, free_dart_native_string, handle::DartHandle,
-        string_into_c_str,
+        c_str_into_string, dart_api, free_dart_native_string,
+        handle::DartHandle, string_into_c_str,
     },
 };
 
@@ -48,19 +69,15 @@ pub use self::{
         ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
         ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
-    utils::{ArgumentError, DartError as Error},
+    utils::DartError as Error,
 };
 
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
     panic::catch_unwind(panic::AssertUnwindSafe(f)).unwrap_or_else(|_| {
-        #[allow(clippy::expect_used)]
         unsafe {
-            Dart_PropagateError_DL
-                .expect("dart_api_dl has not been initialized")(
-                new_panic_error(),
-            );
+            dart_api::propagate_error(new_panic_error());
         }
         unreachable!("`Dart_PropagateError` should do early return")
     })
@@ -720,24 +737,20 @@ pub unsafe extern "C" fn unbox_dart_handle(
 
 /// Frees the provided [`ptr::NonNull`] pointer to a [`Dart_Handle`].
 #[no_mangle]
-#[allow(clippy::expect_used)]
 pub unsafe extern "C" fn free_boxed_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) {
     let handle = Box::from_raw(val.as_ptr());
-    Dart_DeletePersistentHandle_DL
-        .expect("dart_api_dl has not been initialized")(*handle);
+    dart_api::delete_persistent_handle(*handle);
 }
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
 /// [`Dart_Handle`].
 #[no_mangle]
-#[allow(clippy::expect_used)]
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
-    let persisted = Dart_NewPersistentHandle_DL
-        .expect("dart_api_dl has not been initialized")(val);
+    let persisted = dart_api::new_persistent_handle(val);
     ptr::NonNull::from(Box::leak(Box::new(persisted)))
 }
 

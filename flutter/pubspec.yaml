@@ -13,7 +13,7 @@ dependencies:
   ffi: ^2.0.1
   http: ^0.13.5
   js: ^0.6.5
-  medea_flutter_webrtc: 0.8.0-dev+rev.4aa05d31f5ff998b841100353c409a398b8b0a76
+  medea_flutter_webrtc: 0.8.0-dev+rev.595ef035a3598b01c32b2cac576dbe5a83ac55f6
   retry: ^3.1.0
   tuple: ^2.0.1
   uuid: ^3.0.7

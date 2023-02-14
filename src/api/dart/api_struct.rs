@@ -1,14 +1,11 @@
 use flutter_rust_bridge::frb;
 
-use crate::media::{
-    constraints::{ConstrainString, ConstrainU32},
-    FacingMode, MediaDeviceKind,
-};
+use crate::media::{constraints::ConstrainU32, FacingMode, MediaDeviceKind};
 
-#[derive(Debug)]
 /// Representation of a [`ApiMediaDeviceInfo`][0] ONLY for input devices.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
+#[derive(Debug)]
 pub struct ApiMediaDeviceInfo {
     /// [`MediaDeviceKind`] of this [`ApiMediaDeviceInfo`].
     pub(crate) kind: MediaDeviceKind,
@@ -31,32 +28,10 @@ pub struct ApiMediaDeviceInfo {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
     pub(crate) group_id: Option<String>,
-}
 
-/// Representation of a Option [ConstrainULong][1].
-///
-/// Underlying value must fit in a `[0, 4294967295]` range.
-///
-/// [1]: https://tinyurl.com/w3-streams#dom-constrainulong
-#[derive(Copy, Clone, Debug)]
-pub enum ApiOptionConstrainU32 {
-    Some(ConstrainU32),
-
-    // TODO Option<Enum>
-    // https://github.com/fzyzcjy/flutter_rust_bridge/issues/828
-    /// Lack of value.
-    None,
-}
-
-impl TryFrom<ApiOptionConstrainU32> for ConstrainU32 {
-    type Error = ApiOptionConstrainU32;
-
-    fn try_from(value: ApiOptionConstrainU32) -> Result<Self, Self::Error> {
-        match value {
-            ApiOptionConstrainU32::Some(v) => Ok(v),
-            ApiOptionConstrainU32::None => Err(ApiOptionConstrainU32::None),
-        }
-    }
+    /// Indicates whether the last attempt to use the provided device
+    /// failed.
+    pub(crate) is_failed: bool,
 }
 
 /// Representation of a display source.
@@ -73,8 +48,8 @@ pub struct ApiMediaDisplayInfo {
 #[derive(Debug)]
 #[frb]
 pub struct ApiAudioTrackConstrs {
-    #[frb(non_final)]
     /// Identifier of the device generating the content for the media track.
+    #[frb(non_final)]
     pub(crate) device_id: Option<String>,
 }
 
@@ -106,58 +81,27 @@ pub enum ApiConstrainFacingMode {
     Ideal(FacingMode),
 }
 
-/// Representation of the [`Option<ConstrainString<FacingMode>>`]
-#[derive(Copy, Clone, Debug)]
-pub enum ApiOptionConstrainFacingMode {
-    Some(ApiConstrainFacingMode),
-
-    // TODO Option<Enum>
-    // https://github.com/fzyzcjy/flutter_rust_bridge/issues/828
-    None,
-}
-
-impl TryFrom<ApiOptionConstrainFacingMode> for ConstrainString<FacingMode> {
-    type Error = ApiOptionConstrainFacingMode;
-
-    fn try_from(
-        value: ApiOptionConstrainFacingMode,
-    ) -> Result<Self, Self::Error> {
-        match value {
-            ApiOptionConstrainFacingMode::Some(m) => Ok(match m {
-                ApiConstrainFacingMode::Exact(e) => Self::Exact(e),
-                ApiConstrainFacingMode::Ideal(i) => Self::Ideal(i),
-            }),
-            ApiOptionConstrainFacingMode::None => {
-                Err(ApiOptionConstrainFacingMode::None)
-            }
-        }
-    }
-}
-
 /// Constraints applicable to video tracks that are sourced from some media
 /// device.
-#[derive(Debug)]
 #[frb]
+#[derive(Debug)]
 pub struct ApiDeviceVideoTrackConstrs {
-    #[frb(non_final)]
     /// Identifier of the device generating the content for the media track.
+    #[frb(non_final)]
     pub(crate) device_id: Option<String>,
 
     /// Describes the directions that the camera can face, as seen from the
     /// user's perspective.
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) facing_mode: Box<ApiOptionConstrainFacingMode>,
+    pub(crate) facing_mode: Option<ApiConstrainFacingMode>,
 
     /// Height of the video in pixels.
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) height: Box<ApiOptionConstrainU32>,
+    pub(crate) height: Option<ConstrainU32>,
 
     /// Width of the video in pixels.
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) width: Box<ApiOptionConstrainU32>,
+    pub(crate) width: Option<ConstrainU32>,
 }
 
 impl From<ApiDeviceVideoTrackConstrs>
@@ -168,14 +112,14 @@ impl From<ApiDeviceVideoTrackConstrs>
         if let Some(id) = value.device_id {
             res.device_id(id);
         }
-        if let Ok(mode) = (*value.facing_mode).try_into() {
+        if let Some(mode) = value.facing_mode {
             match mode {
-                ConstrainString::Exact(e) => res.exact_facing_mode(e),
-                ConstrainString::Ideal(i) => res.ideal_facing_mode(i),
+                ApiConstrainFacingMode::Exact(e) => res.exact_facing_mode(e),
+                ApiConstrainFacingMode::Ideal(i) => res.ideal_facing_mode(i),
             }
         }
 
-        if let Ok(height) = (*value.height).try_into() {
+        if let Some(height) = value.height {
             match height {
                 ConstrainU32::Exact(e) => res.exact_height(e),
                 ConstrainU32::Ideal(i) => res.ideal_height(i),
@@ -183,7 +127,7 @@ impl From<ApiDeviceVideoTrackConstrs>
             }
         }
 
-        if let Ok(width) = (*value.width).try_into() {
+        if let Some(width) = value.width {
             match width {
                 ConstrainU32::Exact(e) => res.exact_width(e),
                 ConstrainU32::Ideal(i) => res.ideal_width(i),
@@ -206,22 +150,19 @@ pub struct ApiDisplayVideoTrackConstrs {
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) height: Box<ApiOptionConstrainU32>,
+    pub(crate) height: Option<ConstrainU32>,
 
     /// [Width][1] of the video in pixels.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) width: Box<ApiOptionConstrainU32>,
+    pub(crate) width: Option<ConstrainU32>,
 
     /// [Frame rate][1] of the video.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) frame_rate: Box<ApiOptionConstrainU32>,
+    pub(crate) frame_rate: Option<ConstrainU32>,
 }
 
 impl From<ApiDisplayVideoTrackConstrs>
@@ -233,7 +174,7 @@ impl From<ApiDisplayVideoTrackConstrs>
             res.device_id(id);
         }
 
-        if let Ok(height) = (*value.height).try_into() {
+        if let Some(height) = value.height {
             match height {
                 ConstrainU32::Exact(e) => res.exact_height(e),
                 ConstrainU32::Ideal(i) => res.ideal_height(i),
@@ -241,7 +182,7 @@ impl From<ApiDisplayVideoTrackConstrs>
             }
         }
 
-        if let Ok(width) = (*value.width).try_into() {
+        if let Some(width) = value.width {
             match width {
                 ConstrainU32::Exact(e) => res.exact_width(e),
                 ConstrainU32::Ideal(i) => res.ideal_width(i),
@@ -249,7 +190,7 @@ impl From<ApiDisplayVideoTrackConstrs>
             }
         }
 
-        if let Ok(frame_rate) = (*value.frame_rate).try_into() {
+        if let Some(frame_rate) = value.frame_rate {
             match frame_rate {
                 ConstrainU32::Exact(e) => res.exact_frame_rate(e),
                 ConstrainU32::Ideal(i) => res.ideal_frame_rate(i),
@@ -270,8 +211,7 @@ pub struct ApiMediaStreamSettings {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]
-    // TODO Delete Box https://github.com/fzyzcjy/flutter_rust_bridge/pull/901
-    pub(crate) audio: Box<ApiAudioTrackConstrs>,
+    pub(crate) audio: Option<ApiAudioTrackConstrs>,
 
     /// [MediaStreamConstraints][1] for the device video media type.
     ///
@@ -289,7 +229,9 @@ pub struct ApiMediaStreamSettings {
 impl From<ApiMediaStreamSettings> for crate::media::MediaStreamSettings {
     fn from(value: ApiMediaStreamSettings) -> Self {
         let mut res = Self::new();
-        res.audio((*value.audio).into());
+        if let Some(audio) = value.audio {
+            res.audio(audio.into());
+        }
         if let Some(device) = value.device_video {
             res.device_video(device.into());
         }

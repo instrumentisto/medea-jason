@@ -95,7 +95,7 @@ class NativeRoomHandle implements RoomHandle {
   Future<void> muteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleMuteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }
@@ -105,7 +105,7 @@ class NativeRoomHandle implements RoomHandle {
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleUnmuteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }
@@ -115,7 +115,7 @@ class NativeRoomHandle implements RoomHandle {
   Future<void> enableVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleEnableVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }
@@ -125,7 +125,7 @@ class NativeRoomHandle implements RoomHandle {
   Future<void> disableVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleDisableVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }
@@ -155,7 +155,7 @@ class NativeRoomHandle implements RoomHandle {
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleEnableRemoteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }
@@ -165,7 +165,7 @@ class NativeRoomHandle implements RoomHandle {
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.roomHandleDisableRemoteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind?.index) as Future);
+          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }

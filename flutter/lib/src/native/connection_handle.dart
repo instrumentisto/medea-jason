@@ -97,7 +97,7 @@ class NativeConnectionHandle implements ConnectionHandle {
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.connectionHandleEnableRemoteVideo(
-          connection: opaque.innerOpaque) as Future);
+          connection: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }
@@ -107,7 +107,7 @@ class NativeConnectionHandle implements ConnectionHandle {
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
     try {
       await (api.connectionHandleDisableRemoteVideo(
-          connection: opaque.innerOpaque) as Future);
+          connection: opaque.innerOpaque, sourceKind: kind) as Future);
     } on FfiException catch (anyhow) {
       throw anyhow.parse();
     }

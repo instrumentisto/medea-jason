@@ -56,7 +56,7 @@ pub extern "C" fn wire_connection_handle_disable_remote_audio(
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_enable_remote_video(
     connection: wire_ConnectionHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_connection_handle_enable_remote_video_impl(connection, source_kind)
 }
@@ -64,7 +64,7 @@ pub extern "C" fn wire_connection_handle_enable_remote_video(
 #[no_mangle]
 pub extern "C" fn wire_connection_handle_disable_remote_video(
     connection: wire_ConnectionHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_connection_handle_disable_remote_video_impl(connection, source_kind)
 }
@@ -236,7 +236,7 @@ pub extern "C" fn wire_reconnect_handle_from_ptr(
 #[no_mangle]
 pub extern "C" fn wire_reconnect_handle_reconnect_with_delay(
     reconnect_handle: wire_ReconnectHandle,
-    delay_ms: i64,
+    delay_ms: u32,
 ) -> support::WireSyncReturn {
     wire_reconnect_handle_reconnect_with_delay_impl(reconnect_handle, delay_ms)
 }
@@ -244,10 +244,10 @@ pub extern "C" fn wire_reconnect_handle_reconnect_with_delay(
 #[no_mangle]
 pub extern "C" fn wire_reconnect_handle_reconnect_with_backoff(
     reconnect_handle: wire_ReconnectHandle,
-    starting_delay: i64,
+    starting_delay: u32,
     multiplier: f64,
-    max_delay: i64,
-    max_elapsed_time_ms: *mut i64,
+    max_delay: u32,
+    max_elapsed_time_ms: *mut u32,
 ) -> support::WireSyncReturn {
     wire_reconnect_handle_reconnect_with_backoff_impl(
         reconnect_handle,
@@ -393,7 +393,7 @@ pub extern "C" fn wire_room_handle_disable_audio(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_mute_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_room_handle_mute_video_impl(room_handle, source_kind)
 }
@@ -401,7 +401,7 @@ pub extern "C" fn wire_room_handle_mute_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_unmute_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_room_handle_unmute_video_impl(room_handle, source_kind)
 }
@@ -409,7 +409,7 @@ pub extern "C" fn wire_room_handle_unmute_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_room_handle_enable_video_impl(room_handle, source_kind)
 }
@@ -417,7 +417,7 @@ pub extern "C" fn wire_room_handle_enable_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_room_handle_disable_video_impl(room_handle, source_kind)
 }
@@ -439,7 +439,7 @@ pub extern "C" fn wire_room_handle_disable_remote_audio(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_enable_remote_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_room_handle_enable_remote_video_impl(room_handle, source_kind)
 }
@@ -447,7 +447,7 @@ pub extern "C" fn wire_room_handle_enable_remote_video(
 #[no_mangle]
 pub extern "C" fn wire_room_handle_disable_remote_video(
     room_handle: wire_RoomHandle,
-    source_kind: *mut i64,
+    source_kind: *mut i32,
 ) -> support::WireSyncReturn {
     wire_room_handle_disable_remote_video_impl(room_handle, source_kind)
 }
@@ -535,23 +535,9 @@ pub extern "C" fn new_RoomHandle() -> wire_RoomHandle {
 }
 
 #[no_mangle]
-pub extern "C" fn new_box_api_audio_track_constrs_0(
+pub extern "C" fn new_box_autoadd_api_audio_track_constrs_0(
 ) -> *mut wire_ApiAudioTrackConstrs {
     support::new_leak_box_ptr(wire_ApiAudioTrackConstrs::new_with_null_ptr())
-}
-
-#[no_mangle]
-pub extern "C" fn new_box_api_option_constrain_facing_mode_0(
-) -> *mut wire_ApiOptionConstrainFacingMode {
-    support::new_leak_box_ptr(
-        wire_ApiOptionConstrainFacingMode::new_with_null_ptr(),
-    )
-}
-
-#[no_mangle]
-pub extern "C" fn new_box_api_option_constrain_u_32_0(
-) -> *mut wire_ApiOptionConstrainU32 {
-    support::new_leak_box_ptr(wire_ApiOptionConstrainU32::new_with_null_ptr())
 }
 
 #[no_mangle]
@@ -588,7 +574,12 @@ pub extern "C" fn new_box_autoadd_constrain_u_32_0() -> *mut wire_ConstrainU32 {
 }
 
 #[no_mangle]
-pub extern "C" fn new_box_autoadd_i64_0(value: i64) -> *mut i64 {
+pub extern "C" fn new_box_autoadd_media_source_kind_0(value: i32) -> *mut i32 {
+    support::new_leak_box_ptr(value)
+}
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_u32_0(value: u32) -> *mut u32 {
     support::new_leak_box_ptr(value)
 }
 
@@ -821,53 +812,11 @@ impl Wire2Api<ApiMediaStreamSettings> for wire_ApiMediaStreamSettings {
         }
     }
 }
-impl Wire2Api<ApiOptionConstrainFacingMode>
-    for wire_ApiOptionConstrainFacingMode
-{
-    fn wire2api(self) -> ApiOptionConstrainFacingMode {
-        match self.tag {
-            0 => unsafe {
-                let ans = support::box_from_leak_ptr(self.kind);
-                let ans = support::box_from_leak_ptr(ans.Some);
-                ApiOptionConstrainFacingMode::Some(ans.field0.wire2api())
-            },
-            1 => ApiOptionConstrainFacingMode::None,
-            _ => unreachable!(),
-        }
-    }
-}
-impl Wire2Api<ApiOptionConstrainU32> for wire_ApiOptionConstrainU32 {
-    fn wire2api(self) -> ApiOptionConstrainU32 {
-        match self.tag {
-            0 => unsafe {
-                let ans = support::box_from_leak_ptr(self.kind);
-                let ans = support::box_from_leak_ptr(ans.Some);
-                ApiOptionConstrainU32::Some(ans.field0.wire2api())
-            },
-            1 => ApiOptionConstrainU32::None,
-            _ => unreachable!(),
-        }
-    }
-}
 
-impl Wire2Api<Box<ApiAudioTrackConstrs>> for *mut wire_ApiAudioTrackConstrs {
-    fn wire2api(self) -> Box<ApiAudioTrackConstrs> {
+impl Wire2Api<ApiAudioTrackConstrs> for *mut wire_ApiAudioTrackConstrs {
+    fn wire2api(self) -> ApiAudioTrackConstrs {
         let wrap = unsafe { support::box_from_leak_ptr(self) };
         Wire2Api::<ApiAudioTrackConstrs>::wire2api(*wrap).into()
-    }
-}
-impl Wire2Api<Box<ApiOptionConstrainFacingMode>>
-    for *mut wire_ApiOptionConstrainFacingMode
-{
-    fn wire2api(self) -> Box<ApiOptionConstrainFacingMode> {
-        let wrap = unsafe { support::box_from_leak_ptr(self) };
-        Wire2Api::<ApiOptionConstrainFacingMode>::wire2api(*wrap).into()
-    }
-}
-impl Wire2Api<Box<ApiOptionConstrainU32>> for *mut wire_ApiOptionConstrainU32 {
-    fn wire2api(self) -> Box<ApiOptionConstrainU32> {
-        let wrap = unsafe { support::box_from_leak_ptr(self) };
-        Wire2Api::<ApiOptionConstrainU32>::wire2api(*wrap).into()
     }
 }
 impl Wire2Api<ApiConstrainFacingMode> for *mut wire_ApiConstrainFacingMode {
@@ -904,8 +853,14 @@ impl Wire2Api<ConstrainU32> for *mut wire_ConstrainU32 {
         Wire2Api::<ConstrainU32>::wire2api(*wrap).into()
     }
 }
-impl Wire2Api<i64> for *mut i64 {
-    fn wire2api(self) -> i64 {
+impl Wire2Api<MediaSourceKind> for *mut i32 {
+    fn wire2api(self) -> MediaSourceKind {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<MediaSourceKind>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<u32> for *mut u32 {
+    fn wire2api(self) -> u32 {
         unsafe { *support::box_from_leak_ptr(self) }
     }
 }
@@ -1005,18 +960,18 @@ pub struct wire_ApiAudioTrackConstrs {
 #[derive(Clone)]
 pub struct wire_ApiDeviceVideoTrackConstrs {
     device_id: *mut wire_uint_8_list,
-    facing_mode: *mut wire_ApiOptionConstrainFacingMode,
-    height: *mut wire_ApiOptionConstrainU32,
-    width: *mut wire_ApiOptionConstrainU32,
+    facing_mode: *mut wire_ApiConstrainFacingMode,
+    height: *mut wire_ConstrainU32,
+    width: *mut wire_ConstrainU32,
 }
 
 #[repr(C)]
 #[derive(Clone)]
 pub struct wire_ApiDisplayVideoTrackConstrs {
     device_id: *mut wire_uint_8_list,
-    height: *mut wire_ApiOptionConstrainU32,
-    width: *mut wire_ApiOptionConstrainU32,
-    frame_rate: *mut wire_ApiOptionConstrainU32,
+    height: *mut wire_ConstrainU32,
+    width: *mut wire_ConstrainU32,
+    frame_rate: *mut wire_ConstrainU32,
 }
 
 #[repr(C)]
@@ -1058,51 +1013,6 @@ pub struct wire_ApiConstrainFacingMode_Exact {
 pub struct wire_ApiConstrainFacingMode_Ideal {
     field0: i32,
 }
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiOptionConstrainFacingMode {
-    tag: i32,
-    kind: *mut ApiOptionConstrainFacingModeKind,
-}
-
-#[repr(C)]
-pub union ApiOptionConstrainFacingModeKind {
-    Some: *mut wire_ApiOptionConstrainFacingMode_Some,
-    None: *mut wire_ApiOptionConstrainFacingMode_None,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiOptionConstrainFacingMode_Some {
-    field0: *mut wire_ApiConstrainFacingMode,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiOptionConstrainFacingMode_None {}
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiOptionConstrainU32 {
-    tag: i32,
-    kind: *mut ApiOptionConstrainU32Kind,
-}
-
-#[repr(C)]
-pub union ApiOptionConstrainU32Kind {
-    Some: *mut wire_ApiOptionConstrainU32_Some,
-    None: *mut wire_ApiOptionConstrainU32_None,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiOptionConstrainU32_Some {
-    field0: *mut wire_ConstrainU32,
-}
-
-#[repr(C)]
-#[derive(Clone)]
-pub struct wire_ApiOptionConstrainU32_None {}
 
 #[repr(C)]
 #[derive(Clone)]
@@ -1271,46 +1181,6 @@ impl NewWithNullPtr for wire_ApiMediaStreamSettings {
             display_video: core::ptr::null_mut(),
         }
     }
-}
-
-impl NewWithNullPtr for wire_ApiOptionConstrainFacingMode {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            tag: -1,
-            kind: core::ptr::null_mut(),
-        }
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn inflate_ApiOptionConstrainFacingMode_Some(
-) -> *mut ApiOptionConstrainFacingModeKind {
-    support::new_leak_box_ptr(ApiOptionConstrainFacingModeKind {
-        Some: support::new_leak_box_ptr(
-            wire_ApiOptionConstrainFacingMode_Some {
-                field0: core::ptr::null_mut(),
-            },
-        ),
-    })
-}
-
-impl NewWithNullPtr for wire_ApiOptionConstrainU32 {
-    fn new_with_null_ptr() -> Self {
-        Self {
-            tag: -1,
-            kind: core::ptr::null_mut(),
-        }
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn inflate_ApiOptionConstrainU32_Some(
-) -> *mut ApiOptionConstrainU32Kind {
-    support::new_leak_box_ptr(ApiOptionConstrainU32Kind {
-        Some: support::new_leak_box_ptr(wire_ApiOptionConstrainU32_Some {
-            field0: core::ptr::null_mut(),
-        }),
-    })
 }
 
 impl NewWithNullPtr for wire_ConstrainU32 {

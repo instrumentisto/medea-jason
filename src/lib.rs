@@ -128,33 +128,8 @@ pub mod utils;
 pub mod api;
 pub mod connection;
 pub mod jason;
-#[cfg(not(target_family = "wasm"))]
-#[allow(
-    clippy::as_conversions,
-    clippy::missing_panics_doc,
-    clippy::undocumented_unsafe_blocks,
-    clippy::unwrap_used,
-    clippy::needless_pass_by_value,
-    non_snake_case
-)]
-pub mod jason_api;
 pub mod media;
 pub mod peer;
 pub mod platform;
 pub mod room;
 pub mod rpc;
-
-#[cfg(not(target_family = "wasm"))]
-#[allow(
-    clippy::as_conversions,
-    clippy::default_trait_access,
-    clippy::missing_docs_in_private_items,
-    clippy::ptr_as_ptr,
-    clippy::undocumented_unsafe_blocks,
-    clippy::empty_structs_with_brackets,
-    clippy::use_self,
-    clippy::wildcard_imports,
-    let_underscore_drop,
-    unused_qualifications
-)]
-mod jason_api_g;

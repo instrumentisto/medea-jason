@@ -432,9 +432,9 @@ ifeq ($(shell brew list | grep -Fx llvm),)
 endif
 endif
 	flutter_rust_bridge_codegen \
-		--rust-input src/jason_api.rs \
+		--rust-input src/api/dart/jason_api.rs \
 		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
-		--rust-output src/jason_api_g.rs \
+		--rust-output src/api/dart/jason_api_g.rs \
 		--skip-add-mod-to-lib \
 		--no-build-runner \
 		--dart-format-line-length=80
@@ -450,7 +450,8 @@ endif
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
-		$(LINUX_TARGETS) $(WEB_TARGETS)),\
+		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
+		$(WINDOWS_TARGETS)),\
 			$(call cargo.lint.medea-jason,$(target)))
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))

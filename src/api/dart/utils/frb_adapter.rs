@@ -1,15 +1,12 @@
-use dart_sys::{Dart_Handle, Dart_NewPersistentHandle_DL};
+use dart_sys::Dart_Handle;
 use flutter_rust_bridge::DartOpaque;
 
-use crate::api::ForeignClass;
+use crate::{api::ForeignClass, platform::utils::dart_api};
 
 /// Creates a new [`DartOpaque`].
-#[allow(clippy::expect_used)]
 pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
     DartOpaque::new_non_droppable(
-        Dart_NewPersistentHandle_DL
-            .expect("dart_api_dl has not been initialized")(handle)
-        .cast(),
+        dart_api::new_persistent_handle(handle).cast(),
     )
 }
 

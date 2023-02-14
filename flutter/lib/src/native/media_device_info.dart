@@ -1,5 +1,4 @@
 import '../interface/media_device_info.dart';
-import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class NativeMediaDeviceInfo implements MediaDeviceInfo {
@@ -35,7 +34,6 @@ class NativeMediaDeviceInfo implements MediaDeviceInfo {
     return _info.isFailed;
   }
 
-  @moveSemantics
   @override
   void free() {}
 }

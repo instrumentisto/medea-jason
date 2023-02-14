@@ -1,5 +1,4 @@
 import '../interface/media_display_info.dart';
-import '../util/move_semantic.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class NativeMediaDisplayInfo implements MediaDisplayInfo {
@@ -20,7 +19,6 @@ class NativeMediaDisplayInfo implements MediaDisplayInfo {
     return _info.title;
   }
 
-  @moveSemantics
   @override
   void free() {}
 }

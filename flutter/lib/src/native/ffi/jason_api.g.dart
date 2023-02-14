@@ -90,7 +90,9 @@ abstract class MedeaJason {
   ///
   /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
   Object connectionHandleEnableRemoteVideo(
-      {required ConnectionHandle connection, int? sourceKind, dynamic hint});
+      {required ConnectionHandle connection,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleEnableRemoteVideoConstMeta;
@@ -101,7 +103,9 @@ abstract class MedeaJason {
   ///
   /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
   Object connectionHandleDisableRemoteVideo(
-      {required ConnectionHandle connection, int? sourceKind, dynamic hint});
+      {required ConnectionHandle connection,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleDisableRemoteVideoConstMeta;
@@ -482,7 +486,9 @@ abstract class MedeaJason {
   ///
   /// If `source_kind` is not a [`MediaSourceKind`] index.
   Object roomHandleMuteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint});
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleMuteVideoConstMeta;
 
@@ -496,7 +502,9 @@ abstract class MedeaJason {
   ///
   /// If `source_kind` is not a [`MediaSourceKind`] index.
   Object roomHandleUnmuteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint});
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleUnmuteVideoConstMeta;
 
@@ -508,7 +516,9 @@ abstract class MedeaJason {
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
   Object roomHandleEnableVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint});
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableVideoConstMeta;
 
@@ -520,7 +530,9 @@ abstract class MedeaJason {
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
   Object roomHandleDisableVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint});
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableVideoConstMeta;
 
@@ -550,7 +562,9 @@ abstract class MedeaJason {
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
   Object roomHandleEnableRemoteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint});
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableRemoteVideoConstMeta;
 
@@ -564,7 +578,9 @@ abstract class MedeaJason {
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
   Object roomHandleDisableRemoteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint});
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableRemoteVideoConstMeta;
 
@@ -797,19 +813,19 @@ class ApiDeviceVideoTrackConstrs {
 
   /// Describes the directions that the camera can face, as seen from the
   /// user's perspective.
-  ApiOptionConstrainFacingMode facingMode;
+  ApiConstrainFacingMode? facingMode;
 
   /// Height of the video in pixels.
-  ApiOptionConstrainU32 height;
+  ConstrainU32? height;
 
   /// Width of the video in pixels.
-  ApiOptionConstrainU32 width;
+  ConstrainU32? width;
 
   ApiDeviceVideoTrackConstrs({
     this.deviceId,
-    required this.facingMode,
-    required this.height,
-    required this.width,
+    this.facingMode,
+    this.height,
+    this.width,
   });
 }
 
@@ -821,23 +837,23 @@ class ApiDisplayVideoTrackConstrs {
   /// [Height][1] of the video in pixels.
   ///
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
-  ApiOptionConstrainU32 height;
+  ConstrainU32? height;
 
   /// [Width][1] of the video in pixels.
   ///
   /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
-  ApiOptionConstrainU32 width;
+  ConstrainU32? width;
 
   /// [Frame rate][1] of the video.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-  ApiOptionConstrainU32 frameRate;
+  ConstrainU32? frameRate;
 
   ApiDisplayVideoTrackConstrs({
     this.deviceId,
-    required this.height,
-    required this.width,
-    required this.frameRate,
+    this.height,
+    this.width,
+    this.frameRate,
   });
 }
 
@@ -867,11 +883,16 @@ class ApiMediaDeviceInfo {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   final String? groupId;
 
+  /// Indicates whether the last attempt to use the provided device
+  /// failed.
+  final bool isFailed;
+
   ApiMediaDeviceInfo({
     required this.kind,
     required this.deviceId,
     required this.label,
     this.groupId,
+    required this.isFailed,
   });
 }
 
@@ -897,7 +918,7 @@ class ApiMediaStreamSettings {
   /// [MediaStreamConstraints][1] for the audio media type.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-  ApiAudioTrackConstrs audio;
+  ApiAudioTrackConstrs? audio;
 
   /// [MediaStreamConstraints][1] for the device video media type.
   ///
@@ -910,29 +931,10 @@ class ApiMediaStreamSettings {
   ApiDisplayVideoTrackConstrs? displayVideo;
 
   ApiMediaStreamSettings({
-    required this.audio,
+    this.audio,
     this.deviceVideo,
     this.displayVideo,
   });
-}
-
-@freezed
-class ApiOptionConstrainFacingMode with _$ApiOptionConstrainFacingMode {
-  const factory ApiOptionConstrainFacingMode.some(
-    ApiConstrainFacingMode field0,
-  ) = ApiOptionConstrainFacingMode_Some;
-  const factory ApiOptionConstrainFacingMode.none() =
-      ApiOptionConstrainFacingMode_None;
-}
-
-@freezed
-class ApiOptionConstrainU32 with _$ApiOptionConstrainU32 {
-  const factory ApiOptionConstrainU32.some(
-    ConstrainU32 field0,
-  ) = ApiOptionConstrainU32_Some;
-
-  /// Lack of value.
-  const factory ApiOptionConstrainU32.none() = ApiOptionConstrainU32_None;
 }
 
 @freezed
@@ -1196,9 +1198,11 @@ class MedeaJasonImpl implements MedeaJason {
           );
 
   Object connectionHandleEnableRemoteVideo(
-      {required ConnectionHandle connection, int? sourceKind, dynamic hint}) {
+      {required ConnectionHandle connection,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_connection_handle_enable_remote_video(arg0, arg1),
@@ -1217,9 +1221,11 @@ class MedeaJasonImpl implements MedeaJason {
           );
 
   Object connectionHandleDisableRemoteVideo(
-      {required ConnectionHandle connection, int? sourceKind, dynamic hint}) {
+      {required ConnectionHandle connection,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_ConnectionHandle(connection);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_connection_handle_disable_remote_video(arg0, arg1),
@@ -1673,7 +1679,7 @@ class MedeaJasonImpl implements MedeaJason {
       required int delayMs,
       dynamic hint}) {
     var arg0 = _platform.api2wire_ReconnectHandle(reconnectHandle);
-    var arg1 = _platform.api2wire_i64(delayMs);
+    var arg1 = api2wire_u32(delayMs);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_reconnect_handle_reconnect_with_delay(arg0, arg1),
@@ -1699,10 +1705,10 @@ class MedeaJasonImpl implements MedeaJason {
       int? maxElapsedTimeMs,
       dynamic hint}) {
     var arg0 = _platform.api2wire_ReconnectHandle(reconnectHandle);
-    var arg1 = _platform.api2wire_i64(startingDelay);
+    var arg1 = api2wire_u32(startingDelay);
     var arg2 = api2wire_f64(multiplier);
-    var arg3 = _platform.api2wire_i64(maxDelay);
-    var arg4 = _platform.api2wire_opt_box_autoadd_i64(maxElapsedTimeMs);
+    var arg3 = api2wire_u32(maxDelay);
+    var arg4 = _platform.api2wire_opt_box_autoadd_u32(maxElapsedTimeMs);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner
           .wire_reconnect_handle_reconnect_with_backoff(
@@ -2057,9 +2063,11 @@ class MedeaJasonImpl implements MedeaJason {
       );
 
   Object roomHandleMuteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_mute_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
@@ -2076,9 +2084,11 @@ class MedeaJasonImpl implements MedeaJason {
       );
 
   Object roomHandleUnmuteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_unmute_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
@@ -2095,9 +2105,11 @@ class MedeaJasonImpl implements MedeaJason {
       );
 
   Object roomHandleEnableVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_enable_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
@@ -2114,9 +2126,11 @@ class MedeaJasonImpl implements MedeaJason {
       );
 
   Object roomHandleDisableVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_disable_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
@@ -2170,9 +2184,11 @@ class MedeaJasonImpl implements MedeaJason {
       );
 
   Object roomHandleEnableRemoteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_room_handle_enable_remote_video(arg0, arg1),
@@ -2190,9 +2206,11 @@ class MedeaJasonImpl implements MedeaJason {
       );
 
   Object roomHandleDisableRemoteVideo(
-      {required RoomHandle roomHandle, int? sourceKind, dynamic hint}) {
+      {required RoomHandle roomHandle,
+      MediaSourceKind? sourceKind,
+      dynamic hint}) {
     var arg0 = _platform.api2wire_RoomHandle(roomHandle);
-    var arg1 = _platform.api2wire_opt_box_autoadd_i64(sourceKind);
+    var arg1 = _platform.api2wire_opt_box_autoadd_media_source_kind(sourceKind);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_room_handle_disable_remote_video(arg0, arg1),
@@ -2395,13 +2413,14 @@ class MedeaJasonImpl implements MedeaJason {
 
   ApiMediaDeviceInfo _wire2api_api_media_device_info(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return ApiMediaDeviceInfo(
       kind: _wire2api_media_device_kind(arr[0]),
       deviceId: _wire2api_String(arr[1]),
       label: _wire2api_String(arr[2]),
       groupId: _wire2api_opt_String(arr[3]),
+      isFailed: _wire2api_bool(arr[4]),
     );
   }
 
@@ -2504,6 +2523,11 @@ int api2wire_i32(int raw) {
 }
 
 @protected
+int api2wire_media_source_kind(MediaSourceKind raw) {
+  return api2wire_i32(raw.index);
+}
+
+@protected
 int api2wire_u32(int raw) {
   return raw;
 }
@@ -2587,27 +2611,10 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<wire_ApiAudioTrackConstrs> api2wire_box_api_audio_track_constrs(
-      ApiAudioTrackConstrs raw) {
-    final ptr = inner.new_box_api_audio_track_constrs_0();
+  ffi.Pointer<wire_ApiAudioTrackConstrs>
+      api2wire_box_autoadd_api_audio_track_constrs(ApiAudioTrackConstrs raw) {
+    final ptr = inner.new_box_autoadd_api_audio_track_constrs_0();
     _api_fill_to_wire_api_audio_track_constrs(raw, ptr.ref);
-    return ptr;
-  }
-
-  @protected
-  ffi.Pointer<wire_ApiOptionConstrainFacingMode>
-      api2wire_box_api_option_constrain_facing_mode(
-          ApiOptionConstrainFacingMode raw) {
-    final ptr = inner.new_box_api_option_constrain_facing_mode_0();
-    _api_fill_to_wire_api_option_constrain_facing_mode(raw, ptr.ref);
-    return ptr;
-  }
-
-  @protected
-  ffi.Pointer<wire_ApiOptionConstrainU32>
-      api2wire_box_api_option_constrain_u_32(ApiOptionConstrainU32 raw) {
-    final ptr = inner.new_box_api_option_constrain_u_32_0();
-    _api_fill_to_wire_api_option_constrain_u_32(raw, ptr.ref);
     return ptr;
   }
 
@@ -2656,8 +2663,15 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<ffi.Int64> api2wire_box_autoadd_i64(int raw) {
-    return inner.new_box_autoadd_i64_0(api2wire_i64(raw));
+  ffi.Pointer<ffi.Int32> api2wire_box_autoadd_media_source_kind(
+      MediaSourceKind raw) {
+    return inner
+        .new_box_autoadd_media_source_kind_0(api2wire_media_source_kind(raw));
+  }
+
+  @protected
+  ffi.Pointer<ffi.Uint32> api2wire_box_autoadd_u32(int raw) {
+    return inner.new_box_autoadd_u32_0(api2wire_u32(raw));
   }
 
   @protected
@@ -2668,6 +2682,24 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   @protected
   ffi.Pointer<wire_uint_8_list> api2wire_opt_String(String? raw) {
     return raw == null ? ffi.nullptr : api2wire_String(raw);
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiAudioTrackConstrs>
+      api2wire_opt_box_autoadd_api_audio_track_constrs(
+          ApiAudioTrackConstrs? raw) {
+    return raw == null
+        ? ffi.nullptr
+        : api2wire_box_autoadd_api_audio_track_constrs(raw);
+  }
+
+  @protected
+  ffi.Pointer<wire_ApiConstrainFacingMode>
+      api2wire_opt_box_autoadd_api_constrain_facing_mode(
+          ApiConstrainFacingMode? raw) {
+    return raw == null
+        ? ffi.nullptr
+        : api2wire_box_autoadd_api_constrain_facing_mode(raw);
   }
 
   @protected
@@ -2689,8 +2721,22 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<ffi.Int64> api2wire_opt_box_autoadd_i64(int? raw) {
-    return raw == null ? ffi.nullptr : api2wire_box_autoadd_i64(raw);
+  ffi.Pointer<wire_ConstrainU32> api2wire_opt_box_autoadd_constrain_u_32(
+      ConstrainU32? raw) {
+    return raw == null ? ffi.nullptr : api2wire_box_autoadd_constrain_u_32(raw);
+  }
+
+  @protected
+  ffi.Pointer<ffi.Int32> api2wire_opt_box_autoadd_media_source_kind(
+      MediaSourceKind? raw) {
+    return raw == null
+        ? ffi.nullptr
+        : api2wire_box_autoadd_media_source_kind(raw);
+  }
+
+  @protected
+  ffi.Pointer<ffi.Uint32> api2wire_opt_box_autoadd_u32(int? raw) {
+    return raw == null ? ffi.nullptr : api2wire_box_autoadd_u32(raw);
   }
 
   @protected
@@ -2795,24 +2841,25 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
       wire_ApiDeviceVideoTrackConstrs wireObj) {
     wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
     wireObj.facing_mode =
-        api2wire_box_api_option_constrain_facing_mode(apiObj.facingMode);
-    wireObj.height = api2wire_box_api_option_constrain_u_32(apiObj.height);
-    wireObj.width = api2wire_box_api_option_constrain_u_32(apiObj.width);
+        api2wire_opt_box_autoadd_api_constrain_facing_mode(apiObj.facingMode);
+    wireObj.height = api2wire_opt_box_autoadd_constrain_u_32(apiObj.height);
+    wireObj.width = api2wire_opt_box_autoadd_constrain_u_32(apiObj.width);
   }
 
   void _api_fill_to_wire_api_display_video_track_constrs(
       ApiDisplayVideoTrackConstrs apiObj,
       wire_ApiDisplayVideoTrackConstrs wireObj) {
     wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
-    wireObj.height = api2wire_box_api_option_constrain_u_32(apiObj.height);
-    wireObj.width = api2wire_box_api_option_constrain_u_32(apiObj.width);
+    wireObj.height = api2wire_opt_box_autoadd_constrain_u_32(apiObj.height);
+    wireObj.width = api2wire_opt_box_autoadd_constrain_u_32(apiObj.width);
     wireObj.frame_rate =
-        api2wire_box_api_option_constrain_u_32(apiObj.frameRate);
+        api2wire_opt_box_autoadd_constrain_u_32(apiObj.frameRate);
   }
 
   void _api_fill_to_wire_api_media_stream_settings(
       ApiMediaStreamSettings apiObj, wire_ApiMediaStreamSettings wireObj) {
-    wireObj.audio = api2wire_box_api_audio_track_constrs(apiObj.audio);
+    wireObj.audio =
+        api2wire_opt_box_autoadd_api_audio_track_constrs(apiObj.audio);
     wireObj.device_video =
         api2wire_opt_box_autoadd_api_device_video_track_constrs(
             apiObj.deviceVideo);
@@ -2821,54 +2868,10 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
             apiObj.displayVideo);
   }
 
-  void _api_fill_to_wire_api_option_constrain_facing_mode(
-      ApiOptionConstrainFacingMode apiObj,
-      wire_ApiOptionConstrainFacingMode wireObj) {
-    if (apiObj is ApiOptionConstrainFacingMode_Some) {
-      var pre_field0 =
-          api2wire_box_autoadd_api_constrain_facing_mode(apiObj.field0);
-      wireObj.tag = 0;
-      wireObj.kind = inner.inflate_ApiOptionConstrainFacingMode_Some();
-      wireObj.kind.ref.Some.ref.field0 = pre_field0;
-      return;
-    }
-    if (apiObj is ApiOptionConstrainFacingMode_None) {
-      wireObj.tag = 1;
-      return;
-    }
-  }
-
-  void _api_fill_to_wire_api_option_constrain_u_32(
-      ApiOptionConstrainU32 apiObj, wire_ApiOptionConstrainU32 wireObj) {
-    if (apiObj is ApiOptionConstrainU32_Some) {
-      var pre_field0 = api2wire_box_autoadd_constrain_u_32(apiObj.field0);
-      wireObj.tag = 0;
-      wireObj.kind = inner.inflate_ApiOptionConstrainU32_Some();
-      wireObj.kind.ref.Some.ref.field0 = pre_field0;
-      return;
-    }
-    if (apiObj is ApiOptionConstrainU32_None) {
-      wireObj.tag = 1;
-      return;
-    }
-  }
-
-  void _api_fill_to_wire_box_api_audio_track_constrs(
+  void _api_fill_to_wire_box_autoadd_api_audio_track_constrs(
       ApiAudioTrackConstrs apiObj,
       ffi.Pointer<wire_ApiAudioTrackConstrs> wireObj) {
     _api_fill_to_wire_api_audio_track_constrs(apiObj, wireObj.ref);
-  }
-
-  void _api_fill_to_wire_box_api_option_constrain_facing_mode(
-      ApiOptionConstrainFacingMode apiObj,
-      ffi.Pointer<wire_ApiOptionConstrainFacingMode> wireObj) {
-    _api_fill_to_wire_api_option_constrain_facing_mode(apiObj, wireObj.ref);
-  }
-
-  void _api_fill_to_wire_box_api_option_constrain_u_32(
-      ApiOptionConstrainU32 apiObj,
-      ffi.Pointer<wire_ApiOptionConstrainU32> wireObj) {
-    _api_fill_to_wire_api_option_constrain_u_32(apiObj, wireObj.ref);
   }
 
   void _api_fill_to_wire_box_autoadd_api_constrain_facing_mode(
@@ -2927,6 +2930,20 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     }
   }
 
+  void _api_fill_to_wire_opt_box_autoadd_api_audio_track_constrs(
+      ApiAudioTrackConstrs? apiObj,
+      ffi.Pointer<wire_ApiAudioTrackConstrs> wireObj) {
+    if (apiObj != null)
+      _api_fill_to_wire_box_autoadd_api_audio_track_constrs(apiObj, wireObj);
+  }
+
+  void _api_fill_to_wire_opt_box_autoadd_api_constrain_facing_mode(
+      ApiConstrainFacingMode? apiObj,
+      ffi.Pointer<wire_ApiConstrainFacingMode> wireObj) {
+    if (apiObj != null)
+      _api_fill_to_wire_box_autoadd_api_constrain_facing_mode(apiObj, wireObj);
+  }
+
   void _api_fill_to_wire_opt_box_autoadd_api_device_video_track_constrs(
       ApiDeviceVideoTrackConstrs? apiObj,
       ffi.Pointer<wire_ApiDeviceVideoTrackConstrs> wireObj) {
@@ -2941,6 +2958,12 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     if (apiObj != null)
       _api_fill_to_wire_box_autoadd_api_display_video_track_constrs(
           apiObj, wireObj);
+  }
+
+  void _api_fill_to_wire_opt_box_autoadd_constrain_u_32(
+      ConstrainU32? apiObj, ffi.Pointer<wire_ConstrainU32> wireObj) {
+    if (apiObj != null)
+      _api_fill_to_wire_box_autoadd_constrain_u_32(apiObj, wireObj);
   }
 }
 
@@ -3024,26 +3047,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           'box_foreign_value');
   late final _box_foreign_value = _box_foreign_valuePtr
       .asFunction<ffi.Pointer<DartValue> Function(DartValue)>();
-
-  Object new_argument_error(
-    DartValue value,
-    ffi.Pointer<ffi.Char> name,
-    ffi.Pointer<ffi.Char> message,
-  ) {
-    return _new_argument_error(
-      value,
-      name,
-      message,
-    );
-  }
-
-  late final _new_argument_errorPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Handle Function(DartValue, ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>>('new_argument_error');
-  late final _new_argument_error = _new_argument_errorPtr.asFunction<
-      Object Function(
-          DartValue, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   Object new_state_error(
     ffi.Pointer<ffi.Char> message,
@@ -3239,14 +3242,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _throw_panic_exception =
       _throw_panic_exceptionPtr.asFunction<Object Function()>();
 
-  void fire_panic() {
-    return _fire_panic();
-  }
-
-  late final _fire_panicPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function()>>('fire_panic');
-  late final _fire_panic = _fire_panicPtr.asFunction<void Function()>();
-
   void store_dart_post_cobject(
     DartPostCObjectFnType ptr,
   ) {
@@ -3433,7 +3428,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturn wire_connection_handle_enable_remote_video(
     wire_ConnectionHandle connection,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_connection_handle_enable_remote_video(
       connection,
@@ -3444,16 +3439,16 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_enable_remote_videoPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturn Function(
-                  wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>>(
+                  wire_ConnectionHandle, ffi.Pointer<ffi.Int32>)>>(
       'wire_connection_handle_enable_remote_video');
   late final _wire_connection_handle_enable_remote_video =
       _wire_connection_handle_enable_remote_videoPtr.asFunction<
           WireSyncReturn Function(
-              wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>();
+              wire_ConnectionHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_connection_handle_disable_remote_video(
     wire_ConnectionHandle connection,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_connection_handle_disable_remote_video(
       connection,
@@ -3464,12 +3459,12 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_connection_handle_disable_remote_videoPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturn Function(
-                  wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>>(
+                  wire_ConnectionHandle, ffi.Pointer<ffi.Int32>)>>(
       'wire_connection_handle_disable_remote_video');
   late final _wire_connection_handle_disable_remote_video =
       _wire_connection_handle_disable_remote_videoPtr.asFunction<
           WireSyncReturn Function(
-              wire_ConnectionHandle, ffi.Pointer<ffi.Int64>)>();
+              wire_ConnectionHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_on_panic(
     wire_DartOpaque cb,
@@ -3837,7 +3832,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_reconnect_handle_reconnect_with_delayPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_ReconnectHandle,
-              ffi.Int64)>>('wire_reconnect_handle_reconnect_with_delay');
+              ffi.Uint32)>>('wire_reconnect_handle_reconnect_with_delay');
   late final _wire_reconnect_handle_reconnect_with_delay =
       _wire_reconnect_handle_reconnect_with_delayPtr
           .asFunction<WireSyncReturn Function(wire_ReconnectHandle, int)>();
@@ -3847,7 +3842,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
     int starting_delay,
     double multiplier,
     int max_delay,
-    ffi.Pointer<ffi.Int64> max_elapsed_time_ms,
+    ffi.Pointer<ffi.Uint32> max_elapsed_time_ms,
   ) {
     return _wire_reconnect_handle_reconnect_with_backoff(
       reconnect_handle,
@@ -3860,13 +3855,13 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   late final _wire_reconnect_handle_reconnect_with_backoffPtr = _lookup<
           ffi.NativeFunction<
-              WireSyncReturn Function(wire_ReconnectHandle, ffi.Int64,
-                  ffi.Double, ffi.Int64, ffi.Pointer<ffi.Int64>)>>(
+              WireSyncReturn Function(wire_ReconnectHandle, ffi.Uint32,
+                  ffi.Double, ffi.Uint32, ffi.Pointer<ffi.Uint32>)>>(
       'wire_reconnect_handle_reconnect_with_backoff');
   late final _wire_reconnect_handle_reconnect_with_backoff =
       _wire_reconnect_handle_reconnect_with_backoffPtr.asFunction<
           WireSyncReturn Function(wire_ReconnectHandle, int, double, int,
-              ffi.Pointer<ffi.Int64>)>();
+              ffi.Pointer<ffi.Uint32>)>();
 
   WireSyncReturn wire_remote_media_track_from_ptr(
     int ptr,
@@ -4146,7 +4141,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturn wire_room_handle_mute_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_room_handle_mute_video(
       room_handle,
@@ -4157,14 +4152,14 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_mute_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_mute_video');
+              ffi.Pointer<ffi.Int32>)>>('wire_room_handle_mute_video');
   late final _wire_room_handle_mute_video =
       _wire_room_handle_mute_videoPtr.asFunction<
-          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
+          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_room_handle_unmute_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_room_handle_unmute_video(
       room_handle,
@@ -4175,14 +4170,14 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_unmute_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_unmute_video');
+              ffi.Pointer<ffi.Int32>)>>('wire_room_handle_unmute_video');
   late final _wire_room_handle_unmute_video =
       _wire_room_handle_unmute_videoPtr.asFunction<
-          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
+          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_room_handle_enable_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_room_handle_enable_video(
       room_handle,
@@ -4193,14 +4188,14 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_enable_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_enable_video');
+              ffi.Pointer<ffi.Int32>)>>('wire_room_handle_enable_video');
   late final _wire_room_handle_enable_video =
       _wire_room_handle_enable_videoPtr.asFunction<
-          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
+          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_room_handle_disable_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_room_handle_disable_video(
       room_handle,
@@ -4211,10 +4206,10 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_disable_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_disable_video');
+              ffi.Pointer<ffi.Int32>)>>('wire_room_handle_disable_video');
   late final _wire_room_handle_disable_video =
       _wire_room_handle_disable_videoPtr.asFunction<
-          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
+          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_room_handle_enable_remote_audio(
     wire_RoomHandle room_handle,
@@ -4248,7 +4243,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   WireSyncReturn wire_room_handle_enable_remote_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_room_handle_enable_remote_video(
       room_handle,
@@ -4259,14 +4254,14 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_enable_remote_videoPtr = _lookup<
       ffi.NativeFunction<
           WireSyncReturn Function(wire_RoomHandle,
-              ffi.Pointer<ffi.Int64>)>>('wire_room_handle_enable_remote_video');
+              ffi.Pointer<ffi.Int32>)>>('wire_room_handle_enable_remote_video');
   late final _wire_room_handle_enable_remote_video =
       _wire_room_handle_enable_remote_videoPtr.asFunction<
-          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
+          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_room_handle_disable_remote_video(
     wire_RoomHandle room_handle,
-    ffi.Pointer<ffi.Int64> source_kind,
+    ffi.Pointer<ffi.Int32> source_kind,
   ) {
     return _wire_room_handle_disable_remote_video(
       room_handle,
@@ -4277,11 +4272,11 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_disable_remote_videoPtr = _lookup<
           ffi.NativeFunction<
               WireSyncReturn Function(
-                  wire_RoomHandle, ffi.Pointer<ffi.Int64>)>>(
+                  wire_RoomHandle, ffi.Pointer<ffi.Int32>)>>(
       'wire_room_handle_disable_remote_video');
   late final _wire_room_handle_disable_remote_video =
       _wire_room_handle_disable_remote_videoPtr.asFunction<
-          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int64>)>();
+          WireSyncReturn Function(wire_RoomHandle, ffi.Pointer<ffi.Int32>)>();
 
   WireSyncReturn wire_room_handle_on_new_connection(
     wire_RoomHandle room_handle,
@@ -4448,43 +4443,18 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _new_RoomHandle =
       _new_RoomHandlePtr.asFunction<wire_RoomHandle Function()>();
 
-  ffi.Pointer<wire_ApiAudioTrackConstrs> new_box_api_audio_track_constrs_0() {
-    return _new_box_api_audio_track_constrs_0();
+  ffi.Pointer<wire_ApiAudioTrackConstrs>
+      new_box_autoadd_api_audio_track_constrs_0() {
+    return _new_box_autoadd_api_audio_track_constrs_0();
   }
 
-  late final _new_box_api_audio_track_constrs_0Ptr = _lookup<
+  late final _new_box_autoadd_api_audio_track_constrs_0Ptr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<wire_ApiAudioTrackConstrs>
-              Function()>>('new_box_api_audio_track_constrs_0');
-  late final _new_box_api_audio_track_constrs_0 =
-      _new_box_api_audio_track_constrs_0Ptr
+              Function()>>('new_box_autoadd_api_audio_track_constrs_0');
+  late final _new_box_autoadd_api_audio_track_constrs_0 =
+      _new_box_autoadd_api_audio_track_constrs_0Ptr
           .asFunction<ffi.Pointer<wire_ApiAudioTrackConstrs> Function()>();
-
-  ffi.Pointer<wire_ApiOptionConstrainFacingMode>
-      new_box_api_option_constrain_facing_mode_0() {
-    return _new_box_api_option_constrain_facing_mode_0();
-  }
-
-  late final _new_box_api_option_constrain_facing_mode_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiOptionConstrainFacingMode>
-              Function()>>('new_box_api_option_constrain_facing_mode_0');
-  late final _new_box_api_option_constrain_facing_mode_0 =
-      _new_box_api_option_constrain_facing_mode_0Ptr.asFunction<
-          ffi.Pointer<wire_ApiOptionConstrainFacingMode> Function()>();
-
-  ffi.Pointer<wire_ApiOptionConstrainU32>
-      new_box_api_option_constrain_u_32_0() {
-    return _new_box_api_option_constrain_u_32_0();
-  }
-
-  late final _new_box_api_option_constrain_u_32_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiOptionConstrainU32>
-              Function()>>('new_box_api_option_constrain_u_32_0');
-  late final _new_box_api_option_constrain_u_32_0 =
-      _new_box_api_option_constrain_u_32_0Ptr
-          .asFunction<ffi.Pointer<wire_ApiOptionConstrainU32> Function()>();
 
   ffi.Pointer<wire_ApiConstrainFacingMode>
       new_box_autoadd_api_constrain_facing_mode_0() {
@@ -4549,19 +4519,34 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _new_box_autoadd_constrain_u_32_0Ptr
           .asFunction<ffi.Pointer<wire_ConstrainU32> Function()>();
 
-  ffi.Pointer<ffi.Int64> new_box_autoadd_i64_0(
+  ffi.Pointer<ffi.Int32> new_box_autoadd_media_source_kind_0(
     int value,
   ) {
-    return _new_box_autoadd_i64_0(
+    return _new_box_autoadd_media_source_kind_0(
       value,
     );
   }
 
-  late final _new_box_autoadd_i64_0Ptr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int64> Function(ffi.Int64)>>(
-          'new_box_autoadd_i64_0');
-  late final _new_box_autoadd_i64_0 = _new_box_autoadd_i64_0Ptr
-      .asFunction<ffi.Pointer<ffi.Int64> Function(int)>();
+  late final _new_box_autoadd_media_source_kind_0Ptr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int32> Function(ffi.Int32)>>(
+          'new_box_autoadd_media_source_kind_0');
+  late final _new_box_autoadd_media_source_kind_0 =
+      _new_box_autoadd_media_source_kind_0Ptr
+          .asFunction<ffi.Pointer<ffi.Int32> Function(int)>();
+
+  ffi.Pointer<ffi.Uint32> new_box_autoadd_u32_0(
+    int value,
+  ) {
+    return _new_box_autoadd_u32_0(
+      value,
+    );
+  }
+
+  late final _new_box_autoadd_u32_0Ptr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Uint32> Function(ffi.Uint32)>>(
+          'new_box_autoadd_u32_0');
+  late final _new_box_autoadd_u32_0 = _new_box_autoadd_u32_0Ptr
+      .asFunction<ffi.Pointer<ffi.Uint32> Function(int)>();
 
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,
@@ -4809,31 +4794,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _inflate_ApiConstrainFacingMode_IdealPtr
           .asFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>();
 
-  ffi.Pointer<ApiOptionConstrainFacingModeKind>
-      inflate_ApiOptionConstrainFacingMode_Some() {
-    return _inflate_ApiOptionConstrainFacingMode_Some();
-  }
-
-  late final _inflate_ApiOptionConstrainFacingMode_SomePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ApiOptionConstrainFacingModeKind>
-              Function()>>('inflate_ApiOptionConstrainFacingMode_Some');
-  late final _inflate_ApiOptionConstrainFacingMode_Some =
-      _inflate_ApiOptionConstrainFacingMode_SomePtr.asFunction<
-          ffi.Pointer<ApiOptionConstrainFacingModeKind> Function()>();
-
-  ffi.Pointer<ApiOptionConstrainU32Kind> inflate_ApiOptionConstrainU32_Some() {
-    return _inflate_ApiOptionConstrainU32_Some();
-  }
-
-  late final _inflate_ApiOptionConstrainU32_SomePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ApiOptionConstrainU32Kind>
-              Function()>>('inflate_ApiOptionConstrainU32_Some');
-  late final _inflate_ApiOptionConstrainU32_Some =
-      _inflate_ApiOptionConstrainU32_SomePtr
-          .asFunction<ffi.Pointer<ApiOptionConstrainU32Kind> Function()>();
-
   ffi.Pointer<ConstrainU32Kind> inflate_ConstrainU32_Exact() {
     return _inflate_ConstrainU32_Exact();
   }
@@ -4877,6 +4837,14 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           'free_WireSyncReturn');
   late final _free_WireSyncReturn =
       _free_WireSyncReturnPtr.asFunction<void Function(WireSyncReturn)>();
+
+  void fire_panic() {
+    return _fire_panic();
+  }
+
+  late final _fire_panicPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('fire_panic');
+  late final _fire_panic = _fire_panicPtr.asFunction<void Function()>();
 }
 
 class _Dart_Handle extends ffi.Opaque {}
@@ -4913,7 +4881,24 @@ class DartValue extends ffi.Union {
   @DartValue_Tag1()
   external int tag;
 
+  external UnnamedStruct1 unnamed;
+
+  external UnnamedStruct1 unnamed1;
+
   external String_Body string;
+
+  external UnnamedStruct1 unnamed2;
+
+  external UnnamedStruct1 unnamed3;
+
+  external UnnamedStruct1 unnamed4;
+}
+
+class UnnamedStruct1 extends ffi.Struct {
+  @DartValue_Tag1()
+  external int ptr_tag;
+
+  external ffi.Pointer<ffi.Void> ptr;
 }
 
 class wire_ConnectionHandle extends ffi.Struct {
@@ -4978,25 +4963,6 @@ class wire_ApiConstrainFacingMode extends ffi.Struct {
   external ffi.Pointer<ApiConstrainFacingModeKind> kind;
 }
 
-class wire_ApiOptionConstrainFacingMode_Some extends ffi.Struct {
-  external ffi.Pointer<wire_ApiConstrainFacingMode> field0;
-}
-
-class wire_ApiOptionConstrainFacingMode_None extends ffi.Opaque {}
-
-class ApiOptionConstrainFacingModeKind extends ffi.Union {
-  external ffi.Pointer<wire_ApiOptionConstrainFacingMode_Some> Some;
-
-  external ffi.Pointer<wire_ApiOptionConstrainFacingMode_None> None;
-}
-
-class wire_ApiOptionConstrainFacingMode extends ffi.Struct {
-  @ffi.Int32()
-  external int tag;
-
-  external ffi.Pointer<ApiOptionConstrainFacingModeKind> kind;
-}
-
 class wire_ConstrainU32_Exact extends ffi.Struct {
   @ffi.Uint32()
   external int field0;
@@ -5030,43 +4996,24 @@ class wire_ConstrainU32 extends ffi.Struct {
   external ffi.Pointer<ConstrainU32Kind> kind;
 }
 
-class wire_ApiOptionConstrainU32_Some extends ffi.Struct {
-  external ffi.Pointer<wire_ConstrainU32> field0;
-}
-
-class wire_ApiOptionConstrainU32_None extends ffi.Opaque {}
-
-class ApiOptionConstrainU32Kind extends ffi.Union {
-  external ffi.Pointer<wire_ApiOptionConstrainU32_Some> Some;
-
-  external ffi.Pointer<wire_ApiOptionConstrainU32_None> None;
-}
-
-class wire_ApiOptionConstrainU32 extends ffi.Struct {
-  @ffi.Int32()
-  external int tag;
-
-  external ffi.Pointer<ApiOptionConstrainU32Kind> kind;
-}
-
 class wire_ApiDeviceVideoTrackConstrs extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 
-  external ffi.Pointer<wire_ApiOptionConstrainFacingMode> facing_mode;
+  external ffi.Pointer<wire_ApiConstrainFacingMode> facing_mode;
 
-  external ffi.Pointer<wire_ApiOptionConstrainU32> height;
+  external ffi.Pointer<wire_ConstrainU32> height;
 
-  external ffi.Pointer<wire_ApiOptionConstrainU32> width;
+  external ffi.Pointer<wire_ConstrainU32> width;
 }
 
 class wire_ApiDisplayVideoTrackConstrs extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 
-  external ffi.Pointer<wire_ApiOptionConstrainU32> height;
+  external ffi.Pointer<wire_ConstrainU32> height;
 
-  external ffi.Pointer<wire_ApiOptionConstrainU32> width;
+  external ffi.Pointer<wire_ConstrainU32> width;
 
-  external ffi.Pointer<wire_ApiOptionConstrainU32> frame_rate;
+  external ffi.Pointer<wire_ConstrainU32> frame_rate;
 }
 
 class wire_ApiMediaStreamSettings extends ffi.Struct {

@@ -4,7 +4,6 @@
 //! [Control API]: https://tinyurl.com/yxsqplq7
 
 #[cfg(feature = "client")]
-#[allow(clippy::use_debug)]
 mod client;
 mod convert;
 #[cfg(feature = "server")]
