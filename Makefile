@@ -405,6 +405,7 @@ ifeq ($(crate),medea-jason)
 	cargo clean -p $(crate)
 	make cargo.build.jason platform=android args="--features dart-codegen" \
 	     dockerized=$(dockerized)
+	make cargo.gen.bridge
 	make flutter.fmt
 endif
 
@@ -412,9 +413,9 @@ endif
 # Generates Rust and Dart side interop bridge.
 #
 # Usage:
-#	make cargo.bridge.gen
+#	make cargo.gen.bridge
 
-cargo.bridge.gen:
+cargo.gen.bridge:
 ifeq ($(shell which flutter_rust_bridge_codegen),)
 	cargo install flutter_rust_bridge_codegen --vers=$(FLUTTER_RUST_BRIDGE_VER)
 else
@@ -438,7 +439,6 @@ endif
 		--skip-add-mod-to-lib \
 		--no-build-runner \
 		--dart-format-line-length=80
-
 	cd flutter && \
 	flutter pub run build_runner build --delete-conflicting-outputs
 
@@ -450,7 +450,7 @@ endif
 cargo.lint:
 	cargo clippy --workspace --all-features -- -D warnings
 	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
+		$(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
 		$(WINDOWS_TARGETS)),\
 			$(call cargo.lint.medea-jason,$(target)))
 define cargo.lint.medea-jason
@@ -1378,7 +1378,7 @@ endef
 
 .PHONY: build build.jason \
         cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
-        	cargo.lint cargo.version \
+        	cargo.gen.bridge cargo.lint cargo.version \
         docker.build \
         	docker.down.control docker.down.demo docker.down.e2e \
         	docker.down.medea docker.down.webdriver  \

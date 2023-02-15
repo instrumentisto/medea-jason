@@ -8,7 +8,6 @@ pub mod function;
 pub mod handle;
 pub mod list;
 pub mod map;
-pub mod result;
 mod string;
 
 pub use self::string::{

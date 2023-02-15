@@ -756,12 +756,14 @@ pub unsafe extern "C" fn box_foreign_value(
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 
+#[allow(clippy::missing_docs_in_private_items)]
 #[cfg(feature = "mockable")]
 mod dart_value_extern_tests_helpers {
     use super::*;
 
     use crate::platform::set_panic_hook;
 
+    #[allow(clippy::missing_docs_in_private_items)]
     #[no_mangle]
     pub unsafe extern "C" fn fire_panic() {
         set_panic_hook();

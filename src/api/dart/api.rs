@@ -41,15 +41,17 @@ use crate::{
 #[derive(Debug)]
 pub struct ApiMediaDeviceInfo {
     /// [`MediaDeviceKind`] of this [`ApiMediaDeviceInfo`].
-    pub(crate) kind: media::MediaDeviceKind,
+    ///
+    /// [`MediaDeviceKind`]: media::MediaDeviceKind
+    pub kind: media::MediaDeviceKind,
 
     /// Unique identifier of the device represented by this
     /// [`ApiMediaDeviceInfo`].
-    pub(crate) device_id: String,
+    pub device_id: String,
 
     /// Label describing the device represented by this
     /// [`ApiMediaDeviceInfo`] (for example, "External USB Webcam").
-    pub(crate) label: String,
+    pub label: String,
 
     /// Group identifier of the device represented by this
     /// [`ApiMediaDeviceInfo`]
@@ -60,11 +62,11 @@ pub struct ApiMediaDeviceInfo {
     /// same [groupId][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
-    pub(crate) group_id: Option<String>,
+    pub group_id: Option<String>,
 
     /// Indicates whether the last attempt to use the provided device
     /// failed.
-    pub(crate) is_failed: bool,
+    pub is_failed: bool,
 }
 
 /// Representation of a display source.
@@ -72,10 +74,10 @@ pub struct ApiMediaDeviceInfo {
 pub struct ApiMediaDisplayInfo {
     /// Unique identifier of the display represented by this
     /// [`ApiMediaDisplayInfo`].
-    pub(crate) device_id: String,
+    pub device_id: String,
 
     /// Title describing the represented display.
-    pub(crate) title: Option<String>,
+    pub title: Option<String>,
 }
 
 #[derive(Debug)]
@@ -83,7 +85,7 @@ pub struct ApiMediaDisplayInfo {
 pub struct ApiAudioConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
-    pub(crate) device_id: Option<String>,
+    pub device_id: Option<String>,
 }
 
 impl From<ApiAudioConstraints> for media::AudioTrackConstraints {
@@ -118,20 +120,20 @@ pub enum ApiConstrainFacingMode {
 pub struct ApiDeviceVideoTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
-    pub(crate) device_id: Option<String>,
+    pub device_id: Option<String>,
 
     /// Describes the directions that the camera can face, as seen from the
     /// user's perspective.
     #[frb(non_final)]
-    pub(crate) facing_mode: Option<ApiConstrainFacingMode>,
+    pub facing_mode: Option<ApiConstrainFacingMode>,
 
     /// Height of the video in pixels.
     #[frb(non_final)]
-    pub(crate) height: Option<ConstrainU32>,
+    pub height: Option<ConstrainU32>,
 
     /// Width of the video in pixels.
     #[frb(non_final)]
-    pub(crate) width: Option<ConstrainU32>,
+    pub width: Option<ConstrainU32>,
 }
 
 impl From<ApiDeviceVideoTrackConstraints>
@@ -174,25 +176,25 @@ impl From<ApiDeviceVideoTrackConstraints>
 pub struct ApiDisplayVideoTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
-    pub(crate) device_id: Option<String>,
+    pub device_id: Option<String>,
 
     /// [Height][1] of the video in pixels.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-height
     #[frb(non_final)]
-    pub(crate) height: Option<ConstrainU32>,
+    pub height: Option<ConstrainU32>,
 
     /// [Width][1] of the video in pixels.
     ///
     /// [1]: https://tinyurl.com/w3-streams#def-constraint-width
     #[frb(non_final)]
-    pub(crate) width: Option<ConstrainU32>,
+    pub width: Option<ConstrainU32>,
 
     /// [Frame rate][1] of the video.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     #[frb(non_final)]
-    pub(crate) frame_rate: Option<ConstrainU32>,
+    pub frame_rate: Option<ConstrainU32>,
 }
 
 impl From<ApiDisplayVideoTrackConstraints>
@@ -241,19 +243,19 @@ pub struct ApiMediaStreamSettings {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]
-    pub(crate) audio: Option<ApiAudioConstraints>,
+    pub audio: Option<ApiAudioConstraints>,
 
     /// [MediaStreamConstraints][1] for the device video media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]
-    pub(crate) device_video: Option<ApiDeviceVideoTrackConstraints>,
+    pub device_video: Option<ApiDeviceVideoTrackConstraints>,
 
     /// [MediaStreamConstraints][1] for the display video media type.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     #[frb(non_final)]
-    pub(crate) display_video: Option<ApiDisplayVideoTrackConstraints>,
+    pub display_video: Option<ApiDisplayVideoTrackConstraints>,
 }
 
 impl From<ApiMediaStreamSettings> for media::MediaStreamSettings {

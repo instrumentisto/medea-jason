@@ -862,6 +862,8 @@ class ApiDisplayVideoTrackConstraints {
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 class ApiMediaDeviceInfo {
   /// [`MediaDeviceKind`] of this [`ApiMediaDeviceInfo`].
+  ///
+  /// [`MediaDeviceKind`]: media::MediaDeviceKind
   final MediaDeviceKind kind;
 
   /// Unique identifier of the device represented by this
