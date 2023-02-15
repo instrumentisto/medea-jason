@@ -4,8 +4,9 @@ import 'ffi/jason_api.g.dart' as frb;
 class DisplayVideoTrackConstraints
     implements base.DisplayVideoTrackConstraints {
   /// Rust `flutter_rust_bridge` api representation.
-  frb.ApiDisplayVideoTrackConstrs constraints = frb.ApiDisplayVideoTrackConstrs(
-      deviceId: null, height: null, width: null, frameRate: null);
+  frb.ApiDisplayVideoTrackConstraints constraints =
+      frb.ApiDisplayVideoTrackConstraints(
+          deviceId: null, height: null, width: null, frameRate: null);
 
   @override
   void exactHeight(int height) {

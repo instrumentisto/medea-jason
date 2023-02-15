@@ -6,16 +6,12 @@
 // TODO: Improve documentation in this module.
 #![allow(
     clippy::as_conversions,
-    clippy::missing_docs_in_private_items,
     clippy::missing_safety_doc,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
-    clippy::unwrap_used,
     missing_docs
 )]
 
-pub mod api_struct;
-#[cfg(not(target_family = "wasm"))]
 #[allow(
     clippy::as_conversions,
     clippy::missing_panics_doc,
@@ -24,11 +20,9 @@ pub mod api_struct;
     clippy::needless_pass_by_value,
     non_snake_case
 )]
-pub mod jason_api;
+pub mod api;
 pub mod utils;
-pub use api_struct::*;
 
-#[cfg(not(target_family = "wasm"))]
 #[allow(
     clippy::as_conversions,
     clippy::default_trait_access,
@@ -41,7 +35,7 @@ pub use api_struct::*;
     let_underscore_drop,
     unused_qualifications
 )]
-mod jason_api_g;
+mod api_bridge_generated;
 
 use std::{
     ffi::{c_void, CString},
@@ -65,7 +59,7 @@ use crate::{
 pub use crate::media::MediaDirection;
 
 pub use self::{
-    jason_api::{
+    api::{
         ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
         ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },

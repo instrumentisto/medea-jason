@@ -1,7 +1,17 @@
-mod err;
-mod frb_adapter;
+//! Miscellaneous utility structs and functions.
 
-pub use self::{
-    err::{new_panic_error, DartError},
-    frb_adapter::*,
-};
+mod err;
+
+use dart_sys::Dart_Handle;
+use flutter_rust_bridge::DartOpaque;
+
+use crate::platform::utils::dart_api;
+
+pub use self::err::{new_panic_error, DartError};
+
+/// Creates a new [`DartOpaque`].
+pub unsafe fn new_dart_opaque(handle: Dart_Handle) -> DartOpaque {
+    DartOpaque::new_non_droppable(
+        dart_api::new_persistent_handle(handle).cast(),
+    )
+}

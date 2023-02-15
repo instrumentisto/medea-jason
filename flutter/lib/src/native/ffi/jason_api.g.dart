@@ -783,11 +783,11 @@ class RoomHandle extends FrbOpaque {
   OpaqueTypeFinalizer get staticFinalizer => bridge.RoomHandleFinalizer;
 }
 
-class ApiAudioTrackConstrs {
+class ApiAudioConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
 
-  ApiAudioTrackConstrs({
+  ApiAudioConstraints({
     this.deviceId,
   });
 }
@@ -807,7 +807,7 @@ class ApiConstrainFacingMode with _$ApiConstrainFacingMode {
 
 /// Constraints applicable to video tracks that are sourced from some media
 /// device.
-class ApiDeviceVideoTrackConstrs {
+class ApiDeviceVideoTrackConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
 
@@ -821,7 +821,7 @@ class ApiDeviceVideoTrackConstrs {
   /// Width of the video in pixels.
   ConstrainU32? width;
 
-  ApiDeviceVideoTrackConstrs({
+  ApiDeviceVideoTrackConstraints({
     this.deviceId,
     this.facingMode,
     this.height,
@@ -830,7 +830,7 @@ class ApiDeviceVideoTrackConstrs {
 }
 
 /// Constraints applicable to video tracks sourced from a screen capturing.
-class ApiDisplayVideoTrackConstrs {
+class ApiDisplayVideoTrackConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
 
@@ -849,7 +849,7 @@ class ApiDisplayVideoTrackConstrs {
   /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
   ConstrainU32? frameRate;
 
-  ApiDisplayVideoTrackConstrs({
+  ApiDisplayVideoTrackConstraints({
     this.deviceId,
     this.height,
     this.width,
@@ -918,17 +918,17 @@ class ApiMediaStreamSettings {
   /// [MediaStreamConstraints][1] for the audio media type.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-  ApiAudioTrackConstrs? audio;
+  ApiAudioConstraints? audio;
 
   /// [MediaStreamConstraints][1] for the device video media type.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-  ApiDeviceVideoTrackConstrs? deviceVideo;
+  ApiDeviceVideoTrackConstraints? deviceVideo;
 
   /// [MediaStreamConstraints][1] for the display video media type.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
-  ApiDisplayVideoTrackConstrs? displayVideo;
+  ApiDisplayVideoTrackConstraints? displayVideo;
 
   ApiMediaStreamSettings({
     this.audio,
@@ -2611,10 +2611,10 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<wire_ApiAudioTrackConstrs>
-      api2wire_box_autoadd_api_audio_track_constrs(ApiAudioTrackConstrs raw) {
-    final ptr = inner.new_box_autoadd_api_audio_track_constrs_0();
-    _api_fill_to_wire_api_audio_track_constrs(raw, ptr.ref);
+  ffi.Pointer<wire_ApiAudioConstraints>
+      api2wire_box_autoadd_api_audio_constraints(ApiAudioConstraints raw) {
+    final ptr = inner.new_box_autoadd_api_audio_constraints_0();
+    _api_fill_to_wire_api_audio_constraints(raw, ptr.ref);
     return ptr;
   }
 
@@ -2628,20 +2628,20 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<wire_ApiDeviceVideoTrackConstrs>
-      api2wire_box_autoadd_api_device_video_track_constrs(
-          ApiDeviceVideoTrackConstrs raw) {
-    final ptr = inner.new_box_autoadd_api_device_video_track_constrs_0();
-    _api_fill_to_wire_api_device_video_track_constrs(raw, ptr.ref);
+  ffi.Pointer<wire_ApiDeviceVideoTrackConstraints>
+      api2wire_box_autoadd_api_device_video_track_constraints(
+          ApiDeviceVideoTrackConstraints raw) {
+    final ptr = inner.new_box_autoadd_api_device_video_track_constraints_0();
+    _api_fill_to_wire_api_device_video_track_constraints(raw, ptr.ref);
     return ptr;
   }
 
   @protected
-  ffi.Pointer<wire_ApiDisplayVideoTrackConstrs>
-      api2wire_box_autoadd_api_display_video_track_constrs(
-          ApiDisplayVideoTrackConstrs raw) {
-    final ptr = inner.new_box_autoadd_api_display_video_track_constrs_0();
-    _api_fill_to_wire_api_display_video_track_constrs(raw, ptr.ref);
+  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+      api2wire_box_autoadd_api_display_video_track_constraints(
+          ApiDisplayVideoTrackConstraints raw) {
+    final ptr = inner.new_box_autoadd_api_display_video_track_constraints_0();
+    _api_fill_to_wire_api_display_video_track_constraints(raw, ptr.ref);
     return ptr;
   }
 
@@ -2685,12 +2685,11 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<wire_ApiAudioTrackConstrs>
-      api2wire_opt_box_autoadd_api_audio_track_constrs(
-          ApiAudioTrackConstrs? raw) {
+  ffi.Pointer<wire_ApiAudioConstraints>
+      api2wire_opt_box_autoadd_api_audio_constraints(ApiAudioConstraints? raw) {
     return raw == null
         ? ffi.nullptr
-        : api2wire_box_autoadd_api_audio_track_constrs(raw);
+        : api2wire_box_autoadd_api_audio_constraints(raw);
   }
 
   @protected
@@ -2703,21 +2702,21 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   }
 
   @protected
-  ffi.Pointer<wire_ApiDeviceVideoTrackConstrs>
-      api2wire_opt_box_autoadd_api_device_video_track_constrs(
-          ApiDeviceVideoTrackConstrs? raw) {
+  ffi.Pointer<wire_ApiDeviceVideoTrackConstraints>
+      api2wire_opt_box_autoadd_api_device_video_track_constraints(
+          ApiDeviceVideoTrackConstraints? raw) {
     return raw == null
         ? ffi.nullptr
-        : api2wire_box_autoadd_api_device_video_track_constrs(raw);
+        : api2wire_box_autoadd_api_device_video_track_constraints(raw);
   }
 
   @protected
-  ffi.Pointer<wire_ApiDisplayVideoTrackConstrs>
-      api2wire_opt_box_autoadd_api_display_video_track_constrs(
-          ApiDisplayVideoTrackConstrs? raw) {
+  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+      api2wire_opt_box_autoadd_api_display_video_track_constraints(
+          ApiDisplayVideoTrackConstraints? raw) {
     return raw == null
         ? ffi.nullptr
-        : api2wire_box_autoadd_api_display_video_track_constrs(raw);
+        : api2wire_box_autoadd_api_display_video_track_constraints(raw);
   }
 
   @protected
@@ -2813,8 +2812,8 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     wireObj.ptr = apiObj.shareOrMove();
   }
 
-  void _api_fill_to_wire_api_audio_track_constrs(
-      ApiAudioTrackConstrs apiObj, wire_ApiAudioTrackConstrs wireObj) {
+  void _api_fill_to_wire_api_audio_constraints(
+      ApiAudioConstraints apiObj, wire_ApiAudioConstraints wireObj) {
     wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
   }
 
@@ -2836,9 +2835,9 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     }
   }
 
-  void _api_fill_to_wire_api_device_video_track_constrs(
-      ApiDeviceVideoTrackConstrs apiObj,
-      wire_ApiDeviceVideoTrackConstrs wireObj) {
+  void _api_fill_to_wire_api_device_video_track_constraints(
+      ApiDeviceVideoTrackConstraints apiObj,
+      wire_ApiDeviceVideoTrackConstraints wireObj) {
     wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
     wireObj.facing_mode =
         api2wire_opt_box_autoadd_api_constrain_facing_mode(apiObj.facingMode);
@@ -2846,9 +2845,9 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     wireObj.width = api2wire_opt_box_autoadd_constrain_u_32(apiObj.width);
   }
 
-  void _api_fill_to_wire_api_display_video_track_constrs(
-      ApiDisplayVideoTrackConstrs apiObj,
-      wire_ApiDisplayVideoTrackConstrs wireObj) {
+  void _api_fill_to_wire_api_display_video_track_constraints(
+      ApiDisplayVideoTrackConstraints apiObj,
+      wire_ApiDisplayVideoTrackConstraints wireObj) {
     wireObj.device_id = api2wire_opt_String(apiObj.deviceId);
     wireObj.height = api2wire_opt_box_autoadd_constrain_u_32(apiObj.height);
     wireObj.width = api2wire_opt_box_autoadd_constrain_u_32(apiObj.width);
@@ -2859,19 +2858,19 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
   void _api_fill_to_wire_api_media_stream_settings(
       ApiMediaStreamSettings apiObj, wire_ApiMediaStreamSettings wireObj) {
     wireObj.audio =
-        api2wire_opt_box_autoadd_api_audio_track_constrs(apiObj.audio);
+        api2wire_opt_box_autoadd_api_audio_constraints(apiObj.audio);
     wireObj.device_video =
-        api2wire_opt_box_autoadd_api_device_video_track_constrs(
+        api2wire_opt_box_autoadd_api_device_video_track_constraints(
             apiObj.deviceVideo);
     wireObj.display_video =
-        api2wire_opt_box_autoadd_api_display_video_track_constrs(
+        api2wire_opt_box_autoadd_api_display_video_track_constraints(
             apiObj.displayVideo);
   }
 
-  void _api_fill_to_wire_box_autoadd_api_audio_track_constrs(
-      ApiAudioTrackConstrs apiObj,
-      ffi.Pointer<wire_ApiAudioTrackConstrs> wireObj) {
-    _api_fill_to_wire_api_audio_track_constrs(apiObj, wireObj.ref);
+  void _api_fill_to_wire_box_autoadd_api_audio_constraints(
+      ApiAudioConstraints apiObj,
+      ffi.Pointer<wire_ApiAudioConstraints> wireObj) {
+    _api_fill_to_wire_api_audio_constraints(apiObj, wireObj.ref);
   }
 
   void _api_fill_to_wire_box_autoadd_api_constrain_facing_mode(
@@ -2880,16 +2879,16 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     _api_fill_to_wire_api_constrain_facing_mode(apiObj, wireObj.ref);
   }
 
-  void _api_fill_to_wire_box_autoadd_api_device_video_track_constrs(
-      ApiDeviceVideoTrackConstrs apiObj,
-      ffi.Pointer<wire_ApiDeviceVideoTrackConstrs> wireObj) {
-    _api_fill_to_wire_api_device_video_track_constrs(apiObj, wireObj.ref);
+  void _api_fill_to_wire_box_autoadd_api_device_video_track_constraints(
+      ApiDeviceVideoTrackConstraints apiObj,
+      ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> wireObj) {
+    _api_fill_to_wire_api_device_video_track_constraints(apiObj, wireObj.ref);
   }
 
-  void _api_fill_to_wire_box_autoadd_api_display_video_track_constrs(
-      ApiDisplayVideoTrackConstrs apiObj,
-      ffi.Pointer<wire_ApiDisplayVideoTrackConstrs> wireObj) {
-    _api_fill_to_wire_api_display_video_track_constrs(apiObj, wireObj.ref);
+  void _api_fill_to_wire_box_autoadd_api_display_video_track_constraints(
+      ApiDisplayVideoTrackConstraints apiObj,
+      ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> wireObj) {
+    _api_fill_to_wire_api_display_video_track_constraints(apiObj, wireObj.ref);
   }
 
   void _api_fill_to_wire_box_autoadd_api_media_stream_settings(
@@ -2930,11 +2929,11 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
     }
   }
 
-  void _api_fill_to_wire_opt_box_autoadd_api_audio_track_constrs(
-      ApiAudioTrackConstrs? apiObj,
-      ffi.Pointer<wire_ApiAudioTrackConstrs> wireObj) {
+  void _api_fill_to_wire_opt_box_autoadd_api_audio_constraints(
+      ApiAudioConstraints? apiObj,
+      ffi.Pointer<wire_ApiAudioConstraints> wireObj) {
     if (apiObj != null)
-      _api_fill_to_wire_box_autoadd_api_audio_track_constrs(apiObj, wireObj);
+      _api_fill_to_wire_box_autoadd_api_audio_constraints(apiObj, wireObj);
   }
 
   void _api_fill_to_wire_opt_box_autoadd_api_constrain_facing_mode(
@@ -2944,19 +2943,19 @@ class MedeaJasonPlatform extends FlutterRustBridgeBase<MedeaJasonWire> {
       _api_fill_to_wire_box_autoadd_api_constrain_facing_mode(apiObj, wireObj);
   }
 
-  void _api_fill_to_wire_opt_box_autoadd_api_device_video_track_constrs(
-      ApiDeviceVideoTrackConstrs? apiObj,
-      ffi.Pointer<wire_ApiDeviceVideoTrackConstrs> wireObj) {
+  void _api_fill_to_wire_opt_box_autoadd_api_device_video_track_constraints(
+      ApiDeviceVideoTrackConstraints? apiObj,
+      ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> wireObj) {
     if (apiObj != null)
-      _api_fill_to_wire_box_autoadd_api_device_video_track_constrs(
+      _api_fill_to_wire_box_autoadd_api_device_video_track_constraints(
           apiObj, wireObj);
   }
 
-  void _api_fill_to_wire_opt_box_autoadd_api_display_video_track_constrs(
-      ApiDisplayVideoTrackConstrs? apiObj,
-      ffi.Pointer<wire_ApiDisplayVideoTrackConstrs> wireObj) {
+  void _api_fill_to_wire_opt_box_autoadd_api_display_video_track_constraints(
+      ApiDisplayVideoTrackConstraints? apiObj,
+      ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> wireObj) {
     if (apiObj != null)
-      _api_fill_to_wire_box_autoadd_api_display_video_track_constrs(
+      _api_fill_to_wire_box_autoadd_api_display_video_track_constraints(
           apiObj, wireObj);
   }
 
@@ -4443,18 +4442,17 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _new_RoomHandle =
       _new_RoomHandlePtr.asFunction<wire_RoomHandle Function()>();
 
-  ffi.Pointer<wire_ApiAudioTrackConstrs>
-      new_box_autoadd_api_audio_track_constrs_0() {
-    return _new_box_autoadd_api_audio_track_constrs_0();
+  ffi.Pointer<wire_ApiAudioConstraints>
+      new_box_autoadd_api_audio_constraints_0() {
+    return _new_box_autoadd_api_audio_constraints_0();
   }
 
-  late final _new_box_autoadd_api_audio_track_constrs_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiAudioTrackConstrs>
-              Function()>>('new_box_autoadd_api_audio_track_constrs_0');
-  late final _new_box_autoadd_api_audio_track_constrs_0 =
-      _new_box_autoadd_api_audio_track_constrs_0Ptr
-          .asFunction<ffi.Pointer<wire_ApiAudioTrackConstrs> Function()>();
+  late final _new_box_autoadd_api_audio_constraints_0Ptr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<wire_ApiAudioConstraints> Function()>>(
+      'new_box_autoadd_api_audio_constraints_0');
+  late final _new_box_autoadd_api_audio_constraints_0 =
+      _new_box_autoadd_api_audio_constraints_0Ptr
+          .asFunction<ffi.Pointer<wire_ApiAudioConstraints> Function()>();
 
   ffi.Pointer<wire_ApiConstrainFacingMode>
       new_box_autoadd_api_constrain_facing_mode_0() {
@@ -4469,31 +4467,33 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _new_box_autoadd_api_constrain_facing_mode_0Ptr
           .asFunction<ffi.Pointer<wire_ApiConstrainFacingMode> Function()>();
 
-  ffi.Pointer<wire_ApiDeviceVideoTrackConstrs>
-      new_box_autoadd_api_device_video_track_constrs_0() {
-    return _new_box_autoadd_api_device_video_track_constrs_0();
+  ffi.Pointer<wire_ApiDeviceVideoTrackConstraints>
+      new_box_autoadd_api_device_video_track_constraints_0() {
+    return _new_box_autoadd_api_device_video_track_constraints_0();
   }
 
-  late final _new_box_autoadd_api_device_video_track_constrs_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiDeviceVideoTrackConstrs>
-              Function()>>('new_box_autoadd_api_device_video_track_constrs_0');
-  late final _new_box_autoadd_api_device_video_track_constrs_0 =
-      _new_box_autoadd_api_device_video_track_constrs_0Ptr.asFunction<
-          ffi.Pointer<wire_ApiDeviceVideoTrackConstrs> Function()>();
+  late final _new_box_autoadd_api_device_video_track_constraints_0Ptr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> Function()>>(
+      'new_box_autoadd_api_device_video_track_constraints_0');
+  late final _new_box_autoadd_api_device_video_track_constraints_0 =
+      _new_box_autoadd_api_device_video_track_constraints_0Ptr.asFunction<
+          ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> Function()>();
 
-  ffi.Pointer<wire_ApiDisplayVideoTrackConstrs>
-      new_box_autoadd_api_display_video_track_constrs_0() {
-    return _new_box_autoadd_api_display_video_track_constrs_0();
+  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+      new_box_autoadd_api_display_video_track_constraints_0() {
+    return _new_box_autoadd_api_display_video_track_constraints_0();
   }
 
-  late final _new_box_autoadd_api_display_video_track_constrs_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiDisplayVideoTrackConstrs>
-              Function()>>('new_box_autoadd_api_display_video_track_constrs_0');
-  late final _new_box_autoadd_api_display_video_track_constrs_0 =
-      _new_box_autoadd_api_display_video_track_constrs_0Ptr.asFunction<
-          ffi.Pointer<wire_ApiDisplayVideoTrackConstrs> Function()>();
+  late final _new_box_autoadd_api_display_video_track_constraints_0Ptr =
+      _lookup<
+              ffi.NativeFunction<
+                  ffi.Pointer<wire_ApiDisplayVideoTrackConstraints>
+                      Function()>>(
+          'new_box_autoadd_api_display_video_track_constraints_0');
+  late final _new_box_autoadd_api_display_video_track_constraints_0 =
+      _new_box_autoadd_api_display_video_track_constraints_0Ptr.asFunction<
+          ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> Function()>();
 
   ffi.Pointer<wire_ApiMediaStreamSettings>
       new_box_autoadd_api_media_stream_settings_0() {
@@ -4936,7 +4936,7 @@ class wire_uint_8_list extends ffi.Struct {
   external int len;
 }
 
-class wire_ApiAudioTrackConstrs extends ffi.Struct {
+class wire_ApiAudioConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 }
 
@@ -4996,7 +4996,7 @@ class wire_ConstrainU32 extends ffi.Struct {
   external ffi.Pointer<ConstrainU32Kind> kind;
 }
 
-class wire_ApiDeviceVideoTrackConstrs extends ffi.Struct {
+class wire_ApiDeviceVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 
   external ffi.Pointer<wire_ApiConstrainFacingMode> facing_mode;
@@ -5006,7 +5006,7 @@ class wire_ApiDeviceVideoTrackConstrs extends ffi.Struct {
   external ffi.Pointer<wire_ConstrainU32> width;
 }
 
-class wire_ApiDisplayVideoTrackConstrs extends ffi.Struct {
+class wire_ApiDisplayVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 
   external ffi.Pointer<wire_ConstrainU32> height;
@@ -5017,11 +5017,11 @@ class wire_ApiDisplayVideoTrackConstrs extends ffi.Struct {
 }
 
 class wire_ApiMediaStreamSettings extends ffi.Struct {
-  external ffi.Pointer<wire_ApiAudioTrackConstrs> audio;
+  external ffi.Pointer<wire_ApiAudioConstraints> audio;
 
-  external ffi.Pointer<wire_ApiDeviceVideoTrackConstrs> device_video;
+  external ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> device_video;
 
-  external ffi.Pointer<wire_ApiDisplayVideoTrackConstrs> display_video;
+  external ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> display_video;
 }
 
 class wire_ReconnectHandle extends ffi.Struct {

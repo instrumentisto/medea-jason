@@ -12,7 +12,7 @@ import '../interface/display_video_track_constraints.dart'
 class MediaStreamSettings implements base.MediaStreamSettings {
   /// Rust `flutter_rust_bridge` api representation.
   final frb.ApiMediaStreamSettings setting = frb.ApiMediaStreamSettings(
-      audio: frb.ApiAudioTrackConstrs(), deviceVideo: null, displayVideo: null);
+      audio: frb.ApiAudioConstraints(), deviceVideo: null, displayVideo: null);
 
   @override
   void audio(base_audio.AudioTrackConstraints audio) {

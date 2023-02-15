@@ -21,7 +21,7 @@ IMAGE_NAME := $(strip \
 	$(or $(image),medea-control-api-mock)))
 
 RUST_VER := 1.67
-CHROME_VERSION := 104.0
+CHROME_VERSION := 110.0
 FIREFOX_VERSION := 107.0.1-driver0.32.0
 
 CARGO_NDK_VER := 2.12.4-ndkr23b-rust$(RUST_VER)
@@ -432,9 +432,9 @@ ifeq ($(shell brew list | grep -Fx llvm),)
 endif
 endif
 	flutter_rust_bridge_codegen \
-		--rust-input src/api/dart/jason_api.rs \
+		--rust-input src/api/dart/api.rs \
 		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
-		--rust-output src/api/dart/jason_api_g.rs \
+		--rust-output src/api/dart/api_bridge_generated.rs \
 		--skip-add-mod-to-lib \
 		--no-build-runner \
 		--dart-format-line-length=80
