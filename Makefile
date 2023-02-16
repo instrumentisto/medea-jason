@@ -445,14 +445,35 @@ endif
 # Lint Rust sources with Clippy.
 #
 # Usage:
-#	make cargo.lint
+#	make cargo.lint [( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
+#		 | platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
+
+cargo-lint-platform = $(or $(platform),all)
+cargo-lint-targets-android = $(or $(targets),$(ANDROID_TARGETS))
+cargo-lint-targets-ios = $(or $(targets),$(IOS_TARGETS))
+cargo-lint-targets-linux = $(or $(targets),$(LINUX_TARGETS))
+cargo-lint-targets-macos = $(or $(targets),$(MACOS_TARGETS))
+cargo-lint-targets-web = $(or $(targets),$(WEB_TARGETS))
+cargo-lint-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.lint:
-	cargo clippy --workspace --all-features -- -D warnings
+ifeq ($(cargo-lint-platform),all)
+	@make cargo.lint platform=android
+	@make cargo.lint platform=ios
+	@make cargo.lint platform=linux
+	@make cargo.lint platform=macos
+	@make cargo.lint platform=web
+	@make cargo.lint platform=windows
+else
 	$(foreach target,$(subst $(comma), ,\
-		$(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
-		$(WINDOWS_TARGETS)),\
+		$(cargo-lint-targets-$(platform))),\
 			$(call cargo.lint.medea-jason,$(target)))
+endif
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
 	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
