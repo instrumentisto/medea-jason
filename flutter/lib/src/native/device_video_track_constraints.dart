@@ -2,7 +2,7 @@ import '../interface/device_video_track_constraints.dart' as base;
 import 'ffi/jason_api.g.dart' as frb;
 
 class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
-  /// Rust `flutter_rust_bridge` api representation.
+  /// Rust `flutter_rust_bridge` API representation.
   final frb.ApiDeviceVideoTrackConstraints constraints =
       frb.ApiDeviceVideoTrackConstraints(
           deviceId: null, facingMode: null, height: null, width: null);
@@ -25,7 +25,7 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   @override
   void exactHeight(int height) {
     if (height.isNegative || height.bitLength > 32) {
-      throw ArgumentError.value(height, 'height', 'Expected u32');
+      throw ArgumentError.value(height, 'height', 'Expected `u32`');
     }
     constraints.height = frb.ConstrainU32_Exact(height);
   }
@@ -33,7 +33,7 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   @override
   void idealHeight(int height) {
     if (height.isNegative || height.bitLength > 32) {
-      throw ArgumentError.value(height, 'height', 'Expected u32');
+      throw ArgumentError.value(height, 'height', 'Expected `u32`');
     }
     constraints.height = frb.ConstrainU32_Ideal(height);
   }
@@ -41,10 +41,10 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   @override
   void heightInRange(int min, int max) {
     if (min.isNegative || min.bitLength > 32) {
-      throw ArgumentError.value(min, 'min', 'Expected u32');
+      throw ArgumentError.value(min, 'min', 'Expected `u32`');
     }
     if (max.isNegative || max.bitLength > 32) {
-      throw ArgumentError.value(max, 'max', 'Expected u32');
+      throw ArgumentError.value(max, 'max', 'Expected `u32`');
     }
     constraints.height = frb.ConstrainU32_Range(min, max);
   }
@@ -52,7 +52,7 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   @override
   void exactWidth(int width) {
     if (width.isNegative || width.bitLength > 32) {
-      throw ArgumentError.value(width, 'width', 'Expected u32');
+      throw ArgumentError.value(width, 'width', 'Expected `u32`');
     }
     constraints.width = frb.ConstrainU32_Exact(width);
   }
@@ -60,7 +60,7 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   @override
   void idealWidth(int width) {
     if (width.isNegative || width.bitLength > 32) {
-      throw ArgumentError.value(width, 'width', 'Expected u32');
+      throw ArgumentError.value(width, 'width', 'Expected `u32`');
     }
     constraints.width = frb.ConstrainU32_Ideal(width);
   }
@@ -68,10 +68,10 @@ class DeviceVideoTrackConstraints implements base.DeviceVideoTrackConstraints {
   @override
   void widthInRange(int min, int max) {
     if (min.isNegative || min.bitLength > 32) {
-      throw ArgumentError.value(min, 'min', 'Expected u32');
+      throw ArgumentError.value(min, 'min', 'Expected `u32`');
     }
     if (max.isNegative || max.bitLength > 32) {
-      throw ArgumentError.value(max, 'max', 'Expected u32');
+      throw ArgumentError.value(max, 'max', 'Expected `u32`');
     }
 
     constraints.width = frb.ConstrainU32_Range(min, max);

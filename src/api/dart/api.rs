@@ -3,25 +3,22 @@
 //!
 //! [Flutter]: https://flutter.dev
 
+#![allow(
+    clippy::as_conversions,
+    clippy::missing_panics_doc,
+    clippy::undocumented_unsafe_blocks,
+    clippy::unwrap_used,
+    clippy::needless_pass_by_value,
+    non_snake_case
+)]
+
 use std::{
     panic::{RefUnwindSafe, UnwindSafe},
     ptr,
 };
 
-pub use dart_sys::Dart_Handle;
 use flutter_rust_bridge::{frb, DartOpaque, RustOpaque, SyncReturn};
 use tracerr::Traced;
-
-pub use crate::{
-    connection::ConnectionHandle,
-    jason::Jason,
-    media::{
-        track::{local::LocalMediaTrack, remote::Track as RemoteMediaTrack},
-        MediaManagerHandle,
-    },
-    room::{RoomCloseReason, RoomHandle},
-    rpc::ReconnectHandle,
-};
 
 use crate::{
     api::{utils::new_dart_opaque, Error, Error as DartError, ForeignClass},
@@ -35,7 +32,20 @@ use crate::{
     room::{self, ConstraintsUpdateError, RoomJoinError},
 };
 
-/// Representation of a [`ApiMediaDeviceInfo`][0] ONLY for input devices.
+pub use dart_sys::Dart_Handle;
+
+pub use crate::{
+    connection::ConnectionHandle,
+    jason::Jason,
+    media::{
+        track::{local::LocalMediaTrack, remote::Track as RemoteMediaTrack},
+        MediaManagerHandle,
+    },
+    room::{RoomCloseReason, RoomHandle},
+    rpc::ReconnectHandle,
+};
+
+/// Representation of an [`ApiMediaDeviceInfo`][0] ONLY for input devices.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug)]
@@ -49,12 +59,12 @@ pub struct ApiMediaDeviceInfo {
     /// [`ApiMediaDeviceInfo`].
     pub device_id: String,
 
-    /// Label describing the device represented by this
-    /// [`ApiMediaDeviceInfo`] (for example, "External USB Webcam").
+    /// Label describing the device represented by this [`ApiMediaDeviceInfo`]
+    /// (for example, "External USB Webcam").
     pub label: String,
 
     /// Group identifier of the device represented by this
-    /// [`ApiMediaDeviceInfo`]
+    /// [`ApiMediaDeviceInfo`].
     ///
     /// Two devices have the same group identifier if they belong to the same
     /// physical device. For example, the audio input and output devices
@@ -64,8 +74,7 @@ pub struct ApiMediaDeviceInfo {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
     pub group_id: Option<String>,
 
-    /// Indicates whether the last attempt to use the provided device
-    /// failed.
+    /// Indicates whether the last attempt to use the provided device failed.
     pub is_failed: bool,
 }
 
@@ -80,6 +89,7 @@ pub struct ApiMediaDisplayInfo {
     pub title: Option<String>,
 }
 
+/// Constraints applicable to audio tracks.
 #[derive(Debug)]
 #[frb]
 pub struct ApiAudioConstraints {
@@ -115,8 +125,8 @@ pub enum ApiConstrainFacingMode {
 
 /// Constraints applicable to video tracks that are sourced from some media
 /// device.
-#[frb]
 #[derive(Debug)]
+#[frb]
 pub struct ApiDeviceVideoTrackConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
@@ -280,7 +290,7 @@ impl ForeignClass for ConnectionHandle {}
 impl RefUnwindSafe for ConnectionHandle {}
 impl UnwindSafe for ConnectionHandle {}
 
-/// Returns the [`ConnectionHandle`] from the address [`ForeignClass`].
+/// Returns the [`ConnectionHandle`] from the [`ForeignClass`] address.
 #[must_use]
 pub fn connection_handle_from_ptr(
     ptr: usize,
@@ -292,12 +302,11 @@ pub fn connection_handle_from_ptr(
     })
 }
 
-/// Sets callback, invoked when this `Connection` will close.
+/// Sets a callback to be invoked once the provided `connection` is closed.
 ///
 /// # Errors
 ///
-/// If [`ConnectionHandle::on_close`] returns error.
-
+/// If [`ConnectionHandle::on_close()`] errors.
 pub fn connection_handle_on_close(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
@@ -313,16 +322,14 @@ pub fn connection_handle_on_close(
     Ok(SyncReturn(()))
 }
 
-/// Sets callback, invoked when a new [`remote::Track`] is added to this
-/// [`Connection`].
-///
-/// [`remote::Track`]: crate::media::track::remote::Track
-/// [`Connection`]: crate::connection::Connection
+/// Sets a callback to be invoked once a new [`remote::Track`] is added to the
+/// provided `connection`.
 ///
 /// # Errors
 ///
-/// If [`ConnectionHandle::on_remote_track_added`] returns error.
-
+/// If [`ConnectionHandle::on_remote_track_added()`] errors.
+///
+/// [`remote::Track`]: media::track::remote::Track
 pub fn connection_handle_on_remote_track_added(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
@@ -338,12 +345,12 @@ pub fn connection_handle_on_remote_track_added(
     Ok(SyncReturn(()))
 }
 
-/// Sets callback, invoked when a connection quality score is updated by
-/// a server.
+/// Sets a callback to be invoked when a quality score of the provided
+/// `connection` is updated by a server.
 ///
 /// # Errors
 ///
-/// If [`ConnectionHandle::on_quality_score_update`] returns error.
+/// If [`ConnectionHandle::on_quality_score_update()`] errors.
 pub fn connection_handle_on_quality_score_update(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
@@ -359,11 +366,11 @@ pub fn connection_handle_on_quality_score_update(
     Ok(SyncReturn(()))
 }
 
-/// Returns remote `Member` ID.
+/// Returns remote `Member` ID of the provided `connection`.
 ///
 /// # Errors
 ///
-/// If [`ConnectionHandle::get_remote_member_id`] returns error.
+/// If [`ConnectionHandle::get_remote_member_id()`] errors.
 pub fn connection_handle_get_remote_member_id(
     connection: RustOpaque<ConnectionHandle>,
 ) -> anyhow::Result<SyncReturn<String>> {
@@ -372,9 +379,7 @@ pub fn connection_handle_get_remote_member_id(
     )?))
 }
 
-/// Enables inbound audio in this [`ConnectionHandle`].
-///
-/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+/// Enables inbound audio in the provided `connection`.
 #[must_use]
 pub fn connection_handle_enable_remote_audio(
     connection: RustOpaque<ConnectionHandle>,
@@ -390,9 +395,7 @@ pub fn connection_handle_enable_remote_audio(
     )
 }
 
-/// Disables inbound audio in this [`ConnectionHandle`].
-///
-/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+/// Disables inbound audio in the provided `connection`.
 #[must_use]
 pub fn connection_handle_disable_remote_audio(
     connection: RustOpaque<ConnectionHandle>,
@@ -408,12 +411,9 @@ pub fn connection_handle_disable_remote_audio(
     )
 }
 
-/// Enables inbound video in this [`ConnectionHandle`].
+/// Enables inbound video in the provided `connection`.
 ///
 /// Affects only video with the specific [`MediaSourceKind`], if specified.
-///
-/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
-#[must_use]
 pub fn connection_handle_enable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -429,12 +429,9 @@ pub fn connection_handle_enable_remote_video(
     SyncReturn(result)
 }
 
-/// Disables inbound video in this [`ConnectionHandle`].
+/// Disables inbound video in the provided `connection`.
 ///
 /// Affects only video with the specific [`MediaSourceKind`], if specified.
-///
-/// [`ConnectionHandle`]: crate::connection::ConnectionHandle
-#[must_use]
 pub fn connection_handle_disable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -450,7 +447,7 @@ pub fn connection_handle_disable_remote_video(
     SyncReturn(result)
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl RefUnwindSafe for Jason {}
 impl UnwindSafe for Jason {}
@@ -473,7 +470,7 @@ pub fn jason_new() -> SyncReturn<RustOpaque<Jason>> {
 
 /// Creates a new [`Room`] and returns its [`RoomHandle`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn jason_init_room(
     jason: RustOpaque<Jason>,
@@ -510,11 +507,11 @@ pub fn jason_dispose(jason: RustOpaque<Jason>) -> SyncReturn<()> {
     SyncReturn(())
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl ForeignClass for LocalMediaTrack {}
 
-/// Returns the [`LocalMediaTrack`] from the address [`ForeignClass`].
+/// Returns the [`LocalMediaTrack`] from the [`ForeignClass`] address.
 #[must_use]
 pub fn local_media_track_from_ptr(
     ptr: usize,
@@ -526,8 +523,8 @@ pub fn local_media_track_from_ptr(
     })
 }
 
-/// Returns the [`Vec<RustOpaque<LocalMediaTrack>>`] from the address
-/// [`ForeignClass`].
+/// Returns the [`Vec<RustOpaque<LocalMediaTrack>>`] from the [`ForeignClass`]
+/// address.
 #[must_use]
 pub fn vec_local_tracks_from_ptr(
     ptr: usize,
@@ -540,10 +537,10 @@ pub fn vec_local_tracks_from_ptr(
     })
 }
 
-/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
-/// [`LocalMediaTrack`].
+/// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
+/// provided [`LocalMediaTrack`].
 ///
-/// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
+/// [`MediaStreamTrack`]: platform::MediaStreamTrack
 #[must_use]
 pub fn local_media_track_get_track(
     track: RustOpaque<LocalMediaTrack>,
@@ -551,11 +548,9 @@ pub fn local_media_track_get_track(
     SyncReturn(unsafe { new_dart_opaque(track.get_track().handle()) })
 }
 
-/// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
-/// audio track, or a [`MediaKind::Video`] if it represents a video track.
-///
-/// [`MediaKind::Audio`]: crate::media::MediaKind::Audio
-/// [`MediaKind::Video`]: crate::media::MediaKind::Video
+/// Returns a [`MediaKind::Audio`] if the provided [`LocalMediaTrack`]
+/// represents an audio track, or a [`MediaKind::Video`] if it represents a
+/// video track.
 #[must_use]
 pub fn local_media_track_kind(
     track: RustOpaque<LocalMediaTrack>,
@@ -563,14 +558,12 @@ pub fn local_media_track_kind(
     SyncReturn(track.kind())
 }
 
-/// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
+/// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
 /// sourced from some device (webcam/microphone), or a
 /// [`MediaSourceKind::Display`] if it's captured via
 /// [MediaDevices.getDisplayMedia()][1].
 ///
 /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-/// [`MediaSourceKind::Device`]: crate::media::MediaSourceKind::Device
-/// [`MediaSourceKind::Display`]: crate::media::MediaSourceKind::Display
 #[must_use]
 pub fn local_media_track_media_source_kind(
     track: RustOpaque<LocalMediaTrack>,
@@ -594,10 +587,9 @@ pub fn local_media_track_free(
     )
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/// Returns the [`Vec<MediaDeviceInfo>`] from the address
-/// [`ForeignClass`].
+/// Returns the [`Vec<MediaDeviceInfo>`] from the [`ForeignClass`] address.
 #[must_use]
 pub fn vec_media_device_info_from_ptr(
     ptr: usize,
@@ -609,10 +601,10 @@ pub fn vec_media_device_info_from_ptr(
     })
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the address
-/// [`ForeignClass`].
+/// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the [`ForeignClass`]
+/// address.
 #[must_use]
 pub fn vec_media_display_info_from_ptr(
     ptr: usize,
@@ -624,15 +616,13 @@ pub fn vec_media_display_info_from_ptr(
     })
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl RefUnwindSafe for MediaManagerHandle {}
 impl UnwindSafe for MediaManagerHandle {}
 
 /// Returns [`LocalMediaTrack`]s objects, built from the provided
 /// [`ApiMediaStreamSettings`].
-///
-/// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
 #[must_use]
 pub fn media_manager_handle_init_local_tracks(
     manager: RustOpaque<MediaManagerHandle>,
@@ -773,11 +763,11 @@ pub fn media_manager_handle_microphone_volume(
 /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
 /// Sets an ideal [frameRate][1] constraint.
 ///
-/// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-///
 /// # Errors
 ///
-/// If [`MediaManagerHandle::on_device_change`] returns error.
+/// If [`MediaManagerHandle::on_device_change()`] errors.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
 pub fn media_manager_handle_on_device_change(
     manager: RustOpaque<MediaManagerHandle>,
     cb: DartOpaque,
@@ -792,14 +782,13 @@ pub fn media_manager_handle_on_device_change(
     Ok(SyncReturn(()))
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl ForeignClass for ReconnectHandle {}
 impl RefUnwindSafe for ReconnectHandle {}
 impl UnwindSafe for ReconnectHandle {}
 
-/// Returns the [`ReconnectHandle`] from the address
-/// [`ForeignClass`].
+/// Returns the [`ReconnectHandle`] from the [`ForeignClass`] address.
 #[must_use]
 pub fn reconnect_handle_from_ptr(
     ptr: usize,
@@ -815,9 +804,9 @@ pub fn reconnect_handle_from_ptr(
 ///
 /// If the [`Room`] is already reconnecting then new reconnection attempt won't
 /// be performed. Instead, it will wait for the first reconnection attempt
-/// result and use it here..
+/// result and use it here.
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn reconnect_handle_reconnect_with_delay(
     reconnect_handle: RustOpaque<ReconnectHandle>,
@@ -855,7 +844,7 @@ pub fn reconnect_handle_reconnect_with_delay(
 /// be performed. Instead, it will wait for the first reconnection attempt
 /// result and use it here.
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn reconnect_handle_reconnect_with_backoff(
     reconnect_handle: RustOpaque<ReconnectHandle>,
@@ -882,14 +871,13 @@ pub fn reconnect_handle_reconnect_with_backoff(
     SyncReturn(result)
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl ForeignClass for RemoteMediaTrack {}
 impl RefUnwindSafe for RemoteMediaTrack {}
 impl UnwindSafe for RemoteMediaTrack {}
 
-/// Returns the [`RemoteMediaTrack`] from the address
-/// [`ForeignClass`].
+/// Returns the [`RemoteMediaTrack`] from the [`ForeignClass`] address.
 #[must_use]
 pub fn remote_media_track_from_ptr(
     ptr: usize,
@@ -999,12 +987,11 @@ pub fn remote_media_track_media_direction(
     SyncReturn(track.media_direction())
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl ForeignClass for RoomCloseReason {}
 
-/// Returns the [`RoomCloseReason`] from the address
-/// [`ForeignClass`].
+/// Returns the [`RoomCloseReason`] from the [`ForeignClass`] address.
 #[must_use]
 pub fn room_close_reason_from_ptr(ptr: usize) -> SyncReturn<RoomCloseReason> {
     SyncReturn(unsafe {
@@ -1012,7 +999,7 @@ pub fn room_close_reason_from_ptr(ptr: usize) -> SyncReturn<RoomCloseReason> {
     })
 }
 
-// -------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 impl RefUnwindSafe for RoomHandle {}
 impl UnwindSafe for RoomHandle {}
@@ -1024,7 +1011,7 @@ impl UnwindSafe for RoomHandle {}
 /// `{{ Host URL }}/{{ Room ID }}/{{ Member ID }}?token={{ Auth Token }}`
 /// (e.g. `wss://medea.com/MyConf1/Alice?token=777`).
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_join(
     room_handle: RustOpaque<RoomHandle>,
@@ -1064,7 +1051,7 @@ pub fn room_handle_join(
 /// If recovering from fail state isn't possible then affected media types will
 /// be disabled.
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 /// [`PeerConnection`]: crate::peer::PeerConnection
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 #[must_use]
@@ -1092,9 +1079,9 @@ pub fn room_handle_set_local_media_settings(
     SyncReturn(result)
 }
 
-/// Mutes outbound audio in this [`Room`].
+/// Mutes outbound audio in the provided [`Room`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_mute_audio(
     room_handle: RustOpaque<RoomHandle>,
@@ -1112,9 +1099,9 @@ pub fn room_handle_mute_audio(
     )
 }
 
-/// Unmutes outbound audio in this [`Room`].
+/// Unmutes outbound audio in the provided [`Room`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_unmute_audio(
     room_handle: RustOpaque<RoomHandle>,
@@ -1132,9 +1119,9 @@ pub fn room_handle_unmute_audio(
     )
 }
 
-/// Enables outbound audio in this [`Room`].
+/// Enables outbound audio in the provided [`Room`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_enable_audio(
     room_handle: RustOpaque<RoomHandle>,
@@ -1152,9 +1139,9 @@ pub fn room_handle_enable_audio(
     )
 }
 
-/// Disables outbound audio in this [`Room`].
+/// Disables outbound audio in the provided [`Room`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_disable_audio(
     room_handle: RustOpaque<RoomHandle>,
@@ -1172,15 +1159,15 @@ pub fn room_handle_disable_audio(
     )
 }
 
-/// Mutes outbound video in this [`Room`].
+/// Mutes outbound video in the provided [`Room`].
 ///
 /// Affects only video with specific [`MediaSourceKind`] if specified.
-///
-/// [`Room`]: crate::room::Room
 ///
 /// # Errors
 ///
 /// If `source_kind` is not a [`MediaSourceKind`] index.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_mute_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -1198,15 +1185,15 @@ pub fn room_handle_mute_video(
     ))
 }
 
-/// Unmutes outbound video in this [`Room`].
+/// Unmutes outbound video in the provided [`Room`].
 ///
 /// Affects only video with specific [`MediaSourceKind`] if specified.
-///
-/// [`Room`]: crate::room::Room
 ///
 /// # Errors
 ///
 /// If `source_kind` is not a [`MediaSourceKind`] index.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_unmute_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -1224,13 +1211,15 @@ pub fn room_handle_unmute_video(
     ))
 }
 
-/// Enables outbound video.
+/// Enables outbound video in the provided [`Room`].
 ///
 /// Affects only video with specific [`MediaSourceKind`] if specified.
 ///
 /// # Errors
 ///
 /// If `source_kind` is not [`MediaSourceKind`] index.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_enable_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -1248,13 +1237,15 @@ pub fn room_handle_enable_video(
     ))
 }
 
-/// Disables outbound video.
+/// Disables outbound video in the provided [`Room`].
 ///
 /// Affects only video with specific [`MediaSourceKind`] if specified.
 ///
 /// # Errors
 ///
 /// If `source_kind` is not [`MediaSourceKind`] index.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_disable_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -1272,9 +1263,9 @@ pub fn room_handle_disable_video(
     ))
 }
 
-/// Enables inbound audio in this [`Room`].
+/// Enables inbound audio in the provided [`Room`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_enable_remote_audio(
     room_handle: RustOpaque<RoomHandle>,
@@ -1292,9 +1283,9 @@ pub fn room_handle_enable_remote_audio(
     )
 }
 
-/// Disables inbound audio in this [`Room`].
+/// Disables inbound audio in the provided [`Room`].
 ///
-/// [`Room`]: crate::room::Room
+/// [`Room`]: room::Room
 #[must_use]
 pub fn room_handle_disable_remote_audio(
     room_handle: RustOpaque<RoomHandle>,
@@ -1312,15 +1303,15 @@ pub fn room_handle_disable_remote_audio(
     )
 }
 
-/// Enables inbound video in this [`Room`].
+/// Enables inbound video in the provided [`Room`].
 ///
 /// Affects only video with the specific [`MediaSourceKind`], if specified.
-///
-/// [`Room`]: crate::room::Room
 ///
 /// # Errors
 ///
 /// If `source_kind` is not [`MediaSourceKind`] index.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_enable_remote_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -1338,15 +1329,15 @@ pub fn room_handle_enable_remote_video(
     ))
 }
 
-/// Disables inbound video in this [`Room`].
+/// Disables inbound video in the provided [`Room`].
 ///
 /// Affects only video with the specific [`MediaSourceKind`], if specified.
-///
-/// [`Room`]: crate::room::Room
 ///
 /// # Errors
 ///
 /// If `source_kind` is not [`MediaSourceKind`] index.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_disable_remote_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -1364,14 +1355,14 @@ pub fn room_handle_disable_remote_video(
     ))
 }
 
-/// Sets callback, invoked when a new [`Connection`] with some remote `Peer`
-/// is established.
-///
-/// [`Connection`]: crate::connection::Connection
+/// Sets a callback to be invoked once a new [`Connection`] with some remote
+/// `Peer` is established.
 ///
 /// # Errors
 ///
-/// If [`RoomHandle::on_new_connection`] returns error.
+/// If [`RoomHandle::on_new_connection()`] errors.
+///
+/// [`Connection`]: connection::Connection
 pub fn room_handle_on_new_connection(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
@@ -1387,15 +1378,14 @@ pub fn room_handle_on_new_connection(
     ))
 }
 
-/// Sets callback, invoked on this [`Room`] close, providing a
-/// [`RoomCloseReason`].
-///
-/// [`Room`]: crate::room::Room
-/// [`RoomCloseReason`]: crate::room::RoomCloseReason
+/// Sets a callback to be invoked once the provided [`Room`] is closed,
+/// providing a [`RoomCloseReason`].
 ///
 /// # Errors
 ///
-/// If [`RoomHandle::on_close`] returns error.
+/// If [`RoomHandle::on_close()`] errors.
+///
+/// [`Room`]: room::Room
 pub fn room_handle_on_close(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
@@ -1409,21 +1399,20 @@ pub fn room_handle_on_close(
     Ok(SyncReturn(()))
 }
 
-/// Sets callback, invoked when a new [`LocalMediaTrack`] is added to this
-/// [`Room`].
+/// Sets a callback to be invoked when a new [`LocalMediaTrack`] is added to
+/// the provided [`Room`].
 ///
 /// This might happen in such cases:
 /// 1. Media server initiates a media request.
 /// 2. `enable_audio`/`enable_video` is called.
 /// 3. [`MediaStreamSettings`] updated via `set_local_media_settings`.
 ///
-/// [`Room`]: crate::room::Room
-/// [`MediaStreamSettings`]: crate::media::MediaStreamSettings
-/// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
-///
 /// # Errors
 ///
-/// If [`RoomHandle::on_local_track`] returns error.
+/// If [`RoomHandle::on_local_track()`] errors.
+///
+/// [`MediaStreamSettings`]: media::MediaStreamSettings
+/// [`Room`]: room::Room
 pub fn room_handle_on_local_track(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
@@ -1437,11 +1426,11 @@ pub fn room_handle_on_local_track(
     Ok(SyncReturn(()))
 }
 
-/// Sets callback, invoked when a connection with server is lost.
+/// Sets a callback to be invoked once a connection with server is lost.
 ///
 /// # Errors
 ///
-/// If [`RoomHandle::on_connection_loss`] returns error.
+/// If [`RoomHandle::on_connection_loss()`] errors.
 pub fn room_handle_on_connection_loss(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
@@ -1455,11 +1444,11 @@ pub fn room_handle_on_connection_loss(
     Ok(SyncReturn(()))
 }
 
-/// Sets callback, invoked on local media acquisition failures.
+/// Sets a callback to be invoked on local media acquisition failures.
 ///
 /// # Errors
 ///
-/// If [`RoomHandle::on_failed_local_media`] returns error.
+/// If [`RoomHandle::on_failed_local_media()`] errors.
 pub fn room_handle_on_failed_local_media(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,

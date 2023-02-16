@@ -195,12 +195,12 @@ pub enum CallbackApiClientError {
     /// [gRPC] server errored.
     ///
     /// [gRPC]: https://grpc.io
-    #[display(fmt = "gRPC server errored: {_0}")]
+    #[display(fmt = "gRPC server errored: {}", _0)]
     Tonic(tonic::Status),
 
     /// Failed to convert from [gRPC] response.
     ///
     /// [gRPC]: https://grpc.io
-    #[display(fmt = "Failed to convert from gRPC response: {_0}")]
+    #[display(fmt = "Failed to convert from gRPC response: {}", _0)]
     InvalidProtobuf(ProtobufError),
 }

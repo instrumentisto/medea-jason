@@ -35,15 +35,15 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
+FLUTTER_RUST_BRIDGE_VER ?= $(strip \
+	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
+	        | grep -v 'flutter_rust_bridge' \
+	        | cut -d'"' -f2))
 IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
 WEB_TARGETS := wasm32-unknown-unknown
 WINDOWS_TARGETS := x86_64-pc-windows-msvc
-FLUTTER_RUST_BRIDGE_VER ?= $(strip \
-	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
-	        | grep -v 'flutter_rust_bridge' \
-	        | cut -d'"' -f2))
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -410,7 +410,7 @@ ifeq ($(crate),medea-jason)
 endif
 
 
-# Generates Rust and Dart side interop bridge.
+# Generate Rust/Dart interop bridge.
 #
 # Usage:
 #	make cargo.gen.bridge
@@ -419,7 +419,8 @@ cargo.gen.bridge:
 ifeq ($(shell which flutter_rust_bridge_codegen),)
 	cargo install flutter_rust_bridge_codegen --vers=$(FLUTTER_RUST_BRIDGE_VER)
 else
-ifneq ($(strip $(shell flutter_rust_bridge_codegen --version | cut -d ' ' -f2)),$(FLUTTER_RUST_BRIDGE_VER))
+ifneq ($(strip $(shell flutter_rust_bridge_codegen --version \
+                       | cut -d ' ' -f2)),$(FLUTTER_RUST_BRIDGE_VER))
 	cargo install flutter_rust_bridge_codegen --force \
 	                                          --vers=$(FLUTTER_RUST_BRIDGE_VER)
 endif
@@ -442,10 +443,12 @@ endif
 	cd flutter && \
 	flutter pub run build_runner build --delete-conflicting-outputs
 
+
 # Lint Rust sources with Clippy.
 #
 # Usage:
-#	make cargo.lint [( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
+#	make cargo.lint
+#		[( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
 #		 | platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
 #		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
@@ -470,9 +473,8 @@ ifeq ($(cargo-lint-platform),all)
 	@make cargo.lint platform=web
 	@make cargo.lint platform=windows
 else
-	$(foreach target,$(subst $(comma), ,\
-		$(cargo-lint-targets-$(platform))),\
-			$(call cargo.lint.medea-jason,$(target)))
+	$(foreach target,$(subst $(comma), ,$(cargo-lint-targets-$(platform))),\
+		$(call cargo.lint.medea-jason,$(target)))
 endif
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))

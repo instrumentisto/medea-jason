@@ -125,8 +125,8 @@ class Jason implements base.Jason {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
   final RustOpaque<frb.Jason> opaque = RustOpaque(api.jasonNew());
 
-  /// Constructs a new [Jason] backed by the Rust struct behind the
-  /// provided [frb.Jason].
+  /// Constructs a new [Jason] backed by the Rust struct behind the provided
+  /// [frb.Jason].
   Jason() {
     RustHandlesStorage().insertHandle(this);
   }

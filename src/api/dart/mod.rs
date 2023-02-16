@@ -12,14 +12,6 @@
     missing_docs
 )]
 
-#[allow(
-    clippy::as_conversions,
-    clippy::missing_panics_doc,
-    clippy::undocumented_unsafe_blocks,
-    clippy::unwrap_used,
-    clippy::needless_pass_by_value,
-    non_snake_case
-)]
 pub mod api;
 pub mod utils;
 
@@ -613,7 +605,7 @@ impl TryFrom<DartValueArg<Self>> for Option<f64> {
             | DartValue::String(..)
             | DartValue::Int(_)
             | DartValue::Bool(_) => Err(DartValueCastError {
-                expectation: concat!("Option<f64>"),
+                expectation: "Option<f64>",
                 value: value.0,
             }),
         }
@@ -632,7 +624,7 @@ impl TryFrom<DartValueArg<Self>> for Option<bool> {
             | DartValue::String(..)
             | DartValue::Int(_)
             | DartValue::Float(_) => Err(DartValueCastError {
-                expectation: concat!("Option<f64>"),
+                expectation: "Option<bool>",
                 value: value.0,
             }),
         }
@@ -756,14 +748,13 @@ pub unsafe extern "C" fn box_foreign_value(
     ptr::NonNull::from(Box::leak(Box::new(val)))
 }
 
-#[allow(clippy::missing_docs_in_private_items)]
 #[cfg(feature = "mockable")]
+#[allow(clippy::missing_docs_in_private_items)]
 mod dart_value_extern_tests_helpers {
     use super::*;
 
     use crate::platform::set_panic_hook;
 
-    #[allow(clippy::missing_docs_in_private_items)]
     #[no_mangle]
     pub unsafe extern "C" fn fire_panic() {
         set_panic_hook();

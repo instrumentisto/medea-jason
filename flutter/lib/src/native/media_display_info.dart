@@ -2,7 +2,7 @@ import '../interface/media_display_info.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
 class NativeMediaDisplayInfo implements MediaDisplayInfo {
-  /// Rust `flutter_rust_bridge` api representation.
+  /// Rust `flutter_rust_bridge` API representation.
   final frb.ApiMediaDisplayInfo _info;
 
   /// Constructs a new [MediaDisplayInfo] backed by a Rust struct behind the

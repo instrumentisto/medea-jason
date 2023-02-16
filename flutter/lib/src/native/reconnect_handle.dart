@@ -21,7 +21,7 @@ class NativeReconnectHandle implements ReconnectHandle {
   @override
   Future<void> reconnectWithDelay(int delayMs) async {
     if (delayMs.isNegative || delayMs.bitLength > 32) {
-      throw ArgumentError.value(delayMs, 'delayMs', 'Expected u32');
+      throw ArgumentError.value(delayMs, 'delayMs', 'Expected `u32`');
     }
 
     try {
@@ -38,17 +38,17 @@ class NativeReconnectHandle implements ReconnectHandle {
       [int? maxElapsedTimeMs]) async {
     if (startingDelayMs.isNegative || startingDelayMs.bitLength > 32) {
       throw ArgumentError.value(
-          startingDelayMs, 'startingDelayMs', 'Expected u32');
+          startingDelayMs, 'startingDelayMs', 'Expected `u32`');
     }
 
     if (maxDelay.isNegative || maxDelay.bitLength > 32) {
-      throw ArgumentError.value(maxDelay, 'maxDelay', 'Expected u32');
+      throw ArgumentError.value(maxDelay, 'maxDelay', 'Expected `u32`');
     }
 
     if (maxElapsedTimeMs != null) {
       if (maxElapsedTimeMs.isNegative || maxElapsedTimeMs.bitLength > 32) {
         throw ArgumentError.value(
-            maxElapsedTimeMs, 'maxElapsedTimeMs', 'Expected u32');
+            maxElapsedTimeMs, 'maxElapsedTimeMs', 'Expected `u32`');
       }
     }
 

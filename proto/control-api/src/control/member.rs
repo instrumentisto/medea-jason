@@ -194,13 +194,13 @@ pub enum ParseSidError {
     /// `ws://localhost:8080/ws//qwerty`, for example.
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-    #[display(fmt = "Missing paths in URI: {_0}")]
+    #[display(fmt = "Missing paths in URI: {}", _0)]
     MissingPaths(#[error(not(source))] Box<str>),
 
     /// Error of parsing the provided [URI].
     ///
     /// [URI]: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
-    #[display(fmt = "Cannot parse provided URI `{_0}`: {_1}")]
+    #[display(fmt = "Cannot parse provided URI `{}`: {}", _0, _1)]
     InvalidUrl(Box<str>, #[error(source)] url::ParseError),
 }
 

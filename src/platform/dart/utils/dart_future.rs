@@ -152,7 +152,6 @@ impl FutureFromDart {
 /// Rust representation of a Dart [`Future`].
 ///
 /// [`Future`]: https://api.dart.dev/dart-async/Future-class.html
-
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct DartFuture<O>(
@@ -161,7 +160,7 @@ pub struct DartFuture<O>(
 );
 
 impl<O> DartFuture<O> {
-    /// Wraps the given [`DartFuture`] into a [`DartOpaque`] so it can be
+    /// Wraps the given [`DartFuture`] into a [`DartOpaque`] value, so it can be
     /// transferred to Dart side via `flutter_rust_bridge` bindings.
     #[must_use]
     pub fn into_dart_opaque(self) -> DartOpaque {
@@ -169,18 +168,18 @@ impl<O> DartFuture<O> {
     }
 }
 
-/// Extension trait for a [`Future`] allowing to convert Rust [`Future`]s to
+/// Extension trait for a [`Future`] allowing to convert Rust [`Future`]s into
 /// [`DartFuture`]s.
 pub trait IntoDartFuture {
-    /// The type of the value produced on the [`DartFuture`]'s completion.
+    /// Type of the value produced on the [`DartFuture`]'s completion.
     type Output;
 
     /// Converts this [`Future`] into a Dart `Future`.
     ///
     /// Returns a [`Dart_Handle`] to the created Dart `Future`.
     ///
-    /// __Note, that the Dart `Future` execution begins immediately and cannot
-    /// be canceled.__
+    /// __NOTE__: The Dart `Future` execution begins immediately and cannot be
+    /// canceled.
     fn into_dart_future(self) -> DartFuture<Self::Output>;
 }
 

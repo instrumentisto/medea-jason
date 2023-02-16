@@ -162,15 +162,13 @@ pub unsafe fn get_error(handle: Dart_Handle) -> *const core::ffi::c_char {
 ///
 /// If the provided [`Dart_Handle`] is an unhandled exception error, then it
 /// will be rethrown in the standard way: walking up Dart frames until an
-/// appropriate `catch` block is found, than executing `finally` blocks, and
-/// so on.
+/// appropriate `catch` block is found, than executing `finally` blocks, and so
+/// on.
 ///
 /// # Safety
 ///
 /// Intended to be called ONLY with [`NativeApi.initializeApiDLData`][1] from
 /// Dart.
-///
-/// # Safety
 ///
 /// [`initialize_api`] must be called before this function.
 ///
