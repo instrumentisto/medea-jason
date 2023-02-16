@@ -414,6 +414,7 @@ pub fn connection_handle_disable_remote_audio(
 /// Enables inbound video in the provided `connection`.
 ///
 /// Affects only video with the specific [`MediaSourceKind`], if specified.
+#[must_use]
 pub fn connection_handle_enable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<MediaSourceKind>,
@@ -432,6 +433,7 @@ pub fn connection_handle_enable_remote_video(
 /// Disables inbound video in the provided `connection`.
 ///
 /// Affects only video with the specific [`MediaSourceKind`], if specified.
+#[must_use]
 pub fn connection_handle_disable_remote_video(
     connection: RustOpaque<ConnectionHandle>,
     source_kind: Option<MediaSourceKind>,
