@@ -13,82 +13,75 @@ import 'package:meta/meta.dart';
 part 'jason_api.g.freezed.dart';
 
 abstract class MedeaJason {
-  /// Returns the [`ConnectionHandle`] from the address [`ForeignClass`].
+  /// Returns the [`ConnectionHandle`] from the [`ForeignClass`] address.
   ConnectionHandle connectionHandleFromPtr({required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kConnectionHandleFromPtrConstMeta;
 
-  /// Sets callback, invoked when this `Connection` will close.
+  /// Sets a callback to be invoked once the provided `connection` is closed.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_close`] returns error.
+  /// If [`ConnectionHandle::on_close()`] errors.
   void connectionHandleOnClose(
       {required ConnectionHandle connection, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kConnectionHandleOnCloseConstMeta;
 
-  /// Sets callback, invoked when a new [`remote::Track`] is added to this
-  /// [`Connection`].
-  ///
-  /// [`remote::Track`]: crate::media::track::remote::Track
-  /// [`Connection`]: crate::connection::Connection
+  /// Sets a callback to be invoked once a new [`remote::Track`] is added to the
+  /// provided `connection`.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_remote_track_added`] returns error.
+  /// If [`ConnectionHandle::on_remote_track_added()`] errors.
+  ///
+  /// [`remote::Track`]: media::track::remote::Track
   void connectionHandleOnRemoteTrackAdded(
       {required ConnectionHandle connection, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleOnRemoteTrackAddedConstMeta;
 
-  /// Sets callback, invoked when a connection quality score is updated by
-  /// a server.
+  /// Sets a callback to be invoked when a quality score of the provided
+  /// `connection` is updated by a server.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::on_quality_score_update`] returns error.
+  /// If [`ConnectionHandle::on_quality_score_update()`] errors.
   void connectionHandleOnQualityScoreUpdate(
       {required ConnectionHandle connection, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleOnQualityScoreUpdateConstMeta;
 
-  /// Returns remote `Member` ID.
+  /// Returns remote `Member` ID of the provided `connection`.
   ///
   /// # Errors
   ///
-  /// If [`ConnectionHandle::get_remote_member_id`] returns error.
+  /// If [`ConnectionHandle::get_remote_member_id()`] errors.
   String connectionHandleGetRemoteMemberId(
       {required ConnectionHandle connection, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleGetRemoteMemberIdConstMeta;
 
-  /// Enables inbound audio in this [`ConnectionHandle`].
-  ///
-  /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+  /// Enables inbound audio in the provided `connection`.
   Object connectionHandleEnableRemoteAudio(
       {required ConnectionHandle connection, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleEnableRemoteAudioConstMeta;
 
-  /// Disables inbound audio in this [`ConnectionHandle`].
-  ///
-  /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
+  /// Disables inbound audio in the provided `connection`.
   Object connectionHandleDisableRemoteAudio(
       {required ConnectionHandle connection, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleDisableRemoteAudioConstMeta;
 
-  /// Enables inbound video in this [`ConnectionHandle`].
+  /// Enables inbound video in the provided `connection`.
   ///
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
-  ///
-  /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
   Object connectionHandleEnableRemoteVideo(
       {required ConnectionHandle connection,
       MediaSourceKind? sourceKind,
@@ -97,11 +90,9 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kConnectionHandleEnableRemoteVideoConstMeta;
 
-  /// Disables inbound video in this [`ConnectionHandle`].
+  /// Disables inbound video in the provided `connection`.
   ///
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
-  ///
-  /// [`ConnectionHandle`]: crate::connection::ConnectionHandle
   Object connectionHandleDisableRemoteVideo(
       {required ConnectionHandle connection,
       MediaSourceKind? sourceKind,
@@ -122,7 +113,7 @@ abstract class MedeaJason {
 
   /// Creates a new [`Room`] and returns its [`RoomHandle`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   RoomHandle jasonInitRoom({required Jason jason, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonInitRoomConstMeta;
@@ -143,43 +134,39 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kJasonDisposeConstMeta;
 
-  /// Returns the [`LocalMediaTrack`] from the address [`ForeignClass`].
+  /// Returns the [`LocalMediaTrack`] from the [`ForeignClass`] address.
   LocalMediaTrack localMediaTrackFromPtr({required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackFromPtrConstMeta;
 
-  /// Returns the [`Vec<RustOpaque<LocalMediaTrack>>`] from the address
-  /// [`ForeignClass`].
+  /// Returns the [`Vec<RustOpaque<LocalMediaTrack>>`] from the [`ForeignClass`]
+  /// address.
   List<LocalMediaTrack> vecLocalTracksFromPtr({required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kVecLocalTracksFromPtrConstMeta;
 
-  /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of this
-  /// [`LocalMediaTrack`].
+  /// Returns a [`Dart_Handle`] to the underlying [`MediaStreamTrack`] of the
+  /// provided [`LocalMediaTrack`].
   ///
-  /// [`MediaStreamTrack`]: crate::platform::MediaStreamTrack
+  /// [`MediaStreamTrack`]: platform::MediaStreamTrack
   Object localMediaTrackGetTrack(
       {required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackGetTrackConstMeta;
 
-  /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
-  /// audio track, or a [`MediaKind::Video`] if it represents a video track.
-  ///
-  /// [`MediaKind::Audio`]: crate::media::MediaKind::Audio
-  /// [`MediaKind::Video`]: crate::media::MediaKind::Video
+  /// Returns a [`MediaKind::Audio`] if the provided [`LocalMediaTrack`]
+  /// represents an audio track, or a [`MediaKind::Video`] if it represents a
+  /// video track.
   MediaKind localMediaTrackKind({required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackKindConstMeta;
 
-  /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
+  /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
   /// sourced from some device (webcam/microphone), or a
   /// [`MediaSourceKind::Display`] if it's captured via
   /// [MediaDevices.getDisplayMedia()][1].
   ///
   /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-  /// [`MediaSourceKind::Device`]: crate::media::MediaSourceKind::Device
-  /// [`MediaSourceKind::Display`]: crate::media::MediaSourceKind::Display
   MediaSourceKind localMediaTrackMediaSourceKind(
       {required LocalMediaTrack track, dynamic hint});
 
@@ -190,15 +177,14 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackFreeConstMeta;
 
-  /// Returns the [`Vec<MediaDeviceInfo>`] from the address
-  /// [`ForeignClass`].
+  /// Returns the [`Vec<MediaDeviceInfo>`] from the [`ForeignClass`] address.
   List<ApiMediaDeviceInfo> vecMediaDeviceInfoFromPtr(
       {required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoFromPtrConstMeta;
 
-  /// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the address
-  /// [`ForeignClass`].
+  /// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the [`ForeignClass`]
+  /// address.
   List<ApiMediaDisplayInfo> vecMediaDisplayInfoFromPtr(
       {required int ptr, dynamic hint});
 
@@ -206,8 +192,6 @@ abstract class MedeaJason {
 
   /// Returns [`LocalMediaTrack`]s objects, built from the provided
   /// [`ApiMediaStreamSettings`].
-  ///
-  /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
   Object mediaManagerHandleInitLocalTracks(
       {required MediaManagerHandle manager,
       required ApiMediaStreamSettings caps,
@@ -266,18 +250,17 @@ abstract class MedeaJason {
   /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
   /// Sets an ideal [frameRate][1] constraint.
   ///
-  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
-  ///
   /// # Errors
   ///
-  /// If [`MediaManagerHandle::on_device_change`] returns error.
+  /// If [`MediaManagerHandle::on_device_change()`] errors.
+  ///
+  /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
   void mediaManagerHandleOnDeviceChange(
       {required MediaManagerHandle manager, required Object cb, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kMediaManagerHandleOnDeviceChangeConstMeta;
 
-  /// Returns the [`ReconnectHandle`] from the address
-  /// [`ForeignClass`].
+  /// Returns the [`ReconnectHandle`] from the [`ForeignClass`] address.
   ReconnectHandle reconnectHandleFromPtr({required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kReconnectHandleFromPtrConstMeta;
@@ -286,9 +269,9 @@ abstract class MedeaJason {
   ///
   /// If the [`Room`] is already reconnecting then new reconnection attempt won't
   /// be performed. Instead, it will wait for the first reconnection attempt
-  /// result and use it here..
+  /// result and use it here.
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object reconnectHandleReconnectWithDelay(
       {required ReconnectHandle reconnectHandle,
       required int delayMs,
@@ -318,7 +301,7 @@ abstract class MedeaJason {
   /// be performed. Instead, it will wait for the first reconnection attempt
   /// result and use it here.
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object reconnectHandleReconnectWithBackoff(
       {required ReconnectHandle reconnectHandle,
       required int startingDelay,
@@ -330,8 +313,7 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kReconnectHandleReconnectWithBackoffConstMeta;
 
-  /// Returns the [`RemoteMediaTrack`] from the address
-  /// [`ForeignClass`].
+  /// Returns the [`RemoteMediaTrack`] from the [`ForeignClass`] address.
   RemoteMediaTrack remoteMediaTrackFromPtr({required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackFromPtrConstMeta;
@@ -394,8 +376,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackMediaDirectionConstMeta;
 
-  /// Returns the [`RoomCloseReason`] from the address
-  /// [`ForeignClass`].
+  /// Returns the [`RoomCloseReason`] from the [`ForeignClass`] address.
   RoomCloseReason roomCloseReasonFromPtr({required int ptr, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomCloseReasonFromPtrConstMeta;
@@ -407,7 +388,7 @@ abstract class MedeaJason {
   /// `{{ Host URL }}/{{ Room ID }}/{{ Member ID }}?token={{ Auth Token }}`
   /// (e.g. `wss://medea.com/MyConf1/Alice?token=777`).
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleJoin(
       {required RoomHandle roomHandle, required String token, dynamic hint});
 
@@ -436,7 +417,7 @@ abstract class MedeaJason {
   /// If recovering from fail state isn't possible then affected media types will
   /// be disabled.
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   /// [`PeerConnection`]: crate::peer::PeerConnection
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
   Object roomHandleSetLocalMediaSettings(
@@ -448,43 +429,43 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleSetLocalMediaSettingsConstMeta;
 
-  /// Mutes outbound audio in this [`Room`].
+  /// Mutes outbound audio in the provided [`Room`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleMuteAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleMuteAudioConstMeta;
 
-  /// Unmutes outbound audio in this [`Room`].
+  /// Unmutes outbound audio in the provided [`Room`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleUnmuteAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleUnmuteAudioConstMeta;
 
-  /// Enables outbound audio in this [`Room`].
+  /// Enables outbound audio in the provided [`Room`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleEnableAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableAudioConstMeta;
 
-  /// Disables outbound audio in this [`Room`].
+  /// Disables outbound audio in the provided [`Room`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleDisableAudio({required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableAudioConstMeta;
 
-  /// Mutes outbound video in this [`Room`].
+  /// Mutes outbound video in the provided [`Room`].
   ///
   /// Affects only video with specific [`MediaSourceKind`] if specified.
-  ///
-  /// [`Room`]: crate::room::Room
   ///
   /// # Errors
   ///
   /// If `source_kind` is not a [`MediaSourceKind`] index.
+  ///
+  /// [`Room`]: room::Room
   Object roomHandleMuteVideo(
       {required RoomHandle roomHandle,
       MediaSourceKind? sourceKind,
@@ -492,15 +473,15 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleMuteVideoConstMeta;
 
-  /// Unmutes outbound video in this [`Room`].
+  /// Unmutes outbound video in the provided [`Room`].
   ///
   /// Affects only video with specific [`MediaSourceKind`] if specified.
-  ///
-  /// [`Room`]: crate::room::Room
   ///
   /// # Errors
   ///
   /// If `source_kind` is not a [`MediaSourceKind`] index.
+  ///
+  /// [`Room`]: room::Room
   Object roomHandleUnmuteVideo(
       {required RoomHandle roomHandle,
       MediaSourceKind? sourceKind,
@@ -508,13 +489,15 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleUnmuteVideoConstMeta;
 
-  /// Enables outbound video.
+  /// Enables outbound video in the provided [`Room`].
   ///
   /// Affects only video with specific [`MediaSourceKind`] if specified.
   ///
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
+  ///
+  /// [`Room`]: room::Room
   Object roomHandleEnableVideo(
       {required RoomHandle roomHandle,
       MediaSourceKind? sourceKind,
@@ -522,13 +505,15 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableVideoConstMeta;
 
-  /// Disables outbound video.
+  /// Disables outbound video in the provided [`Room`].
   ///
   /// Affects only video with specific [`MediaSourceKind`] if specified.
   ///
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
+  ///
+  /// [`Room`]: room::Room
   Object roomHandleDisableVideo(
       {required RoomHandle roomHandle,
       MediaSourceKind? sourceKind,
@@ -536,31 +521,31 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableVideoConstMeta;
 
-  /// Enables inbound audio in this [`Room`].
+  /// Enables inbound audio in the provided [`Room`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleEnableRemoteAudio(
       {required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableRemoteAudioConstMeta;
 
-  /// Disables inbound audio in this [`Room`].
+  /// Disables inbound audio in the provided [`Room`].
   ///
-  /// [`Room`]: crate::room::Room
+  /// [`Room`]: room::Room
   Object roomHandleDisableRemoteAudio(
       {required RoomHandle roomHandle, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableRemoteAudioConstMeta;
 
-  /// Enables inbound video in this [`Room`].
+  /// Enables inbound video in the provided [`Room`].
   ///
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
-  ///
-  /// [`Room`]: crate::room::Room
   ///
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
+  ///
+  /// [`Room`]: room::Room
   Object roomHandleEnableRemoteVideo(
       {required RoomHandle roomHandle,
       MediaSourceKind? sourceKind,
@@ -568,15 +553,15 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleEnableRemoteVideoConstMeta;
 
-  /// Disables inbound video in this [`Room`].
+  /// Disables inbound video in the provided [`Room`].
   ///
   /// Affects only video with the specific [`MediaSourceKind`], if specified.
-  ///
-  /// [`Room`]: crate::room::Room
   ///
   /// # Errors
   ///
   /// If `source_kind` is not [`MediaSourceKind`] index.
+  ///
+  /// [`Room`]: room::Room
   Object roomHandleDisableRemoteVideo(
       {required RoomHandle roomHandle,
       MediaSourceKind? sourceKind,
@@ -584,68 +569,66 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleDisableRemoteVideoConstMeta;
 
-  /// Sets callback, invoked when a new [`Connection`] with some remote `Peer`
-  /// is established.
-  ///
-  /// [`Connection`]: crate::connection::Connection
+  /// Sets a callback to be invoked once a new [`Connection`] with some remote
+  /// `Peer` is established.
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_new_connection`] returns error.
+  /// If [`RoomHandle::on_new_connection()`] errors.
+  ///
+  /// [`Connection`]: connection::Connection
   void roomHandleOnNewConnection(
       {required RoomHandle roomHandle, required Object cb, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnNewConnectionConstMeta;
 
-  /// Sets callback, invoked on this [`Room`] close, providing a
-  /// [`RoomCloseReason`].
-  ///
-  /// [`Room`]: crate::room::Room
-  /// [`RoomCloseReason`]: crate::room::RoomCloseReason
+  /// Sets a callback to be invoked once the provided [`Room`] is closed,
+  /// providing a [`RoomCloseReason`].
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_close`] returns error.
+  /// If [`RoomHandle::on_close()`] errors.
+  ///
+  /// [`Room`]: room::Room
   void roomHandleOnClose(
       {required RoomHandle roomHandle, required Object cb, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnCloseConstMeta;
 
-  /// Sets callback, invoked when a new [`LocalMediaTrack`] is added to this
-  /// [`Room`].
+  /// Sets a callback to be invoked when a new [`LocalMediaTrack`] is added to
+  /// the provided [`Room`].
   ///
   /// This might happen in such cases:
   /// 1. Media server initiates a media request.
   /// 2. `enable_audio`/`enable_video` is called.
   /// 3. [`MediaStreamSettings`] updated via `set_local_media_settings`.
   ///
-  /// [`Room`]: crate::room::Room
-  /// [`MediaStreamSettings`]: crate::media::MediaStreamSettings
-  /// [`LocalMediaTrack`]: crate::media::track::local::LocalMediaTrack
-  ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_local_track`] returns error.
+  /// If [`RoomHandle::on_local_track()`] errors.
+  ///
+  /// [`MediaStreamSettings`]: media::MediaStreamSettings
+  /// [`Room`]: room::Room
   void roomHandleOnLocalTrack(
       {required RoomHandle roomHandle, required Object cb, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnLocalTrackConstMeta;
 
-  /// Sets callback, invoked when a connection with server is lost.
+  /// Sets a callback to be invoked once a connection with server is lost.
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_connection_loss`] returns error.
+  /// If [`RoomHandle::on_connection_loss()`] errors.
   void roomHandleOnConnectionLoss(
       {required RoomHandle roomHandle, required Object cb, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnConnectionLossConstMeta;
 
-  /// Sets callback, invoked on local media acquisition failures.
+  /// Sets a callback to be invoked on local media acquisition failures.
   ///
   /// # Errors
   ///
-  /// If [`RoomHandle::on_failed_local_media`] returns error.
+  /// If [`RoomHandle::on_failed_local_media()`] errors.
   void roomHandleOnFailedLocalMedia(
       {required RoomHandle roomHandle, required Object cb, dynamic hint});
 
@@ -783,6 +766,7 @@ class RoomHandle extends FrbOpaque {
   OpaqueTypeFinalizer get staticFinalizer => bridge.RoomHandleFinalizer;
 }
 
+/// Constraints applicable to audio tracks.
 class ApiAudioConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
@@ -857,7 +841,7 @@ class ApiDisplayVideoTrackConstraints {
   });
 }
 
-/// Representation of a [`ApiMediaDeviceInfo`][0] ONLY for input devices.
+/// Representation of an [`ApiMediaDeviceInfo`][0] ONLY for input devices.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 class ApiMediaDeviceInfo {
@@ -870,12 +854,12 @@ class ApiMediaDeviceInfo {
   /// [`ApiMediaDeviceInfo`].
   final String deviceId;
 
-  /// Label describing the device represented by this
-  /// [`ApiMediaDeviceInfo`] (for example, "External USB Webcam").
+  /// Label describing the device represented by this [`ApiMediaDeviceInfo`]
+  /// (for example, "External USB Webcam").
   final String label;
 
   /// Group identifier of the device represented by this
-  /// [`ApiMediaDeviceInfo`]
+  /// [`ApiMediaDeviceInfo`].
   ///
   /// Two devices have the same group identifier if they belong to the same
   /// physical device. For example, the audio input and output devices
@@ -885,8 +869,7 @@ class ApiMediaDeviceInfo {
   /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-groupid
   final String? groupId;
 
-  /// Indicates whether the last attempt to use the provided device
-  /// failed.
+  /// Indicates whether the last attempt to use the provided device failed.
   final bool isFailed;
 
   ApiMediaDeviceInfo({
@@ -4847,6 +4830,1489 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _fire_panicPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function()>>('fire_panic');
   late final _fire_panic = _fire_panicPtr.asFunction<void Function()>();
+
+  int init_jason_dart_api_dl(
+    ffi.Pointer<ffi.Void> data,
+  ) {
+    return _init_jason_dart_api_dl(
+      data,
+    );
+  }
+
+  late final _init_jason_dart_api_dlPtr =
+      _lookup<ffi.NativeFunction<ffi.IntPtr Function(ffi.Pointer<ffi.Void>)>>(
+          'init_jason_dart_api_dl');
+  late final _init_jason_dart_api_dl = _init_jason_dart_api_dlPtr
+      .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
+
+  Object init_device_constraints() {
+    return _init_device_constraints();
+  }
+
+  late final _init_device_constraintsPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'init_device_constraints');
+  late final _init_device_constraints =
+      _init_device_constraintsPtr.asFunction<Object Function()>();
+
+  Object init_display_constraints() {
+    return _init_display_constraints();
+  }
+
+  late final _init_display_constraintsPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'init_display_constraints');
+  late final _init_display_constraints =
+      _init_display_constraintsPtr.asFunction<Object Function()>();
+
+  Object new_video_constraints() {
+    return _new_video_constraints();
+  }
+
+  late final _new_video_constraintsPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'new_video_constraints');
+  late final _new_video_constraints =
+      _new_video_constraintsPtr.asFunction<Object Function()>();
+
+  Object new_audio_constraints() {
+    return _new_audio_constraints();
+  }
+
+  late final _new_audio_constraintsPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'new_audio_constraints');
+  late final _new_audio_constraints =
+      _new_audio_constraintsPtr.asFunction<Object Function()>();
+
+  void set_video_constraint_value(
+    Object constraints,
+    int kind,
+    DartValue value,
+  ) {
+    return _set_video_constraint_value(
+      constraints,
+      kind,
+      value,
+    );
+  }
+
+  late final _set_video_constraint_valuePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Handle, ffi.Int64, DartValue)>>('set_video_constraint_value');
+  late final _set_video_constraint_value = _set_video_constraint_valuePtr
+      .asFunction<void Function(Object, int, DartValue)>();
+
+  void set_audio_constraint_value(
+    Object constraints,
+    int kind,
+    DartValue value,
+  ) {
+    return _set_audio_constraint_value(
+      constraints,
+      kind,
+      value,
+    );
+  }
+
+  late final _set_audio_constraint_valuePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Handle, ffi.Int64, DartValue)>>('set_audio_constraint_value');
+  late final _set_audio_constraint_value = _set_audio_constraint_valuePtr
+      .asFunction<void Function(Object, int, DartValue)>();
+
+  void set_video_constraint(
+    Object constraints,
+    int ty,
+    Object video,
+  ) {
+    return _set_video_constraint(
+      constraints,
+      ty,
+      video,
+    );
+  }
+
+  late final _set_video_constraintPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Handle, ffi.Int64, ffi.Handle)>>('set_video_constraint');
+  late final _set_video_constraint =
+      _set_video_constraintPtr.asFunction<void Function(Object, int, Object)>();
+
+  void set_audio_constraint(
+    Object constraints,
+    int ty,
+    Object audio,
+  ) {
+    return _set_audio_constraint(
+      constraints,
+      ty,
+      audio,
+    );
+  }
+
+  late final _set_audio_constraintPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Handle, ffi.Int64, ffi.Handle)>>('set_audio_constraint');
+  late final _set_audio_constraint =
+      _set_audio_constraintPtr.asFunction<void Function(Object, int, Object)>();
+
+  void rust_executor_init(
+    int wake_port,
+  ) {
+    return _rust_executor_init(
+      wake_port,
+    );
+  }
+
+  late final _rust_executor_initPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>(
+          'rust_executor_init');
+  late final _rust_executor_init =
+      _rust_executor_initPtr.asFunction<void Function(int)>();
+
+  void rust_executor_poll_task(
+    ffi.Pointer<Task> task,
+  ) {
+    return _rust_executor_poll_task(
+      task,
+    );
+  }
+
+  late final _rust_executor_poll_taskPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<Task>)>>(
+          'rust_executor_poll_task');
+  late final _rust_executor_poll_task = _rust_executor_poll_taskPtr
+      .asFunction<void Function(ffi.Pointer<Task>)>();
+
+  Object init(
+    DartValueArg_String candidate,
+    DartValueArg_Option_String sdp_mid,
+    DartValueArg_Option_u16 sdp_m_line_index,
+  ) {
+    return _init(
+      candidate,
+      sdp_mid,
+      sdp_m_line_index,
+    );
+  }
+
+  late final _initPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(DartValueArg_String, DartValueArg_Option_String,
+              DartValueArg_Option_u16)>>('init');
+  late final _init = _initPtr.asFunction<
+      Object Function(DartValueArg_String, DartValueArg_Option_String,
+          DartValueArg_Option_u16)>();
+
+  ffi.Pointer<ffi.Char> candidate(
+    Object ice_candidate,
+  ) {
+    return _candidate(
+      ice_candidate,
+    );
+  }
+
+  late final _candidatePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'candidate');
+  late final _candidate =
+      _candidatePtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  int sdp_m_line_index(
+    Object ice_candidate,
+  ) {
+    return _sdp_m_line_index(
+      ice_candidate,
+    );
+  }
+
+  late final _sdp_m_line_indexPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint64 Function(ffi.Handle)>>(
+          'sdp_m_line_index');
+  late final _sdp_m_line_index =
+      _sdp_m_line_indexPtr.asFunction<int Function(Object)>();
+
+  ffi.Pointer<ffi.Char> sdp_mid(
+    Object ice_candidate,
+  ) {
+    return _sdp_mid(
+      ice_candidate,
+    );
+  }
+
+  late final _sdp_midPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'sdp_mid');
+  late final _sdp_mid =
+      _sdp_midPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  void add(
+    Object list,
+    ffi.Pointer<ffi.Char> url,
+    DartValueArg_String username,
+    DartValueArg_String credentials,
+  ) {
+    return _add(
+      list,
+      url,
+      username,
+      credentials,
+    );
+  }
+
+  late final _addPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Handle, ffi.Pointer<ffi.Char>,
+              DartValueArg_String, DartValueArg_String)>>('add');
+  late final _add = _addPtr.asFunction<
+      void Function(Object, ffi.Pointer<ffi.Char>, DartValueArg_String,
+          DartValueArg_String)>();
+
+  ffi.Pointer<ffi.Char> device_id(
+    Object info,
+  ) {
+    return _device_id(
+      info,
+    );
+  }
+
+  late final _device_idPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'device_id');
+  late final _device_id =
+      _device_idPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  int kind(
+    Object info,
+  ) {
+    return _kind(
+      info,
+    );
+  }
+
+  late final _kindPtr =
+      _lookup<ffi.NativeFunction<ffi.Int64 Function(ffi.Handle)>>('kind');
+  late final _kind = _kindPtr.asFunction<int Function(Object)>();
+
+  ffi.Pointer<ffi.Char> label(
+    Object info,
+  ) {
+    return _label(
+      info,
+    );
+  }
+
+  late final _labelPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'label');
+  late final _label =
+      _labelPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_String> group_id(
+    Object info,
+  ) {
+    return _group_id(
+      info,
+    );
+  }
+
+  late final _group_idPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_String> Function(
+              ffi.Handle)>>('group_id');
+  late final _group_id = _group_idPtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_String> Function(Object)>();
+
+  bool is_failed(
+    Object info,
+  ) {
+    return _is_failed(
+      info,
+    );
+  }
+
+  late final _is_failedPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Handle)>>('is_failed');
+  late final _is_failed = _is_failedPtr.asFunction<bool Function(Object)>();
+
+  Object enumerate_devices() {
+    return _enumerate_devices();
+  }
+
+  late final _enumerate_devicesPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>('enumerate_devices');
+  late final _enumerate_devices =
+      _enumerate_devicesPtr.asFunction<Object Function()>();
+
+  Object enumerate_displays() {
+    return _enumerate_displays();
+  }
+
+  late final _enumerate_displaysPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>('enumerate_displays');
+  late final _enumerate_displays =
+      _enumerate_displaysPtr.asFunction<Object Function()>();
+
+  Object get_user_media(
+    Object constraints,
+  ) {
+    return _get_user_media(
+      constraints,
+    );
+  }
+
+  late final _get_user_mediaPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'get_user_media');
+  late final _get_user_media =
+      _get_user_mediaPtr.asFunction<Object Function(Object)>();
+
+  Object get_display_media(
+    Object constraints,
+  ) {
+    return _get_display_media(
+      constraints,
+    );
+  }
+
+  late final _get_display_mediaPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'get_display_media');
+  late final _get_display_media =
+      _get_display_mediaPtr.asFunction<Object Function(Object)>();
+
+  Object set_output_audio_id(
+    ffi.Pointer<ffi.Char> device_id,
+  ) {
+    return _set_output_audio_id(
+      device_id,
+    );
+  }
+
+  late final _set_output_audio_idPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Char>)>>(
+          'set_output_audio_id');
+  late final _set_output_audio_id = _set_output_audio_idPtr
+      .asFunction<Object Function(ffi.Pointer<ffi.Char>)>();
+
+  Object microphone_volume_is_available() {
+    return _microphone_volume_is_available();
+  }
+
+  late final _microphone_volume_is_availablePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'microphone_volume_is_available');
+  late final _microphone_volume_is_available =
+      _microphone_volume_is_availablePtr.asFunction<Object Function()>();
+
+  Object microphone_volume() {
+    return _microphone_volume();
+  }
+
+  late final _microphone_volumePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>('microphone_volume');
+  late final _microphone_volume =
+      _microphone_volumePtr.asFunction<Object Function()>();
+
+  Object set_microphone_volume(
+    int level,
+  ) {
+    return _set_microphone_volume(
+      level,
+    );
+  }
+
+  late final _set_microphone_volumePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Int64)>>(
+          'set_microphone_volume');
+  late final _set_microphone_volume =
+      _set_microphone_volumePtr.asFunction<Object Function(int)>();
+
+  void on_device_change(
+    Object cb,
+  ) {
+    return _on_device_change(
+      cb,
+    );
+  }
+
+  late final _on_device_changePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle)>>(
+          'on_device_change');
+  late final _on_device_change =
+      _on_device_changePtr.asFunction<void Function(Object)>();
+
+  int get_media_exception_kind(
+    Object exception,
+  ) {
+    return _get_media_exception_kind(
+      exception,
+    );
+  }
+
+  late final _get_media_exception_kindPtr =
+      _lookup<ffi.NativeFunction<ffi.Int64 Function(ffi.Handle)>>(
+          'get_media_exception_kind');
+  late final _get_media_exception_kind =
+      _get_media_exception_kindPtr.asFunction<int Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_String> title(
+    Object info,
+  ) {
+    return _title(
+      info,
+    );
+  }
+
+  late final _titlePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_String> Function(
+              ffi.Handle)>>('title');
+  late final _title = _titlePtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_String> Function(Object)>();
+
+  ffi.Pointer<ffi.Char> id(
+    Object track,
+  ) {
+    return _id(
+      track,
+    );
+  }
+
+  late final _idPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'id');
+  late final _id = _idPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_i64> facing_mode(
+    Object track,
+  ) {
+    return _facing_mode(
+      track,
+    );
+  }
+
+  late final _facing_modePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_i64> Function(
+              ffi.Handle)>>('facing_mode');
+  late final _facing_mode = _facing_modePtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_i64> Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_u32> height(
+    Object track,
+  ) {
+    return _height(
+      track,
+    );
+  }
+
+  late final _heightPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_u32> Function(ffi.Handle)>>('height');
+  late final _height = _heightPtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_u32> Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_u32> width(
+    Object track,
+  ) {
+    return _width(
+      track,
+    );
+  }
+
+  late final _widthPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_u32> Function(ffi.Handle)>>('width');
+  late final _width = _widthPtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_u32> Function(Object)>();
+
+  bool enabled(
+    Object track,
+  ) {
+    return _enabled(
+      track,
+    );
+  }
+
+  late final _enabledPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Handle)>>('enabled');
+  late final _enabled = _enabledPtr.asFunction<bool Function(Object)>();
+
+  void set_enabled(
+    Object track,
+    bool is_enabled,
+  ) {
+    return _set_enabled(
+      track,
+      is_enabled,
+    );
+  }
+
+  late final _set_enabledPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Bool)>>(
+          'set_enabled');
+  late final _set_enabled =
+      _set_enabledPtr.asFunction<void Function(Object, bool)>();
+
+  Object ready_state(
+    Object track,
+  ) {
+    return _ready_state(
+      track,
+    );
+  }
+
+  late final _ready_statePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'ready_state');
+  late final _ready_state =
+      _ready_statePtr.asFunction<Object Function(Object)>();
+
+  Object stop(
+    Object track,
+  ) {
+    return _stop(
+      track,
+    );
+  }
+
+  late final _stopPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('stop');
+  late final _stop = _stopPtr.asFunction<Object Function(Object)>();
+
+  void on_ended(
+    Object track,
+    Object cb,
+  ) {
+    return _on_ended(
+      track,
+      cb,
+    );
+  }
+
+  late final _on_endedPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_ended');
+  late final _on_ended =
+      _on_endedPtr.asFunction<void Function(Object, Object)>();
+
+  Object clone(
+    Object track,
+  ) {
+    return _clone(
+      track,
+    );
+  }
+
+  late final _clonePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('clone');
+  late final _clone = _clonePtr.asFunction<Object Function(Object)>();
+
+  Object dispose(
+    Object track,
+  ) {
+    return _dispose(
+      track,
+    );
+  }
+
+  late final _disposePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('dispose');
+  late final _dispose = _disposePtr.asFunction<Object Function(Object)>();
+
+  int ice_connection_state(
+    Object peer,
+  ) {
+    return _ice_connection_state(
+      peer,
+    );
+  }
+
+  late final _ice_connection_statePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Handle)>>(
+          'ice_connection_state');
+  late final _ice_connection_state =
+      _ice_connection_statePtr.asFunction<int Function(Object)>();
+
+  void on_connection_state_change(
+    Object peer,
+    Object cb,
+  ) {
+    return _on_connection_state_change(
+      peer,
+      cb,
+    );
+  }
+
+  late final _on_connection_state_changePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_connection_state_change');
+  late final _on_connection_state_change = _on_connection_state_changePtr
+      .asFunction<void Function(Object, Object)>();
+
+  ffi.Pointer<DartValueArg_Option_i32> connection_state(
+    Object peer,
+  ) {
+    return _connection_state(
+      peer,
+    );
+  }
+
+  late final _connection_statePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_i32> Function(
+              ffi.Handle)>>('connection_state');
+  late final _connection_state = _connection_statePtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_i32> Function(Object)>();
+
+  void restart_ice(
+    Object peer,
+  ) {
+    return _restart_ice(
+      peer,
+    );
+  }
+
+  late final _restart_icePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle)>>('restart_ice');
+  late final _restart_ice = _restart_icePtr.asFunction<void Function(Object)>();
+
+  Object rollback(
+    Object peer,
+  ) {
+    return _rollback(
+      peer,
+    );
+  }
+
+  late final _rollbackPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('rollback');
+  late final _rollback = _rollbackPtr.asFunction<Object Function(Object)>();
+
+  void on_track(
+    Object peer,
+    Object cb,
+  ) {
+    return _on_track(
+      peer,
+      cb,
+    );
+  }
+
+  late final _on_trackPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_track');
+  late final _on_track =
+      _on_trackPtr.asFunction<void Function(Object, Object)>();
+
+  void on_ice_candidate(
+    Object peer,
+    Object cb,
+  ) {
+    return _on_ice_candidate(
+      peer,
+      cb,
+    );
+  }
+
+  late final _on_ice_candidatePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_ice_candidate');
+  late final _on_ice_candidate =
+      _on_ice_candidatePtr.asFunction<void Function(Object, Object)>();
+
+  Object get_transceiver_by_mid(
+    Object peer,
+    ffi.Pointer<ffi.Char> mid,
+  ) {
+    return _get_transceiver_by_mid(
+      peer,
+      mid,
+    );
+  }
+
+  late final _get_transceiver_by_midPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(
+              ffi.Handle, ffi.Pointer<ffi.Char>)>>('get_transceiver_by_mid');
+  late final _get_transceiver_by_mid = _get_transceiver_by_midPtr
+      .asFunction<Object Function(Object, ffi.Pointer<ffi.Char>)>();
+
+  Object add_ice_candidate(
+    Object peer,
+    Object candidate,
+  ) {
+    return _add_ice_candidate(
+      peer,
+      candidate,
+    );
+  }
+
+  late final _add_ice_candidatePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle, ffi.Handle)>>(
+          'add_ice_candidate');
+  late final _add_ice_candidate =
+      _add_ice_candidatePtr.asFunction<Object Function(Object, Object)>();
+
+  void on_ice_connection_state_change(
+    Object peer,
+    Object cb,
+  ) {
+    return _on_ice_connection_state_change(
+      peer,
+      cb,
+    );
+  }
+
+  late final _on_ice_connection_state_changePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_ice_connection_state_change');
+  late final _on_ice_connection_state_change =
+      _on_ice_connection_state_changePtr
+          .asFunction<void Function(Object, Object)>();
+
+  Object new_peer(
+    Object ice_servers,
+    bool is_force_relayed,
+  ) {
+    return _new_peer(
+      ice_servers,
+      is_force_relayed,
+    );
+  }
+
+  late final _new_peerPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle, ffi.Bool)>>(
+          'new_peer');
+  late final _new_peer =
+      _new_peerPtr.asFunction<Object Function(Object, bool)>();
+
+  Object add_transceiver(
+    Object peer,
+    int kind,
+    int direction,
+  ) {
+    return _add_transceiver(
+      peer,
+      kind,
+      direction,
+    );
+  }
+
+  late final _add_transceiverPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(
+              ffi.Handle, ffi.Int64, ffi.Int64)>>('add_transceiver');
+  late final _add_transceiver =
+      _add_transceiverPtr.asFunction<Object Function(Object, int, int)>();
+
+  Object create_offer(
+    Object peer,
+  ) {
+    return _create_offer(
+      peer,
+    );
+  }
+
+  late final _create_offerPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'create_offer');
+  late final _create_offer =
+      _create_offerPtr.asFunction<Object Function(Object)>();
+
+  Object create_answer(
+    Object peer,
+  ) {
+    return _create_answer(
+      peer,
+    );
+  }
+
+  late final _create_answerPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'create_answer');
+  late final _create_answer =
+      _create_answerPtr.asFunction<Object Function(Object)>();
+
+  Object set_local_description(
+    Object peer,
+    ffi.Pointer<ffi.Char> ty,
+    ffi.Pointer<ffi.Char> offer,
+  ) {
+    return _set_local_description(
+      peer,
+      ty,
+      offer,
+    );
+  }
+
+  late final _set_local_descriptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Handle, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('set_local_description');
+  late final _set_local_description = _set_local_descriptionPtr.asFunction<
+      Object Function(Object, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
+
+  Object set_remote_description(
+    Object peer,
+    ffi.Pointer<ffi.Char> ty,
+    ffi.Pointer<ffi.Char> offer,
+  ) {
+    return _set_remote_description(
+      peer,
+      ty,
+      offer,
+    );
+  }
+
+  late final _set_remote_descriptionPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(ffi.Handle, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('set_remote_description');
+  late final _set_remote_description = _set_remote_descriptionPtr.asFunction<
+      Object Function(Object, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
+
+  void close(
+    Object peer,
+  ) {
+    return _close(
+      peer,
+    );
+  }
+
+  late final _closePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle)>>('close');
+  late final _close = _closePtr.asFunction<void Function(Object)>();
+
+  Object get_direction(
+    Object transceiver,
+  ) {
+    return _get_direction(
+      transceiver,
+    );
+  }
+
+  late final _get_directionPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'get_direction');
+  late final _get_direction =
+      _get_directionPtr.asFunction<Object Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_DartHandle> get_send_track(
+    Object transceiver,
+  ) {
+    return _get_send_track(
+      transceiver,
+    );
+  }
+
+  late final _get_send_trackPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_DartHandle> Function(
+              ffi.Handle)>>('get_send_track');
+  late final _get_send_track = _get_send_trackPtr.asFunction<
+      ffi.Pointer<DartValueArg_Option_DartHandle> Function(Object)>();
+
+  Object replace_track(
+    Object transceiver,
+    Object track,
+  ) {
+    return _replace_track(
+      transceiver,
+      track,
+    );
+  }
+
+  late final _replace_trackPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle, ffi.Handle)>>(
+          'replace_track');
+  late final _replace_track =
+      _replace_trackPtr.asFunction<Object Function(Object, Object)>();
+
+  Object drop_sender(
+    Object transceiver,
+  ) {
+    return _drop_sender(
+      transceiver,
+    );
+  }
+
+  late final _drop_senderPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'drop_sender');
+  late final _drop_sender =
+      _drop_senderPtr.asFunction<Object Function(Object)>();
+
+  bool is_stopped(
+    Object transceiver,
+  ) {
+    return _is_stopped(
+      transceiver,
+    );
+  }
+
+  late final _is_stoppedPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Handle)>>('is_stopped');
+  late final _is_stopped = _is_stoppedPtr.asFunction<bool Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_String> mid(
+    Object transceiver,
+  ) {
+    return _mid(
+      transceiver,
+    );
+  }
+
+  late final _midPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_String> Function(ffi.Handle)>>('mid');
+  late final _mid = _midPtr
+      .asFunction<ffi.Pointer<DartValueArg_Option_String> Function(Object)>();
+
+  Object set_recv(
+    Object transceiver,
+    bool active,
+  ) {
+    return _set_recv(
+      transceiver,
+      active,
+    );
+  }
+
+  late final _set_recvPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle, ffi.Bool)>>(
+          'set_recv');
+  late final _set_recv =
+      _set_recvPtr.asFunction<Object Function(Object, bool)>();
+
+  Object set_send(
+    Object transceiver,
+    bool active,
+  ) {
+    return _set_send(
+      transceiver,
+      active,
+    );
+  }
+
+  late final _set_sendPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle, ffi.Bool)>>(
+          'set_send');
+  late final _set_send =
+      _set_sendPtr.asFunction<Object Function(Object, bool)>();
+
+  Object connect(
+    ffi.Pointer<ffi.Char> url,
+    Object on_message,
+    Object on_close,
+  ) {
+    return _connect(
+      url,
+      on_message,
+      on_close,
+    );
+  }
+
+  late final _connectPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Handle Function(
+              ffi.Pointer<ffi.Char>, ffi.Handle, ffi.Handle)>>('connect');
+  late final _connect = _connectPtr
+      .asFunction<Object Function(ffi.Pointer<ffi.Char>, Object, Object)>();
+
+  void send(
+    Object transport,
+    ffi.Pointer<ffi.Char> message,
+  ) {
+    return _send(
+      transport,
+      message,
+    );
+  }
+
+  late final _sendPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Handle, ffi.Pointer<ffi.Char>)>>('send');
+  late final _send =
+      _sendPtr.asFunction<void Function(Object, ffi.Pointer<ffi.Char>)>();
+
+  int close_code(
+    Object close_frame,
+  ) {
+    return _close_code(
+      close_frame,
+    );
+  }
+
+  late final _close_codePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Handle)>>('close_code');
+  late final _close_code = _close_codePtr.asFunction<int Function(Object)>();
+
+  ffi.Pointer<ffi.Char> close_reason(
+    Object close_frame,
+  ) {
+    return _close_reason(
+      close_frame,
+    );
+  }
+
+  late final _close_reasonPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'close_reason');
+  late final _close_reason =
+      _close_reasonPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  void Callback__call_two_arg(
+    ffi.Pointer<ffi.Int> cb,
+    DartValue first,
+    DartValue second,
+  ) {
+    return _Callback__call_two_arg(
+      cb,
+      first,
+      second,
+    );
+  }
+
+  late final _Callback__call_two_argPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<ffi.Int>, DartValue,
+              DartValue)>>('Callback__call_two_arg');
+  late final _Callback__call_two_arg = _Callback__call_two_argPtr.asFunction<
+      void Function(ffi.Pointer<ffi.Int>, DartValue, DartValue)>();
+
+  void Callback__call(
+    ffi.Pointer<ffi.Int> cb,
+    DartValue val,
+  ) {
+    return _Callback__call(
+      cb,
+      val,
+    );
+  }
+
+  late final _Callback__callPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<ffi.Int>, DartValue)>>('Callback__call');
+  late final _Callback__call = _Callback__callPtr.asFunction<
+      void Function(ffi.Pointer<ffi.Int>, DartValue)>();
+
+  Object call_two_arg_proxy(
+    ffi.Pointer<ffi.Int> cb,
+  ) {
+    return _call_two_arg_proxy(
+      cb,
+    );
+  }
+
+  late final _call_two_arg_proxyPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Int>)>>(
+          'call_two_arg_proxy');
+  late final _call_two_arg_proxy = _call_two_arg_proxyPtr
+      .asFunction<Object Function(ffi.Pointer<ffi.Int>)>();
+
+  Object call_proxy(
+    ffi.Pointer<ffi.Int> cb,
+  ) {
+    return _call_proxy(
+      cb,
+    );
+  }
+
+  late final _call_proxyPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Pointer<ffi.Int>)>>(
+          'call_proxy');
+  late final _call_proxy =
+      _call_proxyPtr.asFunction<Object Function(ffi.Pointer<ffi.Int>)>();
+
+  Object test_callback_listener_int(
+    DartValueArg_i64 expects,
+  ) {
+    return _test_callback_listener_int(
+      expects,
+    );
+  }
+
+  late final _test_callback_listener_intPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(DartValueArg_i64)>>(
+          'test_callback_listener_int');
+  late final _test_callback_listener_int = _test_callback_listener_intPtr
+      .asFunction<Object Function(DartValueArg_i64)>();
+
+  Object test_callback_listener_string(
+    DartValueArg_String expects,
+  ) {
+    return _test_callback_listener_string(
+      expects,
+    );
+  }
+
+  late final _test_callback_listener_stringPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(DartValueArg_String)>>(
+          'test_callback_listener_string');
+  late final _test_callback_listener_string = _test_callback_listener_stringPtr
+      .asFunction<Object Function(DartValueArg_String)>();
+
+  Object test_callback_listener_optional_int(
+    DartValueArg_Option_i64 expects,
+  ) {
+    return _test_callback_listener_optional_int(
+      expects,
+    );
+  }
+
+  late final _test_callback_listener_optional_intPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(DartValueArg_Option_i64)>>(
+          'test_callback_listener_optional_int');
+  late final _test_callback_listener_optional_int =
+      _test_callback_listener_optional_intPtr
+          .asFunction<Object Function(DartValueArg_Option_i64)>();
+
+  Object test_callback_listener_optional_string(
+    DartValueArg_Option_String expects,
+  ) {
+    return _test_callback_listener_optional_string(
+      expects,
+    );
+  }
+
+  late final _test_callback_listener_optional_stringPtr = _lookup<
+          ffi.NativeFunction<ffi.Handle Function(DartValueArg_Option_String)>>(
+      'test_callback_listener_optional_string');
+  late final _test_callback_listener_optional_string =
+      _test_callback_listener_optional_stringPtr
+          .asFunction<Object Function(DartValueArg_Option_String)>();
+
+  void register__test__test_callback_handle_function(
+    TestCallbackHandleFunction f,
+  ) {
+    return _register__test__test_callback_handle_function(
+      f,
+    );
+  }
+
+  late final _register__test__test_callback_handle_functionPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(TestCallbackHandleFunction)>>(
+      'register__test__test_callback_handle_function');
+  late final _register__test__test_callback_handle_function =
+      _register__test__test_callback_handle_functionPtr
+          .asFunction<void Function(TestCallbackHandleFunction)>();
+
+  Object test_callback_listener_dart_handle() {
+    return _test_callback_listener_dart_handle();
+  }
+
+  late final _test_callback_listener_dart_handlePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function()>>(
+          'test_callback_listener_dart_handle');
+  late final _test_callback_listener_dart_handle =
+      _test_callback_listener_dart_handlePtr.asFunction<Object Function()>();
+
+  void complete(
+    Object fut,
+    DartValue val,
+  ) {
+    return _complete(
+      fut,
+      val,
+    );
+  }
+
+  late final _completePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, DartValue)>>(
+          'complete');
+  late final _complete =
+      _completePtr.asFunction<void Function(Object, DartValue)>();
+
+  void complete_error(
+    Object fut,
+    DartError val,
+  ) {
+    return _complete_error(
+      fut,
+      val,
+    );
+  }
+
+  late final _complete_errorPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, DartError)>>(
+          'complete_error');
+  late final _complete_error =
+      _complete_errorPtr.asFunction<void Function(Object, DartError)>();
+
+  Object future(
+    Object fut,
+  ) {
+    return _future(
+      fut,
+    );
+  }
+
+  late final _futurePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>('future');
+  late final _future = _futurePtr.asFunction<Object Function(Object)>();
+
+  Object delayed(
+    int delay_ms,
+  ) {
+    return _delayed(
+      delay_ms,
+    );
+  }
+
+  late final _delayedPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Int32)>>('delayed');
+  late final _delayed = _delayedPtr.asFunction<Object Function(int)>();
+
+  void FutureFromDart__resolve_ok(
+    ffi.Pointer<FutureFromDart> future,
+    DartValue val,
+  ) {
+    return _FutureFromDart__resolve_ok(
+      future,
+      val,
+    );
+  }
+
+  late final _FutureFromDart__resolve_okPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<FutureFromDart>,
+              DartValue)>>('FutureFromDart__resolve_ok');
+  late final _FutureFromDart__resolve_ok = _FutureFromDart__resolve_okPtr
+      .asFunction<void Function(ffi.Pointer<FutureFromDart>, DartValue)>();
+
+  void FutureFromDart__resolve_err(
+    ffi.Pointer<FutureFromDart> future,
+    Object val,
+  ) {
+    return _FutureFromDart__resolve_err(
+      future,
+      val,
+    );
+  }
+
+  late final _FutureFromDart__resolve_errPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<FutureFromDart>,
+              ffi.Handle)>>('FutureFromDart__resolve_err');
+  late final _FutureFromDart__resolve_err = _FutureFromDart__resolve_errPtr
+      .asFunction<void Function(ffi.Pointer<FutureFromDart>, Object)>();
+
+  void complete_proxy(
+    Object fut,
+    ffi.Pointer<FutureFromDart> resolver,
+  ) {
+    return _complete_proxy(
+      fut,
+      resolver,
+    );
+  }
+
+  late final _complete_proxyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Handle, ffi.Pointer<FutureFromDart>)>>('complete_proxy');
+  late final _complete_proxy = _complete_proxyPtr
+      .asFunction<void Function(Object, ffi.Pointer<FutureFromDart>)>();
+
+  Object test__future_from_dart__int(
+    Object future,
+  ) {
+    return _test__future_from_dart__int(
+      future,
+    );
+  }
+
+  late final _test__future_from_dart__intPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'test__future_from_dart__int');
+  late final _test__future_from_dart__int =
+      _test__future_from_dart__intPtr.asFunction<Object Function(Object)>();
+
+  Object test__future_from_dart__string(
+    Object future,
+  ) {
+    return _test__future_from_dart__string(
+      future,
+    );
+  }
+
+  late final _test__future_from_dart__stringPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'test__future_from_dart__string');
+  late final _test__future_from_dart__string =
+      _test__future_from_dart__stringPtr.asFunction<Object Function(Object)>();
+
+  void register__test__future_from_dart_handle_fn(
+    TestFutureHandleFunction f,
+  ) {
+    return _register__test__future_from_dart_handle_fn(
+      f,
+    );
+  }
+
+  late final _register__test__future_from_dart_handle_fnPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(TestFutureHandleFunction)>>(
+          'register__test__future_from_dart_handle_fn');
+  late final _register__test__future_from_dart_handle_fn =
+      _register__test__future_from_dart_handle_fnPtr
+          .asFunction<void Function(TestFutureHandleFunction)>();
+
+  Object test__future_from_dart__handle(
+    Object future,
+  ) {
+    return _test__future_from_dart__handle(
+      future,
+    );
+  }
+
+  late final _test__future_from_dart__handlePtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'test__future_from_dart__handle');
+  late final _test__future_from_dart__handle =
+      _test__future_from_dart__handlePtr.asFunction<Object Function(Object)>();
+
+  Object test__future_from_dart__fails(
+    Object future,
+  ) {
+    return _test__future_from_dart__fails(
+      future,
+    );
+  }
+
+  late final _test__future_from_dart__failsPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.Handle)>>(
+          'test__future_from_dart__fails');
+  late final _test__future_from_dart__fails =
+      _test__future_from_dart__failsPtr.asFunction<Object Function(Object)>();
+
+  void caller(
+    Object f,
+    DartValue val,
+  ) {
+    return _caller(
+      f,
+      val,
+    );
+  }
+
+  late final _callerPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, DartValue)>>(
+          'caller');
+  late final _caller =
+      _callerPtr.asFunction<void Function(Object, DartValue)>();
+
+  ffi.Pointer<ffi.Char> runtime_type(
+    Object handle,
+  ) {
+    return _runtime_type(
+      handle,
+    );
+  }
+
+  late final _runtime_typePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'runtime_type');
+  late final _runtime_type =
+      _runtime_typePtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  ffi.Pointer<ffi.Char> to_string(
+    Object handle,
+  ) {
+    return _to_string(
+      handle,
+    );
+  }
+
+  late final _to_stringPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'to_string');
+  late final _to_string =
+      _to_stringPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  ffi.Pointer<DartValueArg_Option_DartHandle> get1(
+    Object list,
+    int index,
+  ) {
+    return _get1(
+      list,
+      index,
+    );
+  }
+
+  late final _get1Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<DartValueArg_Option_DartHandle> Function(
+              ffi.Handle, ffi.Uint32)>>('get');
+  late final _get1 = _get1Ptr.asFunction<
+      ffi.Pointer<DartValueArg_Option_DartHandle> Function(Object, int)>();
+
+  int length(
+    Object list,
+  ) {
+    return _length(
+      list,
+    );
+  }
+
+  late final _lengthPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ffi.Handle)>>('length');
+  late final _length = _lengthPtr.asFunction<int Function(Object)>();
+
+  void set1(
+    Object map,
+    ffi.Pointer<ffi.Char> key,
+    DartValue value,
+  ) {
+    return _set1(
+      map,
+      key,
+      value,
+    );
+  }
+
+  late final _set1Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Handle, ffi.Pointer<ffi.Char>, DartValue)>>('set');
+  late final _set1 = _set1Ptr
+      .asFunction<void Function(Object, ffi.Pointer<ffi.Char>, DartValue)>();
+
+  void String_free(
+    ffi.Pointer<ffi.Char> s,
+  ) {
+    return _String_free(
+      s,
+    );
+  }
+
+  late final _String_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>(
+          'String_free');
+  late final _String_free =
+      _String_freePtr.asFunction<void Function(ffi.Pointer<ffi.Char>)>();
+
+  void register_free_dart_native_string(
+    FreeDartNativeStringFunction f,
+  ) {
+    return _register_free_dart_native_string(
+      f,
+    );
+  }
+
+  late final _register_free_dart_native_stringPtr = _lookup<
+          ffi.NativeFunction<ffi.Void Function(FreeDartNativeStringFunction)>>(
+      'register_free_dart_native_string');
+  late final _register_free_dart_native_string =
+      _register_free_dart_native_stringPtr
+          .asFunction<void Function(FreeDartNativeStringFunction)>();
 }
 
 class _Dart_Handle extends ffi.Opaque {}
@@ -4855,6 +6321,10 @@ abstract class MemoryOwner {
   static const int Rust = 0;
   static const int Dart = 1;
 }
+
+class FutureFromDart extends ffi.Opaque {}
+
+class Task extends ffi.Opaque {}
 
 abstract class DartValue_Tag {
   static const int None = 0;
@@ -4883,24 +6353,7 @@ class DartValue extends ffi.Union {
   @DartValue_Tag1()
   external int tag;
 
-  external UnnamedStruct1 unnamed;
-
-  external UnnamedStruct1 unnamed1;
-
   external String_Body string;
-
-  external UnnamedStruct1 unnamed2;
-
-  external UnnamedStruct1 unnamed3;
-
-  external UnnamedStruct1 unnamed4;
-}
-
-class UnnamedStruct1 extends ffi.Struct {
-  @DartValue_Tag1()
-  external int ptr_tag;
-
-  external ffi.Pointer<ffi.Void> ptr;
 }
 
 class wire_ConnectionHandle extends ffi.Struct {
@@ -5038,3 +6491,18 @@ typedef DartError = ffi.Pointer<ffi.Handle>;
 typedef DartPostCObjectFnType = ffi.Pointer<
     ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;
 typedef DartPort = ffi.Int64;
+
+typedef DartValueArg_String = DartValue;
+typedef DartValueArg_Option_String = DartValue;
+typedef DartValueArg_Option_u16 = DartValue;
+typedef DartValueArg_Option_i64 = DartValue;
+typedef DartValueArg_Option_u32 = DartValue;
+typedef DartValueArg_Option_i32 = DartValue;
+typedef DartValueArg_Option_DartHandle = DartValue;
+typedef DartValueArg_i64 = DartValue;
+typedef TestCallbackHandleFunction
+    = ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Handle)>>;
+typedef TestFutureHandleFunction
+    = ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Handle)>>;
+typedef FreeDartNativeStringFunction
+    = ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>;
