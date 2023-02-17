@@ -1,5 +1,6 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
@@ -32,43 +33,38 @@ Future<void> clear_world() async {
   }
 }
 
-final TestConfigs = FlutterTestConfiguration()
-  ..stepDefinitions = control_api.steps() +
-      connection.steps() +
-      room.steps() +
-      track.steps() +
-      media_state.steps() +
-      websocket.steps() +
-      given.steps()
-  ..reporters = [
-    StdoutReporter(MessageLevel.verbose)
-      ..setWriteLineFn(print)
-      ..setWriteFn(print),
-    ProgressReporter()
-      ..setWriteLineFn(print)
-      ..setWriteFn(print),
-    TestRunSummaryReporter()
-      ..setWriteLineFn(print)
-      ..setWriteFn(print),
-    FlutterDriverReporter(logInfoMessages: true),
-  ]
-  ..defaultTimeout = const Duration(minutes: 10)
-  ..customStepParameterDefinitions = []
-  ..createWorld = (config) => Future.sync(() async {
-        await clear_world();
-        await webrtc.enableFakeMedia();
+final TestConfigs = FlutterTestConfiguration(
+    stepDefinitions: control_api.steps() +
+        connection.steps() +
+        room.steps() +
+        track.steps() +
+        media_state.steps() +
+        websocket.steps() +
+        given.steps(),
+    createWorld: (config) => Future.sync(() async {
+          await clear_world();
+          await webrtc.enableFakeMedia();
 
-        var world = CustomWorld();
-        old_world = world;
-        await world.control_client
-            .create(world.room_id, Room(world.room_id, {}));
-        return world;
-      });
+          var world = CustomWorld();
+          old_world = world;
+          await world.control_client
+              .create(world.room_id, Room(world.room_id, {}));
+          return world;
+        }),
+    reporters: [
+      StdoutReporter(MessageLevel.verbose)
+        ..setWriteLineFn(print)
+        ..setWriteFn(print),
+      ProgressReporter()
+        ..setWriteLineFn(print)
+        ..setWriteFn(print),
+      TestRunSummaryReporter()
+        ..setWriteLineFn(print)
+        ..setWriteFn(print),
+      FlutterDriverReporter(logInfoMessages: true),
+    ]);
 
 @GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
-Future<void> main() async {
-  executeTestSuite(
-    TestConfigs,
-    (World world) async {},
-  );
+void main() {
+  executeTestSuite(configuration: TestConfigs, appMainFunction: (_) async {});
 }

@@ -76,14 +76,14 @@ class Call {
 
     if (publishVideo) {
       videoDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.videoinput)
+          .firstWhere((element) => element.kind() == MediaDeviceKind.VideoInput)
           .deviceId();
       constraints.deviceVideo(DeviceVideoTrackConstraints());
     }
 
     if (publishAudio) {
       audioDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.audioinput)
+          .firstWhere((element) => element.kind() == MediaDeviceKind.AudioInput)
           .deviceId();
       constraints.audio(AudioTrackConstraints());
     }

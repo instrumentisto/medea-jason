@@ -6,15 +6,15 @@ pub mod rtc_stats;
 pub mod transceiver;
 pub mod transport;
 
-cfg_if::cfg_if! {
-    if #[cfg(target_family = "wasm")] {
-        mod wasm;
-        pub use self::wasm::*;
-    } else {
-        mod dart;
-        pub use self::dart::*;
-    }
-}
+#[cfg(not(target_family = "wasm"))]
+mod dart;
+#[cfg(not(target_family = "wasm"))]
+pub use self::dart::*;
+
+#[cfg(target_family = "wasm")]
+mod wasm;
+#[cfg(target_family = "wasm")]
+pub use self::wasm::*;
 
 use derive_more::Display;
 

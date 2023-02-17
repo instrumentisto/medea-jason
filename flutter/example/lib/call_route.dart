@@ -425,10 +425,10 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
 
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.videoinput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.VideoInput)
       .toList();
   var audioDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.audioinput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.AudioInput)
       .toList();
 
   await showDialog<void>(

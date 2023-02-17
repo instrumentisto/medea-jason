@@ -1,141 +1,77 @@
-import 'dart:ffi';
-
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/nullable_pointer.dart';
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
-typedef _muted_C = Uint8 Function(Pointer);
-typedef _muted_Dart = int Function(Pointer);
-
-typedef _kind_C = Uint8 Function(Pointer);
-typedef _kind_Dart = int Function(Pointer);
-
-typedef _mediaSourceKind_C = Uint8 Function(Pointer);
-typedef _mediaSourceKind_Dart = int Function(Pointer);
-
-typedef _mediaDirection_C = Uint8 Function(Pointer);
-typedef _mediaDirection_Dart = int Function(Pointer);
-
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
-
-typedef _onMuted_C = Void Function(Pointer, Handle);
-typedef _onMuted_Dart = void Function(Pointer, void Function());
-
-typedef _onUnmuted_C = Void Function(Pointer, Handle);
-typedef _onUnmuted_Dart = void Function(Pointer, void Function());
-
-typedef _onStopped_C = Void Function(Pointer, Handle);
-typedef _onStopped_Dart = void Function(Pointer, void Function());
-
-typedef _onMediaDirectionChanged_C = Void Function(Pointer, Handle);
-typedef _onMediaDirectionChanged_Dart = void Function(
-    Pointer, void Function(int));
-
-typedef _getTrack_C = Handle Function(Pointer);
-typedef _getTrack_Dart = Object Function(Pointer);
-
-final _muted =
-    dl.lookupFunction<_muted_C, _muted_Dart>('RemoteMediaTrack__muted');
-
-final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('RemoteMediaTrack__kind');
-
-final _mediaSourceKind =
-    dl.lookupFunction<_mediaSourceKind_C, _mediaSourceKind_Dart>(
-        'RemoteMediaTrack__media_source_kind');
-
-final _mediaDirectionKind =
-    dl.lookupFunction<_mediaDirection_C, _mediaDirection_Dart>(
-        'RemoteMediaTrack__media_direction');
-
-final _onMuted =
-    dl.lookupFunction<_onMuted_C, _onMuted_Dart>('RemoteMediaTrack__on_muted');
-
-final _onUnmuted = dl.lookupFunction<_onUnmuted_C, _onUnmuted_Dart>(
-    'RemoteMediaTrack__on_unmuted');
-
-final _onStopped = dl.lookupFunction<_onStopped_C, _onStopped_Dart>(
-    'RemoteMediaTrack__on_stopped');
-
-final _onMediaDirectionChanged = dl
-    .lookupFunction<_onMediaDirectionChanged_C, _onMediaDirectionChanged_Dart>(
-        'RemoteMediaTrack__on_media_direction_changed');
-
-final _getTrack = dl
-    .lookupFunction<_getTrack_C, _getTrack_Dart>('RemoteMediaTrack__get_track');
-
-final _free = dl.lookupFunction<_free_C, _free_Dart>('RemoteMediaTrack__free');
-
 class NativeRemoteMediaTrack implements RemoteMediaTrack {
-  /// [Pointer] to the Rust struct that backing this object.
-  late NullablePointer ptr;
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final RustOpaque<frb.RemoteMediaTrack> opaque;
 
   /// Constructs a new [RemoteMediaTrack] backed by the Rust struct behind the
-  /// provided [Pointer].
-  NativeRemoteMediaTrack(this.ptr) {
+  /// provided [frb.RemoteMediaTrack].
+  NativeRemoteMediaTrack(frb.RemoteMediaTrack remoteMediaTrack)
+      : opaque = RustOpaque(remoteMediaTrack) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   bool muted() {
-    return _muted(ptr.getInnerPtr()) > 0;
+    return api.remoteMediaTrackMuted(track: opaque.innerOpaque);
   }
 
   @override
   MediaKind kind() {
-    var index = _kind(ptr.getInnerPtr());
-    return MediaKind.values[index];
+    return api.remoteMediaTrackKind(track: opaque.innerOpaque);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    var index = _mediaSourceKind(ptr.getInnerPtr());
-    return MediaSourceKind.values[index];
+    return api.remoteMediaTrackMediaSourceKind(track: opaque.innerOpaque);
   }
 
   @override
   TrackMediaDirection mediaDirection() {
-    var index = _mediaDirectionKind(ptr.getInnerPtr());
-    return TrackMediaDirection.values[index];
+    return api.remoteMediaTrackMediaDirection(track: opaque.innerOpaque);
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
+    return api.remoteMediaTrackGetTrack(track: opaque.innerOpaque)
+        as webrtc.MediaStreamTrack;
   }
 
   @override
   void onMuted(void Function() f) {
-    _onMuted(ptr.getInnerPtr(), f);
+    return api.remoteMediaTrackOnMuted(track: opaque.innerOpaque, f: f);
   }
 
   @override
   void onUnmuted(void Function() f) {
-    _onUnmuted(ptr.getInnerPtr(), f);
+    return api.remoteMediaTrackOnUnmuted(track: opaque.innerOpaque, f: f);
   }
 
   @override
   void onStopped(void Function() f) {
-    _onStopped(ptr.getInnerPtr(), f);
+    return api.remoteMediaTrackOnStopped(track: opaque.innerOpaque, f: f);
+  }
+
+  @override
+  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+    api.remoteMediaTrackOnMediaDirectionChanged(
+        track: opaque.innerOpaque, f: (i) => f(TrackMediaDirection.values[i]));
   }
 
   @moveSemantics
   @override
   Future<void> free() async {
-    if (!ptr.isFreed()) {
+    if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
-      ptr.free();
-    }
-  }
 
-  @override
-  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
-    _onMediaDirectionChanged(
-        ptr.getInnerPtr(), (i) => f(TrackMediaDirection.values[i]));
+      opaque.dispose();
+    }
   }
 }

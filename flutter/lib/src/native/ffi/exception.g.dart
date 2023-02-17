@@ -6,10 +6,6 @@ import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunction(
   DynamicLibrary dl, {
-  required Pointer<
-          NativeFunction<
-              Handle Function(ForeignValue, Pointer<Utf8>, Pointer<Utf8>)>>
-      newArgumentError,
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
       newStateError,
   required Pointer<NativeFunction<Handle Function(Pointer<Utf8>)>>
@@ -46,21 +42,9 @@ void registerFunction(
 }) {
   dl.lookupFunction<
       Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer,
-          Pointer)>('register_exception')(
-    newArgumentError,
+          Pointer, Pointer, Pointer, Pointer, Pointer),
+      void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
+          Pointer, Pointer, Pointer, Pointer, Pointer)>('register_exception')(
     newStateError,
     newFormatException,
     newLocalMediaInitException,

@@ -1,116 +1,60 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:ffi/ffi.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 
-import '../interface/media_device_info.dart';
-import '../interface/media_display_info.dart';
-import '../interface/media_manager.dart';
+import '../../medea_jason.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
-import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/nullable_pointer.dart';
-import 'ffi/ptrarray.dart';
-import 'ffi/result.dart';
-import 'jason.dart';
+import 'ffi/jason_api.g.dart' as frb;
 import 'local_media_track.dart';
 import 'media_device_info.dart';
 import 'media_display_info.dart';
-import 'media_stream_settings.dart';
-
-typedef _initLocalTracks_C = Handle Function(Pointer, Pointer);
-typedef _initLocalTracks_Dart = Object Function(Pointer, Pointer);
-
-typedef _enumerateDevices_C = Handle Function(Pointer);
-typedef _enumerateDevices_Dart = Object Function(Pointer);
-
-typedef _enumerateDisplays_C = Handle Function(Pointer);
-typedef _enumerateDisplays_Dart = Object Function(Pointer);
-
-typedef _setOutputAudioId_C = Handle Function(Pointer, Pointer<Utf8>);
-typedef _setOutputAudioId_Dart = Object Function(Pointer, Pointer<Utf8>);
-
-typedef _setMicrophoneVolume_C = Handle Function(Pointer, Int64);
-typedef _setMicrophoneVolume_Dart = Object Function(Pointer, int);
-
-typedef _microphoneVolumeIsAvailable_C = Handle Function(Pointer);
-typedef _microphoneVolumeIsAvailable_Dart = Object Function(Pointer);
-
-typedef _microphoneVolume_C = Handle Function(Pointer);
-typedef _microphoneVolume_Dart = Object Function(Pointer);
-
-typedef _onDeviceChange_C = Result Function(Pointer, Handle);
-typedef _onDeviceChange_Dart = Result Function(Pointer, Object);
-
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
-
-final _initLocalTracks =
-    dl.lookupFunction<_initLocalTracks_C, _initLocalTracks_Dart>(
-        'MediaManagerHandle__init_local_tracks');
-
-final _enumerateDevices =
-    dl.lookupFunction<_enumerateDevices_C, _enumerateDevices_Dart>(
-        'MediaManagerHandle__enumerate_devices');
-
-final _enumerateDisplays =
-    dl.lookupFunction<_enumerateDisplays_C, _enumerateDisplays_Dart>(
-        'MediaManagerHandle__enumerate_displays');
-
-final _setOutputAudioId =
-    dl.lookupFunction<_setOutputAudioId_C, _setOutputAudioId_Dart>(
-        'MediaManagerHandle__set_output_audio_id');
-
-final _setMicrophoneVolume =
-    dl.lookupFunction<_setMicrophoneVolume_C, _setMicrophoneVolume_Dart>(
-        'MediaManagerHandle__set_microphone_volume');
-
-final _microphoneVolumeIsAvailable = dl.lookupFunction<
-        _microphoneVolumeIsAvailable_C, _microphoneVolumeIsAvailable_Dart>(
-    'MediaManagerHandle__microphone_volume_is_available');
-
-final _microphoneVolume =
-    dl.lookupFunction<_microphoneVolume_C, _microphoneVolume_Dart>(
-        'MediaManagerHandle__microphone_volume');
-
-final _onDeviceChange =
-    dl.lookupFunction<_onDeviceChange_C, _onDeviceChange_Dart>(
-        'MediaManagerHandle__on_device_change');
-
-final _free =
-    dl.lookupFunction<_free_C, _free_Dart>('MediaManagerHandle__free');
 
 class NativeMediaManagerHandle implements MediaManagerHandle {
-  /// [Pointer] to the Rust struct backing this object.
-  late NullablePointer ptr;
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final RustOpaque<frb.MediaManagerHandle> opaque;
 
   /// Creates a new [MediaManagerHandle] backed by the Rust struct behind the
-  /// provided [Pointer].
-  NativeMediaManagerHandle(this.ptr) {
+  /// provided [frb.MediaManagerHandle].
+  NativeMediaManagerHandle(frb.MediaManagerHandle mediaManager)
+      : opaque = RustOpaque(mediaManager) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    Pointer tracks = await (_initLocalTracks(
-            ptr.getInnerPtr(), (caps as MediaStreamSettings).ptr.getInnerPtr())
-        as Future);
-    return tracks
-        .cast<PtrArray>()
-        .intoPointerList()
-        .map((e) => NativeLocalMediaTrack(NullablePointer(e)))
+    var tracks;
+    try {
+      tracks = await (api.mediaManagerHandleInitLocalTracks(
+          manager: opaque.innerOpaque,
+          caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
+
+    return api
+        .vecLocalTracksFromPtr(ptr: tracks.address)
+        .map((track) => NativeLocalMediaTrack(track))
         .toList();
   }
 
   @override
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
-    Pointer pointer = await (_enumerateDevices(ptr.getInnerPtr()) as Future);
-    return pointer
-        .cast<PtrArray>()
-        .intoPointerList()
-        .map((e) => NativeMediaDeviceInfo(NullablePointer(e)))
+    var devices;
+    try {
+      devices = await (api.mediaManagerHandleEnumerateDevices(
+          manager: opaque.innerOpaque) as Future);
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
+
+    return api
+        .vecMediaDeviceInfoFromPtr(ptr: devices.address)
+        .map((info) => NativeMediaDeviceInfo(info))
         .toList();
   }
 
@@ -121,50 +65,76 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
           'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
     }
 
-    Pointer pointer = await (_enumerateDisplays(ptr.getInnerPtr()) as Future);
-    return pointer
-        .cast<PtrArray>()
-        .intoPointerList()
-        .map((e) => NativeMediaDisplayInfo(NullablePointer(e)))
+    var devices;
+    try {
+      devices = await (api.mediaManagerHandleEnumerateDisplays(
+          manager: opaque.innerOpaque) as Future) as Pointer;
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
+
+    return api
+        .vecMediaDisplayInfoFromPtr(ptr: devices.address)
+        .map((info) => NativeMediaDisplayInfo(info))
         .toList();
   }
 
   @override
   Future<void> setOutputAudioId(String deviceId) async {
-    await (_setOutputAudioId(ptr.getInnerPtr(), deviceId.toNativeUtf8())
-        as Future);
+    try {
+      await (api.mediaManagerHandleSetOutputAudioId(
+          manager: opaque.innerOpaque, deviceId: deviceId) as Future);
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
-    await (_setMicrophoneVolume(ptr.getInnerPtr(), level) as Future);
+    try {
+      await (api.mediaManagerHandleSetMicrophoneVolume(
+          manager: opaque.innerOpaque, level: level) as Future);
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
   }
 
   @override
   Future<int> microphoneVolume() async {
-    return await (_microphoneVolume(ptr.getInnerPtr()) as Future);
+    try {
+      return await (api.mediaManagerHandleMicrophoneVolume(
+          manager: opaque.innerOpaque) as Future) as int;
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    var available =
-        await (_microphoneVolumeIsAvailable(ptr.getInnerPtr()) as Future);
-
-    return available != 0;
+    try {
+      return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
+          manager: opaque.innerOpaque) as Future) as bool;
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
   }
 
   @override
   void onDeviceChange(void Function() cb) {
-    _onDeviceChange(ptr.getInnerPtr(), cb).unwrap();
+    try {
+      api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
+    } on FfiException catch (anyhow) {
+      throw anyhow.parse();
+    }
   }
 
   @moveSemantics
   @override
   void free() {
-    if (!ptr.isFreed()) {
+    if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
-      ptr.free();
+
+      opaque.dispose();
     }
   }
 }

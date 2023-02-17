@@ -5,11 +5,6 @@
 use std::env;
 
 fn main() {
-    println!("cargo:rerun-if-env-changed=CLIPPY_ARGS");
-    if env::var("CLIPPY_ARGS").is_ok() {
-        return;
-    }
-
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     if target_os == "macos" {
         println!("cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET=10.11");
@@ -18,13 +13,4 @@ fn main() {
              @rpath/libmedea_jason.dylib"
         );
     }
-
-    if let Ok("wasm32-unknown-unknown") = env::var("TARGET").as_deref() {
-        return;
-    }
-
-    println!("cargo:rerun-if-changed=src/platform/dart/api_dl/trampoline.c");
-    cc::Build::new()
-        .file("src/platform/dart/api_dl/trampoline.c")
-        .compile("trampoline");
 }

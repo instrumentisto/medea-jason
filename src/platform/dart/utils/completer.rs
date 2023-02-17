@@ -17,12 +17,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{utils::DartError, DartValue},
-    platform::dart::utils::dart_future::FutureFromDart,
-};
-
-use super::dart_api::{
-    Dart_HandleFromPersistent_DL_Trampolined,
-    Dart_NewPersistentHandle_DL_Trampolined,
+    platform::dart::utils::{dart_api, dart_future::FutureFromDart},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/completer.g.dart")]
@@ -119,7 +114,7 @@ impl<T, E> Completer<T, E> {
     pub fn new() -> Self {
         let handle = unsafe {
             let completer = completer::init();
-            Dart_NewPersistentHandle_DL_Trampolined(completer)
+            dart_api::new_persistent_handle(completer)
         };
         Self {
             handle,
@@ -135,7 +130,7 @@ impl<T, E> Completer<T, E> {
     #[must_use]
     pub fn future(&self) -> Dart_Handle {
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
+            let handle = dart_api::handle_from_persistent(self.handle);
             completer::future(handle)
         }
     }
@@ -154,7 +149,7 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete(&self, arg: T) {
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
+            let handle = dart_api::handle_from_persistent(self.handle);
             completer::complete(handle, arg.into());
         }
     }
@@ -166,7 +161,7 @@ impl<T> Completer<T, DartError> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete_error(&self, e: DartError) {
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
+            let handle = dart_api::handle_from_persistent(self.handle);
             completer::complete_error(handle, e);
         }
     }

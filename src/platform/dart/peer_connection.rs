@@ -12,7 +12,6 @@ use medea_macro::dart_bridge;
 use tracerr::Traced;
 
 use crate::{
-    api::string_into_c_str,
     media::MediaKind,
     platform::{
         dart::{
@@ -31,7 +30,7 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack,
+    media_track::MediaStreamTrack, utils::string_into_c_str,
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
