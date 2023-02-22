@@ -3,7 +3,7 @@
 use futures::FutureExt as _;
 use std::{cell::RefCell, rc::Rc};
 
-use crate::platform;
+use crate::platform::{self, Error};
 
 use crate::{
     media::{MediaManager, MediaManagerHandle},
@@ -17,7 +17,7 @@ use crate::{
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Jason(Rc<RefCell<Inner>>);
 
 /// Inner representation if a [`Jason`].
@@ -66,16 +66,50 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    #[allow(clippy::needless_pass_by_value)]
-    pub fn close_room(&self, room_to_delete: RoomHandle) {
-        self.0.borrow_mut().rooms.retain(|room| {
-            let should_be_closed = room.inner_ptr_eq(&room_to_delete);
-            if should_be_closed {
-                room.set_close_reason(ClientDisconnect::RoomClosed.into());
-            }
+    ///
+    /// # Errors
+    ///
+    /// Function never returns an error.
+    /// [`Result`] signature used to convert to `DartOpaque` future.
+    #[allow(clippy::needless_pass_by_value, unused_must_use)]
+    pub async fn close_room(
+        &self,
+        room_to_delete: RoomHandle,
+    ) -> Result<(), Error> {
+        let drop_indexes: Vec<usize> = self
+            .0
+            .borrow()
+            .rooms
+            .iter()
+            .enumerate()
+            .filter(|(_, room)| {
+                let should_be_closed = room.inner_ptr_eq(&room_to_delete);
+                if should_be_closed {
+                    room.set_close_reason(ClientDisconnect::RoomClosed.into());
+                }
+                should_be_closed
+            })
+            .map(|(index, _)| index)
+            .collect();
 
-            !should_be_closed
-        });
+        let wait = drop_indexes.len() == self.0.borrow().rooms.len();
+
+        let drop_rooms = move || {
+            let rooms = &mut self.0.borrow_mut().rooms;
+            drop_indexes.into_iter().rev().for_each(|i| {
+                drop(rooms.swap_remove(i));
+            });
+        };
+
+        if wait {
+            let fut = self.0.borrow().rpc.on_normal_close();
+            drop_rooms();
+            fut.await;
+        } else {
+            drop_rooms();
+        }
+
+        Ok(())
     }
 
     /// Drops this [`Jason`] API object, so all the related objects (rooms,

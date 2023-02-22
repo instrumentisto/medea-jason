@@ -493,11 +493,14 @@ pub fn jason_media_manager(
 pub fn jason_close_room(
     jason: RustOpaque<Jason>,
     room_to_delete: RustOpaque<RoomHandle>,
-) -> SyncReturn<()> {
+) -> SyncReturn<DartOpaque> {
     let room_to_delete = room_to_delete.try_unwrap().unwrap();
-    jason.close_room(room_to_delete);
 
-    SyncReturn(())
+    SyncReturn(
+        async move { jason.close_room(room_to_delete).await }
+            .into_dart_future()
+            .into_dart_opaque(),
+    )
 }
 
 /// Closes the provided [`RoomHandle`].

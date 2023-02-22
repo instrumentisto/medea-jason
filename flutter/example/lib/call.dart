@@ -171,7 +171,7 @@ class Call {
   Future<void> dispose() async {
     _tracks.forEach((t) async => await t.free());
     _mediaManager.free();
-    _jason.closeRoom(_room);
+    await _jason.closeRoom(_room);
   }
 
   /// Sets the callback for a new local device track.

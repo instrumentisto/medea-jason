@@ -1,7 +1,9 @@
 //! General JS side library interface.
 
 use derive_more::From;
+use js_sys::Promise;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
     api::{MediaManagerHandle, RoomHandle},
@@ -39,8 +41,13 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    pub fn close_room(&self, room_to_delete: RoomHandle) {
-        self.0.close_room(room_to_delete.into());
+    #[allow(unused_must_use)]
+    pub fn close_room(&self, room_to_delete: RoomHandle) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            this.close_room(room_to_delete.into()).await;
+            Ok(JsValue::UNDEFINED)
+        })
     }
 
     /// Drops [`Jason`] API object, so all the related objects (rooms,
