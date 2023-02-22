@@ -237,7 +237,7 @@ async fn room_dispose_works() {
         }
     ));
 
-    jason.close_room(room);
+    JsFuture::from(jason.close_room(room)).await.unwrap();
     assert!(matches!(
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
@@ -246,7 +246,7 @@ async fn room_dispose_works() {
         }
     ));
 
-    jason.close_room(another_room);
+    JsFuture::from(jason.close_room(another_room)).await.unwrap();
     assert!(matches!(
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
