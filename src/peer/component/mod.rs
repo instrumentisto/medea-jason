@@ -342,6 +342,7 @@ impl State {
                         track.id,
                         mid.clone(),
                         track.media_type,
+                        track.media_direction,
                         receivers.clone(),
                         send_constraints,
                     )),
@@ -354,6 +355,7 @@ impl State {
                         track.id,
                         mid.clone(),
                         track.media_type,
+                        track.media_direction,
                         sender.clone(),
                     )),
                 );

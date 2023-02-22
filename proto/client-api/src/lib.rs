@@ -677,6 +677,9 @@ pub struct Track {
     /// [`Direction`] of this [`Track`].
     pub direction: Direction,
 
+    /// [`MediaDirection`] of this [`Track`].
+    pub media_direction: MediaDirection,
+
     /// [`MediaType`] of this [`Track`].
     pub media_type: MediaType,
 }

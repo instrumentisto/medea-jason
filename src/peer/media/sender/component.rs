@@ -265,6 +265,7 @@ impl State {
         id: TrackId,
         mid: Option<String>,
         media_type: MediaType,
+        media_direction: MediaDirection,
         receivers: Vec<MemberId>,
         send_constraints: LocalTracksConstraints,
     ) -> Self {
@@ -274,12 +275,16 @@ impl State {
             media_type,
             receivers,
             enabled_individual: MediaExchangeStateController::new(
-                media_exchange_state::Stable::from(true),
+                media_exchange_state::Stable::from(
+                    media_direction.is_send_enabled(),
+                ),
             ),
             enabled_general: ProgressableCell::new(
-                media_exchange_state::Stable::from(true),
+                media_exchange_state::Stable::from(
+                    media_direction.is_enabled_general(),
+                ),
             ),
-            media_direction: Cell::new(MediaDirection::SendRecv),
+            media_direction: Cell::new(media_direction),
             mute_state: MuteStateController::new(mute_state::Stable::from(
                 false,
             )),
