@@ -715,13 +715,15 @@ pub struct TrackPatchCommand {
 /// [`Event::PeerUpdated`].
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TrackPatchEvent {
     /// ID of the [`Track`] which should be patched.
     pub id: TrackId,
 
     /// General media exchange direction of the `Track`.
     pub media_direction: Option<MediaDirection>,
+
+    pub receivers: Option<Vec<MemberId>>,
 
     /// [`Track`]'s mute state.
     ///
@@ -779,6 +781,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                     MediaDirection::Inactive
                 }
             }),
+            receivers: None,
         }
     }
 }
@@ -791,6 +794,7 @@ impl TrackPatchEvent {
             id,
             muted: None,
             media_direction: None,
+            receivers: None,
         }
     }
 

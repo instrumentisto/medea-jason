@@ -1,6 +1,10 @@
 //! [`Component`] for `MediaTrack` with a `Send` direction.
 
-use std::{cell::Cell, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    collections::HashSet,
+    rc::Rc,
+};
 
 use futures::{future::LocalBoxFuture, StreamExt as _};
 use medea_client_api_proto::{
@@ -14,7 +18,7 @@ use tracerr::Traced;
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
-        component::SyncState,
+        component::{SyncState, UpdateResult},
         media::{
             media_exchange_state, mute_state, InTransition, MediaExchangeState,
             MuteState, ProhibitedStateError,
@@ -92,7 +96,7 @@ pub struct State {
     /// IDs of the members the [`Sender`]'s [`local::Track`] is received by.
     ///
     /// [`local::Track`]: crate::media::track::local::Track
-    receivers: Vec<MemberId>,
+    receivers: Rc<RefCell<Vec<MemberId>>>,
 
     /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
     /// individually.
@@ -137,7 +141,7 @@ impl AsProtoState for State {
             id: self.id,
             mid: self.mid.clone(),
             media_type: self.media_type,
-            receivers: self.receivers.clone(),
+            receivers: self.receivers.borrow().clone(),
             media_direction: self.media_direction.get(),
             muted: self.mute_state.muted(),
         }
@@ -155,7 +159,7 @@ impl SynchronizableState for State {
             id: input.id,
             mid: input.mid,
             media_type: input.media_type,
-            receivers: input.receivers,
+            receivers: Rc::new(RefCell::new(input.receivers)),
             mute_state: MuteStateController::new(mute_state::Stable::from(
                 input.muted,
             )),
@@ -251,7 +255,7 @@ impl From<&State> for proto::state::Sender {
             id: state.id,
             mid: state.mid.clone(),
             media_type: state.media_type,
-            receivers: state.receivers.clone(),
+            receivers: state.receivers.borrow().clone(),
             media_direction: state.media_direction.get(),
             muted: state.mute_state.muted(),
         }
@@ -273,7 +277,7 @@ impl State {
             id,
             mid,
             media_type,
-            receivers,
+            receivers: Rc::new(RefCell::new(receivers)),
             enabled_individual: MediaExchangeStateController::new(
                 media_exchange_state::Stable::from(
                     media_direction.is_send_enabled(),
@@ -322,8 +326,8 @@ impl State {
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
     /// should send media data to.
     #[must_use]
-    pub const fn receivers(&self) -> &Vec<MemberId> {
-        &self.receivers
+    pub fn receivers(&self) -> Vec<MemberId> {
+        self.receivers.borrow().clone()
     }
 
     /// Returns current individual media exchange state of this [`State`].
@@ -372,9 +376,13 @@ impl State {
     }
 
     /// Updates this [`State`] with the provided [`TrackPatchEvent`].
-    pub fn update(&self, track_patch: &TrackPatchEvent) {
+    pub fn update(
+        &self,
+        track_patch: &TrackPatchEvent,
+    ) -> Option<UpdateResult> {
+        let mut res = None;
         if track_patch.id != self.id {
-            return;
+            return res;
         }
         if let Some(direction) = track_patch.media_direction {
             self.media_direction.set(direction);
@@ -387,6 +395,29 @@ impl State {
         if let Some(muted) = track_patch.muted {
             self.mute_state.update(mute_state::Stable::from(muted));
         }
+        if let Some(receivers) = &track_patch.receivers {
+            let mut new_recvs: HashSet<_> = receivers.iter().collect();
+            let mut current_recvs = self.receivers.borrow_mut();
+
+            current_recvs.retain(|cur_recv| {
+                new_recvs
+                    .remove(cur_recv)
+                    .then_some(
+                        res.get_or_insert(UpdateResult::default())
+                            .recv_removed
+                            .push(cur_recv.clone()),
+                    )
+                    .is_some()
+            });
+
+            for new_recv in new_recvs {
+                current_recvs.push(new_recv.clone());
+                res.get_or_insert(UpdateResult::default())
+                    .recv_added
+                    .push(new_recv.clone());
+            }
+        }
+        res
     }
 
     /// Indicates whether local `MediaStream` update needed for this [`State`].

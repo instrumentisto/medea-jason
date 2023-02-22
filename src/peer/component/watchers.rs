@@ -18,7 +18,7 @@ use crate::{
     utils::{transpose_guarded, Updatable as _},
 };
 
-use super::{Component, PeerConnection, State};
+use super::{Component, PeerConnection, State, UpdateResult};
 
 /// Errors occurring in watchers of a [`Component`].
 #[derive(Clone, Debug, Display, From)]
@@ -157,7 +157,7 @@ impl Component {
 
         let ((_, new_sender), _guard) = val.into_parts();
         for receiver in new_sender.receivers() {
-            drop(peer.connections.create_connection(state.id, receiver));
+            drop(peer.connections.create_connection(state.id, &receiver));
         }
         let sender = sender::Sender::new(
             &new_sender,
@@ -470,5 +470,28 @@ impl Component {
         drop(state.update_local_stream(&peer).await);
 
         state.maybe_update_local_stream.set(false);
+    }
+
+    #[watch(
+        self.maybe_update_connections.subscribe().filter(|v| future::ready(v.is_some()))
+    )]
+    fn maybe_update_connections(
+        peer: &PeerConnection,
+        state: &State,
+        res: Option<UpdateResult>,
+    ) {
+        if let Some(res) = res {
+            for member_id_to_del in res.recv_removed {
+                peer.connections
+                    .close_specific_connection(peer.id(), &member_id_to_del);
+            }
+            for member_id_to_add in res.recv_added {
+                let _ = peer
+                    .connections
+                    .create_connection(peer.id(), &member_id_to_add);
+            }
+
+            state.maybe_update_connections.set(None);
+        }
     }
 }

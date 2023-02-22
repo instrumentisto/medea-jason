@@ -13,6 +13,7 @@ use medea_client_api_proto::{
     TrackId,
 };
 use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
+use proto::MemberId;
 use tracerr::Traced;
 
 use crate::{
@@ -40,6 +41,12 @@ pub enum SyncState {
 
     /// State is synced.
     Synced,
+}
+
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct UpdateResult {
+    pub recv_added: Vec<MemberId>,
+    pub recv_removed: Vec<MemberId>,
 }
 
 /// Negotiation state of the [`Component`].
@@ -133,6 +140,8 @@ pub struct State {
 
     /// Synchronization state of this [`Component`].
     sync_state: ObservableCell<SyncState>,
+
+    maybe_update_connections: ObservableCell<Option<UpdateResult>>,
 }
 
 impl State {
@@ -158,6 +167,7 @@ impl State {
             ice_candidates: IceCandidates::new(),
             maybe_update_local_stream: ObservableCell::new(false),
             sync_state: ObservableCell::new(SyncState::Synced),
+            maybe_update_connections: ObservableCell::new(None),
         }
     }
 
@@ -391,7 +401,8 @@ impl State {
                 }
             },
             |sender| {
-                sender.update(track_patch);
+                self.maybe_update_connections
+                    .set(sender.update(track_patch));
                 self.maybe_update_local_stream.set(true);
             },
         );
