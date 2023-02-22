@@ -128,12 +128,15 @@ async fn room_dispose_works() {
     let (test_tx, mut test_rx) = mpsc::unbounded();
     let (cmd_tx, mut cmd_rx) = mpsc::unbounded();
     let client_msg_txs = Rc::new(RefCell::new(Vec::new()));
+    let client_state_txs = Rc::new(RefCell::new(Vec::new()));
     let ws = Rc::new(WebSocketRpcClient::new({
         let client_msg_txs = client_msg_txs.clone();
+        let client_state_txs = client_state_txs.clone();
         Box::new(move || {
             let test_tx = test_tx.clone();
             let cmd_tx = cmd_tx.clone();
             let client_msg_txs = client_msg_txs.clone();
+            let client_state_txs = client_state_txs.clone();
             let mut transport = MockRpcTransport::new();
             transport
                 .expect_connect()
@@ -155,8 +158,14 @@ async fn room_dispose_works() {
                 .returning(move |reason| {
                     test_tx.unbounded_send(reason).unwrap();
                 });
-            transport.expect_on_state_change().returning(|| {
-                Box::pin(stream::once(async { TransportState::Open }))
+            transport
+            .expect_on_state_change().returning_st({
+                move || {
+                    let (tx, rx) = mpsc::unbounded();
+                    tx.unbounded_send(TransportState::Open ).unwrap();
+                    client_state_txs.borrow_mut().push(tx);
+                    Box::pin(rx)
+                }
             });
             let transport = Rc::new(transport);
             transport as Rc<dyn RpcTransport>
@@ -245,7 +254,17 @@ async fn room_dispose_works() {
             command: Command::LeaveRoom { member_id: _ }
         }
     ));
-
+    
+    spawn_local({
+        let client_state_txs = client_state_txs.clone();
+        async move {
+            yield_now().await;
+            client_state_txs.borrow().iter().for_each(|tx| {
+                tx.unbounded_send(TransportState::Closed(CloseMsg::Normal(1000, CloseReason::Finished)))
+                .ok();
+            });
+        }
+    });
     JsFuture::from(jason.close_room(another_room)).await.unwrap();
     assert!(matches!(
         cmd_rx.next().await.unwrap(),
