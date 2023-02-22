@@ -158,11 +158,10 @@ async fn room_dispose_works() {
                 .returning(move |reason| {
                     test_tx.unbounded_send(reason).unwrap();
                 });
-            transport
-            .expect_on_state_change().returning_st({
+            transport.expect_on_state_change().returning_st({
                 move || {
                     let (tx, rx) = mpsc::unbounded();
-                    tx.unbounded_send(TransportState::Open ).unwrap();
+                    tx.unbounded_send(TransportState::Open).unwrap();
                     client_state_txs.borrow_mut().push(tx);
                     Box::pin(rx)
                 }
@@ -254,18 +253,23 @@ async fn room_dispose_works() {
             command: Command::LeaveRoom { member_id: _ }
         }
     ));
-    
+
     spawn_local({
         let client_state_txs = client_state_txs.clone();
         async move {
             yield_now().await;
             client_state_txs.borrow().iter().for_each(|tx| {
-                tx.unbounded_send(TransportState::Closed(CloseMsg::Normal(1000, CloseReason::Finished)))
+                tx.unbounded_send(TransportState::Closed(CloseMsg::Normal(
+                    1000,
+                    CloseReason::Finished,
+                )))
                 .ok();
             });
         }
     });
-    JsFuture::from(jason.close_room(another_room)).await.unwrap();
+    JsFuture::from(jason.close_room(another_room))
+        .await
+        .unwrap();
     assert!(matches!(
         cmd_rx.next().await.unwrap(),
         ClientMsg::Command {
