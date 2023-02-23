@@ -7,11 +7,11 @@ import '../jason.dart';
 import 'box_handle.dart';
 import 'nullable_pointer.dart';
 
-typedef _boxForeignValue_C = Pointer Function(ForeignValue);
-typedef _boxForeignValue_Dart = Pointer Function(ForeignValue);
+typedef _BoxForeignValueC = Pointer Function(ForeignValue);
+typedef _BoxForeignValueDart = Pointer Function(ForeignValue);
 
-final _boxForeignValue_Dart _boxForeignValue =
-    dl.lookupFunction<_boxForeignValue_C, _boxForeignValue_Dart>(
+final _BoxForeignValueDart _boxForeignValue =
+    dl.lookupFunction<_BoxForeignValueC, _BoxForeignValueDart>(
         'box_foreign_value');
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.

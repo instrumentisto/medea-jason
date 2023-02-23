@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, avoid_web_libraries_in_flutter
+
 @JS()
 library medea_jason;
 

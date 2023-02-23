@@ -5,11 +5,11 @@ import 'package:ffi/ffi.dart';
 import '../../util/move_semantic.dart';
 import '../jason.dart';
 
-typedef _free_C = Void Function(Pointer<Utf8>);
-typedef _free_Dart = void Function(Pointer<Utf8>);
+typedef _FreeC = Void Function(Pointer<Utf8>);
+typedef _FreeDart = void Function(Pointer<Utf8>);
 
 /// Frees [String] returned from Rust.
-final _free = dl.lookupFunction<_free_C, _free_Dart>('String_free');
+final _free = dl.lookupFunction<_FreeC, _FreeDart>('String_free');
 
 extension RustStringPointer on Pointer<Utf8> {
   /// Converts this [RustStringPointer] to a Dart's [String].

@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_flutter_webrtc/src/model/device.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart';
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'media_display_info.g.dart' as bridge;

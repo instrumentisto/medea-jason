@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'package:medea_flutter_webrtc/src/platform/web/video_renderer.dart'
     as video_renderer;
 

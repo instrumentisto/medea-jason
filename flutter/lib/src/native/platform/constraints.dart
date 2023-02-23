@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-import 'package:medea_flutter_webrtc/src/model/constraints.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'constraints.g.dart' as bridge;
@@ -51,35 +51,35 @@ enum ConstraintType {
 
 /// Returns new empty [DeviceConstraints].
 Object _newDeviceConstraints() {
-  return DeviceConstraints();
+  return webrtc.DeviceConstraints();
 }
 
 ///Returns new empty [DisplayConstraints].
 Object _newDisplayConstraints() {
-  return DisplayConstraints();
+  return webrtc.DisplayConstraints();
 }
 
 /// Returns new empty [DeviceVideoConstraints].
 Object _newVideoConstraints() {
-  return DeviceVideoConstraints();
+  return webrtc.DeviceVideoConstraints();
 }
 
 /// Returns new empty [AudioConstraints].
 Object _newAudioConstraints() {
-  return AudioConstraints();
+  return webrtc.AudioConstraints();
 }
 
 /// Specifies the provided setting of a [MediaStreamConstraints.video][0].
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-video
 void _setVideoConstraintValue(
-    DeviceVideoConstraints cons, int kind, ForeignValue value) {
+    webrtc.DeviceVideoConstraints cons, int kind, ForeignValue value) {
   switch (VideoConstraintKind.values[kind]) {
     case VideoConstraintKind.deviceId:
       cons.deviceId = value.toDart() as String;
       break;
     case VideoConstraintKind.facingMode:
-      cons.facingMode = FacingMode.values[value.toDart() as int];
+      cons.facingMode = webrtc.FacingMode.values[value.toDart() as int];
       break;
     case VideoConstraintKind.width:
       cons.width = value.toDart();
@@ -97,7 +97,7 @@ void _setVideoConstraintValue(
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints-audio
 void _setAudioConstraintValue(
-    AudioConstraints cons, int kind, ForeignValue value) {
+    webrtc.AudioConstraints cons, int kind, ForeignValue value) {
   switch (AudioConstraintKind.values[kind]) {
     case AudioConstraintKind.deviceId:
       cons.deviceId = value.toDart() as String;
@@ -107,8 +107,8 @@ void _setAudioConstraintValue(
 
 /// Specifies the provided nature and settings of a video track to the given
 /// [DeviceConstraints].
-void _setVideoConstraint(
-    DeviceConstraints cons, int type, DeviceVideoConstraints video) {
+void _setVideoConstraint(webrtc.DeviceConstraints cons, int type,
+    webrtc.DeviceVideoConstraints video) {
   switch (ConstraintType.values[type]) {
     case ConstraintType.optional:
       cons.video.optional = video;
@@ -122,7 +122,7 @@ void _setVideoConstraint(
 /// Specifies the provided nature and settings of a audio track to the given
 /// [DeviceConstraints].
 void _setAudioConstraint(
-    DeviceConstraints cons, int type, AudioConstraints audio) {
+    webrtc.DeviceConstraints cons, int type, webrtc.AudioConstraints audio) {
   switch (ConstraintType.values[type]) {
     case ConstraintType.optional:
       cons.audio.optional = audio;

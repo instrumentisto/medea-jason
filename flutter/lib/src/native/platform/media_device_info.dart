@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_flutter_webrtc/src/model/device.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'media_device_info.g.dart' as bridge;
@@ -19,33 +19,33 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns [MediaDeviceInfo.deviceId] value.
-Pointer<Utf8> _deviceId(MediaDeviceInfo deviceInfo) {
+Pointer<Utf8> _deviceId(webrtc.MediaDeviceInfo deviceInfo) {
   return deviceInfo.deviceId.toNativeUtf8();
 }
 
 /// Returns [MediaDeviceInfo.label] value.
-Pointer<Utf8> _label(MediaDeviceInfo deviceInfo) {
+Pointer<Utf8> _label(webrtc.MediaDeviceInfo deviceInfo) {
   return deviceInfo.label.toNativeUtf8();
 }
 
 /// Returns [MediaDeviceInfo.groupId] value.
-Pointer _groupId(MediaDeviceInfo deviceInfo) {
+Pointer _groupId(webrtc.MediaDeviceInfo deviceInfo) {
   return ForeignValue.none().intoRustOwned();
 }
 
 /// Indicates whether the last attempt to use the provided device failed.
-bool _isFailed(MediaDeviceInfo deviceInfo) {
+bool _isFailed(webrtc.MediaDeviceInfo deviceInfo) {
   return deviceInfo.isFailed;
 }
 
 /// Returns [MediaDeviceInfo.kind] value.
-int _kind(MediaDeviceInfo deviceInfo) {
+int _kind(webrtc.MediaDeviceInfo deviceInfo) {
   switch (deviceInfo.kind) {
-    case MediaDeviceKind.audioinput:
+    case webrtc.MediaDeviceKind.audioinput:
       return 0;
-    case MediaDeviceKind.videoinput:
+    case webrtc.MediaDeviceKind.videoinput:
       return 1;
-    case MediaDeviceKind.audiooutput:
+    case webrtc.MediaDeviceKind.audiooutput:
       return 2;
     default:
       // Not supposed to ever happen.

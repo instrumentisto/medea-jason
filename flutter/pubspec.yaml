@@ -2,34 +2,36 @@ name: medea_jason
 description: Cross-platform client library of Medea media server for Flutter.
 version: 0.3.0-dev
 homepage: https://github.com/instrumentisto/medea-jason
-
 environment:
-  sdk: ">=2.13.0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=3.7.0"
+  sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   ffi: ^2.0.1
-  flutter_rust_bridge: 1.62.1  # should be the same as in `Cargo.lock`
+  flutter_rust_bridge: 1.64.0  # should be the same as in `Cargo.lock`
   freezed_annotation: ^2.2.0
   http: ^0.13.5
   js: ^0.6.5
-  medea_flutter_webrtc: 0.8.0-dev+rev.595ef035a3598b01c32b2cac576dbe5a83ac55f6
+  json_annotation: ^4.7.0
+  medea_flutter_webrtc: 0.8.0-dev+rev.6ea48a8aaa1d6cf181d74827bcb84cea9031792e
+  meta: ^1.8.0
   retry: ^3.1.0
   tuple: ^2.0.1
   uuid: ^3.0.7
 
 dev_dependencies:
-  build_runner: ^2.2.0
-  ffigen: ^7.2.4
+  build_runner: ^2.3.2
+  ffigen: 7.2.6
   flutter_gherkin: 3.0.0-rc.17
-  freezed: ^2.2.0
-  import_sorter: ^4.6.0
-  integration_test:
+  flutter_lints: ^2.0.1
+  flutter_test:
     sdk: flutter
+  freezed: ^2.2.0
+  gherkin: ^3.1.0
+  import_sorter: ^4.6.0
   json_serializable: ^6.3.1
-  pedantic: ^1.9.0
 
 flutter:
   plugin:

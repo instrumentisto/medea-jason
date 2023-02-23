@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_flutter_webrtc/src/model/peer.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'package:medea_jason/src/native/ffi/native_string.dart';
@@ -24,7 +24,7 @@ Object _new() {
 /// Adds an [IceServer] with the provided data to the provided [List].
 void _add(List servers, Pointer<Utf8> url, ForeignValue username,
     ForeignValue credentials) {
-  var iceServer = IceServer([url.nativeStringToDartString()], username.toDart(),
-      credentials.toDart());
+  var iceServer = webrtc.IceServer([url.nativeStringToDartString()],
+      username.toDart(), credentials.toDart());
   servers.add(iceServer);
 }

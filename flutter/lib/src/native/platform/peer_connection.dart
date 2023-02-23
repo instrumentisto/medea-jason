@@ -99,7 +99,7 @@ Object _getTransceiverByMid(PeerConnection peer, Pointer<Utf8> mid) {
 /// Sets a remote SDP offer in the provided [PeerConnection].
 Object _setRemoteDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  var sdpType;
+  SessionDescriptionType sdpType;
   if (type.nativeStringToDartString() == 'offer') {
     sdpType = SessionDescriptionType.offer;
   } else {
@@ -112,7 +112,7 @@ Object _setRemoteDescription(
 /// Sets a local SDP offer in the provided [PeerConnection].
 Object _setLocalDescription(
     PeerConnection conn, Pointer<Utf8> type, Pointer<Utf8> sdp) {
-  var sdpType;
+  SessionDescriptionType sdpType;
   if (type.nativeStringToDartString() == 'offer') {
     sdpType = SessionDescriptionType.offer;
   } else {

@@ -27,7 +27,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
-    var tracks;
+    Pointer tracks;
     try {
       tracks = await (api.mediaManagerHandleInitLocalTracks(
           manager: opaque.innerOpaque,
@@ -44,7 +44,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<List<MediaDeviceInfo>> enumerateDevices() async {
-    var devices;
+    Pointer devices;
     try {
       devices = await (api.mediaManagerHandleEnumerateDevices(
           manager: opaque.innerOpaque) as Future);
@@ -65,7 +65,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
           'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
     }
 
-    var devices;
+    Pointer devices;
     try {
       devices = await (api.mediaManagerHandleEnumerateDisplays(
           manager: opaque.innerOpaque) as Future) as Pointer;

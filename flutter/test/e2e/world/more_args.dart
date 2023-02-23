@@ -160,7 +160,7 @@ StepDefinitionGeneric<TWorld> given9<TInput1, TInput2, TInput3, TInput4,
       configuration: configuration,
     );
 
-Tuple2<MediaKind, MediaSourceKind> parse_media_kind(String kind) {
+Tuple2<MediaKind, MediaSourceKind> parseMediaKind(String kind) {
   var kind_ = MediaKind.Video;
   var source = MediaSourceKind.Device;
   if (kind.contains('audio')) {
@@ -173,8 +173,8 @@ Tuple2<MediaKind, MediaSourceKind> parse_media_kind(String kind) {
   return Tuple2(kind_, source);
 }
 
-StepDefinitionGeneric<TWorld> fix_then5<TInput1, TInput2, TInput3, TInput4,
-        TInput5, TWorld extends World>(
+StepDefinitionGeneric<TWorld>
+    fixThen5<TInput1, TInput2, TInput3, TInput4, TInput5, TWorld extends World>(
   Pattern pattern,
   Future<void> Function(
     TInput1 input1,
@@ -187,14 +187,14 @@ StepDefinitionGeneric<TWorld> fix_then5<TInput1, TInput2, TInput3, TInput4,
       onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
-    step<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5>(
-      pattern,
-      5,
-      onInvoke,
-      configuration: configuration,
-    );
+        step<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5>(
+          pattern,
+          5,
+          onInvoke,
+          configuration: configuration,
+        );
 
-StepDefinitionGeneric<TWorld> fix_given5<TInput1, TInput2, TInput3, TInput4,
+StepDefinitionGeneric<TWorld> fixGiven5<TInput1, TInput2, TInput3, TInput4,
         TInput5, TWorld extends World>(
   Pattern pattern,
   Future<void> Function(

@@ -27,14 +27,14 @@ import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
 /// Bindings to the Rust side API.
-late frb.MedeaJason api = _init_api();
-late DynamicLibrary dl = _dl_load();
+frb.MedeaJason api = _initApi();
+DynamicLibrary dl = _dlLoad();
 
 /// [Executor] that drives Rust futures.
 ///
 /// Instantiated in the [_dl_load()] function, and must not be touched ever
 /// after that.
-var executor;
+late Executor executor;
 
 /// Callback to be fired whenever Rust code panics.
 void Function(String)? _onPanicCallback;
@@ -54,16 +54,16 @@ extension FfiExceptionParse on FfiException {
     }
     var handle = message;
     var reg = RegExp(r'\(([^]*?)\)');
-    var err_ptr =
+    var errPtr =
         Pointer<Handle>.fromAddress(int.parse(reg.firstMatch(handle)![1]!));
-    var err = unboxDartHandle(err_ptr);
-    freeBoxedDartHandle(err_ptr);
+    var err = unboxDartHandle(errPtr);
+    freeBoxedDartHandle(errPtr);
 
     return err;
   }
 }
 
-DynamicLibrary _dl_load() {
+DynamicLibrary _dlLoad() {
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -80,13 +80,13 @@ DynamicLibrary _dl_load() {
 
   const base = 'medea_jason';
   final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
-  late final _dl = Platform.isIOS
+  late final dl = Platform.isIOS
       ? DynamicLibrary.process()
       : Platform.isMacOS
           ? DynamicLibrary.executable()
           : DynamicLibrary.open(path);
 
-  var initResult = _dl.lookupFunction<IntPtr Function(Pointer<Void>),
+  var initResult = dl.lookupFunction<IntPtr Function(Pointer<Void>),
           int Function(Pointer<Void>)>('init_jason_dart_api_dl')(
       NativeApi.initializeApiDLData);
 
@@ -94,22 +94,22 @@ DynamicLibrary _dl_load() {
     throw 'Failed to initialize Dart API. Code: $initResult';
   }
 
-  callback.registerFunctions(_dl);
-  completer.registerFunctions(_dl);
-  exceptions.registerFunctions(_dl);
-  future.registerFunctions(_dl);
-  function.registerFunctions(_dl);
-  platform_utils_registerer.registerFunctions(_dl);
-  list.registerFunctions(_dl);
-  map.registerFunctions(_dl);
-  native_string.registerFunctions(_dl);
+  callback.registerFunctions(dl);
+  completer.registerFunctions(dl);
+  exceptions.registerFunctions(dl);
+  future.registerFunctions(dl);
+  function.registerFunctions(dl);
+  platform_utils_registerer.registerFunctions(dl);
+  list.registerFunctions(dl);
+  map.registerFunctions(dl);
+  native_string.registerFunctions(dl);
 
-  executor = Executor(_dl);
+  executor = Executor(dl);
 
-  return _dl;
+  return dl;
 }
 
-frb.MedeaJason _init_api() {
+frb.MedeaJason _initApi() {
   var api = frb.MedeaJasonImpl(dl);
   api.onPanic(cb: (msg) async {
     msg as String;

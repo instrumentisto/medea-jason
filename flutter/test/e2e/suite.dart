@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,23 +19,23 @@ import 'world/custom_world.dart';
 
 part 'suite.g.dart';
 
-CustomWorld? old_world;
-Future<void> clear_world() async {
+CustomWorld? oldWorld;
+Future<void> clearWorld() async {
   MockMediaDevices.resetGUM();
 
-  if (old_world != null) {
-    old_world!.jasons.values.forEach((element) {
+  if (oldWorld != null) {
+    for (var element in oldWorld!.jasons.values) {
       element.free();
-    });
+    }
 
-    var members = old_world!.members.values;
+    var members = oldWorld!.members.values;
     for (var member in members) {
-      await member.forget_local_tracks();
+      await member.forgetLocalTracks();
     }
   }
 }
 
-final TestConfigs = FlutterTestConfiguration(
+final testConfigs = FlutterTestConfiguration(
     stepDefinitions: control_api.steps() +
         connection.steps() +
         room.steps() +
@@ -42,13 +44,13 @@ final TestConfigs = FlutterTestConfiguration(
         websocket.steps() +
         given.steps(),
     createWorld: (config) => Future.sync(() async {
-          await clear_world();
+          await clearWorld();
           await webrtc.enableFakeMedia();
 
           var world = CustomWorld();
-          old_world = world;
-          await world.control_client
-              .create(world.room_id, Room(world.room_id, {}));
+          oldWorld = world;
+          await world.controlClient
+              .create(world.roomId, Room(world.roomId, {}));
           return world;
         }),
     reporters: [
@@ -66,5 +68,5 @@ final TestConfigs = FlutterTestConfiguration(
 
 @GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
 void main() {
-  executeTestSuite(configuration: TestConfigs, appMainFunction: (_) async {});
+  executeTestSuite(configuration: testConfigs, appMainFunction: (_) async {});
 }

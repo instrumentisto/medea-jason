@@ -2,20 +2,20 @@ import 'dart:ffi';
 
 import '../jason.dart';
 
-typedef _unboxDartHandle_C = Handle Function(Pointer<Handle>);
-typedef _unboxDartHandle_Dart = Object Function(Pointer<Handle>);
-typedef _boxDartHandle_C = Pointer<Handle> Function(Handle);
-typedef _boxDartHandle_Dart = Pointer<Handle> Function(Object);
-typedef _freeBoxedDartHandle_C = Void Function(Pointer<Handle>);
-typedef _freeBoxedDartHandle_Dart = void Function(Pointer<Handle>);
+typedef _UnboxDartHandleC = Handle Function(Pointer<Handle>);
+typedef _UnboxDartHandleDart = Object Function(Pointer<Handle>);
+typedef _BoxDartHandleC = Pointer<Handle> Function(Handle);
+typedef _BoxDartHandleDart = Pointer<Handle> Function(Object);
+typedef _FreeBoxedDartHandleC = Void Function(Pointer<Handle>);
+typedef _FreeBoxedDartHandleDart = void Function(Pointer<Handle>);
 
 final _boxDartHandle =
-    dl.lookupFunction<_boxDartHandle_C, _boxDartHandle_Dart>('box_dart_handle');
+    dl.lookupFunction<_BoxDartHandleC, _BoxDartHandleDart>('box_dart_handle');
 final _unboxDartHandle =
-    dl.lookupFunction<_unboxDartHandle_C, _unboxDartHandle_Dart>(
+    dl.lookupFunction<_UnboxDartHandleC, _UnboxDartHandleDart>(
         'unbox_dart_handle');
 final _freeBoxedDartHandle =
-    dl.lookupFunction<_freeBoxedDartHandle_C, _freeBoxedDartHandle_Dart>(
+    dl.lookupFunction<_FreeBoxedDartHandleC, _FreeBoxedDartHandleDart>(
         'free_boxed_dart_handle');
 
 /// Converts a [`Pointer<Handle>`] to an [Object] using a Rust trampoline.
