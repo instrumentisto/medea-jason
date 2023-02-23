@@ -148,10 +148,6 @@ impl Jason {
                 if let Some(i) = index {
                     inner.rooms.remove(i).close(reason);
                 }
-                if inner.rooms.is_empty() {
-                    inner.media_manager = Rc::default();
-                }
-
                 Some(())
             })();
         }));
