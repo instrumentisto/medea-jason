@@ -274,8 +274,7 @@ mod disable_recv_tracks {
                             receivers: vec![MemberId::from("bob")],
                             mid: None,
                         },
-                        media_direction:
-                            medea_client_api_proto::MediaDirection::SendRecv,
+                        media_direction: MediaDirection::SendRecv,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -286,8 +285,7 @@ mod disable_recv_tracks {
                             sender: MemberId::from("bob"),
                             mid: None,
                         },
-                        media_direction:
-                            medea_client_api_proto::MediaDirection::SendRecv,
+                        media_direction: MediaDirection::SendRecv,
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
@@ -299,8 +297,7 @@ mod disable_recv_tracks {
                             sender: MemberId::from("bob"),
                             mid: None,
                         },
-                        media_direction:
-                            medea_client_api_proto::MediaDirection::SendRecv,
+                        media_direction: MediaDirection::SendRecv,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -400,7 +397,7 @@ mod disable_send_tracks {
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
-            media_direction: medea_client_api_proto::MediaDirection::SendRecv,
+            media_direction: MediaDirection::SendRecv,
             media_type: MediaType::Audio(AudioSettings { required }),
         }
     }
@@ -416,7 +413,7 @@ mod disable_send_tracks {
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
-            media_direction: medea_client_api_proto::MediaDirection::SendRecv,
+            media_direction: MediaDirection::SendRecv,
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
@@ -1242,8 +1239,7 @@ mod patches_generation {
                 .map(|(track_i, (media_type, direction))| Track {
                     id: TrackId(track_i as u32),
                     direction: direction.clone(),
-                    media_direction:
-                        medea_client_api_proto::MediaDirection::SendRecv,
+                    media_direction: MediaDirection::SendRecv,
                     media_type: media_type.clone(),
                 })
                 .inspect(|track| {
@@ -2086,8 +2082,7 @@ mod set_local_media_settings {
                         receivers: vec![MemberId::from("bob")],
                         mid: None,
                     },
-                    media_direction:
-                        medea_client_api_proto::MediaDirection::SendRecv,
+                    media_direction: MediaDirection::SendRecv,
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
@@ -2116,7 +2111,7 @@ mod set_local_media_settings {
                                     sender: MemberId::from("Alice"),
                                     mid: Some(String::from("1")),
                                 },
-                                media_direction: medea_client_api_proto::MediaDirection::SendRecv,
+                                media_direction: MediaDirection::SendRecv,
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
@@ -2635,8 +2630,7 @@ mod state_synchronization {
             state::Sender {
                 id: TrackId(0),
                 muted: false,
-                media_direction:
-                    medea_client_api_proto::MediaDirection::SendRecv,
+                media_direction: MediaDirection::SendRecv,
                 receivers: Vec::new(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
@@ -2648,8 +2642,7 @@ mod state_synchronization {
             state::Receiver {
                 id: TrackId(1),
                 muted: false,
-                media_direction:
-                    medea_client_api_proto::MediaDirection::SendRecv,
+                media_direction: MediaDirection::SendRecv,
                 sender_id: "".into(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
@@ -2798,8 +2791,7 @@ async fn sender_answerer() {
                         receivers: Vec::new(),
                         mid: Some(a_tr.mid().unwrap()),
                     },
-                    media_direction:
-                        medea_client_api_proto::MediaDirection::SendRecv,
+                    media_direction: MediaDirection::SendRecv,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
                     }),
@@ -2810,8 +2802,7 @@ async fn sender_answerer() {
                         receivers: Vec::new(),
                         mid: Some(v_tr.mid().unwrap()),
                     },
-                    media_direction:
-                        medea_client_api_proto::MediaDirection::SendRecv,
+                    media_direction: MediaDirection::SendRecv,
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
                         source_kind: MediaSourceKind::Device,
