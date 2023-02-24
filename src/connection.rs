@@ -155,6 +155,10 @@ impl Connections {
         }
     }
 
+    /// Closes [`Connection`] associated with provided local [`PeerId`] and
+    /// [`MemberId`].
+    ///
+    /// Invokes `on_close` callback.
     pub fn close_specific_connection(
         &self,
         local_peer: PeerId,
@@ -169,7 +173,7 @@ impl Connections {
             })
             .map(|_| {
                 if let Some(connection) =
-                    self.connections.borrow_mut().remove(&remote_member_id)
+                    self.connections.borrow_mut().remove(remote_member_id)
                 {
                     // `on_close` callback is invoked here and not in `Drop`
                     // implementation so `ConnectionHandle` is available during

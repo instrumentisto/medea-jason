@@ -43,9 +43,13 @@ pub enum SyncState {
     Synced,
 }
 
+/// Result of patching [`sender::State`] with [`proto::TrackPatchEvent`].
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct UpdateResult {
+    /// [`MemberId`]s of added `receiver`.
     pub recv_added: Vec<MemberId>,
+
+    /// [`MemberId`]s of removed `receiver`.
     pub recv_removed: Vec<MemberId>,
 }
 
@@ -138,10 +142,13 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
+    /// Indicator whether we should update [`Connections`].
+    ///
+    /// [`Connections`]: crate::connection::Connections
+    maybe_update_connections: ObservableCell<Option<UpdateResult>>,
+
     /// Synchronization state of this [`Component`].
     sync_state: ObservableCell<SyncState>,
-
-    maybe_update_connections: ObservableCell<Option<UpdateResult>>,
 }
 
 impl State {
@@ -166,8 +173,8 @@ impl State {
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
             maybe_update_local_stream: ObservableCell::new(false),
-            sync_state: ObservableCell::new(SyncState::Synced),
             maybe_update_connections: ObservableCell::new(None),
+            sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
 

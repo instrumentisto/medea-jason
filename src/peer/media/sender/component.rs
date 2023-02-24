@@ -402,11 +402,11 @@ impl State {
             current_recvs.retain(|cur_recv| {
                 new_recvs
                     .remove(cur_recv)
-                    .then_some(
+                    .then(|| {
                         res.get_or_insert(UpdateResult::default())
                             .recv_removed
-                            .push(cur_recv.clone()),
-                    )
+                            .push(cur_recv.clone());
+                    })
                     .is_some()
             });
 

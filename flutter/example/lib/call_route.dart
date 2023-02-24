@@ -39,7 +39,7 @@ class _CallState extends State {
   VideoView? localScreenVideo;
   VideoView? localCameraVideo;
 
-  final Map<String, List<VideoView>> _videos = {};
+  final Map<String, Map<String, VideoView>> _videos = {};
   final Call _call = Call();
   late String _roomId;
   late String _memberId;
@@ -57,20 +57,50 @@ class _CallState extends State {
   @override
   void initState() {
     _call.onNewRemoteStream((track, remoteId) async {
-      var renderer = createVideoRenderer();
-      await renderer.initialize();
-      await renderer.setSrcObject(track);
+      var trackId = track.getTrack().id();
+      if (track.mediaDirection() == jason.TrackMediaDirection.SendRecv) {
+        var renderer = createVideoRenderer();
+        await renderer.initialize();
+        await renderer.setSrcObject(track.getTrack());
 
-      var remoteTracks = _videos[remoteId];
-      if (remoteTracks == null) {
-        remoteTracks = List.empty(growable: true);
-        remoteTracks.add(VideoView(renderer, mirror: true));
-      } else {
-        remoteTracks.add(VideoView(renderer, mirror: true));
+        var remoteTracks = _videos[remoteId];
+        if (remoteTracks == null) {
+          remoteTracks = Map.from({trackId: VideoView(renderer, mirror: true)});
+        } else {
+          remoteTracks[trackId] = VideoView(renderer, mirror: true);
+        }
+
+        setState(() {
+          _videos[remoteId] = remoteTracks!;
+        });
       }
-      setState(() {
-        _videos[remoteId] = remoteTracks!;
-      });
+
+      track.onMediaDirectionChanged(
+        (new_dir) async {
+          var remoteTracks = _videos[remoteId];
+
+          if (new_dir == jason.TrackMediaDirection.SendRecv) {
+            var renderer = createVideoRenderer();
+            await renderer.initialize();
+            await renderer.setSrcObject(track.getTrack());
+
+            if (remoteTracks == null) {
+              remoteTracks =
+                  Map.from({trackId: VideoView(renderer, mirror: true)});
+            } else {
+              remoteTracks[trackId] = VideoView(renderer, mirror: true);
+            }
+          } else {
+            if (remoteTracks != null) {
+              remoteTracks.remove(trackId);
+            }
+          }
+
+          setState(() {
+            _videos[remoteId] = remoteTracks!;
+          });
+        },
+      );
     });
 
     _call.onLocalDeviceStream((track) async {
@@ -82,10 +112,9 @@ class _CallState extends State {
 
         var localTracks = _videos['I'];
         if (localTracks == null) {
-          localTracks = List.empty(growable: true);
-          localTracks.add(localCameraVideo!);
+          localTracks = Map.from({'I': localCameraVideo!});
         } else {
-          localTracks.add(localCameraVideo!);
+          localTracks['I'] = localCameraVideo!;
         }
         setState(() {
           _videos['I'] = localTracks!;
@@ -104,10 +133,9 @@ class _CallState extends State {
 
         var localTracks = _videos['I'];
         if (localTracks == null) {
-          localTracks = List.empty(growable: true);
-          localTracks.add(localScreenVideo!);
+          localTracks = Map.from({'I': localScreenVideo!});
         } else {
-          localTracks.add(localScreenVideo!);
+          localTracks['I'] = localScreenVideo!;
         }
         setState(() {
           _videos['I'] = localTracks!;
@@ -188,9 +216,9 @@ class _CallState extends State {
                 height: MediaQuery.of(context).size.height,
                 child: Row(
                   children: _videos.values
-                      .map((videoList) => Expanded(
+                      .map((videoMap) => Expanded(
                           child: Column(
-                              children: videoList
+                              children: videoMap.values
                                   .map((video) => Expanded(child: video))
                                   .toList())))
                       .toList(),

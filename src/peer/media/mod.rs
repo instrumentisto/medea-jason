@@ -816,6 +816,7 @@ impl MediaConnections {
         id: TrackId,
         media_type: MediaType,
         mid: Option<String>,
+        media_direction: medea_client_api_proto::MediaDirection,
         receivers: Vec<MemberId>,
         send_constraints: &LocalTracksConstraints,
     ) -> Result<sender::Component, Traced<sender::CreateError>> {
@@ -823,6 +824,7 @@ impl MediaConnections {
             id,
             mid,
             media_type,
+            media_direction,
             receivers,
             send_constraints.clone(),
         );
@@ -846,7 +848,13 @@ impl MediaConnections {
         sender: MemberId,
         recv_constraints: &RecvConstraints,
     ) -> receiver::Component {
-        let state = receiver::State::new(id, mid, media_type, sender);
+        let state = receiver::State::new(
+            id,
+            mid,
+            media_type,
+            medea_client_api_proto::MediaDirection::SendRecv,
+            sender,
+        );
         let receiver = receiver::Receiver::new(
             &state,
             self,
@@ -879,6 +887,7 @@ impl MediaConnections {
                             track.id,
                             track.media_type,
                             mid,
+                            medea_client_api_proto::MediaDirection::SendRecv,
                             receivers,
                             send_constraints,
                         )

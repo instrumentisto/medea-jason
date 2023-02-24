@@ -472,8 +472,17 @@ impl Component {
         state.maybe_update_local_stream.set(false);
     }
 
+    /// Watcher for the [`State::maybe_update_connections`] updates.
+    ///
+    /// Adds and/or deletes [`Connection`]s specified in provided
+    /// [`UpdateResult`].
+    ///
+    /// [`Connection`]: crate::connection::Connection
     #[watch(
-        self.maybe_update_connections.subscribe().filter(|v| future::ready(v.is_some()))
+        self
+            .maybe_update_connections
+            .subscribe()
+            .filter(|v| future::ready(v.is_some()))
     )]
     fn maybe_update_connections(
         peer: &PeerConnection,
@@ -486,9 +495,10 @@ impl Component {
                     .close_specific_connection(peer.id(), &member_id_to_del);
             }
             for member_id_to_add in res.recv_added {
-                let _ = peer
-                    .connections
-                    .create_connection(peer.id(), &member_id_to_add);
+                drop(
+                    peer.connections
+                        .create_connection(peer.id(), &member_id_to_add),
+                );
             }
 
             state.maybe_update_connections.set(None);
