@@ -32,6 +32,7 @@ async fn sendrecv_works() {
             receivers: vec![MemberId::from("bob")],
             mid: None,
         },
+        media_direction: medea_client_api_proto::MediaDirection::SendRecv,
         media_type: MediaType::Audio(AudioSettings { required: false }),
     };
     let recv_audio_track = Track {
@@ -40,6 +41,7 @@ async fn sendrecv_works() {
             mid: None,
             sender: MemberId::from("alice"),
         },
+        media_direction: medea_client_api_proto::MediaDirection::SendRecv,
         media_type: MediaType::Audio(AudioSettings { required: false }),
     };
     media_connections

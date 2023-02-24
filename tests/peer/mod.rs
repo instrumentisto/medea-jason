@@ -46,6 +46,7 @@ fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
     };
     TrackPatchEvent {
         id,
+        receivers: None,
         media_direction: Some(media_direction),
         muted: None,
     }
@@ -751,6 +752,8 @@ impl InterconnectedPeers {
                     receivers: vec![MemberId::from("bob")],
                     mid: None,
                 },
+                media_direction:
+                    medea_client_api_proto::MediaDirection::SendRecv,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -759,6 +762,8 @@ impl InterconnectedPeers {
                     receivers: vec![MemberId::from("bob")],
                     mid: None,
                 },
+                media_direction:
+                    medea_client_api_proto::MediaDirection::SendRecv,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -776,6 +781,8 @@ impl InterconnectedPeers {
                     sender: MemberId::from("alice"),
                     mid: None,
                 },
+                media_direction:
+                    medea_client_api_proto::MediaDirection::SendRecv,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -784,6 +791,8 @@ impl InterconnectedPeers {
                     sender: MemberId::from("alice"),
                     mid: None,
                 },
+                media_direction:
+                    medea_client_api_proto::MediaDirection::SendRecv,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -1212,6 +1221,8 @@ async fn new_remote_track() {
                     sender: MemberId::from("whatever"),
                     mid: Some(String::from("0")),
                 },
+                media_direction:
+                    medea_client_api_proto::MediaDirection::SendRecv,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             LocalTracksConstraints::default(),
@@ -1223,6 +1234,8 @@ async fn new_remote_track() {
                     sender: MemberId::from("whatever"),
                     mid: Some(String::from("1")),
                 },
+                media_direction:
+                    medea_client_api_proto::MediaDirection::SendRecv,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -1488,6 +1501,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: audio_track_id,
+        receivers: None,
         media_direction: Some(MediaDirection::RecvOnly),
         muted: None,
     });
@@ -1500,6 +1514,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: video_track_id,
+        receivers: None,
         media_direction: Some(MediaDirection::RecvOnly),
         muted: None,
     });
@@ -1512,6 +1527,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: audio_track_id,
+        receivers: None,
         media_direction: Some(MediaDirection::SendRecv),
         muted: None,
     });
@@ -1524,6 +1540,7 @@ async fn disable_and_enable_all_tracks() {
         .unwrap();
     pc.state().patch_track(&TrackPatchEvent {
         id: video_track_id,
+        receivers: None,
         media_direction: Some(MediaDirection::SendRecv),
         muted: None,
     });
