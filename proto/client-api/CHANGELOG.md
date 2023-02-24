@@ -18,6 +18,8 @@ All user visible changes to this project will be documented in this file. This p
 - Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([#16]).
 - Made `RtcOutboundRtpStreamStats::bytes_sent` and `RtcOutboundRtpStreamStats::packets_sent` optional ([#26]).
 - Replaced `enabled_individual` and `enabled_individual` fields with `MediaDirection` in `TrackPatchEvent`, `state::Receiver` and `state::Sender` ([#46]).
+- Added `media_direction` in `Track` ([#107]).
+- Added `receivers` in `TrackPatchEvent` ([#107]).
 
 ### Added
 
@@ -30,6 +32,7 @@ All user visible changes to this project will be documented in this file. This p
 [#16]: /../../pull/16
 [#26]: /../../pull/26
 [#46]: /../../pull/46
+[#107]: /../../pull/107
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 
