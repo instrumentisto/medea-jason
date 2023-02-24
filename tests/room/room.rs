@@ -2589,8 +2589,8 @@ mod state_synchronization {
 
     use futures::{channel::mpsc, stream, StreamExt as _};
     use medea_client_api_proto::{
-        state, AudioSettings, Command, Event, MediaType, NegotiationRole,
-        PeerId, TrackId,
+        state, AudioSettings, Command, Event, MediaDirection, MediaType,
+        NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
         media::MediaManager, room::Room, rpc::MockRpcSession,
