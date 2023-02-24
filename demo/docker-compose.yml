@@ -9,6 +9,7 @@ services:
       - "8080:8080"    # medea ws
     volumes:
       - ./chart/medea-demo/conf/nginx.vh.conf:/etc/nginx/conf.d/default.conf
+    network_mode: host
   medea:
     container_name: demo-medea
     image: ghcr.io/instrumentisto/medea:edge
@@ -16,11 +17,11 @@ services:
       MEDEA__LOG__LEVEL: "DEBUG"
     volumes:
       - ../_dev/specs:/specs:ro
-    network_mode: service:web-client
+    network_mode: host
   control-mock:
     container_name: demo-control-api-mock
     image: instrumentisto/medea-control-api-mock:dev
     depends_on: ["medea"]
     environment:
       RUST_LOG: INFO
-    network_mode: service:web-client
+    network_mode: host

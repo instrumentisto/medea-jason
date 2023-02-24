@@ -83,7 +83,7 @@
         url: controlUrl + roomId + '/' + memberId + '/publish',
         data: {
           kind: 'WebRtcPublishEndpoint',
-          p2p: 'Always',
+          p2p: 'Never',
           force_relay: isForceRelay,
           audio_settings: {
             publish_policy: audioPublishPolicy,
@@ -154,7 +154,7 @@
       if (isPublishingEnabled) {
         pipeline['publish'] = {
           kind: 'WebRtcPublishEndpoint',
-          p2p: 'Always',
+          p2p: 'Never',
           force_relay: isForceRelay,
           audio_settings: {
             publish_policy: audioPublishPolicy,
