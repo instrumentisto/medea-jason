@@ -124,7 +124,7 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta get kJasonMediaManagerConstMeta;
 
   /// Closes the provided [`RoomHandle`].
-  Object jasonCloseRoom(
+  void jasonCloseRoom(
       {required Jason jason, required RoomHandle roomToDelete, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kJasonCloseRoomConstMeta;
@@ -1295,13 +1295,13 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["jason"],
       );
 
-  Object jasonCloseRoom(
+  void jasonCloseRoom(
       {required Jason jason, required RoomHandle roomToDelete, dynamic hint}) {
     var arg0 = _platform.api2wire_Jason(jason);
     var arg1 = _platform.api2wire_RoomHandle(roomToDelete);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_jason_close_room(arg0, arg1),
-      parseSuccessData: _wire2api_DartOpaque,
+      parseSuccessData: _wire2api_unit,
       constMeta: kJasonCloseRoomConstMeta,
       argValues: [jason, roomToDelete],
       hint: hint,

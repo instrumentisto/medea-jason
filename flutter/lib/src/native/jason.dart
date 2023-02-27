@@ -143,10 +143,10 @@ class Jason implements base.Jason {
   }
 
   @override
-  Future<void> closeRoom(@moveSemantics RoomHandle room) {
-    return api.jasonCloseRoom(
+  void closeRoom(@moveSemantics RoomHandle room) {
+    api.jasonCloseRoom(
         jason: opaque.innerOpaque,
-        roomToDelete: (room as NativeRoomHandle).opaque.moveOpaque) as Future;
+        roomToDelete: (room as NativeRoomHandle).opaque.moveOpaque);
   }
 
   @override

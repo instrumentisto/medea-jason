@@ -113,7 +113,7 @@ impl Object<Jason> {
             r#"
             async (jason) => {
                 const [room] = objs;
-                await jason.close_room(room.room);
+                jason.close_room(room.room);
             }
             "#,
             [],

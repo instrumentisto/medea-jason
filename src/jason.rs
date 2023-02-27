@@ -3,7 +3,7 @@
 use futures::FutureExt as _;
 use std::{cell::RefCell, rc::Rc};
 
-use crate::platform::{self, Error};
+use crate::platform;
 
 use crate::{
     media::{MediaManager, MediaManagerHandle},
@@ -66,50 +66,26 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    ///
-    /// # Errors
-    ///
-    /// Function never returns an error.
-    /// [`Result`] signature used to convert to `DartOpaque` future.
     #[allow(clippy::needless_pass_by_value, unused_must_use)]
-    pub async fn close_room(
-        &self,
-        room_to_delete: RoomHandle,
-    ) -> Result<(), Error> {
-        let drop_indexes: Vec<usize> = self
+    pub fn close_room(&self, room_to_delete: RoomHandle) {
+        let index = self
             .0
             .borrow()
             .rooms
             .iter()
             .enumerate()
-            .filter(|(_, room)| {
-                let should_be_closed = room.inner_ptr_eq(&room_to_delete);
-                if should_be_closed {
-                    room.set_close_reason(ClientDisconnect::RoomClosed.into());
-                }
-                should_be_closed
-            })
-            .map(|(index, _)| index)
-            .collect();
+            .find(|(_, room)| room.inner_ptr_eq(&room_to_delete))
+            .map(|(i, _)| i);
 
-        let wait = drop_indexes.len() == self.0.borrow().rooms.len();
-
-        let drop_rooms = move || {
-            let rooms = &mut self.0.borrow_mut().rooms;
-            drop_indexes.into_iter().rev().for_each(|i| {
-                drop(rooms.swap_remove(i));
-            });
-        };
-
-        if wait {
-            let fut = self.0.borrow().rpc.on_normal_close();
-            drop_rooms();
-            fut.await;
-        } else {
-            drop_rooms();
+        if let Some(i) = index {
+            let this = &mut self.0.borrow_mut();
+            drop(this.rooms.swap_remove(i));
+            if this.rooms.is_empty() {
+                this.rpc = Rc::new(WebSocketRpcClient::new(Box::new(|| {
+                    Rc::new(platform::WebSocketRpcTransport::new())
+                })));
+            }
         }
-
-        Ok(())
     }
 
     /// Drops this [`Jason`] API object, so all the related objects (rooms,
