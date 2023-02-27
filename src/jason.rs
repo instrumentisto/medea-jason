@@ -79,7 +79,9 @@ impl Jason {
 
         if let Some(i) = index {
             let this = &mut self.0.borrow_mut();
-            drop(this.rooms.swap_remove(i));
+            let room = this.rooms.swap_remove(i);
+            room.set_close_reason(ClientDisconnect::RoomClosed.into());
+            drop(room);
             if this.rooms.is_empty() {
                 this.rpc = Rc::new(WebSocketRpcClient::new(Box::new(|| {
                     Rc::new(platform::WebSocketRpcTransport::new())
