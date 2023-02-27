@@ -677,11 +677,11 @@ window.onload = async function() {
           playElement.srcObject = mediaStream;
         }
 
-        track.on_media_direction_changed((direction) => {
+        track.on_media_direction_changed(async (direction) => {
           console.log('New TransceiverDirection: ' + direction);
 
           if (direction == 0) {
-            playElement.play();
+            await playElement.play();
             playElement.style.display = 'block';
           } else {
             playElement.pause();
