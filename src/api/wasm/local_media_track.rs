@@ -6,7 +6,7 @@ use derive_more::From;
 use wasm_bindgen::prelude::*;
 
 use crate::{
-    api::{MediaKind, MediaSourceKind},
+    api::{MediaKind, MediaSourceKind, FacingMode},
     media::track::local,
 };
 
@@ -36,6 +36,11 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.kind().into()
+    }
+
+    /// Returns a [`FacingMode`] of the [`LocalMediaTrack`]. 
+    pub fn facing_mode(&self) -> Option<FacingMode> {
+        self.0.facing_mode().map(Into::into)
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

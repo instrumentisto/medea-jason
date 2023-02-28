@@ -169,6 +169,7 @@ class LocalMediaTrack {
   external void free();
   external html.MediaStreamTrack get_track();
   external num kind();
+  external num? facing_mode();
   external num media_source_kind();
 }
 

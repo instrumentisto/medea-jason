@@ -10,7 +10,7 @@ use derive_more::AsRef;
 use medea_client_api_proto as proto;
 
 use crate::{
-    media::{MediaKind, MediaSourceKind},
+    media::{MediaKind, MediaSourceKind, FacingMode},
     platform,
 };
 
@@ -92,6 +92,12 @@ impl Track {
         self.track.kind()
     }
 
+    /// Returns this [`Track`]'s [`FacingMode`] (user/environment).
+    #[must_use]
+    pub fn facing_mode(&self) -> Option<FacingMode> {
+        self.track.facing_mode()
+    }
+
     /// Forks this [`Track`].
     ///
     /// Creates a new [`Track`] from this [`Track`]'s
@@ -151,6 +157,11 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.kind()
+    }
+
+    /// Returns this [`Track`]'s [`FacingMode`] (user/environment).
+    pub fn facing_mode(&self) -> Option<FacingMode> {
+        self.0.facing_mode()
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

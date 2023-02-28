@@ -61,8 +61,11 @@ Object _readyState(MediaStreamTrack track) {
 
 /// Returns facingMode of the provided [MediaStreamTrack].
 Pointer _facingMode(MediaStreamTrack track) {
-  // TODO: Correct implementation requires flutter_webrtc-side fixes.
-  return ForeignValue.fromInt(0).intoRustOwned();
+  var facingMode = track.facingMode();
+  if (facingMode != null) {
+    return ForeignValue.fromInt(facingMode.index).intoRustOwned();
+  }
+  return ForeignValue.none();
 }
 
 /// Returns height of the video of the provided [MediaStreamTrack].
