@@ -125,6 +125,41 @@ impl From<MediaSourceKind> for media::MediaSourceKind {
     }
 }
 
+/// Liveness state of a [MediaStreamTrack][1] .
+///
+/// [1]: crate::platform::MediaStreamTrack#[wasm_bindgen]
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+pub enum MediaStreamTrackState {
+    /// Active track (the track's underlying media source is making a
+    /// best-effort attempt to provide a data in real time).
+    Live,
+
+    /// Ended track (the track's underlying media source is no longer providing
+    /// any data, and will never provide more data for this track).
+    ///
+    /// This is a final state.
+    Ended,
+}
+
+impl From<media::MediaStreamTrackState> for MediaStreamTrackState {
+    fn from(that: media::MediaStreamTrackState) -> Self {
+        match that {
+            media::MediaStreamTrackState::Live => Self::Live,
+            media::MediaStreamTrackState::Ended => Self::Ended,
+        }
+    }
+}
+
+impl From<MediaStreamTrackState> for media::MediaStreamTrackState {
+    fn from(that: MediaStreamTrackState) -> Self {
+        match that {
+            MediaStreamTrackState::Live => Self::Live,
+            MediaStreamTrackState::Ended => Self::Ended,
+        }
+    }
+}
+
 /// Describes directions that a camera can face, as seen from a user's
 /// perspective. Representation of a [VideoFacingModeEnum][1].
 ///

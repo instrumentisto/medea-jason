@@ -129,7 +129,7 @@ class FormatException {
 }
 
 @JS()
-class MediaDeviceInfo {
+class MediaDeviceInfo_ {
   external void free();
   external String device_id();
   external num kind();
@@ -170,6 +170,19 @@ class LocalMediaTrack {
   external html.MediaStreamTrack get_track();
   external num kind();
   external num media_source_kind();
+  external void on_enabled(Function cb);
+}
+
+@JS('LocalMediaTrack')
+abstract class _LocalMediaTrack {
+  external Promise<dynamic> state();
+}
+
+extension LocalMediaTrackExtensions on LocalMediaTrack {
+  Future<dynamic> state() {
+    final tt = this as _LocalMediaTrack;
+    return promiseToFuture(tt.state());
+  }
 }
 
 @JS()

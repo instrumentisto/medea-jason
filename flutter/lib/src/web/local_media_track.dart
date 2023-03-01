@@ -39,4 +39,10 @@ class WebLocalMediaTrack implements LocalMediaTrack {
   Future<void> free() async {
     obj.free();
   }
+
+  @override
+  Future<webrtc.MediaStreamTrackState> state() async {
+    var index = await fallibleFuture(obj.state());
+    return webrtc.MediaStreamTrackState.values[index];
+  }
 }

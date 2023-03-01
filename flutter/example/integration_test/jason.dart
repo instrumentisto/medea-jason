@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'dart:ffi';
+// import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
-import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:medea_jason/src/native/media_device_info.dart';
-import 'package:medea_jason/src/native/local_media_track.dart';
+// import 'package:medea_jason/src/native/ffi/foreign_value.dart';
+// import 'package:medea_jason/src/native/media_device_info.dart';
+// import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 void main() {
@@ -29,12 +29,14 @@ void main() {
     var tracks = await mediaManager.initLocalTracks(settings);
     var track =
         tracks.firstWhere((element) => element.kind() == MediaKind.Video);
-    track.onEnded(() {
-      print('Dead');
-    });
+    print(await track.state());
+    // track.onEnded(() {
+    //   print('Dead');
+    // });
     for (var i in tracks) {
       await i.free();
     }
+    // print(await track.state());
     // jason.free();
     // mediaManager.free();
     await Future.delayed(Duration(seconds: 100));

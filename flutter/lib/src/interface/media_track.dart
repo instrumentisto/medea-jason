@@ -34,8 +34,11 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 abstract class LocalMediaTrack implements MediaTrack {
-  // todo
+  /// Sets callback to invoke when this [LocalMediaTrack] is ended.
   void onEnded(OnEndedCallback f);
+
+  //todo
+  Future<webrtc.MediaStreamTrackState> state();
 }
 
 /// Representation of a received remote [`MediaStreamTrack`][1].

@@ -14,6 +14,8 @@ use crate::{
     platform,
 };
 
+use super::MediaStreamTrackState;
+
 /// Wrapper around a [`platform::MediaStreamTrack`] received from a
 /// [getUserMedia()][1]/[getDisplayMedia()][2] request.
 ///
@@ -94,8 +96,12 @@ impl Track {
 
     /// todo
     pub fn on_ended(&self, callback: platform::Function<()>) {
-        println!("SET RS");
-        self.track.on_ended(Some(move || {println!("CALL RS"); callback.call0();}))
+        self.track.on_ended(Some(move || callback.call0()))
+    }
+
+    /// todo
+    pub async fn state(&self) -> MediaStreamTrackState {
+        self.track.ready_state().await
     }
 
     /// Forks this [`Track`].
@@ -135,7 +141,7 @@ impl Drop for Track {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LocalMediaTrack(Rc<Track>);
 
 impl LocalMediaTrack {
@@ -162,6 +168,11 @@ impl LocalMediaTrack {
     /// todo
     pub fn on_ended(&self, callback: platform::Function<()>) {
         self.0.on_ended(callback);
+    }
+
+    /// todo
+    pub async fn state(&self) -> MediaStreamTrackState {
+        self.0.state().await
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

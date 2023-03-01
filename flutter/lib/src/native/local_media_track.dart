@@ -45,7 +45,13 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
 
   @override
   void onEnded(OnEndedCallback f) {
-    print("SET");
     api.localMediaTrackOnEnded(track: opaque.innerOpaque, f: f);
+  }
+
+  @override
+  Future<webrtc.MediaStreamTrackState> state() async {
+    var index =
+        await (api.localMediaTrackState(track: opaque.innerOpaque) as Future);
+    return webrtc.MediaStreamTrackState.values[index];
   }
 }
