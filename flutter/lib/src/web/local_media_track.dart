@@ -24,9 +24,9 @@ class WebLocalMediaTrack implements LocalMediaTrack {
 
   @override
   FacingMode? facingMode() {
-    var facingMode = obj.get_track().getSettings()['facingMode'];
+    var facingMode = obj.facing_mode();
     if (facingMode != null) {
-      return FacingMode.values.firstWhere((mode) => return mode.name.toLowerCase() == facingMode);
+      return fallibleFunction(() => FacingMode.values[facingMode.toInt()]);
     }
     return null;
   }
