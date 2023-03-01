@@ -92,6 +92,12 @@ impl Track {
         self.track.kind()
     }
 
+    /// todo
+    pub fn on_ended(&self, callback: platform::Function<()>) {
+        println!("SET RS");
+        self.track.on_ended(Some(move || {println!("CALL RS"); callback.call0();}))
+    }
+
     /// Forks this [`Track`].
     ///
     /// Creates a new [`Track`] from this [`Track`]'s
@@ -151,6 +157,11 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.kind()
+    }
+
+    /// todo
+    pub fn on_ended(&self, callback: platform::Function<()>) {
+        self.0.on_ended(callback);
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

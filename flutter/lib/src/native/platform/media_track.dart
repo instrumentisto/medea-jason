@@ -44,10 +44,10 @@ int _kind(MediaStreamTrack track) {
 /// [MediaStreamTrack].
 void _onEnded(MediaStreamTrack track, Function f) {
   // TODO(evdokimovs): Implement onEnded callback
-  // track.onEnded = () {
-  //   track.onEnded = null;
-  //   f(null);
-  // };
+  track.onEnded(() {
+    print("CALL");
+    f();
+  });
 }
 
 /// Returns device ID of the provided [MediaStreamTrack].

@@ -42,4 +42,10 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
       await (api.localMediaTrackFree(track: opaque.moveOpaque) as Future);
     }
   }
+
+  @override
+  void onEnded(OnEndedCallback f) {
+    print("SET");
+    api.localMediaTrackOnEnded(track: opaque.innerOpaque, f: f);
+  }
 }

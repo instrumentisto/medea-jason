@@ -512,6 +512,8 @@ pub fn jason_dispose(jason: RustOpaque<Jason>) -> SyncReturn<()> {
 //------------------------------------------------------------------------------
 
 impl ForeignClass for LocalMediaTrack {}
+impl RefUnwindSafe for LocalMediaTrack {}
+impl UnwindSafe for LocalMediaTrack {}
 
 /// Returns the [`LocalMediaTrack`] from the [`ForeignClass`] address.
 #[must_use]
@@ -558,6 +560,18 @@ pub fn local_media_track_kind(
     track: RustOpaque<LocalMediaTrack>,
 ) -> SyncReturn<MediaKind> {
     SyncReturn(track.kind())
+}
+
+// todo
+#[must_use]
+pub fn local_media_track_on_ended(
+    track: RustOpaque<LocalMediaTrack>,
+    f: DartOpaque,
+) -> SyncReturn<()> {
+    track.on_ended(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+    });
+    SyncReturn(())
 }
 
 /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is

@@ -8,6 +8,9 @@ import '../native/ffi/jason_api.g.dart'
 
 typedef TrackMediaDirection = MediaDirection;
 
+/// Representation of the `onEnded` callback.
+typedef OnEndedCallback = void Function();
+
 /// Abstraction of a handle to an object allocated on the Rust side.
 abstract class MediaTrack implements AsyncPlatformHandle {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
@@ -30,7 +33,10 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class LocalMediaTrack implements MediaTrack {}
+abstract class LocalMediaTrack implements MediaTrack {
+  // todo
+  void onEnded(OnEndedCallback f);
+}
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///

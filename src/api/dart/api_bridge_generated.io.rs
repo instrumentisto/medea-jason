@@ -139,6 +139,14 @@ pub extern "C" fn wire_local_media_track_kind(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_local_media_track_on_ended(
+    track: wire_LocalMediaTrack,
+    f: wire_DartOpaque,
+) -> support::WireSyncReturn {
+    wire_local_media_track_on_ended_impl(track, f)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_local_media_track_media_source_kind(
     track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturn {

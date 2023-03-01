@@ -27,6 +27,13 @@ class WebLocalMediaTrack implements LocalMediaTrack {
     return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
   }
 
+  @override
+  void onEnded(OnEndedCallback f) {
+    obj.get_track().onEnded.listen((event) {
+      f();
+    });
+  }
+
   @moveSemantics
   @override
   Future<void> free() async {
