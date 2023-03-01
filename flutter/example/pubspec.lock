@@ -277,7 +277,7 @@ packages:
       name: medea_flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0-dev+rev.595ef035a3598b01c32b2cac576dbe5a83ac55f6"
+    version: "0.8.0-dev+rev.f9aa6cc6bac80b69c0623908700e574fe1e441b3"
   medea_jason:
     dependency: "direct main"
     description:

@@ -154,6 +154,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackGetTrackConstMeta;
 
+  /// Returns [`FacingMode`] of the [`LocalMediaTrack`].
   FacingMode? localMediaTrackFacingMode(
       {required LocalMediaTrack track, dynamic hint});
 
