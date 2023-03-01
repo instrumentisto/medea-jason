@@ -2,9 +2,9 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../util/rust_handles_storage.dart';
 
-export '../native/ffi/jason_api.g.dart' show MediaKind, MediaSourceKind;
-import '../native/ffi/jason_api.g.dart'
-    show MediaKind, MediaSourceKind, MediaDirection;
+export 'enums.dart' show MediaKind, MediaSourceKind, FacingMode;
+import 'enums.dart'
+    show MediaKind, MediaSourceKind, MediaDirection, FacingMode;
 
 typedef TrackMediaDirection = MediaDirection;
 
@@ -30,7 +30,10 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class LocalMediaTrack implements MediaTrack {}
+abstract class LocalMediaTrack implements MediaTrack {
+  /// Returns [FacingMode] of the [MediaTrack].
+  FacingMode? facingMode();
+}
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///

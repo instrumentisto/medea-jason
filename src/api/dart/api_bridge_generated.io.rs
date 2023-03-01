@@ -132,6 +132,13 @@ pub extern "C" fn wire_local_media_track_get_track(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_local_media_track_facing_mode(
+    track: wire_LocalMediaTrack,
+) -> support::WireSyncReturn {
+    wire_local_media_track_facing_mode_impl(track)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_local_media_track_kind(
     track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturn {

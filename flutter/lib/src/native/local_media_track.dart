@@ -24,6 +24,11 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   }
 
   @override
+  FacingMode? facingMode() {
+    return api.localMediaTrackFacingMode(track: opaque.innerOpaque);
+  }
+
+  @override
   MediaSourceKind mediaSourceKind() {
     return api.localMediaTrackMediaSourceKind(track: opaque.innerOpaque);
   }

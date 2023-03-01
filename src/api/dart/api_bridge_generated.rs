@@ -14,18 +14,18 @@
 use crate::api::dart::api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::{ffi::c_void, sync::Arc};
+use std::ffi::c_void;
+use std::sync::Arc;
 
 // Section: imports
 
-use crate::{
-    media::{
-        constraints::{ConstrainU32, FacingMode},
-        track::{remote::MediaDirection, MediaSourceKind},
-        MediaDeviceKind, MediaKind,
-    },
-    room::RoomCloseReason,
-};
+use crate::media::constraints::ConstrainU32;
+use crate::media::constraints::FacingMode;
+use crate::media::track::remote::MediaDirection;
+use crate::media::track::MediaSourceKind;
+use crate::media::MediaDeviceKind;
+use crate::media::MediaKind;
+use crate::room::RoomCloseReason;
 
 // Section: wire functions
 
@@ -309,6 +309,21 @@ fn wire_local_media_track_get_track_impl(
         move || {
             let api_track = track.wire2api();
             Ok(local_media_track_get_track(api_track))
+        },
+    )
+}
+fn wire_local_media_track_facing_mode_impl(
+    track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "local_media_track_facing_mode",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_track = track.wire2api();
+            Ok(local_media_track_facing_mode(api_track))
         },
     )
 }
@@ -1189,6 +1204,18 @@ impl support::IntoDart for ApiMediaDisplayInfo {
 }
 impl support::IntoDartExceptPrimitive for ApiMediaDisplayInfo {}
 
+impl support::IntoDart for FacingMode {
+    fn into_dart(self) -> support::DartAbi {
+        match self {
+            Self::User => 0,
+            Self::Environment => 1,
+            Self::Left => 2,
+            Self::Right => 3,
+        }
+        .into_dart()
+    }
+}
+
 impl support::IntoDart for MediaDeviceKind {
     fn into_dart(self) -> support::DartAbi {
         match self {
@@ -1244,8 +1271,7 @@ impl support::IntoDartExceptPrimitive for RoomCloseReason {}
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
-        Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]
@@ -1253,3 +1279,20 @@ support::lazy_static! {
 mod io;
 #[cfg(not(target_family = "wasm"))]
 pub use io::*;
+
+    // ----------- DUMMY CODE FOR BINDGEN ----------
+
+    // copied from: allo-isolate
+    pub type DartPort = i64;
+    pub type DartPostCObjectFnType = unsafe extern "C" fn(port_id: DartPort, message: *mut std::ffi::c_void) -> bool;
+    #[no_mangle] pub unsafe extern "C" fn store_dart_post_cobject(ptr: DartPostCObjectFnType) { panic!("dummy code") }
+    #[no_mangle] pub unsafe extern "C" fn get_dart_object(ptr: usize) -> Dart_Handle { panic!("dummy code") }
+    #[no_mangle] pub unsafe extern "C" fn drop_dart_object(ptr: usize) { panic!("dummy code") }
+    #[no_mangle] pub unsafe extern "C" fn new_dart_opaque(handle: Dart_Handle) -> usize { panic!("dummy code") }
+    #[no_mangle] pub unsafe extern "C" fn init_frb_dart_api_dl(obj: *mut c_void) -> isize { panic!("dummy code") }
+
+    pub struct DartCObject;
+    pub type WireSyncReturn = *mut DartCObject;
+
+    // ---------------------------------------------
+    

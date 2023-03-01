@@ -1,7 +1,7 @@
-import '../native/ffi/jason_api.g.dart' show FacingMode;
+import 'enums.dart' show FacingMode;
 import '/src/util/rust_handles_storage.dart';
 
-export '../native/ffi/jason_api.g.dart' show FacingMode;
+export 'enums.dart' show FacingMode;
 
 abstract class DeviceVideoTrackConstraints implements SyncPlatformHandle {
   /// Sets an exact [`deviceId`][1] constraint.

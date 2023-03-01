@@ -23,6 +23,15 @@ class WebLocalMediaTrack implements LocalMediaTrack {
   }
 
   @override
+  FacingMode? facingMode() {
+    var facingMode = obj.get_track().getSettings()['facingMode'];
+    if (facingMode != null) {
+      return FacingMode.values.firstWhere((mode) => return mode.name.toLowerCase() == facingMode);
+    }
+    return null;
+  }
+
+  @override
   webrtc.MediaStreamTrack getTrack() {
     return fallibleFunction(() => WebMediaStreamTrack(obj.get_track()));
   }

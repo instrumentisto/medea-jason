@@ -4,7 +4,7 @@ import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
 class WebMediaDeviceInfo implements MediaDeviceInfo {
-  late wasm.MediaDeviceInfo obj;
+  late wasm.MediaDeviceInfo_ obj;
 
   WebMediaDeviceInfo(this.obj);
 

@@ -550,6 +550,14 @@ pub fn local_media_track_get_track(
     SyncReturn(unsafe { new_dart_opaque(track.get_track().handle()) })
 }
 
+/// Returns [`FacingMode`] of the [`LocalMediaTrack`].
+#[must_use]
+pub fn local_media_track_facing_mode(
+    track: RustOpaque<LocalMediaTrack>,
+) -> SyncReturn<Option<media::FacingMode>> {
+    SyncReturn(track.facing_mode())
+}
+
 /// Returns a [`MediaKind::Audio`] if the provided [`LocalMediaTrack`]
 /// represents an audio track, or a [`MediaKind::Video`] if it represents a
 /// video track.
