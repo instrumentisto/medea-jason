@@ -94,12 +94,13 @@ impl Track {
         self.track.kind()
     }
 
-    /// todo
+    /// Sets callback to invoke when this [`Track`] is ended.
     pub fn on_ended(&self, callback: platform::Function<()>) {
-        self.track.on_ended(Some(move || callback.call0()))
+        self.track.on_ended(Some(move || callback.call0()));
     }
 
-    /// todo
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
+    /// or a [`MediaStreamTrackState::Ended`] if the track has ended.
     pub async fn state(&self) -> MediaStreamTrackState {
         self.track.ready_state().await
     }
@@ -165,12 +166,14 @@ impl LocalMediaTrack {
         self.0.kind()
     }
 
-    /// todo
+    /// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
     pub fn on_ended(&self, callback: platform::Function<()>) {
         self.0.on_ended(callback);
     }
 
-    /// todo
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
+    /// active, or a [`MediaStreamTrackState::Ended`] if the track has
+    /// ended.
     pub async fn state(&self) -> MediaStreamTrackState {
         self.0.state().await
     }

@@ -167,7 +167,8 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnEndedConstMeta;
 
-  /// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
+  /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
+  /// active, or a [`MediaStreamTrackState::Ended`] if the track has ended.
   Object localMediaTrackState({required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta;

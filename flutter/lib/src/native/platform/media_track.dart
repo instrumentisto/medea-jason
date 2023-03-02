@@ -43,9 +43,7 @@ int _kind(MediaStreamTrack track) {
 /// Subscribes on the [MediaStreamTrack.onEnded] of the provided
 /// [MediaStreamTrack].
 void _onEnded(MediaStreamTrack track, Function f) {
-  // TODO(evdokimovs): Implement onEnded callback
   track.onEnded(() {
-    print("CALL");
     f();
   });
 }
