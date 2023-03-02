@@ -2,7 +2,6 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 
-use crate::api::MediaStreamTrackState;
 use derive_more::From;
 use js_sys::Promise;
 use wasm_bindgen::prelude::*;
@@ -43,11 +42,11 @@ impl LocalMediaTrack {
 
     /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
     /// audio track, or a [`MediaKind::Video`] if it represents a video track.
-    #[must_use]
+    #[allow(clippy::as_conversions)]
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
-            Ok(JsValue::from_f64(this.state().await as u8 as f64))
+            Ok(JsValue::from_f64(f64::from(this.state().await as u8)))
         })
     }
 

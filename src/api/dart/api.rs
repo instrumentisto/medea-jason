@@ -574,8 +574,8 @@ pub fn local_media_track_on_ended(
     SyncReturn(())
 }
 
-/// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
-/// active, or a [`MediaStreamTrackState::Ended`] if the track has ended.
+/// Returns a `MediaStreamTrackState::Live` if this [`LocalMediaTrack`] is
+/// active, or a `MediaStreamTrackState::Ended` if the track has ended.
 #[must_use]
 pub fn local_media_track_state(
     track: RustOpaque<LocalMediaTrack>,
