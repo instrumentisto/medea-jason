@@ -742,10 +742,7 @@ jobs:
                && !contains(steps.commit.outputs.message, '[publish]')
              ) }}" >> $GITHUB_OUTPUT
 
-      # TODO: Upgrade Flutter to 3.7.0 version.
-      - uses: dart-lang/setup-dart@v1.3
-        with:
-          sdk: 2.18.6
+      - uses: subosito/flutter-action@v2
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - uses: actions/download-artifact@v3
@@ -796,7 +793,7 @@ jobs:
           PUB_CREDENTIALS: ${{ secrets.PUBDEV_CREDS }}
         if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - run: dart pub publish --force
+      - run: flutter pub publish --force
         working-directory: flutter/
         if: ${{ steps.skip.outputs.no == 'true' }}
 

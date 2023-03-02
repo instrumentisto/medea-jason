@@ -160,10 +160,10 @@ pub extern "C" fn wire_vec_media_device_details_from_ptr(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_vec_media_display_info_from_ptr(
+pub extern "C" fn wire_vec_media_display_details_from_ptr(
     ptr: usize,
 ) -> support::WireSyncReturn {
-    wire_vec_media_display_info_from_ptr_impl(ptr)
+    wire_vec_media_display_details_from_ptr_impl(ptr)
 }
 
 #[no_mangle]

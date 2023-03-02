@@ -372,18 +372,18 @@ fn wire_vec_media_device_details_from_ptr_impl(
         },
     )
 }
-fn wire_vec_media_display_info_from_ptr_impl(
+fn wire_vec_media_display_details_from_ptr_impl(
     ptr: impl Wire2Api<usize> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "vec_media_display_info_from_ptr",
+            debug_name: "vec_media_display_details_from_ptr",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_ptr = ptr.wire2api();
-            Ok(vec_media_display_info_from_ptr(api_ptr))
+            Ok(vec_media_display_details_from_ptr(api_ptr))
         },
     )
 }

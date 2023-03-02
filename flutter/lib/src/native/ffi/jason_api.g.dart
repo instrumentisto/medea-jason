@@ -186,10 +186,10 @@ abstract class MedeaJason {
 
   /// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
   /// [`ForeignClass`] address.
-  List<ApiMediaDisplayDetails> vecMediaDisplayInfoFromPtr(
+  List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromPtr(
       {required int ptr, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta;
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayDetailsFromPtrConstMeta;
 
   /// Returns [`LocalMediaTrack`]s objects, built from the provided
   /// [`ApiMediaStreamSettings`].
@@ -1458,21 +1458,22 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["ptr"],
       );
 
-  List<ApiMediaDisplayDetails> vecMediaDisplayInfoFromPtr(
+  List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromPtr(
       {required int ptr, dynamic hint}) {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_vec_media_display_info_from_ptr(arg0),
+      callFfi: () =>
+          _platform.inner.wire_vec_media_display_details_from_ptr(arg0),
       parseSuccessData: _wire2api_list_api_media_display_details,
-      constMeta: kVecMediaDisplayInfoFromPtrConstMeta,
+      constMeta: kVecMediaDisplayDetailsFromPtrConstMeta,
       argValues: [ptr],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayDetailsFromPtrConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "vec_media_display_info_from_ptr",
+        debugName: "vec_media_display_details_from_ptr",
         argNames: ["ptr"],
       );
 
@@ -3641,19 +3642,19 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_vec_media_device_details_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
-  WireSyncReturn wire_vec_media_display_info_from_ptr(
+  WireSyncReturn wire_vec_media_display_details_from_ptr(
     int ptr,
   ) {
-    return _wire_vec_media_display_info_from_ptr(
+    return _wire_vec_media_display_details_from_ptr(
       ptr,
     );
   }
 
-  late final _wire_vec_media_display_info_from_ptrPtr =
+  late final _wire_vec_media_display_details_from_ptrPtr =
       _lookup<ffi.NativeFunction<WireSyncReturn Function(ffi.UintPtr)>>(
-          'wire_vec_media_display_info_from_ptr');
-  late final _wire_vec_media_display_info_from_ptr =
-      _wire_vec_media_display_info_from_ptrPtr
+          'wire_vec_media_display_details_from_ptr');
+  late final _wire_vec_media_display_details_from_ptr =
+      _wire_vec_media_display_details_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
   WireSyncReturn wire_media_manager_handle_init_local_tracks(

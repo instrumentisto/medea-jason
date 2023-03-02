@@ -609,7 +609,7 @@ pub fn vec_media_device_details_from_ptr(
 /// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
 /// [`ForeignClass`] address.
 #[must_use]
-pub fn vec_media_display_info_from_ptr(
+pub fn vec_media_display_details_from_ptr(
     ptr: usize,
 ) -> SyncReturn<Vec<ApiMediaDisplayDetails>> {
     SyncReturn(unsafe {
