@@ -17,7 +17,7 @@ use crate::{
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Jason(Rc<RefCell<Inner>>);
 
 /// Inner representation if a [`Jason`].
@@ -66,7 +66,7 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    #[allow(clippy::needless_pass_by_value, unused_must_use)]
+    #[allow(clippy::needless_pass_by_value)]
     pub fn close_room(&self, room_to_delete: RoomHandle) {
         let index = self
             .0

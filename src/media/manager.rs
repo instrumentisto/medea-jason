@@ -203,7 +203,7 @@ impl InnerMediaManager {
             .map_err(tracerr::wrap!())
     }
 
-    /// Returns a list of [`platform::MediaDeviceInfo`] objects.
+    /// Returns a list of [`platform::MediaDisplayInfo`] objects.
     async fn enumerate_displays(
         &self,
     ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<platform::Error>> {

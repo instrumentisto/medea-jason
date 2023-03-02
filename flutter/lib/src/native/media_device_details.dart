@@ -1,13 +1,13 @@
-import '../interface/media_device_info.dart';
+import '../interface/media_device_details.dart';
 import 'ffi/jason_api.g.dart' as frb;
 
-class NativeMediaDeviceInfo implements MediaDeviceInfo {
+class NativeMediaDeviceDetails implements MediaDeviceDetails {
   /// Rust `flutter_rust_bridge` API representation.
-  final frb.ApiMediaDeviceInfo _info;
+  final frb.ApiMediaDeviceDetails _info;
 
-  /// Constructs a new [MediaDeviceInfo] backed by a Rust struct behind the
-  /// provided [frb.ApiMediaDeviceInfo].
-  NativeMediaDeviceInfo(this._info);
+  /// Constructs a new [MediaDeviceDetails] backed by a Rust struct behind the
+  /// provided [frb.ApiMediaDeviceDetails].
+  NativeMediaDeviceDetails(this._info);
 
   @override
   String deviceId() {

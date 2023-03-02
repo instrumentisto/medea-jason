@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings},
+    api::{LocalMediaTrack, MediaDeviceDetails, MediaStreamSettings},
     media,
 };
 
@@ -38,7 +38,7 @@ pub struct MediaManagerHandle(media::MediaManagerHandle);
 #[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl MediaManagerHandle {
-    /// Returns a list of [`MediaDeviceInfo`] objects representing available
+    /// Returns a list of [`MediaDeviceDetails`] objects representing available
     /// media input and output devices, such as microphones, cameras, and so
     /// forth.
     ///
@@ -65,7 +65,7 @@ impl MediaManagerHandle {
                         .into_iter()
                         .fold(js_sys::Array::new(), |devices_info, info| {
                             let _ = devices_info.push(&JsValue::from(
-                                MediaDeviceInfo::from(info),
+                                MediaDeviceDetails::from(info),
                             ));
                             devices_info
                         })

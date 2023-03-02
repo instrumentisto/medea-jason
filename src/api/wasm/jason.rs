@@ -39,7 +39,6 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    #[allow(unused_must_use)]
     pub fn close_room(&self, room_to_delete: RoomHandle) {
         self.0.close_room(room_to_delete.into());
     }
