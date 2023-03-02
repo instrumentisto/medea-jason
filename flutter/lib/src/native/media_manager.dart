@@ -74,7 +74,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     }
 
     return api
-        .vecMediaDisplayInfoFromPtr(ptr: devices.address)
+        .vecMediaDisplayDetailsFromPtr(ptr: devices.address)
         .map((info) => NativeMediaDisplayDetails(info))
         .toList();
   }
