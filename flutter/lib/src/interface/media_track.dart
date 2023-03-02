@@ -37,7 +37,8 @@ abstract class LocalMediaTrack implements MediaTrack {
   /// Sets callback to invoke when this [LocalMediaTrack] is ended.
   void onEnded(OnEndedCallback f);
 
-  //todo
+  /// Returns a [webrtc.MediaStreamTrackState.live] if this [LocalMediaTrack] is
+  /// active, or a [webrtc.MediaStreamTrackState.ended] if the track has ended.
   Future<webrtc.MediaStreamTrackState> state();
 }
 
