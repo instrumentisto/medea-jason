@@ -10,8 +10,8 @@ import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/jason_api.g.dart' as frb;
 import 'local_media_track.dart';
-import 'media_device_info.dart';
-import 'media_display_info.dart';
+import 'media_device_details.dart';
+import 'media_display_details.dart';
 
 class NativeMediaManagerHandle implements MediaManagerHandle {
   /// `flutter_rust_bridge` Rust opaque type backing this object.
@@ -43,7 +43,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   }
 
   @override
-  Future<List<MediaDeviceInfo>> enumerateDevices() async {
+  Future<List<MediaDeviceDetails>> enumerateDevices() async {
     var devices;
     try {
       devices = await (api.mediaManagerHandleEnumerateDevices(
@@ -53,13 +53,13 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     }
 
     return api
-        .vecMediaDeviceInfoFromPtr(ptr: devices.address)
-        .map((info) => NativeMediaDeviceInfo(info))
+        .vecMediaDeviceDetailsFromPtr(ptr: devices.address)
+        .map((info) => NativeMediaDeviceDetails(info))
         .toList();
   }
 
   @override
-  Future<List<MediaDisplayInfo>> enumerateDisplays() async {
+  Future<List<MediaDisplayDetails>> enumerateDisplays() async {
     if (!(Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
       throw UnsupportedError(
           'enumerateDisplays() is not supported on ${Platform.operatingSystem}');
@@ -74,8 +74,8 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     }
 
     return api
-        .vecMediaDisplayInfoFromPtr(ptr: devices.address)
-        .map((info) => NativeMediaDisplayInfo(info))
+        .vecMediaDisplayDetailsFromPtr(ptr: devices.address)
+        .map((info) => NativeMediaDisplayDetails(info))
         .toList();
   }
 

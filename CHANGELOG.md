@@ -43,7 +43,7 @@ All user visible changes to this project will be documented in this file. This p
                 - `MediaStateTransitionException`;
                 - `InternalException`;
                 - `LocalMediaInitException`.
-    - Renamed `InputDeviceInfo` object to `MediaDeviceInfo` ([#29]).
+    - Renamed `InputDeviceInfo` object to `MediaDeviceDetails` ([#29], [#106]).
     - `RemoteMediaTrack`:
         - Replaced `on_enabled` and `on_disabled` callbacks with `on_media_direction_changed` callback ([#46]);
         - Replaced `enabled` method with `media_direction` method ([#46]).
@@ -99,6 +99,7 @@ All user visible changes to this project will be documented in this file. This p
 [#57]: /../../pull/57
 [#59]: /../../pull/59
 [#81]: /../../pull/81
+[#106]: /../../pull/106
 
 
 

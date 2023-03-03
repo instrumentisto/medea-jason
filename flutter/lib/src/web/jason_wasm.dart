@@ -129,7 +129,7 @@ class FormatException {
 }
 
 @JS()
-class MediaDeviceInfo {
+class MediaDeviceDetails {
   external void free();
   external String device_id();
   external num kind();

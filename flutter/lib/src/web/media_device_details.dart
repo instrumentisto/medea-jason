@@ -1,12 +1,12 @@
-import '../interface/media_device_info.dart';
+import '../interface/media_device_details.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class WebMediaDeviceInfo implements MediaDeviceInfo {
-  late wasm.MediaDeviceInfo obj;
+class WebMediaDeviceDetails implements MediaDeviceDetails {
+  late wasm.MediaDeviceDetails obj;
 
-  WebMediaDeviceInfo(this.obj);
+  WebMediaDeviceDetails(this.obj);
 
   @override
   String deviceId() {

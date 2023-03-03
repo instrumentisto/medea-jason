@@ -7,7 +7,7 @@ pub mod connection_handle;
 pub mod err;
 pub mod jason;
 pub mod local_media_track;
-pub mod media_device_info;
+pub mod media_device_details;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
 pub mod reconnect_handle;
@@ -25,7 +25,7 @@ pub use self::{
     err::Error,
     jason::Jason,
     local_media_track::LocalMediaTrack,
-    media_device_info::MediaDeviceInfo,
+    media_device_details::MediaDeviceDetails,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::{
         AudioTrackConstraints, DeviceVideoTrackConstraints,

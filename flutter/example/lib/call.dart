@@ -341,12 +341,12 @@ class Call {
   }
 
   /// Returns a list of the current displays.
-  Future<List<MediaDisplayInfo>> enumerateDisplay() async {
+  Future<List<MediaDisplayDetails>> enumerateDisplay() async {
     return _mediaManager.enumerateDisplays();
   }
 
   /// Returns a list of the current devices.
-  Future<List<MediaDeviceInfo>> enumerateDevice() async {
+  Future<List<MediaDeviceDetails>> enumerateDevice() async {
     return _mediaManager.enumerateDevices();
   }
 }

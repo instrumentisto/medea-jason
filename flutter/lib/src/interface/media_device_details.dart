@@ -1,12 +1,12 @@
-import '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
 import '/src/util/rust_handles_storage.dart';
+import 'enums.dart' show MediaDeviceKind;
 
-export '../native/ffi/jason_api.g.dart' show MediaDeviceKind;
+export 'enums.dart' show MediaDeviceKind;
 
 /// [`MediaDeviceInfo`][1] interface.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
-abstract class MediaDeviceInfo implements SyncPlatformHandle {
+abstract class MediaDeviceDetails implements SyncPlatformHandle {
   /// Returns an unique identifier of the represented device.
   String deviceId();
 

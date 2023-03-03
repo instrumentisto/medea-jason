@@ -179,7 +179,7 @@ pub struct MediaManager(Rc<InnerMediaManager>);
 #[derive(Debug, Default)]
 struct InnerMediaManager {
     /// Obtained tracks storage
-    tracks: Rc<RefCell<HashMap<String, Weak<local::Track>>>>,
+    tracks: RefCell<HashMap<String, Weak<local::Track>>>,
 
     /// Media devices platform controller.
     media_devices: platform::MediaDevices,
@@ -203,7 +203,7 @@ impl InnerMediaManager {
             .map_err(tracerr::wrap!())
     }
 
-    /// Returns a list of [`platform::MediaDeviceInfo`] objects.
+    /// Returns a list of [`platform::MediaDisplayInfo`] objects.
     async fn enumerate_displays(
         &self,
     ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<platform::Error>> {
