@@ -45,7 +45,7 @@ pub use crate::{
     rpc::ReconnectHandle,
 };
 
-/// Representation of an [`MediaDeviceInfo`][0] ONLY for input devices.
+/// Representation of a [MediaDeviceInfo][0] ONLY for input devices.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug)]
