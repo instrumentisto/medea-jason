@@ -56,15 +56,15 @@ pub struct RoomCloseReason {
     /// Indicator if [`Room`] is closed by server.
     ///
     /// `true` if [`CloseReason::ByServer`].
-    is_closed_by_server: bool,
+    pub(crate) is_closed_by_server: bool,
 
     /// Reason of closing.
-    reason: String,
+    pub(crate) reason: String,
 
     /// Indicator if closing is considered as error.
     ///
     /// This field may be `true` only on closing by client.
-    is_err: bool,
+    pub(crate) is_err: bool,
 }
 
 impl RoomCloseReason {

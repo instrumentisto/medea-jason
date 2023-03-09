@@ -48,14 +48,24 @@ jobs:
   ##########################
 
   clippy:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux
+          - macos
+          - windows
+          - web
+    runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'ubuntu-22.04' }}
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
           components: clippy
-      - run: make rustup.targets
+      - run: make rustup.targets only=${{ matrix.platform }}
       - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
       - uses: arduino/setup-protoc@v1
@@ -63,7 +73,7 @@ jobs:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: make cargo.lint
+      - run: make cargo.lint platform=${{ matrix.platform }}
 
   dartanalyze:
     if: ${{ github.ref == 'refs/heads/master'
@@ -721,10 +731,7 @@ jobs:
           && !contains(steps.commit.outputs.message, '[publish]')
           ) }}" >> $GITHUB_OUTPUT
 
-      # TODO: Upgrade Flutter to 3.7.0 version.
-      - uses: dart-lang/setup-dart@v1.3
-        with:
-          sdk: 2.18.6
+      - uses: subosito/flutter-action@v2
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - uses: actions/download-artifact@v3
@@ -775,7 +782,7 @@ jobs:
           PUB_CREDENTIALS: ${{ secrets.PUBDEV_CREDS }}
         if: ${{ steps.skip.outputs.no == 'true' }}
 
-      - run: dart pub publish --force
+      - run: flutter pub publish --force
         working-directory: flutter/
         if: ${{ steps.skip.outputs.no == 'true' }}
 

@@ -9,15 +9,12 @@
 
 use std::marker::PhantomData;
 
-use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use dart_sys::Dart_PersistentHandle;
 use medea_macro::dart_bridge;
 
-use crate::{api::DartValue, platform::Callback};
-
-use super::dart_api::{
-    Dart_DeletePersistentHandle_DL_Trampolined,
-    Dart_HandleFromPersistent_DL_Trampolined,
-    Dart_NewPersistentHandle_DL_Trampolined,
+use crate::{
+    api::DartValue,
+    platform::{utils::dart_api, Callback},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
@@ -61,10 +58,12 @@ impl<T> Function<T> {
     /// # Safety
     ///
     /// The provided [`Dart_Handle`] should be non-`null` and correct.
+    ///
+    /// [`Dart_Handle`]: dart_sys::Dart_Handle
     #[must_use]
-    pub unsafe fn new(cb: Dart_Handle) -> Self {
+    pub const unsafe fn new(dart_fn: Dart_PersistentHandle) -> Self {
         Self {
-            dart_fn: Dart_NewPersistentHandle_DL_Trampolined(cb),
+            dart_fn,
             _arg: PhantomData,
         }
     }
@@ -81,8 +80,7 @@ impl<T: Into<DartValue>> Function<T> {
     /// Calls the underlying Dart closure with the provided argument.
     pub fn call1(&self, arg: T) {
         unsafe {
-            let fn_handle =
-                Dart_HandleFromPersistent_DL_Trampolined(self.dart_fn);
+            let fn_handle = dart_api::handle_from_persistent(self.dart_fn);
             function::caller(fn_handle, arg.into());
         }
     }
@@ -92,7 +90,7 @@ impl<T> Drop for Function<T> {
     /// Manually deallocates saved [`Dart_PersistentHandle`] so it won't leak.
     fn drop(&mut self) {
         unsafe {
-            Dart_DeletePersistentHandle_DL_Trampolined(self.dart_fn);
+            dart_api::delete_persistent_handle(self.dart_fn);
         }
     }
 }

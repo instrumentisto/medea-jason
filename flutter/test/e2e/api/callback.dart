@@ -57,7 +57,7 @@ enum OnLeaveReason {
   /// Connection with the [Member] was lost.
   Lost,
 
-  /// [Member[ was forcibly disconnected by a media server.
+  /// [Member] was forcibly disconnected by a media server.
   Kicked,
 
   /// Media server was shut down.

@@ -276,22 +276,20 @@ impl WebSocketRpcSession {
             while let Some(state) = state_updates.next().await {
                 let this = upgrade_or_break!(weak_this);
                 match state {
-                    S::Connecting(info) => {
-                        match Rc::clone(&this.client)
-                            .connect(info.url.clone())
-                            .await
-                        {
-                            Ok(_) => {
-                                this.state.set(S::Authorizing(info));
-                            }
-                            Err(e) => {
-                                this.state.set(S::Lost(
-                                    ConnectionLostReason::ConnectError(e),
-                                    info,
-                                ));
-                            }
+                    S::Connecting(info) => match Rc::clone(&this.client)
+                        .connect(info.url.clone())
+                        .await
+                    {
+                        Ok(_) => {
+                            this.state.set(S::Authorizing(info));
                         }
-                    }
+                        Err(e) => {
+                            this.state.set(S::Lost(
+                                ConnectionLostReason::ConnectError(e),
+                                info,
+                            ));
+                        }
+                    },
                     S::Authorizing(info) => {
                         this.client.authorize(
                             info.room_id.clone(),

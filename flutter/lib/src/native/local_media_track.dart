@@ -1,71 +1,45 @@
-import 'dart:ffi';
-
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/nullable_pointer.dart';
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
 
-typedef _kind_C = Uint8 Function(Pointer);
-typedef _kind_Dart = int Function(Pointer);
-
-typedef _mediaSourceKind_C = Uint8 Function(Pointer);
-typedef _mediaSourceKind_Dart = int Function(Pointer);
-
-typedef _getTrack_C = Handle Function(Pointer);
-typedef _getTrack_Dart = Object Function(Pointer);
-
-typedef _free_C = Handle Function(Pointer);
-typedef _free_Dart = Object Function(Pointer);
-
-final _kind = dl.lookupFunction<_kind_C, _kind_Dart>('LocalMediaTrack__kind');
-
-final _sourceKind =
-    dl.lookupFunction<_mediaSourceKind_C, _mediaSourceKind_Dart>(
-        'LocalMediaTrack__media_source_kind');
-
-final _getTrack = dl
-    .lookupFunction<_getTrack_C, _getTrack_Dart>('LocalMediaTrack__get_track');
-
-final _free = dl.lookupFunction<_free_C, _free_Dart>('LocalMediaTrack__free');
-
 class NativeLocalMediaTrack implements LocalMediaTrack {
-  /// [Pointer] to the Rust struct backing this object.
-  late NullablePointer ptr;
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final RustOpaque<frb.LocalMediaTrack> opaque;
 
   /// Constructs a new [LocalMediaTrack] backed by the Rust struct behind the
-  /// provided [Pointer].
-  NativeLocalMediaTrack(this.ptr) {
+  /// provided [frb.LocalMediaTrack].
+  NativeLocalMediaTrack(frb.LocalMediaTrack localMediaTrack)
+      : opaque = RustOpaque(localMediaTrack) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   MediaKind kind() {
-    var index = _kind(ptr.getInnerPtr());
-    return MediaKind.values[index];
+    return api.localMediaTrackKind(track: opaque.innerOpaque);
   }
 
   @override
   MediaSourceKind mediaSourceKind() {
-    var index = _sourceKind(ptr.getInnerPtr());
-    return MediaSourceKind.values[index];
+    return api.localMediaTrackMediaSourceKind(track: opaque.innerOpaque);
   }
 
   @override
   webrtc.MediaStreamTrack getTrack() {
-    return _getTrack(ptr.getInnerPtr()) as webrtc.MediaStreamTrack;
+    return api.localMediaTrackGetTrack(track: opaque.innerOpaque)
+        as webrtc.MediaStreamTrack;
   }
 
   @moveSemantics
   @override
   Future<void> free() async {
-    if (!ptr.isFreed()) {
+    if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      var innerPtr = ptr.getInnerPtr();
-      ptr.free();
-      await (_free(innerPtr) as Future);
+      await (api.localMediaTrackFree(track: opaque.moveOpaque) as Future);
     }
   }
 }

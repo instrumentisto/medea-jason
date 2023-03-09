@@ -46,6 +46,10 @@ class ForeignValue extends Struct {
         return _payload.stringPtr.string.toDartString();
       case 4:
         return _payload.number;
+      case 5:
+        return _payload.float;
+      case 6:
+        return _payload.boolean;
       default:
         throw TypeError();
     }
@@ -57,6 +61,10 @@ class ForeignValue extends Struct {
       return ForeignValue.none();
     } else if (val is int) {
       return ForeignValue.fromInt(val);
+    } else if (val is double) {
+      return ForeignValue.fromDouble(val);
+    } else if (val is bool) {
+      return ForeignValue.fromBool(val);
     } else if (val is String) {
       return ForeignValue.fromString(val);
     } else if (val is NullablePointer) {
@@ -106,6 +114,20 @@ class ForeignValue extends Struct {
     fVal.ref._payload.number = num;
     return fVal;
   }
+
+  static Pointer<ForeignValue> fromDouble(double num) {
+    var fVal = calloc<ForeignValue>();
+    fVal.ref._tag = 5;
+    fVal.ref._payload.float = num;
+    return fVal;
+  }
+
+  static Pointer<ForeignValue> fromBool(bool boolean) {
+    var fVal = calloc<ForeignValue>();
+    fVal.ref._tag = 6;
+    fVal.ref._payload.boolean = boolean;
+    return fVal;
+  }
 }
 
 extension ForeignValuePointer on Pointer<ForeignValue> {
@@ -142,6 +164,14 @@ class _ForeignValueFields extends Union {
   /// Integer value.
   @Int64()
   external int number;
+
+  /// Double value.
+  @Double()
+  external double float;
+
+  /// Bool value.
+  @Bool()
+  external bool boolean;
 }
 
 /// [Pointer] to a native string along with information of its owner.

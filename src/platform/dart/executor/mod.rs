@@ -4,12 +4,12 @@ mod task;
 
 use std::{future::Future, ptr, rc::Rc};
 
-use dart_sys::{Dart_CObject, Dart_CObjectValue, Dart_CObject_Type, Dart_Port};
-
-use crate::{
-    api::propagate_panic,
-    platform::dart::utils::dart_api::Dart_PostCObject_DL_Trampolined,
+use dart_sys::{
+    Dart_CObject, Dart_CObject_Type_Dart_CObject_kInt64, Dart_Port,
+    _Dart_CObject__bindgen_ty_1,
 };
+
+use crate::{api::propagate_panic, platform::utils::dart_api};
 
 pub use self::task::Task;
 
@@ -60,14 +60,14 @@ fn task_wake(task: Rc<Task>) {
     let task = Rc::into_raw(task);
 
     let mut task_addr = Dart_CObject {
-        type_: Dart_CObject_Type::Int64,
-        value: Dart_CObjectValue {
+        type_: Dart_CObject_Type_Dart_CObject_kInt64,
+        value: _Dart_CObject__bindgen_ty_1 {
             as_int64: task as i64,
         },
     };
 
     let enqueued =
-        unsafe { Dart_PostCObject_DL_Trampolined(wake_port, &mut task_addr) };
+        unsafe { dart_api::post_c_object(wake_port, &mut task_addr) };
     if !enqueued {
         log::warn!("Could not send message to Dart's native port");
         unsafe {

@@ -6,8 +6,8 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{string_into_c_str, DartValue},
-    platform::dart::utils::handle::DartHandle,
+    api::DartValue,
+    platform::dart::utils::{handle::DartHandle, string_into_c_str},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/map.g.dart")]

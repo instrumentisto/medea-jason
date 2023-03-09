@@ -11,10 +11,10 @@ use medea_reactive::ObservableCell;
 use tracerr::Traced;
 
 use crate::{
-    api::{dart_string_into_rust, string_into_c_str},
     platform::{
         dart::utils::{
-            callback::Callback, dart_future::FutureFromDart, handle::DartHandle,
+            callback::Callback, dart_future::FutureFromDart,
+            dart_string_into_rust, handle::DartHandle, string_into_c_str,
         },
         RpcTransport, TransportError, TransportState,
     },

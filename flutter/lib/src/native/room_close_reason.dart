@@ -1,70 +1,29 @@
-import 'dart:ffi';
-
-import 'package:ffi/ffi.dart';
-
 import '../interface/room_close_reason.dart';
-import '../util/move_semantic.dart';
-import '/src/util/rust_handles_storage.dart';
-import 'ffi/native_string.dart';
-import 'ffi/nullable_pointer.dart';
-import 'jason.dart';
-
-typedef _reason_C = Pointer<Utf8> Function(Pointer);
-typedef _reason_Dart = Pointer<Utf8> Function(Pointer);
-
-typedef _isClosedByServer_C = Int8 Function(Pointer);
-typedef _isClosedByServer_Dart = int Function(Pointer);
-
-typedef _isErr_C = Int8 Function(Pointer);
-typedef _isErr_Dart = int Function(Pointer);
-
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
-
-final _reason =
-    dl.lookupFunction<_reason_C, _reason_Dart>('RoomCloseReason__reason');
-
-final _isClosedByServer =
-    dl.lookupFunction<_isClosedByServer_C, _isClosedByServer_Dart>(
-        'RoomCloseReason__is_closed_by_server');
-
-final _isErr =
-    dl.lookupFunction<_isErr_C, _isErr_Dart>('RoomCloseReason__is_err');
-
-final _free = dl.lookupFunction<_free_C, _free_Dart>('RoomCloseReason__free');
+import 'ffi/jason_api.g.dart' as frb;
 
 class NativeRoomCloseReason implements RoomCloseReason {
-  /// [Pointer] to the Rust struct that backing this object.
-  late NullablePointer ptr;
+  /// Rust `flutter_rust_bridge` api representation.
+  final frb.RoomCloseReason _closeReason;
 
   /// Constructs a new [RoomCloseReason] backed by the Rust struct behind the
-  /// provided [Pointer].
-  NativeRoomCloseReason(this.ptr) {
-    RustHandlesStorage().insertHandle(this);
-  }
+  /// provided [frb.RoomCloseReason].
+  NativeRoomCloseReason(this._closeReason);
 
   @override
   String reason() {
-    return _reason(ptr.getInnerPtr()).nativeStringToDartString();
+    return _closeReason.reason;
   }
 
   @override
   bool isClosedByServer() {
-    return _isClosedByServer(ptr.getInnerPtr()) > 0;
+    return _closeReason.isClosedByServer;
   }
 
   @override
   bool isErr() {
-    return _isErr(ptr.getInnerPtr()) > 0;
+    return _closeReason.isErr;
   }
 
-  @moveSemantics
   @override
-  void free() {
-    if (!ptr.isFreed()) {
-      RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
-      ptr.free();
-    }
-  }
+  void free() {}
 }
