@@ -1000,7 +1000,7 @@ const controlApi = {
     }
   },
 
-  createEndpoint: async function (roomId, memberId, endpointId, spec) {
+  createEndpoint: async function(roomId, memberId, endpointId, spec) {
     try {
       await axios({
         method: 'post',
