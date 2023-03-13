@@ -18,6 +18,7 @@ bitflags! {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiverdirection
     /// [2]: https://w3.org/TR/webrtc#dom-rtcrtptransceiverdirection-sendrecv
+    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
     pub struct Direction: u8 {
         /// [`inactive` direction][1] of transceiver.
         ///
