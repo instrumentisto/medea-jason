@@ -2,6 +2,9 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiverdirection
 
+// Because of uncontrolled names in the generated code.
+#![allow(clippy::same_name_method)]
+
 use bitflags::bitflags;
 use medea_client_api_proto::Direction as DirectionProto;
 #[cfg(target_family = "wasm")]

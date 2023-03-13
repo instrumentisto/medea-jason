@@ -1,5 +1,8 @@
 //! [`MediaKind`] + [`MediaSourceKind`] criteria for local stream updates.
 
+// Because of uncontrolled names in the generated code.
+#![allow(clippy::same_name_method)]
+
 use std::ops::BitOrAssign;
 
 use medea_client_api_proto::{Direction, MediaSourceKind, MediaType, Track};
