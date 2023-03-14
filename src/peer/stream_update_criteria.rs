@@ -1,5 +1,8 @@
 //! [`MediaKind`] + [`MediaSourceKind`] criteria for local stream updates.
 
+// Because of uncontrolled names in the generated code.
+#![allow(clippy::same_name_method)]
+
 use std::ops::BitOrAssign;
 
 use medea_client_api_proto::{Direction, MediaSourceKind, MediaType, Track};
@@ -7,6 +10,7 @@ use medea_client_api_proto::{Direction, MediaSourceKind, MediaType, Track};
 use crate::media::MediaKind;
 
 bitflags::bitflags! {
+    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
     pub struct Inner: u8 {
         const DEVICE_AUDIO =  0b0001;
         const DISPLAY_AUDIO = 0b0010;

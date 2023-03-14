@@ -18,7 +18,7 @@ class Room {
   Room(this.id, this.pipeline);
 
   factory Room.fromJson(Map<String, dynamic> json) {
-    json.remove('kind'); // asdasd ?
+    json.remove('kind');
     return _$RoomFromJson(json);
   }
 
