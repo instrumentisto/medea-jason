@@ -96,7 +96,7 @@ pub struct State {
     /// IDs of the members the [`Sender`]'s [`local::Track`] is received by.
     ///
     /// [`local::Track`]: crate::media::track::local::Track
-    receivers: Rc<RefCell<Vec<MemberId>>>,
+    receivers: RefCell<Vec<MemberId>>,
 
     /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
     /// individually.
@@ -159,7 +159,7 @@ impl SynchronizableState for State {
             id: input.id,
             mid: input.mid,
             media_type: input.media_type,
-            receivers: Rc::new(RefCell::new(input.receivers)),
+            receivers: RefCell::new(input.receivers),
             mute_state: MuteStateController::new(mute_state::Stable::from(
                 input.muted,
             )),
@@ -277,7 +277,7 @@ impl State {
             id,
             mid,
             media_type,
-            receivers: Rc::new(RefCell::new(receivers)),
+            receivers: RefCell::new(receivers),
             enabled_individual: MediaExchangeStateController::new(
                 media_exchange_state::Stable::from(
                     media_direction.is_send_enabled(),

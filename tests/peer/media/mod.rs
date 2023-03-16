@@ -177,7 +177,7 @@ mod sender_patch {
             .create_sender(
                 TrackId(0),
                 MediaType::Audio(AudioSettings { required: false }),
-                medea_client_api_proto::MediaDirection::SendRecv,
+                MediaDirection::SendRecv,
                 None,
                 vec!["bob".into()],
                 &LocalTracksConstraints::default(),
@@ -317,7 +317,7 @@ mod receiver_patch {
             .create_receiver(
                 TRACK_ID,
                 MediaType::Audio(AudioSettings { required: true }).into(),
-                medea_client_api_proto::MediaDirection::SendRecv,
+                MediaDirection::SendRecv,
                 Some(MID.to_string()),
                 MemberId(SENDER_ID.to_string()),
                 &RecvConstraints::default(),
