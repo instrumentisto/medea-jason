@@ -353,9 +353,9 @@ mod disable_recv_tracks {
             .iter()
             .enumerate()
             .map(|(i, media_direction)| Track {
-                id: TrackId(i),
+                id: TrackId(i.try_into().unwrap()),
                 direction: Direction::Send {
-                    receivers: vec![MemberId::from("bob")],
+                    receivers: Vec::from([MemberId::from("bob")]),
                     mid: None,
                 },
                 media_direction,
@@ -380,8 +380,10 @@ mod disable_recv_tracks {
         peer_state.when_updated().await;
 
         for (i, media_direction) in media_directions.iter().enumerate() {
-            let sender = peer_state.get_sender(TrackId(i)).unwrap();
-            assert_eq!(receiver.media_direction(), media_direction);
+            let sender = peer_state
+                .get_sender(TrackId(i.try_into().unwrap()))
+                .unwrap();
+            assert_eq!(&sender.media_direction(), media_direction);
             assert_eq!(
                 sender.is_enabled_general(),
                 media_direction.is_enabled_general()
@@ -409,7 +411,7 @@ mod disable_recv_tracks {
             .iter()
             .enumerate()
             .map(|(i, media_direction)| Track {
-                id: TrackId(i),
+                id: TrackId(i.try_into().unwrap()),
                 direction: Direction::Recv {
                     sender: MemberId::from("bob"),
                     mid: None,
@@ -436,8 +438,10 @@ mod disable_recv_tracks {
         peer_state.when_updated().await;
 
         for (i, media_direction) in media_directions.iter().enumerate() {
-            let receiver = peer_state.get_receiver(TrackId(i)).unwrap();
-            assert_eq!(receiver.media_direction(), media_direction);
+            let receiver = peer_state
+                .get_receiver(TrackId(i.try_into().unwrap()))
+                .unwrap();
+            assert_eq!(&receiver.media_direction(), media_direction);
             assert_eq!(
                 receiver.is_enabled_general(),
                 media_direction.is_enabled_general()
@@ -453,20 +457,6 @@ mod disable_recv_tracks {
     async fn update_sender_receivers() {
         let (event_tx, event_rx) = mpsc::unbounded();
         let (room, _) = get_test_room(Box::pin(event_rx));
-
-        let tracks = media_directions
-            .iter()
-            .enumerate()
-            .map(|(i, media_direction)| Track {
-                id: TrackId(0),
-                direction: Direction::Send {
-                    receivers: Vec::from[MemberId::from("bob")],
-                    mid: None,
-                },
-                media_direction,
-                media_type: MediaType::Audio(AudioSettings { required: true }),
-            })
-            .collect();
 
         event_tx
             .unbounded_send(Event::PeerCreated {
