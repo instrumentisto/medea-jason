@@ -440,7 +440,7 @@ mod disable_recv_tracks {
             let receiver = peer_state
                 .get_receiver(TrackId(i.try_into().unwrap()))
                 .unwrap();
-            assert_eq!(receiver.media_direction(), media_direction.into());
+            assert_eq!(receiver.media_direction(), (*media_direction).into());
             assert_eq!(
                 receiver.enabled_general(),
                 media_direction.is_enabled_general()
