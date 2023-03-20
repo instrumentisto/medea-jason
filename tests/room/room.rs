@@ -336,7 +336,9 @@ mod disable_recv_tracks {
 
         // TODO: add is_recv_audio/video asserts
     }
+}
 
+mod init_track_states {
     #[wasm_bindgen_test]
     async fn init_sender_states() {
         let (event_tx, event_rx) = mpsc::unbounded();
@@ -451,7 +453,9 @@ mod disable_recv_tracks {
             );
         }
     }
+}
 
+mod receivers_patch_send_tracks {
     #[wasm_bindgen_test]
     async fn update_sender_receivers() {
         let (event_tx, event_rx) = mpsc::unbounded();
