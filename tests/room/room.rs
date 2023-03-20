@@ -250,6 +250,7 @@ mod disable_recv_tracks {
         AudioSettings, Direction, MediaSourceKind, MediaType, MemberId,
         VideoSettings,
     };
+    use medea_jason::peer;
 
     use super::*;
 
@@ -334,6 +335,197 @@ mod disable_recv_tracks {
         }
 
         // TODO: add is_recv_audio/video asserts
+    }
+
+    #[wasm_bindgen_test]
+    async fn init_sender_states() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let media_directions = Vec::from([
+            MediaDirection::SendOnly,
+            MediaDirection::SendOnly,
+            MediaDirection::RecvOnly,
+            MediaDirection::Inactive,
+        ]);
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(i),
+                direction: Direction::Send {
+                    receivers: vec![MemberId::from("bob")],
+                    mid: None,
+                },
+                media_direction,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+            })
+            .unwrap();
+
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        for (i, media_direction) in media_directions.iter().enumerate() {
+            let sender = peer_state.get_sender(TrackId(i)).unwrap();
+            assert_eq!(receiver.media_direction(), media_direction);
+            assert_eq!(
+                sender.is_enabled_general(),
+                media_direction.is_enabled_general()
+            );
+            assert_eq!(
+                sender.is_enabled_individual(),
+                media_direction.is_send_enabled()
+            );
+        }
+    }
+
+    #[wasm_bindgen_test]
+    async fn init_receiver_states() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let media_directions = Vec::from([
+            MediaDirection::SendRecv,
+            MediaDirection::SendOnly,
+            MediaDirection::RecvOnly,
+            MediaDirection::Inactive,
+        ]);
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(i),
+                direction: Direction::Recv {
+                    sender: MemberId::from("bob"),
+                    mid: None,
+                },
+                media_direction,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+            })
+            .unwrap();
+
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        for (i, media_direction) in media_directions.iter().enumerate() {
+            let receiver = peer_state.get_receiver(TrackId(i)).unwrap();
+            assert_eq!(receiver.media_direction(), media_direction);
+            assert_eq!(
+                receiver.is_enabled_general(),
+                media_direction.is_enabled_general()
+            );
+            assert_eq!(
+                receiver.is_enabled_individual(),
+                media_direction.is_recv_enabled()
+            );
+        }
+    }
+
+    #[wasm_bindgen_test]
+    async fn update_sender_receivers() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(0),
+                direction: Direction::Send {
+                    receivers: Vec::from[MemberId::from("bob")],
+                    mid: None,
+                },
+                media_direction,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        let sender = peer_state.get_sender(TrackId(0)).unwrap();
+
+        assert_eq!(sender.receivers().len(), 1);
+        assert!(sender.receivers().contains(&MemberId::from("bob")));
+
+        event_tx
+            .unbounded_send(Event::PeerUpdated {
+                peer_id: PeerId(1),
+                updates: Vec::from([PeerUpdate::Updated(TrackPatchEvent {
+                    id: TrackId(0),
+                    media_direction: None,
+                    receivers: Some(Vec::new()),
+                    muted: None,
+                })]),
+                negotiation_role: None,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        peer_state.when_updated().await;
+        assert!(sender.receivers().is_empty());
+
+        event_tx
+            .unbounded_send(Event::PeerUpdated {
+                peer_id: PeerId(1),
+                updates: Vec::from([PeerUpdate::Updated(TrackPatchEvent {
+                    id: TrackId(0),
+                    media_direction: None,
+                    receivers: Some(Vec::from([
+                        MemberId::from("bob"),
+                        MemberId::from("eva"),
+                    ])),
+                    muted: None,
+                })]),
+                negotiation_role: None,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        peer_state.when_updated().await;
+        assert_eq!(sender.receivers().len(), 2);
+        assert!(sender.receivers().contains(&MemberId::from("bob")));
+        assert!(sender.receivers().contains(&MemberId::from("eva")));
     }
 }
 
