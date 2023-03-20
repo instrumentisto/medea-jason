@@ -250,7 +250,6 @@ mod disable_recv_tracks {
         AudioSettings, Direction, MediaSourceKind, MediaType, MemberId,
         VideoSettings,
     };
-    use medea_jason::peer;
 
     use super::*;
 
@@ -340,8 +339,7 @@ mod disable_recv_tracks {
 
 mod init_track_states {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaSourceKind, MediaType, MemberId,
-        VideoSettings,
+        AudioSettings, Direction, MediaType, MemberId,
     };
     use medea_jason::peer;
 
@@ -465,8 +463,7 @@ mod init_track_states {
 
 mod receivers_patch_send_tracks {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaSourceKind, MediaType, MemberId,
-        VideoSettings,
+        AudioSettings, Direction, MediaType, MemberId,
     };
     use medea_jason::peer;
 
