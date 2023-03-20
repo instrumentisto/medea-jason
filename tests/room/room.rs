@@ -358,7 +358,7 @@ mod disable_recv_tracks {
                     receivers: Vec::from([MemberId::from("bob")]),
                     mid: None,
                 },
-                media_direction,
+                media_direction: *media_direction,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             })
             .collect();
@@ -383,7 +383,7 @@ mod disable_recv_tracks {
             let sender = peer_state
                 .get_sender(TrackId(i.try_into().unwrap()))
                 .unwrap();
-            assert_eq!(&sender.media_direction(), media_direction);
+            assert_eq!(sender.media_direction(), media_direction.into());
             assert_eq!(
                 sender.is_enabled_general(),
                 media_direction.is_enabled_general()
@@ -416,7 +416,7 @@ mod disable_recv_tracks {
                     sender: MemberId::from("bob"),
                     mid: None,
                 },
-                media_direction,
+                media_direction: *media_direction,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             })
             .collect();
@@ -441,13 +441,13 @@ mod disable_recv_tracks {
             let receiver = peer_state
                 .get_receiver(TrackId(i.try_into().unwrap()))
                 .unwrap();
-            assert_eq!(&receiver.media_direction(), media_direction);
+            assert_eq!(&receiver.media_direction(), media_direction.into());
             assert_eq!(
-                receiver.is_enabled_general(),
+                receiver.enabled_general(),
                 media_direction.is_enabled_general()
             );
             assert_eq!(
-                receiver.is_enabled_individual(),
+                receiver.enabled_individual(),
                 media_direction.is_recv_enabled()
             );
         }
@@ -462,7 +462,17 @@ mod disable_recv_tracks {
             .unbounded_send(Event::PeerCreated {
                 peer_id: PeerId(1),
                 negotiation_role: NegotiationRole::Answerer("offer".into()),
-                tracks,
+                tracks: Vec::from([Track {
+                    id: TrackId(0),
+                    direction: Direction::Send {
+                        receivers: vec![MemberId::from("bob")],
+                        mid: None,
+                    },
+                    media_direction: MediaDirection::SendRecv,
+                    media_type: MediaType::Audio(AudioSettings {
+                        required: true,
+                    }),
+                }]),
                 ice_servers: Vec::new(),
                 force_relay: false,
             })
