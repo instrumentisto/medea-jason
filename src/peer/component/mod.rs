@@ -13,7 +13,7 @@ use medea_client_api_proto::{
     TrackId,
 };
 use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
-use proto::MemberId;
+use proto::{ConnectionMode, MemberId};
 use tracerr::Traced;
 
 use crate::{
@@ -107,6 +107,8 @@ pub struct State {
     /// ID of this [`Component`].
     id: Id,
 
+    connection_mode: ConnectionMode,
+
     /// All [`sender::State`]s of this [`Component`].
     senders: TracksRepository<sender::State>,
 
@@ -159,9 +161,11 @@ impl State {
         ice_servers: Vec<IceServer>,
         force_relay: bool,
         negotiation_role: Option<NegotiationRole>,
+        connection_mode: ConnectionMode,
     ) -> Self {
         Self {
             id,
+            connection_mode,
             senders: TracksRepository::new(),
             receivers: TracksRepository::new(),
             ice_servers,
@@ -362,6 +366,7 @@ impl State {
                         track.media_direction,
                         receivers.clone(),
                         send_constraints,
+                        self.connection_mode,
                     )),
                 );
             }
@@ -431,6 +436,7 @@ impl AsProtoState for State {
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
+            connection_mode: self.connection_mode,
             senders: self.senders.as_proto(),
             receivers: self.receivers.as_proto(),
             ice_candidates: self.ice_candidates.as_proto(),
@@ -456,6 +462,7 @@ impl SynchronizableState for State {
             from.ice_servers,
             from.force_relay,
             from.negotiation_role,
+            from.connection_mode,
         );
 
         for (id, sender) in from.senders {

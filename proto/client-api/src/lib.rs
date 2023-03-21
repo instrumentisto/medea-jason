@@ -524,6 +524,8 @@ pub enum Event {
         /// [`NegotiationRole`] of the `Peer`.
         negotiation_role: NegotiationRole,
 
+        connection_mode: ConnectionMode,
+
         /// [`Track`]s to create RTCPeerConnection with.
         tracks: Vec<Track>,
 
@@ -617,6 +619,13 @@ pub enum NegotiationRole {
 
     /// [`Command::MakeSdpAnswer`] should be sent by client.
     Answerer(String),
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ConnectionMode {
+    P2pMesh,
+
+    Sfu,
 }
 
 /// [`Track`] update which should be applied to the `Peer`.

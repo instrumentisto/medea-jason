@@ -6,8 +6,8 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    IceCandidate, IceServer, MediaDirection, MediaType, MemberId,
-    NegotiationRole, PeerId, TrackId,
+    ConnectionMode, IceCandidate, IceServer, MediaDirection, MediaType,
+    MemberId, NegotiationRole, PeerId, TrackId,
 };
 
 /// State of a `Room` element.
@@ -22,6 +22,8 @@ pub struct Room {
 pub struct Peer {
     /// ID of this [`Peer`].
     pub id: PeerId,
+
+    pub connection_mode: ConnectionMode,
 
     /// All [`Sender`]s of this [`Peer`].
     pub senders: HashMap<TrackId, Sender>,
@@ -57,6 +59,8 @@ pub struct Peer {
 pub struct Sender {
     /// ID of this [`Sender`].
     pub id: TrackId,
+
+    pub connection_mode: ConnectionMode,
 
     /// Mid of this [`Sender`].
     pub mid: Option<String>,
