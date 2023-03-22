@@ -2,7 +2,6 @@
 
 use std::{
     cell::{Cell, RefCell},
-    collections::HashSet,
     rc::Rc,
 };
 
@@ -18,7 +17,7 @@ use tracerr::Traced;
 use crate::{
     media::{LocalTracksConstraints, MediaKind, TrackConstraints, VideoSource},
     peer::{
-        component::{SyncState, UpdateResult},
+        component::SyncState,
         media::{
             media_exchange_state, mute_state, InTransition, MediaExchangeState,
             MuteState, ProhibitedStateError,
@@ -376,13 +375,9 @@ impl State {
     }
 
     /// Updates this [`State`] with the provided [`TrackPatchEvent`].
-    pub fn update(
-        &self,
-        track_patch: &TrackPatchEvent,
-    ) -> Option<UpdateResult> {
-        let mut res = None;
+    pub fn update(&self, track_patch: TrackPatchEvent) {
         if track_patch.id != self.id {
-            return res;
+            return;
         }
         if let Some(direction) = track_patch.media_direction {
             self.media_direction.set(direction);
@@ -395,29 +390,9 @@ impl State {
         if let Some(muted) = track_patch.muted {
             self.mute_state.update(mute_state::Stable::from(muted));
         }
-        if let Some(receivers) = &track_patch.receivers {
-            let mut new_recvs: HashSet<_> = receivers.iter().collect();
-            let mut current_recvs = self.receivers.borrow_mut();
-
-            current_recvs.retain(|cur_recv| {
-                new_recvs
-                    .remove(cur_recv)
-                    .then(|| {
-                        res.get_or_insert(UpdateResult::default())
-                            .recv_removed
-                            .push(cur_recv.clone());
-                    })
-                    .is_some()
-            });
-
-            for new_recv in new_recvs {
-                current_recvs.push(new_recv.clone());
-                res.get_or_insert(UpdateResult::default())
-                    .recv_added
-                    .push(new_recv.clone());
-            }
+        if let Some(receivers) = track_patch.receivers {
+            *self.receivers.borrow_mut() = receivers;
         }
-        res
     }
 
     /// Indicates whether local `MediaStream` update needed for this [`State`].

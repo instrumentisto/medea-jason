@@ -724,7 +724,7 @@ pub struct TrackPatchEvent {
     /// General media exchange direction of the `Track`.
     pub media_direction: Option<MediaDirection>,
 
-    /// An actual [`Vec<MemberId>`] of `receivers` of a [`Track`].
+    /// IDs of the `Member`s who should receive this outgoing [`Track`].
     pub receivers: Option<Vec<MemberId>>,
 
     /// [`Track`]'s mute state.

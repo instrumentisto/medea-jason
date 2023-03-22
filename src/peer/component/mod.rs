@@ -5,14 +5,20 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{cell::Cell, collections::HashSet, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    collections::HashSet,
+    rc::Rc,
+};
 
 use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
 };
-use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
+use medea_reactive::{
+    AllProcessed, ObservableCell, ProgressableCell, ProgressableHashSet,
+};
 use proto::MemberId;
 use tracerr::Traced;
 
@@ -41,16 +47,6 @@ pub enum SyncState {
 
     /// State is synced.
     Synced,
-}
-
-/// Result of patching [`sender::State`] with [`proto::TrackPatchEvent`].
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
-pub struct UpdateResult {
-    /// [`MemberId`]s of added `receiver`.
-    pub recv_added: Vec<MemberId>,
-
-    /// [`MemberId`]s of removed `receiver`.
-    pub recv_removed: Vec<MemberId>,
 }
 
 /// Negotiation state of the [`Component`].
@@ -113,6 +109,11 @@ pub struct State {
     /// All [`receiver::State`]s of this [`Component`].
     receivers: TracksRepository<receiver::State>,
 
+    /// Collection of [`Connection`]s with a remote `Member`s.
+    ///
+    /// [`Connection`]: crate::connection::Connection
+    connections: RefCell<ProgressableHashSet<MemberId>>,
+
     /// Indicator whether this [`Component`] should relay all media through a
     /// TURN server forcibly.
     force_relay: bool,
@@ -142,11 +143,6 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
-    /// Indicator whether we should update [`Connections`].
-    ///
-    /// [`Connections`]: crate::connection::Connections
-    maybe_update_connections: ObservableCell<Option<UpdateResult>>,
-
     /// Synchronization state of this [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
@@ -164,6 +160,7 @@ impl State {
             id,
             senders: TracksRepository::new(),
             receivers: TracksRepository::new(),
+            connections: RefCell::new(ProgressableHashSet::new()),
             ice_servers,
             force_relay,
             remote_sdp: ProgressableCell::new(None),
@@ -173,7 +170,6 @@ impl State {
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
             maybe_update_local_stream: ObservableCell::new(false),
-            maybe_update_connections: ObservableCell::new(None),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
@@ -400,19 +396,20 @@ impl State {
     /// [`proto::TrackPatchEvent`].
     ///
     /// Schedules a local stream update.
-    pub fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
-        self.get_sender(track_patch.id).map_or_else(
-            || {
-                if let Some(receiver) = self.get_receiver(track_patch.id) {
-                    receiver.update(track_patch);
-                }
-            },
-            |sender| {
-                self.maybe_update_connections
-                    .set(sender.update(track_patch));
-                self.maybe_update_local_stream.set(true);
-            },
-        );
+    pub fn patch_track(&self, patch: proto::TrackPatchEvent) {
+        if let Some(receivers) = &patch.receivers {
+            let receivers: HashSet<_> = receivers.clone().into_iter().collect();
+            self.connections.borrow_mut().update(receivers);
+        }
+
+        if let Some(sender) = self.get_sender(patch.id) {
+            sender.update(patch);
+            self.maybe_update_local_stream.set(true);
+        } else if let Some(receiver) = self.get_receiver(patch.id) {
+            receiver.update(&patch);
+        } else {
+            log::warn!("Could not apply patch to Track {}", patch.id.0);
+        }
     }
 
     /// Returns the current SDP offer of this [`State`].
