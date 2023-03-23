@@ -16,7 +16,7 @@ use wasm_bindgen_test::*;
 use crate::{
     get_audio_track, get_video_track, timeout, wait_and_check_test_result,
 };
-// TODO(review): Add tests for receivers updating.
+
 wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen_test]

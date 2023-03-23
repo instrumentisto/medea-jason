@@ -215,9 +215,9 @@ impl Component {
         conn.add_receiver(rcvr_state);
     }
 
-    /// Watcher for the [`State::senders`] remove update.
+    /// Watcher for the [`State::connections`] insert update.
     ///
-    /// Removes a [`sender::Component`] from the [`PeerConnection`].
+    /// Creates a new [`Connection`] for the given [`PeerConnection`].
     #[allow(clippy::needless_pass_by_value)]
     #[watch(self.connections.borrow().on_insert())]
     fn connection_added(
@@ -228,9 +228,9 @@ impl Component {
         drop(peer.connections.create_connection(peer.id, val.as_ref()));
     }
 
-    /// Watcher for the [`State::senders`] remove update.
+    /// Watcher for the [`State::connections`] remove update.
     ///
-    /// Removes a [`sender::Component`] from the [`PeerConnection`].
+    /// Closes the provided [`Connection`] in the given [`PeerConnection`].
     #[allow(clippy::needless_pass_by_value)]
     #[watch(self.connections.borrow().on_remove())]
     fn connection_removed(
