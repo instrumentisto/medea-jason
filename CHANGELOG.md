@@ -82,8 +82,6 @@ All user visible changes to this project will be documented in this file. This p
 
 - Library API:
     - Unconverted into Dart exception error in `RoomHandle.onFailedLocalMedia()` ([#57]).
-- Testing:
-    - Incorrect error handling in E2E tests ([#112]).
 
 ### Updated
 
@@ -102,7 +100,6 @@ All user visible changes to this project will be documented in this file. This p
 [#59]: /../../pull/59
 [#81]: /../../pull/81
 [#106]: /../../pull/106
-[#112]: /../../pull/112
 
 
 
