@@ -125,6 +125,11 @@ pub struct State {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     send_constraints: LocalTracksConstraints,
 
+    /// Indicator whether this [`Sender`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
     connection_mode: ConnectionMode,
 
     /// State of the [`Sender`]'s [`local::Track`].

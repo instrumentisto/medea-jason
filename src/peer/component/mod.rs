@@ -107,6 +107,11 @@ pub struct State {
     /// ID of this [`Component`].
     id: Id,
 
+    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
     connection_mode: ConnectionMode,
 
     /// All [`sender::State`]s of this [`Component`].
@@ -406,6 +411,7 @@ impl State {
     ///
     /// Schedules a local stream update.
     pub async fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
+        #[allow(clippy::else_if_without_else)]
         if let Some(sender) = self.get_sender(track_patch.id) {
             self.maybe_update_connections
                 .set(sender.update(track_patch));

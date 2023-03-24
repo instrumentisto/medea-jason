@@ -23,6 +23,11 @@ pub struct Peer {
     /// ID of this [`Peer`].
     pub id: PeerId,
 
+    /// Indicator whether this [`Peer`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
     pub connection_mode: ConnectionMode,
 
     /// All [`Sender`]s of this [`Peer`].
@@ -60,6 +65,11 @@ pub struct Sender {
     /// ID of this [`Sender`].
     pub id: TrackId,
 
+    /// Indicator whether this [`Sender`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
     pub connection_mode: ConnectionMode,
 
     /// Mid of this [`Sender`].
