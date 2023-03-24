@@ -405,19 +405,15 @@ impl State {
     /// [`proto::TrackPatchEvent`].
     ///
     /// Schedules a local stream update.
-    pub fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
-        self.get_sender(track_patch.id).map_or_else(
-            || {
-                if let Some(receiver) = self.get_receiver(track_patch.id) {
-                    receiver.update(track_patch);
-                }
-            },
-            |sender| {
-                self.maybe_update_connections
-                    .set(sender.update(track_patch));
-                self.maybe_update_local_stream.set(true);
-            },
-        );
+    pub async fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
+        if let Some(sender) = self.get_sender(track_patch.id) {
+            self.maybe_update_connections
+                .set(sender.update(track_patch));
+            let _ = self.maybe_update_local_stream.when_eq(false).await;
+            self.maybe_update_local_stream.set(true);
+        } else if let Some(receiver) = self.get_receiver(track_patch.id) {
+            receiver.update(track_patch);
+        }
     }
 
     /// Returns the current SDP offer of this [`State`].
