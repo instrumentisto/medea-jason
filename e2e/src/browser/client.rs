@@ -249,10 +249,10 @@ impl Inner {
                         if (e.ptr != undefined) {{
                             callback({{
                                 err: {{
-                                    name: e.name(),
+                                    kind: e.kind ? e.kind() : undefined,
                                     message: e.message(),
                                     trace: e.trace(),
-                                    source: e.source()
+                                    cause: e.cause ? e.cause() : undefined
                                 }}
                             }});
                         }} else {{
