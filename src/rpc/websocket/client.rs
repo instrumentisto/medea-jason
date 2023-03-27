@@ -277,6 +277,11 @@ impl WebSocketRpcClient {
                 | CloseByServerReason::Rejected
                 | CloseByServerReason::InternalError
                 | CloseByServerReason::Evicted => {
+                    self.0.borrow().state.set(ClientState::Closed(
+                        ClosedStateReason::ConnectionLost(
+                            ConnectionLostReason::WithMessage(close_msg),
+                        ),
+                    ));
                     drop(self.0.borrow_mut().sock.take());
                     self.0
                         .borrow_mut()

@@ -189,18 +189,19 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackFreeConstMeta;
 
-  /// Returns the [`Vec<MediaDeviceInfo>`] from the [`ForeignClass`] address.
-  List<ApiMediaDeviceInfo> vecMediaDeviceInfoFromPtr(
-      {required int ptr, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoFromPtrConstMeta;
-
-  /// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the [`ForeignClass`]
+  /// Returns the [`Vec<ApiMediaDeviceDetails>`] from the [`ForeignClass`]
   /// address.
-  List<ApiMediaDisplayInfo> vecMediaDisplayInfoFromPtr(
+  List<ApiMediaDeviceDetails> vecMediaDeviceDetailsFromPtr(
       {required int ptr, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta;
+  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceDetailsFromPtrConstMeta;
+
+  /// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
+  /// [`ForeignClass`] address.
+  List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromPtr(
+      {required int ptr, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayDetailsFromPtrConstMeta;
 
   /// Returns [`LocalMediaTrack`]s objects, built from the provided
   /// [`ApiMediaStreamSettings`].
@@ -212,7 +213,7 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kMediaManagerHandleInitLocalTracksConstMeta;
 
-  /// Returns a list of [`ApiMediaDeviceInfo`] objects representing available
+  /// Returns a list of [`ApiMediaDeviceDetails`] objects representing available
   /// media input and devices, such as microphones, cameras, and so forth.
   Object mediaManagerHandleEnumerateDevices(
       {required MediaManagerHandle manager, dynamic hint});
@@ -220,7 +221,7 @@ abstract class MedeaJason {
   FlutterRustBridgeTaskConstMeta
       get kMediaManagerHandleEnumerateDevicesConstMeta;
 
-  /// Returns a list of [`ApiMediaDisplayInfo`] objects representing available
+  /// Returns a list of [`ApiMediaDisplayDetails`] objects representing available
   /// sources that can be used for screen capturing.
   Object mediaManagerHandleEnumerateDisplays(
       {required MediaManagerHandle manager, dynamic hint});
@@ -853,25 +854,25 @@ class ApiDisplayVideoTrackConstraints {
   });
 }
 
-/// Representation of an [`ApiMediaDeviceInfo`][0] ONLY for input devices.
+/// Representation of a [MediaDeviceInfo][0] ONLY for input devices.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
-class ApiMediaDeviceInfo {
-  /// [`MediaDeviceKind`] of this [`ApiMediaDeviceInfo`].
+class ApiMediaDeviceDetails {
+  /// [`MediaDeviceKind`] of this [`ApiMediaDeviceDetails`].
   ///
   /// [`MediaDeviceKind`]: media::MediaDeviceKind
   final MediaDeviceKind kind;
 
   /// Unique identifier of the device represented by this
-  /// [`ApiMediaDeviceInfo`].
+  /// [`ApiMediaDeviceDetails`].
   final String deviceId;
 
-  /// Label describing the device represented by this [`ApiMediaDeviceInfo`]
-  /// (for example, "External USB Webcam").
+  /// Label describing the device represented by this
+  /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
   final String label;
 
   /// Group identifier of the device represented by this
-  /// [`ApiMediaDeviceInfo`].
+  /// [`ApiMediaDeviceDetails`].
   ///
   /// Two devices have the same group identifier if they belong to the same
   /// physical device. For example, the audio input and output devices
@@ -884,7 +885,7 @@ class ApiMediaDeviceInfo {
   /// Indicates whether the last attempt to use the provided device failed.
   final bool isFailed;
 
-  ApiMediaDeviceInfo({
+  ApiMediaDeviceDetails({
     required this.kind,
     required this.deviceId,
     required this.label,
@@ -894,15 +895,15 @@ class ApiMediaDeviceInfo {
 }
 
 /// Representation of a display source.
-class ApiMediaDisplayInfo {
+class ApiMediaDisplayDetails {
   /// Unique identifier of the display represented by this
-  /// [`ApiMediaDisplayInfo`].
+  /// [`ApiMediaDisplayDetails`].
   final String deviceId;
 
   /// Title describing the represented display.
   final String? title;
 
-  ApiMediaDisplayInfo({
+  ApiMediaDisplayDetails({
     required this.deviceId,
     this.title,
   });
@@ -1487,39 +1488,41 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track"],
       );
 
-  List<ApiMediaDeviceInfo> vecMediaDeviceInfoFromPtr(
+  List<ApiMediaDeviceDetails> vecMediaDeviceDetailsFromPtr(
       {required int ptr, dynamic hint}) {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_vec_media_device_info_from_ptr(arg0),
-      parseSuccessData: _wire2api_list_api_media_device_info,
-      constMeta: kVecMediaDeviceInfoFromPtrConstMeta,
+      callFfi: () =>
+          _platform.inner.wire_vec_media_device_details_from_ptr(arg0),
+      parseSuccessData: _wire2api_list_api_media_device_details,
+      constMeta: kVecMediaDeviceDetailsFromPtrConstMeta,
       argValues: [ptr],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceInfoFromPtrConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kVecMediaDeviceDetailsFromPtrConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "vec_media_device_info_from_ptr",
+        debugName: "vec_media_device_details_from_ptr",
         argNames: ["ptr"],
       );
 
-  List<ApiMediaDisplayInfo> vecMediaDisplayInfoFromPtr(
+  List<ApiMediaDisplayDetails> vecMediaDisplayDetailsFromPtr(
       {required int ptr, dynamic hint}) {
     var arg0 = api2wire_usize(ptr);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
-      callFfi: () => _platform.inner.wire_vec_media_display_info_from_ptr(arg0),
-      parseSuccessData: _wire2api_list_api_media_display_info,
-      constMeta: kVecMediaDisplayInfoFromPtrConstMeta,
+      callFfi: () =>
+          _platform.inner.wire_vec_media_display_details_from_ptr(arg0),
+      parseSuccessData: _wire2api_list_api_media_display_details,
+      constMeta: kVecMediaDisplayDetailsFromPtrConstMeta,
       argValues: [ptr],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayInfoFromPtrConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kVecMediaDisplayDetailsFromPtrConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "vec_media_display_info_from_ptr",
+        debugName: "vec_media_display_details_from_ptr",
         argNames: ["ptr"],
       );
 
@@ -2445,11 +2448,11 @@ class MedeaJasonImpl implements MedeaJason {
     return raw as String;
   }
 
-  ApiMediaDeviceInfo _wire2api_api_media_device_info(dynamic raw) {
+  ApiMediaDeviceDetails _wire2api_api_media_device_details(dynamic raw) {
     final arr = raw as List<dynamic>;
     if (arr.length != 5)
       throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return ApiMediaDeviceInfo(
+    return ApiMediaDeviceDetails(
       kind: _wire2api_media_device_kind(arr[0]),
       deviceId: _wire2api_String(arr[1]),
       label: _wire2api_String(arr[2]),
@@ -2458,11 +2461,11 @@ class MedeaJasonImpl implements MedeaJason {
     );
   }
 
-  ApiMediaDisplayInfo _wire2api_api_media_display_info(dynamic raw) {
+  ApiMediaDisplayDetails _wire2api_api_media_display_details(dynamic raw) {
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return ApiMediaDisplayInfo(
+    return ApiMediaDisplayDetails(
       deviceId: _wire2api_String(arr[0]),
       title: _wire2api_opt_String(arr[1]),
     );
@@ -2480,13 +2483,17 @@ class MedeaJasonImpl implements MedeaJason {
     return (raw as List<dynamic>).map(_wire2api_LocalMediaTrack).toList();
   }
 
-  List<ApiMediaDeviceInfo> _wire2api_list_api_media_device_info(dynamic raw) {
-    return (raw as List<dynamic>).map(_wire2api_api_media_device_info).toList();
+  List<ApiMediaDeviceDetails> _wire2api_list_api_media_device_details(
+      dynamic raw) {
+    return (raw as List<dynamic>)
+        .map(_wire2api_api_media_device_details)
+        .toList();
   }
 
-  List<ApiMediaDisplayInfo> _wire2api_list_api_media_display_info(dynamic raw) {
+  List<ApiMediaDisplayDetails> _wire2api_list_api_media_display_details(
+      dynamic raw) {
     return (raw as List<dynamic>)
-        .map(_wire2api_api_media_display_info)
+        .map(_wire2api_api_media_display_details)
         .toList();
   }
 
@@ -3701,34 +3708,34 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_local_media_track_free = _wire_local_media_track_freePtr
       .asFunction<WireSyncReturn Function(wire_LocalMediaTrack)>();
 
-  WireSyncReturn wire_vec_media_device_info_from_ptr(
+  WireSyncReturn wire_vec_media_device_details_from_ptr(
     int ptr,
   ) {
-    return _wire_vec_media_device_info_from_ptr(
+    return _wire_vec_media_device_details_from_ptr(
       ptr,
     );
   }
 
-  late final _wire_vec_media_device_info_from_ptrPtr =
+  late final _wire_vec_media_device_details_from_ptrPtr =
       _lookup<ffi.NativeFunction<WireSyncReturn Function(ffi.UintPtr)>>(
-          'wire_vec_media_device_info_from_ptr');
-  late final _wire_vec_media_device_info_from_ptr =
-      _wire_vec_media_device_info_from_ptrPtr
+          'wire_vec_media_device_details_from_ptr');
+  late final _wire_vec_media_device_details_from_ptr =
+      _wire_vec_media_device_details_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
-  WireSyncReturn wire_vec_media_display_info_from_ptr(
+  WireSyncReturn wire_vec_media_display_details_from_ptr(
     int ptr,
   ) {
-    return _wire_vec_media_display_info_from_ptr(
+    return _wire_vec_media_display_details_from_ptr(
       ptr,
     );
   }
 
-  late final _wire_vec_media_display_info_from_ptrPtr =
+  late final _wire_vec_media_display_details_from_ptrPtr =
       _lookup<ffi.NativeFunction<WireSyncReturn Function(ffi.UintPtr)>>(
-          'wire_vec_media_display_info_from_ptr');
-  late final _wire_vec_media_display_info_from_ptr =
-      _wire_vec_media_display_info_from_ptrPtr
+          'wire_vec_media_display_details_from_ptr');
+  late final _wire_vec_media_display_details_from_ptr =
+      _wire_vec_media_display_details_from_ptrPtr
           .asFunction<WireSyncReturn Function(int)>();
 
   WireSyncReturn wire_media_manager_handle_init_local_tracks(

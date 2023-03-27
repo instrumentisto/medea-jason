@@ -389,33 +389,33 @@ fn wire_local_media_track_free_impl(
         },
     )
 }
-fn wire_vec_media_device_info_from_ptr_impl(
+fn wire_vec_media_device_details_from_ptr_impl(
     ptr: impl Wire2Api<usize> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "vec_media_device_info_from_ptr",
+            debug_name: "vec_media_device_details_from_ptr",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_ptr = ptr.wire2api();
-            Ok(vec_media_device_info_from_ptr(api_ptr))
+            Ok(vec_media_device_details_from_ptr(api_ptr))
         },
     )
 }
-fn wire_vec_media_display_info_from_ptr_impl(
+fn wire_vec_media_display_details_from_ptr_impl(
     ptr: impl Wire2Api<usize> + UnwindSafe,
 ) -> support::WireSyncReturn {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
         WrapInfo {
-            debug_name: "vec_media_display_info_from_ptr",
+            debug_name: "vec_media_display_details_from_ptr",
             port: None,
             mode: FfiCallMode::Sync,
         },
         move || {
             let api_ptr = ptr.wire2api();
-            Ok(vec_media_display_info_from_ptr(api_ptr))
+            Ok(vec_media_display_details_from_ptr(api_ptr))
         },
     )
 }
@@ -1200,7 +1200,7 @@ impl Wire2Api<usize> for usize {
 }
 // Section: impl IntoDart
 
-impl support::IntoDart for ApiMediaDeviceInfo {
+impl support::IntoDart for ApiMediaDeviceDetails {
     fn into_dart(self) -> support::DartAbi {
         vec![
             self.kind.into_dart(),
@@ -1212,14 +1212,14 @@ impl support::IntoDart for ApiMediaDeviceInfo {
         .into_dart()
     }
 }
-impl support::IntoDartExceptPrimitive for ApiMediaDeviceInfo {}
+impl support::IntoDartExceptPrimitive for ApiMediaDeviceDetails {}
 
-impl support::IntoDart for ApiMediaDisplayInfo {
+impl support::IntoDart for ApiMediaDisplayDetails {
     fn into_dart(self) -> support::DartAbi {
         vec![self.device_id.into_dart(), self.title.into_dart()].into_dart()
     }
 }
-impl support::IntoDartExceptPrimitive for ApiMediaDisplayInfo {}
+impl support::IntoDartExceptPrimitive for ApiMediaDisplayDetails {}
 
 impl support::IntoDart for MediaDeviceKind {
     fn into_dart(self) -> support::DartAbi {
