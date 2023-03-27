@@ -498,20 +498,20 @@ impl Component {
             .enabled_general
             .set(new_state == media_exchange_state::Stable::Enabled);
 
-        if state.connection_mode == ConnectionMode::Sfu {
-            sender.transceiver.set_send(true).await;
-        } else {
-            match new_state {
-                media_exchange_state::Stable::Enabled => {
-                    if sender.enabled_in_cons() {
-                        sender.transceiver.set_send(true).await;
-                    }
-                }
-                media_exchange_state::Stable::Disabled => {
-                    sender.transceiver.set_send(false).await;
+        // if state.connection_mode == ConnectionMode::Sfu {
+        //     sender.transceiver.set_send(true).await;
+        // } else {
+        match new_state {
+            media_exchange_state::Stable::Enabled => {
+                if sender.enabled_in_cons() {
+                    sender.transceiver.set_send(true).await;
                 }
             }
+            media_exchange_state::Stable::Disabled => {
+                sender.transceiver.set_send(false).await;
+            }
         }
+        // }
     }
 
     /// Watcher for [`media_exchange_state::Stable`] media exchange state
