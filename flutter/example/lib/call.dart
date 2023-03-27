@@ -76,14 +76,14 @@ class Call {
 
     if (publishVideo) {
       videoDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.videoinput)
+          .firstWhere((element) => element.kind() == MediaDeviceKind.VideoInput)
           .deviceId();
       constraints.deviceVideo(DeviceVideoTrackConstraints());
     }
 
     if (publishAudio) {
       audioDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.audioinput)
+          .firstWhere((element) => element.kind() == MediaDeviceKind.AudioInput)
           .deviceId();
       constraints.audio(AudioTrackConstraints());
     }
@@ -340,12 +340,12 @@ class Call {
   }
 
   /// Returns a list of the current displays.
-  Future<List<MediaDisplayInfo>> enumerateDisplay() async {
+  Future<List<MediaDisplayDetails>> enumerateDisplay() async {
     return _mediaManager.enumerateDisplays();
   }
 
   /// Returns a list of the current devices.
-  Future<List<MediaDeviceInfo>> enumerateDevice() async {
+  Future<List<MediaDeviceDetails>> enumerateDevice() async {
     return _mediaManager.enumerateDevices();
   }
 }

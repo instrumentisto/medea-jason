@@ -6,29 +6,28 @@
 // TODO: Improve documentation in this module.
 #![allow(
     clippy::as_conversions,
-    clippy::missing_docs_in_private_items,
     clippy::missing_safety_doc,
     clippy::missing_panics_doc,
     clippy::undocumented_unsafe_blocks,
-    clippy::unwrap_used,
     missing_docs
 )]
 
-pub mod audio_track_constraints;
-pub mod connection_handle;
-pub mod device_video_track_constraints;
-pub mod display_video_track_constraints;
-pub mod jason;
-pub mod local_media_track;
-pub mod media_device_info;
-pub mod media_display_info;
-pub mod media_manager_handle;
-pub mod media_stream_settings;
-pub mod reconnect_handle;
-pub mod remote_media_track;
-pub mod room_close_reason;
-pub mod room_handle;
+pub mod api;
 pub mod utils;
+
+#[allow(
+    clippy::as_conversions,
+    clippy::default_trait_access,
+    clippy::missing_docs_in_private_items,
+    clippy::ptr_as_ptr,
+    clippy::undocumented_unsafe_blocks,
+    clippy::empty_structs_with_brackets,
+    clippy::use_self,
+    clippy::wildcard_imports,
+    let_underscore_drop,
+    unused_qualifications
+)]
+mod api_bridge_generated;
 
 use std::{
     ffi::{c_void, CString},
@@ -41,59 +40,30 @@ use derive_more::Display;
 use libc::c_char;
 
 use crate::{
-    api::{
-        dart::utils::{DartError, PtrArray},
-        utils::new_panic_error,
-    },
+    api::dart::utils::new_panic_error,
     media::{FacingMode, MediaDeviceKind, MediaKind, MediaSourceKind},
-    platform::{
-        self,
-        utils::{
-            dart_api::{
-                Dart_DeletePersistentHandle_DL_Trampolined,
-                Dart_NewPersistentHandle_DL_Trampolined,
-                Dart_PropagateError_DL_Trampolined,
-            },
-            handle::DartHandle,
-        },
+    platform::utils::{
+        c_str_into_string, dart_api, free_dart_native_string,
+        handle::DartHandle, string_into_c_str,
     },
 };
 
 pub use crate::media::MediaDirection;
 
 pub use self::{
-    audio_track_constraints::AudioTrackConstraints,
-    connection_handle::ConnectionHandle,
-    device_video_track_constraints::DeviceVideoTrackConstraints,
-    display_video_track_constraints::DisplayVideoTrackConstraints,
-    jason::Jason,
-    local_media_track::LocalMediaTrack,
-    media_device_info::MediaDeviceInfo,
-    media_display_info::MediaDisplayInfo,
-    media_manager_handle::MediaManagerHandle,
-    media_stream_settings::MediaStreamSettings,
-    reconnect_handle::ReconnectHandle,
-    remote_media_track::RemoteMediaTrack,
-    room_close_reason::RoomCloseReason,
-    room_handle::RoomHandle,
-    utils::{
-        c_str_into_string, dart_string_into_rust, free_dart_native_string,
-        string_into_c_str, ArgumentError, DartError as Error,
+    api::{
+        ConnectionHandle, Jason, LocalMediaTrack, MediaManagerHandle,
+        ReconnectHandle, RemoteMediaTrack, RoomCloseReason, RoomHandle,
     },
+    utils::DartError as Error,
 };
-
-/// Sets the provided [`Dart_Handle`] as a callback for the Rust panic hook.
-#[no_mangle]
-pub unsafe extern "C" fn on_panic(cb: Dart_Handle) {
-    platform::set_panic_callback(platform::Function::new(cb));
-}
 
 /// Wraps the provided function to catch all the Rust panics and propagate them
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
     panic::catch_unwind(panic::AssertUnwindSafe(f)).unwrap_or_else(|_| {
         unsafe {
-            Dart_PropagateError_DL_Trampolined(new_panic_error());
+            dart_api::propagate_error(new_panic_error());
         }
         unreachable!("`Dart_PropagateError` should do early return")
     })
@@ -159,12 +129,23 @@ pub enum DartValue {
     ///
     /// This can also be used to transfer boolean values and C-like enums.
     Int(i64),
+
+    /// Float value.
+    Float(f64),
+
+    /// Boolean value.
+    Bool(bool),
 }
 
 impl Drop for DartValue {
     fn drop(&mut self) {
         match self {
-            Self::Int(_) | Self::Ptr(_) | Self::Handle(_) | Self::None => {}
+            Self::Float(_)
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Ptr(_)
+            | Self::Handle(_)
+            | Self::None => {}
             Self::String(ptr, MemoryOwner::Dart) => unsafe {
                 free_dart_native_string(*ptr);
             },
@@ -190,18 +171,6 @@ impl<T: ForeignClass> From<T> for DartValue {
 impl<T: ForeignClass> From<Option<T>> for DartValue {
     fn from(val: Option<T>) -> Self {
         val.map_or(Self::None, |t| Self::from(t))
-    }
-}
-
-impl<T> From<PtrArray<T>> for DartValue {
-    fn from(val: PtrArray<T>) -> Self {
-        Self::Ptr(ptr::NonNull::from(Box::leak(Box::new(val))).cast())
-    }
-}
-
-impl<T> From<Option<PtrArray<T>>> for DartValue {
-    fn from(val: Option<PtrArray<T>>) -> Self {
-        val.map_or(Self::None, Self::from)
     }
 }
 
@@ -247,14 +216,14 @@ impl From<Option<Dart_Handle>> for DartValue {
     }
 }
 
-impl From<DartError> for DartValue {
-    fn from(err: DartError) -> Self {
+impl From<Error> for DartValue {
+    fn from(err: Error) -> Self {
         Self::Handle(err.into())
     }
 }
 
-impl From<Option<DartError>> for DartValue {
-    fn from(val: Option<DartError>) -> Self {
+impl From<Option<Error>> for DartValue {
+    fn from(val: Option<Error>) -> Self {
         val.map_or(Self::None, Self::from)
     }
 }
@@ -262,6 +231,24 @@ impl From<Option<DartError>> for DartValue {
 impl From<MediaDirection> for DartValue {
     fn from(val: MediaDirection) -> Self {
         Self::from(val as u8)
+    }
+}
+
+impl From<bool> for DartValue {
+    fn from(val: bool) -> Self {
+        Self::Bool(val)
+    }
+}
+
+impl From<f32> for DartValue {
+    fn from(val: f32) -> Self {
+        Self::Float(f64::from(val))
+    }
+}
+
+impl From<f64> for DartValue {
+    fn from(val: f64) -> Self {
+        Self::Float(val)
     }
 }
 
@@ -284,7 +271,6 @@ impl_from_num_for_dart_value!(i64);
 impl_from_num_for_dart_value!(u8);
 impl_from_num_for_dart_value!(u16);
 impl_from_num_for_dart_value!(u32);
-impl_from_num_for_dart_value!(bool);
 
 /// [`DartValue`] marked by a Rust type.
 ///
@@ -312,7 +298,9 @@ impl<T> TryFrom<DartValueArg<T>> for ptr::NonNull<c_void> {
             DartValue::None
             | DartValue::Handle(_)
             | DartValue::String(_, _)
-            | DartValue::Int(_) => Err(DartValueCastError {
+            | DartValue::Int(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_) => Err(DartValueCastError {
                 expectation: "NonNull<c_void>",
                 value: value.0,
             }),
@@ -329,6 +317,8 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<c_void>> {
             DartValue::Ptr(ptr) => Ok(Some(ptr)),
             DartValue::Handle(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "Option<NonNull<c_void>>",
                 value: value.0,
@@ -348,6 +338,8 @@ impl TryFrom<DartValueArg<Self>> for String {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::Handle(_)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "String",
                 value: value.0,
@@ -365,6 +357,8 @@ impl TryFrom<DartValueArg<()>> for () {
             DartValue::Ptr(_)
             | DartValue::Handle(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "()",
                 value: value.0,
@@ -382,12 +376,14 @@ impl TryFrom<DartValueArg<Self>> for Option<DartHandle> {
             DartValue::Handle(handle) => {
                 Ok(Some(unsafe { DartHandle::new(*handle.as_ptr()) }))
             }
-            DartValue::Ptr(_) | DartValue::String(_, _) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<DartHandle>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_)
+            | DartValue::String(_, _)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<DartHandle>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -401,12 +397,14 @@ impl TryFrom<DartValueArg<Self>> for Option<String> {
             DartValue::String(c_str, _) => unsafe {
                 Ok(Some(c_str_into_string(c_str)))
             },
-            DartValue::Ptr(_) | DartValue::Handle(_) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<String>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_)
+            | DartValue::Handle(_)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<String>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -420,6 +418,8 @@ impl<T> TryFrom<DartValueArg<T>> for Dart_Handle {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "Dart_Handle",
                 value: value.0,
@@ -439,6 +439,8 @@ impl TryFrom<DartValueArg<Self>> for DartHandle {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "DartHandle",
                 value: value.0,
@@ -456,6 +458,8 @@ impl<T> TryFrom<DartValueArg<T>> for ptr::NonNull<Dart_Handle> {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::String(_, _)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Int(_) => Err(DartValueCastError {
                 expectation: "NonNull<Dart_Handle>",
                 value: value.0,
@@ -471,12 +475,14 @@ impl<T> TryFrom<DartValueArg<T>> for Option<ptr::NonNull<Dart_Handle>> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(c_str) => Ok(Some(c_str)),
-            DartValue::Ptr(_) | DartValue::String(_, _) | DartValue::Int(_) => {
-                Err(DartValueCastError {
-                    expectation: "Option<NonNull<Dart_Handle>>",
-                    value: value.0,
-                })
-            }
+            DartValue::Ptr(_)
+            | DartValue::Bool(_)
+            | DartValue::Float(_)
+            | DartValue::String(_, _)
+            | DartValue::Int(_) => Err(DartValueCastError {
+                expectation: "Option<NonNull<Dart_Handle>>",
+                value: value.0,
+            }),
         }
     }
 }
@@ -552,6 +558,8 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<T>> for i64 {
             DartValue::None
             | DartValue::Ptr(_)
             | DartValue::Handle(_)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::String(_, _) => Err(DartValueCastError {
                 expectation: "i64",
                 value: value.0,
@@ -574,9 +582,49 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<Self>> for Option<T> {
                 }),
             },
             DartValue::Ptr(_)
+            | DartValue::Float(_)
+            | DartValue::Bool(_)
             | DartValue::Handle(_)
             | DartValue::String(_, _) => Err(DartValueCastError {
                 expectation: "Option<i64>",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Self>> for Option<f64> {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Float(num) => Ok(Some(num)),
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Bool(_) => Err(DartValueCastError {
+                expectation: "Option<f64>",
+                value: value.0,
+            }),
+        }
+    }
+}
+
+impl TryFrom<DartValueArg<Self>> for Option<bool> {
+    type Error = DartValueCastError;
+
+    fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::None => Ok(None),
+            DartValue::Bool(num) => Ok(Some(num)),
+            DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Float(_) => Err(DartValueCastError {
+                expectation: "Option<bool>",
                 value: value.0,
             }),
         }
@@ -592,15 +640,6 @@ pub struct DartValueCastError {
 
     /// [`DartValue`] that cannot be casted.
     value: DartValue,
-}
-
-impl DartValueCastError {
-    /// Returns [`DartValue`] that could not be casted.
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
-    fn into_value(self) -> DartValue {
-        self.value
-    }
 }
 
 impl PrimitiveEnum for MediaSourceKind {}
@@ -688,7 +727,7 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) {
     let handle = Box::from_raw(val.as_ptr());
-    Dart_DeletePersistentHandle_DL_Trampolined(*handle);
+    dart_api::delete_persistent_handle(*handle);
 }
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
@@ -697,7 +736,7 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
-    let persisted = Dart_NewPersistentHandle_DL_Trampolined(val);
+    let persisted = dart_api::new_persistent_handle(val);
     ptr::NonNull::from(Box::leak(Box::new(persisted)))
 }
 
@@ -710,65 +749,11 @@ pub unsafe extern "C" fn box_foreign_value(
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::missing_docs_in_private_items)]
 mod dart_value_extern_tests_helpers {
     use super::*;
 
     use crate::platform::set_panic_hook;
-
-    #[no_mangle]
-    pub unsafe extern "C" fn returns_none() -> DartValueArg<String> {
-        DartValueArg::from(())
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn returns_media_device_info_ptr(
-    ) -> DartValueArg<MediaDeviceInfo> {
-        DartValueArg::from(MediaDeviceInfo(0))
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn returns_handle_ptr(
-        handle: Dart_Handle,
-    ) -> DartValueArg<Dart_Handle> {
-        DartValueArg::from(handle)
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn returns_string() -> DartValueArg<String> {
-        DartValueArg::from(String::from("QWERTY"))
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn returns_int() -> DartValueArg<i64> {
-        DartValueArg::from(333)
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn accepts_none(none: DartValueArg<String>) {
-        assert!(matches!(none.0, DartValue::None));
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn accepts_media_device_info_pointer(
-        ptr: DartValueArg<MediaDeviceInfo>,
-    ) {
-        let ptr: ptr::NonNull<c_void> = ptr.try_into().unwrap();
-        let info = MediaDeviceInfo::from_ptr(ptr.cast());
-
-        assert_eq!(info.device_id(), "MediaDeviceInfo.device_id");
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn accepts_string(str: DartValueArg<String>) {
-        let string = String::try_from(str).unwrap();
-        assert_eq!(string, "my string");
-    }
-
-    #[no_mangle]
-    pub unsafe extern "C" fn accepts_int(int: DartValueArg<i64>) {
-        let int: i64 = int.try_into().unwrap();
-        assert_eq!(int, 235);
-    }
 
     #[no_mangle]
     pub unsafe extern "C" fn fire_panic() {

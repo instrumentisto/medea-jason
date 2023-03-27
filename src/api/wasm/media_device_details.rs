@@ -12,11 +12,11 @@ use crate::{api::MediaDeviceKind, platform};
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
 #[wasm_bindgen]
 #[derive(Debug, From)]
-pub struct MediaDeviceInfo(platform::MediaDeviceInfo);
+pub struct MediaDeviceDetails(platform::MediaDeviceInfo);
 
 #[allow(clippy::unused_unit)]
 #[wasm_bindgen]
-impl MediaDeviceInfo {
+impl MediaDeviceDetails {
     /// Returns a unique identifier for the represented device.
     #[must_use]
     pub fn device_id(&self) -> String {

@@ -6,11 +6,11 @@ use medea_macro::dart_bridge;
 use tracerr::Traced;
 
 use crate::{
-    api::string_into_c_str,
     media::MediaSourceKind,
     platform::{
         dart::utils::{
             dart_future::FutureFromDart, handle::DartHandle, list::DartList,
+            string_into_c_str,
         },
         utils::callback::Callback,
         Error, GetUserMediaError,

@@ -65,6 +65,7 @@
     clippy::rc_mutex,
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
+    clippy::semicolon_inside_block,
     clippy::shadow_unrelated,
     clippy::significant_drop_in_scrutinee,
     clippy::str_to_string,
@@ -747,7 +748,7 @@ pub struct TrackPatchEvent {
     /// General media exchange direction of the `Track`.
     pub media_direction: Option<MediaDirection>,
 
-    /// An actual [`Vec<MemberId>`] of `receivers` of the `Track`.
+    /// IDs of the `Member`s who should receive this outgoing [`Track`].
     pub receivers: Option<Vec<MemberId>>,
 
     /// [`Track`]'s mute state.

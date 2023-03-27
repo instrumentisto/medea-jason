@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.67
-CHROME_VERSION := 104.0
+RUST_VER := 1.68
+CHROME_VERSION := 110.0
 FIREFOX_VERSION := 107.0.1-driver0.32.0
 
-CARGO_NDK_VER := 2.12.4-ndkr23b-rust$(RUST_VER)
+CARGO_NDK_VER := 3.0.0-ndkr25c-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -35,6 +35,10 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
+FLUTTER_RUST_BRIDGE_VER ?= $(strip \
+	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
+	        | grep -v 'flutter_rust_bridge' \
+	        | cut -d'"' -f2))
 IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
 LINUX_TARGETS := x86_64-unknown-linux-gnu
 MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
@@ -401,21 +405,77 @@ ifeq ($(crate),medea-jason)
 	cargo clean -p $(crate)
 	make cargo.build.jason platform=android args="--features dart-codegen" \
 	     dockerized=$(dockerized)
+	make cargo.gen.bridge
 	make flutter.fmt
 endif
+
+
+# Generate Rust/Dart interop bridge.
+#
+# Usage:
+#	make cargo.gen.bridge
+
+cargo.gen.bridge:
+ifeq ($(shell which flutter_rust_bridge_codegen),)
+	cargo install flutter_rust_bridge_codegen --vers=$(FLUTTER_RUST_BRIDGE_VER)
+else
+ifneq ($(strip $(shell flutter_rust_bridge_codegen --version \
+                       | cut -d ' ' -f2)),$(FLUTTER_RUST_BRIDGE_VER))
+	cargo install flutter_rust_bridge_codegen --force \
+	                                          --vers=$(FLUTTER_RUST_BRIDGE_VER)
+endif
+endif
+ifeq ($(shell which cbindgen),)
+	cargo install cbindgen
+endif
+ifeq ($(CURRENT_OS),macos)
+ifeq ($(shell brew list | grep -Fx llvm),)
+	brew install llvm
+endif
+endif
+	flutter_rust_bridge_codegen \
+		--rust-input src/api/dart/api.rs \
+		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
+		--rust-output src/api/dart/api_bridge_generated.rs \
+		--skip-add-mod-to-lib \
+		--no-build-runner \
+		--dart-format-line-length=80
+	cd flutter && \
+	flutter pub run build_runner build --delete-conflicting-outputs
 
 
 # Lint Rust sources with Clippy.
 #
 # Usage:
 #	make cargo.lint
+#		[( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
+#		 | platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
+
+cargo-lint-platform = $(or $(platform),all)
+cargo-lint-targets-android = $(or $(targets),$(ANDROID_TARGETS))
+cargo-lint-targets-ios = $(or $(targets),$(IOS_TARGETS))
+cargo-lint-targets-linux = $(or $(targets),$(LINUX_TARGETS))
+cargo-lint-targets-macos = $(or $(targets),$(MACOS_TARGETS))
+cargo-lint-targets-web = $(or $(targets),$(WEB_TARGETS))
+cargo-lint-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.lint:
-	cargo clippy --workspace --all-features -- -D warnings
-	$(foreach target,$(subst $(comma), ,\
-		$(ANDROID_TARGETS) $(LINUX_TARGETS) $(MACOS_TARGETS) $(WEB_TARGETS) \
-		$(WINDOWS_TARGETS)),\
-			$(call cargo.lint.medea-jason,$(target)))
+ifeq ($(cargo-lint-platform),all)
+	@make cargo.lint platform=android
+	@make cargo.lint platform=ios
+	@make cargo.lint platform=linux
+	@make cargo.lint platform=macos
+	@make cargo.lint platform=web
+	@make cargo.lint platform=windows
+else
+	$(foreach target,$(subst $(comma), ,$(cargo-lint-targets-$(platform))),\
+		$(call cargo.lint.medea-jason,$(target)))
+endif
 define cargo.lint.medea-jason
 	$(eval target := $(strip $(1)))
 	cargo clippy --manifest-path Cargo.toml --target=$(target) -- -D warnings
@@ -524,6 +584,7 @@ ifeq ($(wildcard flutter/pubspec.lock),)
 	@make flutter
 endif
 	cd flutter && \
+	flutter pub get && \
 	flutter pub run build_runner build \
 		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
 
@@ -1340,7 +1401,7 @@ endef
 
 .PHONY: build build.jason \
         cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
-        	cargo.lint cargo.version \
+        	cargo.gen.bridge cargo.lint cargo.version \
         docker.build \
         	docker.down.control docker.down.demo docker.down.e2e \
         	docker.down.medea docker.down.webdriver  \

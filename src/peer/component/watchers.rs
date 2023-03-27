@@ -4,7 +4,9 @@ use std::rc::Rc;
 
 use derive_more::{Display, From};
 use futures::{future, StreamExt as _};
-use medea_client_api_proto::{IceCandidate, NegotiationRole, TrackId};
+use medea_client_api_proto::{
+    IceCandidate, MemberId, NegotiationRole, TrackId,
+};
 use medea_macro::watchers;
 use medea_reactive::Guarded;
 use tracerr::Traced;
@@ -18,7 +20,7 @@ use crate::{
     utils::{transpose_guarded, Updatable as _},
 };
 
-use super::{Component, PeerConnection, State, UpdateResult};
+use super::{Component, PeerConnection, State};
 
 /// Errors occurring in watchers of a [`Component`].
 #[derive(Clone, Debug, Display, From)]
@@ -211,6 +213,33 @@ impl Component {
                 Rc::clone(&rcvr_state),
             ));
         conn.add_receiver(rcvr_state);
+    }
+
+    /// Watcher for the [`State::connections`] insert update.
+    ///
+    /// Creates a new [`Connection`] for the given [`PeerConnection`].
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(self.connections.borrow().on_insert())]
+    fn connection_added(
+        peer: &PeerConnection,
+        _: &State,
+        val: Guarded<MemberId>,
+    ) {
+        drop(peer.connections.create_connection(peer.id, val.as_ref()));
+    }
+
+    /// Watcher for the [`State::connections`] remove update.
+    ///
+    /// Closes the provided [`Connection`] in the given [`PeerConnection`].
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(self.connections.borrow().on_remove())]
+    fn connection_removed(
+        peer: &PeerConnection,
+        _: &State,
+        val: Guarded<MemberId>,
+    ) {
+        peer.connections
+            .close_specific_connection(peer.id, val.as_ref());
     }
 
     /// Watcher for the [`State::local_sdp`] updates.
@@ -470,38 +499,5 @@ impl Component {
         drop(state.update_local_stream(&peer).await);
 
         state.maybe_update_local_stream.set(false);
-    }
-
-    /// Watcher for the [`State::maybe_update_connections`] updates.
-    ///
-    /// Adds and/or deletes [`Connection`]s specified in provided
-    /// [`UpdateResult`].
-    ///
-    /// [`Connection`]: crate::connection::Connection
-    #[watch(
-        self
-            .maybe_update_connections
-            .subscribe()
-            .filter(|v| future::ready(v.is_some()))
-    )]
-    fn maybe_update_connections(
-        peer: &PeerConnection,
-        state: &State,
-        res: Option<UpdateResult>,
-    ) {
-        if let Some(res) = res {
-            for member_id_to_del in res.recv_removed {
-                peer.connections
-                    .close_specific_connection(peer.id(), &member_id_to_del);
-            }
-            for member_id_to_add in res.recv_added {
-                drop(
-                    peer.connections
-                        .create_connection(peer.id(), &member_id_to_add),
-                );
-            }
-
-            state.maybe_update_connections.set(None);
-        }
     }
 }

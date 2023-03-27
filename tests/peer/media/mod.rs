@@ -182,7 +182,7 @@ mod sender_patch {
             .create_sender(
                 TrackId(0),
                 MediaType::Audio(AudioSettings { required: false }),
-                medea_client_api_proto::MediaDirection::SendRecv,
+                MediaDirection::SendRecv,
                 None,
                 vec!["bob".into()],
                 &LocalTracksConstraints::default(),
@@ -197,7 +197,7 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn wrong_track_id() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: TrackId(track_id.0 + 100),
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
@@ -211,7 +211,7 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn disable() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
@@ -225,7 +225,7 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn enabled_enabled() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
@@ -239,7 +239,7 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn disable_disabled() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
@@ -248,7 +248,7 @@ mod sender_patch {
         sender.state().when_updated().await;
         assert!(sender.general_disabled());
 
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
@@ -262,7 +262,7 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn empty_patch() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
             receivers: None,
             media_direction: None,
@@ -323,7 +323,7 @@ mod receiver_patch {
             .create_receiver(
                 TRACK_ID,
                 MediaType::Audio(AudioSettings { required: true }).into(),
-                medea_client_api_proto::MediaDirection::SendRecv,
+                MediaDirection::SendRecv,
                 Some(MID.to_string()),
                 MemberId(SENDER_ID.to_string()),
                 &RecvConstraints::default(),

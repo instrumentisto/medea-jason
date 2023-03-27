@@ -12,7 +12,6 @@ use medea_macro::dart_bridge;
 use tracerr::Traced;
 
 use crate::{
-    api::string_into_c_str,
     media::MediaKind,
     platform::{
         dart::{
@@ -31,7 +30,7 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack,
+    media_track::MediaStreamTrack, utils::string_into_c_str,
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
@@ -326,7 +325,9 @@ impl RtcPeerConnection {
     /// [`RtcPeerConnection::create_offer`] is automatically configured
     /// to trigger ICE restart.
     pub fn restart_ice(&self) {
-        unsafe { peer_connection::restart_ice(self.handle.get()) };
+        unsafe {
+            peer_connection::restart_ice(self.handle.get());
+        }
     }
 
     /// Sets provided [SDP offer][`SdpType::Offer`] as local description.

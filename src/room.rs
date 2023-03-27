@@ -57,15 +57,15 @@ pub struct RoomCloseReason {
     /// Indicator if [`Room`] is closed by server.
     ///
     /// `true` if [`CloseReason::ByServer`].
-    is_closed_by_server: bool,
+    pub(crate) is_closed_by_server: bool,
 
     /// Reason of closing.
-    reason: String,
+    pub(crate) reason: String,
 
     /// Indicator if closing is considered as error.
     ///
     /// This field may be `true` only on closing by client.
-    is_err: bool,
+    pub(crate) is_err: bool,
 }
 
 impl RoomCloseReason {
@@ -1676,7 +1676,7 @@ impl EventHandler for InnerRoom {
                 PeerUpdate::Added(track) => peer_state
                     .insert_track(&track, self.send_constraints.clone()),
                 PeerUpdate::Updated(patch) => {
-                    peer_state.patch_track(&patch).await;
+                    peer_state.patch_track(patch).await;
                 }
                 PeerUpdate::IceRestart => {
                     peer_state.restart_ice();
