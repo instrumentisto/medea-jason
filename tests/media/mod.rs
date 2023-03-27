@@ -6,7 +6,8 @@ use std::rc::Rc;
 
 use futures::channel::mpsc;
 use medea_client_api_proto::{
-    AudioSettings, Direction, MediaType, MemberId, Track, TrackId,
+    AudioSettings, ConnectionMode, Direction, MediaType, MemberId, Track,
+    TrackId,
 };
 use medea_jason::{
     media::{MediaDirection, MediaManager, RecvConstraints},
@@ -49,6 +50,7 @@ async fn sendrecv_works() {
             vec![send_audio_track, recv_audio_track],
             &get_media_stream_settings(true, false).into(),
             &RecvConstraints::default(),
+            ConnectionMode::P2pMesh,
         )
         .await
         .unwrap();

@@ -5,7 +5,7 @@ mod transitable_state;
 use std::{mem, rc::Rc};
 
 use futures::channel::mpsc;
-use medea_client_api_proto::{TrackId, TrackPatchEvent};
+use medea_client_api_proto::{ConnectionMode, TrackId, TrackPatchEvent};
 use medea_jason::{
     media::{LocalTracksConstraints, MediaManager, RecvConstraints},
     peer::{
@@ -41,6 +41,7 @@ async fn get_test_media_connections(
             vec![audio_track, video_track],
             &get_media_stream_settings(enabled_audio, enabled_video).into(),
             &RecvConstraints::default(),
+            ConnectionMode::P2pMesh,
         )
         .await
         .unwrap();
@@ -93,6 +94,7 @@ async fn get_tracks_request1() {
             vec![audio_track, video_track],
             &local_constraints(true, true),
             &RecvConstraints::default(),
+            ConnectionMode::P2pMesh,
         )
         .await
         .unwrap();
@@ -114,6 +116,7 @@ async fn get_tracks_request2() {
             Vec::new(),
             &LocalTracksConstraints::default(),
             &RecvConstraints::default(),
+            ConnectionMode::P2pMesh,
         )
         .await
         .unwrap();
@@ -158,7 +161,9 @@ async fn new_media_connections_with_disabled_video_tracks() {
 ///
 /// This tests checks that [`TrackPatch`] works as expected.
 mod sender_patch {
-    use medea_client_api_proto::{AudioSettings, MediaDirection, MediaType};
+    use medea_client_api_proto::{
+        AudioSettings, ConnectionMode, MediaDirection, MediaType,
+    };
     use medea_jason::{
         peer::{sender, MediaExchangeState},
         utils::{AsProtoState, SynchronizableState},
@@ -181,6 +186,7 @@ mod sender_patch {
                 None,
                 vec!["bob".into()],
                 &LocalTracksConstraints::default(),
+                ConnectionMode::P2pMesh,
             )
             .await
             .unwrap();

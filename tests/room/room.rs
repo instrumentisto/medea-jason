@@ -14,7 +14,7 @@ use futures::{
     stream::{self, BoxStream, LocalBoxStream, StreamExt as _},
 };
 use medea_client_api_proto::{
-    self as proto, AudioSettings, Command, Direction, Event,
+    self as proto, AudioSettings, Command, ConnectionMode, Direction, Event,
     IceConnectionState, MediaDirection, MediaSourceKind, MediaType, MemberId,
     NegotiationRole, PeerId, PeerMetrics, PeerUpdate, Track, TrackId,
     TrackPatchCommand, TrackPatchEvent, VideoSettings,
@@ -131,6 +131,7 @@ async fn get_test_room_and_exist_peer(
             tracks,
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::P2pMesh,
         })
         .unwrap();
 
@@ -180,6 +181,7 @@ async fn error_get_local_stream_on_new_peer() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::P2pMesh,
         })
         .unwrap();
 
@@ -245,10 +247,68 @@ async fn error_join_room_without_on_connection_loss_callback() {
     assert!(!err.trace().is_empty());
 }
 
+mod connection_mode {
+    use medea_client_api_proto::ConnectionMode;
+
+    use super::*;
+
+    #[wasm_bindgen_test]
+    async fn p2p() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let room_handle = api::RoomHandle::from(room.new_handle());
+
+        JsFuture::from(room_handle.set_local_media_settings(
+            &media_stream_settings(true, true),
+            false,
+            false,
+        ))
+        .await
+        .unwrap();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Offerer,
+                tracks: Vec::new(),
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
+            })
+            .unwrap();
+    }
+
+    #[wasm_bindgen_test]
+    async fn sfu() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let room_handle = api::RoomHandle::from(room.new_handle());
+
+        JsFuture::from(room_handle.set_local_media_settings(
+            &media_stream_settings(true, true),
+            false,
+            false,
+        ))
+        .await
+        .unwrap();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Offerer,
+                tracks: Vec::new(),
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::Sfu,
+            })
+            .unwrap();
+    }
+}
+
 mod disable_recv_tracks {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaSourceKind, MediaType, MemberId,
-        VideoSettings,
+        AudioSettings, ConnectionMode, Direction, MediaSourceKind, MediaType,
+        MemberId, VideoSettings,
     };
 
     use super::*;
@@ -305,6 +365,7 @@ mod disable_recv_tracks {
                 ],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -749,6 +810,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -829,6 +891,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -912,6 +975,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -1255,6 +1319,7 @@ mod patches_generation {
                     tracks,
                     ice_servers: Vec::new(),
                     force_relay: false,
+                    connection_mode: ConnectionMode::P2pMesh,
                 })
                 .unwrap();
 
@@ -2021,6 +2086,7 @@ async fn send_enabling_holds_local_tracks() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::P2pMesh,
         })
         .unwrap();
     // wait until Event::PeerCreated is handled
@@ -2090,6 +2156,7 @@ mod set_local_media_settings {
                 }],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -2119,6 +2186,7 @@ mod set_local_media_settings {
                             }],
                             ice_servers: Vec::new(),
                             force_relay: false,
+                            connection_mode: ConnectionMode::P2pMesh,
                         })
                         .unwrap();
                 }
@@ -2253,6 +2321,7 @@ mod set_local_media_settings {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -2401,6 +2470,7 @@ mod set_local_media_settings {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
         delay_for(10).await;
@@ -2589,8 +2659,8 @@ mod state_synchronization {
 
     use futures::{channel::mpsc, stream, StreamExt as _};
     use medea_client_api_proto::{
-        state, AudioSettings, Command, Event, MediaDirection, MediaType,
-        NegotiationRole, PeerId, TrackId,
+        state, AudioSettings, Command, ConnectionMode, Event, MediaDirection,
+        MediaType, NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
         media::MediaManager, room::Room, rpc::MockRpcSession,
@@ -2634,6 +2704,7 @@ mod state_synchronization {
                 receivers: Vec::new(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
+                connection_mode: ConnectionMode::P2pMesh,
             },
         );
         let mut receivers = HashMap::new();
@@ -2662,6 +2733,7 @@ mod state_synchronization {
                 local_sdp: None,
                 remote_sdp: None,
                 ice_candidates: HashSet::new(),
+                connection_mode: ConnectionMode::P2pMesh,
             },
         );
         event_tx
@@ -2702,6 +2774,7 @@ async fn intentions_are_sent_on_reconnect() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::P2pMesh,
         })
         .unwrap();
     while let Some(cmd) = commands_rx.next().await {
@@ -2811,6 +2884,7 @@ async fn sender_answerer() {
             ],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::P2pMesh,
         })
         .unwrap();
 
