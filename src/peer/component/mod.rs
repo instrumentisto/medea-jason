@@ -415,7 +415,9 @@ impl State {
         if let Some(sender) = self.get_sender(track_patch.id) {
             self.maybe_update_connections
                 .set(sender.update(track_patch));
-            let _ = self.maybe_update_local_stream.when_eq(false).await;
+            if self.connection_mode == ConnectionMode::Sfu {
+                let _ = self.maybe_update_local_stream.when_eq(false).await;
+            }
             self.maybe_update_local_stream.set(true);
         } else if let Some(receiver) = self.get_receiver(track_patch.id) {
             receiver.update(track_patch);
