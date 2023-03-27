@@ -368,14 +368,14 @@ packages:
       name: puppeteer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.23.0"
+    version: "2.24.0"
   retry:
     dependency: transitive
     description:
       name: retry
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
   shelf:
     dependency: transitive
     description:
