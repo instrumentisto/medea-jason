@@ -1,5 +1,6 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
+import '../interface/enums.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
@@ -49,9 +50,9 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   }
 
   @override
-  Future<webrtc.MediaStreamTrackState> state() async {
+  Future<MediaStreamTrackState> state() async {
     var index =
         await (api.localMediaTrackState(track: opaque.innerOpaque) as Future);
-    return webrtc.MediaStreamTrackState.values[index];
+    return MediaStreamTrackState.values[index];
   }
 }

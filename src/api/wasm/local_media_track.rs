@@ -45,9 +45,9 @@ impl LocalMediaTrack {
     #[allow(clippy::as_conversions)]
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
-        future_to_promise(async move {
-            Ok(JsValue::from(this.state().await as u8))
-        })
+        future_to_promise(
+            async move { Ok(JsValue::from(this.state().await as u8)) },
+        )
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

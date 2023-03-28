@@ -1,7 +1,9 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../util/rust_handles_storage.dart';
-import 'enums.dart' show MediaKind, MediaSourceKind, MediaDirection;
+
+import 'enums.dart'
+    show MediaDirection, MediaKind, MediaSourceKind, MediaStreamTrackState;
 
 export 'enums.dart' show MediaKind, MediaSourceKind;
 
@@ -36,9 +38,9 @@ abstract class LocalMediaTrack implements MediaTrack {
   /// Sets callback to invoke when this [LocalMediaTrack] is ended.
   void onEnded(OnEndedCallback f);
 
-  /// Returns a [webrtc.MediaStreamTrackState.live] if this [LocalMediaTrack] is
-  /// active, or a [webrtc.MediaStreamTrackState.ended] if the track has ended.
-  Future<webrtc.MediaStreamTrackState> state();
+  /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
+  /// active, or a [MediaStreamTrackState.ended] if the track has ended.
+  Future<MediaStreamTrackState> state();
 }
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
@@ -65,22 +67,3 @@ abstract class RemoteMediaTrack implements MediaTrack {
   /// [TrackMediaDirection] is changed.
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f);
 }
-
-// Target dart2js failed: Exception: Warning: The 'dart2js' entrypoint script is deprecated, please use 'dart compile js' instead.
-// ../../CLionProjects3/medea-jason/flutter/lib/src/interface/media_track.dart:41:10:
-// Error: Type 'webrtc.MediaStreamTrackState' not found.
-// Future<webrtc.MediaStreamTrackState> state();
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-// ../../CLionProjects3/medea-jason/flutter/lib/src/web/local_media_track.dart:44:10:
-// Error: Type 'webrtc.MediaStreamTrackState' not found.
-// Future<webrtc.MediaStreamTrackState> state() async {
-//   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//   lib/ui/page/home/page/chat/view.dart:1595:47:
-//   Warning: Operand of null-aware operation '!' has type 'String' which excludes null.
-//   child: Text(text!, style: style.boldBody),
-//   ^
-//   ../../CLionProjects3/medea-jason/flutter/lib/src/web/local_media_track.dart:46:19:
-//   Error: Undefined name 'MediaStreamTrackState'.
-//   return webrtc.MediaStreamTrackState.values[index];
-//   ^^^^^^^^^^^^^^^^^^^^^
-//   Error: Compilation failed.

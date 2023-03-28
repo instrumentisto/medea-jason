@@ -1,6 +1,7 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
 
+import '../interface/enums.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
 import 'exceptions.dart';
@@ -41,8 +42,8 @@ class WebLocalMediaTrack implements LocalMediaTrack {
   }
 
   @override
-  Future<webrtc.MediaStreamTrackState> state() async {
+  Future<MediaStreamTrackState> state() async {
     var index = await fallibleFuture(obj.state());
-    return webrtc.MediaStreamTrackState.values[index];
+    return MediaStreamTrackState.values[index];
   }
 }
