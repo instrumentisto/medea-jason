@@ -65,3 +65,22 @@ abstract class RemoteMediaTrack implements MediaTrack {
   /// [TrackMediaDirection] is changed.
   void onMediaDirectionChanged(void Function(TrackMediaDirection) f);
 }
+
+// Target dart2js failed: Exception: Warning: The 'dart2js' entrypoint script is deprecated, please use 'dart compile js' instead.
+// ../../CLionProjects3/medea-jason/flutter/lib/src/interface/media_track.dart:41:10:
+// Error: Type 'webrtc.MediaStreamTrackState' not found.
+// Future<webrtc.MediaStreamTrackState> state();
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// ../../CLionProjects3/medea-jason/flutter/lib/src/web/local_media_track.dart:44:10:
+// Error: Type 'webrtc.MediaStreamTrackState' not found.
+// Future<webrtc.MediaStreamTrackState> state() async {
+//   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//   lib/ui/page/home/page/chat/view.dart:1595:47:
+//   Warning: Operand of null-aware operation '!' has type 'String' which excludes null.
+//   child: Text(text!, style: style.boldBody),
+//   ^
+//   ../../CLionProjects3/medea-jason/flutter/lib/src/web/local_media_track.dart:46:19:
+//   Error: Undefined name 'MediaStreamTrackState'.
+//   return webrtc.MediaStreamTrackState.values[index];
+//   ^^^^^^^^^^^^^^^^^^^^^
+//   Error: Compilation failed.

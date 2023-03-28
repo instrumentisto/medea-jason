@@ -46,7 +46,7 @@ impl LocalMediaTrack {
     pub fn state(&self) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
-            Ok(JsValue::from_f64(f64::from(this.state().await as u8)))
+            Ok(JsValue::from(this.state().await as u8))
         })
     }
 
