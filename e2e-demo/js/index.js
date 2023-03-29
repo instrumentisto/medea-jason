@@ -628,6 +628,10 @@ window.onload = async function() {
               playElement.playsinline = 'true';
               playElement.controls = 'true';
               playElement.autoplay = 'true';
+              if (track.media_direction() != 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
@@ -643,6 +647,10 @@ window.onload = async function() {
               playElement.playsinline = 'true';
               playElement.controls = 'true';
               playElement.autoplay = 'true';
+              if (track.media_direction() != 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
@@ -658,6 +666,10 @@ window.onload = async function() {
             playElement.classList.add('order-3');
             playElement.controls = 'true';
             playElement.autoplay = 'true';
+            if (track.media_direction() != 0) {
+              playElement.pause();
+              playElement.style.display = 'none';
+            }
             memberVideoDiv.appendChild(playElement);
           }
           let mediaStream = new MediaStream();
@@ -665,8 +677,16 @@ window.onload = async function() {
           playElement.srcObject = mediaStream;
         }
 
-        track.on_media_direction_changed((direction) => {
+        track.on_media_direction_changed(async (direction) => {
           console.log('New TransceiverDirection: ' + direction);
+
+          if (direction == 0) {
+            await playElement.play();
+            playElement.style.display = 'block';
+          } else {
+            playElement.pause();
+            playElement.style.display = 'none';
+          }
         });
         track.on_muted( () => {
           console.log(`Track muted: ${track.kind()}`);

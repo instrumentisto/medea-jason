@@ -188,6 +188,7 @@ pub fn get_test_tracks(
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv.into(),
             media_type: MediaType::Audio(AudioSettings {
                 required: is_audio_required,
             }),
@@ -198,6 +199,7 @@ pub fn get_test_tracks(
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv.into(),
             media_type: MediaType::Video(VideoSettings {
                 required: is_video_required,
                 source_kind: MediaSourceKind::Device,
@@ -218,6 +220,7 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 sender: "bob".into(),
                 mid: Some("mid0".to_string()),
             },
+            media_direction: MediaDirection::SendRecv.into(),
             media_type: MediaType::Audio(AudioSettings { required: false }),
         },
         Track {
@@ -226,6 +229,7 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 sender: "bob".into(),
                 mid: Some("mid1".to_string()),
             },
+            media_direction: MediaDirection::SendRecv.into(),
             media_type: MediaType::Video(VideoSettings {
                 required: false,
                 source_kind: MediaSourceKind::Device,
@@ -313,7 +317,7 @@ async fn get_video_track() -> api::RemoteMediaTrack {
         track,
         MediaSourceKind::Device,
         false,
-        MediaDirection::SendRecv,
+        MediaDirection::SendRecv.into(),
     )
     .into()
 }
@@ -328,7 +332,7 @@ async fn get_audio_track() -> api::RemoteMediaTrack {
         track,
         MediaSourceKind::Device,
         false,
-        MediaDirection::SendRecv,
+        MediaDirection::SendRecv.into(),
     )
     .into()
 }

@@ -185,14 +185,13 @@ class Call {
   }
 
   /// Sets the callback for a new video remote track.
-  void onNewRemoteStream(Function(webrtc.MediaStreamTrack, String) f) {
+  void onNewRemoteStream(Function(RemoteMediaTrack, String) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
         if (track.kind() == MediaKind.Audio && !kIsWeb) {
           return;
         }
-        var sysTrack = track.getTrack();
-        f(sysTrack, conn.getRemoteMemberId());
+        f(track, conn.getRemoteMemberId());
       });
     });
   }
