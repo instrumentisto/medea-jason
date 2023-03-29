@@ -400,7 +400,7 @@ mod disable_recv_tracks {
 
 mod init_track_states {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaType, MemberId,
+        AudioSettings, ConnectionMode, Direction, MediaType, MemberId,
     };
     use medea_jason::peer;
 
@@ -439,6 +439,7 @@ mod init_track_states {
                 tracks,
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -496,6 +497,7 @@ mod init_track_states {
                 tracks,
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
 
@@ -524,7 +526,7 @@ mod init_track_states {
 
 mod receivers_patch_send_tracks {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaType, MemberId,
+        AudioSettings, ConnectionMode, Direction, MediaType, MemberId,
     };
     use medea_jason::peer;
 
@@ -552,6 +554,7 @@ mod receivers_patch_send_tracks {
                 }]),
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::P2pMesh,
             })
             .unwrap();
         delay_for(200).await;
