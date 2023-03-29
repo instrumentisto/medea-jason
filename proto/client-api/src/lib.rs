@@ -678,6 +678,9 @@ pub struct Track {
     /// [`Direction`] of this [`Track`].
     pub direction: Direction,
 
+    /// [`MediaDirection`] of this [`Track`].
+    pub media_direction: MediaDirection,
+
     /// [`MediaType`] of this [`Track`].
     pub media_type: MediaType,
 }
@@ -713,13 +716,25 @@ pub struct TrackPatchCommand {
 /// [`Event::PeerUpdated`].
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TrackPatchEvent {
     /// ID of the [`Track`] which should be patched.
     pub id: TrackId,
 
     /// General media exchange direction of the `Track`.
     pub media_direction: Option<MediaDirection>,
+
+    /// IDs of the `Member`s who should receive this outgoing [`Track`].
+    ///
+    /// If [`Some`], then it means there are some changes in this outgoing
+    /// [`Track`]'s `receivers` (or we just want to sync this outgoing
+    /// [`Track`]'s `receivers`). It describes not changes, but the actual
+    /// [`Vec<MemberId>`] of this outgoing [`Track`], that have to be reached
+    /// once this [`TrackPatchEvent`] applied.
+    ///
+    /// If [`None`], then it means there is no need to check and recalculate
+    /// this outgoing [`Track`]'s `receivers`.
+    pub receivers: Option<Vec<MemberId>>,
 
     /// [`Track`]'s mute state.
     ///
@@ -777,6 +792,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                     MediaDirection::Inactive
                 }
             }),
+            receivers: None,
         }
     }
 }
@@ -789,6 +805,7 @@ impl TrackPatchEvent {
             id,
             muted: None,
             media_direction: None,
+            receivers: None,
         }
     }
 

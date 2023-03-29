@@ -202,6 +202,7 @@ impl State {
         id: TrackId,
         mid: Option<String>,
         media_type: MediaType,
+        media_direction: medea_client_api_proto::MediaDirection,
         sender: MemberId,
     ) -> Self {
         Self {
@@ -210,14 +211,14 @@ impl State {
             media_type,
             sender_id: sender,
             enabled_individual: MediaExchangeStateController::new(
-                media_exchange_state::Stable::Enabled,
+                media_direction.is_recv_enabled().into(),
             ),
             enabled_general: ProgressableCell::new(
-                media_exchange_state::Stable::Enabled,
+                media_direction.is_enabled_general().into(),
             ),
             muted: ObservableCell::new(false),
             sync_state: ObservableCell::new(SyncState::Synced),
-            media_direction: ObservableCell::new(MediaDirection::SendRecv),
+            media_direction: ObservableCell::new(media_direction.into()),
         }
     }
 

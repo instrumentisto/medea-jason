@@ -1,6 +1,9 @@
 //! [`Component`] for `MediaTrack` with a `Send` direction.
 
-use std::{cell::Cell, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+};
 
 use futures::{future::LocalBoxFuture, StreamExt as _};
 use medea_client_api_proto::{
@@ -92,7 +95,7 @@ pub struct State {
     /// IDs of the members the [`Sender`]'s [`local::Track`] is received by.
     ///
     /// [`local::Track`]: crate::media::track::local::Track
-    receivers: Vec<MemberId>,
+    receivers: RefCell<Vec<MemberId>>,
 
     /// Indicator whether the [`Sender`]'s [`local::Track`] is enabled
     /// individually.
@@ -137,7 +140,7 @@ impl AsProtoState for State {
             id: self.id,
             mid: self.mid.clone(),
             media_type: self.media_type,
-            receivers: self.receivers.clone(),
+            receivers: self.receivers.borrow().clone(),
             media_direction: self.media_direction.get(),
             muted: self.mute_state.muted(),
         }
@@ -155,7 +158,7 @@ impl SynchronizableState for State {
             id: input.id,
             mid: input.mid,
             media_type: input.media_type,
-            receivers: input.receivers,
+            receivers: RefCell::new(input.receivers),
             mute_state: MuteStateController::new(mute_state::Stable::from(
                 input.muted,
             )),
@@ -251,7 +254,7 @@ impl From<&State> for proto::state::Sender {
             id: state.id,
             mid: state.mid.clone(),
             media_type: state.media_type,
-            receivers: state.receivers.clone(),
+            receivers: state.receivers.borrow().clone(),
             media_direction: state.media_direction.get(),
             muted: state.mute_state.muted(),
         }
@@ -265,6 +268,7 @@ impl State {
         id: TrackId,
         mid: Option<String>,
         media_type: MediaType,
+        media_direction: MediaDirection,
         receivers: Vec<MemberId>,
         send_constraints: LocalTracksConstraints,
     ) -> Self {
@@ -272,14 +276,18 @@ impl State {
             id,
             mid,
             media_type,
-            receivers,
+            receivers: RefCell::new(receivers),
             enabled_individual: MediaExchangeStateController::new(
-                media_exchange_state::Stable::from(true),
+                media_exchange_state::Stable::from(
+                    media_direction.is_send_enabled(),
+                ),
             ),
             enabled_general: ProgressableCell::new(
-                media_exchange_state::Stable::from(true),
+                media_exchange_state::Stable::from(
+                    media_direction.is_enabled_general(),
+                ),
             ),
-            media_direction: Cell::new(MediaDirection::SendRecv),
+            media_direction: Cell::new(media_direction),
             mute_state: MuteStateController::new(mute_state::Stable::from(
                 false,
             )),
@@ -317,8 +325,8 @@ impl State {
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
     /// should send media data to.
     #[must_use]
-    pub const fn receivers(&self) -> &Vec<MemberId> {
-        &self.receivers
+    pub fn receivers(&self) -> Vec<MemberId> {
+        self.receivers.borrow().clone()
     }
 
     /// Returns current individual media exchange state of this [`State`].
@@ -367,7 +375,7 @@ impl State {
     }
 
     /// Updates this [`State`] with the provided [`TrackPatchEvent`].
-    pub fn update(&self, track_patch: &TrackPatchEvent) {
+    pub fn update(&self, track_patch: TrackPatchEvent) {
         if track_patch.id != self.id {
             return;
         }
@@ -381,6 +389,9 @@ impl State {
         }
         if let Some(muted) = track_patch.muted {
             self.mute_state.update(mute_state::Stable::from(muted));
+        }
+        if let Some(receivers) = track_patch.receivers {
+            *self.receivers.borrow_mut() = receivers;
         }
     }
 

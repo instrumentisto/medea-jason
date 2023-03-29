@@ -5,14 +5,21 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{cell::Cell, collections::HashSet, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    collections::HashSet,
+    rc::Rc,
+};
 
 use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
 };
-use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
+use medea_reactive::{
+    AllProcessed, ObservableCell, ProgressableCell, ProgressableHashSet,
+};
+use proto::MemberId;
 use tracerr::Traced;
 
 use crate::{
@@ -102,6 +109,11 @@ pub struct State {
     /// All [`receiver::State`]s of this [`Component`].
     receivers: TracksRepository<receiver::State>,
 
+    /// Collection of [`Connection`]s with remote `Member`s.
+    ///
+    /// [`Connection`]: crate::connection::Connection
+    connections: RefCell<ProgressableHashSet<MemberId>>,
+
     /// Indicator whether this [`Component`] should relay all media through a
     /// TURN server forcibly.
     force_relay: bool,
@@ -148,6 +160,7 @@ impl State {
             id,
             senders: TracksRepository::new(),
             receivers: TracksRepository::new(),
+            connections: RefCell::new(ProgressableHashSet::new()),
             ice_servers,
             force_relay,
             remote_sdp: ProgressableCell::new(None),
@@ -342,6 +355,7 @@ impl State {
                         track.id,
                         mid.clone(),
                         track.media_type,
+                        track.media_direction,
                         receivers.clone(),
                         send_constraints,
                     )),
@@ -354,6 +368,7 @@ impl State {
                         track.id,
                         mid.clone(),
                         track.media_type,
+                        track.media_direction,
                         sender.clone(),
                     )),
                 );
@@ -381,18 +396,20 @@ impl State {
     /// [`proto::TrackPatchEvent`].
     ///
     /// Schedules a local stream update.
-    pub fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
-        self.get_sender(track_patch.id).map_or_else(
-            || {
-                if let Some(receiver) = self.get_receiver(track_patch.id) {
-                    receiver.update(track_patch);
-                }
-            },
-            |sender| {
-                sender.update(track_patch);
-                self.maybe_update_local_stream.set(true);
-            },
-        );
+    pub fn patch_track(&self, patch: proto::TrackPatchEvent) {
+        if let Some(receivers) = &patch.receivers {
+            let receivers: HashSet<_> = receivers.clone().into_iter().collect();
+            self.connections.borrow_mut().update(receivers);
+        }
+
+        if let Some(sender) = self.get_sender(patch.id) {
+            sender.update(patch);
+            self.maybe_update_local_stream.set(true);
+        } else if let Some(receiver) = self.get_receiver(patch.id) {
+            receiver.update(&patch);
+        } else {
+            log::warn!("Cannot apply patch to `Track`: {}", patch.id.0);
+        }
     }
 
     /// Returns the current SDP offer of this [`State`].
