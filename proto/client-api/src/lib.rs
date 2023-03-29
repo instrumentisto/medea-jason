@@ -749,6 +749,15 @@ pub struct TrackPatchEvent {
     pub media_direction: Option<MediaDirection>,
 
     /// IDs of the `Member`s who should receive this outgoing [`Track`].
+    ///
+    /// If [`Some`], then it means there are some changes in this outgoing
+    /// [`Track`]'s `receivers` (or we just want to sync this outgoing
+    /// [`Track`]'s `receivers`). It describes not changes, but the actual
+    /// [`Vec<MemberId>`] of this outgoing [`Track`], that have to be reached
+    /// once this [`TrackPatchEvent`] applied.
+    ///
+    /// If [`None`], then it means there is no need to check and recalculate
+    /// this outgoing [`Track`]'s `receivers`.
     pub receivers: Option<Vec<MemberId>>,
 
     /// [`Track`]'s mute state.

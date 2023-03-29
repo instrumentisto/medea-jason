@@ -155,8 +155,8 @@ impl Connections {
         }
     }
 
-    /// Closes [`Connection`] associated with provided local [`PeerId`] and
-    /// [`MemberId`].
+    /// Closes the [`Connection`] associated with the provided local [`PeerId`]
+    /// and [`MemberId`].
     ///
     /// Invokes `on_close` callback.
     pub fn close_specific_connection(

@@ -116,7 +116,7 @@ pub struct State {
     /// All [`receiver::State`]s of this [`Component`].
     receivers: TracksRepository<receiver::State>,
 
-    /// Collection of [`Connection`]s with a remote `Member`s.
+    /// Collection of [`Connection`]s with remote `Member`s.
     ///
     /// [`Connection`]: crate::connection::Connection
     connections: RefCell<ProgressableHashSet<MemberId>>,
@@ -419,7 +419,7 @@ impl State {
         } else if let Some(receiver) = self.get_receiver(patch.id) {
             receiver.update(&patch);
         } else {
-            log::warn!("Could not apply patch to Track {}", patch.id.0);
+            log::warn!("Cannot apply patch to `Track`: {}", patch.id.0);
         }
     }
 
