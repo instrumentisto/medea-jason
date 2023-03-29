@@ -92,13 +92,15 @@ async fn disable_enable_audio() {
     assert!(peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(AUDIO_TRACK_ID, false));
+        .patch_track(&toggle_disable_track_update(AUDIO_TRACK_ID, false))
+        .await;
     peer.state().when_updated().await;
     assert!(!peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(AUDIO_TRACK_ID, true));
+        .patch_track(&toggle_disable_track_update(AUDIO_TRACK_ID, true))
+        .await;
     peer.state().when_updated().await;
     assert!(peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
@@ -142,13 +144,15 @@ async fn disable_enable_video() {
     assert!(peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(VIDEO_TRACK_ID, false));
+        .patch_track(&toggle_disable_track_update(VIDEO_TRACK_ID, false))
+        .await;
     peer.state().when_updated().await;
     assert!(peer.is_send_audio_enabled());
     assert!(!peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(VIDEO_TRACK_ID, true));
+        .patch_track(&toggle_disable_track_update(VIDEO_TRACK_ID, true))
+        .await;
     peer.state().when_updated().await;
     assert!(peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
@@ -1568,12 +1572,14 @@ async fn disable_and_enable_all_tracks() {
     audio_track_state
         .media_state_transition_to(Disabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: audio_track_id,
-        receivers: None,
-        media_direction: Some(MediaDirection::RecvOnly),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(&TrackPatchEvent {
+            id: audio_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::RecvOnly),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(audio_track.general_disabled());
     assert!(!video_track.general_disabled());
@@ -1581,12 +1587,14 @@ async fn disable_and_enable_all_tracks() {
     video_track_state
         .media_state_transition_to(Disabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: video_track_id,
-        receivers: None,
-        media_direction: Some(MediaDirection::RecvOnly),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(&TrackPatchEvent {
+            id: video_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::RecvOnly),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(audio_track.general_disabled());
     assert!(video_track.general_disabled());
@@ -1594,12 +1602,14 @@ async fn disable_and_enable_all_tracks() {
     audio_track_state
         .media_state_transition_to(Enabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: audio_track_id,
-        receivers: None,
-        media_direction: Some(MediaDirection::SendRecv),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(&TrackPatchEvent {
+            id: audio_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::SendRecv),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(!audio_track.general_disabled());
     assert!(video_track.general_disabled());
@@ -1607,12 +1617,14 @@ async fn disable_and_enable_all_tracks() {
     video_track_state
         .media_state_transition_to(Enabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: video_track_id,
-        receivers: None,
-        media_direction: Some(MediaDirection::SendRecv),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(&TrackPatchEvent {
+            id: video_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::SendRecv),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(!audio_track.general_disabled());
     assert!(!video_track.general_disabled());

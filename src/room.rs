@@ -1676,7 +1676,7 @@ impl EventHandler for InnerRoom {
                 PeerUpdate::Added(track) => peer_state
                     .insert_track(&track, self.send_constraints.clone()),
                 PeerUpdate::Updated(patch) => {
-                    peer_state.patch_track(patch);
+                    peer_state.patch_track(patch).await;
                 }
                 PeerUpdate::IceRestart => {
                     peer_state.restart_ice();

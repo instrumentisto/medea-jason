@@ -406,7 +406,7 @@ impl State {
     /// [`proto::TrackPatchEvent`].
     ///
     /// Schedules a local stream update.
-    pub fn patch_track(&self, patch: proto::TrackPatchEvent) {
+    pub async fn patch_track(&self, patch: proto::TrackPatchEvent) {
         if let Some(receivers) = &patch.receivers {
             let receivers: HashSet<_> = receivers.clone().into_iter().collect();
             self.connections.borrow_mut().update(receivers);
@@ -414,9 +414,7 @@ impl State {
 
         if let Some(sender) = self.get_sender(patch.id) {
             sender.update(patch);
-            // if self.connection_mode == ConnectionMode::Sfu {
-            //     let _ = self.maybe_update_local_stream.when_eq(false).await;
-            // }
+            let _ = self.maybe_update_local_stream.when_eq(false).await;
             self.maybe_update_local_stream.set(true);
         } else if let Some(receiver) = self.get_receiver(patch.id) {
             receiver.update(&patch);

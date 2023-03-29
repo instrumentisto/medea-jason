@@ -1,7 +1,4 @@
-use std::time::Duration;
-
 use cucumber::{then, when};
-use tokio::time::sleep;
 
 use crate::World;
 
@@ -16,7 +13,6 @@ async fn ws_connection_restore(world: &mut World, id: String) {
     let member = world.get_member(&id).unwrap();
     member.ws_mock().disable_connection_loss().await;
     member.room().start_ws_reconnect().await.unwrap();
-    sleep(Duration::from_millis(200)).await;
 }
 
 #[then(regex = r"^(\S+)'s WS connection is lost$")]
