@@ -20,6 +20,7 @@ All user visible changes to this project will be documented in this file. This p
 - Replaced `enabled_individual` and `enabled_individual` fields with `MediaDirection` in `TrackPatchEvent`, `state::Receiver` and `state::Sender` ([#46]).
 - Added `media_direction` to `Track` ([#107]).
 - Added `receivers` to `TrackPatchEvent` ([#107]).
+- Added `connection_mode` to `PeerCreated` ([#113]).
 
 ### Added
 
@@ -33,6 +34,7 @@ All user visible changes to this project will be documented in this file. This p
 [#26]: /../../pull/26
 [#46]: /../../pull/46
 [#107]: /../../pull/107
+[#107]: /../../pull/113
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 
