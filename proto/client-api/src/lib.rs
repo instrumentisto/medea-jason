@@ -728,7 +728,7 @@ pub struct TrackPatchEvent {
     ///
     /// If [`Some`], then it means there are some changes in this outgoing
     /// [`Track`]'s `receivers` (or we just want to sync this outgoing
-    /// [`Track`]'s `receivers`). It discribes not changes, but an actual
+    /// [`Track`]'s `receivers`). It describes not changes, but the actual
     /// [`Vec<MemberId>`] of this outgoing [`Track`], that have to be reached
     /// once this [`TrackPatchEvent`] applied.
     ///

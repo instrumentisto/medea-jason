@@ -18,8 +18,8 @@ All user visible changes to this project will be documented in this file. This p
 - Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([#16]).
 - Made `RtcOutboundRtpStreamStats::bytes_sent` and `RtcOutboundRtpStreamStats::packets_sent` optional ([#26]).
 - Replaced `enabled_individual` and `enabled_individual` fields with `MediaDirection` in `TrackPatchEvent`, `state::Receiver` and `state::Sender` ([#46]).
-- Added `media_direction` in `Track` ([#107]).
-- Added `receivers` in `TrackPatchEvent` ([#107]).
+- Added `media_direction` to `Track` ([#107]).
+- Added `receivers` to `TrackPatchEvent` ([#107]).
 
 ### Added
 
