@@ -327,6 +327,38 @@ fn wire_local_media_track_kind_impl(
         },
     )
 }
+fn wire_local_media_track_on_ended_impl(
+    track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
+    f: impl Wire2Api<DartOpaque> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "local_media_track_on_ended",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_track = track.wire2api();
+            let api_f = f.wire2api();
+            Ok(local_media_track_on_ended(api_track, api_f))
+        },
+    )
+}
+fn wire_local_media_track_state_impl(
+    track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "local_media_track_state",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_track = track.wire2api();
+            Ok(local_media_track_state(api_track))
+        },
+    )
+}
 fn wire_local_media_track_media_source_kind_impl(
     track: impl Wire2Api<RustOpaque<LocalMediaTrack>> + UnwindSafe,
 ) -> support::WireSyncReturn {

@@ -76,7 +76,10 @@ All user visible changes to this project will be documented in this file. This p
     - `LocalMediaInitExceptionKind` variants ([#52]):
         - `GetUserMediaAudioFailed`;
         - `GetUserMediaVideoFailed`.
-    - `MediaManager.enumerate_displays()` ([#81]).
+    - `MediaManager.enumerate_displays()` ([#81]);
+    - `LocalMediaTrack` ([#109]):
+        - `on_ended`;
+        - `state`.
 
 ### Fixed
 
@@ -100,6 +103,7 @@ All user visible changes to this project will be documented in this file. This p
 [#59]: /../../pull/59
 [#81]: /../../pull/81
 [#106]: /../../pull/106
+[#106]: /../../pull/109
 
 
 

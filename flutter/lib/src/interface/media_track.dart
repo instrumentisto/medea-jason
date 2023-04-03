@@ -1,11 +1,16 @@
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../util/rust_handles_storage.dart';
-import 'enums.dart' show MediaKind, MediaSourceKind, MediaDirection;
+
+import 'enums.dart'
+    show MediaDirection, MediaKind, MediaSourceKind, MediaStreamTrackState;
 
 export 'enums.dart' show MediaKind, MediaSourceKind;
 
 typedef TrackMediaDirection = MediaDirection;
+
+/// Representation of the `onEnded` callback.
+typedef OnEndedCallback = void Function();
 
 /// Abstraction of a handle to an object allocated on the Rust side.
 abstract class MediaTrack implements AsyncPlatformHandle {
@@ -29,7 +34,16 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class LocalMediaTrack implements MediaTrack {}
+abstract class LocalMediaTrack implements MediaTrack {
+  /// Sets a callback to invoke when this [LocalMediaTrack] is ended.
+  ///
+  /// This only works on Web.
+  void onEnded(OnEndedCallback f);
+
+  /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
+  /// active, or a [MediaStreamTrackState.ended] if it has ended.
+  Future<MediaStreamTrackState> state();
+}
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///

@@ -560,6 +560,31 @@ pub fn local_media_track_kind(
     SyncReturn(track.kind())
 }
 
+/// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
+#[must_use]
+pub fn local_media_track_on_ended(
+    track: RustOpaque<LocalMediaTrack>,
+    f: DartOpaque,
+) -> SyncReturn<()> {
+    track.on_ended(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+    });
+    SyncReturn(())
+}
+
+/// Returns a [`media::MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
+/// is active, or a [`media::MediaStreamTrackState::Ended`] if it has ended.
+#[must_use]
+pub fn local_media_track_state(
+    track: RustOpaque<LocalMediaTrack>,
+) -> SyncReturn<DartOpaque> {
+    SyncReturn(
+        async move { Ok::<_, Error>(track.state().await as i64) }
+            .into_dart_future()
+            .into_dart_opaque(),
+    )
+}
+
 /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
 /// sourced from some device (webcam/microphone), or a
 /// [`MediaSourceKind::Display`] if it's captured via
