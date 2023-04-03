@@ -35,12 +35,13 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 abstract class LocalMediaTrack implements MediaTrack {
-  /// Sets callback to invoke when this [LocalMediaTrack] is ended. This only
-  /// works on WEB.
+  /// Sets a callback to invoke when this [LocalMediaTrack] is ended.
+  ///
+  /// This only works on Web.
   void onEnded(OnEndedCallback f);
 
   /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
-  /// active, or a [MediaStreamTrackState.ended] if the track has ended.
+  /// active, or a [MediaStreamTrackState.ended] if it has ended.
   Future<MediaStreamTrackState> state();
 }
 

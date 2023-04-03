@@ -77,7 +77,7 @@ All user visible changes to this project will be documented in this file. This p
         - `GetUserMediaAudioFailed`;
         - `GetUserMediaVideoFailed`.
     - `MediaManager.enumerate_displays()` ([#81]);
-    - `LocalMediaTrack` ([#109]);:
+    - `LocalMediaTrack` ([#109]):
         - `on_ended`;
         - `state`.
 
