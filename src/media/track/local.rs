@@ -101,7 +101,6 @@ impl Track {
 
     /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
     /// or a [`MediaStreamTrackState::Ended`] if it has ended.
-    #[must_use]
     pub async fn state(&self) -> MediaStreamTrackState {
         self.track.ready_state().await
     }
@@ -174,7 +173,6 @@ impl LocalMediaTrack {
 
     /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
     /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
-    #[must_use]
     pub async fn state(&self) -> MediaStreamTrackState {
         self.0.state().await
     }

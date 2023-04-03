@@ -125,7 +125,7 @@ impl From<MediaSourceKind> for media::MediaSourceKind {
     }
 }
 
-/// Liveness state of a [`MediaStreamTrack`][1] .
+/// Liveness state of a [`MediaStreamTrack`][1].
 ///
 /// [1]: crate::platform::MediaStreamTrack
 #[wasm_bindgen]
