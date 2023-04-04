@@ -161,6 +161,18 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackKindConstMeta;
 
+  /// Sets a callback to invoke when this [`LocalMediaTrack`] is ended.
+  void localMediaTrackOnEnded(
+      {required LocalMediaTrack track, required Object f, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnEndedConstMeta;
+
+  /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
+  /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
+  Object localMediaTrackState({required LocalMediaTrack track, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta;
+
   /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
   /// sourced from some device (webcam/microphone), or a
   /// [`MediaSourceKind::Display`] if it's captured via
@@ -1400,6 +1412,43 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackKindConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "local_media_track_kind",
+        argNames: ["track"],
+      );
+
+  void localMediaTrackOnEnded(
+      {required LocalMediaTrack track, required Object f, dynamic hint}) {
+    var arg0 = _platform.api2wire_LocalMediaTrack(track);
+    var arg1 = _platform.api2wire_DartOpaque(f);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () =>
+          _platform.inner.wire_local_media_track_on_ended(arg0, arg1),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kLocalMediaTrackOnEndedConstMeta,
+      argValues: [track, f],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnEndedConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "local_media_track_on_ended",
+        argNames: ["track", "f"],
+      );
+
+  Object localMediaTrackState({required LocalMediaTrack track, dynamic hint}) {
+    var arg0 = _platform.api2wire_LocalMediaTrack(track);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_local_media_track_state(arg0),
+      parseSuccessData: _wire2api_DartOpaque,
+      constMeta: kLocalMediaTrackStateConstMeta,
+      argValues: [track],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "local_media_track_state",
         argNames: ["track"],
       );
 
@@ -3596,6 +3645,38 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           ffi.NativeFunction<WireSyncReturn Function(wire_LocalMediaTrack)>>(
       'wire_local_media_track_kind');
   late final _wire_local_media_track_kind = _wire_local_media_track_kindPtr
+      .asFunction<WireSyncReturn Function(wire_LocalMediaTrack)>();
+
+  WireSyncReturn wire_local_media_track_on_ended(
+    wire_LocalMediaTrack track,
+    wire_DartOpaque f,
+  ) {
+    return _wire_local_media_track_on_ended(
+      track,
+      f,
+    );
+  }
+
+  late final _wire_local_media_track_on_endedPtr = _lookup<
+      ffi.NativeFunction<
+          WireSyncReturn Function(wire_LocalMediaTrack,
+              wire_DartOpaque)>>('wire_local_media_track_on_ended');
+  late final _wire_local_media_track_on_ended =
+      _wire_local_media_track_on_endedPtr.asFunction<
+          WireSyncReturn Function(wire_LocalMediaTrack, wire_DartOpaque)>();
+
+  WireSyncReturn wire_local_media_track_state(
+    wire_LocalMediaTrack track,
+  ) {
+    return _wire_local_media_track_state(
+      track,
+    );
+  }
+
+  late final _wire_local_media_track_statePtr = _lookup<
+          ffi.NativeFunction<WireSyncReturn Function(wire_LocalMediaTrack)>>(
+      'wire_local_media_track_state');
+  late final _wire_local_media_track_state = _wire_local_media_track_statePtr
       .asFunction<WireSyncReturn Function(wire_LocalMediaTrack)>();
 
   WireSyncReturn wire_local_media_track_media_source_kind(
