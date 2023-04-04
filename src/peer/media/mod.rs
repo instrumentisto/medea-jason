@@ -15,9 +15,7 @@ use futures::{
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
-use medea_client_api_proto::{MediaType, MemberId};
-#[cfg(feature = "mockable")]
-use proto::ConnectionMode;
+use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
 use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
@@ -813,7 +811,6 @@ impl MediaConnections {
     /// # Errors
     ///
     /// See [`sender::CreateError`] for details.
-    #[allow(clippy::too_many_arguments)]
     pub async fn create_sender(
         &self,
         id: TrackId,

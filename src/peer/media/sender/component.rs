@@ -499,6 +499,7 @@ impl Component {
             .set(new_state == media_exchange_state::Stable::Enabled);
 
         if state.connection_mode == ConnectionMode::Sfu {
+            // All senders are always on in SFU mode.
             sender.transceiver.set_send(true).await;
         } else {
             match new_state {
