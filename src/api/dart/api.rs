@@ -45,26 +45,26 @@ pub use crate::{
     rpc::ReconnectHandle,
 };
 
-/// Representation of an [`ApiMediaDeviceInfo`][0] ONLY for input devices.
+/// Representation of a [MediaDeviceInfo][0] ONLY for input devices.
 ///
 /// [0]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug)]
-pub struct ApiMediaDeviceInfo {
-    /// [`MediaDeviceKind`] of this [`ApiMediaDeviceInfo`].
+pub struct ApiMediaDeviceDetails {
+    /// [`MediaDeviceKind`] of this [`ApiMediaDeviceDetails`].
     ///
     /// [`MediaDeviceKind`]: media::MediaDeviceKind
     pub kind: media::MediaDeviceKind,
 
     /// Unique identifier of the device represented by this
-    /// [`ApiMediaDeviceInfo`].
+    /// [`ApiMediaDeviceDetails`].
     pub device_id: String,
 
-    /// Label describing the device represented by this [`ApiMediaDeviceInfo`]
-    /// (for example, "External USB Webcam").
+    /// Label describing the device represented by this
+    /// [`ApiMediaDeviceDetails`] (for example, "External USB Webcam").
     pub label: String,
 
     /// Group identifier of the device represented by this
-    /// [`ApiMediaDeviceInfo`].
+    /// [`ApiMediaDeviceDetails`].
     ///
     /// Two devices have the same group identifier if they belong to the same
     /// physical device. For example, the audio input and output devices
@@ -80,9 +80,9 @@ pub struct ApiMediaDeviceInfo {
 
 /// Representation of a display source.
 #[derive(Debug)]
-pub struct ApiMediaDisplayInfo {
+pub struct ApiMediaDisplayDetails {
     /// Unique identifier of the display represented by this
-    /// [`ApiMediaDisplayInfo`].
+    /// [`ApiMediaDisplayDetails`].
     pub device_id: String,
 
     /// Title describing the represented display.
@@ -560,6 +560,31 @@ pub fn local_media_track_kind(
     SyncReturn(track.kind())
 }
 
+/// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
+#[must_use]
+pub fn local_media_track_on_ended(
+    track: RustOpaque<LocalMediaTrack>,
+    f: DartOpaque,
+) -> SyncReturn<()> {
+    track.on_ended(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+    });
+    SyncReturn(())
+}
+
+/// Returns a [`media::MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
+/// is active, or a [`media::MediaStreamTrackState::Ended`] if it has ended.
+#[must_use]
+pub fn local_media_track_state(
+    track: RustOpaque<LocalMediaTrack>,
+) -> SyncReturn<DartOpaque> {
+    SyncReturn(
+        async move { Ok::<_, Error>(track.state().await as i64) }
+            .into_dart_future()
+            .into_dart_opaque(),
+    )
+}
+
 /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
 /// sourced from some device (webcam/microphone), or a
 /// [`MediaSourceKind::Display`] if it's captured via
@@ -591,13 +616,14 @@ pub fn local_media_track_free(
 
 //------------------------------------------------------------------------------
 
-/// Returns the [`Vec<MediaDeviceInfo>`] from the [`ForeignClass`] address.
+/// Returns the [`Vec<ApiMediaDeviceDetails>`] from the [`ForeignClass`]
+/// address.
 #[must_use]
-pub fn vec_media_device_info_from_ptr(
+pub fn vec_media_device_details_from_ptr(
     ptr: usize,
-) -> SyncReturn<Vec<ApiMediaDeviceInfo>> {
+) -> SyncReturn<Vec<ApiMediaDeviceDetails>> {
     SyncReturn(unsafe {
-        Vec::<ApiMediaDeviceInfo>::from_ptr(
+        Vec::<ApiMediaDeviceDetails>::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         )
     })
@@ -605,14 +631,14 @@ pub fn vec_media_device_info_from_ptr(
 
 //------------------------------------------------------------------------------
 
-/// Returns the [`Vec<RustOpaque<MediaDisplayInfo>>`] from the [`ForeignClass`]
-/// address.
+/// Returns the [`Vec<RustOpaque<ApiMediaDisplayDetails>>`] from the
+/// [`ForeignClass`] address.
 #[must_use]
-pub fn vec_media_display_info_from_ptr(
+pub fn vec_media_display_details_from_ptr(
     ptr: usize,
-) -> SyncReturn<Vec<ApiMediaDisplayInfo>> {
+) -> SyncReturn<Vec<ApiMediaDisplayDetails>> {
     SyncReturn(unsafe {
-        Vec::<ApiMediaDisplayInfo>::from_ptr(
+        Vec::<ApiMediaDisplayDetails>::from_ptr(
             ptr::NonNull::new(ptr as _).unwrap(),
         )
     })
@@ -639,7 +665,7 @@ pub fn media_manager_handle_init_local_tracks(
     )
 }
 
-/// Returns a list of [`ApiMediaDeviceInfo`] objects representing available
+/// Returns a list of [`ApiMediaDeviceDetails`] objects representing available
 /// media input and devices, such as microphones, cameras, and so forth.
 #[must_use]
 pub fn media_manager_handle_enumerate_devices(
@@ -652,7 +678,7 @@ pub fn media_manager_handle_enumerate_devices(
                 .enumerate_devices()
                 .await?
                 .into_iter()
-                .map(|v| ApiMediaDeviceInfo {
+                .map(|v| ApiMediaDeviceDetails {
                     kind: v.kind(),
                     device_id: v.device_id(),
                     label: v.label(),
@@ -668,7 +694,7 @@ pub fn media_manager_handle_enumerate_devices(
     SyncReturn(result)
 }
 
-/// Returns a list of [`ApiMediaDisplayInfo`] objects representing available
+/// Returns a list of [`ApiMediaDisplayDetails`] objects representing available
 /// sources that can be used for screen capturing.
 #[must_use]
 pub fn media_manager_handle_enumerate_displays(
@@ -681,7 +707,7 @@ pub fn media_manager_handle_enumerate_displays(
                 .enumerate_displays()
                 .await?
                 .into_iter()
-                .map(|v| ApiMediaDisplayInfo {
+                .map(|v| ApiMediaDisplayDetails {
                     device_id: v.device_id(),
                     title: v.title(),
                 })

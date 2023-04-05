@@ -4,7 +4,9 @@ use std::rc::Rc;
 
 use derive_more::{Display, From};
 use futures::{future, StreamExt as _};
-use medea_client_api_proto::{IceCandidate, NegotiationRole, TrackId};
+use medea_client_api_proto::{
+    IceCandidate, MemberId, NegotiationRole, TrackId,
+};
 use medea_macro::watchers;
 use medea_reactive::Guarded;
 use tracerr::Traced;
@@ -157,7 +159,7 @@ impl Component {
 
         let ((_, new_sender), _guard) = val.into_parts();
         for receiver in new_sender.receivers() {
-            drop(peer.connections.create_connection(state.id, receiver));
+            drop(peer.connections.create_connection(state.id, &receiver));
         }
         let sender = sender::Sender::new(
             &new_sender,
@@ -211,6 +213,33 @@ impl Component {
                 Rc::clone(&rcvr_state),
             ));
         conn.add_receiver(rcvr_state);
+    }
+
+    /// Watcher for the [`State::connections`] insert update.
+    ///
+    /// Creates a new [`Connection`] for the given [`PeerConnection`].
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(self.connections.borrow().on_insert())]
+    fn connection_added(
+        peer: &PeerConnection,
+        _: &State,
+        val: Guarded<MemberId>,
+    ) {
+        drop(peer.connections.create_connection(peer.id, val.as_ref()));
+    }
+
+    /// Watcher for the [`State::connections`] remove update.
+    ///
+    /// Closes the provided [`Connection`] in the given [`PeerConnection`].
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(self.connections.borrow().on_remove())]
+    fn connection_removed(
+        peer: &PeerConnection,
+        _: &State,
+        val: Guarded<MemberId>,
+    ) {
+        peer.connections
+            .close_specific_connection(peer.id, val.as_ref());
     }
 
     /// Watcher for the [`State::local_sdp`] updates.

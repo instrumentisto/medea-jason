@@ -7,6 +7,9 @@ import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
+import 'package:medea_jason/src/interface/enums.dart'
+    show MediaStreamTrackState;
+
 List<StepDefinitionGeneric> steps() {
   return [
     thenMemberDoesntHaveLiveLocalTracks,
@@ -163,7 +166,7 @@ StepDefinitionGeneric thenMemberDoesntHaveLiveLocalTracks =
     var member = context.world.members[id]!;
     var count = 0;
     for (var element in member.connectionStore.localTracks) {
-      if (await element.getTrack().state() == fw.MediaStreamTrackState.live) {
+      if (await element.getTrack().state() == MediaStreamTrackState.live) {
         ++count;
       }
     }

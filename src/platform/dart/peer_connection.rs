@@ -325,7 +325,9 @@ impl RtcPeerConnection {
     /// [`RtcPeerConnection::create_offer`] is automatically configured
     /// to trigger ICE restart.
     pub fn restart_ice(&self) {
-        unsafe { peer_connection::restart_ice(self.handle.get()) };
+        unsafe {
+            peer_connection::restart_ice(self.handle.get());
+        }
     }
 
     /// Sets provided [SDP offer][`SdpType::Offer`] as local description.

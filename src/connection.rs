@@ -154,6 +154,34 @@ impl Connections {
             }
         }
     }
+
+    /// Closes the [`Connection`] associated with the provided local [`PeerId`]
+    /// and [`MemberId`].
+    ///
+    /// Invokes `on_close` callback.
+    pub fn close_specific_connection(
+        &self,
+        local_peer: PeerId,
+        remote_member_id: &MemberId,
+    ) {
+        let _ = self
+            .peer_members
+            .borrow_mut()
+            .get_mut(&local_peer)
+            .and_then(|remote_member_ids| {
+                remote_member_ids.remove(remote_member_id).then_some(())
+            })
+            .map(|_| {
+                if let Some(connection) =
+                    self.connections.borrow_mut().remove(remote_member_id)
+                {
+                    // `on_close` callback is invoked here and not in `Drop`
+                    // implementation so `ConnectionHandle` is available during
+                    // callback invocation.
+                    connection.0.on_close.call0();
+                }
+            });
+    }
 }
 
 /// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.

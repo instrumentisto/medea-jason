@@ -14,6 +14,8 @@ use crate::{
     platform,
 };
 
+use super::MediaStreamTrackState;
+
 /// Wrapper around a [`platform::MediaStreamTrack`] received from a
 /// [getUserMedia()][1]/[getDisplayMedia()][2] request.
 ///
@@ -92,6 +94,17 @@ impl Track {
         self.track.kind()
     }
 
+    /// Sets a callback to invoke when this [`Track`] is ended.
+    pub fn on_ended(&self, callback: platform::Function<()>) {
+        self.track.on_ended(Some(move || callback.call0()));
+    }
+
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
+    /// or a [`MediaStreamTrackState::Ended`] if it has ended.
+    pub async fn state(&self) -> MediaStreamTrackState {
+        self.track.ready_state().await
+    }
+
     /// Forks this [`Track`].
     ///
     /// Creates a new [`Track`] from this [`Track`]'s
@@ -129,7 +142,7 @@ impl Drop for Track {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LocalMediaTrack(Rc<Track>);
 
 impl LocalMediaTrack {
@@ -151,6 +164,17 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.kind()
+    }
+
+    /// Sets a callback to invoke when this [`LocalMediaTrack`] is ended.
+    pub fn on_ended(&self, callback: platform::Function<()>) {
+        self.0.on_ended(callback);
+    }
+
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
+    /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
+    pub async fn state(&self) -> MediaStreamTrackState {
+        self.0.state().await
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

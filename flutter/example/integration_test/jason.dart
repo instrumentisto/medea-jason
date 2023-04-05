@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
-import 'package:medea_jason/src/native/media_device_info.dart';
+import 'package:medea_jason/src/native/media_device_details.dart';
 import 'package:medea_jason/src/native/local_media_track.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
@@ -28,16 +28,19 @@ void main() {
     settings.deviceVideo(DeviceVideoTrackConstraints());
     var tracks = await mediaManager.initLocalTracks(settings);
 
-    var deviceLenght = 2;
+    var deviceLength = 2;
     if (Platform.isAndroid) {
-      deviceLenght = 4;
+      deviceLength = 4;
     }
 
-    expect(devices.length, equals(deviceLenght));
+    expect(devices.length, equals(deviceLength));
     expect(tracks.length, equals(2));
 
-    expect((devices.first as NativeMediaDeviceInfo),
-        isNot(equals((devices.last as NativeMediaDeviceInfo))));
+    expect(await tracks[0].state(), webrtc.MediaStreamTrackState.live);
+    expect(await tracks[1].state(), webrtc.MediaStreamTrackState.live);
+
+    expect((devices.first as NativeMediaDeviceDetails),
+        isNot(equals((devices.last as NativeMediaDeviceDetails))));
     expect((tracks.first as NativeLocalMediaTrack).opaque,
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 

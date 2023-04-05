@@ -139,6 +139,21 @@ pub extern "C" fn wire_local_media_track_kind(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_local_media_track_on_ended(
+    track: wire_LocalMediaTrack,
+    f: wire_DartOpaque,
+) -> support::WireSyncReturn {
+    wire_local_media_track_on_ended_impl(track, f)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_local_media_track_state(
+    track: wire_LocalMediaTrack,
+) -> support::WireSyncReturn {
+    wire_local_media_track_state_impl(track)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_local_media_track_media_source_kind(
     track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturn {
@@ -153,17 +168,17 @@ pub extern "C" fn wire_local_media_track_free(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_vec_media_device_info_from_ptr(
+pub extern "C" fn wire_vec_media_device_details_from_ptr(
     ptr: usize,
 ) -> support::WireSyncReturn {
-    wire_vec_media_device_info_from_ptr_impl(ptr)
+    wire_vec_media_device_details_from_ptr_impl(ptr)
 }
 
 #[no_mangle]
-pub extern "C" fn wire_vec_media_display_info_from_ptr(
+pub extern "C" fn wire_vec_media_display_details_from_ptr(
     ptr: usize,
 ) -> support::WireSyncReturn {
-    wire_vec_media_display_info_from_ptr_impl(ptr)
+    wire_vec_media_display_details_from_ptr_impl(ptr)
 }
 
 #[no_mangle]

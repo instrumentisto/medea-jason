@@ -68,14 +68,26 @@ impl Jason {
     /// Closes the provided [`RoomHandle`].
     #[allow(clippy::needless_pass_by_value)]
     pub fn close_room(&self, room_to_delete: RoomHandle) {
-        self.0.borrow_mut().rooms.retain(|room| {
-            let should_be_closed = room.inner_ptr_eq(&room_to_delete);
-            if should_be_closed {
-                room.set_close_reason(ClientDisconnect::RoomClosed.into());
-            }
+        let index = self
+            .0
+            .borrow()
+            .rooms
+            .iter()
+            .enumerate()
+            .find(|(_, room)| room.inner_ptr_eq(&room_to_delete))
+            .map(|(i, _)| i);
 
-            !should_be_closed
-        });
+        if let Some(i) = index {
+            let this = &mut self.0.borrow_mut();
+            let room = this.rooms.swap_remove(i);
+            room.set_close_reason(ClientDisconnect::RoomClosed.into());
+            drop(room);
+            if this.rooms.is_empty() {
+                this.rpc = Rc::new(WebSocketRpcClient::new(Box::new(|| {
+                    Rc::new(platform::WebSocketRpcTransport::new())
+                })));
+            }
+        }
     }
 
     /// Drops this [`Jason`] API object, so all the related objects (rooms,
@@ -114,10 +126,6 @@ impl Jason {
                 if let Some(i) = index {
                     inner.rooms.remove(i).close(reason);
                 }
-                if inner.rooms.is_empty() {
-                    inner.media_manager = Rc::default();
-                }
-
                 Some(())
             })();
         }));

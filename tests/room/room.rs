@@ -274,6 +274,7 @@ mod disable_recv_tracks {
                             receivers: vec![MemberId::from("bob")],
                             mid: None,
                         },
+                        media_direction: MediaDirection::SendRecv,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -284,6 +285,7 @@ mod disable_recv_tracks {
                             sender: MemberId::from("bob"),
                             mid: None,
                         },
+                        media_direction: MediaDirection::SendRecv,
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
@@ -295,6 +297,7 @@ mod disable_recv_tracks {
                             sender: MemberId::from("bob"),
                             mid: None,
                         },
+                        media_direction: MediaDirection::SendRecv,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -331,6 +334,214 @@ mod disable_recv_tracks {
         }
 
         // TODO: add is_recv_audio/video asserts
+    }
+}
+
+mod init_track_states {
+    use medea_client_api_proto::{
+        AudioSettings, Direction, MediaType, MemberId,
+    };
+    use medea_jason::peer;
+
+    use super::*;
+
+    #[wasm_bindgen_test]
+    async fn init_sender_states() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let media_directions = Vec::from([
+            MediaDirection::SendOnly,
+            MediaDirection::SendOnly,
+            MediaDirection::RecvOnly,
+            MediaDirection::Inactive,
+        ]);
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(i.try_into().unwrap()),
+                direction: Direction::Send {
+                    receivers: Vec::from([MemberId::from("bob")]),
+                    mid: None,
+                },
+                media_direction: *media_direction,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+            })
+            .unwrap();
+
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        for (i, media_direction) in media_directions.iter().enumerate() {
+            let sender = peer_state
+                .get_sender(TrackId(i.try_into().unwrap()))
+                .unwrap();
+            assert_eq!(
+                sender.is_enabled_general(),
+                media_direction.is_enabled_general()
+            );
+            assert_eq!(
+                sender.is_enabled_individual(),
+                media_direction.is_send_enabled()
+            );
+        }
+    }
+
+    #[wasm_bindgen_test]
+    async fn init_receiver_states() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let media_directions = Vec::from([
+            MediaDirection::SendRecv,
+            MediaDirection::SendOnly,
+            MediaDirection::RecvOnly,
+            MediaDirection::Inactive,
+        ]);
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(i.try_into().unwrap()),
+                direction: Direction::Recv {
+                    sender: MemberId::from("bob"),
+                    mid: None,
+                },
+                media_direction: *media_direction,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+            })
+            .unwrap();
+
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        for (i, media_direction) in media_directions.iter().enumerate() {
+            let receiver = peer_state
+                .get_receiver(TrackId(i.try_into().unwrap()))
+                .unwrap();
+            assert_eq!(receiver.media_direction(), (*media_direction).into());
+            assert_eq!(
+                receiver.enabled_general(),
+                media_direction.is_enabled_general()
+            );
+            assert_eq!(
+                receiver.enabled_individual(),
+                media_direction.is_recv_enabled()
+            );
+        }
+    }
+}
+
+mod receivers_patch_send_tracks {
+    use medea_client_api_proto::{
+        AudioSettings, Direction, MediaType, MemberId,
+    };
+    use medea_jason::peer;
+
+    use super::*;
+
+    #[wasm_bindgen_test]
+    async fn update_sender_receivers() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks: Vec::from([Track {
+                    id: TrackId(0),
+                    direction: Direction::Send {
+                        receivers: vec![MemberId::from("bob")],
+                        mid: None,
+                    },
+                    media_direction: MediaDirection::SendRecv,
+                    media_type: MediaType::Audio(AudioSettings {
+                        required: true,
+                    }),
+                }]),
+                ice_servers: Vec::new(),
+                force_relay: false,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        let sender = peer_state.get_sender(TrackId(0)).unwrap();
+
+        assert_eq!(sender.receivers().len(), 1);
+        assert!(sender.receivers().contains(&MemberId::from("bob")));
+
+        event_tx
+            .unbounded_send(Event::PeerUpdated {
+                peer_id: PeerId(1),
+                updates: Vec::from([PeerUpdate::Updated(TrackPatchEvent {
+                    id: TrackId(0),
+                    media_direction: None,
+                    receivers: Some(Vec::new()),
+                    muted: None,
+                })]),
+                negotiation_role: None,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        peer_state.when_updated().await;
+        assert!(sender.receivers().is_empty());
+
+        event_tx
+            .unbounded_send(Event::PeerUpdated {
+                peer_id: PeerId(1),
+                updates: Vec::from([PeerUpdate::Updated(TrackPatchEvent {
+                    id: TrackId(0),
+                    media_direction: None,
+                    receivers: Some(Vec::from([
+                        MemberId::from("bob"),
+                        MemberId::from("eva"),
+                    ])),
+                    muted: None,
+                })]),
+                negotiation_role: None,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        peer_state.when_updated().await;
+        assert_eq!(sender.receivers().len(), 2);
+        assert!(sender.receivers().contains(&MemberId::from("bob")));
+        assert!(sender.receivers().contains(&MemberId::from("eva")));
     }
 }
 
@@ -394,6 +605,7 @@ mod disable_send_tracks {
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv,
             media_type: MediaType::Audio(AudioSettings { required }),
         }
     }
@@ -409,6 +621,7 @@ mod disable_send_tracks {
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv,
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
@@ -769,6 +982,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
+                    receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
@@ -848,6 +1062,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
+                    receivers: None,
                     media_direction: None,
                     muted: Some(true),
                 })],
@@ -930,6 +1145,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(2),
+                    receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
@@ -1231,6 +1447,7 @@ mod patches_generation {
                 .map(|(track_i, (media_type, direction))| Track {
                     id: TrackId(track_i as u32),
                     direction: direction.clone(),
+                    media_direction: MediaDirection::SendRecv,
                     media_type: media_type.clone(),
                 })
                 .inspect(|track| {
@@ -1267,6 +1484,7 @@ mod patches_generation {
                         peer_id: PeerId(i + 1),
                         updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                             id: audio_track_id,
+                            receivers: None,
                             media_direction: Some(media_direction),
                             muted: Some(matches!(
                                 state,
@@ -1720,6 +1938,7 @@ async fn disable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1750,6 +1969,7 @@ async fn enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1768,6 +1988,7 @@ async fn enable_by_server() {
             )),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
             })],
@@ -1803,6 +2024,7 @@ async fn only_one_gum_performed_on_enable() {
             negotiation_role: Some(NegotiationRole::Offerer),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1821,6 +2043,7 @@ async fn only_one_gum_performed_on_enable() {
             negotiation_role: Some(NegotiationRole::Offerer),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1937,6 +2160,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1954,6 +2178,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -2014,6 +2239,7 @@ async fn send_enabling_holds_local_tracks() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: video_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -2064,6 +2290,7 @@ mod set_local_media_settings {
                         receivers: vec![MemberId::from("bob")],
                         mid: None,
                     },
+                    media_direction: MediaDirection::SendRecv,
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
@@ -2092,6 +2319,7 @@ mod set_local_media_settings {
                                     sender: MemberId::from("Alice"),
                                     mid: Some(String::from("1")),
                                 },
+                                media_direction: MediaDirection::SendRecv,
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
@@ -2771,6 +2999,7 @@ async fn sender_answerer() {
                         receivers: Vec::new(),
                         mid: Some(a_tr.mid().unwrap()),
                     },
+                    media_direction: MediaDirection::SendRecv,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
                     }),
@@ -2781,6 +3010,7 @@ async fn sender_answerer() {
                         receivers: Vec::new(),
                         mid: Some(v_tr.mid().unwrap()),
                     },
+                    media_direction: MediaDirection::SendRecv,
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
                         source_kind: MediaSourceKind::Device,
