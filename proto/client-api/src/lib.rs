@@ -849,6 +849,10 @@ impl TrackPatchEvent {
         if let Some(direction) = another.media_direction {
             self.media_direction = Some(direction);
         }
+
+        if let Some(receivers) = &another.receivers {
+            self.receivers = Some(receivers.clone());
+        }
     }
 }
 
