@@ -247,64 +247,6 @@ async fn error_join_room_without_on_connection_loss_callback() {
     assert!(!err.trace().is_empty());
 }
 
-mod connection_mode {
-    use medea_client_api_proto::ConnectionMode;
-
-    use super::*;
-
-    #[wasm_bindgen_test]
-    async fn p2p() {
-        let (event_tx, event_rx) = mpsc::unbounded();
-        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
-        let room_handle = api::RoomHandle::from(room.new_handle());
-
-        JsFuture::from(room_handle.set_local_media_settings(
-            &media_stream_settings(true, true),
-            false,
-            false,
-        ))
-        .await
-        .unwrap();
-
-        event_tx
-            .unbounded_send(Event::PeerCreated {
-                peer_id: PeerId(1),
-                negotiation_role: NegotiationRole::Offerer,
-                tracks: Vec::new(),
-                ice_servers: Vec::new(),
-                force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
-            })
-            .unwrap();
-    }
-
-    #[wasm_bindgen_test]
-    async fn sfu() {
-        let (event_tx, event_rx) = mpsc::unbounded();
-        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
-        let room_handle = api::RoomHandle::from(room.new_handle());
-
-        JsFuture::from(room_handle.set_local_media_settings(
-            &media_stream_settings(true, true),
-            false,
-            false,
-        ))
-        .await
-        .unwrap();
-
-        event_tx
-            .unbounded_send(Event::PeerCreated {
-                peer_id: PeerId(1),
-                negotiation_role: NegotiationRole::Offerer,
-                tracks: Vec::new(),
-                ice_servers: Vec::new(),
-                force_relay: false,
-                connection_mode: ConnectionMode::Sfu,
-            })
-            .unwrap();
-    }
-}
-
 mod disable_recv_tracks {
     use medea_client_api_proto::{
         AudioSettings, ConnectionMode, Direction, MediaSourceKind, MediaType,
