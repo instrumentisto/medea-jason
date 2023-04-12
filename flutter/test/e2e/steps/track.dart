@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
 import 'package:retry/retry.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
 import '../world/more_args.dart';
+
+import 'package:medea_jason/src/interface/enums.dart'
+    show MediaStreamTrackState;
 
 List<StepDefinitionGeneric> steps() {
   return [
@@ -164,7 +166,7 @@ StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
     var member = context.world.members[id]!;
     var count = 0;
     member.connection_store.local_tracks.forEach((element) async {
-      if (await element.getTrack().state() == fw.MediaStreamTrackState.live) {
+      if (await element.getTrack().state() == MediaStreamTrackState.live) {
         ++count;
       }
     });

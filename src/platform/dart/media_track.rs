@@ -247,7 +247,7 @@ impl MediaStreamTrack {
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let handle = self.inner.get();
         let state = unsafe {
-            FutureFromDart::execute::<i32>(media_stream_track::ready_state(
+            FutureFromDart::execute::<i64>(media_stream_track::ready_state(
                 handle,
             ))
             .await

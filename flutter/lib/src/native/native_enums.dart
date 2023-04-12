@@ -5,3 +5,6 @@ export '../native/ffi/jason_api.g.dart'
         MediaDirection,
         MediaDeviceKind,
         FacingMode;
+
+export 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart'
+    show MediaStreamTrackState;
