@@ -21,6 +21,7 @@ use medea_client_api_proto::{
     NegotiationRole, PeerConnectionState, PeerId, PeerMetrics, PeerUpdate,
     Track, TrackId,
 };
+use proto::ConnectionMode;
 use tracerr::Traced;
 
 use crate::{
@@ -1573,6 +1574,7 @@ impl EventHandler for InnerRoom {
         &self,
         peer_id: PeerId,
         negotiation_role: NegotiationRole,
+        connection_mode: ConnectionMode,
         tracks: Vec<Track>,
         ice_servers: Vec<IceServer>,
         is_force_relayed: bool,
@@ -1582,6 +1584,7 @@ impl EventHandler for InnerRoom {
             ice_servers,
             is_force_relayed,
             Some(negotiation_role),
+            connection_mode,
         );
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
@@ -1672,7 +1675,9 @@ impl EventHandler for InnerRoom {
             match update {
                 PeerUpdate::Added(track) => peer_state
                     .insert_track(&track, self.send_constraints.clone()),
-                PeerUpdate::Updated(patch) => peer_state.patch_track(patch),
+                PeerUpdate::Updated(patch) => {
+                    peer_state.patch_track(patch).await;
+                }
                 PeerUpdate::IceRestart => {
                     peer_state.restart_ice();
                 }

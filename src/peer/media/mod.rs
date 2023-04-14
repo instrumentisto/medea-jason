@@ -15,7 +15,7 @@ use futures::{
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
-use medea_client_api_proto::{MediaType, MemberId};
+use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
 use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
@@ -819,6 +819,7 @@ impl MediaConnections {
         mid: Option<String>,
         receivers: Vec<MemberId>,
         send_constraints: &LocalTracksConstraints,
+        connection_mode: ConnectionMode,
     ) -> Result<sender::Component, Traced<sender::CreateError>> {
         let sender_state = sender::State::new(
             id,
@@ -827,6 +828,7 @@ impl MediaConnections {
             media_direction,
             receivers,
             send_constraints.clone(),
+            connection_mode,
         );
         let sender = sender::Sender::new(
             &sender_state,
@@ -873,6 +875,7 @@ impl MediaConnections {
         tracks: Vec<proto::Track>,
         send_constraints: &LocalTracksConstraints,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> Result<(), Traced<sender::CreateError>> {
         use medea_client_api_proto::Direction;
         for track in tracks {
@@ -886,6 +889,7 @@ impl MediaConnections {
                             mid,
                             receivers,
                             send_constraints,
+                            connection_mode,
                         )
                         .await?;
                     drop(
