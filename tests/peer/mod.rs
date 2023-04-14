@@ -947,7 +947,7 @@ mod peer_stats_caching {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
@@ -1005,7 +1005,7 @@ mod peer_stats_caching {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
@@ -1065,7 +1065,7 @@ mod peer_stats_caching {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(

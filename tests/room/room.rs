@@ -963,7 +963,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -1044,7 +1044,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -1128,7 +1128,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -1472,7 +1472,7 @@ mod patches_generation {
                     tracks,
                     ice_servers: Vec::new(),
                     force_relay: false,
-                    connection_mode: ConnectionMode::P2pMesh,
+                    connection_mode: ConnectionMode::Mesh,
                 })
                 .unwrap();
 
@@ -2309,7 +2309,7 @@ mod set_local_media_settings {
                 }],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -2339,7 +2339,7 @@ mod set_local_media_settings {
                             }],
                             ice_servers: Vec::new(),
                             force_relay: false,
-                            connection_mode: ConnectionMode::P2pMesh,
+                            connection_mode: ConnectionMode::Mesh,
                         })
                         .unwrap();
                 }
@@ -2474,7 +2474,7 @@ mod set_local_media_settings {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -2623,7 +2623,7 @@ mod set_local_media_settings {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
         delay_for(10).await;
