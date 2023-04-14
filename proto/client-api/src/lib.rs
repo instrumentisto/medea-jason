@@ -528,7 +528,7 @@ pub enum Event {
         /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU]
         /// mode.
         ///
-        /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+        /// [P2P mesh]: https://webrtcglossary.com/mesh
         /// [SFU]: https://webrtcglossary.com/sfu
         connection_mode: ConnectionMode,
 
@@ -627,16 +627,16 @@ pub enum NegotiationRole {
     Answerer(String),
 }
 
-/// Indicator whether `Peer` is working in a [P2P mesh] or [SFU] mode.
+/// Indication whether a `Peer` is working in a [P2P mesh] or [SFU] mode.
 ///
-/// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+/// [P2P mesh]: https://webrtcglossary.com/mesh
 /// [SFU]: https://webrtcglossary.com/sfu
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ConnectionMode {
     /// `Peer` is configured to work in a [P2P mesh] mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
-    P2pMesh,
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    Mesh,
 
     /// `Peer` is configured to work in an [SFU] mode.
     ///

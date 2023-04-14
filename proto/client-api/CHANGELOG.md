@@ -20,11 +20,12 @@ All user visible changes to this project will be documented in this file. This p
 - Replaced `enabled_individual` and `enabled_individual` fields with `MediaDirection` in `TrackPatchEvent`, `state::Receiver` and `state::Sender` ([#46]).
 - Added `media_direction` to `Track` ([#107]).
 - Added `receivers` to `TrackPatchEvent` ([#107]).
-- Added `connection_mode` to `PeerCreated` ([#113]).
+- Added `connection_mode` to `Event::PeerCreated`, `state::Sender` and `state::Peer` ([#113]).
 
 ### Added
 
 - `MediaDirection` type ([#46]).
+- `ConnectionMode` type ([#113]).
 
 ### Updated
 

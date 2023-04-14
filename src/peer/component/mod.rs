@@ -103,10 +103,9 @@ pub struct State {
     /// ID of this [`Component`].
     id: Id,
 
-    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU]
-    /// mode.
+    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU] mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     /// [SFU]: https://webrtcglossary.com/sfu
     connection_mode: ConnectionMode,
 

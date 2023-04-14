@@ -131,7 +131,7 @@ async fn get_test_room_and_exist_peer(
             tracks,
             ice_servers: Vec::new(),
             force_relay: false,
-            connection_mode: ConnectionMode::P2pMesh,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
 
@@ -181,7 +181,7 @@ async fn error_get_local_stream_on_new_peer() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
-            connection_mode: ConnectionMode::P2pMesh,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
 
@@ -307,7 +307,7 @@ mod disable_recv_tracks {
                 ],
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -381,7 +381,7 @@ mod init_track_states {
                 tracks,
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -439,7 +439,7 @@ mod init_track_states {
                 tracks,
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -496,7 +496,7 @@ mod receivers_patch_send_tracks {
                 }]),
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
         delay_for(200).await;
@@ -2239,7 +2239,7 @@ async fn send_enabling_holds_local_tracks() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
-            connection_mode: ConnectionMode::P2pMesh,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
     // wait until Event::PeerCreated is handled
@@ -2857,7 +2857,7 @@ mod state_synchronization {
                 receivers: Vec::new(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             },
         );
         let mut receivers = HashMap::new();
@@ -2886,7 +2886,7 @@ mod state_synchronization {
                 local_sdp: None,
                 remote_sdp: None,
                 ice_candidates: HashSet::new(),
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             },
         );
         event_tx
@@ -2927,7 +2927,7 @@ async fn intentions_are_sent_on_reconnect() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
-            connection_mode: ConnectionMode::P2pMesh,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
     while let Some(cmd) = commands_rx.next().await {
@@ -3037,7 +3037,7 @@ async fn sender_answerer() {
             ],
             ice_servers: Vec::new(),
             force_relay: false,
-            connection_mode: ConnectionMode::P2pMesh,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
 
