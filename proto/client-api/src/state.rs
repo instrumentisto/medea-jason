@@ -94,6 +94,13 @@ pub struct Receiver {
     /// ID of this [`Receiver`].
     pub id: TrackId,
 
+    /// Indicator whether this [`Receiver`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    pub connection_mode: ConnectionMode,
+
     /// Mid of this [`Receiver`].
     pub mid: Option<String>,
 

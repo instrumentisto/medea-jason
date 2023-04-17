@@ -380,6 +380,7 @@ impl State {
                         track.media_type,
                         track.media_direction,
                         sender.clone(),
+                        self.connection_mode,
                     )),
                 );
             }

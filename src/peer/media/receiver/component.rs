@@ -12,6 +12,7 @@ use medea_reactive::{
     when_all_processed, AllProcessed, Guarded, ObservableCell, Processed,
     ProgressableCell,
 };
+use proto::ConnectionMode;
 
 use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
@@ -74,6 +75,13 @@ pub struct State {
     /// [`remote::Track`]: crate::media::track::remote::Track
     muted: ObservableCell<bool>,
 
+    /// Indicator whether this [`Receiver`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
+
     /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
@@ -84,6 +92,7 @@ impl AsProtoState for State {
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
+            connection_mode: self.connection_mode,
             mid: self.mid.clone(),
             media_type: self.media_type,
             sender_id: self.sender_id.clone(),
@@ -114,6 +123,7 @@ impl SynchronizableState for State {
             ),
             muted: ObservableCell::new(input.muted),
             media_direction: ObservableCell::new(input.media_direction.into()),
+            connection_mode: input.connection_mode,
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
@@ -186,6 +196,7 @@ impl From<&State> for proto::state::Receiver {
     fn from(from: &State) -> Self {
         Self {
             id: from.id,
+            connection_mode: from.connection_mode,
             mid: from.mid.clone(),
             media_type: from.media_type,
             sender_id: from.sender_id.clone(),
@@ -204,6 +215,7 @@ impl State {
         media_type: MediaType,
         media_direction: medea_client_api_proto::MediaDirection,
         sender: MemberId,
+        connection_mode: ConnectionMode,
     ) -> Self {
         Self {
             id,
@@ -218,6 +230,7 @@ impl State {
             ),
             muted: ObservableCell::new(false),
             sync_state: ObservableCell::new(SyncState::Synced),
+            connection_mode,
             media_direction: ObservableCell::new(media_direction.into()),
         }
     }
@@ -304,15 +317,18 @@ impl Component {
     #[watch(self.enabled_general.subscribe())]
     async fn general_media_exchange_state_changed(
         receiver: Rc<Receiver>,
-        _: Rc<State>,
+        st: Rc<State>,
         state: Guarded<media_exchange_state::Stable>,
     ) {
         let (state, _guard) = state.into_parts();
         receiver
             .enabled_general
             .set(state == media_exchange_state::Stable::Enabled);
-        match state {
-            media_exchange_state::Stable::Disabled => {
+        match (st.connection_mode, state) {
+            (
+                ConnectionMode::P2pMesh,
+                media_exchange_state::Stable::Disabled,
+            ) => {
                 let sub_recv = {
                     receiver
                         .transceiver
@@ -324,7 +340,7 @@ impl Component {
                     fut.await;
                 }
             }
-            media_exchange_state::Stable::Enabled => {
+            _ => {
                 let add_recv = receiver
                     .transceiver
                     .borrow()
