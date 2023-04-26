@@ -206,7 +206,7 @@ impl Receiver {
         &self,
         state: media_exchange_state::Transition,
     ) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MediaExchangeIntention {
                 id: self.track_id,
                 enabled: matches!(

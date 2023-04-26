@@ -37,7 +37,7 @@ impl<T: ControlApi> ControlApiServer<T> {
     pub async fn run(self, limit: impl Into<Option<usize>>) {
         self.receiver
             .for_each_concurrent(limit, |req| async {
-                let _ = match req {
+                _ = match req {
                     ControlApiRequest::Create { request, sender } => {
                         sender.send(self.api.create(request).await).ok()
                     }

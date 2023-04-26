@@ -61,11 +61,9 @@ impl MediaDeviceInfo {
     /// [`MediaDeviceInfo`].
     #[must_use]
     pub fn device_id(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_device_info::device_id(
-                self.handle.get(),
-            ))
-        }
+        let device_id =
+            unsafe { media_device_info::device_id(self.handle.get()) };
+        unsafe { dart_string_into_rust(device_id) }
     }
 
     /// Returns a kind of the device represented by this [`MediaDeviceInfo`].
@@ -80,9 +78,8 @@ impl MediaDeviceInfo {
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_device_info::label(self.handle.get()))
-        }
+        let label = unsafe { media_device_info::label(self.handle.get()) };
+        unsafe { dart_string_into_rust(label) }
     }
 
     /// Returns a group identifier of the device represented by this
@@ -97,10 +94,9 @@ impl MediaDeviceInfo {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
-        Option::try_from(unsafe {
-            media_device_info::group_id(self.handle.get()).unbox()
-        })
-        .unwrap()
+        let group_id =
+            unsafe { media_device_info::group_id(self.handle.get()) };
+        Option::try_from(unsafe { group_id.unbox() }).unwrap()
     }
 
     /// Indicates whether the last attempt to use this device failed.

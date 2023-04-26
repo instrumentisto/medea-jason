@@ -64,7 +64,7 @@ impl MediaManagerHandle {
                     devices
                         .into_iter()
                         .fold(js_sys::Array::new(), |devices_info, info| {
-                            let _ = devices_info.push(&JsValue::from(
+                            _ = devices_info.push(&JsValue::from(
                                 MediaDeviceDetails::from(info),
                             ));
                             devices_info

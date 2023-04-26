@@ -82,7 +82,6 @@ impl TryFrom<syn::ItemMod> for ModExpander {
                 | syn::Item::Fn(_)
                 | syn::Item::Impl(_)
                 | syn::Item::Macro(_)
-                | syn::Item::Macro2(_)
                 | syn::Item::Mod(_)
                 | syn::Item::Static(_)
                 | syn::Item::Struct(_)
@@ -388,7 +387,7 @@ impl FnExpander {
                 .attrs
                 .into_iter()
                 .map(|attr| {
-                    if attr.path.get_ident().map_or(false, |i| i == "doc") {
+                    if attr.path().get_ident().map_or(false, |i| i == "doc") {
                         Ok(attr)
                     } else {
                         Err(syn::Error::new(

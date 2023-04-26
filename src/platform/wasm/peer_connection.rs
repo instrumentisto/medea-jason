@@ -119,9 +119,9 @@ impl RtcPeerConnection {
         } else {
             RtcIceTransportPolicy::All
         };
-        let _ = peer_conf.bundle_policy(RtcBundlePolicy::MaxBundle);
-        let _ = peer_conf.ice_transport_policy(policy);
-        let _ = peer_conf.ice_servers(&RtcIceServers::from(ice_servers));
+        _ = peer_conf.bundle_policy(RtcBundlePolicy::MaxBundle);
+        _ = peer_conf.ice_transport_policy(policy);
+        _ = peer_conf.ice_servers(&RtcIceServers::from(ice_servers));
         let peer = SysRtcPeerConnection::new_with_configuration(&peer_conf)
             .map_err(Into::into)
             .map_err(RtcPeerConnectionError::PeerCreationError)
@@ -363,7 +363,7 @@ impl RtcPeerConnection {
         sdp_mid: &Option<String>,
     ) -> Result<()> {
         let mut cand_init = RtcIceCandidateInit::new(candidate);
-        let _ = cand_init
+        _ = cand_init
             .sdp_m_line_index(sdp_m_line_index)
             .sdp_mid(sdp_mid.as_ref().map(String::as_ref));
         JsFuture::from(
@@ -404,7 +404,7 @@ impl RtcPeerConnection {
         let peer: Rc<SysRtcPeerConnection> = Rc::clone(&self.peer);
 
         let mut desc = RtcSessionDescriptionInit::new(sdp_type);
-        let _ = desc.sdp(offer);
+        _ = desc.sdp(offer);
 
         JsFuture::from(peer.set_local_description(&desc))
             .await
@@ -507,7 +507,7 @@ impl RtcPeerConnection {
 
         let mut offer_options = RtcOfferOptions::new();
         if self.ice_restart.take() {
-            let _ = offer_options.ice_restart(true);
+            _ = offer_options.ice_restart(true);
         }
         let create_offer = JsFuture::from(
             peer.create_offer_with_rtc_offer_options(&offer_options),
@@ -538,13 +538,13 @@ impl RtcPeerConnection {
             SdpType::Offer(offer) => {
                 let mut desc =
                     RtcSessionDescriptionInit::new(RtcSdpType::Offer);
-                let _ = desc.sdp(&offer);
+                _ = desc.sdp(&offer);
                 desc
             }
             SdpType::Answer(answer) => {
                 let mut desc =
                     RtcSessionDescriptionInit::new(RtcSdpType::Answer);
-                let _ = desc.sdp(&answer);
+                _ = desc.sdp(&answer);
                 desc
             }
         };
@@ -572,7 +572,7 @@ impl RtcPeerConnection {
         let peer = Rc::clone(&self.peer);
         async move {
             let mut init = RtcRtpTransceiverInit::new();
-            let _ = init.direction(direction.into());
+            _ = init.direction(direction.into());
             let transceiver =
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
             Transceiver::from(transceiver)

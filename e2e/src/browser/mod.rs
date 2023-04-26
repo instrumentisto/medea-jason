@@ -75,7 +75,7 @@ pub struct Window {
 
 impl Clone for Window {
     fn clone(&self) -> Self {
-        let _ = self.rc.fetch_add(1, Ordering::SeqCst);
+        _ = self.rc.fetch_add(1, Ordering::SeqCst);
         Self {
             client: self.client.clone(),
             window: self.window.clone(),

@@ -28,7 +28,7 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
         .items
         .iter_mut()
         .filter_map(|i| {
-            if let ImplItem::Method(m) = i {
+            if let ImplItem::Fn(m) = i {
                 Some(m)
             } else {
                 None
@@ -41,12 +41,13 @@ pub(crate) fn expand(mut input: ItemImpl) -> Result<TokenStream> {
                 .iter()
                 .enumerate()
                 .find_map(|(i, attr)| {
-                    attr.path.get_ident().map_or(false, |p| *p == "watch").then(
-                        || {
+                    attr.path()
+                        .get_ident()
+                        .map_or(false, |p| *p == "watch")
+                        .then(|| {
                             watch_attr_index = Some(i);
                             attr
-                        },
-                    )
+                        })
                 })
                 .ok_or_else(|| {
                     Error::new(

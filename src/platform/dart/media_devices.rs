@@ -109,14 +109,11 @@ impl MediaDevices {
     pub async fn enumerate_devices(
         &self,
     ) -> Result<Vec<MediaDeviceInfo>, Traced<Error>> {
-        let devices = unsafe {
-            FutureFromDart::execute::<DartHandle>(
-                media_devices::enumerate_devices(),
-            )
+        let fut = unsafe { media_devices::enumerate_devices() };
+        let devices = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
-        }
-        .map(DartList::from)
-        .map_err(tracerr::wrap!())?;
+            .map(DartList::from)
+            .map_err(tracerr::wrap!())?;
 
         let len = devices.length();
         let mut result = Vec::with_capacity(len);
@@ -137,14 +134,11 @@ impl MediaDevices {
     pub async fn enumerate_displays(
         &self,
     ) -> Result<Vec<MediaDisplayInfo>, Traced<Error>> {
-        let displays = unsafe {
-            FutureFromDart::execute::<DartHandle>(
-                media_devices::enumerate_displays(),
-            )
+        let fut = unsafe { media_devices::enumerate_displays() };
+        let displays = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
-        }
-        .map(DartList::from)
-        .map_err(tracerr::from_and_wrap!())?;
+            .map(DartList::from)
+            .map_err(tracerr::from_and_wrap!())?;
 
         let len = displays.length();
         let mut result = Vec::with_capacity(len);
@@ -172,13 +166,10 @@ impl MediaDevices {
         &self,
         caps: MediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<GetUserMediaError>> {
-        let tracks = unsafe {
-            FutureFromDart::execute::<DartHandle>(
-                media_devices::get_user_media(caps.into()),
-            )
+        let fut = unsafe { media_devices::get_user_media(caps.into()) };
+        let tracks = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
-        }
-        .map_err(tracerr::from_and_wrap!())?;
+            .map_err(tracerr::from_and_wrap!())?;
 
         let tracks = Vec::from(DartList::from(tracks))
             .into_iter()
@@ -207,13 +198,10 @@ impl MediaDevices {
         &self,
         caps: DisplayMediaStreamConstraints,
     ) -> Result<Vec<MediaStreamTrack>, Traced<Error>> {
-        let tracks = unsafe {
-            FutureFromDart::execute::<DartHandle>(
-                media_devices::get_display_media(caps.into()),
-            )
+        let fut = unsafe { media_devices::get_display_media(caps.into()) };
+        let tracks = unsafe { FutureFromDart::execute::<DartHandle>(fut) }
             .await
-        }
-        .map_err(tracerr::wrap!())?;
+            .map_err(tracerr::wrap!())?;
 
         let tracks = Vec::from(DartList::from(tracks))
             .into_iter()
@@ -235,24 +223,20 @@ impl MediaDevices {
         &self,
         device_id: String,
     ) -> Result<(), Traced<Error>> {
-        unsafe {
-            FutureFromDart::execute::<()>(media_devices::set_output_audio_id(
-                string_into_c_str(device_id),
-            ))
+        let fut = unsafe {
+            media_devices::set_output_audio_id(string_into_c_str(device_id))
+        };
+        unsafe { FutureFromDart::execute::<()>(fut) }
             .await
-        }
-        .map_err(tracerr::wrap!())
+            .map_err(tracerr::wrap!())
     }
 
     /// Indicates whether it's possible to access microphone volume settings.
     pub async fn microphone_volume_is_available(&self) -> bool {
-        let result = unsafe {
-            FutureFromDart::execute::<i64>(
-                media_devices::microphone_volume_is_available(),
-            )
+        let fut = unsafe { media_devices::microphone_volume_is_available() };
+        let result = unsafe { FutureFromDart::execute::<i64>(fut) }
             .await
-        }
-        .unwrap();
+            .unwrap();
 
         result == 1
     }
@@ -264,11 +248,10 @@ impl MediaDevices {
     /// If it the "Audio Device Module" is not initialized or there is no
     /// connected audio input devices.
     pub async fn microphone_volume(&self) -> Result<i64, Traced<Error>> {
-        unsafe {
-            FutureFromDart::execute::<i64>(media_devices::microphone_volume())
-                .await
-        }
-        .map_err(tracerr::wrap!())
+        let fut = unsafe { media_devices::microphone_volume() };
+        unsafe { FutureFromDart::execute::<i64>(fut) }
+            .await
+            .map_err(tracerr::wrap!())
     }
 
     /// Sets the microphone volume level in percents.
@@ -281,13 +264,10 @@ impl MediaDevices {
         &self,
         level: i64,
     ) -> Result<(), Traced<Error>> {
-        unsafe {
-            FutureFromDart::execute::<()>(media_devices::set_microphone_volume(
-                level,
-            ))
+        let fut = unsafe { media_devices::set_microphone_volume(level) };
+        unsafe { FutureFromDart::execute::<()>(fut) }
             .await
-        }
-        .map_err(tracerr::wrap!())
+            .map_err(tracerr::wrap!())
     }
 
     /// Subscribes onto the [`MediaDevices`]'s `devicechange` event.

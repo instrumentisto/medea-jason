@@ -131,52 +131,59 @@ impl RpcTransport for WebSocketRpcTransport {
     async fn connect(&self, url: ApiUrl) -> Result<()> {
         // TODO: Propagate execution error.
         #[allow(clippy::map_err_ignore)]
-        let handle = unsafe {
-            FutureFromDart::execute::<DartHandle>(transport::connect(
-                string_into_c_str(url.as_ref().to_owned()),
-                Callback::from_fn_mut({
-                    let weak_subs = Rc::downgrade(&self.on_message_subs);
-                    move |msg: String| {
-                        if let Some(subs) = weak_subs.upgrade() {
-                            let msg =
-                                match serde_json::from_str::<ServerMsg>(&msg) {
-                                    Ok(parsed) => parsed,
-                                    Err(e) => {
-                                        // TODO: Protocol versions mismatch?
-                                        //       Should drop connection if so.
-                                        log::error!("{}", tracerr::new!(e));
-                                        return;
-                                    }
-                                };
+        let handle = {
+            let on_message = Callback::from_fn_mut({
+                let weak_subs = Rc::downgrade(&self.on_message_subs);
+                move |msg: String| {
+                    if let Some(subs) = weak_subs.upgrade() {
+                        let msg = match serde_json::from_str::<ServerMsg>(&msg)
+                        {
+                            Ok(parsed) => parsed,
+                            Err(e) => {
+                                // TODO: Protocol versions mismatch?
+                                //       Should drop connection if so.
+                                log::error!("{}", tracerr::new!(e));
+                                return;
+                            }
+                        };
 
-                            subs.borrow_mut().retain(
-                                |sub: &mpsc::UnboundedSender<ServerMsg>| {
-                                    sub.unbounded_send(msg.clone()).is_ok()
-                                },
-                            );
-                        }
+                        subs.borrow_mut().retain(
+                            |sub: &mpsc::UnboundedSender<ServerMsg>| {
+                                sub.unbounded_send(msg.clone()).is_ok()
+                            },
+                        );
                     }
-                })
-                .into_dart(),
-                Callback::from_fn_mut({
-                    let socket_state = Rc::clone(&self.socket_state);
-                    move |close_frame: DartHandle| {
-                        let code = transport::close_code(close_frame.get())
+                }
+            })
+            .into_dart();
+            let on_close = Callback::from_fn_mut({
+                let socket_state = Rc::clone(&self.socket_state);
+                move |close_frame: DartHandle| {
+                    let code =
+                        unsafe { transport::close_code(close_frame.get()) }
                             .try_into()
                             .unwrap_or(1007);
-                        let reason = dart_string_into_rust(
-                            transport::close_reason(close_frame.get()),
-                        );
+                    let reason =
+                        unsafe { transport::close_reason(close_frame.get()) };
+                    let reason = unsafe { dart_string_into_rust(reason) };
 
-                        socket_state.set(TransportState::Closed(
-                            CloseMsg::from((code, reason)),
-                        ));
-                    }
-                })
-                .into_dart(),
-            ))
-            .await
+                    socket_state.set(TransportState::Closed(CloseMsg::from((
+                        code, reason,
+                    ))));
+                }
+            })
+            .into_dart();
+
+            let fut = unsafe {
+                transport::connect(
+                    string_into_c_str(url.as_ref().to_owned()),
+                    on_message,
+                    on_close,
+                )
+            };
+            unsafe { FutureFromDart::execute::<DartHandle>(fut) }
         }
+        .await
         .map_err(|_| tracerr::new!(TransportError::InitSocket))?;
 
         *self.handle.borrow_mut() = Some(handle);

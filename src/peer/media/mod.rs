@@ -215,7 +215,7 @@ pub enum ProhibitedStateError {
 
 /// Errors occurring in [`MediaConnections::insert_local_tracks()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum InsertLocalTracksError {
     /// [`local::Track`] doesn't satisfy [`Sender`]'s constraints.
     #[display(fmt = "Provided Track doesn't satisfy senders constraints")]
@@ -581,7 +581,7 @@ impl MediaConnections {
                     InsertLocalTracksError::NotEnoughTracks
                 ));
             } else {
-                let _ = media_exchange_state_updates
+                _ = media_exchange_state_updates
                     .insert(state.id(), media_exchange_state::Stable::Disabled);
             }
         }
@@ -811,6 +811,7 @@ impl MediaConnections {
     /// # Errors
     ///
     /// See [`sender::CreateError`] for details.
+    #[allow(clippy::too_many_arguments)] // TODO: refactor
     pub async fn create_sender(
         &self,
         id: TrackId,

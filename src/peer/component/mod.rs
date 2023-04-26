@@ -234,7 +234,7 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let _ = self
+        _ = self
             .negotiation_role
             .subscribe()
             .any(|val| async move { val.is_none() })
@@ -251,7 +251,7 @@ impl State {
     /// [`TrackId`].
     pub fn remove_track(&self, track_id: TrackId) {
         if !self.receivers.remove(track_id) {
-            let _ = self.senders.remove(track_id);
+            _ = self.senders.remove(track_id);
         }
     }
 
@@ -413,7 +413,7 @@ impl State {
 
         if let Some(sender) = self.get_sender(patch.id) {
             sender.update(patch);
-            let _ = self.maybe_update_local_stream.when_eq(false).await;
+            _ = self.maybe_update_local_stream.when_eq(false).await;
             self.maybe_update_local_stream.set(true);
         } else if let Some(receiver) = self.get_receiver(patch.id) {
             receiver.update(&patch);

@@ -18,7 +18,9 @@ pub mod utils;
 #[allow(
     clippy::as_conversions,
     clippy::default_trait_access,
+    clippy::let_underscore_untyped,
     clippy::missing_docs_in_private_items,
+    clippy::multiple_unsafe_ops_per_block,
     clippy::ptr_as_ptr,
     clippy::undocumented_unsafe_blocks,
     clippy::empty_structs_with_brackets,
@@ -62,8 +64,9 @@ pub use self::{
 /// to the Dart side.
 pub fn propagate_panic<T>(f: impl FnOnce() -> T) -> T {
     panic::catch_unwind(panic::AssertUnwindSafe(f)).unwrap_or_else(|_| {
+        let exception = unsafe { new_panic_error() };
         unsafe {
-            dart_api::propagate_error(new_panic_error());
+            dart_api::propagate_error(exception);
         }
         unreachable!("`Dart_PropagateError` should do early return")
     })
@@ -374,7 +377,8 @@ impl TryFrom<DartValueArg<Self>> for Option<DartHandle> {
         match value.0 {
             DartValue::None => Ok(None),
             DartValue::Handle(handle) => {
-                Ok(Some(unsafe { DartHandle::new(*handle.as_ptr()) }))
+                let handle = unsafe { *handle.as_ptr() };
+                Ok(Some(unsafe { DartHandle::new(handle) }))
             }
             DartValue::Ptr(_)
             | DartValue::Bool(_)
@@ -434,7 +438,8 @@ impl TryFrom<DartValueArg<Self>> for DartHandle {
     fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
         match value.0 {
             DartValue::Handle(handle) => {
-                Ok(unsafe { Self::new(unbox_dart_handle(handle)) })
+                let handle = unsafe { unbox_dart_handle(handle) };
+                Ok(unsafe { Self::new(handle) })
             }
             DartValue::None
             | DartValue::Ptr(_)

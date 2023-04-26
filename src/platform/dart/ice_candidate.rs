@@ -69,7 +69,8 @@ impl IceCandidate {
     /// Returns candidate of this [`IceCandidate`].
     #[must_use]
     pub fn candidate(&self) -> String {
-        unsafe { dart_string_into_rust(ice_candidate::candidate(self.0.get())) }
+        let candidate = unsafe { ice_candidate::candidate(self.0.get()) };
+        unsafe { dart_string_into_rust(candidate) }
     }
 
     /// Returns SDP M line index of this [`IceCandidate`].
@@ -86,8 +87,7 @@ impl IceCandidate {
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        Some(unsafe {
-            dart_string_into_rust(ice_candidate::sdp_mid(self.0.get()))
-        })
+        let mid = unsafe { ice_candidate::sdp_mid(self.0.get()) };
+        Some(unsafe { dart_string_into_rust(mid) })
     }
 }

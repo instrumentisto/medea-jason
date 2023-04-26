@@ -288,7 +288,7 @@ impl WebSocketRpcClient {
                         .on_close_subscribers
                         .drain(..)
                         .for_each(|sub| {
-                            let _ = sub.send(CloseReason::ByServer(reason));
+                            _ = sub.send(CloseReason::ByServer(reason));
                         });
                 }
             },

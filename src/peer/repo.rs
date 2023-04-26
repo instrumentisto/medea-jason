@@ -176,7 +176,7 @@ impl Repository {
         });
 
         platform::spawn(async move {
-            let _ = fut.await.ok();
+            _ = fut.await.ok();
         });
 
         abort.into()
