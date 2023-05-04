@@ -795,6 +795,9 @@ window.onload = async function() {
             await initLocalStream();
           }
           await room.set_local_media_settings(constraints, true, true);
+          if (screenshareSwitchEl.checked) {
+            await room.enable_video(rust.MediaSourceKind.Display);
+          }
         } catch (e) {
           let name = e.name();
           if (name === 'RecoveredException') {
