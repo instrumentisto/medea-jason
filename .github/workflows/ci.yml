@@ -2,10 +2,8 @@ name: CI
 
 on:
   push:
-    branches: ["master"]
-    tags: ["medea-*"]
-  pull_request:
-    branches: ["master"]
+    branches:    
+      - '**'        # matches every branch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
