@@ -127,7 +127,7 @@ pub struct State {
     /// Indicator whether this [`Sender`] is working in a [P2P mesh] or [SFU]
     /// mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     /// [SFU]: https://webrtcglossary.com/sfu
     connection_mode: ConnectionMode,
 
@@ -499,6 +499,7 @@ impl Component {
             .set(new_state == media_exchange_state::Stable::Enabled);
 
         if state.connection_mode == ConnectionMode::Sfu {
+            // All senders are always on in SFU mode.
             sender.transceiver.set_send(true).await;
         } else {
             match new_state {

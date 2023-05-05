@@ -49,7 +49,7 @@ impl LocalSdp {
     pub fn when_approved(&self) -> LocalBoxFuture<'static, ()> {
         let approved = Rc::clone(&self.0.approved);
         Box::pin(async move {
-            let _ = approved.when_eq(true).await;
+            _ = approved.when_eq(true).await;
         })
     }
 

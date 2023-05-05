@@ -31,7 +31,7 @@ use crate::{
 /// [`Sender`]: crate::peer::media::Sender
 /// [`Receiver`]: crate::peer::media::Receiver
 #[derive(Caused, Clone, Copy, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`ConnectionHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "ConnectionHandle is in detached state")]
@@ -117,7 +117,7 @@ impl Connections {
                         .borrow_mut()
                         .insert(remote_member_id.clone(), connection.clone()),
                 );
-                let _ = self
+                _ = self
                     .peer_members
                     .borrow_mut()
                     .entry(local_peer_id)
@@ -164,7 +164,7 @@ impl Connections {
         local_peer: PeerId,
         remote_member_id: &MemberId,
     ) {
-        let _ = self
+        _ = self
             .peer_members
             .borrow_mut()
             .get_mut(&local_peer)
@@ -186,7 +186,7 @@ impl Connections {
 
 /// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 #[display(fmt = "`ConnectionHandle` is in detached state")]
 pub struct HandleDetachedError;
 

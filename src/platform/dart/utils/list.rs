@@ -47,9 +47,8 @@ impl DartList {
     #[must_use]
     pub fn get(&self, index: usize) -> Option<DartHandle> {
         #[allow(clippy::cast_possible_truncation)]
-        unsafe { list::get(self.0.get(), index as u32).unbox() }
-            .try_into()
-            .unwrap()
+        let item_ptr = unsafe { list::get(self.0.get(), index as u32) };
+        unsafe { item_ptr.unbox() }.try_into().unwrap()
     }
 
     /// Returns [`length`] of this [`DartList`].

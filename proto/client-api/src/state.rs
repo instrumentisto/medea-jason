@@ -26,7 +26,7 @@ pub struct Peer {
     /// Indicator whether this [`Peer`] is working in a [P2P mesh] or [SFU]
     /// mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     /// [SFU]: https://webrtcglossary.com/sfu
     pub connection_mode: ConnectionMode,
 
@@ -68,7 +68,7 @@ pub struct Sender {
     /// Indicator whether this [`Sender`] is working in a [P2P mesh] or [SFU]
     /// mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     /// [SFU]: https://webrtcglossary.com/sfu
     pub connection_mode: ConnectionMode,
 

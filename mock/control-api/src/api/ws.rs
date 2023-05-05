@@ -145,11 +145,10 @@ impl Actor for WsSession {
             .or_default()
             .push(recp);
 
-        let _ =
-            ctx.run_interval(Duration::from_secs(10), |this: &mut Self, cx| {
-                this.last_ping_num += 1;
-                cx.ping(&this.last_ping_num.to_be_bytes());
-            });
+        _ = ctx.run_interval(Duration::from_secs(10), |this: &mut Self, cx| {
+            this.last_ping_num += 1;
+            cx.ping(&this.last_ping_num.to_be_bytes());
+        });
     }
 
     /// Removes [`WsSession`] from [`WsSession`]s map.

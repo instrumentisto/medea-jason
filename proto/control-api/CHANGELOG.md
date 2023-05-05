@@ -26,14 +26,15 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Upgraded
 
-- Dependencies: ([todo])
-    - [`prost`] to `0.11`;
-    - [`tonic`] to `0.8`.
+- Dependencies:
+    - [`prost`] to `0.11` ([c8332ea9]);
+    - [`tonic`] to `0.9` ([todo]).
 
 [#55]: /../../pull/55
 [#56]: /../../pull/56
 [#67]: /../../pull/67
 [#68]: /../../pull/68
+[c8332ea9]: /../../commit/c8332ea9b6310958549e750a5553294f894c2d7b
 [todo]: /../../commit/todo
 
 

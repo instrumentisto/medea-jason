@@ -156,7 +156,8 @@ impl MediaStreamConstraints {
     /// Creates new empty [`MediaStreamConstraints`].
     #[must_use]
     pub fn new() -> Self {
-        unsafe { Self(DartHandle::new(constraints::init_device_constraints())) }
+        let constraints = unsafe { constraints::init_device_constraints() };
+        unsafe { Self(DartHandle::new(constraints)) }
     }
 
     /// Specifies the provided nature and settings of an `audio`
@@ -164,13 +165,15 @@ impl MediaStreamConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
+        let audio = MediaTrackConstraints::from(audio);
         unsafe {
-            let audio = MediaTrackConstraints::from(audio);
             constraints::set_audio_constraint(
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
                 audio.mandatory.get(),
             );
+        }
+        unsafe {
             constraints::set_audio_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
@@ -184,13 +187,15 @@ impl MediaStreamConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
+        let video = MediaTrackConstraints::from(video);
         unsafe {
-            let video = MediaTrackConstraints::from(video);
             constraints::set_video_constraint(
                 self.0.get(),
                 ConstraintType::Mandatory as i64,
                 video.mandatory.get(),
             );
+        }
+        unsafe {
             constraints::set_video_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
@@ -222,9 +227,8 @@ impl DisplayMediaStreamConstraints {
     /// Creates new empty [`DisplayMediaStreamConstraints`] .
     #[must_use]
     pub fn new() -> Self {
-        unsafe {
-            Self(DartHandle::new(constraints::init_display_constraints()))
-        }
+        let constraints = unsafe { constraints::init_display_constraints() };
+        unsafe { Self(DartHandle::new(constraints)) }
     }
 
     /// Specifies the provided nature and settings of a `video`
@@ -239,6 +243,8 @@ impl DisplayMediaStreamConstraints {
                 ConstraintType::Mandatory as i64,
                 video.mandatory.get(),
             );
+        }
+        unsafe {
             constraints::set_video_constraint(
                 self.0.get(),
                 ConstraintType::Optional as i64,
@@ -250,47 +256,54 @@ impl DisplayMediaStreamConstraints {
 
 impl From<AudioTrackConstraints> for MediaTrackConstraints {
     fn from(from: AudioTrackConstraints) -> Self {
-        unsafe {
-            let optional =
-                DartHandle::new(constraints::new_audio_constraints());
-            let mandatory =
-                DartHandle::new(constraints::new_audio_constraints());
-            if let Some(device_id) = from.device_id {
-                match device_id {
-                    ConstrainString::Exact(device_id) => {
-                        constraints::set_audio_constraint_value(
-                            mandatory.get(),
-                            AudioConstraintKind::DeviceId as i64,
-                            DartValue::from(device_id),
-                        );
-                    }
-                    ConstrainString::Ideal(device_id) => {
-                        constraints::set_audio_constraint_value(
-                            optional.get(),
-                            AudioConstraintKind::DeviceId as i64,
-                            DartValue::from(device_id),
-                        );
-                    }
-                }
-            }
+        let optional = {
+            let audio = unsafe { constraints::new_audio_constraints() };
+            unsafe { DartHandle::new(audio) }
+        };
+        let mandatory = {
+            let audio = unsafe { constraints::new_audio_constraints() };
+            unsafe { DartHandle::new(audio) }
+        };
 
-            Self {
-                optional,
-                mandatory,
+        if let Some(device_id) = from.device_id {
+            match device_id {
+                ConstrainString::Exact(device_id) => unsafe {
+                    constraints::set_audio_constraint_value(
+                        mandatory.get(),
+                        AudioConstraintKind::DeviceId as i64,
+                        DartValue::from(device_id),
+                    );
+                },
+                ConstrainString::Ideal(device_id) => unsafe {
+                    constraints::set_audio_constraint_value(
+                        optional.get(),
+                        AudioConstraintKind::DeviceId as i64,
+                        DartValue::from(device_id),
+                    );
+                },
             }
+        }
+
+        Self {
+            optional,
+            mandatory,
         }
     }
 }
 
 impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DeviceVideoTrackConstraints) -> Self {
-        unsafe {
-            let optional =
-                DartHandle::new(constraints::new_video_constraints());
-            let mandatory =
-                DartHandle::new(constraints::new_video_constraints());
+        let optional = {
+            let video = unsafe { constraints::new_video_constraints() };
+            unsafe { DartHandle::new(video) }
+        };
+        let mandatory = {
+            let video = unsafe { constraints::new_video_constraints() };
+            unsafe { DartHandle::new(video) }
+        };
 
-            if let Some(device_id) = from.device_id {
+        if let Some(device_id) = from.device_id {
+            unsafe {
                 set_constrain_string(
                     device_id,
                     VideoConstraintKind::DeviceId,
@@ -298,27 +311,27 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
-
-            if let Some(facing_mode) = from.facing_mode {
-                match facing_mode {
-                    ConstrainString::Exact(facing_mode) => {
-                        constraints::set_video_constraint_value(
-                            mandatory.get(),
-                            VideoConstraintKind::FacingMode as i64,
-                            DartValue::from(facing_mode as i64),
-                        );
-                    }
-                    ConstrainString::Ideal(facing_mode) => {
-                        constraints::set_video_constraint_value(
-                            optional.get(),
-                            VideoConstraintKind::FacingMode as i64,
-                            DartValue::from(facing_mode as i64),
-                        );
-                    }
-                }
+        }
+        if let Some(facing_mode) = from.facing_mode {
+            match facing_mode {
+                ConstrainString::Exact(facing_mode) => unsafe {
+                    constraints::set_video_constraint_value(
+                        mandatory.get(),
+                        VideoConstraintKind::FacingMode as i64,
+                        DartValue::from(facing_mode as i64),
+                    );
+                },
+                ConstrainString::Ideal(facing_mode) => unsafe {
+                    constraints::set_video_constraint_value(
+                        optional.get(),
+                        VideoConstraintKind::FacingMode as i64,
+                        DartValue::from(facing_mode as i64),
+                    );
+                },
             }
-
-            if let Some(width) = from.width {
+        }
+        if let Some(width) = from.width {
+            unsafe {
                 set_video_constrain_u32(
                     width,
                     VideoConstraintKind::Width,
@@ -326,8 +339,9 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
-
-            if let Some(height) = from.height {
+        }
+        if let Some(height) = from.height {
+            unsafe {
                 set_video_constrain_u32(
                     height,
                     VideoConstraintKind::Height,
@@ -335,24 +349,28 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
+        }
 
-            Self {
-                optional,
-                mandatory,
-            }
+        Self {
+            optional,
+            mandatory,
         }
     }
 }
 
 impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
     fn from(from: DisplayVideoTrackConstraints) -> Self {
-        unsafe {
-            let optional =
-                DartHandle::new(constraints::new_video_constraints());
-            let mandatory =
-                DartHandle::new(constraints::new_video_constraints());
+        let optional = {
+            let video = unsafe { constraints::new_video_constraints() };
+            unsafe { DartHandle::new(video) }
+        };
+        let mandatory = {
+            let video = unsafe { constraints::new_video_constraints() };
+            unsafe { DartHandle::new(video) }
+        };
 
-            if let Some(device_id) = from.device_id {
+        if let Some(device_id) = from.device_id {
+            unsafe {
                 set_constrain_string(
                     device_id,
                     VideoConstraintKind::DeviceId,
@@ -360,8 +378,9 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
-
-            if let Some(width) = from.width {
+        }
+        if let Some(width) = from.width {
+            unsafe {
                 set_video_constrain_u32(
                     width,
                     VideoConstraintKind::Width,
@@ -369,8 +388,9 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
-
-            if let Some(height) = from.height {
+        }
+        if let Some(height) = from.height {
+            unsafe {
                 set_video_constrain_u32(
                     height,
                     VideoConstraintKind::Height,
@@ -378,8 +398,9 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
-
-            if let Some(frame_rate) = from.frame_rate {
+        }
+        if let Some(frame_rate) = from.frame_rate {
+            unsafe {
                 set_video_constrain_u32(
                     frame_rate,
                     VideoConstraintKind::FrameRate,
@@ -387,11 +408,11 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
                     &mandatory,
                 );
             }
+        }
 
-            Self {
-                optional,
-                mandatory,
-            }
+        Self {
+            optional,
+            mandatory,
         }
     }
 }

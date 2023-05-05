@@ -138,11 +138,16 @@ impl DartType {
                 }
                 syn::GenericArgument::Lifetime(_)
                 | syn::GenericArgument::Type(_)
-                | syn::GenericArgument::Binding(_)
-                | syn::GenericArgument::Constraint(_)
-                | syn::GenericArgument::Const(_) => Err(syn::Error::new(
+                | syn::GenericArgument::Const(_)
+                | syn::GenericArgument::AssocType(_)
+                | syn::GenericArgument::AssocConst(_)
+                | syn::GenericArgument::Constraint(_) => Err(syn::Error::new(
                     bracketed.span(),
                     "Unsupported generic argument",
+                )),
+                _ => Err(syn::Error::new(
+                    bracketed.span(),
+                    "Unsupported unknown generic argument",
                 )),
             }
         } else {

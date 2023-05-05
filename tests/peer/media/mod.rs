@@ -41,7 +41,7 @@ async fn get_test_media_connections(
             vec![audio_track, video_track],
             &get_media_stream_settings(enabled_audio, enabled_video).into(),
             &RecvConstraints::default(),
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();
@@ -94,7 +94,7 @@ async fn get_tracks_request1() {
             vec![audio_track, video_track],
             &local_constraints(true, true),
             &RecvConstraints::default(),
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();
@@ -116,7 +116,7 @@ async fn get_tracks_request2() {
             Vec::new(),
             &LocalTracksConstraints::default(),
             &RecvConstraints::default(),
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();
@@ -186,7 +186,7 @@ mod sender_patch {
                 None,
                 vec!["bob".into()],
                 &LocalTracksConstraints::default(),
-                ConnectionMode::P2pMesh,
+                ConnectionMode::Mesh,
             )
             .await
             .unwrap();

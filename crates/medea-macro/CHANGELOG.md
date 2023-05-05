@@ -14,7 +14,7 @@ All user visible changes to this project will be documented in this file. This p
 - `#[derive(JsCaused)]` ([#4]):
     - Renamed to `#[derive(Caused)]`;
     - `#[js(cause)]` renamed to `#[cause]`;
-    - `#[js(error = "...")]` renamed to `#[cause(error = "...")]`.
+    - `#[js(error = "...")]` renamed to `#[cause(error = ...)]` ([todo]).
 
 ### Added
 
@@ -22,12 +22,14 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Updated
 
-- Switch to [2021 Rust edition][012-1] ([#16]).
+- Switched to [2021 Rust edition][012-1] ([#16]).
+- Switched to 2.0 version of [`syn`] ([todo]).
 
 [#4]: /../../pull/4
 [#14]: /../../pull/14
 [#16]: /../../pull/16
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+[todo]: /../../commit/todo
 
 
 
@@ -62,7 +64,7 @@ All user visible changes to this project will be documented in this file. This p
 - `#[derive(JsCaused)]` macro for deriving `JsCaused` trait from `medea-jason` crate ([#68]).
 - `#[dispatchable]` macro:
     - Optional argument to specify `self` type for methods of `*Handler` trait (e.g. `#[dispatchable(self: &Self)]`) ([#112]);
-    - Optional argument that enables [async-trait] integration (e.g. `#[dispatchable(async_trait(?Send))]`) ([#112]).
+    - Optional argument that enables [`async-trait`] integration (e.g. `#[dispatchable(async_trait(?Send))]`) ([#112]).
 - `#[watchers]` macro for generating `Component::spawn` method in `medea-jason` crate ([#169]).
 
 ### Fixed
@@ -94,6 +96,6 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
-[async-trait]: https://docs.rs/async-trait
+[`async-trait`]: https://docs.rs/async-trait
+[`syn`]: https://docs.rs/syn
 [Semantic Versioning 2.0.0]: https://semver.org

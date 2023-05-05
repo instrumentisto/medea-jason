@@ -36,7 +36,7 @@ pub use self::transport::MockRpcTransport;
 ///
 /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
 #[derive(Caused, Clone, Debug, Display)]
-#[cause(error = "Error")]
+#[cause(error = Error)]
 pub enum GetUserMediaError {
     /// [`Error`] has been caused by getting audio.
     Audio(Error),

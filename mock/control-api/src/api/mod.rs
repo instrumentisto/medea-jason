@@ -67,14 +67,13 @@ pub struct AppContext {
 /// [Control API]: https://tinyurl.com/yxsqplq7
 pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
     let subscribers = Arc::new(Mutex::new(HashMap::new()));
-    let client = ControlClient::new(
-        opts.medea_addr.clone().into(),
-        Arc::clone(&subscribers),
-    )
-    .await
-    .unwrap();
     let app_data = Data::new(AppContext {
-        client,
+        client: ControlClient::new(
+            opts.medea_addr.clone().into(),
+            Arc::clone(&subscribers),
+        )
+        .await
+        .unwrap(),
         subscribers,
         callback_server,
     });

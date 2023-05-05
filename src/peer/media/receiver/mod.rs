@@ -136,7 +136,7 @@ impl Receiver {
             };
             trnsvr
                 .set_recv(match connection_mode {
-                    ConnectionMode::P2pMesh => state.enabled_individual(),
+                    ConnectionMode::Mesh => state.enabled_individual(),
                     ConnectionMode::Sfu => true,
                 })
                 .await;
@@ -220,7 +220,7 @@ impl Receiver {
         &self,
         state: media_exchange_state::Transition,
     ) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MediaExchangeIntention {
                 id: self.track_id,
                 enabled: matches!(
@@ -261,7 +261,7 @@ impl Receiver {
         let trnscvr = self.transceiver.borrow().as_ref().cloned();
         if let Some(t) = trnscvr {
             t.set_recv(match self.connection_mode {
-                ConnectionMode::P2pMesh => self.enabled_individual.get(),
+                ConnectionMode::Mesh => self.enabled_individual.get(),
                 ConnectionMode::Sfu => true,
             })
             .await;

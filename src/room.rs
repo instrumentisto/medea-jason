@@ -114,7 +114,7 @@ impl RoomCloseReason {
 
 /// Errors occurring in [`RoomHandle::join()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum RoomJoinError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "RoomHandle is in detached state")]
@@ -136,7 +136,7 @@ pub enum RoomJoinError {
 
 /// Error of [`RoomHandle`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display, Eq, From, PartialEq)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub struct HandleDetachedError;
 
 /// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
@@ -144,7 +144,7 @@ pub struct HandleDetachedError;
 /// [`Sender`]: peer::media::Sender
 /// [`Receiver`]: peer::media::Receiver
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "RoomHandle is in detached state")]
@@ -204,7 +204,7 @@ impl From<UpdateLocalStreamError> for ChangeMediaStateError {
 /// Errors occurring when a [`Room`] tries to acquire [`local::Track`]s via
 /// [`MediaManager`].
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum GetLocalTracksError {
     /// Validating [`TracksRequest`] doesn't pass.
     ///
@@ -1201,7 +1201,7 @@ impl InnerRoom {
     /// [`Drop`] implementation of [`InnerRoom`] is supposed to be triggered
     /// after this function call.
     fn set_close_reason(&self, reason: CloseReason) {
-        let _ = self.close_reason.replace(reason);
+        _ = self.close_reason.replace(reason);
     }
 
     /// Toggles [`TransceiverSide`]s [`MediaState`] by the provided

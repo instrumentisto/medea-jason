@@ -28,6 +28,7 @@ use crate::{
         media::{receiver, sender},
         LocalStreamUpdateCriteria, PeerConnection, UpdateLocalStreamError,
     },
+    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -103,10 +104,9 @@ pub struct State {
     /// ID of this [`Component`].
     id: Id,
 
-    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU]
-    /// mode.
+    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU] mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
     /// [SFU]: https://webrtcglossary.com/sfu
     connection_mode: ConnectionMode,
 
@@ -129,7 +129,7 @@ pub struct State {
     ice_servers: Vec<IceServer>,
 
     /// Current [`NegotiationRole`] of this [`Component`].
-    negotiation_role: ProgressableCell<Option<NegotiationRole>>,
+    negotiation_role: Rc<ProgressableCell<Option<NegotiationRole>>>,
 
     /// Negotiation state of this [`Component`].
     negotiation_state: ObservableCell<NegotiationState>,
@@ -174,7 +174,7 @@ impl State {
             force_relay,
             remote_sdp: ProgressableCell::new(None),
             local_sdp: LocalSdp::new(),
-            negotiation_role: ProgressableCell::new(negotiation_role),
+            negotiation_role: Rc::new(ProgressableCell::new(negotiation_role)),
             negotiation_state: ObservableCell::new(NegotiationState::Stable),
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
@@ -235,12 +235,25 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let _ = self
+        // let _ = self
+        //     .negotiation_role
+        //     .subscribe()
+        //     .any(|val| async move { val.is_none() })
+        //     .await;
+
+        // self.negotiation_role.set(Some(negotiation_role));
+
+        let lock = self
             .negotiation_role
             .subscribe()
-            .any(|val| async move { val.is_none() })
-            .await;
-        self.negotiation_role.set(Some(negotiation_role));
+            .any(|val| async move { val.is_none() });
+        let role = Rc::clone(&self.negotiation_role);
+
+        platform::spawn(async move {
+            let _ = lock.await;
+
+            role.set(Some(negotiation_role));
+        });
     }
 
     /// Sets [`State::restart_ice`] to `true`.
@@ -252,7 +265,7 @@ impl State {
     /// [`TrackId`].
     pub fn remove_track(&self, track_id: TrackId) {
         if !self.receivers.remove(track_id) {
-            let _ = self.senders.remove(track_id);
+            _ = self.senders.remove(track_id);
         }
     }
 
@@ -415,7 +428,7 @@ impl State {
 
         if let Some(sender) = self.get_sender(patch.id) {
             sender.update(patch);
-            let _ = self.maybe_update_local_stream.when_eq(false).await;
+            _ = self.maybe_update_local_stream.when_eq(false).await;
             self.maybe_update_local_stream.set(true);
         } else if let Some(receiver) = self.get_receiver(patch.id) {
             receiver.update(&patch);

@@ -81,7 +81,7 @@ impl ConnectionInfo {
 
 /// Errors which can occur while [`ConnectionInfo`] parsing from the [`str`].
 #[derive(Caused, Clone, Copy, Debug, Display)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum ConnectionInfoParseError {
     /// [`Url::parse`] returned error.
     #[display(fmt = "Failed to parse provided URL: {}", _0)]
@@ -133,7 +133,7 @@ impl FromStr for ConnectionInfo {
 
         // Removes last two segments.
         if let Ok(mut s) = url.path_segments_mut() {
-            let _ = s.pop().pop();
+            _ = s.pop().pop();
         }
 
         Ok(Self {
@@ -197,7 +197,7 @@ pub enum ConnectionLostReason {
 
 /// Errors that may occur in [`WebSocketRpcClient`].
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum RpcClientError {
     /// Occurs if WebSocket connection to remote media server failed.
     #[display(fmt = "Connection failed: {}", _0)]

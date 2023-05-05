@@ -65,7 +65,7 @@ async fn disable_enable_audio() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, true);
     let recv_constraints = Rc::new(RecvConstraints::default());
@@ -117,7 +117,7 @@ async fn disable_enable_video() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, true);
     let recv_constraints = Rc::new(RecvConstraints::default());
@@ -168,7 +168,7 @@ async fn new_with_disable_audio() {
         Vec::new(),
         false,
         None,
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(false, true);
     peer_state.insert_track(&audio_track, send_constraints.clone());
@@ -203,7 +203,7 @@ async fn new_with_disable_video() {
         Vec::new(),
         false,
         None,
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, false);
     let recv_constraints = Rc::new(RecvConstraints::default());
@@ -242,7 +242,7 @@ async fn add_candidates_to_answerer_before_offer() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
@@ -269,7 +269,7 @@ async fn add_candidates_to_answerer_before_offer() {
         Vec::new(),
         false,
         None,
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
@@ -308,7 +308,7 @@ async fn add_candidates_to_offerer_before_answer() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
@@ -334,7 +334,7 @@ async fn add_candidates_to_offerer_before_answer() {
         Vec::new(),
         false,
         None,
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
@@ -380,7 +380,7 @@ async fn normal_exchange_of_candidates() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
@@ -406,7 +406,7 @@ async fn normal_exchange_of_candidates() {
         Vec::new(),
         false,
         None,
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
@@ -477,7 +477,7 @@ async fn send_event_on_new_local_stream() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     peer_state.insert_track(&audio_track, send_constraints.clone());
     peer_state.insert_track(&video_track, send_constraints.clone());
@@ -522,7 +522,7 @@ async fn ice_connection_state_changed_is_emitted() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
@@ -549,7 +549,7 @@ async fn ice_connection_state_changed_is_emitted() {
         Vec::new(),
         false,
         Some(NegotiationRole::Answerer(pc1_offer)),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
@@ -652,7 +652,7 @@ impl InterconnectedPeers {
             Vec::new(),
             false,
             Some(NegotiationRole::Offerer),
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         for track in Self::get_peer1_tracks() {
             pc1_state.insert_track(&track, pc1_send_cons.clone());
@@ -679,7 +679,7 @@ impl InterconnectedPeers {
             Vec::new(),
             false,
             Some(NegotiationRole::Answerer(pc1_offer)),
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         for track in Self::get_peer2_tracks() {
             pc2_state.insert_track(&track, pc2_send_cons.clone());
@@ -947,7 +947,7 @@ mod peer_stats_caching {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
@@ -1005,7 +1005,7 @@ mod peer_stats_caching {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
@@ -1065,7 +1065,7 @@ mod peer_stats_caching {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
@@ -1126,7 +1126,7 @@ async fn reset_transition_timers() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, true);
     let recv_constraints = Rc::new(RecvConstraints::default());
@@ -1226,7 +1226,7 @@ async fn new_remote_track() {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let recv_constraints = Rc::new(RecvConstraints::default());
         let sender_peer = peer::Component::new(
@@ -1267,7 +1267,7 @@ async fn new_remote_track() {
             Vec::new(),
             false,
             None,
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         );
         let rcvr_peer = peer::Component::new(
             peer::PeerConnection::new(
@@ -1536,7 +1536,7 @@ async fn disable_and_enable_all_tracks() {
         Vec::new(),
         false,
         None,
-        ConnectionMode::P2pMesh,
+        ConnectionMode::Mesh,
     );
     pc_state.insert_track(&audio_track, LocalTracksConstraints::default());
     pc_state.insert_track(&video_track, LocalTracksConstraints::default());

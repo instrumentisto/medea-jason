@@ -50,7 +50,7 @@ async fn sendrecv_works() {
             vec![send_audio_track, recv_audio_track],
             &get_media_stream_settings(true, false).into(),
             &RecvConstraints::default(),
-            ConnectionMode::P2pMesh,
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();

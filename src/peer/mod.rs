@@ -52,7 +52,7 @@ pub use self::{
 
 /// Errors occurring in [`PeerConnection::update_local_stream()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum UpdateLocalStreamError {
     /// Errors occurred when [`TracksRequest`] validation fails.
     InvalidLocalTracks(TracksRequestError),
@@ -92,7 +92,7 @@ pub enum TrackEvent {
 /// Local media update errors that [`PeerConnection`] reports in
 /// [`PeerEvent::FailedLocalMedia`] messages.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum LocalMediaError {
     /// Error occurred in [`PeerConnection::update_local_stream()`] method.
     UpdateLocalStreamError(#[cause] UpdateLocalStreamError),
@@ -443,7 +443,7 @@ impl PeerConnection {
             }
         };
 
-        let _ = peer_events_sender
+        _ = peer_events_sender
             .unbounded_send(PeerEvent::MediaUpdateCommand {
                 command: Command::UpdateTracks {
                     peer_id,
@@ -495,7 +495,7 @@ impl PeerConnection {
                             true
                         }
                     } else {
-                        let _ = stats_cache.insert(stat.id.clone(), stat_hash);
+                        _ = stats_cache.insert(stat.id.clone(), stat_hash);
                         true
                     }
                 })

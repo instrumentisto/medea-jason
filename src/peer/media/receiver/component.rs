@@ -325,10 +325,7 @@ impl Component {
             .enabled_general
             .set(state == media_exchange_state::Stable::Enabled);
         match (st.connection_mode, state) {
-            (
-                ConnectionMode::P2pMesh,
-                media_exchange_state::Stable::Disabled,
-            ) => {
+            (ConnectionMode::Mesh, media_exchange_state::Stable::Disabled) => {
                 let sub_recv = {
                     receiver
                         .transceiver

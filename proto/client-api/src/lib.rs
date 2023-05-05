@@ -4,8 +4,7 @@
     macro_use_extern_crate,
     nonstandard_style,
     rust_2018_idioms,
-    rustdoc::broken_intra_doc_links,
-    rustdoc::private_intra_doc_links,
+    rustdoc::all,
     trivial_casts,
     trivial_numeric_casts
 )]
@@ -43,6 +42,7 @@
     clippy::iter_on_single_items,
     clippy::iter_with_drain,
     clippy::large_include_file,
+    clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::manual_clamp,
     clippy::map_err_ignore,
@@ -50,6 +50,7 @@
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
+    clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::needless_collect,
@@ -68,6 +69,7 @@
     clippy::semicolon_inside_block,
     clippy::shadow_unrelated,
     clippy::significant_drop_in_scrutinee,
+    clippy::significant_drop_tightening,
     clippy::str_to_string,
     clippy::string_add,
     clippy::string_lit_as_bytes,
@@ -528,7 +530,7 @@ pub enum Event {
         /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU]
         /// mode.
         ///
-        /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+        /// [P2P mesh]: https://webrtcglossary.com/mesh
         /// [SFU]: https://webrtcglossary.com/sfu
         connection_mode: ConnectionMode,
 
@@ -627,16 +629,16 @@ pub enum NegotiationRole {
     Answerer(String),
 }
 
-/// Indicator whether `Peer` is working in a [P2P mesh] or [SFU] mode.
+/// Indication whether a `Peer` is working in a [P2P mesh] or [SFU] mode.
 ///
-/// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
+/// [P2P mesh]: https://webrtcglossary.com/mesh
 /// [SFU]: https://webrtcglossary.com/sfu
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ConnectionMode {
     /// `Peer` is configured to work in a [P2P mesh] mode.
     ///
-    /// [P2P mesh]: https://bloggeek.me/webrtcglossary/mesh
-    P2pMesh,
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    Mesh,
 
     /// `Peer` is configured to work in an [SFU] mode.
     ///
@@ -848,6 +850,10 @@ impl TrackPatchEvent {
 
         if let Some(direction) = another.media_direction {
             self.media_direction = Some(direction);
+        }
+
+        if let Some(receivers) = &another.receivers {
+            self.receivers = Some(receivers.clone());
         }
     }
 }

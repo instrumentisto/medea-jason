@@ -77,8 +77,8 @@ mod completer {
 pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
-    unsafe { FutureFromDart::execute::<()>(completer::delayed(delay)).await }
-        .unwrap();
+    let delayed = unsafe { completer::delayed(delay) };
+    unsafe { FutureFromDart::execute::<()>(delayed).await }.unwrap();
 }
 
 /// Dart [Future] which can be resolved from Rust.
@@ -112,10 +112,8 @@ impl<T, E> Completer<T, E> {
     /// [1]: https://api.dart.dev/dart-async/Completer-class.html
     #[must_use]
     pub fn new() -> Self {
-        let handle = unsafe {
-            let completer = completer::init();
-            dart_api::new_persistent_handle(completer)
-        };
+        let completer = unsafe { completer::init() };
+        let handle = unsafe { dart_api::new_persistent_handle(completer) };
         Self {
             handle,
             _success_kind: PhantomData::default(),
@@ -129,10 +127,8 @@ impl<T, E> Completer<T, E> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     #[must_use]
     pub fn future(&self) -> Dart_Handle {
-        unsafe {
-            let handle = dart_api::handle_from_persistent(self.handle);
-            completer::future(handle)
-        }
+        let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
+        unsafe { completer::future(handle) }
     }
 }
 
@@ -148,8 +144,8 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     ///
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete(&self, arg: T) {
+        let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
         unsafe {
-            let handle = dart_api::handle_from_persistent(self.handle);
             completer::complete(handle, arg.into());
         }
     }
@@ -160,8 +156,8 @@ impl<T> Completer<T, DartError> {
     ///
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete_error(&self, e: DartError) {
+        let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
         unsafe {
-            let handle = dart_api::handle_from_persistent(self.handle);
             completer::complete_error(handle, e);
         }
     }
