@@ -1,10 +1,10 @@
-const controlDomain = document.location.protocol + '//' +
-  document.location.host;
-const controlUrl = controlDomain + '/control-api/';
-const baseUrl = 'wss://' + document.location.host + '/ws-proxy';
-// const controlDomain = 'http://127.0.0.1:8000';
+// const controlDomain = document.location.protocol + '//' +
+//   document.location.host;
 // const controlUrl = controlDomain + '/control-api/';
-// const baseUrl = 'ws://127.0.0.1:8080/ws/';
+// const baseUrl = 'wss://' + document.location.host + '/ws-proxy';
+const controlDomain = 'http://127.0.0.1:8000';
+const controlUrl = controlDomain + '/control-api/';
+const baseUrl = 'ws://127.0.0.1:8080/ws/';
 
 let rust;
 let roomId = window.location.hash.replace('#', '');

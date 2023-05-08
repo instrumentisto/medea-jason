@@ -28,7 +28,6 @@ use crate::{
         media::{receiver, sender},
         LocalStreamUpdateCriteria, PeerConnection, UpdateLocalStreamError,
     },
-    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -129,7 +128,7 @@ pub struct State {
     ice_servers: Vec<IceServer>,
 
     /// Current [`NegotiationRole`] of this [`Component`].
-    negotiation_role: Rc<ProgressableCell<Option<NegotiationRole>>>,
+    negotiation_role: ProgressableCell<Option<NegotiationRole>>,
 
     /// Negotiation state of this [`Component`].
     negotiation_state: ObservableCell<NegotiationState>,
@@ -174,7 +173,7 @@ impl State {
             force_relay,
             remote_sdp: ProgressableCell::new(None),
             local_sdp: LocalSdp::new(),
-            negotiation_role: Rc::new(ProgressableCell::new(negotiation_role)),
+            negotiation_role: ProgressableCell::new(negotiation_role),
             negotiation_state: ObservableCell::new(NegotiationState::Stable),
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
@@ -235,16 +234,12 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let lock = self
+        let _ = self
             .negotiation_role
             .subscribe()
-            .any(|val| async move { val.is_none() });
-        let role = Rc::clone(&self.negotiation_role);
-
-        platform::spawn(async move {
-            let _ = lock.await;
-            role.set(Some(negotiation_role));
-        });
+            .any(|val| async move { val.is_none() })
+            .await;
+        self.negotiation_role.set(Some(negotiation_role));
     }
 
     /// Sets [`State::restart_ice`] to `true`.
