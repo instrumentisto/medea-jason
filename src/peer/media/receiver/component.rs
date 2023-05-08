@@ -324,28 +324,27 @@ impl Component {
         receiver
             .enabled_general
             .set(state == media_exchange_state::Stable::Enabled);
-        match (st.connection_mode, state) {
-            (ConnectionMode::Mesh, media_exchange_state::Stable::Disabled) => {
-                let sub_recv = {
-                    receiver
-                        .transceiver
-                        .borrow()
-                        .as_ref()
-                        .map(|trnscvr| trnscvr.set_recv(false))
-                };
-                if let Some(fut) = sub_recv {
-                    fut.await;
-                }
-            }
-            _ => {
-                let add_recv = receiver
+        if (st.connection_mode, state)
+            == (ConnectionMode::Mesh, media_exchange_state::Stable::Disabled)
+        {
+            let sub_recv = {
+                receiver
                     .transceiver
                     .borrow()
                     .as_ref()
-                    .map(|trnscvr| trnscvr.set_recv(true));
-                if let Some(fut) = add_recv {
-                    fut.await;
-                }
+                    .map(|trnscvr| trnscvr.set_recv(false))
+            };
+            if let Some(fut) = sub_recv {
+                fut.await;
+            }
+        } else {
+            let add_recv = receiver
+                .transceiver
+                .borrow()
+                .as_ref()
+                .map(|trnscvr| trnscvr.set_recv(true));
+            if let Some(fut) = add_recv {
+                fut.await;
             }
         }
         receiver.maybe_notify_track().await;

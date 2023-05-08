@@ -573,7 +573,7 @@ flutter:
 #	make flutter.fmt [check=(no|yes)]
 
 flutter.fmt:
-	flutter format $(if $(call eq,$(check),yes),-n --set-exit-if-changed,) \
+	dart format $(if $(call eq,$(check),yes),-n --set-exit-if-changed,) \
 		flutter/
 ifeq ($(wildcard flutter/.packages),)
 	@make flutter cmd='pub get'
