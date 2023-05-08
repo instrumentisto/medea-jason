@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Chat</title>
   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" integrity="sha384-6woDBwQr+eqsszpfCWmyJ2UTm+OSym/GuB2NAD8H3d+6xuEZzOMJ/6GEPDTPPCmi" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js" integrity="sha384-PlFzuf6GOlJNxLuosezJ/jwndIVZ2hWI/AmvYQtBzstOdLtcUe6DPSI4LsqwiN1y" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
+    integrity="sha384-6woDBwQr+eqsszpfCWmyJ2UTm+OSym/GuB2NAD8H3d+6xuEZzOMJ/6GEPDTPPCmi"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"
+    integrity="sha384-PlFzuf6GOlJNxLuosezJ/jwndIVZ2hWI/AmvYQtBzstOdLtcUe6DPSI4LsqwiN1y"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+    integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
   <style>
     body {
@@ -74,85 +86,58 @@
     }
   </style>
 </head>
+
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand">Medea</a>
-    <button class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbar"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbar">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle"
-             id="navbarDropdown"
-             role="button"
-             data-toggle="dropdown"
-             aria-haspopup="true"
-             aria-expanded="false">
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
             Create
           </a>
           <div class="dropdown-menu">
-            <a class="dropdown-item"
-               role="button"
-               data-toggle="modal"
-               data-target="#control-debug__window_create_room">
+            <a class="dropdown-item" role="button" data-toggle="modal" data-target="#control-debug__window_create_room">
               Room
             </a>
-            <a class="dropdown-item"
-               role="button"
-               data-toggle="modal"
-               data-target="#control-debug__window_create_member">
+            <a class="dropdown-item" role="button" data-toggle="modal"
+              data-target="#control-debug__window_create_member">
               Member
             </a>
-            <a class="dropdown-item"
-               role="button"
-               data-toggle="modal"
-               data-target="#control-debug__window_create_endpoint">
+            <a class="dropdown-item" role="button" data-toggle="modal"
+              data-target="#control-debug__window_create_endpoint">
               Endpoint
             </a>
           </div>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link"
-            role="button"
-            data-toggle="modal"
-            data-target="#control-debug__window_get">
+          <a class="nav-link" role="button" data-toggle="modal" data-target="#control-debug__window_get">
             Get
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link"
-             role="button"
-             data-toggle="modal"
-             data-target="#control-debug__window_delete">
+          <a class="nav-link" role="button" data-toggle="modal" data-target="#control-debug__window_delete">
             Delete
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link"
-             role="button"
-             data-toggle="modal"
-             data-target="#control-debug__window_callbacks">
+          <a class="nav-link" role="button" data-toggle="modal" data-target="#control-debug__window_callbacks">
             Callbacks
           </a>
         </li>
       </ul>
       <div class="dropdown">
-        <button class="btn btn-light dropdown-toggle" type="button"
-                id="username-menu-button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
+        <button class="btn btn-light dropdown-toggle" type="button" id="username-menu-button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
           Username
         </button>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="username-menu-button">
@@ -162,7 +147,7 @@
     </div>
   </nav>
 
-  <div class="remote-videos d-flex flex-row justify-content-center">
+  <div class="remote-videos d-flex flex-row flex-wrap justify-content-center">
   </div>
 
   <div class="footer m-3">
@@ -180,28 +165,18 @@
       <button id="control__mute_audio_send" class="btn btn-secondary">Mute audio send</button>
       <button id="control__mute_video_send" class="btn btn-secondary">Mute video send</button>
     </div>
-    <button type="button"
-            class="btn btn-secondary"
-            data-toggle="modal"
-            data-target="#devices-settings">
+    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#devices-settings">
       Devices
     </button>
     <button id="control__close_app" class="btn btn-danger">Dispose</button>
   </div>
 
-  <div class="modal fade"
-       id="control-debug__window_create_endpoint"
-       tabindex="-1"
-       role="dialog"
-       aria-hidden="true">
+  <div class="modal fade" id="control-debug__window_create_endpoint" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Create Endpoint</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           </button>
           <span aria-hidden="true">&times;</span>
         </div>
@@ -213,23 +188,17 @@
             <div class="input-group-prepend">
               <span class="input-group-text">local://</span>
             </div>
-            <input type="text"
-                   placeholder="Room ID"
-                   class="form-control control-debug__id_room">
+            <input type="text" placeholder="Room ID" class="form-control control-debug__id_room">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Member ID"
-                   class="form-control control-debug__id_member">
+            <input type="text" placeholder="Member ID" class="form-control control-debug__id_member">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Endpoint ID"
-                   class="form-control control-debug__id_endpoint">
+            <input type="text" placeholder="Endpoint ID" class="form-control control-debug__id_endpoint">
           </div>
           <br>
 
@@ -251,19 +220,14 @@
                 <span class="input-group-text">local://</span>
               </div>
 
-              <input type="text"
-                     placeholder="room_id/member_id/source_id"
-                     class="webrtc-play-endpoint-spec__src form-control">
+              <input type="text" placeholder="room_id/member_id/source_id"
+                class="webrtc-play-endpoint-spec__src form-control">
             </div>
             <br>
 
             <div class="custom-control custom-switch">
-              <input type="checkbox"
-                     id="webrtc-play-endpoint-spec__force-relay"
-                     class="custom-control-input">
-              <label
-                for="webrtc-play-endpoint-spec__force-relay"
-                class="custom-control-label">
+              <input type="checkbox" id="webrtc-play-endpoint-spec__force-relay" class="custom-control-input">
+              <label for="webrtc-play-endpoint-spec__force-relay" class="custom-control-label">
                 Force relay
               </label>
             </div>
@@ -301,12 +265,8 @@
 
             <br>
             <div class="custom-control custom-switch">
-              <input type="checkbox"
-                     id="webrtc-publish-endpoint-spec__force-relay"
-                     class="custom-control-input">
-              <label
-                for="webrtc-publish-endpoint-spec__force-relay"
-                class="custom-control-label">
+              <input type="checkbox" id="webrtc-publish-endpoint-spec__force-relay" class="custom-control-input">
+              <label for="webrtc-publish-endpoint-spec__force-relay" class="custom-control-label">
                 Force relay
               </label>
             </div>
@@ -314,8 +274,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button"
-                  class="control-debug__execute btn btn-success">
+          <button type="button" class="control-debug__execute btn btn-success">
             Create
           </button>
         </div>
@@ -323,19 +282,12 @@
     </div>
   </div>
 
-  <div class="modal fade"
-       id="control-debug__window_delete"
-       tabindex="1"
-       role="dialog"
-       aria-hidden="true">
+  <div class="modal fade" id="control-debug__window_delete" tabindex="1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Delete element</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </div>
 
@@ -346,29 +298,22 @@
             <div class="input-group-prepend">
               <span class="input-group-text">local://</span>
             </div>
-            <input type="text"
-                   placeholder="Room ID"
-                   class="form-control control-debug__id_room">
+            <input type="text" placeholder="Room ID" class="form-control control-debug__id_room">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Member ID"
-                   class="form-control control-debug__id_member">
+            <input type="text" placeholder="Member ID" class="form-control control-debug__id_member">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Endpoint ID"
-                   class="form-control control-debug__id_endpoint">
+            <input type="text" placeholder="Endpoint ID" class="form-control control-debug__id_endpoint">
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button"
-                  class="control-debug__execute btn btn-danger">
+          <button type="button" class="control-debug__execute btn btn-danger">
             Delete
           </button>
         </div>
@@ -376,19 +321,12 @@
     </div>
   </div>
 
-  <div class="modal fade"
-       id="control-debug__window_create_member"
-       tabindex="1"
-       role="dialog"
-       aria-hidden="true">
+  <div class="modal fade" id="control-debug__window_create_member" tabindex="1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Create Member</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </div>
 
@@ -400,16 +338,12 @@
             <div class="input-group-prepend">
               <span class="input-group-text">local://</span>
             </div>
-            <input type="text"
-                   placeholder="Room ID"
-                   class="form-control control-debug__id_room">
+            <input type="text" placeholder="Room ID" class="form-control control-debug__id_room">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Member ID"
-                   class="form-control control-debug__id_member">
+            <input type="text" placeholder="Member ID" class="form-control control-debug__id_member">
           </div>
           <br>
           <b>Credentials</b>
@@ -423,29 +357,22 @@
             <div class="input-group-prepend">
               <span class="input-group-text">IDLE</span>
             </div>
-            <input type="text"
-                   class="form-control member-spec__idle-timeout"
-                   placeholder="10s">
+            <input type="text" class="form-control member-spec__idle-timeout" placeholder="10s">
 
             <div class="input-group-prepend">
               <span class="input-group-text">Reconnect</span>
             </div>
-            <input type="text"
-                   class="form-control member-spec__reconnect-timeout"
-                   placeholder="10s">
+            <input type="text" class="form-control member-spec__reconnect-timeout" placeholder="10s">
 
             <div class="input-group-prepend">
               <span class="input-group-text">Ping</span>
             </div>
-            <input type="text"
-                   class="form-control member-spec__ping-interval"
-                   placeholder="3s">
+            <input type="text" class="form-control member-spec__ping-interval" placeholder="3s">
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button"
-                  class="control-debug__execute btn btn-success">
+          <button type="button" class="control-debug__execute btn btn-success">
             Create
           </button>
         </div>
@@ -453,19 +380,12 @@
     </div>
   </div>
 
-  <div class="modal fade"
-       id="control-debug__window_create_room"
-       tabindex="1"
-       role="dialog"
-       aria-hidden="true">
+  <div class="modal fade" id="control-debug__window_create_room" tabindex="1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Create Room</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </div>
 
@@ -477,15 +397,12 @@
             <div class="input-group-prepend">
               <span class="input-group-text">local://</span>
             </div>
-            <input type="text"
-                   placeholder="Room ID"
-                   class="form-control control-debug__id_room">
+            <input type="text" placeholder="Room ID" class="form-control control-debug__id_room">
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button"
-                  class="control-debug__execute btn btn-success">
+          <button type="button" class="control-debug__execute btn btn-success">
             Create
           </button>
         </div>
@@ -493,19 +410,12 @@
     </div>
   </div>
 
-  <div class="modal fade"
-       id="control-debug__window_get"
-       tabindex="1"
-       role="document"
-       aria-hidden="true">
+  <div class="modal fade" id="control-debug__window_get" tabindex="1" role="document" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Get element</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </div>
 
@@ -516,23 +426,17 @@
             <div class="input-group-prepend">
               <span class="input-group-text">local://</span>
             </div>
-            <input type="text"
-                   placeholder="Room ID"
-                   class="form-control control-debug__id_room">
+            <input type="text" placeholder="Room ID" class="form-control control-debug__id_room">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Member ID"
-                   class="form-control control-debug__id_member">
+            <input type="text" placeholder="Member ID" class="form-control control-debug__id_member">
 
             <div class="input-group-prepend">
               <span class="input-group-text">/</span>
             </div>
-            <input type="text"
-                   placeholder="Endpoint ID"
-                   class="form-control control-debug__id_endpoint">
+            <input type="text" placeholder="Endpoint ID" class="form-control control-debug__id_endpoint">
           </div>
           <br>
           <b>Result</b>
@@ -541,8 +445,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button"
-                  class="control-debug__execute btn btn-success">
+          <button type="button" class="control-debug__execute btn btn-success">
             Get
           </button>
         </div>
@@ -550,19 +453,12 @@
     </div>
   </div>
 
-  <div class="modal fade"
-       id="control-debug__window_callbacks"
-       tabindex="1"
-       role="document"
-       aria-hidden="true">
+  <div class="modal fade" id="control-debug__window_callbacks" tabindex="1" role="document" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Callbacks</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </div>
 
@@ -573,8 +469,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button"
-                  class="control-debug__execute btn btn-success">
+          <button type="button" class="control-debug__execute btn btn-success">
             Get
           </button>
         </div>
@@ -582,11 +477,8 @@
     </div>
   </div>
 
-  <div class="toast connection-loss-notification"
-       role="alert"
-       aria-live="assertive"
-       aria-atomic="true"
-       data-autohide="false">
+  <div class="toast connection-loss-notification" role="alert" aria-live="assertive" aria-atomic="true"
+    data-autohide="false">
     <div class="toast-header">
       <strong class="mr-auto">Connection lost</strong>
     </div>
@@ -596,19 +488,12 @@
     </div>
   </div>
 
-  <div class="modal fade"
-       id="connection-settings"
-       tabindex="-1"
-       role="dialog"
-       aria-hidden="true">
+  <div class="modal fade" id="connection-settings" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="staticBackdropLabel">Connect to the Room</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -616,40 +501,29 @@
           <form>
             <div class="form-group">
               <h5>Username</h5>
-              <input id="connection-settings__username" class="form-control"/>
+              <input id="connection-settings__username" class="form-control" />
               <br>
 
               <h5>Publishing</h5>
 
               <div class="custom-control custom-switch">
-                <input type="checkbox"
-                       id="connection-settings__publish_is-enabled"
-                       class="custom-control-input"
-                       checked>
-                <label for="connection-settings__publish_is-enabled"
-                       class="custom-control-label">
+                <input type="checkbox" id="connection-settings__publish_is-enabled" class="custom-control-input"
+                  checked>
+                <label for="connection-settings__publish_is-enabled" class="custom-control-label">
                   Publish media
                 </label>
               </div>
 
               <div class="custom-control custom-switch">
-                <input type="checkbox"
-                       id="connection-settings__publish_audio"
-                       class="custom-control-input"
-                       checked>
-                <label for="connection-settings__publish_audio"
-                       class="custom-control-label">
+                <input type="checkbox" id="connection-settings__publish_audio" class="custom-control-input" checked>
+                <label for="connection-settings__publish_audio" class="custom-control-label">
                   Publish audio
                 </label>
               </div>
 
               <div class="custom-control custom-switch">
-                <input type="checkbox"
-                       id="connection-settings__publish_video"
-                       class="custom-control-input"
-                       checked>
-                <label for="connection-settings__publish_video"
-                       class="custom-control-label">
+                <input type="checkbox" id="connection-settings__publish_video" class="custom-control-input" checked>
+                <label for="connection-settings__publish_video" class="custom-control-label">
                   Publish video
                 </label>
               </div>
@@ -657,15 +531,10 @@
           </form>
         </div>
         <div class="modal-footer">
-           <button type="button"
-                   class="btn btn-secondary"
-                   data-toggle="modal"
-                   data-target="#devices-settings">
-             Configure devices
-           </button>
-          <button type="button"
-                  id="connection-settings__connect"
-                  class="btn btn-success">
+          <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#devices-settings">
+            Configure devices
+          </button>
+          <button type="button" id="connection-settings__connect" class="btn btn-success">
             Connect
           </button>
         </div>
@@ -673,28 +542,18 @@
     </div>
   </div>
   <div class="text-center">
-   <button type="button"
-           class="btn btn-success btn-lg"
-           id="connect-btn"
-           data-toggle="modal"
-           data-target="#connection-settings">
-    Connect
-   </button>
+    <button type="button" class="btn btn-success btn-lg" id="connect-btn" data-toggle="modal"
+      data-target="#connection-settings">
+      Connect
+    </button>
   </div>
 
-  <div class="modal fade"
-       id="devices-settings"
-       tabindex="-1"
-       role="dialog"
-       aria-hidden="true">
+  <div class="modal fade" id="devices-settings" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Devices settings</h5>
-          <button type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -709,12 +568,9 @@
           </select>
 
           <div class="custom-control custom-switch" style="margin-top: 10px">
-            <input type="checkbox"
-                   id="connection-settings__screenshare"
-                   class="custom-control-input"
-                   autocomplete="off">
-            <label for="connection-settings__screenshare"
-                   class="custom-control-label">
+            <input type="checkbox" id="connection-settings__screenshare" class="custom-control-input"
+              autocomplete="off">
+            <label for="connection-settings__screenshare" class="custom-control-label">
               Screenshare
             </label>
           </div>
@@ -724,4 +580,5 @@
     </div>
   </div>
 </body>
+
 </html>

@@ -19,7 +19,7 @@ module.exports = {
       template: 'index.html',
     }),
     new HtmlWebpackPlugin({
-      filename: 'video-call',
+      filename: 'video-call.html',
       template: 'video-call.html',
     }),
     new WasmPackPlugin({
