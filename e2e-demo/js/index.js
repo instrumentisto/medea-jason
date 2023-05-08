@@ -46,7 +46,7 @@ async function createRoom(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -102,7 +102,7 @@ async function createMember(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -374,7 +374,7 @@ async function startPublishing() {
 
   let publishEndpoint = {
     kind: 'WebRtcPublishEndpoint',
-    p2p: 'Always',
+    p2p: 'Never',
   };
   let isSuccess = await controlApi.createEndpoint(roomId, memberId, 'publish', publishEndpoint);
   if (!isSuccess) {
@@ -550,6 +550,7 @@ window.onload = async function() {
           constraints.display_video(video);
         } else {
           let video = new rust.DeviceVideoTrackConstraints();
+//          video.exact_width(320);
           if (videoSource.value === 'facingModeUser') {
             video.exact_facing_mode(rust.FacingMode.User);
           } else if (videoSource.value === 'facingModeEnvironment') {
@@ -563,6 +564,9 @@ window.onload = async function() {
           }
         }
       } else {
+//        let video = new rust.DeviceVideoTrackConstraints()
+//        video.exact_width(320);
+//        constraints.device_video(video);
         constraints.device_video(new rust.DeviceVideoTrackConstraints());
       }
     }
