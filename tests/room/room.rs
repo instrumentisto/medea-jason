@@ -273,7 +273,7 @@ mod connection_mode {
                 tracks: Vec::new(),
                 ice_servers: Vec::new(),
                 force_relay: false,
-                connection_mode: ConnectionMode::P2pMesh,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
     }
@@ -2928,6 +2928,7 @@ mod state_synchronization {
                 sender_id: "".into(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
+                connection_mode: ConnectionMode::Mesh,
             },
         );
         let mut room_proto = room.peers_state().as_proto();
