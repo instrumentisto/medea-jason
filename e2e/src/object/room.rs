@@ -409,7 +409,7 @@ impl Object<Room> {
                             }
 
                             for (sub of track.onMediaDirectionChangedSubs) {
-                                sub();
+                                sub(dir);
                             }
                             track.onMediaDirectionChangedSubs = [];
                         });
