@@ -235,14 +235,6 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        // let _ = self
-        //     .negotiation_role
-        //     .subscribe()
-        //     .any(|val| async move { val.is_none() })
-        //     .await;
-
-        // self.negotiation_role.set(Some(negotiation_role));
-
         let lock = self
             .negotiation_role
             .subscribe()
@@ -251,7 +243,6 @@ impl State {
 
         platform::spawn(async move {
             let _ = lock.await;
-
             role.set(Some(negotiation_role));
         });
     }

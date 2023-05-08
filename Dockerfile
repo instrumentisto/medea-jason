@@ -34,6 +34,10 @@ FROM nginx:stable-alpine AS runtime
 
 COPY demo/chart/medea-demo/conf/nginx.vh.conf \
      /etc/nginx/conf.d/default.conf
+COPY demo/chart/medea-demo/conf/fullchain.pem \
+     /etc/nginx/fullchain.pem
+COPY demo/chart/medea-demo/conf/privkey.pem \
+     /etc/nginx/privkey.pem
 
 COPY /e2e-demo/dist/*.html /app/
 COPY /e2e-demo/dist/*.js /app/js/

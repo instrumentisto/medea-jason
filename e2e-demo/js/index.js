@@ -1,10 +1,10 @@
-// const controlDomain = document.location.protocol + '//' +
-//   document.location.host;
-// const controlUrl = controlDomain + '/control-api/';
-// const baseUrl = 'ws://' + document.location.host + ':8080/ws/';
-const controlDomain = 'http://127.0.0.1:8000';
+const controlDomain = document.location.protocol + '//' +
+  document.location.host;
 const controlUrl = controlDomain + '/control-api/';
-const baseUrl = 'ws://127.0.0.1:8080/ws/';
+const baseUrl = 'wss://' + document.location.host + '/ws-proxy';
+// const controlDomain = 'http://127.0.0.1:8000';
+// const controlUrl = controlDomain + '/control-api/';
+// const baseUrl = 'ws://127.0.0.1:8080/ws/';
 
 let rust;
 let roomId = window.location.hash.replace('#', '');
@@ -554,6 +554,7 @@ window.onload = async function () {
           constraints.display_video(video);
         } else {
           let video = new rust.DeviceVideoTrackConstraints();
+          //          video.exact_width(320);
           if (videoSource.value === 'facingModeUser') {
             video.exact_facing_mode(rust.FacingMode.User);
           } else if (videoSource.value === 'facingModeEnvironment') {
@@ -567,6 +568,9 @@ window.onload = async function () {
           }
         }
       } else {
+        //        let video = new rust.DeviceVideoTrackConstraints()
+        //        video.exact_width(320);
+        //        constraints.device_video(video);
         constraints.device_video(new rust.DeviceVideoTrackConstraints());
       }
     }
@@ -803,6 +807,9 @@ window.onload = async function () {
             await initLocalStream();
           }
           await room.set_local_media_settings(constraints, true, true);
+          if (screenshareSwitchEl.checked) {
+            await room.enable_video(rust.MediaSourceKind.Display);
+          }
         } catch (e) {
           let name = e.kind();
           if (name === 'RecoveredException') {
