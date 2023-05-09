@@ -161,14 +161,19 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackKindConstMeta;
 
-  /// Sets a callback to invoke when this [`LocalMediaTrack`] is ended.
+  /// Sets callback to invoke when this [`LocalMediaTrack`] is ended.
   void localMediaTrackOnEnded(
       {required LocalMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnEndedConstMeta;
 
-  /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
-  /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
+  void localMediaTrackOnAudioLevel(
+      {required LocalMediaTrack track, required Object f, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnAudioLevelConstMeta;
+
+  /// Returns a [`media::MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
+  /// is active, or a [`media::MediaStreamTrackState::Ended`] if it has ended.
   Object localMediaTrackState({required LocalMediaTrack track, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackStateConstMeta;
@@ -345,6 +350,11 @@ abstract class MedeaJason {
       {required RemoteMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnMutedConstMeta;
+
+  void remoteMediaTrackOnAudioLevel(
+      {required RemoteMediaTrack track, required Object f, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnAudioLevelConstMeta;
 
   /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.
   void remoteMediaTrackOnUnmuted(
@@ -1435,6 +1445,26 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track", "f"],
       );
 
+  void localMediaTrackOnAudioLevel(
+      {required LocalMediaTrack track, required Object f, dynamic hint}) {
+    var arg0 = _platform.api2wire_LocalMediaTrack(track);
+    var arg1 = _platform.api2wire_DartOpaque(f);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () =>
+          _platform.inner.wire_local_media_track_on_audio_level(arg0, arg1),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kLocalMediaTrackOnAudioLevelConstMeta,
+      argValues: [track, f],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnAudioLevelConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "local_media_track_on_audio_level",
+        argNames: ["track", "f"],
+      );
+
   Object localMediaTrackState({required LocalMediaTrack track, dynamic hint}) {
     var arg0 = _platform.api2wire_LocalMediaTrack(track);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
@@ -1828,6 +1858,26 @@ class MedeaJasonImpl implements MedeaJason {
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnMutedConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "remote_media_track_on_muted",
+        argNames: ["track", "f"],
+      );
+
+  void remoteMediaTrackOnAudioLevel(
+      {required RemoteMediaTrack track, required Object f, dynamic hint}) {
+    var arg0 = _platform.api2wire_RemoteMediaTrack(track);
+    var arg1 = _platform.api2wire_DartOpaque(f);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () =>
+          _platform.inner.wire_remote_media_track_on_audio_level(arg0, arg1),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kRemoteMediaTrackOnAudioLevelConstMeta,
+      argValues: [track, f],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnAudioLevelConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "remote_media_track_on_audio_level",
         argNames: ["track", "f"],
       );
 
@@ -3665,6 +3715,24 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
       _wire_local_media_track_on_endedPtr.asFunction<
           WireSyncReturn Function(wire_LocalMediaTrack, wire_DartOpaque)>();
 
+  WireSyncReturn wire_local_media_track_on_audio_level(
+    wire_LocalMediaTrack track,
+    wire_DartOpaque f,
+  ) {
+    return _wire_local_media_track_on_audio_level(
+      track,
+      f,
+    );
+  }
+
+  late final _wire_local_media_track_on_audio_levelPtr = _lookup<
+      ffi.NativeFunction<
+          WireSyncReturn Function(wire_LocalMediaTrack,
+              wire_DartOpaque)>>('wire_local_media_track_on_audio_level');
+  late final _wire_local_media_track_on_audio_level =
+      _wire_local_media_track_on_audio_levelPtr.asFunction<
+          WireSyncReturn Function(wire_LocalMediaTrack, wire_DartOpaque)>();
+
   WireSyncReturn wire_local_media_track_state(
     wire_LocalMediaTrack track,
   ) {
@@ -3981,6 +4049,24 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
               wire_DartOpaque)>>('wire_remote_media_track_on_muted');
   late final _wire_remote_media_track_on_muted =
       _wire_remote_media_track_on_mutedPtr.asFunction<
+          WireSyncReturn Function(wire_RemoteMediaTrack, wire_DartOpaque)>();
+
+  WireSyncReturn wire_remote_media_track_on_audio_level(
+    wire_RemoteMediaTrack track,
+    wire_DartOpaque f,
+  ) {
+    return _wire_remote_media_track_on_audio_level(
+      track,
+      f,
+    );
+  }
+
+  late final _wire_remote_media_track_on_audio_levelPtr = _lookup<
+      ffi.NativeFunction<
+          WireSyncReturn Function(wire_RemoteMediaTrack,
+              wire_DartOpaque)>>('wire_remote_media_track_on_audio_level');
+  late final _wire_remote_media_track_on_audio_level =
+      _wire_remote_media_track_on_audio_levelPtr.asFunction<
           WireSyncReturn Function(wire_RemoteMediaTrack, wire_DartOpaque)>();
 
   WireSyncReturn wire_remote_media_track_on_unmuted(
@@ -5489,6 +5575,22 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           'on_ended');
   late final _on_ended =
       _on_endedPtr.asFunction<void Function(Object, Object)>();
+
+  void on_audio_level(
+    Object track,
+    Object cb,
+  ) {
+    return _on_audio_level(
+      track,
+      cb,
+    );
+  }
+
+  late final _on_audio_levelPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_audio_level');
+  late final _on_audio_level =
+      _on_audio_levelPtr.asFunction<void Function(Object, Object)>();
 
   Object clone(
     Object track,

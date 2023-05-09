@@ -103,6 +103,9 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
         pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
 
+        // todo
+        pub fn on_audio_level(track: Dart_Handle, cb: Dart_Handle);
+
         /// Creates a new instance of [MediaStreamTrack][0] depending on the
         /// same media source as the provided one has.
         ///
@@ -307,6 +310,22 @@ impl MediaStreamTrack {
             let cb = Callback::from_once(|_: ()| cb());
             unsafe {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
+            };
+        }
+    }
+
+    // todo
+    pub fn on_audio_level<F>(&self, f: Option<F>)
+    where
+        F: 'static + FnMut(f64),
+    {
+        if let Some(mut cb) = f {
+            let cb = Callback::from_fn_mut(move |level| cb(level));
+            unsafe {
+                media_stream_track::on_audio_level(
+                    self.inner.get(),
+                    cb.into_dart(),
+                );
             };
         }
     }

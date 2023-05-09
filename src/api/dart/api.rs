@@ -572,6 +572,18 @@ pub fn local_media_track_on_ended(
     SyncReturn(())
 }
 
+// todo
+#[must_use]
+pub fn local_media_track_on_audio_level(
+    track: RustOpaque<LocalMediaTrack>,
+    f: DartOpaque,
+) -> SyncReturn<()> {
+    track.on_audio_level(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+    });
+    SyncReturn(())
+}
+
 /// Returns a [`media::MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
 /// is active, or a [`media::MediaStreamTrackState::Ended`] if it has ended.
 #[must_use]
@@ -938,6 +950,18 @@ pub fn remote_media_track_on_muted(
         platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
     });
 
+    SyncReturn(())
+}
+
+// todo
+#[must_use]
+pub fn remote_media_track_on_audio_level(
+    track: RustOpaque<RemoteMediaTrack>,
+    f: DartOpaque,
+) -> SyncReturn<()> {
+    track.on_audio_level(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+    });
     SyncReturn(())
 }
 

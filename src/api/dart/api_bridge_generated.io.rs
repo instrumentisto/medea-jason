@@ -147,6 +147,14 @@ pub extern "C" fn wire_local_media_track_on_ended(
 }
 
 #[no_mangle]
+pub extern "C" fn wire_local_media_track_on_audio_level(
+    track: wire_LocalMediaTrack,
+    f: wire_DartOpaque,
+) -> support::WireSyncReturn {
+    wire_local_media_track_on_audio_level_impl(track, f)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_local_media_track_state(
     track: wire_LocalMediaTrack,
 ) -> support::WireSyncReturn {
@@ -293,6 +301,14 @@ pub extern "C" fn wire_remote_media_track_on_muted(
     f: wire_DartOpaque,
 ) -> support::WireSyncReturn {
     wire_remote_media_track_on_muted_impl(track, f)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_remote_media_track_on_audio_level(
+    track: wire_RemoteMediaTrack,
+    f: wire_DartOpaque,
+) -> support::WireSyncReturn {
+    wire_remote_media_track_on_audio_level_impl(track, f)
 }
 
 #[no_mangle]

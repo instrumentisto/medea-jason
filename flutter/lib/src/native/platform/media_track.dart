@@ -20,6 +20,7 @@ void registerFunctions(DynamicLibrary dl) {
     enabled: Pointer.fromFunction(_enabled, false),
     stop: Pointer.fromFunction(_stop),
     onEnded: Pointer.fromFunction(_onEnded),
+    onAudioLevel: Pointer.fromFunction(_onAudioLevel),
     clone: Pointer.fromFunction(_clone),
     readyState: Pointer.fromFunction(_readyState),
     dispose: Pointer.fromFunction(_dispose),
@@ -45,6 +46,13 @@ int _kind(MediaStreamTrack track) {
 void _onEnded(MediaStreamTrack track, Function f) {
   track.onEnded(() {
     f(null);
+  });
+}
+
+// todo
+void _onAudioLevel(MediaStreamTrack track, Function f) {
+  track.onAudioLevel((level) {
+    f(level);
   });
 }
 

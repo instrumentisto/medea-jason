@@ -9,6 +9,9 @@ export 'enums.dart' show MediaKind, MediaSourceKind;
 
 typedef TrackMediaDirection = MediaDirection;
 
+/// Representation of the `onAudioLevel` callback.
+typedef OnAudioLevelCallback = void Function(double);
+
 /// Representation of the `onEnded` callback.
 typedef OnEndedCallback = void Function();
 
@@ -27,6 +30,9 @@ abstract class MediaTrack implements AsyncPlatformHandle {
 
   /// Returns the underlying [MediaStreamTrack] of this [LocalMediaTrack].
   webrtc.MediaStreamTrack getTrack();
+
+  /// todo
+  void onAudioLevel(OnAudioLevelCallback f);
 }
 
 /// Strongly referenced media track received from a

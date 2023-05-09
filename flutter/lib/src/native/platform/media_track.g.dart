@@ -17,13 +17,28 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function(Handle)>> readyState,
   required Pointer<NativeFunction<Handle Function(Handle)>> stop,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onEnded,
+  required Pointer<NativeFunction<Void Function(Handle, Handle)>> onAudioLevel,
   required Pointer<NativeFunction<Handle Function(Handle)>> clone,
   required Pointer<NativeFunction<Handle Function(Handle)>> dispose,
 }) {
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
+      Void Function(
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer),
       void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -48,6 +63,7 @@ void registerFunction(
     readyState,
     stop,
     onEnded,
+    onAudioLevel,
     clone,
     dispose,
   );

@@ -99,6 +99,12 @@ impl Track {
         self.track.on_ended(Some(move || callback.call0()));
     }
 
+    // todo
+    pub fn on_audio_level(&self, callback: platform::Function<f64>) {
+        self.track
+            .on_audio_level(Some(move |level| callback.call1(level)));
+    }
+
     /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
     /// or a [`MediaStreamTrackState::Ended`] if it has ended.
     pub async fn state(&self) -> MediaStreamTrackState {
@@ -169,6 +175,11 @@ impl LocalMediaTrack {
     /// Sets a callback to invoke when this [`LocalMediaTrack`] is ended.
     pub fn on_ended(&self, callback: platform::Function<()>) {
         self.0.on_ended(callback);
+    }
+
+    // todo
+    pub fn on_audio_level(&self, callback: platform::Function<f64>) {
+        self.0.on_audio_level(callback);
     }
 
     /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
