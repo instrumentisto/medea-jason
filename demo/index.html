@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Chat</title>
   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
-    integrity="sha384-6woDBwQr+eqsszpfCWmyJ2UTm+OSym/GuB2NAD8H3d+6xuEZzOMJ/6GEPDTPPCmi"
-    crossorigin="anonymous"></script>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js" integrity="sha384-6woDBwQr+eqsszpfCWmyJ2UTm+OSym/GuB2NAD8H3d+6xuEZzOMJ/6GEPDTPPCmi" crossorigin="anonymous"></script>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <script type="module">
     import init, {
@@ -23,7 +19,7 @@
     } from './js/medea_jason.js';
 
     const controlUrl = document.location.protocol + '//' +
-      document.location.host + '/control-api/';
+                       document.location.host + '/control-api/';
     const userNameCookieName = 'MEDEA_DEMO_USER_NAME';
 
     let chooseRoomDiv = document.getElementById('choose-room');
@@ -470,39 +466,39 @@
       isVideoEnabledCheckbox.addEventListener('change', isVideoEnabledListener);
 
       isPublishingEnabledCheckbox.addEventListener('change', async () => {
-        isPublishingEnabled = isPublishingEnabledCheckbox.checked;
-        if (isPublishingEnabledCheckbox.checked) {
-          isAudioEnabledCheckbox.disabled = false;
-          isVideoEnabledCheckbox.disabled = false;
-          if (isJoinedRoom) {
-            await startPublishing(roomId, usernameInput.value);
-            isAudioEnabledCheckbox.disabled = true;
-            isVideoEnabledCheckbox.disabled = true;
-            isPublishingEnabledCheckbox.disabled = true;
-          } else {
-            isAudioEnabledCheckbox.checked = true;
-            isVideoEnabledCheckbox.checked = true;
-
-            await isAudioEnabledListener({ target: isAudioEnabledCheckbox });
-            await isVideoEnabledListener({ target: isVideoEnabledCheckbox });
-          }
-        } else {
-          if (isJoinedRoom) {
-            await stopPublishing(roomId, usernameInput.value);
+          isPublishingEnabled = isPublishingEnabledCheckbox.checked;
+          if (isPublishingEnabledCheckbox.checked) {
             isAudioEnabledCheckbox.disabled = false;
             isVideoEnabledCheckbox.disabled = false;
+            if (isJoinedRoom) {
+              await startPublishing(roomId, usernameInput.value);
+              isAudioEnabledCheckbox.disabled = true;
+              isVideoEnabledCheckbox.disabled = true;
+              isPublishingEnabledCheckbox.disabled = true;
+            } else {
+              isAudioEnabledCheckbox.checked = true;
+              isVideoEnabledCheckbox.checked = true;
+
+              await isAudioEnabledListener({target: isAudioEnabledCheckbox});
+              await isVideoEnabledListener({target: isVideoEnabledCheckbox});
+            }
           } else {
-            isAudioEnabledCheckbox.checked = false;
-            isVideoEnabledCheckbox.checked = false;
+            if (isJoinedRoom) {
+              await stopPublishing(roomId, usernameInput.value);
+              isAudioEnabledCheckbox.disabled = false;
+              isVideoEnabledCheckbox.disabled = false;
+            } else {
+              isAudioEnabledCheckbox.checked = false;
+              isVideoEnabledCheckbox.checked = false;
 
-            await isAudioEnabledListener({ target: isAudioEnabledCheckbox });
-            await isVideoEnabledListener({ target: isVideoEnabledCheckbox });
+              await isAudioEnabledListener({target: isAudioEnabledCheckbox});
+              await isVideoEnabledListener({target: isVideoEnabledCheckbox});
 
-            isAudioEnabledCheckbox.disabled = true;
-            isVideoEnabledCheckbox.disabled = true;
+              isAudioEnabledCheckbox.disabled = true;
+              isVideoEnabledCheckbox.disabled = true;
+            }
           }
         }
-      }
       );
 
       audioSelect.addEventListener('change', async () => {
@@ -863,11 +859,9 @@
   </script>
 
 </head>
-
 <body>
   <div id="choose-room" class="input-group col-md-3">
-    <input id="choose-room__room-id" type="text" class="form-control" placeholder="Room name" aria-label="Room name"
-      aria-describedby="basic-addon2">
+    <input id="choose-room__room-id" type="text" class="form-control" placeholder="Room name" aria-label="Room name" aria-describedby="basic-addon2">
     <div class="input-group-append">
       <button id="choose-room__join" class="btn btn-outline-secondary" type="submit">Join Room</button>
     </div>
@@ -883,8 +877,7 @@
       <div class="col-md-4">
 
         <div class="input-group mb-3">
-          <input id="join__username" type="text" class="form-control" placeholder="Username" aria-label="Username"
-            aria-describedby="basic-addon2">
+          <input id="join__username" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon2">
           <div class="input-group-append">
             <button id="join__join" class="btn btn-outline-secondary" type="button">Connect</button>
           </div>
@@ -905,8 +898,12 @@
         </div>
 
         <div class="custom-control custom-switch">
-          <input type="checkbox" id="connection-settings__screenshare" class="custom-control-input" autocomplete="off">
-          <label for="connection-settings__screenshare" class="custom-control-label">
+          <input type="checkbox"
+                 id="connection-settings__screenshare"
+                 class="custom-control-input"
+                 autocomplete="off">
+          <label for="connection-settings__screenshare"
+                 class="custom-control-label">
             Screenshare
           </label>
         </div>
@@ -933,22 +930,34 @@
 
         <div class="form-check form-check-inline mb-3">
           <div class="custom-switch">
-            <input class="form-check-input custom-control-input" type="checkbox" id="is-audio-enabled" checked>
-            <label class="form-check-label custom-control-label" for="is-audio-enabled">
+            <input class="form-check-input custom-control-input"
+                   type="checkbox"
+                   id="is-audio-enabled"
+                   checked>
+            <label class="form-check-label custom-control-label"
+                   for="is-audio-enabled">
               Publish audio
             </label>
           </div>
 
           <div class="custom-switch">
-            <input class="form-check-input custom-control-input" type="checkbox" id="is-video-enabled" checked>
-            <label class="form-check-label custom-control-label" for="is-video-enabled">
+            <input class="form-check-input custom-control-input"
+                   type="checkbox"
+                   id="is-video-enabled"
+                   checked>
+            <label class="form-check-label custom-control-label"
+                   for="is-video-enabled">
               Publish video
             </label>
           </div>
 
           <div class="custom-switch">
-            <input class="form-check-input custom-control-input" type="checkbox" id="is-publishing-enabled" checked>
-            <label class="form-check-label custom-control-label" for="is-publishing-enabled">
+            <input class="form-check-input custom-control-input"
+                   type="checkbox"
+                   id="is-publishing-enabled"
+                   checked>
+            <label class="form-check-label custom-control-label"
+                   for="is-publishing-enabled">
               Publish media
             </label>
           </div>
@@ -956,8 +965,12 @@
 
         <div class="form-check mb-3">
           <div class="custom-switch">
-            <input class="form-check-input custom-control-input" type="checkbox" id="is_force_relay" value="true">
-            <label class="form-check-label custom-control-label" for="is_force_relay">
+            <input class="form-check-input custom-control-input"
+                   type="checkbox"
+                   id="is_force_relay"
+                   value="true">
+            <label class="form-check-label custom-control-label"
+                   for="is_force_relay">
               Force TURN relay
             </label>
           </div>
@@ -965,11 +978,9 @@
 
       </div>
       <div class="col-md-4">
-        <textarea class="form-control" id="logs-output" style="resize: none" rows="14" autocomplete="off"
-          disabled></textarea>
+          <textarea class="form-control" id="logs-output" style="resize: none" rows="14" autocomplete="off" disabled></textarea>
       </div>
     </div>
   </div>
 </body>
-
 </html>

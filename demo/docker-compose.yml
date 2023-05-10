@@ -3,7 +3,7 @@ version: "2"
 services:
   web-client:
     container_name: demo-web-client
-    image: logist322/medea-e2e-demo:dev
+    image: instrumentisto/medea-demo:dev
     ports:
       - "80:80"        # web-client http
       - "8080:8080"    # medea ws
@@ -11,7 +11,7 @@ services:
       - ./chart/medea-demo/conf/nginx.vh.conf:/etc/nginx/conf.d/default.conf
   medea:
     container_name: demo-medea
-    image: logist322/medea:dev
+    image: ghcr.io/instrumentisto/medea:edge
     environment:
       MEDEA__LOG__LEVEL: "DEBUG"
     volumes:
@@ -19,7 +19,7 @@ services:
     network_mode: service:web-client
   control-mock:
     container_name: demo-control-api-mock
-    image: logist322/medea-control-api-mock:dev
+    image: instrumentisto/medea-control-api-mock:dev
     depends_on: ["medea"]
     environment:
       RUST_LOG: INFO

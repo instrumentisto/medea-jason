@@ -439,7 +439,6 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-peerconnection-setlocaldescription
     pub async fn set_answer(&self, answer: &str) -> Result<()> {
-        // log::error!("set_answer");
         self.set_local_description(RtcSdpType::Answer, answer)
             .await
             .map_err(tracerr::map_from_and_wrap!())

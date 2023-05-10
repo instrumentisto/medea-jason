@@ -234,7 +234,7 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let _ = self
+        _ = self
             .negotiation_role
             .subscribe()
             .any(|val| async move { val.is_none() })

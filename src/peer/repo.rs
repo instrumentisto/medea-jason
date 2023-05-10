@@ -160,18 +160,18 @@ impl Repository {
         let (fut, abort) = future::abortable(async move {
             loop {
                 platform::delay_for(Duration::from_secs(1)).await;
-                //
-                // let peers = peers
-                //     .borrow()
-                //     .values()
-                //     .map(component::Component::obj)
-                //     .collect::<Vec<_>>();
-                // drop(
-                //     future::join_all(
-                //         peers.iter().map(|p| p.scrape_and_send_peer_stats()),
-                //     )
-                //     .await,
-                // );
+
+                let peers = peers
+                    .borrow()
+                    .values()
+                    .map(component::Component::obj)
+                    .collect::<Vec<_>>();
+                drop(
+                    future::join_all(
+                        peers.iter().map(|p| p.scrape_and_send_peer_stats()),
+                    )
+                    .await,
+                );
             }
         });
 

@@ -156,7 +156,6 @@ impl LocalSdp {
                     future::select(this.when_approved(), Box::pin(timeout))
                         .await
                 {
-                    // log::error!("rollback 2");
                     this.rollback();
                 };
             }

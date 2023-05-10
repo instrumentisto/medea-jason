@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "webpack-dev-server -d --open --port 8081",
-    "build": "webpack --mode=production"
+    "build": "webpack"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "^1.3",

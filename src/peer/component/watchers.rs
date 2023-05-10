@@ -270,7 +270,6 @@ impl Component {
                 // TODO: Temporary fix that allows us to ignore rollback
                 //       since it won't work anyway.
                 if state.negotiation_state.get() != NegotiationState::Stable {
-                    // log::error!("rollback 1");
                     peer.peer
                         .rollback()
                         .await
@@ -309,7 +308,6 @@ impl Component {
                             .set(NegotiationState::WaitLocalSdpApprove);
                     }
                     NegotiationRole::Answerer(_) => {
-                        // log::error!("NegotiationRole::Answerer");
                         peer.peer
                             .set_answer(&sdp)
                             .await

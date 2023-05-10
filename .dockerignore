@@ -11,14 +11,14 @@
 !mock/
 !proto/
 
-# Demo assets and configs.
+# Demos assets and configs.
 !demo/chart/medea-demo/conf/
 !demo/index.html
+!e2e-demo/dist
 
 # E2E tests sources and manifest.
 !e2e/Cargo.toml
 !e2e/src/
-!e2e-demo/dist
 
 # Makefile may be used in Dockerfiles.
 !.env

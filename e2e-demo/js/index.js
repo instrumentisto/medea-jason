@@ -1,7 +1,3 @@
-// const controlDomain = document.location.protocol + '//' +
-//   document.location.host;
-// const controlUrl = controlDomain + '/control-api/';
-// const baseUrl = 'wss://' + document.location.host + '/ws-proxy';
 const controlDomain = 'http://127.0.0.1:8000';
 const controlUrl = controlDomain + '/control-api/';
 const baseUrl = 'ws://127.0.0.1:8080/ws/';
@@ -50,7 +46,7 @@ async function createRoom(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Never',
+      p2p: 'Always',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -106,7 +102,7 @@ async function createMember(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Never',
+      p2p: 'Always',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -165,7 +161,7 @@ async function createMember(roomId, memberId) {
 }
 
 const colorizedJson = {
-  replacer: function (match, pIndent, pKey, pVal, pEnd) {
+  replacer: function(match, pIndent, pKey, pVal, pEnd) {
     let key = '<span class="json__key">';
     let val = '<span class="json__value">';
     let str = '<span class="json__string">';
@@ -177,7 +173,7 @@ const colorizedJson = {
     return r + (pEnd || '');
   },
 
-  prettyPrint: function (obj) {
+  prettyPrint: function(obj) {
     let jsonLine = /^( *)("[\w\-]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
     return JSON.stringify(obj, null, 3)
       .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
@@ -187,7 +183,7 @@ const colorizedJson = {
 };
 
 const controlDebugWindows = {
-  createEndpoint: function () {
+  createEndpoint: function() {
     let container = document.getElementById('control-debug__window_create_endpoint');
 
     let publishEndpointSpecContainer = container.getElementsByClassName('webrtc-publish-endpoint-spec')[0];
@@ -197,12 +193,12 @@ const controlDebugWindows = {
     endpointTypeSelect.addEventListener('change', () => {
       switch (endpointTypeSelect.value) {
         case 'WebRtcPlayEndpoint':
-          $(playEndpointSpecContainer).show();
-          $(publishEndpointSpecContainer).hide();
+          $( playEndpointSpecContainer ).show();
+          $( publishEndpointSpecContainer ).hide();
           break;
         case 'WebRtcPublishEndpoint':
-          $(publishEndpointSpecContainer).show();
-          $(playEndpointSpecContainer).hide();
+          $( publishEndpointSpecContainer ).show();
+          $( playEndpointSpecContainer ).hide();
           break;
       }
     });
@@ -215,34 +211,34 @@ const controlDebugWindows = {
       let endpointId = container.getElementsByClassName('control-debug__id_endpoint')[0].value;
       let endpointType = container.getElementsByClassName('control-debug__endpoint-type')[0].value;
       if (endpointType === 'WebRtcPublishEndpoint') {
-        let p2pMode = container.getElementsByClassName('webrtc-publish-endpoint-spec__p2p')[0].value;
-        let isForceRelay = document.getElementById('webrtc-publish-endpoint-spec__force-relay').checked;
-        let audioPublishPolicy = document.getElementsByClassName('webrtc-publish-endpoint-spec__publish-policy_audio')[0].value;
-        let videoPublishPolicy = document.getElementsByClassName('webrtc-publish-endpoint-spec__publish-policy_video')[0].value;
-        await controlApi.createEndpoint(roomId, memberId, endpointId, {
-          kind: endpointType,
-          p2p: p2pMode,
-          force_relay: isForceRelay,
-          audio_settings: {
-            publish_policy: audioPublishPolicy,
-          },
-          video_settings: {
-            publish_policy: videoPublishPolicy,
-          },
-        });
+          let p2pMode = container.getElementsByClassName('webrtc-publish-endpoint-spec__p2p')[0].value;
+          let isForceRelay = document.getElementById('webrtc-publish-endpoint-spec__force-relay').checked;
+          let audioPublishPolicy = document.getElementsByClassName('webrtc-publish-endpoint-spec__publish-policy_audio')[0].value;
+          let videoPublishPolicy = document.getElementsByClassName('webrtc-publish-endpoint-spec__publish-policy_video')[0].value;
+          await controlApi.createEndpoint(roomId, memberId, endpointId, {
+            kind: endpointType,
+            p2p: p2pMode,
+            force_relay: isForceRelay,
+            audio_settings: {
+              publish_policy: audioPublishPolicy,
+            },
+            video_settings: {
+              publish_policy: videoPublishPolicy,
+            },
+          });
       } else if (endpointType === 'WebRtcPlayEndpoint') {
-        let source = 'local://' + container.getElementsByClassName('webrtc-play-endpoint-spec__src')[0].value;
-        let isForceRelay = document.getElementById('webrtc-play-endpoint-spec__force-relay').checked;
-        await controlApi.createEndpoint(roomId, memberId, endpointId, {
-          kind: endpointType,
-          src: source,
-          force_relay: isForceRelay,
-        });
+          let source = 'local://' + container.getElementsByClassName('webrtc-play-endpoint-spec__src')[0].value;
+          let isForceRelay = document.getElementById('webrtc-play-endpoint-spec__force-relay').checked;
+          await controlApi.createEndpoint(roomId, memberId, endpointId, {
+            kind: endpointType,
+            src: source,
+            force_relay: isForceRelay,
+          });
       }
     })
   },
 
-  delete: function () {
+  delete: function() {
     let container = document.getElementById('control-debug__window_delete');
 
     let execute = container.getElementsByClassName('control-debug__execute')[0];
@@ -254,7 +250,7 @@ const controlDebugWindows = {
     });
   },
 
-  createRoom: function () {
+  createRoom: function() {
     let container = document.getElementById('control-debug__window_create_room');
 
     let execute = container.getElementsByClassName('control-debug__execute')[0];
@@ -265,7 +261,7 @@ const controlDebugWindows = {
     });
   },
 
-  createMember: function () {
+  createMember: function() {
     let container = document.getElementById('control-debug__window_create_member');
 
     let execute = container.getElementsByClassName('control-debug__execute')[0];
@@ -296,7 +292,7 @@ const controlDebugWindows = {
     });
   },
 
-  get: function () {
+  get: function() {
     let container = document.getElementById('control-debug__window_get');
     let resultContainer = container.getElementsByClassName('control-debug__json-result')[0];
 
@@ -311,7 +307,7 @@ const controlDebugWindows = {
     })
   },
 
-  callbacks: function () {
+  callbacks: function() {
     let container = document.getElementById('control-debug__window_callbacks');
     let resultContainer = container.getElementsByClassName('control-debug__table-result')[0];
 
@@ -378,7 +374,7 @@ async function startPublishing() {
 
   let publishEndpoint = {
     kind: 'WebRtcPublishEndpoint',
-    p2p: 'Never',
+    p2p: 'Always',
   };
   let isSuccess = await controlApi.createEndpoint(roomId, memberId, 'publish', publishEndpoint);
   if (!isSuccess) {
@@ -426,7 +422,7 @@ async function updateLocalVideo(stream) {
   }
 }
 
-window.onload = async function () {
+window.onload = async function() {
   rust = await import('../../pkg');
   let jason = new rust.Jason();
   console.log(baseUrl);
@@ -434,14 +430,14 @@ window.onload = async function () {
     usernameMenuButton.innerHTML = e.target.value;
   });
 
-  $('.modal').on('show.bs.modal', function (event) {
-    var idx = $('.modal:visible').length;
-    $(this).css('z-index', 1040 + (10 * idx));
+  $('.modal').on('show.bs.modal', function(event) {
+      var idx = $('.modal:visible').length;
+      $(this).css('z-index', 1040 + (10 * idx));
   });
-  $('.modal').on('shown.bs.modal', function (event) {
-    var idx = ($('.modal:visible').length) - 1; // raise backdrop after animation.
-    $('.modal-backdrop').not('.stacked').css('z-index', 1039 + (10 * idx));
-    $('.modal-backdrop').not('.stacked').addClass('stacked');
+  $('.modal').on('shown.bs.modal', function(event) {
+      var idx = ($('.modal:visible').length) -1; // raise backdrop after animation.
+      $('.modal-backdrop').not('.stacked').css('z-index', 1039 + (10 * idx));
+      $('.modal-backdrop').not('.stacked').addClass('stacked');
   });
 
   $('#connection-settings').modal('show');
@@ -464,33 +460,33 @@ window.onload = async function () {
   let room = await newRoom();
 
   async function initLocalStream() {
-    let constraints = await build_constraints(
-      isAudioSendEnabled ? audioSelect : null,
-      isVideoSendEnabled ? videoSelect : null
-    );
-    try {
-      localTracks = await jason.media_manager().init_local_tracks(constraints)
-    } catch (e) {
-      let origError = e.cause();
-      if (origError && (origError.name === 'NotReadableError' || origError.name === 'AbortError')) {
-        if (origError.message.includes('audio')) {
-          constraints = await build_constraints(null, videoSelect);
-          localTracks = await jason.media_manager().init_local_tracks(constraints);
-          alert('unable to get audio, will try to enter room with video only');
-        } else if (origError.message.includes('video')) {
-          constraints = await build_constraints(audioSelect, null);
-          localTracks = await jason.media_manager().init_local_tracks(constraints);
-          alert('unable to get video, will try to enter room with audio only');
+      let constraints = await build_constraints(
+        isAudioSendEnabled ? audioSelect : null,
+        isVideoSendEnabled ? videoSelect : null
+      );
+      try {
+        localTracks = await jason.media_manager().init_local_tracks(constraints)
+      } catch (e) {
+        let origError = e.cause();
+        if (origError && (origError.name === 'NotReadableError' || origError.name === 'AbortError')) {
+          if (origError.message.includes('audio')) {
+            constraints = await build_constraints(null, videoSelect);
+            localTracks = await jason.media_manager().init_local_tracks(constraints);
+            alert('unable to get audio, will try to enter room with video only');
+          } else if (origError.message.includes('video')) {
+            constraints = await build_constraints(audioSelect, null);
+            localTracks = await jason.media_manager().init_local_tracks(constraints);
+            alert('unable to get video, will try to enter room with audio only');
+          } else {
+            throw e;
+          }
         } else {
           throw e;
         }
-      } else {
-        throw e;
       }
-    }
-    await updateLocalVideo(localTracks);
+      await updateLocalVideo(localTracks);
 
-    return constraints;
+      return constraints;
   }
 
   async function fillMediaDevicesInputs(audio_select, video_select, current_stream) {
@@ -554,7 +550,6 @@ window.onload = async function () {
           constraints.display_video(video);
         } else {
           let video = new rust.DeviceVideoTrackConstraints();
-          //          video.exact_width(320);
           if (videoSource.value === 'facingModeUser') {
             video.exact_facing_mode(rust.FacingMode.User);
           } else if (videoSource.value === 'facingModeEnvironment') {
@@ -568,9 +563,6 @@ window.onload = async function () {
           }
         }
       } else {
-        //        let video = new rust.DeviceVideoTrackConstraints()
-        //        video.exact_width(320);
-        //        constraints.device_video(video);
         constraints.device_video(new rust.DeviceVideoTrackConstraints());
       }
     }
@@ -589,7 +581,7 @@ window.onload = async function () {
       console.error('Init local video failed: ' + e);
     }
 
-    room.on_new_connection((connection) => {
+    room.on_new_connection( (connection) => {
       let remoteMemberId = connection.get_remote_member_id();
       isCallStarted = true;
 
@@ -696,23 +688,19 @@ window.onload = async function () {
             playElement.style.display = 'none';
           }
         });
-        track.on_muted(() => {
+        track.on_muted( () => {
           console.log(`Track muted: ${track.kind()}`);
         });
-        track.on_unmuted(() => {
+        track.on_unmuted( () => {
           console.log(`Track unmuted: ${track.kind()}`);
         });
-        track.on_stopped(() => {
-          console.error("on stopped");
-          console.dir(track);
+        track.on_stopped( () => {
           track.free();
           playElement.remove();
         });
       });
 
       connection.on_close(() => {
-        console.error("on close");
-        console.dir(connection);
         remote_videos[remoteMemberId].remove();
         delete remote_videos[remoteMemberId];
       });
@@ -728,9 +716,9 @@ window.onload = async function () {
       console.error(error.message());
     });
 
-    room.on_connection_loss(async (reconnectHandle) => {
+    room.on_connection_loss( async (reconnectHandle) => {
       let connectionLossNotification = document.getElementsByClassName('connection-loss-notification')[0];
-      $(connectionLossNotification).toast('show');
+      $( connectionLossNotification ).toast('show');
 
       let manualReconnectBtn = document.getElementsByClassName('connection-loss-notification__manual-reconnect')[0];
       let connectionLossMsg = document.getElementsByClassName('connection-loss-notification__msg')[0];
@@ -740,7 +728,7 @@ window.onload = async function () {
         try {
           connectionLossMsg.textContent = 'Trying to manually reconnect...';
           await reconnectHandle.reconnect_with_delay(0);
-          $(connectionLossNotification).toast('hide');
+          $( connectionLossNotification ).toast('hide');
           console.log('Reconnected!');
         } catch (e) {
           console.error('Failed to manually reconnect: ' + e.message());
@@ -753,7 +741,7 @@ window.onload = async function () {
       } catch (e) {
         console.error('Error in reconnection with backoff:\n' + e.message());
       }
-      $(connectionLossNotification).toast('hide');
+      $( connectionLossNotification ).toast('hide');
     });
 
     room.on_close(async function (on_closed) {
@@ -940,8 +928,8 @@ window.onload = async function () {
     usernameInput.value = faker.name.firstName();
     usernameMenuButton.innerHTML = usernameInput.value;
 
-    let bindJoinButtons = function (roomId) {
-      joinCallerButton.onclick = async function () {
+    let bindJoinButtons = function(roomId) {
+      joinCallerButton.onclick = async function() {
         $('#connection-settings').modal('hide');
         $('.control').css('display', 'flex');
         $('#connect-btn').hide();
@@ -966,7 +954,7 @@ window.onload = async function () {
             await room.join(await createMember(roomId, username));
             return;
           }
-          await room.join(baseUrl + roomId + '/' + username + '?token=test');
+          await room.join(baseUrl + roomId + '/' + username + '?token=test')
         } catch (e) {
           console.error(e);
           console.error(
@@ -985,7 +973,7 @@ window.onload = async function () {
 };
 
 const controlApi = {
-  createRoom: async function (roomId) {
+  createRoom: async function(roomId) {
     try {
       await axios({
         method: 'post',
@@ -1000,7 +988,7 @@ const controlApi = {
     }
   },
 
-  createMember: async function (roomId, memberId, spec) {
+  createMember: async function(roomId, memberId, spec) {
     spec.kind = 'Member';
     spec.pipeline = {};
 
@@ -1015,7 +1003,7 @@ const controlApi = {
     }
   },
 
-  createEndpoint: async function (roomId, memberId, endpointId, spec) {
+  createEndpoint: async function(roomId, memberId, endpointId, spec) {
     try {
       await axios({
         method: 'post',
@@ -1031,7 +1019,7 @@ const controlApi = {
     }
   },
 
-  getUrlForElement: function (roomId, memberId, endpointId) {
+  getUrlForElement: function(roomId, memberId, endpointId) {
     let url = controlUrl + roomId;
     if (memberId.length > 0 && endpointId.length > 0) {
       url = controlUrl + roomId + '/' + memberId + '/' + endpointId;
@@ -1042,7 +1030,7 @@ const controlApi = {
     return url;
   },
 
-  delete: async function (roomId, memberId, endpointId) {
+  delete: async function(roomId, memberId, endpointId) {
     try {
       let url = controlApi.getUrlForElement(roomId, memberId, endpointId);
       let resp = await axios.delete(url);
@@ -1052,7 +1040,7 @@ const controlApi = {
     }
   },
 
-  get: async function (roomId, memberId, endpointId) {
+  get: async function(roomId, memberId, endpointId) {
     try {
       let url = controlApi.getUrlForElement(roomId, memberId, endpointId);
       let resp = await axios.get(url);
@@ -1062,7 +1050,7 @@ const controlApi = {
     }
   },
 
-  getCallbacks: async function () {
+  getCallbacks: async function() {
     try {
       let resp = await axios.get(controlDomain + '/callbacks');
       return resp.data;
