@@ -582,13 +582,13 @@ pub fn local_media_track_on_audio_level(
     SyncReturn(
         async move {
             track
-            .on_audio_level(unsafe {
-                platform::Function::new(
-                    f.try_unwrap().unwrap().into_raw().cast(),
-                )
-            })
-            .await;
-        Ok::<(), Error>(())
+                .on_audio_level(unsafe {
+                    platform::Function::new(
+                        f.try_unwrap().unwrap().into_raw().cast(),
+                    )
+                })
+                .await;
+            Ok::<(), Error>(())
         }
         .into_dart_future()
         .into_dart_opaque(),
@@ -974,13 +974,13 @@ pub fn remote_media_track_on_audio_level(
     SyncReturn(
         async move {
             track
-            .on_audio_level(unsafe {
-                platform::Function::new(
-                    f.try_unwrap().unwrap().into_raw().cast(),
-                )
-            })
-            .await;
-        Ok::<(), Error>(())
+                .on_audio_level(unsafe {
+                    platform::Function::new(
+                        f.try_unwrap().unwrap().into_raw().cast(),
+                    )
+                })
+                .await;
+            Ok::<(), Error>(())
         }
         .into_dart_future()
         .into_dart_opaque(),

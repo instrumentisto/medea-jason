@@ -15,8 +15,7 @@ dependencies:
   freezed_annotation: ^2.2.0
   http: ^0.13.5
   js: ^0.6.5
-  medea_flutter_webrtc:
-    path: /media/human/NTFS/Work/Github/flutter-webrtc # todo
+  medea_flutter_webrtc: 0.8.0-dev+rev.cdbbb05edc6887923bf191cbd2116377afeb4468
   meta: ^1.8.0
   retry: ^3.1.0
   tuple: ^2.0.1
