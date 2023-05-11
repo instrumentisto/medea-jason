@@ -572,16 +572,27 @@ pub fn local_media_track_on_ended(
     SyncReturn(())
 }
 
-// todo
+/// Sets a callback to invoke when this [`LocalMediaTrack`]
+/// receive audio level.
 #[must_use]
 pub fn local_media_track_on_audio_level(
     track: RustOpaque<LocalMediaTrack>,
     f: DartOpaque,
-) -> SyncReturn<()> {
-    track.on_audio_level(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
-    });
-    SyncReturn(())
+) -> SyncReturn<DartOpaque> {
+    SyncReturn(
+        async move {
+            track
+            .on_audio_level(unsafe {
+                platform::Function::new(
+                    f.try_unwrap().unwrap().into_raw().cast(),
+                )
+            })
+            .await;
+        Ok::<(), Error>(())
+        }
+        .into_dart_future()
+        .into_dart_opaque(),
+    )
 }
 
 /// Returns a [`media::MediaStreamTrackState::Live`] if this [`LocalMediaTrack`]
@@ -953,16 +964,27 @@ pub fn remote_media_track_on_muted(
     SyncReturn(())
 }
 
-// todo
+/// Sets a callback to invoke when this [`RemoteMediaTrack`]
+/// receive audio level.
 #[must_use]
 pub fn remote_media_track_on_audio_level(
     track: RustOpaque<RemoteMediaTrack>,
     f: DartOpaque,
-) -> SyncReturn<()> {
-    track.on_audio_level(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
-    });
-    SyncReturn(())
+) -> SyncReturn<DartOpaque> {
+    SyncReturn(
+        async move {
+            track
+            .on_audio_level(unsafe {
+                platform::Function::new(
+                    f.try_unwrap().unwrap().into_raw().cast(),
+                )
+            })
+            .await;
+        Ok::<(), Error>(())
+        }
+        .into_dart_future()
+        .into_dart_opaque(),
+    )
 }
 
 /// Sets callback to invoke when this [`RemoteMediaTrack`] is unmuted.

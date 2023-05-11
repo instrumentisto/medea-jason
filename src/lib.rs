@@ -133,6 +133,11 @@ pub mod connection;
 pub mod jason;
 pub mod media;
 pub mod peer;
+
+#[cfg(target_family = "wasm")]
+#[macro_use]
+use lazy_static;
+
 pub mod platform;
 pub mod room;
 pub mod rpc;

@@ -50,8 +50,9 @@ class NativeLocalMediaTrack implements LocalMediaTrack {
   }
 
   @override
-  void onAudioLevel(OnAudioLevelCallback f) {
-    api.localMediaTrackOnAudioLevel(track: opaque.innerOpaque, f: f);
+  Future<void> onAudioLevel(OnAudioLevelCallback f) async {
+    await (api.localMediaTrackOnAudioLevel(track: opaque.innerOpaque, f: f)
+        as Future);
   }
 
   @override

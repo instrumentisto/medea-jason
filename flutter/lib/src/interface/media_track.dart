@@ -31,8 +31,9 @@ abstract class MediaTrack implements AsyncPlatformHandle {
   /// Returns the underlying [MediaStreamTrack] of this [LocalMediaTrack].
   webrtc.MediaStreamTrack getTrack();
 
-  /// todo
-  void onAudioLevel(OnAudioLevelCallback f);
+  /// Sets a callback to invoke when this [LocalMediaTrack]
+  /// receive audio level.
+  Future<void> onAudioLevel(OnAudioLevelCallback f);
 }
 
 /// Strongly referenced media track received from a

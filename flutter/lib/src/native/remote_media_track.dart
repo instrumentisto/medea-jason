@@ -60,8 +60,9 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
   }
 
   @override
-  void onAudioLevel(OnAudioLevelCallback f) {
-    api.remoteMediaTrackOnAudioLevel(track: opaque.innerOpaque, f: f);
+  Future<void> onAudioLevel(OnAudioLevelCallback f) async {
+    await (api.remoteMediaTrackOnAudioLevel(track: opaque.innerOpaque, f: f)
+        as Future);
   }
 
   @override

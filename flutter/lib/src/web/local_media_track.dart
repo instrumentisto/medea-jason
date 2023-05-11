@@ -35,6 +35,11 @@ class WebLocalMediaTrack implements LocalMediaTrack {
     });
   }
 
+  @override
+  Future<void> onAudioLevel(OnAudioLevelCallback f) async {
+    await fallibleFuture(obj.on_audio_level(f));
+  }
+
   @moveSemantics
   @override
   Future<void> free() async {

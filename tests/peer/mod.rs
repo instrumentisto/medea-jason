@@ -913,9 +913,11 @@ async fn get_traffic_stats() {
                     }
                 }
             }
-            RtcStatsType::OutboundRtp(_) => unreachable!(
-                "Second Peer shouldn't have any OutboundRtp stats."
-            ),
+            RtcStatsType::OutboundRtp(_) => {
+                unreachable!(
+                    "Second Peer shouldn't have any OutboundRtp stats."
+                )
+            }
             RtcStatsType::CandidatePair(candidate_pair) => {
                 if let NonExhaustive::Known(
                     KnownIceCandidatePairState::Succeeded,

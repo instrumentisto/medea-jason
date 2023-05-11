@@ -2,17 +2,96 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::{cell::RefCell, future::Future, rc::Rc};
-
+use async_once::AsyncOnce;
 use derive_more::AsRef;
-use futures::future;
+use futures::{future, TryFutureExt};
+use js_sys::{Promise, Reflect};
+use lazy_static::*;
+use once_cell::unsync::OnceCell;
+use std::{
+    borrow::BorrowMut, cell::RefCell, future::Future, rc::Rc, sync::Once,
+};
+use wasm_bindgen::{closure::Closure, JsCast};
+use wasm_bindgen_futures::JsFuture;
 
 use crate::{
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
-    platform::wasm::{get_property_by_name, utils::EventListener},
+    platform::{
+        self,
+        wasm::{get_property_by_name, utils::EventListener},
+    },
 };
+
+/// Provides calculation and sending of audio level.
+#[derive(Debug)]
+pub struct AudioLevelProvider {
+    /// Js `AudioLevelProcessor`.
+    node: web_sys::AudioWorkletNode,
+    /// Js `MediaStream` with audio tracks.
+    stream: web_sys::MediaStream,
+    /// Js `AudioLevelProcessor` source.
+    source: web_sys::MediaStreamAudioSourceNode,
+    /// Js `AudioLevelProcessor` on message cb.
+    cb: Option<Closure<dyn FnMut(web_sys::MessageEvent)>>,
+}
+
+impl AudioLevelProvider {
+    /// Creates a new [`AudioLevelProvider`].
+    pub async fn new(track: &web_sys::MediaStreamTrack) -> Self {
+        let stream = web_sys::MediaStream::new().unwrap();
+        stream.add_track(track);
+
+        let context = web_sys::AudioContext::new().unwrap();
+        let source = context.create_media_stream_source(&stream).unwrap();
+
+        drop(MODULE_REGISTRATION.get().await);
+
+        let node = web_sys::AudioWorkletNode::new(
+            &context,
+            &format!("audio-level-processor"),
+        )
+        .unwrap();
+
+        source.connect_with_audio_node(&node);
+        Self {
+            node,
+            stream,
+            source,
+            cb: None,
+        }
+    }
+
+    /// Sets a callback to invoke when receive audio level message from
+    /// `AudioLevelProcessor`.
+    pub fn set_audio_level_cb<F>(&mut self, f: Option<F>)
+    where
+        F: 'static + FnMut(f64),
+    {
+        if let Some(mut f) = f {
+            let closure: Closure<dyn FnMut(web_sys::MessageEvent)> =
+                Closure::new(move |v: web_sys::MessageEvent| {
+                    f(v.data().as_f64().unwrap_or_default());
+                });
+
+            self.node
+                .port()
+                .unwrap()
+                .set_onmessage(Some(closure.as_ref().unchecked_ref()));
+            self.cb = Some(closure);
+        } else {
+            self.node.port().unwrap().set_onmessage(None);
+            self.cb = None;
+        }
+    }
+}
+
+impl Drop for AudioLevelProvider {
+    fn drop(&mut self) {
+        self.node.port().unwrap().set_onmessage(None);
+    }
+}
 
 /// Wrapper around [MediaStreamTrack][1] received from a
 /// [getUserMedia()][2]/[getDisplayMedia()][3] request.
@@ -44,6 +123,71 @@ pub struct MediaStreamTrack {
     on_ended: RefCell<
         Option<EventListener<web_sys::MediaStreamTrack, web_sys::Event>>,
     >,
+
+    // todo
+    on_audio_level: OnceCell<RefCell<AudioLevelProvider>>,
+}
+
+lazy_static! {
+    /// Url to the audio level calculation module.
+    static ref AUDIO_LEVEL_PROCESSOR_URL: String = {
+        let generate_processor = js_sys::Function::new_no_args(
+            format!(
+                "
+            function generateProcessor()
+            {{
+                return (`
+                    class AudioLevelProcessor extends AudioWorkletProcessor
+                    {{
+                        process(inputs, outputs)
+                        {{
+                            if (inputs.length > 0) {{
+                                const samples = inputs[0][0];
+                                let sum = 0.0;
+                                for (let i = 0; i < samples.length; ++i)
+                                {{
+                                    sum += samples[i] * samples[i];
+                                }}
+                                let rms = Math.sqrt(sum / samples.length);
+                                this.port.postMessage(rms);
+                            }}
+                            return true;
+                        }}
+                    }}
+                    registerProcessor('audio-level-processor',
+                    AudioLevelProcessor);
+                    `);
+                }}
+                return URL.createObjectURL(
+                    new Blob([generateProcessor()],
+                {{type: \"application/javascript\"}})
+            );
+            "
+        )
+        .as_str(),
+    );
+
+    generate_processor
+    .call0(&wasm_bindgen::JsValue::from_str(""))
+    .map(|js| js.as_string().unwrap_or_default())
+    .unwrap_or_default()
+};
+
+/// Registration `AudioLevelProcessor`.
+static ref MODULE_REGISTRATION: AsyncOnce<wasm_bindgen::JsValue> =
+    AsyncOnce::new(
+    async {
+        let context = web_sys::AudioContext::new().unwrap();
+
+        JsFuture::from(
+            context
+                .audio_worklet()
+                .unwrap()
+                .add_module(&AUDIO_LEVEL_PROCESSOR_URL)
+                .unwrap(),
+        )
+        .await.unwrap()
+    });
 }
 
 impl MediaStreamTrack {
@@ -64,6 +208,7 @@ impl MediaStreamTrack {
             source_kind,
             kind,
             on_ended: RefCell::new(None),
+            on_audio_level: OnceCell::new(),
         }
     }
 
@@ -236,6 +381,7 @@ impl MediaStreamTrack {
             kind: self.kind,
             source_kind: self.source_kind,
             on_ended: RefCell::new(None),
+            on_audio_level: OnceCell::new(),
         })
     }
 
@@ -270,5 +416,27 @@ impl MediaStreamTrack {
                 )
             }
         });
+    }
+
+    /// Sets a callback to invoke when this [`MediaStreamTrack`]
+    /// receive audio level.
+    pub async fn on_audio_level<F>(&self, f: Option<F>)
+    where
+        F: 'static + FnMut(f64),
+    {
+        if self.kind == MediaKind::Audio {
+            if let Some(provider) = self.on_audio_level.get() {
+                provider.borrow_mut().set_audio_level_cb(f);
+            } else {
+                self.on_audio_level.set(RefCell::new(
+                    AudioLevelProvider::new(&self.sys_track).await,
+                ));
+                self.on_audio_level
+                    .get()
+                    .unwrap()
+                    .borrow_mut()
+                    .set_audio_level_cb(f);
+            }
+        }
     }
 }

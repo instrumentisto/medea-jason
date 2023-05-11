@@ -50,6 +50,16 @@ impl LocalMediaTrack {
         )
     }
 
+    /// Sets a callback to invoke when this [`LocalMediaTrack`]
+    /// receive audio level.
+    pub fn on_audio_level(&self, cb: js_sys::Function) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            this.on_audio_level(cb.into()).await;
+            Ok(JsValue::null())
+        })
+    }
+
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
     /// sourced from some device (webcam/microphone), or a
     /// [`MediaSourceKind::Display`] if it's captured via

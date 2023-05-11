@@ -314,13 +314,15 @@ impl MediaStreamTrack {
         }
     }
 
-    // todo
-    pub fn on_audio_level<F>(&self, f: Option<F>)
+    /// Sets a callback to invoke when this [`MediaStreamTrack`]
+    /// receive audio level.
+    #[allow(clippy::unused_async)]
+    pub async fn on_audio_level<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(f64),
     {
-        if let Some(mut cb) = f {
-            let cb = Callback::from_fn_mut(move |level| cb(level));
+        if let Some(cb) = f {
+            let cb = Callback::from_fn_mut(cb);
             unsafe {
                 media_stream_track::on_audio_level(
                     self.inner.get(),

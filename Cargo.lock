@@ -444,6 +444,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "async_once"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ce4f10ea3abcd6617873bae9f91d1c5332b4a778bd9ce34d0cd517474c1de82"
+
+[[package]]
 name = "atomic"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1921,6 +1927,7 @@ dependencies = [
  "anyhow",
  "async-recursion",
  "async-trait",
+ "async_once",
  "backoff",
  "bitflags 2.2.1",
  "cc",
@@ -1932,12 +1939,14 @@ dependencies = [
  "futures",
  "instant",
  "js-sys",
+ "lazy_static",
  "libc",
  "log",
  "medea-client-api-proto",
  "medea-macro",
  "medea-reactive 0.1.1",
  "mockall",
+ "once_cell",
  "sealed 0.5.0",
  "serde",
  "serde_json",

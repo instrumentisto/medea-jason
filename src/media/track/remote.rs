@@ -176,11 +176,13 @@ impl Track {
         self.0.on_muted.set_func(callback);
     }
 
-    // todo
-    pub fn on_audio_level(&self, callback: platform::Function<f64>) {
+    /// Sets a callback to invoke when this [`Track`]
+    /// receive audio level.
+    pub async fn on_audio_level(&self, callback: platform::Function<f64>) {
         self.0
             .track
-            .on_audio_level(Some(move |level| callback.call1(level)));
+            .on_audio_level(Some(move |level| callback.call1(level)))
+            .await;
     }
 
     /// Sets callback to invoke when this [`Track`] is unmuted.

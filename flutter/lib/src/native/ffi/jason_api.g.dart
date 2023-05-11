@@ -167,7 +167,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnEndedConstMeta;
 
-  void localMediaTrackOnAudioLevel(
+  Object localMediaTrackOnAudioLevel(
       {required LocalMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kLocalMediaTrackOnAudioLevelConstMeta;
@@ -351,7 +351,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnMutedConstMeta;
 
-  void remoteMediaTrackOnAudioLevel(
+  Object remoteMediaTrackOnAudioLevel(
       {required RemoteMediaTrack track, required Object f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kRemoteMediaTrackOnAudioLevelConstMeta;
@@ -1445,14 +1445,14 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track", "f"],
       );
 
-  void localMediaTrackOnAudioLevel(
+  Object localMediaTrackOnAudioLevel(
       {required LocalMediaTrack track, required Object f, dynamic hint}) {
     var arg0 = _platform.api2wire_LocalMediaTrack(track);
     var arg1 = _platform.api2wire_DartOpaque(f);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_local_media_track_on_audio_level(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
+      parseSuccessData: _wire2api_DartOpaque,
       constMeta: kLocalMediaTrackOnAudioLevelConstMeta,
       argValues: [track, f],
       hint: hint,
@@ -1861,14 +1861,14 @@ class MedeaJasonImpl implements MedeaJason {
         argNames: ["track", "f"],
       );
 
-  void remoteMediaTrackOnAudioLevel(
+  Object remoteMediaTrackOnAudioLevel(
       {required RemoteMediaTrack track, required Object f, dynamic hint}) {
     var arg0 = _platform.api2wire_RemoteMediaTrack(track);
     var arg1 = _platform.api2wire_DartOpaque(f);
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () =>
           _platform.inner.wire_remote_media_track_on_audio_level(arg0, arg1),
-      parseSuccessData: _wire2api_unit,
+      parseSuccessData: _wire2api_DartOpaque,
       constMeta: kRemoteMediaTrackOnAudioLevelConstMeta,
       argValues: [track, f],
       hint: hint,

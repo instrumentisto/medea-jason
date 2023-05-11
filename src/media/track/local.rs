@@ -99,10 +99,12 @@ impl Track {
         self.track.on_ended(Some(move || callback.call0()));
     }
 
-    // todo
-    pub fn on_audio_level(&self, callback: platform::Function<f64>) {
+    /// Sets a callback to invoke when this [`Track`]
+    /// receive audio level.
+    pub async fn on_audio_level(&self, callback: platform::Function<f64>) {
         self.track
-            .on_audio_level(Some(move |level| callback.call1(level)));
+            .on_audio_level(Some(move |level| callback.call1(level)))
+            .await;
     }
 
     /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
@@ -177,9 +179,10 @@ impl LocalMediaTrack {
         self.0.on_ended(callback);
     }
 
-    // todo
-    pub fn on_audio_level(&self, callback: platform::Function<f64>) {
-        self.0.on_audio_level(callback);
+    /// Sets a callback to invoke when this [`Track`]
+    /// receive audio level.
+    pub async fn on_audio_level(&self, callback: platform::Function<f64>) {
+        self.0.on_audio_level(callback).await;
     }
 
     /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is

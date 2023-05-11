@@ -176,12 +176,18 @@ class LocalMediaTrack {
 @JS('LocalMediaTrack')
 abstract class _LocalMediaTrack {
   external Promise<dynamic> state();
+  external Promise<dynamic> on_audio_level(Function cb);
 }
 
 extension LocalMediaTrackExtensions on LocalMediaTrack {
   Future<dynamic> state() {
     final tt = this as _LocalMediaTrack;
     return promiseToFuture(tt.state());
+  }
+
+  Future<dynamic> on_audio_level(Function cb) {
+    final tt = this as _LocalMediaTrack;
+    return promiseToFuture(tt.on_audio_level(cb));
   }
 }
 
@@ -275,6 +281,18 @@ class RemoteMediaTrack {
   external num kind();
   external num media_source_kind();
   external num media_direction();
+}
+
+@JS('RemoteMediaTrack')
+abstract class _RemoteMediaTrack {
+  external Promise<dynamic> on_audio_level(Function cb);
+}
+
+extension RemoteMediaTrackExtensions on RemoteMediaTrack {
+  Future<dynamic> on_audio_level(Function cb) {
+    final tt = this as _RemoteMediaTrack;
+    return promiseToFuture(tt.on_audio_level(allowInterop(cb)));
+  }
 }
 
 @JS()
