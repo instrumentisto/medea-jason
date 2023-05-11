@@ -274,10 +274,10 @@ packages:
   medea_flutter_webrtc:
     dependency: transitive
     description:
-      path: "/media/human/NTFS/Work/Github/flutter-webrtc"
-      relative: false
-    source: path
-    version: "0.8.0-dev"
+      name: medea_flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0-dev+rev.cdbbb05edc6887923bf191cbd2116377afeb4468"
   medea_jason:
     dependency: "direct main"
     description:

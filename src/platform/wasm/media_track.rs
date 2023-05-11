@@ -4,13 +4,10 @@
 
 use async_once::AsyncOnce;
 use derive_more::AsRef;
-use futures::{future, TryFutureExt};
-use js_sys::{Promise, Reflect};
+use futures::future;
 use lazy_static::*;
 use once_cell::unsync::OnceCell;
-use std::{
-    borrow::BorrowMut, cell::RefCell, future::Future, rc::Rc, sync::Once,
-};
+use std::{cell::RefCell, future::Future, rc::Rc};
 use wasm_bindgen::{closure::Closure, JsCast};
 use wasm_bindgen_futures::JsFuture;
 
@@ -18,10 +15,7 @@ use crate::{
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
-    platform::{
-        self,
-        wasm::{get_property_by_name, utils::EventListener},
-    },
+    platform::wasm::{get_property_by_name, utils::EventListener},
 };
 
 /// Provides calculation and sending of audio level.
@@ -29,10 +23,6 @@ use crate::{
 pub struct AudioLevelProvider {
     /// Js `AudioLevelProcessor`.
     node: web_sys::AudioWorkletNode,
-    /// Js `MediaStream` with audio tracks.
-    stream: web_sys::MediaStream,
-    /// Js `AudioLevelProcessor` source.
-    source: web_sys::MediaStreamAudioSourceNode,
     /// Js `AudioLevelProcessor` on message cb.
     cb: Option<Closure<dyn FnMut(web_sys::MessageEvent)>>,
 }
@@ -54,13 +44,8 @@ impl AudioLevelProvider {
         )
         .unwrap();
 
-        source.connect_with_audio_node(&node);
-        Self {
-            node,
-            stream,
-            source,
-            cb: None,
-        }
+        drop(source.connect_with_audio_node(&node));
+        Self { node, cb: None }
     }
 
     /// Sets a callback to invoke when receive audio level message from
@@ -428,9 +413,9 @@ impl MediaStreamTrack {
             if let Some(provider) = self.on_audio_level.get() {
                 provider.borrow_mut().set_audio_level_cb(f);
             } else {
-                self.on_audio_level.set(RefCell::new(
+                drop(self.on_audio_level.set(RefCell::new(
                     AudioLevelProvider::new(&self.sys_track).await,
-                ));
+                )));
                 self.on_audio_level
                     .get()
                     .unwrap()
