@@ -5,7 +5,7 @@
 use async_once::AsyncOnce;
 use derive_more::AsRef;
 use futures::future;
-use lazy_static::*;
+use lazy_static::lazy_static;
 use once_cell::unsync::OnceCell;
 use std::{cell::RefCell, future::Future, rc::Rc};
 use wasm_bindgen::{closure::Closure, JsCast};
@@ -29,6 +29,11 @@ pub struct AudioLevelProvider {
 
 impl AudioLevelProvider {
     /// Creates a new [`AudioLevelProvider`].
+    ///
+    /// # Panics
+    ///
+    /// Panic if `web_sys` function return error.
+    #[allow(clippy::unwrap_used)]
     pub async fn new(track: &web_sys::MediaStreamTrack) -> Self {
         let stream = web_sys::MediaStream::new().unwrap();
         stream.add_track(track);
@@ -36,7 +41,7 @@ impl AudioLevelProvider {
         let context = web_sys::AudioContext::new().unwrap();
         let source = context.create_media_stream_source(&stream).unwrap();
 
-        drop(MODULE_REGISTRATION.get().await);
+        _ = MODULE_REGISTRATION.get().await;
 
         let node = web_sys::AudioWorkletNode::new(
             &context,
@@ -54,27 +59,28 @@ impl AudioLevelProvider {
     where
         F: 'static + FnMut(f64),
     {
-        if let Some(mut f) = f {
-            let closure: Closure<dyn FnMut(web_sys::MessageEvent)> =
-                Closure::new(move |v: web_sys::MessageEvent| {
-                    f(v.data().as_f64().unwrap_or_default());
-                });
+        if let Ok(port) = self.node.port() {
+            if let Some(mut f) = f {
+                let closure: Closure<dyn FnMut(web_sys::MessageEvent)> =
+                    Closure::new(move |v: web_sys::MessageEvent| {
+                        f(v.data().as_f64().unwrap_or_default());
+                    });
 
-            self.node
-                .port()
-                .unwrap()
-                .set_onmessage(Some(closure.as_ref().unchecked_ref()));
-            self.cb = Some(closure);
-        } else {
-            self.node.port().unwrap().set_onmessage(None);
-            self.cb = None;
+                port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
+                self.cb = Some(closure);
+            } else {
+                port.set_onmessage(None);
+                self.cb = None;
+            }
         }
     }
 }
 
 impl Drop for AudioLevelProvider {
     fn drop(&mut self) {
-        self.node.port().unwrap().set_onmessage(None);
+        if let Ok(port) = self.node.port() {
+            port.set_onmessage(None);
+        }
     }
 }
 
@@ -109,7 +115,7 @@ pub struct MediaStreamTrack {
         Option<EventListener<web_sys::MediaStreamTrack, web_sys::Event>>,
     >,
 
-    // todo
+    /// Listener audio level change.
     on_audio_level: OnceCell<RefCell<AudioLevelProvider>>,
 }
 
@@ -117,39 +123,36 @@ lazy_static! {
     /// Url to the audio level calculation module.
     static ref AUDIO_LEVEL_PROCESSOR_URL: String = {
         let generate_processor = js_sys::Function::new_no_args(
-            format!(
-                "
+            "
             function generateProcessor()
-            {{
+            {
                 return (`
                     class AudioLevelProcessor extends AudioWorkletProcessor
-                    {{
+                    {
                         process(inputs, outputs)
-                        {{
-                            if (inputs.length > 0) {{
+                        {
+                            if (inputs.length > 0) {
                                 const samples = inputs[0][0];
                                 let sum = 0.0;
                                 for (let i = 0; i < samples.length; ++i)
-                                {{
+                                {
                                     sum += samples[i] * samples[i];
-                                }}
+                                }
                                 let rms = Math.sqrt(sum / samples.length);
                                 this.port.postMessage(rms);
-                            }}
+                            }
                             return true;
-                        }}
-                    }}
+                        }
+                    }
                     registerProcessor('audio-level-processor',
                     AudioLevelProcessor);
                     `);
-                }}
+                }
                 return URL.createObjectURL(
                     new Blob([generateProcessor()],
-                {{type: \"application/javascript\"}})
+                {type: \"application/javascript\"})
             );
-            "
-        )
-        .as_str(),
+            ",
     );
 
     generate_processor
@@ -160,6 +163,7 @@ lazy_static! {
 
 /// Registration `AudioLevelProcessor`.
 static ref MODULE_REGISTRATION: AsyncOnce<wasm_bindgen::JsValue> =
+    #[allow(clippy::unwrap_used)]
     AsyncOnce::new(
     async {
         let context = web_sys::AudioContext::new().unwrap();
@@ -405,6 +409,7 @@ impl MediaStreamTrack {
 
     /// Sets a callback to invoke when this [`MediaStreamTrack`]
     /// receive audio level.
+    #[allow(clippy::unwrap_used, clippy::missing_panics_doc)]
     pub async fn on_audio_level<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(f64),
