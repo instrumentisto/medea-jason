@@ -144,7 +144,7 @@ extern "C" {
 /// Performs a unchecked conversion from a [`JsValue`] into an instance of the
 /// specified `FromWasmAbi<Abi = u32>` implementor.
 pub fn unchecked_jsval_cast<T: FromWasmAbi<Abi = u32>>(val: JsValue) -> T {
-    let ptr = Reflect::get(&val, &JsValue::from_str("ptr")).unwrap();
+    let ptr = Reflect::get(&val, &JsValue::from_str("__wbg_ptr")).unwrap();
     let ptr = ptr.as_f64().unwrap() as u32;
 
     unsafe { T::from_abi(ptr) }
