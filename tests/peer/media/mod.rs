@@ -327,6 +327,7 @@ mod receiver_patch {
                 Some(MID.to_string()),
                 MemberId(SENDER_ID.to_string()),
                 &RecvConstraints::default(),
+                ConnectionMode::Mesh,
             )
             .await;
 

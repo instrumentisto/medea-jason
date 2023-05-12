@@ -843,6 +843,7 @@ impl MediaConnections {
     }
 
     /// Creates a new [`receiver::Component`] with the provided data.
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_receiver(
         &self,
         id: TrackId,
@@ -851,14 +852,22 @@ impl MediaConnections {
         mid: Option<String>,
         sender: MemberId,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> receiver::Component {
-        let state =
-            receiver::State::new(id, mid, media_type, media_direction, sender);
+        let state = receiver::State::new(
+            id,
+            mid,
+            media_type,
+            media_direction,
+            sender,
+            connection_mode,
+        );
         let receiver = receiver::Receiver::new(
             &state,
             self,
             mpsc::unbounded().0,
             recv_constraints,
+            connection_mode,
         )
         .await;
 
@@ -906,6 +915,7 @@ impl MediaConnections {
                             mid,
                             sender,
                             recv_constraints,
+                            connection_mode,
                         )
                         .await;
                     drop(

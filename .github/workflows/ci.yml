@@ -14,7 +14,7 @@ concurrency:
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
   # MEDEA_BRANCH: edge  # for E2E tests only
-  MEDEA_BRANCH: edge
+  MEDEA_BRANCH: sfu-for-testing
   PROTOC_VER: 3.x
   RUST_BACKTRACE: 1
 
@@ -120,6 +120,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
 
       - run: make flutter.fmt check=yes
 

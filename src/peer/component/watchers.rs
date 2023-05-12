@@ -205,6 +205,7 @@ impl Component {
             &peer.media_connections,
             peer.track_events_sender.clone(),
             &peer.recv_constraints,
+            state.connection_mode,
         )
         .await;
         peer.media_connections
