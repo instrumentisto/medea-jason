@@ -843,6 +843,7 @@ impl MediaConnections {
     }
 
     /// Creates a new [`receiver::Component`] with the provided data.
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_receiver(
         &self,
         id: TrackId,
