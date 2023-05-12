@@ -45,7 +45,7 @@ impl AudioLevelProvider {
 
         let node = web_sys::AudioWorkletNode::new(
             &context,
-            &format!("audio-level-processor"),
+            "audio-level-processor",
         )
         .unwrap();
 
