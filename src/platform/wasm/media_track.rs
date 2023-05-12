@@ -43,11 +43,9 @@ impl AudioLevelProvider {
 
         _ = MODULE_REGISTRATION.get().await;
 
-        let node = web_sys::AudioWorkletNode::new(
-            &context,
-            "audio-level-processor",
-        )
-        .unwrap();
+        let node =
+            web_sys::AudioWorkletNode::new(&context, "audio-level-processor")
+                .unwrap();
 
         drop(source.connect_with_audio_node(&node));
         Self { node, cb: None }
