@@ -14,7 +14,7 @@
 # Demos assets and configs.
 !demo/chart/medea-demo/conf/
 !demo/index.html
-!e2e-demo/dist
+!e2e-demo/dist/
 
 # E2E tests sources and manifest.
 !e2e/Cargo.toml
