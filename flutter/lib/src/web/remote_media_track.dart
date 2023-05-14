@@ -54,6 +54,11 @@ class WebRemoteMediaTrack implements RemoteMediaTrack {
     fallibleFunction(() => obj.on_stopped(allowInterop(f)));
   }
 
+  @override
+  Future<void> onAudioLevel(OnAudioLevelCallback f) async {
+    await fallibleFuture(obj.on_audio_level(f));
+  }
+
   @moveSemantics
   @override
   Future<void> free() async {

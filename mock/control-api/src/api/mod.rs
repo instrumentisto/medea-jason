@@ -435,7 +435,9 @@ impl Element {
             }
             Self::WebRtcPublishEndpoint(_)
             | Self::WebRtcPlayEndpoint(_)
-            | Self::Room(_) => unimplemented!(),
+            | Self::Room(_) => {
+                unimplemented!()
+            }
         };
         proto::room::Element { el: Some(el) }
     }

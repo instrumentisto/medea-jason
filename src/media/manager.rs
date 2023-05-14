@@ -101,7 +101,7 @@ pub struct HandleDetachedError;
 /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
 /// [2]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[derive(Clone, Debug, Display)]
+#[derive(Copy, Clone, Debug, Display)]
 #[display(fmt = "{} track is ended", _0)]
 struct LocalTrackIsEndedError(MediaKind);
 

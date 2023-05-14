@@ -3,7 +3,9 @@
 //! [1]: https://w3.org/TR/mediacapture-streams/#dom-mediastreamtrack
 
 use derive_more::{From, Into};
+use js_sys::Promise;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
     api::{MediaDirection, MediaKind, MediaSourceKind},
@@ -53,6 +55,16 @@ impl RemoteMediaTrack {
     /// [`MediaDirection`] changes.
     pub fn on_media_direction_changed(&self, cb: js_sys::Function) {
         self.0.on_media_direction_changed(cb.into());
+    }
+
+    /// Sets a callback to invoke when this [`RemoteMediaTrack`]
+    /// receive audio level.
+    pub fn on_audio_level(&self, cb: js_sys::Function) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(async move {
+            this.on_audio_level(cb.into()).await;
+            Ok(JsValue::null())
+        })
     }
 
     /// Returns a [`MediaKind::Audio`] if this [`RemoteMediaTrack`] represents

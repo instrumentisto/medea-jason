@@ -25,7 +25,7 @@ use crate::{
 /// Wrapper for help to get [`ServerMsg`] from Websocket [MessageEvent][1].
 ///
 /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent
-#[derive(Clone, From, Into)]
+#[derive(Debug, Clone, From, Into)]
 struct ServerMessage(ServerMsg);
 
 impl TryFrom<&MessageEvent> for ServerMessage {

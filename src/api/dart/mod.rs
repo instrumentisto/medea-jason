@@ -598,6 +598,31 @@ impl<T: PrimitiveEnum> TryFrom<DartValueArg<Self>> for Option<T> {
     }
 }
 
+impl TryFrom<DartValueArg<Self>> for f64 {
+    type Error = DartValueCastError;
+
+    #[allow(clippy::useless_conversion)]
+    fn try_from(value: DartValueArg<Self>) -> Result<Self, Self::Error> {
+        match value.0 {
+            DartValue::Float(num) => {
+                Ok(Self::try_from(num).map_err(|_err| DartValueCastError {
+                    expectation: stringify!($arg),
+                    value: value.0,
+                })?)
+            }
+            DartValue::None
+            | DartValue::Ptr(_)
+            | DartValue::Handle(_)
+            | DartValue::String(..)
+            | DartValue::Int(_)
+            | DartValue::Bool(_) => Err(DartValueCastError {
+                expectation: stringify!($arg),
+                value: value.0,
+            }),
+        }
+    }
+}
+
 impl TryFrom<DartValueArg<Self>> for Option<f64> {
     type Error = DartValueCastError;
 
