@@ -67,15 +67,15 @@ impl DartHandle {
     /// [`DartHandle`].
     #[must_use]
     pub fn name(&self) -> String {
-        unsafe { dart_string_into_rust(handle::runtime_type(self.get())) }
+        let type_name = unsafe { handle::runtime_type(self.get()) };
+        unsafe { dart_string_into_rust(type_name) }
     }
 }
 
 impl fmt::Display for DartHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string =
-            unsafe { dart_string_into_rust(handle::to_string(self.get())) };
-
+        let string = unsafe { handle::to_string(self.get()) };
+        let string = unsafe { dart_string_into_rust(string) };
         write!(f, "{string}")
     }
 }

@@ -81,13 +81,8 @@ impl Transceiver {
     pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_recv(
-                    handle, active,
-                ))
-                .await
-                .unwrap();
-            }
+            let fut = unsafe { transceiver::set_recv(handle, active) };
+            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         })
     }
 
@@ -96,13 +91,8 @@ impl Transceiver {
     pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_send(
-                    handle, active,
-                ))
-                .await
-                .unwrap();
-            }
+            let fut = unsafe { transceiver::set_send(handle, active) };
+            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         })
     }
 
@@ -126,23 +116,16 @@ impl Transceiver {
         &self,
         new_track: Option<&Rc<local::Track>>,
     ) -> Result<(), platform::Error> {
-        if let Some(track) = new_track {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::replace_track(
+        let fut = new_track.map_or_else(
+            || unsafe { transceiver::drop_sender(self.0.get()) },
+            |track| unsafe {
+                transceiver::replace_track(
                     self.0.get(),
                     track.platform_track().handle(),
-                ))
-                .await?;
-            }
-        } else {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::drop_sender(
-                    self.0.get(),
-                ))
-                .await?;
-            }
-        }
-        Ok(())
+                )
+            },
+        );
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
     }
 
     /// Returns [`mid`] of this [`Transceiver`].
@@ -151,10 +134,8 @@ impl Transceiver {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
-        unsafe {
-            let mid = transceiver::mid(self.0.get());
-            (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
-        }
+        let mid = unsafe { transceiver::mid(self.0.get()) };
+        unsafe { (*Box::from_raw(mid.as_ptr())).try_into().unwrap() }
     }
 
     /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
@@ -169,14 +150,11 @@ impl Transceiver {
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.0.get();
         async move {
-            unsafe {
-                FutureFromDart::execute::<i32>(transceiver::get_direction(
-                    handle,
-                ))
+            let fut = unsafe { transceiver::get_direction(handle) };
+            unsafe { FutureFromDart::execute::<i32>(fut) }
                 .await
-            }
-            .unwrap()
-            .into()
+                .unwrap()
+                .into()
         }
     }
 }
@@ -186,13 +164,8 @@ impl Drop for Transceiver {
         if Rc::get_mut(&mut self.0).is_some() {
             let transceiver = Rc::clone(&self.0);
             platform::spawn(async move {
-                unsafe {
-                    FutureFromDart::execute::<()>(transceiver::dispose(
-                        transceiver.get(),
-                    ))
-                    .await
-                    .unwrap();
-                }
+                let fut = unsafe { transceiver::dispose(transceiver.get()) };
+                unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
             });
         }
     }

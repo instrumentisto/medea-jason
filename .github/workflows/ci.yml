@@ -14,7 +14,7 @@ concurrency:
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
   # MEDEA_BRANCH: edge  # for E2E tests only
-  MEDEA_BRANCH: sfu-track-states
+  MEDEA_BRANCH: sfu-for-testing
   PROTOC_VER: 3.x
   RUST_BACKTRACE: 1
 
@@ -56,13 +56,17 @@ jobs:
       fail-fast: false
       matrix:
         platform:
+          #- android  TODO: Re-enable once fixed in `cargo-ndk`.
+          - ios
           - linux
           - macos
-          - windows
           - web
-    runs-on: ${{ (matrix.platform == 'macos' &&   'macos-latest')
-              || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'ubuntu-22.04' }}
+          - windows
+          - workspace
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
+              || (matrix.platform == 'windows' &&           'windows-latest')
+              || (matrix.platform == 'linux' &&             'ubuntu-22.04')
+              ||                                            'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@v1
@@ -70,14 +74,27 @@ jobs:
           toolchain: stable
           components: clippy
       - run: make rustup.targets only=${{ matrix.platform }}
+        if: ${{ matrix.platform != 'workspace' }}
       - uses: Swatinem/rust-cache@v2
         if: ${{ env.CACHE == 'true' }}
+
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-ndk
+          use-tool-cache: true
+        if: ${{ matrix.platform == 'android' }}
+
+      - run: make cargo.lint platform=${{ matrix.platform }}
+        if: ${{ matrix.platform != 'workspace' }}
+
       - uses: arduino/setup-protoc@v1
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ matrix.platform == 'workspace' }}
 
-      - run: make cargo.lint platform=${{ matrix.platform }}
+      - run: make cargo.lint workspace=yes
+        if: ${{ matrix.platform == 'workspace' }}
 
   dartanalyze:
     if: ${{ github.ref == 'refs/heads/master'
@@ -100,6 +117,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.10'
 
       - run: make flutter.fmt check=yes
 
@@ -631,11 +650,13 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/tags/medea-control-api-proto-')
              || !startsWith(github.ref, 'refs/tags/medea-') }}
 
-      - run: make docs.rust crate=medea-jason open=no
-        env:
-          RUSTFLAGS: -D warnings
-        if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
-             || !startsWith(github.ref, 'refs/tags/medea-') }}
+      # TODO: Uncomment once `rustdoc` ICE is fixed and released:
+      #       https://github.com/rust-lang/rust/issues/110848
+      #- run: make docs.rust crate=medea-jason open=no
+      #  env:
+      #    RUSTFLAGS: -D warnings
+      #  if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
+      #       || !startsWith(github.ref, 'refs/tags/medea-') }}
 
 
 

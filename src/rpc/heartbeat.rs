@@ -150,7 +150,7 @@ fn spawn_idle_watchdog_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
         });
 
     platform::spawn(async move {
-        let _ = idle_watchdog_fut.await.ok();
+        _ = idle_watchdog_fut.await.ok();
     });
 
     idle_watchdog_handle.into()
@@ -175,7 +175,7 @@ fn spawn_ping_handle_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
         }
     });
     platform::spawn(async move {
-        let _ = handle_ping_fut.await.ok();
+        _ = handle_ping_fut.await.ok();
     });
     handle_ping_task.into()
 }

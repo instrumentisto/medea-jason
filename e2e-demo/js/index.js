@@ -467,7 +467,7 @@ window.onload = async function() {
       try {
         localTracks = await jason.media_manager().init_local_tracks(constraints)
       } catch (e) {
-        let origError = e.source();
+        let origError = e.cause();
         if (origError && (origError.name === 'NotReadableError' || origError.name === 'AbortError')) {
           if (origError.message.includes('audio')) {
             constraints = await build_constraints(null, videoSelect);
@@ -795,8 +795,11 @@ window.onload = async function() {
             await initLocalStream();
           }
           await room.set_local_media_settings(constraints, true, true);
+          if (screenshareSwitchEl.checked) {
+            await room.enable_video(rust.MediaSourceKind.Display);
+          }
         } catch (e) {
-          let name = e.name();
+          let name = e.kind();
           if (name === 'RecoveredException') {
             alert('MediaStreamSettings set failed and current MediaStreamSettings was successfully recovered.');
           } else if (name === 'RecoverFailedException') {
@@ -955,8 +958,8 @@ window.onload = async function() {
         } catch (e) {
           console.error(e);
           console.error(
-            'Join to room failed: Error[name:[', e.name(), '], ',
-            '[msg:', e.message(), '], [source', e.source(), ']]',
+            'Join to room failed: Error[name:[', e.kind(), '], ',
+            '[msg:', e.message(), '], [source', e.cause(), ']]',
           );
           console.error(e.trace());
         }

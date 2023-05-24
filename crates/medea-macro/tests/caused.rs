@@ -7,7 +7,7 @@ struct MyError {}
 #[test]
 fn derives_for_structure() {
     #[derive(Caused)]
-    #[cause(error = "MyError")]
+    #[cause(error = MyError)]
     struct TestError;
 
     let err = TestError;
@@ -17,7 +17,7 @@ fn derives_for_structure() {
 #[test]
 fn derives_for_enum_with_error() {
     #[derive(Caused)]
-    #[cause(error = "MyError")]
+    #[cause(error = MyError)]
     enum TestError {
         Foo,
         Bar(MyError),
@@ -33,13 +33,13 @@ fn derives_for_enum_with_error() {
 #[test]
 fn derives_for_enum_with_nested_error() {
     #[derive(Caused)]
-    #[cause(error = "MyError")]
+    #[cause(error = MyError)]
     enum CausedError {
         Baz(MyError),
     }
 
     #[derive(Caused)]
-    #[cause(error = "MyError")]
+    #[cause(error = MyError)]
     enum TestError {
         Foo,
         Bar(#[cause] CausedError),
@@ -59,13 +59,13 @@ fn derives_for_non_default_name_error() {
     struct SomeError;
 
     #[derive(Caused)]
-    #[cause(error = "SomeError")]
+    #[cause(error = SomeError)]
     enum CausedError {
         Baz(SomeError),
     }
 
     #[derive(Caused)]
-    #[cause(error = "SomeError")]
+    #[cause(error = SomeError)]
     enum TestError {
         Foo,
         Bar(#[cause] CausedError),

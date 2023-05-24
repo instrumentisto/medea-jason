@@ -21,6 +21,7 @@ use medea_client_api_proto::{
     NegotiationRole, PeerConnectionState, PeerId, PeerMetrics, PeerUpdate,
     Track, TrackId,
 };
+use proto::ConnectionMode;
 use tracerr::Traced;
 
 use crate::{
@@ -113,7 +114,7 @@ impl RoomCloseReason {
 
 /// Errors occurring in [`RoomHandle::join()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum RoomJoinError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "RoomHandle is in detached state")]
@@ -135,7 +136,7 @@ pub enum RoomJoinError {
 
 /// Error of [`RoomHandle`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display, Eq, From, PartialEq)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub struct HandleDetachedError;
 
 /// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
@@ -143,7 +144,7 @@ pub struct HandleDetachedError;
 /// [`Sender`]: peer::media::Sender
 /// [`Receiver`]: peer::media::Receiver
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "RoomHandle is in detached state")]
@@ -203,7 +204,7 @@ impl From<UpdateLocalStreamError> for ChangeMediaStateError {
 /// Errors occurring when a [`Room`] tries to acquire [`local::Track`]s via
 /// [`MediaManager`].
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum GetLocalTracksError {
     /// Validating [`TracksRequest`] doesn't pass.
     ///
@@ -1200,7 +1201,7 @@ impl InnerRoom {
     /// [`Drop`] implementation of [`InnerRoom`] is supposed to be triggered
     /// after this function call.
     fn set_close_reason(&self, reason: CloseReason) {
-        let _ = self.close_reason.replace(reason);
+        _ = self.close_reason.replace(reason);
     }
 
     /// Toggles [`TransceiverSide`]s [`MediaState`] by the provided
@@ -1573,6 +1574,7 @@ impl EventHandler for InnerRoom {
         &self,
         peer_id: PeerId,
         negotiation_role: NegotiationRole,
+        connection_mode: ConnectionMode,
         tracks: Vec<Track>,
         ice_servers: Vec<IceServer>,
         is_force_relayed: bool,
@@ -1582,6 +1584,7 @@ impl EventHandler for InnerRoom {
             ice_servers,
             is_force_relayed,
             Some(negotiation_role),
+            connection_mode,
         );
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
@@ -1672,7 +1675,9 @@ impl EventHandler for InnerRoom {
             match update {
                 PeerUpdate::Added(track) => peer_state
                     .insert_track(&track, self.send_constraints.clone()),
-                PeerUpdate::Updated(patch) => peer_state.patch_track(patch),
+                PeerUpdate::Updated(patch) => {
+                    peer_state.patch_track(patch).await;
+                }
                 PeerUpdate::IceRestart => {
                     peer_state.restart_ice();
                 }

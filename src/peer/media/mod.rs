@@ -15,7 +15,7 @@ use futures::{
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
-use medea_client_api_proto::{MediaType, MemberId};
+use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
 use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
@@ -215,7 +215,7 @@ pub enum ProhibitedStateError {
 
 /// Errors occurring in [`MediaConnections::insert_local_tracks()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum InsertLocalTracksError {
     /// [`local::Track`] doesn't satisfy [`Sender`]'s constraints.
     #[display(fmt = "Provided Track doesn't satisfy senders constraints")]
@@ -581,7 +581,7 @@ impl MediaConnections {
                     InsertLocalTracksError::NotEnoughTracks
                 ));
             } else {
-                let _ = media_exchange_state_updates
+                _ = media_exchange_state_updates
                     .insert(state.id(), media_exchange_state::Stable::Disabled);
             }
         }
@@ -811,6 +811,7 @@ impl MediaConnections {
     /// # Errors
     ///
     /// See [`sender::CreateError`] for details.
+    #[allow(clippy::too_many_arguments)] // TODO: refactor
     pub async fn create_sender(
         &self,
         id: TrackId,
@@ -819,6 +820,7 @@ impl MediaConnections {
         mid: Option<String>,
         receivers: Vec<MemberId>,
         send_constraints: &LocalTracksConstraints,
+        connection_mode: ConnectionMode,
     ) -> Result<sender::Component, Traced<sender::CreateError>> {
         let sender_state = sender::State::new(
             id,
@@ -827,6 +829,7 @@ impl MediaConnections {
             media_direction,
             receivers,
             send_constraints.clone(),
+            connection_mode,
         );
         let sender = sender::Sender::new(
             &sender_state,
@@ -840,6 +843,7 @@ impl MediaConnections {
     }
 
     /// Creates a new [`receiver::Component`] with the provided data.
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_receiver(
         &self,
         id: TrackId,
@@ -848,14 +852,22 @@ impl MediaConnections {
         mid: Option<String>,
         sender: MemberId,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> receiver::Component {
-        let state =
-            receiver::State::new(id, mid, media_type, media_direction, sender);
+        let state = receiver::State::new(
+            id,
+            mid,
+            media_type,
+            media_direction,
+            sender,
+            connection_mode,
+        );
         let receiver = receiver::Receiver::new(
             &state,
             self,
             mpsc::unbounded().0,
             recv_constraints,
+            connection_mode,
         )
         .await;
 
@@ -873,6 +885,7 @@ impl MediaConnections {
         tracks: Vec<proto::Track>,
         send_constraints: &LocalTracksConstraints,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> Result<(), Traced<sender::CreateError>> {
         use medea_client_api_proto::Direction;
         for track in tracks {
@@ -886,6 +899,7 @@ impl MediaConnections {
                             mid,
                             receivers,
                             send_constraints,
+                            connection_mode,
                         )
                         .await?;
                     drop(
@@ -901,6 +915,7 @@ impl MediaConnections {
                             mid,
                             sender,
                             recv_constraints,
+                            connection_mode,
                         )
                         .await;
                     drop(

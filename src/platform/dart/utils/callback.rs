@@ -189,25 +189,26 @@ impl Callback {
     pub fn into_dart(self) -> Dart_Handle {
         let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
         let is_two_arg = matches!(&self.0, Kind::TwoArgFnMut(_));
-        unsafe {
-            let f = ptr::NonNull::from(Box::leak(Box::new(self)));
-            let handle = if is_two_arg {
-                callback::call_two_arg_proxy(f)
-            } else {
-                callback::call_proxy(f)
-            };
 
-            if is_finalizable {
-                let _ = dart_api::new_finalizable_handle(
+        let f = ptr::NonNull::from(Box::leak(Box::new(self)));
+        let handle = if is_two_arg {
+            unsafe { callback::call_two_arg_proxy(f) }
+        } else {
+            unsafe { callback::call_proxy(f) }
+        };
+
+        if is_finalizable {
+            unsafe {
+                _ = dart_api::new_finalizable_handle(
                     handle,
                     f.as_ptr().cast::<c_void>(),
                     mem::size_of::<Self>() as libc::intptr_t,
                     Some(callback_finalizer),
                 );
             }
-
-            handle
         }
+
+        handle
     }
 }
 

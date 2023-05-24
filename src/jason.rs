@@ -117,7 +117,7 @@ impl Jason {
         let weak_room = room.downgrade();
         let weak_inner = Rc::downgrade(&self.0);
         platform::spawn(on_normal_close.map(move |reason| {
-            let _ = (|| {
+            _ = (|| {
                 let this_room = weak_room.upgrade()?;
                 let inner = weak_inner.upgrade()?;
                 let mut inner = inner.borrow_mut();

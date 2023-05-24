@@ -6,7 +6,7 @@ use std::cell::{Cell, RefCell};
 
 use futures::channel::mpsc;
 use medea_client_api_proto as proto;
-use proto::TrackId;
+use proto::{ConnectionMode, TrackId};
 
 use crate::{
     media::{
@@ -34,6 +34,13 @@ pub use self::component::{Component, State};
 pub struct Receiver {
     /// ID of this [`remote::Track`].
     track_id: TrackId,
+
+    /// Indicator whether this [`Receiver`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
 
     /// Constraints of this [`remote::Track`].
     caps: TrackConstraints,
@@ -97,6 +104,7 @@ impl Receiver {
         media_connections: &MediaConnections,
         track_events_sender: mpsc::UnboundedSender<TrackEvent>,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> Self {
         let caps = TrackConstraints::from(state.media_type());
         let kind = MediaKind::from(&caps);
@@ -126,7 +134,12 @@ impl Receiver {
                     );
                 new_transceiver.await
             };
-            trnsvr.set_recv(state.enabled_individual()).await;
+            trnsvr
+                .set_recv(match connection_mode {
+                    ConnectionMode::Mesh => state.enabled_individual(),
+                    ConnectionMode::Sfu => true,
+                })
+                .await;
             Some(trnsvr)
         } else {
             None
@@ -136,6 +149,7 @@ impl Receiver {
             media_connections.0.borrow().peer_events_sender.clone();
         let this = Self {
             track_id: state.track_id(),
+            connection_mode,
             caps,
             sender_id: state.sender_id().clone(),
             transceiver: RefCell::new(transceiver),
@@ -206,7 +220,7 @@ impl Receiver {
         &self,
         state: media_exchange_state::Transition,
     ) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MediaExchangeIntention {
                 id: self.track_id,
                 enabled: matches!(
@@ -246,7 +260,11 @@ impl Receiver {
         // to a garbage-collectable memory on each platform.
         let trnscvr = self.transceiver.borrow().as_ref().cloned();
         if let Some(t) = trnscvr {
-            t.set_recv(self.enabled_individual.get()).await;
+            t.set_recv(match self.connection_mode {
+                ConnectionMode::Mesh => self.enabled_individual.get(),
+                ConnectionMode::Sfu => true,
+            })
+            .await;
         }
 
         if let Some(prev_track) = self.track.replace(Some(new_track)) {

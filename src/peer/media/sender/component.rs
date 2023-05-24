@@ -12,6 +12,7 @@ use medea_client_api_proto::{
 };
 use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
+use proto::ConnectionMode;
 use tracerr::Traced;
 
 use crate::{
@@ -123,6 +124,13 @@ pub struct State {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
     send_constraints: LocalTracksConstraints,
 
+    /// Indicator whether this [`Sender`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
+
     /// State of the [`Sender`]'s [`local::Track`].
     ///
     /// [`local::Track`]: crate::media::track::local::Track
@@ -138,6 +146,7 @@ impl AsProtoState for State {
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
+            connection_mode: self.connection_mode,
             mid: self.mid.clone(),
             media_type: self.media_type,
             receivers: self.receivers.borrow().clone(),
@@ -174,6 +183,7 @@ impl SynchronizableState for State {
             ),
             media_direction: Cell::new(input.media_direction),
             send_constraints: send_constraints.clone(),
+            connection_mode: input.connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
@@ -252,6 +262,7 @@ impl From<&State> for proto::state::Sender {
     fn from(state: &State) -> Self {
         Self {
             id: state.id,
+            connection_mode: state.connection_mode,
             mid: state.mid.clone(),
             media_type: state.media_type,
             receivers: state.receivers.borrow().clone(),
@@ -271,6 +282,7 @@ impl State {
         media_direction: MediaDirection,
         receivers: Vec<MemberId>,
         send_constraints: LocalTracksConstraints,
+        connection_mode: ConnectionMode,
     ) -> Self {
         Self {
             id,
@@ -293,6 +305,7 @@ impl State {
             )),
             sync_state: ObservableCell::new(SyncState::Synced),
             send_constraints,
+            connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
         }
     }
@@ -477,21 +490,27 @@ impl Component {
     #[watch(self.enabled_general.subscribe())]
     async fn enabled_general_state_changed(
         sender: Rc<Sender>,
-        _: Rc<State>,
+        state: Rc<State>,
         new_state: Guarded<media_exchange_state::Stable>,
     ) {
         let (new_state, _guard) = new_state.into_parts();
         sender
             .enabled_general
             .set(new_state == media_exchange_state::Stable::Enabled);
-        match new_state {
-            media_exchange_state::Stable::Enabled => {
-                if sender.enabled_in_cons() {
-                    sender.transceiver.set_send(true).await;
+
+        if state.connection_mode == ConnectionMode::Sfu {
+            // All senders are always on in SFU mode.
+            sender.transceiver.set_send(true).await;
+        } else {
+            match new_state {
+                media_exchange_state::Stable::Enabled => {
+                    if sender.enabled_in_cons() {
+                        sender.transceiver.set_send(true).await;
+                    }
                 }
-            }
-            media_exchange_state::Stable::Disabled => {
-                sender.transceiver.set_send(false).await;
+                media_exchange_state::Stable::Disabled => {
+                    sender.transceiver.set_send(false).await;
+                }
             }
         }
     }

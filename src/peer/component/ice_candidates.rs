@@ -26,7 +26,7 @@ impl IceCandidates {
 
     /// Adds a new [`IceCandidate`] to this [`IceCandidates`] store.
     pub fn add(&self, candidate: IceCandidate) {
-        let _ = self.0.borrow_mut().insert(candidate);
+        _ = self.0.borrow_mut().insert(candidate);
     }
 
     /// Returns [`LocalBoxStream`] with all the already added [`IceCandidate`]s

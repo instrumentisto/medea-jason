@@ -205,6 +205,7 @@ impl Component {
             &peer.media_connections,
             peer.track_events_sender.clone(),
             &peer.recv_constraints,
+            state.connection_mode,
         )
         .await;
         peer.media_connections
@@ -263,7 +264,7 @@ impl Component {
         state: Rc<State>,
         sdp: String,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        let _ = state.sync_state.when_eq(SyncState::Synced).await;
+        _ = state.sync_state.when_eq(SyncState::Synced).await;
         if let Some(role) = state.negotiation_role.get() {
             if state.local_sdp.is_rollback() {
                 // TODO: Temporary fix that allows us to ignore rollback
@@ -291,7 +292,7 @@ impl Component {
                         let mids = peer
                             .get_mids()
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        let _ = peer
+                        _ = peer
                             .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpOffer {
                                 peer_id: peer.id(),
@@ -312,7 +313,7 @@ impl Component {
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
                         peer.media_connections.sync_receivers().await;
-                        let _ = peer
+                        _ = peer
                             .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpAnswer {
                                 peer_id: peer.id(),
@@ -463,7 +464,7 @@ impl Component {
         }
 
         state.maybe_update_local_stream.set(true);
-        let _ = state.maybe_update_local_stream.when_eq(false).await;
+        _ = state.maybe_update_local_stream.when_eq(false).await;
 
         state.negotiation_state.set(NegotiationState::WaitLocalSdp);
     }

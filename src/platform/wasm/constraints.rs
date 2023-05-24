@@ -27,14 +27,14 @@ impl MediaStreamConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn audio(&mut self, audio: AudioTrackConstraints) {
-        let _ = self.0.audio(&MediaTrackConstraints::from(audio).into());
+        _ = self.0.audio(&MediaTrackConstraints::from(audio).into());
     }
 
     /// Specifies the nature and settings of the `video` [MediaStreamTrack][1].
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn video(&mut self, video: DeviceVideoTrackConstraints) {
-        let _ = self.0.video(&MediaTrackConstraints::from(video).into());
+        _ = self.0.video(&MediaTrackConstraints::from(video).into());
     }
 }
 
@@ -49,7 +49,7 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
         let mut constraints = Self::new();
 
         if let Some(device_id) = track_constraints.device_id {
-            let _ = constraints
+            _ = constraints
                 .device_id(&ConstrainDomStringParameters::from(&device_id));
         }
 
@@ -62,18 +62,18 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
         let mut constraints = Self::new();
 
         if let Some(device_id) = track_constraints.device_id {
-            let _ = constraints
+            _ = constraints
                 .device_id(&ConstrainDomStringParameters::from(&device_id));
         }
         if let Some(facing_mode) = track_constraints.facing_mode {
-            let _ = constraints
+            _ = constraints
                 .facing_mode(&ConstrainDomStringParameters::from(&facing_mode));
         }
         if let Some(width) = track_constraints.width {
-            let _ = constraints.width(&ConstrainDoubleRange::from(width));
+            _ = constraints.width(&ConstrainDoubleRange::from(width));
         }
         if let Some(height) = track_constraints.height {
-            let _ = constraints.height(&ConstrainDoubleRange::from(height));
+            _ = constraints.height(&ConstrainDoubleRange::from(height));
         }
 
         constraints
@@ -83,7 +83,7 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
 impl From<ConstrainU32> for ConstrainDoubleRange {
     fn from(from: ConstrainU32) -> Self {
         let mut constraint = Self::new();
-        let _ = match from {
+        _ = match from {
             ConstrainU32::Exact(val) => constraint.exact(f64::from(val)),
             ConstrainU32::Ideal(val) => constraint.ideal(f64::from(val)),
             ConstrainU32::Range(min, max) => {
@@ -97,7 +97,7 @@ impl From<ConstrainU32> for ConstrainDoubleRange {
 impl<T: AsRef<str>> From<&ConstrainString<T>> for ConstrainDomStringParameters {
     fn from(from: &ConstrainString<T>) -> Self {
         let mut constraint = Self::new();
-        let _ =
+        _ =
             match from {
                 ConstrainString::Exact(val) => constraint
                     .exact(&wasm_bindgen::JsValue::from_str(val.as_ref())),
@@ -134,7 +134,7 @@ impl DisplayMediaStreamConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams/#mediastreamtrack
     pub fn video(&mut self, video: DisplayVideoTrackConstraints) {
-        let _ = self.0.video(&MediaTrackConstraints::from(video).into());
+        _ = self.0.video(&MediaTrackConstraints::from(video).into());
     }
 }
 
@@ -143,14 +143,13 @@ impl From<DisplayVideoTrackConstraints> for MediaTrackConstraints {
         let mut constraints = Self::new();
 
         if let Some(width) = track_constraints.width {
-            let _ = constraints.width(&ConstrainDoubleRange::from(width));
+            _ = constraints.width(&ConstrainDoubleRange::from(width));
         }
         if let Some(height) = track_constraints.height {
-            let _ = constraints.height(&ConstrainDoubleRange::from(height));
+            _ = constraints.height(&ConstrainDoubleRange::from(height));
         }
         if let Some(frame_rate) = track_constraints.frame_rate {
-            let _ =
-                constraints.frame_rate(&ConstrainDoubleRange::from(frame_rate));
+            _ = constraints.frame_rate(&ConstrainDoubleRange::from(frame_rate));
         }
 
         constraints

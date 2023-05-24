@@ -481,7 +481,7 @@ pub mod control_api_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -537,13 +537,29 @@ pub mod control_api_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
         /// Creates a new `Element` on the media server.
         ///
         /// Non-idempotent. Errors if an `Element` with such ID already exists.
         pub async fn create(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -555,7 +571,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Create");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Create"));
+            self.inner.unary(req, path, codec).await
         }
         /// Removes `Element`s from the media server.
         /// Allows referring multiple `Element`s on the last two levels of a FID.
@@ -564,7 +582,7 @@ pub mod control_api_client {
         pub async fn delete(
             &mut self,
             request: impl tonic::IntoRequest<super::IdRequest>,
-        ) -> Result<tonic::Response<super::Response>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -576,7 +594,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Delete");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Delete"));
+            self.inner.unary(req, path, codec).await
         }
         /// Lookups `Element`s by their FIDs on the media server.
         /// If no FIDs are specified, then returns all the current `Element`s on the
@@ -584,7 +604,7 @@ pub mod control_api_client {
         pub async fn get(
             &mut self,
             request: impl tonic::IntoRequest<super::IdRequest>,
-        ) -> Result<tonic::Response<super::GetResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -596,7 +616,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Get");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Get"));
+            self.inner.unary(req, path, codec).await
         }
         /// Applies changes to an existing `Element` on the media server, or creates a
         /// new one in case there is no `Element` with such ID.
@@ -608,7 +630,7 @@ pub mod control_api_client {
         pub async fn apply(
             &mut self,
             request: impl tonic::IntoRequest<super::ApplyRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -620,7 +642,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Apply"));
+            self.inner.unary(req, path, codec).await
         }
         /// Checks healthiness of the media server.
         /// Caller should assert that the returned `Pong` has the same nonce as the
@@ -628,7 +652,7 @@ pub mod control_api_client {
         pub async fn healthz(
             &mut self,
             request: impl tonic::IntoRequest<super::Ping>,
-        ) -> Result<tonic::Response<super::Pong>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -640,7 +664,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Healthz"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -657,7 +683,7 @@ pub mod control_api_server {
         async fn create(
             &self,
             request: tonic::Request<super::CreateRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status>;
         /// Removes `Element`s from the media server.
         /// Allows referring multiple `Element`s on the last two levels of a FID.
         ///
@@ -665,14 +691,14 @@ pub mod control_api_server {
         async fn delete(
             &self,
             request: tonic::Request<super::IdRequest>,
-        ) -> Result<tonic::Response<super::Response>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status>;
         /// Lookups `Element`s by their FIDs on the media server.
         /// If no FIDs are specified, then returns all the current `Element`s on the
         /// media server.
         async fn get(
             &self,
             request: tonic::Request<super::IdRequest>,
-        ) -> Result<tonic::Response<super::GetResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status>;
         /// Applies changes to an existing `Element` on the media server, or creates a
         /// new one in case there is no `Element` with such ID.
         ///
@@ -683,14 +709,14 @@ pub mod control_api_server {
         async fn apply(
             &self,
             request: tonic::Request<super::ApplyRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status>;
         /// Checks healthiness of the media server.
         /// Caller should assert that the returned `Pong` has the same nonce as the
         /// sent `Ping`.
         async fn healthz(
             &self,
             request: tonic::Request<super::Ping>,
-        ) -> Result<tonic::Response<super::Pong>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status>;
     }
     /// Service allowing to control a media server dynamically, by creating, updating
     /// and destroying pipelines of media `Element`s on it.
@@ -699,6 +725,8 @@ pub mod control_api_server {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: ControlApi> ControlApiServer<T> {
@@ -711,6 +739,8 @@ pub mod control_api_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -734,6 +764,22 @@ pub mod control_api_server {
             self.send_compression_encodings.enable(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
     }
     impl<T, B> tonic::codegen::Service<http::Request<B>> for ControlApiServer<T>
     where
@@ -747,7 +793,7 @@ pub mod control_api_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -767,13 +813,15 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::CreateRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).create(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -783,6 +831,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -803,13 +855,15 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::IdRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).delete(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -819,6 +873,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -839,13 +897,15 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::IdRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).get(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -855,6 +915,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -875,13 +939,15 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::ApplyRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).apply(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -891,6 +957,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -911,13 +981,15 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::Ping>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move { (*inner).healthz(request).await };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -927,6 +999,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -955,12 +1031,14 @@ pub mod control_api_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: ControlApi> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {

@@ -174,7 +174,7 @@ impl FromStr for Sid {
 
         // Removes last two segments.
         if let Ok(mut path) = url.path_segments_mut() {
-            let _ = path.pop().pop();
+            _ = path.pop().pop();
         }
 
         Ok(Self {

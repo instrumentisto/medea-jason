@@ -30,7 +30,7 @@ pub use self::component::{Component, State};
 
 /// Errors occurring when creating a new [`Sender`].
 #[derive(Caused, Clone, Debug, Display)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum CreateError {
     /// [`Sender`] cannot be disabled because it's marked as `required`.
     #[display(fmt = "MediaExchangeState of Sender cannot transit to \
@@ -46,7 +46,7 @@ pub enum CreateError {
 ///
 /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 #[display(fmt = "MediaManagerHandle is in detached state")]
 pub struct InsertTrackError(platform::Error);
 
@@ -281,7 +281,7 @@ impl Sender {
         &self,
         state: media_exchange_state::Transition,
     ) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MediaExchangeIntention {
                 id: self.track_id,
                 enabled: matches!(
@@ -295,7 +295,7 @@ impl Sender {
     /// Sends [`TrackEvent::MuteUpdateIntention`] with the provided
     /// [`mute_state`].
     pub fn send_mute_state_intention(&self, state: mute_state::Transition) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MuteUpdateIntention {
                 id: self.track_id,
                 muted: matches!(state, mute_state::Transition::Muting(_)),

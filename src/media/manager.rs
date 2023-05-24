@@ -23,7 +23,7 @@ use super::track::local;
 
 /// Errors returned from the [`MediaManagerHandle::enumerate_devices()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum EnumerateDevicesError {
     /// Occurs if the `enumerateDevices` request fails.
     #[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
@@ -37,7 +37,7 @@ pub enum EnumerateDevicesError {
 /// Errors returned from the [`MediaManagerHandle::enumerate_displays()`]
 /// method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum EnumerateDisplaysError {
     /// Occurs if the `enumerateDisplays` request fails.
     #[display(fmt = "MediaDevices.enumerateDisplays() failed: {}", _0)]
@@ -50,7 +50,7 @@ pub enum EnumerateDisplaysError {
 
 /// Errors returned from the [`MediaManagerHandle::init_local_tracks()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum InitLocalTracksError {
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer could not be upgraded.
     #[display(fmt = "MediaManagerHandle is in detached state")]
@@ -79,7 +79,7 @@ pub struct InvalidOutputAudioDeviceIdError;
 /// Error returned from the [`MediaManagerHandle::microphone_volume()`] or
 /// [`MediaManagerHandle::set_microphone_volume()`] methods.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum MicVolumeError {
     /// Error accessing microphone volume settings.
     #[display(fmt = "Error accessing microphone volume settings: {}", _0)]
@@ -109,7 +109,7 @@ struct LocalTrackIsEndedError(MediaKind);
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum GetUserMediaError {
     /// [getUserMedia()][1] request failed.
     ///
@@ -138,7 +138,7 @@ impl From<LocalTrackIsEndedError> for GetUserMediaError {
 /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
 #[allow(variant_size_differences)] // `Box`ing still reports this
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum GetDisplayMediaError {
     /// [getDisplayMedia()][1] request failed.
     ///

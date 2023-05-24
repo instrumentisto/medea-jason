@@ -95,7 +95,7 @@ pub async fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
         .parse()
         .unwrap();
 
-    let _ = Arbiter::current().spawn(async move {
+    _ = Arbiter::current().spawn(async move {
         Server::builder()
             .add_service(service)
             .serve(addr)

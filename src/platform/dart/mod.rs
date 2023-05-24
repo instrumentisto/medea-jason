@@ -102,7 +102,7 @@ pub fn init_logger() {
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
     // TODO: Should be called only once.
-    let _ = simple_logger::SimpleLogger::new()
+    _ = simple_logger::SimpleLogger::new()
         .with_level(log::LevelFilter::Debug)
         .init();
 }

@@ -79,8 +79,9 @@ impl Function<()> {
 impl<T: Into<DartValue>> Function<T> {
     /// Calls the underlying Dart closure with the provided argument.
     pub fn call1(&self, arg: T) {
+        let fn_handle =
+            unsafe { dart_api::handle_from_persistent(self.dart_fn) };
         unsafe {
-            let fn_handle = dart_api::handle_from_persistent(self.dart_fn);
             function::caller(fn_handle, arg.into());
         }
     }

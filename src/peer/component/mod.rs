@@ -19,7 +19,7 @@ use medea_client_api_proto::{
 use medea_reactive::{
     AllProcessed, ObservableCell, ProgressableCell, ProgressableHashSet,
 };
-use proto::MemberId;
+use proto::{ConnectionMode, MemberId};
 use tracerr::Traced;
 
 use crate::{
@@ -103,6 +103,12 @@ pub struct State {
     /// ID of this [`Component`].
     id: Id,
 
+    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
+
     /// All [`sender::State`]s of this [`Component`].
     senders: TracksRepository<sender::State>,
 
@@ -155,9 +161,11 @@ impl State {
         ice_servers: Vec<IceServer>,
         force_relay: bool,
         negotiation_role: Option<NegotiationRole>,
+        connection_mode: ConnectionMode,
     ) -> Self {
         Self {
             id,
+            connection_mode,
             senders: TracksRepository::new(),
             receivers: TracksRepository::new(),
             connections: RefCell::new(ProgressableHashSet::new()),
@@ -226,7 +234,7 @@ impl State {
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let _ = self
+        _ = self
             .negotiation_role
             .subscribe()
             .any(|val| async move { val.is_none() })
@@ -243,7 +251,7 @@ impl State {
     /// [`TrackId`].
     pub fn remove_track(&self, track_id: TrackId) {
         if !self.receivers.remove(track_id) {
-            let _ = self.senders.remove(track_id);
+            _ = self.senders.remove(track_id);
         }
     }
 
@@ -358,6 +366,7 @@ impl State {
                         track.media_direction,
                         receivers.clone(),
                         send_constraints,
+                        self.connection_mode,
                     )),
                 );
             }
@@ -370,6 +379,7 @@ impl State {
                         track.media_type,
                         track.media_direction,
                         sender.clone(),
+                        self.connection_mode,
                     )),
                 );
             }
@@ -396,7 +406,7 @@ impl State {
     /// [`proto::TrackPatchEvent`].
     ///
     /// Schedules a local stream update.
-    pub fn patch_track(&self, patch: proto::TrackPatchEvent) {
+    pub async fn patch_track(&self, patch: proto::TrackPatchEvent) {
         if let Some(receivers) = &patch.receivers {
             let receivers: HashSet<_> = receivers.clone().into_iter().collect();
             self.connections.borrow_mut().update(receivers);
@@ -404,6 +414,7 @@ impl State {
 
         if let Some(sender) = self.get_sender(patch.id) {
             sender.update(patch);
+            _ = self.maybe_update_local_stream.when_eq(false).await;
             self.maybe_update_local_stream.set(true);
         } else if let Some(receiver) = self.get_receiver(patch.id) {
             receiver.update(&patch);
@@ -428,6 +439,7 @@ impl AsProtoState for State {
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
+            connection_mode: self.connection_mode,
             senders: self.senders.as_proto(),
             receivers: self.receivers.as_proto(),
             ice_candidates: self.ice_candidates.as_proto(),
@@ -453,6 +465,7 @@ impl SynchronizableState for State {
             from.ice_servers,
             from.force_relay,
             from.negotiation_role,
+            from.connection_mode,
         );
 
         for (id, sender) in from.senders {
