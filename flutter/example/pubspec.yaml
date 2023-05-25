@@ -1,9 +1,11 @@
 name: medea_jason_example
 description: Demonstrates how to use the medea_jason plugin.
+version: 1.0.0
+publish_to: none
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=3.7.0"
+  sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -18,17 +20,22 @@ dependencies:
     path: ../
 
   cupertino_icons: ^1.0.2
+  faker_dart: ^0.1.11
   freezed_annotation: ^2.2.0
+  http: ^0.13.6
+  medea_flutter_webrtc: 0.8.0
+  retry: ^3.1.2
 
 dev_dependencies:
-  faker_dart: ^0.1.11
   flutter_gherkin: 3.0.0-rc.17
+  flutter_driver:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
   json_serializable: ^6.3.1
-  pedantic: ^1.9.0
+  flutter_lints: ^2.0.1
 
 flutter:
   assets:

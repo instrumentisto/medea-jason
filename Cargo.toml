@@ -63,7 +63,7 @@ simple_logger = "4.0"
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 anyhow = "1.0"
 dart-sys = "4.0"
-flutter_rust_bridge = { version = "=1.64.0", default-features = false }
+flutter_rust_bridge = { version = "=1.75.3", default-features = false }
 libc = "0.2"
 
 [target.'cfg(target_family = "wasm")'.dependencies]

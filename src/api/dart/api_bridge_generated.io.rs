@@ -1139,6 +1139,18 @@ impl NewWithNullPtr for wire_ApiAudioConstraints {
     }
 }
 
+impl Default for wire_ApiAudioConstraints {
+    fn default() -> Self {
+        Self::new_with_null_ptr()
+    }
+}
+
+impl Default for wire_ApiConstrainFacingMode {
+    fn default() -> Self {
+        Self::new_with_null_ptr()
+    }
+}
+
 impl NewWithNullPtr for wire_ApiConstrainFacingMode {
     fn new_with_null_ptr() -> Self {
         Self {
@@ -1179,6 +1191,12 @@ impl NewWithNullPtr for wire_ApiDeviceVideoTrackConstraints {
     }
 }
 
+impl Default for wire_ApiDeviceVideoTrackConstraints {
+    fn default() -> Self {
+        Self::new_with_null_ptr()
+    }
+}
+
 impl NewWithNullPtr for wire_ApiDisplayVideoTrackConstraints {
     fn new_with_null_ptr() -> Self {
         Self {
@@ -1190,6 +1208,12 @@ impl NewWithNullPtr for wire_ApiDisplayVideoTrackConstraints {
     }
 }
 
+impl Default for wire_ApiDisplayVideoTrackConstraints {
+    fn default() -> Self {
+        Self::new_with_null_ptr()
+    }
+}
+
 impl NewWithNullPtr for wire_ApiMediaStreamSettings {
     fn new_with_null_ptr() -> Self {
         Self {
@@ -1197,6 +1221,18 @@ impl NewWithNullPtr for wire_ApiMediaStreamSettings {
             device_video: core::ptr::null_mut(),
             display_video: core::ptr::null_mut(),
         }
+    }
+}
+
+impl Default for wire_ApiMediaStreamSettings {
+    fn default() -> Self {
+        Self::new_with_null_ptr()
+    }
+}
+
+impl Default for wire_ConstrainU32 {
+    fn default() -> Self {
+        Self::new_with_null_ptr()
     }
 }
 

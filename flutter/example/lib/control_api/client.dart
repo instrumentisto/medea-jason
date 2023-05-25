@@ -18,19 +18,19 @@ class ControlApi {
 
   /// Creates room member by its ID.
   Future<void> createMember(String roomId, Member member) async {
-    await _client.create(roomId + '/' + member.id, member);
+    await _client.create('$roomId/${member.id}', member);
   }
 
   /// Creates [WebRtcPlayEndpoint] of member for the specified room.
   Future<void> createPlayEndpoint(
       String roomId, String memberId, WebRtcPlayEndpoint endpoint) async {
-    await _client.create(roomId + '/' + memberId + '/' + endpoint.id, endpoint);
+    await _client.create('$roomId/$memberId/${endpoint.id}', endpoint);
   }
 
   /// Creates [WebRtcPublishEndpoint] of member for the specified room.
   Future<void> createPublishEndpoint(
       String roomId, String memberId, WebRtcPublishEndpoint endpoint) async {
-    await _client.create(roomId + '/' + memberId + '/' + endpoint.id, endpoint);
+    await _client.create('$roomId/$memberId/${endpoint.id}', endpoint);
   }
 
   /// Returns URL by the provided endpointId.
@@ -39,9 +39,9 @@ class ControlApi {
     var url = roomId;
 
     if (memberId != null && endpointId != null) {
-      url = roomId + '/' + memberId + '/' + endpointId;
+      url = '$roomId/$memberId/$endpointId';
     } else if (memberId != null) {
-      url = roomId + '/' + memberId;
+      url = '$roomId/$memberId';
     }
 
     return url;
