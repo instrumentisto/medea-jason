@@ -312,7 +312,7 @@ jobs:
 
   test-e2e-native:
     name: test (E2E, ${{ matrix.platform }})
-    needs: ["build-jason", "build-jason-linux", "build-jason-windows" ,"docker"]
+    needs: ["build-jason", "build-jason-linux", "docker"]
     strategy:
       fail-fast: false
       matrix:
