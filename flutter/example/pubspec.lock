@@ -326,10 +326,10 @@ packages:
     dependency: "direct main"
     description:
       name: medea_flutter_webrtc
-      sha256: "50f0b720dae7c1f4fdf927dc38261f6cc735c8cf10cee4310dc18321e01bcc4b"
+      sha256: d50536aee9dfd7959380710a0ac12351928f0196d50062442f8210a2ccf1f576
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.0"
+    version: "0.8.1-dev+rev.0e22a7b5d33796574a996704217ea8e88ec7832c"
   medea_jason:
     dependency: "direct main"
     description:
