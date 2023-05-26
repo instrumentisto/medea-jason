@@ -320,7 +320,7 @@ jobs:
           - ios
           - linux
           - macos
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -400,7 +400,7 @@ jobs:
           - windows
     runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
               || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'macos-latest' }}
+              ||                                  'macos-13' }}
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@v1
