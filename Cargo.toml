@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.3.0-dev"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.65"
 description = "Client library for Medea media server."
@@ -44,8 +44,8 @@ derivative = "2.2"
 derive_more = "0.99"
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.4.0-dev", path = "proto/client-api" }
-medea-macro = { version = "0.3.0-dev", path = "crates/medea-macro" }
+medea-client-api-proto = { version = "0.4.0", path = "proto/client-api" }
+medea-macro = { version = "0.3.0", path = "crates/medea-macro" }
 medea-reactive = "0.1"
 mockall = { version = "0.11", optional = true }
 sealed = "0.5"

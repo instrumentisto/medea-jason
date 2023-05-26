@@ -51,8 +51,9 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Library API:
+    - Expose all APIs via FFI to a Dart via [medea_jason] plugin ([#8], [#9], [#10], [#12], [#14], [#26], [#28]). 
     - Optional argument to `ReconnectHandle.reconnect_with_backoff()` function that limits max elapsed time ([#206]).
-    - Exceptions ([#4]):
+    - Exceptions ([#4], [#31]):
         - `StateError`;
         - `LocalMediaInitException`;
         - `EnumerateDevicesException`;
@@ -92,9 +93,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [instrumentisto/medea#206]: https://github.com/instrumentisto/medea/pull/206
 [#4]: /../../pull/4
+[#8]: /../../pull/8
+[#9]: /../../pull/9
+[#10]: /../../pull/10
+[#12]: /../../pull/12
+[#14]: /../../pull/14
 [#16]: /../../pull/16
+[#26]: /../../pull/26
+[#28]: /../../pull/28
 [#29]: /../../pull/29
 [#30]: /../../pull/30
+[#31]: /../../pull/31
 [#43]: /../../pull/43
 [#46]: /../../pull/46
 [#49]: /../../pull/49
@@ -288,5 +297,5 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
+[medea_jason]: https://pub.dev/packages/medea_jason
 [Semantic Versioning 2.0.0]: https://semver.org

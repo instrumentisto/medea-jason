@@ -34,10 +34,6 @@ dev_dependencies:
   import_sorter: ^4.6.0
   json_serializable: ^6.3.1
 
-# TODO: Remove when dart-lang/build#3515 is released:
-dependency_overrides:
-  logging: 1.1.1
-
 flutter:
   plugin:
     platforms:
