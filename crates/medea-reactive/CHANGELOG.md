@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.1.2] · 2023-05-26
+## [0.1.2] · 2023-05-29
 [0.1.2]: /../../tree/medea-macro-0.1.2/crates/medea-macro
 
 ### Updated

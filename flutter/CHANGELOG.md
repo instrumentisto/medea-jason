@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2023-05-26
+## [0.3.0] · 2023-05-29
 [0.3.0]: /../../tree/medea-jason-flutter-0.3.0/jason/flutter
 
 [Milestone](/../../milestone/3) | [Roadmap](/../../issues/182)
