@@ -329,7 +329,9 @@ jobs:
         with:
           toolchain: stable
       - name: Setup Docker and Docker Compose
-        uses: docker-practice/actions-setup-docker@v1
+        run: |
+          brew install docker docker-compose colima
+          colima start
         if: ${{ contains('ios macos', matrix.platform) }}
 
       - uses: subosito/flutter-action@v2
