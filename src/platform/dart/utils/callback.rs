@@ -243,7 +243,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: i64 = expects.try_into().unwrap();
         Callback::from_once(move |val: i64| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }
@@ -254,7 +254,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: String = expects.try_into().unwrap();
         Callback::from_once(move |val: String| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }
@@ -265,7 +265,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: Option<i64> = expects.try_into().unwrap();
         Callback::from_once(move |val: Option<i64>| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }
@@ -276,7 +276,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: Option<String> = expects.try_into().unwrap();
         Callback::from_once(move |val: Option<String>| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }

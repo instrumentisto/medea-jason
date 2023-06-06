@@ -32,8 +32,8 @@ pub(crate) fn derive(
     let mut output = input.clone();
     let inp: syn::DeriveInput = syn::parse(input)?;
 
-    let enum_name = inp.ident.clone();
-    let enum_name_iter = iter::repeat(enum_name.clone());
+    let enum_name = &inp.ident;
+    let enum_name_iter = iter::repeat(enum_name);
 
     let variants = if let syn::Data::Enum(ref data) = &inp.data {
         data.variants

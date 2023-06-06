@@ -78,7 +78,8 @@ pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
     let delayed = unsafe { completer::delayed(delay) };
-    unsafe { FutureFromDart::execute::<()>(delayed).await }.unwrap();
+    let delayed_fut = unsafe { FutureFromDart::execute::<()>(delayed) };
+    delayed_fut.await.unwrap();
 }
 
 /// Dart [Future] which can be resolved from Rust.
