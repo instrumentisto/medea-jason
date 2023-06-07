@@ -446,9 +446,9 @@ impl RoomHandle {
             // required messaging.
             // Hold tracks through all process, to ensure that they will be
             // reused without additional requests.
-            let _tracks_handles;
+            let tracks_handles;
             if direction_send && enabling {
-                _tracks_handles = inner
+                tracks_handles = inner
                     .get_local_tracks(kind, source_kind)
                     .await
                     .map_err(|e| {
@@ -468,7 +468,7 @@ impl RoomHandle {
                     ));
                 }
             } else {
-                _tracks_handles = Vec::new();
+                tracks_handles = Vec::new();
             };
 
             while !inner.is_all_peers_in_media_state(
@@ -503,6 +503,7 @@ impl RoomHandle {
                 }
             }
 
+            drop(tracks_handles);
             Ok(())
         })
     }

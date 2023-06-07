@@ -12,16 +12,16 @@ use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
 /// Expands `#[dart_bridge]` attribute placed on a Rust module declaration.
-#[allow(clippy::needless_pass_by_value)] // due to feature
 pub(crate) fn expand(
-    #[cfg(feature = "dart-codegen")] args: TokenStream,
-    #[cfg(not(feature = "dart-codegen"))] _: TokenStream,
+    args: TokenStream,
     input: TokenStream,
 ) -> syn::Result<TokenStream> {
     let expander = ModExpander::try_from(syn::parse2::<syn::ItemMod>(input)?)?;
 
     #[cfg(feature = "dart-codegen")]
     expander.generate_dart_code(&syn::parse2(args)?)?;
+    #[cfg(not(feature = "dart-codegen"))]
+    drop(args);
 
     Ok(expander.expand())
 }
