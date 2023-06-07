@@ -12,7 +12,7 @@ repository = "https://github.com/instrumentisto/medea-jason"
 readme = "README.md"
 keywords = ["medea", "macro", "derive", "codegen"]
 categories = ["development-tools::build-utils"]
-exclude = ["/tests/"]
+include = ["/src/", "/CHANGELOG.md", "/LICENSE.md"]
 
 [lib]
 proc-macro = true

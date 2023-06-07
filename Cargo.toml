@@ -12,7 +12,7 @@ repository = "https://github.com/instrumentisto/medea-jason"
 readme = "README.md"
 keywords = ["medea", "jason", "webrtc", "client", "browser"]
 categories = ["multimedia", "api-bindings", "web-programming", "wasm"]
-exclude = ["/demo/", "/e2e-demo/", "/flutter/"]
+include = ["/src/", "/build.rs", "/CHANGELOG.md", "/LICENSE.md"]
 
 [workspace]
 members = [
@@ -44,9 +44,9 @@ derivative = "2.2"
 derive_more = "0.99"
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.4.0", path = "proto/client-api" }
-medea-macro = { version = "0.3.0", path = "crates/medea-macro" }
-medea-reactive = "0.1"
+medea-client-api-proto = { version = "0.4", path = "proto/client-api" }
+medea-macro = { version = "0.3", path = "crates/medea-macro" }
+medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.11", optional = true }
 sealed = "0.5"
 serde = { version = "1.0", features = ["derive"] }

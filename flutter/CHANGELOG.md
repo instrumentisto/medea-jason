@@ -6,31 +6,26 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2023-05-29
-[0.3.0]: /../../tree/medea-jason-flutter-0.3.0/jason/flutter
+## [0.3.0] · 2023-06-07
+[0.3.0]: /../../tree/medea-jason-0.3.0/flutter
 
-[Milestone](/../../milestone/3) | [Roadmap](/../../issues/182)
+### Added
 
-#### Added
-
-- Bindings to [medea-jason] Rust crate:
-    - Errors ([#4], [#9], [#28], [#31], [#52]);
-    - All basic [medea-jason] API objects ([#5], [#12], [#45]):
-        - `Jason`;
-        - `RoomHandle`;
-        - `ConnectionHandle`;
-        - `MediaManagerHandle`;
-        - `ReconnectHandle`;
-        - `MediaStreamSettings`, `AudioTrackConstraints`, `DeviceVideoTrackConstraints`, `DisplayVideoTrackConstraints` ([#79]);
-        - `MediaDeviceDetails`, `MediaDisplayDetails` ([#96]);
-        - `LocalMediaTrack`, `RemoteMediaTrack` ([#42], [#46], [#101], [#109]);
-        - `enumerate_displays` ([#81]);
-        - `microphoneVolumeIsAvailable`, `setMicrophoneVolume`, microphoneVolume ([#49]);
-        - `setOutputAudioId` ([#29]);
-        - `on_device_change` ([#30]).
-
-
-
+- Bindings to [`medea-jason`] Rust crate.
+- Errors ([#4], [#9], [#28], [#31], [#52]).
+- Basic API objects ([#5], [#12], [#45]):
+    - `Jason`;
+    - `RoomHandle`;
+    - `ConnectionHandle`;
+    - `MediaManagerHandle`;
+    - `ReconnectHandle`;
+    - `MediaStreamSettings`, `AudioTrackConstraints`, `DeviceVideoTrackConstraints`, `DisplayVideoTrackConstraints` ([#79]);
+    - `MediaDeviceDetails`, `MediaDisplayDetails` ([#96]);
+    - `LocalMediaTrack`, `RemoteMediaTrack` ([#42], [#46], [#101], [#109]);
+    - `enumerate_displays` ([#81]);
+    - `microphoneVolumeIsAvailable`, `setMicrophoneVolume`, `microphoneVolume` ([#49]);
+    - `setOutputAudioId` ([#29]);
+    - `on_device_change` ([#30]).
 
 [#4]: https://github.com/instrumentisto/medea-jason/pull/4
 [#5]: https://github.com/instrumentisto/medea-jason/pull/5
@@ -54,5 +49,5 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-[medea-jason]: https://crates.io/crates/medea-jason
+[`medea-jason`]: https://docs.rs/medea-jason
 [Semantic Versioning 2.0.0]: https://semver.org

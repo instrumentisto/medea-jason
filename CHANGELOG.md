@@ -6,10 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2023-05-29
+## [0.3.0] · 2023-06-07
 [0.3.0]: /../../tree/medea-jason-0.3.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0)
 
 ### BC Breaks
 
@@ -51,7 +51,6 @@ All user visible changes to this project will be documented in this file. This p
 ### Added
 
 - Library API:
-    - Expose all APIs via FFI to a Dart via [medea_jason] plugin ([#8], [#9], [#10], [#12], [#14], [#26], [#28]). 
     - Optional argument to `ReconnectHandle.reconnect_with_backoff()` function that limits max elapsed time ([#206]).
     - Exceptions ([#4], [#31]):
         - `StateError`;
@@ -81,6 +80,7 @@ All user visible changes to this project will be documented in this file. This p
     - `LocalMediaTrack` ([#109]):
         - `on_ended`;
         - `state`.
+    - Exposing all APIs via FFI to Dart ([#8], [#9], [#10], [#12], [#14], [#26], [#28]).
 
 ### Fixed
 
@@ -297,5 +297,4 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-[medea_jason]: https://pub.dev/packages/medea_jason
 [Semantic Versioning 2.0.0]: https://semver.org

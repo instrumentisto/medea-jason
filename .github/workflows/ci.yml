@@ -13,8 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  # MEDEA_BRANCH: edge  # for E2E tests only
-  MEDEA_BRANCH: edge
+  MEDEA_BRANCH: edge  # for E2E tests only
   PROTOC_VER: 3.x
   RUST_BACKTRACE: 1
 
@@ -316,6 +315,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # TODO: Run E2E test on Windows
         platform:
           - ios
           - linux
@@ -330,7 +330,7 @@ jobs:
           toolchain: stable
       - name: Setup Docker and Docker Compose
         run: |
-          brew install docker docker-compose colima
+          brew install colima docker docker-compose
           colima start
         if: ${{ contains('ios macos', matrix.platform) }}
 
@@ -662,10 +662,20 @@ jobs:
 
   cargo-publish:
     name: cargo publish (crates.io)
-    if: ${{ startsWith(github.ref, 'refs/tags/medea-')
-         && !startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
-         && !startsWith(github.ref, 'refs/tags/medea-demo-') }}
-    needs: ["release-github"]
+    if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-')
+         || startsWith(github.ref, 'refs/tags/medea-client-api-proto-')
+         || startsWith(github.ref, 'refs/tags/medea-control-api-proto-')
+         || startsWith(github.ref, 'refs/tags/medea-macro-')
+         || startsWith(github.ref, 'refs/tags/medea-reactive-') }}
+    needs:
+      - build-jason
+      - build-jason-linux
+      - clippy
+      - rustdoc
+      - rustfmt
+      - test
+      - test-e2e-browser
+      - test-e2e-native
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -673,16 +683,18 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Parse crate name and version
+      - name: Parse release version
         id: crate
         uses: actions-ecosystem/action-regex-match@v2
         with:
           text: ${{ github.ref }}
           regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+      - name: Verify release version matches Cargo manifest
+        run: |
+          test "${{ steps.release.outputs.group2 }}" \
+            == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
 
-      - name: Release ${{ steps.crate.outputs.group2 }} version
-              of '${{ steps.crate.outputs.group1 }}' crate
-        run: make release.cargo crate=${{ steps.crate.outputs.group1 }}
+      - run: make release.cargo crate=${{ steps.crate.outputs.group1 }}
                                 publish=yes
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
@@ -711,6 +723,24 @@ jobs:
         with:
           fetch-depth: 2 # for PRs only
 
+      - name: Parse pubspec version
+        id: pubspec
+        run: echo "version=$(grep -m1 'version:' pubspec.yaml | cut -d' ' -f2)"
+             >> $GITHUB_OUTPUT
+        working-directory: flutter/
+      - name: Parse release version
+        id: release
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ github.ref }}
+          regex: '^refs/tags/(medea[a-z-]*)-([0-9]+\.[0-9]+\.[0-9]+-?.*)$'
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: Verify release version matches pubspec version
+        run: |
+          test "${{ steps.release.outputs.group2 }}" \
+            == "${{ steps.pubspec.outputs.version }}"
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+
       - name: Retrieve commit message and hash
         id: commit
         run: |
@@ -723,8 +753,11 @@ jobs:
       - name: Check whether should be skipped
         id: skip
         run: echo "no=${{ !(
-               github.event_name == 'pull_request'
-               && !contains(steps.commit.outputs.message, '[publish]')
+               (!startsWith(github.ref, 'refs/tags/')
+                && !contains(steps.pubspec.outputs.version, '-'))
+               ||
+               (github.event_name == 'pull_request'
+                && !contains(steps.commit.outputs.message, '[publish]'))
              ) }}" >> $GITHUB_OUTPUT
 
       - uses: subosito/flutter-action@v2
@@ -793,7 +826,8 @@ jobs:
     name: docker push
     if: ${{ github.event_name == 'push'
          && (github.ref == 'refs/heads/master'
-             || startsWith(github.ref, 'refs/tags/medea-')) }}
+             || startsWith(github.ref, 'refs/tags/medea-control-api-mock-')
+             || startsWith(github.ref, 'refs/tags/medea-demo-')) }}
     needs: ["docker"]
     strategy:
       fail-fast: false
@@ -970,11 +1004,12 @@ jobs:
   npm-publish:
     name: npm publish (npm.js)
     if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
-    needs: ["release-github"]
+    needs: ["cargo-publish"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Parse package name and version
+
+      - name: Parse release version
         id: package
         uses: actions-ecosystem/action-regex-match@v2
         with:
@@ -983,7 +1018,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "19"
+          node-version: "20"
           registry-url: https://registry.npmjs.org
 
       - uses: dtolnay/rust-toolchain@v1
@@ -992,9 +1027,7 @@ jobs:
           target: wasm32-unknown-unknown
       - uses: jetli/wasm-pack-action@v0.4.0
 
-      - name: Release ${{ steps.package.outputs.group2 }} version
-              of '${{ steps.package.outputs.group1 }}' package
-        run: make release.npm crate=${{ steps.package.outputs.group1 }}
+      - run: make release.npm crate=${{ steps.package.outputs.group1 }}
                               publish=yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
@@ -1013,7 +1046,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Parse crate/package name and version
+      - name: Parse pubspec version
+        id: pubspec
+        run: echo "version=$(grep -m1 'version:' pubspec.yaml | cut -d' ' -f2)"
+             >> $GITHUB_OUTPUT
+        working-directory: flutter/
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
+
+      - name: Parse release version
         id: release
         uses: actions-ecosystem/action-regex-match@v2
         with:
@@ -1024,6 +1064,11 @@ jobs:
           test "${{ steps.release.outputs.group2 }}" \
             == $(make cargo.version crate=${{ steps.release.outputs.group1 }})
         if: ${{ !startsWith(github.ref, 'refs/tags/medea-demo-') }}
+      - name: Verify release version matches pubspec
+        run: |
+          test "${{ steps.release.outputs.group2 }}" \
+            == "${{ steps.pubspec.outputs.version }}"
+        if: ${{ startsWith(github.ref, 'refs/tags/medea-jason-') }}
       - name: Verify release version matches Yarn manifest
         run: |
           test "${{ steps.release.outputs.group2 }}" \

@@ -1,4 +1,3 @@
-# Additional information about this file can be found here:
 # https://dart.dev/guides/language/analysis-options
 
 include: package:flutter_lints/flutter.yaml
@@ -10,7 +9,5 @@ analyzer:
     - '**/*.g.dart'
 
 linter:
-  # List of all available lints can be found here:
-  # https://dart-lang.github.io/linter/lints/index.html
-  rules:
+  rules: # https://dart-lang.github.io/linter/lints/index.html
     prefer_single_quotes: true

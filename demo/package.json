@@ -2,6 +2,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "medea-jason": "^0.2"
+    "medea-jason": "^0.3"
   }
 }
