@@ -592,7 +592,7 @@ ifeq ($(wildcard flutter/pubspec.lock),)
 endif
 	cd flutter && \
 	flutter pub get && \
-	dart pub run build_runner build \
+	dart run build_runner build \
 		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
 
 

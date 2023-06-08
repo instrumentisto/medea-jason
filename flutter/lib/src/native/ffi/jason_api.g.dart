@@ -6405,16 +6405,16 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           .asFunction<void Function(FreeDartNativeStringFunction)>();
 }
 
-final class _Dart_Handle extends ffi.Opaque {}
+class _Dart_Handle extends ffi.Opaque {}
 
 abstract class MemoryOwner {
   static const int Rust = 0;
   static const int Dart = 1;
 }
 
-final class FutureFromDart extends ffi.Opaque {}
+class FutureFromDart extends ffi.Opaque {}
 
-final class Task extends ffi.Opaque {}
+class Task extends ffi.Opaque {}
 
 abstract class DartValue_Tag {
   static const int None = 0;
@@ -6426,7 +6426,7 @@ abstract class DartValue_Tag {
   static const int Bool = 6;
 }
 
-final class String_Body extends ffi.Struct {
+class String_Body extends ffi.Struct {
   @DartValue_Tag1()
   external int tag;
 
@@ -6439,7 +6439,7 @@ final class String_Body extends ffi.Struct {
 typedef DartValue_Tag1 = ffi.Uint8;
 typedef MemoryOwner1 = ffi.Uint8;
 
-final class DartValue extends ffi.Union {
+class DartValue extends ffi.Union {
   @DartValue_Tag1()
   external int tag;
 
@@ -6456,18 +6456,18 @@ final class DartValue extends ffi.Union {
   external UnnamedStruct1 unnamed4;
 }
 
-final class UnnamedStruct1 extends ffi.Struct {
+class UnnamedStruct1 extends ffi.Struct {
   @DartValue_Tag1()
   external int ptr_tag;
 
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_ConnectionHandle extends ffi.Struct {
+class wire_ConnectionHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_DartOpaque extends ffi.Struct {
+class wire_DartOpaque extends ffi.Struct {
   @ffi.Int64()
   external int port;
 
@@ -6475,67 +6475,67 @@ final class wire_DartOpaque extends ffi.Struct {
   external int handle;
 }
 
-final class wire_Jason extends ffi.Struct {
+class wire_Jason extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_RoomHandle extends ffi.Struct {
+class wire_RoomHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_LocalMediaTrack extends ffi.Struct {
+class wire_LocalMediaTrack extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_MediaManagerHandle extends ffi.Struct {
+class wire_MediaManagerHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_uint_8_list extends ffi.Struct {
+class wire_uint_8_list extends ffi.Struct {
   external ffi.Pointer<ffi.Uint8> ptr;
 
   @ffi.Int32()
   external int len;
 }
 
-final class wire_ApiAudioConstraints extends ffi.Struct {
+class wire_ApiAudioConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 }
 
-final class wire_ApiConstrainFacingMode_Exact extends ffi.Struct {
+class wire_ApiConstrainFacingMode_Exact extends ffi.Struct {
   @ffi.Int32()
   external int field0;
 }
 
-final class wire_ApiConstrainFacingMode_Ideal extends ffi.Struct {
+class wire_ApiConstrainFacingMode_Ideal extends ffi.Struct {
   @ffi.Int32()
   external int field0;
 }
 
-final class ApiConstrainFacingModeKind extends ffi.Union {
+class ApiConstrainFacingModeKind extends ffi.Union {
   external ffi.Pointer<wire_ApiConstrainFacingMode_Exact> Exact;
 
   external ffi.Pointer<wire_ApiConstrainFacingMode_Ideal> Ideal;
 }
 
-final class wire_ApiConstrainFacingMode extends ffi.Struct {
+class wire_ApiConstrainFacingMode extends ffi.Struct {
   @ffi.Int32()
   external int tag;
 
   external ffi.Pointer<ApiConstrainFacingModeKind> kind;
 }
 
-final class wire_ConstrainU32_Exact extends ffi.Struct {
+class wire_ConstrainU32_Exact extends ffi.Struct {
   @ffi.Uint32()
   external int field0;
 }
 
-final class wire_ConstrainU32_Ideal extends ffi.Struct {
+class wire_ConstrainU32_Ideal extends ffi.Struct {
   @ffi.Uint32()
   external int field0;
 }
 
-final class wire_ConstrainU32_Range extends ffi.Struct {
+class wire_ConstrainU32_Range extends ffi.Struct {
   @ffi.Uint32()
   external int field0;
 
@@ -6543,7 +6543,7 @@ final class wire_ConstrainU32_Range extends ffi.Struct {
   external int field1;
 }
 
-final class ConstrainU32Kind extends ffi.Union {
+class ConstrainU32Kind extends ffi.Union {
   external ffi.Pointer<wire_ConstrainU32_Exact> Exact;
 
   external ffi.Pointer<wire_ConstrainU32_Ideal> Ideal;
@@ -6551,14 +6551,14 @@ final class ConstrainU32Kind extends ffi.Union {
   external ffi.Pointer<wire_ConstrainU32_Range> Range;
 }
 
-final class wire_ConstrainU32 extends ffi.Struct {
+class wire_ConstrainU32 extends ffi.Struct {
   @ffi.Int32()
   external int tag;
 
   external ffi.Pointer<ConstrainU32Kind> kind;
 }
 
-final class wire_ApiDeviceVideoTrackConstraints extends ffi.Struct {
+class wire_ApiDeviceVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 
   external ffi.Pointer<wire_ApiConstrainFacingMode> facing_mode;
@@ -6568,7 +6568,7 @@ final class wire_ApiDeviceVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<wire_ConstrainU32> width;
 }
 
-final class wire_ApiDisplayVideoTrackConstraints extends ffi.Struct {
+class wire_ApiDisplayVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> device_id;
 
   external ffi.Pointer<wire_ConstrainU32> height;
@@ -6578,7 +6578,7 @@ final class wire_ApiDisplayVideoTrackConstraints extends ffi.Struct {
   external ffi.Pointer<wire_ConstrainU32> frame_rate;
 }
 
-final class wire_ApiMediaStreamSettings extends ffi.Struct {
+class wire_ApiMediaStreamSettings extends ffi.Struct {
   external ffi.Pointer<wire_ApiAudioConstraints> audio;
 
   external ffi.Pointer<wire_ApiDeviceVideoTrackConstraints> device_video;
@@ -6586,11 +6586,11 @@ final class wire_ApiMediaStreamSettings extends ffi.Struct {
   external ffi.Pointer<wire_ApiDisplayVideoTrackConstraints> display_video;
 }
 
-final class wire_ReconnectHandle extends ffi.Struct {
+class wire_ReconnectHandle extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
-final class wire_RemoteMediaTrack extends ffi.Struct {
+class wire_RemoteMediaTrack extends ffi.Struct {
   external ffi.Pointer<ffi.Void> ptr;
 }
 
