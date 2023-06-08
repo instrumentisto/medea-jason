@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   flutter: ">=3.7.0"
-  sdk: ">=2.19.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -27,15 +27,16 @@ dependencies:
   retry: ^3.1.2
 
 dev_dependencies:
-  flutter_gherkin: 3.0.0-rc.17
   flutter_driver:
     sdk: flutter
+  flutter_gherkin: 3.0.0-rc.17
+  flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
   json_serializable: ^6.3.1
-  flutter_lints: ^2.0.1
+
 
 flutter:
   assets:

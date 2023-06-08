@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2023-06-07
+## [0.3.0] · 2023-06-08
 [0.3.0]: /../../tree/medea-macro-0.3.0/crates/medea-macro
 
 ### BC Breaks
