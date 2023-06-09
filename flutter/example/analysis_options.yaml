@@ -1,8 +1,12 @@
+# https://dart.dev/guides/language/analysis-options
+
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  errors:
+    invalid_use_of_visible_for_testing_member: error
   exclude:
-    - '**.g.dart'
+    - '**/*.g.dart'
 
 linter:
   rules: # https://dart-lang.github.io/linter/lints/index.html

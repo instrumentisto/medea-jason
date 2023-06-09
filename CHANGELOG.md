@@ -6,10 +6,10 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2021-??-?? · To-be-done
+## [0.3.0] · 2023-06-09
 [0.3.0]: /../../tree/medea-jason-0.3.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0)
 
 ### BC Breaks
 
@@ -52,7 +52,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - Library API:
     - Optional argument to `ReconnectHandle.reconnect_with_backoff()` function that limits max elapsed time ([#206]).
-    - Exceptions ([#4]):
+    - Exceptions ([#4], [#31]):
         - `StateError`;
         - `LocalMediaInitException`;
         - `EnumerateDevicesException`;
@@ -80,6 +80,7 @@ All user visible changes to this project will be documented in this file. This p
     - `LocalMediaTrack` ([#109]):
         - `on_ended`;
         - `state`.
+    - Exposing all APIs via FFI to Dart ([#8], [#9], [#10], [#12], [#14], [#26], [#28]).
 
 ### Fixed
 
@@ -92,9 +93,17 @@ All user visible changes to this project will be documented in this file. This p
 
 [instrumentisto/medea#206]: https://github.com/instrumentisto/medea/pull/206
 [#4]: /../../pull/4
+[#8]: /../../pull/8
+[#9]: /../../pull/9
+[#10]: /../../pull/10
+[#12]: /../../pull/12
+[#14]: /../../pull/14
 [#16]: /../../pull/16
+[#26]: /../../pull/26
+[#28]: /../../pull/28
 [#29]: /../../pull/29
 [#30]: /../../pull/30
+[#31]: /../../pull/31
 [#43]: /../../pull/43
 [#46]: /../../pull/46
 [#49]: /../../pull/49
@@ -284,7 +293,6 @@ All user visible changes to this project will be documented in this file. This p
 [#18]: https://github.com/instrumentisto/medea/pull/18
 [#20]: https://github.com/instrumentisto/medea/pull/20
 [#22]: https://github.com/instrumentisto/medea/pull/22
-
 
 
 

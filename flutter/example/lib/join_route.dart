@@ -4,17 +4,19 @@ import 'call_route.dart';
 import 'package:faker_dart/faker_dart.dart';
 
 class JoinRoute extends StatefulWidget {
+  const JoinRoute({super.key});
+
   @override
-  _JoinRouteState createState() => _JoinRouteState();
+  State<JoinRoute> createState() => _JoinRouteState();
 }
 
 final _faker = Faker.instance;
-const DEFAULT_ROOM_ID = 'pub-pub-video-call';
-final DEFAULT_MEMBER_ID = _faker.name.firstName();
+const defaultRoomId = 'pub-pub-video-call';
+final defaultMemberId = _faker.name.firstName();
 
 class _JoinRouteState extends State<JoinRoute> {
-  String _roomId = DEFAULT_ROOM_ID;
-  String _memberId = DEFAULT_MEMBER_ID;
+  String _roomId = defaultRoomId;
+  String _memberId = defaultMemberId;
 
   bool isPublish = true;
   bool publishAudio = true;
@@ -29,53 +31,53 @@ class _JoinRouteState extends State<JoinRoute> {
       ),
       body: Center(
           child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Image.asset('assets/images/logo.png', height: 200),
                   TextFormField(
-                    initialValue: DEFAULT_ROOM_ID,
+                    initialValue: defaultRoomId,
                     onChanged: (text) {
                       setState(() {
                         _roomId = text;
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Room ID',
                     ),
                   ),
                   TextFormField(
-                    initialValue: DEFAULT_MEMBER_ID,
+                    initialValue: defaultMemberId,
                     onChanged: (text) {
                       setState(() {
                         _memberId = text;
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Member ID',
                     ),
                   ),
                   SwitchListTile(
-                      title: Text('Publish'),
+                      title: const Text('Publish'),
                       value: isPublish,
                       onChanged: (v) => setState(() {
                             isPublish = v;
                           })),
                   SwitchListTile(
-                      title: Text('Publish Video'),
+                      title: const Text('Publish Video'),
                       value: publishVideo,
                       onChanged: (v) => setState(() {
                             publishVideo = v;
                           })),
                   SwitchListTile(
-                      title: Text('Publish Audio'),
+                      title: const Text('Publish Audio'),
                       value: publishAudio,
                       onChanged: (v) => setState(() {
                             publishAudio = v;
                           })),
                   SwitchListTile(
-                      title: Text('FakeMedia'),
+                      title: const Text('FakeMedia'),
                       value: fakeMedia,
                       onChanged: (v) => setState(() {
                             fakeMedia = v;
@@ -87,7 +89,6 @@ class _JoinRouteState extends State<JoinRoute> {
                       disabledForegroundColor: Colors.grey.withOpacity(0.38),
                     ),
                     onPressed: () {
-                      print('RoomID: $_roomId and MemberID: $_memberId');
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -99,7 +100,7 @@ class _JoinRouteState extends State<JoinRoute> {
                                   publishAudio,
                                   fakeMedia)));
                     },
-                    child: Text('Join Room'),
+                    child: const Text('Join Room'),
                   )
                 ],
               ))),

@@ -441,7 +441,7 @@ endif
 		--no-build-runner \
 		--dart-format-line-length=80
 	cd flutter && \
-	flutter pub run build_runner build --delete-conflicting-outputs
+	dart pub run build_runner build --delete-conflicting-outputs
 
 
 # Lint Rust sources with Clippy.
@@ -573,8 +573,7 @@ flutter:
 #	make flutter.fmt [check=(no|yes)]
 
 flutter.fmt:
-	flutter format $(if $(call eq,$(check),yes),-n --set-exit-if-changed,) \
-		flutter/
+	dart format $(if $(call eq,$(check),yes), --set-exit-if-changed,) flutter/
 ifeq ($(wildcard flutter/.packages),)
 	@make flutter cmd='pub get'
 endif
@@ -593,7 +592,7 @@ ifeq ($(wildcard flutter/pubspec.lock),)
 endif
 	cd flutter && \
 	flutter pub get && \
-	flutter pub run build_runner build \
+	dart run build_runner build \
 		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
 
 

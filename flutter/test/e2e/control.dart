@@ -8,16 +8,16 @@ Map<String, String> headers = {'Content-Type': 'application/json'};
 /// Client of a Control API.
 class Client {
   http.Client inner = http.Client();
-  late String control_api_address;
+  late String controlApiAddress;
 
   /// Returns a new Control API [Client].
-  Client(this.control_api_address);
+  Client(this.controlApiAddress);
 
   /// Creates the provided media `Element` in the provided [path] on a media
   /// server.
   Future<http.Response> create(String path, Object element) async {
     var response = await retry(() => inner.post(
-        Uri.parse(get_url(control_api_address, path)),
+        Uri.parse(getUrl(controlApiAddress, path)),
         headers: headers,
         body: json.encode(element)));
     if (response.statusCode != 200) {
@@ -29,7 +29,7 @@ class Client {
   /// Deletes a media `Element` identified by the provided [path].
   Future<http.Response> delete(String path) async {
     var response = await retry(
-        () => inner.delete(Uri.parse(get_url(control_api_address, path))));
+        () => inner.delete(Uri.parse(getUrl(controlApiAddress, path))));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -39,7 +39,7 @@ class Client {
   /// Returns a media `Element` identified by the provided [path].
   Future<http.Response> get(String path) async {
     var response = await retry(
-        () => inner.get(Uri.parse(get_url(control_api_address, path))));
+        () => inner.get(Uri.parse(getUrl(controlApiAddress, path))));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -50,7 +50,7 @@ class Client {
   /// provided [path].
   Future<http.Response> apply(String path, Object element) async {
     var response = await retry(() => inner.put(
-        Uri.parse(get_url(control_api_address, path)),
+        Uri.parse(getUrl(controlApiAddress, path)),
         headers: headers,
         body: json.encode(element)));
     if (response.statusCode != 200) {
@@ -61,8 +61,8 @@ class Client {
 
   /// Fetches all callbacks received by Control API mock server.
   Future<http.Response> callbacks() async {
-    var response = await retry(
-        () => inner.get(Uri.parse('$control_api_address/callbacks')));
+    var response =
+        await retry(() => inner.get(Uri.parse('$controlApiAddress/callbacks')));
     if (response.statusCode != 200) {
       throw response.body;
     }
@@ -70,7 +70,7 @@ class Client {
   }
 
   /// Returns URL of a media element identified by the provided [path].
-  String get_url(String control_api_address, String path) {
-    return '$control_api_address/control-api/$path';
+  String getUrl(String controlApiAddress, String path) {
+    return '$controlApiAddress/control-api/$path';
   }
 }

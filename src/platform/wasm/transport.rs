@@ -92,7 +92,7 @@ struct InnerSocket {
 impl InnerSocket {
     /// Creates a new [`InnerSocket`] which can be connected to the server with
     /// the [`RpcTransport::connect()`] method call.
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             socket_state: ObservableCell::new(TransportState::Connecting),
             socket: RefCell::new(None),

@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.8.0] · 2022-??-?? · To-be-done
+## [0.8.0] · 2023-06-09
 [0.8.0]: /../../tree/medea-control-api-proto-0.8.0/proto/control-api
 
 [Diff](/../../compare/medea-control-api-proto-0.7.0...medea-control-api-proto-0.8.0)
@@ -28,14 +28,14 @@ All user visible changes to this project will be documented in this file. This p
 
 - Dependencies:
     - [`prost`] to `0.11` ([c8332ea9]);
-    - [`tonic`] to `0.9` ([todo]).
+    - [`tonic`] to `0.9` ([6234b23f]).
 
 [#55]: /../../pull/55
 [#56]: /../../pull/56
 [#67]: /../../pull/67
 [#68]: /../../pull/68
+[6234b23f]: /../../commit/6234b23f66e81c0ce411dfb8cdf983eda51cd2ad
 [c8332ea9]: /../../commit/c8332ea9b6310958549e750a5553294f894c2d7b
-[todo]: /../../commit/todo
 
 
 

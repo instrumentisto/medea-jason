@@ -4,16 +4,16 @@ import '../jason.dart';
 import 'foreign_value.dart';
 import 'future.g.dart' as bridge;
 
-typedef _futureResolveOk_C = Void Function(Pointer, ForeignValue);
-typedef _futureResolveOk_Dart = void Function(Pointer, ForeignValue);
+typedef _FutureResolveOkC = Void Function(Pointer, ForeignValue);
+typedef _FutureResolveOkDart = void Function(Pointer, ForeignValue);
 final _futureResolveOk =
-    dl.lookupFunction<_futureResolveOk_C, _futureResolveOk_Dart>(
+    dl.lookupFunction<_FutureResolveOkC, _FutureResolveOkDart>(
         'FutureFromDart__resolve_ok');
 
-typedef _futureResolveErr_C = Void Function(Pointer, Handle);
-typedef _futureResolveErr_Dart = void Function(Pointer, Object);
+typedef _FutureResolveErrC = Void Function(Pointer, Handle);
+typedef _FutureResolveErrDart = void Function(Pointer, Object);
 final _futureResolveErr =
-    dl.lookupFunction<_futureResolveErr_C, _futureResolveErr_Dart>(
+    dl.lookupFunction<_FutureResolveErrC, _FutureResolveErrDart>(
         'FutureFromDart__resolve_err');
 
 /// Registers functions required for Rust's `FutureFromDart` to work.

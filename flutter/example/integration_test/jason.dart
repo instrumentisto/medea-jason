@@ -44,16 +44,16 @@ void main() {
     expect((tracks.first as NativeLocalMediaTrack).opaque,
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 
-    var video_device =
+    var videoDevice =
         devices.firstWhere((d) => d.kind() == MediaDeviceKind.VideoInput);
 
     if (!Platform.isAndroid) {
-      expect(video_device.deviceId(), equals('fake camera id'));
-      expect(video_device.groupId(), isNull);
-      expect(video_device.label(), equals('fake camera'));
+      expect(videoDevice.deviceId(), equals('fake camera id'));
+      expect(videoDevice.groupId(), isNull);
+      expect(videoDevice.label(), equals('fake camera'));
     }
 
-    video_device.free();
+    videoDevice.free();
     var video = tracks.where((element) => element.kind() == MediaKind.Video);
     expect(video.isNotEmpty, isTrue);
     expect(video.first.mediaSourceKind(), equals(MediaSourceKind.Device));
@@ -111,7 +111,7 @@ void main() {
     await room.enableRemoteAudio();
     await room.disableRemoteVideo(MediaSourceKind.Device);
 
-    var formatExc;
+    dynamic formatExc;
     try {
       await room.join('obviously bad url');
     } catch (e) {
@@ -179,11 +179,11 @@ void main() {
             'test__future_from_dart__string');
 
     var intVal = await (intResolver(
-        () => Future.delayed(Duration(milliseconds: 500), () async {
+        () => Future.delayed(const Duration(milliseconds: 500), () async {
               return 45;
             })) as Future);
     var stringVal = await (stringResolver(
-        () => Future.delayed(Duration(milliseconds: 500), () async {
+        () => Future.delayed(const Duration(milliseconds: 500), () async {
               return 'test string';
             })) as Future);
 
@@ -202,7 +202,7 @@ void main() {
             'test__future_from_dart__handle');
 
     var testObj = TestObj(0);
-    var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
+    fut() => Future.delayed(const Duration(milliseconds: 500), () async {
           return testObj;
         });
     await (handleResolver(fut) as Future);
@@ -215,7 +215,7 @@ void main() {
         dl.lookupFunction<Handle Function(Handle), Object Function(Object)>(
             'test__future_from_dart__fails');
 
-    var fut = () => Future.delayed(Duration(milliseconds: 500), () async {
+    fut() => Future.delayed(const Duration(milliseconds: 500), () async {
           throw Exception('Test Exception');
         });
     var res = await (futureCatchesException(fut) as Future);
@@ -247,7 +247,7 @@ void main() {
     var media = jason.mediaManager();
 
     if (!shouldWork) {
-      var err;
+      dynamic err;
       try {
         await media.enumerateDisplays();
       } catch (e) {

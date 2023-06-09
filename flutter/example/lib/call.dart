@@ -98,11 +98,11 @@ class Call {
     await _room.setLocalMediaSettings(constraints, false, false);
     _tracks = tracks;
 
-    tracks.forEach((track) async {
+    for (var track in tracks) {
       if (track.kind() == MediaKind.Video) {
         _onLocalDeviceTrack(track.getTrack());
       }
-    });
+    }
 
     _room.onLocalTrack((track) {
       _tracks.add(track);
@@ -127,14 +127,14 @@ class Call {
       }
     }
     try {
-      await client.get(roomId + '/' + memberId);
+      await client.get('$roomId/$memberId');
     } catch (e) {
       await _room.join(await createMember(
           roomId, memberId, isPublish, publishVideo, publishAudio));
       return;
     }
     try {
-      await _room.join(baseUrl + roomId + '/' + memberId + '?token=test');
+      await _room.join('$baseUrl$roomId/$memberId?token=test');
     } catch (e) {
       rethrow;
     }
@@ -169,7 +169,9 @@ class Call {
 
   /// Clears the media and closes the room.
   Future<void> dispose() async {
-    _tracks.forEach((t) async => await t.free());
+    for (var track in _tracks) {
+      await track.free();
+    }
     _mediaManager.free();
     _jason.closeRoom(_room);
   }
@@ -267,22 +269,20 @@ class Call {
 
     for (var m in anotherMembers) {
       if (m.pipeline.keys.where((element) => element == 'publish').isNotEmpty) {
-        pipeline['play-' + m.id] = WebRtcPlayEndpoint(
-            'play-' + m.id, 'local://' + roomId + '/' + m.id + '/publish');
+        pipeline['play-${m.id}'] = WebRtcPlayEndpoint(
+            'play-${m.id}', 'local://$roomId/${m.id}/publish');
       }
     }
 
     var resp = await client.create(
-        roomId + '/' + memberId,
+        '$roomId/$memberId',
         Member(memberId, pipeline, Plain('test'), 'grpc://127.0.0.1:9099',
             'grpc://127.0.0.1:9099'));
 
     if (isPublish) {
       for (var m in anotherMembers) {
-        await client.create(
-            roomId + '/' + m.id + '/' + 'play-' + memberId,
-            WebRtcPlayEndpoint(
-                m.id, 'local://' + roomId + '/' + memberId + '/publish'));
+        await client.create('$roomId/${m.id}/play-$memberId',
+            WebRtcPlayEndpoint(m.id, 'local://$roomId/$memberId/publish'));
       }
     }
 

@@ -1,6 +1,6 @@
 [package]
 name = "medea-reactive"
-version = "0.1.2-dev"
+version = "0.1.2"
 edition = "2021"
 rust-version = "1.64"
 description = "Reactive mutable data containers."
@@ -12,6 +12,7 @@ repository = "https://github.com/instrumentisto/medea-jason"
 readme = "README.md"
 keywords = ["medea", "reactive", "reactivity", "observable"]
 categories = ["asynchronous", "data-structures"]
+include = ["/src/", "/CHANGELOG.md", "/LICENSE.md"]
 
 [dependencies]
 futures = "0.3"

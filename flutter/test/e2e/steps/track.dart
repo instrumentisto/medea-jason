@@ -11,179 +11,178 @@ import 'package:medea_jason/src/interface/enums.dart'
 
 List<StepDefinitionGeneric> steps() {
   return [
-    then_member_doesnt_have_live_local_tracks,
-    then_member_has_remote_track,
-    then_member_doesnt_have_remote_tracks_with,
-    then_doesnt_have_remote_track,
-    then_member_has_n_remote_tracks_from,
-    then_member_has_local_tracks,
-    then_remote_media_track,
-    then_remote_track_stops,
-    then_callback_fires_on_remote_track,
-    then_has_local_track,
+    thenMemberDoesntHaveLiveLocalTracks,
+    thenMemberHasRemoteTrack,
+    thenMemberDoesntHaveRemoteTracksWith,
+    thenDoesntHaveRemoteTrack,
+    thenMemberHasNRemoteTracksFrom,
+    thenMemberHasLocalTracks,
+    thenRemoteMediaTrack,
+    thenRemoteTrackStops,
+    thenCallbackFiresOnRemoteTrack,
+    thenHasLocalTrack,
   ];
 }
 
-StepDefinitionGeneric then_member_has_remote_track =
+StepDefinitionGeneric thenMemberHasRemoteTrack =
     then3<String, String, String, CustomWorld>(
   RegExp(r'(\S+) has (audio|video|audio and video) remote '
       r'track(?:s)? from (\S+)'),
-  (id, kind, partner_id, context) async {
+  (id, kind, partnerId, context) async {
     var member = context.world.members[id]!;
-    await member.wait_for_connect(partner_id);
+    await member.waitForConnect(partnerId);
     if (kind.contains('audio')) {
-      await member.wait_remote_track_from(partner_id, null, MediaKind.Audio);
+      await member.waitRemoteTrackFrom(partnerId, null, MediaKind.Audio);
     }
     if (kind.contains('video')) {
-      await member.wait_remote_track_from(partner_id, null, MediaKind.Video);
+      await member.waitRemoteTrackFrom(partnerId, null, MediaKind.Video);
     }
   },
 );
 
-StepDefinitionGeneric then_member_doesnt_have_remote_tracks_with =
+StepDefinitionGeneric thenMemberDoesntHaveRemoteTracksWith =
     then2<String, String, CustomWorld>(
   RegExp(r"(\S+) doesn't have remote tracks from (\S+)$"),
-  (id, partner_id, context) async {
+  (id, partnerId, context) async {
     var member = context.world.members[id]!;
-    await member.wait_for_connect(partner_id);
-    var tracks_count =
-        member.connection_store.remote_tracks[partner_id]!.length;
-    expect(tracks_count, 0);
+    await member.waitForConnect(partnerId);
+    var tracksCount = member.connectionStore.remoteTracks[partnerId]!.length;
+    expect(tracksCount, 0);
   },
 );
 
-StepDefinitionGeneric then_member_has_n_remote_tracks_from =
+StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
     then4<String, int, String, String, CustomWorld>(
   RegExp(r'(\S+) has {int} (live|stopped) remote tracks from (\S+)$'),
-  (id, expected_count, live_or_stopped, remote_id, context) async {
+  (id, expectedCount, liveOrStopped, remoteId, context) async {
     var member = context.world.members[id]!;
-    await context.world.wait_for_interconnection(id);
-    var live = (live_or_stopped == 'live');
+    await context.world.waitForInterconnection(id);
+    var live = (liveOrStopped == 'live');
 
     // We might have to wait for Rust side for a little bit.
     await retry(() async {
-      var actual_count =
-          member.connection_store.count_tracks_by_lived(live, remote_id);
-      expect(actual_count, expected_count);
+      var actualCount =
+          member.connectionStore.countTracksByLived(live, remoteId);
+      expect(actualCount, expectedCount);
     });
   },
 );
 
-StepDefinitionGeneric then_member_has_local_tracks =
+StepDefinitionGeneric thenMemberHasLocalTracks =
     then2<String, int, CustomWorld>(
   RegExp(r'(\S+) has {int} local track(?:s)?$'),
-  (id, expected_count, context) async {
-    await context.world.wait_for_interconnection(id);
+  (id, expectedCount, context) async {
+    await context.world.waitForInterconnection(id);
     var member = context.world.members[id]!;
-    var actual_count = member.connection_store.local_tracks.length;
+    var actualCount = member.connectionStore.localTracks.length;
 
-    expect(actual_count, expected_count);
+    expect(actualCount, expectedCount);
   },
 );
 
-StepDefinitionGeneric then_doesnt_have_remote_track =
+StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     then3<String, String, String, CustomWorld>(
   RegExp(r"(\S+) doesn't have (audio|(?:device|display) video) "
       r'remote track from (\S+)$'),
-  (id, kind, partner_id, context) async {
+  (id, kind, partnerId, context) async {
     var member = context.world.members[id]!;
-    await member.wait_for_connect(partner_id);
-    var parsedKind = parse_media_kind(kind);
+    await member.waitForConnect(partnerId);
+    var parsedKind = parseMediaKind(kind);
 
-    var tracks = member.connection_store.remote_tracks[partner_id]!.values
+    var tracks = member.connectionStore.remoteTracks[partnerId]!.values
         .where((element) => element.isNotEmpty)
         .map((e) => e.last)
         .toList();
 
-    var actual_count = tracks
+    var actualCount = tracks
         .where((element) =>
             element.kind() == parsedKind.item1 &&
             element.mediaSourceKind() == parsedKind.item2)
         .length;
 
-    expect(actual_count, 0);
+    expect(actualCount, 0);
   },
 );
 
-StepDefinitionGeneric then_remote_media_track =
+StepDefinitionGeneric thenRemoteMediaTrack =
     then4<String, String, String, String, CustomWorld>(
   RegExp(r"(\S+)'s (audio|(?:display|device) video) remote track "
       r'from (\S+) is (enabled|disabled)$'),
-  (id, kind, partner_id, state, context) async {
+  (id, kind, partnerId, state, context) async {
     var member = context.world.members[id]!;
-    var parsedKind = parse_media_kind(kind);
+    var parsedKind = parseMediaKind(kind);
 
-    await member.wait_for_connect(partner_id);
+    await member.waitForConnect(partnerId);
 
-    var track = await member.wait_remote_track_from(
-        partner_id, parsedKind.item2, parsedKind.item1);
+    var track = await member.waitRemoteTrackFrom(
+        partnerId, parsedKind.item2, parsedKind.item1);
 
     if (state == 'enabled') {
-      await member.wait_enabled_track(track);
+      await member.waitEnabledTrack(track);
     } else {
-      await member.wait_disabled_track(track);
+      await member.waitDisabledTrack(track);
     }
   },
 );
 
-StepDefinitionGeneric then_remote_track_stops =
+StepDefinitionGeneric thenRemoteTrackStops =
     then3<String, String, String, CustomWorld>(
   RegExp(r"(\S+)'s remote (audio|(?:device|display) video) "
       r'track from (\S+) disables$'),
-  (id, kind, remote_id, context) async {
+  (id, kind, remoteId, context) async {
     var member = context.world.members[id]!;
 
-    var parsedKind = parse_media_kind(kind);
-    var track = await member.wait_remote_track_from(
-        remote_id, parsedKind.item2, parsedKind.item1);
-    await member.wait_disabled_track(track);
+    var parsedKind = parseMediaKind(kind);
+    var track = await member.waitRemoteTrackFrom(
+        remoteId, parsedKind.item2, parsedKind.item1);
+    await member.waitDisabledTrack(track);
   },
 );
 
-StepDefinitionGeneric then_callback_fires_on_remote_track =
-    fix_then5<String, int, String, String, String, CustomWorld>(
+StepDefinitionGeneric thenCallbackFiresOnRemoteTrack =
+    fixThen5<String, int, String, String, String, CustomWorld>(
   RegExp(r'`on_(enabled|disabled|muted|unmuted)` callback fires '
       r"{int} time(?:s)? on (\S+)'s "
       r'remote (audio|(?:device|display) video) track from (\S+)$'),
-  (callback_kind, int times, id, kind, remote_id, context) async {
+  (callbackKind, int times, id, kind, remoteId, context) async {
     var member = context.world.members[id]!;
-    await member.wait_for_connect(remote_id);
+    await member.waitForConnect(remoteId);
 
-    await member.wait_for_connect(remote_id);
+    await member.waitForConnect(remoteId);
 
-    var parsedKind = parse_media_kind(kind);
-    var track = await member.wait_remote_track_from(
-        remote_id, parsedKind.item2, parsedKind.item1);
+    var parsedKind = parseMediaKind(kind);
+    var track = await member.waitRemoteTrackFrom(
+        remoteId, parsedKind.item2, parsedKind.item1);
 
-    await member.wait_for_track_cb_fire_count(callback_kind, track, times);
+    await member.waitForTrackCbFireCount(callbackKind, track, times);
   },
 );
 
-StepDefinitionGeneric then_member_doesnt_have_live_local_tracks =
+StepDefinitionGeneric thenMemberDoesntHaveLiveLocalTracks =
     then1<String, CustomWorld>(
   RegExp(r"(\S+) doesn't have live local tracks$"),
   (id, context) async {
     var member = context.world.members[id]!;
     var count = 0;
-    member.connection_store.local_tracks.forEach((element) async {
+    for (var element in member.connectionStore.localTracks) {
       if (await element.getTrack().state() == MediaStreamTrackState.live) {
         ++count;
       }
-    });
+    }
     expect(count, 0);
   },
 );
 
-StepDefinitionGeneric then_has_local_track = then2<String, String, CustomWorld>(
+StepDefinitionGeneric thenHasLocalTrack = then2<String, String, CustomWorld>(
   RegExp(r'(\S+) has local (audio|(?:device |display )?video)$'),
   (id, kind, context) async {
     var member = context.world.members[id]!;
-    var parsedKind = parse_media_kind(kind);
+    var parsedKind = parseMediaKind(kind);
 
-    await member.wait_local_track(parsedKind.item2, parsedKind.item1);
+    await member.waitLocalTrack(parsedKind.item2, parsedKind.item1);
 
     if (kind == 'video') {
-      await member.wait_local_track(MediaSourceKind.Display, parsedKind.item1);
+      await member.waitLocalTrack(MediaSourceKind.Display, parsedKind.item1);
     }
   },
 );

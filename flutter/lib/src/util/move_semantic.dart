@@ -1,5 +1,5 @@
-class _MoveSemantics {
-  const _MoveSemantics();
+class MoveSemantics {
+  const MoveSemantics();
 }
 
 /// Marker annotation signalling that current operation on an item (it's applied
@@ -12,4 +12,4 @@ class _MoveSemantics {
 ///
 /// When applied to method arguments, means that the argument is moved into that
 /// method.
-const _MoveSemantics moveSemantics = _MoveSemantics();
+const MoveSemantics moveSemantics = MoveSemantics();

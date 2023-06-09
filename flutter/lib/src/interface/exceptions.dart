@@ -3,22 +3,22 @@ enum LocalMediaInitExceptionKind {
   /// Occurs if the [getUserMedia()][1] request failed.
   ///
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-  GetUserMediaFailed,
+  getUserMediaFailed,
 
   /// Occurs if the [getUserMedia()][1] request failed on getting audio.
   ///
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-  GetUserMediaAudioFailed,
+  getUserMediaAudioFailed,
 
   /// Occurs if the [getUserMedia()][1] request failed on getting video.
   ///
   /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-  GetUserMediaVideoFailed,
+  getUserMediaVideoFailed,
 
   /// Occurs if the [getDisplayMedia()][1] request failed.
   ///
   /// [1]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-  GetDisplayMediaFailed,
+  getDisplayMediaFailed,
 
   /// Occurs when local track is [ended][1] right after [getUserMedia()][2]
   /// or [getDisplayMedia()][3] request.
@@ -26,7 +26,7 @@ enum LocalMediaInitExceptionKind {
   /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
   /// [2]: https://tinyurl.com/rnxcavf
   /// [3]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-  LocalTrackIsEnded,
+  localTrackIsEnded,
 }
 
 /// Possible error kinds of a [RpcClientException].
@@ -35,25 +35,25 @@ enum RpcClientExceptionKind {
   ///
   /// This usually means that some transport error occurred, so a client can
   /// continue performing reconnecting attempts.
-  ConnectionLost,
+  connectionLost,
 
   /// Could not authorize an RPC session.
   ///
   /// This usually means that authentication data a client provides is
   /// obsolete.
-  AuthorizationFailed,
+  authorizationFailed,
 
   /// RPC session has been finished. This is a terminal state.
-  SessionFinished,
+  sessionFinished,
 }
 
 /// Kind of a [MediaStateTransitionException].
 enum MediaStateTransitionExceptionKind {
   /// Media state of a `Sender` transits to an opposite of the requested one.
-  OppositeState,
+  oppositeState,
 
   /// Requested state transition is not allowed by `Sender`'s settings.
-  ProhibitedState,
+  prohibitedState,
 }
 
 /// Exception thrown when cannot get info of available media devices.

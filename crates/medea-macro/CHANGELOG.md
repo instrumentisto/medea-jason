@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · ????-??-?? · To-be-done
+## [0.3.0] · 2023-06-09
 [0.3.0]: /../../tree/medea-macro-0.3.0/crates/medea-macro
 
 ### BC Breaks
@@ -14,7 +14,7 @@ All user visible changes to this project will be documented in this file. This p
 - `#[derive(JsCaused)]` ([#4]):
     - Renamed to `#[derive(Caused)]`;
     - `#[js(cause)]` renamed to `#[cause]`;
-    - `#[js(error = "...")]` renamed to `#[cause(error = ...)]` ([todo]).
+    - `#[js(error = "...")]` renamed to `#[cause(error = ...)]` ([6234b23f]).
 
 ### Added
 
@@ -23,13 +23,13 @@ All user visible changes to this project will be documented in this file. This p
 ### Updated
 
 - Switched to [2021 Rust edition][012-1] ([#16]).
-- Switched to 2.0 version of [`syn`] ([todo]).
+- Switched to 2.0 version of [`syn`] ([6234b23f]).
 
 [#4]: /../../pull/4
 [#14]: /../../pull/14
 [#16]: /../../pull/16
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
-[todo]: /../../commit/todo
+[6234b23f]: /../../commit/6234b23f66e81c0ce411dfb8cdf983eda51cd2ad
 
 
 

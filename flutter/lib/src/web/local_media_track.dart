@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
 

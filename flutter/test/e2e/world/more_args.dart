@@ -74,8 +74,7 @@ StepDefinitionGeneric<TWorld> given6<TInput1, TInput2, TInput3, TInput4,
     TInput5 input5,
     TInput6 input6,
     StepContext<TWorld> context,
-  )
-      onInvoke, {
+  ) onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
     step6<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6>(
@@ -97,8 +96,7 @@ StepDefinitionGeneric<TWorld> given7<TInput1, TInput2, TInput3, TInput4,
     TInput6 input6,
     TInput7 input7,
     StepContext<TWorld> context,
-  )
-      onInvoke, {
+  ) onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
     step7<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6,
@@ -122,8 +120,7 @@ StepDefinitionGeneric<TWorld> given8<TInput1, TInput2, TInput3, TInput4,
     TInput7 input7,
     TInput8 input8,
     StepContext<TWorld> context,
-  )
-      onInvoke, {
+  ) onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
     step8<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6, TInput7,
@@ -148,8 +145,7 @@ StepDefinitionGeneric<TWorld> given9<TInput1, TInput2, TInput3, TInput4,
     TInput8 input8,
     TInput9 input9,
     StepContext<TWorld> context,
-  )
-      onInvoke, {
+  ) onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
     step9<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5, TInput6, TInput7,
@@ -160,7 +156,7 @@ StepDefinitionGeneric<TWorld> given9<TInput1, TInput2, TInput3, TInput4,
       configuration: configuration,
     );
 
-Tuple2<MediaKind, MediaSourceKind> parse_media_kind(String kind) {
+Tuple2<MediaKind, MediaSourceKind> parseMediaKind(String kind) {
   var kind_ = MediaKind.Video;
   var source = MediaSourceKind.Device;
   if (kind.contains('audio')) {
@@ -173,8 +169,8 @@ Tuple2<MediaKind, MediaSourceKind> parse_media_kind(String kind) {
   return Tuple2(kind_, source);
 }
 
-StepDefinitionGeneric<TWorld> fix_then5<TInput1, TInput2, TInput3, TInput4,
-        TInput5, TWorld extends World>(
+StepDefinitionGeneric<TWorld>
+    fixThen5<TInput1, TInput2, TInput3, TInput4, TInput5, TWorld extends World>(
   Pattern pattern,
   Future<void> Function(
     TInput1 input1,
@@ -183,18 +179,17 @@ StepDefinitionGeneric<TWorld> fix_then5<TInput1, TInput2, TInput3, TInput4,
     TInput4 input4,
     TInput5 input5,
     StepContext<TWorld> context,
-  )
-      onInvoke, {
+  ) onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
-    step<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5>(
-      pattern,
-      5,
-      onInvoke,
-      configuration: configuration,
-    );
+        step<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5>(
+          pattern,
+          5,
+          onInvoke,
+          configuration: configuration,
+        );
 
-StepDefinitionGeneric<TWorld> fix_given5<TInput1, TInput2, TInput3, TInput4,
+StepDefinitionGeneric<TWorld> fixGiven5<TInput1, TInput2, TInput3, TInput4,
         TInput5, TWorld extends World>(
   Pattern pattern,
   Future<void> Function(
@@ -204,8 +199,7 @@ StepDefinitionGeneric<TWorld> fix_given5<TInput1, TInput2, TInput3, TInput4,
     TInput1 input4,
     TInput1 input5,
     StepContext<TWorld> context,
-  )
-      onInvoke, {
+  ) onInvoke, {
   StepDefinitionConfiguration? configuration,
 }) =>
     step<TWorld, TInput1, TInput2, TInput3, TInput4, TInput5>(

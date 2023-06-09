@@ -6,7 +6,7 @@ void main() {
     title: 'Medea demo',
     initialRoute: '/',
     routes: {
-      '/': (context) => JoinRoute(),
+      '/': (context) => const JoinRoute(),
     },
   ));
 }

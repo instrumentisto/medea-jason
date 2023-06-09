@@ -1,9 +1,11 @@
 name: medea_jason_example
-description: Demonstrates how to use the medea_jason plugin.
+description: Demonstrates how to use the `medea_jason` plugin.
+version: 1.0.0
+publish_to: none
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=3.10.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -12,23 +14,29 @@ dependencies:
   # When depending on this package from a real application you should use:
   #   medea_jason: ^x.y.z
   # See https://dart.dev/tools/pub/dependencies#version-constraints
-  # The example app is bundled with the plugin so we use a path dependency on
+  # The example app is bundled with the plugin, so we use a path dependency on
   # the parent directory to use the current plugin's version.
   medea_jason:
     path: ../
 
   cupertino_icons: ^1.0.2
+  faker_dart: ^0.1.11
   freezed_annotation: ^2.2.0
+  http: ^0.13.6
+  medea_flutter_webrtc: ^0.8.2
+  retry: ^3.1.2
 
 dev_dependencies:
-  faker_dart: ^0.1.11
+  flutter_driver:
+    sdk: flutter
   flutter_gherkin: 3.0.0-rc.17
+  flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
   json_serializable: ^6.3.1
-  pedantic: ^1.9.0
+
 
 flutter:
   assets:

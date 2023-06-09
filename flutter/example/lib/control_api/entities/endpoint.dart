@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names, depend_on_referenced_packages, non_constant_identifier_names
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'endpoint.g.dart';

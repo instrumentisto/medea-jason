@@ -1,6 +1,6 @@
 [package]
 name = "medea-macro"
-version = "0.3.0-dev"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.65"
 description = "Internal macros and codegen for Medea media server project."
@@ -12,7 +12,7 @@ repository = "https://github.com/instrumentisto/medea-jason"
 readme = "README.md"
 keywords = ["medea", "macro", "derive", "codegen"]
 categories = ["development-tools::build-utils"]
-exclude = ["/tests/"]
+include = ["/src/", "/CHANGELOG.md", "/LICENSE.md"]
 
 [lib]
 proc-macro = true

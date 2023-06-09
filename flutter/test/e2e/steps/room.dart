@@ -7,71 +7,71 @@ import '../world/custom_world.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
-    given_member_gum_will_error,
-    then_on_close_fires,
-    then_room_failed_local_stream_fires,
-    when_jason_object_disposes,
-    when_room_closed_by_client,
-    when_member_enables_via_local_media_settings,
-    when_member_joins_room
+    givenMemberGumWillError,
+    thenOnCloseFires,
+    thenRoomFailedLocalStreamFires,
+    whenJasonObjectDisposes,
+    whenRoomClosedByClient,
+    whenMemberEnablesViaLocalMediaSettings,
+    whenMemberJoinsRoom
   ];
 }
 
-StepDefinitionGeneric then_on_close_fires = then2<String, String, CustomWorld>(
+StepDefinitionGeneric thenOnCloseFires = then2<String, String, CustomWorld>(
   RegExp(r"(\S+)'s `on_close` room's callback fires with `(\S+)` reason$"),
-  (id, expect_reason, context) async {
-    var reason = await context.world.wait_for_on_close(id);
-    expect(reason.reason(), expect_reason);
+  (id, expectReason, context) async {
+    var reason = await context.world.waitForOnClose(id);
+    expect(reason.reason(), expectReason);
   },
 );
 
-StepDefinitionGeneric when_member_joins_room = when1<String, CustomWorld>(
+StepDefinitionGeneric whenMemberJoinsRoom = when1<String, CustomWorld>(
   RegExp(r'(\S+) joins the room$'),
   (id, context) async {
-    await context.world.join_room(id);
+    await context.world.joinRoom(id);
   },
 );
 
-StepDefinitionGeneric when_room_closed_by_client = when1<String, CustomWorld>(
+StepDefinitionGeneric whenRoomClosedByClient = when1<String, CustomWorld>(
   RegExp(r"(\S+)'s room closed by client$"),
   (id, context) async {
-    context.world.close_room(id);
+    context.world.closeRoom(id);
   },
 );
 
-StepDefinitionGeneric when_jason_object_disposes = when1<String, CustomWorld>(
+StepDefinitionGeneric whenJasonObjectDisposes = when1<String, CustomWorld>(
   RegExp(r'(\S+) disposes Jason object$'),
   (id, context) async {
     context.world.jasons[id]!.free();
   },
 );
 
-StepDefinitionGeneric given_member_gum_will_error =
+StepDefinitionGeneric givenMemberGumWillError =
     given2<String, String, CustomWorld>(
   RegExp(r"(\S+)'s `getUserMedia\(\)` (audio |video |)errors$"),
   (id, kind, context) async {
     var member = context.world.members[id]!;
     Tuple2<bool, bool> gumSetting;
     if (kind.isEmpty) {
-      gumSetting = Tuple2(true, true);
+      gumSetting = const Tuple2(true, true);
     } else {
       gumSetting = Tuple2(kind.contains('audio'), kind.contains('video'));
     }
-    member.get_user_media_mock(gumSetting.item1, gumSetting.item2);
+    member.getUserMediaMock(gumSetting.item1, gumSetting.item2);
   },
 );
 
-StepDefinitionGeneric then_room_failed_local_stream_fires =
+StepDefinitionGeneric thenRoomFailedLocalStreamFires =
     then2<String, String, CustomWorld>(
   RegExp(r"(\S+)'s `Room.on_failed_local_stream\(\)` fires {int} time(:?s)?$"),
   (id, times, context) async {
     var member = context.world.members[id]!;
-    var times_parse = int.parse(times);
-    await member.wait_failed_local_stream_count(times_parse);
+    var timesParse = int.parse(times);
+    await member.waitFailedLocalStreamCount(timesParse);
   },
 );
 
-StepDefinitionGeneric when_member_enables_via_local_media_settings =
+StepDefinitionGeneric whenMemberEnablesViaLocalMediaSettings =
     then2<String, String, CustomWorld>(
   RegExp(r'(\S+) enables (video|audio|video and audio) in local '
       r'media settings'),

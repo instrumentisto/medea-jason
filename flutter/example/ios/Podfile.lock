@@ -7,7 +7,7 @@ PODS:
     - Flutter
     - libyuv-iOS
     - WebRTC-SDK (= 104.5112.04)
-  - medea_jason (0.3.0-dev):
+  - medea_jason (0.3.0):
     - Flutter
   - WebRTC-SDK (104.5112.04)
 

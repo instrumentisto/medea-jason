@@ -23,7 +23,7 @@ class MediaStreamSettings implements base.MediaStreamSettings {
   @override
   void deviceVideo(
       @moveSemantics
-          base_device_video.DeviceVideoTrackConstraints constraints) {
+      base_device_video.DeviceVideoTrackConstraints constraints) {
     fallibleFunction(() =>
         obj.device_video((constraints as DeviceVideoTrackConstraints).obj));
   }
@@ -31,7 +31,7 @@ class MediaStreamSettings implements base.MediaStreamSettings {
   @override
   void displayVideo(
       @moveSemantics
-          base_display_video.DisplayVideoTrackConstraints constraints) {
+      base_display_video.DisplayVideoTrackConstraints constraints) {
     fallibleFunction(() =>
         obj.display_video((constraints as DisplayVideoTrackConstraints).obj));
   }

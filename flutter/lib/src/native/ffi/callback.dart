@@ -4,17 +4,17 @@ import '../jason.dart';
 import 'callback.g.dart' as bridge;
 import 'foreign_value.dart';
 
-typedef _callbackCall_C = Void Function(Pointer, ForeignValue);
-typedef _callbackCall_Dart = void Function(Pointer, ForeignValue);
-typedef _callbackTwoArgCall_C = Void Function(
+typedef _CallbackCallC = Void Function(Pointer, ForeignValue);
+typedef _CallbackCallDart = void Function(Pointer, ForeignValue);
+typedef _CallbackTwoArgCallC = Void Function(
     Pointer, ForeignValue, ForeignValue);
-typedef _callbackTwoArgCall_Dart = void Function(
+typedef _CallbackTwoArgCallDart = void Function(
     Pointer, ForeignValue, ForeignValue);
 
 final _callbackCall =
-    dl.lookupFunction<_callbackCall_C, _callbackCall_Dart>('Callback__call');
+    dl.lookupFunction<_CallbackCallC, _CallbackCallDart>('Callback__call');
 final _callbackTwoArgCall =
-    dl.lookupFunction<_callbackTwoArgCall_C, _callbackTwoArgCall_Dart>(
+    dl.lookupFunction<_CallbackTwoArgCallC, _CallbackTwoArgCallDart>(
         'Callback__call_two_arg');
 
 /// Registers the closure callers functions in Rust.

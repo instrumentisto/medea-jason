@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
-import 'package:medea_flutter_webrtc/src/model/ice.dart';
+import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 import 'ice_candidate.g.dart' as bridge;
@@ -18,17 +18,17 @@ void registerFunctions(DynamicLibrary dl) {
 }
 
 /// Returns the provided [IceCandidate] [String].
-Pointer<Utf8> _candidate(IceCandidate iceCandidate) {
+Pointer<Utf8> _candidate(webrtc.IceCandidate iceCandidate) {
   return iceCandidate.candidate.toNativeUtf8();
 }
 
 /// Returns SDP M line index of the provided [IceCandidate].
-int _sdpMLineIndex(IceCandidate iceCandidate) {
+int _sdpMLineIndex(webrtc.IceCandidate iceCandidate) {
   return iceCandidate.sdpMLineIndex;
 }
 
 /// Returns SDP MID of the provided [IceCandidate].
-Pointer<Utf8> _sdpMid(IceCandidate iceCandidate) {
+Pointer<Utf8> _sdpMid(webrtc.IceCandidate iceCandidate) {
   return iceCandidate.sdpMid.toNativeUtf8();
 }
 
@@ -38,5 +38,5 @@ Object _new(
   var candidateArg = candidate.toDart();
   var sdpMidArg = sdpMid.toDart();
   var sdpMLineIndexArg = sdpMlineIndex.toDart();
-  return IceCandidate(sdpMidArg, sdpMLineIndexArg, candidateArg);
+  return webrtc.IceCandidate(sdpMidArg, sdpMLineIndexArg, candidateArg);
 }

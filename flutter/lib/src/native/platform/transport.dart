@@ -8,11 +8,11 @@ import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'transport.g.dart' as bridge;
 
 /// Option to mock a [WebSocket].
-const bool MOCKABLE = bool.fromEnvironment('MOCKABLE', defaultValue: false);
+const bool mockable = bool.fromEnvironment('MOCKABLE', defaultValue: false);
 
 /// Registers functions allowing Rust to operate Dart [WebSocket]s.
 void registerFunctions(DynamicLibrary dl) {
-  if (MOCKABLE) {
+  if (mockable) {
     bridge.registerFunction(
       dl,
       connect: Pointer.fromFunction(MockWebSocket.connect),
@@ -49,7 +49,7 @@ class CloseFrame {
 
 /// Provider to mock a [WebSocket].
 ///
-/// [MOCKABLE] must be `true`.
+/// [mockable] must be `true`.
 class MockWebSocket {
   /// Safe last created [WebSocket].
   static late WebSocket _lastWebSocket;
@@ -83,12 +83,12 @@ class MockWebSocket {
   }
 
   /// Saves [WebSocket] for the specified [member].
-  static void add_member(String member) {
+  static void addMember(String member) {
     _allWebSocket.addAll({member: _lastWebSocket});
   }
 
   /// Returns the [WebSocket] of the provided [member].
-  static WebSocket? get_socket(String member) {
+  static WebSocket? getSocket(String member) {
     return _allWebSocket[member];
   }
 }
