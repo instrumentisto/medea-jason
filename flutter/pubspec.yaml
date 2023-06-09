@@ -34,10 +34,9 @@ dev_dependencies:
   import_sorter: ^4.6.0
   json_serializable: ^6.3.1
 
+# TODO: Remove once `flutter_gherkin` updates.
 dependency_overrides:
-  # TODO: Remove when `flutter_gherkin` updates.
   analyzer: ^5.13.0
-
 
 flutter:
   plugin:
