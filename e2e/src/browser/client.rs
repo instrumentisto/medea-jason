@@ -246,7 +246,7 @@ impl Inner {
                         {inner_js}
                         callback({{ ok: lastResult }});
                     }} catch (e) {{
-                        if (e.ptr != undefined) {{
+                        if (e.__wbg_ptr > 0) {{
                             callback({{
                                 err: {{
                                     kind: e.kind ? e.kind() : undefined,
@@ -256,7 +256,7 @@ impl Inner {
                                 }}
                             }});
                         }} else {{
-                            callback({{ err: e.toString() }});
+                            callback({{ err: JSON.stringify(e) }});
                         }}
                     }}
                 }}
