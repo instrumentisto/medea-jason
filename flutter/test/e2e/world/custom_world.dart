@@ -49,11 +49,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Audio, MediaSourceKind.Device): true
+            MediaKind.audio, MediaSourceKind.device): true
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Video, MediaSourceKind.Device): true
+            MediaKind.video, MediaSourceKind.device): true
       });
 
       pipeline.addAll(
@@ -63,11 +63,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isRecv) {
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Audio, MediaSourceKind.Device): true
+            MediaKind.audio, MediaSourceKind.device): true
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Video, MediaSourceKind.Device): true
+            MediaKind.video, MediaSourceKind.device): true
       });
 
       members.forEach((key, value) {
@@ -104,7 +104,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
     var jason = Jason();
     var room = jason.initRoom();
-    await room.disableVideo(MediaSourceKind.Display);
+    await room.disableVideo(MediaSourceKind.display);
 
     var member = builder.build(room, sendState, recvState);
 
@@ -246,11 +246,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var leftMember = members[pair.left.id]!;
       if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        leftMember.updateSendMediaState(MediaKind.Audio, null, true);
+        leftMember.updateSendMediaState(MediaKind.audio, null, true);
       }
       if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        leftMember.updateSendMediaState(MediaKind.Video, null, true);
+        leftMember.updateSendMediaState(MediaKind.video, null, true);
       }
       try {
         await controlClient.create(
@@ -269,11 +269,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var rightMember = members[pair.right.id]!;
       if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        rightMember.updateSendMediaState(MediaKind.Audio, null, true);
+        rightMember.updateSendMediaState(MediaKind.audio, null, true);
       }
       if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        rightMember.updateSendMediaState(MediaKind.Video, null, true);
+        rightMember.updateSendMediaState(MediaKind.video, null, true);
       }
 
       try {
@@ -292,8 +292,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var publishEndpoint = pair.left.playEndpointFor(roomId, pair.right)!;
       var leftMember = members[pair.left.id]!;
 
-      await leftMember.updateRecvMediaState(MediaKind.Video, null, true);
-      await leftMember.updateRecvMediaState(MediaKind.Audio, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.video, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.audio, null, true);
 
       await controlClient.create(
           '$roomId/${pair.left.id}/${publishEndpoint.id}', publishEndpoint);
@@ -303,8 +303,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var publishEndpoint = pair.right.playEndpointFor(roomId, pair.left)!;
       var rightMember = members[pair.right.id]!;
 
-      await rightMember.updateRecvMediaState(MediaKind.Video, null, true);
-      await rightMember.updateRecvMediaState(MediaKind.Audio, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.video, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.audio, null, true);
 
       await controlClient.create(
           '$roomId/${pair.right.id}/${publishEndpoint.id}', publishEndpoint);

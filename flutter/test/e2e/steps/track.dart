@@ -32,10 +32,10 @@ StepDefinitionGeneric thenMemberHasRemoteTrack =
     var member = context.world.members[id]!;
     await member.waitForConnect(partnerId);
     if (kind.contains('audio')) {
-      await member.waitRemoteTrackFrom(partnerId, null, MediaKind.Audio);
+      await member.waitRemoteTrackFrom(partnerId, null, MediaKind.audio);
     }
     if (kind.contains('video')) {
-      await member.waitRemoteTrackFrom(partnerId, null, MediaKind.Video);
+      await member.waitRemoteTrackFrom(partnerId, null, MediaKind.video);
     }
   },
 );
@@ -182,7 +182,7 @@ StepDefinitionGeneric thenHasLocalTrack = then2<String, String, CustomWorld>(
     await member.waitLocalTrack(parsedKind.item2, parsedKind.item1);
 
     if (kind == 'video') {
-      await member.waitLocalTrack(MediaSourceKind.Display, parsedKind.item1);
+      await member.waitLocalTrack(MediaSourceKind.display, parsedKind.item1);
     }
   },
 );
