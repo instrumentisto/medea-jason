@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: "4897882604d919befd350648c7f91926a9d5de99e67b455bf0917cc2362f4bb8"
+      sha256: ae92f5d747aee634b87f89d9946000c2de774be1d6ac3e58268224348cd0101a
       url: "https://pub.dev"
     source: hosted
-    version: "47.0.0"
+    version: "61.0.0"
   analyzer:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: analyzer
-      sha256: "690e335554a8385bc9d787117d9eb52c0c03ee207a607e593de3c9d71b1cfe80"
+      sha256: ea3d8652bda62982addfd92fdc2d0214e5f82e43325104990d4f4c4a2a313562
       url: "https://pub.dev"
     source: hosted
-    version: "4.7.0"
+    version: "5.13.0"
   archive:
     dependency: transitive
     description:
@@ -190,11 +190,12 @@ packages:
   flutter_gherkin:
     dependency: "direct dev"
     description:
-      name: flutter_gherkin
-      sha256: b03106d55fbb3a7561e7eb0cef63a57063ee1db4db6a9ce8362f45517bc1d285
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0-rc.17"
+      path: "."
+      ref: ea59f6376f2d78e5b2140980e74879b862218ea1
+      resolved-ref: ea59f6376f2d78e5b2140980e74879b862218ea1
+      url: "https://github.com/jonsamwell/flutter_gherkin.git"
+    source: git
+    version: "3.0.0-rc.9"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -233,10 +234,10 @@ packages:
     dependency: transitive
     description:
       name: gherkin
-      sha256: c3e0c98b305a94ec8c015038529a1c8c6ea3b0953619514e76647407efb66d7f
+      sha256: "7c835be5c28dc50f753caa30b4d8e2204d0617dc56fc019dca0fc70279d779b7"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "2.0.8"
   glob:
     dependency: transitive
     description:
@@ -278,18 +279,18 @@ packages:
     dependency: transitive
     description:
       name: json_annotation
-      sha256: "3520fa844009431b5d4491a5a778603520cdc399ab3406332dcc50f93547258c"
+      sha256: b10a7b2ff83d83c777edba3c6a0f97045ddadd56c944e1a23a3fdf43a1bf4467
       url: "https://pub.dev"
     source: hosted
-    version: "4.7.0"
+    version: "4.8.1"
   json_serializable:
     dependency: "direct dev"
     description:
       name: json_serializable
-      sha256: f3c2c18a7889580f71926f30c1937727c8c7d4f3a435f8f5e8b0ddd25253ef5d
+      sha256: "43793352f90efa5d8b251893a63d767b2f7c833120e3cc02adad55eefec04dc7"
       url: "https://pub.dev"
     source: hosted
-    version: "6.5.4"
+    version: "6.6.2"
   lints:
     dependency: transitive
     description:

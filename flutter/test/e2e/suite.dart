@@ -35,38 +35,45 @@ Future<void> clearWorld() async {
   }
 }
 
-final testConfigs = FlutterTestConfiguration(
-    stepDefinitions: control_api.steps() +
-        connection.steps() +
-        room.steps() +
-        track.steps() +
-        media_state.steps() +
-        websocket.steps() +
-        given.steps(),
-    createWorld: (config) => Future.sync(() async {
-          await clearWorld();
-          await webrtc.enableFakeMedia();
+/// Configuration of a Gherkin test suite.
+final FlutterTestConfiguration testConfigs = FlutterTestConfiguration()
+  ..stepDefinitions = control_api.steps() +
+      connection.steps() +
+      room.steps() +
+      track.steps() +
+      media_state.steps() +
+      websocket.steps() +
+      given.steps()
+  ..reporters = [
+    StdoutReporter(MessageLevel.verbose)
+      ..setWriteLineFn(print)
+      ..setWriteFn(print),
+    ProgressReporter()
+      ..setWriteLineFn(print)
+      ..setWriteFn(print),
+    TestRunSummaryReporter()
+      ..setWriteLineFn(print)
+      ..setWriteFn(print),
+    FlutterDriverReporter(logInfoMessages: true),
+  ]
+  ..semanticsEnabled = false
+  ..defaultTimeout = const Duration(seconds: 30)
+  ..customStepParameterDefinitions = []
+  ..createWorld = (config) => Future.sync(() async {
+        await clearWorld();
+        await webrtc.enableFakeMedia();
 
-          var world = CustomWorld();
-          oldWorld = world;
-          await world.controlClient
-              .create(world.roomId, Room(world.roomId, {}));
-          return world;
-        }),
-    reporters: [
-      StdoutReporter(MessageLevel.verbose)
-        ..setWriteLineFn(print)
-        ..setWriteFn(print),
-      ProgressReporter()
-        ..setWriteLineFn(print)
-        ..setWriteFn(print),
-      TestRunSummaryReporter()
-        ..setWriteLineFn(print)
-        ..setWriteFn(print),
-      FlutterDriverReporter(logInfoMessages: true),
-    ]);
+        var world = CustomWorld();
+        oldWorld = world;
+        await world.controlClient.create(world.roomId, Room(world.roomId, {}));
+        return world;
+      });
 
+/// Entry point of E2E tests.
 @GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
-void main() {
-  executeTestSuite(configuration: testConfigs, appMainFunction: (_) async {});
+void main() async {
+  executeTestSuite(
+    testConfigs,
+    (_) async {},
+  );
 }
