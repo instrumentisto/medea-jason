@@ -57,7 +57,7 @@ final FlutterTestConfiguration testConfigs = FlutterTestConfiguration()
     FlutterDriverReporter(logInfoMessages: true),
   ]
   ..semanticsEnabled = false
-  ..defaultTimeout = const Duration(seconds: 30)
+  ..defaultTimeout = const Duration(seconds: 12)
   ..customStepParameterDefinitions = []
   ..createWorld = (config) => Future.sync(() async {
         await clearWorld();
@@ -70,7 +70,10 @@ final FlutterTestConfiguration testConfigs = FlutterTestConfiguration()
       });
 
 /// Entry point of E2E tests.
-@GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
+@GherkinTestSuite(
+  featurePaths: ['../e2e/tests/features/**'],
+  executionOrder: ExecutionOrder.alphabetical,
+)
 void main() async {
   executeTestSuite(
     testConfigs,
