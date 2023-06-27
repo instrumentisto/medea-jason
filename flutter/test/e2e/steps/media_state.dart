@@ -25,6 +25,7 @@ StepDefinitionGeneric whenEnablesOrMutes =
   RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
       r' (awaits it completes|awaits it errors|ignores the result)?$'),
   (id, action, audioOrVideo, String awaits, context) async {
+    throw (42);
     var kind = parseMediaKind(audioOrVideo);
     var member = context.world.members[id]!;
 
