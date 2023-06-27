@@ -359,9 +359,9 @@ mod transport_close_reason_on_drop {
     ///
     /// 2. Drop [`WebSocketRpcClient`].
     ///
-    /// 3. Check that close reason provided
-    ///    into [`RpcTransport::set_close_reason`]
-    ///    is [`ClientDisconnect::RpcClientUnexpectedlyDropped`].
+    /// 3. Check that close reason provided into
+    ///    [`RpcTransport::set_close_reason`] is
+    ///    [`ClientDisconnect::RpcClientUnexpectedlyDropped`].
     #[wasm_bindgen_test]
     async fn sets_default_close_reason_on_drop() {
         let (ws, test_rx) = get_client().await;
@@ -388,9 +388,9 @@ mod transport_close_reason_on_drop {
     /// 2. Set [`ClientDisconnect::RoomClosed`] close reason and drop
     ///    [`WebSocketRpcClient`].
     ///
-    /// 3. Check that close reason provided
-    ///    into [`RpcTransport::set_close_reason`]
-    ///    is [`ClientDisconnect::RoomClosed`].
+    /// 3. Check that close reason provided into
+    ///    [`RpcTransport::set_close_reason`] is
+    ///    [`ClientDisconnect::RoomClosed`].
     #[wasm_bindgen_test]
     async fn sets_provided_close_reason_on_drop() {
         let (ws, test_rx) = get_client().await;
