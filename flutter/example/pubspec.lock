@@ -191,10 +191,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_gherkin
-      sha256: ed30a9c1539ce3318039b273f5d871708b1767385915e40321f0c9794b3e2363
+      sha256: d276f4df32d7186d3771c245a41e07aa43b67c44ff2d1488e4f0be5fa5da541c
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.11"
+    version: "3.0.0-rc.12"
   flutter_lints:
     dependency: "direct dev"
     description:
