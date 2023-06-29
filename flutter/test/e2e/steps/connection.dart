@@ -17,7 +17,6 @@ List<StepDefinitionGeneric> steps() {
 StepDefinitionGeneric thenConnectionCloses = then2<String, String, CustomWorld>(
   r"(\S+)'s connection with (\S+) closes$",
   (id, partnerId, context) async {
-    throw (42);
     var member = context.world.members[id]!;
     await member.waitForClose(partnerId);
   },

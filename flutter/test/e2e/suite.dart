@@ -44,7 +44,6 @@ final testConfigs = FlutterTestConfiguration(
         websocket.steps() +
         given.steps(),
     createWorld: (config) => Future.sync(() async {
-          print(42);
           await clearWorld();
           await webrtc.enableFakeMedia();
 
