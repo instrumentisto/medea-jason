@@ -797,6 +797,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -806,6 +807,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -824,6 +826,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -833,6 +836,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -1291,6 +1295,7 @@ async fn new_remote_track() {
                     mid: Some(String::from("0")),
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             LocalTracksConstraints::default(),
@@ -1303,6 +1308,7 @@ async fn new_remote_track() {
                     mid: Some(String::from("1")),
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
