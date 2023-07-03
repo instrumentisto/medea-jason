@@ -60,6 +60,10 @@ impl<S> TracksRepository<S> {
         self.0.borrow().get(&id).cloned()
     }
 
+    pub fn get_all_ids(&self) -> Vec<TrackId> {
+        self.0.borrow().iter().map(|(id, _)| id.clone()).collect()
+    }
+
     /// Returns a [`Stream`] streaming all the [`TracksRepository::insert`]ions.
     ///
     /// [`Stream`]: futures::Stream
