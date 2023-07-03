@@ -262,6 +262,5 @@ impl Component {
         for receiver_id in peer.get_receivers() {
             peers.connections.remove_track(&receiver_id);
         }
-        // peers.connections.close_connection(peer_id);
     }
 }

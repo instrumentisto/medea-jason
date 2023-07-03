@@ -1,7 +1,6 @@
 //! [`Connection`] with a specific remote `Member`.
 
 use std::{
-    borrow::Borrow,
     cell::{Cell, RefCell},
     collections::{HashMap, HashSet},
     future::Future,
@@ -61,10 +60,10 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 /// Service which manages [`Connection`]s with remote `Member`s.
 #[derive(Debug)]
 pub struct Connections {
-    /// Local [`PeerId`] to remote [`MemberId`].
-    // peer_members: RefCell<HashMap<PeerId, HashSet<MemberId>>>,
+    /// [`TrackId`] to remote [`MemberId`].
     tracks: RefCell<HashMap<TrackId, HashSet<MemberId>>>,
 
+    /// Remote [`MemberId`] to [`TrackId`].
     members_to_tracks: RefCell<HashMap<MemberId, HashSet<TrackId>>>,
 
     /// Remote [`MemberId`] to [`Connection`] with that `Member`.
@@ -100,23 +99,21 @@ impl Connections {
         self.on_new_connection.set_func(f);
     }
 
-    pub fn add_or_update_track(
+    /// Adds or updates information about related [`Track`]s with provided
+    /// [`TrackId`] and [`MemberId`]s. Then [`Connections`] decides to create or
+    /// to delete [`Connection`]s.
+    ///
+    /// Returns [`Connection`]s associated with provided [`MemberId`]s.
+    ///
+    /// [`Track`]: medea_client_api_proto::Track
+    pub fn update_connections(
         &self,
         track_id: &TrackId,
         mut partner_members: HashSet<MemberId>,
     ) -> Vec<Connection> {
-        log::error!("track {track_id:?} members {partner_members:?}");
-        if let Some(partners) = self.tracks.borrow_mut().get_mut(&track_id) {
+        if let Some(partners) = self.tracks.borrow_mut().get_mut(track_id) {
+            // No changes.
             if partners == &mut partner_members {
-                log::error!(
-                    "equal members to tracks {:?}",
-                    self.borrow().members_to_tracks.borrow()
-                );
-                log::error!(
-                    "connections {:?}",
-                    self.borrow().connections.borrow().keys()
-                );
-
                 return partners
                     .iter()
                     .filter_map(|partner| {
@@ -124,36 +121,29 @@ impl Connections {
                             .members_to_tracks
                             .borrow_mut()
                             .get_mut(partner)
-                            .map(|tracks| tracks.insert(track_id.clone()));
+                            .map(|tracks| tracks.insert(*track_id));
                         self.connections.borrow().get(partner).cloned()
                     })
                     .collect();
             }
 
-            let asd = partners.clone();
-            log::error!("partner_members {partner_members:?}");
+            // Need to update.
+            let current_partners = partners.clone();
+            // Adding.
             drop(
                 partner_members
                     .iter()
                     .filter_map(|partner| {
-                        log::error!(
-                            "aaaaaaaa {partner:?} {}",
-                            asd.contains(partner)
-                        );
-                        (!asd.contains(partner)).then_some(partner.clone())
-                        // Some(partner.clone())
+                        (!current_partners.contains(partner))
+                            .then_some(partner.clone())
                     })
                     .map(|partner| {
-                        log::error!(
-                            "{partner:?} {:?}",
-                            self.connections.borrow()
-                        );
                         _ = self
                             .members_to_tracks
                             .borrow_mut()
                             .entry(partner.clone())
                             .or_default()
-                            .insert(track_id.clone());
+                            .insert(*track_id);
 
                         let add_conn =
                             !self.connections.borrow().contains_key(&partner);
@@ -175,51 +165,28 @@ impl Connections {
                     .collect::<Vec<_>>(),
             );
 
-            log::error!("retain {partners:?}");
+            // Deleting.
             partners.retain(|partner| {
                 let to_remove = !partner_members.contains(partner);
 
                 if to_remove {
                     if let Some(member_tracks) =
-                        self.members_to_tracks.borrow_mut().get_mut(&partner)
+                        self.members_to_tracks.borrow_mut().get_mut(partner)
                     {
-                        log::error!("before remove {member_tracks:?}");
                         _ = member_tracks.remove(track_id);
-                        log::error!("after remove {member_tracks:?}");
 
                         if member_tracks.is_empty() {
-                            log::error!("remove on add {track_id} {partner:?}");
                             _ = self
                                 .connections
                                 .borrow_mut()
-                                .remove(&partner)
+                                .remove(partner)
                                 .map(|conn| conn.0.on_close.call0());
-                        } else {
-                            log::error!("member tracks {member_tracks:?}");
                         }
                     }
-
-                    // drop(self.members_to_tracks.borrow_mut().remove(&partner));
-                    // _ = self
-                    //     .connections
-                    //     .borrow_mut()
-                    //     .remove(&partner)
-                    //     .map(|conn| conn.0.on_close.call0());
-                } else {
-                    log::error!("partner_members {partner_members:?}");
                 }
 
                 !to_remove
             });
-
-            log::error!(
-                "not members to tracks {:?}",
-                self.borrow().members_to_tracks.borrow()
-            );
-            log::error!(
-                "connections {:?}",
-                self.borrow().connections.borrow().keys()
-            );
 
             return partner_members
                 .iter()
@@ -229,6 +196,20 @@ impl Connections {
                 .collect();
         }
 
+        self.add_connections(*track_id, partner_members)
+    }
+
+    /// Adds information about related [`Track`]s with provided [`TrackId`] and
+    /// [`MemberId`]s, creates [`Connection`]s.
+    ///
+    /// Returns [`Connection`]s associated with provided [`MemberId`]s.
+    ///
+    /// [`Track`]: medea_client_api_proto::Track
+    fn add_connections(
+        &self,
+        track_id: TrackId,
+        partner_members: HashSet<MemberId>,
+    ) -> Vec<Connection> {
         let connections = partner_members
             .iter()
             .filter_map(|partner| {
@@ -237,7 +218,7 @@ impl Connections {
                     .borrow_mut()
                     .entry(partner.clone())
                     .or_default()
-                    .insert(track_id.clone());
+                    .insert(track_id);
                 if self.connections.borrow().contains_key(partner) {
                     None
                 } else {
@@ -256,27 +237,16 @@ impl Connections {
             })
             .collect();
 
-        drop(
-            self.tracks
-                .borrow_mut()
-                .insert(track_id.clone(), partner_members),
-        );
-
-        log::error!(
-            "new members to tracks {:?}",
-            self.borrow().members_to_tracks.borrow()
-        );
-        log::error!(
-            "connections {:?}",
-            self.borrow().connections.borrow().keys()
-        );
-        log::error!("tracks {:?}", self.borrow().tracks.borrow());
+        drop(self.tracks.borrow_mut().insert(track_id, partner_members));
 
         connections
     }
 
+    /// Removes information about [`Track`] with provided [`TrackId`]. Then
+    /// [`Connections`] can decides to delete related [`Connection`].
+    ///
+    /// [`Track`]: medea_client_api_proto::Track
     pub fn remove_track(&self, track_id: &TrackId) {
-        log::error!("remove {track_id:?}");
         _ = self.tracks.borrow_mut().remove(track_id).map(|partners| {
             for partner in partners {
                 if let Some(member_tracks) =
@@ -285,123 +255,21 @@ impl Connections {
                     _ = member_tracks.remove(track_id);
 
                     if member_tracks.is_empty() {
-                        log::error!("remove on remove {track_id} {partner:?}");
                         _ = self
                             .connections
                             .borrow_mut()
                             .remove(&partner)
                             .map(|conn| conn.0.on_close.call0());
-                    } else {
-                        log::error!("member tracks {member_tracks:?}");
                     }
                 }
             }
         });
-
-        log::error!(
-            "remove members to tracks {:?}",
-            self.borrow().members_to_tracks.borrow()
-        );
-        log::error!(
-            "connections {:?}",
-            self.borrow().connections.borrow().keys()
-        );
-        log::error!("tracks {:?}", self.borrow().tracks.borrow());
     }
 
-    // /// Creates and returns new connection with remote `Member` based on its
-    // /// [`MemberId`].
-    // ///
-    // /// No-op if [`Connection`] already exists.
-    // pub fn create_connection(
-    //     &self,
-    //     local_peer_id: PeerId,
-    //     remote_member_id: &MemberId,
-    // ) -> Connection {
-    //     let conn = self.connections.borrow().get(remote_member_id).cloned();
-    //     conn.map_or_else(
-    //         || {
-    //             let connection = Connection::new(
-    //                 remote_member_id.clone(),
-    //                 &self.room_recv_constraints,
-    //             );
-    //             self.on_new_connection.call1(connection.new_handle());
-    //             drop(
-    //                 self.connections
-    //                     .borrow_mut()
-    //                     .insert(remote_member_id.clone(), connection.clone()),
-    //             );
-    //             _ = self
-    //                 .peer_members
-    //                 .borrow_mut()
-    //                 .entry(local_peer_id)
-    //                 .or_default()
-    //                 .insert(remote_member_id.clone());
-
-    //             connection
-    //         },
-    //         |c| c,
-    //     )
-    // }
-
-    /// Lookups [`Connection`] by the given remote [`PeerId`].
+    /// Lookups [`Connection`] by the given remote [`MemberId`].
     pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
         self.connections.borrow().get(remote_member_id).cloned()
     }
-
-    // /// Closes [`Connection`] associated with provided local [`PeerId`].
-    // ///
-    // /// Invokes `on_close` callback.
-    // pub fn close_connection(&self, local_peer: PeerId) {
-    //     if let Some(remote_ids) =
-    //         self.peer_members.borrow_mut().remove(&local_peer)
-    //     {
-    //         for remote_id in remote_ids {
-    //             if let Some(connection) =
-    //                 self.connections.borrow_mut().remove(&remote_id)
-    //             {
-    //                 // `on_close` callback is invoked here and not in `Drop`
-    //                 // implementation so `ConnectionHandle` is available during
-    //                 // callback invocation.
-    //                 connection.0.on_close.call0();
-    //             }
-    //         }
-    //     }
-    // }
-
-    // /// Closes the [`Connection`] associated with the provided local [`PeerId`]
-    // /// and [`MemberId`].
-    // ///
-    // /// Invokes `on_close` callback.
-    // pub fn close_specific_connection(
-    //     &self,
-    //     local_peer: PeerId,
-    //     remote_member_id: &MemberId,
-    // ) {
-    //     log::error!("close specific connection {remote_member_id:?}");
-    //     log::error!("peer members {:?}", self.peer_members);
-    //     _ = self
-    //         .peer_members
-    //         .borrow_mut()
-    //         .get_mut(&local_peer)
-    //         .and_then(|remote_member_ids| {
-    //             log::error!("peer members remove {remote_member_id:?}");
-    //             remote_member_ids.remove(remote_member_id).then_some(())
-    //         })
-    //         .map(|_| {
-    //             log::error!("connections remove {remote_member_id:?}");
-    //             if let Some(connection) =
-    //                 self.connections.borrow_mut().remove(remote_member_id)
-    //             {
-    //                 // `on_close` callback is invoked here and not in `Drop`
-    //                 // implementation so `ConnectionHandle` is available during
-    //                 // callback invocation.
-    //                 connection.0.on_close.call0();
-    //             }
-    //         });
-
-    //     log::error!("result connections\n{:?}", self.connections);
-    // }
 }
 
 /// Error of [`ConnectionHandle`]'s [`Weak`] pointer being detached.

@@ -160,13 +160,10 @@ impl Component {
         medea_reactive::when_all_processed(wait_futs).await;
 
         let ((track_id, new_sender), _guard) = val.into_parts();
-        drop(peer.connections.add_or_update_track(
+        drop(peer.connections.update_connections(
             &track_id,
             new_sender.receivers().into_iter().collect(),
         ));
-        // for receiver in new_sender.receivers() {
-        //     drop(peer.connections.add_or_update_track(&track_id, &receiver));
-        // }
         let sender = sender::Sender::new(
             &new_sender,
             &peer.media_connections,
@@ -203,7 +200,7 @@ impl Component {
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) {
         let ((track_id, rcvr_state), _guard) = val.into_parts();
-        let conns = peer.connections.add_or_update_track(
+        let conns = peer.connections.update_connections(
             &track_id,
             HashSet::from([rcvr_state.sender_id().clone()]),
         );
@@ -229,14 +226,15 @@ impl Component {
     ///
     /// Creates a new [`Connection`] for the given [`PeerConnection`].
     #[allow(clippy::needless_pass_by_value)]
-    #[watch(self.maybe_update_connections.subscribe().filter_map(future::ready))]
+    #[watch(
+        self.maybe_update_connections.subscribe().filter_map(future::ready)
+    )]
     fn maybe_update_connections(
         peer: &PeerConnection,
         state: &State,
         val: (TrackId, HashSet<MemberId>),
     ) {
-        log::error!("watcher update");
-        drop(peer.connections.add_or_update_track(&val.0, val.1));
+        drop(peer.connections.update_connections(&val.0, val.1));
         state.maybe_update_connections.set(None);
     }
 

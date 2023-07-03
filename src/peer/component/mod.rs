@@ -138,6 +138,10 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
+    /// Inicator whether we have some information about tracks to provide in
+    /// [`Connections`].
+    ///
+    /// [`Connections`]: crate::connection::Connections
     maybe_update_connections:
         ObservableCell<Option<(TrackId, HashSet<MemberId>)>>,
 
@@ -221,10 +225,12 @@ impl State {
         self.receivers.get(track_id)
     }
 
+    /// Returns the all send [`TrackId`]s.
     pub fn get_senders(&self) -> Vec<TrackId> {
         self.senders.get_all_ids()
     }
 
+    /// Returns the all receive [`TrackId`]s.
     pub fn get_receivers(&self) -> Vec<TrackId> {
         self.receivers.get_all_ids()
     }
@@ -410,9 +416,7 @@ impl State {
     /// Schedules a local stream update.
     pub async fn patch_track(&self, patch: proto::TrackPatchEvent) {
         if let Some(receivers) = &patch.receivers {
-            log::error!("patch recvs");
             _ = self.maybe_update_connections.when_eq(None).await;
-            log::error!("waited");
             self.maybe_update_connections
                 .set(Some((patch.id, receivers.clone().into_iter().collect())));
         }

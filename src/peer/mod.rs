@@ -754,11 +754,10 @@ impl PeerConnection {
         &self,
         criteria: LocalStreamUpdateCriteria,
     ) -> Result<Option<SimpleTracksRequest>, Traced<TracksRequestError>> {
-        let Some(request) = self
-            .media_connections
-            .get_tracks_request(criteria) else {
-                return Ok(None);
-            };
+        let Some(request) = self.media_connections.get_tracks_request(criteria)
+        else {
+            return Ok(None);
+        };
         let mut required_caps = SimpleTracksRequest::try_from(request)
             .map_err(tracerr::from_and_wrap!())?;
         required_caps

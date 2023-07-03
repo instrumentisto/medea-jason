@@ -275,6 +275,7 @@ impl From<&State> for proto::state::Sender {
 impl State {
     /// Creates new [`State`] with the provided data.
     #[must_use]
+    #[allow(clippy::too_many_arguments)] // TODO(alexlapa): Check this allow.
     pub fn new(
         id: TrackId,
         mid: Option<String>,
