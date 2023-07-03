@@ -553,6 +553,7 @@ mod receivers_patch_send_tracks {
                         mid: None,
                     },
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
                     }),
@@ -2368,6 +2369,7 @@ mod set_local_media_settings {
                         mid: None,
                     },
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
@@ -2398,6 +2400,7 @@ mod set_local_media_settings {
                                     mid: Some(String::from("1")),
                                 },
                                 media_direction: MediaDirection::SendRecv,
+                                muted: false,
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
