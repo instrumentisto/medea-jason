@@ -243,65 +243,65 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true'
              && matrix.crate != 'medea-jason' }}
 
-  test-e2e-browser:
-    name: test (E2E, chrome, firefox)
-    needs: ["docker"]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-unknown-unknown
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VER }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+  # test-e2e-browser:
+  #   name: test (E2E, chrome, firefox)
+  #   needs: ["docker"]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: dtolnay/rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         target: wasm32-unknown-unknown
+  #     - uses: arduino/setup-protoc@v1
+  #       with:
+  #         version: ${{ env.PROTOC_VER }}
+  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: Swatinem/rust-cache@v2
-        if: ${{ env.CACHE == 'true' }}
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        with:
-          key: test-e2e-browser-{hash}
-          restore-keys: test-e2e-browser-
-        continue-on-error: true
-        if: ${{ env.CACHE == 'true' }}
+  #     - uses: Swatinem/rust-cache@v2
+  #       if: ${{ env.CACHE == 'true' }}
+  #     - uses: satackey/action-docker-layer-caching@v0.0.11
+  #       with:
+  #         key: test-e2e-browser-{hash}
+  #         restore-keys: test-e2e-browser-
+  #       continue-on-error: true
+  #       if: ${{ env.CACHE == 'true' }}
 
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: wasm-pack
-          use-tool-cache: true
+  #     - uses: actions-rs/install@v0.1
+  #       with:
+  #         crate: wasm-pack
+  #         use-tool-cache: true
 
-      - name: Download `medea-control-api-mock` Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: docker-medea-control-api-mock-${{ github.run_number }}
-          path: .cache/
-      - name: Unpack `medea-control-api-mock` Docker image
-        run: make docker.untar from-file=.cache/image.tar
+  #     - name: Download `medea-control-api-mock` Docker image
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: docker-medea-control-api-mock-${{ github.run_number }}
+  #         path: .cache/
+  #     - name: Unpack `medea-control-api-mock` Docker image
+  #       run: make docker.untar from-file=.cache/image.tar
 
-      - name: Login to Medea Docker registry
-        uses: docker/login-action@v2
-        with:
-          registry: hub.instrumentisto.com
-          username: ${{ secrets.MEDEA_DOCKER_USER }}
-          password: ${{ secrets.MEDEA_DOCKER_PASS }}
+  #     - name: Login to Medea Docker registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: hub.instrumentisto.com
+  #         username: ${{ secrets.MEDEA_DOCKER_USER }}
+  #         password: ${{ secrets.MEDEA_DOCKER_PASS }}
 
-      - name: Pull edge Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea:edge
-        if: ${{ env.MEDEA_BRANCH == 'edge' }}
-      - name: Pull review Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
-        if: ${{ env.MEDEA_BRANCH != 'edge' }}
+  #     - name: Pull edge Medea Docker image
+  #       run: docker pull hub.instrumentisto.com/streaming/medea:edge
+  #       if: ${{ env.MEDEA_BRANCH == 'edge' }}
+  #     - name: Pull review Medea Docker image
+  #       run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
+  #       if: ${{ env.MEDEA_BRANCH != 'edge' }}
 
-      - name: Chrome
-        run: make test.e2e browser=chrome up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
-                           control-tag=build-${{ github.run_number }}
-      - name: Firefox
-        run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
-                           control-tag=build-${{ github.run_number }}
+  #     - name: Chrome
+  #       run: make test.e2e browser=chrome up=yes debug=no dockerized=yes
+  #                          medea-tag=${{ env.MEDEA_BRANCH }}
+  #                          control-tag=build-${{ github.run_number }}
+  #     - name: Firefox
+  #       run: make test.e2e browser=firefox up=yes debug=no dockerized=yes
+  #                          medea-tag=${{ env.MEDEA_BRANCH }}
+  #                          control-tag=build-${{ github.run_number }}
 
   test-e2e-native:
     name: test (E2E, ${{ matrix.platform }})

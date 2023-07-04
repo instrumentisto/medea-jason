@@ -95,7 +95,8 @@ async function createMember(roomId, memberId) {
   let isPublish = document.getElementById('connection-settings__publish_is-enabled').checked;
 
   let controlRoom = await axios.get(controlUrl + roomId);
-  let anotherMembers = Object.values(controlRoom.data.element.pipeline);
+  let isRoomExist = Object.keys(controlRoom.data).length;
+  let anotherMembers = isRoomExist ? Object.values(controlRoom.data.element.pipeline) : [];
   let pipeline = {};
 
   let memberIds = [];
@@ -125,17 +126,40 @@ async function createMember(roomId, memberId) {
     }
   }
 
-  let resp = await axios({
-    method: 'post',
-    url: controlUrl + roomId + '/' + memberId,
-    data: {
-      kind: 'Member',
-      credentials: { plain: 'test' },
-      pipeline: pipeline,
-      on_join: 'grpc://127.0.0.1:9099',
-      on_leave: 'grpc://127.0.0.1:9099'
-    }
-  });
+  let resp;
+
+  if (isRoomExist) {
+    resp = await axios({
+      method: 'post',
+      url: controlUrl + roomId + '/' + memberId,
+      data: {
+        kind: 'Member',
+        credentials: { plain: 'test' },
+        pipeline: pipeline,
+        on_join: 'grpc://127.0.0.1:9099',
+        on_leave: 'grpc://127.0.0.1:9099'
+      }
+    });
+  } else {
+    resp = await axios({
+      method: 'post',
+      url: controlUrl + roomId,
+      data: {
+        kind: 'Room',
+        pipeline: {
+          [memberId]: {
+            kind: 'Member',
+            credentials: { plain: 'test' },
+            pipeline: pipeline,
+            on_join: 'grpc://127.0.0.1:9099',
+            on_leave: 'grpc://127.0.0.1:9099'
+          }
+        }
+      }
+    });
+  }
+
+  console.dir(resp);
 
   if (isPublish) {
     try {
@@ -936,20 +960,13 @@ window.onload = async function() {
 
         try {
           let username = usernameInput.value;
-          try {
-            await axios.get(controlUrl + roomId);
-          } catch (e) {
-            if (e.response.status === 400) {
-              console.log('Room not found. Creating new room...');
-              await room.join(await createRoom(roomId, username));
-              return;
-            } else {
-              throw e;
-            }
+          // try {
+          if (!Object.keys((await axios.get(controlUrl + roomId)).data).length) {
+            console.log('Room not found. Creating new room...');
+            await room.join(await createRoom(roomId, username));
+            return;
           }
-          try {
-            await axios.get(controlUrl + roomId + '/' + username);
-          } catch (e) {
+          if (!Object.keys((await axios.get(controlUrl + roomId + '/' + username)).data).length) {
             console.log('Member not found. Creating new member...');
             await room.join(await createMember(roomId, username));
             return;
