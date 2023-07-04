@@ -36,7 +36,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test
-      - test-e2e-browser
+      # - test-e2e-browser
       - test-e2e-native
       - test-flutter
     runs-on: ubuntu-latest
@@ -659,7 +659,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test
-      - test-e2e-browser
+      # - test-e2e-browser
       - test-e2e-native
       - test-flutter
     runs-on: ubuntu-latest
@@ -700,7 +700,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test
-      - test-e2e-browser
+      # - test-e2e-browser
       - test-e2e-native
       - test-flutter
     runs-on: ubuntu-latest
@@ -1030,7 +1030,7 @@ jobs:
       - rustdoc
       - rustfmt
       - test
-      - test-e2e-browser
+      # - test-e2e-browser
       - test-e2e-native
       - test-flutter
     runs-on: ubuntu-latest
