@@ -6,6 +6,37 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.4.0] · 2023-07-04
+[0.4.0]: /../../tree/medea-jason-0.4.0/flutter
+
+### BC Breaks
+
+- Changed values in `FacingMode` ([#119]):
+    - from `User` to `user`;
+    - from `Environment` to `environment`;
+    - from `Left` to `left`;
+    - from `Right` to `right`.
+- Changed values in `MediaDeviceKind` ([#119]):
+    - from `AudioInput` to `audioInput`;
+    - from `VideoInput` to `videoInput`;
+    - from `AudioOutput` to `audioOutput`.
+- Changed values in `MediaDirection` ([#119]):
+    - from `SendRecv` to `sendRecv`;
+    - from `SendOnly` to `sendOnly`;
+    - from `RecvOnly` to `recvOnly`;
+    - from `Inactive` to `inactive`.
+- Changed values in `MediaKind` ([#119]):
+    - from `Audio` to `audio`;
+    - from `Video` to `video`.
+- Changed values in `MediaSourceKind` ([#119]):
+    - from `Device` to `device`;
+    - from `Display` to `display`.
+
+[#119]: /../../pull/119
+
+
+
+
 ## [0.3.0] · 2023-06-09
 [0.3.0]: /../../tree/medea-jason-0.3.0/flutter
 
