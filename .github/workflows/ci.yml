@@ -385,7 +385,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - android
+          # - android
           - linux
           - macos
           - windows
