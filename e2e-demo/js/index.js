@@ -960,7 +960,6 @@ window.onload = async function() {
 
         try {
           let username = usernameInput.value;
-          // try {
           if (!Object.keys((await axios.get(controlUrl + roomId)).data).length) {
             console.log('Room not found. Creating new room...');
             await room.join(await createRoom(roomId, username));

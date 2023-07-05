@@ -259,7 +259,7 @@ impl Component {
         (peer_id, peer): (PeerId, Rc<peer::State>),
     ) {
         drop(peers.peers.borrow_mut().remove(&peer_id));
-        for receiver_id in peer.get_receivers() {
+        for receiver_id in peer.get_recv_tracks() {
             peers.connections.remove_track(&receiver_id);
         }
     }

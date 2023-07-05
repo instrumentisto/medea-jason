@@ -226,13 +226,13 @@ impl State {
     }
 
     /// Returns the all send [`TrackId`]s.
-    pub fn get_senders(&self) -> Vec<TrackId> {
-        self.senders.get_all_ids()
+    pub fn get_send_tracks(&self) -> Vec<TrackId> {
+        self.senders.ids()
     }
 
     /// Returns the all receive [`TrackId`]s.
-    pub fn get_receivers(&self) -> Vec<TrackId> {
-        self.receivers.get_all_ids()
+    pub fn get_recv_tracks(&self) -> Vec<TrackId> {
+        self.receivers.ids()
     }
 
     /// Sets [`NegotiationRole`] of this [`State`] to the provided one.

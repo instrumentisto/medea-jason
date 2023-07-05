@@ -235,6 +235,7 @@ impl Component {
         val: (TrackId, HashSet<MemberId>),
     ) {
         drop(peer.connections.update_connections(&val.0, val.1));
+
         state.maybe_update_connections.set(None);
     }
 
