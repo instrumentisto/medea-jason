@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.5.0] · 2023-07-06
+[0.5.0]: /../../tree/medea-client-api-proto-0.5.0/proto/client-api
+
+### BC Breaks
+
+- Added `Track.muted` field ([#119]).
+
+[#119]: /../../pull/119
+
+
+
+
 ## [0.4.0] · 2023-06-09
 [0.4.0]: /../../tree/medea-client-api-proto-0.4.0/proto/client-api
 
