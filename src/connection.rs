@@ -109,11 +109,11 @@ impl Connections {
     pub fn update_connections(
         &self,
         track_id: &TrackId,
-        mut partner_members: HashSet<MemberId>,
+        partner_members: HashSet<MemberId>,
     ) -> Vec<Connection> {
         if let Some(partners) = self.tracks.borrow_mut().get_mut(track_id) {
             // No changes.
-            if partners == &mut partner_members {
+            if partners == &partner_members {
                 return partners
                     .iter()
                     .filter_map(|partner| {
