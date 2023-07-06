@@ -178,6 +178,12 @@ impl State {
         }
     }
 
+    /// Returns [`ConnectionMode`] of this [`State`].
+    #[must_use]
+    pub const fn connection_mode(&self) -> ConnectionMode {
+        self.connection_mode
+    }
+
     /// Returns [`Id`] of this [`State`].
     #[must_use]
     pub const fn id(&self) -> Id {
