@@ -247,10 +247,12 @@ impl Connections {
     ///
     /// [`Track`]: medea_client_api_proto::Track
     pub fn remove_track(&self, track_id: &TrackId) {
-        _ = self.tracks.borrow_mut().remove(track_id).map(|partners| {
-            for partner in partners {
+        let mut tracks = self.tracks.borrow_mut();
+
+        if let Some(partners) = tracks.remove(track_id) {
+            for p in partners {
                 if let Some(member_tracks) =
-                    self.members_to_tracks.borrow_mut().get_mut(&partner)
+                    self.members_to_tracks.borrow_mut().get_mut(&p)
                 {
                     _ = member_tracks.remove(track_id);
 
@@ -258,12 +260,12 @@ impl Connections {
                         _ = self
                             .connections
                             .borrow_mut()
-                            .remove(&partner)
+                            .remove(&p)
                             .map(|conn| conn.0.on_close.call0());
                     }
                 }
             }
-        });
+        }
     }
 
     /// Lookups [`Connection`] by the given remote [`MemberId`].
