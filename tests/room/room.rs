@@ -1887,7 +1887,7 @@ mod patches_generation {
         });
 
         assert_eq!(
-            command_rx.next().await.unwrap(),
+            command_rx.skip(1).next().await.unwrap(),
             Command::UpdateTracks {
                 peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
@@ -1917,7 +1917,7 @@ mod patches_generation {
         });
 
         assert_eq!(
-            command_rx.next().await.unwrap(),
+            command_rx.skip(1).next().await.unwrap(),
             Command::UpdateTracks {
                 peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
