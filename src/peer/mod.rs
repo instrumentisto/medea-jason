@@ -18,8 +18,9 @@ use std::{
 use derive_more::{Display, From};
 use futures::{channel::mpsc, future, StreamExt as _};
 use medea_client_api_proto::{
-    stats::StatId, Command, IceConnectionState, MediaSourceKind, MemberId,
-    PeerConnectionState, PeerId as Id, PeerId, TrackId, TrackPatchCommand, ConnectionMode,
+    stats::StatId, Command, ConnectionMode, IceConnectionState,
+    MediaSourceKind, MemberId, PeerConnectionState, PeerId as Id, PeerId,
+    TrackId, TrackPatchCommand,
 };
 use medea_macro::dispatchable;
 use tracerr::Traced;
@@ -399,9 +400,10 @@ impl PeerConnection {
             peer.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
                     platform::spawn(async move {
-                        if let (Err(mid), ConnectionMode::Mesh) =
-                            (c.add_remote_track(track, transceiver).await, connection_mode)
-                        {
+                        if let (Err(mid), ConnectionMode::Mesh) = (
+                            c.add_remote_track(track, transceiver).await,
+                            connection_mode,
+                        ) {
                             log::error!(
                                 "Cannot add new remote track with mid={mid}",
                             );

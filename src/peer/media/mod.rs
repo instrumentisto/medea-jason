@@ -900,7 +900,7 @@ impl MediaConnections {
                             track.id,
                             track.media_type,
                             medea_client_api_proto::MediaDirection::SendRecv,
-                            false,
+                            send_constraints.muted(track.media_type),
                             mid,
                             receivers,
                             send_constraints,

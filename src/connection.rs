@@ -112,73 +112,52 @@ impl Connections {
         partner_members: HashSet<MemberId>,
     ) -> Vec<Connection> {
         if let Some(partners) = self.tracks.borrow_mut().get_mut(track_id) {
+            let mut connections = self.connections.borrow_mut();
+            let mut members_to_tracks = self.members_to_tracks.borrow_mut();
+
             // No changes.
             if partners == &partner_members {
                 return partners
                     .iter()
                     .filter_map(|partner| {
-                        _ = self
-                            .members_to_tracks
-                            .borrow_mut()
+                        _ = members_to_tracks
                             .get_mut(partner)
                             .map(|tracks| tracks.insert(*track_id));
-                        self.connections.borrow().get(partner).cloned()
+                        connections.get(partner).cloned()
                     })
                     .collect();
             }
 
-            // Need to update.
-            let current_partners = partners.clone();
-            // Adding.
-            drop(
-                partner_members
-                    .iter()
-                    .filter_map(|partner| {
-                        (!current_partners.contains(partner))
-                            .then_some(partner.clone())
-                    })
-                    .map(|partner| {
-                        _ = self
-                            .members_to_tracks
-                            .borrow_mut()
-                            .entry(partner.clone())
-                            .or_default()
-                            .insert(*track_id);
+            // Adding new.
+            let added: Vec<_> =
+                partner_members.difference(partners).cloned().collect();
+            for mid in added {
+                _ = members_to_tracks
+                    .entry(mid.clone())
+                    .or_default()
+                    .insert(*track_id);
 
-                        let add_conn =
-                            !self.connections.borrow().contains_key(&partner);
-                        if add_conn {
-                            let connection = Connection::new(
-                                partner.clone(),
-                                &self.room_recv_constraints,
-                            );
-                            self.on_new_connection
-                                .call1(connection.new_handle());
-                            drop(
-                                self.connections
-                                    .borrow_mut()
-                                    .insert(partner.clone(), connection),
-                            );
-                        }
-                        _ = partners.insert(partner);
-                    })
-                    .collect::<Vec<_>>(),
-            );
+                if !connections.contains_key(&mid) {
+                    let connection = Connection::new(
+                        mid.clone(),
+                        &self.room_recv_constraints,
+                    );
+                    self.on_new_connection.call1(connection.new_handle());
+                    drop(connections.insert(mid.clone(), connection));
+                }
+                _ = partners.insert(mid);
+            }
 
             // Deleting.
             partners.retain(|partner| {
                 let to_remove = !partner_members.contains(partner);
 
                 if to_remove {
-                    if let Some(member_tracks) =
-                        self.members_to_tracks.borrow_mut().get_mut(partner)
-                    {
-                        _ = member_tracks.remove(track_id);
+                    if let Some(tracks) = members_to_tracks.get_mut(partner) {
+                        _ = tracks.remove(track_id);
 
-                        if member_tracks.is_empty() {
-                            _ = self
-                                .connections
-                                .borrow_mut()
+                        if tracks.is_empty() {
+                            _ = connections
                                 .remove(partner)
                                 .map(|conn| conn.0.on_close.call0());
                         }
@@ -189,10 +168,8 @@ impl Connections {
             });
 
             return partner_members
-                .iter()
-                .filter_map(|partner| {
-                    self.connections.borrow().get(partner).cloned()
-                })
+                .into_iter()
+                .filter_map(|partner| connections.get(&partner).cloned())
                 .collect();
         }
 

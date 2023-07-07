@@ -138,7 +138,7 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
-    /// Inicator whether we have some information about tracks to provide in
+    /// Indicator whether we have some information about tracks to provide in
     /// [`Connections`].
     ///
     /// [`Connections`]: crate::connection::Connections
