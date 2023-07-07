@@ -16,8 +16,8 @@ use syn::{
 ///
 /// 1. Check that input `enum` is not empty.
 /// 2. Add `{}` to the macro argument (given function declaration).
-/// 3. Check that delegation function is not static (presence of
-///    `[&][&mut] self` arguments).
+/// 3. Check that delegation function is not static (presence of `[&][&mut]
+///    self` arguments).
 /// 4. Collect all the delegation function arguments.
 /// 5. Generate wrapper-function with dispatching delegation function call to
 ///    all the `enum` variants.
