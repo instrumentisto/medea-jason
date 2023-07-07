@@ -15,6 +15,11 @@ All user visible changes to this project will be documented in this file. This p
 
 - Minimal supported version of `medea-client-api-proto` is `0.5.0` ([#119]).
 
+### Fixed
+
+- Fix initial mute state on incoming tracks in [SFU] mode ([#119]);
+- Fix `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
+
 [#119]: /../../pull/119
 
 
@@ -312,3 +317,4 @@ All user visible changes to this project will be documented in this file. This p
 
 
 [Semantic Versioning 2.0.0]: https://semver.org
+[SFU]: https://webrtcglossary.com/sfu
