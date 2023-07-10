@@ -173,7 +173,7 @@ impl Connections {
                 .collect();
         }
 
-        self.add_connections(*track_id, partner_members)
+        self.add_connections(*track_id, &partner_members)
     }
 
     /// Adds information about related [`Track`]s with provided [`TrackId`] and
@@ -185,40 +185,42 @@ impl Connections {
     fn add_connections(
         &self,
         track_id: TrackId,
-        partner_members: HashSet<MemberId>,
+        partner_members: &HashSet<MemberId>,
     ) -> Vec<Connection> {
-        let connections = partner_members
+        for partner in partner_members {
+            _ = self
+                .members_to_tracks
+                .borrow_mut()
+                .entry(partner.clone())
+                .or_default()
+                .insert(track_id);
+            if !self.connections.borrow().contains_key(partner) {
+                let connection = Connection::new(
+                    partner.clone(),
+                    &self.room_recv_constraints,
+                );
+                self.on_new_connection.call1(connection.new_handle());
+                drop(
+                    self.connections
+                        .borrow_mut()
+                        .insert(partner.clone(), connection),
+                );
+            }
+        }
+
+        drop(
+            self.tracks.borrow_mut().insert(
+                track_id,
+                partner_members.clone().into_iter().collect(),
+            ),
+        );
+
+        partner_members
             .iter()
-            .map(|partner| {
-                _ = self
-                    .members_to_tracks
-                    .borrow_mut()
-                    .entry(partner.clone())
-                    .or_default()
-                    .insert(track_id);
-                self.connections
-                    .borrow_mut()
-                    .entry(partner.clone())
-                    .or_insert_with(|| {
-                        let connection = Connection::new(
-                            partner.clone(),
-                            &self.room_recv_constraints,
-                        );
-                        self.on_new_connection.call1(connection.new_handle());
-                        drop(
-                            self.connections
-                                .borrow_mut()
-                                .insert(partner.clone(), connection.clone()),
-                        );
-                        connection
-                    })
-                    .clone()
+            .filter_map(|partner| {
+                self.connections.borrow().get(partner).cloned()
             })
-            .collect();
-
-        drop(self.tracks.borrow_mut().insert(track_id, partner_members));
-
-        connections
+            .collect()
     }
 
     /// Removes information about [`Track`] with provided [`TrackId`]. Then
