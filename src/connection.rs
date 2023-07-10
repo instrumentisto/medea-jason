@@ -196,19 +196,23 @@ impl Connections {
                     .entry(partner.clone())
                     .or_default()
                     .insert(track_id);
-                self.connections.borrow_mut().entry(partner.clone()).or_insert_with(|| {
-                    let connection = Connection::new(
-                        partner.clone(),
-                        &self.room_recv_constraints,
-                    );
-                    self.on_new_connection.call1(connection.new_handle());
-                    drop(
-                        self.connections
-                            .borrow_mut()
-                            .insert(partner.clone(), connection.clone()),
-                    );
-                    connection
-                }).clone()
+                self.connections
+                    .borrow_mut()
+                    .entry(partner.clone())
+                    .or_insert_with(|| {
+                        let connection = Connection::new(
+                            partner.clone(),
+                            &self.room_recv_constraints,
+                        );
+                        self.on_new_connection.call1(connection.new_handle());
+                        drop(
+                            self.connections
+                                .borrow_mut()
+                                .insert(partner.clone(), connection.clone()),
+                        );
+                        connection
+                    })
+                    .clone()
             })
             .collect();
 
