@@ -262,5 +262,8 @@ impl Component {
         for t in peer.get_recv_tracks() {
             peers.connections.remove_track(&t);
         }
+        for t in peer.get_send_tracks() {
+            peers.connections.remove_track(&t);
+        }
     }
 }
