@@ -189,16 +189,14 @@ impl Connections {
     ) -> Vec<Connection> {
         let connections = partner_members
             .iter()
-            .filter_map(|partner| {
+            .map(|partner| {
                 _ = self
                     .members_to_tracks
                     .borrow_mut()
                     .entry(partner.clone())
                     .or_default()
                     .insert(track_id);
-                if self.connections.borrow().contains_key(partner) {
-                    None
-                } else {
+                self.connections.borrow_mut().entry(partner.clone()).or_insert_with(|| {
                     let connection = Connection::new(
                         partner.clone(),
                         &self.room_recv_constraints,
@@ -209,8 +207,8 @@ impl Connections {
                             .borrow_mut()
                             .insert(partner.clone(), connection.clone()),
                     );
-                    Some(connection)
-                }
+                    connection
+                }).clone()
             })
             .collect();
 
