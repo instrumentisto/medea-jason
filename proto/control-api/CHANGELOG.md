@@ -6,6 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.8.1] · 2023-07-12
+[0.8.1]: /../../tree/medea-control-api-proto-0.8.1/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.8.0...medea-control-api-proto-0.8.1)
+
+### Upgraded
+
+- Dependencies:
+    - [`medea-client-api-proto`] to `0.5` ([123]).
+
+[#123]: /../../pull/123
+
+
+
+
 ## [0.8.0] · 2023-06-09
 [0.8.0]: /../../tree/medea-control-api-proto-0.8.0/proto/control-api
 
@@ -181,5 +196,6 @@ All user visible changes to this project will be documented in this file. This p
 
 [`prost`]: https://docs.rs/prost
 [`tonic`]: https://docs.rs/tonic
+[`medea-client-api-proto`]: https://docs.rs/medea_client_api_proto
 
 [Semantic Versioning 2.0.0]: https://semver.org
