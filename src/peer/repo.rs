@@ -256,9 +256,14 @@ impl Component {
     fn peer_removed(
         peers: &Repository,
         _: &State,
-        (peer_id, _): (PeerId, Rc<peer::State>),
+        (peer_id, peer): (PeerId, Rc<peer::State>),
     ) {
         drop(peers.peers.borrow_mut().remove(&peer_id));
-        peers.connections.close_connection(peer_id);
+        for t in peer.get_recv_tracks() {
+            peers.connections.remove_track(&t);
+        }
+        for t in peer.get_send_tracks() {
+            peers.connections.remove_track(&t);
+        }
     }
 }

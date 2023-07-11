@@ -963,16 +963,16 @@ class ConstrainU32 with _$ConstrainU32 {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-videofacingmodeenum
 enum FacingMode {
   /// Facing towards a user (a self-view camera).
-  User,
+  user,
 
   /// Facing away from a user (viewing an environment).
-  Environment,
+  environment,
 
   /// Facing to the left of a user.
-  Left,
+  left,
 
   /// Facing to the right of a user.
-  Right,
+  right,
 }
 
 /// [MediaDeviceInfo.kind][1] representation.
@@ -980,28 +980,28 @@ enum FacingMode {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
 enum MediaDeviceKind {
   /// Audio input device (for example, a microphone).
-  AudioInput,
+  audioInput,
 
   /// Video input device (for example, a webcam).
-  VideoInput,
+  videoInput,
 
   /// Audio output device (for example, a pair of headphones).
-  AudioOutput,
+  audioOutput,
 }
 
 /// Media exchange direction of a [`Track`].
 enum MediaDirection {
   /// [`Track`] is enabled on both receiver and sender sides.
-  SendRecv,
+  sendRecv,
 
   /// [`Track`] is enabled on sender side only.
-  SendOnly,
+  sendOnly,
 
   /// [`Track`] is enabled on receiver side only.
-  RecvOnly,
+  recvOnly,
 
   /// [`Track`] is disabled on both sides.
-  Inactive,
+  inactive,
 }
 
 /// [MediaStreamTrack.kind][1] representation.
@@ -1009,19 +1009,19 @@ enum MediaDirection {
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
 enum MediaKind {
   /// Audio track.
-  Audio,
+  audio,
 
   /// Video track.
-  Video,
+  video,
 }
 
 /// Media source type.
 enum MediaSourceKind {
   /// Media is sourced from some media device (webcam or microphone).
-  Device,
+  device,
 
   /// Media is obtained with screen-capture.
-  Display,
+  display,
 }
 
 /// Reason of why [`Room`] has been closed.

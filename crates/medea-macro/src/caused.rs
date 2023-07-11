@@ -61,11 +61,11 @@ fn error_type(s: &Structure<'_>) -> Result<syn::Path> {
                 ));
             }
             let syn::Meta::List(list) = &attr.meta else {
-                    return Err(Error::new_spanned(
-                        &attr.meta,
-                        "#[cause] attribute must take a list in parentheses",
-                    ));
-                };
+                return Err(Error::new_spanned(
+                    &attr.meta,
+                    "#[cause] attribute must take a list in parentheses",
+                ));
+            };
             let nv = syn::parse2::<syn::MetaNameValue>(list.tokens.clone())
                 .map_err(|e| {
                     Error::new_spanned(
@@ -83,11 +83,11 @@ fn error_type(s: &Structure<'_>) -> Result<syn::Path> {
                 ));
             }
             let syn::Expr::Path(expr) = nv.value else {
-                    return Err(Error::new_spanned(
-                        &nv.value,
-                        "Expected `path::to::error`",
-                    ));
-                };
+                return Err(Error::new_spanned(
+                    &nv.value,
+                    "Expected `path::to::error`",
+                ));
+            };
             error_type = Some(expr.path);
         }
     }

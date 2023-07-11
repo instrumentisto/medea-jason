@@ -189,6 +189,7 @@ pub fn get_test_tracks(
                 mid: None,
             },
             media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Audio(AudioSettings {
                 required: is_audio_required,
             }),
@@ -200,6 +201,7 @@ pub fn get_test_tracks(
                 mid: None,
             },
             media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Video(VideoSettings {
                 required: is_video_required,
                 source_kind: MediaSourceKind::Device,
@@ -221,6 +223,7 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 mid: Some("mid0".to_string()),
             },
             media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Audio(AudioSettings { required: false }),
         },
         Track {
@@ -230,6 +233,7 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 mid: Some("mid1".to_string()),
             },
             media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Video(VideoSettings {
                 required: false,
                 source_kind: MediaSourceKind::Device,

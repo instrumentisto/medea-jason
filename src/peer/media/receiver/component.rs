@@ -214,6 +214,7 @@ impl State {
         mid: Option<String>,
         media_type: MediaType,
         media_direction: medea_client_api_proto::MediaDirection,
+        muted: bool,
         sender: MemberId,
         connection_mode: ConnectionMode,
     ) -> Self {
@@ -228,7 +229,7 @@ impl State {
             enabled_general: ProgressableCell::new(
                 media_direction.is_enabled_general().into(),
             ),
-            muted: ObservableCell::new(false),
+            muted: ObservableCell::new(muted),
             sync_state: ObservableCell::new(SyncState::Synced),
             connection_mode,
             media_direction: ObservableCell::new(media_direction.into()),

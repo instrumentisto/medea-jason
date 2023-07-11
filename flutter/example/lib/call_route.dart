@@ -62,7 +62,7 @@ class _CallState extends State<CallRoute> {
   void initState() {
     _call.onNewRemoteStream((track, remoteId) async {
       var trackId = track.getTrack().id();
-      if (track.mediaDirection() == jason.TrackMediaDirection.SendRecv) {
+      if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track.getTrack());
@@ -83,7 +83,7 @@ class _CallState extends State<CallRoute> {
         (newDir) async {
           var remoteTracks = _videos[remoteId];
 
-          if (newDir == jason.TrackMediaDirection.SendRecv) {
+          if (newDir == jason.TrackMediaDirection.sendRecv) {
             var renderer = createVideoRenderer();
             await renderer.initialize();
             await renderer.setSrcObject(track.getTrack());
@@ -454,10 +454,10 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
 
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.VideoInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
       .toList();
   var audioDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.AudioInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
       .toList();
 
   await showDialog<void>(

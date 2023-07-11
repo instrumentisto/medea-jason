@@ -335,6 +335,7 @@ mod disable_recv_tracks {
                             mid: None,
                         },
                         media_direction: MediaDirection::SendRecv,
+                        muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -346,6 +347,7 @@ mod disable_recv_tracks {
                             mid: None,
                         },
                         media_direction: MediaDirection::SendRecv,
+                        muted: false,
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
@@ -358,6 +360,7 @@ mod disable_recv_tracks {
                             mid: None,
                         },
                         media_direction: MediaDirection::SendRecv,
+                        muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -428,6 +431,7 @@ mod init_track_states {
                     mid: None,
                 },
                 media_direction: *media_direction,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             })
             .collect();
@@ -486,6 +490,7 @@ mod init_track_states {
                     mid: None,
                 },
                 media_direction: *media_direction,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             })
             .collect();
@@ -548,6 +553,7 @@ mod receivers_patch_send_tracks {
                         mid: None,
                     },
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
                     }),
@@ -670,6 +676,7 @@ mod disable_send_tracks {
                 mid: None,
             },
             media_direction: MediaDirection::SendRecv,
+            muted: false,
             media_type: MediaType::Audio(AudioSettings { required }),
         }
     }
@@ -686,6 +693,7 @@ mod disable_send_tracks {
                 mid: None,
             },
             media_direction: MediaDirection::SendRecv,
+            muted: false,
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
@@ -1515,6 +1523,7 @@ mod patches_generation {
                     id: TrackId(track_i as u32),
                     direction: direction.clone(),
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: media_type.clone(),
                 })
                 .inspect(|track| {
@@ -2360,6 +2369,7 @@ mod set_local_media_settings {
                         mid: None,
                     },
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
@@ -2390,6 +2400,7 @@ mod set_local_media_settings {
                                     mid: Some(String::from("1")),
                                 },
                                 media_direction: MediaDirection::SendRecv,
+                                muted: false,
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
@@ -3077,6 +3088,7 @@ async fn sender_answerer() {
                         mid: Some(a_tr.mid().unwrap()),
                     },
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Audio(AudioSettings {
                         required: true,
                     }),
@@ -3088,6 +3100,7 @@ async fn sender_answerer() {
                         mid: Some(v_tr.mid().unwrap()),
                     },
                     media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
                         source_kind: MediaSourceKind::Device,

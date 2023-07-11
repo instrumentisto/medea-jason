@@ -12,7 +12,7 @@ use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
     StreamExt as _,
 };
-use medea_client_api_proto::{ConnectionQualityScore, MemberId, PeerId};
+use medea_client_api_proto::{ConnectionQualityScore, MemberId, TrackId};
 use tracerr::Traced;
 
 use crate::{
@@ -60,8 +60,11 @@ type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 /// Service which manages [`Connection`]s with remote `Member`s.
 #[derive(Debug)]
 pub struct Connections {
-    /// Local [`PeerId`] to remote [`MemberId`].
-    peer_members: RefCell<HashMap<PeerId, HashSet<MemberId>>>,
+    /// [`TrackId`] to remote [`MemberId`].
+    tracks: RefCell<HashMap<TrackId, HashSet<MemberId>>>,
+
+    /// Remote [`MemberId`] to [`TrackId`].
+    members_to_tracks: RefCell<HashMap<MemberId, HashSet<TrackId>>>,
 
     /// Remote [`MemberId`] to [`Connection`] with that `Member`.
     connections: RefCell<HashMap<MemberId, Connection>>,
@@ -78,7 +81,8 @@ impl Connections {
     /// Creates new [`Connections`].
     pub fn new(room_recv_constraints: Rc<RecvConstraints>) -> Self {
         Self {
-            peer_members: RefCell::default(),
+            tracks: RefCell::default(),
+            members_to_tracks: RefCell::default(),
             connections: RefCell::default(),
             room_recv_constraints,
             on_new_connection: platform::Callback::default(),
@@ -95,92 +99,157 @@ impl Connections {
         self.on_new_connection.set_func(f);
     }
 
-    /// Creates and returns new connection with remote `Member` based on its
-    /// [`MemberId`].
+    /// Adds or updates information about related [`Track`]s with the provided
+    /// [`TrackId`] and [`MemberId`]s. Then [`Connections`] decides to create or
+    /// to delete [`Connection`]s.
     ///
-    /// No-op if [`Connection`] already exists.
-    pub fn create_connection(
+    /// Returns [`Connection`]s associated with the provided [`MemberId`]s.
+    ///
+    /// [`Track`]: medea_client_api_proto::Track
+    #[must_use]
+    pub fn update_connections(
         &self,
-        local_peer_id: PeerId,
-        remote_member_id: &MemberId,
-    ) -> Connection {
-        let conn = self.connections.borrow().get(remote_member_id).cloned();
-        conn.map_or_else(
-            || {
+        track_id: &TrackId,
+        partner_members: HashSet<MemberId>,
+    ) -> Vec<Connection> {
+        if let Some(partners) = self.tracks.borrow_mut().get_mut(track_id) {
+            let mut connections = self.connections.borrow_mut();
+            let mut members_to_tracks = self.members_to_tracks.borrow_mut();
+
+            // No changes.
+            if partners == &partner_members {
+                return partners
+                    .iter()
+                    .filter_map(|partner| {
+                        _ = members_to_tracks
+                            .get_mut(partner)
+                            .map(|tracks| tracks.insert(*track_id));
+                        connections.get(partner).cloned()
+                    })
+                    .collect();
+            }
+
+            // Adding new.
+            let added: Vec<_> =
+                partner_members.difference(partners).cloned().collect();
+            for mid in added {
+                _ = members_to_tracks
+                    .entry(mid.clone())
+                    .or_default()
+                    .insert(*track_id);
+
+                if !connections.contains_key(&mid) {
+                    let connection = Connection::new(
+                        mid.clone(),
+                        &self.room_recv_constraints,
+                    );
+                    self.on_new_connection.call1(connection.new_handle());
+                    drop(connections.insert(mid.clone(), connection));
+                }
+                _ = partners.insert(mid);
+            }
+
+            // Deleting.
+            partners.retain(|partner| {
+                let to_remove = !partner_members.contains(partner);
+
+                if to_remove {
+                    if let Some(tracks) = members_to_tracks.get_mut(partner) {
+                        _ = tracks.remove(track_id);
+
+                        if tracks.is_empty() {
+                            _ = connections
+                                .remove(partner)
+                                .map(|conn| conn.0.on_close.call0());
+                        }
+                    }
+                }
+
+                !to_remove
+            });
+
+            return partner_members
+                .into_iter()
+                .filter_map(|partner| connections.get(&partner).cloned())
+                .collect();
+        }
+
+        self.add_connections(*track_id, &partner_members)
+    }
+
+    /// Adds information about related [`Track`]s with the provided [`TrackId`]
+    /// and [`MemberId`]s, and creates [`Connection`]s.
+    ///
+    /// Returns [`Connection`]s associated with the provided [`MemberId`]s.
+    ///
+    /// [`Track`]: medea_client_api_proto::Track
+    #[must_use]
+    fn add_connections(
+        &self,
+        track_id: TrackId,
+        partner_members: &HashSet<MemberId>,
+    ) -> Vec<Connection> {
+        let mut connections = self.connections.borrow_mut();
+
+        for partner in partner_members {
+            _ = self
+                .members_to_tracks
+                .borrow_mut()
+                .entry(partner.clone())
+                .or_default()
+                .insert(track_id);
+            if !connections.contains_key(partner) {
                 let connection = Connection::new(
-                    remote_member_id.clone(),
+                    partner.clone(),
                     &self.room_recv_constraints,
                 );
                 self.on_new_connection.call1(connection.new_handle());
-                drop(
-                    self.connections
-                        .borrow_mut()
-                        .insert(remote_member_id.clone(), connection.clone()),
-                );
-                _ = self
-                    .peer_members
-                    .borrow_mut()
-                    .entry(local_peer_id)
-                    .or_default()
-                    .insert(remote_member_id.clone());
+                drop(connections.insert(partner.clone(), connection));
+            }
+        }
 
-                connection
-            },
-            |c| c,
-        )
+        drop(
+            self.tracks.borrow_mut().insert(
+                track_id,
+                partner_members.clone().into_iter().collect(),
+            ),
+        );
+
+        partner_members
+            .iter()
+            .filter_map(|p| connections.get(p).cloned())
+            .collect()
     }
 
-    /// Lookups [`Connection`] by the given remote [`PeerId`].
-    pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
-        self.connections.borrow().get(remote_member_id).cloned()
-    }
-
-    /// Closes [`Connection`] associated with provided local [`PeerId`].
+    /// Removes information about [`Track`] with the provided [`TrackId`]. Then
+    /// [`Connections`] can decides to delete the related [`Connection`].
     ///
-    /// Invokes `on_close` callback.
-    pub fn close_connection(&self, local_peer: PeerId) {
-        if let Some(remote_ids) =
-            self.peer_members.borrow_mut().remove(&local_peer)
-        {
-            for remote_id in remote_ids {
-                if let Some(connection) =
-                    self.connections.borrow_mut().remove(&remote_id)
+    /// [`Track`]: medea_client_api_proto::Track
+    pub fn remove_track(&self, track_id: &TrackId) {
+        let mut tracks = self.tracks.borrow_mut();
+
+        if let Some(partners) = tracks.remove(track_id) {
+            for p in partners {
+                if let Some(member_tracks) =
+                    self.members_to_tracks.borrow_mut().get_mut(&p)
                 {
-                    // `on_close` callback is invoked here and not in `Drop`
-                    // implementation so `ConnectionHandle` is available during
-                    // callback invocation.
-                    connection.0.on_close.call0();
+                    _ = member_tracks.remove(track_id);
+
+                    if member_tracks.is_empty() {
+                        _ = self
+                            .connections
+                            .borrow_mut()
+                            .remove(&p)
+                            .map(|conn| conn.0.on_close.call0());
+                    }
                 }
             }
         }
     }
 
-    /// Closes the [`Connection`] associated with the provided local [`PeerId`]
-    /// and [`MemberId`].
-    ///
-    /// Invokes `on_close` callback.
-    pub fn close_specific_connection(
-        &self,
-        local_peer: PeerId,
-        remote_member_id: &MemberId,
-    ) {
-        _ = self
-            .peer_members
-            .borrow_mut()
-            .get_mut(&local_peer)
-            .and_then(|remote_member_ids| {
-                remote_member_ids.remove(remote_member_id).then_some(())
-            })
-            .map(|_| {
-                if let Some(connection) =
-                    self.connections.borrow_mut().remove(remote_member_id)
-                {
-                    // `on_close` callback is invoked here and not in `Drop`
-                    // implementation so `ConnectionHandle` is available during
-                    // callback invocation.
-                    connection.0.on_close.call0();
-                }
-            });
+    /// Lookups a [`Connection`] by the provided remote [`MemberId`].
+    pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
+        self.connections.borrow().get(remote_member_id).cloned()
     }
 }
 

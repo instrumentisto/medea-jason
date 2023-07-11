@@ -18,8 +18,9 @@ use std::{
 use derive_more::{Display, From};
 use futures::{channel::mpsc, future, StreamExt as _};
 use medea_client_api_proto::{
-    stats::StatId, Command, IceConnectionState, MediaSourceKind, MemberId,
-    PeerConnectionState, PeerId as Id, PeerId, TrackId, TrackPatchCommand,
+    stats::StatId, Command, ConnectionMode, IceConnectionState,
+    MediaSourceKind, MemberId, PeerConnectionState, PeerId as Id, PeerId,
+    TrackId, TrackPatchCommand,
 };
 use medea_macro::dispatchable;
 use tracerr::Traced;
@@ -395,12 +396,14 @@ impl PeerConnection {
         // Bind to `track` event.
         {
             let media_conns = Rc::downgrade(&peer.media_connections);
+            let connection_mode = state.connection_mode();
             peer.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
                     platform::spawn(async move {
-                        if let Err(mid) =
-                            c.add_remote_track(track, transceiver).await
-                        {
+                        if let (Err(mid), ConnectionMode::Mesh) = (
+                            c.add_remote_track(track, transceiver).await,
+                            connection_mode,
+                        ) {
                             log::error!(
                                 "Cannot add new remote track with mid={mid}",
                             );
@@ -754,11 +757,10 @@ impl PeerConnection {
         &self,
         criteria: LocalStreamUpdateCriteria,
     ) -> Result<Option<SimpleTracksRequest>, Traced<TracksRequestError>> {
-        let Some(request) = self
-            .media_connections
-            .get_tracks_request(criteria) else {
-                return Ok(None);
-            };
+        let Some(request) = self.media_connections.get_tracks_request(criteria)
+        else {
+            return Ok(None);
+        };
         let mut required_caps = SimpleTracksRequest::try_from(request)
             .map_err(tracerr::from_and_wrap!())?;
         required_caps

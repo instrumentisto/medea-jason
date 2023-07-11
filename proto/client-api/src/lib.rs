@@ -712,6 +712,9 @@ pub struct Track {
     /// [`MediaDirection`] of this [`Track`].
     pub media_direction: MediaDirection,
 
+    /// [`Track`]'s mute state.
+    pub muted: bool,
+
     /// [`MediaType`] of this [`Track`].
     pub media_type: MediaType,
 }
