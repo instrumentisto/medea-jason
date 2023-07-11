@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.4.0] · 2023-07-07
+## [0.4.0] · 2023-07-11
 [0.4.0]: /../../tree/medea-jason-0.4.0
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.3.0...medea-jason-0.4.0)
