@@ -17,8 +17,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Fix initial mute state on incoming tracks in [SFU] mode ([#119]);
-- Fix `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
+- Initial mute state on incoming tracks in [SFU] mode ([#119]).
+- Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
 
 [#119]: /../../pull/119
 

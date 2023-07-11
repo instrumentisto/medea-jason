@@ -138,8 +138,8 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
-    /// Indicator whether we have some information about tracks to provide in
-    /// [`Connections`].
+    /// Indicator whether there is some information about tracks to provide
+    /// into [`Connections`].
     ///
     /// [`Connections`]: crate::connection::Connections
     maybe_update_connections:
@@ -231,12 +231,12 @@ impl State {
         self.receivers.get(track_id)
     }
 
-    /// Returns the all send [`TrackId`]s.
+    /// Returns IDs of all the send [`TrackId`]s.
     pub fn get_send_tracks(&self) -> Vec<TrackId> {
         self.senders.ids()
     }
 
-    /// Returns the all receive [`TrackId`]s.
+    /// Returns IDs of all the receive [`TrackId`]s.
     pub fn get_recv_tracks(&self) -> Vec<TrackId> {
         self.receivers.ids()
     }

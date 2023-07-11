@@ -55,11 +55,12 @@ impl<S> TracksRepository<S> {
     }
 
     /// Returns a track with the provided `id`.
+    #[must_use]
     pub fn get(&self, id: TrackId) -> Option<Rc<S>> {
         self.0.borrow().get(&id).cloned()
     }
 
-    /// Returns the all [`TrackId`]s this [`TracksRepository`] contains.
+    /// Returns all the [`TrackId`]s this [`TracksRepository`] contains.
     pub fn ids(&self) -> Vec<TrackId> {
         self.0.borrow().iter().map(|(id, _)| *id).collect()
     }

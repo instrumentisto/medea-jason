@@ -99,13 +99,14 @@ impl Connections {
         self.on_new_connection.set_func(f);
     }
 
-    /// Adds or updates information about related [`Track`]s with provided
+    /// Adds or updates information about related [`Track`]s with the provided
     /// [`TrackId`] and [`MemberId`]s. Then [`Connections`] decides to create or
     /// to delete [`Connection`]s.
     ///
-    /// Returns [`Connection`]s associated with provided [`MemberId`]s.
+    /// Returns [`Connection`]s associated with the provided [`MemberId`]s.
     ///
     /// [`Track`]: medea_client_api_proto::Track
+    #[must_use]
     pub fn update_connections(
         &self,
         track_id: &TrackId,
@@ -176,12 +177,13 @@ impl Connections {
         self.add_connections(*track_id, &partner_members)
     }
 
-    /// Adds information about related [`Track`]s with provided [`TrackId`] and
-    /// [`MemberId`]s, creates [`Connection`]s.
+    /// Adds information about related [`Track`]s with the provided [`TrackId`]
+    /// and [`MemberId`]s, and creates [`Connection`]s.
     ///
-    /// Returns [`Connection`]s associated with provided [`MemberId`]s.
+    /// Returns [`Connection`]s associated with the provided [`MemberId`]s.
     ///
     /// [`Track`]: medea_client_api_proto::Track
+    #[must_use]
     fn add_connections(
         &self,
         track_id: TrackId,
@@ -219,8 +221,8 @@ impl Connections {
             .collect()
     }
 
-    /// Removes information about [`Track`] with provided [`TrackId`]. Then
-    /// [`Connections`] can decides to delete related [`Connection`].
+    /// Removes information about [`Track`] with the provided [`TrackId`]. Then
+    /// [`Connections`] can decides to delete the related [`Connection`].
     ///
     /// [`Track`]: medea_client_api_proto::Track
     pub fn remove_track(&self, track_id: &TrackId) {
@@ -245,7 +247,7 @@ impl Connections {
         }
     }
 
-    /// Lookups [`Connection`] by the given remote [`MemberId`].
+    /// Lookups a [`Connection`] by the provided remote [`MemberId`].
     pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
         self.connections.borrow().get(remote_member_id).cloned()
     }

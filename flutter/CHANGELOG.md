@@ -11,7 +11,12 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Rename enums variants in lowerCamelCase ([#119]):
+- Renamed all enum variants in `сamelCase` style ([#119]).
+
+### Fixed
+
+- Initial mute state on incoming tracks in [SFU] mode ([#119]).
+- Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
 
 [#119]: /../../pull/119
 
@@ -63,3 +68,4 @@ All user visible changes to this project will be documented in this file. This p
 
 [`medea-jason`]: https://docs.rs/medea-jason
 [Semantic Versioning 2.0.0]: https://semver.org
+[SFU]: https://webrtcglossary.com/sfu
