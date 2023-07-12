@@ -274,12 +274,14 @@ impl From<&State> for proto::state::Sender {
 
 impl State {
     /// Creates new [`State`] with the provided data.
+    #[allow(clippy::too_many_arguments)]
     #[must_use]
     pub fn new(
         id: TrackId,
         mid: Option<String>,
         media_type: MediaType,
         media_direction: MediaDirection,
+        muted: bool,
         receivers: Vec<MemberId>,
         send_constraints: LocalTracksConstraints,
         connection_mode: ConnectionMode,
@@ -301,7 +303,7 @@ impl State {
             ),
             media_direction: Cell::new(media_direction),
             mute_state: MuteStateController::new(mute_state::Stable::from(
-                false,
+                muted,
             )),
             sync_state: ObservableCell::new(SyncState::Synced),
             send_constraints,

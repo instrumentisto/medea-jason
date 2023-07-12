@@ -885,9 +885,9 @@ release.helm: helm.package.release
 
 release.npm:
 ifneq ($(filter $(crate),medea-jason),)
-	@make cargo.build debug=no dockerized=no
+	make cargo.build.jason platform=web debug=no dockerized=no
 ifeq ($(publish),yes)
-	wasm-pack publish $(crate-dir)/
+	wasm-pack publish $(crate-dir)/pkg/
 endif
 endif
 
