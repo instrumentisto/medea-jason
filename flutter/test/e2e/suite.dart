@@ -53,6 +53,7 @@ final testConfigs = FlutterTestConfiguration(
               .create(world.roomId, Room(world.roomId, {}));
           return world;
         }),
+    defaultTimeout: const Duration(seconds: 30),
     reporters: [
       StdoutReporter(MessageLevel.verbose)
         ..setWriteLineFn(print)
