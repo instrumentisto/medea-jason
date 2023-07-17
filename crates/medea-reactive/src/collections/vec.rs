@@ -192,6 +192,7 @@ where
     /// inserted.
     ///
     /// [`Stream`]: futures::Stream
+    #[allow(clippy::needless_collect)] // false positive: lifetimes
     pub fn replay_on_push(&self) -> LocalBoxStream<'static, O> {
         Box::pin(futures::stream::iter(
             self.store
@@ -211,7 +212,7 @@ impl<T, S: SubscribersStore<T, O>, O> Default for Vec<T, S, O> {
             store: std::vec::Vec::new(),
             on_push_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }
@@ -222,7 +223,7 @@ impl<T, S: SubscribersStore<T, O>, O> From<std::vec::Vec<T>> for Vec<T, S, O> {
             store: from,
             on_push_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }

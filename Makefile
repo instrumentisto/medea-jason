@@ -20,9 +20,9 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.70
-CHROME_VERSION := 112.0
-FIREFOX_VERSION := 107.0.1-driver0.32.0
+RUST_VER := 1.71
+CHROME_VERSION := 114.0
+FIREFOX_VERSION := 115.0.2-driver0.33.0
 
 CARGO_NDK_VER := 3.0.0-ndkr25c-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
@@ -447,7 +447,7 @@ endif
 # Lint Rust sources with Clippy.
 #
 # Usage:
-#	make cargo.lint [workspace=yes]
+#	make cargo.lint
 #		[( workspace=yes
 #		 | [workspace=no]
 #		    [( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]

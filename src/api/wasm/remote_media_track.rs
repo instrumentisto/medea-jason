@@ -17,7 +17,6 @@ use crate::{
 #[derive(Clone, Debug, From, Into)]
 pub struct RemoteMediaTrack(remote::Track);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl RemoteMediaTrack {
     /// Returns the underlying [MediaStreamTrack][1].
