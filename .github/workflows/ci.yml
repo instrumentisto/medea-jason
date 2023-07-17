@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: fix-mute-in-sfu  # for E2E tests only
+  MEDEA_BRANCH: master  # for E2E tests only
   PROTOC_VER: 3.x
   RUST_BACKTRACE: 1
 
