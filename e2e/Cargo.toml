@@ -7,6 +7,9 @@ description = "E2E tests for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 publish = false
 
+[features]
+sfu = []
+
 [dependencies]
 async-recursion = "1.0"
 cucumber = { version = "0.19", features = ["libtest"] }

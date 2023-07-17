@@ -141,12 +141,16 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             send_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if cfg!(feature = "sfu") {
+                send_state
+                .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             pipeline.insert(
                 "publish".to_owned(),
                 proto::Endpoint::WebRtcPublishEndpoint(
                     proto::WebRtcPublishEndpoint {
                         id: "publish".to_owned(),
-                        p2p: proto::P2pMode::Always,
+                        p2p: if cfg!(feature = "sfu") {proto::P2pMode::Never} else {proto::P2pMode::Always},
                         force_relay: false,
                         audio_settings: proto::AudioSettings::default(),
                         video_settings: proto::VideoSettings::default(),
@@ -159,6 +163,10 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             recv_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if cfg!(feature = "sfu") {
+                recv_state
+                .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             self.members.values().filter(|m| m.is_send()).for_each(|m| {
                 let endpoint_id = format!("play-{}", m.id());
                 pipeline.insert(
