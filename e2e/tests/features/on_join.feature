@@ -1,5 +1,6 @@
 Feature: `OnJoin` callback of Control API
 
+  @both
   Scenario: `OnJoin` fires when member joins
     Given room with member Alice
     When Alice joins the room

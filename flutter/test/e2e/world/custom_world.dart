@@ -64,8 +64,10 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         });
       }
 
-      pipeline.addAll(
-          {'publish': WebRtcPublishEndpoint('publish', isSfu ? P2pMode.Never :P2pMode.Always)});
+      pipeline.addAll({
+        'publish': WebRtcPublishEndpoint(
+            'publish', isSfu ? P2pMode.Never : P2pMode.Always)
+      });
     }
 
     if (builder.isRecv) {

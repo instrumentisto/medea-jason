@@ -1,10 +1,12 @@
 Feature: State synchronization
 
+  @both
   Scenario: `RoomHandle.on_connection_loss()` fires when WS connection lost
     Given room with joined member Alice with no WebRTC endpoints
     When Alice loses WS connection
     Then Alice's WS connection is lost
 
+  @both
   Scenario: Remote track disable works while disconnect
     Given room with joined member Alice and Bob
     When Alice loses WS connection
@@ -12,6 +14,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's audio remote track from Bob is disabled
 
+  @both
   Scenario: Local track disable works while disconnect
     Given room with joined member Alice and Bob
     When Alice loses WS connection
@@ -19,6 +22,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Bob's audio remote track from Alice is disabled
 
+  @both
   Scenario: Disable/enable works fine while disconnect
     Given room with joined member Alice and Bob
     When Alice loses WS connection
@@ -27,6 +31,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Bob's audio remote track from Alice is enabled
 
+  @both
   Scenario: Audio endpoint added while disconnected
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection
@@ -35,6 +40,7 @@ Feature: State synchronization
     Then Alice has audio remote tracks from Bob
     And Bob has audio remote tracks from Alice
 
+  @both
   Scenario: Video endpoint added while disconnected
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection
@@ -43,6 +49,7 @@ Feature: State synchronization
     Then Alice has video remote tracks from Bob
     And Bob has video remote tracks from Alice
 
+  @both
   Scenario: New endpoint creates new tracks
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection
@@ -51,6 +58,7 @@ Feature: State synchronization
     Then Alice has audio and video remote tracks from Bob
     And Bob has audio and video remote tracks from Alice
 
+  @both
   Scenario: New member joins while disconnected
     Given room with joined member Alice
     And member Bob
@@ -60,6 +68,7 @@ Feature: State synchronization
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
 
+  @mesh
   Scenario: `Connection.on_close()` fires when other member leaves while disconnected
     Given room with joined members Alice and Bob
     When Alice loses WS connection
@@ -67,6 +76,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's connection with Bob closes
 
+  @mesh
   Scenario: `Connection.on_close()` fires when other member is deleted by Control API while disconnected
     Given room with joined members Alice and Bob
     When Alice loses WS connection
@@ -74,6 +84,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's connection with Bob closes
 
+  @mesh
   Scenario: Control API deletes WebRtcPublishEndpoint
     Given room with joined member Alice and Bob
     When Alice loses WS connection
@@ -81,6 +92,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Bob has 2 stopped remote tracks from Alice
 
+  @mesh
   Scenario: Control API deletes WebRtcPlayEndpoint
     Given room with joined member Alice and Bob
     When Alice loses WS connection
@@ -88,6 +100,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice has 2 stopped remote tracks from Bob
 
+  @both
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob
     When Alice loses WS connection
@@ -97,6 +110,7 @@ Feature: State synchronization
     Then Alice's connection with Bob closes
     And Bob's connection with Alice closes
 
+  @both
   Scenario: Create and delete endpoints while disconnected
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection
