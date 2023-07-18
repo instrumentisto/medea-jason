@@ -785,8 +785,8 @@ endif
 		$(if $(call eq,$(sfu),yes),--features sfu,) \
 		--test e2e \
 		$(if $(call eq,$(only),),\
-			-- --tags '$(if $(call eq,$(only-tags),),\
-					   $(p2p-tags),$(only-tags))',\
+			-- --tags $(if $(call eq,$(only-tags),),\
+					   '$(p2p-tags)'','$(only-tags)''),\
 			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
