@@ -767,6 +767,8 @@ test.e2e: test.e2e.browser
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
+p2p-tags = $(if $(call eq,$(sfu),yes),@both or @sfu,@both or @mesh)
+
 test.e2e.browser:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
@@ -784,7 +786,7 @@ endif
 		--test e2e \
 		$(if $(call eq,$(only),),\
 			-- --tags '$(if $(call eq,$(only-tags),),\
-				@both or @$(if $(call eq,$(sfu),yes),sfu,mesh),\$(only-tags)'),\
+					   $(p2p-tags),$(only-tags)),\
 			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
