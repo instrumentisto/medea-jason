@@ -215,13 +215,9 @@ impl<T> Object<TracksStore<T>> {
                 async (store) => {{
                     let count = 0;
                     for (track of store.tracks) {{
-                        if ({live} &&
-                            track.track.media_direction() == 0 &&
-                            !track.stopped) {{
+                        if ({live} && !track.stopped) {{
                             count++;
-                        }} else if (!{live} &&
-                            track.track.media_direction() != 0 &&
-                            track.stopped) {{
+                        }} else if (!{live} && track.stopped) {{
                             count++;
                         }}
                     }}

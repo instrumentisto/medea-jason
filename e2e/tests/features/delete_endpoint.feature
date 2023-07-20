@@ -1,16 +1,34 @@
 Feature: Delete endpoint
 
-  @mesh
   Scenario: Control API deletes WebRtcPublishEndpoint
     Given room with joined member Alice and Bob
     When Control API deletes Alice's publish endpoint
-    Then Bob has 2 stopped remote tracks from Alice
+    Then Bob has <tracks> stopped remote tracks from Alice
 
-  @mesh
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+    
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |
+
   Scenario: Control API deletes WebRtcPlayEndpoint
     Given room with joined member Alice and Bob
     When Control API deletes Alice's play endpoint with Bob
-    Then Alice has 2 stopped remote tracks from Bob
+    Then Alice has <tracks> stopped remote tracks from Bob
+
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+    
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |
 
   @both
   Scenario: Control API deletes all endpoints
@@ -20,14 +38,32 @@ Feature: Delete endpoint
     Then Alice's connection with Bob closes
     And Bob's connection with Alice closes
 
-  @both
   Scenario: Publishing continues when WebRtcPlayEndpoint is deleted
     Given room with joined member Alice and Bob
     When Control API deletes Alice's play endpoint with Bob
-    Then Bob has 2 live remote tracks from Alice
+    Then Bob has <tracks> live remote tracks from Alice
 
-  @both
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+    
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |
+
   Scenario: Publishing continues when partner's WebRtcPublishEndpoint is deleted
     Given room with joined member Alice and Bob
     When Control API deletes Alice's publish endpoint
-    Then Alice has 2 live remote tracks from Bob
+    Then Alice has <tracks> live remote tracks from Bob
+
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+    
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |

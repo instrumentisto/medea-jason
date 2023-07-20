@@ -53,12 +53,21 @@ Feature: Create endpoint
     Then Alice doesn't have remote tracks from Bob
     And Bob has video remote track from Alice
 
-  @both
   Scenario: WebRtcPlayEndpoint removed and recreated
     Given room with joined member Alice and Bob
     When Control API deletes Alice's play endpoint with Bob
     And Control API starts Bob's media publishing to Alice
-    Then Alice has 2 live remote tracks from Bob
+    Then Alice has <tracks> live remote tracks from Bob
+
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+    
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |
 
   @mesh
   Scenario: Endpoints removed and recreated
