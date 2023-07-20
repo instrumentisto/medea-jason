@@ -1,6 +1,6 @@
 Feature: Local tracks are created
 
-  @both
+  @mesh
   Scenario: Local tracks are created when connecting
     Given room with member Alice
     And joined member Bob
