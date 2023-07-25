@@ -136,7 +136,6 @@ impl LocalMediaInitException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
@@ -186,7 +185,6 @@ impl EnumerateDevicesException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl EnumerateDevicesException {
     /// Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
@@ -219,7 +217,6 @@ impl InvalidOutputAudioDeviceIdException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl InvalidOutputAudioDeviceIdException {
     /// Returns stacktrace of this [`InvalidOutputAudioDeviceIdException`].
@@ -248,7 +245,6 @@ impl MicVolumeException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MicVolumeException {
     /// Returns the [`platform::Error`] causing this [`MicVolumeException`].
@@ -322,7 +318,6 @@ impl RpcClientException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
@@ -385,7 +380,6 @@ impl InternalException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl InternalException {
     /// Returns an error message describing the problem.
@@ -422,7 +416,6 @@ impl FormatException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl FormatException {
     /// Returns an error message describing of the problem.
@@ -480,7 +473,6 @@ impl MediaStateTransitionException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MediaStateTransitionException {
     /// Returns an error message describing the problem.
@@ -539,7 +531,6 @@ impl MediaSettingsUpdateException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MediaSettingsUpdateException {
     /// Returns an error message describing the problem.

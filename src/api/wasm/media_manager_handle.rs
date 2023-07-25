@@ -35,7 +35,6 @@ use super::Error;
 #[derive(Debug, From)]
 pub struct MediaManagerHandle(media::MediaManagerHandle);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl MediaManagerHandle {
     /// Returns a list of [`MediaDeviceDetails`] objects representing available

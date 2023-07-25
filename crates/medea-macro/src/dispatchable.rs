@@ -149,8 +149,8 @@ impl Item {
                     &to_handler_fn_name(&v.ident.to_string()),
                     Span::call_site(),
                 );
-                let handler_fn_args = match v.fields {
-                    syn::Fields::Named(ref fields) => {
+                let handler_fn_args = match &v.fields {
+                    syn::Fields::Named(fields) => {
                         let handler_fn_args: Vec<_> = fields
                             .named
                             .iter()
@@ -162,7 +162,7 @@ impl Item {
                             .collect();
                         quote! { #(#handler_fn_args),* }
                     }
-                    syn::Fields::Unnamed(ref fields) => {
+                    syn::Fields::Unnamed(fields) => {
                         let handler_fn_args: Vec<_> = fields
                             .unnamed
                             .iter()

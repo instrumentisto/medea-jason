@@ -190,6 +190,7 @@ where
     /// values and values that will be inserted.
     ///
     /// [`Stream`]: futures::Stream
+    #[allow(clippy::needless_collect)] // false positive: lifetimes
     pub fn replay_on_insert(&self) -> LocalBoxStream<'static, O> {
         Box::pin(futures::stream::iter(
             self.store
@@ -275,7 +276,7 @@ where
             store: std::collections::HashSet::new(),
             on_insert_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }
@@ -313,7 +314,7 @@ where
             store: from,
             on_insert_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }

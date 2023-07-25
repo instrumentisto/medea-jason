@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamconstraints
 
-#![allow(clippy::drop_copy, clippy::new_without_default)]
+#![allow(clippy::new_without_default)]
 
 use derive_more::{From, Into};
 use wasm_bindgen::prelude::*;
@@ -16,7 +16,6 @@ use crate::{api::FacingMode, media};
 #[derive(Clone, Debug, From, Into)]
 pub struct MediaStreamSettings(media::MediaStreamSettings);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl MediaStreamSettings {
     /// Creates new [`MediaStreamSettings`] with none constraints configured.
@@ -51,7 +50,6 @@ impl MediaStreamSettings {
 #[derive(Debug, From, Into)]
 pub struct AudioTrackConstraints(media::AudioTrackConstraints);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl AudioTrackConstraints {
     /// Creates new [`AudioTrackConstraints`] with none constraints configured.
@@ -77,7 +75,6 @@ pub struct DeviceVideoTrackConstraints(media::DeviceVideoTrackConstraints);
 
 /// Constraints applicable to video tracks that are sourced from a screen
 /// capturing.
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl DeviceVideoTrackConstraints {
     /// Creates new [`DeviceVideoTrackConstraints`] with none constraints
@@ -157,7 +154,6 @@ impl DeviceVideoTrackConstraints {
 #[derive(Clone, Debug, From, Into)]
 pub struct DisplayVideoTrackConstraints(media::DisplayVideoTrackConstraints);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl DisplayVideoTrackConstraints {
     /// Creates new [`DisplayVideoTrackConstraints`] with none constraints

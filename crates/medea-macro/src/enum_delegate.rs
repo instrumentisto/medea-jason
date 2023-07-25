@@ -35,7 +35,7 @@ pub(crate) fn derive(
     let enum_name = &inp.ident;
     let enum_name_iter = iter::repeat(enum_name);
 
-    let variants = if let syn::Data::Enum(ref data) = &inp.data {
+    let variants = if let syn::Data::Enum(data) = &inp.data {
         data.variants
             .iter()
             .map(|c| c.ident.clone())
