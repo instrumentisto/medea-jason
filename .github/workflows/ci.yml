@@ -13,8 +13,8 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: fix-mute-in-sfu  # for E2E tests only
-  PROTOC_VER: 3.x
+  MEDEA_BRANCH: edge
+  PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
 jobs:
@@ -86,7 +86,7 @@ jobs:
       - run: make cargo.lint platform=${{ matrix.platform }}
         if: ${{ matrix.platform != 'workspace' }}
 
-      - uses: arduino/setup-protoc@v1
+      - uses: arduino/setup-protoc@v2
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -207,7 +207,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         if: ${{ steps.skip.outputs.no == 'true'
              && env.CACHE == 'true' }}
-      - uses: arduino/setup-protoc@v1
+      - uses: arduino/setup-protoc@v2
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -253,7 +253,7 @@ jobs:
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
-      - uses: arduino/setup-protoc@v1
+      - uses: arduino/setup-protoc@v2
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
