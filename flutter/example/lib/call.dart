@@ -115,27 +115,20 @@ class Call {
       }
     });
 
-    try {
-      var get = await client.get(roomId);
-      if (get.body == '{}') {
-        await _room.join(await createRoom(
-            roomId, memberId, isPublish, publishVideo, publishAudio));
-        return;
-      }
-    } catch (e) {
-      print(e);
+    var getRoom = await client.get(roomId);
+    if (getRoom.body == '{}') {
+      await _room.join(await createRoom(
+          roomId, memberId, isPublish, publishVideo, publishAudio));
+      return;
     }
 
-    try {
-      var get = await client.get('$roomId/$memberId');
-      if (get.body == '{}') {
-        await _room.join(await createMember(
-            roomId, memberId, isPublish, publishVideo, publishAudio));
-        return;
-      }
-    } catch (e) {
-      print(e);
+    var getMember = await client.get('$roomId/$memberId');
+    if (getMember.body == '{}') {
+      await _room.join(await createMember(
+          roomId, memberId, isPublish, publishVideo, publishAudio));
+      return;
     }
+
     try {
       await _room.join('$baseUrl$roomId/$memberId?token=test');
     } catch (e) {
