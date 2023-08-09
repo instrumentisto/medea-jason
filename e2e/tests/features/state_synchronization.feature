@@ -68,7 +68,7 @@ Feature: State synchronization
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
 
-  @mesh
+  @both
   Scenario: `Connection.on_close()` fires when other member leaves while disconnected
     Given room with joined members Alice and Bob
     When Alice loses WS connection
@@ -76,7 +76,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's connection with Bob closes
 
-  @mesh
+  @both
   Scenario: `Connection.on_close()` fires when other member is deleted by Control API while disconnected
     Given room with joined members Alice and Bob
     When Alice loses WS connection
@@ -95,7 +95,7 @@ Feature: State synchronization
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |
@@ -112,7 +112,7 @@ Feature: State synchronization
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |

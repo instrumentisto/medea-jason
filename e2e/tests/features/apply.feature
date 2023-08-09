@@ -5,7 +5,7 @@ Feature: Apply method of Control API
     Given room with joined member Alice and Bob
     When Control API removes Alice with `Apply` method
     Then Bob's connection with Alice closes
-  
+
   @both
   Scenario: Interconnect members with `Apply` method
     Given room with joined member Alice and Bob with no WebRTC endpoints
