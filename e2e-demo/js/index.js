@@ -620,6 +620,45 @@ window.onload = async function() {
         memberVideoDiv.style = 'margin: 10px';
         remoteVideos.appendChild(memberVideoDiv);
         remote_videos[remoteMemberId] = memberVideoDiv;
+        
+        let recvDeviceVideo = true;
+        let buttonDeviceVideoToggleElement = document.createElement('button');
+        buttonDeviceVideoToggleElement.innerHTML = "Toggle device video recv";
+        buttonDeviceVideoToggleElement.onclick = function () {
+          recvDeviceVideo = !recvDeviceVideo;
+          if (recvDeviceVideo) {
+            connection.enable_remote_video(0);
+          } else {
+            connection.disable_remote_video(0);
+          }
+        };
+        memberVideoDiv.appendChild(buttonDeviceVideoToggleElement);
+
+        let recvDisplayVideo = true;
+        let buttonDisplayVideoToggleElement = document.createElement('button');
+        buttonDisplayVideoToggleElement.innerHTML = "Toggle display video recv";
+        buttonDisplayVideoToggleElement.onclick = function () {
+          recvDisplayVideo = !recvDisplayVideo;
+          if (recvDisplayVideo) {
+            connection.enable_remote_video(1);
+          } else {
+            connection.disable_remote_video(1);
+          }
+        };
+        memberVideoDiv.appendChild(buttonDisplayVideoToggleElement);
+
+        let recvAudio = true;
+        let buttonAudioToggleElement = document.createElement('button');
+        buttonAudioToggleElement.innerHTML = "Toggle audio recv";
+        buttonAudioToggleElement.onclick = function () {
+          recvAudio = !recvAudio;
+          if (recvAudio) {
+            connection.enable_remote_audio();
+          } else {
+            connection.disable_remote_audio();
+          }
+        };
+        memberVideoDiv.appendChild(buttonAudioToggleElement);
       }
 
       let memberIdEl = document.createElement('span');
