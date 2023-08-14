@@ -256,17 +256,15 @@ impl Connections {
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
     pub fn apply(&self, new_state: &proto::state::Room) {
-        for (peer_id, peer) in &new_state.peers {
-            for (track_id, sender) in peer.senders.iter() {
-                if let Some(partners) =
-                    self.tracks.borrow().get(track_id)
-                {
+        for peer in new_state.peers.values() {
+            for (track_id, sender) in &peer.senders {
+                if let Some(partners) = self.tracks.borrow().get(track_id) {
                     for member in partners {
-                        if let Some(mut member_tracks) =
+                        if let Some(member_tracks) =
                             self.members_to_tracks.borrow_mut().get_mut(member)
                         {
                             if !sender.receivers.contains(member) {
-                                member_tracks.remove(track_id);
+                                _ = member_tracks.remove(track_id);
                             }
                         }
                     }
