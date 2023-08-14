@@ -9,14 +9,14 @@ Feature: Local tracks are created
     And Alice has local device video
     And Alice has local audio
 
-  @mesh
+  @both
   Scenario: Local tracks are not created when all media is disabled
     Given room with member Alice with disabled media publishing
     And joined member Bob
     When Alice joins the room
     Then Alice has 0 local tracks
 
-  @mesh
+  @both
   Scenario: Local video track is created when member enables video
     Given room with joined member Alice with disabled media publishing
     And joined member Bob
@@ -24,7 +24,7 @@ Feature: Local tracks are created
     Then Alice has 1 local tracks
     And Alice has local device video
 
-  @mesh
+  @both
   Scenario: Local audio track is created when member enables audio
     Given room with joined member Alice with disabled media publishing
     And joined member Bob
