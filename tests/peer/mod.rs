@@ -900,7 +900,7 @@ async fn get_traffic_stats() {
     assert_eq!(first_peer_video_outbound_stats_count, 1);
     assert_eq!(first_peer_audio_outbound_stats_count, 1);
     assert_eq!(firs_peer_succeeded_pairs_count, 1);
-    
+
     delay_for(100).await;
 
     let second_peer_stats = peers.second_peer.get_stats().await.unwrap();
