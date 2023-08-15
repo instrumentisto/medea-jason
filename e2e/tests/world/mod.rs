@@ -132,7 +132,7 @@ impl World {
         &mut self,
         builder: MemberBuilder,
     ) -> Result<()> {
-        let is_sfu = cfg!(feature = "sfu");
+        let is_sfu = std::env::var("SFU").is_ok();
 
         let mut pipeline = HashMap::new();
         let mut send_state = HashMap::new();
