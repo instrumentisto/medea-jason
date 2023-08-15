@@ -46,7 +46,7 @@ Feature: Create endpoint
     Then Alice doesn't have remote tracks from Bob
     And Bob has video remote track from Alice
 
-  Scenario Outline:: WebRtcPlayEndpoint removed and recreated
+  Scenario Outline: WebRtcPlayEndpoint removed and recreated
     Given room with joined member Alice and Bob
     When Control API deletes Alice's play endpoint with Bob
     And Control API starts Bob's media publishing to Alice
@@ -56,7 +56,7 @@ Feature: Create endpoint
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |

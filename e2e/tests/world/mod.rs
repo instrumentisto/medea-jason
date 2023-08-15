@@ -4,7 +4,7 @@
 
 pub mod member;
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{collections::HashMap, fmt, time::Duration, env};
 
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
@@ -16,6 +16,7 @@ use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
     object::{self, Jason, MediaKind, MediaSourceKind, Object},
 };
+use once_cell::sync::Lazy;
 use tokio::time::interval;
 use uuid::Uuid;
 
@@ -132,7 +133,7 @@ impl World {
         &mut self,
         builder: MemberBuilder,
     ) -> Result<()> {
-        let is_sfu = std::env::var("SFU").is_ok();
+        let is_sfu = env::var("SFU").is_ok();
 
         let mut pipeline = HashMap::new();
         let mut send_state = HashMap::new();
