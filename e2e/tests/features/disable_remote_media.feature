@@ -1,70 +1,59 @@
 Feature: Remote media disabling
 
-  @both
   Scenario: Remote video track stops when disabled
     Given room with joined members Alice and Bob
     When Alice disables remote video
     Then Alice's remote device video track from Bob disables
 
-  @both
   Scenario: Remote audio track stops when disabled
     Given room with joined members Alice and Bob
     When Alice disables remote audio
     Then Alice's remote audio track from Bob disables
 
-  @both
   Scenario: `RemoteTrack.on_disabled()` fires when audio is disabled
     Given room with joined members Alice and Bob
     When Alice disables remote audio
     Then `on_disabled` callback fires 1 time on Alice's remote audio track from Bob
 
-  @both
   Scenario: `RemoteTrack.on_disabled()` fires when video is disabled
     Given room with joined members Alice and Bob
     When Alice disables remote video
     Then `on_disabled` callback fires 1 time on Alice's remote device video track from Bob
 
-  @both
   Scenario: Remote member disables video
     Given room with joined members Alice and Bob
     When Bob disables video and awaits it completes
     Then `on_disabled` callback fires 1 time on Alice's remote device video track from Bob
 
-  @both
   Scenario: Remote member disables audio
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
     Then `on_disabled` callback fires 1 time on Alice's remote audio track from Bob
 
-  @both
   Scenario: Member disables audio receiving from concrete `Connection`
     Given room with joined members Alice and Bob and Carol
     When Alice disables audio receiving from Bob
     Then Alice's remote audio track from Bob disables
     And Alice's audio remote track from Carol is enabled
 
-  @both
   Scenario: Member disables video receiving from concrete `Connection`
     Given room with joined members Alice and Bob and Carol
     When Alice disables video receiving from Bob
     Then Alice's remote device video track from Bob disables
     And Alice's device video remote track from Carol is enabled
 
-  @both
   Scenario: Member enables video receiving from concrete `Connection`
     Given room with joined members Alice and Bob
     When Alice disables video receiving from Bob
     And Alice enables video receiving from Bob
     Then Alice's device video remote track from Bob is enabled
 
-  @both
   Scenario: Member enables audio receiving from concrete `Connection`
     Given room with joined members Alice and Bob
     When Alice disables audio receiving from Bob
     And Alice enables audio receiving from Bob
     Then Alice's audio remote track from Bob is enabled
 
-  @both
   Scenario: Member disables remote audio via `Room` and enables concrete `Connection`'s remote audio
     Given room with joined members Alice and Bob and Carol
     When Alice disables remote audio
@@ -72,7 +61,6 @@ Feature: Remote media disabling
     Then Alice's audio remote track from Bob is enabled
     And Alice's audio remote track from Carol is disabled
 
-  @both
   Scenario: Member disables remote video via `Room` and enables concrete `Connection`'s remote video
     Given room with joined members Alice and Bob and Carol
     When Alice disables remote video
@@ -80,7 +68,6 @@ Feature: Remote media disabling
     Then Alice's device video remote track from Bob is enabled
     And Alice's device video remote track from Carol is disabled
 
-  @both
   Scenario: Member disables remote video from `Connection` and enables remote video via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables video receiving from Bob
@@ -88,7 +75,6 @@ Feature: Remote media disabling
     Then Alice's device video remote track from Bob is enabled
     Then Alice's device video remote track from Carol is enabled
 
-  @both
   Scenario: Member disables remote audio from `Connection` and enables remote audio via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables audio receiving from Bob
@@ -96,7 +82,6 @@ Feature: Remote media disabling
     Then Alice's audio remote track from Bob is enabled
     Then Alice's audio remote track from Carol is enabled
 
-  @both
   Scenario: Member disables all `Connection`s audio receiving and enables it via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables audio receiving from Bob
@@ -105,7 +90,6 @@ Feature: Remote media disabling
     Then Alice's audio remote track from Bob is enabled
     Then Alice's audio remote track from Carol is enabled
 
-  @both
   Scenario: Member disables all `Connection`s video receiving and enables it via `Room`
     Given room with joined members Alice and Bob and Carol
     When Alice disables video receiving from Bob
@@ -114,7 +98,6 @@ Feature: Remote media disabling
     Then Alice's device video remote track from Bob is enabled
     Then Alice's device video remote track from Carol is enabled
 
-  @both
   Scenario: Member disables remote video via `Room` and enables all `Connection`s remote videos
     Given room with joined members Alice and Bob and Carol
     When Alice disables remote video
@@ -123,7 +106,6 @@ Feature: Remote media disabling
     Then Alice's device video remote track from Bob is enabled
     And Alice's device video remote track from Carol is enabled
 
-  @both
   Scenario: Member disables remote audio via `Room` and enables all `Connection`s remote audios
     Given room with joined members Alice and Bob and Carol
     When Alice disables remote audio

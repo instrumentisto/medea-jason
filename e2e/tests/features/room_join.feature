@@ -1,6 +1,5 @@
 Feature: Room joining
 
-  @both
   Scenario: Member joined
     Given room with joined member Alice
     And member Bob
@@ -8,7 +7,6 @@ Feature: Room joining
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
 
-  @both
   Scenario: Member joined with disabled media
     Given room with member Alice with disabled media publishing
     And joined member Bob
@@ -16,7 +14,6 @@ Feature: Room joining
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
 
-  @both
   Scenario: Member without endpoints joined
     Given room with member Alice with no WebRTC endpoints
     And joined member Bob with no WebRTC endpoints
@@ -24,7 +21,6 @@ Feature: Room joining
     Then Alice doesn't receive connection with Bob
     And Bob doesn't receive connection with Alice
 
-  @both
   Scenario: Third member joined
     Given room with joined members Alice and Bob
     And member Carol

@@ -1,6 +1,5 @@
 Feature: Local tracks are created
 
-  @both
   Scenario: Local tracks are created when connecting
     Given room with member Alice
     And joined member Bob

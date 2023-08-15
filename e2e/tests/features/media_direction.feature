@@ -1,6 +1,5 @@
 Feature: Media direction
 
-  @both
   Scenario: Media direction is `SendRecv` before any media updates
     Given room with joined members Alice and Bob
     Then Alice's video from Bob has `SendRecv` direction
@@ -8,59 +7,50 @@ Feature: Media direction
     And Bob's video from Alice has `SendRecv` direction
     And Bob's audio from Alice has `SendRecv` direction
 
-  @both
   Scenario: Media direction is `RecvOnly` when audio sending is disabled
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
     Then Alice's audio from Bob has `RecvOnly` direction
 
-  @both
   Scenario: Media direction is `RecvOnly` when video sending is disabled
     Given room with joined members Alice and Bob
     When Bob disables video and awaits it completes
     Then Alice's video from Bob has `RecvOnly` direction
 
-  @both
   Scenario: Media direction is `SendOnly` when audio receiving is disabled
     Given room with joined members Alice and Bob
     When Alice disables remote audio
     Then Alice's audio from Bob has `SendOnly` direction
 
-  @both
   Scenario: Media direction is `SendOnly` when video receiving is disabled
     Given room with joined members Alice and Bob
     When Alice disables remote video
     Then Alice's video from Bob has `SendOnly` direction
 
-  @both
   Scenario: Media direction is `Inactive` when audio receiving and sending is disabled
     Given room with joined members Alice and Bob
     When Alice disables remote audio
     And Bob disables audio and awaits it completes
     Then Alice's audio from Bob has `Inactive` direction
 
-  @both
   Scenario: Media direction is `Inactive` when video receiving and sending is disabled
     Given room with joined members Alice and Bob
     When Alice disables remote video
     And Bob disables video and awaits it completes
     Then Alice's video from Bob has `Inactive` direction
 
-  @both
   Scenario: Media direction is `SendRecv` when audio receiving is enabled after disabling
     Given room with joined members Alice and Bob
     When Alice disables remote audio
     And Alice enables remote audio
     Then Alice's audio from Bob has `SendRecv` direction
 
-  @both
   Scenario: Media direction is `SendRecv` when video sending is enabled after disabling
     Given room with joined members Alice and Bob
     When Bob disables video and awaits it completes
     And Bob enables video and awaits it completes
     Then Alice's video from Bob has `SendRecv` direction
 
-  @both
   Scenario: Media direction is `SendRecv` when audio receiving and sending is enabled after disabling
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
@@ -69,7 +59,6 @@ Feature: Media direction
     And Alice enables remote audio
     Then Alice's audio from Bob has `SendRecv` direction
 
-  @both
   Scenario: Media direction is `SendRecv` when video receiving and sending is enabled after disabling
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
@@ -78,7 +67,6 @@ Feature: Media direction
     And Alice enables remote audio
     Then Alice's audio from Bob has `SendRecv` direction
 
-  @both
   Scenario: Test all directions for audio track
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
@@ -90,7 +78,6 @@ Feature: Media direction
     When Alice enables remote audio
     Then Alice's audio from Bob has `SendRecv` direction
 
-  @both
   Scenario: Test all directions for video track
     Given room with joined members Alice and Bob
     When Bob disables video and awaits it completes
