@@ -16,7 +16,6 @@ use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
     object::{self, Jason, MediaKind, MediaSourceKind, Object},
 };
-use once_cell::sync::Lazy;
 use tokio::time::interval;
 use uuid::Uuid;
 

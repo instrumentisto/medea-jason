@@ -782,8 +782,7 @@ endif
 	@make wait.port port=4444
 endif
 	$(if $(call eq,$(sfu),yes),SFU=true,) \
-	cargo test -p medea-e2e \
-		--test e2e \
+	cargo test -p medea-e2e --test e2e \
 		$(if $(call eq,$(only),),\
 			-- --tags $(if $(call eq,$(only-tags),),\
 			          '$(test-e2e-tags)','$(only-tags)'),\
@@ -797,7 +796,7 @@ endif
 #
 # Usage:
 #	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
-# 		[sfu=(no|yes)]
+#		[sfu=(no|yes)]
 #		[device=<device-id>]
 #		[server=<server-ip>]
 #		[( [up=no]
