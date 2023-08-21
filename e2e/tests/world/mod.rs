@@ -4,7 +4,7 @@
 
 pub mod member;
 
-use std::{collections::HashMap, fmt, time::Duration, env};
+use std::{collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
