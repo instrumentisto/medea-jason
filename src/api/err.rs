@@ -773,7 +773,8 @@ impl From<Traced<room::ChangeMediaStateError>> for Error {
             room::ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
                 Traced::compose(err, trace).into()
             }
-            room::ChangeMediaStateError::ProhibitedState(_) => {
+            room::ChangeMediaStateError::InvalidLocalTracks(_)
+            | room::ChangeMediaStateError::ProhibitedState(_) => {
                 MediaStateTransitionException::new(
                     message,
                     trace,
@@ -789,8 +790,7 @@ impl From<Traced<room::ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            room::ChangeMediaStateError::InvalidLocalTracks(_)
-            | room::ChangeMediaStateError::InsertLocalTracksError(_) => {
+            room::ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
             }
         }
@@ -828,12 +828,19 @@ impl From<Traced<LocalMediaError>> for Error {
                 UE::CouldNotGetLocalMedia(err) => {
                     Traced::compose(err, trace).into()
                 }
-                UE::InvalidLocalTracks(_)
-                | UE::InsertLocalTracksError(
+                UE::InsertLocalTracksError(
                     IE::InvalidMediaTrack | IE::NotEnoughTracks,
                 ) => InternalException::new(message, None, trace).into(),
                 UE::InsertLocalTracksError(IE::CouldNotInsertLocalTrack(_)) => {
                     InternalException::new(message, None, trace).into()
+                }
+                UE::InvalidLocalTracks(_) => {
+                    MediaStateTransitionException::new(
+                        message,
+                        trace,
+                        MediaStateTransitionExceptionKind::ProhibitedState,
+                    )
+                    .into()
                 }
             },
             ME::SenderCreateError(CreateError::TransceiverNotFound(_)) => {

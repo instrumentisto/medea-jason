@@ -758,6 +758,7 @@ test.e2e: test.e2e.browser
 #
 # Usage:
 #	make test.e2e.browser [(only=<regex>|only-tags=<tag-expression>)]
+#		[sfu=(no|yes)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -765,6 +766,8 @@ test.e2e: test.e2e.browser
 #		          [debug=(yes|no)]
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
+
+test-e2e-tags = $(if $(call eq,$(sfu),yes),not @mesh,not @sfu)
 
 test.e2e.browser:
 ifeq ($(up),yes)
@@ -778,9 +781,11 @@ endif
 	                    rebuild=yes
 	@make wait.port port=4444
 endif
+	$(if $(call eq,$(sfu),yes),SFU=true,) \
 	cargo test -p medea-e2e --test e2e \
 		$(if $(call eq,$(only),),\
-			$(if $(call eq,$(only-tags),),,-- --tags '$(only-tags)'),\
+			-- --tags $(if $(call eq,$(only-tags),),\
+			          '$(test-e2e-tags)','$(only-tags)'),\
 			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
@@ -791,7 +796,8 @@ endif
 #
 # Usage:
 #	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
-# 		[device=<device-id>]
+#		[sfu=(no|yes)]
+#		[device=<device-id>]
 #		[server=<server-ip>]
 #		[( [up=no]
 #		 | up=yes [( [dockerized=no]
@@ -818,6 +824,7 @@ endif
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \
+		$(if $(call eq,$(sfu),yes),--dart-define=SFU=true,) \
 		$(if $(call eq,$(server),),,--dart-define=IP_TEST_BASE=$(server)) \
 		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)

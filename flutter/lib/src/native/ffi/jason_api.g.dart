@@ -3838,7 +3838,8 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   late final _wire_media_manager_handle_microphone_volume_is_availablePtr =
       _lookup<
-              ffi.NativeFunction<
+              ffi
+              .NativeFunction<
                   WireSyncReturn Function(wire_MediaManagerHandle)>>(
           'wire_media_manager_handle_microphone_volume_is_available');
   late final _wire_media_manager_handle_microphone_volume_is_available =
@@ -4535,9 +4536,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _new_box_autoadd_api_constrain_facing_mode_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiConstrainFacingMode>
-              Function()>>('new_box_autoadd_api_constrain_facing_mode_0');
+          ffi
+          .NativeFunction<ffi.Pointer<wire_ApiConstrainFacingMode> Function()>>(
+      'new_box_autoadd_api_constrain_facing_mode_0');
   late final _new_box_autoadd_api_constrain_facing_mode_0 =
       _new_box_autoadd_api_constrain_facing_mode_0Ptr
           .asFunction<ffi.Pointer<wire_ApiConstrainFacingMode> Function()>();
@@ -4576,9 +4577,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _new_box_autoadd_api_media_stream_settings_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_ApiMediaStreamSettings>
-              Function()>>('new_box_autoadd_api_media_stream_settings_0');
+          ffi
+          .NativeFunction<ffi.Pointer<wire_ApiMediaStreamSettings> Function()>>(
+      'new_box_autoadd_api_media_stream_settings_0');
   late final _new_box_autoadd_api_media_stream_settings_0 =
       _new_box_autoadd_api_media_stream_settings_0Ptr
           .asFunction<ffi.Pointer<wire_ApiMediaStreamSettings> Function()>();
@@ -4632,9 +4633,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _new_uint_8_list_0Ptr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<wire_uint_8_list> Function(
-              ffi.Int32)>>('new_uint_8_list_0');
+          ffi
+          .NativeFunction<ffi.Pointer<wire_uint_8_list> Function(ffi.Int32)>>(
+      'new_uint_8_list_0');
   late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
       .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
 
@@ -4849,9 +4850,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _inflate_ApiConstrainFacingMode_ExactPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ApiConstrainFacingModeKind>
-              Function()>>('inflate_ApiConstrainFacingMode_Exact');
+          ffi
+          .NativeFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>>(
+      'inflate_ApiConstrainFacingMode_Exact');
   late final _inflate_ApiConstrainFacingMode_Exact =
       _inflate_ApiConstrainFacingMode_ExactPtr
           .asFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>();
@@ -4862,9 +4863,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _inflate_ApiConstrainFacingMode_IdealPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ApiConstrainFacingModeKind>
-              Function()>>('inflate_ApiConstrainFacingMode_Ideal');
+          ffi
+          .NativeFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>>(
+      'inflate_ApiConstrainFacingMode_Ideal');
   late final _inflate_ApiConstrainFacingMode_Ideal =
       _inflate_ApiConstrainFacingMode_IdealPtr
           .asFunction<ffi.Pointer<ApiConstrainFacingModeKind> Function()>();
@@ -4988,9 +4989,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _set_video_constraint_valuePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Handle, ffi.Int64, DartValue)>>('set_video_constraint_value');
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Handle, ffi.Int64, DartValue)>>(
+      'set_video_constraint_value');
   late final _set_video_constraint_value = _set_video_constraint_valuePtr
       .asFunction<void Function(Object, int, DartValue)>();
 
@@ -5007,9 +5008,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _set_audio_constraint_valuePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Handle, ffi.Int64, DartValue)>>('set_audio_constraint_value');
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Handle, ffi.Int64, DartValue)>>(
+      'set_audio_constraint_value');
   late final _set_audio_constraint_value = _set_audio_constraint_valuePtr
       .asFunction<void Function(Object, int, DartValue)>();
 
@@ -5988,9 +5989,9 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   }
 
   late final _Callback__callPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Int>, DartValue)>>('Callback__call');
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Int>, DartValue)>>(
+      'Callback__call');
   late final _Callback__call = _Callback__callPtr.asFunction<
       void Function(ffi.Pointer<ffi.Int>, DartValue)>();
 
