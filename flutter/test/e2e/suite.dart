@@ -54,6 +54,7 @@ final testConfigs = FlutterTestConfiguration(
           return world;
         }),
     defaultTimeout: const Duration(seconds: 30),
+    tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
     reporters: [
       StdoutReporter(MessageLevel.verbose)
         ..setWriteLineFn(print)

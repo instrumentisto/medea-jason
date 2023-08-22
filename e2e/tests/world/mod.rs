@@ -4,7 +4,7 @@
 
 pub mod member;
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
@@ -132,6 +132,8 @@ impl World {
         &mut self,
         builder: MemberBuilder,
     ) -> Result<()> {
+        let is_sfu = env::var("SFU").is_ok();
+
         let mut pipeline = HashMap::new();
         let mut send_state = HashMap::new();
         let mut recv_state = HashMap::new();
@@ -141,12 +143,20 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             send_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if is_sfu {
+                send_state
+                    .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             pipeline.insert(
                 "publish".to_owned(),
                 proto::Endpoint::WebRtcPublishEndpoint(
                     proto::WebRtcPublishEndpoint {
                         id: "publish".to_owned(),
-                        p2p: proto::P2pMode::Always,
+                        p2p: if is_sfu {
+                            proto::P2pMode::Never
+                        } else {
+                            proto::P2pMode::Always
+                        },
                         force_relay: false,
                         audio_settings: proto::AudioSettings::default(),
                         video_settings: proto::VideoSettings::default(),
@@ -159,6 +169,10 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             recv_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if is_sfu {
+                recv_state
+                    .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             self.members.values().filter(|m| m.is_send()).for_each(|m| {
                 let endpoint_id = format!("play-{}", m.id());
                 pipeline.insert(

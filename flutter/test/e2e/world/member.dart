@@ -83,11 +83,16 @@ class ConnectionStore {
   /// Returns count of tracks from `remote_id` by the provided `live` values.
   int countTracksByLived(bool live, String remoteId) {
     var count = 0;
-    remoteTracks[remoteId]!.forEach((key, value) {
+    remoteTracks[remoteId]!.forEach((key, track) {
       var trackStopped = remoteTrackIsStopped(remoteId, key);
-      if (live && !value.last.muted() && !trackStopped) {
+      if (live &&
+          !track.last.muted() &&
+          track.last.mediaDirection() == TrackMediaDirection.sendRecv &&
+          !trackStopped) {
         count += 1;
-      } else if (!live && trackStopped) {
+      } else if (!live &&
+          track.last.mediaDirection() != TrackMediaDirection.sendRecv &&
+          trackStopped) {
         count += 1;
       }
     });

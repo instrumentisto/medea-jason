@@ -60,6 +60,7 @@ Feature: State synchronization
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
 
+  @mesh
   Scenario: `Connection.on_close()` fires when other member leaves while disconnected
     Given room with joined members Alice and Bob
     When Alice loses WS connection
@@ -67,6 +68,7 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's connection with Bob closes
 
+  @mesh
   Scenario: `Connection.on_close()` fires when other member is deleted by Control API while disconnected
     Given room with joined members Alice and Bob
     When Alice loses WS connection
@@ -74,19 +76,39 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Alice's connection with Bob closes
 
-  Scenario: Control API deletes WebRtcPublishEndpoint
+  Scenario Outline: Control API deletes WebRtcPublishEndpoint
     Given room with joined member Alice and Bob
     When Alice loses WS connection
     And Control API deletes Alice's publish endpoint
     And Alice restores WS connection
-    Then Bob has 2 stopped remote tracks from Alice
+    Then Bob has <tracks> stopped remote tracks from Alice
 
-  Scenario: Control API deletes WebRtcPlayEndpoint
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |
+
+  Scenario Outline: Control API deletes WebRtcPlayEndpoint
     Given room with joined member Alice and Bob
     When Alice loses WS connection
     And Control API deletes Alice's play endpoint with Bob
     And Alice restores WS connection
-    Then Alice has 2 stopped remote tracks from Bob
+    Then Alice has <tracks> stopped remote tracks from Bob
+
+    @mesh
+    Examples:
+      | tracks |
+      | 2      |
+
+    @sfu
+    Examples:
+      | tracks |
+      | 3      |
 
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob

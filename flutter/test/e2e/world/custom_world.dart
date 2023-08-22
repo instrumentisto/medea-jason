@@ -16,6 +16,8 @@ import '../conf.dart';
 import '../control.dart';
 import 'member.dart';
 
+const bool isSfu = bool.fromEnvironment('SFU', defaultValue: false);
+
 /// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
   /// ID of the [Room] created for this [FlutterWidgetTesterWorld].
@@ -55,9 +57,17 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         const Tuple2<MediaKind, MediaSourceKind>(
             MediaKind.video, MediaSourceKind.device): true
       });
+      if (isSfu) {
+        sendState.addAll({
+          const Tuple2<MediaKind, MediaSourceKind>(
+              MediaKind.video, MediaSourceKind.display): true
+        });
+      }
 
-      pipeline.addAll(
-          {'publish': WebRtcPublishEndpoint('publish', P2pMode.Always)});
+      pipeline.addAll({
+        'publish': WebRtcPublishEndpoint(
+            'publish', isSfu ? P2pMode.Never : P2pMode.Always)
+      });
     }
 
     if (builder.isRecv) {
@@ -69,6 +79,13 @@ class CustomWorld extends FlutterWidgetTesterWorld {
         const Tuple2<MediaKind, MediaSourceKind>(
             MediaKind.video, MediaSourceKind.device): true
       });
+
+      if (isSfu) {
+        recvState.addAll({
+          const Tuple2<MediaKind, MediaSourceKind>(
+              MediaKind.video, MediaSourceKind.display): true
+        });
+      }
 
       members.forEach((key, value) {
         if (value.isSend) {

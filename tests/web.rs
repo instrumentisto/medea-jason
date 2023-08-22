@@ -1,7 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 #![forbid(non_ascii_idents)]
 
-use js_sys::Reflect;
+use js_sys::{Object, Reflect};
 
 /// Analog for [`assert_eq`] but for [`js_callback`] macro.
 /// Simply use it as [`assert_eq`]. For use cases and reasons
@@ -143,11 +143,28 @@ extern "C" {
 
 /// Performs a unchecked conversion from a [`JsValue`] into an instance of the
 /// specified `FromWasmAbi<Abi = u32>` implementor.
-pub fn unchecked_jsval_cast<T: FromWasmAbi<Abi = u32>>(val: JsValue) -> T {
-    let ptr = Reflect::get(&val, &JsValue::from_str("__wbg_ptr")).unwrap();
+pub fn jsval_cast<T: FromWasmAbi<Abi = u32>>(
+    val: JsValue,
+    t: &str,
+) -> Result<T, String> {
+    if !val.is_object() {
+        return Err(String::from(
+            "`unchecked_jsval_cast` is only applicable to objects",
+        ));
+    }
+
+    let obj: Object = Object::from(val);
+    let class_name = obj.constructor().name();
+    if class_name != t {
+        return Err(format!(
+            "type check failed, expected {t}, but got {class_name}",
+        ));
+    }
+
+    let ptr = Reflect::get(&obj, &JsValue::from_str("__wbg_ptr")).unwrap();
     let ptr = ptr.as_f64().unwrap() as u32;
 
-    unsafe { T::from_abi(ptr) }
+    Ok(unsafe { T::from_abi(ptr) })
 }
 
 pub fn get_test_required_tracks() -> (Track, Track) {
