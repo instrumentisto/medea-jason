@@ -115,24 +115,20 @@ class Call {
       }
     });
 
-    try {
-      await client.get(roomId);
-    } catch (e) {
-      if (e.toString().contains('Room not found.')) {
-        await _room.join(await createRoom(
-            roomId, memberId, isPublish, publishVideo, publishAudio));
-        return;
-      } else {
-        rethrow;
-      }
+    var getRoom = await client.get(roomId);
+    if (getRoom.body == '{}') {
+      await _room.join(await createRoom(
+          roomId, memberId, isPublish, publishVideo, publishAudio));
+      return;
     }
-    try {
-      await client.get('$roomId/$memberId');
-    } catch (e) {
+
+    var getMember = await client.get('$roomId/$memberId');
+    if (getMember.body == '{}') {
       await _room.join(await createMember(
           roomId, memberId, isPublish, publishVideo, publishAudio));
       return;
     }
+
     try {
       await _room.join('$baseUrl$roomId/$memberId?token=test');
     } catch (e) {
@@ -187,13 +183,14 @@ class Call {
   }
 
   /// Sets the callback for a new video remote track.
-  void onNewRemoteStream(Function(RemoteMediaTrack, String) f) {
+  void onNewRemoteStream(
+      Function(RemoteMediaTrack, String, ConnectionHandle) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
         if (track.kind() == MediaKind.audio && !kIsWeb) {
           return;
         }
-        f(track, conn.getRemoteMemberId());
+        f(track, conn.getRemoteMemberId(), conn);
       });
     });
   }

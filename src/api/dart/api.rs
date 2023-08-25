@@ -5,11 +5,12 @@
 
 #![allow(
     clippy::as_conversions,
+    clippy::doc_markdown, // TODO: From generated code in #[frb].
     clippy::missing_panics_doc,
+    clippy::needless_pass_by_value,
     clippy::undocumented_unsafe_blocks,
     clippy::unwrap_used,
-    clippy::needless_pass_by_value,
-    non_snake_case
+    non_snake_case,
 )]
 
 use std::{

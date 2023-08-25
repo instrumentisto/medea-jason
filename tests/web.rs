@@ -149,7 +149,7 @@ pub fn jsval_cast<T: FromWasmAbi<Abi = u32>>(
 ) -> Result<T, String> {
     if !val.is_object() {
         return Err(String::from(
-            "unchecked_jsval_cast is only applicable to Objects",
+            "`unchecked_jsval_cast` is only applicable to objects",
         ));
     }
 
@@ -157,8 +157,7 @@ pub fn jsval_cast<T: FromWasmAbi<Abi = u32>>(
     let class_name = obj.constructor().name();
     if class_name != t {
         return Err(format!(
-            "type check failed, expected {}, but got {}",
-            t, class_name
+            "type check failed, expected {t}, but got {class_name}",
         ));
     }
 

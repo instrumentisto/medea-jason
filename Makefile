@@ -758,7 +758,7 @@ test.e2e: test.e2e.browser
 #
 # Usage:
 #	make test.e2e.browser [(only=<regex>|only-tags=<tag-expression>)]
-#		[sfu=(no=yes)]
+#		[sfu=(no|yes)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -767,7 +767,7 @@ test.e2e: test.e2e.browser
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-p2p-tags = $(if $(call eq,$(sfu),yes),@both or @sfu,@both or @mesh)
+test-e2e-tags = $(if $(call eq,$(sfu),yes),not @mesh,not @sfu)
 
 test.e2e.browser:
 ifeq ($(up),yes)
@@ -781,12 +781,11 @@ endif
 	                    rebuild=yes
 	@make wait.port port=4444
 endif
-	cargo test -p medea-e2e \
-		$(if $(call eq,$(sfu),yes),--features sfu,) \
-		--test e2e \
+	$(if $(call eq,$(sfu),yes),SFU=true,) \
+	cargo test -p medea-e2e --test e2e \
 		$(if $(call eq,$(only),),\
 			-- --tags $(if $(call eq,$(only-tags),),\
-					   '$(p2p-tags)','$(only-tags)''),\
+			          '$(test-e2e-tags)','$(only-tags)'),\
 			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
@@ -797,7 +796,7 @@ endif
 #
 # Usage:
 #	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
-# 		[sfu=(no=yes)]
+#		[sfu=(no|yes)]
 #		[device=<device-id>]
 #		[server=<server-ip>]
 #		[( [up=no]

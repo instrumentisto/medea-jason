@@ -294,21 +294,25 @@ jobs:
         run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
         if: ${{ env.MEDEA_BRANCH != 'edge' }}
 
-      - name: Chrome
-        run: |
-          make test.e2e browser=chrome up=yes debug=no dockerized=yes \
-                           medea-tag=${{ env.MEDEA_BRANCH }} \
+      - name: Chrome (P2P mesh)
+        run: make test.e2e browser=chrome sfu=no
+                           up=yes debug=no dockerized=yes
+                           medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
-          make test.e2e browser=chrome up=yes debug=no dockerized=yes sfu=yes \
-                           medea-tag=${{ env.MEDEA_BRANCH }} \
+      - name: Chrome (SFU)
+        run: make test.e2e browser=chrome sfu=yes
+                           up=yes debug=no dockerized=yes
+                           medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
-      - name: Firefox
-        run: |
-          make test.e2e browser=firefox up=yes debug=no dockerized=yes \
-                           medea-tag=${{ env.MEDEA_BRANCH }} \
+      - name: Firefox (P2P mesh)
+        run: make test.e2e browser=firefox sfu=no
+                           up=yes debug=no dockerized=yes
+                           medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
-          make test.e2e browser=firefox up=yes debug=no dockerized=yes sfu=yes \
-                           medea-tag=${{ env.MEDEA_BRANCH }} \
+      - name: Firefox (SFU)
+        run: make test.e2e browser=firefox sfu=yes
+                           up=yes debug=no dockerized=yes
+                           medea-tag=${{ env.MEDEA_BRANCH }}
                            control-tag=build-${{ github.run_number }}
 
   test-e2e-native:
@@ -375,9 +379,22 @@ jobs:
           username: ${{ secrets.MEDEA_DOCKER_USER }}
           password: ${{ secrets.MEDEA_DOCKER_PASS }}
 
-      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+      - name: P2P mesh
+        run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
-             make test.e2e.native
+             make test.e2e.native sfu=no
+                  device=${{ (matrix.platform == 'ios'
+                              && steps.simulator.outputs.udid)
+                          ||     matrix.platform }}
+                  up=yes debug=no dockerized=yes
+                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  control-tag=build-${{ github.run_number }}
+             ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
+              ||                              '' }}
+      - name: SFU
+        run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
+              ||                                '' }}
+             make test.e2e.native sfu=yes
                   device=${{ (matrix.platform == 'ios'
                               && steps.simulator.outputs.udid)
                           ||     matrix.platform }}

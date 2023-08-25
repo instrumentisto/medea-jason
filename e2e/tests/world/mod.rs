@@ -4,7 +4,7 @@
 
 pub mod member;
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
@@ -132,7 +132,7 @@ impl World {
         &mut self,
         builder: MemberBuilder,
     ) -> Result<()> {
-        let is_sfu = cfg!(feature = "sfu");
+        let is_sfu = env::var("SFU").is_ok();
 
         let mut pipeline = HashMap::new();
         let mut send_state = HashMap::new();
