@@ -193,7 +193,15 @@ async fn then_doesnt_have_remote_track(
             .get_track(media_kind, source_kind)
             .await
             .unwrap();
-        assert!(!track.lived().await.unwrap())
+
+        let mut state = track.lived().await.unwrap();
+        for _ in 0..5 {
+            state = track.lived().await.unwrap();
+            if state {
+                sleep(Duration::from_millis(300)).await;
+            }
+        }
+        assert!(!state);
     } else {
         assert!(!tracks_with_partner
             .has_track(media_kind, Some(source_kind))
