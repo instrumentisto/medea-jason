@@ -404,6 +404,7 @@ impl RoomHandle {
     ///
     /// Helper function for all the exported mute/unmute/enable/disable
     /// audio/video send/receive methods.
+    #[allow(clippy::redundant_closure_call)]
     fn change_media_state<S>(
         &self,
         new_state: S,
@@ -1443,6 +1444,7 @@ impl InnerRoom {
     /// [`Sender`]: peer::media::Sender
     /// [1]: https://tinyurl.com/rnxcavf
     #[async_recursion(?Send)]
+    #[allow(clippy::redundant_closure_call)]
     async fn set_local_media_settings(
         &self,
         new_settings: MediaStreamSettings,
