@@ -2947,7 +2947,7 @@ mod state_synchronization {
                 id: TrackId(0),
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
-                receivers: vec!(MemberId::from("Test")),
+                receivers: vec![MemberId::from("Test")],
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,
