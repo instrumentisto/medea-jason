@@ -1,20 +1,17 @@
 Feature: Media enabling/disabling
 
-  @both
   Scenario: Member disables video during call
     Given room with joined members Alice and Bob
     When Bob disables video and awaits it completes
     Then Alice's device video remote track from Bob is disabled
     And Alice's audio remote track from Bob is enabled
 
-  @both
   Scenario: Member disables audio during call
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
     Then Alice's audio remote track from Bob is disabled
     And Alice's device video remote track from Bob is enabled
 
-  @both
   Scenario: Member disables video before call
     Given room with joined member Alice
     And member Bob with disabled video publishing
@@ -22,7 +19,6 @@ Feature: Media enabling/disabling
     Then Alice doesn't have live device video remote track from Bob
     And Alice's audio remote track from Bob is enabled
 
-  @both
   Scenario: Member disables audio before call
     Given room with joined member Alice
     And member Bob with disabled audio publishing
@@ -30,7 +26,6 @@ Feature: Media enabling/disabling
     Then Alice doesn't have live audio remote track from Bob
     And Alice's device video remote track from Bob is enabled
 
-  @both
   Scenario: Member enables audio during call
     Given room with joined member Alice
     And member Bob with disabled audio publishing
@@ -38,7 +33,6 @@ Feature: Media enabling/disabling
     And Bob enables audio and awaits it completes
     Then Alice's audio remote track from Bob is enabled
 
-  @both
   Scenario: Member enables video during call
     Given room with joined member Alice
     And member Bob with disabled video publishing
@@ -46,19 +40,16 @@ Feature: Media enabling/disabling
     And Bob enables video and awaits it completes
     Then Alice's device video remote track from Bob is enabled
 
-  @both
   Scenario: Local track is dropped when video is disabled
     Given room with joined members Alice and Bob
     When Bob disables video and awaits it completes
     Then Bob's device video local track is stopped
 
-  @both
   Scenario: Local track is dropped when audio is disabled
     Given room with joined members Alice and Bob
     When Bob disables audio and awaits it completes
     Then Bob's audio local track is stopped
 
-  @both
   Scenario: Member starts enabling video and instantly disables it
     Given room with joined members Alice and Bob
     And Bob's `getUserMedia()` request has added latency

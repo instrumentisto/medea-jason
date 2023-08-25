@@ -31,7 +31,6 @@ Feature: Delete endpoint
       | 3      |
 
 
-  @both
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob
     When Control API deletes Alice's publish endpoint

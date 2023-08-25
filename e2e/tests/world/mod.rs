@@ -293,7 +293,7 @@ impl World {
         let interconnected_members = self.members.values().filter(|m| {
             m.is_joined() && m.id() != member_id && (m.is_recv() || m.is_send())
         });
-        let is_sfu = cfg!(feature = "sfu");
+        let is_sfu = env::var("SFU").is_ok();
 
         let member = self.members.get(member_id).unwrap();
         for partner in interconnected_members {
@@ -807,7 +807,7 @@ impl PairedMember {
     /// Returns a [`proto::WebRtcPublishEndpoint`] for this [`PairedMember`] if
     /// publishing is enabled.
     fn publish_endpoint(&self) -> Option<proto::WebRtcPublishEndpoint> {
-        let is_sfu = cfg!(feature = "sfu");
+        let is_sfu = env::var("SFU").is_ok();
 
         self.is_send().then(|| proto::WebRtcPublishEndpoint {
             id: "publish".to_owned(),
