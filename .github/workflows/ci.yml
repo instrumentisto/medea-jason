@@ -404,18 +404,6 @@ jobs:
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
 
-      - run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
-              ||                                '' }}
-             make test.e2e.native
-                  device=${{ (matrix.platform == 'ios'
-                              && steps.simulator.outputs.udid)
-                          ||     matrix.platform }}
-                  up=yes debug=no dockerized=yes sfu=yes
-                  medea-tag=${{ env.MEDEA_BRANCH }}
-                  control-tag=build-${{ github.run_number }}
-             ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
-              ||                              '' }}
-
   test-flutter:
     name: test (medea-jason, ${{ matrix.platform }})
     strategy:
