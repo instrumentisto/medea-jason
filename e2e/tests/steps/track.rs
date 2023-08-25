@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{env, time::Duration};
 
 use cucumber::then;
 use medea_e2e::object::{MediaKind, MediaSourceKind};
@@ -178,7 +178,7 @@ async fn then_doesnt_have_remote_track(
     kind: String,
     partner_id: String,
 ) {
-    let live = cfg!(feature = "sfu") && !live.is_empty();
+    let live = env::var("SFU").is_ok() && !live.is_empty();
     let member = world.get_member(&id).unwrap();
     let partner_connection = member
         .connections()

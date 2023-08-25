@@ -1,6 +1,6 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap, fmt, time::Duration};
+use std::{cell::RefCell, collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
@@ -219,7 +219,7 @@ impl Member {
     /// [`RemoteTrack`]: crate::object::remote_track::RemoteTrack
     #[must_use]
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
-        if cfg!(feature = "sfu") {
+        if env::var("SFU").is_ok() {
             return (3, 3);
         }
 

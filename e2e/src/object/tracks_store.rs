@@ -221,11 +221,15 @@ impl<T> Object<TracksStore<T>> {
                     if ({remote}) {{
                         for (track of store.tracks) {{
                             var tr = track.track;
-                            if ({live} && !track.stopped
-                                && tr.media_direction() == 0) {{
+                            if ({live} &&
+                                    !track.stopped &&
+                                    tr.media_direction() == 0)
+                            {{
                                 count++;
                             }} else if (!{live} &&
-                                (track.stopped || tr.media_direction() != 0)) {{
+                                    (track.stopped ||
+                                        tr.media_direction() != 0))
+                            {{
                                 count++;
                             }}
                         }}
