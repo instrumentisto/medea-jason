@@ -91,9 +91,9 @@ class ConnectionStore {
           track.last.mediaDirection() == TrackMediaDirection.sendRecv &&
           !trackStopped) {
         count += 1;
-      } else if (!live &&
-          track.last.mediaDirection() != TrackMediaDirection.sendRecv &&
-          trackStopped) {
+      } else if ((!live && trackStopped) ||
+          (!live &&
+              track.last.mediaDirection() != TrackMediaDirection.sendRecv)) {
         count += 1;
       }
     });
@@ -111,6 +111,12 @@ class Member {
 
   /// Indicator whether this [Member] should receive media.
   bool isRecv;
+
+  /// Indicator whether this [Member] should publish audio.
+  bool enabledAudio = true;
+
+  /// Indicator whether this [Member] should publish video.
+  bool enabledVideo = true;
 
   /// Indicator whether this [Member] is joined a [RoomHandle] on a media
   /// server.
@@ -380,23 +386,31 @@ class Member {
       if (kind != null) {
         if (kind == MediaKind.audio) {
           await room.enableAudio();
+          enabledAudio = true;
         } else {
           await room.enableVideo(source);
+          enabledVideo = true;
         }
       } else {
         await room.enableAudio();
         await room.enableVideo(source);
+        enabledAudio = true;
+        enabledVideo = true;
       }
     } else {
       if (kind != null) {
         if (kind == MediaKind.audio) {
           await room.disableAudio();
+          enabledAudio = false;
         } else {
           await room.disableVideo(source);
+          enabledVideo = false;
         }
       } else {
         await room.disableAudio();
         await room.disableVideo(source);
+        enabledAudio = false;
+        enabledVideo = false;
       }
     }
   }

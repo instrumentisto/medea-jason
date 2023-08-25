@@ -106,6 +106,28 @@ impl Object<RemoteTrack> {
         .ok_or(Error::TypeCast)
     }
 
+    /// Indicates whether this [`RemoteTrack`]'s underlying `MediaStreamTrack`
+    /// is live.
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn lived(&self) -> Result<bool, Error> {
+        self.execute(Statement::new(
+            // language=JavaScript
+            r#"
+            async (t) => {
+                const currentDirection = t.track.media_direction();
+                return currentDirection == 0 && !t.track.stopped;
+            }
+            "#,
+            [],
+        ))
+        .await?
+        .as_bool()
+        .ok_or(Error::TypeCast)
+    }
+
     /// Waits for the `RemoteMediaTrack.on_disabled()` callback to fire `count`
     /// times.
     ///

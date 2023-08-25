@@ -167,14 +167,18 @@ async fn then_remote_media_track(
     };
 }
 
-#[then(regex = "^(\\S+) doesn't have (audio|(?:device|display) video) \
-                 remote track from (\\S+)$")]
+#[then(
+    regex = "^(\\S+) doesn't have (live |)(audio|(?:device|display) video) \
+                 remote track from (\\S+)$"
+)]
 async fn then_doesnt_have_remote_track(
     world: &mut World,
     id: String,
+    live: String,
     kind: String,
     partner_id: String,
 ) {
+    let live = cfg!(feature = "sfu") && !live.is_empty();
     let member = world.get_member(&id).unwrap();
     let partner_connection = member
         .connections()
@@ -184,10 +188,18 @@ async fn then_doesnt_have_remote_track(
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
 
-    assert!(!tracks_with_partner
-        .has_track(media_kind, Some(source_kind))
-        .await
-        .unwrap());
+    if live {
+        let track = tracks_with_partner
+            .get_track(media_kind, source_kind)
+            .await
+            .unwrap();
+        assert!(!track.lived().await.unwrap())
+    } else {
+        assert!(!tracks_with_partner
+            .has_track(media_kind, Some(source_kind))
+            .await
+            .unwrap());
+    }
 }
 
 #[then(regex = r"^(\S+) doesn't have remote tracks from (\S+)$")]
@@ -214,7 +226,10 @@ async fn then_member_doesnt_have_live_local_tracks(
 ) {
     let member = world.get_member(&id).unwrap();
     let local_tracks = member.room().local_tracks().await.unwrap();
-    let count = local_tracks.count_tracks_by_live(true).await.unwrap();
+    let count = local_tracks
+        .count_tracks_by_live(true, false)
+        .await
+        .unwrap();
     assert_eq!(count, 0);
 }
 
@@ -237,7 +252,8 @@ async fn then_member_has_n_remote_tracks_from(
 
     let mut actual_count = 0;
     for _ in 0..5 {
-        actual_count = tracks_store.count_tracks_by_live(live).await.unwrap();
+        actual_count =
+            tracks_store.count_tracks_by_live(live, true).await.unwrap();
         if actual_count != expected_count {
             sleep(Duration::from_millis(300)).await;
         }

@@ -27,13 +27,15 @@ Feature: Enable remote media
   @both
   Scenario: Remote member enables video
     Given room with joined member Alice
-    And joined member Bob with disabled video publishing
-    When Bob enables video and awaits it completes
+    And joined member Bob
+    When Bob disables video and awaits it completes
+    And Bob enables video and awaits it completes
     Then `on_enabled` callback fires 1 time on Alice's remote device video track from Bob
 
   @both
   Scenario: Remote member enables audio
     Given room with joined member Alice
-    And joined member Bob with disabled audio publishing
-    When Bob enables audio and awaits it completes
+    And joined member Bob
+    When Bob disables audio and awaits it completes
+    And Bob enables audio and awaits it completes
     Then `on_enabled` callback fires 1 time on Alice's remote audio track from Bob

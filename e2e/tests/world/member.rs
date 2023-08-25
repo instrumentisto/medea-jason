@@ -57,6 +57,8 @@ impl Builder {
             room,
             connection_store,
             window,
+            enabled_audio: RefCell::new(true),
+            enabled_video: RefCell::new(true),
         })
     }
 }
@@ -71,6 +73,12 @@ pub struct Member {
 
     /// Indicator whether this [`Member`] should receive media.
     is_recv: bool,
+
+    /// Indicator whether this [`Member`] should publish audio.
+    enabled_audio: RefCell<bool>,
+
+    /// Indicator whether this [`Member`] should publish video.
+    enabled_video: RefCell<bool>,
 
     /// Indicator whether this [`Member`] is joined a [`Room`] on a media
     /// server.
@@ -122,6 +130,18 @@ impl Member {
     #[must_use]
     pub fn is_send(&self) -> bool {
         self.is_send
+    }
+
+    /// Indicates whether this [`Member`] should publish video.
+    #[must_use]
+    pub fn is_send_video(&self) -> bool {
+        *self.enabled_video.borrow()
+    }
+
+    /// Indicates whether this [`Member`] should publish audio.\
+    #[must_use]
+    pub fn is_send_audio(&self) -> bool {
+        *self.enabled_audio.borrow()
     }
 
     /// Indicator whether this [`Member`] should receive media.
@@ -199,6 +219,10 @@ impl Member {
     /// [`RemoteTrack`]: crate::object::remote_track::RemoteTrack
     #[must_use]
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
+        if cfg!(feature = "sfu") {
+            return (3, 3);
+        }
+
         let send_count = self
             .send_state
             .borrow()
@@ -235,6 +259,10 @@ impl Member {
                 self.room
                     .enable_media_send(kind, source, maybe_await)
                     .await?;
+                match kind {
+                    MediaKind::Audio => *self.enabled_audio.borrow_mut() = true,
+                    MediaKind::Video => *self.enabled_video.borrow_mut() = true,
+                }
             } else {
                 self.room
                     .enable_media_send(MediaKind::Video, source, maybe_await)
@@ -242,11 +270,17 @@ impl Member {
                 self.room
                     .enable_media_send(MediaKind::Audio, source, maybe_await)
                     .await?;
+                *self.enabled_audio.borrow_mut() = true;
+                *self.enabled_video.borrow_mut() = true;
             }
         } else if let Some(kind) = kind {
             self.room
                 .disable_media_send(kind, source, maybe_await)
                 .await?;
+            match kind {
+                MediaKind::Audio => *self.enabled_audio.borrow_mut() = false,
+                MediaKind::Video => *self.enabled_video.borrow_mut() = false,
+            }
         } else {
             self.room
                 .disable_media_send(MediaKind::Audio, source, maybe_await)
@@ -254,6 +288,8 @@ impl Member {
             self.room
                 .disable_media_send(MediaKind::Video, source, maybe_await)
                 .await?;
+            *self.enabled_audio.borrow_mut() = false;
+            *self.enabled_video.borrow_mut() = false;
         }
         Ok(())
     }

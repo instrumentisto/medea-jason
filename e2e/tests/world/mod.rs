@@ -293,6 +293,8 @@ impl World {
         let interconnected_members = self.members.values().filter(|m| {
             m.is_joined() && m.id() != member_id && (m.is_recv() || m.is_send())
         });
+        let is_sfu = cfg!(feature = "sfu");
+
         let member = self.members.get(member_id).unwrap();
         for partner in interconnected_members {
             let (send_count, recv_count) =
@@ -315,6 +317,56 @@ impl World {
                 .await?
                 .wait_for_count(send_count)
                 .await?;
+
+            if is_sfu {
+                if !partner.is_send_audio() {
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Audio, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !partner.is_send_video() {
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Display)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !member.is_send_audio() {
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Audio, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !member.is_send_video() {
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Display)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+            }
         }
         Ok(())
     }
@@ -755,9 +807,15 @@ impl PairedMember {
     /// Returns a [`proto::WebRtcPublishEndpoint`] for this [`PairedMember`] if
     /// publishing is enabled.
     fn publish_endpoint(&self) -> Option<proto::WebRtcPublishEndpoint> {
+        let is_sfu = cfg!(feature = "sfu");
+
         self.is_send().then(|| proto::WebRtcPublishEndpoint {
             id: "publish".to_owned(),
-            p2p: proto::P2pMode::Always,
+            p2p: if is_sfu {
+                proto::P2pMode::Never
+            } else {
+                proto::P2pMode::Always
+            },
             force_relay: false,
             audio_settings: self.send_audio.unwrap_or(proto::AudioSettings {
                 publish_policy: PublishPolicy::Disabled,
