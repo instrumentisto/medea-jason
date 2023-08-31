@@ -58,11 +58,7 @@ impl<'a> WebSocket<'a> {
                 async () => {
                     const [code] = args;
                     for (socket of window.wsMock.allSockets) {
-                        window.wsMock.isClosed = true;
-                        window.wsMock.closeCode = code;
-                        socket.dispatchEvent(
-                            new CloseEvent("close", { code: code })
-                        );
+                        socket.close(code);
                     }
                 }
                 "#,
