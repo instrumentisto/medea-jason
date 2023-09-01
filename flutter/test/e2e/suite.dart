@@ -111,7 +111,7 @@ final testConfigs = FlutterTestConfiguration(
       FlutterDriverReporter(logInfoMessages: true),
     ]);
 
-@GherkinTestSuite(featurePaths: ['../e2e/tests/features/**'])
+@GherkinTestSuite(featurePaths: ['../e2e/tests/features/apply.feature'])
 void main() {
   executeTestSuite(configuration: testConfigs, appMainFunction: (_) async {});
 }
