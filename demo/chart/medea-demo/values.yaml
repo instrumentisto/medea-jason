@@ -137,3 +137,21 @@ ingress:
 
   annotations:
     kubernetes.io/ingress.class: nginx
+
+
+monitoring:
+  enabled: false
+
+  # Prometheus Operator settings.
+  # Enabling will create ServiceMonitor resources for Prometheus Operator
+  # and will disable annotations usage.
+  operator:
+    enabled: false
+    serviceMonitor:
+      # Interval to scrape metrics.
+      interval: 1m
+      # Namespace where Prometheus Operator is installed in.
+      namespace: monitoring
+      # Selector for ServiceMonitor used by installed Prometheus Operator.
+      selector:
+        prometheus: kube-prometheus
