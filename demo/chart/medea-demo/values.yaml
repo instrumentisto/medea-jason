@@ -24,6 +24,8 @@ server:
       control:
         grpc:
           bind_port: 6565
+      metrics:
+        bind_port: 9372
     ice:
       embedded:
         # External IP address to be used by embedded TURN server as relay.

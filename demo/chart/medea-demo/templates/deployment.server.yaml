@@ -76,7 +76,7 @@ spec:
               protocol: TCP
           {{- if .Values.monitoring.enabled }}
             - name: metrics
-              containerPort: {{ .Values.conf.server.metrics.port | int }}
+              containerPort: {{ .Values.conf.metrics.port | int }}
               protocol: TCP
           {{- end }}
           volumeMounts:
