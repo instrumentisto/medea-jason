@@ -355,11 +355,11 @@ impl WebSocketRpcClient {
 
     /// Starts [`Heartbeat`] with provided [`RpcSettings`] for provided
     /// [`platform::RpcTransport`].
-    async fn start_heartbeat(
+    fn start_heartbeat(
         self: Rc<Self>,
         transport: Rc<dyn platform::RpcTransport>,
         rpc_settings: RpcSettings,
-    ) -> Result<(), Traced<RpcClientError>> {
+    ) {
         let idle_timeout = IdleTimeout(Duration::from_millis(
             rpc_settings.idle_timeout_ms.into(),
         ));
@@ -380,8 +380,6 @@ impl WebSocketRpcClient {
             }
         });
         self.0.borrow_mut().heartbeat = Some(heartbeat);
-
-        Ok(())
     }
 
     /// Tries to establish [`WebSocketRpcClient`] connection.
@@ -409,8 +407,7 @@ impl WebSocketRpcClient {
         if let Some(msg) = on_message.next().await {
             if let ServerMsg::RpcSettings(rpc_settings) = msg {
                 Rc::clone(&self)
-                    .start_heartbeat(Rc::clone(&transport), rpc_settings)
-                    .await?;
+                    .start_heartbeat(Rc::clone(&transport), rpc_settings);
             } else {
                 let close_reason =
                     ClosedStateReason::FirstServerMsgIsNotRpcSettings;

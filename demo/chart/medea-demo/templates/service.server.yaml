@@ -26,3 +26,9 @@ spec:
       port: 8000
       targetPort: control-http
       protocol: TCP
+    {{- if .Values.monitoring.enabled }}
+    - name: metrics
+      port: {{ .Values.conf.server.metrics.port | int }}
+      targetPort: metrics
+      protocol: TCP
+  {{- end }}
