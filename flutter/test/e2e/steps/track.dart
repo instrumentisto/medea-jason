@@ -98,13 +98,15 @@ StepDefinitionGeneric thenDoesntHaveRemoteTrack =
         .toList();
 
     if (isSfu && live.isNotEmpty) {
-      var length = tracks
-          .where((element) =>
-              !member.connectionStore
-                  .remoteTrackIsStopped(partnerId, element.getTrack().id()) &&
-              element.mediaDirection() == MediaDirection.sendRecv)
-          .length;
-      expect(length, 0);
+      await retry(() async {
+        var length = tracks
+            .where((element) =>
+                !member.connectionStore
+                    .remoteTrackIsStopped(partnerId, element.getTrack().id()) &&
+                element.mediaDirection() == MediaDirection.sendRecv)
+            .length;
+        expect(length, 0);
+      });
     } else {
       expect(tracks.length, 0);
     }
