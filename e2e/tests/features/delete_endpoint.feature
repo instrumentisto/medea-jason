@@ -9,7 +9,7 @@ Feature: Delete endpoint
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |
@@ -24,12 +24,11 @@ Feature: Delete endpoint
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |
       | 3      |
-
 
   Scenario: Control API deletes all endpoints
     Given room with joined member Alice and Bob

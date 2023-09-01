@@ -1,6 +1,6 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap, env, fmt, time::Duration};
+use std::{cell::RefCell, collections::HashMap, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
@@ -57,8 +57,8 @@ impl Builder {
             room,
             connection_store,
             window,
-            enabled_audio: RefCell::new(true),
-            enabled_video: RefCell::new(true),
+            enabled_audio: true,
+            enabled_video: true,
         })
     }
 }
@@ -75,10 +75,10 @@ pub struct Member {
     is_recv: bool,
 
     /// Indicator whether this [`Member`] should publish audio.
-    enabled_audio: RefCell<bool>,
+    enabled_audio: bool,
 
     /// Indicator whether this [`Member`] should publish video.
-    enabled_video: RefCell<bool>,
+    enabled_video: bool,
 
     /// Indicator whether this [`Member`] is joined a [`Room`] on a media
     /// server.
@@ -135,13 +135,13 @@ impl Member {
     /// Indicates whether this [`Member`] should publish video.
     #[must_use]
     pub fn is_send_video(&self) -> bool {
-        *self.enabled_video.borrow()
+        self.enabled_video
     }
 
     /// Indicates whether this [`Member`] should publish audio.\
     #[must_use]
     pub fn is_send_audio(&self) -> bool {
-        *self.enabled_audio.borrow()
+        self.enabled_audio
     }
 
     /// Indicator whether this [`Member`] should receive media.
@@ -219,10 +219,6 @@ impl Member {
     /// [`RemoteTrack`]: crate::object::remote_track::RemoteTrack
     #[must_use]
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
-        if env::var("SFU").is_ok() {
-            return (3, 3);
-        }
-
         let send_count = self
             .send_state
             .borrow()
@@ -247,7 +243,7 @@ impl Member {
 
     /// Toggles media state of this [`Member`]'s [`Room`].
     pub async fn toggle_media(
-        &self,
+        &mut self,
         kind: Option<MediaKind>,
         source: Option<MediaSourceKind>,
         enabled: bool,
@@ -260,8 +256,8 @@ impl Member {
                     .enable_media_send(kind, source, maybe_await)
                     .await?;
                 match kind {
-                    MediaKind::Audio => *self.enabled_audio.borrow_mut() = true,
-                    MediaKind::Video => *self.enabled_video.borrow_mut() = true,
+                    MediaKind::Audio => self.enabled_audio = true,
+                    MediaKind::Video => self.enabled_video = true,
                 }
             } else {
                 self.room
@@ -270,16 +266,16 @@ impl Member {
                 self.room
                     .enable_media_send(MediaKind::Audio, source, maybe_await)
                     .await?;
-                *self.enabled_audio.borrow_mut() = true;
-                *self.enabled_video.borrow_mut() = true;
+                self.enabled_audio = true;
+                self.enabled_video = true;
             }
         } else if let Some(kind) = kind {
             self.room
                 .disable_media_send(kind, source, maybe_await)
                 .await?;
             match kind {
-                MediaKind::Audio => *self.enabled_audio.borrow_mut() = false,
-                MediaKind::Video => *self.enabled_video.borrow_mut() = false,
+                MediaKind::Audio => self.enabled_audio = false,
+                MediaKind::Video => self.enabled_video = false,
             }
         } else {
             self.room
@@ -288,8 +284,8 @@ impl Member {
             self.room
                 .disable_media_send(MediaKind::Video, source, maybe_await)
                 .await?;
-            *self.enabled_audio.borrow_mut() = false;
-            *self.enabled_video.borrow_mut() = false;
+            self.enabled_audio = false;
+            self.enabled_video = false;
         }
         Ok(())
     }

@@ -178,7 +178,8 @@ async fn then_doesnt_have_remote_track(
     kind: String,
     partner_id: String,
 ) {
-    let live = env::var("SFU").is_ok() && !live.is_empty();
+    let is_track_live = env::var("SFU").is_ok() && !live.is_empty();
+
     let member = world.get_member(&id).unwrap();
     let partner_connection = member
         .connections()
@@ -188,20 +189,23 @@ async fn then_doesnt_have_remote_track(
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
 
-    if live {
+    if is_track_live {
         let track = tracks_with_partner
             .get_track(media_kind, source_kind)
             .await
             .unwrap();
 
-        let mut state = track.lived().await.unwrap();
+        let mut track_state = track.lived().await.unwrap();
         for _ in 0..5 {
-            state = track.lived().await.unwrap();
-            if state {
+            track_state = track.lived().await.unwrap();
+            if track_state {
                 sleep(Duration::from_millis(300)).await;
+            } else {
+                break;
             }
         }
-        assert!(!state);
+
+        assert_eq!(track_state, is_track_live);
     } else {
         assert!(!tracks_with_partner
             .has_track(media_kind, Some(source_kind))

@@ -37,13 +37,15 @@ Future<void> clearWorld() async {
   }
 }
 
-// Throws the fall of any scenario out. Fixes false exit code.
-class FalsePositiveFix implements Hook {
+/// A [Hook] that calls `exit(1)` if any tests in the run have failed to make
+/// sure that test run process exits with an error code.
+class ExitOnFailureHook implements Hook {
   bool fail = false;
+
   @override
   Future<void> onAfterRun(TestConfiguration config) async {
     if (fail) {
-      exit(-1);
+      exit(1);
     }
   }
 
@@ -73,7 +75,7 @@ class FalsePositiveFix implements Hook {
   Future<void> onBeforeStep(World world, String step) async {}
 
   @override
-  int get priority => 1;
+  int get priority => 999;
 }
 
 final testConfigs = FlutterTestConfiguration(
@@ -97,7 +99,7 @@ final testConfigs = FlutterTestConfiguration(
     defaultTimeout: const Duration(seconds: 30),
     tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
     hooks: [
-      FalsePositiveFix()
+      ExitOnFailureHook()
     ],
     reporters: [
       StdoutReporter(MessageLevel.verbose)
