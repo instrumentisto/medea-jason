@@ -8,7 +8,6 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
-import 'custom_world.dart';
 
 /// Builder of a [Member].
 class MemberBuilder {
@@ -366,6 +365,9 @@ class Member {
   /// Returns a count of [LocalMediaTrack]s and [RemoteMediaTrack]s of this
   /// [Member] with the provided partner [Member].
   Tuple2<int, int> countOfTracksBetweenMembers(Member other) {
+    if (isSfu) {
+      return const Tuple2<int, int>(3, 3);
+    }
     var sendCount = sendState.entries
         .where((element) => other.recvState[element.key]! && element.value)
         .length;

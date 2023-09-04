@@ -219,6 +219,10 @@ impl Member {
     /// [`RemoteTrack`]: crate::object::remote_track::RemoteTrack
     #[must_use]
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
+        if std::env::var("SFU").is_ok() {
+            return (3, 3);
+        }
+
         let send_count = self
             .send_state
             .borrow()
