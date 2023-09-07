@@ -41,7 +41,7 @@ impl Object<RemoteTrack> {
     pub async fn wait_for_enabled(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const currentDirection = track.track.media_direction()
                 if (currentDirection != 0) {
@@ -51,7 +51,7 @@ impl Object<RemoteTrack> {
                     await waiter;
                 }
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -67,7 +67,7 @@ impl Object<RemoteTrack> {
     pub async fn wait_for_disabled(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const currentDirection = track.track.media_direction()
                 if (currentDirection == 0) {
@@ -77,7 +77,7 @@ impl Object<RemoteTrack> {
                     await waiter;
                 }
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -93,12 +93,12 @@ impl Object<RemoteTrack> {
     pub async fn disabled(&self) -> Result<bool, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (t) => {
                 const currentDirection = t.track.media_direction();
                 return currentDirection != 0;
             }
-            "#,
+            ",
             [],
         ))
         .await?
@@ -118,7 +118,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_disabled_fire_count !== count) {
@@ -131,7 +131,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -150,7 +150,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_enabled_fire_count !== count) {
@@ -163,7 +163,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -182,7 +182,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_muted_fire_count !== count) {
@@ -195,7 +195,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -214,7 +214,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_unmuted_fire_count !== count) {
@@ -227,7 +227,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -246,7 +246,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [direction] = args;
                     if (track.track.media_direction() != direction) {
@@ -260,7 +260,7 @@ impl Object<RemoteTrack> {
                     await waiter;
                 }
             }
-            "#,
+            ",
             [u8::from(direction).into()],
         ))
         .await

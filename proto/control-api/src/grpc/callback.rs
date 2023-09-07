@@ -311,7 +311,9 @@ pub mod callback_server {
                             request: tonic::Request<super::Request>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).on_event(request).await };
+                            let fut = async move {
+                                <T as Callback>::on_event(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
