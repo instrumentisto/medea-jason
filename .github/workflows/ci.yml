@@ -281,7 +281,7 @@ jobs:
         run: make docker.untar from-file=.cache/image.tar
 
       - name: Login to Medea Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: hub.instrumentisto.com
           username: ${{ secrets.MEDEA_DOCKER_USER }}
@@ -373,7 +373,7 @@ jobs:
         run: make docker.untar from-file=.cache/image.tar
 
       - name: Login to Medea Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: hub.instrumentisto.com
           username: ${{ secrets.MEDEA_DOCKER_USER }}
@@ -886,7 +886,7 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - name: Login to ${{ matrix.registry }} container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ matrix.registry }}
           username: ${{ (matrix.registry == 'docker.io'
