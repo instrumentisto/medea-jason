@@ -115,12 +115,12 @@ impl Object<RemoteTrack> {
     pub async fn lived(&self) -> Result<bool, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (t) => {
                 const currentDirection = t.track.media_direction();
                 return currentDirection == 0 && !t.track.stopped;
             }
-            "#,
+            ",
             [],
         ))
         .await?
