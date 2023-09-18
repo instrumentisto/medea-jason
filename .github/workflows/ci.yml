@@ -67,7 +67,7 @@ jobs:
               || (matrix.platform == 'linux' &&             'ubuntu-22.04')
               ||                                            'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -98,7 +98,7 @@ jobs:
   dartanalyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
 
       - run: make flutter
@@ -108,7 +108,7 @@ jobs:
   dartfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
 
       - run: make flutter.fmt check=yes
@@ -122,7 +122,7 @@ jobs:
         chart: ["medea-demo"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: azure/setup-helm@v3
 
       - run: make helm.lint chart=${{ matrix.chart }}
@@ -130,7 +130,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: nightly
@@ -195,7 +195,7 @@ jobs:
                || !startsWith(github.ref, 'refs/tags/medea-')
              }}" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ steps.skip.outputs.no == 'true' }}
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -248,7 +248,7 @@ jobs:
     needs: ["docker"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -281,7 +281,7 @@ jobs:
         run: make docker.untar from-file=.cache/image.tar
 
       - name: Login to Medea Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: hub.instrumentisto.com
           username: ${{ secrets.MEDEA_DOCKER_USER }}
@@ -330,7 +330,7 @@ jobs:
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -374,7 +374,7 @@ jobs:
         run: make docker.untar from-file=.cache/image.tar
 
       - name: Login to Medea Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: hub.instrumentisto.com
           username: ${{ secrets.MEDEA_DOCKER_USER }}
@@ -419,7 +419,7 @@ jobs:
               || (matrix.platform == 'windows' && 'windows-latest')
               ||                                  'macos-13' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -515,7 +515,7 @@ jobs:
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -555,7 +555,7 @@ jobs:
     # Pin glibc to 2.28 for better compatibility.
     container: debian:buster
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install linux dependencies
         run: |
           apt update
@@ -602,9 +602,9 @@ jobs:
                             && github.ref == 'refs/heads/master') }}"
              >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ steps.skip.outputs.no == 'true' }}
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-buildx-action@v3
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - run: make docker.build debug=no no-cache=yes
@@ -626,7 +626,7 @@ jobs:
   rustdoc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -690,7 +690,7 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -731,7 +731,7 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # for PRs only
 
@@ -875,7 +875,7 @@ jobs:
                        && steps.skip-image.outputs.no == 'true' }}"
              >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - uses: actions/download-artifact@v3
@@ -887,7 +887,7 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true' }}
 
       - name: Login to ${{ matrix.registry }} container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ matrix.registry }}
           username: ${{ (matrix.registry == 'docker.io'
@@ -990,7 +990,7 @@ jobs:
         chart: ["medea-demo"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: trilom/file-changes-action@v1.2.4
         id: changed
       - id: chart
@@ -1019,7 +1019,7 @@ jobs:
     needs: ["cargo-publish"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Parse release version
         id: package
@@ -1061,7 +1061,7 @@ jobs:
       - test-flutter
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Parse pubspec version
         id: pubspec
