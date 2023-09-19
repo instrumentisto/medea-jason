@@ -421,10 +421,10 @@ packages:
     dependency: transitive
     description:
       name: puppeteer
-      sha256: "0d27d2923d17fccb9792538452da63f242ac0ee31d46bc73df622c029c7ee86f"
+      sha256: "43678bb9bd69385cf896ea13fe8c965d95850cba48af8dffd6c130565ebdf5ed"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "3.4.0"
   retry:
     dependency: "direct main"
     description:
