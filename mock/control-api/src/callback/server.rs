@@ -86,8 +86,8 @@ impl Handler<GetCallbackItems> for GrpcCallbackServer {
 /// # Panics
 ///
 /// If cannot bind and run gRPC server.
-#[allow(clippy::unused_async)]
-pub async fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
+#[must_use]
+pub fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
     let events = Arc::new(Mutex::new(Vec::new()));
 
     let service =

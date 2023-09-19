@@ -81,12 +81,12 @@ impl<'a> WebSocket<'a> {
         self.0
             .execute(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async () => {
                     window.wsMock.isClosed = false;
                     window.wsMock.closeCode = 0;
                 }
-                "#,
+                ",
                 [],
             ))
             .await

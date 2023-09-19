@@ -96,11 +96,11 @@ impl Statement {
     /// arguments for this code.
     pub(super) fn prepare(self) -> (String, Vec<Json>) {
         // language=JavaScript
-        let mut final_js = r#"
+        let mut final_js = "
             let lastResult;
             let objs;
             let args;
-        "#
+        "
         .to_owned();
 
         let mut statement = Some(Box::new(self));
