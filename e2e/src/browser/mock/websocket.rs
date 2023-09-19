@@ -54,14 +54,14 @@ impl<'a> WebSocket<'a> {
         self.0
             .execute(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async () => {
                     const [code] = args;
                     for (socket of window.wsMock.allSockets) {
                         socket.close(code);
                     }
                 }
-                "#,
+                ",
                 [code.into()],
             ))
             .await
