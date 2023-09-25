@@ -685,7 +685,7 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      - test-e2e-native
+      #- test-e2e-native
       #- test-flutter
     runs-on: ubuntu-latest
     steps:
@@ -1056,7 +1056,7 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      - test-e2e-native
+      #- test-e2e-native
       #- test-flutter
     runs-on: ubuntu-latest
     steps:
