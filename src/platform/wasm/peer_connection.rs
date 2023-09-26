@@ -11,7 +11,7 @@ use std::{
 };
 
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState,
+    IceConnectionState, IceServer, PeerConnectionState, Encodings,
 };
 use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
@@ -568,11 +568,53 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
+        encodings: Option<Vec<Encodings>>
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
             let mut init = RtcRtpTransceiverInit::new();
             _ = init.direction(direction.into());
+
+            if let Some(encodings) = encodings {
+                let send_encodings = ::js_sys::Array::new();
+
+                for encoding in encodings {
+                    let obj = ::js_sys::Object::default();
+                    ::js_sys::Reflect::set(
+                        &obj,
+                        &wasm_bindgen::JsValue::from("rid"),
+                        &wasm_bindgen::JsValue::from(encoding.rid),
+                    );
+                    ::js_sys::Reflect::set(
+                        &obj,
+                        &wasm_bindgen::JsValue::from("active"),
+                        &wasm_bindgen::JsValue::from(encoding.active),
+                    );
+                    if let Some(max_bitrate) = encoding.max_bitrate {
+                        ::js_sys::Reflect::set(
+                            &obj,
+                            &wasm_bindgen::JsValue::from("maxBitrate"),
+                            &wasm_bindgen::JsValue::from(max_bitrate),
+                        );
+                    }
+                    if let Some(scale_resolution_down_by) = encoding.scale_resolution_down_by {
+                        ::js_sys::Reflect::set(
+                            &obj,
+                            &wasm_bindgen::JsValue::from("scaleResolutionDownBy"),
+                            &wasm_bindgen::JsValue::from(scale_resolution_down_by),
+                        );
+                    }
+    
+                    send_encodings.push(&obj);
+                }
+
+                ::js_sys::Reflect::set(
+                    &init,
+                    &wasm_bindgen::JsValue::from("sendEncodings"),
+                    &send_encodings,
+                );
+            }
+
             let transceiver =
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
             Transceiver::from(transceiver)

@@ -6,7 +6,7 @@ use derive_more::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
     AudioSettings as ProtoAudioConstraints, MediaSourceKind,
-    MediaType as ProtoTrackConstraints, MediaType, VideoSettings,
+    MediaType as ProtoTrackConstraints, MediaType, VideoSettings, Encodings,
 };
 use medea_reactive::ObservableCell;
 
@@ -862,6 +862,13 @@ impl VideoSource {
             Self::Device(device) => device.satisfies(track).await,
         }
     }
+
+    pub const fn encodings(&self) -> Option<Vec<Encodings>> {
+        match self {
+            VideoSource::Device(s) => s.encodings,
+            VideoSource::Display(s) => s.encodings,
+        }
+    }
 }
 
 impl From<VideoSettings> for VideoSource {
@@ -874,6 +881,7 @@ impl From<VideoSettings> for VideoSource {
                     width: None,
                     height: None,
                     required: settings.required,
+                    encodings: settings.encodings
                 })
             }
             MediaSourceKind::Display => {
@@ -883,6 +891,7 @@ impl From<VideoSettings> for VideoSource {
                     frame_rate: None,
                     required: settings.required,
                     device_id: None,
+                    encodings: settings.encodings
                 })
             }
         }
@@ -939,6 +948,13 @@ impl TrackConstraints {
             TrackConstraints::Video(VideoSource::Display(_)) => {
                 MediaSourceKind::Display
             }
+        }
+    }
+
+    pub const fn encodings(&self) -> Option<Vec<Encodings>> {
+        match &self {
+            TrackConstraints::Audio(_) => None,
+            TrackConstraints::Video(vs) => vs.encodings(),
         }
     }
 
@@ -1131,6 +1147,8 @@ pub struct DeviceVideoTrackConstraints {
 
     /// Width of the video in pixels.
     pub width: Option<ConstrainU32>,
+
+    pub encodings: Option<Vec<Encodings>>
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1283,6 +1301,8 @@ pub struct DisplayVideoTrackConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub frame_rate: Option<ConstrainU32>,
+
+    pub encodings: Option<Vec<Encodings>>
 }
 
 impl DisplayVideoTrackConstraints {

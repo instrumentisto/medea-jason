@@ -811,6 +811,7 @@ impl InterconnectedPeers {
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
+                    encodings: None
                 }),
             },
         ]
@@ -840,6 +841,7 @@ impl InterconnectedPeers {
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
+                    encodings: None
                 }),
             },
         ]
@@ -1314,6 +1316,7 @@ async fn new_remote_track() {
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
+                    encodings: None
                 }),
             },
             LocalTracksConstraints::default(),

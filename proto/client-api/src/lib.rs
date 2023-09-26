@@ -917,7 +917,7 @@ pub enum Direction {
 }
 
 /// Possible media types of a [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MediaType {
     /// Audio [`Track`].
     Audio(AudioSettings),
@@ -947,7 +947,7 @@ pub struct AudioSettings {
 }
 
 /// Settings of a video [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct VideoSettings {
     /// Importance of the video.
     ///
@@ -956,6 +956,8 @@ pub struct VideoSettings {
 
     /// Source kind of this [`VideoSettings`] media.
     pub source_kind: MediaSourceKind,
+
+    pub encodings: Option<Vec<Encodings>>,
 }
 
 /// Possible media sources of a video [`Track`].
@@ -966,6 +968,14 @@ pub enum MediaSourceKind {
 
     /// Media is obtained with screen-capture.
     Display,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Encodings {
+    pub rid: String,
+    pub active: bool,
+    pub max_bitrate: Option<u16>,
+    pub scale_resolution_down_by: Option<u16>
 }
 
 /// Estimated connection quality.

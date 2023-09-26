@@ -98,7 +98,7 @@ mod peer_connection {
             is_force_relayed: bool,
         ) -> Dart_Handle;
 
-        /// Creates a new [`Transceiver`[ in the provided [`PeerConnection`].
+        /// Creates a new [`Transceiver`] in the provided [`PeerConnection`].
         pub fn add_transceiver(
             peer: Dart_Handle,
             kind: i64,
