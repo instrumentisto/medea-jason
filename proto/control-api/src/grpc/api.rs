@@ -466,98 +466,75 @@ pub struct Pong {
     #[prost(uint32, tag = "1")]
     pub nonce: u32,
 }
-/// Generated server implementations.
-pub mod control_api_server {
+/// Generated client implementations.
+pub mod control_api_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with ControlApiServer.
-    #[async_trait]
-    pub trait ControlApi: Send + Sync + 'static {
-        /// Creates a new `Element` on the media server.
-        ///
-        /// Non-idempotent. Errors if an `Element` with such ID already exists.
-        async fn create(
-            &self,
-            request: tonic::Request<super::CreateRequest>,
-        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status>;
-        /// Removes `Element`s from the media server.
-        /// Allows referring multiple `Element`s on the last two levels of a FID.
-        ///
-        /// Idempotent. If no `Element`s with such FIDs exist, then succeeds.
-        async fn delete(
-            &self,
-            request: tonic::Request<super::IdRequest>,
-        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status>;
-        /// Lookups `Element`s by their FIDs on the media server.
-        /// If no FIDs are specified, then returns all the current `Element`s on the
-        /// media server.
-        async fn get(
-            &self,
-            request: tonic::Request<super::IdRequest>,
-        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status>;
-        /// Applies changes to an existing `Element` on the media server, or creates a
-        /// new one in case there is no `Element` with such ID.
-        ///
-        /// Idempotent. If no `Element` with such ID exists, then it will be created,
-        /// otherwise it will be reconfigured. `Element`s that exist on the same
-        /// hierarchy level, but are not specified in the provided spec, will be
-        /// removed.
-        async fn apply(
-            &self,
-            request: tonic::Request<super::ApplyRequest>,
-        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status>;
-        /// Checks healthiness of the media server.
-        /// Caller should assert that the returned `Pong` has the same nonce as the
-        /// sent `Ping`.
-        async fn healthz(
-            &self,
-            request: tonic::Request<super::Ping>,
-        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status>;
-    }
+    use tonic::codegen::http::Uri;
     /// Service allowing to control a media server dynamically, by creating, updating
     /// and destroying pipelines of media `Element`s on it.
-    #[derive(Debug)]
-    pub struct ControlApiServer<T: ControlApi> {
-        inner: _Inner<T>,
-        accept_compression_encodings: EnabledCompressionEncodings,
-        send_compression_encodings: EnabledCompressionEncodings,
-        max_decoding_message_size: Option<usize>,
-        max_encoding_message_size: Option<usize>,
+    #[derive(Debug, Clone)]
+    pub struct ControlApiClient<T> {
+        inner: tonic::client::Grpc<T>,
     }
-    struct _Inner<T>(Arc<T>);
-    impl<T: ControlApi> ControlApiServer<T> {
-        pub fn new(inner: T) -> Self {
-            Self::from_arc(Arc::new(inner))
+    impl ControlApiClient<tonic::transport::Channel> {
+        /// Attempt to create a new client by connecting to a given endpoint.
+        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
+        where
+            D: TryInto<tonic::transport::Endpoint>,
+            D::Error: Into<StdError>,
+        {
+            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
+            Ok(Self::new(conn))
         }
-        pub fn from_arc(inner: Arc<T>) -> Self {
-            let inner = _Inner(inner);
-            Self {
-                inner,
-                accept_compression_encodings: Default::default(),
-                send_compression_encodings: Default::default(),
-                max_decoding_message_size: None,
-                max_encoding_message_size: None,
-            }
+    }
+    impl<T> ControlApiClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::Error: Into<StdError>,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
+            Self { inner }
         }
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> InterceptedService<Self, F>
+        ) -> ControlApiClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+            >>::Error: Into<StdError> + Send + Sync,
         {
-            InterceptedService::new(Self::new(inner), interceptor)
+            ControlApiClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Enable decompressing requests with the given encoding.
-        #[must_use]
-        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.accept_compression_encodings.enable(encoding);
-            self
-        }
-        /// Compress responses with the given encoding, if the client supports it.
+        /// Compress requests with the given encoding.
+        ///
+        /// This requires the server to support it otherwise it might respond with an
+        /// error.
         #[must_use]
         pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
-            self.send_compression_encodings.enable(encoding);
+            self.inner = self.inner.send_compressed(encoding);
+            self
+        }
+        /// Enable decompressing responses.
+        #[must_use]
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
             self
         }
         /// Limits the maximum size of a decoded message.
@@ -565,7 +542,7 @@ pub mod control_api_server {
         /// Default: `4MB`
         #[must_use]
         pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
-            self.max_decoding_message_size = Some(limit);
+            self.inner = self.inner.max_decoding_message_size(limit);
             self
         }
         /// Limits the maximum size of an encoded message.
@@ -573,276 +550,123 @@ pub mod control_api_server {
         /// Default: `usize::MAX`
         #[must_use]
         pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
-            self.max_encoding_message_size = Some(limit);
+            self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-    }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for ControlApiServer<T>
-    where
-        T: ControlApi,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
-    {
-        type Response = http::Response<tonic::body::BoxBody>;
-        type Error = std::convert::Infallible;
-        type Future = BoxFuture<Self::Response, Self::Error>;
-        fn poll_ready(
+        /// Creates a new `Element` on the media server.
+        ///
+        /// Non-idempotent. Errors if an `Element` with such ID already exists.
+        pub async fn create(
             &mut self,
-            _cx: &mut Context<'_>,
-        ) -> Poll<std::result::Result<(), Self::Error>> {
-            Poll::Ready(Ok(()))
+            request: impl tonic::IntoRequest<super::CreateRequest>,
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Create");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Create"));
+            self.inner.unary(req, path, codec).await
         }
-        fn call(&mut self, req: http::Request<B>) -> Self::Future {
-            let inner = self.inner.clone();
-            match req.uri().path() {
-                "/api.ControlApi/Create" => {
-                    #[allow(non_camel_case_types)]
-                    struct CreateSvc<T: ControlApi>(pub Arc<T>);
-                    impl<T: ControlApi> tonic::server::UnaryService<super::CreateRequest>
-                    for CreateSvc<T> {
-                        type Response = super::CreateResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::CreateRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).create(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = CreateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/api.ControlApi/Delete" => {
-                    #[allow(non_camel_case_types)]
-                    struct DeleteSvc<T: ControlApi>(pub Arc<T>);
-                    impl<T: ControlApi> tonic::server::UnaryService<super::IdRequest>
-                    for DeleteSvc<T> {
-                        type Response = super::Response;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::IdRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).delete(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = DeleteSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/api.ControlApi/Get" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetSvc<T: ControlApi>(pub Arc<T>);
-                    impl<T: ControlApi> tonic::server::UnaryService<super::IdRequest>
-                    for GetSvc<T> {
-                        type Response = super::GetResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::IdRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).get(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/api.ControlApi/Apply" => {
-                    #[allow(non_camel_case_types)]
-                    struct ApplySvc<T: ControlApi>(pub Arc<T>);
-                    impl<T: ControlApi> tonic::server::UnaryService<super::ApplyRequest>
-                    for ApplySvc<T> {
-                        type Response = super::CreateResponse;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::ApplyRequest>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).apply(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = ApplySvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/api.ControlApi/Healthz" => {
-                    #[allow(non_camel_case_types)]
-                    struct HealthzSvc<T: ControlApi>(pub Arc<T>);
-                    impl<T: ControlApi> tonic::server::UnaryService<super::Ping>
-                    for HealthzSvc<T> {
-                        type Response = super::Pong;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::Ping>,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).healthz(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = HealthzSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                _ => {
-                    Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", "12")
-                                .header("content-type", "application/grpc")
-                                .body(empty_body())
-                                .unwrap(),
-                        )
-                    })
-                }
-            }
+        /// Removes `Element`s from the media server.
+        /// Allows referring multiple `Element`s on the last two levels of a FID.
+        ///
+        /// Idempotent. If no `Element`s with such FIDs exist, then succeeds.
+        pub async fn delete(
+            &mut self,
+            request: impl tonic::IntoRequest<super::IdRequest>,
+        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Delete");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Delete"));
+            self.inner.unary(req, path, codec).await
         }
-    }
-    impl<T: ControlApi> Clone for ControlApiServer<T> {
-        fn clone(&self) -> Self {
-            let inner = self.inner.clone();
-            Self {
-                inner,
-                accept_compression_encodings: self.accept_compression_encodings,
-                send_compression_encodings: self.send_compression_encodings,
-                max_decoding_message_size: self.max_decoding_message_size,
-                max_encoding_message_size: self.max_encoding_message_size,
-            }
+        /// Lookups `Element`s by their FIDs on the media server.
+        /// If no FIDs are specified, then returns all the current `Element`s on the
+        /// media server.
+        pub async fn get(
+            &mut self,
+            request: impl tonic::IntoRequest<super::IdRequest>,
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Get");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Get"));
+            self.inner.unary(req, path, codec).await
         }
-    }
-    impl<T: ControlApi> Clone for _Inner<T> {
-        fn clone(&self) -> Self {
-            Self(Arc::clone(&self.0))
+        /// Applies changes to an existing `Element` on the media server, or creates a
+        /// new one in case there is no `Element` with such ID.
+        ///
+        /// Idempotent. If no `Element` with such ID exists, then it will be created,
+        /// otherwise it will be reconfigured. `Element`s that exist on the same
+        /// hierarchy level, but are not specified in the provided spec, will be
+        /// removed.
+        pub async fn apply(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ApplyRequest>,
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Apply"));
+            self.inner.unary(req, path, codec).await
         }
-    }
-    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self.0)
+        /// Checks healthiness of the media server.
+        /// Caller should assert that the returned `Pong` has the same nonce as the
+        /// sent `Ping`.
+        pub async fn healthz(
+            &mut self,
+            request: impl tonic::IntoRequest<super::Ping>,
+        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Healthz"));
+            self.inner.unary(req, path, codec).await
         }
-    }
-    impl<T: ControlApi> tonic::server::NamedService for ControlApiServer<T> {
-        const NAME: &'static str = "api.ControlApi";
     }
 }

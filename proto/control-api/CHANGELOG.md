@@ -6,6 +6,22 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.10.0] · 2023-09-25
+[0.10.0]: /../../tree/medea-control-api-proto-0.10.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.9.0...medea-control-api-proto-0.10.0)
+
+### Upgraded
+
+- Dependencies:
+    - [`prost`] to `0.12` ([7ab40e8a]);
+    - [`tonic`] to `0.10` ([7ab40e8a]).
+
+[7ab40e8a]: /../../commit/7ab40e8a48b4add3ddee31935f11dbcd09cecece
+
+
+
+
 ## [0.9.0] · 2023-07-12
 [0.9.0]: /../../tree/medea-control-api-proto-0.9.0/proto/control-api
 

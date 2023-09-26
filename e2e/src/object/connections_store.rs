@@ -25,12 +25,12 @@ impl Object<ConnectionStore> {
         let connection = self
             .execute_and_fetch(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async (store) => {
                     const [id] = args;
                     return store.connections.get(id);
                 }
-                "#,
+                ",
                 [remote_id.into()],
             ))
             .await?;
@@ -50,7 +50,7 @@ impl Object<ConnectionStore> {
     ) -> Result<Object<Connection>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (store) => {
                 const [remoteId] = args;
                 let conn = store.connections.get(remoteId);
@@ -63,7 +63,7 @@ impl Object<ConnectionStore> {
                     return await waiter;
                 }
             }
-            "#,
+            ",
             [remote_id.into()],
         ))
         .await

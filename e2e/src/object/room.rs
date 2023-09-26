@@ -92,12 +92,12 @@ impl Object<Room> {
     pub async fn join(&self, uri: String) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 const [uri] = args;
                 await room.room.join(uri);
             }
-            "#,
+            ",
             [uri.into()],
         ))
         .await
@@ -342,7 +342,7 @@ impl Object<Room> {
     ) -> Result<Object<ConnectionStore>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (r) => {
                 let store = {
                     connections: new Map(),
@@ -435,7 +435,7 @@ impl Object<Room> {
                 });
                 return store;
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -451,7 +451,7 @@ impl Object<Room> {
     ) -> Result<Object<tracks_store::Local>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"async (room) => room.localTracksStore"#,
+            "async (room) => room.localTracksStore",
             [],
         ))
         .await
@@ -465,7 +465,7 @@ impl Object<Room> {
     pub async fn wait_for_close(&self) -> Result<String, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 if (room.closeListener.isClosed) {
                     return room.closeListener.closeReason.reason();
@@ -478,7 +478,7 @@ impl Object<Room> {
                     return closeReason.reason();
                 }
             }
-            "#,
+            ",
             [],
         ))
         .await?
@@ -497,7 +497,7 @@ impl Object<Room> {
     pub async fn wait_for_connection_loss(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 if (!room.connLossListener.isLost) {
                     await new Promise((resolve) => {
@@ -505,7 +505,7 @@ impl Object<Room> {
                     });
                 }
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -521,14 +521,14 @@ impl Object<Room> {
     pub async fn start_ws_reconnect(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 await room
                     .connLossListener
                     .reconnectHandle
                     .reconnect_with_backoff(100, 2.0, 1000, 5000);
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -550,7 +550,7 @@ impl Object<Room> {
         self.forget_local_tracks().await;
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 const [video, audio, shouldWait] = args;
                 let constraints = new rust.MediaStreamSettings();
@@ -572,7 +572,7 @@ impl Object<Room> {
                     await promise;
                 }
             }
-            "#,
+            ",
             [video.into(), audio.into(), should_wait.into()],
         ))
         .await
@@ -588,7 +588,7 @@ impl Object<Room> {
     pub async fn when_failed_local_stream_count(&self, count: u64) {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 const [count] = args;
                 return await new Promise((resolve) => {
@@ -608,7 +608,7 @@ impl Object<Room> {
                     }
                 });
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -624,12 +624,12 @@ impl Object<Room> {
     pub async fn forget_local_tracks(&self) {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (room) => {
                 room.localTracksStore.tracks.forEach((t) => t.track.free());
                 room.localTracksStore.tracks = [];
             }
-            "#,
+            ",
             [],
         ))
         .await

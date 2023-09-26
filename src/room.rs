@@ -458,8 +458,8 @@ impl RoomHandle {
                             direction,
                             source_kind,
                         );
+                        // false positive: output expression is not input one
                         #[allow(clippy::redundant_closure_call)]
-                        // TODO: Fix in `tracerr`.
                         tracerr::map_from_and_wrap!()(e)
                     })?;
                 if !inner.send_constraints.is_track_enabled(kind, source_kind) {
@@ -1482,8 +1482,8 @@ impl InnerRoom {
                         e.as_ref(),
                         UpdateLocalStreamError::CouldNotGetLocalMedia(_)
                     ) {
+                        // false positive: output expression is not input one
                         #[allow(clippy::redundant_closure_call)]
-                        // TODO: Fix in `tracerr`.
                         return Err(E::errored(tracerr::map_from_and_wrap!()(
                             e.clone(),
                         )));
@@ -1497,13 +1497,16 @@ impl InnerRoom {
                         )
                         .await
                         .map_err(|err| {
+                            // false positive: output expression is not input
+                            //                 one
                             #[allow(clippy::redundant_closure_call)]
-                            // TODO: Fix in `tracerr`.
                             err.recovery_failed(tracerr::map_from_and_wrap!()(
                                 e.clone(),
                             ))
                         })?;
 
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::recovered(tracerr::map_from_and_wrap!()(e.clone()))
                     } else if stop_first {
                         self.disable_senders_without_tracks(
@@ -1523,8 +1526,12 @@ impl InnerRoom {
                             }
                         })?;
 
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     } else {
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     };
 

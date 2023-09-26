@@ -42,6 +42,7 @@
     clippy::iter_on_single_items,
     clippy::iter_with_drain,
     clippy::large_include_file,
+    clippy::large_stack_frames,
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::manual_clamp,
@@ -55,6 +56,7 @@
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::needless_collect,
+    clippy::needless_raw_strings,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
     clippy::or_fun_call,
@@ -63,9 +65,11 @@
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
+    clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::redundant_clone,
+    clippy::redundant_type_annotations,
     clippy::ref_patterns,
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
@@ -87,6 +91,7 @@
     clippy::transmute_undefined_repr,
     clippy::trivial_regex,
     clippy::try_err,
+    clippy::tuple_array_conversions,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
     clippy::unnecessary_safety_comment,
@@ -103,6 +108,7 @@
     clippy::verbose_file_reads,
     clippy::wildcard_enum_match_arm,
     future_incompatible,
+    invalid_reference_casting,
     let_underscore_drop,
     meta_variable_misuse,
     missing_copy_implementations,
@@ -180,7 +186,7 @@ pub fn run() {
     let _log_guard = init_logger();
 
     actix_web::rt::System::new().block_on(async move {
-        let callback_server = callback::server::run(&opts).await;
+        let callback_server = callback::server::run(&opts);
         api::run(&opts, callback_server).await;
     });
 }

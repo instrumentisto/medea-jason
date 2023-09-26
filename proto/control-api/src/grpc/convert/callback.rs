@@ -76,7 +76,7 @@ impl From<OnJoinEvent> for proto::OnJoin {
 impl From<proto::OnLeave> for OnLeaveEvent {
     fn from(ev: proto::OnLeave) -> Self {
         Self {
-            reason: proto::on_leave::Reason::from_i32(ev.reason)
+            reason: proto::on_leave::Reason::try_from(ev.reason)
                 .unwrap_or_default()
                 .into(),
         }

@@ -85,7 +85,7 @@ mod leave {
     impl From<proto::OnLeave> for OnLeave {
         fn from(proto: proto::OnLeave) -> Self {
             Self {
-                reason: proto::on_leave::Reason::from_i32(proto.reason)
+                reason: proto::on_leave::Reason::try_from(proto.reason)
                     .unwrap_or_default()
                     .into(),
             }
