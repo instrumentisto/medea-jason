@@ -131,7 +131,7 @@ impl Receiver {
                     media_connections.0.borrow().add_transceiver(
                         kind,
                         platform::TransceiverDirection::INACTIVE,
-                        None
+                        Vec::new()
                     );
                 new_transceiver.await
             };

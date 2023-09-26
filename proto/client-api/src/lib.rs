@@ -963,7 +963,7 @@ pub struct VideoSettings {
     /// Source kind of this [`VideoSettings`] media.
     pub source_kind: MediaSourceKind,
 
-    pub encodings: Option<Vec<Encodings>>,
+    pub encodings: Vec<EncodingParameters>,
 }
 
 /// Possible media sources of a video [`Track`].
@@ -977,7 +977,7 @@ pub enum MediaSourceKind {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct Encodings {
+pub struct EncodingParameters {
     pub rid: String,
     pub active: bool,
     pub max_bitrate: Option<u32>,

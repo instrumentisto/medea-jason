@@ -6,7 +6,7 @@ use derive_more::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
     AudioSettings as ProtoAudioConstraints, MediaSourceKind,
-    MediaType as ProtoTrackConstraints, MediaType, VideoSettings, Encodings,
+    MediaType as ProtoTrackConstraints, MediaType, VideoSettings, EncodingParameters,
 };
 use medea_reactive::ObservableCell;
 
@@ -659,7 +659,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
     #[must_use]
-    pub const fn enabled(&self, kind: MediaType) -> bool {
+    pub fn enabled(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => self.is_track_enabled_and_constrained(
                 MediaKind::Video,
@@ -675,7 +675,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
     #[must_use]
-    pub const fn muted(&self, kind: MediaType) -> bool {
+    pub fn muted(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => match video.source_kind {
                 MediaSourceKind::Device => self.device_video.muted,
@@ -863,10 +863,10 @@ impl VideoSource {
         }
     }
 
-    pub const fn encodings(&self) -> Option<Vec<Encodings>> {
+    pub fn encodings(&self) -> Vec<EncodingParameters> {
         match self {
-            VideoSource::Device(s) => s.encodings,
-            VideoSource::Display(s) => s.encodings,
+            VideoSource::Device(s) => s.encodings.clone(),
+            VideoSource::Display(s) => s.encodings.clone(),
         }
     }
 }
@@ -881,7 +881,7 @@ impl From<VideoSettings> for VideoSource {
                     width: None,
                     height: None,
                     required: settings.required,
-                    encodings: settings.encodings
+                    encodings: settings.encodings.clone()
                 })
             }
             MediaSourceKind::Display => {
@@ -891,7 +891,7 @@ impl From<VideoSettings> for VideoSource {
                     frame_rate: None,
                     required: settings.required,
                     device_id: None,
-                    encodings: settings.encodings
+                    encodings: settings.encodings.clone()
                 })
             }
         }
@@ -951,9 +951,9 @@ impl TrackConstraints {
         }
     }
 
-    pub const fn encodings(&self) -> Option<Vec<Encodings>> {
+    pub fn encodings(&self) -> Vec<EncodingParameters> {
         match &self {
-            TrackConstraints::Audio(_) => None,
+            TrackConstraints::Audio(_) => Vec::new(),
             TrackConstraints::Video(vs) => vs.encodings(),
         }
     }
@@ -1148,7 +1148,7 @@ pub struct DeviceVideoTrackConstraints {
     /// Width of the video in pixels.
     pub width: Option<ConstrainU32>,
 
-    pub encodings: Option<Vec<Encodings>>
+    pub encodings: Vec<EncodingParameters>
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1302,7 +1302,7 @@ pub struct DisplayVideoTrackConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub frame_rate: Option<ConstrainU32>,
 
-    pub encodings: Option<Vec<Encodings>>
+    pub encodings: Vec<EncodingParameters>
 }
 
 impl DisplayVideoTrackConstraints {
