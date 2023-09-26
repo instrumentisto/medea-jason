@@ -980,8 +980,8 @@ pub enum MediaSourceKind {
 pub struct Encodings {
     pub rid: String,
     pub active: bool,
-    pub max_bitrate: Option<u16>,
-    pub scale_resolution_down_by: Option<u16>
+    pub max_bitrate: Option<u32>,
+    pub scale_resolution_down_by: Option<u8>
 }
 
 /// Estimated connection quality.
