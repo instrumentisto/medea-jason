@@ -86,6 +86,7 @@ impl ControlClient {
         subscribers: Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>,
     ) -> Result<Self, tonic::transport::Error> {
         let grpc_client = {
+            /// Max number of retries when connection medea.
             const MAX_RETRIES: u64 = 5;
 
             let mut current_try = 0;
@@ -99,16 +100,12 @@ impl ControlClient {
                         break client;
                     }
                     Err(err) => {
-                        if current_try > MAX_RETRIES {
+                        if current_try == MAX_RETRIES {
                             error!("Error connection to medea: {}", err);
                             return Err(err);
-                        } else {
-                            error!(
-                                "Error connection to medea: {}, retrying",
-                                err
-                            );
-                            actix::clock::sleep(Duration::from_secs(1)).await;
                         }
+                        error!("Error connection to medea: {}, retrying", err);
+                        actix::clock::sleep(Duration::from_secs(1)).await;
                     }
                 }
             }
