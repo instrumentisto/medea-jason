@@ -6,6 +6,7 @@
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
+    time::Duration,
 };
 
 use actix::Recipient;
@@ -14,7 +15,10 @@ use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
 use tonic::{transport::Channel, Status};
 
-use crate::api::{ws::Notification, Element, Subscribers};
+use crate::{
+    api::{ws::Notification, Element, Subscribers},
+    prelude::*,
+};
 
 /// Fid to `Room` element.
 #[derive(Clone, Debug, AsRef, From, Into)]
@@ -81,10 +85,38 @@ impl ControlClient {
         medea_addr: String,
         subscribers: Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>,
     ) -> Result<Self, tonic::transport::Error> {
-        let client = ControlApiClient::connect(medea_addr).await?;
+        let grpc_client = {
+            const MAX_RETRIES: u64 = 5;
+
+            let mut current_try = 0;
+            loop {
+                current_try += 1;
+                let client =
+                    ControlApiClient::connect(medea_addr.clone()).await;
+
+                match client {
+                    Ok(client) => {
+                        break client;
+                    }
+                    Err(err) => {
+                        if current_try > MAX_RETRIES {
+                            error!("Error connection to medea: {}", err);
+                            return Err(err);
+                        } else {
+                            error!(
+                                "Error connection to medea: {}, retrying",
+                                err
+                            );
+                            actix::clock::sleep(Duration::from_secs(1)).await;
+                        }
+                    }
+                }
+            }
+        };
+
         Ok(Self {
             subscribers,
-            grpc_client: client,
+            grpc_client,
         })
     }
 
