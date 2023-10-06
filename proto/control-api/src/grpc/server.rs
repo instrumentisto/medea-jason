@@ -24,6 +24,7 @@ use crate::{
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].
 ///
 /// [`Error`]: std::error::Error
+#[allow(clippy::absolute_paths)]
 type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[async_trait]
@@ -75,7 +76,7 @@ where
         };
 
         Ok(tonic::Response::new(match result {
-            Ok(_) => control_proto::Response { error: None },
+            Ok(()) => control_proto::Response { error: None },
             Err(e) => control_proto::Response {
                 error: Some(e.into()),
             },

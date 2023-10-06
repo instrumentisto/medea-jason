@@ -1,6 +1,6 @@
 //! ICE candidate of a [RTCPeerConnection][1].
 //!
-//! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+//! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
@@ -38,7 +38,7 @@ mod ice_candidate {
 /// Wrapper around a [`DartHandle`] representing an ICE candidate of a
 /// [RTCPeerConnection][1].
 ///
-/// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+/// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 #[derive(Debug, From)]
 pub struct IceCandidate(DartHandle);
 

@@ -341,7 +341,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
-    fn local_sdp_approved(_: &PeerConnection, state: &State, _: ()) {
+    fn local_sdp_approved(_: &PeerConnection, state: &State, (): ()) {
         if let Some(negotiation_role) = state.negotiation_role.get() {
             match negotiation_role {
                 NegotiationRole::Offerer => {

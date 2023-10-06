@@ -94,7 +94,7 @@ impl CallbackUrl {
     #[must_use]
     pub fn to_http(&self) -> Url {
         let mut url = self.0.clone();
-        url.set_scheme("http").unwrap_or_else(|_| unreachable!());
+        url.set_scheme("http").unwrap_or_else(|()| unreachable!());
         url
     }
 }

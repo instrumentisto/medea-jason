@@ -3,7 +3,6 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#device-info
 
 use derive_more::From;
-use web_sys as sys;
 
 use crate::media::MediaDeviceKind;
 
@@ -11,15 +10,15 @@ use crate::media::MediaDeviceKind;
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#device-info
 #[derive(Debug, From)]
-pub struct MediaDeviceInfo(sys::MediaDeviceInfo);
+pub struct MediaDeviceInfo(web_sys::MediaDeviceInfo);
 
-impl From<sys::MediaDeviceKind> for MediaDeviceKind {
-    fn from(value: sys::MediaDeviceKind) -> Self {
+impl From<web_sys::MediaDeviceKind> for MediaDeviceKind {
+    fn from(value: web_sys::MediaDeviceKind) -> Self {
         match value {
-            sys::MediaDeviceKind::Audioinput => Self::AudioInput,
-            sys::MediaDeviceKind::Videoinput => Self::VideoInput,
-            sys::MediaDeviceKind::Audiooutput => Self::AudioOutput,
-            sys::MediaDeviceKind::__Nonexhaustive => {
+            web_sys::MediaDeviceKind::Audioinput => Self::AudioInput,
+            web_sys::MediaDeviceKind::Videoinput => Self::VideoInput,
+            web_sys::MediaDeviceKind::Audiooutput => Self::AudioOutput,
+            web_sys::MediaDeviceKind::__Nonexhaustive => {
                 unreachable!("Unknown MediaDeviceKind::{value:?}")
             }
         }

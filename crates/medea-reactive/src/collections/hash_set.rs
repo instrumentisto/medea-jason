@@ -1,8 +1,12 @@
 //! Reactive hash set based on [`HashSet`].
 
-use std::{collections::hash_set::Iter, hash::Hash, marker::PhantomData};
+use std::{
+    collections::{hash_set::Iter, HashSet as StdHashSet},
+    hash::Hash,
+    marker::PhantomData,
+};
 
-use futures::stream::LocalBoxStream;
+use futures::stream::{self, LocalBoxStream};
 
 use crate::subscribers_store::{
     common, progressable,
@@ -99,7 +103,7 @@ pub type ObservableHashSet<T> = HashSet<T, common::SubStore<T>, T>;
 #[derive(Debug)]
 pub struct HashSet<T, S: SubscribersStore<T, O>, O> {
     /// Data stored by this [`HashSet`].
-    store: std::collections::HashSet<T>,
+    store: StdHashSet<T>,
 
     /// Subscribers of the [`HashSet::on_insert()`] method.
     on_insert_subs: S,
@@ -192,7 +196,7 @@ where
     /// [`Stream`]: futures::Stream
     #[allow(clippy::needless_collect)] // false positive: lifetimes
     pub fn replay_on_insert(&self) -> LocalBoxStream<'static, O> {
-        Box::pin(futures::stream::iter(
+        Box::pin(stream::iter(
             self.store
                 .clone()
                 .into_iter()
@@ -243,7 +247,7 @@ where
     /// diff is not empty.
     ///
     /// For the usage example you can read [`HashSet`] docs.
-    pub fn update(&mut self, updated: std::collections::HashSet<T>) {
+    pub fn update(&mut self, updated: StdHashSet<T>) {
         let removed_elems = self.store.difference(&updated);
         let inserted_elems = updated.difference(&self.store);
 
@@ -273,7 +277,7 @@ where
 {
     fn default() -> Self {
         Self {
-            store: std::collections::HashSet::new(),
+            store: StdHashSet::new(),
             on_insert_subs: S::default(),
             on_remove_subs: S::default(),
             _output: PhantomData,
@@ -305,11 +309,11 @@ where
     }
 }
 
-impl<T, S, O> From<std::collections::HashSet<T>> for HashSet<T, S, O>
+impl<T, S, O> From<StdHashSet<T>> for HashSet<T, S, O>
 where
     S: SubscribersStore<T, O>,
 {
-    fn from(from: std::collections::HashSet<T>) -> Self {
+    fn from(from: StdHashSet<T>) -> Self {
         Self {
             store: from,
             on_insert_subs: S::default(),

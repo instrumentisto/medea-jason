@@ -1,6 +1,6 @@
 //! Definition and implementation of [RTCRtpTransceiverDirection][1].
 //!
-//! [1]: https://w3.org/TR/webrtc/#dom-rtcrtptransceiverdirection
+//! [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiverdirection
 
 // Because of uncontrolled names in the generated code.
 #![allow(clippy::same_name_method)]

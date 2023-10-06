@@ -2,7 +2,10 @@
 //!
 //! [`Cell`]: std::cell::Cell
 
-use std::cell::{Ref, RefCell};
+use std::{
+    cell::{Ref, RefCell},
+    mem,
+};
 
 use futures::stream::LocalBoxStream;
 
@@ -79,7 +82,7 @@ where
     /// value.
     #[must_use]
     pub fn replace(&self, mut new_data: D) -> D {
-        std::mem::swap(&mut *self.0.borrow_mut().borrow_mut(), &mut new_data);
+        mem::swap(&mut *self.0.borrow_mut().borrow_mut(), &mut new_data);
         new_data
     }
 
