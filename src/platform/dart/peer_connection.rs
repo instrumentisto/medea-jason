@@ -6,7 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState,
+    IceConnectionState, IceServer, PeerConnectionState, EncodingParameters,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -30,7 +30,7 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack, utils::string_into_c_str,
+    media_track::MediaStreamTrack, utils::string_into_c_str, transceiver::TransceiverInit, send_encoding_parameters::SendEncodingParameters,
 };
 
 type Result<T> = std::result::Result<T, Traced<RtcPeerConnectionError>>;
@@ -102,7 +102,7 @@ mod peer_connection {
         pub fn add_transceiver(
             peer: Dart_Handle,
             kind: i64,
-            direction: i64,
+            init: Dart_Handle,
         ) -> Dart_Handle;
 
         /// Returns newly created SDP offer of the provided [`PeerConnection`].
@@ -457,14 +457,26 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
+        encodings: Vec<EncodingParameters>
     ) -> impl Future<Output = Transceiver> + 'static {
         let handle = self.handle.get();
         async move {
             let fut = unsafe {
+                let init = TransceiverInit::new(direction);
+                for encoding in encodings {
+                    let enc = SendEncodingParameters::new(encoding.rid, encoding.active);
+                    if let Some(max_bitrate) = encoding.max_bitrate {
+                        enc.set_max_bitrate(max_bitrate.into());
+                    }
+                    if let Some(scale_resolution_down_by) = encoding.scale_resolution_down_by {
+                        enc.set_scale_resolution_down_by(scale_resolution_down_by.into());
+                    }
+                    init.add_sending_encodings(enc);
+                }
                 peer_connection::add_transceiver(
                     handle,
                     kind as i64,
-                    direction.into(),
+                    init.handle(),
                 )
             };
             let trnsvr: DartHandle =

@@ -9,6 +9,7 @@ import 'media_display_info.dart' as media_display_info;
 import 'media_track.dart' as media_track;
 import 'object.dart' as object;
 import 'peer_connection.dart' as peer_connection;
+import 'send_encoding_parameters.dart' as send_encoding_parameters;
 import 'transceiver.dart' as transceiver;
 import 'transport.dart' as transport;
 
@@ -25,4 +26,5 @@ void registerFunctions(DynamicLibrary dl) {
   media_device_info.registerFunctions(dl);
   media_display_info.registerFunctions(dl);
   ice_candidate.registerFunctions(dl);
+  send_encoding_parameters.registerFunctions(dl);
 }

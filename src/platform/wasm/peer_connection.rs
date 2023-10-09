@@ -19,7 +19,7 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceEvent,
-    RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
+    RtcRtpTransceiver, RtcRtpTransceiverInit,RtcRtpEncodingParameters, RtcSdpType,
     RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
 
@@ -579,40 +579,19 @@ impl RtcPeerConnection {
                 let send_encodings = ::js_sys::Array::new();
 
                 for encoding in encodings {
-                    let obj = ::js_sys::Object::default();
-                    let _ = ::js_sys::Reflect::set(
-                        &obj,
-                        &wasm_bindgen::JsValue::from("rid"),
-                        &wasm_bindgen::JsValue::from(encoding.rid),
-                    );
-                    let _ = ::js_sys::Reflect::set(
-                        &obj,
-                        &wasm_bindgen::JsValue::from("active"),
-                        &wasm_bindgen::JsValue::from(encoding.active),
-                    );
+                    let mut params = RtcRtpEncodingParameters::new();
+                    params.rid(&encoding.rid);
+                    params.active(encoding.active);
                     if let Some(max_bitrate) = encoding.max_bitrate {
-                        let _ = ::js_sys::Reflect::set(
-                            &obj,
-                            &wasm_bindgen::JsValue::from("maxBitrate"),
-                            &wasm_bindgen::JsValue::from(max_bitrate),
-                        );
+                        params.max_bitrate(max_bitrate);
                     }
                     if let Some(scale_resolution_down_by) = encoding.scale_resolution_down_by {
-                        let _ = ::js_sys::Reflect::set(
-                            &obj,
-                            &wasm_bindgen::JsValue::from("scaleResolutionDownBy"),
-                            &wasm_bindgen::JsValue::from(scale_resolution_down_by),
-                        );
+                        params.scale_resolution_down_by(scale_resolution_down_by.into());
                     }
     
-                    send_encodings.push(&obj);
+                    send_encodings.push(&params);
                 }
-
-                let _ = ::js_sys::Reflect::set(
-                    &init,
-                    &wasm_bindgen::JsValue::from("sendEncodings"),
-                    &send_encodings,
-                );
+                init.send_encodings(&send_encodings);
             }
 
             let transceiver =

@@ -4,6 +4,7 @@
 
 use std::{future::Future, rc::Rc};
 
+use dart_sys::_Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -15,6 +16,8 @@ use crate::{
         TransceiverDirection,
     },
 };
+
+use super::send_encoding_parameters::SendEncodingParameters;
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
 mod transceiver {
@@ -59,6 +62,10 @@ mod transceiver {
 
         /// Disposes the provided [`Transceiver`].
         pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
+
+        pub fn create_transceiver_init(direction: i64) -> Dart_Handle;
+
+        pub fn add_sending_encodings(transceiver_init: Dart_Handle, encoding: Dart_Handle);
     }
 }
 
@@ -167,6 +174,27 @@ impl Drop for Transceiver {
                 let fut = unsafe { transceiver::dispose(transceiver.get()) };
                 unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
             });
+        }
+    }
+}
+
+pub struct TransceiverInit(DartHandle);
+
+impl TransceiverInit {
+    #[must_use]
+    pub fn new(direction: TransceiverDirection) -> Self {
+        unsafe {
+            Self(DartHandle::new(transceiver::create_transceiver_init(direction.into())))
+        }
+    }
+
+    pub fn handle(&self) -> *mut _Dart_Handle {
+        self.0.get()
+    }
+
+    pub fn add_sending_encodings(&self, encoding: SendEncodingParameters) {
+        unsafe {
+            transceiver::add_sending_encodings(self.0.get(), encoding.handle());
         }
     }
 }

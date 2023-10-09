@@ -18,7 +18,18 @@ void registerFunctions(DynamicLibrary dl) {
     setRecv: Pointer.fromFunction(_setRecv),
     setSend: Pointer.fromFunction(_setSend),
     dispose: Pointer.fromFunction(_dispose),
+    createTransceiverInit: Pointer.fromFunction(_createTransceiverInit),
+    addSendingEncodings: Pointer.fromFunction(_addSendingEncodings),
   );
+}
+
+Object _createTransceiverInit(int direction) {
+  return RtpTransceiverInit(TransceiverDirection.values[direction]);
+}
+
+void _addSendingEncodings(
+    RtpTransceiverInit init, SendEncodingParameters encoding) {
+  init.sendEncodings.add(encoding);
 }
 
 /// Changes the receive direction of the provided [RtpTransceiver].
