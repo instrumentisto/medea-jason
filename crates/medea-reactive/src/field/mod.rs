@@ -13,7 +13,7 @@ use std::{
 
 use futures::{
     channel::{mpsc, oneshot},
-    future::LocalBoxFuture,
+    future::{self, LocalBoxFuture},
     stream::{self, LocalBoxStream, StreamExt as _},
 };
 
@@ -94,7 +94,7 @@ where
         // TODO: This is kinda broken.
         //       See https://github.com/instrumentisto/medea/issues/163 issue.
         if (assert_fn)(&self.data) {
-            Box::pin(futures::future::ok(()))
+            Box::pin(future::ok(()))
         } else {
             self.subs.when(Box::new(assert_fn))
         }
@@ -318,7 +318,7 @@ impl<D: Clone> OnObservableFieldModification<D>
                         .take()
                         .expect("`UniversalSubscriber::When` used already")
                         .send(())
-                        .map_or(false, |_| false)
+                        .map_or(false, |()| false)
                 } else {
                     true
                 }

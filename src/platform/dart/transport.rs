@@ -21,7 +21,7 @@ use crate::{
     rpc::{ApiUrl, ClientDisconnect, CloseMsg},
 };
 
-type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
+type TransportResult<T> = Result<T, Traced<TransportError>>;
 
 #[dart_bridge("flutter/lib/src/native/platform/transport.g.dart")]
 mod transport {
@@ -128,7 +128,7 @@ impl Default for WebSocketRpcTransport {
 
 #[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
-    async fn connect(&self, url: ApiUrl) -> Result<()> {
+    async fn connect(&self, url: ApiUrl) -> TransportResult<()> {
         // TODO: Propagate execution error.
         #[allow(clippy::map_err_ignore)]
         let handle = {
@@ -203,7 +203,7 @@ impl RpcTransport for WebSocketRpcTransport {
     }
 
     #[allow(clippy::unwrap_in_result)]
-    fn send(&self, msg: &ClientMsg) -> Result<(), Traced<TransportError>> {
+    fn send(&self, msg: &ClientMsg) -> TransportResult<()> {
         let state = self.socket_state.get();
         let handle = self
             .handle

@@ -25,6 +25,7 @@ use crate::{
 /// [`Box`]ed [`Error`] with [`Send`] and [`Sync`].
 ///
 /// [`Error`]: std::error::Error
+#[allow(clippy::absolute_paths)]
 type StdError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[async_trait]
@@ -42,7 +43,7 @@ where
             .map_err(T::Error::from)?;
         self.on_event(req)
             .await
-            .map(|_| tonic::Response::new(callback_proto::Response {}))
+            .map(|()| tonic::Response::new(callback_proto::Response {}))
             .map_err(Into::into)
     }
 }

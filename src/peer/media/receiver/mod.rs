@@ -189,7 +189,7 @@ impl Receiver {
 
     /// Returns [`mid`] of this [`Receiver`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         if self.mid.borrow().is_none() && self.transceiver.borrow().is_some() {

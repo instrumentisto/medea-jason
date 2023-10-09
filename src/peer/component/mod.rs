@@ -5,6 +5,8 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
+#[cfg(feature = "mockable")]
+use std::future::Future;
 use std::{cell::Cell, collections::HashSet, rc::Rc};
 
 use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
@@ -569,11 +571,10 @@ impl State {
         self.negotiation_role.get()
     }
 
-    /// Returns [`Future`] resolving once local SDP approve is needed.
-    pub fn when_local_sdp_approve_needed(
-        &self,
-    ) -> impl std::future::Future<Output = ()> {
+    /// Returns a [`Future`] resolving once local SDP approve is needed.
+    pub fn when_local_sdp_approve_needed(&self) -> impl Future<Output = ()> {
         use futures::FutureExt as _;
+
         self.negotiation_state
             .when_eq(NegotiationState::WaitLocalSdpApprove)
             .map(drop)

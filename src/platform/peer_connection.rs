@@ -9,17 +9,17 @@ use crate::{
 
 /// Representation of [RTCSdpType].
 ///
-/// [RTCSdpType]: https://w3.org/TR/webrtc/#dom-rtcsdptype
+/// [RTCSdpType]: https://w3.org/TR/webrtc#dom-rtcsdptype
 #[derive(Debug)]
 pub enum SdpType {
     /// [`offer` type][1] of SDP.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcsdptype-offer
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcsdptype-offer
     Offer(String),
 
     /// [`answer` type][1] of SDP.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcsdptype-answer
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcsdptype-answer
     Answer(String),
 }
 
@@ -30,34 +30,34 @@ pub enum SdpType {
 pub struct IceCandidate {
     /// [`candidate` field][2] of the discovered [RTCIceCandidate][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidate
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcicecandidate-candidate
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidate
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcicecandidate-candidate
     pub candidate: String,
 
     /// [`sdpMLineIndex` field][2] of the discovered [RTCIceCandidate][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidate
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcicecandidate-sdpmlineindex
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidate
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcicecandidate-sdpmlineindex
     pub sdp_m_line_index: Option<u16>,
 
     /// [`sdpMid` field][2] of the discovered [RTCIceCandidate][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidate
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcicecandidate-sdpmid
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidate
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcicecandidate-sdpmid
     pub sdp_mid: Option<String>,
 }
 
 /// Errors that may occur during signaling between this and remote
 /// [RTCPeerConnection][1] and event handlers setting errors.
 ///
-/// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+/// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 #[derive(Caused, Clone, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum RtcPeerConnectionError {
     /// Occurs when cannot adds new remote candidate to the
     /// [RTCPeerConnection][1]'s remote description.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
     #[display(fmt = "Failed to add ICE candidate: {}", _0)]
     #[from(ignore)]
     AddIceCandidateFailed(platform::Error),
