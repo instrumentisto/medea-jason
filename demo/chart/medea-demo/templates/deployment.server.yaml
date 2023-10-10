@@ -74,11 +74,6 @@ spec:
             - name: grpc
               containerPort: {{ .Values.server.conf.server.control.grpc.bind_port | int }}
               protocol: TCP
-          {{- if .Values.monitoring.enabled }}
-            - name: metrics
-              containerPort: {{ .Values.conf.metrics.port | int }}
-              protocol: TCP
-          {{- end }}
           volumeMounts:
             - name: conf
               subPath: medea.toml

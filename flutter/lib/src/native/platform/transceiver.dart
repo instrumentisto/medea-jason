@@ -23,10 +23,12 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
+/// Creates a new [RtpTransceiverInit].
 Object _createTransceiverInit(int direction) {
   return RtpTransceiverInit(TransceiverDirection.values[direction]);
 }
 
+/// Adds [SendEncodingParameters] to the [RtpTransceiverInit.sendEncodings].
 void _addSendingEncodings(
     RtpTransceiverInit init, SendEncodingParameters encoding) {
   init.sendEncodings.add(encoding);

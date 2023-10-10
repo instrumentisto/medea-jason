@@ -1,6 +1,6 @@
-//! [RTCRtpTransceiver] wrapper.
+//! [SendEncodingParameters] wrapper.
 //!
-//! [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
+//! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
 use dart_sys::_Dart_Handle;
 use medea_macro::dart_bridge;
@@ -18,13 +18,17 @@ mod send_encoding_parameters {
     use dart_sys::Dart_Handle;
 
     extern "C" {
+        /// Creates a new [`SendEncodingParameters`].
         pub fn new_send_encoding_parameters(
             rid: ptr::NonNull<c_char>,
             active: bool,
         ) -> Dart_Handle;
 
+        /// Sets `max_bitrate` for the provided [`SendEncodingParameters`].
         pub fn set_max_bitrate(encoding: Dart_Handle, max_bitrate: i64);
 
+        /// Sets `scale_resolution_down_by` for the provided
+        /// [`SendEncodingParameters`].
         pub fn set_scale_resolution_down_by(
             encoding: Dart_Handle,
             scale_resolution_down_by: i64,
@@ -32,14 +36,15 @@ mod send_encoding_parameters {
     }
 }
 
-/// Wrapper around [RTCRtpTransceiver] which provides handy methods for
+/// Wrapper around [ RTCRtpEncodingParameters] which provides handy methods for
 /// direction changes.
 ///
-/// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
+/// [ RTCRtpEncodingParameters]: https://tinyurl.com/mr3dt9ch
 #[derive(Clone, Debug)]
 pub struct SendEncodingParameters(DartHandle);
 
 impl SendEncodingParameters {
+    /// Creates a new [`SendEncodingParameters`].
     #[must_use]
     pub fn new(rid: String, active: bool) -> Self {
         unsafe {
@@ -51,25 +56,28 @@ impl SendEncodingParameters {
         }
     }
 
+    /// Returns underlying [`_Dart_Handle`].
     #[must_use]
     pub fn handle(&self) -> *mut _Dart_Handle {
         self.0.get()
     }
 
+    /// Sets `max_bitrate`.
     pub fn set_max_bitrate(&self, max_bitrate: i64) {
         let handle = self.0.get();
         unsafe {
-            send_encoding_parameters::set_max_bitrate(handle, max_bitrate)
+            send_encoding_parameters::set_max_bitrate(handle, max_bitrate);
         };
     }
 
+    /// Sets `scale_resolution_down_by`.
     pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: i64) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scale_resolution_down_by(
                 handle,
                 scale_resolution_down_by,
-            )
+            );
         };
     }
 }

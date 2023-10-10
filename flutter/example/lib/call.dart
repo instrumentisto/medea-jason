@@ -229,7 +229,7 @@ class Call {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Never);
+      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
       end.audio_settings = AudioSettings(
           publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled);
       end.video_settings = VideoSettings(
@@ -252,7 +252,7 @@ class Call {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Never);
+      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
       end.audio_settings = AudioSettings(
           publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled);
       end.video_settings = VideoSettings(

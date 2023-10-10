@@ -63,9 +63,14 @@ mod transceiver {
         /// Disposes the provided [`Transceiver`].
         pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
 
+        /// Creates a new [`TransceiverInit`].
         pub fn create_transceiver_init(direction: i64) -> Dart_Handle;
 
-        pub fn add_sending_encodings(transceiver_init: Dart_Handle, encoding: Dart_Handle);
+        /// Adds [`SendEncodingParameters`] to the provided [`TransceiverInit`]
+        pub fn add_sending_encodings(
+            transceiver_init: Dart_Handle,
+            encoding: Dart_Handle,
+        );
     }
 }
 
@@ -178,20 +183,30 @@ impl Drop for Transceiver {
     }
 }
 
+/// Wrapper around [RTCRtpTransceiverInit] which provides handy methods for
+/// direction changes.
+///
+/// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
 pub struct TransceiverInit(DartHandle);
 
 impl TransceiverInit {
+    /// Creates a new [`TransceiverInit`].
     #[must_use]
     pub fn new(direction: TransceiverDirection) -> Self {
         unsafe {
-            Self(DartHandle::new(transceiver::create_transceiver_init(direction.into())))
+            Self(DartHandle::new(transceiver::create_transceiver_init(
+                direction.into(),
+            )))
         }
     }
 
+    /// Returns underlying [`_Dart_Handle`].
+    #[must_use]
     pub fn handle(&self) -> *mut _Dart_Handle {
         self.0.get()
     }
 
+    /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
     pub fn add_sending_encodings(&self, encoding: SendEncodingParameters) {
         unsafe {
             transceiver::add_sending_encodings(self.0.get(), encoding.handle());

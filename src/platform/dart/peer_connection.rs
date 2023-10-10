@@ -6,7 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState, EncodingParameters,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -30,7 +30,9 @@ use crate::{
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
-    media_track::MediaStreamTrack, utils::string_into_c_str, transceiver::TransceiverInit, send_encoding_parameters::SendEncodingParameters,
+    media_track::MediaStreamTrack,
+    send_encoding_parameters::SendEncodingParameters,
+    transceiver::TransceiverInit, utils::string_into_c_str,
 };
 
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -466,19 +468,26 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        encodings: Vec<EncodingParameters>
+        encodings: Vec<EncodingParameters>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let handle = self.handle.get();
         async move {
             let fut = unsafe {
                 let init = TransceiverInit::new(direction);
                 for encoding in encodings {
-                    let enc = SendEncodingParameters::new(encoding.rid, encoding.active);
+                    let enc = SendEncodingParameters::new(
+                        encoding.rid,
+                        encoding.active,
+                    );
                     if let Some(max_bitrate) = encoding.max_bitrate {
                         enc.set_max_bitrate(max_bitrate.into());
                     }
-                    if let Some(scale_resolution_down_by) = encoding.scale_resolution_down_by {
-                        enc.set_scale_resolution_down_by(scale_resolution_down_by.into());
+                    if let Some(scale_resolution_down_by) =
+                        encoding.scale_resolution_down_by
+                    {
+                        enc.set_scale_resolution_down_by(
+                            scale_resolution_down_by.into(),
+                        );
                     }
                     init.add_sending_encodings(enc);
                 }

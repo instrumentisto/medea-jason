@@ -355,7 +355,7 @@ mod disable_recv_tracks {
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
-                            encodings: None
+                            encodings: Vec::new(),
                         }),
                     },
                     Track {
@@ -702,7 +702,7 @@ mod disable_send_tracks {
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
-                encodings: None
+                encodings: Vec::new(),
             }),
         }
     }
@@ -1483,7 +1483,7 @@ mod patches_generation {
                 MediaType::Video(VideoSettings {
                     required: false,
                     source_kind: proto::MediaSourceKind::Device,
-                    encodings: None
+                    encodings: Vec::new(),
                 }),
                 Direction::Send {
                     receivers: Vec::new(),
@@ -1790,7 +1790,7 @@ mod patches_generation {
             MediaType::Video(VideoSettings {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
-                encodings: None
+                encodings: Vec::new(),
             }),
             Direction::Send {
                 mid: None,
@@ -1847,7 +1847,7 @@ mod patches_generation {
             MediaType::Video(VideoSettings {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
-                encodings: None
+                encodings: Vec::new(),
             }),
             Direction::Send {
                 mid: None,
@@ -2389,7 +2389,7 @@ mod set_local_media_settings {
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
-                        encodings: None
+                        encodings: Vec::new(),
                     }),
                 }],
                 ice_servers: Vec::new(),
@@ -2421,7 +2421,7 @@ mod set_local_media_settings {
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
-                                    encodings: None
+                                    encodings: Vec::new(),
                                 }),
                             }],
                             ice_servers: Vec::new(),
@@ -3099,10 +3099,18 @@ async fn sender_answerer() {
         .unwrap();
 
     let a_tr = peer
-        .add_transceiver(MediaKind::Audio, platform::TransceiverDirection::RECV, None)
+        .add_transceiver(
+            MediaKind::Audio,
+            platform::TransceiverDirection::RECV,
+            Vec::new(),
+        )
         .await;
     let v_tr = peer
-        .add_transceiver(MediaKind::Video, platform::TransceiverDirection::RECV, None)
+        .add_transceiver(
+            MediaKind::Video,
+            platform::TransceiverDirection::RECV,
+            Vec::new(),
+        )
         .await;
     let offer = peer.create_offer().await.unwrap();
     peer.set_offer(&offer).await.unwrap();
@@ -3135,7 +3143,7 @@ async fn sender_answerer() {
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
                         source_kind: MediaSourceKind::Device,
-                        encodings: None
+                        encodings: Vec::new(),
                     }),
                 },
             ],

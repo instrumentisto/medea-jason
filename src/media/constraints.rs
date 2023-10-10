@@ -5,8 +5,9 @@ use std::{cell::RefCell, rc::Rc};
 use derive_more::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
-    AudioSettings as ProtoAudioConstraints, MediaSourceKind,
-    MediaType as ProtoTrackConstraints, MediaType, VideoSettings, EncodingParameters,
+    AudioSettings as ProtoAudioConstraints, EncodingParameters,
+    MediaSourceKind, MediaType as ProtoTrackConstraints, MediaType,
+    VideoSettings,
 };
 use medea_reactive::ObservableCell;
 
@@ -863,10 +864,12 @@ impl VideoSource {
         }
     }
 
+    /// Returns configured [`EncodingParameters`].
+    #[must_use]
     pub fn encodings(&self) -> Vec<EncodingParameters> {
         match self {
-            VideoSource::Device(s) => s.encodings.clone(),
-            VideoSource::Display(s) => s.encodings.clone(),
+            Self::Device(s) => s.encodings.clone(),
+            Self::Display(s) => s.encodings.clone(),
         }
     }
 }
@@ -881,7 +884,7 @@ impl From<VideoSettings> for VideoSource {
                     width: None,
                     height: None,
                     required: settings.required,
-                    encodings: settings.encodings.clone()
+                    encodings: settings.encodings,
                 })
             }
             MediaSourceKind::Display => {
@@ -891,7 +894,7 @@ impl From<VideoSettings> for VideoSource {
                     frame_rate: None,
                     required: settings.required,
                     device_id: None,
-                    encodings: settings.encodings.clone()
+                    encodings: settings.encodings,
                 })
             }
         }
@@ -951,10 +954,12 @@ impl TrackConstraints {
         }
     }
 
+    /// Returns configured [`EncodingParameters`].
+    #[must_use]
     pub fn encodings(&self) -> Vec<EncodingParameters> {
         match &self {
-            TrackConstraints::Audio(_) => Vec::new(),
-            TrackConstraints::Video(vs) => vs.encodings(),
+            Self::Audio(_) => Vec::new(),
+            Self::Video(vs) => vs.encodings(),
         }
     }
 
@@ -1148,7 +1153,8 @@ pub struct DeviceVideoTrackConstraints {
     /// Width of the video in pixels.
     pub width: Option<ConstrainU32>,
 
-    pub encodings: Vec<EncodingParameters>
+    /// [`EncodingParameters`] for the track.
+    pub encodings: Vec<EncodingParameters>,
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1302,7 +1308,8 @@ pub struct DisplayVideoTrackConstraints {
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub frame_rate: Option<ConstrainU32>,
 
-    pub encodings: Vec<EncodingParameters>
+    /// [`EncodingParameters`] for the track.
+    pub encodings: Vec<EncodingParameters>,
 }
 
 impl DisplayVideoTrackConstraints {

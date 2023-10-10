@@ -11,7 +11,7 @@ use std::{
 };
 
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState, EncodingParameters,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
 };
 use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
@@ -19,8 +19,9 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceEvent,
-    RtcRtpTransceiver, RtcRtpTransceiverInit,RtcRtpEncodingParameters, RtcSdpType,
-    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
+    RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
+    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
+    RtcTrackEvent,
 };
 
 use crate::{
@@ -575,7 +576,7 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        encodings: Vec<EncodingParameters>
+        encodings: Vec<EncodingParameters>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
@@ -587,18 +588,22 @@ impl RtcPeerConnection {
 
                 for encoding in encodings {
                     let mut params = RtcRtpEncodingParameters::new();
-                    params.rid(&encoding.rid);
-                    params.active(encoding.active);
+                    _ = params.rid(&encoding.rid);
+                    _ = params.active(encoding.active);
                     if let Some(max_bitrate) = encoding.max_bitrate {
-                        params.max_bitrate(max_bitrate);
+                        _ = params.max_bitrate(max_bitrate);
                     }
-                    if let Some(scale_resolution_down_by) = encoding.scale_resolution_down_by {
-                        params.scale_resolution_down_by(scale_resolution_down_by.into());
+                    if let Some(scale_resolution_down_by) =
+                        encoding.scale_resolution_down_by
+                    {
+                        _ = params.scale_resolution_down_by(
+                            scale_resolution_down_by.into(),
+                        );
                     }
-    
-                    send_encodings.push(&params);
+
+                    _ = send_encodings.push(&params);
                 }
-                init.send_encodings(&send_encodings);
+                _ = init.send_encodings(&send_encodings);
             }
 
             let transceiver =

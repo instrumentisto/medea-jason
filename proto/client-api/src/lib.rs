@@ -967,6 +967,7 @@ pub struct VideoSettings {
     /// Source kind of this [`VideoSettings`] media.
     pub source_kind: MediaSourceKind,
 
+    /// [`EncodingParameters`] of this [`VideoSettings`] media.
     pub encodings: Vec<EncodingParameters>,
 }
 
@@ -980,12 +981,22 @@ pub enum MediaSourceKind {
     Display,
 }
 
+/// Representation of the [RTCRtpEncodingParameters][0].
+///
+/// [0]: https://tinyurl.com/mr3dt9ch
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct EncodingParameters {
+    /// RTP stream ID of this [`EncodingParameters`].
     pub rid: String,
+
+    /// Indicates whether this encoding is actively being used or not.
     pub active: bool,
+
+    /// The maximum bitrate that can be used to send this encoding.
     pub max_bitrate: Option<u32>,
-    pub scale_resolution_down_by: Option<u8>
+
+    /// A factor by which to scale down the video during encoding.
+    pub scale_resolution_down_by: Option<u8>,
 }
 
 /// Estimated connection quality.
