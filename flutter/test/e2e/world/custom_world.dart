@@ -51,16 +51,16 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.audio, MediaSourceKind.device): true
+            MediaKind.Audio, MediaSourceKind.Device): true
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.video, MediaSourceKind.device): true
+            MediaKind.Video, MediaSourceKind.Device): true
       });
       if (isSfu) {
         sendState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.video, MediaSourceKind.display): true
+              MediaKind.Video, MediaSourceKind.Display): true
         });
       }
 
@@ -73,17 +73,17 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isRecv) {
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.audio, MediaSourceKind.device): true
+            MediaKind.Audio, MediaSourceKind.Device): true
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.video, MediaSourceKind.device): true
+            MediaKind.Video, MediaSourceKind.Device): true
       });
 
       if (isSfu) {
         recvState.addAll({
           const Tuple2<MediaKind, MediaSourceKind>(
-              MediaKind.video, MediaSourceKind.display): true
+              MediaKind.Video, MediaSourceKind.Display): true
         });
       }
 
@@ -121,7 +121,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
     var jason = Jason();
     var room = jason.initRoom();
-    await room.disableVideo(MediaSourceKind.display);
+    await room.disableVideo(MediaSourceKind.Display);
 
     var member = builder.build(room, sendState, recvState);
 
@@ -263,11 +263,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var leftMember = members[pair.left.id]!;
       if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        leftMember.updateSendMediaState(MediaKind.audio, null, true);
+        leftMember.updateSendMediaState(MediaKind.Audio, null, true);
       }
       if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        leftMember.updateSendMediaState(MediaKind.video, null, true);
+        leftMember.updateSendMediaState(MediaKind.Video, null, true);
       }
       try {
         await controlClient.create(
@@ -286,11 +286,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var rightMember = members[pair.right.id]!;
       if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        rightMember.updateSendMediaState(MediaKind.audio, null, true);
+        rightMember.updateSendMediaState(MediaKind.Audio, null, true);
       }
       if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        rightMember.updateSendMediaState(MediaKind.video, null, true);
+        rightMember.updateSendMediaState(MediaKind.Video, null, true);
       }
 
       try {
@@ -309,8 +309,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var publishEndpoint = pair.left.playEndpointFor(roomId, pair.right)!;
       var leftMember = members[pair.left.id]!;
 
-      await leftMember.updateRecvMediaState(MediaKind.video, null, true);
-      await leftMember.updateRecvMediaState(MediaKind.audio, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.Video, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.Audio, null, true);
 
       await controlClient.create(
           '$roomId/${pair.left.id}/${publishEndpoint.id}', publishEndpoint);
@@ -320,8 +320,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var publishEndpoint = pair.right.playEndpointFor(roomId, pair.left)!;
       var rightMember = members[pair.right.id]!;
 
-      await rightMember.updateRecvMediaState(MediaKind.video, null, true);
-      await rightMember.updateRecvMediaState(MediaKind.audio, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.Video, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.Audio, null, true);
 
       await controlClient.create(
           '$roomId/${pair.right.id}/${publishEndpoint.id}', publishEndpoint);

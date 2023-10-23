@@ -76,14 +76,14 @@ class Call {
 
     if (publishVideo) {
       videoDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.videoInput)
+          .firstWhere((element) => element.kind() == MediaDeviceKind.VideoInput)
           .deviceId();
       constraints.deviceVideo(DeviceVideoTrackConstraints());
     }
 
     if (publishAudio) {
       audioDeviceId = devices
-          .firstWhere((element) => element.kind() == MediaDeviceKind.audioInput)
+          .firstWhere((element) => element.kind() == MediaDeviceKind.AudioInput)
           .deviceId();
       constraints.audio(AudioTrackConstraints());
     }
@@ -99,15 +99,15 @@ class Call {
     _tracks = tracks;
 
     for (var track in tracks) {
-      if (track.kind() == MediaKind.video) {
+      if (track.kind() == MediaKind.Video) {
         _onLocalDeviceTrack(track.getTrack());
       }
     }
 
     _room.onLocalTrack((track) {
       _tracks.add(track);
-      if (track.kind() == MediaKind.video) {
-        if (track.mediaSourceKind() == MediaSourceKind.device) {
+      if (track.kind() == MediaKind.Video) {
+        if (track.mediaSourceKind() == MediaSourceKind.Device) {
           _onLocalDeviceTrack(track.getTrack());
         } else {
           _onLocalDisplayTrack(track.getTrack());
@@ -153,8 +153,8 @@ class Call {
     _tracks = await _mediaManager.initLocalTracks(constraints);
     await _room.setLocalMediaSettings(constraints, true, true);
     for (var track in _tracks) {
-      if (track.kind() == MediaKind.video) {
-        if (track.mediaSourceKind() == MediaSourceKind.display) {
+      if (track.kind() == MediaKind.Video) {
+        if (track.mediaSourceKind() == MediaSourceKind.Display) {
           _onLocalDisplayTrack(track.getTrack());
         } else {
           _onLocalDeviceTrack(track.getTrack());
@@ -187,7 +187,7 @@ class Call {
       Function(RemoteMediaTrack, String, ConnectionHandle) f) {
     _room.onNewConnection((conn) {
       conn.onRemoteTrackAdded((track) async {
-        if (track.kind() == MediaKind.audio && !kIsWeb) {
+        if (track.kind() == MediaKind.Audio && !kIsWeb) {
           return;
         }
         f(track, conn.getRemoteMemberId(), conn);
@@ -217,9 +217,9 @@ class Call {
   /// Mutes or unmutes video.
   Future<void> toggleVideo(bool enabled) async {
     if (enabled) {
-      await _room.unmuteVideo(MediaSourceKind.device);
+      await _room.unmuteVideo(MediaSourceKind.Device);
     } else {
-      await _room.muteVideo(MediaSourceKind.device);
+      await _room.muteVideo(MediaSourceKind.Device);
     }
   }
 
@@ -293,7 +293,7 @@ class Call {
     } else {
       for (var track in _tracks) {
         try {
-          if (track.kind() == MediaKind.video) {
+          if (track.kind() == MediaKind.Video) {
             await track.free();
           }
         } catch (_) {}
@@ -318,7 +318,7 @@ class Call {
     } else {
       for (var track in _tracks) {
         try {
-          if (track.kind() == MediaKind.video) {
+          if (track.kind() == MediaKind.Video) {
             await track.free();
           }
         } catch (_) {}

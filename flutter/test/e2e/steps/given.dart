@@ -60,28 +60,28 @@ Future<void> newGivenMember(
 
     if (isPublish) {
       if (isAudio) {
-        await member.toggleMedia(MediaKind.audio, null, false);
+        await member.toggleMedia(MediaKind.Audio, null, false);
       }
       if (isVideo) {
-        await member.toggleMedia(MediaKind.video, null, false);
+        await member.toggleMedia(MediaKind.Video, null, false);
       }
     }
     if (isPlaying) {
       if (isAudio) {
-        await member.toggleRemoteMedia(MediaKind.audio, null, false);
+        await member.toggleRemoteMedia(MediaKind.Audio, null, false);
       }
       if (isVideo) {
-        await member.toggleRemoteMedia(MediaKind.video, null, false);
+        await member.toggleRemoteMedia(MediaKind.Video, null, false);
       }
     }
   }
 
   if (mediaSettings.contains(' muted')) {
     if (isAudio) {
-      await member.toggleMute(MediaKind.audio, null, true);
+      await member.toggleMute(MediaKind.Audio, null, true);
     }
     if (isVideo) {
-      await member.toggleMute(MediaKind.video, null, true);
+      await member.toggleMute(MediaKind.Video, null, true);
     }
   }
 

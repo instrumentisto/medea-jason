@@ -74,13 +74,13 @@ StepDefinitionGeneric whenMemberEnablesRemoteTrack =
     var member = context.world.members[id]!;
 
     if (toggle == 'enables') {
-      if (parsedKind.item1 == MediaKind.audio) {
+      if (parsedKind.item1 == MediaKind.Audio) {
         await member.room.enableRemoteAudio();
       } else {
         await member.room.enableRemoteVideo();
       }
     } else {
-      if (parsedKind.item1 == MediaKind.audio) {
+      if (parsedKind.item1 == MediaKind.Audio) {
         await member.room.disableRemoteAudio();
       } else {
         await member.room.disableRemoteVideo();
