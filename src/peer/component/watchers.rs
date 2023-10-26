@@ -49,7 +49,7 @@ impl Component {
     #[watch(self.ice_candidates.on_add())]
     async fn ice_candidate_added(
         peer: Rc<PeerConnection>,
-        _: Rc<State>,
+        _unused: Rc<State>,
         candidate: IceCandidate,
     ) -> Result<(), Traced<RtcPeerConnectionError>> {
         peer.add_ice_candidate(
@@ -341,7 +341,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
-    fn local_sdp_approved(_: &PeerConnection, state: &State, _: ()) {
+    fn local_sdp_approved(_: &PeerConnection, state: &State, _unused: ()) {
         if let Some(negotiation_role) = state.negotiation_role.get() {
             match negotiation_role {
                 NegotiationRole::Offerer => {
@@ -418,7 +418,7 @@ impl Component {
     /// renegotiates [`PeerConnection`].
     #[watch(self.negotiation_role.subscribe().filter_map(transpose_guarded))]
     async fn negotiation_role_changed(
-        _: Rc<PeerConnection>,
+        _unused: Rc<PeerConnection>,
         state: Rc<State>,
         role: Guarded<NegotiationRole>,
     ) {
@@ -490,7 +490,7 @@ impl Component {
     async fn maybe_local_stream_update_needed(
         peer: Rc<PeerConnection>,
         state: Rc<State>,
-        _: bool,
+        _unused: bool,
     ) {
         state.senders.when_updated().await;
         drop(state.update_local_stream(&peer).await);

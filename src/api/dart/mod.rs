@@ -160,7 +160,7 @@ impl Drop for DartValue {
 }
 
 impl From<()> for DartValue {
-    fn from(_: ()) -> Self {
+    fn from(_unused: ()) -> Self {
         Self::None
     }
 }

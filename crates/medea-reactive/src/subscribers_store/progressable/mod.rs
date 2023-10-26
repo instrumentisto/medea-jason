@@ -47,6 +47,7 @@ impl<T> SubStore<T> {
     /// Returns [`Future`] resolving when all subscribers processes update.
     ///
     /// [`Future`]: std::future::Future
+    #[allow(clippy::multiple_unsafe_ops_per_block)]
     pub fn when_all_processed(&self) -> Processed<'static> {
         let counter = Rc::clone(&self.counter);
         Processed::new(Box::new(move || {

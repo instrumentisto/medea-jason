@@ -695,16 +695,12 @@ impl MediaConnections {
     /// [`LocalStreamUpdateCriteria`].
     pub async fn drop_send_tracks(&self, kinds: LocalStreamUpdateCriteria) {
         let remove_tracks_fut = future::join_all(
-            self.0.borrow().senders.values().filter_map(|s| {
-                kinds.has(s.state().kind(), s.state().source_kind()).then(
-                    || {
-                        let sender = s.obj();
-                        async move {
-                            sender.remove_track().await;
-                        }
-                    },
-                )
-            }),
+            self.0.borrow().senders.values().filter(|&s| kinds.has(s.state().kind(), s.state().source_kind())).map(|s| {
+                                    let sender = s.obj();
+                                    async move {
+                                         sender.remove_track().await;
+                                     }
+                                  }),
         );
         drop(remove_tracks_fut.await);
     }

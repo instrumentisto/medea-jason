@@ -224,7 +224,7 @@ impl Component {
     #[watch(self.0.borrow().on_insert())]
     async fn peer_added(
         peers: Rc<Repository>,
-        _: Rc<State>,
+        _unused: Rc<State>,
         (peer_id, new_peer): (PeerId, Rc<peer::State>),
     ) -> Result<(), Traced<RtcPeerConnectionError>> {
         let peer = peer::Component::new(

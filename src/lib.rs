@@ -7,6 +7,7 @@
     trivial_numeric_casts
 )]
 #![forbid(non_ascii_idents)]
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 #![warn(
     clippy::as_conversions,
     clippy::as_ptr_cast_mut,
@@ -52,7 +53,6 @@
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
-    clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::needless_collect,

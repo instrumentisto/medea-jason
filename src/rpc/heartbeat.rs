@@ -65,11 +65,10 @@ impl Inner {
     ///
     /// If some error happen then it will be printed with [`log::error`].
     fn send_pong(&self, n: u32) {
-        self.transport
+        let _ = self.transport
             .send(&ClientMsg::Pong(n))
             .map_err(tracerr::wrap!(=> platform::TransportError))
-            .map_err(|e| log::error!("Failed to send pong: {e}"))
-            .map_or((), drop);
+            .map_err(|e| log::error!("Failed to send pong: {e}"));
     }
 }
 

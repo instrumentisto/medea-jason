@@ -284,6 +284,7 @@ pub trait Whenable<D: 'static> {
 }
 
 impl<D: 'static> Whenable<D> for RefCell<Vec<UniversalSubscriber<D>>> {
+    #[allow(clippy::multiple_unsafe_ops_per_block)]
     fn when(
         &self,
         assert_fn: Box<dyn Fn(&D) -> bool>,
@@ -318,7 +319,7 @@ impl<D: Clone> OnObservableFieldModification<D>
                         .take()
                         .expect("`UniversalSubscriber::When` used already")
                         .send(())
-                        .map_or(false, |_| false)
+                        .map_or(false, |()| false)
                 } else {
                     true
                 }
