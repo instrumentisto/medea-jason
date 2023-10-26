@@ -917,7 +917,7 @@ impl PeerConnection {
     ///
     /// # Errors
     ///
-    /// With [`RtcPeerConnectionError::AddIceCandidateFailed`][2] if
+    /// With [`AddIceCandidateFailed`][2] if
     /// [RtcPeerConnection.addIceCandidate()][3] fails to add buffered
     /// [ICE candidates][1].
     ///
