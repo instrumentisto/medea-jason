@@ -163,12 +163,15 @@ class Member {
     });
     room.onNewConnection((connection) async {
       var remoteMemberId = connection.getRemoteMemberId();
+      print('${id} - new connect ${remoteMemberId}');
       connectionStore.remoteTracks.addAll({remoteMemberId: HashMap()});
       connectionStore.connections.addAll({remoteMemberId: connection});
       connectionStore.closeConnect.addAll({remoteMemberId: Completer()});
 
       connection.onRemoteTrackAdded((remoteTrack) {
         var remoteTrackId = remoteTrack.getTrack().id();
+        print(
+            '${id} - new track ${remoteTrack.kind()} ${remoteTrack.mediaSourceKind()} ${remoteTrackId} from ${remoteMemberId}');
         if (connectionStore.remoteTracks[remoteMemberId]![remoteTrackId] ==
             null) {
           connectionStore.remoteTracks[remoteMemberId]![remoteTrackId] =
