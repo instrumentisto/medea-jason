@@ -230,7 +230,7 @@ impl MediaDevices {
     #[allow(clippy::unused_async)]
     pub async fn set_output_audio_id(
         &self,
-        _: String,
+        _unused: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
         unreachable!(
             "`set_output_audio_id()` is implemented on the Dart side,\
@@ -300,7 +300,7 @@ impl MediaDevices {
     #[allow(clippy::unused_async)]
     pub async fn set_microphone_volume(
         &self,
-        _: i64,
+        _unused: i64,
     ) -> Result<(), Traced<MicVolumeError>> {
         unreachable!(
             "`set_microphone_volume()` cannot be implemented on web platform",
