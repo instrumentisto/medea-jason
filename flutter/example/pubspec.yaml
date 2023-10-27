@@ -23,7 +23,7 @@ dependencies:
   faker_dart: ^0.1.11
   freezed_annotation: ^2.2.0
   http: ^0.13.6
-  medea_flutter_webrtc: 0.8.3-dev+rev.a2c9d1a92b5da0eba37a80df62732424d4da2656
+  medea_flutter_webrtc: 0.8.3-dev+rev.97ae790f2078166645d926b8cdbd9775d9127651
   retry: ^3.1.2
 
 dev_dependencies:
