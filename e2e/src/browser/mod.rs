@@ -1,6 +1,7 @@
 //! Interaction with browser through a [WebDriver] protocol.
 //!
 //! [WebDriver]: https://w3.org/TR/webdriver
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 
 mod client;
 mod js;

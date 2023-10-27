@@ -2,6 +2,7 @@
 //!
 //! [Control API]: https://tinyurl.com/yxsqplq7
 
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 #[cfg(feature = "client")]
 mod client;
 #[cfg(feature = "server")]

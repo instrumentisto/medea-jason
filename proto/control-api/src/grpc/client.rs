@@ -42,7 +42,7 @@ where
             .map_err(T::Error::from)?;
         self.on_event(req)
             .await
-            .map(|_| tonic::Response::new(callback_proto::Response {}))
+            .map(|()| tonic::Response::new(callback_proto::Response {}))
             .map_err(Into::into)
     }
 }

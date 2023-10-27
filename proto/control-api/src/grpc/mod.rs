@@ -3,6 +3,7 @@
 //! [gRPC]: https://grpc.io
 //! [Control API]: https://tinyurl.com/yxsqplq7
 
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 #[cfg(feature = "client")]
 mod client;
 mod convert;
@@ -94,7 +95,7 @@ impl CallbackUrl {
     #[must_use]
     pub fn to_http(&self) -> Url {
         let mut url = self.0.clone();
-        url.set_scheme("http").unwrap_or_else(|_| unreachable!());
+        url.set_scheme("http").unwrap_or_else(|()| unreachable!());
         url
     }
 }

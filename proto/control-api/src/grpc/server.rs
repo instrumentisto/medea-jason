@@ -75,7 +75,7 @@ where
         };
 
         Ok(tonic::Response::new(match result {
-            Ok(_) => control_proto::Response { error: None },
+            Ok(()) => control_proto::Response { error: None },
             Err(e) => control_proto::Response {
                 error: Some(e.into()),
             },

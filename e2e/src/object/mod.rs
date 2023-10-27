@@ -1,5 +1,5 @@
 //! Browser-side objects.
-
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 pub mod connection;
 pub mod connections_store;
 pub mod jason;

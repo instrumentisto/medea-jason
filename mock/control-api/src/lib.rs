@@ -129,6 +129,7 @@
 )]
 #![allow(
     clippy::module_name_repetitions,
+    clippy::multiple_unsafe_ops_per_block,
     clippy::unimplemented,
     clippy::unwrap_used,
     unreachable_pub
