@@ -1492,6 +1492,7 @@ pub fn room_handle_on_failed_local_media(
 }
 
 /// Log Dart exception.
+#[must_use]
 pub fn log_dart_exception(
     message: String,
     stack_trace: String,

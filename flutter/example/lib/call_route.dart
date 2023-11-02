@@ -87,7 +87,7 @@ class _CallState extends State<CallRoute> {
   void initState() {
     _call.onNewRemoteStream((track, remoteId, conn) async {
       var trackId = track.getTrack().id();
-      if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
+      if (track.mediaDirection() == jason.TrackMediaDirection.SendRecv) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track.getTrack());
@@ -103,9 +103,9 @@ class _CallState extends State<CallRoute> {
             TextButton(
                 onPressed: () {
                   if (!connectionWidgets!.recvVideoDevice) {
-                    conn.enableRemoteVideo(jason.MediaSourceKind.device);
+                    conn.enableRemoteVideo(jason.MediaSourceKind.Device);
                   } else {
-                    conn.disableRemoteVideo(jason.MediaSourceKind.device);
+                    conn.disableRemoteVideo(jason.MediaSourceKind.Device);
                   }
                   connectionWidgets.recvVideoDevice =
                       !connectionWidgets.recvVideoDevice;
@@ -114,9 +114,9 @@ class _CallState extends State<CallRoute> {
             TextButton(
                 onPressed: () {
                   if (!connectionWidgets!.recvVideoDisplay) {
-                    conn.enableRemoteVideo(jason.MediaSourceKind.display);
+                    conn.enableRemoteVideo(jason.MediaSourceKind.Display);
                   } else {
-                    conn.disableRemoteVideo(jason.MediaSourceKind.display);
+                    conn.disableRemoteVideo(jason.MediaSourceKind.Display);
                   }
                   connectionWidgets.recvVideoDisplay =
                       !connectionWidgets.recvVideoDisplay;
@@ -147,7 +147,7 @@ class _CallState extends State<CallRoute> {
         (newDir) async {
           var remoteTracks = _widgets[remoteId];
 
-          if (newDir == jason.TrackMediaDirection.sendRecv) {
+          if (newDir == jason.TrackMediaDirection.SendRecv) {
             var renderer = createVideoRenderer();
             await renderer.initialize();
             await renderer.setSrcObject(track.getTrack());
@@ -519,10 +519,10 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
 
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.VideoInput)
       .toList();
   var audioDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.AudioInput)
       .toList();
 
   await showDialog<void>(

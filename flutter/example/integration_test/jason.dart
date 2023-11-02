@@ -45,7 +45,7 @@ void main() {
         isNot(equals((tracks.last as NativeLocalMediaTrack).opaque)));
 
     var videoDevice =
-        devices.firstWhere((d) => d.kind() == MediaDeviceKind.videoInput);
+        devices.firstWhere((d) => d.kind() == MediaDeviceKind.VideoInput);
 
     if (!Platform.isAndroid) {
       expect(videoDevice.deviceId(), equals('fake camera id'));
@@ -54,9 +54,9 @@ void main() {
     }
 
     videoDevice.free();
-    var video = tracks.where((element) => element.kind() == MediaKind.video);
+    var video = tracks.where((element) => element.kind() == MediaKind.Video);
     expect(video.isNotEmpty, isTrue);
-    expect(video.first.mediaSourceKind(), equals(MediaSourceKind.device));
+    expect(video.first.mediaSourceKind(), equals(MediaSourceKind.Device));
 
     await tracks.first.free();
     expect(() => tracks.first.kind(), throwsA(isA<StateError>()));
@@ -65,8 +65,8 @@ void main() {
   testWidgets('DeviceVideoTrackConstraints', (WidgetTester tester) async {
     var constraints = DeviceVideoTrackConstraints();
     constraints.deviceId('deviceId');
-    constraints.exactFacingMode(FacingMode.user);
-    constraints.idealFacingMode(FacingMode.right);
+    constraints.exactFacingMode(FacingMode.User);
+    constraints.idealFacingMode(FacingMode.Right);
     constraints.exactHeight(444);
     constraints.idealHeight(111);
     constraints.heightInRange(55, 66);
@@ -102,14 +102,14 @@ void main() {
     await room.muteAudio();
     await room.unmuteAudio();
     await room.muteVideo();
-    await room.unmuteVideo(MediaSourceKind.display);
-    await room.disableVideo(MediaSourceKind.display);
-    await room.enableVideo(MediaSourceKind.device);
+    await room.unmuteVideo(MediaSourceKind.Display);
+    await room.disableVideo(MediaSourceKind.Display);
+    await room.enableVideo(MediaSourceKind.Device);
     await room.disableAudio();
     await room.enableAudio();
     await room.disableRemoteAudio();
     await room.enableRemoteAudio();
-    await room.disableRemoteVideo(MediaSourceKind.device);
+    await room.disableRemoteVideo(MediaSourceKind.Device);
 
     dynamic formatExc;
     try {
