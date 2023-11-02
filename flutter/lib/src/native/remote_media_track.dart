@@ -45,24 +45,27 @@ class NativeRemoteMediaTrack implements RemoteMediaTrack {
   }
 
   @override
-  void onMuted(void Function() f) {
+  void onMuted(dynamic Function() f) {
     return api.remoteMediaTrackOnMuted(track: opaque.innerOpaque, f: f);
   }
 
   @override
-  void onUnmuted(void Function() f) {
+  void onUnmuted(dynamic Function() f) {
     return api.remoteMediaTrackOnUnmuted(track: opaque.innerOpaque, f: f);
   }
 
   @override
-  void onStopped(void Function() f) {
+  void onStopped(dynamic Function() f) {
     return api.remoteMediaTrackOnStopped(track: opaque.innerOpaque, f: f);
   }
 
   @override
-  void onMediaDirectionChanged(void Function(TrackMediaDirection) f) {
+  void onMediaDirectionChanged(dynamic Function(TrackMediaDirection) f) {
     api.remoteMediaTrackOnMediaDirectionChanged(
-        track: opaque.innerOpaque, f: (i) => f(TrackMediaDirection.values[i]));
+        track: opaque.innerOpaque,
+        f: (i) {
+          return f(TrackMediaDirection.values[i]);
+        });
   }
 
   @moveSemantics

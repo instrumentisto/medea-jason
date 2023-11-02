@@ -10,7 +10,7 @@ export 'enums.dart' show MediaKind, MediaSourceKind;
 typedef TrackMediaDirection = MediaDirection;
 
 /// Representation of the `onEnded` callback.
-typedef OnEndedCallback = void Function();
+typedef OnEndedCallback = dynamic Function();
 
 /// Abstraction of a handle to an object allocated on the Rust side.
 abstract class MediaTrack implements AsyncPlatformHandle {

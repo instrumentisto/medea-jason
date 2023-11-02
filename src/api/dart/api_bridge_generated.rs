@@ -14,18 +14,18 @@
 use crate::api::dart::api::*;
 use core::panic::UnwindSafe;
 use flutter_rust_bridge::*;
-use std::{ffi::c_void, sync::Arc};
+use std::ffi::c_void;
+use std::sync::Arc;
 
 // Section: imports
 
-use crate::{
-    media::{
-        constraints::{ConstrainU32, FacingMode},
-        track::{remote::MediaDirection, MediaSourceKind},
-        MediaDeviceKind, MediaKind,
-    },
-    room::RoomCloseReason,
-};
+use crate::media::constraints::ConstrainU32;
+use crate::media::constraints::FacingMode;
+use crate::media::track::remote::MediaDirection;
+use crate::media::track::MediaSourceKind;
+use crate::media::MediaDeviceKind;
+use crate::media::MediaKind;
+use crate::room::RoomCloseReason;
 
 // Section: wire functions
 
@@ -1117,6 +1117,23 @@ fn wire_room_handle_on_failed_local_media_impl(
         },
     )
 }
+fn wire_log_dart_exception_impl(
+    message: impl Wire2Api<String> + UnwindSafe,
+    stack_trace: impl Wire2Api<String> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "log_dart_exception",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_message = message.wire2api();
+            let api_stack_trace = stack_trace.wire2api();
+            Ok(log_dart_exception(api_message, api_stack_trace))
+        },
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks
@@ -1280,8 +1297,7 @@ impl support::IntoDartExceptPrimitive for RoomCloseReason {}
 // Section: executor
 
 support::lazy_static! {
-    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler =
-        Default::default();
+    pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
 
 #[cfg(not(target_family = "wasm"))]

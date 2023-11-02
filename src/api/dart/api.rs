@@ -1490,3 +1490,9 @@ pub fn room_handle_on_failed_local_media(
 
     Ok(SyncReturn(()))
 }
+
+/// Log Dart exception.
+pub fn log_dart_exception(message: String, stack_trace: String) -> SyncReturn<()> {
+    log::error!("{message}\n{stack_trace}");
+    SyncReturn(())
+}

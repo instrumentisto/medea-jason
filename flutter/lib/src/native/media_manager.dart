@@ -120,7 +120,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   }
 
   @override
-  void onDeviceChange(void Function() cb) {
+  void onDeviceChange(dynamic Function() cb) {
     try {
       api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
     } on FfiException catch (anyhow) {

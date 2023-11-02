@@ -172,12 +172,12 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  void onNewConnection(void Function(ConnectionHandle) f) {
+  void onNewConnection(dynamic Function(ConnectionHandle) f) {
     try {
       api.roomHandleOnNewConnection(
           roomHandle: opaque.innerOpaque,
           cb: (t) {
-            f(NativeConnectionHandle(
+            return f(NativeConnectionHandle(
                 api.connectionHandleFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
@@ -186,12 +186,12 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  void onClose(void Function(RoomCloseReason) f) {
+  void onClose(dynamic Function(RoomCloseReason) f) {
     try {
       api.roomHandleOnClose(
           roomHandle: opaque.innerOpaque,
           cb: (t) {
-            f(NativeRoomCloseReason(
+            return f(NativeRoomCloseReason(
                 api.roomCloseReasonFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
@@ -200,12 +200,12 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  void onLocalTrack(void Function(LocalMediaTrack) f) {
+  void onLocalTrack(dynamic Function(LocalMediaTrack) f) {
     try {
       api.roomHandleOnLocalTrack(
           roomHandle: opaque.innerOpaque,
           cb: (t) {
-            f(NativeLocalMediaTrack(
+            return f(NativeLocalMediaTrack(
                 api.localMediaTrackFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
@@ -214,12 +214,12 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  void onConnectionLoss(void Function(ReconnectHandle) f) {
+  void onConnectionLoss(dynamic Function(ReconnectHandle) f) {
     try {
       api.roomHandleOnConnectionLoss(
           roomHandle: opaque.innerOpaque,
           cb: (t) {
-            f(NativeReconnectHandle(
+            return f(NativeReconnectHandle(
                 api.reconnectHandleFromPtr(ptr: t.address)));
           });
     } on FfiException catch (anyhow) {
@@ -228,12 +228,12 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  void onFailedLocalMedia(void Function(Object) f) {
+  void onFailedLocalMedia(dynamic Function(Object) f) {
     try {
       api.roomHandleOnFailedLocalMedia(
           roomHandle: opaque.innerOpaque,
           cb: (err) {
-            f(err);
+            return f(err);
           });
     } on FfiException catch (anyhow) {
       throw anyhow.parse();

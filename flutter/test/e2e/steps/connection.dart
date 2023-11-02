@@ -49,13 +49,13 @@ StepDefinitionGeneric whenConnectionChangesRemoteMediaState =
 
     var connect = member.connectionStore.connections[partnerId]!;
     if (action == 'enables') {
-      if (parsedKind.item1 == MediaKind.audio) {
+      if (parsedKind.item1 == MediaKind.Audio) {
         await connect.enableRemoteAudio();
       } else {
         await connect.enableRemoteVideo();
       }
     } else {
-      if (parsedKind.item1 == MediaKind.audio) {
+      if (parsedKind.item1 == MediaKind.Audio) {
         await connect.disableRemoteAudio();
       } else {
         await connect.disableRemoteVideo();
