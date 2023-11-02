@@ -12,7 +12,7 @@ use medea_client_api_proto::{
 };
 use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
-use proto::ConnectionMode;
+use proto::{ConnectionMode, EncodingParameters};
 use tracerr::Traced;
 
 use crate::{
@@ -138,6 +138,8 @@ pub struct State {
 
     /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
+
+    update_encodings: ObservableCell<Option<EncodingParameters>>,
 }
 
 impl AsProtoState for State {
@@ -186,6 +188,7 @@ impl SynchronizableState for State {
             connection_mode: input.connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
             sync_state: ObservableCell::new(SyncState::Synced),
+            update_encodings: ObservableCell::new(None),
         }
     }
 
@@ -309,6 +312,7 @@ impl State {
             send_constraints,
             connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
+            update_encodings: ObservableCell::new(None),
         }
     }
 
@@ -407,6 +411,9 @@ impl State {
         }
         if let Some(receivers) = track_patch.receivers {
             *self.receivers.borrow_mut() = receivers;
+        }
+        if !track_patch.encodings.is_empty() {
+            self.update_encodings.set(Some(track_patch.encodings));
         }
     }
 
@@ -617,6 +624,22 @@ impl Component {
                 media_exchange_state::Stable::Disabled,
             ))?;
         }
+        Ok(())
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(self.update_encodings.subscribe())]
+    async fn update_encodings_changed(
+        sender: &Sender,
+        state: &State,
+        encs: Option<EncodingParameters>,
+    ) -> Result<(), Traced<ProhibitedStateError>> {
+        if let Some(encodings) = encs {
+            sender.transceiver().update_send_encodings(encodings)
+        }
+    
+        state.update_encodings.set(None);
+
         Ok(())
     }
 }

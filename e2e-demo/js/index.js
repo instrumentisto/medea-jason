@@ -48,7 +48,7 @@ async function createRoom(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -105,7 +105,7 @@ async function createMember(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -400,7 +400,7 @@ async function startPublishing() {
 
   let publishEndpoint = {
     kind: 'WebRtcPublishEndpoint',
-    p2p: 'Always',
+    p2p: 'Never',
   };
   let isSuccess = await controlApi.createEndpoint(roomId, memberId, 'publish', publishEndpoint);
   if (!isSuccess) {

@@ -17,7 +17,7 @@ use crate::{
     },
 };
 
-use super::send_encoding_parameters::SendEncodingParameters;
+use super::{send_encoding_parameters::SendEncodingParameters, parameters::Parameters};
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
 mod transceiver {
@@ -71,6 +71,10 @@ mod transceiver {
             transceiver_init: Dart_Handle,
             encoding: Dart_Handle,
         );
+
+        pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
+
+        pub fn set_send_parameters(transceiver: Dart_Handle, parameters: Dart_Handle) -> Dart_Handle;
     }
 }
 
@@ -167,6 +171,34 @@ impl Transceiver {
                 .await
                 .unwrap()
                 .into()
+        }
+    }
+
+    pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
+        let handle = self.0.get();
+        async move {
+            let fut = unsafe {
+                transceiver::get_send_parameters(
+                    handle
+                )
+            };
+            let params: DartHandle =
+                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+            Parameters::from(params)
+        }
+    }
+
+    pub fn set_send_parameters(&self, params: Parameters) -> impl Future<Output = ()> {
+        let handle = self.0.get();
+        let params_handle = params.handle();
+        async move {
+            let fut = unsafe {
+                transceiver::set_send_parameters(
+                    handle, params_handle
+                )
+            };
+            
+            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         }
     }
 }

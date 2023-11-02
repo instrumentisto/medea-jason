@@ -20,6 +20,8 @@ void registerFunctions(DynamicLibrary dl) {
     dispose: Pointer.fromFunction(_dispose),
     createTransceiverInit: Pointer.fromFunction(_createTransceiverInit),
     addSendingEncodings: Pointer.fromFunction(_addSendingEncodings),
+    getSendParameters: Pointer.fromFunction(_getSendParameters),
+    setSendParameters: Pointer.fromFunction(_setSendParameters),
   );
 }
 
@@ -92,4 +94,12 @@ bool _isStopped(RtpTransceiver transceiver) {
 /// Disposes of this [RtpTransceiver].
 Object _dispose(RtpTransceiver transceiver) {
   return () => transceiver.dispose();
+}
+
+Object _getSendParameters(RtpTransceiver transceiver) {
+  return () => transceiver.sender.getParameters();
+}
+
+Object _setSendParameters(RtpTransceiver transceiver, RtpParameters parameters) {
+  return () => transceiver.sender.setParameters(parameters);
 }

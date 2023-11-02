@@ -3,13 +3,17 @@
 use std::{future::Future, rc::Rc};
 
 use derive_more::From;
+use js_sys::Array;
+use medea_client_api_proto::EncodingParameters;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::RtcRtpTransceiver;
+use web_sys::{RtcRtpEncodingParameters, RtcRtpTransceiver};
 
 use crate::{
     media::track::local,
     platform::{Error, TransceiverDirection},
 };
+
+use super::get_property_by_name;
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
 /// direction changes.
@@ -92,6 +96,37 @@ impl Transceiver {
     #[must_use]
     pub fn is_stopped(&self) -> bool {
         self.0.stopped()
+    }
+
+    pub async fn update_send_encodings(
+        &self,
+        encodings: Vec<EncodingParameters>,
+    ) -> Result<(), Error>{
+        let mut params = self.0.sender().get_parameters();
+        let encs = get_property_by_name(&params, "encodings", |v| {
+            v.is_array().then_some(Array::from(&v))
+        })
+        .unwrap();
+
+        for enc in encs.iter().map(RtcRtpEncodingParameters::from) {
+            let rid = get_property_by_name(&enccc, "rid", |v| v.as_string())
+                .unwrap();
+
+            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {continue;};
+            
+            enc.active(encoding.active);
+            if let Some(max_bitrate) = encoding.max_bitrate {
+                enc.max_bitrate(max_bitrate);
+            }
+            if let Some(scale_resolution_down_bymax_bitrate) = encoding.scale_resolution_down_by {
+                enc.scale_resolution_down_by(scale_resolution_down_by);
+            }
+        }
+
+        drop(JsFuture::from(self.0.sender().set_parameters_with_parameters(&params))
+            .await?);
+
+        Ok(())
     }
 }
 

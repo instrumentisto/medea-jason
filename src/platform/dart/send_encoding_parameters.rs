@@ -43,6 +43,12 @@ mod send_encoding_parameters {
 #[derive(Clone, Debug)]
 pub struct SendEncodingParameters(DartHandle);
 
+impl From<DartHandle> for SendEncodingParameters {
+    fn from(value: DartHandle) -> Self {
+        Self(value)
+    }
+}
+
 impl SendEncodingParameters {
     /// Creates a new [`SendEncodingParameters`].
     #[must_use]

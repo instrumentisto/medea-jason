@@ -740,7 +740,7 @@ else
 	cd $(crate-dir)/ && \
 	$(webdriver-env)="http://127.0.0.1:4444" \
 	WASM_BINDGEN_TEST_TIMEOUT=$(or $(timeout),60) \
-	cargo test --target wasm32-unknown-unknown --features mockable
+	cargo test aaaaaaaaaaaaaaaaaaaaaaaaaaaaa --target wasm32-unknown-unknown --features mockable
 	@make docker.down.webdriver browser=$(browser)
 endif
 else

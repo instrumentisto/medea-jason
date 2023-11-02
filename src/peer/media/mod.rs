@@ -901,7 +901,7 @@ impl MediaConnections {
                     let component = self
                         .create_sender(
                             track.id,
-                            track.media_type,
+                            track.media_type.clone(),
                             proto::MediaDirection::SendRecv,
                             send_constraints.muted(track.media_type),
                             mid,

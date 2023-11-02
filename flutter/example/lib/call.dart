@@ -11,8 +11,8 @@ import 'control_api/entities/room.dart';
 import 'control_api/client.dart';
 import 'control_api/http.dart';
 
-const controlDomain = 'http://127.0.0.1:8000';
-const baseUrl = 'ws://127.0.0.1:8080/ws/';
+const controlDomain = 'http://192.168.1.81:8000';
+const baseUrl = 'ws://192.168.1.81:8080/ws/';
 
 class Call {
   var client = HttpClient(controlDomain);
@@ -229,7 +229,7 @@ class Call {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var end = WebRtcPublishEndpoint('publish', P2pMode.Never);
       end.audio_settings = AudioSettings(
           publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled);
       end.video_settings = VideoSettings(
@@ -241,7 +241,7 @@ class Call {
         roomId,
         Room(roomId, {
           memberId: Member(memberId, pipeline, Plain('test'),
-              'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099')
+              'grpc://192.168.1.81:9099', 'grpc://192.168.1.81:9099')
         }));
     return jsonDecode(resp.body)['sids'][memberId];
   }
@@ -252,7 +252,7 @@ class Call {
     var pipeline = HashMap<String, Endpoint>();
 
     if (isPublish) {
-      var end = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var end = WebRtcPublishEndpoint('publish', P2pMode.Never);
       end.audio_settings = AudioSettings(
           publishAudio ? PublishPolicy.Optional : PublishPolicy.Disabled);
       end.video_settings = VideoSettings(
@@ -273,8 +273,8 @@ class Call {
 
     var resp = await client.create(
         '$roomId/$memberId',
-        Member(memberId, pipeline, Plain('test'), 'grpc://127.0.0.1:9099',
-            'grpc://127.0.0.1:9099'));
+        Member(memberId, pipeline, Plain('test'), 'grpc://192.168.1.81:9099',
+            'grpc://192.168.1.81:9099'));
 
     if (isPublish) {
       for (var m in anotherMembers) {

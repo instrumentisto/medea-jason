@@ -787,6 +787,8 @@ pub struct TrackPatchEvent {
     /// Muting and unmuting can be performed without adding/removing tracks
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
+
+    pub encodings: Vec<EncodingParameters>,
 }
 
 /// Media exchange direction of a `Track`.
@@ -839,6 +841,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
+            encodings: Vec::new()
         }
     }
 }
@@ -852,6 +855,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
+            encodings: Vec::new()
         }
     }
 

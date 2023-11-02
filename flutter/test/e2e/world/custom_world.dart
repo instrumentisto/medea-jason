@@ -100,7 +100,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     }
 
     var createMember = api.Member(builderId, pipeline, api.Plain('test'),
-        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
+        'grpc://192.168.1.81:9099', 'grpc://192.168.1.81:9099');
     await controlClient.create('$roomId/$builderId', createMember);
 
     if (builder.isSend) {
