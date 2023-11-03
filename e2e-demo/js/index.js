@@ -705,14 +705,16 @@ window.onload = async function() {
             mediaStream.addTrack(track.get_track());
             playElement.srcObject = mediaStream;
           } else {
-            playElement = memberVideoDiv.getElementsByClassName('camera-video')[0];
+            memberVideoDiv.querySelectorAll('.camera-video').forEach(videoElement => {
+              if (videoElement.dataset.trackId == track.get_track().id) playElement = videoElement;
+            });
             if (playElement === undefined) {
               playElement = document.createElement('video');
-              playElement.className = 'camera-video';
               playElement.classList.add('camera-video', 'order-1');
               playElement.playsinline = 'true';
               playElement.controls = 'true';
               playElement.autoplay = 'true';
+              playElement.dataset.trackId = track.get_track().id;
               if (track.media_direction() != 0) {
                 playElement.pause();
                 playElement.style.display = 'none';
@@ -727,7 +729,6 @@ window.onload = async function() {
           playElement = memberVideoDiv.getElementsByClassName('audio')[0];
           if (playElement === undefined) {
             playElement = document.createElement('audio');
-            playElement.className = 'audio';
             playElement.classList.add('audio', 'order-3');
             playElement.controls = 'true';
             playElement.autoplay = 'true';
