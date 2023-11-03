@@ -108,8 +108,8 @@ impl Transceiver {
         })
         .unwrap();
 
-        for enc in encs.iter().map(RtcRtpEncodingParameters::from) {
-            let rid = get_property_by_name(&enccc, "rid", |v| v.as_string())
+        for mut enc in encs.iter().map(RtcRtpEncodingParameters::from) {
+            let rid = get_property_by_name(&enc, "rid", |v| v.as_string())
                 .unwrap();
 
             let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {continue;};
@@ -118,8 +118,8 @@ impl Transceiver {
             if let Some(max_bitrate) = encoding.max_bitrate {
                 enc.max_bitrate(max_bitrate);
             }
-            if let Some(scale_resolution_down_bymax_bitrate) = encoding.scale_resolution_down_by {
-                enc.scale_resolution_down_by(scale_resolution_down_by);
+            if let Some(scale_resolution_down_by) = encoding.scale_resolution_down_by {
+                enc.scale_resolution_down_by(scale_resolution_down_by.into());
             }
         }
 

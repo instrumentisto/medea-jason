@@ -26,7 +26,7 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
-    utils::{component, AsProtoState, SynchronizableState, Updatable},
+    utils::{component, AsProtoState, SynchronizableState, Updatable}, platform,
 };
 
 use super::Sender;
@@ -139,7 +139,7 @@ pub struct State {
     /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 
-    update_encodings: ObservableCell<Option<EncodingParameters>>,
+    update_encodings: ObservableCell<Option<Vec<EncodingParameters>>>,
 }
 
 impl AsProtoState for State {
@@ -630,12 +630,12 @@ impl Component {
     #[allow(clippy::needless_pass_by_value)]
     #[watch(self.update_encodings.subscribe())]
     async fn update_encodings_changed(
-        sender: &Sender,
-        state: &State,
-        encs: Option<EncodingParameters>,
-    ) -> Result<(), Traced<ProhibitedStateError>> {
+        sender: Rc<Sender>,
+        state: Rc<State>,
+        encs: Option<Vec<EncodingParameters>>,
+    ) -> Result<(), Traced<platform::Error>> {
         if let Some(encodings) = encs {
-            sender.transceiver().update_send_encodings(encodings)
+            sender.transceiver().update_send_encodings(encodings).await.unwrap();
         }
     
         state.update_encodings.set(None);
