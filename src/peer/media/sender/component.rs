@@ -26,7 +26,8 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
-    utils::{component, AsProtoState, SynchronizableState, Updatable}, platform,
+    platform,
+    utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
 use super::Sender;
@@ -139,6 +140,8 @@ pub struct State {
     /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 
+    /// Indicator whether needs to update this [`local::Track`]'s encoding
+    /// parameters.
     update_encodings: ObservableCell<Option<Vec<EncodingParameters>>>,
 }
 
@@ -627,17 +630,25 @@ impl Component {
         Ok(())
     }
 
+    /// Updates [`Sender`]'s encoding parameters.
+    /// 
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if setting the [`EncodingParameters`] fails.
     #[allow(clippy::needless_pass_by_value)]
     #[watch(self.update_encodings.subscribe())]
     async fn update_encodings_changed(
         sender: Rc<Sender>,
         state: Rc<State>,
         encs: Option<Vec<EncodingParameters>>,
-    ) -> Result<(), Traced<platform::Error>> {
+    ) -> Result<(), platform::Error> {
         if let Some(encodings) = encs {
-            sender.transceiver().update_send_encodings(encodings).await.unwrap();
+            sender
+                .transceiver()
+                .update_send_encodings(encodings)
+                .await?;
         }
-    
+
         state.update_encodings.set(None);
 
         Ok(())

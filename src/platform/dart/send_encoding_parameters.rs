@@ -7,7 +7,7 @@ use medea_macro::dart_bridge;
 
 use crate::platform::dart::utils::handle::DartHandle;
 
-use super::utils::string_into_c_str;
+use super::utils::{c_str_into_string, string_into_c_str};
 
 #[dart_bridge(
     "flutter/lib/src/native/platform/send_encoding_parameters.g.dart"
@@ -23,6 +23,12 @@ mod send_encoding_parameters {
             rid: ptr::NonNull<c_char>,
             active: bool,
         ) -> Dart_Handle;
+
+        /// Gets `rid` of this [`SendEncodingParameters`].
+        pub fn get_rid(encoding: Dart_Handle) -> ptr::NonNull<c_char>;
+
+        /// Sets `active` for the provided [`SendEncodingParameters`].
+        pub fn set_active(encoding: Dart_Handle, active: bool);
 
         /// Sets `max_bitrate` for the provided [`SendEncodingParameters`].
         pub fn set_max_bitrate(encoding: Dart_Handle, max_bitrate: i64);
@@ -66,6 +72,21 @@ impl SendEncodingParameters {
     #[must_use]
     pub fn handle(&self) -> *mut _Dart_Handle {
         self.0.get()
+    }
+
+    /// Gets `rid`.
+    #[must_use]
+    pub fn rid(&self) -> String {
+        let handle = self.0.get();
+        unsafe { c_str_into_string(send_encoding_parameters::get_rid(handle)) }
+    }
+
+    /// Sets `active`.
+    pub fn set_active(&self, active: bool) {
+        let handle = self.0.get();
+        unsafe {
+            send_encoding_parameters::set_active(handle, active);
+        };
     }
 
     /// Sets `max_bitrate`.

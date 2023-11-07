@@ -587,6 +587,7 @@ mod receivers_patch_send_tracks {
                     media_direction: None,
                     receivers: Some(Vec::new()),
                     muted: None,
+                    encodings: Vec::new(),
                 })]),
                 negotiation_role: None,
             })
@@ -607,6 +608,7 @@ mod receivers_patch_send_tracks {
                         MemberId::from("eva"),
                     ])),
                     muted: None,
+                    encodings: Vec::new(),
                 })]),
                 negotiation_role: None,
             })
@@ -1064,6 +1066,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
+                    encodings: Vec::new(),
                 })],
                 negotiation_role: None,
             })
@@ -1145,6 +1148,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: None,
                     muted: Some(true),
+                    encodings: Vec::new(),
                 })],
                 negotiation_role: None,
             })
@@ -1229,6 +1233,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
+                    encodings: Vec::new(),
                 })],
                 negotiation_role: None,
             })
@@ -1574,6 +1579,7 @@ mod patches_generation {
                                 state,
                                 MediaState::Mute(mute_state::Stable::Muted)
                             )),
+                            encodings: Vec::new(),
                         })],
                         negotiation_role: None,
                     })
@@ -2027,6 +2033,7 @@ async fn disable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2058,6 +2065,7 @@ async fn enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2077,6 +2085,7 @@ async fn enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2113,6 +2122,7 @@ async fn only_one_gum_performed_on_enable() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2132,6 +2142,7 @@ async fn only_one_gum_performed_on_enable() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2253,6 +2264,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2271,6 +2283,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2333,6 +2346,7 @@ async fn send_enabling_holds_local_tracks() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();

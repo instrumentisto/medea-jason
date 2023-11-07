@@ -11,6 +11,8 @@ void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(
     dl,
     newSendEncodingParameters: Pointer.fromFunction(_newSendEncodingParameters),
+    getRid: Pointer.fromFunction(_getRid),
+    setActive: Pointer.fromFunction(_setActive),
     setMaxBitrate: Pointer.fromFunction(_setMaxBitrate),
     setScaleResolutionDownBy: Pointer.fromFunction(_setScaleResolutionDownBy),
   );
@@ -19,6 +21,16 @@ void registerFunctions(DynamicLibrary dl) {
 /// Creates a new [SendEncodingParameters].
 Object _newSendEncodingParameters(Pointer<Utf8> rid, bool active) {
   return SendEncodingParameters(rid.nativeStringToDartString(), active);
+}
+
+/// Returns [SendEncodingParameters.rid].
+Pointer<Utf8> _getRid(SendEncodingParameters encoding) {
+  return encoding.rid.toNativeUtf8();
+}
+
+/// Sets [SendEncodingParameters.active].
+void _setActive(SendEncodingParameters encoding, bool active) {
+  encoding.active = active;
 }
 
 /// Sets [SendEncodingParameters.maxBitrate].

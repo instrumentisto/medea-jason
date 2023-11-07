@@ -96,10 +96,13 @@ Object _dispose(RtpTransceiver transceiver) {
   return () => transceiver.dispose();
 }
 
+/// Gets [RtpParameters] from the [RtpTransceiver.sender].
 Object _getSendParameters(RtpTransceiver transceiver) {
   return () => transceiver.sender.getParameters();
 }
 
-Object _setSendParameters(RtpTransceiver transceiver, RtpParameters parameters) {
+/// Sets [RtpParameters] into the [RtpTransceiver.sender].
+Object _setSendParameters(
+    RtpTransceiver transceiver, RtpParameters parameters) {
   return () => transceiver.sender.setParameters(parameters);
 }

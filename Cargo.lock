@@ -1916,7 +1916,6 @@ dependencies = [
  "serde",
  "serde_json",
  "simple_logger",
- "tokio",
  "tracerr",
  "url",
  "wasm-bindgen",

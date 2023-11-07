@@ -49,6 +49,7 @@ fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
         receivers: None,
         media_direction: Some(media_direction),
         muted: None,
+        encodings: Vec::new(),
     }
 }
 
@@ -1589,6 +1590,7 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
+            encodings: Vec::new(),
         })
         .await;
     pc.state().when_updated().await;
@@ -1604,6 +1606,7 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
+            encodings: Vec::new(),
         })
         .await;
     pc.state().when_updated().await;
@@ -1619,6 +1622,7 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
+            encodings: Vec::new(),
         })
         .await;
     pc.state().when_updated().await;
@@ -1634,6 +1638,7 @@ async fn disable_and_enable_all_tracks() {
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
+            encodings: Vec::new(),
         })
         .await;
     pc.state().when_updated().await;

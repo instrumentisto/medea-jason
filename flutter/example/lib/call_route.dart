@@ -986,7 +986,7 @@ Future controlApiCreateMemberDialog(BuildContext context, Call call) {
               TextButton(
                   onPressed: () async {
                     var member = Member(memberId, {}, Plain(credentials),
-                        'grpc://192.168.1.81:9099', 'grpc://192.168.1.81:9099');
+                        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
 
                     member.idle_timeout = idle;
                     member.reconnect_timeout = reconnectTimeout;
@@ -1135,7 +1135,7 @@ Future controlApiCreateEndpointDialog(BuildContext context, Call call) {
                           .createPlayEndpoint(roomId, memberId, endpoint);
                     } else {
                       var endpoint =
-                          WebRtcPublishEndpoint(endpointId, P2pMode.Never);
+                          WebRtcPublishEndpoint(endpointId, P2pMode.Always);
                       await call.controlApi
                           .createPublishEndpoint(roomId, memberId, endpoint);
                     }

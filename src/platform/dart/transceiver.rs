@@ -6,6 +6,7 @@ use std::{future::Future, rc::Rc};
 
 use dart_sys::_Dart_Handle;
 use futures::future::LocalBoxFuture;
+use medea_client_api_proto::EncodingParameters;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -17,7 +18,9 @@ use crate::{
     },
 };
 
-use super::{send_encoding_parameters::SendEncodingParameters, parameters::Parameters};
+use super::{
+    parameters::Parameters, send_encoding_parameters::SendEncodingParameters,
+};
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
 mod transceiver {
@@ -72,9 +75,14 @@ mod transceiver {
             encoding: Dart_Handle,
         );
 
+        /// Gets [`Parameters`] of the underlying `sender`.
         pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
 
-        pub fn set_send_parameters(transceiver: Dart_Handle, parameters: Dart_Handle) -> Dart_Handle;
+        /// Sets [`Parameters`] into the underlying `sender`.
+        pub fn set_send_parameters(
+            transceiver: Dart_Handle,
+            parameters: Dart_Handle,
+        ) -> Dart_Handle;
     }
 }
 
@@ -174,32 +182,82 @@ impl Transceiver {
         }
     }
 
+    /// Gets [`Parameters`] of the underlying `sender`.
     pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
         let handle = self.0.get();
         async move {
-            let fut = unsafe {
-                transceiver::get_send_parameters(
-                    handle
-                )
-            };
+            let fut = unsafe { transceiver::get_send_parameters(handle) };
             let params: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
             Parameters::from(params)
         }
     }
 
-    pub fn set_send_parameters(&self, params: Parameters) -> impl Future<Output = ()> {
+    /// Sets [`Parameters`] into the underlying `sender`.
+    /// 
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
+    /// call fails.
+    /// 
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    pub fn set_send_parameters(
+        &self,
+        params: Parameters,
+    ) -> impl Future<Output = Result<(), platform::Error>> {
         let handle = self.0.get();
         let params_handle = params.handle();
         async move {
             let fut = unsafe {
-                transceiver::set_send_parameters(
-                    handle, params_handle
-                )
+                transceiver::set_send_parameters(handle, params_handle)
             };
-            
-            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
+
+            unsafe { FutureFromDart::execute::<()>(fut) }.await?;
+
+            Ok(())
         }
+    }
+
+    /// Updates parameters of encoding for underlying `sender`.
+    /// 
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
+    /// call fails.
+    /// 
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    pub async fn update_send_encodings(
+        &self,
+        encodings: Vec<EncodingParameters>,
+    ) -> Result<(), platform::Error> {
+        let params = self.get_send_parameters().await;
+
+        let encs = params.encodings().await?;
+        for enc in encs {
+            let rid = enc.rid();
+
+            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
+                continue;
+            };
+
+            enc.set_active(encoding.active);
+            if let Some(max_bitrate) = encoding.max_bitrate {
+                enc.set_max_bitrate(max_bitrate.into());
+            }
+            if let Some(scale_resolution_down_by) =
+                encoding.scale_resolution_down_by
+            {
+                enc.set_scale_resolution_down_by(
+                    scale_resolution_down_by.into(),
+                );
+            }
+
+            params.set_encoding(&enc).await;
+        }
+
+        self.set_send_parameters(params).await?;
+
+        Ok(())
     }
 }
 

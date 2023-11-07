@@ -788,6 +788,7 @@ pub struct TrackPatchEvent {
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
 
+    /// Settings for this [`Track`] encoding.
     pub encodings: Vec<EncodingParameters>,
 }
 
@@ -841,7 +842,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
-            encodings: Vec::new()
+            encodings: Vec::new(),
         }
     }
 }
@@ -855,7 +856,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
-            encodings: Vec::new()
+            encodings: Vec::new(),
         }
     }
 
