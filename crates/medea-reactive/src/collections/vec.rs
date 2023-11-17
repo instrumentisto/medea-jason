@@ -1,8 +1,8 @@
 //! Reactive vector based on [`Vec`].
 
-use std::{marker::PhantomData, mem, slice::Iter};
+use std::{marker::PhantomData, mem, slice::Iter, vec::Vec as StdVec};
 
-use futures::stream::LocalBoxStream;
+use futures::stream::{self, LocalBoxStream};
 
 use crate::subscribers_store::{
     common, progressable,
@@ -83,7 +83,7 @@ pub type ObservableVec<T> = Vec<T, common::SubStore<T>, T>;
 #[derive(Debug)]
 pub struct Vec<T, S: SubscribersStore<T, O>, O> {
     /// Data stored by this [`Vec`].
-    store: std::vec::Vec<T>,
+    store: StdVec<T>,
 
     /// Subscribers of the [`Vec::on_push`] method.
     on_push_subs: S,
@@ -194,12 +194,12 @@ where
     /// [`Stream`]: futures::Stream
     #[allow(clippy::needless_collect)] // false positive: lifetimes
     pub fn replay_on_push(&self) -> LocalBoxStream<'static, O> {
-        Box::pin(futures::stream::iter(
+        Box::pin(stream::iter(
             self.store
                 .clone()
                 .into_iter()
                 .map(|val| self.on_push_subs.wrap(val))
-                .collect::<std::vec::Vec<_>>(),
+                .collect::<StdVec<_>>(),
         ))
     }
 }
@@ -209,7 +209,7 @@ where
 impl<T, S: SubscribersStore<T, O>, O> Default for Vec<T, S, O> {
     fn default() -> Self {
         Self {
-            store: std::vec::Vec::new(),
+            store: StdVec::new(),
             on_push_subs: S::default(),
             on_remove_subs: S::default(),
             _output: PhantomData,
@@ -217,8 +217,8 @@ impl<T, S: SubscribersStore<T, O>, O> Default for Vec<T, S, O> {
     }
 }
 
-impl<T, S: SubscribersStore<T, O>, O> From<std::vec::Vec<T>> for Vec<T, S, O> {
-    fn from(from: std::vec::Vec<T>) -> Self {
+impl<T, S: SubscribersStore<T, O>, O> From<StdVec<T>> for Vec<T, S, O> {
+    fn from(from: StdVec<T>) -> Self {
         Self {
             store: from,
             on_push_subs: S::default(),

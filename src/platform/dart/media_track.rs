@@ -304,7 +304,7 @@ impl MediaStreamTrack {
         F: 'static + FnOnce(),
     {
         if let Some(cb) = f {
-            let cb = Callback::from_once(|()| cb());
+            let cb = Callback::from_once(|(): ()| cb());
             unsafe {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
             };

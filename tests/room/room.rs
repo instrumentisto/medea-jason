@@ -2906,7 +2906,7 @@ mod state_synchronization {
     use futures::{channel::mpsc, stream, StreamExt as _};
     use medea_client_api_proto::{
         state, AudioSettings, Command, ConnectionMode, Event, MediaDirection,
-        MediaType, MemberId, NegotiationRole, PeerId, TrackId,
+        MediaType, NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
         media::MediaManager, room::Room, rpc::MockRpcSession,
@@ -2947,7 +2947,7 @@ mod state_synchronization {
                 id: TrackId(0),
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
-                receivers: vec![MemberId::from("Test")],
+                receivers: Vec::new(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,

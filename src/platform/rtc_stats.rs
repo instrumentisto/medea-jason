@@ -14,7 +14,7 @@ use crate::{platform, utils::Caused};
 pub enum RtcStatsError {
     /// [RTCStats.id][1] is undefined.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcstats-id
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcstats-id
     #[display(fmt = "RTCStats.id is undefined")]
     UndefinedId,
 

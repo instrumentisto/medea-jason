@@ -15,14 +15,14 @@ pub trait Caused {
     fn cause(self) -> Option<Self::Error>;
 }
 
-/// Wrapper for [`serde_json::error::Error`] that provides [`Clone`], [`Debug`],
+/// Wrapper for [`serde_json::Error`] that provides [`Clone`], [`Debug`],
 /// [`Display`] implementations.
 ///
 /// [`Debug`]: std::fmt::Debug
 /// [`Display`]: std::fmt::Display
 #[derive(Clone, Debug, Display, From)]
 #[from(forward)]
-pub struct JsonParseError(Rc<serde_json::error::Error>);
+pub struct JsonParseError(Rc<serde_json::Error>);
 
 impl PartialEq for JsonParseError {
     fn eq(&self, other: &Self) -> bool {

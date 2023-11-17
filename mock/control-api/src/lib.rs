@@ -8,6 +8,7 @@
 )]
 #![forbid(non_ascii_idents)]
 #![warn(
+    clippy::absolute_paths,
     clippy::as_conversions,
     clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
@@ -56,6 +57,7 @@
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::needless_collect,
+    clippy::needless_pass_by_ref_mut,
     clippy::needless_raw_strings,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
@@ -68,6 +70,7 @@
     clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::readonly_write_lock,
     clippy::redundant_clone,
     clippy::redundant_type_annotations,
     clippy::ref_patterns,
@@ -80,6 +83,7 @@
     clippy::str_to_string,
     clippy::string_add,
     clippy::string_lit_as_bytes,
+    clippy::string_lit_chars_any,
     clippy::string_slice,
     clippy::string_to_string,
     clippy::suboptimal_flops,
@@ -91,7 +95,6 @@
     clippy::transmute_undefined_repr,
     clippy::trivial_regex,
     clippy::try_err,
-    clippy::tuple_array_conversions,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
     clippy::unnecessary_safety_comment,
@@ -108,13 +111,11 @@
     clippy::verbose_file_reads,
     clippy::wildcard_enum_match_arm,
     future_incompatible,
-    invalid_reference_casting,
     let_underscore_drop,
     meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
-    noop_method_call,
     semicolon_in_expressions_from_macros,
     unreachable_pub,
     unused_crate_dependencies,
@@ -129,17 +130,20 @@
 )]
 #![allow(
     clippy::module_name_repetitions,
-    clippy::multiple_unsafe_ops_per_block,
     clippy::unimplemented,
     clippy::unwrap_used,
     unreachable_pub
 )]
+// TODO: Massive false positives on `.await` points. Try remove on next Rust
+//       version.
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 
 pub mod api;
 pub mod callback;
 pub mod client;
 pub mod prelude;
 
+use actix_web::rt;
 use clap::Parser as _;
 use slog::{o, Drain};
 use slog_scope::GlobalLoggerGuard;
@@ -186,7 +190,7 @@ pub fn run() {
 
     let _log_guard = init_logger();
 
-    actix_web::rt::System::new().block_on(async move {
+    rt::System::new().block_on(async move {
         let callback_server = callback::server::run(&opts);
         api::run(&opts, callback_server).await;
     });

@@ -13,7 +13,7 @@ use std::{
 
 use futures::{
     channel::{mpsc, oneshot},
-    future::LocalBoxFuture,
+    future::{self, LocalBoxFuture},
     stream::{self, LocalBoxStream, StreamExt as _},
 };
 
@@ -94,7 +94,7 @@ where
         // TODO: This is kinda broken.
         //       See https://github.com/instrumentisto/medea/issues/163 issue.
         if (assert_fn)(&self.data) {
-            Box::pin(futures::future::ok(()))
+            Box::pin(future::ok(()))
         } else {
             self.subs.when(Box::new(assert_fn))
         }
@@ -284,7 +284,6 @@ pub trait Whenable<D: 'static> {
 }
 
 impl<D: 'static> Whenable<D> for RefCell<Vec<UniversalSubscriber<D>>> {
-    #[allow(clippy::multiple_unsafe_ops_per_block)]
     fn when(
         &self,
         assert_fn: Box<dyn Fn(&D) -> bool>,

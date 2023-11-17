@@ -3,6 +3,8 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
 #![allow(clippy::unwrap_used)]
+// TODO: False positive in function signatures, try remove on 1.74 Rust upgrade.
+#![allow(clippy::let_underscore_untyped, let_underscore_drop)]
 
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen_futures::JsFuture;
@@ -230,7 +232,7 @@ impl MediaDevices {
     #[allow(clippy::unused_async)]
     pub async fn set_output_audio_id(
         &self,
-        _unused: String,
+        _: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
         unreachable!(
             "`set_output_audio_id()` is implemented on the Dart side,\
@@ -300,7 +302,7 @@ impl MediaDevices {
     #[allow(clippy::unused_async)]
     pub async fn set_microphone_volume(
         &self,
-        _unused: i64,
+        _: i64,
     ) -> Result<(), Traced<MicVolumeError>> {
         unreachable!(
             "`set_microphone_volume()` cannot be implemented on web platform",

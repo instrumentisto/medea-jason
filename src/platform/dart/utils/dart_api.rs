@@ -2,6 +2,8 @@
 //!
 //! [`Dart DL API`]: https://tinyurl.com/32e7fudh
 
+use core::ffi;
+
 use dart_sys::{
     Dart_CObject, Dart_DeletePersistentHandle_DL, Dart_FinalizableHandle,
     Dart_GetError_DL, Dart_Handle, Dart_HandleFinalizer,
@@ -19,7 +21,7 @@ use dart_sys::{
 /// Dart.
 ///
 /// [1]: https://api.dart.dev/dart-ffi/NativeApi/initializeApiDLData.html
-pub unsafe fn initialize_api(data: *mut core::ffi::c_void) -> isize {
+pub unsafe fn initialize_api(data: *mut ffi::c_void) -> isize {
     Dart_InitializeApiDL(data)
 }
 
@@ -118,7 +120,7 @@ pub unsafe fn post_c_object(
 /// [`mem::size_of()`]: std::mem::size_of
 pub unsafe fn new_finalizable_handle(
     object: Dart_Handle,
-    peer: *mut ::core::ffi::c_void,
+    peer: *mut ffi::c_void,
     external_allocation_size: isize,
     callback: Dart_HandleFinalizer,
 ) -> Dart_FinalizableHandle {
@@ -153,7 +155,7 @@ pub unsafe fn is_error(handle: Dart_Handle) -> bool {
 /// # Safety
 ///
 /// [`initialize_api`] must be called before this function.
-pub unsafe fn get_error(handle: Dart_Handle) -> *const core::ffi::c_char {
+pub unsafe fn get_error(handle: Dart_Handle) -> *const ffi::c_char {
     #[allow(clippy::expect_used)]
     Dart_GetError_DL.expect("dart_api_dl has not been initialized")(handle)
 }
