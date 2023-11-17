@@ -99,7 +99,7 @@ impl Sender {
     /// [`LocalTracksConstraints`] are configured to disable this [`Sender`],
     /// but it cannot be disabled according to the provide [`State`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     pub async fn new(
         state: &State,
         media_connections: &MediaConnections,
@@ -205,7 +205,7 @@ impl Sender {
     /// should never fail for any other reason.
     ///
     /// [1]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
     pub async fn remove_track(&self) {
         drop(self.track.take());
         drop(self.transceiver.set_send_track(None).await);
@@ -260,7 +260,7 @@ impl Sender {
 
     /// Returns [`mid`] of this [`Sender`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         self.transceiver.mid()

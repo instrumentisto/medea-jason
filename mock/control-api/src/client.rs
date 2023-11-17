@@ -31,7 +31,7 @@ impl Fid {
 }
 
 impl From<()> for Fid {
-    fn from(_: ()) -> Self {
+    fn from((): ()) -> Self {
         Self(String::new())
     }
 }

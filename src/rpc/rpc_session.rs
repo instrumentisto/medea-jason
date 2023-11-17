@@ -280,7 +280,7 @@ impl WebSocketRpcSession {
                         .connect(info.url.clone())
                         .await
                     {
-                        Ok(_) => {
+                        Ok(()) => {
                             this.state.set(S::Authorizing(info));
                         }
                         Err(e) => {

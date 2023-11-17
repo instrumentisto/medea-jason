@@ -853,11 +853,11 @@ impl Room {
             peer_events_rx.map(RoomEvent::PeerEvent).fuse();
         let mut rpc_connection_lost = rpc
             .on_connection_loss()
-            .map(|_| RoomEvent::RpcClientLostConnection)
+            .map(|()| RoomEvent::RpcClientLostConnection)
             .fuse();
         let mut rpc_client_reconnected = rpc
             .on_reconnected()
-            .map(|_| RoomEvent::RpcClientReconnected)
+            .map(|()| RoomEvent::RpcClientReconnected)
             .fuse();
 
         let room = Rc::new(InnerRoom::new(rpc, media_manager, tx));

@@ -695,16 +695,19 @@ impl MediaConnections {
     /// [`LocalStreamUpdateCriteria`].
     pub async fn drop_send_tracks(&self, kinds: LocalStreamUpdateCriteria) {
         let remove_tracks_fut = future::join_all(
-            self.0.borrow().senders.values().filter_map(|s| {
-                kinds.has(s.state().kind(), s.state().source_kind()).then(
-                    || {
-                        let sender = s.obj();
-                        async move {
-                            sender.remove_track().await;
-                        }
-                    },
-                )
-            }),
+            self.0
+                .borrow()
+                .senders
+                .values()
+                .filter(|&s| {
+                    kinds.has(s.state().kind(), s.state().source_kind())
+                })
+                .map(|s| {
+                    let sender = s.obj();
+                    async move {
+                        sender.remove_track().await;
+                    }
+                }),
         );
         drop(remove_tracks_fut.await);
     }
@@ -816,7 +819,7 @@ impl MediaConnections {
         &self,
         id: TrackId,
         media_type: MediaType,
-        media_direction: medea_client_api_proto::MediaDirection,
+        media_direction: proto::MediaDirection,
         muted: bool,
         mid: Option<String>,
         receivers: Vec<MemberId>,
@@ -850,7 +853,7 @@ impl MediaConnections {
         &self,
         id: TrackId,
         media_type: MediaType,
-        media_direction: medea_client_api_proto::MediaDirection,
+        media_direction: proto::MediaDirection,
         muted: bool,
         mid: Option<String>,
         sender: MemberId,
@@ -891,15 +894,14 @@ impl MediaConnections {
         recv_constraints: &RecvConstraints,
         connection_mode: ConnectionMode,
     ) -> Result<(), Traced<sender::CreateError>> {
-        use medea_client_api_proto::Direction;
         for track in tracks {
             match track.direction {
-                Direction::Send { mid, receivers } => {
+                proto::Direction::Send { mid, receivers } => {
                     let component = self
                         .create_sender(
                             track.id,
                             track.media_type,
-                            medea_client_api_proto::MediaDirection::SendRecv,
+                            proto::MediaDirection::SendRecv,
                             send_constraints.muted(track.media_type),
                             mid,
                             receivers,
@@ -911,12 +913,12 @@ impl MediaConnections {
                         self.0.borrow_mut().senders.insert(track.id, component),
                     );
                 }
-                Direction::Recv { mid, sender } => {
+                proto::Direction::Recv { mid, sender } => {
                     let component = self
                         .create_receiver(
                             track.id,
                             track.media_type,
-                            medea_client_api_proto::MediaDirection::SendRecv,
+                            proto::MediaDirection::SendRecv,
                             false,
                             mid,
                             sender,
