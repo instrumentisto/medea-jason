@@ -3,6 +3,9 @@
 //!
 //! [`Jason`]: crate::api::Jason
 
+// For `wasm_bindgen`.
+#![allow(clippy::mem_forget)]
+
 pub mod connection_handle;
 pub mod err;
 pub mod jason;
@@ -242,12 +245,5 @@ impl From<media::MediaDirection> for MediaDirection {
             D::RecvOnly => Self::RecvOnly,
             D::Inactive => Self::Inactive,
         }
-    }
-}
-
-impl From<MediaDirection> for JsValue {
-    #[allow(clippy::as_conversions)]
-    fn from(val: MediaDirection) -> Self {
-        Self::from(val as u8)
     }
 }

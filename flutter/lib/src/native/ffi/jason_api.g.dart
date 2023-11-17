@@ -3838,8 +3838,7 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   late final _wire_media_manager_handle_microphone_volume_is_availablePtr =
       _lookup<
-              ffi
-              .NativeFunction<
+              ffi.NativeFunction<
                   WireSyncReturn Function(wire_MediaManagerHandle)>>(
           'wire_media_manager_handle_microphone_volume_is_available');
   late final _wire_media_manager_handle_microphone_volume_is_available =

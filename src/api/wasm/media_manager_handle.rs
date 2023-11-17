@@ -110,6 +110,15 @@ impl MediaManagerHandle {
     }
 
     /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
+    /// implicitly owns native object behind this [`MediaManagerHandle`].
+    ///
+    /// [`Jason`]: crate::api::Jason
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_device_change(
         &self,
         cb: js_sys::Function,
