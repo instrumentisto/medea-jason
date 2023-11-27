@@ -56,7 +56,7 @@ StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
   RegExp(r'(\S+) has {int} (live|stopped) remote tracks from (\S+)$'),
   (id, expectedCount, liveOrStopped, remoteId, context) async {
     var member = context.world.members[id]!;
-    member.waitForConnect(remoteId);
+    await member.waitForConnect(remoteId);
     var live = (liveOrStopped == 'live');
 
     // We might have to wait for Rust side for a little bit.
