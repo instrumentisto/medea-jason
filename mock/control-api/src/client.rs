@@ -9,7 +9,7 @@ use std::{
     time::Duration,
 };
 
-use actix::Recipient;
+use actix::{clock::sleep, Recipient};
 use derive_more::{AsRef, From, Into};
 use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
@@ -105,7 +105,7 @@ impl ControlClient {
                             return Err(err);
                         }
                         error!("Error connection to medea: {}, retrying", err);
-                        actix::clock::sleep(Duration::from_secs(1)).await;
+                        sleep(Duration::from_secs(1)).await;
                     }
                 }
             }
