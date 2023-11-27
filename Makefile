@@ -437,9 +437,10 @@ endif
 		--rust-input src/api/dart/api.rs \
 		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
 		--rust-output src/api/dart/api_bridge_generated.rs \
-		--skip-add-mod-to-lib \
+		--dart-enums-style \
+		--inline-rust \
 		--no-build-runner \
-		--dart-format-line-length=80
+		--skip-add-mod-to-lib
 	cd flutter && \
 	dart pub run build_runner build --delete-conflicting-outputs
 
