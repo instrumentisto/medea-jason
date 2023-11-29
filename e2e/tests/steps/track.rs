@@ -167,10 +167,8 @@ async fn then_remote_media_track(
     };
 }
 
-#[then(
-    regex = "^(\\S+) doesn't have (live |)(audio|(?:device|display) video) \
-                 remote track from (\\S+)$"
-)]
+#[then(regex = "^(\\S+) doesn't have (live )?\
+                 (audio|(?:device|display) video) remote track from (\\S+)$")]
 async fn then_doesnt_have_remote_track(
     world: &mut World,
     id: String,
@@ -206,12 +204,15 @@ async fn then_doesnt_have_remote_track(
                 }
             }
         }
-        assert!(!track_live_state);
+
+        assert!(!track_live_state, "live track is present");
     } else {
-        assert!(!tracks_with_partner
+        let has_track = tracks_with_partner
             .has_track(media_kind, Some(source_kind))
             .await
-            .unwrap());
+            .unwrap();
+
+        assert!(!has_track, "track is present");
     }
 }
 

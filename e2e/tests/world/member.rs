@@ -1,6 +1,6 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap, fmt, time::Duration};
+use std::{cell::RefCell, collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
@@ -139,7 +139,7 @@ impl Member {
         self.enabled_video
     }
 
-    /// Indicates whether this [`Member`] should publish audio.\
+    /// Indicates whether this [`Member`] should publish audio.
     #[must_use]
     pub fn is_send_audio(&self) -> bool {
         self.enabled_audio
@@ -220,8 +220,8 @@ impl Member {
     /// [`RemoteTrack`]: crate::object::remote_track::RemoteTrack
     #[must_use]
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
-        if std::env::var("SFU").is_ok() {
-            // All transceivers are always sendrecv in SFU mode.
+        if env::var("SFU").is_ok() {
+            // All transceivers are always `sendrecv` in SFU mode.
             return (3, 3);
         }
 

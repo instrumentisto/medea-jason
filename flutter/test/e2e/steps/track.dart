@@ -82,7 +82,7 @@ StepDefinitionGeneric thenMemberHasLocalTracks =
 
 StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     then4<String, String, String, String, CustomWorld>(
-  RegExp(r"(\S+) doesn't have (live |)(audio|(?:device|display) video) "
+  RegExp(r"(\S+) doesn't have (live )?(audio|(?:device|display) video) "
       r'remote track from (\S+)$'),
   (id, live, kind, partnerId, context) async {
     var member = context.world.members[id]!;

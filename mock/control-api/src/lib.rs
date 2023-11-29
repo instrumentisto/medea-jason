@@ -150,6 +150,8 @@ use clap::Parser as _;
 use slog::{o, Drain};
 use slog_scope::GlobalLoggerGuard;
 
+pub(crate) use slog_scope as log;
+
 /// Control API protocol re-exported definitions.
 pub mod proto {
     pub use crate::api::{

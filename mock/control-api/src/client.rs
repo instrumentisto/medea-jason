@@ -17,7 +17,7 @@ use tonic::{transport::Channel, Status};
 
 use crate::{
     api::{ws::Notification, Element, Subscribers},
-    prelude::*,
+    log,
 };
 
 /// Fid to `Room` element.
@@ -86,7 +86,7 @@ impl ControlClient {
         subscribers: Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>,
     ) -> Result<Self, tonic::transport::Error> {
         let grpc_client = {
-            /// Max number of retries when connection medea.
+            /// Max number of retries for connecting to Medea.
             const MAX_RETRIES: u64 = 5;
 
             let mut current_try = 0;
@@ -99,12 +99,12 @@ impl ControlClient {
                     Ok(client) => {
                         break client;
                     }
-                    Err(err) => {
+                    Err(e) => {
                         if current_try == MAX_RETRIES {
-                            error!("Error connection to medea: {}", err);
-                            return Err(err);
+                            log::error!("Error connection to medea: {e}");
+                            return Err(e);
                         }
-                        error!("Error connection to medea: {}, retrying", err);
+                        log::error!("Error connection to medea: {e}, retrying");
                         sleep(Duration::from_secs(1)).await;
                     }
                 }

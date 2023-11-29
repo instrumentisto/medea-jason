@@ -37,8 +37,8 @@ Future<void> clearWorld() async {
   }
 }
 
-/// A [Hook] that calls `exit(1)` if any tests in the run have failed to make
-/// sure that test run process exits with an error code.
+/// [Hook] calling `exit(1)` if any tests in the run have failed, to make sure
+/// that test run process exits with an error code.
 class ExitOnFailureHook implements Hook {
   bool fail = false;
 
