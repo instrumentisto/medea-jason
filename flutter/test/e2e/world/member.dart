@@ -367,6 +367,7 @@ class Member {
   /// [Member] with the provided partner [Member].
   Tuple2<int, int> countOfTracksBetweenMembers(Member other) {
     if (isSfu) {
+      // All transceivers are always `sendrecv` in SFU mode.
       return const Tuple2<int, int>(3, 3);
     }
     var sendCount = sendState.entries

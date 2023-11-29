@@ -326,7 +326,7 @@ jobs:
           - ios
           - linux
           - macos
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -450,13 +450,6 @@ jobs:
                                     ${{ (matrix.platform == 'android'
                                          && 'targets=x86_64')
                                      ||     '' }}
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: 11
-        if: ${{ matrix.platform == 'android' }}
 
       - name: Parse Android API versions
         id: api-version
@@ -685,8 +678,8 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      #- test-e2e-native
-      #- test-flutter
+      - test-e2e-native
+      - test-flutter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -1056,8 +1049,8 @@ jobs:
       - rustfmt
       - test
       - test-e2e-browser
-      #- test-e2e-native
-      #- test-flutter
+      - test-e2e-native
+      - test-flutter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

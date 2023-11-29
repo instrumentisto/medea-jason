@@ -261,6 +261,14 @@ impl World {
         self.members.get(member_id)
     }
 
+    /// Returns mutable reference to a [`Member`] with the provided ID.
+    ///
+    /// Returns [`None`] if a [`Member`] with the provided ID doesn't exist.
+    #[must_use]
+    pub fn get_member_mut(&mut self, member_id: &str) -> Option<&mut Member> {
+        self.members.get_mut(member_id)
+    }
+
     /// Joins a [`Member`] with the provided ID to the `Room` created for this
     /// [`World`].
     ///
@@ -291,9 +299,15 @@ impl World {
         &mut self,
         member_id: &str,
     ) -> Result<()> {
-        let interconnected_members = self.members.values().filter(|m| {
-            m.is_joined() && m.id() != member_id && (m.is_recv() || m.is_send())
-        });
+        let interconnected_members: Vec<_> = self
+            .members
+            .values()
+            .filter(|m| {
+                m.is_joined()
+                    && m.id() != member_id
+                    && (m.is_recv() || m.is_send())
+            })
+            .collect();
         let is_sfu = env::var("SFU").is_ok();
 
         let member = self.members.get(member_id).unwrap();

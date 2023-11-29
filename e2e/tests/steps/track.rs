@@ -167,10 +167,8 @@ async fn then_remote_media_track(
     };
 }
 
-#[then(
-    regex = "^(\\S+) doesn't have (live |)(audio|(?:device|display) video) \
-                 remote track from (\\S+)$"
-)]
+#[then(regex = "^(\\S+) doesn't have (live )?\
+                 (audio|(?:device|display) video) remote track from (\\S+)$")]
 async fn then_doesnt_have_remote_track(
     world: &mut World,
     id: String,
@@ -178,7 +176,8 @@ async fn then_doesnt_have_remote_track(
     kind: String,
     partner_id: String,
 ) {
-    let live = env::var("SFU").is_ok() && !live.is_empty();
+    let should_not_be_live = env::var("SFU").is_ok() && !live.is_empty();
+
     let member = world.get_member(&id).unwrap();
     let partner_connection = member
         .connections()
@@ -188,25 +187,32 @@ async fn then_doesnt_have_remote_track(
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
 
-    if live {
+    if should_not_be_live {
         let track = tracks_with_partner
             .get_track(media_kind, source_kind)
             .await
             .unwrap();
 
-        let mut state = track.lived().await.unwrap();
-        for _ in 0..5 {
-            state = track.lived().await.unwrap();
-            if state {
-                sleep(Duration::from_millis(300)).await;
+        let mut track_live_state = track.lived().await.unwrap();
+        if track_live_state {
+            for _ in 0..5 {
+                track_live_state = track.lived().await.unwrap();
+                if track_live_state {
+                    sleep(Duration::from_millis(300)).await;
+                } else {
+                    break;
+                }
             }
         }
-        assert!(!state);
+
+        assert!(!track_live_state, "live track is present");
     } else {
-        assert!(!tracks_with_partner
+        let has_track = tracks_with_partner
             .has_track(media_kind, Some(source_kind))
             .await
-            .unwrap());
+            .unwrap();
+
+        assert!(!has_track, "track is present");
     }
 }
 

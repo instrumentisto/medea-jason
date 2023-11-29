@@ -1736,8 +1736,8 @@ impl EventHandler for InnerRoom {
         unreachable!("Room can't receive Event::RoomLeft")
     }
 
-    /// Updates [`peer::repo::State`] and [`Connections`] with the provided
-    /// [`proto::state::Room`].
+    /// Updates the [`peer::repo::State`] and the [`Connections`] with the
+    /// provided [`proto::state::Room`].
     async fn on_state_synchronized(
         &self,
         state: proto::state::Room,

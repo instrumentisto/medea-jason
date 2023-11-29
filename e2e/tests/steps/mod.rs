@@ -50,7 +50,7 @@ async fn new_given_member(
     };
     world.create_member(member_builder).await.unwrap();
 
-    let member = world.get_member(&first_member_id).unwrap();
+    let member = world.get_member_mut(&first_member_id).unwrap();
     let is_audio = disabled_media_type == DisabledMediaType::Audio
         || disabled_media_type == DisabledMediaType::All;
     let is_video = disabled_media_type == DisabledMediaType::Video

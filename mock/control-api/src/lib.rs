@@ -37,6 +37,7 @@
     clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
+    clippy::implied_bounds_in_impls,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
     clippy::iter_on_empty_collections,
@@ -50,6 +51,7 @@
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_assert_message,
+    clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
@@ -147,6 +149,8 @@ use actix_web::rt;
 use clap::Parser as _;
 use slog::{o, Drain};
 use slog_scope::GlobalLoggerGuard;
+
+pub(crate) use slog_scope as log;
 
 /// Control API protocol re-exported definitions.
 pub mod proto {

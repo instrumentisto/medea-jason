@@ -56,7 +56,7 @@ StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
   RegExp(r'(\S+) has {int} (live|stopped) remote tracks from (\S+)$'),
   (id, expectedCount, liveOrStopped, remoteId, context) async {
     var member = context.world.members[id]!;
-    member.waitForConnect(remoteId);
+    await member.waitForConnect(remoteId);
     var live = (liveOrStopped == 'live');
 
     // We might have to wait for Rust side for a little bit.
@@ -82,7 +82,7 @@ StepDefinitionGeneric thenMemberHasLocalTracks =
 
 StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     then4<String, String, String, String, CustomWorld>(
-  RegExp(r"(\S+) doesn't have (live |)(audio|(?:device|display) video) "
+  RegExp(r"(\S+) doesn't have (live )?(audio|(?:device|display) video) "
       r'remote track from (\S+)$'),
   (id, live, kind, partnerId, context) async {
     var member = context.world.members[id]!;
@@ -98,13 +98,15 @@ StepDefinitionGeneric thenDoesntHaveRemoteTrack =
         .toList();
 
     if (isSfu && live.isNotEmpty) {
-      var length = tracks
-          .where((element) =>
-              !member.connectionStore
-                  .remoteTrackIsStopped(partnerId, element.getTrack().id()) &&
-              element.mediaDirection() == MediaDirection.sendRecv)
-          .length;
-      expect(length, 0);
+      await retry(() async {
+        var length = tracks
+            .where((element) =>
+                !member.connectionStore
+                    .remoteTrackIsStopped(partnerId, element.getTrack().id()) &&
+                element.mediaDirection() == MediaDirection.sendRecv)
+            .length;
+        expect(length, 0);
+      });
     } else {
       expect(tracks.length, 0);
     }

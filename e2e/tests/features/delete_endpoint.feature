@@ -9,7 +9,7 @@ Feature: Delete endpoint
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |
@@ -24,7 +24,7 @@ Feature: Delete endpoint
     Examples:
       | tracks |
       | 2      |
-    
+
     @sfu
     Examples:
       | tracks |
