@@ -539,7 +539,6 @@ dependencies = [
  "instant",
  "pin-project-lite",
  "rand",
- "tokio",
 ]
 
 [[package]]
@@ -1872,7 +1871,6 @@ dependencies = [
  "actix-cors",
  "actix-web",
  "actix-web-actors",
- "backoff",
  "clap",
  "derive_more",
  "dotenv",
