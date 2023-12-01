@@ -1,5 +1,3 @@
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
-
 import '../interface/connection_handle.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../interface/media_track.dart';
@@ -30,214 +28,133 @@ class NativeRoomHandle implements RoomHandle {
 
   @override
   Future<void> join(String token) async {
-    try {
-      await (api.roomHandleJoin(roomHandle: opaque.innerOpaque, token: token)
-          as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleJoin(roomHandle: opaque.innerOpaque, token: token)
+        as Future);
   }
 
   @override
   Future<void> setLocalMediaSettings(base_settings.MediaStreamSettings settings,
       bool stopFirst, bool rollbackOnFail) async {
-    try {
-      await (api.roomHandleSetLocalMediaSettings(
-          roomHandle: opaque.innerOpaque,
-          settings: (settings as MediaStreamSettings).setting,
-          stopFirst: stopFirst,
-          rollbackOnFail: rollbackOnFail) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleSetLocalMediaSettings(
+        roomHandle: opaque.innerOpaque,
+        settings: (settings as MediaStreamSettings).setting,
+        stopFirst: stopFirst,
+        rollbackOnFail: rollbackOnFail) as Future);
   }
 
   @override
   Future<void> muteAudio() async {
-    try {
-      await (api.roomHandleMuteAudio(roomHandle: opaque.innerOpaque) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleMuteAudio(roomHandle: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> unmuteAudio() async {
-    try {
-      await (api.roomHandleUnmuteAudio(roomHandle: opaque.innerOpaque)
-          as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleUnmuteAudio(roomHandle: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> enableAudio() async {
-    try {
-      await (api.roomHandleEnableAudio(roomHandle: opaque.innerOpaque)
-          as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleEnableAudio(roomHandle: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> disableAudio() async {
-    try {
-      await (api.roomHandleDisableAudio(roomHandle: opaque.innerOpaque)
-          as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleDisableAudio(roomHandle: opaque.innerOpaque)
+        as Future);
   }
 
   @override
   Future<void> muteVideo([MediaSourceKind? kind]) async {
-    try {
-      await (api.roomHandleMuteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleMuteVideo(
+        roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> unmuteVideo([MediaSourceKind? kind]) async {
-    try {
-      await (api.roomHandleUnmuteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleUnmuteVideo(
+        roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> enableVideo([MediaSourceKind? kind]) async {
-    try {
-      await (api.roomHandleEnableVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleEnableVideo(
+        roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> disableVideo([MediaSourceKind? kind]) async {
-    try {
-      await (api.roomHandleDisableVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleDisableVideo(
+        roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    try {
-      await (api.roomHandleEnableRemoteAudio(roomHandle: opaque.innerOpaque)
-          as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleEnableRemoteAudio(roomHandle: opaque.innerOpaque)
+        as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    try {
-      await (api.roomHandleDisableRemoteAudio(roomHandle: opaque.innerOpaque)
-          as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleDisableRemoteAudio(roomHandle: opaque.innerOpaque)
+        as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    try {
-      await (api.roomHandleEnableRemoteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleEnableRemoteVideo(
+        roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    try {
-      await (api.roomHandleDisableRemoteVideo(
-          roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.roomHandleDisableRemoteVideo(
+        roomHandle: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   void onNewConnection(void Function(ConnectionHandle) f) {
-    try {
-      api.roomHandleOnNewConnection(
-          roomHandle: opaque.innerOpaque,
-          cb: (t) {
-            f(NativeConnectionHandle(
-                api.connectionHandleFromPtr(ptr: t.address)));
-          });
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    api.roomHandleOnNewConnection(
+        roomHandle: opaque.innerOpaque,
+        cb: (t) {
+          f(NativeConnectionHandle(
+              api.connectionHandleFromPtr(ptr: t.address)));
+        });
   }
 
   @override
   void onClose(void Function(RoomCloseReason) f) {
-    try {
-      api.roomHandleOnClose(
-          roomHandle: opaque.innerOpaque,
-          cb: (t) {
-            f(NativeRoomCloseReason(
-                api.roomCloseReasonFromPtr(ptr: t.address)));
-          });
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    api.roomHandleOnClose(
+        roomHandle: opaque.innerOpaque,
+        cb: (t) {
+          f(NativeRoomCloseReason(api.roomCloseReasonFromPtr(ptr: t.address)));
+        });
   }
 
   @override
   void onLocalTrack(void Function(LocalMediaTrack) f) {
-    try {
-      api.roomHandleOnLocalTrack(
-          roomHandle: opaque.innerOpaque,
-          cb: (t) {
-            f(NativeLocalMediaTrack(
-                api.localMediaTrackFromPtr(ptr: t.address)));
-          });
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    api.roomHandleOnLocalTrack(
+        roomHandle: opaque.innerOpaque,
+        cb: (t) {
+          f(NativeLocalMediaTrack(api.localMediaTrackFromPtr(ptr: t.address)));
+        });
   }
 
   @override
   void onConnectionLoss(void Function(ReconnectHandle) f) {
-    try {
-      api.roomHandleOnConnectionLoss(
-          roomHandle: opaque.innerOpaque,
-          cb: (t) {
-            f(NativeReconnectHandle(
-                api.reconnectHandleFromPtr(ptr: t.address)));
-          });
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    api.roomHandleOnConnectionLoss(
+        roomHandle: opaque.innerOpaque,
+        cb: (t) {
+          f(NativeReconnectHandle(api.reconnectHandleFromPtr(ptr: t.address)));
+        });
   }
 
   @override
   void onFailedLocalMedia(void Function(Object) f) {
-    try {
-      api.roomHandleOnFailedLocalMedia(
-          roomHandle: opaque.innerOpaque,
-          cb: (err) {
-            f(err);
-          });
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    api.roomHandleOnFailedLocalMedia(
+        roomHandle: opaque.innerOpaque,
+        cb: (err) {
+          f(err);
+        });
   }
 
   @moveSemantics

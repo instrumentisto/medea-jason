@@ -1931,7 +1931,6 @@ name = "medea-jason"
 version = "0.4.0"
 dependencies = [
  "android_logger",
- "anyhow",
  "async-recursion",
  "async-trait",
  "backoff",
