@@ -140,9 +140,7 @@ impl DartError {
 
 impl From<DartError> for DartOpaque {
     fn from(val: DartError) -> Self {
-        unsafe {
-            Self::new_non_droppable(*Box::from_raw(val.0.as_ptr()))
-        }
+        unsafe { Self::new_non_droppable(*Box::from_raw(val.0.as_ptr())) }
     }
 }
 
