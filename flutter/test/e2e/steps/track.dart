@@ -7,7 +7,7 @@ import '../world/custom_world.dart';
 import '../world/more_args.dart';
 
 import 'package:medea_jason/src/interface/enums.dart'
-    show MediaStreamTrackState;
+    show MediaDirection, MediaStreamTrackState;
 
 List<StepDefinitionGeneric> steps() {
   return [
@@ -56,7 +56,7 @@ StepDefinitionGeneric thenMemberHasNRemoteTracksFrom =
   RegExp(r'(\S+) has {int} (live|stopped) remote tracks from (\S+)$'),
   (id, expectedCount, liveOrStopped, remoteId, context) async {
     var member = context.world.members[id]!;
-    await context.world.waitForInterconnection(id);
+    await member.waitForConnect(remoteId);
     var live = (liveOrStopped == 'live');
 
     // We might have to wait for Rust side for a little bit.
@@ -81,10 +81,10 @@ StepDefinitionGeneric thenMemberHasLocalTracks =
 );
 
 StepDefinitionGeneric thenDoesntHaveRemoteTrack =
-    then3<String, String, String, CustomWorld>(
-  RegExp(r"(\S+) doesn't have (audio|(?:device|display) video) "
+    then4<String, String, String, String, CustomWorld>(
+  RegExp(r"(\S+) doesn't have (live )?(audio|(?:device|display) video) "
       r'remote track from (\S+)$'),
-  (id, kind, partnerId, context) async {
+  (id, live, kind, partnerId, context) async {
     var member = context.world.members[id]!;
     await member.waitForConnect(partnerId);
     var parsedKind = parseMediaKind(kind);
@@ -92,15 +92,24 @@ StepDefinitionGeneric thenDoesntHaveRemoteTrack =
     var tracks = member.connectionStore.remoteTracks[partnerId]!.values
         .where((element) => element.isNotEmpty)
         .map((e) => e.last)
-        .toList();
-
-    var actualCount = tracks
         .where((element) =>
             element.kind() == parsedKind.item1 &&
             element.mediaSourceKind() == parsedKind.item2)
-        .length;
+        .toList();
 
-    expect(actualCount, 0);
+    if (isSfu && live.isNotEmpty) {
+      await retry(() async {
+        var length = tracks
+            .where((element) =>
+                !member.connectionStore
+                    .remoteTrackIsStopped(partnerId, element.getTrack().id()) &&
+                element.mediaDirection() == MediaDirection.sendRecv)
+            .length;
+        expect(length, 0);
+      });
+    } else {
+      expect(tracks.length, 0);
+    }
   },
 );
 

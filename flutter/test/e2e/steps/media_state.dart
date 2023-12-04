@@ -102,7 +102,8 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
     var track = await member.waitRemoteTrackFrom(
         remoteId, parsedKind.item2, parsedKind.item1);
 
-    var dir = TrackMediaDirection.values.firstWhere((e) => e.name == direction);
+    var dir = TrackMediaDirection.values
+        .firstWhere((e) => e.name.toLowerCase() == direction.toLowerCase());
 
     await member.waitMediaDirectionTrack(dir, track);
   },

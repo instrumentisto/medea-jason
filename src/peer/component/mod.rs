@@ -486,10 +486,12 @@ impl SynchronizableState for State {
         );
 
         for (id, sender) in from.senders {
-            state.senders.insert(
-                id,
-                Rc::new(sender::State::from_proto(sender, send_cons)),
-            );
+            if !sender.receivers.is_empty() {
+                state.senders.insert(
+                    id,
+                    Rc::new(sender::State::from_proto(sender, send_cons)),
+                );
+            }
         }
         for (id, receiver) in from.receivers {
             state.receivers.insert(
