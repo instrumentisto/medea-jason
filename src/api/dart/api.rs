@@ -316,9 +316,7 @@ pub fn connection_handle_on_close(
         platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
     };
 
-    connection
-        .on_close(f)
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+    connection.on_close(f).map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -341,7 +339,7 @@ pub fn connection_handle_on_remote_track_added(
 
     connection
         .on_remote_track_added(f)
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -362,7 +360,7 @@ pub fn connection_handle_on_quality_score_update(
 
     connection
         .on_quality_score_update(f)
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -376,9 +374,7 @@ pub fn connection_handle_get_remote_member_id(
     connection: RustOpaque<ConnectionHandle>,
 ) -> Result<SyncReturn<String>, DartOpaque> {
     Ok(SyncReturn(
-        connection
-            .get_remote_member_id()
-            .map_err(|err| DartOpaque::from(DartError::from(err)))?,
+        connection.get_remote_member_id().map_err(DartError::from)?,
     ))
 }
 
@@ -808,7 +804,7 @@ pub fn media_manager_handle_on_device_change(
         .on_device_change(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1411,7 +1407,7 @@ pub fn room_handle_on_new_connection(
                     cb.try_unwrap().unwrap().into_raw().cast(),
                 )
             })
-            .map_err(|err| DartOpaque::from(DartError::from(err)))?,
+            .map_err(DartError::from)?,
     ))
 }
 
@@ -1431,7 +1427,7 @@ pub fn room_handle_on_close(
         .on_close(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1458,7 +1454,7 @@ pub fn room_handle_on_local_track(
         .on_local_track(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1476,7 +1472,7 @@ pub fn room_handle_on_connection_loss(
         .on_connection_loss(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1494,7 +1490,7 @@ pub fn room_handle_on_failed_local_media(
         .on_failed_local_media(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| DartOpaque::from(DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }

@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use cucumber::{then, when};
+use tokio::time::sleep;
 
 use crate::World;
 
@@ -6,7 +9,7 @@ use crate::World;
 async fn ws_connection_loss(world: &mut World, id: String) {
     let member = world.get_member(&id).unwrap();
     member.ws_mock().enable_connection_loss(3999).await;
-    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+    sleep(Duration::from_millis(500)).await;
 }
 
 #[when(regex = r"^(\S+) restores WS connection$")]
