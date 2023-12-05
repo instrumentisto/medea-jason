@@ -1,5 +1,3 @@
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
-
 import '../interface/reconnect_handle.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
@@ -24,12 +22,8 @@ class NativeReconnectHandle implements ReconnectHandle {
       throw ArgumentError.value(delayMs, 'delayMs', 'Expected `u32`');
     }
 
-    try {
-      await (api.reconnectHandleReconnectWithDelay(
-          reconnectHandle: opaque.innerOpaque, delayMs: delayMs) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.reconnectHandleReconnectWithDelay(
+        reconnectHandle: opaque.innerOpaque, delayMs: delayMs) as Future);
   }
 
   @override
@@ -52,16 +46,12 @@ class NativeReconnectHandle implements ReconnectHandle {
       }
     }
 
-    try {
-      await (api.reconnectHandleReconnectWithBackoff(
-          reconnectHandle: opaque.innerOpaque,
-          startingDelay: startingDelayMs,
-          multiplier: multiplier,
-          maxDelay: maxDelay,
-          maxElapsedTimeMs: maxElapsedTimeMs) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.reconnectHandleReconnectWithBackoff(
+        reconnectHandle: opaque.innerOpaque,
+        startingDelay: startingDelayMs,
+        multiplier: multiplier,
+        maxDelay: maxDelay,
+        maxElapsedTimeMs: maxElapsedTimeMs) as Future);
   }
 
   @moveSemantics

@@ -27,7 +27,6 @@ Feature: State synchronization
     And Alice restores WS connection
     Then Bob's audio remote track from Alice is enabled
 
-  @mesh
   Scenario: Audio endpoint added while disconnected
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection
@@ -36,7 +35,6 @@ Feature: State synchronization
     Then Alice has audio remote tracks from Bob
     And Bob has audio remote tracks from Alice
 
-  @mesh
   Scenario: Video endpoint added while disconnected
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection
@@ -45,7 +43,6 @@ Feature: State synchronization
     Then Alice has video remote tracks from Bob
     And Bob has video remote tracks from Alice
 
-  @mesh
   Scenario: New endpoint creates new tracks
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Alice loses WS connection

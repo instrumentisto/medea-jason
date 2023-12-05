@@ -4,6 +4,7 @@ use std::ptr;
 
 use dart_sys::Dart_Handle;
 use derive_more::Into;
+use flutter_rust_bridge::DartOpaque;
 use medea_macro::dart_bridge;
 
 use crate::{
@@ -134,6 +135,12 @@ impl DartError {
     /// Creates a new [`DartError`] from the provided [`Dart_Handle`].
     fn new(handle: Dart_Handle) -> Self {
         Self(unsafe { box_dart_handle(handle) })
+    }
+}
+
+impl From<DartError> for DartOpaque {
+    fn from(val: DartError) -> Self {
+        unsafe { Self::new_non_droppable(*Box::from_raw(val.0.as_ptr())) }
     }
 }
 

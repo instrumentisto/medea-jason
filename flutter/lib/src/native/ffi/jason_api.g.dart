@@ -1083,7 +1083,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_connection_handle_on_close(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kConnectionHandleOnCloseConstMeta,
       argValues: [connection, f],
       hint: hint,
@@ -1104,7 +1104,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () => _platform.inner
           .wire_connection_handle_on_remote_track_added(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kConnectionHandleOnRemoteTrackAddedConstMeta,
       argValues: [connection, f],
       hint: hint,
@@ -1126,7 +1126,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () => _platform.inner
           .wire_connection_handle_on_quality_score_update(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kConnectionHandleOnQualityScoreUpdateConstMeta,
       argValues: [connection, f],
       hint: hint,
@@ -1147,7 +1147,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_connection_handle_get_remote_member_id(arg0),
       parseSuccessData: _wire2api_String,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kConnectionHandleGetRemoteMemberIdConstMeta,
       argValues: [connection],
       hint: hint,
@@ -1714,7 +1714,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () => _platform.inner
           .wire_media_manager_handle_on_device_change(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kMediaManagerHandleOnDeviceChangeConstMeta,
       argValues: [manager, cb],
       hint: hint,
@@ -2162,7 +2162,7 @@ class MedeaJasonImpl implements MedeaJason {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_mute_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: null,
       constMeta: kRoomHandleMuteVideoConstMeta,
       argValues: [roomHandle, sourceKind],
       hint: hint,
@@ -2184,7 +2184,7 @@ class MedeaJasonImpl implements MedeaJason {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_unmute_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: null,
       constMeta: kRoomHandleUnmuteVideoConstMeta,
       argValues: [roomHandle, sourceKind],
       hint: hint,
@@ -2206,7 +2206,7 @@ class MedeaJasonImpl implements MedeaJason {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_enable_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: null,
       constMeta: kRoomHandleEnableVideoConstMeta,
       argValues: [roomHandle, sourceKind],
       hint: hint,
@@ -2228,7 +2228,7 @@ class MedeaJasonImpl implements MedeaJason {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_disable_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: null,
       constMeta: kRoomHandleDisableVideoConstMeta,
       argValues: [roomHandle, sourceKind],
       hint: hint,
@@ -2290,7 +2290,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_room_handle_enable_remote_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: null,
       constMeta: kRoomHandleEnableRemoteVideoConstMeta,
       argValues: [roomHandle, sourceKind],
       hint: hint,
@@ -2313,7 +2313,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_room_handle_disable_remote_video(arg0, arg1),
       parseSuccessData: _wire2api_DartOpaque,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: null,
       constMeta: kRoomHandleDisableRemoteVideoConstMeta,
       argValues: [roomHandle, sourceKind],
       hint: hint,
@@ -2334,7 +2334,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_room_handle_on_new_connection(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kRoomHandleOnNewConnectionConstMeta,
       argValues: [roomHandle, cb],
       hint: hint,
@@ -2354,7 +2354,7 @@ class MedeaJasonImpl implements MedeaJason {
     return _platform.executeSync(FlutterRustBridgeSyncTask(
       callFfi: () => _platform.inner.wire_room_handle_on_close(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kRoomHandleOnCloseConstMeta,
       argValues: [roomHandle, cb],
       hint: hint,
@@ -2375,7 +2375,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_room_handle_on_local_track(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kRoomHandleOnLocalTrackConstMeta,
       argValues: [roomHandle, cb],
       hint: hint,
@@ -2396,7 +2396,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_room_handle_on_connection_loss(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kRoomHandleOnConnectionLossConstMeta,
       argValues: [roomHandle, cb],
       hint: hint,
@@ -2417,7 +2417,7 @@ class MedeaJasonImpl implements MedeaJason {
       callFfi: () =>
           _platform.inner.wire_room_handle_on_failed_local_media(arg0, arg1),
       parseSuccessData: _wire2api_unit,
-      parseErrorData: _wire2api_FrbAnyhowException,
+      parseErrorData: _wire2api_DartOpaque,
       constMeta: kRoomHandleOnFailedLocalMediaConstMeta,
       argValues: [roomHandle, cb],
       hint: hint,
@@ -2485,10 +2485,6 @@ class MedeaJasonImpl implements MedeaJason {
 
   Object _wire2api_DartOpaque(dynamic raw) {
     return _platform.inner.get_dart_object(raw);
-  }
-
-  FrbAnyhowException _wire2api_FrbAnyhowException(dynamic raw) {
-    return FrbAnyhowException(raw as String);
   }
 
   Jason _wire2api_Jason(dynamic raw) {
