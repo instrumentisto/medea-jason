@@ -925,7 +925,10 @@ fn wire_room_handle_mute_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            room_handle_mute_video(api_room_handle, api_source_kind)
+            Result::<_, ()>::Ok(room_handle_mute_video(
+                api_room_handle,
+                api_source_kind,
+            ))
         },
     )
 }
@@ -942,7 +945,10 @@ fn wire_room_handle_unmute_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            room_handle_unmute_video(api_room_handle, api_source_kind)
+            Result::<_, ()>::Ok(room_handle_unmute_video(
+                api_room_handle,
+                api_source_kind,
+            ))
         },
     )
 }
@@ -959,7 +965,10 @@ fn wire_room_handle_enable_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            room_handle_enable_video(api_room_handle, api_source_kind)
+            Result::<_, ()>::Ok(room_handle_enable_video(
+                api_room_handle,
+                api_source_kind,
+            ))
         },
     )
 }
@@ -976,7 +985,10 @@ fn wire_room_handle_disable_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            room_handle_disable_video(api_room_handle, api_source_kind)
+            Result::<_, ()>::Ok(room_handle_disable_video(
+                api_room_handle,
+                api_source_kind,
+            ))
         },
     )
 }
@@ -1027,7 +1039,10 @@ fn wire_room_handle_enable_remote_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            room_handle_enable_remote_video(api_room_handle, api_source_kind)
+            Result::<_, ()>::Ok(room_handle_enable_remote_video(
+                api_room_handle,
+                api_source_kind,
+            ))
         },
     )
 }
@@ -1044,7 +1059,10 @@ fn wire_room_handle_disable_remote_video_impl(
         move || {
             let api_room_handle = room_handle.wire2api();
             let api_source_kind = source_kind.wire2api();
-            room_handle_disable_remote_video(api_room_handle, api_source_kind)
+            Result::<_, ()>::Ok(room_handle_disable_remote_video(
+                api_room_handle,
+                api_source_kind,
+            ))
         },
     )
 }
