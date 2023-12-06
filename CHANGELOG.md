@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Screen sharing on Firefox ([#135]).
+- Screen sharing in Firefox ([#135]).
 
 [#135]: /../../pull/135
 
