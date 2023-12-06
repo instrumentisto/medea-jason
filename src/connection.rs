@@ -12,7 +12,9 @@ use futures::{
     future, future::LocalBoxFuture, stream::LocalBoxStream, FutureExt as _,
     StreamExt as _,
 };
-use medea_client_api_proto::{ConnectionQualityScore, MemberId, TrackId};
+use medea_client_api_proto::{
+    self as proto, ConnectionQualityScore, MemberId, TrackId,
+};
 use tracerr::Traced;
 
 use crate::{
@@ -250,6 +252,25 @@ impl Connections {
     /// Lookups a [`Connection`] by the provided remote [`MemberId`].
     pub fn get(&self, remote_member_id: &MemberId) -> Option<Connection> {
         self.connections.borrow().get(remote_member_id).cloned()
+    }
+
+    /// Updates this [`Connection`] with the provided [`proto::state::Room`].
+    pub fn apply(&self, new_state: &proto::state::Room) {
+        for peer in new_state.peers.values() {
+            for (track_id, sender) in &peer.senders {
+                if let Some(partners) = self.tracks.borrow().get(track_id) {
+                    for member in partners {
+                        if let Some(member_tracks) =
+                            self.members_to_tracks.borrow_mut().get_mut(member)
+                        {
+                            if !sender.receivers.contains(member) {
+                                _ = member_tracks.remove(track_id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

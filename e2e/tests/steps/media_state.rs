@@ -104,7 +104,7 @@ async fn when_enables_or_mutes(
     audio_or_video: String,
     awaits: String,
 ) {
-    let member = world.get_member(&id).unwrap();
+    let member = world.get_member_mut(&id).unwrap();
     let maybe_await = if awaits.contains("awaits") {
         AwaitCompletion::Do
     } else {

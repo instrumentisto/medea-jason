@@ -8,6 +8,7 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
+import 'custom_world.dart';
 
 /// Builder of a [Member].
 class MemberBuilder {
@@ -90,9 +91,9 @@ class ConnectionStore {
           track.last.mediaDirection() == TrackMediaDirection.SendRecv &&
           !trackStopped) {
         count += 1;
-      } else if (!live &&
-          track.last.mediaDirection() != TrackMediaDirection.SendRecv &&
-          trackStopped) {
+      } else if ((!live && trackStopped) ||
+          (!live &&
+              track.last.mediaDirection() != TrackMediaDirection.sendRecv)) {
         count += 1;
       }
     });
@@ -110,6 +111,12 @@ class Member {
 
   /// Indicator whether this [Member] should receive media.
   bool isRecv;
+
+  /// Indicator whether this [Member] should publish audio.
+  bool enabledAudio = true;
+
+  /// Indicator whether this [Member] should publish video.
+  bool enabledVideo = true;
 
   /// Indicator whether this [Member] is joined a [RoomHandle] on a media
   /// server.
@@ -363,6 +370,10 @@ class Member {
   /// Returns a count of [LocalMediaTrack]s and [RemoteMediaTrack]s of this
   /// [Member] with the provided partner [Member].
   Tuple2<int, int> countOfTracksBetweenMembers(Member other) {
+    if (isSfu) {
+      // All transceivers are always `sendrecv` in SFU mode.
+      return const Tuple2<int, int>(3, 3);
+    }
     var sendCount = sendState.entries
         .where((element) => other.recvState[element.key]! && element.value)
         .length;
@@ -380,23 +391,31 @@ class Member {
       if (kind != null) {
         if (kind == MediaKind.Audio) {
           await room.enableAudio();
+          enabledAudio = true;
         } else {
           await room.enableVideo(source);
+          enabledVideo = true;
         }
       } else {
         await room.enableAudio();
         await room.enableVideo(source);
+        enabledAudio = true;
+        enabledVideo = true;
       }
     } else {
       if (kind != null) {
         if (kind == MediaKind.Audio) {
           await room.disableAudio();
+          enabledAudio = false;
         } else {
           await room.disableVideo(source);
+          enabledVideo = false;
         }
       } else {
         await room.disableAudio();
         await room.disableVideo(source);
+        enabledAudio = false;
+        enabledVideo = false;
       }
     }
   }

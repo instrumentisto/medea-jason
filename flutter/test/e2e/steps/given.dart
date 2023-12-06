@@ -42,36 +42,23 @@ Future<void> newGivenMember(
       MemberBuilder(firstMemberId, !isSendDisabled, !isRecvDisabled);
 
   await context.world.createMember(memberBuilder);
-  if (joined.contains('joined ')) {
-    await context.world.joinRoom(firstMemberId);
-    await context.world.waitForInterconnection(firstMemberId);
-  }
 
   var member = context.world.members[firstMemberId]!;
 
   var isAudio = disabledMediaType == ' audio' || disabledMediaType == ' media';
   var isVideo = disabledMediaType == ' video' || disabledMediaType == ' media';
+  var isPublish =
+      disabledDirection.contains(' publishing') || disabledDirection.isEmpty;
+  var isPlaying =
+      disabledDirection.contains(' playing') || disabledDirection.isEmpty;
 
   if (mediaSettings.contains(' disabled')) {
-    var isPublish =
-        disabledDirection.contains(' publishing') || disabledDirection.isEmpty;
-    var isPlaying =
-        disabledDirection.contains(' playing') || disabledDirection.isEmpty;
-
     if (isPublish) {
       if (isAudio) {
         await member.toggleMedia(MediaKind.Audio, null, false);
       }
       if (isVideo) {
         await member.toggleMedia(MediaKind.Video, null, false);
-      }
-    }
-    if (isPlaying) {
-      if (isAudio) {
-        await member.toggleRemoteMedia(MediaKind.Audio, null, false);
-      }
-      if (isVideo) {
-        await member.toggleRemoteMedia(MediaKind.Video, null, false);
       }
     }
   }
@@ -82,6 +69,20 @@ Future<void> newGivenMember(
     }
     if (isVideo) {
       await member.toggleMute(MediaKind.Video, null, true);
+    }
+  }
+
+  if (joined.contains('joined ')) {
+    await context.world.joinRoom(firstMemberId);
+    await context.world.waitForInterconnection(firstMemberId);
+  }
+
+  if (isPlaying) {
+    if (isAudio) {
+      await member.toggleRemoteMedia(MediaKind.audio, null, false);
+    }
+    if (isVideo) {
+      await member.toggleRemoteMedia(MediaKind.video, null, false);
     }
   }
 

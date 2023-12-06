@@ -1,8 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
-
 import '../../medea_jason.dart';
 import '../interface/media_stream_settings.dart' as base_settings;
 import '../util/move_semantic.dart';
@@ -28,13 +26,9 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   Future<List<LocalMediaTrack>> initLocalTracks(
       base_settings.MediaStreamSettings caps) async {
     Pointer tracks;
-    try {
-      tracks = await (api.mediaManagerHandleInitLocalTracks(
-          manager: opaque.innerOpaque,
-          caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    tracks = await (api.mediaManagerHandleInitLocalTracks(
+        manager: opaque.innerOpaque,
+        caps: (caps as MediaStreamSettings).setting) as Future) as Pointer;
 
     return api
         .vecLocalTracksFromPtr(ptr: tracks.address)
@@ -45,13 +39,8 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   @override
   Future<List<MediaDeviceDetails>> enumerateDevices() async {
     Pointer devices;
-    try {
-      devices = await (api.mediaManagerHandleEnumerateDevices(
-          manager: opaque.innerOpaque) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
-
+    devices = await (api.mediaManagerHandleEnumerateDevices(
+        manager: opaque.innerOpaque) as Future);
     return api
         .vecMediaDeviceDetailsFromPtr(ptr: devices.address)
         .map((info) => NativeMediaDeviceDetails(info))
@@ -66,12 +55,8 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
     }
 
     Pointer devices;
-    try {
-      devices = await (api.mediaManagerHandleEnumerateDisplays(
-          manager: opaque.innerOpaque) as Future) as Pointer;
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    devices = await (api.mediaManagerHandleEnumerateDisplays(
+        manager: opaque.innerOpaque) as Future) as Pointer;
 
     return api
         .vecMediaDisplayDetailsFromPtr(ptr: devices.address)
@@ -81,51 +66,31 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
 
   @override
   Future<void> setOutputAudioId(String deviceId) async {
-    try {
-      await (api.mediaManagerHandleSetOutputAudioId(
-          manager: opaque.innerOpaque, deviceId: deviceId) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.mediaManagerHandleSetOutputAudioId(
+        manager: opaque.innerOpaque, deviceId: deviceId) as Future);
   }
 
   @override
   Future<void> setMicrophoneVolume(int level) async {
-    try {
-      await (api.mediaManagerHandleSetMicrophoneVolume(
-          manager: opaque.innerOpaque, level: level) as Future);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    await (api.mediaManagerHandleSetMicrophoneVolume(
+        manager: opaque.innerOpaque, level: level) as Future);
   }
 
   @override
   Future<int> microphoneVolume() async {
-    try {
-      return await (api.mediaManagerHandleMicrophoneVolume(
-          manager: opaque.innerOpaque) as Future) as int;
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    return await (api.mediaManagerHandleMicrophoneVolume(
+        manager: opaque.innerOpaque) as Future) as int;
   }
 
   @override
   Future<bool> microphoneVolumeIsAvailable() async {
-    try {
-      return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
-          manager: opaque.innerOpaque) as Future) as bool;
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    return await (api.mediaManagerHandleMicrophoneVolumeIsAvailable(
+        manager: opaque.innerOpaque) as Future) as bool;
   }
 
   @override
   void onDeviceChange(dynamic Function() cb) {
-    try {
-      api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
-    } on FfiException catch (anyhow) {
-      throw anyhow.parse();
-    }
+    api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
   }
 
   @moveSemantics
