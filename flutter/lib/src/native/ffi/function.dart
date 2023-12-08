@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 
 import '../jason.dart';
@@ -13,7 +14,7 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Function used by Rust to call closures with a single [ForeignValue]
 /// argument.
-void _callFn(dynamic Function(dynamic) fn, ForeignValue value) {
+void _callFn(FutureOr<void> Function(dynamic) fn, ForeignValue value) {
   try {
     var arg = value.toDart();
     if (arg != null) {

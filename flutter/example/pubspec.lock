@@ -149,10 +149,10 @@ packages:
     dependency: "direct main"
     description:
       name: faker_dart
-      sha256: dfa2a28dddbacf6ed96bdfba013ac24c5ce85073831fdc8f0b6ae7ae15cb09bc
+      sha256: aaf3756cb19947340af10602be86a607dd6d2acf007ea351cdea36a5533c77f7
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.11"
+    version: "0.2.1"
   ffi:
     dependency: transitive
     description:
@@ -318,10 +318,10 @@ packages:
     dependency: "direct main"
     description:
       name: medea_flutter_webrtc
-      sha256: "5b308b88d7eba6279971c218cfddb374e2f60977811cc9b5cf30f26379a66a97"
+      sha256: "9e26a55a4b432b8f1badcf6b43782f18654bc2a169e4526ef0bf4dc614f89568"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.3-dev+rev.0fe64b4610154ddb7e8774a952b6ecf6369b7633"
+    version: "0.9.0"
   medea_jason:
     dependency: "direct main"
     description:

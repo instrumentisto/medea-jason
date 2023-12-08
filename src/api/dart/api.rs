@@ -1502,5 +1502,6 @@ pub fn log_dart_exception(
     stack_trace: String,
 ) -> SyncReturn<()> {
     log::error!("{message}\n{stack_trace}");
+
     SyncReturn(())
 }

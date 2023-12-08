@@ -25,12 +25,12 @@ class NativeConnectionHandle implements ConnectionHandle {
   }
 
   @override
-  void onClose(dynamic Function() f) {
+  void onClose(void Function() f) {
     api.connectionHandleOnClose(connection: opaque.innerOpaque, f: f);
   }
 
   @override
-  void onRemoteTrackAdded(dynamic Function(RemoteMediaTrack) f) {
+  void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
     api.connectionHandleOnRemoteTrackAdded(
         connection: opaque.innerOpaque,
         f: (t) {
@@ -40,7 +40,7 @@ class NativeConnectionHandle implements ConnectionHandle {
   }
 
   @override
-  void onQualityScoreUpdate(dynamic Function(int) f) {
+  void onQualityScoreUpdate(void Function(int) f) {
     api.connectionHandleOnQualityScoreUpdate(
         connection: opaque.innerOpaque, f: f);
   }

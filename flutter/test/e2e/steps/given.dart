@@ -55,20 +55,20 @@ Future<void> newGivenMember(
   if (mediaSettings.contains(' disabled')) {
     if (isPublish) {
       if (isAudio) {
-        await member.toggleMedia(MediaKind.Audio, null, false);
+        await member.toggleMedia(MediaKind.audio, null, false);
       }
       if (isVideo) {
-        await member.toggleMedia(MediaKind.Video, null, false);
+        await member.toggleMedia(MediaKind.video, null, false);
       }
     }
   }
 
   if (mediaSettings.contains(' muted')) {
     if (isAudio) {
-      await member.toggleMute(MediaKind.Audio, null, true);
+      await member.toggleMute(MediaKind.audio, null, true);
     }
     if (isVideo) {
-      await member.toggleMute(MediaKind.Video, null, true);
+      await member.toggleMute(MediaKind.video, null, true);
     }
   }
 

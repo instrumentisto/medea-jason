@@ -1164,7 +1164,10 @@ fn wire_log_dart_exception_impl(
         move || {
             let api_message = message.wire2api();
             let api_stack_trace = stack_trace.wire2api();
-            Ok(log_dart_exception(api_message, api_stack_trace))
+            Result::<_, ()>::Ok(log_dart_exception(
+                api_message,
+                api_stack_trace,
+            ))
         },
     )
 }
@@ -1894,6 +1897,14 @@ mod io {
         cb: wire_DartOpaque,
     ) -> support::WireSyncReturn {
         wire_room_handle_on_failed_local_media_impl(room_handle, cb)
+    }
+
+    #[no_mangle]
+    pub extern "C" fn wire_log_dart_exception(
+        message: *mut wire_uint_8_list,
+        stack_trace: *mut wire_uint_8_list,
+    ) -> support::WireSyncReturn {
+        wire_log_dart_exception_impl(message, stack_trace)
     }
 
     // Section: allocate functions

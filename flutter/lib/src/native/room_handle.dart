@@ -112,57 +112,49 @@ class NativeRoomHandle implements RoomHandle {
   }
 
   @override
-  void onNewConnection(dynamic Function(ConnectionHandle) f) {
+  void onNewConnection(void Function(ConnectionHandle) f) {
     api.roomHandleOnNewConnection(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          return f(NativeConnectionHandle(
-                api.connectionHandleFromPtr(ptr: t.address)));
-          });
-
+          f(NativeConnectionHandle(
+              api.connectionHandleFromPtr(ptr: t.address)));
+        });
   }
 
   @override
-  void onClose(dynamic Function(RoomCloseReason) f) {
+  void onClose(void Function(RoomCloseReason) f) {
     api.roomHandleOnClose(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          return f(NativeRoomCloseReason(
-                api.roomCloseReasonFromPtr(ptr: t.address)));
-          });
-
+          f(NativeRoomCloseReason(api.roomCloseReasonFromPtr(ptr: t.address)));
+        });
   }
 
   @override
-  void onLocalTrack(dynamic Function(LocalMediaTrack) f) {
+  void onLocalTrack(void Function(LocalMediaTrack) f) {
     api.roomHandleOnLocalTrack(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          return f(NativeLocalMediaTrack(
-                api.localMediaTrackFromPtr(ptr: t.address)));
-          });
-
+          f(NativeLocalMediaTrack(api.localMediaTrackFromPtr(ptr: t.address)));
+        });
   }
 
   @override
-  void onConnectionLoss(dynamic Function(ReconnectHandle) f) {
+  void onConnectionLoss(void Function(ReconnectHandle) f) {
     api.roomHandleOnConnectionLoss(
         roomHandle: opaque.innerOpaque,
         cb: (t) {
-          return f(NativeReconnectHandle(
-                api.reconnectHandleFromPtr(ptr: t.address)));
-          });
-
+          f(NativeReconnectHandle(api.reconnectHandleFromPtr(ptr: t.address)));
+        });
   }
 
   @override
-  void onFailedLocalMedia(dynamic Function(Object) f) {
+  void onFailedLocalMedia(void Function(Object) f) {
     api.roomHandleOnFailedLocalMedia(
         roomHandle: opaque.innerOpaque,
         cb: (err) {
-          return f(err);
-          });
-
+          f(err);
+        });
   }
 
   @moveSemantics

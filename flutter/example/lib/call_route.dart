@@ -87,7 +87,7 @@ class _CallState extends State<CallRoute> {
   void initState() {
     _call.onNewRemoteStream((track, remoteId, conn) async {
       var trackId = track.getTrack().id();
-      if (track.mediaDirection() == jason.TrackMediaDirection.SendRecv) {
+      if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track.getTrack());
@@ -97,15 +97,15 @@ class _CallState extends State<CallRoute> {
         if (connectionWidgets == null) {
           connectionWidgets = ConnectWidgets();
           connectionWidgets.videoTracks =
-              Map.from({trackId: VideoView(renderer, mirror: true)});
+              Map.from({trackId: VideoView(renderer)});
           connectionWidgets.name = Text(remoteId);
           connectionWidgets.toggleButtons = [
             TextButton(
                 onPressed: () {
                   if (!connectionWidgets!.recvVideoDevice) {
-                    conn.enableRemoteVideo(jason.MediaSourceKind.Device);
+                    conn.enableRemoteVideo(jason.MediaSourceKind.device);
                   } else {
-                    conn.disableRemoteVideo(jason.MediaSourceKind.Device);
+                    conn.disableRemoteVideo(jason.MediaSourceKind.device);
                   }
                   connectionWidgets.recvVideoDevice =
                       !connectionWidgets.recvVideoDevice;
@@ -114,9 +114,9 @@ class _CallState extends State<CallRoute> {
             TextButton(
                 onPressed: () {
                   if (!connectionWidgets!.recvVideoDisplay) {
-                    conn.enableRemoteVideo(jason.MediaSourceKind.Display);
+                    conn.enableRemoteVideo(jason.MediaSourceKind.display);
                   } else {
-                    conn.disableRemoteVideo(jason.MediaSourceKind.Display);
+                    conn.disableRemoteVideo(jason.MediaSourceKind.display);
                   }
                   connectionWidgets.recvVideoDisplay =
                       !connectionWidgets.recvVideoDisplay;
@@ -134,8 +134,7 @@ class _CallState extends State<CallRoute> {
                 child: const Text('Toggle audio recv'))
           ];
         } else {
-          connectionWidgets.videoTracks[trackId] =
-              VideoView(renderer, mirror: true);
+          connectionWidgets.videoTracks[trackId] = VideoView(renderer);
         }
 
         setState(() {
@@ -147,7 +146,7 @@ class _CallState extends State<CallRoute> {
         (newDir) async {
           var remoteTracks = _widgets[remoteId];
 
-          if (newDir == jason.TrackMediaDirection.SendRecv) {
+          if (newDir == jason.TrackMediaDirection.sendRecv) {
             var renderer = createVideoRenderer();
             await renderer.initialize();
             await renderer.setSrcObject(track.getTrack());
@@ -155,10 +154,9 @@ class _CallState extends State<CallRoute> {
             if (remoteTracks == null) {
               remoteTracks = ConnectWidgets();
               remoteTracks.videoTracks =
-                  Map.from({trackId: VideoView(renderer, mirror: true)});
+                  Map.from({trackId: VideoView(renderer)});
             } else {
-              remoteTracks.videoTracks[trackId] =
-                  VideoView(renderer, mirror: true);
+              remoteTracks.videoTracks[trackId] = VideoView(renderer);
             }
           } else {
             if (remoteTracks != null) {
@@ -519,10 +517,10 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
 
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.VideoInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
       .toList();
   var audioDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.AudioInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
       .toList();
 
   await showDialog<void>(

@@ -157,13 +157,13 @@ StepDefinitionGeneric<TWorld> given9<TInput1, TInput2, TInput3, TInput4,
     );
 
 Tuple2<MediaKind, MediaSourceKind> parseMediaKind(String kind) {
-  var kind_ = MediaKind.Video;
-  var source = MediaSourceKind.Device;
+  var kind_ = MediaKind.video;
+  var source = MediaSourceKind.device;
   if (kind.contains('audio')) {
-    kind_ = MediaKind.Audio;
+    kind_ = MediaKind.audio;
   } else {
     if (kind.contains('display')) {
-      source = MediaSourceKind.Display;
+      source = MediaSourceKind.display;
     }
   }
   return Tuple2(kind_, source);

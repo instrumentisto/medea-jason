@@ -89,7 +89,7 @@ class NativeMediaManagerHandle implements MediaManagerHandle {
   }
 
   @override
-  void onDeviceChange(dynamic Function() cb) {
+  void onDeviceChange(void Function() cb) {
     api.mediaManagerHandleOnDeviceChange(manager: opaque.innerOpaque, cb: cb);
   }
 
