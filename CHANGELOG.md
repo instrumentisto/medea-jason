@@ -11,11 +11,16 @@ All user visible changes to this project will be documented in this file. This p
 
 [Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.4.0...medea-jason-0.4.1)
 
+### Added
+
+- Log exceptions thrown from Dart callbacks called by Rust ([#138]).
+
 ### Fixed
 
 - Screen sharing in Firefox ([#135]).
 
 [#135]: /../../pull/135
+[#138]: /../../pull/138
 
 
 
