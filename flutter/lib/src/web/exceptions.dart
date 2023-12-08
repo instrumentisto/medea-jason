@@ -72,7 +72,7 @@ Future<T> fallibleFuture<T>(Future<T> f) async {
 }
 
 /// Exception thrown when cannot get info of available media devices.
-class WebEnumerateDevicesException implements EnumerateDevicesException {
+class WebEnumerateDevicesException extends EnumerateDevicesException {
   late dynamic _cause;
   late String _trace;
 
@@ -99,7 +99,7 @@ class WebEnumerateDevicesException implements EnumerateDevicesException {
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-class WebInternalException implements InternalException {
+class WebInternalException extends InternalException {
   late String _message;
   late dynamic _cause;
   late String _trace;
@@ -131,7 +131,7 @@ class WebInternalException implements InternalException {
 }
 
 /// Exception thrown when accessing media devices.
-class WebLocalMediaInitException implements LocalMediaInitException {
+class WebLocalMediaInitException extends LocalMediaInitException {
   late LocalMediaInitExceptionKind _kind;
   late String _message;
   late dynamic _cause;
@@ -171,7 +171,7 @@ class WebLocalMediaInitException implements LocalMediaInitException {
 }
 
 /// Errors occurring in `RoomHandle::set_local_media_settings()` method.
-class WebMediaSettingsUpdateException implements MediaSettingsUpdateException {
+class WebMediaSettingsUpdateException extends MediaSettingsUpdateException {
   late String _message;
   late dynamic _cause;
   late bool _rolledBack;
@@ -205,8 +205,7 @@ class WebMediaSettingsUpdateException implements MediaSettingsUpdateException {
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-class WebMediaStateTransitionException
-    implements MediaStateTransitionException {
+class WebMediaStateTransitionException extends MediaStateTransitionException {
   late String _message;
   late String _trace;
   late MediaStateTransitionExceptionKind _kind;
@@ -239,7 +238,7 @@ class WebMediaStateTransitionException
 
 /// Exceptions thrown from an RPC client that implements messaging with a media
 /// server.
-class WebRpcClientException implements RpcClientException {
+class WebRpcClientException extends RpcClientException {
   late RpcClientExceptionKind _kind;
   late String _message;
   late dynamic _cause;
