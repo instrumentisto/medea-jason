@@ -10,18 +10,20 @@ use std::{
     rc::Rc,
 };
 
+use js_sys::{Array, JsString, Reflect};
 use medea_client_api_proto::{
     EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
 };
 use tracerr::Traced;
+use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceEvent,
-    RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
-    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
-    RtcTrackEvent,
+    RtcRtpCodecParameters, RtcRtpEncodingParameters, RtcRtpSender,
+    RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
+    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
 
 use crate::{
@@ -584,21 +586,83 @@ impl RtcPeerConnection {
             _ = init.direction(direction.into());
 
             if !encodings.is_empty() {
+                let capabs = RtcRtpSender::get_capabilities("video").and_then(
+                    |capabs| {
+                        Reflect::get(&capabs, &JsString::from("codecs")).ok()
+                    },
+                );
+
                 let send_encodings = ::js_sys::Array::new();
 
-                for encoding in encodings {
+                for encoding in &encodings {
                     let mut params = RtcRtpEncodingParameters::new();
                     _ = params.rid(&encoding.rid);
                     _ = params.active(encoding.active);
-                    if let Some(max_bitrate) = encoding.max_bitrate {
-                        _ = params.max_bitrate(max_bitrate);
+                    if let Some(max_bitrate) = &encoding.max_bitrate {
+                        _ = params.max_bitrate(*max_bitrate);
                     }
                     if let Some(scale_resolution_down_by) =
-                        encoding.scale_resolution_down_by
+                        &encoding.scale_resolution_down_by
                     {
                         _ = params.scale_resolution_down_by(
-                            scale_resolution_down_by.into(),
+                            (*scale_resolution_down_by).into(),
                         );
+                    }
+                    if let (Some(svc), Some(capabs)) = (
+                        &encoding.svc,
+                        &capabs
+                            .clone()
+                            .map(|capabs| {
+                                Reflect::get(&capabs, &JsString::from("codecs"))
+                                    .ok()
+                            })
+                            .flatten(),
+                    ) {
+                        for setting in svc {
+                            let Some(codec) =
+                                Array::from(capabs).iter().find(|codec| {
+                                    Reflect::get(
+                                        codec,
+                                        &JsString::from("mimeType"),
+                                    )
+                                    .ok()
+                                    .and_then(|a| a.as_string())
+                                    .map(|mime| {
+                                        mime == format!(
+                                            "video/{}",
+                                            setting.codec.to_string()
+                                        )
+                                    })
+                                    .unwrap_or(false)
+                                })
+                            else {
+                                continue;
+                            };
+
+                            Reflect::set(
+                                &params,
+                                &JsString::from("codec"),
+                                &codec,
+                            )
+                            .unwrap();
+                            Reflect::set(
+                                &params,
+                                &JsString::from("scalabilityMode"),
+                                &JsString::from(
+                                    setting.scalability_mode.to_string(),
+                                ),
+                            )
+                            .unwrap();
+
+                            // _ = params.codec(&RtcRtpCodecParameters::from(
+                            //     codec.clone(),
+                            // ));
+                            // _ = params.scalability_mode(
+                            //     &setting.scalability_mode.to_string(),
+                            // );
+
+                            break;
+                        }
                     }
 
                     _ = send_encodings.push(&params);
@@ -608,6 +672,7 @@ impl RtcPeerConnection {
 
             let transceiver =
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
+
             Transceiver::from(transceiver)
         }
     }

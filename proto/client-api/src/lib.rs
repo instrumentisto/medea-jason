@@ -986,6 +986,95 @@ pub enum MediaSourceKind {
     Display,
 }
 
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum Codec {
+    H264,
+    VP8,
+    VP9,
+    AV1,
+}
+
+impl ToString for Codec {
+    fn to_string(&self) -> String {
+        match self {
+            Self::H264 => "H264".to_string(),
+            Self::VP8 => "VP8".to_string(),
+            Self::VP9 => "VP9".to_string(),
+            Self::AV1 => "AV1".to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ScalabilityMode {
+    L1T1,
+    L1T2,
+    L1T3,
+    L2T1,
+    L2T2,
+    L2T3,
+    L3T1,
+    L3T2,
+    L3T3,
+    S2T1,
+    S2T2,
+    S2T3,
+    S3T1,
+    S3T2,
+    S3T3,
+}
+
+impl ToString for ScalabilityMode {
+    fn to_string(&self) -> String {
+        match self {
+            Self::L1T1 => "L1T1".to_string(),
+            Self::L1T2 => "L1T2".to_string(),
+            Self::L1T3 => "L1T3".to_string(),
+            Self::L2T1 => "L2T1".to_string(),
+            Self::L2T2 => "L2T2".to_string(),
+            Self::L2T3 => "L2T3".to_string(),
+            Self::L3T1 => "L3T1".to_string(),
+            Self::L3T2 => "L3T2".to_string(),
+            Self::L3T3 => "L3T3".to_string(),
+            Self::S2T1 => "S2T1".to_string(),
+            Self::S2T2 => "S2T2".to_string(),
+            Self::S2T3 => "S2T3".to_string(),
+            Self::S3T1 => "S3T1".to_string(),
+            Self::S3T2 => "S3T2".to_string(),
+            Self::S3T3 => "S3T3".to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SvcSetting {
+    pub codec: Codec,
+    pub scalability_mode: ScalabilityMode,
+}
+
+impl SvcSetting {
+    pub fn assert(&self) -> bool {
+        match self.codec {
+            Codec::H264 => !matches!(
+                self.scalability_mode,
+                ScalabilityMode::S2T1
+                    | ScalabilityMode::S2T2
+                    | ScalabilityMode::S2T3
+                    | ScalabilityMode::S3T1
+                    | ScalabilityMode::S3T2
+                    | ScalabilityMode::S3T3
+            ),
+            Codec::VP8 => matches!(
+                self.scalability_mode,
+                ScalabilityMode::L1T1
+                    | ScalabilityMode::L1T2
+                    | ScalabilityMode::L1T3
+            ),
+            _ => true,
+        }
+    }
+}
+
 /// Representation of the [RTCRtpEncodingParameters][0].
 ///
 /// [0]: https://tinyurl.com/mr3dt9ch
@@ -1002,6 +1091,8 @@ pub struct EncodingParameters {
 
     /// A factor by which to scale down the video during encoding.
     pub scale_resolution_down_by: Option<u8>,
+
+    pub svc: Option<Vec<SvcSetting>>,
 }
 
 /// Estimated connection quality.
