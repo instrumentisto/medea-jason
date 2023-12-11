@@ -1495,7 +1495,9 @@ pub fn room_handle_on_failed_local_media(
     Ok(SyncReturn(()))
 }
 
-/// Log Dart exception.
+//------------------------------------------------------------------------------
+
+/// Logs Dart exception.
 #[must_use]
 pub fn log_dart_exception(
     message: String,

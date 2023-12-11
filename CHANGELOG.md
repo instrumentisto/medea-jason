@@ -13,7 +13,8 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- Log exceptions thrown from Dart callbacks called by Rust ([#138]).
+- Logging:
+    - Exceptions thrown from Dart callbacks called by Rust ([#138]).
 
 ### Fixed
 
