@@ -986,7 +986,7 @@ pub enum MediaSourceKind {
     Display,
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Codec {
     H264,
     VP8,
@@ -997,15 +997,15 @@ pub enum Codec {
 impl ToString for Codec {
     fn to_string(&self) -> String {
         match self {
-            Self::H264 => "H264".to_string(),
-            Self::VP8 => "VP8".to_string(),
-            Self::VP9 => "VP9".to_string(),
-            Self::AV1 => "AV1".to_string(),
+            Self::H264 => String::from("H264"),
+            Self::VP8 => String::from("VP8"),
+            Self::VP9 => String::from("VP9"),
+            Self::AV1 => String::from("AV1"),
         }
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ScalabilityMode {
     L1T1,
     L1T2,
@@ -1027,33 +1027,34 @@ pub enum ScalabilityMode {
 impl ToString for ScalabilityMode {
     fn to_string(&self) -> String {
         match self {
-            Self::L1T1 => "L1T1".to_string(),
-            Self::L1T2 => "L1T2".to_string(),
-            Self::L1T3 => "L1T3".to_string(),
-            Self::L2T1 => "L2T1".to_string(),
-            Self::L2T2 => "L2T2".to_string(),
-            Self::L2T3 => "L2T3".to_string(),
-            Self::L3T1 => "L3T1".to_string(),
-            Self::L3T2 => "L3T2".to_string(),
-            Self::L3T3 => "L3T3".to_string(),
-            Self::S2T1 => "S2T1".to_string(),
-            Self::S2T2 => "S2T2".to_string(),
-            Self::S2T3 => "S2T3".to_string(),
-            Self::S3T1 => "S3T1".to_string(),
-            Self::S3T2 => "S3T2".to_string(),
-            Self::S3T3 => "S3T3".to_string(),
+            Self::L1T1 => String::from("L1T1"),
+            Self::L1T2 => String::from("L1T2"),
+            Self::L1T3 => String::from("L1T3"),
+            Self::L2T1 => String::from("L2T1"),
+            Self::L2T2 => String::from("L2T2"),
+            Self::L2T3 => String::from("L2T3"),
+            Self::L3T1 => String::from("L3T1"),
+            Self::L3T2 => String::from("L3T2"),
+            Self::L3T3 => String::from("L3T3"),
+            Self::S2T1 => String::from("S2T1"),
+            Self::S2T2 => String::from("S2T2"),
+            Self::S2T3 => String::from("S2T3"),
+            Self::S3T1 => String::from("S3T1"),
+            Self::S3T2 => String::from("S3T2"),
+            Self::S3T3 => String::from("S3T3"),
         }
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SvcSetting {
     pub codec: Codec,
     pub scalability_mode: ScalabilityMode,
 }
 
 impl SvcSetting {
-    pub fn assert(&self) -> bool {
+    #[must_use]
+    pub const fn assert(&self) -> bool {
         match self.codec {
             Codec::H264 => !matches!(
                 self.scalability_mode,
@@ -1070,7 +1071,7 @@ impl SvcSetting {
                     | ScalabilityMode::L1T2
                     | ScalabilityMode::L1T3
             ),
-            _ => true,
+            Codec::VP9 | Codec::AV1 => true,
         }
     }
 }

@@ -97,7 +97,7 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcOfferOptions",
         "RtcPeerConnection", "RtcPeerConnectionIceEvent",
         "RtcRtpReceiver", "RtcRtpSender",
-        "RtcRtpParameters", "RtcRtpCodecParameters",
+        "RtcRtpParameters", "RtcRtpCodec", "RtcRtpCodecParameters",
         "RtcRtpEncodingParameters",
         "RtcRtpTransceiver", "RtcRtpTransceiverDirection",
         "RtcRtpTransceiverInit",
@@ -109,10 +109,10 @@ wee_alloc = { version = "0.4", optional = true }
     ]
 
 [patch.crates-io]
-web-sys = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "6184e3f" }
-js-sys = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "6184e3f" }
-wasm-bindgen = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "6184e3f" }
-wasm-bindgen-shared = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "6184e3f" }
+web-sys = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
+js-sys = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
+wasm-bindgen = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
+wasm-bindgen-shared = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
 
 [build-dependencies]
 cc = "1.0"

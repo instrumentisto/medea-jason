@@ -99,12 +99,12 @@ impl Transceiver {
     }
 
     /// Updates parameters of encoding for underlying `sender`.
-    /// 
+    ///
     /// # Errors
     ///
     /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
     /// call fails.
-    /// 
+    ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
     #[allow(clippy::missing_panics_doc)]
     pub async fn update_send_encodings(
@@ -134,7 +134,8 @@ impl Transceiver {
             if let Some(scale_resolution_down_by) =
                 encoding.scale_resolution_down_by
             {
-                _ = enc.scale_resolution_down_by(scale_resolution_down_by.into());
+                _ = enc
+                    .scale_resolution_down_by(scale_resolution_down_by.into());
             }
         }
 

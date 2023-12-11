@@ -194,12 +194,12 @@ impl Transceiver {
     }
 
     /// Sets [`Parameters`] into the underlying `sender`.
-    /// 
+    ///
     /// # Errors
     ///
     /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
     /// call fails.
-    /// 
+    ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
     pub fn set_send_parameters(
         &self,
@@ -219,12 +219,12 @@ impl Transceiver {
     }
 
     /// Updates parameters of encoding for underlying `sender`.
-    /// 
+    ///
     /// # Errors
     ///
     /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
     /// call fails.
-    /// 
+    ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
     pub async fn update_send_encodings(
         &self,

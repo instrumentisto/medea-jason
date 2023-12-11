@@ -21,7 +21,7 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceEvent,
-    RtcRtpCodecParameters, RtcRtpEncodingParameters, RtcRtpSender,
+    RtcRtpCodec, RtcRtpCodecParameters, RtcRtpEncodingParameters, RtcRtpSender,
     RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
     RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
@@ -608,16 +608,8 @@ impl RtcPeerConnection {
                             (*scale_resolution_down_by).into(),
                         );
                     }
-                    if let (Some(svc), Some(capabs)) = (
-                        &encoding.svc,
-                        &capabs
-                            .clone()
-                            .map(|capabs| {
-                                Reflect::get(&capabs, &JsString::from("codecs"))
-                                    .ok()
-                            })
-                            .flatten(),
-                    ) {
+                    if let (Some(svc), Some(capabs)) = (&encoding.svc, &capabs)
+                    {
                         for setting in svc {
                             let Some(codec) =
                                 Array::from(capabs).iter().find(|codec| {
@@ -639,27 +631,10 @@ impl RtcPeerConnection {
                                 continue;
                             };
 
-                            Reflect::set(
-                                &params,
-                                &JsString::from("codec"),
-                                &codec,
-                            )
-                            .unwrap();
-                            Reflect::set(
-                                &params,
-                                &JsString::from("scalabilityMode"),
-                                &JsString::from(
-                                    setting.scalability_mode.to_string(),
-                                ),
-                            )
-                            .unwrap();
-
-                            // _ = params.codec(&RtcRtpCodecParameters::from(
-                            //     codec.clone(),
-                            // ));
-                            // _ = params.scalability_mode(
-                            //     &setting.scalability_mode.to_string(),
-                            // );
+                            _ = params.codec(&RtcRtpCodec::from(codec.clone()));
+                            _ = params.scalability_mode(
+                                &setting.scalability_mode.to_string(),
+                            );
 
                             break;
                         }

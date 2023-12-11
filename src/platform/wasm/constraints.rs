@@ -71,10 +71,10 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
                 .facing_mode(&ConstrainDomStringParameters::from(&facing_mode));
         }
         // if let Some(width) = track_constraints.width {
-            _ = constraints.width(&JsValue::from_f64(1280f64));
+        _ = constraints.width(&JsValue::from_f64(1280f64));
         // }
         // if let Some(height) = track_constraints.height {
-            _ = constraints.height(&JsValue::from_f64(720f64));
+        _ = constraints.height(&JsValue::from_f64(720f64));
         // }
 
         constraints

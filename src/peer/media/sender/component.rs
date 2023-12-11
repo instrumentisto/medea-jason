@@ -631,10 +631,11 @@ impl Component {
     }
 
     /// Updates [`Sender`]'s encoding parameters.
-    /// 
+    ///
     /// # Errors
     ///
-    /// Errors with [`platform::Error`] if setting the [`EncodingParameters`] fails.
+    /// Errors with [`platform::Error`] if setting the [`EncodingParameters`]
+    /// fails.
     #[allow(clippy::needless_pass_by_value)]
     #[watch(self.update_encodings.subscribe())]
     async fn update_encodings_changed(
