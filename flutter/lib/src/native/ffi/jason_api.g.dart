@@ -648,6 +648,12 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnFailedLocalMediaConstMeta;
 
+  /// Log Dart exception.
+  void logDartException(
+      {required String message, required String stackTrace, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kLogDartExceptionConstMeta;
+
   DropFnType get dropOpaqueConnectionHandle;
   ShareFnType get shareOpaqueConnectionHandle;
   OpaqueTypeFinalizer get ConnectionHandleFinalizer;
@@ -2428,6 +2434,26 @@ class MedeaJasonImpl implements MedeaJason {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "room_handle_on_failed_local_media",
         argNames: ["roomHandle", "cb"],
+      );
+
+  void logDartException(
+      {required String message, required String stackTrace, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(message);
+    var arg1 = _platform.api2wire_String(stackTrace);
+    return _platform.executeSync(FlutterRustBridgeSyncTask(
+      callFfi: () => _platform.inner.wire_log_dart_exception(arg0, arg1),
+      parseSuccessData: _wire2api_unit,
+      parseErrorData: null,
+      constMeta: kLogDartExceptionConstMeta,
+      argValues: [message, stackTrace],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kLogDartExceptionConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "log_dart_exception",
+        argNames: ["message", "stackTrace"],
       );
 
   DropFnType get dropOpaqueConnectionHandle =>
@@ -4470,6 +4496,24 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _wire_room_handle_on_failed_local_media =
       _wire_room_handle_on_failed_local_mediaPtr.asFunction<
           WireSyncReturn Function(wire_RoomHandle, wire_DartOpaque)>();
+
+  WireSyncReturn wire_log_dart_exception(
+    ffi.Pointer<wire_uint_8_list> message,
+    ffi.Pointer<wire_uint_8_list> stack_trace,
+  ) {
+    return _wire_log_dart_exception(
+      message,
+      stack_trace,
+    );
+  }
+
+  late final _wire_log_dart_exceptionPtr = _lookup<
+      ffi.NativeFunction<
+          WireSyncReturn Function(ffi.Pointer<wire_uint_8_list>,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_log_dart_exception');
+  late final _wire_log_dart_exception = _wire_log_dart_exceptionPtr.asFunction<
+      WireSyncReturn Function(
+          ffi.Pointer<wire_uint_8_list>, ffi.Pointer<wire_uint_8_list>)>();
 
   wire_ConnectionHandle new_ConnectionHandle() {
     return _new_ConnectionHandle();

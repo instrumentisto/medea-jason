@@ -1151,6 +1151,26 @@ fn wire_room_handle_on_failed_local_media_impl(
         },
     )
 }
+fn wire_log_dart_exception_impl(
+    message: impl Wire2Api<String> + UnwindSafe,
+    stack_trace: impl Wire2Api<String> + UnwindSafe,
+) -> support::WireSyncReturn {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync(
+        WrapInfo {
+            debug_name: "log_dart_exception",
+            port: None,
+            mode: FfiCallMode::Sync,
+        },
+        move || {
+            let api_message = message.wire2api();
+            let api_stack_trace = stack_trace.wire2api();
+            Result::<_, ()>::Ok(log_dart_exception(
+                api_message,
+                api_stack_trace,
+            ))
+        },
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks
@@ -1877,6 +1897,14 @@ mod io {
         cb: wire_DartOpaque,
     ) -> support::WireSyncReturn {
         wire_room_handle_on_failed_local_media_impl(room_handle, cb)
+    }
+
+    #[no_mangle]
+    pub extern "C" fn wire_log_dart_exception(
+        message: *mut wire_uint_8_list,
+        stack_trace: *mut wire_uint_8_list,
+    ) -> support::WireSyncReturn {
+        wire_log_dart_exception_impl(message, stack_trace)
     }
 
     // Section: allocate functions
