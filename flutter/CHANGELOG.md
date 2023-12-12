@@ -11,7 +11,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
--  Better `toString()` on custom exceptions ([#140]).
+- More information in `toString()` on custom exceptions ([#140]).
 
 [#140]: /../../pull/140
 

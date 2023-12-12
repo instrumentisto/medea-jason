@@ -131,7 +131,8 @@ abstract class LocalMediaInitException implements Exception {
 
   @override
   String toString() {
-    return 'LocalMediaInitException: ${kind().name}, ${message()}, ${cause()}\n${trace()}';
+    return 'LocalMediaInitException: ${kind().name}, ${message()}, ${cause()}'
+        '\n${trace()}';
   }
 }
 
@@ -168,7 +169,8 @@ abstract class MediaStateTransitionException implements Exception {
 
   @override
   String toString() {
-    return 'MediaStateTransitionException: ${kind().name}, ${message()}\n${trace()}';
+    return 'MediaStateTransitionException: ${kind().name}, ${message()}'
+        '\n${trace()}';
   }
 }
 
@@ -189,6 +191,7 @@ abstract class RpcClientException implements Exception {
 
   @override
   String toString() {
-    return 'RpcClientException: ${kind().name}, ${message()}, ${cause()}\n${trace()}';
+    return 'RpcClientException: ${kind().name}, ${message()}, ${cause()}'
+        '\n${trace()}';
   }
 }
