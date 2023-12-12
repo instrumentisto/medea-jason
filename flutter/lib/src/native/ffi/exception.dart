@@ -126,8 +126,7 @@ class NativePanicException implements Exception {
 }
 
 /// Exception thrown when local media acquisition fails.
-class NativeLocalMediaInitException
-    implements LocalMediaInitException, Exception {
+class NativeLocalMediaInitException extends LocalMediaInitException {
   /// Concrete error kind of this [NativeLocalMediaInitException].
   late final LocalMediaInitExceptionKind _kind;
 
@@ -168,8 +167,7 @@ class NativeLocalMediaInitException
 /// Exception thrown when cannot get info about connected [MediaDevices][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#mediadevices
-class NativeEnumerateDevicesException
-    implements EnumerateDevicesException, Exception {
+class NativeEnumerateDevicesException extends EnumerateDevicesException {
   /// Dart [Exception] or [Error] that caused this [NativeEnumerateDevicesException].
   late final Object _cause;
 
@@ -192,7 +190,7 @@ class NativeEnumerateDevicesException
 
 /// Exception thrown when cannot switch audio output device ID.
 class NativeInvalidOutputAudioDeviceIdException
-    implements InvalidOutputAudioDeviceIdException {
+    extends InvalidOutputAudioDeviceIdException {
   /// Native stacktrace.
   late final String _nativeStackTrace;
 
@@ -206,7 +204,7 @@ class NativeInvalidOutputAudioDeviceIdException
 }
 
 /// Exception thrown when cannot interact with microphone volume.
-class NativeMicVolumeException implements MicVolumeException {
+class NativeMicVolumeException extends MicVolumeException {
   /// Dart [Exception] or [Error] that caused this [NativeMicVolumeException].
   late final Object _cause;
 
@@ -229,7 +227,7 @@ class NativeMicVolumeException implements MicVolumeException {
 
 /// Exceptions thrown from `Jason`'s `RpcClient` which implements messaging with
 /// media server.
-class NativeRpcClientException implements RpcClientException, Exception {
+class NativeRpcClientException extends RpcClientException {
   /// Concrete error kind of this [NativeRpcClientException].
   late final RpcClientExceptionKind _kind;
 
@@ -270,7 +268,7 @@ class NativeRpcClientException implements RpcClientException, Exception {
 /// Exception thrown when the requested media state transition could not be
 /// performed.
 class NativeMediaStateTransitionException
-    implements MediaStateTransitionException, Exception {
+    extends MediaStateTransitionException {
   /// Error message describing the problem.
   late final String _message;
 
@@ -304,7 +302,7 @@ class NativeMediaStateTransitionException
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-class NativeInternalException implements InternalException, Exception {
+class NativeInternalException extends InternalException {
   /// Error message describing the problem.
   late final String _message;
 
@@ -335,8 +333,7 @@ class NativeInternalException implements InternalException, Exception {
 
 /// Exception that might happen when updating local media settings via
 /// `RoomHandle.setLocalMediaSettings`.
-class NativeMediaSettingsUpdateException
-    implements MediaSettingsUpdateException, Exception {
+class NativeMediaSettingsUpdateException extends MediaSettingsUpdateException {
   /// Error message describing the problem.
   late final String _message;
 

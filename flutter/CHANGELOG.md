@@ -6,6 +6,18 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.4.1] · 2023-??-??
+[0.4.1]: /../../tree/medea-jason-0.4.1/flutter
+
+### Added
+
+- More information in `toString()` on custom exceptions ([#140]).
+
+[#140]: /../../pull/140
+
+
+
+
 ## [0.4.0] · 2023-07-11
 [0.4.0]: /../../tree/medea-jason-0.4.0/flutter
 
