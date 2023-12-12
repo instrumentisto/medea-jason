@@ -20,10 +20,10 @@ dependencies:
     path: ../
 
   cupertino_icons: ^1.0.2
-  faker_dart: ^0.1.11
+  faker_dart: ^0.2.1
   freezed_annotation: ^2.2.0
   http: ^0.13.6
-  medea_flutter_webrtc: 0.8.3-dev+rev.0fe64b4610154ddb7e8774a952b6ecf6369b7633
+  medea_flutter_webrtc: ^0.9.0
   retry: ^3.1.2
 
 dev_dependencies:

@@ -223,9 +223,13 @@ class Member {
             connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
                 connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
           }
-          connectionStore.onMediaDirectionChanged.forEach((key, value) {
-            value(direction);
-          });
+          var keys = connectionStore.onMediaDirectionChanged.keys;
+          for (var i = 0;
+              i < connectionStore.onMediaDirectionChanged.length;
+              ++i) {
+            var cb = connectionStore.onMediaDirectionChanged[keys.elementAt(i)];
+            cb!(direction);
+          }
         });
 
         remoteTrack.onStopped(() {

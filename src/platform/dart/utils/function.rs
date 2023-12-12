@@ -39,7 +39,6 @@ impl<A: Into<DartValue>> Callback<A> {
     }
 }
 
-// TODO: Print exception if Dart closure throws.
 /// Dart closure that can be called from Rust.
 #[derive(Debug)]
 pub struct Function<T> {

@@ -97,7 +97,7 @@ class _CallState extends State<CallRoute> {
         if (connectionWidgets == null) {
           connectionWidgets = ConnectWidgets();
           connectionWidgets.videoTracks =
-              Map.from({trackId: VideoView(renderer, mirror: true)});
+              Map.from({trackId: VideoView(renderer)});
           connectionWidgets.name = Text(remoteId);
           connectionWidgets.toggleButtons = [
             TextButton(
@@ -134,8 +134,7 @@ class _CallState extends State<CallRoute> {
                 child: const Text('Toggle audio recv'))
           ];
         } else {
-          connectionWidgets.videoTracks[trackId] =
-              VideoView(renderer, mirror: true);
+          connectionWidgets.videoTracks[trackId] = VideoView(renderer);
         }
 
         setState(() {
@@ -155,10 +154,9 @@ class _CallState extends State<CallRoute> {
             if (remoteTracks == null) {
               remoteTracks = ConnectWidgets();
               remoteTracks.videoTracks =
-                  Map.from({trackId: VideoView(renderer, mirror: true)});
+                  Map.from({trackId: VideoView(renderer)});
             } else {
-              remoteTracks.videoTracks[trackId] =
-                  VideoView(renderer, mirror: true);
+              remoteTracks.videoTracks[trackId] = VideoView(renderer);
             }
           } else {
             if (remoteTracks != null) {
