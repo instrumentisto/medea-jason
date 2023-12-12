@@ -117,8 +117,8 @@ impl<T, E> Completer<T, E> {
         let handle = unsafe { dart_api::new_persistent_handle(completer) };
         Self {
             handle,
-            _success_kind: PhantomData::default(),
-            _error_kind: PhantomData::default(),
+            _success_kind: PhantomData,
+            _error_kind: PhantomData,
         }
     }
 

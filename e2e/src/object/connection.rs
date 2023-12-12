@@ -22,7 +22,7 @@ impl Object<Connection> {
     ) -> Result<Object<tracks_store::Remote>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"async (conn) => conn.tracksStore"#,
+            "async (conn) => conn.tracksStore",
             [],
         ))
         .await
@@ -95,7 +95,7 @@ impl Object<Connection> {
     pub async fn wait_for_close(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (conn) => {
                 await new Promise((resolve) => {
                     if (!conn.closeListener.isClosed) {
@@ -105,7 +105,7 @@ impl Object<Connection> {
                     }
                 });
             }
-            "#,
+            ",
             [],
         ))
         .await

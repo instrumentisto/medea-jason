@@ -5,7 +5,7 @@
 use std::rc::Rc;
 
 use js_sys::{
-    Array as JsArray, Function as JsFunction, Iterator as JsIterator,
+    Array as JsArray, Function as JsFunction, Iterator as JsIterator, JSON,
 };
 use medea_client_api_proto::stats::{RtcStat, RtcStatsType};
 use tracerr::Traced;
@@ -43,7 +43,7 @@ impl TryFrom<&JsValue> for RtcStats {
             let stat = stat.unchecked_into::<JsArray>();
             let stat = RtcStatsReportEntry::try_from(stat)
                 .map_err(tracerr::map_from_and_wrap!())?;
-            let stat_json = js_sys::JSON::stringify(&JsValue::from(&stat.0))
+            let stat_json = JSON::stringify(&JsValue::from(&stat.0))
                 .map(String::from)
                 .unwrap_throw();
             let rtc_stat: RtcStat = serde_json::from_str(&stat_json)

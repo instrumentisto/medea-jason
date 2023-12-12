@@ -1,6 +1,6 @@
 //! Implementation of a [`Component`] watchers.
 
-use std::rc::Rc;
+use std::{collections::HashSet, rc::Rc};
 
 use derive_more::{Display, From};
 use futures::{future, StreamExt as _};
@@ -110,6 +110,7 @@ impl Component {
     ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
+        peer.connections.remove_track(&track_id);
     }
 
     /// Watcher for the [`State::receivers`] remove update.
@@ -123,6 +124,7 @@ impl Component {
     ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
+        peer.connections.remove_track(&track_id);
     }
 
     /// Watcher for the [`State::senders`] insert update.
@@ -157,10 +159,11 @@ impl Component {
         }
         medea_reactive::when_all_processed(wait_futs).await;
 
-        let ((_, new_sender), _guard) = val.into_parts();
-        for receiver in new_sender.receivers() {
-            drop(peer.connections.create_connection(state.id, &receiver));
-        }
+        let ((track_id, new_sender), _guard) = val.into_parts();
+        drop(peer.connections.update_connections(
+            &track_id,
+            new_sender.receivers().into_iter().collect(),
+        ));
         let sender = sender::Sender::new(
             &new_sender,
             &peer.media_connections,
@@ -196,10 +199,11 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) {
-        let ((_, rcvr_state), _guard) = val.into_parts();
-        let conn = peer
-            .connections
-            .create_connection(state.id, rcvr_state.sender_id());
+        let ((track_id, rcvr_state), _guard) = val.into_parts();
+        let conns = peer.connections.update_connections(
+            &track_id,
+            HashSet::from([rcvr_state.sender_id().clone()]),
+        );
         let receiver = receiver::Receiver::new(
             &rcvr_state,
             &peer.media_connections,
@@ -213,34 +217,26 @@ impl Component {
                 Rc::new(receiver),
                 Rc::clone(&rcvr_state),
             ));
-        conn.add_receiver(rcvr_state);
+        for conn in conns {
+            conn.add_receiver(Rc::clone(&rcvr_state));
+        }
     }
 
     /// Watcher for the [`State::connections`] insert update.
     ///
     /// Creates a new [`Connection`] for the given [`PeerConnection`].
     #[allow(clippy::needless_pass_by_value)]
-    #[watch(self.connections.borrow().on_insert())]
-    fn connection_added(
+    #[watch(
+        self.maybe_update_connections.subscribe().filter_map(future::ready)
+    )]
+    fn maybe_update_connections(
         peer: &PeerConnection,
-        _: &State,
-        val: Guarded<MemberId>,
+        state: &State,
+        val: (TrackId, HashSet<MemberId>),
     ) {
-        drop(peer.connections.create_connection(peer.id, val.as_ref()));
-    }
+        drop(peer.connections.update_connections(&val.0, val.1));
 
-    /// Watcher for the [`State::connections`] remove update.
-    ///
-    /// Closes the provided [`Connection`] in the given [`PeerConnection`].
-    #[allow(clippy::needless_pass_by_value)]
-    #[watch(self.connections.borrow().on_remove())]
-    fn connection_removed(
-        peer: &PeerConnection,
-        _: &State,
-        val: Guarded<MemberId>,
-    ) {
-        peer.connections
-            .close_specific_connection(peer.id, val.as_ref());
+        state.maybe_update_connections.set(None);
     }
 
     /// Watcher for the [`State::local_sdp`] updates.
@@ -345,7 +341,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
-    fn local_sdp_approved(_: &PeerConnection, state: &State, _: ()) {
+    fn local_sdp_approved(_: &PeerConnection, state: &State, (): ()) {
         if let Some(negotiation_role) = state.negotiation_role.get() {
             match negotiation_role {
                 NegotiationRole::Offerer => {

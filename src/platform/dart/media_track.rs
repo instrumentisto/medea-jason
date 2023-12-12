@@ -163,10 +163,10 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-deviceid
     #[inline]
     #[must_use]
-    pub fn device_id(&self) -> String {
+    pub fn device_id(&self) -> Option<String> {
         let device_id =
             unsafe { media_stream_track::device_id(self.inner.get()) };
-        unsafe { dart_string_into_rust(device_id) }
+        Some(unsafe { dart_string_into_rust(device_id) })
     }
 
     /// Returns [kind][1] of this [`MediaStreamTrack`].
@@ -304,7 +304,7 @@ impl MediaStreamTrack {
         F: 'static + FnOnce(),
     {
         if let Some(cb) = f {
-            let cb = Callback::from_once(|_: ()| cb());
+            let cb = Callback::from_once(|(): ()| cb());
             unsafe {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
             };

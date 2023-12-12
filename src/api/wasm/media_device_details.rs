@@ -14,7 +14,6 @@ use crate::{api::MediaDeviceKind, platform};
 #[derive(Debug, From)]
 pub struct MediaDeviceDetails(platform::MediaDeviceInfo);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl MediaDeviceDetails {
     /// Returns a unique identifier for the represented device.

@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.70
-CHROME_VERSION := 112.0
-FIREFOX_VERSION := 107.0.1-driver0.32.0
+RUST_VER := 1.74
+CHROME_VERSION := 119.0
+FIREFOX_VERSION := 119.0.1-driver0.33.0
 
-CARGO_NDK_VER := 3.0.0-ndkr25c-rust$(RUST_VER)
+CARGO_NDK_VER := 3.4.0-ndkr26b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -437,9 +437,10 @@ endif
 		--rust-input src/api/dart/api.rs \
 		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
 		--rust-output src/api/dart/api_bridge_generated.rs \
-		--skip-add-mod-to-lib \
+		--dart-enums-style \
+		--inline-rust \
 		--no-build-runner \
-		--dart-format-line-length=80
+		--skip-add-mod-to-lib
 	cd flutter && \
 	dart pub run build_runner build --delete-conflicting-outputs
 
@@ -447,7 +448,7 @@ endif
 # Lint Rust sources with Clippy.
 #
 # Usage:
-#	make cargo.lint [workspace=yes]
+#	make cargo.lint
 #		[( workspace=yes
 #		 | [workspace=no]
 #		    [( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
@@ -758,6 +759,7 @@ test.e2e: test.e2e.browser
 #
 # Usage:
 #	make test.e2e.browser [(only=<regex>|only-tags=<tag-expression>)]
+#		[sfu=(no|yes)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -765,6 +767,8 @@ test.e2e: test.e2e.browser
 #		          [debug=(yes|no)]
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
+
+test-e2e-tags = $(if $(call eq,$(sfu),yes),not @mesh,not @sfu)
 
 test.e2e.browser:
 ifeq ($(up),yes)
@@ -778,9 +782,11 @@ endif
 	                    rebuild=yes
 	@make wait.port port=4444
 endif
+	$(if $(call eq,$(sfu),yes),SFU=true,) \
 	cargo test -p medea-e2e --test e2e \
 		$(if $(call eq,$(only),),\
-			$(if $(call eq,$(only-tags),),,-- --tags '$(only-tags)'),\
+			-- --tags $(if $(call eq,$(only-tags),),\
+			          '$(test-e2e-tags)','$(only-tags)'),\
 			-- --name '$(only)')
 ifeq ($(up),yes)
 	@make docker.down.e2e
@@ -791,7 +797,8 @@ endif
 #
 # Usage:
 #	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
-# 		[device=<device-id>]
+#		[sfu=(no|yes)]
+#		[device=<device-id>]
 #		[server=<server-ip>]
 #		[( [up=no]
 #		 | up=yes [( [dockerized=no]
@@ -818,6 +825,7 @@ endif
 	flutter drive --driver=test_driver/integration_test.dart \
 		--target=../test/e2e/suite.dart \
 		--dart-define=MOCKABLE=true \
+		$(if $(call eq,$(sfu),yes),--dart-define=SFU=true,) \
 		$(if $(call eq,$(server),),,--dart-define=IP_TEST_BASE=$(server)) \
 		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
@@ -885,9 +893,9 @@ release.helm: helm.package.release
 
 release.npm:
 ifneq ($(filter $(crate),medea-jason),)
-	@make cargo.build debug=no dockerized=no
+	make cargo.build.jason platform=web debug=no dockerized=no
 ifeq ($(publish),yes)
-	wasm-pack publish $(crate-dir)/
+	wasm-pack publish $(crate-dir)/pkg/
 endif
 endif
 

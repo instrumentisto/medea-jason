@@ -1,6 +1,6 @@
 //! [`Component`] for `MediaTrack` with a `Recv` direction.
 
-use std::rc::Rc;
+use std::{iter, rc::Rc};
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
@@ -159,7 +159,7 @@ impl Updatable for State {
     /// [`Future`]: std::future::Future
     fn when_stabilized(&self) -> AllProcessed<'static> {
         let controller = Rc::clone(&self.enabled_individual);
-        when_all_processed(std::iter::once(
+        when_all_processed(iter::once(
             Processed::new(Box::new(move || {
                 let controller = Rc::clone(&controller);
                 Box::pin(async move {
@@ -214,6 +214,7 @@ impl State {
         mid: Option<String>,
         media_type: MediaType,
         media_direction: medea_client_api_proto::MediaDirection,
+        muted: bool,
         sender: MemberId,
         connection_mode: ConnectionMode,
     ) -> Self {
@@ -228,7 +229,7 @@ impl State {
             enabled_general: ProgressableCell::new(
                 media_direction.is_enabled_general().into(),
             ),
-            muted: ObservableCell::new(false),
+            muted: ObservableCell::new(muted),
             sync_state: ObservableCell::new(SyncState::Synced),
             connection_mode,
             media_direction: ObservableCell::new(media_direction.into()),
@@ -480,9 +481,9 @@ impl TransceiverSide for State {
 #[cfg(feature = "mockable")]
 #[allow(clippy::multiple_inherent_impl)]
 impl State {
-    /// Stabilizes [`MediaExchangeState`] of this [`State`].
+    /// Stabilizes the [`MediaExchangeState`] of this [`State`].
     pub fn stabilize(&self) {
-        if let crate::peer::MediaExchangeState::Transition(transition) =
+        if let MediaExchangeState::Transition(transition) =
             self.enabled_individual.state()
         {
             self.enabled_individual.update(transition.intended());

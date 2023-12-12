@@ -8,6 +8,7 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
+import 'custom_world.dart';
 
 /// Builder of a [Member].
 class MemberBuilder {
@@ -83,11 +84,16 @@ class ConnectionStore {
   /// Returns count of tracks from `remote_id` by the provided `live` values.
   int countTracksByLived(bool live, String remoteId) {
     var count = 0;
-    remoteTracks[remoteId]!.forEach((key, value) {
+    remoteTracks[remoteId]!.forEach((key, track) {
       var trackStopped = remoteTrackIsStopped(remoteId, key);
-      if (live && !value.last.muted() && !trackStopped) {
+      if (live &&
+          !track.last.muted() &&
+          track.last.mediaDirection() == TrackMediaDirection.sendRecv &&
+          !trackStopped) {
         count += 1;
-      } else if (!live && trackStopped) {
+      } else if ((!live && trackStopped) ||
+          (!live &&
+              track.last.mediaDirection() != TrackMediaDirection.sendRecv)) {
         count += 1;
       }
     });
@@ -105,6 +111,12 @@ class Member {
 
   /// Indicator whether this [Member] should receive media.
   bool isRecv;
+
+  /// Indicator whether this [Member] should publish audio.
+  bool enabledAudio = true;
+
+  /// Indicator whether this [Member] should publish video.
+  bool enabledVideo = true;
 
   /// Indicator whether this [Member] is joined a [RoomHandle] on a media
   /// server.
@@ -199,7 +211,7 @@ class Member {
         });
 
         remoteTrack.onMediaDirectionChanged((direction) {
-          if (direction != TrackMediaDirection.SendRecv) {
+          if (direction != TrackMediaDirection.sendRecv) {
             connectionStore.callbackCounter[remoteTrackId]!
                 .update('disabled', (value) => value += 1);
 
@@ -211,9 +223,13 @@ class Member {
             connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
                 connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
           }
-          connectionStore.onMediaDirectionChanged.forEach((key, value) {
-            value(direction);
-          });
+          var keys = connectionStore.onMediaDirectionChanged.keys;
+          for (var i = 0;
+              i < connectionStore.onMediaDirectionChanged.length;
+              ++i) {
+            var cb = connectionStore.onMediaDirectionChanged[keys.elementAt(i)];
+            cb!(direction);
+          }
         });
 
         remoteTrack.onStopped(() {
@@ -354,6 +370,10 @@ class Member {
   /// Returns a count of [LocalMediaTrack]s and [RemoteMediaTrack]s of this
   /// [Member] with the provided partner [Member].
   Tuple2<int, int> countOfTracksBetweenMembers(Member other) {
+    if (isSfu) {
+      // All transceivers are always `sendrecv` in SFU mode.
+      return const Tuple2<int, int>(3, 3);
+    }
     var sendCount = sendState.entries
         .where((element) => other.recvState[element.key]! && element.value)
         .length;
@@ -369,25 +389,33 @@ class Member {
     updateSendMediaState(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
-        if (kind == MediaKind.Audio) {
+        if (kind == MediaKind.audio) {
           await room.enableAudio();
+          enabledAudio = true;
         } else {
           await room.enableVideo(source);
+          enabledVideo = true;
         }
       } else {
         await room.enableAudio();
         await room.enableVideo(source);
+        enabledAudio = true;
+        enabledVideo = true;
       }
     } else {
       if (kind != null) {
-        if (kind == MediaKind.Audio) {
+        if (kind == MediaKind.audio) {
           await room.disableAudio();
+          enabledAudio = false;
         } else {
           await room.disableVideo(source);
+          enabledVideo = false;
         }
       } else {
         await room.disableAudio();
         await room.disableVideo(source);
+        enabledAudio = false;
+        enabledVideo = false;
       }
     }
   }
@@ -397,7 +425,7 @@ class Member {
       MediaKind? kind, MediaSourceKind? source, bool muted) async {
     if (!muted) {
       if (kind != null) {
-        if (kind == MediaKind.Audio) {
+        if (kind == MediaKind.audio) {
           await room.unmuteAudio();
         } else {
           await room.unmuteVideo(source);
@@ -408,7 +436,7 @@ class Member {
       }
     } else {
       if (kind != null) {
-        if (kind == MediaKind.Audio) {
+        if (kind == MediaKind.audio) {
           await room.muteAudio();
         } else {
           await room.muteVideo(source);
@@ -426,7 +454,7 @@ class Member {
     await updateRecvMediaState(kind, source, enabled);
     if (enabled) {
       if (kind != null) {
-        if (kind == MediaKind.Audio) {
+        if (kind == MediaKind.audio) {
           await room.enableRemoteAudio();
         } else {
           await room.enableRemoteVideo();
@@ -437,7 +465,7 @@ class Member {
       }
     } else {
       if (kind != null) {
-        if (kind == MediaKind.Audio) {
+        if (kind == MediaKind.audio) {
           await room.disableRemoteAudio();
         } else {
           await room.disableRemoteVideo();
@@ -458,14 +486,14 @@ class Member {
       if (sourceKind != null) {
         out.add(Tuple2(kind, sourceKind));
       } else {
-        out.add(Tuple2(kind, MediaSourceKind.Device));
+        out.add(Tuple2(kind, MediaSourceKind.device));
       }
     } else if (sourceKind != null) {
-      out.add(Tuple2(MediaKind.Audio, sourceKind));
-      out.add(Tuple2(MediaKind.Video, sourceKind));
+      out.add(Tuple2(MediaKind.audio, sourceKind));
+      out.add(Tuple2(MediaKind.video, sourceKind));
     } else {
-      out.add(const Tuple2(MediaKind.Video, MediaSourceKind.Device));
-      out.add(const Tuple2(MediaKind.Audio, MediaSourceKind.Device));
+      out.add(const Tuple2(MediaKind.video, MediaSourceKind.device));
+      out.add(const Tuple2(MediaKind.audio, MediaSourceKind.device));
     }
     return out;
   }
@@ -490,10 +518,10 @@ class Member {
   /// Waits for the [RemoteMediaTrack]'s disabled state.
   Future<void> waitDisabledTrack(RemoteMediaTrack track) async {
     var id = track.getTrack().id();
-    if (track.mediaDirection() == TrackMediaDirection.SendRecv) {
+    if (track.mediaDirection() == TrackMediaDirection.sendRecv) {
       var directionFuture = Completer();
       connectionStore.onMediaDirectionChanged[id] = (d) {
-        if (d != TrackMediaDirection.SendRecv) {
+        if (d != TrackMediaDirection.sendRecv) {
           directionFuture.complete();
           connectionStore.onMediaDirectionChanged.remove(track.getTrack().id());
         }
@@ -504,7 +532,7 @@ class Member {
 
   /// Waits for the [RemoteMediaTrack]'s enabled state.
   Future<void> waitEnabledTrack(RemoteMediaTrack track) async {
-    return waitMediaDirectionTrack(TrackMediaDirection.SendRecv, track);
+    return waitMediaDirectionTrack(TrackMediaDirection.sendRecv, track);
   }
 
   /// Waits for the [RemoteMediaTrack]'s direction change to the provided

@@ -814,7 +814,9 @@ pub mod control_api_server {
                             request: tonic::Request<super::CreateRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).create(request).await };
+                            let fut = async move {
+                                <T as ControlApi>::create(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -856,7 +858,9 @@ pub mod control_api_server {
                             request: tonic::Request<super::IdRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).delete(request).await };
+                            let fut = async move {
+                                <T as ControlApi>::delete(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -898,7 +902,9 @@ pub mod control_api_server {
                             request: tonic::Request<super::IdRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).get(request).await };
+                            let fut = async move {
+                                <T as ControlApi>::get(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -940,7 +946,9 @@ pub mod control_api_server {
                             request: tonic::Request<super::ApplyRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).apply(request).await };
+                            let fut = async move {
+                                <T as ControlApi>::apply(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
@@ -982,7 +990,9 @@ pub mod control_api_server {
                             request: tonic::Request<super::Ping>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
-                            let fut = async move { (*inner).healthz(request).await };
+                            let fut = async move {
+                                <T as ControlApi>::healthz(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }

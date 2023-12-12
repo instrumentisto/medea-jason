@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{env, time::Duration};
 
 use cucumber::then;
 use medea_e2e::object::{MediaKind, MediaSourceKind};
@@ -167,14 +167,17 @@ async fn then_remote_media_track(
     };
 }
 
-#[then(regex = "^(\\S+) doesn't have (audio|(?:device|display) video) \
-                 remote track from (\\S+)$")]
+#[then(regex = "^(\\S+) doesn't have (live )?\
+                 (audio|(?:device|display) video) remote track from (\\S+)$")]
 async fn then_doesnt_have_remote_track(
     world: &mut World,
     id: String,
+    live: String,
     kind: String,
     partner_id: String,
 ) {
+    let should_not_be_live = env::var("SFU").is_ok() && !live.is_empty();
+
     let member = world.get_member(&id).unwrap();
     let partner_connection = member
         .connections()
@@ -184,10 +187,33 @@ async fn then_doesnt_have_remote_track(
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
 
-    assert!(!tracks_with_partner
-        .has_track(media_kind, Some(source_kind))
-        .await
-        .unwrap());
+    if should_not_be_live {
+        let track = tracks_with_partner
+            .get_track(media_kind, source_kind)
+            .await
+            .unwrap();
+
+        let mut track_live_state = track.lived().await.unwrap();
+        if track_live_state {
+            for _ in 0..5 {
+                track_live_state = track.lived().await.unwrap();
+                if track_live_state {
+                    sleep(Duration::from_millis(300)).await;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        assert!(!track_live_state, "live track is present");
+    } else {
+        let has_track = tracks_with_partner
+            .has_track(media_kind, Some(source_kind))
+            .await
+            .unwrap();
+
+        assert!(!has_track, "track is present");
+    }
 }
 
 #[then(regex = r"^(\S+) doesn't have remote tracks from (\S+)$")]
@@ -214,7 +240,10 @@ async fn then_member_doesnt_have_live_local_tracks(
 ) {
     let member = world.get_member(&id).unwrap();
     let local_tracks = member.room().local_tracks().await.unwrap();
-    let count = local_tracks.count_tracks_by_live(true).await.unwrap();
+    let count = local_tracks
+        .count_tracks_by_live(true, false)
+        .await
+        .unwrap();
     assert_eq!(count, 0);
 }
 
@@ -237,7 +266,8 @@ async fn then_member_has_n_remote_tracks_from(
 
     let mut actual_count = 0;
     for _ in 0..5 {
-        actual_count = tracks_store.count_tracks_by_live(live).await.unwrap();
+        actual_count =
+            tracks_store.count_tracks_by_live(live, true).await.unwrap();
         if actual_count != expected_count {
             sleep(Duration::from_millis(300)).await;
         }

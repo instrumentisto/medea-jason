@@ -74,12 +74,12 @@ impl<T> Drop for Object<T> {
             window
                 .execute(Statement::new(
                     // language=JavaScript
-                    r#"
+                    "
                     async () => {
                         const [id] = args;
                         window.registry.delete(id);
                     }
-                    "#,
+                    ",
                     [ptr.to_string().into()],
                 ))
                 .await
@@ -123,12 +123,12 @@ impl<T> Object<T> {
         let id = Uuid::new_v4().to_string();
         self.execute(statement.and_then(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (obj) => {
                 const [id] = args;
                 window.registry.set(id, obj);
             }
-            "#,
+            ",
             [id.clone().into()],
         )))
         .await
@@ -146,7 +146,7 @@ impl<T> Object<T> {
     pub async fn is_undefined(&self) -> Result<bool, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"async (o) => o === undefined"#,
+            "async (o) => o === undefined",
             [],
         ))
         .await?
@@ -169,12 +169,12 @@ impl<T> Object<T> {
     fn get_obj(&self) -> Statement {
         Statement::new(
             // language=JavaScript
-            r#"
+            "
             async () => {
                 const [id] = args;
                 return window.registry.get(id);
             }
-            "#,
+            ",
             [self.ptr.to_string().into()],
         )
     }
@@ -191,12 +191,12 @@ impl<T: Builder> Object<T> {
         window
             .execute(obj.build().and_then(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async (obj) => {
                     const [id] = args;
                     window.registry.set(id, obj);
                 }
-                "#,
+                ",
                 [id.clone().into()],
             )))
             .await

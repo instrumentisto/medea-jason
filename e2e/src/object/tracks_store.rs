@@ -35,7 +35,7 @@ impl<T> Object<TracksStore<T>> {
     pub async fn count(&self) -> Result<u64, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"async (store) => store.tracks.length"#,
+            "async (store) => store.tracks.length",
             [],
         ))
         .await?
@@ -55,27 +55,27 @@ impl<T> Object<TracksStore<T>> {
 
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (store) => {
-                    const [neededCount] = args;
-                    let currentCount = store.tracks.length;
-                    if (currentCount === neededCount) {
-                        return;
-                    } else {
-                        let waiter = new Promise((resolve) => {
-                            store.subs.push(() => {
-                                currentCount += 1;
-                                if (currentCount === neededCount) {
-                                    resolve();
-                                    return false;
-                                }
-                                return true;
-                            });
+            "
+            async (store) => {
+                const [neededCount] = args;
+                let currentCount = store.tracks.length;
+                if (currentCount === neededCount) {
+                    return;
+                } else {
+                    let waiter = new Promise((resolve) => {
+                        store.subs.push(() => {
+                            currentCount += 1;
+                            if (currentCount === neededCount) {
+                                resolve();
+                                return false;
+                            }
+                            return true;
                         });
-                        await waiter;
-                    }
+                    });
+                    await waiter;
                 }
-            "#,
+            }
+            ",
             [count.into()],
         ))
         .await
@@ -115,22 +115,22 @@ impl<T> Object<TracksStore<T>> {
 
         self.execute(kind_js.and_then(Statement::new(
             // language=JavaScript
-            r#"
-                async (meta) => {
-                    for (track of meta.store.tracks) {
-                        if (track.track.kind() === meta.kind &&
-                            (
-                                track.track.media_source_kind()  ===
-                                meta.sourceKind ||
-                                meta.sourceKind === undefined
-                            )
-                        ) {
-                            return true;
-                        }
+            "
+            async (meta) => {
+                for (track of meta.store.tracks) {
+                    if (track.track.kind() === meta.kind &&
+                        (
+                            track.track.media_source_kind()  ===
+                            meta.sourceKind ||
+                            meta.sourceKind === undefined
+                        )
+                    ) {
+                        return true;
                     }
-                    return false;
                 }
-            "#,
+                return false;
+             }
+            ",
             [],
         )))
         .await?
@@ -169,33 +169,33 @@ impl<T> Object<TracksStore<T>> {
 
         self.execute_and_fetch(kind_js.and_then(Statement::new(
             // language=JavaScript
-            r#"
-                async (meta) => {
-                    for (track of meta.store.tracks) {
+            "
+            async (meta) => {
+                for (track of meta.store.tracks) {
+                    let kind = track.track.kind();
+                    let sourceKind = track.track.media_source_kind();
+                    if (kind === meta.kind
+                        && sourceKind === meta.sourceKind) {
+                        return track;
+                    }
+                }
+                let waiter = new Promise((resolve) => {
+                    meta.store.subs.push((track) => {
                         let kind = track.track.kind();
-                        let sourceKind = track.track.media_source_kind();
+                        let sourceKind =
+                            track.track.media_source_kind();
                         if (kind === meta.kind
                             && sourceKind === meta.sourceKind) {
-                            return track;
+                            resolve(track);
+                            return false;
+                        } else {
+                            return true;
                         }
-                    }
-                    let waiter = new Promise((resolve) => {
-                        meta.store.subs.push((track) => {
-                            let kind = track.track.kind();
-                            let sourceKind =
-                                track.track.media_source_kind();
-                            if (kind === meta.kind
-                                && sourceKind === meta.sourceKind) {
-                                resolve(track);
-                                return false;
-                            } else {
-                                return true;
-                            }
-                        });
                     });
-                    return await waiter;
-                }
-            "#,
+                });
+                return await waiter;
+            }
+            ",
             [],
         )))
         .await
@@ -207,18 +207,39 @@ impl<T> Object<TracksStore<T>> {
     ///
     /// - If failed to execute JS statement.
     /// - If failed to parse result as [`u64`].
-    pub async fn count_tracks_by_live(&self, live: bool) -> Result<u64, Error> {
+    pub async fn count_tracks_by_live(
+        &self,
+        live: bool,
+        remote: bool,
+    ) -> Result<u64, Error> {
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
                 async (store) => {{
                     let count = 0;
-                    for (track of store.tracks) {{
-                        if ({live} && !track.stopped) {{
-                            count++;
-                        }} else if (!{live} && track.stopped) {{
-                            count++;
+                    if ({remote}) {{
+                        for (track of store.tracks) {{
+                            var tr = track.track;
+                            if ({live} &&
+                                    !track.stopped &&
+                                    tr.media_direction() == 0)
+                            {{
+                                count++;
+                            }} else if (!{live} &&
+                                    (track.stopped ||
+                                        tr.media_direction() != 0))
+                            {{
+                                count++;
+                            }}
+                        }}
+                    }} else {{
+                        for (track of store.tracks) {{
+                            if ({live} && !track.stopped) {{
+                                count++;
+                            }} else if (!{live} && track.stopped) {{
+                                count++;
+                            }}
                         }}
                     }}
                     return count;

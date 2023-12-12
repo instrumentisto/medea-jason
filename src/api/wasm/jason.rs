@@ -16,7 +16,6 @@ use crate::{
 #[derive(Debug, Default, From)]
 pub struct Jason(jason::Jason);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl Jason {
     /// Instantiates a new [`Jason`] interface to interact with this library.

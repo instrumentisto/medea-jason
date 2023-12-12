@@ -16,6 +16,7 @@ pub mod api;
 pub mod utils;
 
 #[allow(
+    clippy::absolute_paths,
     clippy::as_conversions,
     clippy::default_trait_access,
     clippy::let_underscore_untyped,
@@ -160,7 +161,7 @@ impl Drop for DartValue {
 }
 
 impl From<()> for DartValue {
-    fn from(_: ()) -> Self {
+    fn from((): ()) -> Self {
         Self::None
     }
 }

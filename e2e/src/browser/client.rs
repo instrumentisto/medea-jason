@@ -294,11 +294,11 @@ impl Inner {
 
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async () => {
                 window.registry = new Map();
             }
-            "#,
+            ",
             vec![],
         ))
         .await

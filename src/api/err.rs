@@ -1,6 +1,7 @@
 //! External API errors.
 
-#![allow(clippy::multiple_inherent_impl)] // for `wasm_bindgen`
+// For `wasm_bindgen`.
+#![allow(clippy::mem_forget, clippy::multiple_inherent_impl)]
 
 use std::borrow::Cow;
 
@@ -136,7 +137,6 @@ impl LocalMediaInitException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
@@ -186,7 +186,6 @@ impl EnumerateDevicesException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl EnumerateDevicesException {
     /// Returns [`platform::Error`] causing this [`EnumerateDevicesException`].
@@ -219,7 +218,6 @@ impl InvalidOutputAudioDeviceIdException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl InvalidOutputAudioDeviceIdException {
     /// Returns stacktrace of this [`InvalidOutputAudioDeviceIdException`].
@@ -248,7 +246,6 @@ impl MicVolumeException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MicVolumeException {
     /// Returns the [`platform::Error`] causing this [`MicVolumeException`].
@@ -322,7 +319,6 @@ impl RpcClientException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
@@ -385,7 +381,6 @@ impl InternalException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl InternalException {
     /// Returns an error message describing the problem.
@@ -422,7 +417,6 @@ impl FormatException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl FormatException {
     /// Returns an error message describing of the problem.
@@ -480,7 +474,6 @@ impl MediaStateTransitionException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MediaStateTransitionException {
     /// Returns an error message describing the problem.
@@ -539,7 +532,6 @@ impl MediaSettingsUpdateException {
     }
 }
 
-#[cfg_attr(target_family = "wasm", allow(clippy::unused_unit))]
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl MediaSettingsUpdateException {
     /// Returns an error message describing the problem.
@@ -782,7 +774,8 @@ impl From<Traced<room::ChangeMediaStateError>> for Error {
             room::ChangeMediaStateError::CouldNotGetLocalMedia(err) => {
                 Traced::compose(err, trace).into()
             }
-            room::ChangeMediaStateError::ProhibitedState(_) => {
+            room::ChangeMediaStateError::InvalidLocalTracks(_)
+            | room::ChangeMediaStateError::ProhibitedState(_) => {
                 MediaStateTransitionException::new(
                     message,
                     trace,
@@ -798,8 +791,7 @@ impl From<Traced<room::ChangeMediaStateError>> for Error {
                 )
                 .into()
             }
-            room::ChangeMediaStateError::InvalidLocalTracks(_)
-            | room::ChangeMediaStateError::InsertLocalTracksError(_) => {
+            room::ChangeMediaStateError::InsertLocalTracksError(_) => {
                 InternalException::new(message, None, trace).into()
             }
         }
@@ -837,12 +829,19 @@ impl From<Traced<LocalMediaError>> for Error {
                 UE::CouldNotGetLocalMedia(err) => {
                     Traced::compose(err, trace).into()
                 }
-                UE::InvalidLocalTracks(_)
-                | UE::InsertLocalTracksError(
+                UE::InsertLocalTracksError(
                     IE::InvalidMediaTrack | IE::NotEnoughTracks,
                 ) => InternalException::new(message, None, trace).into(),
                 UE::InsertLocalTracksError(IE::CouldNotInsertLocalTrack(_)) => {
                     InternalException::new(message, None, trace).into()
+                }
+                UE::InvalidLocalTracks(_) => {
+                    MediaStateTransitionException::new(
+                        message,
+                        trace,
+                        MediaStateTransitionExceptionKind::ProhibitedState,
+                    )
+                    .into()
                 }
             },
             ME::SenderCreateError(CreateError::TransceiverNotFound(_)) => {

@@ -7,6 +7,7 @@ import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/interface/enums.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../api/callback.dart';
 import '../api/endpoint.dart';
@@ -15,6 +16,8 @@ import '../api/room.dart';
 import '../conf.dart';
 import '../control.dart';
 import 'member.dart';
+
+const bool isSfu = bool.fromEnvironment('SFU', defaultValue: false);
 
 /// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
@@ -49,26 +52,41 @@ class CustomWorld extends FlutterWidgetTesterWorld {
     if (builder.isSend) {
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Audio, MediaSourceKind.Device): true
+            MediaKind.audio, MediaSourceKind.device): true
       });
       sendState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Video, MediaSourceKind.Device): true
+            MediaKind.video, MediaSourceKind.device): true
       });
+      if (isSfu) {
+        sendState.addAll({
+          const Tuple2<MediaKind, MediaSourceKind>(
+              MediaKind.video, MediaSourceKind.display): true
+        });
+      }
 
-      pipeline.addAll(
-          {'publish': WebRtcPublishEndpoint('publish', P2pMode.Always)});
+      pipeline.addAll({
+        'publish': WebRtcPublishEndpoint(
+            'publish', isSfu ? P2pMode.Never : P2pMode.Always)
+      });
     }
 
     if (builder.isRecv) {
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Audio, MediaSourceKind.Device): true
+            MediaKind.audio, MediaSourceKind.device): true
       });
       recvState.addAll({
         const Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Video, MediaSourceKind.Device): true
+            MediaKind.video, MediaSourceKind.device): true
       });
+
+      if (isSfu) {
+        recvState.addAll({
+          const Tuple2<MediaKind, MediaSourceKind>(
+              MediaKind.video, MediaSourceKind.display): true
+        });
+      }
 
       members.forEach((key, value) {
         if (value.isSend) {
@@ -104,7 +122,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
     var jason = Jason();
     var room = jason.initRoom();
-    await room.disableVideo(MediaSourceKind.Display);
+    await room.disableVideo(MediaSourceKind.display);
 
     var member = builder.build(room, sendState, recvState);
 
@@ -234,6 +252,48 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await otherMember.waitForConnect(member.id);
       await otherMember.waitForTrackCount(member.id, sendCount);
+
+      if (isSfu) {
+        if (!otherMember.enabledAudio) {
+          for (var track in member
+              .connectionStore.remoteTracks[element.key]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.audio)) {
+            await member.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+
+        if (!otherMember.enabledVideo) {
+          for (var track in member
+              .connectionStore.remoteTracks[element.key]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.video)) {
+            await member.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+        if (!member.enabledAudio) {
+          for (var track in otherMember
+              .connectionStore.remoteTracks[memberId]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.audio)) {
+            await otherMember.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+
+        if (!member.enabledVideo) {
+          for (var track in otherMember
+              .connectionStore.remoteTracks[memberId]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.video)) {
+            await otherMember.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+      }
+
       await Future.delayed(const Duration(milliseconds: 500));
     }
   }
@@ -246,11 +306,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var leftMember = members[pair.left.id]!;
       if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        leftMember.updateSendMediaState(MediaKind.Audio, null, true);
+        leftMember.updateSendMediaState(MediaKind.audio, null, true);
       }
       if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        leftMember.updateSendMediaState(MediaKind.Video, null, true);
+        leftMember.updateSendMediaState(MediaKind.video, null, true);
       }
       try {
         await controlClient.create(
@@ -269,11 +329,11 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var rightMember = members[pair.right.id]!;
       if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        rightMember.updateSendMediaState(MediaKind.Audio, null, true);
+        rightMember.updateSendMediaState(MediaKind.audio, null, true);
       }
       if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        rightMember.updateSendMediaState(MediaKind.Video, null, true);
+        rightMember.updateSendMediaState(MediaKind.video, null, true);
       }
 
       try {
@@ -292,8 +352,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var publishEndpoint = pair.left.playEndpointFor(roomId, pair.right)!;
       var leftMember = members[pair.left.id]!;
 
-      await leftMember.updateRecvMediaState(MediaKind.Video, null, true);
-      await leftMember.updateRecvMediaState(MediaKind.Audio, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.video, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.audio, null, true);
 
       await controlClient.create(
           '$roomId/${pair.left.id}/${publishEndpoint.id}', publishEndpoint);
@@ -303,8 +363,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       var publishEndpoint = pair.right.playEndpointFor(roomId, pair.left)!;
       var rightMember = members[pair.right.id]!;
 
-      await rightMember.updateRecvMediaState(MediaKind.Video, null, true);
-      await rightMember.updateRecvMediaState(MediaKind.Audio, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.video, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.audio, null, true);
 
       await controlClient.create(
           '$roomId/${pair.right.id}/${publishEndpoint.id}', publishEndpoint);
@@ -405,7 +465,11 @@ class PairedMember {
   WebRtcPublishEndpoint? publishEndpoint() {
     WebRtcPublishEndpoint? res;
     if (isSend()) {
-      res = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var mode = P2pMode.Always;
+      if (isSfu) {
+        mode = P2pMode.Never;
+      }
+      res = WebRtcPublishEndpoint('publish', mode);
       if (sendAudio == null) {
         res.audio_settings = AudioSettings(PublishPolicy.Disabled);
       } else {

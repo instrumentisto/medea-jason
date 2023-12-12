@@ -5,20 +5,16 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
-use std::{
-    cell::{Cell, RefCell},
-    collections::HashSet,
-    rc::Rc,
-};
+#[cfg(feature = "mockable")]
+use std::future::Future;
+use std::{cell::Cell, collections::HashSet, rc::Rc};
 
 use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
 };
-use medea_reactive::{
-    AllProcessed, ObservableCell, ProgressableCell, ProgressableHashSet,
-};
+use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
 use proto::{ConnectionMode, MemberId};
 use tracerr::Traced;
 
@@ -115,11 +111,6 @@ pub struct State {
     /// All [`receiver::State`]s of this [`Component`].
     receivers: TracksRepository<receiver::State>,
 
-    /// Collection of [`Connection`]s with remote `Member`s.
-    ///
-    /// [`Connection`]: crate::connection::Connection
-    connections: RefCell<ProgressableHashSet<MemberId>>,
-
     /// Indicator whether this [`Component`] should relay all media through a
     /// TURN server forcibly.
     force_relay: bool,
@@ -149,6 +140,13 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
+    /// Indicator whether there is some information about tracks to provide
+    /// into [`Connections`].
+    ///
+    /// [`Connections`]: crate::connection::Connections
+    maybe_update_connections:
+        ObservableCell<Option<(TrackId, HashSet<MemberId>)>>,
+
     /// Synchronization state of this [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
@@ -168,7 +166,6 @@ impl State {
             connection_mode,
             senders: TracksRepository::new(),
             receivers: TracksRepository::new(),
-            connections: RefCell::new(ProgressableHashSet::new()),
             ice_servers,
             force_relay,
             remote_sdp: ProgressableCell::new(None),
@@ -178,8 +175,15 @@ impl State {
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
             maybe_update_local_stream: ObservableCell::new(false),
+            maybe_update_connections: ObservableCell::new(None),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
+    }
+
+    /// Returns [`ConnectionMode`] of this [`State`].
+    #[must_use]
+    pub const fn connection_mode(&self) -> ConnectionMode {
+        self.connection_mode
     }
 
     /// Returns [`Id`] of this [`State`].
@@ -227,6 +231,16 @@ impl State {
         track_id: TrackId,
     ) -> Option<Rc<receiver::State>> {
         self.receivers.get(track_id)
+    }
+
+    /// Returns IDs of all the send [`TrackId`]s.
+    pub fn get_send_tracks(&self) -> Vec<TrackId> {
+        self.senders.ids()
+    }
+
+    /// Returns IDs of all the receive [`TrackId`]s.
+    pub fn get_recv_tracks(&self) -> Vec<TrackId> {
+        self.receivers.ids()
     }
 
     /// Sets [`NegotiationRole`] of this [`State`] to the provided one.
@@ -364,6 +378,7 @@ impl State {
                         mid.clone(),
                         track.media_type,
                         track.media_direction,
+                        track.muted,
                         receivers.clone(),
                         send_constraints,
                         self.connection_mode,
@@ -378,6 +393,7 @@ impl State {
                         mid.clone(),
                         track.media_type,
                         track.media_direction,
+                        track.muted,
                         sender.clone(),
                         self.connection_mode,
                     )),
@@ -408,8 +424,9 @@ impl State {
     /// Schedules a local stream update.
     pub async fn patch_track(&self, patch: proto::TrackPatchEvent) {
         if let Some(receivers) = &patch.receivers {
-            let receivers: HashSet<_> = receivers.clone().into_iter().collect();
-            self.connections.borrow_mut().update(receivers);
+            _ = self.maybe_update_connections.when_eq(None).await;
+            self.maybe_update_connections
+                .set(Some((patch.id, receivers.clone().into_iter().collect())));
         }
 
         if let Some(sender) = self.get_sender(patch.id) {
@@ -469,10 +486,12 @@ impl SynchronizableState for State {
         );
 
         for (id, sender) in from.senders {
-            state.senders.insert(
-                id,
-                Rc::new(sender::State::from_proto(sender, send_cons)),
-            );
+            if !sender.receivers.is_empty() {
+                state.senders.insert(
+                    id,
+                    Rc::new(sender::State::from_proto(sender, send_cons)),
+                );
+            }
         }
         for (id, receiver) in from.receivers {
             state.receivers.insert(
@@ -554,11 +573,10 @@ impl State {
         self.negotiation_role.get()
     }
 
-    /// Returns [`Future`] resolving once local SDP approve is needed.
-    pub fn when_local_sdp_approve_needed(
-        &self,
-    ) -> impl std::future::Future<Output = ()> {
+    /// Returns a [`Future`] resolving once local SDP approve is needed.
+    pub fn when_local_sdp_approve_needed(&self) -> impl Future<Output = ()> {
         use futures::FutureExt as _;
+
         self.negotiation_state
             .when_eq(NegotiationState::WaitLocalSdpApprove)
             .map(drop)

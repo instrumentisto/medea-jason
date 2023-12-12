@@ -31,6 +31,30 @@ class CallRoute extends StatefulWidget {
       _roomId, _memberId, _isPublish, _publishVideo, _publishAudio, _fakeMedia);
 }
 
+class ConnectWidgets {
+  Text name = const Text('');
+  Map<String, VideoView> videoTracks = {};
+  List<TextButton> toggleButtons = List.empty(growable: true);
+  bool recvVideoDevice = true;
+  bool recvVideoDisplay = true;
+  bool recvAudio = true;
+
+  List<Widget> all() {
+    List<Widget> res = List.empty(growable: true);
+
+    res.add(name);
+
+    List<Widget> buttons = toggleButtons;
+    res.addAll(buttons);
+
+    List<Widget> videos =
+        videoTracks.values.map((video) => Expanded(child: video)).toList();
+    res.addAll(videos);
+
+    return res;
+  }
+}
+
 class _CallState extends State<CallRoute> {
   late bool _isPublish;
   late bool _publishAudio;
@@ -43,7 +67,8 @@ class _CallState extends State<CallRoute> {
   VideoView? localScreenVideo;
   VideoView? localCameraVideo;
 
-  final Map<String, Map<String, VideoView>> _videos = {};
+  final Map<String, ConnectWidgets> _widgets = {};
+
   final Call _call = Call();
   late String _roomId;
   late String _memberId;
@@ -60,48 +85,87 @@ class _CallState extends State<CallRoute> {
 
   @override
   void initState() {
-    _call.onNewRemoteStream((track, remoteId) async {
+    _call.onNewRemoteStream((track, remoteId, conn) async {
       var trackId = track.getTrack().id();
-      if (track.mediaDirection() == jason.TrackMediaDirection.SendRecv) {
+      if (track.mediaDirection() == jason.TrackMediaDirection.sendRecv) {
         var renderer = createVideoRenderer();
         await renderer.initialize();
         await renderer.setSrcObject(track.getTrack());
 
-        var remoteTracks = _videos[remoteId];
-        if (remoteTracks == null) {
-          remoteTracks = Map.from({trackId: VideoView(renderer, mirror: true)});
+        var connectionWidgets = _widgets[remoteId];
+
+        if (connectionWidgets == null) {
+          connectionWidgets = ConnectWidgets();
+          connectionWidgets.videoTracks =
+              Map.from({trackId: VideoView(renderer)});
+          connectionWidgets.name = Text(remoteId);
+          connectionWidgets.toggleButtons = [
+            TextButton(
+                onPressed: () {
+                  if (!connectionWidgets!.recvVideoDevice) {
+                    conn.enableRemoteVideo(jason.MediaSourceKind.device);
+                  } else {
+                    conn.disableRemoteVideo(jason.MediaSourceKind.device);
+                  }
+                  connectionWidgets.recvVideoDevice =
+                      !connectionWidgets.recvVideoDevice;
+                },
+                child: const Text('Toggle divece video recv')),
+            TextButton(
+                onPressed: () {
+                  if (!connectionWidgets!.recvVideoDisplay) {
+                    conn.enableRemoteVideo(jason.MediaSourceKind.display);
+                  } else {
+                    conn.disableRemoteVideo(jason.MediaSourceKind.display);
+                  }
+                  connectionWidgets.recvVideoDisplay =
+                      !connectionWidgets.recvVideoDisplay;
+                },
+                child: const Text('Toggle display video recv')),
+            TextButton(
+                onPressed: () {
+                  if (!connectionWidgets!.recvAudio) {
+                    conn.enableRemoteAudio();
+                  } else {
+                    conn.disableRemoteAudio();
+                  }
+                  connectionWidgets.recvAudio = !connectionWidgets.recvAudio;
+                },
+                child: const Text('Toggle audio recv'))
+          ];
         } else {
-          remoteTracks[trackId] = VideoView(renderer, mirror: true);
+          connectionWidgets.videoTracks[trackId] = VideoView(renderer);
         }
 
         setState(() {
-          _videos[remoteId] = remoteTracks!;
+          _widgets[remoteId] = connectionWidgets!;
         });
       }
 
       track.onMediaDirectionChanged(
         (newDir) async {
-          var remoteTracks = _videos[remoteId];
+          var remoteTracks = _widgets[remoteId];
 
-          if (newDir == jason.TrackMediaDirection.SendRecv) {
+          if (newDir == jason.TrackMediaDirection.sendRecv) {
             var renderer = createVideoRenderer();
             await renderer.initialize();
             await renderer.setSrcObject(track.getTrack());
 
             if (remoteTracks == null) {
-              remoteTracks =
-                  Map.from({trackId: VideoView(renderer, mirror: true)});
+              remoteTracks = ConnectWidgets();
+              remoteTracks.videoTracks =
+                  Map.from({trackId: VideoView(renderer)});
             } else {
-              remoteTracks[trackId] = VideoView(renderer, mirror: true);
+              remoteTracks.videoTracks[trackId] = VideoView(renderer);
             }
           } else {
             if (remoteTracks != null) {
-              remoteTracks.remove(trackId);
+              remoteTracks.videoTracks.remove(trackId);
             }
           }
 
           setState(() {
-            _videos[remoteId] = remoteTracks!;
+            _widgets[remoteId] = remoteTracks!;
           });
         },
       );
@@ -114,14 +178,15 @@ class _CallState extends State<CallRoute> {
         await renderer.setSrcObject(track);
         localCameraVideo = VideoView(renderer, mirror: true);
 
-        var localTracks = _videos['I'];
+        var localTracks = _widgets['I'];
         if (localTracks == null) {
-          localTracks = Map.from({'I': localCameraVideo!});
+          localTracks = ConnectWidgets();
+          localTracks.videoTracks = Map.from({'I': localCameraVideo!});
         } else {
-          localTracks['I'] = localCameraVideo!;
+          localTracks.videoTracks['I'] = localCameraVideo!;
         }
         setState(() {
-          _videos['I'] = localTracks!;
+          _widgets['I'] = localTracks!;
         });
       } else {
         await localCameraVideo!.videoRenderer.setSrcObject(track);
@@ -135,14 +200,15 @@ class _CallState extends State<CallRoute> {
         await renderer.setSrcObject(track);
         localScreenVideo = VideoView(renderer, mirror: true);
 
-        var localTracks = _videos['I'];
+        var localTracks = _widgets['I'];
         if (localTracks == null) {
-          localTracks = Map.from({'I': localScreenVideo!});
+          localTracks = ConnectWidgets();
+          localTracks.videoTracks = Map.from({'I': localScreenVideo!});
         } else {
-          localTracks['I'] = localScreenVideo!;
+          localTracks.videoTracks['I'] = localScreenVideo!;
         }
         setState(() {
-          _videos['I'] = localTracks!;
+          _widgets['I'] = localTracks!;
         });
       } else {
         await localScreenVideo!.videoRenderer.setSrcObject(track);
@@ -219,12 +285,9 @@ class _CallState extends State<CallRoute> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Row(
-                  children: _videos.values
+                  children: _widgets.values
                       .map((videoMap) => Expanded(
-                          child: Column(
-                              children: videoMap.values
-                                  .map((video) => Expanded(child: video))
-                                  .toList())))
+                          child: Column(children: videoMap.all().toList())))
                       .toList(),
                 ))),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -454,10 +517,10 @@ Future mediaSettingDialog(BuildContext context, Call call) async {
 
   var deviceList = await call.enumerateDevice();
   var videoDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.VideoInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.videoInput)
       .toList();
   var audioDevices = deviceList
-      .where((element) => element.kind() == jason.MediaDeviceKind.AudioInput)
+      .where((element) => element.kind() == jason.MediaDeviceKind.audioInput)
       .toList();
 
   await showDialog<void>(

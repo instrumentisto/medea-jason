@@ -8,6 +8,7 @@
 )]
 #![forbid(non_ascii_idents)]
 #![warn(
+    clippy::absolute_paths,
     clippy::as_conversions,
     clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
@@ -36,18 +37,21 @@
     clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
+    clippy::implied_bounds_in_impls,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
     clippy::iter_on_empty_collections,
     clippy::iter_on_single_items,
     clippy::iter_with_drain,
     clippy::large_include_file,
+    clippy::large_stack_frames,
     clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
     clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_assert_message,
+    clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
@@ -55,6 +59,8 @@
     clippy::mutex_atomic,
     clippy::mutex_integer,
     clippy::needless_collect,
+    clippy::needless_pass_by_ref_mut,
+    clippy::needless_raw_strings,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
     clippy::or_fun_call,
@@ -63,8 +69,13 @@
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
+    clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::readonly_write_lock,
+    clippy::redundant_clone,
+    clippy::redundant_type_annotations,
+    clippy::ref_patterns,
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
     clippy::semicolon_inside_block,
@@ -74,6 +85,7 @@
     clippy::str_to_string,
     clippy::string_add,
     clippy::string_lit_as_bytes,
+    clippy::string_lit_chars_any,
     clippy::string_slice,
     clippy::string_to_string,
     clippy::suboptimal_flops,
@@ -106,7 +118,6 @@
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
-    noop_method_call,
     semicolon_in_expressions_from_macros,
     unreachable_pub,
     unused_crate_dependencies,
@@ -129,6 +140,9 @@
 )]
 // TODO: Remove on next `derive_more` major version.
 #![allow(clippy::uninlined_format_args, clippy::use_debug)]
+// TODO: Massive false positives on `.await` points. Try remove on next Rust
+//       version.
+#![allow(clippy::multiple_unsafe_ops_per_block)]
 
 #[macro_use]
 pub mod utils;

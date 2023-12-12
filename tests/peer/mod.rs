@@ -797,6 +797,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -806,6 +807,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -824,6 +826,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -833,6 +836,7 @@ impl InterconnectedPeers {
                     mid: None,
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -896,6 +900,8 @@ async fn get_traffic_stats() {
     assert_eq!(first_peer_video_outbound_stats_count, 1);
     assert_eq!(first_peer_audio_outbound_stats_count, 1);
     assert_eq!(firs_peer_succeeded_pairs_count, 1);
+
+    delay_for(100).await;
 
     let second_peer_stats = peers.second_peer.get_stats().await.unwrap();
     let mut second_peer_video_inbound_stats_count = 0;
@@ -1291,6 +1297,7 @@ async fn new_remote_track() {
                     mid: Some(String::from("0")),
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             LocalTracksConstraints::default(),
@@ -1303,6 +1310,7 @@ async fn new_remote_track() {
                     mid: Some(String::from("1")),
                 },
                 media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,

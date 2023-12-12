@@ -659,7 +659,7 @@ impl TryFrom<proto::WebRtcPublishEndpoint> for WebRtcPublish {
         Ok(Self {
             id: val.id.into(),
             spec: web_rtc_publish::Spec {
-                p2p: P2p::from_i32(val.p2p).unwrap_or_default().into(),
+                p2p: P2p::try_from(val.p2p).unwrap_or_default().into(),
                 audio_settings: val
                     .audio_settings
                     .map(AudioSettings::from)
@@ -695,7 +695,7 @@ impl From<proto::web_rtc_publish_endpoint::AudioSettings> for AudioSettings {
         use proto::web_rtc_publish_endpoint::PublishPolicy;
 
         Self {
-            publish_policy: PublishPolicy::from_i32(val.publish_policy)
+            publish_policy: PublishPolicy::try_from(val.publish_policy)
                 .unwrap_or_default()
                 .into(),
         }
@@ -717,7 +717,7 @@ impl From<proto::web_rtc_publish_endpoint::VideoSettings> for VideoSettings {
         use proto::web_rtc_publish_endpoint::PublishPolicy;
 
         Self {
-            publish_policy: PublishPolicy::from_i32(val.publish_policy)
+            publish_policy: PublishPolicy::try_from(val.publish_policy)
                 .unwrap_or_default()
                 .into(),
         }

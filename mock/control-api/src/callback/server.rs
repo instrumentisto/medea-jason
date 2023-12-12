@@ -86,7 +86,8 @@ impl Handler<GetCallbackItems> for GrpcCallbackServer {
 /// # Panics
 ///
 /// If cannot bind and run gRPC server.
-pub async fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
+#[must_use]
+pub fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
     let events = Arc::new(Mutex::new(Vec::new()));
 
     let service =

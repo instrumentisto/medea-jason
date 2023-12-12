@@ -3,15 +3,12 @@ library jason;
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
-
 import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
 import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/box_handle.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
 import 'ffi/exception.dart' as exceptions;
@@ -45,22 +42,6 @@ void Function(String)? _onPanicCallback;
 /// NOT be used.
 void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
-}
-
-extension FfiExceptionParse on FfiException {
-  Object parse() {
-    if (!message.contains('RESULT_ERROR: DartError')) {
-      return this;
-    }
-    var handle = message;
-    var reg = RegExp(r'\(([^]*?)\)');
-    var errPtr =
-        Pointer<Handle>.fromAddress(int.parse(reg.firstMatch(handle)![1]!));
-    var err = unboxDartHandle(errPtr);
-    freeBoxedDartHandle(errPtr);
-
-    return err;
-  }
 }
 
 DynamicLibrary _dlLoad() {

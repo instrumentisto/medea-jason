@@ -34,6 +34,7 @@ async fn sendrecv_works() {
             mid: None,
         },
         media_direction: MediaDirection::SendRecv.into(),
+        muted: false,
         media_type: MediaType::Audio(AudioSettings { required: false }),
     };
     let recv_audio_track = Track {
@@ -43,6 +44,7 @@ async fn sendrecv_works() {
             sender: MemberId::from("alice"),
         },
         media_direction: MediaDirection::SendRecv.into(),
+        muted: false,
         media_type: MediaType::Audio(AudioSettings { required: false }),
     };
     media_connections

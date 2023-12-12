@@ -278,7 +278,7 @@ impl MediaDevices {
         if let Some(mut h) = handler {
             unsafe {
                 media_devices::on_device_change(
-                    Callback::from_fn_mut(move |_: ()| {
+                    Callback::from_fn_mut(move |(): ()| {
                         h();
                     })
                     .into_dart(),

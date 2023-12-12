@@ -74,13 +74,13 @@ StepDefinitionGeneric whenMemberEnablesRemoteTrack =
     var member = context.world.members[id]!;
 
     if (toggle == 'enables') {
-      if (parsedKind.item1 == MediaKind.Audio) {
+      if (parsedKind.item1 == MediaKind.audio) {
         await member.room.enableRemoteAudio();
       } else {
         await member.room.enableRemoteVideo();
       }
     } else {
-      if (parsedKind.item1 == MediaKind.Audio) {
+      if (parsedKind.item1 == MediaKind.audio) {
         await member.room.disableRemoteAudio();
       } else {
         await member.room.disableRemoteVideo();
@@ -102,7 +102,8 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
     var track = await member.waitRemoteTrackFrom(
         remoteId, parsedKind.item2, parsedKind.item1);
 
-    var dir = TrackMediaDirection.values.firstWhere((e) => e.name == direction);
+    var dir = TrackMediaDirection.values
+        .firstWhere((e) => e.name.toLowerCase() == direction.toLowerCase());
 
     await member.waitMediaDirectionTrack(dir, track);
   },

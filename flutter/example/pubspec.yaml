@@ -20,10 +20,10 @@ dependencies:
     path: ../
 
   cupertino_icons: ^1.0.2
-  faker_dart: ^0.1.11
+  faker_dart: ^0.2.1
   freezed_annotation: ^2.2.0
   http: ^0.13.6
-  medea_flutter_webrtc: ^0.8.2
+  medea_flutter_webrtc: ^0.9.0
   retry: ^3.1.2
 
 dev_dependencies:
@@ -33,10 +33,17 @@ dev_dependencies:
   flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
+  gherkin: ^3.1.0
   integration_test:
     sdk: flutter
-  json_serializable: ^6.3.1
+  json_serializable: ^6.7.1
 
+dependency_overrides:
+  # TODO: Remove when `flutter_gherkin` updates.
+  analyzer: ^5.13.0
+  # Pinned until gql-dart updates to v4
+  # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
+  uuid: ^3.0.7
 
 flutter:
   assets:

@@ -5,11 +5,12 @@
 
 #![allow(
     clippy::as_conversions,
+    clippy::doc_markdown, // TODO: From generated code in #[frb].
     clippy::missing_panics_doc,
+    clippy::needless_pass_by_value,
     clippy::undocumented_unsafe_blocks,
     clippy::unwrap_used,
-    clippy::needless_pass_by_value,
-    non_snake_case
+    non_snake_case,
 )]
 
 use std::{
@@ -310,14 +311,12 @@ pub fn connection_handle_from_ptr(
 pub fn connection_handle_on_close(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     let f = unsafe {
         platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
     };
 
-    connection
-        .on_close(f)
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+    connection.on_close(f).map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -333,14 +332,14 @@ pub fn connection_handle_on_close(
 pub fn connection_handle_on_remote_track_added(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     let f = unsafe {
         platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
     };
 
     connection
         .on_remote_track_added(f)
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -354,14 +353,14 @@ pub fn connection_handle_on_remote_track_added(
 pub fn connection_handle_on_quality_score_update(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     let f = unsafe {
         platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
     };
 
     connection
         .on_quality_score_update(f)
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -373,10 +372,10 @@ pub fn connection_handle_on_quality_score_update(
 /// If [`ConnectionHandle::get_remote_member_id()`] errors.
 pub fn connection_handle_get_remote_member_id(
     connection: RustOpaque<ConnectionHandle>,
-) -> anyhow::Result<SyncReturn<String>> {
-    Ok(SyncReturn(connection.get_remote_member_id().map_err(
-        |err| anyhow::anyhow!("{:?}", DartError::from(err)),
-    )?))
+) -> Result<SyncReturn<String>, DartOpaque> {
+    Ok(SyncReturn(
+        connection.get_remote_member_id().map_err(DartError::from)?,
+    ))
 }
 
 /// Enables inbound audio in the provided `connection`.
@@ -799,13 +798,13 @@ pub fn media_manager_handle_microphone_volume(
 pub fn media_manager_handle_on_device_change(
     manager: RustOpaque<MediaManagerHandle>,
     cb: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     let manager = MediaManagerHandle::clone(&manager);
     manager
         .on_device_change(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1196,13 +1195,14 @@ pub fn room_handle_disable_audio(
 /// If `source_kind` is not a [`MediaSourceKind`] index.
 ///
 /// [`Room`]: room::Room
+#[must_use]
 pub fn room_handle_mute_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
-) -> anyhow::Result<SyncReturn<DartOpaque>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    Ok(SyncReturn(
+    SyncReturn(
         async move {
             room_handle.mute_video(source_kind).await?;
 
@@ -1210,7 +1210,7 @@ pub fn room_handle_mute_video(
         }
         .into_dart_future()
         .into_dart_opaque(),
-    ))
+    )
 }
 
 /// Unmutes outbound video in the provided [`Room`].
@@ -1222,13 +1222,14 @@ pub fn room_handle_mute_video(
 /// If `source_kind` is not a [`MediaSourceKind`] index.
 ///
 /// [`Room`]: room::Room
+#[must_use]
 pub fn room_handle_unmute_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
-) -> anyhow::Result<SyncReturn<DartOpaque>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    Ok(SyncReturn(
+    SyncReturn(
         async move {
             room_handle.unmute_video(source_kind).await?;
 
@@ -1236,7 +1237,7 @@ pub fn room_handle_unmute_video(
         }
         .into_dart_future()
         .into_dart_opaque(),
-    ))
+    )
 }
 
 /// Enables outbound video in the provided [`Room`].
@@ -1248,13 +1249,14 @@ pub fn room_handle_unmute_video(
 /// If `source_kind` is not [`MediaSourceKind`] index.
 ///
 /// [`Room`]: room::Room
+#[must_use]
 pub fn room_handle_enable_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
-) -> anyhow::Result<SyncReturn<DartOpaque>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    Ok(SyncReturn(
+    SyncReturn(
         async move {
             room_handle.enable_video(source_kind).await?;
 
@@ -1262,7 +1264,7 @@ pub fn room_handle_enable_video(
         }
         .into_dart_future()
         .into_dart_opaque(),
-    ))
+    )
 }
 
 /// Disables outbound video in the provided [`Room`].
@@ -1274,13 +1276,14 @@ pub fn room_handle_enable_video(
 /// If `source_kind` is not [`MediaSourceKind`] index.
 ///
 /// [`Room`]: room::Room
+#[must_use]
 pub fn room_handle_disable_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
-) -> anyhow::Result<SyncReturn<DartOpaque>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    Ok(SyncReturn(
+    SyncReturn(
         async move {
             room_handle.disable_video(source_kind).await?;
 
@@ -1288,7 +1291,7 @@ pub fn room_handle_disable_video(
         }
         .into_dart_future()
         .into_dart_opaque(),
-    ))
+    )
 }
 
 /// Enables inbound audio in the provided [`Room`].
@@ -1340,13 +1343,14 @@ pub fn room_handle_disable_remote_audio(
 /// If `source_kind` is not [`MediaSourceKind`] index.
 ///
 /// [`Room`]: room::Room
+#[must_use]
 pub fn room_handle_enable_remote_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
-) -> anyhow::Result<SyncReturn<DartOpaque>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    Ok(SyncReturn(
+    SyncReturn(
         async move {
             room_handle.enable_remote_video(source_kind).await?;
 
@@ -1354,7 +1358,7 @@ pub fn room_handle_enable_remote_video(
         }
         .into_dart_future()
         .into_dart_opaque(),
-    ))
+    )
 }
 
 /// Disables inbound video in the provided [`Room`].
@@ -1366,13 +1370,14 @@ pub fn room_handle_enable_remote_video(
 /// If `source_kind` is not [`MediaSourceKind`] index.
 ///
 /// [`Room`]: room::Room
+#[must_use]
 pub fn room_handle_disable_remote_video(
     room_handle: RustOpaque<RoomHandle>,
     source_kind: Option<MediaSourceKind>,
-) -> anyhow::Result<SyncReturn<DartOpaque>> {
+) -> SyncReturn<DartOpaque> {
     let room_handle = RoomHandle::clone(&room_handle);
 
-    Ok(SyncReturn(
+    SyncReturn(
         async move {
             room_handle.disable_remote_video(source_kind).await?;
 
@@ -1380,7 +1385,7 @@ pub fn room_handle_disable_remote_video(
         }
         .into_dart_future()
         .into_dart_opaque(),
-    ))
+    )
 }
 
 /// Sets a callback to be invoked once a new [`Connection`] with some remote
@@ -1394,7 +1399,7 @@ pub fn room_handle_disable_remote_video(
 pub fn room_handle_on_new_connection(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     Ok(SyncReturn(
         room_handle
             .on_new_connection(unsafe {
@@ -1402,7 +1407,7 @@ pub fn room_handle_on_new_connection(
                     cb.try_unwrap().unwrap().into_raw().cast(),
                 )
             })
-            .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?,
+            .map_err(DartError::from)?,
     ))
 }
 
@@ -1417,12 +1422,12 @@ pub fn room_handle_on_new_connection(
 pub fn room_handle_on_close(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_close(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1444,12 +1449,12 @@ pub fn room_handle_on_close(
 pub fn room_handle_on_local_track(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_local_track(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1462,12 +1467,12 @@ pub fn room_handle_on_local_track(
 pub fn room_handle_on_connection_loss(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_connection_loss(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
 }
@@ -1480,12 +1485,25 @@ pub fn room_handle_on_connection_loss(
 pub fn room_handle_on_failed_local_media(
     room_handle: RustOpaque<RoomHandle>,
     cb: DartOpaque,
-) -> anyhow::Result<SyncReturn<()>> {
+) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_failed_local_media(unsafe {
             platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
         })
-        .map_err(|err| anyhow::anyhow!("{:?}", DartError::from(err)))?;
+        .map_err(DartError::from)?;
 
     Ok(SyncReturn(()))
+}
+
+//------------------------------------------------------------------------------
+
+/// Logs Dart exception.
+#[must_use]
+pub fn log_dart_exception(
+    message: String,
+    stack_trace: String,
+) -> SyncReturn<()> {
+    log::error!("{message}\n{stack_trace}");
+
+    SyncReturn(())
 }

@@ -6,6 +6,45 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.4.1] · 2023-??-??
+[0.4.1]: /../../tree/medea-jason-0.4.1
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.4.0...medea-jason-0.4.1)
+
+### Added
+
+- Logging:
+    - Exceptions thrown from Dart callbacks called by Rust ([#138]).
+
+### Fixed
+
+- Screen sharing in Firefox ([#135]).
+
+[#135]: /../../pull/135
+[#138]: /../../pull/138
+
+
+
+
+## [0.4.0] · 2023-07-11
+[0.4.0]: /../../tree/medea-jason-0.4.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.3.0...medea-jason-0.4.0)
+
+### BC Breaks
+
+- Minimal supported version of `medea-client-api-proto` is `0.5.0` ([#119]).
+
+### Fixed
+
+- Initial mute state on incoming tracks in [SFU] mode ([#119]).
+- Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
+
+[#119]: /../../pull/119
+
+
+
+
 ## [0.3.0] · 2023-06-09
 [0.3.0]: /../../tree/medea-jason-0.3.0
 
@@ -298,3 +337,4 @@ All user visible changes to this project will be documented in this file. This p
 
 
 [Semantic Versioning 2.0.0]: https://semver.org
+[SFU]: https://webrtcglossary.com/sfu

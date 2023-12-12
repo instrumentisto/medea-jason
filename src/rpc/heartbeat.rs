@@ -64,6 +64,8 @@ impl Inner {
     /// Sends [`ClientMsg::Pong`] to a server.
     ///
     /// If some error happen then it will be printed with [`log::error`].
+    // TODO: False positive, try remove on Rust 1.74 upgrade.
+    #[allow(unused_must_use)]
     fn send_pong(&self, n: u32) {
         self.transport
             .send(&ClientMsg::Pong(n))
