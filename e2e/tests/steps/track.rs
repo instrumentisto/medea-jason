@@ -153,6 +153,7 @@ async fn then_remote_media_track(
         .unwrap();
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
 
+    sleep(Duration::from_millis(500)).await;
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
     let track = tracks_with_partner
         .get_track(media_kind, source_kind)
