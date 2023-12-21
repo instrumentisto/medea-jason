@@ -6,7 +6,6 @@ use crate::media::{
     DisplayVideoTrackConstraints,
 };
 use derive_more::{AsRef, Into};
-use wasm_bindgen::JsValue;
 use web_sys::{
     ConstrainDomStringParameters, ConstrainDoubleRange, MediaTrackConstraints,
 };
@@ -70,12 +69,12 @@ impl From<DeviceVideoTrackConstraints> for MediaTrackConstraints {
             _ = constraints
                 .facing_mode(&ConstrainDomStringParameters::from(&facing_mode));
         }
-        // if let Some(width) = track_constraints.width {
-        _ = constraints.width(&JsValue::from_f64(1280f64));
-        // }
-        // if let Some(height) = track_constraints.height {
-        _ = constraints.height(&JsValue::from_f64(720f64));
-        // }
+        if let Some(width) = track_constraints.width {
+            _ = constraints.width(&ConstrainDoubleRange::from(width));
+        }
+        if let Some(height) = track_constraints.height {
+            _ = constraints.height(&ConstrainDoubleRange::from(height));
+        }
 
         constraints
     }
