@@ -308,11 +308,14 @@ class Member {
     if (connectionStore.remoteTracks[id]!.values.any((element) =>
         sourceCheck(element.last.mediaSourceKind(), source) &&
         kindCheck(element.last.kind(), kind))) {
-      return connectionStore.remoteTracks[id]!.values
-          .lastWhere((element) =>
-              sourceCheck(element.last.mediaSourceKind(), source) &&
-              kindCheck(element.last.kind(), kind))
-          .last;
+      return connectionStore.remoteTracks[id]!.values.lastWhere((element) {
+        var stopped = connectionStore
+                .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+            0;
+        return sourceCheck(element.last.mediaSourceKind(), source) &&
+            kindCheck(element.last.kind(), kind) &&
+            !stopped;
+      }).last;
     } else {
       var trackCompl = Completer<RemoteMediaTrack>();
       connectionStore.onRemoteTrack[id] = (track) {

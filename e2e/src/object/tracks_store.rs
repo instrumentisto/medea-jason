@@ -171,7 +171,7 @@ impl<T> Object<TracksStore<T>> {
             // language=JavaScript
             "
             async (meta) => {
-                for (track of meta.store.tracks) {
+                for (track of meta.store.tracks.reverse()) {
                     let kind = track.track.kind();
                     let sourceKind = track.track.media_source_kind();
                     if (kind === meta.kind

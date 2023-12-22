@@ -57,34 +57,49 @@ enum MediaStateTransitionExceptionKind {
 }
 
 /// Exception thrown when cannot get info of available media devices.
-abstract class EnumerateDevicesException {
+abstract class EnumerateDevicesException implements Exception {
   /// Returns error that caused this [EnumerateDevicesException].
   dynamic cause();
 
   /// Returns stacktrace of this [EnumerateDevicesException].
   String trace();
+
+  @override
+  String toString() {
+    return 'EnumerateDevicesException: ${cause()}\n${trace()}';
+  }
 }
 
 /// Exception thrown when cannot switch output audio device ID.
-abstract class InvalidOutputAudioDeviceIdException {
+abstract class InvalidOutputAudioDeviceIdException implements Exception {
   /// Returns stacktrace of this [InvalidOutputAudioDeviceIdException].
   String trace();
+
+  @override
+  String toString() {
+    return 'InvalidOutputAudioDeviceIdException:\n${trace()}';
+  }
 }
 
 /// Exception thrown when cannot interact with microphone volume.
-abstract class MicVolumeException {
+abstract class MicVolumeException implements Exception {
   /// Returns error that caused this [MicVolumeException].
   dynamic cause();
 
   /// Returns stacktrace of this [MicVolumeException].
   String trace();
+
+  @override
+  String toString() {
+    return 'MicVolumeException: ${cause()}\n${trace()}';
+  }
 }
 
 /// Jason's internal exception.
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-abstract class InternalException {
+abstract class InternalException implements Exception {
   /// Returns error message describing the problem.
   String message();
 
@@ -96,12 +111,12 @@ abstract class InternalException {
 
   @override
   String toString() {
-    return message();
+    return 'InternalException: ${message()}, ${cause()}\n${trace()}';
   }
 }
 
 /// Exception thrown when accessing media devices.
-abstract class LocalMediaInitException {
+abstract class LocalMediaInitException implements Exception {
   /// Returns concrete error kind of this [LocalMediaInitException].
   LocalMediaInitExceptionKind kind();
 
@@ -116,12 +131,13 @@ abstract class LocalMediaInitException {
 
   @override
   String toString() {
-    return message();
+    return 'LocalMediaInitException: ${kind().name}, ${message()}, ${cause()}'
+        '\n${trace()}';
   }
 }
 
 /// Errors occurring in `RoomHandle.set_local_media_settings` method.
-abstract class MediaSettingsUpdateException {
+abstract class MediaSettingsUpdateException implements Exception {
   /// Returns error message describing the problem.
   String message();
 
@@ -135,13 +151,13 @@ abstract class MediaSettingsUpdateException {
 
   @override
   String toString() {
-    return message();
+    return 'MediaSettingsUpdateException: ${message()}, ${cause()}';
   }
 }
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-abstract class MediaStateTransitionException {
+abstract class MediaStateTransitionException implements Exception {
   /// Returns error message describing the problem.
   String message();
 
@@ -153,13 +169,14 @@ abstract class MediaStateTransitionException {
 
   @override
   String toString() {
-    return message();
+    return 'MediaStateTransitionException: ${kind().name}, ${message()}'
+        '\n${trace()}';
   }
 }
 
 /// Exceptions thrown from an RPC client that implements messaging with media
 /// server.
-abstract class RpcClientException {
+abstract class RpcClientException implements Exception {
   /// Returns concrete error kind of this [RpcClientException].
   RpcClientExceptionKind kind();
 
@@ -174,6 +191,7 @@ abstract class RpcClientException {
 
   @override
   String toString() {
-    return message();
+    return 'RpcClientException: ${kind().name}, ${message()}, ${cause()}'
+        '\n${trace()}';
   }
 }
