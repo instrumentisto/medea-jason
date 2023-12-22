@@ -23,12 +23,16 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Changes the receive direction of the provided [RtpTransceiver].
 Object _setRecv(RtpTransceiver transceiver, bool active) {
-  return () => transceiver.setRecv(active);
+  return () => transceiver.setRecv(active).catchError((e) {
+        print(e);
+      });
 }
 
 /// Changes the send direction of the provided [RtpTransceiver].
 Object _setSend(RtpTransceiver transceiver, bool active) {
-  return () => transceiver.setSend(active);
+  return () => transceiver.setSend(active).catchError((e) {
+        print(e);
+      });
 }
 
 /// Returns the current [TransceiverDirection] of the provided [RtpTransceiver].
