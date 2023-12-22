@@ -598,10 +598,9 @@ class Member {
       room.onFailedLocalMedia((err) {
         ++failedLocalStreamCount;
         if (failedLocalStreamCount == times) {
-          failedLocalStreamFuture.complete();
-          room.onFailedLocalMedia((p0) {
-            ++failedLocalStreamCount;
-          });
+          if (!failedLocalStreamFuture.isCompleted) {
+            failedLocalStreamFuture.complete();
+          }
         }
       });
       return failedLocalStreamFuture.future;
