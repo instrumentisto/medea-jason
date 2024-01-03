@@ -73,6 +73,7 @@
     clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::read_zero_byte_vec,
     clippy::readonly_write_lock,
     clippy::redundant_clone,
     clippy::redundant_type_annotations,
@@ -131,9 +132,6 @@
     unused_tuple_struct_fields,
     variant_size_differences
 )]
-// TODO: Massive false positives on `.await` points. Try remove on next Rust
-//       version.
-#![allow(clippy::multiple_unsafe_ops_per_block)]
 
 pub mod collections;
 pub mod field;

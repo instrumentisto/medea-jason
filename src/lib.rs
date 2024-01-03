@@ -72,6 +72,7 @@
     clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::read_zero_byte_vec,
     clippy::readonly_write_lock,
     clippy::redundant_clone,
     clippy::redundant_type_annotations,
@@ -140,9 +141,6 @@
 )]
 // TODO: Remove on next `derive_more` major version.
 #![allow(clippy::uninlined_format_args, clippy::use_debug)]
-// TODO: Massive false positives on `.await` points. Try remove on next Rust
-//       version.
-#![allow(clippy::multiple_unsafe_ops_per_block)]
 
 #[macro_use]
 pub mod utils;
