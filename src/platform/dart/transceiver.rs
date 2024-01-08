@@ -87,7 +87,7 @@ impl Transceiver {
             //       investigation.
             let res = unsafe { FutureFromDart::execute::<()>(fut) }.await;
             if let Err(e) = res {
-                log::error!("Error in Transceiver::set_recv: ${e}");
+                log::error!("Error in `Transceiver::set_recv`: {e}");
             }
         })
     }
@@ -103,7 +103,7 @@ impl Transceiver {
             //       investigation.
             let res = unsafe { FutureFromDart::execute::<()>(fut) }.await;
             if let Err(e) = res {
-                log::error!("Error in Transceiver::set_send: ${e}");
+                log::error!("Error in `Transceiver::set_send`: {e}");
             }
         })
     }
