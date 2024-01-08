@@ -82,7 +82,13 @@ impl Transceiver {
         let handle = self.0.get();
         Box::pin(async move {
             let fut = unsafe { transceiver::set_recv(handle, active) };
-            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
+
+            // TODO: Not supposed to error, but seems to. Log for further
+            //       investigation.
+            let res = unsafe { FutureFromDart::execute::<()>(fut) }.await;
+            if let Err(e) = res {
+                log::error!("Error in `Transceiver::set_recv`: {e}");
+            }
         })
     }
 
@@ -92,7 +98,13 @@ impl Transceiver {
         let handle = self.0.get();
         Box::pin(async move {
             let fut = unsafe { transceiver::set_send(handle, active) };
-            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
+
+            // TODO: Not supposed to error, but seems to. Log for further
+            //       investigation.
+            let res = unsafe { FutureFromDart::execute::<()>(fut) }.await;
+            if let Err(e) = res {
+                log::error!("Error in `Transceiver::set_send`: {e}");
+            }
         })
     }
 

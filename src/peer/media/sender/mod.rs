@@ -169,11 +169,9 @@ impl Sender {
             track: RefCell::new(None),
         });
 
-        if !enabled_in_cons {
-            state.media_exchange_state_controller().transition_to(
-                media_exchange_state::Stable::from(enabled_in_cons),
-            );
-        }
+        state
+            .media_exchange_state_controller()
+            .transition_to(media_exchange_state::Stable::from(enabled_in_cons));
         if muted_in_cons {
             state
                 .mute_state_controller()
