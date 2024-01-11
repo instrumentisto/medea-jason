@@ -211,17 +211,17 @@ class Member {
         });
 
         remoteTrack.onMediaDirectionChanged((direction) {
-          if (direction != TrackMediaDirection.sendRecv) {
+          if (direction == TrackMediaDirection.sendRecv) {
+            connectionStore.callbackCounter[remoteTrackId]!
+                .update('enabled', (value) => value += 1);
+            connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
+                connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
+          } else {
             connectionStore.callbackCounter[remoteTrackId]!
                 .update('disabled', (value) => value += 1);
 
             connectionStore.onCallbackCounter[remoteTrackId]!['disabled']!(
                 connectionStore.callbackCounter[remoteTrackId]!['disabled']!);
-          } else {
-            connectionStore.callbackCounter[remoteTrackId]!
-                .update('enabled', (value) => value += 1);
-            connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
-                connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
           }
           var keys = connectionStore.onMediaDirectionChanged.keys;
           for (var i = 0;
