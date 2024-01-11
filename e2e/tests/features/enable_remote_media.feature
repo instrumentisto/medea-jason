@@ -12,6 +12,7 @@ Feature: Enable remote media
     When Alice enables remote audio
     Then `on_enabled` callback fires 1 time on Alice's remote audio track from Bob
 
+  @mesh
   Scenario: `RemoteMediaTrack.on_enabled()` doesn't fire when track is created
     Given room with joined member Alice
     And member Bob
@@ -21,16 +22,36 @@ Feature: Enable remote media
     And `on_enabled` callback fires 0 times on Alice's remote device video track from Bob
     And `on_enabled` callback fires 0 times on Bob's remote device video track from Alice
 
-  Scenario: Remote member enables video
+  Scenario Outline: Remote member enables video
     Given room with joined member Alice
     And joined member Bob
     When Bob disables video and awaits it completes
     And Bob enables video and awaits it completes
-    Then `on_enabled` callback fires 1 time on Alice's remote device video track from Bob
+    Then `on_enabled` callback fires <times> time on Alice's remote device video track from Bob
 
-  Scenario: Remote member enables audio
+    @mesh
+    Examples:
+      | times |
+      | 1     |
+
+    @sfu
+    Examples:
+      | times |
+      | 2     |
+
+  Scenario Outline: Remote member enables audio
     Given room with joined member Alice
     And joined member Bob
     When Bob disables audio and awaits it completes
     And Bob enables audio and awaits it completes
-    Then `on_enabled` callback fires 1 time on Alice's remote audio track from Bob
+    Then `on_enabled` callback fires <times> time on Alice's remote audio track from Bob
+
+    @mesh
+    Examples:
+      | times |
+      | 1     |
+
+    @sfu
+    Examples:
+      | times |
+      | 2     |
