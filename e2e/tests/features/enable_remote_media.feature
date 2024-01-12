@@ -22,6 +22,7 @@ Feature: Enable remote media
     And `on_enabled` callback fires 0 times on Alice's remote device video track from Bob
     And `on_enabled` callback fires 0 times on Bob's remote device video track from Alice
 
+  @mesh
   Scenario: Remote member enables video
     Given room with joined member Alice
     And joined member Bob
@@ -29,7 +30,7 @@ Feature: Enable remote media
     And Bob enables video and awaits it completes
     Then `on_enabled` callback fires 1 times on Alice's remote device video track from Bob
 
-
+  @mesh
   Scenario: Remote member enables audio
     Given room with joined member Alice
     And joined member Bob
