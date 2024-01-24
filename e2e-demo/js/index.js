@@ -676,11 +676,7 @@ window.onload = async function() {
           }
         }
       } else {
-        var caps = new rust.DeviceVideoTrackConstraints();
-        caps.ideal_width(1920);
-        caps.ideal_height(1080);
-
-        constraints.device_video(caps);
+        constraints.device_video(new rust.DeviceVideoTrackConstraints());
       }
     }
 
