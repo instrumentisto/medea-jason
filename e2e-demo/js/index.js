@@ -54,6 +54,7 @@ let [listenerWrapper, deleteTrack] = (() => {
           const settings = track.inner.getSettings();
           mediaElement.dataset.width = settings.width;
           mediaElement.dataset.height = settings.height;
+          mediaElement.dataset.framerate = settings.frameRate.toFixed(2);;
         });
     });
   }, 1000);
@@ -79,7 +80,7 @@ RTCPeerConnection.prototype.addEventListener = function (type, listener, others)
   EventTarget.prototype.addEventListener.call(
     this,
     type,
-    type == 'track' 
+    type == 'track'
       ? evt => listenerWrapper(evt, listener)
       : listener,
     others
@@ -132,7 +133,7 @@ async function createRoom(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -189,7 +190,7 @@ async function createMember(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -484,7 +485,7 @@ async function startPublishing() {
 
   let publishEndpoint = {
     kind: 'WebRtcPublishEndpoint',
-    p2p: 'Always',
+    p2p: 'Never',
   };
   let isSuccess = await controlApi.createEndpoint(roomId, memberId, 'publish', publishEndpoint);
   if (!isSuccess) {
@@ -675,7 +676,11 @@ window.onload = async function() {
           }
         }
       } else {
-        constraints.device_video(new rust.DeviceVideoTrackConstraints());
+        var caps = new rust.DeviceVideoTrackConstraints();
+        caps.ideal_width(1920);
+        caps.ideal_height(1080);
+
+        constraints.device_video(caps);
       }
     }
 
@@ -803,6 +808,7 @@ window.onload = async function() {
               playElement.dataset.bitrate = 0;
               playElement.dataset.width = 0;
               playElement.dataset.height = 0;
+              playElement.dataset.framerate = 0;
               if (track.media_direction() != 0) {
                 playElement.firstChild.pause();
                 playElement.style.display = 'none';
