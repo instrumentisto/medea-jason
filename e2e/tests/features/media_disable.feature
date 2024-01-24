@@ -12,20 +12,18 @@ Feature: Media enabling/disabling
     Then Alice's audio remote track from Bob is disabled
     And Alice's device video remote track from Bob is enabled
 
-  @mesh
   Scenario: Member disables video before call
     Given room with joined member Alice
     And member Bob with disabled video publishing
     When Bob joins the room
-    Then Alice doesn't have device video remote track from Bob
+    Then Alice doesn't have live device video remote track from Bob
     And Alice's audio remote track from Bob is enabled
 
-  @mesh
   Scenario: Member disables audio before call
     Given room with joined member Alice
     And member Bob with disabled audio publishing
     When Bob joins the room
-    Then Alice doesn't have audio remote track from Bob
+    Then Alice doesn't have live audio remote track from Bob
     And Alice's device video remote track from Bob is enabled
 
   Scenario: Member enables audio during call

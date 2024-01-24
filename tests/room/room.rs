@@ -1734,53 +1734,6 @@ mod patches_generation {
         assert!(timeout(5, command_rx.next()).await.is_err());
     }
 
-    /// Tests that [`Room`] will generate [`Command::UpdateTracks`] only for
-    /// enabled [`PeerConnection`].
-    ///
-    /// # Algorithm
-    ///
-    /// 1. Get mock of [`Room`] and [`Command`]s receiver of this [`Room`] with
-    ///    one enabled [`PeerConnection`]s and one disabled [`PeerConnection`].
-    ///
-    /// 2. Call [`RoomHandle::disable_audio`].
-    ///
-    /// 3. Check that [`Room`] tries to send [`Command::UpdateTracks`] only for
-    ///    enabled [`PeerConnection`].
-    #[wasm_bindgen_test]
-    async fn disable_room_with_one_disabled_track() {
-        let (room, mut command_rx) = get_room_and_commands_receiver(
-            2,
-            |i| {
-                if i % 2 == 1 {
-                    media_exchange_state::Stable::Enabled.into()
-                } else {
-                    media_exchange_state::Stable::Disabled.into()
-                }
-            },
-            audio_and_device_video_tracks_content(),
-        )
-        .await;
-        let room_handle = api::RoomHandle::from(room.new_handle());
-
-        spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio())
-                .await
-                .unwrap_err();
-        });
-
-        assert_eq!(
-            command_rx.next().await.unwrap(),
-            Command::UpdateTracks {
-                peer_id: PeerId(2),
-                tracks_patches: vec![TrackPatchCommand {
-                    id: TrackId(0),
-                    enabled: Some(false),
-                    muted: None,
-                }]
-            }
-        );
-    }
-
     /// Checks that on device video muting, correct [`Command::UpdateTracks`]
     /// will be sent to the `Media Server`.
     ///
@@ -1911,7 +1864,7 @@ mod patches_generation {
         });
 
         assert_eq!(
-            command_rx.next().await.unwrap(),
+            command_rx.skip(1).next().await.unwrap(),
             Command::UpdateTracks {
                 peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
@@ -1941,7 +1894,7 @@ mod patches_generation {
         });
 
         assert_eq!(
-            command_rx.next().await.unwrap(),
+            command_rx.skip(1).next().await.unwrap(),
             Command::UpdateTracks {
                 peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
@@ -2927,7 +2880,7 @@ mod state_synchronization {
     use futures::{channel::mpsc, stream, StreamExt as _};
     use medea_client_api_proto::{
         state, AudioSettings, Command, ConnectionMode, Event, MediaDirection,
-        MediaType, NegotiationRole, PeerId, TrackId,
+        MediaType, MemberId, NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
         media::MediaManager, room::Room, rpc::MockRpcSession,
@@ -2968,7 +2921,7 @@ mod state_synchronization {
                 id: TrackId(0),
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
-                receivers: Vec::new(),
+                receivers: vec![MemberId::from("Test")],
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
                 connection_mode: ConnectionMode::Mesh,

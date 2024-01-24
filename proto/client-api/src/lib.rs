@@ -39,6 +39,7 @@
     clippy::format_push_string,
     clippy::get_unwrap,
     clippy::if_then_some_else_none,
+    clippy::implied_bounds_in_impls,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
     clippy::iter_on_empty_collections,
@@ -52,6 +53,7 @@
     clippy::map_err_ignore,
     clippy::mem_forget,
     clippy::missing_assert_message,
+    clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
@@ -72,6 +74,7 @@
     clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::read_zero_byte_vec,
     clippy::readonly_write_lock,
     clippy::redundant_clone,
     clippy::redundant_type_annotations,
@@ -130,9 +133,6 @@
     unused_tuple_struct_fields,
     variant_size_differences
 )]
-// TODO: Massive false positives on `.await` points. Try remove on next Rust
-//       version.
-#![allow(clippy::multiple_unsafe_ops_per_block)]
 
 pub mod state;
 pub mod stats;

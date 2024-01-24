@@ -7,6 +7,7 @@ import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/interface/enums.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../api/callback.dart';
 import '../api/endpoint.dart';
@@ -251,6 +252,48 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
       await otherMember.waitForConnect(member.id);
       await otherMember.waitForTrackCount(member.id, sendCount);
+
+      if (isSfu) {
+        if (!otherMember.enabledAudio) {
+          for (var track in member
+              .connectionStore.remoteTracks[element.key]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.audio)) {
+            await member.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+
+        if (!otherMember.enabledVideo) {
+          for (var track in member
+              .connectionStore.remoteTracks[element.key]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.video)) {
+            await member.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+        if (!member.enabledAudio) {
+          for (var track in otherMember
+              .connectionStore.remoteTracks[memberId]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.audio)) {
+            await otherMember.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+
+        if (!member.enabledVideo) {
+          for (var track in otherMember
+              .connectionStore.remoteTracks[memberId]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.video)) {
+            await otherMember.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+      }
+
       await Future.delayed(const Duration(milliseconds: 500));
     }
   }
@@ -422,7 +465,11 @@ class PairedMember {
   WebRtcPublishEndpoint? publishEndpoint() {
     WebRtcPublishEndpoint? res;
     if (isSend()) {
-      res = WebRtcPublishEndpoint('publish', P2pMode.Always);
+      var mode = P2pMode.Always;
+      if (isSfu) {
+        mode = P2pMode.Never;
+      }
+      res = WebRtcPublishEndpoint('publish', mode);
       if (sendAudio == null) {
         res.audio_settings = AudioSettings(PublishPolicy.Disabled);
       } else {

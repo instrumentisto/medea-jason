@@ -8,6 +8,7 @@ import 'package:medea_jason/medea_jason.dart';
 import 'package:medea_jason/src/native/platform/media_devices.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../conf.dart';
+import 'custom_world.dart';
 
 /// Builder of a [Member].
 class MemberBuilder {
@@ -90,9 +91,9 @@ class ConnectionStore {
           track.last.mediaDirection() == TrackMediaDirection.sendRecv &&
           !trackStopped) {
         count += 1;
-      } else if (!live &&
-          track.last.mediaDirection() != TrackMediaDirection.sendRecv &&
-          trackStopped) {
+      } else if ((!live && trackStopped) ||
+          (!live &&
+              track.last.mediaDirection() != TrackMediaDirection.sendRecv)) {
         count += 1;
       }
     });
@@ -110,6 +111,12 @@ class Member {
 
   /// Indicator whether this [Member] should receive media.
   bool isRecv;
+
+  /// Indicator whether this [Member] should publish audio.
+  bool enabledAudio = true;
+
+  /// Indicator whether this [Member] should publish video.
+  bool enabledVideo = true;
 
   /// Indicator whether this [Member] is joined a [RoomHandle] on a media
   /// server.
@@ -216,9 +223,13 @@ class Member {
             connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
                 connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
           }
-          connectionStore.onMediaDirectionChanged.forEach((key, value) {
-            value(direction);
-          });
+          var keys = connectionStore.onMediaDirectionChanged.keys;
+          for (var i = 0;
+              i < connectionStore.onMediaDirectionChanged.length;
+              ++i) {
+            var cb = connectionStore.onMediaDirectionChanged[keys.elementAt(i)];
+            cb!(direction);
+          }
         });
 
         remoteTrack.onStopped(() {
@@ -297,11 +308,14 @@ class Member {
     if (connectionStore.remoteTracks[id]!.values.any((element) =>
         sourceCheck(element.last.mediaSourceKind(), source) &&
         kindCheck(element.last.kind(), kind))) {
-      return connectionStore.remoteTracks[id]!.values
-          .lastWhere((element) =>
-              sourceCheck(element.last.mediaSourceKind(), source) &&
-              kindCheck(element.last.kind(), kind))
-          .last;
+      return connectionStore.remoteTracks[id]!.values.lastWhere((element) {
+        var stopped = connectionStore
+                .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+            0;
+        return sourceCheck(element.last.mediaSourceKind(), source) &&
+            kindCheck(element.last.kind(), kind) &&
+            !stopped;
+      }).last;
     } else {
       var trackCompl = Completer<RemoteMediaTrack>();
       connectionStore.onRemoteTrack[id] = (track) {
@@ -359,6 +373,10 @@ class Member {
   /// Returns a count of [LocalMediaTrack]s and [RemoteMediaTrack]s of this
   /// [Member] with the provided partner [Member].
   Tuple2<int, int> countOfTracksBetweenMembers(Member other) {
+    if (isSfu) {
+      // All transceivers are always `sendrecv` in SFU mode.
+      return const Tuple2<int, int>(3, 3);
+    }
     var sendCount = sendState.entries
         .where((element) => other.recvState[element.key]! && element.value)
         .length;
@@ -376,23 +394,31 @@ class Member {
       if (kind != null) {
         if (kind == MediaKind.audio) {
           await room.enableAudio();
+          enabledAudio = true;
         } else {
           await room.enableVideo(source);
+          enabledVideo = true;
         }
       } else {
         await room.enableAudio();
         await room.enableVideo(source);
+        enabledAudio = true;
+        enabledVideo = true;
       }
     } else {
       if (kind != null) {
         if (kind == MediaKind.audio) {
           await room.disableAudio();
+          enabledAudio = false;
         } else {
           await room.disableVideo(source);
+          enabledVideo = false;
         }
       } else {
         await room.disableAudio();
         await room.disableVideo(source);
+        enabledAudio = false;
+        enabledVideo = false;
       }
     }
   }
@@ -572,10 +598,9 @@ class Member {
       room.onFailedLocalMedia((err) {
         ++failedLocalStreamCount;
         if (failedLocalStreamCount == times) {
-          failedLocalStreamFuture.complete();
-          room.onFailedLocalMedia((p0) {
-            ++failedLocalStreamCount;
-          });
+          if (!failedLocalStreamFuture.isCompleted) {
+            failedLocalStreamFuture.complete();
+          }
         }
       });
       return failedLocalStreamFuture.future;

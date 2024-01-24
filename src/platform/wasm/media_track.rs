@@ -116,12 +116,11 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     #[must_use]
-    pub fn device_id(&self) -> String {
+    pub fn device_id(&self) -> Option<String> {
         #[allow(clippy::unwrap_used)]
         get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
             v.as_string()
         })
-        .unwrap()
     }
 
     /// Return a [`facingMode`][1] of the underlying [MediaStreamTrack][2].

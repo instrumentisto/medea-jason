@@ -1,6 +1,7 @@
 //! External API errors.
 
-#![allow(clippy::multiple_inherent_impl)] // for `wasm_bindgen`
+// For `wasm_bindgen`.
+#![allow(clippy::mem_forget, clippy::multiple_inherent_impl)]
 
 use std::borrow::Cow;
 

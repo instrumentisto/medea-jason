@@ -1018,10 +1018,7 @@ impl AudioTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Audio).await
-            && ConstrainString::satisfies(
-                &self.device_id,
-                &Some(track.device_id()),
-            )
+            && ConstrainString::satisfies(&self.device_id, &track.device_id())
         // TODO returns Result<bool, Error>
     }
 
@@ -1237,10 +1234,7 @@ impl DeviceVideoTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video).await
-            && ConstrainString::satisfies(
-                &self.device_id,
-                &Some(track.device_id()),
-            )
+            && ConstrainString::satisfies(&self.device_id, &track.device_id())
             && ConstrainString::satisfies(
                 &self.facing_mode,
                 &track.facing_mode(),
@@ -1328,10 +1322,7 @@ impl DisplayVideoTrackConstraints {
     ) -> bool {
         let track = track.as_ref();
         satisfies_track(track, MediaKind::Video).await
-            && ConstrainString::satisfies(
-                &self.device_id,
-                &Some(track.device_id()),
-            )
+            && ConstrainString::satisfies(&self.device_id, &track.device_id())
             && ConstrainU32::satisfies(self.height, track.height())
             && ConstrainU32::satisfies(self.width, track.width())
             && track.guess_is_from_display()

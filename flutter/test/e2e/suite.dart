@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_gherkin/flutter_gherkin_with_driver.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,6 +37,47 @@ Future<void> clearWorld() async {
   }
 }
 
+/// [Hook] calling `exit(1)` if any tests in the run have failed, to make sure
+/// that test run process exits with an error code.
+class ExitOnFailureHook implements Hook {
+  bool fail = false;
+
+  @override
+  Future<void> onAfterRun(TestConfiguration config) async {
+    if (fail) {
+      exit(1);
+    }
+  }
+
+  @override
+  Future<void> onAfterScenario(
+      TestConfiguration config, String scenario, Iterable<Tag> tags,
+      {bool passed = true}) async {
+    fail = fail || !passed;
+  }
+
+  @override
+  Future<void> onAfterScenarioWorldCreated(
+      World world, String scenario, Iterable<Tag> tags) async {}
+
+  @override
+  Future<void> onAfterStep(
+      World world, String step, StepResult stepResult) async {}
+
+  @override
+  Future<void> onBeforeRun(TestConfiguration config) async {}
+
+  @override
+  Future<void> onBeforeScenario(
+      TestConfiguration config, String scenario, Iterable<Tag> tags) async {}
+
+  @override
+  Future<void> onBeforeStep(World world, String step) async {}
+
+  @override
+  int get priority => 999;
+}
+
 final testConfigs = FlutterTestConfiguration(
     stepDefinitions: control_api.steps() +
         connection.steps() +
@@ -55,6 +98,9 @@ final testConfigs = FlutterTestConfiguration(
         }),
     defaultTimeout: const Duration(seconds: 30),
     tagExpression: 'not @${isSfu ? 'mesh' : 'sfu'}',
+    hooks: [
+      ExitOnFailureHook()
+    ],
     reporters: [
       StdoutReporter(MessageLevel.verbose)
         ..setWriteLineFn(print)

@@ -218,6 +218,10 @@ pub trait IntoResult {
     type Error: Display;
 
     /// Coerces into the [`Result`].
+    ///
+    /// # Errors
+    ///
+    /// If coerces into a [`Result::Err`].
     fn into_result(self) -> Result<(), Self::Error>;
 }
 

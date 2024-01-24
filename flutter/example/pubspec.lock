@@ -21,10 +21,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: "49b1fad315e57ab0bbc15bcbb874e83116a1d78f77ebd500a4af6c9407d6b28e"
+      sha256: "7b875fd4a20b165a3084bd2d210439b22ebc653f21cea4842729c0c30c82596b"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.8"
+    version: "3.4.9"
   args:
     dependency: transitive
     description:
@@ -101,10 +101,14 @@ packages:
     dependency: transitive
     description:
       name: collection
-      sha256: f092b211a4319e98e5ff58223576de6c2803db36221657b46c82574721240687
+      sha256: ee67cb0715911d28db6bf4af1026078bd6f0128b07a5f66fb2ed94ec6783c09a
       url: "https://pub.dev"
     source: hosted
+<<<<<<< HEAD
     version: "1.17.2"
+=======
+    version: "1.18.0"
+>>>>>>> master
   convert:
     dependency: transitive
     description:
@@ -133,10 +137,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "1efa911ca7086affd35f463ca2fc1799584fb6aa89883cf0af8e3664d6a02d55"
+      sha256: "40ae61a5d43feea6d24bd22c0537a6629db858963b99b4bc1c3db80676f32368"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.3.4"
   fake_async:
     dependency: transitive
     description:
@@ -149,10 +153,10 @@ packages:
     dependency: "direct main"
     description:
       name: faker_dart
-      sha256: dfa2a28dddbacf6ed96bdfba013ac24c5ce85073831fdc8f0b6ae7ae15cb09bc
+      sha256: aaf3756cb19947340af10602be86a607dd6d2acf007ea351cdea36a5533c77f7
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.11"
+    version: "0.2.1"
   ffi:
     dependency: transitive
     description:
@@ -199,10 +203,17 @@ packages:
     dependency: transitive
     description:
       name: flutter_rust_bridge
+<<<<<<< HEAD
       sha256: a2ff791f96ed03be0d4a8d249130688371ab3612ef95efeddef23600b904a1ef
       url: "https://pub.dev"
     source: hosted
     version: "1.81.0"
+=======
+      sha256: "7c5e94d037ccb0de7b5f7de3ff2491548d292b5aad01b01f5a5703f8aac9389b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.82.4"
+>>>>>>> master
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -317,25 +328,33 @@ packages:
   medea_flutter_webrtc:
     dependency: "direct main"
     description:
+<<<<<<< HEAD
       path: "../../../flutter-webrtc"
       relative: true
     source: path
     version: "0.8.3-dev"
+=======
+      name: medea_flutter_webrtc
+      sha256: "9e26a55a4b432b8f1badcf6b43782f18654bc2a169e4526ef0bf4dc614f89568"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.0"
+>>>>>>> master
   medea_jason:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.4.1-dev"
   meta:
     dependency: transitive
     description:
       name: meta
-      sha256: "3c74dbf8763d36539f114c799d8a2d87343b5067e9d796ca22b5eb8437090ee3"
+      sha256: a6e590c838b18133bb482a2745ad77c5bb7715fb0451209e1a7567d416678b8e
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.1"
+    version: "1.10.0"
   mime:
     dependency: transitive
     description:
@@ -364,18 +383,25 @@ packages:
     dependency: transitive
     description:
       name: petitparser
+<<<<<<< HEAD
       sha256: eeb2d1428ee7f4170e2bd498827296a18d4e7fc462b71727d111c0ac7707cfa6
       url: "https://pub.dev"
     source: hosted
     version: "6.0.1"
+=======
+      sha256: c15605cd28af66339f8eb6fbe0e541bfe2d1b72d5825efc6598f3e0a31b9ad27
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
+>>>>>>> master
   platform:
     dependency: transitive
     description:
       name: platform
-      sha256: "4a451831508d7d6ca779f7ac6e212b4023dd5a7d08a27a63da33756410e32b76"
+      sha256: ae68c7bfcd7383af3629daafb32fb4e8681c7154428da4febcff06200585f102
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.2"
   pointycastle:
     dependency: transitive
     description:
@@ -420,10 +446,17 @@ packages:
     dependency: transitive
     description:
       name: puppeteer
+<<<<<<< HEAD
       sha256: efdcbee22832534733ae073f1d13a876ec2a82fadbc42a692beff9673d63f78f
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
+=======
+      sha256: eedeaae6ec5d2e54f9ae22ab4d6b3dda2e8791c356cc783046d06c287ffe11d8
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.0"
+>>>>>>> master
   retry:
     dependency: "direct main"
     description:
@@ -489,18 +522,18 @@ packages:
     dependency: transitive
     description:
       name: stack_trace
-      sha256: c3c7d8edb15bee7f0f74debd4b9c5f3c2ea86766fe4178eb2a18eb30a0bdaed5
+      sha256: "73713990125a6d93122541237550ee3352a2d84baad52d375a4cad2eb9b7ce0b"
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   stream_channel:
     dependency: transitive
     description:
       name: stream_channel
-      sha256: "83615bee9045c1d322bbbd1ba209b7a749c2cbcdcb3fdd1df8eb488b3279c1c8"
+      sha256: ba2aa5d8cc609d96bbb2899c28934f9e1af5cddbd60a827822ea467161eb54e7
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   string_scanner:
     dependency: transitive
     description:
@@ -529,10 +562,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "75760ffd7786fffdfb9597c35c5b27eaeec82be8edfb6d71d32651128ed7aab8"
+      sha256: "5c2f730018264d276c20e4f1503fd1308dfbbae39ec8ee63c5236311ac06954b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "0.6.1"
   tuple:
     dependency: transitive
     description:
@@ -550,7 +583,7 @@ packages:
     source: hosted
     version: "1.3.2"
   uuid:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: uuid
       sha256: "648e103079f7c64a36dc7d39369cabb358d377078a051d6ae2ad3aa539519313"
@@ -569,10 +602,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: c620a6f783fa22436da68e42db7ebbf18b8c44b9a46ab911f666ff09ffd9153f
+      sha256: c538be99af830f478718b51630ec1b6bee5e74e52c8a802d328d9e71d35d2583
       url: "https://pub.dev"
     source: hosted
-    version: "11.7.1"
+    version: "11.10.0"
   watcher:
     dependency: transitive
     description:
@@ -585,10 +618,10 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: dc8ccd225a2005c1be616fe02951e2e342092edf968cf0844220383757ef8f10
+      sha256: afe077240a270dcfd2aafe77602b4113645af95d0ad31128cc02bce5ac5d5152
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.4-beta"
+    version: "0.3.0"
   web_socket_channel:
     dependency: transitive
     description:
@@ -614,5 +647,9 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
+<<<<<<< HEAD
   dart: ">=3.1.0 <4.0.0"
+=======
+  dart: ">=3.2.0 <4.0.0"
+>>>>>>> master
   flutter: ">=3.10.0"

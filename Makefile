@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.73
-CHROME_VERSION := 117.0
-FIREFOX_VERSION := 118.0.1-driver0.33.0
+RUST_VER := 1.75
+CHROME_VERSION := 120.0
+FIREFOX_VERSION := 121.0-driver0.33.0
 
-CARGO_NDK_VER := 3.4.0-ndkr26-rust$(RUST_VER)
+CARGO_NDK_VER := 3.4.0-ndkr26b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -437,9 +437,10 @@ endif
 		--rust-input src/api/dart/api.rs \
 		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
 		--rust-output src/api/dart/api_bridge_generated.rs \
-		--skip-add-mod-to-lib \
+		--dart-enums-style \
+		--inline-rust \
 		--no-build-runner \
-		--dart-format-line-length=80
+		--skip-add-mod-to-lib
 	cd flutter && \
 	dart pub run build_runner build --delete-conflicting-outputs
 
