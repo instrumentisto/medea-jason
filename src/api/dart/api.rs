@@ -312,9 +312,8 @@ pub fn connection_handle_on_close(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
 ) -> Result<SyncReturn<()>, DartOpaque> {
-    let f = unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
-    };
+    let f =
+        unsafe { platform::Function::new(f.try_unwrap().unwrap().into_raw()) };
 
     connection.on_close(f).map_err(DartError::from)?;
 
@@ -333,9 +332,8 @@ pub fn connection_handle_on_remote_track_added(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
 ) -> Result<SyncReturn<()>, DartOpaque> {
-    let f = unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
-    };
+    let f =
+        unsafe { platform::Function::new(f.try_unwrap().unwrap().into_raw()) };
 
     connection
         .on_remote_track_added(f)
@@ -354,9 +352,8 @@ pub fn connection_handle_on_quality_score_update(
     connection: RustOpaque<ConnectionHandle>,
     f: DartOpaque,
 ) -> Result<SyncReturn<()>, DartOpaque> {
-    let f = unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
-    };
+    let f =
+        unsafe { platform::Function::new(f.try_unwrap().unwrap().into_raw()) };
 
     connection
         .on_quality_score_update(f)
@@ -457,7 +454,7 @@ impl UnwindSafe for Jason {}
 #[must_use]
 pub fn on_panic(cb: DartOpaque) -> SyncReturn<()> {
     platform::set_panic_callback(unsafe {
-        platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
+        platform::Function::new(cb.try_unwrap().unwrap().into_raw())
     });
 
     SyncReturn(())
@@ -566,7 +563,7 @@ pub fn local_media_track_on_ended(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_ended(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
     });
     SyncReturn(())
 }
@@ -802,7 +799,7 @@ pub fn media_manager_handle_on_device_change(
     let manager = MediaManagerHandle::clone(&manager);
     manager
         .on_device_change(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(DartError::from)?;
 
@@ -934,7 +931,7 @@ pub fn remote_media_track_on_muted(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_muted(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
     });
 
     SyncReturn(())
@@ -947,7 +944,7 @@ pub fn remote_media_track_on_unmuted(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_unmuted(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
     });
 
     SyncReturn(())
@@ -960,7 +957,7 @@ pub fn remote_media_track_on_stopped(
     f: DartOpaque,
 ) -> SyncReturn<()> {
     track.on_stopped(unsafe {
-        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+        platform::Function::new(f.try_unwrap().unwrap().into_raw())
     });
 
     SyncReturn(())
@@ -975,7 +972,7 @@ pub fn remote_media_track_on_media_direction_changed(
 ) -> SyncReturn<()> {
     track.on_media_direction_changed(unsafe {
         platform::Function::<MediaDirection>::new(
-            f.try_unwrap().unwrap().into_raw().cast(),
+            f.try_unwrap().unwrap().into_raw(),
         )
     });
 
@@ -1403,9 +1400,7 @@ pub fn room_handle_on_new_connection(
     Ok(SyncReturn(
         room_handle
             .on_new_connection(unsafe {
-                platform::Function::new(
-                    cb.try_unwrap().unwrap().into_raw().cast(),
-                )
+                platform::Function::new(cb.try_unwrap().unwrap().into_raw())
             })
             .map_err(DartError::from)?,
     ))
@@ -1425,7 +1420,7 @@ pub fn room_handle_on_close(
 ) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_close(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(DartError::from)?;
 
@@ -1452,7 +1447,7 @@ pub fn room_handle_on_local_track(
 ) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_local_track(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(DartError::from)?;
 
@@ -1470,7 +1465,7 @@ pub fn room_handle_on_connection_loss(
 ) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_connection_loss(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(DartError::from)?;
 
@@ -1488,7 +1483,7 @@ pub fn room_handle_on_failed_local_media(
 ) -> Result<SyncReturn<()>, DartOpaque> {
     room_handle
         .on_failed_local_media(unsafe {
-            platform::Function::new(cb.try_unwrap().unwrap().into_raw().cast())
+            platform::Function::new(cb.try_unwrap().unwrap().into_raw())
         })
         .map_err(DartError::from)?;
 

@@ -2,6 +2,8 @@
 //!
 //! [0]: https://w3.org/TR/mediacapture-streams#mediadevices
 
+use std::{cell::RefCell, fmt, fmt::Debug, rc::Rc};
+
 use medea_macro::dart_bridge;
 use tracerr::Traced;
 
@@ -91,10 +93,31 @@ impl From<Error> for GetUserMediaError {
 }
 
 /// Media devices controller.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct MediaDevices;
+#[derive(Clone)]
+pub struct MediaDevices {
+    on_device_change: Rc<RefCell<Option<Box<dyn FnMut() -> ()>>>>,
+}
 
 impl MediaDevices {
+    pub fn new() -> Self {
+        let on_device_change =
+            Rc::new(RefCell::new(None::<Box<dyn FnMut() -> ()>>));
+
+        unsafe {
+            let cb = Rc::clone(&on_device_change);
+            media_devices::on_device_change(
+                Callback::from_fn_mut(move |(): ()| {
+                    if let Some(cb) = cb.borrow_mut().as_mut() {
+                        cb();
+                    }
+                })
+                .into_dart(),
+            );
+        };
+
+        Self { on_device_change }
+    }
+
     /// Collects information about available media input devices.
     ///
     /// Adapter for the [MediaDevices.enumerateDevices()][1] function.
@@ -271,19 +294,22 @@ impl MediaDevices {
     }
 
     /// Subscribes onto the [`MediaDevices`]'s `devicechange` event.
-    pub fn on_device_change<F>(&self, handler: Option<F>)
+    pub fn on_device_change<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(),
     {
-        if let Some(mut h) = handler {
-            unsafe {
-                media_devices::on_device_change(
-                    Callback::from_fn_mut(move |(): ()| {
-                        h();
-                    })
-                    .into_dart(),
-                );
-            };
-        }
+        *self.on_device_change.borrow_mut() = f.map(|f| Box::new(f) as Box<_>);
+    }
+}
+
+impl Debug for MediaDevices {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "dart::MediaDevices")
+    }
+}
+
+impl Default for MediaDevices {
+    fn default() -> Self {
+        Self::new()
     }
 }

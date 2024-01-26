@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
-use std::future::Future;
+use std::{cell::RefCell, fmt, fmt::Debug, future::Future, rc::Rc};
 
 use derive_more::Display;
 use medea_client_api_proto::{
@@ -136,9 +136,17 @@ mod peer_connection {
 /// Representation of [RTCPeerConnection][1].
 ///
 /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct RtcPeerConnection {
     handle: DartHandle,
+    on_ice_connection_state_change:
+        Rc<RefCell<Option<Box<dyn FnMut(IceConnectionState) -> ()>>>>,
+    on_ice_candidate: Rc<RefCell<Option<Box<dyn FnMut(IceCandidate) -> ()>>>>,
+    on_connection_state_change:
+        Rc<RefCell<Option<Box<dyn FnMut(PeerConnectionState) -> ()>>>>,
+    on_track: Rc<
+        RefCell<Option<Box<dyn FnMut(MediaStreamTrack, Transceiver) -> ()>>>,
+    >,
 }
 
 impl RtcPeerConnection {
@@ -162,11 +170,86 @@ impl RtcPeerConnection {
                 is_force_relayed,
             )
         };
+
+        let handle: DartHandle = unsafe { FutureFromDart::execute(fut) }
+            .await
+            .map_err(RtcPeerConnectionError::PeerCreationError)
+            .map_err(tracerr::wrap!())?;
+
+        let on_ice_connection_state_change = Rc::new(RefCell::new(
+            None::<Box<dyn FnMut(IceConnectionState) -> ()>>,
+        ));
+        let on_ice_candidate =
+            Rc::new(RefCell::new(None::<Box<dyn FnMut(IceCandidate) -> ()>>));
+        let on_connection_state_change = Rc::new(RefCell::new(
+            None::<Box<dyn FnMut(PeerConnectionState) -> ()>>,
+        ));
+        let on_track = Rc::new(RefCell::new(
+            None::<Box<dyn FnMut(MediaStreamTrack, Transceiver) -> ()>>,
+        ));
+
+        unsafe {
+            let cb = Rc::clone(&on_ice_connection_state_change);
+            peer_connection::on_ice_connection_state_change(
+                handle.get(),
+                Callback::from_fn_mut(move |v| {
+                    if let Some(cb) = cb.borrow_mut().as_mut() {
+                        cb(ice_connection_from_int(v));
+                    }
+                })
+                .into_dart(),
+            );
+
+            let cb = Rc::clone(&on_ice_candidate);
+            peer_connection::on_ice_candidate(
+                handle.get(),
+                Callback::from_fn_mut(move |handle: DartHandle| {
+                    if let Some(cb) = cb.borrow_mut().as_mut() {
+                        let candidate = PlatformIceCandidate::from(handle);
+                        cb(IceCandidate {
+                            candidate: candidate.candidate(),
+                            sdp_m_line_index: candidate.sdp_m_line_index(),
+                            sdp_mid: candidate.sdp_mid(),
+                        });
+                    }
+                })
+                .into_dart(),
+            );
+
+            let cb = Rc::clone(&on_connection_state_change);
+            peer_connection::on_connection_state_change(
+                handle.get(),
+                Callback::from_fn_mut(move |v| {
+                    if let Some(cb) = cb.borrow_mut().as_mut() {
+                        cb(peer_connection_state_from_int(v));
+                    }
+                })
+                .into_dart(),
+            );
+
+            let cb = Rc::clone(&on_track);
+            peer_connection::on_track(
+                handle.get(),
+                Callback::from_two_arg_fn_mut(
+                    move |track: DartHandle, transceiver: DartHandle| {
+                        if let Some(cb) = cb.borrow_mut().as_mut() {
+                            cb(
+                                MediaStreamTrack::new(track, None),
+                                Transceiver::from(transceiver),
+                            );
+                        }
+                    },
+                )
+                .into_dart(),
+            );
+        };
+
         Ok(Self {
-            handle: unsafe { FutureFromDart::execute(fut) }
-                .await
-                .map_err(RtcPeerConnectionError::PeerCreationError)
-                .map_err(tracerr::wrap!())?,
+            handle,
+            on_ice_connection_state_change,
+            on_ice_candidate,
+            on_connection_state_change,
+            on_track,
         })
     }
 
@@ -181,26 +264,11 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc/#rtctrackevent
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-ontrack
-    pub fn on_track<F>(&self, handler: Option<F>)
+    pub fn on_track<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(MediaStreamTrack, Transceiver),
     {
-        if let Some(mut h) = handler {
-            unsafe {
-                peer_connection::on_track(
-                    self.handle.get(),
-                    Callback::from_two_arg_fn_mut(
-                        move |track: DartHandle, transceiver: DartHandle| {
-                            h(
-                                MediaStreamTrack::new(track, None),
-                                Transceiver::from(transceiver),
-                            );
-                        },
-                    )
-                    .into_dart(),
-                );
-            };
-        }
+        *self.on_track.borrow_mut() = f.map(|f| Box::new(f) as Box<_>);
     }
 
     /// Sets `handler` for a [RTCPeerConnectionIceEvent][1] (see
@@ -208,26 +276,11 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceevent
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidate
-    pub fn on_ice_candidate<F>(&self, handler: Option<F>)
+    pub fn on_ice_candidate<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(IceCandidate),
     {
-        if let Some(mut h) = handler {
-            unsafe {
-                peer_connection::on_ice_candidate(
-                    self.handle.get(),
-                    Callback::from_fn_mut(move |handle: DartHandle| {
-                        let candidate = PlatformIceCandidate::from(handle);
-                        h(IceCandidate {
-                            candidate: candidate.candidate(),
-                            sdp_m_line_index: candidate.sdp_m_line_index(),
-                            sdp_mid: candidate.sdp_mid(),
-                        });
-                    })
-                    .into_dart(),
-                );
-            }
-        }
+        *self.on_ice_candidate.borrow_mut() = f.map(|f| Box::new(f) as Box<_>);
     }
 
     /// Returns [`IceConnectionState`] of this [`RtcPeerConnection`].
@@ -255,41 +308,23 @@ impl RtcPeerConnection {
     /// Sets `handler` for an [`iceconnectionstatechange`][1] event.
     ///
     /// [1]: https://w3.org/TR/webrtc/#event-iceconnectionstatechange
-    pub fn on_ice_connection_state_change<F>(&self, handler: Option<F>)
+    pub fn on_ice_connection_state_change<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(IceConnectionState),
     {
-        if let Some(mut h) = handler {
-            unsafe {
-                peer_connection::on_ice_connection_state_change(
-                    self.handle.get(),
-                    Callback::from_fn_mut(move |v| {
-                        h(ice_connection_from_int(v));
-                    })
-                    .into_dart(),
-                );
-            }
-        }
+        *self.on_ice_connection_state_change.borrow_mut() =
+            f.map(|f| Box::new(f) as Box<_>);
     }
 
     /// Sets `handler` for a [`connectionstatechange`][1] event.
     ///
     /// [1]: https://w3.org/TR/webrtc/#event-connectionstatechange
-    pub fn on_connection_state_change<F>(&self, handler: Option<F>)
+    pub fn on_connection_state_change<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(PeerConnectionState),
     {
-        if let Some(mut h) = handler {
-            unsafe {
-                peer_connection::on_connection_state_change(
-                    self.handle.get(),
-                    Callback::from_fn_mut(move |v| {
-                        h(peer_connection_state_from_int(v));
-                    })
-                    .into_dart(),
-                );
-            }
-        }
+        *self.on_connection_state_change.borrow_mut() =
+            f.map(|f| Box::new(f) as Box<_>);
     }
 
     /// Adds remote [RTCPeerConnection][1]'s [ICE candidate][2] to this
@@ -522,6 +557,12 @@ impl RtcPeerConnection {
             .await
             .map_err(RtcPeerConnectionError::SetLocalDescriptionFailed)
             .map_err(tracerr::wrap!())
+    }
+}
+
+impl Debug for RtcPeerConnection {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "dart::RtcPeerConnection")
     }
 }
 

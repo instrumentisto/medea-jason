@@ -49,7 +49,7 @@ pub unsafe extern "C" fn Callback__call_two_arg(
 ) {
     propagate_panic(move || match &mut cb.as_mut().0 {
         Kind::TwoArgFnMut(func) => (func)(first, second),
-        Kind::FnOnce(_) | Kind::FnMut(_) | Kind::Fn(_) => unreachable!(),
+        Kind::FnOnce(_) | Kind::FnMut(_) => unreachable!(),
     });
 }
 
@@ -75,9 +75,6 @@ pub unsafe extern "C" fn Callback__call(
                 Kind::FnMut(func) => {
                     (func)(val);
                 }
-                Kind::Fn(func) => {
-                    (func)(val);
-                }
                 Kind::FnOnce(_) | Kind::TwoArgFnMut(_) => {
                     unreachable!();
                 }
@@ -90,7 +87,6 @@ pub unsafe extern "C" fn Callback__call(
 enum Kind {
     FnOnce(Box<dyn FnOnce(DartValue)>),
     FnMut(Box<dyn FnMut(DartValue)>),
-    Fn(Box<dyn Fn(DartValue)>),
     TwoArgFnMut(Box<dyn FnMut(DartValue, DartValue)>),
 }
 
@@ -100,7 +96,6 @@ impl Debug for Kind {
         match self {
             Self::FnOnce(p) => write!(f, "FnOnce({p:p})"),
             Self::FnMut(p) => write!(f, "FnMut({p:p})"),
-            Self::Fn(p) => write!(f, "Fn({p:p})"),
             Self::TwoArgFnMut(p) => write!(f, "TwoArgFnMut({p:p})"),
         }
     }
@@ -145,21 +140,6 @@ impl Callback {
         })))
     }
 
-    /// Returns a [`Callback`] wrapping the provided [`Fn`], that can be
-    /// converted to a [`Dart_Handle`] and passed to Dart.
-    pub fn from_fn<F, T>(f: F) -> Self
-    where
-        F: Fn(T) + 'static,
-        DartValueArg<T>: TryInto<T>,
-        <DartValueArg<T> as TryInto<T>>::Error: Debug,
-        T: 'static,
-    {
-        Self(Kind::Fn(Box::new(move |val: DartValue| {
-            let arg = DartValueArg::<T>::from(val);
-            (f)(arg.try_into().unwrap());
-        })))
-    }
-
     /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two
     /// arguments, that can be converted to a [`Dart_Handle`] and passed to
     /// Dart.
@@ -187,7 +167,6 @@ impl Callback {
     #[allow(clippy::cast_possible_wrap)]
     #[must_use]
     pub fn into_dart(self) -> Dart_Handle {
-        let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
         let is_two_arg = matches!(&self.0, Kind::TwoArgFnMut(_));
 
         let f = ptr::NonNull::from(Box::leak(Box::new(self)));
@@ -197,15 +176,13 @@ impl Callback {
             unsafe { callback::call_proxy(f) }
         };
 
-        if is_finalizable {
-            unsafe {
-                _ = dart_api::new_finalizable_handle(
-                    handle,
-                    f.as_ptr().cast::<c_void>(),
-                    mem::size_of::<Self>() as libc::intptr_t,
-                    Some(callback_finalizer),
-                );
-            }
+        unsafe {
+            _ = dart_api::new_finalizable_handle(
+                handle,
+                f.as_ptr().cast::<c_void>(),
+                mem::size_of::<Self>() as libc::intptr_t,
+                Some(callback_finalizer),
+            );
         }
 
         handle
