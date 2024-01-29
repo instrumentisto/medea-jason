@@ -16,7 +16,7 @@ use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
     object::{self, Jason, MediaKind, MediaSourceKind, Object},
 };
-use tokio::time::interval;
+use tokio::time::{interval, sleep};
 use uuid::Uuid;
 
 use crate::{conf, control};
@@ -381,6 +381,7 @@ impl World {
                         .wait_for_disabled()
                         .await?;
                 }
+                sleep(Duration::from_millis(1000)).await;
             }
         }
         Ok(())

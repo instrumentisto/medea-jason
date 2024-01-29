@@ -1,7 +1,7 @@
 Feature: `getUserMedia()` requests
 
   Scenario: Member joins Room and its `getUserMedia()` errors
-    Given room with member Alice
+    Given room with member Alice with disabled audio publishing
     And Alice's `getUserMedia()` errors
     And joined member Bob
     When Alice joins the room

@@ -146,7 +146,7 @@ class _$ApiConstrainFacingMode_ExactImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiConstrainFacingMode_ExactImpl &&
@@ -291,7 +291,7 @@ class _$ApiConstrainFacingMode_IdealImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiConstrainFacingMode_IdealImpl &&
@@ -518,7 +518,7 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_ExactImpl &&
@@ -662,7 +662,7 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_IdealImpl &&
@@ -813,7 +813,7 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_RangeImpl &&
