@@ -5,6 +5,13 @@ Feature: Apply method of Control API
     When Control API removes Alice with `Apply` method
     Then Bob's connection with Alice closes
 
+  Scenario: Remove connected member and then recreate him and reconnect
+    Given room with joined member Alice and Bob
+    When Control API removes Alice with `Apply` method
+    And Alice joins the room
+    Then Bob's video from Alice has `SendRecv` direction
+    And Bob's audio from Alice has `SendRecv` direction
+
   Scenario: Interconnect members with `Apply` method
     Given room with joined member Alice and Bob with no WebRTC endpoints
     When Control API interconnects Alice and Bob with `Apply` method
