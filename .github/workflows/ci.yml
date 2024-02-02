@@ -24,7 +24,7 @@ jobs:
   ################
 
   push:
-    if: ${{ github.event_name == 'pull_request' }}
+    # if: ${{ github.event_name == 'pull_request' }}
     needs:
       - build-jason
       - build-jason-linux
