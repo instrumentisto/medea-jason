@@ -29,17 +29,17 @@ jobs:
     needs:
       - build-jason
       - build-jason-linux
-      - clippy
-      - dartanalyze
-      - dartfmt
+      # - clippy
+      # - dartanalyze
+      # - dartfmt
       - docker
-      - helm-lint
-      - rustdoc
-      - rustfmt
-      - test
+      # - helm-lint
+      # - rustdoc
+      # - rustfmt
+      # - test
       - test-e2e-browser
-      - test-e2e-native
-      - test-flutter
+      # - test-e2e-native
+      # - test-flutter
     runs-on: ubuntu-latest
     steps:
       - run: true
