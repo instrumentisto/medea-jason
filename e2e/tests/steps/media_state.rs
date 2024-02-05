@@ -89,10 +89,8 @@ async fn then_remote_media_direction_is(
         .get_track(media_kind, MediaSourceKind::Device)
         .await
         .unwrap();
-    track
-        .wait_for_media_direction(media_direction)
-        .await
-        .unwrap();
+    tokio::time::timeout(Duration::from_secs(10), track
+        .wait_for_media_direction(media_direction)).await.unwrap().unwrap();
 }
 
 #[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video) and \
