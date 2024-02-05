@@ -8,6 +8,8 @@ Feature: Apply method of Control API
   Scenario: Remove connected member and then recreate him and reconnect
     Given room with joined member Alice and Bob
     When Control API removes Alice with `Apply` method
+    And Control API creates member Alice with `Apply` method
+    And Control API interconnects Alice and Bob with `Apply` method
     And Alice joins the room
     Then Bob's video from Alice has `SendRecv` direction
     And Bob's audio from Alice has `SendRecv` direction
