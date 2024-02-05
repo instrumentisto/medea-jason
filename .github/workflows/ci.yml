@@ -14,7 +14,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: fix-blink-direction
+  MEDEA_BRANCH: prepare-0.7.1
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
