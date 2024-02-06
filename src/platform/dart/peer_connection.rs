@@ -255,6 +255,7 @@ impl RtcPeerConnection {
                         let candidate = PlatformIceCandidateError::from(handle);
                         h(IceCandidateError {
                             address: candidate.address(),
+                            port: candidate.port(),
                             url: candidate.url(),
                             error_code: candidate.error_code(),
                             error_text: candidate.error_text(),

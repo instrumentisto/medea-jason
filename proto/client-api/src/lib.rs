@@ -384,6 +384,9 @@ pub struct IceCandidateError {
     /// Local IP address used to communicate with a STUN or TURN server.
     pub address: String,
 
+    /// Port used to communicate with a STUN or TURN server.
+    pub port: u32,
+
     /// STUN or TURN URL identifying the STUN or TURN server for which the
     /// failure occurred.
     pub url: String,

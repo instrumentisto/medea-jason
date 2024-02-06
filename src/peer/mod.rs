@@ -144,6 +144,9 @@ pub enum PeerEvent {
         /// Local IP address used to communicate with a STUN or TURN server.
         address: String,
 
+        /// Port used to communicate with a STUN or TURN server.
+        port: u32,
+
         /// STUN or TURN URL identifying the STUN or TURN server for which the
         /// failure occurred.
         url: String,
@@ -612,6 +615,7 @@ impl PeerConnection {
         drop(sender.unbounded_send(PeerEvent::IceCandidateError {
             peer_id: id,
             address: error.address,
+            port: error.port,
             url: error.url,
             error_code: error.error_code,
             error_text: error.error_text,

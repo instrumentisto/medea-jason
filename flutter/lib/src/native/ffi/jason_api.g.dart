@@ -648,7 +648,7 @@ abstract class MedeaJason {
 
   FlutterRustBridgeTaskConstMeta get kRoomHandleOnFailedLocalMediaConstMeta;
 
-  /// Log Dart exception.
+  /// Logs Dart exception.
   void logDartException(
       {required String message, required String stackTrace, dynamic hint});
 
@@ -5215,6 +5215,72 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _sdp_mid =
       _sdp_midPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
 
+  ffi.Pointer<ffi.Char> address(
+    Object error,
+  ) {
+    return _address(
+      error,
+    );
+  }
+
+  late final _addressPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'address');
+  late final _address =
+      _addressPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  int port(
+    Object error,
+  ) {
+    return _port(
+      error,
+    );
+  }
+
+  late final _portPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ffi.Handle)>>('port');
+  late final _port = _portPtr.asFunction<int Function(Object)>();
+
+  ffi.Pointer<ffi.Char> url(
+    Object error,
+  ) {
+    return _url(
+      error,
+    );
+  }
+
+  late final _urlPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'url');
+  late final _url =
+      _urlPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
+  int error_code(
+    Object error,
+  ) {
+    return _error_code(
+      error,
+    );
+  }
+
+  late final _error_codePtr =
+      _lookup<ffi.NativeFunction<ffi.Int32 Function(ffi.Handle)>>('error_code');
+  late final _error_code = _error_codePtr.asFunction<int Function(Object)>();
+
+  ffi.Pointer<ffi.Char> error_text(
+    Object error,
+  ) {
+    return _error_text(
+      error,
+    );
+  }
+
+  late final _error_textPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Handle)>>(
+          'error_text');
+  late final _error_text =
+      _error_textPtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
+
   void add(
     Object list,
     ffi.Pointer<ffi.Char> url,
@@ -5690,6 +5756,22 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
           'on_ice_candidate');
   late final _on_ice_candidate =
       _on_ice_candidatePtr.asFunction<void Function(Object, Object)>();
+
+  void on_ice_candidate_error(
+    Object peer,
+    Object cb,
+  ) {
+    return _on_ice_candidate_error(
+      peer,
+      cb,
+    );
+  }
+
+  late final _on_ice_candidate_errorPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
+          'on_ice_candidate_error');
+  late final _on_ice_candidate_error =
+      _on_ice_candidate_errorPtr.asFunction<void Function(Object, Object)>();
 
   Object get_transceiver_by_mid(
     Object peer,

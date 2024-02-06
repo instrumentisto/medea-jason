@@ -52,15 +52,21 @@ pub struct IceCandidate {
 pub struct IceCandidateError {
     /// Local IP address used to communicate with a STUN or TURN server.
     pub address: String,
+
+    /// Port used to communicate with a STUN or TURN server.
+    pub port: u32,
+
     /// STUN or TURN URL identifying the STUN or TURN server for which the
     /// failure occurred.
     pub url: String,
+
     /// Numeric STUN error code returned by the STUN or TURN server. If no host
     /// candidate can reach the server, `errorCode` will be set to the value
     /// 701 which is outside the STUN error code range. This error is only
     /// fired once per server URL while in the `RTCIceGatheringState` of
     /// "gathering".
     pub error_code: i32,
+
     /// STUN reason text returned by the STUN or TURN server. If the server
     /// could not be reached, `errorText` will be set to an
     /// implementation-specific value providing details about the error.

@@ -46,6 +46,9 @@ mod ice_candidate_error {
         /// server.
         pub fn address(error: Dart_Handle) -> ptr::NonNull<c_char>;
 
+        /// Port used to communicate with a STUN or TURN server.
+        pub fn port(error: Dart_Handle) -> u32;
+
         /// Returns STUN or TURN URL identifying the STUN or TURN server for
         /// which the failure occurred.
         pub fn url(error: Dart_Handle) -> ptr::NonNull<c_char>;
@@ -74,6 +77,15 @@ impl IceCandidateError {
     pub fn address(&self) -> String {
         let address = unsafe { ice_candidate_error::address(self.0.get()) };
         unsafe { dart_string_into_rust(address) }
+    }
+
+    /// Port used to communicate with a STUN or TURN server.
+    pub fn port(&self) -> u32 {
+        unsafe {
+            ice_candidate_error::port(self.0.get())
+                .try_into()
+                .unwrap()
+        }
     }
 
     /// STUN or TURN URL identifying the STUN or TURN server for which the

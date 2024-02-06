@@ -1783,6 +1783,7 @@ impl PeerEventHandler for InnerRoom {
         &self,
         peer_id: PeerId,
         address: String,
+        port: u32,
         url: String,
         error_code: i32,
         error_text: String,
@@ -1791,6 +1792,7 @@ impl PeerEventHandler for InnerRoom {
             peer_id,
             metrics: PeerMetrics::IceCandidateError(IceCandidateError {
                 address,
+                port,
                 url,
                 error_code,
                 error_text,
