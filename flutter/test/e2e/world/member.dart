@@ -314,7 +314,7 @@ class Member {
             0;
         return sourceCheck(element.last.mediaSourceKind(), source) &&
             kindCheck(element.last.kind(), kind) &&
-            !stopped;
+            true // !stopped;
       }).last;
     } else {
       var trackCompl = Completer<RemoteMediaTrack>();
