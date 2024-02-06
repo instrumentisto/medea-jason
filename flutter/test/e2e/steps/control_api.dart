@@ -59,6 +59,16 @@ StepDefinitionGeneric whenInterconnectsKind =
 
 StepDefinitionGeneric whenControlApiRemovesMemberViaApply =
     when1<String, CustomWorld>(
+  r'Control API creates member (\S+) with `Apply` method$',
+  (memberId, context) async {
+    var memberBuilder = MemberBuilder(memberId, false, false);
+
+    await context.world.createMember(memberBuilder);
+  },
+);
+
+StepDefinitionGeneric whenControlApiRemovesMemberViaApply =
+    when1<String, CustomWorld>(
   r'Control API removes (\S+) with `Apply` method$',
   (memberId, context) async {
     var spec = await context.world.getSpec();
