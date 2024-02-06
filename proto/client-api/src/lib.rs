@@ -369,8 +369,20 @@ pub enum PeerMetrics {
     /// `PeerConnection`'s connection state.
     PeerConnectionState(PeerConnectionState),
 
+    IceCandidateError(IceCandidateError),
+
     /// `PeerConnection`'s RTC stats.
     RtcStats(Vec<RtcStat>),
+}
+
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, PartialEq)]
+pub struct IceCandidateError {
+    pub address: String,
+    pub url: String,
+    pub error_code: i32,
+    pub error_text: String,
 }
 
 /// `PeerConnection`'s ICE connection state.

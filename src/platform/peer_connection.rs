@@ -47,6 +47,14 @@ pub struct IceCandidate {
     pub sdp_mid: Option<String>,
 }
 
+#[derive(Debug)]
+pub struct IceCandidateError {
+    pub address: String,
+    pub url: String,
+    pub error_code: i32,
+    pub error_text: String,
+}
+
 /// Errors that may occur during signaling between this and remote
 /// [RTCPeerConnection][1] and event handlers setting errors.
 ///

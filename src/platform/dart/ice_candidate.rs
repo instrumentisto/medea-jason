@@ -35,6 +35,48 @@ mod ice_candidate {
     }
 }
 
+#[dart_bridge("flutter/lib/src/native/platform/ice_candidate_error.g.dart")]
+mod ice_candidate_error {
+    use std::{os::raw::c_char, ptr};
+
+    use dart_sys::Dart_Handle;
+
+    extern "C" {
+        pub fn address(error: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn url(error: Dart_Handle) -> ptr::NonNull<c_char>;
+        pub fn error_code(error: Dart_Handle) -> i32;
+        pub fn error_text(error: Dart_Handle) -> ptr::NonNull<c_char>;
+    }
+}
+
+#[derive(Debug, From)]
+pub struct IceCandidateError(DartHandle);
+
+impl IceCandidateError {
+    pub fn address(&self) -> String {
+        let address = unsafe { ice_candidate_error::address(self.0.get()) };
+        unsafe { dart_string_into_rust(address) }
+    }
+
+    pub fn url(&self) -> String {
+        let url = unsafe { ice_candidate_error::url(self.0.get()) };
+        unsafe { dart_string_into_rust(url) }
+    }
+
+    pub fn error_code(&self) -> i32 {
+        unsafe {
+            ice_candidate_error::error_code(self.0.get())
+                .try_into()
+                .unwrap()
+        }
+    }
+
+    pub fn error_text(&self) -> String {
+        let error_text = unsafe { ice_candidate_error::error_text(self.0.get()) };
+        unsafe { dart_string_into_rust(error_text) }
+    }
+}
+
 /// Wrapper around a [`DartHandle`] representing an ICE candidate of a
 /// [RTCPeerConnection][1].
 ///

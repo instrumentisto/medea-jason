@@ -136,6 +136,14 @@ pub enum PeerEvent {
         sdp_mid: Option<String>,
     },
 
+    IceCandidateError {
+        peer_id: Id,
+        address: String,
+        url: String,
+        error_code: i32,
+        error_text: String,
+    },
+
     /// [`platform::RtcPeerConnection`] received a new [`remote::Track`] from
     /// a remote sender.
     NewRemoteTrack {
@@ -359,6 +367,17 @@ impl PeerConnection {
             }));
         }
 
+        // Bind to `icecandidateerror` event.
+        {
+            let id = peer.id;
+            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
+            peer.peer.on_ice_candidate_error(Some(move |error| {
+                if let Some(sender) = weak_sender.upgrade() {
+                    Self::on_ice_candidate_error(id, &sender, error);
+                }
+            }));
+        }
+
         // Bind to `iceconnectionstatechange` event.
         {
             let id = peer.id;
@@ -561,6 +580,20 @@ impl PeerConnection {
             candidate: candidate.candidate,
             sdp_m_line_index: candidate.sdp_m_line_index,
             sdp_mid: candidate.sdp_mid,
+        }));
+    }
+
+    fn on_ice_candidate_error(
+        id: Id,
+        sender: &mpsc::UnboundedSender<PeerEvent>,
+        error: platform::IceCandidateError,
+    ) {
+        drop(sender.unbounded_send(PeerEvent::IceCandidateError {
+            peer_id: id,
+            address: error.address,
+            url: error.url,
+            error_code: error.error_code,
+            error_text: error.error_text,
         }));
     }
 
@@ -1064,5 +1097,7 @@ impl Drop for PeerConnection {
         >>(None);
         self.peer
             .on_ice_candidate::<Box<dyn FnMut(platform::IceCandidate)>>(None);
+        self.peer
+            .on_ice_candidate_error::<Box<dyn FnMut(platform::IceCandidateError)>>(None);
     }
 }

@@ -24,12 +24,13 @@ use crate::{
             },
         },
         IceCandidate, RtcPeerConnectionError, RtcStats, SdpType,
-        TransceiverDirection,
+        TransceiverDirection, IceCandidateError,
     },
 };
 
 use super::{
     ice_candidate::IceCandidate as PlatformIceCandidate,
+    ice_candidate::IceCandidateError as PlatformIceCandidateError,
     media_track::MediaStreamTrack, utils::string_into_c_str,
 };
 
@@ -70,6 +71,9 @@ mod peer_connection {
 
         /// Sets `onIceCandidate` callback of the provided [`PeerConnection`].
         pub fn on_ice_candidate(peer: Dart_Handle, cb: Dart_Handle);
+
+        /// Sets `onIceCandidateError` callback of the provided [`PeerConnection`].
+        pub fn on_ice_candidate_error(peer: Dart_Handle, cb: Dart_Handle);
 
         /// Looks ups [`Transceiver`] in the provided [`PeerConnection`] by the
         /// provided [`String`].
@@ -222,6 +226,34 @@ impl RtcPeerConnection {
                             candidate: candidate.candidate(),
                             sdp_m_line_index: candidate.sdp_m_line_index(),
                             sdp_mid: candidate.sdp_mid(),
+                        });
+                    })
+                    .into_dart(),
+                );
+            }
+        }
+    }
+
+    /// Sets `handler` for a [RTCPeerConnectionIceEvent][1] (see
+    /// [`onicecandidateerror` callback][2]).
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceevent
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidateerror
+    pub fn on_ice_candidate_error<F>(&self, handler: Option<F>)
+    where
+        F: 'static + FnMut(IceCandidateError),
+    {
+        if let Some(mut h) = handler {
+            unsafe {
+                peer_connection::on_ice_candidate_error(
+                    self.handle.get(),
+                    Callback::from_fn_mut(move |handle: DartHandle| {
+                        let candidate = PlatformIceCandidateError::from(handle);
+                        h(IceCandidateError {
+                            address: candidate.address(),
+                            url: candidate.url(),
+                            error_code: candidate.error_code(),
+                            error_text: candidate.error_text(),
                         });
                     })
                     .into_dart(),
