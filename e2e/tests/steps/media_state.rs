@@ -4,6 +4,7 @@ use cucumber::{given, then, when};
 use medea_e2e::object::{
     remote_track::MediaDirection, AwaitCompletion, MediaSourceKind,
 };
+use tokio::time::timeout;
 
 use crate::World;
 
@@ -89,7 +90,7 @@ async fn then_remote_media_direction_is(
         .get_track(media_kind, MediaSourceKind::Device)
         .await
         .unwrap();
-    tokio::time::timeout(Duration::from_secs(10), track
+    timeout(Duration::from_secs(10), track
         .wait_for_media_direction(media_direction)).await.unwrap().unwrap();
 }
 
