@@ -12,6 +12,7 @@ List<StepDefinitionGeneric> steps() {
     whenControlApiRemovesRoom,
     whenInterconnectsKind,
     whenControlApiRemovesMemberViaApply,
+    whenControlApiCreatesMemberViaApply,
     whenControlApiInterconnectsMembers,
     whenControlApiInterconnectsViaApply,
     thenControlApiSendsOnJoin,
@@ -57,7 +58,7 @@ StepDefinitionGeneric whenInterconnectsKind =
   },
 );
 
-StepDefinitionGeneric whenControlApiRemovesMemberViaApply =
+StepDefinitionGeneric whenControlApiCreatesMemberViaApply =
     when1<String, CustomWorld>(
   r'Control API creates member (\S+) with `Apply` method$',
   (memberId, context) async {
