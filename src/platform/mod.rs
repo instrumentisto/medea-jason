@@ -22,7 +22,9 @@ use crate::utils::Caused;
 
 pub use self::{
     callback::Callback,
-    peer_connection::{IceCandidate, RtcPeerConnectionError, IceCandidateError, SdpType},
+    peer_connection::{
+        IceCandidate, IceCandidateError, RtcPeerConnectionError, SdpType,
+    },
     rtc_stats::RtcStatsError,
     transceiver::Direction as TransceiverDirection,
     transport::{RpcTransport, TransportError, TransportState},

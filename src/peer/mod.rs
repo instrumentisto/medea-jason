@@ -136,11 +136,29 @@ pub enum PeerEvent {
         sdp_mid: Option<String>,
     },
 
+    /// Error occurred with ICE candidate from a peer connection.
     IceCandidateError {
+        /// ID of the [`PeerConnection`] that errored.
         peer_id: Id,
+
+        /// Local IP address used to communicate with a STUN or TURN server.
         address: String,
+
+        /// STUN or TURN URL identifying the STUN or TURN server for which the
+        /// failure occurred.
         url: String,
+
+        /// Numeric STUN error code returned by the STUN or TURN server. If no
+        /// host candidate can reach the server, `errorCode` will be
+        /// set to the value 701 which is outside the STUN error code
+        /// range. This error is only fired once per server URL while
+        /// in the `RTCIceGatheringState` of "gathering".
         error_code: i32,
+
+        /// STUN reason text returned by the STUN or TURN server. If the server
+        /// could not be reached, `errorText` will be set to an
+        /// implementation-specific value providing details about the
+        /// error.
         error_text: String,
     },
 
@@ -583,6 +601,9 @@ impl PeerConnection {
         }));
     }
 
+    /// Handle `icecandidateerror` event from underlying peer emitting
+    /// [`PeerEvent::IceCandidateError`] event into this peers
+    /// `peer_events_sender`.
     fn on_ice_candidate_error(
         id: Id,
         sender: &mpsc::UnboundedSender<PeerEvent>,
@@ -1098,6 +1119,8 @@ impl Drop for PeerConnection {
         self.peer
             .on_ice_candidate::<Box<dyn FnMut(platform::IceCandidate)>>(None);
         self.peer
-            .on_ice_candidate_error::<Box<dyn FnMut(platform::IceCandidateError)>>(None);
+            .on_ice_candidate_error::<Box<dyn FnMut(
+                platform::IceCandidateError
+            )>>(None);
     }
 }

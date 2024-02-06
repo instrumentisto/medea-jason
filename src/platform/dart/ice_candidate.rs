@@ -42,27 +42,52 @@ mod ice_candidate_error {
     use dart_sys::Dart_Handle;
 
     extern "C" {
+        /// Returns local IP address used to communicate with a STUN or TURN
+        /// server.
         pub fn address(error: Dart_Handle) -> ptr::NonNull<c_char>;
+
+        /// Returns STUN or TURN URL identifying the STUN or TURN server for
+        /// which the failure occurred.
         pub fn url(error: Dart_Handle) -> ptr::NonNull<c_char>;
+
+        /// Returns numeric STUN error code returned by the STUN or TURN server.
+        /// If no host candidate can reach the server, `errorCode` will
+        /// be set to the value 701 which is outside the STUN error code
+        /// range. This error is only fired once per server URL while in
+        /// the `RTCIceGatheringState` of "gathering".
         pub fn error_code(error: Dart_Handle) -> i32;
+
+        /// Returns STUN reason text returned by the STUN or TURN server. If the
+        /// server could not be reached, `errorText` will be set to an
+        /// implementation-specific value providing details about the
+        /// error.
         pub fn error_text(error: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
 
+/// Description of the error occurred with ICE candidate from a peer connection.
 #[derive(Debug, From)]
 pub struct IceCandidateError(DartHandle);
 
 impl IceCandidateError {
+    /// Local IP address used to communicate with a STUN or TURN server.
     pub fn address(&self) -> String {
         let address = unsafe { ice_candidate_error::address(self.0.get()) };
         unsafe { dart_string_into_rust(address) }
     }
 
+    /// STUN or TURN URL identifying the STUN or TURN server for which the
+    /// failure occurred.
     pub fn url(&self) -> String {
         let url = unsafe { ice_candidate_error::url(self.0.get()) };
         unsafe { dart_string_into_rust(url) }
     }
 
+    /// Numeric STUN error code returned by the STUN or TURN server. If no host
+    /// candidate can reach the server, `errorCode` will be set to the value 701
+    /// which is outside the STUN error code range. This error is only fired
+    /// once per server URL while in the `RTCIceGatheringState` of
+    /// "gathering".
     pub fn error_code(&self) -> i32 {
         unsafe {
             ice_candidate_error::error_code(self.0.get())
@@ -71,8 +96,12 @@ impl IceCandidateError {
         }
     }
 
+    /// STUN reason text returned by the STUN or TURN server. If the server
+    /// could not be reached, `errorText` will be set to an
+    /// implementation-specific value providing details about the error.
     pub fn error_text(&self) -> String {
-        let error_text = unsafe { ice_candidate_error::error_text(self.0.get()) };
+        let error_text =
+            unsafe { ice_candidate_error::error_text(self.0.get()) };
         unsafe { dart_string_into_rust(error_text) }
     }
 }

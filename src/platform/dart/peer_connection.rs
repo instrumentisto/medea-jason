@@ -23,15 +23,18 @@ use crate::{
                 peer_connection_state_from_int,
             },
         },
-        IceCandidate, RtcPeerConnectionError, RtcStats, SdpType,
-        TransceiverDirection, IceCandidateError,
+        IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
+        SdpType, TransceiverDirection,
     },
 };
 
 use super::{
-    ice_candidate::IceCandidate as PlatformIceCandidate,
-    ice_candidate::IceCandidateError as PlatformIceCandidateError,
-    media_track::MediaStreamTrack, utils::string_into_c_str,
+    ice_candidate::{
+        IceCandidate as PlatformIceCandidate,
+        IceCandidateError as PlatformIceCandidateError,
+    },
+    media_track::MediaStreamTrack,
+    utils::string_into_c_str,
 };
 
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -72,7 +75,8 @@ mod peer_connection {
         /// Sets `onIceCandidate` callback of the provided [`PeerConnection`].
         pub fn on_ice_candidate(peer: Dart_Handle, cb: Dart_Handle);
 
-        /// Sets `onIceCandidateError` callback of the provided [`PeerConnection`].
+        /// Sets `onIceCandidateError` callback of the provided
+        /// [`PeerConnection`].
         pub fn on_ice_candidate_error(peer: Dart_Handle, cb: Dart_Handle);
 
         /// Looks ups [`Transceiver`] in the provided [`PeerConnection`] by the

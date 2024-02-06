@@ -1777,6 +1777,8 @@ impl PeerEventHandler for InnerRoom {
         Ok(())
     }
 
+    /// Handles [`PeerEvent::IceCandidateError`] event and sends received
+    /// error to RPC server.
     async fn on_ice_candidate_error(
         &self,
         peer_id: PeerId,
