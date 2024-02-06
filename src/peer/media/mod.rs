@@ -16,7 +16,7 @@ use futures::{
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
-use proto::{EncodingParameters, MediaSourceKind, TrackId};
+use proto::{EncodingParameters, MediaSourceKind, SvcSetting, TrackId};
 use tracerr::Traced;
 
 #[cfg(feature = "mockable")]
@@ -320,8 +320,9 @@ impl InnerMediaConnections {
         kind: MediaKind,
         direction: platform::TransceiverDirection,
         encodings: Vec<EncodingParameters>,
+        svc: Option<Vec<SvcSetting>>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
-        self.peer.add_transceiver(kind, direction, encodings)
+        self.peer.add_transceiver(kind, direction, encodings, svc)
     }
 
     /// Lookups a [`platform::Transceiver`] by the provided [`mid`].

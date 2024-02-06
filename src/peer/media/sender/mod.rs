@@ -142,6 +142,7 @@ impl Sender {
                             kind,
                             platform::TransceiverDirection::INACTIVE,
                             caps.encodings(),
+                            caps.svc(),
                         );
                     add_transceiver.await
                 }

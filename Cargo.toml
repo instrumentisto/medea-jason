@@ -88,7 +88,7 @@ wee_alloc = { version = "0.4", optional = true }
         "MessageEvent",
         "Navigator",
         "RtcBundlePolicy",
-        "RtcConfiguration",
+        "RtcConfiguration", "RtcRtpCapabilities",
         "RtcIceCandidate", "RtcIceCandidateInit",
         "RtcIceConnectionState",
         "RtcIceServer",
@@ -96,22 +96,20 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcOfferOptions",
         "RtcPeerConnection", "RtcPeerConnectionIceEvent",
         "RtcRtpReceiver", "RtcRtpSender",
-        "RtcRtpParameters", "RtcRtpCodec", "RtcRtpCodecParameters",
+        "RtcRtpParameters", "RtcRtpCodecParameters",
         "RtcRtpEncodingParameters",
         "RtcRtpTransceiver", "RtcRtpTransceiverDirection",
         "RtcRtpTransceiverInit",
         "RtcSdpType",
-        "RtcSessionDescription", "RtcSessionDescriptionInit","RtcRtpCapabilities",
-        "RtcStats",
-        "RtcTrackEvent",
-        "WebSocket", "Window",
+        "RtcSessionDescription", "RtcSessionDescriptionInit", "RtcStats",
+        "RtcTrackEvent", "WebSocket", "Window",
     ]
 
 [patch.crates-io]
-web-sys = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
-js-sys = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
-wasm-bindgen = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
-wasm-bindgen-shared = { git = "https://github.com/logist322/wasm-bindgen.git", rev = "4ec9219cb30483afc6ca7ecc6bc25f4bbf870164" }
+web-sys = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "b56728f0f46473e648b31719af2b8013db83e024" }
+js-sys = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "b56728f0f46473e648b31719af2b8013db83e024" }
+wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "b56728f0f46473e648b31719af2b8013db83e024" }
+wasm-bindgen-shared = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "b56728f0f46473e648b31719af2b8013db83e024" }
 
 [build-dependencies]
 cc = "1.0"

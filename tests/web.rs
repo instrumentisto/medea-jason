@@ -223,6 +223,7 @@ pub fn get_test_tracks(
                 required: is_video_required,
                 source_kind: MediaSourceKind::Device,
                 encodings: Vec::new(),
+                svc: None,
             }),
         },
     )
@@ -256,6 +257,7 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 required: false,
                 source_kind: MediaSourceKind::Device,
                 encodings: Vec::new(),
+                svc: None,
             }),
         },
     )
