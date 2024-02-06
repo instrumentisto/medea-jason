@@ -5,6 +5,7 @@ import 'package:gherkin/gherkin.dart';
 
 import '../api/endpoint.dart';
 import '../world/custom_world.dart';
+import '../world/member.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
