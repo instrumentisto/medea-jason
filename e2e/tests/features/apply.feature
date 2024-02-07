@@ -5,7 +5,7 @@ Feature: Apply method of Control API
     When Control API removes Alice with `Apply` method
     Then Bob's connection with Alice closes
 
-  Scenario: Remove connected member and then recreate him and reconnect
+  Scenario: Remove connected member, recreate him and reconnect
     Given room with joined member Alice and Bob
     When Control API removes Alice with `Apply` method
     And Control API creates member Alice with `Apply` method
