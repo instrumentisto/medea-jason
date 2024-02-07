@@ -6,7 +6,7 @@ use medea_control_api_mock::proto::{
 };
 use tokio::time::{sleep, timeout};
 
-use crate::world::{MembersPair, PairedMember, World};
+use crate::world::{member, MembersPair, PairedMember, World};
 
 #[when(regex = r"^Control API removes member (\S+)$")]
 async fn when_control_api_removes_member(world: &mut World, id: String) {
@@ -78,6 +78,18 @@ async fn then_control_api_doesnt_sends_on_leave(world: &mut World, id: String) {
 #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
 async fn then_control_api_sends_on_join(world: &mut World, id: String) {
     timeout(Duration::from_secs(10), world.wait_for_on_join(id))
+        .await
+        .unwrap();
+}
+
+#[when(regex = r"^Control API creates member (\S+) with `Apply` method$")]
+async fn when_control_api_creates_member(world: &mut World, id: String) {
+    world
+        .create_member(member::Builder {
+            id,
+            is_send: false,
+            is_recv: false,
+        })
         .await
         .unwrap();
 }
