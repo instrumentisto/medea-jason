@@ -193,6 +193,7 @@ impl Connections {
     ) -> Vec<Connection> {
         let mut connections = self.connections.borrow_mut();
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for partner in partner_members {
             _ = self
                 .members_to_tracks
@@ -231,6 +232,7 @@ impl Connections {
         let mut tracks = self.tracks.borrow_mut();
 
         if let Some(partners) = tracks.remove(track_id) {
+            #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
             for p in partners {
                 if let Some(member_tracks) =
                     self.members_to_tracks.borrow_mut().get_mut(&p)
@@ -256,6 +258,7 @@ impl Connections {
 
     /// Updates this [`Connection`] with the provided [`proto::state::Room`].
     pub fn apply(&self, new_state: &proto::state::Room) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for peer in new_state.peers.values() {
             for (track_id, sender) in &peer.senders {
                 if let Some(partners) = self.tracks.borrow().get(track_id) {
