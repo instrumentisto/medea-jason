@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.11.0] · 2024-??-?? (unreleased)
+## [0.11.0] · 2024-02-12
 [0.11.0]: /../../tree/medea-control-api-proto-0.11.0/proto/control-api
 
 [Diff](/../../compare/medea-control-api-proto-0.10.0...medea-control-api-proto-0.11.0)
@@ -14,9 +14,9 @@ All user visible changes to this project will be documented in this file. This p
 ### Upgraded
 
 - Dependencies:
-    - [`tonic`] to `0.11` ([todo]).
+    - [`tonic`] to `0.11` ([b504f9dc]).
 
-[todo]: /../../commit/todo
+[b504f9dc]: /../../commit/b504f9dc97451135e2138afabf67935e3bc53475
 
 
 
