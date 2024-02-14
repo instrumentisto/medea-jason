@@ -1782,8 +1782,8 @@ impl PeerEventHandler for InnerRoom {
     async fn on_ice_candidate_error(
         &self,
         peer_id: PeerId,
-        address: String,
-        port: u32,
+        address: Option<String>,
+        port: Option<u32>,
         url: String,
         error_code: i32,
         error_text: String,

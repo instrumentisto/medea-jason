@@ -243,10 +243,9 @@ impl RtcPeerConnection {
                         Rc::clone(&self.peer),
                         "icecandidateerror",
                         move |msg: RtcPeerConnectionIceErrorEvent| {
-                            // TODO(evdokimovs): Remove unwraps
                             f(IceCandidateError {
-                                address: msg.address().unwrap(),
-                                port: u32::from(msg.port().unwrap()),
+                                address: msg.address(),
+                                port: msg.port().map(u32::from),
                                 url: msg.url(),
                                 error_code: i32::from(msg.error_code()),
                                 error_text: msg.error_text(),

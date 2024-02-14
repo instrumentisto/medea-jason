@@ -385,10 +385,10 @@ pub enum PeerMetrics {
 #[derive(Clone, Debug, PartialEq)]
 pub struct IceCandidateError {
     /// Local IP address used to communicate with a STUN or TURN server.
-    pub address: String,
+    pub address: Option<String>,
 
     /// Port used to communicate with a STUN or TURN server.
-    pub port: u32,
+    pub port: Option<u32>,
 
     /// STUN or TURN URL identifying the STUN or TURN server for which the
     /// failure occurred.

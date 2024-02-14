@@ -142,10 +142,10 @@ pub enum PeerEvent {
         peer_id: Id,
 
         /// Local IP address used to communicate with a STUN or TURN server.
-        address: String,
+        address: Option<String>,
 
         /// Port used to communicate with a STUN or TURN server.
-        port: u32,
+        port: Option<u32>,
 
         /// STUN or TURN URL identifying the STUN or TURN server for which the
         /// failure occurred.

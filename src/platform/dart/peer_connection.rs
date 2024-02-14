@@ -254,8 +254,8 @@ impl RtcPeerConnection {
                     Callback::from_fn_mut(move |handle: DartHandle| {
                         let candidate = PlatformIceCandidateError::from(handle);
                         h(IceCandidateError {
-                            address: candidate.address(),
-                            port: candidate.port(),
+                            address: Some(candidate.address()),
+                            port: Some(candidate.port()),
                             url: candidate.url(),
                             error_code: candidate.error_code(),
                             error_text: candidate.error_text(),
