@@ -372,14 +372,24 @@ pub enum PeerMetrics {
     /// `PeerConnection`'s connection state.
     PeerConnectionState(PeerConnectionState),
 
-    /// Error occurred with ICE candidate from a peer connection.
-    IceCandidateError(IceCandidateError),
+    /// `PeerConnection` related error occurred.
+    PeerConnectionError(PeerConnectionError),
 
     /// `PeerConnection`'s RTC stats.
     RtcStats(Vec<RtcStat>),
 }
 
-/// Description of the error occurred with ICE candidate from a peer connection.
+/// Errors related to a `PeerConnection`.
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, PartialEq)]
+pub enum PeerConnectionError {
+    /// Error occurred with ICE candidate from a `PeerConnection`.
+    IceCandidate(IceCandidateError),
+}
+
+/// Description of the error occurred with ICE candidate from a
+/// `PeerConnection`.
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Debug, PartialEq)]

@@ -18,8 +18,8 @@ use futures::{
 use medea_client_api_proto::{
     self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
     EventHandler, IceCandidate, IceConnectionState, IceServer, MemberId,
-    NegotiationRole, PeerConnectionState, PeerId, PeerMetrics, PeerUpdate,
-    Track, TrackId,
+    NegotiationRole, PeerConnectionError, PeerConnectionState, PeerId,
+    PeerMetrics, PeerUpdate, Track, TrackId,
 };
 use proto::{ConnectionMode, IceCandidateError};
 use tracerr::Traced;
@@ -1790,13 +1790,15 @@ impl PeerEventHandler for InnerRoom {
     ) -> Self::Output {
         self.rpc.send_command(Command::AddPeerConnectionMetrics {
             peer_id,
-            metrics: PeerMetrics::IceCandidateError(IceCandidateError {
-                address,
-                port,
-                url,
-                error_code,
-                error_text,
-            }),
+            metrics: PeerMetrics::PeerConnectionError(
+                PeerConnectionError::IceCandidate(IceCandidateError {
+                    address,
+                    port,
+                    url,
+                    error_code,
+                    error_text,
+                }),
+            ),
         });
         Ok(())
     }
