@@ -1,14 +1,11 @@
 //! General JS side library interface.
 
-#![allow(clippy::new_without_default)]
-
 use derive_more::From;
 use wasm_bindgen::prelude::*;
 
 use crate::{
     api::{MediaManagerHandle, RoomHandle},
     jason,
-    platform::{init_logger, set_panic_hook},
 };
 
 /// General JS side library interface.
@@ -16,7 +13,7 @@ use crate::{
 /// Responsible for managing shared transports, local media and room
 /// initialization.
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, Default, From)]
 pub struct Jason(jason::Jason);
 
 #[wasm_bindgen]
@@ -25,9 +22,6 @@ impl Jason {
     #[must_use]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        set_panic_hook();
-        init_logger();
-
         Self(jason::Jason::new())
     }
 
@@ -44,7 +38,6 @@ impl Jason {
     }
 
     /// Closes the provided [`RoomHandle`].
-    #[allow(clippy::needless_pass_by_value)]
     pub fn close_room(&self, room_to_delete: RoomHandle) {
         self.0.close_room(room_to_delete.into());
     }

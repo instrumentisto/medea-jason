@@ -1,6 +1,6 @@
 //! `Member` element related methods and entities.
 
-use std::{collections::HashMap, convert::TryInto as _, time::Duration};
+use std::{collections::HashMap, time::Duration};
 
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
@@ -51,23 +51,29 @@ pub struct Member {
 
 impl Member {
     /// Converts [`Member`] into protobuf [`proto::Member`].
+    #[allow(clippy::missing_panics_doc)]
     #[must_use]
-    pub fn into_proto(self, id: String) -> proto::Member {
+    pub fn into_proto(self, member_id: String) -> proto::Member {
         let member_elements = self
             .pipeline
             .into_iter()
             .map(|(id, endpoint)| (id.clone(), endpoint.into_proto(id)))
             .collect();
 
+        // PANIC: Unwrapping `Duration` conversion is OK here, because its
+        //        values are not expected to be large.
+        #[allow(clippy::unwrap_used)]
         proto::Member {
             pipeline: member_elements,
-            id,
+            id: member_id,
             credentials: self.credentials.map(Into::into),
             on_join: self.on_join.unwrap_or_default(),
             on_leave: self.on_leave.unwrap_or_default(),
-            idle_timeout: self.idle_timeout.map(Into::into),
-            reconnect_timeout: self.reconnect_timeout.map(Into::into),
-            ping_interval: self.ping_interval.map(Into::into),
+            idle_timeout: self.idle_timeout.map(|d| d.try_into().unwrap()),
+            reconnect_timeout: self
+                .reconnect_timeout
+                .map(|d| d.try_into().unwrap()),
+            ping_interval: self.ping_interval.map(|d| d.try_into().unwrap()),
         }
     }
 
@@ -119,7 +125,6 @@ pub enum Credentials {
 }
 
 impl From<proto::member::Credentials> for Credentials {
-    #[inline]
     fn from(from: proto::member::Credentials) -> Self {
         use proto::member::Credentials as C;
         match from {
@@ -130,7 +135,6 @@ impl From<proto::member::Credentials> for Credentials {
 }
 
 impl From<Credentials> for proto::member::Credentials {
-    #[inline]
     fn from(from: Credentials) -> Self {
         use Credentials as C;
         match from {

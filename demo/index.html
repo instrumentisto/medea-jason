@@ -9,7 +9,6 @@
   <script type="module">
     import init, {
       Jason,
-      JasonError,
       MediaStreamSettings,
       AudioTrackConstraints,
       DeviceVideoTrackConstraints,
@@ -592,6 +591,10 @@
                 playElement.width = 480;
                 playElement.controls = 'true';
                 playElement.autoplay = 'true';
+                if (track.media_direction() != 0) {
+                  playElement.pause();
+                  playElement.style.display = 'none';
+                }
                 memberVideoDiv.appendChild(displayVideoEl);
               }
               let mediaStream = new MediaStream();
@@ -608,6 +611,10 @@
                 playElement.width = 480;
                 playElement.controls = 'true';
                 playElement.autoplay = 'true';
+                if (track.media_direction() != 0) {
+                  playElement.pause();
+                  playElement.style.display = 'none';
+                }
                 memberVideoDiv.appendChild(playElement);
               }
               let mediaStream = new MediaStream();
@@ -623,6 +630,10 @@
               playElement.classList.add('order-3');
               playElement.controls = 'true';
               playElement.autoplay = 'true';
+              if (track.media_direction() != 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
@@ -630,19 +641,30 @@
             playElement.srcObject = mediaStream;
           }
 
-          track.on_enabled( () => {
+          track.on_media_direction_changed(async (direction) => {
+            console.log('New TransceiverDirection: ' + direction);
+
+            if (direction == 0) {
+              await playElement.play();
+              playElement.style.display = 'block';
+            } else {
+              playElement.pause();
+              playElement.style.display = 'none';
+            }
+          });
+          track.on_enabled(() => {
             console.log(`Track enabled: ${track.kind()}`);
           });
-          track.on_disabled( () => {
+          track.on_disabled(() => {
             console.log(`Track disabled: ${track.kind()}`);
           });
-          track.on_muted( () => {
+          track.on_muted(() => {
             console.log(`Track muted: ${track.kind()}`);
           });
-          track.on_unmuted( () => {
+          track.on_unmuted(() => {
             console.log(`Track unmuted: ${track.kind()}`);
           });
-          track.on_stopped( () => {
+          track.on_stopped(() => {
             track.free();
             playElement.remove();
           });
@@ -807,27 +829,12 @@
     };
 
     window.onunhandledrejection = function (event) {
-      handleJasonError(event.reason);
+      console.error(event.reason);
     };
 
     window.onerror = function (event) {
-      handleJasonError(event.error);
+      console.error(event.error);
     };
-
-    // Pretty-prints JasonError, since it does not implements Error due to
-    // wasm-bindgen limitations.
-    function handleJasonError(error) {
-      if (error && error instanceof JasonError) {
-        console.error(
-          error.name(), "\n",
-          error.message(), "\n",
-          error.source(), "\n",
-          error.trace()
-        );
-      } else {
-        console.error(error);
-      }
-    }
 
     function setCookie(name, value, days) {
       var expires = '';

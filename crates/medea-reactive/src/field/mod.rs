@@ -13,7 +13,7 @@ use std::{
 
 use futures::{
     channel::{mpsc, oneshot},
-    future::LocalBoxFuture,
+    future::{self, LocalBoxFuture},
     stream::{self, LocalBoxStream, StreamExt as _},
 };
 
@@ -66,8 +66,8 @@ where
     ///
     /// Also you can subscribe to concrete mutations with
     /// [`ObservableField::when`] and [`ObservableField::when_eq`] methods.
-    #[inline]
-    pub fn new(data: D) -> Self {
+    #[must_use]
+    pub const fn new(data: D) -> Self {
         Self {
             data,
             subs: RefCell::new(Vec::new()),
@@ -94,7 +94,7 @@ where
         // TODO: This is kinda broken.
         //       See https://github.com/instrumentisto/medea/issues/163 issue.
         if (assert_fn)(&self.data) {
-            Box::pin(futures::future::ok(()))
+            Box::pin(future::ok(()))
         } else {
             self.subs.when(Box::new(assert_fn))
         }
@@ -106,7 +106,7 @@ impl<D: 'static> Progressable<D> {
     ///
     /// Also, you can wait for all updates processing by awaiting on
     /// [`ObservableField::when_all_processed()`].
-    #[inline]
+    #[must_use]
     pub fn new(data: D) -> Self {
         Self {
             data,
@@ -169,7 +169,6 @@ where
     /// [`Future`]: std::future::Future
     // TODO: This is kinda broken.
     //       See https://github.com/instrumentisto/medea/issues/163 issue.
-    #[inline]
     pub fn when_eq(
         &self,
         should_be: D,
@@ -194,7 +193,6 @@ where
     /// Notification about mutation will be sent only if this field __really__
     /// changed. This will be checked with [`PartialEq`] implementation of
     /// underlying data.
-    #[inline]
     pub fn borrow_mut(&mut self) -> MutObservableFieldGuard<'_, D, S> {
         MutObservableFieldGuard {
             value_before_mutation: self.data.clone(),
@@ -221,6 +219,7 @@ pub trait OnObservableFieldModification<D> {
 /// Subscriber that implements subscribing and [`Whenable`] in [`Vec`].
 ///
 /// This structure should be wrapped into [`Vec`].
+#[allow(variant_size_differences)]
 pub enum UniversalSubscriber<D> {
     /// Subscriber for [`Whenable`].
     When {
@@ -243,11 +242,11 @@ pub enum UniversalSubscriber<D> {
 
 impl<D> fmt::Debug for UniversalSubscriber<D> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self {
-            UniversalSubscriber::When { .. } => {
+        match self {
+            Self::When { .. } => {
                 write!(f, "UniversalSubscriber::When")
             }
-            UniversalSubscriber::Subscribe(_) => {
+            Self::Subscribe(_) => {
                 write!(f, "UniversalSubscriber::Subscribe")
             }
         }
@@ -260,14 +259,12 @@ impl<D> fmt::Debug for UniversalSubscriber<D> {
 pub struct DroppedError;
 
 impl fmt::Display for DroppedError {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Observable value has been dropped")
     }
 }
 
 impl From<oneshot::Canceled> for DroppedError {
-    #[inline]
     fn from(_: oneshot::Canceled) -> Self {
         Self
     }
@@ -314,9 +311,14 @@ impl<D: Clone> OnObservableFieldModification<D>
     fn on_modify(&mut self, data: &D) {
         self.borrow_mut().retain(|sub| match sub {
             UniversalSubscriber::When { assert_fn, sender } => {
+                #[allow(clippy::expect_used)]
                 if (assert_fn)(data) {
-                    let _ = sender.borrow_mut().take().unwrap().send(());
-                    false
+                    sender
+                        .borrow_mut()
+                        .take()
+                        .expect("`UniversalSubscriber::When` used already")
+                        .send(())
+                        .map_or(false, |()| false)
                 } else {
                     true
                 }
@@ -331,7 +333,6 @@ impl<D: Clone> OnObservableFieldModification<D>
 impl<D, S> Deref for ObservableField<D, S> {
     type Target = D;
 
-    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.data
     }
@@ -341,7 +342,6 @@ impl<D, S> fmt::Display for ObservableField<D, S>
 where
     D: fmt::Display,
 {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.data, f)
     }
@@ -376,7 +376,6 @@ where
 {
     type Target = D;
 
-    #[inline]
     fn deref(&self) -> &Self::Target {
         self.data
     }
@@ -387,7 +386,6 @@ where
     S: OnObservableFieldModification<D>,
     D: PartialEq,
 {
-    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.data
     }
@@ -398,7 +396,6 @@ where
     S: OnObservableFieldModification<D>,
     D: PartialEq,
 {
-    #[inline]
     fn drop(&mut self) {
         if self.data != &self.value_before_mutation {
             self.subs.on_modify(self.data);

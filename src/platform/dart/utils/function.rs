@@ -1,47 +1,37 @@
 //! Functionality for calling Dart closures from Rust.
 //!
 //! Dart DL API doesn't allow calling Dart closures directly. So Dart registers
-//! a static function that accepts and invokes the provided Dart closures:
-//! [`register_fn_caller`].
+//! a static function that accepts and invokes the provided Dart closures.
 //!
-//! [`register_fn_caller`] function MUST be registered by Dart during FFI
-//! initialization phase: after Dart DL API is initialized and before any other
-//! exported Rust function is called.
+//! Dart side must register these function during the FFI initialization phase:
+//! after Dart DL API is initialized and before any other exported Rust function
+//! is called.
 
 use std::marker::PhantomData;
 
-use dart_sys::{Dart_Handle, Dart_PersistentHandle};
+use dart_sys::Dart_PersistentHandle;
+use medea_macro::dart_bridge;
 
-use crate::{api::DartValue, platform::Callback};
-
-use super::dart_api::{
-    Dart_DeletePersistentHandle_DL_Trampolined,
-    Dart_HandleFromPersistent_DL_Trampolined,
-    Dart_NewPersistentHandle_DL_Trampolined,
+use crate::{
+    api::DartValue,
+    platform::{utils::dart_api, Callback},
 };
 
-/// Pointer to an extern function that accepts a [`Dart_Handle`] and a
-/// [`DartValue`] argument.
-type FnCaller = extern "C" fn(Dart_Handle, DartValue);
+#[dart_bridge("flutter/lib/src/native/ffi/function.g.dart")]
+mod function {
+    use dart_sys::Dart_Handle;
 
-/// Dart function used to invoke other Dart closures that accept a [`DartValue`]
-/// argument.
-static mut FN_CALLER: Option<FnCaller> = None;
+    use crate::api::DartValue;
 
-/// Registers the provided [`FnCaller`] as [`FN_CALLER`].
-///
-/// # Safety
-///
-/// Must ONLY be called by Dart during FFI initialization.
-#[no_mangle]
-pub unsafe extern "C" fn register_fn_caller(f: FnCaller) {
-    FN_CALLER = Some(f);
+    /// Invokes other Dart closures that accept a [`DartValue`] argument.
+    extern "C" {
+        pub fn caller(f: Dart_Handle, val: DartValue);
+    }
 }
 
 impl<A: Into<DartValue>> Callback<A> {
     /// Invokes the underlying [`Function`] (if any) passing the single provided
     /// argument to it.
-    #[inline]
     pub fn call1<T: Into<A>>(&self, arg: T) {
         if let Some(f) = self.0.borrow().as_ref() {
             f.call1(arg.into());
@@ -49,8 +39,8 @@ impl<A: Into<DartValue>> Callback<A> {
     }
 }
 
-// TODO: Print exception if Dart closure throws.
 /// Dart closure that can be called from Rust.
+#[derive(Debug)]
 pub struct Function<T> {
     /// [`Dart_PersistentHandle`] to the Dart closure that should be called.
     dart_fn: Dart_PersistentHandle,
@@ -63,11 +53,16 @@ impl<T> Function<T> {
     /// Creates a new [`Function`] from the provided [`Dart_Handle`] to a Dart
     /// closure, and persists the provided [`Dart_Handle`] so it won't be moved
     /// by the Dart VM GC.
-    #[inline]
+    ///
+    /// # Safety
+    ///
+    /// The provided [`Dart_Handle`] should be non-`null` and correct.
+    ///
+    /// [`Dart_Handle`]: dart_sys::Dart_Handle
     #[must_use]
-    pub fn new(cb: Dart_Handle) -> Self {
+    pub const unsafe fn new(dart_fn: Dart_PersistentHandle) -> Self {
         Self {
-            dart_fn: unsafe { Dart_NewPersistentHandle_DL_Trampolined(cb) },
+            dart_fn,
             _arg: PhantomData,
         }
     }
@@ -75,7 +70,6 @@ impl<T> Function<T> {
 
 impl Function<()> {
     /// Calls the underlying Dart closure.
-    #[inline]
     pub fn call0(&self) {
         self.call1(());
     }
@@ -83,12 +77,11 @@ impl Function<()> {
 
 impl<T: Into<DartValue>> Function<T> {
     /// Calls the underlying Dart closure with the provided argument.
-    #[inline]
     pub fn call1(&self, arg: T) {
+        let fn_handle =
+            unsafe { dart_api::handle_from_persistent(self.dart_fn) };
         unsafe {
-            let fn_handle =
-                Dart_HandleFromPersistent_DL_Trampolined(self.dart_fn);
-            FN_CALLER.unwrap()(fn_handle, arg.into());
+            function::caller(fn_handle, arg.into());
         }
     }
 }
@@ -97,7 +90,7 @@ impl<T> Drop for Function<T> {
     /// Manually deallocates saved [`Dart_PersistentHandle`] so it won't leak.
     fn drop(&mut self) {
         unsafe {
-            Dart_DeletePersistentHandle_DL_Trampolined(self.dart_fn);
+            dart_api::delete_persistent_handle(self.dart_fn);
         }
     }
 }

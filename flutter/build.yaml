@@ -1,0 +1,7 @@
+targets:
+  $default:
+    sources:
+      - $package$
+      - test/**
+      - pubspec.*
+      - lib/src/native/ffi/jason_api.g.dart

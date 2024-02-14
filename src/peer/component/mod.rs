@@ -5,14 +5,17 @@ mod local_sdp;
 mod tracks_repository;
 mod watchers;
 
+#[cfg(feature = "mockable")]
+use std::future::Future;
 use std::{cell::Cell, collections::HashSet, rc::Rc};
 
-use futures::{future::LocalBoxFuture, TryFutureExt as _};
+use futures::{future::LocalBoxFuture, StreamExt as _, TryFutureExt as _};
 use medea_client_api_proto::{
     self as proto, IceCandidate, IceServer, NegotiationRole, PeerId as Id,
     TrackId,
 };
 use medea_reactive::{AllProcessed, ObservableCell, ProgressableCell};
+use proto::{ConnectionMode, MemberId};
 use tracerr::Traced;
 
 use crate::{
@@ -96,6 +99,12 @@ pub struct State {
     /// ID of this [`Component`].
     id: Id,
 
+    /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
+
     /// All [`sender::State`]s of this [`Component`].
     senders: TracksRepository<sender::State>,
 
@@ -110,7 +119,7 @@ pub struct State {
     ice_servers: Vec<IceServer>,
 
     /// Current [`NegotiationRole`] of this [`Component`].
-    negotiation_role: ObservableCell<Option<NegotiationRole>>,
+    negotiation_role: ProgressableCell<Option<NegotiationRole>>,
 
     /// Negotiation state of this [`Component`].
     negotiation_state: ObservableCell<NegotiationState>,
@@ -131,66 +140,76 @@ pub struct State {
     /// called if some [`sender`] wants to update a local stream.
     maybe_update_local_stream: ObservableCell<bool>,
 
+    /// Indicator whether there is some information about tracks to provide
+    /// into [`Connections`].
+    ///
+    /// [`Connections`]: crate::connection::Connections
+    maybe_update_connections:
+        ObservableCell<Option<(TrackId, HashSet<MemberId>)>>,
+
     /// Synchronization state of this [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
 
 impl State {
     /// Creates a new [`State`] with the provided data.
-    #[inline]
     #[must_use]
     pub fn new(
         id: Id,
         ice_servers: Vec<IceServer>,
         force_relay: bool,
         negotiation_role: Option<NegotiationRole>,
+        connection_mode: ConnectionMode,
     ) -> Self {
         Self {
             id,
+            connection_mode,
             senders: TracksRepository::new(),
             receivers: TracksRepository::new(),
             ice_servers,
             force_relay,
             remote_sdp: ProgressableCell::new(None),
             local_sdp: LocalSdp::new(),
-            negotiation_role: ObservableCell::new(negotiation_role),
+            negotiation_role: ProgressableCell::new(negotiation_role),
             negotiation_state: ObservableCell::new(NegotiationState::Stable),
             restart_ice: Cell::new(false),
             ice_candidates: IceCandidates::new(),
             maybe_update_local_stream: ObservableCell::new(false),
+            maybe_update_connections: ObservableCell::new(None),
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
 
-    /// Returns [`Id`] of this [`State`].
-    #[inline]
+    /// Returns [`ConnectionMode`] of this [`State`].
     #[must_use]
-    pub fn id(&self) -> Id {
+    pub const fn connection_mode(&self) -> ConnectionMode {
+        self.connection_mode
+    }
+
+    /// Returns [`Id`] of this [`State`].
+    #[must_use]
+    pub const fn id(&self) -> Id {
         self.id
     }
 
     /// Returns all [`IceServer`]s of this [`State`].
-    #[inline]
     #[must_use]
-    pub fn ice_servers(&self) -> &Vec<IceServer> {
+    pub const fn ice_servers(&self) -> &Vec<IceServer> {
         &self.ice_servers
     }
 
     /// Indicates whether [`PeerConnection`] should be relayed forcibly.
-    #[inline]
     #[must_use]
-    pub fn force_relay(&self) -> bool {
+    pub const fn force_relay(&self) -> bool {
         self.force_relay
     }
 
     /// Inserts a new [`sender::State`] into this [`State`].
-    #[inline]
     pub fn insert_sender(&self, track_id: TrackId, sender: Rc<sender::State>) {
         self.senders.insert(track_id, sender);
     }
 
     /// Inserts a new [`receiver::State`] into this [`State`].
-    #[inline]
     pub fn insert_receiver(
         &self,
         track_id: TrackId,
@@ -200,14 +219,12 @@ impl State {
     }
 
     /// Returns [`Rc`] to the [`sender::State`] with the provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_sender(&self, track_id: TrackId) -> Option<Rc<sender::State>> {
         self.senders.get(track_id)
     }
 
     /// Returns [`Rc`] to the [`receiver::State`] with the provided [`TrackId`].
-    #[inline]
     #[must_use]
     pub fn get_receiver(
         &self,
@@ -216,45 +233,53 @@ impl State {
         self.receivers.get(track_id)
     }
 
+    /// Returns IDs of all the send [`TrackId`]s.
+    pub fn get_send_tracks(&self) -> Vec<TrackId> {
+        self.senders.ids()
+    }
+
+    /// Returns IDs of all the receive [`TrackId`]s.
+    pub fn get_recv_tracks(&self) -> Vec<TrackId> {
+        self.receivers.ids()
+    }
+
     /// Sets [`NegotiationRole`] of this [`State`] to the provided one.
-    #[inline]
     pub async fn set_negotiation_role(
         &self,
         negotiation_role: NegotiationRole,
     ) {
-        let _ = self.negotiation_role.when(Option::is_none).await;
+        _ = self
+            .negotiation_role
+            .subscribe()
+            .any(|val| async move { val.is_none() })
+            .await;
         self.negotiation_role.set(Some(negotiation_role));
     }
 
     /// Sets [`State::restart_ice`] to `true`.
-    #[inline]
     pub fn restart_ice(&self) {
         self.restart_ice.set(true);
     }
 
     /// Removes [`sender::State`] or [`receiver::State`] with the provided
     /// [`TrackId`].
-    #[inline]
     pub fn remove_track(&self, track_id: TrackId) {
         if !self.receivers.remove(track_id) {
-            self.senders.remove(track_id);
+            _ = self.senders.remove(track_id);
         }
     }
 
     /// Sets remote SDP offer to the provided value.
-    #[inline]
     pub fn set_remote_sdp(&self, sdp: String) {
         self.remote_sdp.set(Some(sdp));
     }
 
     /// Adds [`IceCandidate`] for the [`State`].
-    #[inline]
     pub fn add_ice_candidate(&self, ice_candidate: IceCandidate) {
         self.ice_candidates.add(ice_candidate);
     }
 
     /// Marks current local SDP as approved by server.
-    #[inline]
     pub fn apply_local_sdp(&self, sdp: String) {
         self.local_sdp.approved_set(sdp);
     }
@@ -262,7 +287,6 @@ impl State {
     /// Stops all timeouts of the [`State`].
     ///
     /// Stops local SDP rollback timeout.
-    #[inline]
     pub fn stop_timeouts(&self) {
         self.local_sdp.stop_timeout();
     }
@@ -270,7 +294,6 @@ impl State {
     /// Resumes all timeouts of the [`State`].
     ///
     /// Resumes local SDP rollback timeout.
-    #[inline]
     pub fn resume_timeouts(&self) {
         self.local_sdp.resume_timeout();
     }
@@ -305,7 +328,6 @@ impl State {
     /// [`receiver::State`]'s updates will be applied.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_all_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.senders.when_updated().into(),
@@ -354,9 +376,12 @@ impl State {
                     Rc::new(sender::State::new(
                         track.id,
                         mid.clone(),
-                        track.media_type.clone(),
+                        track.media_type,
+                        track.media_direction,
+                        track.muted,
                         receivers.clone(),
                         send_constraints,
+                        self.connection_mode,
                     )),
                 );
             }
@@ -366,20 +391,22 @@ impl State {
                     Rc::new(receiver::State::new(
                         track.id,
                         mid.clone(),
-                        track.media_type.clone(),
+                        track.media_type,
+                        track.media_direction,
+                        track.muted,
                         sender.clone(),
+                        self.connection_mode,
                     )),
                 );
             }
         }
     }
 
-    /// Returns [`Future`] resolving once all [`State::senders`]' inserts and
-    /// removes are processed.
+    /// Returns [`Future`] resolving once all senders inserts and removes are
+    /// processed.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
-    fn when_all_senders_processed(&self) -> AllProcessed<'static> {
+    pub fn when_all_senders_processed(&self) -> AllProcessed<'static> {
         self.senders.when_all_processed()
     }
 
@@ -387,7 +414,6 @@ impl State {
     /// removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     fn when_all_receivers_processed(&self) -> AllProcessed<'static> {
         self.receivers.when_all_processed()
     }
@@ -396,17 +422,25 @@ impl State {
     /// [`proto::TrackPatchEvent`].
     ///
     /// Schedules a local stream update.
-    pub fn patch_track(&self, track_patch: &proto::TrackPatchEvent) {
-        if let Some(sender) = self.get_sender(track_patch.id) {
-            sender.update(track_patch);
+    pub async fn patch_track(&self, patch: proto::TrackPatchEvent) {
+        if let Some(receivers) = &patch.receivers {
+            _ = self.maybe_update_connections.when_eq(None).await;
+            self.maybe_update_connections
+                .set(Some((patch.id, receivers.clone().into_iter().collect())));
+        }
+
+        if let Some(sender) = self.get_sender(patch.id) {
+            sender.update(patch);
+            _ = self.maybe_update_local_stream.when_eq(false).await;
             self.maybe_update_local_stream.set(true);
-        } else if let Some(receiver) = self.get_receiver(track_patch.id) {
-            receiver.update(track_patch);
+        } else if let Some(receiver) = self.get_receiver(patch.id) {
+            receiver.update(&patch);
+        } else {
+            log::warn!("Cannot apply patch to `Track`: {}", patch.id.0);
         }
     }
 
     /// Returns the current SDP offer of this [`State`].
-    #[inline]
     #[must_use]
     pub fn current_sdp_offer(&self) -> Option<String> {
         self.local_sdp.current()
@@ -419,10 +453,10 @@ pub type Component = component::Component<State, PeerConnection>;
 impl AsProtoState for State {
     type Output = proto::state::Peer;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
+            connection_mode: self.connection_mode,
             senders: self.senders.as_proto(),
             receivers: self.receivers.as_proto(),
             ice_candidates: self.ice_candidates.as_proto(),
@@ -448,20 +482,26 @@ impl SynchronizableState for State {
             from.ice_servers,
             from.force_relay,
             from.negotiation_role,
+            from.connection_mode,
         );
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, sender) in from.senders {
-            state.senders.insert(
-                id,
-                Rc::new(sender::State::from_proto(sender, send_cons)),
-            );
+            if !sender.receivers.is_empty() {
+                state.senders.insert(
+                    id,
+                    Rc::new(sender::State::from_proto(sender, send_cons)),
+                );
+            }
         }
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, receiver) in from.receivers {
             state.receivers.insert(
                 id,
                 Rc::new(receiver::State::from_proto(receiver, send_cons)),
             );
         }
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for ice_candidate in from.ice_candidates {
             state.ice_candidates.add(ice_candidate);
         }
@@ -489,7 +529,6 @@ impl SynchronizableState for State {
 }
 
 impl Updatable for State {
-    #[inline]
     fn when_stabilized(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.senders.when_stabilized().into(),
@@ -497,7 +536,6 @@ impl Updatable for State {
         ])
     }
 
-    #[inline]
     fn when_updated(&self) -> AllProcessed<'static> {
         medea_reactive::when_all_processed(vec![
             self.receivers.when_updated().into(),
@@ -505,14 +543,12 @@ impl Updatable for State {
         ])
     }
 
-    #[inline]
     fn connection_lost(&self) {
         self.sync_state.set(SyncState::Desynced);
         self.senders.connection_lost();
         self.receivers.connection_lost();
     }
 
-    #[inline]
     fn connection_recovered(&self) {
         self.sync_state.set(SyncState::Syncing);
         self.senders.connection_recovered();
@@ -521,57 +557,49 @@ impl Updatable for State {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl State {
     /// Waits for a [`State::remote_sdp`] change to be applied.
-    #[inline]
     pub async fn when_remote_sdp_processed(&self) {
         self.remote_sdp.when_all_processed().await;
     }
 
     /// Resets a [`NegotiationRole`] of this [`State`] to [`None`].
-    #[inline]
     pub fn reset_negotiation_role(&self) {
         self.negotiation_state.set(NegotiationState::Stable);
         self.negotiation_role.set(None);
     }
 
     /// Returns the current [`NegotiationRole`] of this [`State`].
-    #[inline]
     #[must_use]
     pub fn negotiation_role(&self) -> Option<NegotiationRole> {
         self.negotiation_role.get()
     }
 
-    /// Returns [`Future`] resolving once local SDP approve is needed.
-    #[inline]
-    pub fn when_local_sdp_approve_needed(
-        &self,
-    ) -> impl std::future::Future<Output = ()> {
+    /// Returns a [`Future`] resolving once local SDP approve is needed.
+    pub fn when_local_sdp_approve_needed(&self) -> impl Future<Output = ()> {
         use futures::FutureExt as _;
+
         self.negotiation_state
             .when_eq(NegotiationState::WaitLocalSdpApprove)
             .map(drop)
     }
 
     /// Stabilizes all [`receiver::State`]s of this [`State`].
-    #[inline]
     pub fn stabilize_all(&self) {
         self.receivers.stabilize_all();
     }
 
     /// Waits until a [`State::local_sdp`] is resolved and returns its new
     /// value.
-    #[inline]
-    #[must_use]
     pub async fn when_local_sdp_updated(&self) -> Option<String> {
         use futures::StreamExt as _;
 
-        self.local_sdp.subscribe().skip(1).next().await.unwrap()
+        self.local_sdp.subscribe().skip(1).next().await.flatten()
     }
 
     /// Waits until all [`State::senders`]' and [`State::receivers`]' inserts
     /// are processed.
-    #[inline]
     pub async fn when_all_tracks_created(&self) {
         medea_reactive::when_all_processed(vec![
             self.senders.when_insert_processed().into(),
@@ -581,7 +609,6 @@ impl State {
     }
 
     /// Sets [`State::sync_state`] to the [`SyncState::Synced`].
-    #[inline]
     pub fn synced(&self) {
         self.senders.synced();
         self.receivers.synced();

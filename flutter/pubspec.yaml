@@ -1,19 +1,49 @@
 name: medea_jason
 description: Cross-platform client library of Medea media server for Flutter.
-version: 0.3.0-dev
-homepage: https://github.com/instrumentisto/medea-jason
+version: 0.4.1-dev
+homepage: https://github.com/instrumentisto/medea-jason/blob/master/flutter
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=3.10.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^1.0.0
+  ffi: ^2.0.1
+  flutter_rust_bridge: 1.82.4  # should be the same as in `Cargo.lock`
+  freezed_annotation: ^2.2.0
+  http: ^0.13.5
+  js: ^0.6.5
+  json_annotation: ^4.7.0
+  medea_flutter_webrtc: ^0.9.0
+  meta: ^1.8.0
+  retry: ^3.1.0
+  tuple: ^2.0.1
+  uuid: ^3.0.7
 
 dev_dependencies:
-  pedantic: ^1.9.0
+  build_runner: ^2.4.5
+  ffigen: 8.0.2
+  flutter_gherkin: 3.0.0-rc.17
+  flutter_lints: ^3.0.1
+  flutter_test:
+    sdk: flutter
+  freezed: ^2.2.0
+  gherkin: ^3.1.0
+  import_sorter: ^4.6.0
+  json_serializable: ^6.7.1
+
+# TODO: Remove once `flutter_gherkin` updates.
+dependency_overrides:
+  analyzer: ^5.13.0
+  # Pinned until analyzer is upgraded to v6
+  #  https://github.com/dart-lang/dart_style/issues/1328
+  dart_style: 2.3.3
+  # Pinned until gql-dart updates to v4
+  # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
+  uuid: ^3.0.7
+
 
 flutter:
   plugin:
@@ -21,3 +51,13 @@ flutter:
       android:
         package: com.medea.jason
         pluginClass: JasonPlugin
+      ios:
+        pluginClass: MedeaJasonPlugin
+      linux:
+        pluginClass: MedeaJasonPlugin
+      macos:
+        pluginClass: MedeaJasonPlugin
+      windows:
+        pluginClass: MedeaJasonPlugin
+  assets:
+    - assets/pkg/

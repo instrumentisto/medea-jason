@@ -23,9 +23,9 @@ pub struct Room {
 impl Room {
     /// Converts [`Room`] into protobuf [`proto::Room`].
     #[must_use]
-    pub fn into_proto(self, id: String) -> proto::Room {
+    pub fn into_proto(self, room_id: String) -> proto::Room {
         proto::Room {
-            id,
+            id: room_id,
             pipeline: self
                 .pipeline
                 .into_iter()
@@ -39,10 +39,13 @@ impl Room {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(tag = "kind")]
 pub enum RoomElement {
+    /// [`Member`] of the [`Room`].
     Member(Member),
 }
 
 impl RoomElement {
+    /// Converts this [`RoomElement`] into a [`proto::room::Element`] with the
+    /// specified `id`.
     #[must_use]
     pub fn into_proto(self, id: String) -> proto::room::Element {
         let el = match self {
@@ -54,13 +57,15 @@ impl RoomElement {
     }
 }
 
+#[allow(clippy::fallible_impl_from, clippy::unwrap_used)]
 impl From<proto::room::Element> for RoomElement {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {
             proto::room::element::El::Member(member) => {
                 Self::Member(member.into())
             }
-            _ => unimplemented!(),
+            proto::room::element::El::WebrtcPlay(_)
+            | proto::room::element::El::WebrtcPub(_) => unimplemented!(),
         }
     }
 }

@@ -5,6 +5,7 @@ use crate::{browser::Statement, object::Object};
 use super::Error;
 
 /// Representation of a `LocalMediaTrack` object.
+#[derive(Clone, Copy, Debug)]
 pub struct LocalTrack;
 
 impl Object<LocalTrack> {
@@ -18,11 +19,11 @@ impl Object<LocalTrack> {
         self.execute(Statement::new(
             // language=JavaScript
             r#"
-                async (track) => {
-                    let sysTrack = track.track.get_track();
-                    track.track.free();
-                    return sysTrack.readyState === "ended";
-                }
+            async (track) => {
+                let sysTrack = track.track.get_track();
+                track.track.free();
+                return sysTrack.readyState === "ended";
+            }
             "#,
             [],
         ))
@@ -42,7 +43,7 @@ impl Object<LocalTrack> {
             // Not a bug, but a naming specific of WebRTC.
             // See: https:/mdn.io/Web/API/MediaStreamTrack/enabled
             // language=JavaScript
-            r#"async (t) => !t.track.get_track().enabled"#,
+            "async (t) => !t.track.get_track().enabled",
             [],
         ))
         .await?

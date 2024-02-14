@@ -10,19 +10,22 @@ use crate::{
 use super::{AwaitCompletion, Error};
 
 /// Representation of a `Room` JS object.
+#[derive(Clone, Copy, Debug)]
 pub struct Room;
 
 /// Representation of a `MediaKind` JS enum.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MediaKind {
+    /// Audio media.
     Audio,
+
+    /// Video media.
     Video,
 }
 
 impl FromStr for MediaKind {
     type Err = ParsingFailedError;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains("audio") {
             Ok(Self::Audio)
@@ -36,12 +39,11 @@ impl FromStr for MediaKind {
 
 impl MediaKind {
     /// Converts this [`MediaKind`] to the JS code for this enum variant.
-    #[inline]
     #[must_use]
-    pub fn as_js(self) -> &'static str {
+    pub const fn as_js(self) -> &'static str {
         match self {
-            MediaKind::Audio => "window.rust.MediaKind.Audio",
-            MediaKind::Video => "window.rust.MediaKind.Video",
+            Self::Audio => "window.rust.MediaKind.Audio",
+            Self::Video => "window.rust.MediaKind.Video",
         }
     }
 }
@@ -49,14 +51,16 @@ impl MediaKind {
 /// Representation of a `MediaSourceKind` JS enum.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MediaSourceKind {
+    /// Device source of media (camera, mic, etc).
     Device,
+
+    /// Display source of media (screen sharing, etc).
     Display,
 }
 
 impl FromStr for MediaSourceKind {
     type Err = ParsingFailedError;
 
-    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.contains("device") {
             Ok(Self::Device)
@@ -70,12 +74,11 @@ impl FromStr for MediaSourceKind {
 
 impl MediaSourceKind {
     /// Converts this [`MediaSourceKind`] to a JS code for this enum variant.
-    #[inline]
     #[must_use]
-    pub fn as_js(self) -> &'static str {
+    pub const fn as_js(self) -> &'static str {
         match self {
-            MediaSourceKind::Device => "window.rust.MediaSourceKind.Device",
-            MediaSourceKind::Display => "window.rust.MediaSourceKind.Display",
+            Self::Device => "window.rust.MediaSourceKind.Device",
+            Self::Display => "window.rust.MediaSourceKind.Display",
         }
     }
 }
@@ -89,12 +92,12 @@ impl Object<Room> {
     pub async fn join(&self, uri: String) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    const [uri] = args;
-                    await room.room.join(uri);
-                }
-            "#,
+            "
+            async (room) => {
+                const [uri] = args;
+                await room.room.join(uri);
+            }
+            ",
             [uri.into()],
         ))
         .await
@@ -118,21 +121,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<_> = match kind {
+        let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.disable_video({})", media_source_kind).into()
+                format!("r.room.disable_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {disable};
+                }}
                 "#,
-                maybe_await, disable,
             ),
             [],
         ))
@@ -157,21 +159,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<_> = match kind {
+        let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.enable_video({})", media_source_kind).into()
+                format!("r.room.enable_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {enable};
+                }}
                 "#,
-                maybe_await, enable,
             ),
             [],
         ))
@@ -195,10 +196,10 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let disable: Cow<_> = match kind {
+        let disable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.disable_remote_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.disable_remote_video({})", media_source_kind)
+                format!("r.room.disable_remote_video({media_source_kind})")
                     .into()
             }
         };
@@ -206,11 +207,10 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        await {};
-                    }}
+                async (r) => {{
+                    await {disable};
+                }}
                 "#,
-                disable,
             ),
             [],
         ))
@@ -234,10 +234,10 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let enable: Cow<_> = match kind {
+        let enable: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.enable_remote_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.enable_remote_video({})", media_source_kind)
+                format!("r.room.enable_remote_video({media_source_kind})")
                     .into()
             }
         };
@@ -245,11 +245,10 @@ impl Object<Room> {
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        await {};
-                    }}
+                async (r) => {{
+                    await {enable};
+                }}
                 "#,
-                enable,
             ),
             [],
         ))
@@ -274,21 +273,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let mute: Cow<_> = match kind {
+        let mute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.mute_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.mute_video({})", media_source_kind).into()
+                format!("r.room.mute_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {mute};
+                }}
                 "#,
-                maybe_await, mute,
             ),
             [],
         ))
@@ -313,21 +311,20 @@ impl Object<Room> {
     ) -> Result<(), Error> {
         let media_source_kind =
             source_kind.map(MediaSourceKind::as_js).unwrap_or_default();
-        let unmute: Cow<_> = match kind {
+        let unmute: Cow<'_, _> = match kind {
             MediaKind::Audio => "r.room.unmute_audio()".into(),
             MediaKind::Video => {
-                format!("r.room.unmute_video({})", media_source_kind).into()
+                format!("r.room.unmute_video({media_source_kind})").into()
             }
         };
         self.execute(Statement::new(
             // language=JavaScript
             &format!(
                 r#"
-                    async (r) => {{
-                        {} {};
-                    }}
+                async (r) => {{
+                    {maybe_await} {unmute};
+                }}
                 "#,
-                maybe_await, unmute,
             ),
             [],
         ))
@@ -345,93 +342,100 @@ impl Object<Room> {
     ) -> Result<Object<ConnectionStore>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"
-                async (r) => {
-                    let store = {
-                        connections: new Map(),
-                        subs: new Map(),
+            "
+            async (r) => {
+                let store = {
+                    connections: new Map(),
+                    subs: new Map(),
+                };
+                r.room.on_new_connection((conn) => {
+                    let closeListener = {
+                        isClosed: false,
+                        subs: [],
                     };
-                    r.room.on_new_connection((conn) => {
-                        let closeListener = {
-                            isClosed: false,
-                            subs: [],
+                    let tracksStore = {
+                        tracks: [],
+                        subs: []
+                    };
+                    let connection = {
+                        conn: conn,
+                        tracksStore: tracksStore,
+                        closeListener: closeListener,
+                    };
+                    conn.on_remote_track_added((t) => {
+                        let track = {
+                            track: t,
+                            on_enabled_fire_count: 0,
+                            on_disabled_fire_count: 0,
+                            on_muted_fire_count: 0,
+                            on_unmuted_fire_count: 0,
+                            stopped: false,
+                            onEnabledSubs: [],
+                            onDisabledSubs: [],
+                            onMutedSubs: [],
+                            onUnmutedSubs: [],
+                            onMediaDirectionChangedSubs: []
                         };
-                        let tracksStore = {
-                            tracks: [],
-                            subs: []
-                        };
-                        let connection = {
-                            conn: conn,
-                            tracksStore: tracksStore,
-                            closeListener: closeListener,
-                        };
-                        conn.on_remote_track_added((t) => {
-                            let track = {
-                                track: t,
-                                on_enabled_fire_count: 0,
-                                on_disabled_fire_count: 0,
-                                on_muted_fire_count: 0,
-                                on_unmuted_fire_count: 0,
-                                stopped: false,
-                                onEnabledSubs: [],
-                                onDisabledSubs: [],
-                                onMutedSubs: [],
-                                onUnmutedSubs: []
-                            };
-                            track.track.on_enabled(() => {
+                        track.track.on_muted(() => {
+                            track.on_muted_fire_count++;
+                            for (sub of track.onMutedSubs) {
+                                sub();
+                            }
+                            track.onMutedSubs = [];
+                        });
+                        track.track.on_unmuted(() => {
+                            track.on_unmuted_fire_count++;
+                            for (sub of track.onUnmutedSubs) {
+                                sub();
+                            }
+                            track.onUnmutedSubs = [];
+                        });
+                        track.track.on_stopped(() => {
+                            track.stopped = true;
+                        });
+                        track.track.on_media_direction_changed((dir) => {
+                            if (dir == 0) {
                                 track.on_enabled_fire_count++;
                                 for (sub of track.onEnabledSubs) {
                                     sub();
                                 }
                                 track.onEnabledSubs = [];
-                            });
-                            track.track.on_disabled(() => {
+                            } else {
                                 track.on_disabled_fire_count++;
                                 for (sub of track.onDisabledSubs) {
-                                    sub();
+                                    sub(dir);
                                 }
                                 track.onDisabledSubs = [];
-                            });
-                            track.track.on_muted(() => {
-                                track.on_muted_fire_count++;
-                                for (sub of track.onMutedSubs) {
-                                    sub();
-                                }
-                                track.onMutedSubs = [];
-                            });
-                            track.track.on_unmuted(() => {
-                                track.on_unmuted_fire_count++;
-                                for (sub of track.onUnmutedSubs) {
-                                    sub();
-                                }
-                                track.onUnmutedSubs = [];
-                            });
-                            track.track.on_stopped(() => {
-                                track.stopped = true;
-                            });
-                            tracksStore.tracks.push(track);
-                            let newStoreSubs = tracksStore.subs
-                                .filter((sub) => {
-                                    return sub(track);
-                                });
-                            tracksStore.subs = newStoreSubs;
-                        });
-                        conn.on_close(() => {
-                            closeListener.isClosed = true;
-                            for (sub of closeListener.subs) {
-                                sub();
                             }
+
+                            for (sub of track.onMediaDirectionChangedSubs) {
+                                sub(dir);
+                            }
+                            track.onMediaDirectionChangedSubs = [];
                         });
-                        let id = conn.get_remote_member_id();
-                        store.connections.set(id, connection);
-                        let sub = store.subs.get(id);
-                        if (sub !== undefined) {
-                            sub(connection);
+                        tracksStore.tracks.push(track);
+                        let newStoreSubs = tracksStore.subs
+                            .filter((sub) => {
+                                return sub(track);
+                            });
+                        tracksStore.subs = newStoreSubs;
+                    });
+                    conn.on_close(() => {
+                        closeListener.isClosed = true;
+                        for (sub of closeListener.subs) {
+                            sub();
                         }
                     });
-                    return store;
-                }
-            "#,
+                    let id = conn.get_remote_member_id();
+                    store.connections.set(id, connection);
+                    let sub = store.subs.get(id);
+                    if (sub !== undefined) {
+                        sub(connection);
+                    }
+                });
+                return store;
+            }
+            ",
             [],
         ))
         .await
@@ -447,7 +451,7 @@ impl Object<Room> {
     ) -> Result<Object<tracks_store::Local>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"async (room) => room.localTracksStore"#,
+            "async (room) => room.localTracksStore",
             [],
         ))
         .await
@@ -461,20 +465,20 @@ impl Object<Room> {
     pub async fn wait_for_close(&self) -> Result<String, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    if (room.closeListener.isClosed) {
-                        return room.closeListener.closeReason.reason();
-                    } else {
-                        let waiter = new Promise((resolve) => {
-                            room.closeListener.subs.push(resolve);
-                        });
+            "
+            async (room) => {
+                if (room.closeListener.isClosed) {
+                    return room.closeListener.closeReason.reason();
+                } else {
+                    let waiter = new Promise((resolve) => {
+                        room.closeListener.subs.push(resolve);
+                    });
 
-                        let closeReason = await waiter;
-                        return closeReason.reason();
-                    }
+                    let closeReason = await waiter;
+                    return closeReason.reason();
                 }
-            "#,
+            }
+            ",
             [],
         ))
         .await?
@@ -493,15 +497,15 @@ impl Object<Room> {
     pub async fn wait_for_connection_loss(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    if (!room.connLossListener.isLost) {
-                        await new Promise((resolve) => {
-                            room.connLossListener.subs.push(resolve);
-                        });
-                    }
+            "
+            async (room) => {
+                if (!room.connLossListener.isLost) {
+                    await new Promise((resolve) => {
+                        room.connLossListener.subs.push(resolve);
+                    });
                 }
-            "#,
+            }
+            ",
             [],
         ))
         .await
@@ -517,14 +521,14 @@ impl Object<Room> {
     pub async fn start_ws_reconnect(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    await room
-                        .connLossListener
-                        .reconnectHandle
-                        .reconnect_with_backoff(100, 2.0, 1000, 5000);
-                }
-            "#,
+            "
+            async (room) => {
+                await room
+                    .connLossListener
+                    .reconnectHandle
+                    .reconnect_with_backoff(100, 2.0, 1000, 5000);
+            }
+            ",
             [],
         ))
         .await
@@ -541,31 +545,35 @@ impl Object<Room> {
         &self,
         video: bool,
         audio: bool,
+        should_wait: bool,
     ) -> Result<(), Error> {
         self.forget_local_tracks().await;
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    const [video, audio] = args;
-                    let constraints = new rust.MediaStreamSettings();
-                    if (video) {
-                        let video =
-                            new window.rust.DeviceVideoTrackConstraints();
-                        constraints.device_video(video);
-                    }
-                    if (audio) {
-                        let audio = new window.rust.AudioTrackConstraints();
-                        constraints.audio(audio);
-                    }
-                    await room.room.set_local_media_settings(
-                        constraints,
-                        true,
-                        false
-                    );
+            "
+            async (room) => {
+                const [video, audio, shouldWait] = args;
+                let constraints = new rust.MediaStreamSettings();
+                if (video) {
+                    let video =
+                        new window.rust.DeviceVideoTrackConstraints();
+                    constraints.device_video(video);
                 }
-            "#,
-            [video.into(), audio.into()],
+                if (audio) {
+                    let audio = new window.rust.AudioTrackConstraints();
+                    constraints.audio(audio);
+                }
+                let promise = room.room.set_local_media_settings(
+                    constraints,
+                    true,
+                    false
+                );
+                if (shouldWait) {
+                    await promise;
+                }
+            }
+            ",
+            [video.into(), audio.into(), should_wait.into()],
         ))
         .await
         .map(drop)
@@ -580,30 +588,31 @@ impl Object<Room> {
     pub async fn when_failed_local_stream_count(&self, count: u64) {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    const [count] = args;
-                    return await new Promise((resolve) => {
-                        if (room.onFailedLocalStreamListener.count === count) {
-                            resolve();
-                        } else {
-                            room.onFailedLocalStreamListener.subs.push(() => {
-                                let failCount =
-                                    room.onFailedLocalStreamListener.count;
-                                if (failCount === count) {
-                                    resolve();
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            });
-                        }
-                    });
-                }
-            "#,
+            "
+            async (room) => {
+                const [count] = args;
+                return await new Promise((resolve) => {
+                    if (room.onFailedLocalStreamListener.count === count) {
+                        resolve();
+                    } else {
+                        room.onFailedLocalStreamListener.subs.push(() => {
+                            let failCount =
+                                room.onFailedLocalStreamListener.count;
+                            if (failCount === count) {
+                                resolve();
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        });
+                    }
+                });
+            }
+            ",
             [count.into()],
         ))
         .await
+        .map(drop)
         .unwrap();
     }
 
@@ -615,18 +624,20 @@ impl Object<Room> {
     pub async fn forget_local_tracks(&self) {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async (room) => {
-                    room.localTracksStore.tracks = [];
-                }
-            "#,
+            "
+            async (room) => {
+                room.localTracksStore.tracks.forEach((t) => t.track.free());
+                room.localTracksStore.tracks = [];
+            }
+            ",
             [],
         ))
         .await
+        .map(drop)
         .unwrap();
     }
 }
 
 /// Error of parsing a [`MediaKind`] or a [`MediaSourceKind`].
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ParsingFailedError;

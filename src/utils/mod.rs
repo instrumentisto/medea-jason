@@ -15,7 +15,7 @@ use medea_reactive::Guarded;
 #[doc(inline)]
 pub use self::{
     component::{AsProtoState, Component, SynchronizableState, Updatable},
-    errors::{JsCaused, JsonParseError},
+    errors::{Caused, JsonParseError},
     resettable_delay::{resettable_delay_for, ResettableDelayHandle},
 };
 
@@ -48,7 +48,6 @@ macro_rules! upgrade_or_break {
 /// Intended for use in [`StreamExt::filter_map()`].
 ///
 /// [`StreamExt::filter_map()`]: futures::StreamExt::filter_map
-#[inline]
 pub fn transpose_guarded<T>(
     val: Guarded<Option<T>>,
 ) -> impl Future<Output = Option<Guarded<T>>> {

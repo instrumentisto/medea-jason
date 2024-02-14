@@ -3,19 +3,25 @@
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
+    fmt,
+    future::Future,
     rc::{Rc, Weak},
 };
 
 use async_recursion::async_recursion;
 use async_trait::async_trait;
 use derive_more::{Display, From};
-use futures::{channel::mpsc, future, FutureExt as _, StreamExt as _};
+use futures::{
+    channel::mpsc, future, future::LocalBoxFuture, FutureExt as _,
+    StreamExt as _, TryFutureExt as _,
+};
 use medea_client_api_proto::{
     self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
     EventHandler, IceCandidate, IceConnectionState, IceServer, MemberId,
     NegotiationRole, PeerConnectionState, PeerId, PeerMetrics, PeerUpdate,
     Track, TrackId,
 };
+use proto::ConnectionMode;
 use tracerr::Traced;
 
 use crate::{
@@ -37,25 +43,29 @@ use crate::{
         ClientDisconnect, CloseReason, ConnectionInfo,
         ConnectionInfoParseError, ReconnectHandle, RpcSession, SessionError,
     },
-    utils::{AsProtoState, JsCaused},
+    utils::{AsProtoState, Caused},
 };
+
+/// Alias of [`Result`]s related to [`MediaState`] update functions.
+type ChangeMediaStateResult = Result<(), Traced<ChangeMediaStateError>>;
 
 /// Reason of why [`Room`] has been closed.
 ///
 /// This struct is passed into [`RoomHandle::on_close`] callback.
+#[derive(Debug)]
 pub struct RoomCloseReason {
     /// Indicator if [`Room`] is closed by server.
     ///
     /// `true` if [`CloseReason::ByServer`].
-    is_closed_by_server: bool,
+    pub(crate) is_closed_by_server: bool,
 
     /// Reason of closing.
-    reason: String,
+    pub(crate) reason: String,
 
     /// Indicator if closing is considered as error.
     ///
     /// This field may be `true` only on closing by client.
-    is_err: bool,
+    pub(crate) is_err: bool,
 }
 
 impl RoomCloseReason {
@@ -67,13 +77,16 @@ impl RoomCloseReason {
     #[must_use]
     pub fn new(reason: CloseReason) -> Self {
         match reason {
-            CloseReason::ByServer(reason) => Self {
-                reason: reason.to_string(),
+            CloseReason::ByServer(rsn) => Self {
+                reason: rsn.to_string(),
                 is_closed_by_server: true,
                 is_err: false,
             },
-            CloseReason::ByClient { reason, is_err } => Self {
-                reason: reason.to_string(),
+            CloseReason::ByClient {
+                reason: rsn,
+                is_err,
+            } => Self {
+                reason: rsn.to_string(),
                 is_closed_by_server: false,
                 is_err,
             },
@@ -81,33 +94,30 @@ impl RoomCloseReason {
     }
 
     /// Returns a close reason of the [`Room`].
-    #[inline]
     #[must_use]
     pub fn reason(&self) -> String {
         self.reason.clone()
     }
 
     /// Indicates whether the [`Room`] was closed by server.
-    #[inline]
     #[must_use]
-    pub fn is_closed_by_server(&self) -> bool {
+    pub const fn is_closed_by_server(&self) -> bool {
         self.is_closed_by_server
     }
 
     /// Indicates whether the [`Room`]'s close reason is considered as an error.
-    #[inline]
     #[must_use]
-    pub fn is_err(&self) -> bool {
+    pub const fn is_err(&self) -> bool {
         self.is_err
     }
 }
 
 /// Errors occurring in [`RoomHandle::join()`] method.
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum RoomJoinError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "Room is in detached state")]
+    #[display(fmt = "RoomHandle is in detached state")]
     Detached,
 
     /// Returned if the mandatory callback wasn't set.
@@ -121,23 +131,23 @@ pub enum RoomJoinError {
 
     /// [`RpcSession`] returned [`SessionError`].
     #[display(fmt = "WebSocketSession error occurred: {}", _0)]
-    SessionError(#[js(cause)] SessionError),
+    SessionError(#[cause] SessionError),
 }
 
 /// Error of [`RoomHandle`]'s [`Weak`] pointer being detached.
-#[derive(Clone, Debug, Display, Eq, From, JsCaused, PartialEq)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Copy, Debug, Display, Eq, From, PartialEq)]
+#[cause(error = platform::Error)]
 pub struct HandleDetachedError;
 
 /// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
 ///
 /// [`Sender`]: peer::media::Sender
 /// [`Receiver`]: peer::media::Receiver
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
-    #[display(fmt = "Room is in detached state")]
+    #[display(fmt = "RoomHandle is in detached state")]
     Detached,
 
     /// Validating [`TracksRequest`] doesn't pass.
@@ -146,13 +156,13 @@ pub enum ChangeMediaStateError {
     InvalidLocalTracks(TracksRequestError),
 
     /// [`MediaManager`] failed to acquire [`local::Track`]s.
-    CouldNotGetLocalMedia(#[js(cause)] InitLocalTracksError),
+    CouldNotGetLocalMedia(#[cause] InitLocalTracksError),
 
     /// [`local::Track`]s cannot be inserted into [`Sender`]s of some
     /// [`PeerConnection`] in this [`Room`].
     ///
     /// [`Sender`]: peer::media::Sender
-    InsertLocalTracksError(#[js(cause)] InsertLocalTracksError),
+    InsertLocalTracksError(#[cause] InsertLocalTracksError),
 
     /// Requested state transition is not allowed by [`Sender`]'s settings.
     ///
@@ -172,7 +182,6 @@ pub enum ChangeMediaStateError {
 }
 
 impl From<GetLocalTracksError> for ChangeMediaStateError {
-    #[inline]
     fn from(err: GetLocalTracksError) -> Self {
         match err {
             GetLocalTracksError::InvalidLocalTracks(e) => Self::from(e),
@@ -182,7 +191,6 @@ impl From<GetLocalTracksError> for ChangeMediaStateError {
 }
 
 impl From<UpdateLocalStreamError> for ChangeMediaStateError {
-    #[inline]
     fn from(err: UpdateLocalStreamError) -> Self {
         use UpdateLocalStreamError as UpdateErr;
         match err {
@@ -195,8 +203,8 @@ impl From<UpdateLocalStreamError> for ChangeMediaStateError {
 
 /// Errors occurring when a [`Room`] tries to acquire [`local::Track`]s via
 /// [`MediaManager`].
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum GetLocalTracksError {
     /// Validating [`TracksRequest`] doesn't pass.
     ///
@@ -204,9 +212,11 @@ pub enum GetLocalTracksError {
     InvalidLocalTracks(TracksRequestError),
 
     /// [`MediaManager`] failed to acquire [`local::Track`]s.
-    CouldNotGetLocalMedia(#[js(cause)] InitLocalTracksError),
+    CouldNotGetLocalMedia(#[cause] InitLocalTracksError),
 }
 
+/// Upgrades the provided weak reference, or returns [`Traced`]
+/// [`HandleDetachedError`] otherwise.
 macro_rules! upgrade_inner {
     ($v:expr) => {
         $v.upgrade()
@@ -215,7 +225,7 @@ macro_rules! upgrade_inner {
 }
 
 /// External handle to a [`Room`].
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RoomHandle(Weak<InnerRoom>);
 
 impl RoomHandle {
@@ -283,6 +293,7 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_close(
         &self,
         f: platform::Function<api::RoomCloseReason>,
@@ -328,6 +339,7 @@ impl RoomHandle {
     /// # Errors
     ///
     /// See [`HandleDetachedError`] for details.
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     pub fn on_connection_loss(
         &self,
         f: platform::Function<api::ReconnectHandle>,
@@ -392,19 +404,23 @@ impl RoomHandle {
     ///
     /// Helper function for all the exported mute/unmute/enable/disable
     /// audio/video send/receive methods.
-    async fn change_media_state<S>(
+    fn change_media_state<S>(
         &self,
         new_state: S,
         kind: MediaKind,
         direction: TrackDirection,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>>
+    ) -> LocalBoxFuture<'static, ChangeMediaStateResult>
     where
         S: Into<MediaState> + 'static,
     {
         let inner = (self.0)
             .upgrade()
-            .ok_or_else(|| tracerr::new!(ChangeMediaStateError::Detached))?;
+            .ok_or_else(|| tracerr::new!(ChangeMediaStateError::Detached));
+        let inner = match inner {
+            Ok(inner) => inner,
+            Err(e) => return Box::pin(future::err(e)),
+        };
 
         let new_state = new_state.into();
         let source_kind = source_kind.map(Into::into);
@@ -416,59 +432,82 @@ impl RoomHandle {
             source_kind,
         );
 
-        let direction_send = matches!(direction, TrackDirection::Send);
-        let enabling = matches!(
-            new_state,
-            MediaState::MediaExchange(media_exchange_state::Stable::Enabled)
-        );
+        Box::pin(async move {
+            let direction_send = matches!(direction, TrackDirection::Send);
+            let enabling = matches!(
+                new_state,
+                MediaState::MediaExchange(
+                    media_exchange_state::Stable::Enabled
+                )
+            );
 
-        // Perform `getUserMedia()`/`getDisplayMedia()` right away, so we can
-        // fail fast without touching senders states and starting all required
-        // messaging.
-        // Hold tracks through all process, to ensure that they will be reused
-        // without additional requests.
-        let _tracks_handles = if direction_send && enabling {
-            inner
-                .get_local_tracks(kind, source_kind)
-                .await
-                .map_err(tracerr::map_from_and_wrap!())?
-        } else {
-            Vec::new()
-        };
-
-        while !inner.is_all_peers_in_media_state(
-            kind,
-            direction,
-            source_kind,
-            new_state,
-        ) {
-            if let Err(e) = inner
-                .toggle_media_state(new_state, kind, direction, source_kind)
-                .await
-                .map_err(tracerr::map_from_and_wrap!())
-            {
-                if direction_send && enabling {
-                    inner.set_constraints_media_state(
-                        new_state.opposite(),
-                        kind,
-                        direction,
-                        source_kind,
-                    );
-                    inner
-                        .toggle_media_state(
+            // Perform `getUserMedia()`/`getDisplayMedia()` right away, so we
+            // can fail fast without touching senders states and starting all
+            // required messaging.
+            // Hold tracks through all process, to ensure that they will be
+            // reused without additional requests.
+            let tracks_handles;
+            if direction_send && enabling {
+                tracks_handles = inner
+                    .get_local_tracks(kind, source_kind)
+                    .await
+                    .map_err(|e| {
+                        inner.set_constraints_media_state(
                             new_state.opposite(),
                             kind,
                             direction,
                             source_kind,
+                        );
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
+                        tracerr::map_from_and_wrap!()(e)
+                    })?;
+                if !inner.send_constraints.is_track_enabled(kind, source_kind) {
+                    return Err(tracerr::new!(
+                        ChangeMediaStateError::TransitionIntoOppositeState(
+                            media_exchange_state::Stable::Disabled.into()
                         )
-                        .await
-                        .map_err(tracerr::map_from_and_wrap!())?;
+                    ));
                 }
-                return Err(e);
-            }
-        }
+            } else {
+                tracks_handles = Vec::new();
+            };
 
-        Ok(())
+            while !inner.is_all_peers_in_media_state(
+                kind,
+                direction,
+                source_kind,
+                new_state,
+            ) {
+                if let Err(e) = inner
+                    .toggle_media_state(new_state, kind, direction, source_kind)
+                    .await
+                    .map_err(tracerr::map_from_and_wrap!())
+                {
+                    if direction_send && enabling {
+                        inner.set_constraints_media_state(
+                            new_state.opposite(),
+                            kind,
+                            direction,
+                            source_kind,
+                        );
+                        inner
+                            .toggle_media_state(
+                                new_state.opposite(),
+                                kind,
+                                direction,
+                                source_kind,
+                            )
+                            .await
+                            .map_err(tracerr::map_from_and_wrap!())?;
+                    }
+                    return Err(e);
+                }
+            }
+
+            drop(tracks_handles);
+            Ok(())
+        })
     }
 
     /// Mutes outbound audio in this [`Room`].
@@ -481,17 +520,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::unmute_audio()`] was called while muting or a media server
     /// didn't approve this state transition.
-    #[inline]
-    pub async fn mute_audio(
+    pub fn mute_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -505,17 +542,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::mute_audio()`] was called while muting or a media server
     /// didn't approve this state transition.
-    #[inline]
-    pub async fn unmute_audio(
+    pub fn unmute_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -529,18 +564,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::unmute_video()`] was called while muting or a media server
     /// didn't approve this state transition.
-    #[inline]
-    pub async fn mute_video(
+    pub fn mute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Muted,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -554,18 +587,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::mute_video()`] was called while muting or a media server
     /// didn't approve this state transition.
-    #[inline]
-    pub async fn unmute_video(
+    pub fn unmute_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             mute_state::Stable::Unmuted,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -582,17 +613,15 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_audio()`] was called while disabling or a media
     /// server didn't approve this state transition.
-    #[inline]
-    pub async fn disable_audio(
+    pub fn disable_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -609,17 +638,15 @@ impl RoomHandle {
     ///
     /// With [`ChangeMediaStateError::CouldNotGetLocalMedia`] if media
     /// acquisition request failed.
-    #[inline]
-    pub async fn enable_audio(
+    pub fn enable_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
             TrackDirection::Send,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -638,18 +665,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_video()`] was called while disabling or a media
     /// server didn't approve this state transition.
-    #[inline]
-    pub async fn disable_video(
+    pub fn disable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -668,18 +693,16 @@ impl RoomHandle {
     ///
     /// With [`ChangeMediaStateError::CouldNotGetLocalMedia`] if media
     /// acquisition request failed.
-    #[inline]
-    pub async fn enable_video(
+    pub fn enable_video(
         &self,
         source_kind: Option<MediaSourceKind>,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
             TrackDirection::Send,
             source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -693,21 +716,21 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_remote_audio()`] was called while disabling or a
     /// media server didn't approve this state transition.
-    #[inline]
-    pub async fn disable_remote_audio(
+    pub fn disable_remote_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Audio,
             TrackDirection::Recv,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Disables inbound video in this [`Room`].
+    ///
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///
@@ -717,17 +740,16 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::enable_remote_video()`] was called while disabling or a
     /// media server didn't approve this state transition.
-    #[inline]
-    pub async fn disable_remote_video(
+    pub fn disable_remote_video(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+        source_kind: Option<MediaSourceKind>,
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Disabled,
             MediaKind::Video,
             TrackDirection::Recv,
-            None,
+            source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
@@ -741,21 +763,21 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::disable_remote_audio()`] was called while enabling or a
     /// media server didn't approve this state transition.
-    #[inline]
-    pub async fn enable_remote_audio(
+    pub fn enable_remote_audio(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
             TrackDirection::Recv,
             None,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 
     /// Enables inbound video in this [`Room`].
+    ///
+    /// Affects only video with the specific [`MediaSourceKind`], if specified.
     ///
     /// # Errors
     ///
@@ -765,30 +787,28 @@ impl RoomHandle {
     /// With [`ChangeMediaStateError::TransitionIntoOppositeState`] if
     /// [`RoomHandle::disable_remote_video()`] was called while enabling or a
     /// media server didn't approve this state transition.
-    #[inline]
-    pub async fn enable_remote_video(
+    pub fn enable_remote_video(
         &self,
-    ) -> Result<(), Traced<ChangeMediaStateError>> {
+        source_kind: Option<MediaSourceKind>,
+    ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
             TrackDirection::Recv,
-            None,
+            source_kind,
         )
-        .await
         .map_err(tracerr::map_from_and_wrap!())
     }
 }
 
 /// [`Weak`] reference upgradeable to the [`Room`].
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WeakRoom(Weak<InnerRoom>);
 
 impl WeakRoom {
     /// Upgrades this [`WeakRoom`] to the [`Room`].
     ///
     /// Returns [`None`] if weak reference cannot be upgraded.
-    #[inline]
     pub fn upgrade(&self) -> Option<Room> {
         self.0.upgrade().map(Room)
     }
@@ -796,19 +816,31 @@ impl WeakRoom {
 
 /// [`Room`] where all the media happens (manages concrete [`PeerConnection`]s,
 /// handles media server events, etc).
+#[derive(Debug)]
 pub struct Room(Rc<InnerRoom>);
 
 impl Room {
     /// Creates new [`Room`] and associates it with the provided [`RpcSession`].
-    #[allow(clippy::mut_mut)]
     pub fn new(
         rpc: Rc<dyn RpcSession>,
         media_manager: Rc<MediaManager>,
     ) -> Self {
+        /// Possible events happening in a [`Room`].
         enum RoomEvent {
+            /// [`RpcEvent`] happened in a [`Room`].
             RpcEvent(RpcEvent),
+
+            /// [`PeerEvent`] happened in a [`Room`].
             PeerEvent(PeerEvent),
+
+            /// [`rpc::Client`] lost connection to the Media Server.
+            ///
+            /// [`rpc::Client`]: crate::rpc::Client
             RpcClientLostConnection,
+
+            /// [`rpc::Client`] lost restored connection to the Media Server.
+            ///
+            /// [`rpc::Client`]: crate::rpc::Client
             RpcClientReconnected,
         }
 
@@ -820,15 +852,15 @@ impl Room {
             peer_events_rx.map(RoomEvent::PeerEvent).fuse();
         let mut rpc_connection_lost = rpc
             .on_connection_loss()
-            .map(|_| RoomEvent::RpcClientLostConnection)
+            .map(|()| RoomEvent::RpcClientLostConnection)
             .fuse();
         let mut rpc_client_reconnected = rpc
             .on_reconnected()
-            .map(|_| RoomEvent::RpcClientReconnected)
+            .map(|()| RoomEvent::RpcClientReconnected)
             .fuse();
 
         let room = Rc::new(InnerRoom::new(rpc, media_manager, tx));
-        let inner = Rc::downgrade(&room);
+        let weak_room = Rc::downgrade(&room);
 
         platform::spawn(async move {
             loop {
@@ -840,31 +872,31 @@ impl Room {
                     complete => break,
                 };
 
-                if let Some(inner) = inner.upgrade() {
+                if let Some(this_room) = weak_room.upgrade() {
                     match event {
                         RoomEvent::RpcEvent(event) => {
                             if let Err(e) = event
-                                .dispatch_with(&*inner)
+                                .dispatch_with(&*this_room)
                                 .await
                                 .map_err(tracerr::wrap!(=> UnknownPeerIdError))
                             {
-                                log::error!("{}", e);
+                                log::error!("{e}");
                             };
                         }
                         RoomEvent::PeerEvent(event) => {
                             if let Err(e) =
-                                event.dispatch_with(&*inner).await.map_err(
+                                event.dispatch_with(&*this_room).await.map_err(
                                     tracerr::wrap!(=> UnknownRemoteMemberError),
                                 )
                             {
-                                log::error!("{}", e);
+                                log::error!("{e}");
                             };
                         }
                         RoomEvent::RpcClientLostConnection => {
-                            inner.handle_rpc_connection_lost();
+                            this_room.handle_rpc_connection_lost();
                         }
                         RoomEvent::RpcClientReconnected => {
-                            inner.handle_rpc_connection_recovered();
+                            this_room.handle_rpc_connection_recovered();
                         }
                     }
                 } else {
@@ -886,14 +918,12 @@ impl Room {
     }
 
     /// Sets [`Room`]'s [`CloseReason`] to the provided value.
-    #[inline]
     pub fn set_close_reason(&self, reason: CloseReason) {
         self.0.set_close_reason(reason);
     }
 
     /// Creates a new external handle to [`Room`]. You can create them as many
     /// as you need.
-    #[inline]
     #[must_use]
     pub fn new_handle(&self) -> RoomHandle {
         RoomHandle(Rc::downgrade(&self.0))
@@ -901,14 +931,12 @@ impl Room {
 
     /// Indicates whether this [`Room`] reference is the same as the given
     /// [`Room`] reference. Compares pointers, not values.
-    #[inline]
     #[must_use]
-    pub fn ptr_eq(&self, other: &Room) -> bool {
+    pub fn ptr_eq(&self, other: &Self) -> bool {
         Rc::ptr_eq(&self.0, &other.0)
     }
 
     /// Checks [`RoomHandle`] equality by comparing inner pointers.
-    #[inline]
     #[must_use]
     pub fn inner_ptr_eq(&self, handle: &RoomHandle) -> bool {
         handle
@@ -918,7 +946,6 @@ impl Room {
     }
 
     /// Downgrades this [`Room`] to a weak reference.
-    #[inline]
     #[must_use]
     pub fn downgrade(&self) -> WeakRoom {
         WeakRoom(Rc::downgrade(&self.0))
@@ -960,9 +987,11 @@ struct InnerRoom {
     on_failed_local_media: Rc<platform::Callback<api::Error>>,
 
     /// Callback invoked when a [`RpcSession`] loses connection.
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_connection_loss: platform::Callback<api::ReconnectHandle>,
 
     /// Callback invoked when this [`Room`] is closed.
+    #[cfg_attr(not(target_family = "wasm"), allow(unused_qualifications))]
     on_close: Rc<platform::Callback<api::RoomCloseReason>>,
 
     /// Reason of [`Room`] closing.
@@ -973,6 +1002,23 @@ struct InnerRoom {
     /// Note that `None` will be considered as error and `is_err` will be
     /// `true` in [`CloseReason`] provided to callback.
     close_reason: RefCell<CloseReason>,
+}
+
+impl fmt::Debug for InnerRoom {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("InnerRoom")
+            .field("send_constraints", &self.send_constraints)
+            .field("recv_constraints", &self.recv_constraints)
+            .field("peers", &self.peers)
+            .field("media_manager", &self.media_manager)
+            .field("connections", &self.connections)
+            .field("on_local_track", &self.on_local_track)
+            .field("on_failed_local_media", &self.on_failed_local_media)
+            .field("on_connection_loss", &self.on_connection_loss)
+            .field("on_close", &self.on_close)
+            .field("close_reason", &self.close_reason)
+            .finish_non_exhaustive()
+    }
 }
 
 /// Errors occurring in [`RoomHandle::set_local_media_settings()`] method.
@@ -1002,7 +1048,6 @@ pub enum ConstraintsUpdateError {
 
 impl ConstraintsUpdateError {
     /// Returns a name of this [`ConstraintsUpdateError`].
-    #[inline]
     #[must_use]
     pub fn name(&self) -> String {
         self.to_string()
@@ -1010,7 +1055,6 @@ impl ConstraintsUpdateError {
 
     /// Returns a [`ChangeMediaStateError`] if this [`ConstraintsUpdateError`]
     /// represents a `RecoveredException` or a `RecoverFailedException`.
-    #[inline]
     #[must_use]
     pub fn recover_reason(&self) -> Option<Traced<ChangeMediaStateError>> {
         match &self {
@@ -1022,39 +1066,37 @@ impl ConstraintsUpdateError {
 
     /// Returns a list of [`ChangeMediaStateError`]s due to which a recovery
     /// has failed.
-    #[inline]
     #[must_use]
     pub fn recover_fail_reasons(&self) -> Vec<Traced<ChangeMediaStateError>> {
-        match &self {
-            Self::RecoverFailed {
-                recover_fail_reasons,
-                ..
-            } => recover_fail_reasons.clone(),
-            _ => Vec::new(),
+        if let Self::RecoverFailed {
+            recover_fail_reasons,
+            ..
+        } = self
+        {
+            recover_fail_reasons.clone()
+        } else {
+            Vec::new()
         }
     }
 
     /// Returns a [`ChangeMediaStateError`] if this [`ConstraintsUpdateError`]
     /// represents an `ErroredException`.
-    #[inline]
     #[must_use]
     pub fn error(&self) -> Option<Traced<ChangeMediaStateError>> {
-        match &self {
-            Self::Errored(error) => Some(error.clone()),
-            _ => None,
+        if let Self::Errored(err) = self {
+            Some(err.clone())
+        } else {
+            None
         }
     }
 
     /// Returns a new [`ConstraintsUpdateError::Recovered`].
-    #[inline]
-    #[must_use]
-    fn recovered(recover_reason: Traced<ChangeMediaStateError>) -> Self {
+    const fn recovered(recover_reason: Traced<ChangeMediaStateError>) -> Self {
         Self::Recovered(recover_reason)
     }
 
     /// Converts this [`ChangeMediaStateError`] to the
     /// [`ConstraintsUpdateError::RecoverFailed`].
-    #[must_use]
     fn recovery_failed(self, reason: Traced<ChangeMediaStateError>) -> Self {
         match self {
             Self::Recovered(recover_reason) => Self::RecoverFailed {
@@ -1081,24 +1123,22 @@ impl ConstraintsUpdateError {
 
     /// Returns a [`ConstraintsUpdateError::Errored`] with the provided
     /// [`ChangeMediaStateError`].
-    #[inline]
-    #[must_use]
-    fn errored(err: Traced<ChangeMediaStateError>) -> Self {
+    const fn errored(err: Traced<ChangeMediaStateError>) -> Self {
         Self::Errored(err)
     }
 }
 
 impl InnerRoom {
     /// Creates a new [`InnerRoom`].
-    #[inline]
     fn new(
         rpc: Rc<dyn RpcSession>,
         media_manager: Rc<MediaManager>,
         peer_event_sender: mpsc::UnboundedSender<PeerEvent>,
     ) -> Self {
-        let connections = Rc::new(Connections::default());
         let send_constraints = LocalTracksConstraints::default();
         let recv_constraints = Rc::new(RecvConstraints::default());
+        let connections =
+            Rc::new(Connections::new(Rc::clone(&recv_constraints)));
         Self {
             peers: peer::repo::Component::new(
                 Rc::new(peer::repo::Repository::new(
@@ -1147,7 +1187,11 @@ impl InnerRoom {
                     .set_media_state(state, kind, source_kind);
             }
             (Recv, MediaExchange(exchange)) => {
-                self.recv_constraints.set_enabled(exchange == Enabled, kind);
+                self.recv_constraints.set_enabled(
+                    exchange == Enabled,
+                    kind,
+                    source_kind,
+                );
             }
             (Recv, Mute(_)) => {
                 unreachable!("Receivers muting is not implemented");
@@ -1160,7 +1204,7 @@ impl InnerRoom {
     /// [`Drop`] implementation of [`InnerRoom`] is supposed to be triggered
     /// after this function call.
     fn set_close_reason(&self, reason: CloseReason) {
-        self.close_reason.replace(reason);
+        _ = self.close_reason.replace(reason);
     }
 
     /// Toggles [`TransceiverSide`]s [`MediaState`] by the provided
@@ -1202,22 +1246,19 @@ impl InnerRoom {
     ) -> Result<(), Traced<ChangeMediaStateError>> {
         let stream_upd_sub: HashMap<PeerId, HashSet<TrackId>> = desired_states
             .iter()
-            .map(|(id, states)| {
+            .map(|(peer_id, states)| {
                 (
-                    *id,
+                    *peer_id,
                     states
                         .iter()
-                        .filter_map(|(id, state)| {
-                            if matches!(
+                        .filter_map(|(track_id, state)| {
+                            matches!(
                                 state,
                                 MediaState::MediaExchange(
                                     media_exchange_state::Stable::Enabled
                                 )
-                            ) {
-                                Some(*id)
-                            } else {
-                                None
-                            }
+                            )
+                            .then_some(*track_id)
                         })
                         .collect(),
                 )
@@ -1226,22 +1267,20 @@ impl InnerRoom {
         future::try_join_all(
             desired_states
                 .into_iter()
-                .filter_map(|(peer_id, desired_states)| {
-                    self.peers.get(peer_id).map(|peer| (peer, desired_states))
+                .filter_map(|(peer_id, states)| {
+                    self.peers.get(peer_id).map(|peer| (peer, states))
                 })
-                .map(|(peer, desired_states)| {
-                    let transitions_futs: Vec<_> = desired_states
+                .map(|(peer, states)| {
+                    let transitions_futs: Vec<_> = states
                         .into_iter()
                         .filter_map(move |(track_id, desired_state)| {
                             peer.get_transceiver_side_by_id(track_id)
                                 .map(|trnscvr| (trnscvr, desired_state))
                         })
                         .filter_map(|(trnscvr, desired_state)| {
-                            if trnscvr.is_subscription_needed(desired_state) {
-                                Some((trnscvr, desired_state))
-                            } else {
-                                None
-                            }
+                            trnscvr
+                                .is_subscription_needed(desired_state)
+                                .then_some((trnscvr, desired_state))
                         })
                         .map(|(trnscvr, desired_state)| {
                             trnscvr.media_state_transition_to(desired_state)?;
@@ -1257,6 +1296,7 @@ impl InnerRoom {
                 .map_err(tracerr::map_from_and_wrap!())?,
         )
         .await
+        .map(drop)
         .map_err(tracerr::from_and_wrap!())?;
 
         future::try_join_all(stream_upd_sub.into_iter().filter_map(
@@ -1387,7 +1427,7 @@ impl InnerRoom {
     /// callback.
     ///
     /// Will update [`media_exchange_state::Stable`]s of the [`Sender`]s that
-    /// should be enabled or disabled.
+    /// should be disabled.
     ///
     /// If `stop_first` set to `true` then affected [`local::Track`]s will be
     /// dropped before new [`MediaStreamSettings`] is applied. This is usually
@@ -1442,6 +1482,8 @@ impl InnerRoom {
                         e.as_ref(),
                         UpdateLocalStreamError::CouldNotGetLocalMedia(_)
                     ) {
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         return Err(E::errored(tracerr::map_from_and_wrap!()(
                             e.clone(),
                         )));
@@ -1455,11 +1497,16 @@ impl InnerRoom {
                         )
                         .await
                         .map_err(|err| {
+                            // false positive: output expression is not input
+                            //                 one
+                            #[allow(clippy::redundant_closure_call)]
                             err.recovery_failed(tracerr::map_from_and_wrap!()(
                                 e.clone(),
                             ))
                         })?;
 
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::recovered(tracerr::map_from_and_wrap!()(e.clone()))
                     } else if stop_first {
                         self.disable_senders_without_tracks(
@@ -1479,8 +1526,12 @@ impl InnerRoom {
                             }
                         })?;
 
-                        E::recovered(tracerr::map_from_and_wrap!()(e.clone()))
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
+                        E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     } else {
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     };
 
@@ -1537,6 +1588,7 @@ impl EventHandler for InnerRoom {
         &self,
         peer_id: PeerId,
         negotiation_role: NegotiationRole,
+        connection_mode: ConnectionMode,
         tracks: Vec<Track>,
         ice_servers: Vec<IceServer>,
         is_force_relayed: bool,
@@ -1546,6 +1598,7 @@ impl EventHandler for InnerRoom {
             ice_servers,
             is_force_relayed,
             Some(negotiation_role),
+            connection_mode,
         );
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
@@ -1636,7 +1689,9 @@ impl EventHandler for InnerRoom {
             match update {
                 PeerUpdate::Added(track) => peer_state
                     .insert_track(&track, self.send_constraints.clone()),
-                PeerUpdate::Updated(patch) => peer_state.patch_track(&patch),
+                PeerUpdate::Updated(patch) => {
+                    peer_state.patch_track(patch).await;
+                }
                 PeerUpdate::IceRestart => {
                     peer_state.restart_ice();
                 }
@@ -1645,8 +1700,8 @@ impl EventHandler for InnerRoom {
                 }
             }
         }
-        if let Some(negotiation_role) = negotiation_role {
-            peer_state.set_negotiation_role(negotiation_role).await;
+        if let Some(role) = negotiation_role {
+            peer_state.set_negotiation_role(role).await;
         }
 
         Ok(())
@@ -1668,12 +1723,10 @@ impl EventHandler for InnerRoom {
         Ok(())
     }
 
-    #[inline]
     async fn on_room_joined(&self, _: MemberId) -> Self::Output {
         unreachable!("Room can't receive Event::RoomJoined")
     }
 
-    #[inline]
     async fn on_room_left(
         &self,
         _: medea_client_api_proto::CloseReason,
@@ -1681,12 +1734,13 @@ impl EventHandler for InnerRoom {
         unreachable!("Room can't receive Event::RoomLeft")
     }
 
-    /// Updates [`peer::repo::State`] with the provided [`proto::state::Room`].
-    #[inline]
+    /// Updates the [`peer::repo::State`] and the [`Connections`] with the
+    /// provided [`proto::state::Room`].
     async fn on_state_synchronized(
         &self,
         state: proto::state::Room,
     ) -> Self::Output {
+        self.connections.apply(&state);
         self.peers.apply(state);
         Ok(())
     }
@@ -1777,7 +1831,7 @@ impl PeerEventHandler for InnerRoom {
             metrics: PeerMetrics::PeerConnectionState(peer_connection_state),
         });
 
-        if let PeerConnectionState::Connected = peer_connection_state {
+        if peer_connection_state == PeerConnectionState::Connected {
             if let Some(peer) = self.peers.get(peer_id) {
                 peer.scrape_and_send_peer_stats().await;
             }
@@ -1869,11 +1923,12 @@ impl Drop for InnerRoom {
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl Room {
     /// Returns [`PeerConnection`] stored in repository by its ID.
     ///
     /// Used to inspect [`Room`]'s inner state in integration tests.
-    #[inline]
+    #[must_use]
     pub fn get_peer_by_id(
         &self,
         peer_id: PeerId,
@@ -1882,13 +1937,13 @@ impl Room {
     }
 
     /// Returns reference to the [`peer::repo::State`] of this [`Room`].
-    #[inline]
+    #[must_use]
     pub fn peers_state(&self) -> Rc<peer::repo::State> {
         self.0.peers.state()
     }
 
     /// Lookups [`peer::State`] by the provided [`PeerId`].
-    #[inline]
+    #[must_use]
     pub fn get_peer_state_by_id(
         &self,
         peer_id: PeerId,

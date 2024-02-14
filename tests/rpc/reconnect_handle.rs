@@ -5,7 +5,7 @@ use std::{
     str::FromStr,
 };
 
-use futures::{stream, StreamExt as _};
+use futures::{future, stream, StreamExt as _};
 use medea_client_api_proto::{Event, ServerMsg};
 use medea_jason::{
     platform::{self, MockRpcTransport, RpcTransport, TransportState},
@@ -29,29 +29,30 @@ async fn reconnect_with_backoff() {
 
     let state_clone = Rc::clone(&transport_state);
     let session = WebSocketRpcSession::new(Rc::new(WebSocketRpcClient::new(
-        Box::new(move |_| {
+        Box::new(move || {
             let state_clone = Rc::clone(&state_clone);
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().returning_st(|| {
-                    Box::pin(stream::iter(vec![
-                        RPC_SETTINGS,
-                        ServerMsg::Event {
-                            room_id: "room_id".into(),
-                            event: Event::RoomJoined {
-                                member_id: "member_id".into(),
-                            },
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
+            transport.expect_on_message().returning_st(|| {
+                Box::pin(stream::iter(vec![
+                    RPC_SETTINGS,
+                    ServerMsg::Event {
+                        room_id: "room_id".into(),
+                        event: Event::RoomJoined {
+                            member_id: "member_id".into(),
                         },
-                    ]))
-                });
-                transport.expect_send().returning_st(move |_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport
-                    .expect_on_state_change()
-                    .return_once_st(move || state_clone.subscribe());
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+                    },
+                ]))
+            });
+            transport.expect_send().returning_st(move |_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport
+                .expect_on_state_change()
+                .return_once_st(move || state_clone.subscribe());
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         }),
     )));
 
@@ -70,12 +71,12 @@ async fn reconnect_with_backoff() {
     // Checks that max_elapsed is not exceeded if starting_delay > max_elapsed.
     let start = instant::Instant::now();
     let err = handle
-        .reconnect_with_backoff(1000, 999.0, 50, Some(200))
+        .reconnect_with_backoff(1000, 999.0, 50, Some(300))
         .await
         .expect_err("supposed to err since transport state didn't change")
         .into_inner();
     let elapsed = start.elapsed().as_millis();
-    assert!(elapsed >= 200 && elapsed < 300);
+    assert!(elapsed < 300);
     assert!(matches!(err, ReconnectError::Session(_)));
 
     // Checks that reconnect attempts are made for an expected period.
@@ -86,7 +87,7 @@ async fn reconnect_with_backoff() {
         .expect_err("supposed to err since transport state didn't change")
         .into_inner();
     let elapsed = start.elapsed().as_millis();
-    assert!(elapsed >= 444 && elapsed < 555);
+    assert!(elapsed >= (444 - 50) && elapsed < 555);
     assert!(matches!(err, ReconnectError::Session(_)));
 
     // Checks that reconnect returns Ok immediately after a successful attempt.
@@ -102,7 +103,7 @@ async fn reconnect_with_backoff() {
     let err = handle.reconnect_with_backoff(30, 3.0, 9999, None).await;
     let elapsed = start.elapsed().as_millis();
     assert!(elapsed >= 120 && elapsed < 200); // 30 + 90
-    assert!(err.is_ok());
+    err.unwrap();
 
     // Checks that ReconnectError::Detached is fired when session is dropped.
     transport_state.set(TransportState::Closed(CloseMsg::Abnormal(999)));

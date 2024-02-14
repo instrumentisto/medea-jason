@@ -1,5 +1,7 @@
 #![cfg(target_arch = "wasm32")]
-#![forbid(non_ascii_idents, unsafe_code)]
+#![forbid(non_ascii_idents)]
+
+use js_sys::{Object, Reflect};
 
 /// Analog for [`assert_eq`] but for [`js_callback`] macro.
 /// Simply use it as [`assert_eq`]. For use cases and reasons
@@ -91,13 +93,14 @@ use medea_jason::{
     api,
     media::{
         track::remote, AudioTrackConstraints, DeviceVideoTrackConstraints,
-        LocalTracksConstraints, MediaKind, MediaManager, MediaStreamSettings,
+        LocalTracksConstraints, MediaDirection, MediaKind, MediaManager,
+        MediaStreamSettings,
     },
     peer::media_exchange_state,
     rpc::ApiUrl,
 };
 use url::Url;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{convert::FromWasmAbi, prelude::*};
 use wasm_bindgen_futures::JsFuture;
 use wasm_bindgen_test::*;
 
@@ -138,18 +141,30 @@ extern "C" {
     fn stop(this: &MockNavigator);
 }
 
-#[wasm_bindgen(inline_js = "export const get_jason_error = (err) => err;")]
-extern "C" {
-    fn get_jason_error(err: JsValue) -> api::Error;
-}
+/// Performs a unchecked conversion from a [`JsValue`] into an instance of the
+/// specified `FromWasmAbi<Abi = u32>` implementor.
+pub fn jsval_cast<T: FromWasmAbi<Abi = u32>>(
+    val: JsValue,
+    t: &str,
+) -> Result<T, String> {
+    if !val.is_object() {
+        return Err(String::from(
+            "`unchecked_jsval_cast` is only applicable to objects",
+        ));
+    }
 
-#[wasm_bindgen(
-    inline_js = "export const get_constraints_update_exception = (e) => e;"
-)]
-extern "C" {
-    fn get_constraints_update_exception(
-        err: JsValue,
-    ) -> api::ConstraintsUpdateException;
+    let obj: Object = Object::from(val);
+    let class_name = obj.constructor().name();
+    if class_name != t {
+        return Err(format!(
+            "type check failed, expected {t}, but got {class_name}",
+        ));
+    }
+
+    let ptr = Reflect::get(&obj, &JsValue::from_str("__wbg_ptr")).unwrap();
+    let ptr = ptr.as_f64().unwrap() as u32;
+
+    Ok(unsafe { T::from_abi(ptr) })
 }
 
 pub fn get_test_required_tracks() -> (Track, Track) {
@@ -190,6 +205,8 @@ pub fn get_test_tracks(
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Audio(AudioSettings {
                 required: is_audio_required,
             }),
@@ -200,6 +217,8 @@ pub fn get_test_tracks(
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Video(VideoSettings {
                 required: is_video_required,
                 source_kind: MediaSourceKind::Device,
@@ -220,6 +239,8 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 sender: "bob".into(),
                 mid: Some("mid0".to_string()),
             },
+            media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Audio(AudioSettings { required: false }),
         },
         Track {
@@ -228,6 +249,8 @@ pub fn get_test_recv_tracks() -> (Track, Track) {
                 sender: "bob".into(),
                 mid: Some("mid1".to_string()),
             },
+            media_direction: MediaDirection::SendRecv.into(),
+            muted: false,
             media_type: MediaType::Video(VideoSettings {
                 required: false,
                 source_kind: MediaSourceKind::Device,
@@ -310,8 +333,14 @@ async fn get_video_track() -> api::RemoteMediaTrack {
     let mut settings = MediaStreamSettings::new();
     settings.device_video(DeviceVideoTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
-    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork();
-    remote::Track::new(track, MediaSourceKind::Device, true, false).into()
+    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
+    remote::Track::new(
+        track,
+        MediaSourceKind::Device,
+        false,
+        MediaDirection::SendRecv.into(),
+    )
+    .into()
 }
 
 async fn get_audio_track() -> api::RemoteMediaTrack {
@@ -319,8 +348,14 @@ async fn get_audio_track() -> api::RemoteMediaTrack {
     let mut settings = MediaStreamSettings::new();
     settings.audio(AudioTrackConstraints::new());
     let mut tracks = manager.get_tracks(settings).await.unwrap();
-    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork();
-    remote::Track::new(track, MediaSourceKind::Device, true, false).into()
+    let track = tracks.pop().unwrap().0.as_ref().as_ref().fork().await;
+    remote::Track::new(
+        track,
+        MediaSourceKind::Device,
+        false,
+        MediaDirection::SendRecv.into(),
+    )
+    .into()
 }
 
 /// Awaits provided [`LocalBoxFuture`] for `timeout` milliseconds. If within
@@ -359,9 +394,11 @@ pub fn window() -> web_sys::Window {
 }
 
 // TODO: Might be extended to proc macro at some point.
-#[wasm_bindgen(inline_js = "export function is_firefox() { return \
-                            navigator.userAgent.toLowerCase().indexOf('\
-                            firefox') > -1; }")]
+#[wasm_bindgen(inline_js = "\
+    export function is_firefox() { \
+        return navigator.userAgent.toLowerCase().indexOf('firefox') > -1; \
+    }\
+")]
 extern "C" {
     fn is_firefox() -> bool;
 }

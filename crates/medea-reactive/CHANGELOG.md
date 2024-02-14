@@ -6,6 +6,19 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.1.2] · 2023-06-09
+[0.1.2]: /../../tree/medea-macro-0.1.2/crates/medea-macro
+
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([#16]).
+
+[#16]: /../../pull/16
+[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+
+
+
+
 ## [0.1.1] · 2021-04-09
 [0.1.1]: https://github.com/instrumentisto/medea/tree/medea-reactive-0.1.1/crates/medea-reactive
 

@@ -5,12 +5,11 @@ mod reconnect_handle;
 mod rpc_session;
 mod websocket;
 
-use std::{collections::HashMap, rc::Rc};
+use std::{cell::Cell, collections::HashMap, rc::Rc};
 
 use futures::{
     channel::{mpsc, oneshot},
-    future::{self},
-    stream,
+    future, stream,
     stream::LocalBoxStream,
     StreamExt as _,
 };
@@ -36,8 +35,8 @@ pub const RPC_SETTINGS: ServerMsg = ServerMsg::RpcSettings(RpcSettings {
 
 /// Creates [`WebSocketRpcClient`] with the provided [`MockRpcTransport`].
 fn new_client(transport: Rc<MockRpcTransport>) -> Rc<WebSocketRpcClient> {
-    Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
-        Box::pin(future::ok(transport.clone() as Rc<dyn RpcTransport>))
+    Rc::new(WebSocketRpcClient::new(Box::new(move || {
+        transport.clone() as Rc<dyn RpcTransport>
     })))
 }
 
@@ -69,8 +68,11 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
         peer_ids: Vec::new(),
     };
 
-    let ws = Rc::new(WebSocketRpcClient::new(Box::new(|_| {
+    let ws = Rc::new(WebSocketRpcClient::new(Box::new(|| {
         let mut transport = MockRpcTransport::new();
+        transport
+            .expect_connect()
+            .return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(|| {
             stream::once(async { TransportState::Open }).boxed()
         });
@@ -90,7 +92,7 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
         transport.expect_send().returning(|_| Ok(()));
         transport.expect_set_close_reason().return_const(());
 
-        Box::pin(future::ok(Rc::new(transport) as Rc<dyn RpcTransport>))
+        Rc::new(transport) as Rc<dyn RpcTransport>
     })));
 
     let mut stream = ws.subscribe();
@@ -119,6 +121,9 @@ async fn message_received_from_transport_is_transmitted_to_sub() {
 #[wasm_bindgen_test]
 async fn transport_is_dropped_when_client_is_dropped() {
     let mut transport = MockRpcTransport::new();
+    transport
+        .expect_connect()
+        .return_once(|_| Box::pin(future::ok(())));
     transport.expect_send().returning(|_| Ok(()));
     transport.expect_set_close_reason().return_const(());
     transport
@@ -154,6 +159,9 @@ async fn transport_is_dropped_when_client_is_dropped() {
 #[wasm_bindgen_test]
 async fn send_goes_to_transport() {
     let mut transport = MockRpcTransport::new();
+    transport
+        .expect_connect()
+        .return_once(|_| Box::pin(future::ok(())));
     let (on_send_tx, mut on_send_rx) = mpsc::unbounded();
     transport
         .expect_on_state_change()
@@ -218,6 +226,9 @@ mod on_close {
     /// [`CloseMsg`].
     async fn get_client(close_msg: CloseMsg) -> Rc<WebSocketRpcClient> {
         let mut transport = MockRpcTransport::new();
+        transport
+            .expect_connect()
+            .return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(move || {
             stream::iter(vec![
                 TransportState::Open,
@@ -313,6 +324,9 @@ mod transport_close_reason_on_drop {
     async fn get_client(
     ) -> (Rc<WebSocketRpcClient>, oneshot::Receiver<ClientDisconnect>) {
         let mut transport = MockRpcTransport::new();
+        transport
+            .expect_connect()
+            .return_once(|_| Box::pin(future::ok(())));
         transport.expect_on_state_change().return_once(|| {
             stream::once(async { TransportState::Open }).boxed()
         });
@@ -345,9 +359,9 @@ mod transport_close_reason_on_drop {
     ///
     /// 2. Drop [`WebSocketRpcClient`].
     ///
-    /// 3. Check that close reason provided
-    ///    into [`RpcTransport::set_close_reason`]
-    ///    is [`ClientDisconnect::RpcClientUnexpectedlyDropped`].
+    /// 3. Check that close reason provided into
+    ///    [`RpcTransport::set_close_reason`] is
+    ///    [`ClientDisconnect::RpcClientUnexpectedlyDropped`].
     #[wasm_bindgen_test]
     async fn sets_default_close_reason_on_drop() {
         let (ws, test_rx) = get_client().await;
@@ -374,9 +388,9 @@ mod transport_close_reason_on_drop {
     /// 2. Set [`ClientDisconnect::RoomClosed`] close reason and drop
     ///    [`WebSocketRpcClient`].
     ///
-    /// 3. Check that close reason provided
-    ///    into [`RpcTransport::set_close_reason`]
-    ///    is [`ClientDisconnect::RoomClosed`].
+    /// 3. Check that close reason provided into
+    ///    [`RpcTransport::set_close_reason`] is
+    ///    [`ClientDisconnect::RoomClosed`].
     #[wasm_bindgen_test]
     async fn sets_provided_close_reason_on_drop() {
         let (ws, test_rx) = get_client().await;
@@ -399,8 +413,6 @@ mod transport_close_reason_on_drop {
 mod connect {
     use medea_client_api_proto::RpcSettings;
 
-    use crate::delay_for;
-
     use super::*;
 
     /// Tests that new connection will be created if [`RpcClient`] is in
@@ -415,9 +427,12 @@ mod connect {
     #[wasm_bindgen_test]
     async fn closed() {
         let (test_tx, mut test_rx) = mpsc::unbounded();
-        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
+        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move || {
             test_tx.unbounded_send(()).unwrap();
             let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
             transport.expect_on_message().times(3).returning(|| {
                 on_message_mock(RpcSettings {
                     idle_timeout_ms: 3_000,
@@ -430,7 +445,7 @@ mod connect {
                 stream::once(async { TransportState::Open }).boxed()
             });
             let transport = Rc::new(transport);
-            Box::pin(future::ok(transport as Rc<dyn RpcTransport>))
+            transport as Rc<dyn RpcTransport>
         })));
         ws.clone().connect(join_room_url()).await.unwrap();
 
@@ -452,30 +467,30 @@ mod connect {
     /// 4. Check that only one [`RpcTransport`] was created.
     #[wasm_bindgen_test]
     async fn connecting() {
-        let mut connecting_count: i32 = 0;
-        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().times(3).returning(|| {
-                    on_message_mock(RpcSettings {
-                        idle_timeout_ms: 3_000,
-                        ping_interval_ms: 3_000,
-                    })
-                });
-                transport.expect_send().return_once(|_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport.expect_on_state_change().return_once(|| {
-                    stream::once(async { TransportState::Open }).boxed()
-                });
-                let transport = Rc::new(transport);
-                connecting_count += 1;
-                if connecting_count > 1 {
-                    unreachable!("New connection try was performed!");
-                } else {
-                    delay_for(500).await;
-                    Ok(Rc::clone(&transport) as Rc<dyn RpcTransport>)
-                }
-            })
+        let connecting_count = Cell::new(0);
+        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move || {
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
+            transport.expect_on_message().times(3).returning(|| {
+                on_message_mock(RpcSettings {
+                    idle_timeout_ms: 3_000,
+                    ping_interval_ms: 3_000,
+                })
+            });
+            transport.expect_send().return_once(|_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport.expect_on_state_change().return_once(|| {
+                stream::once(async { TransportState::Open }).boxed()
+            });
+            let transport = Rc::new(transport);
+            connecting_count.set(connecting_count.get() + 1);
+            if connecting_count.get() > 1 {
+                unreachable!("New connection try was performed!");
+            } else {
+                Rc::clone(&transport) as Rc<dyn RpcTransport>
+            }
         })));
         let first_connect_fut = ws.clone().connect(join_room_url());
         spawn_local(async move {
@@ -500,28 +515,29 @@ mod connect {
     /// 3. Check that only one [`RpcTransport`] was created.
     #[wasm_bindgen_test]
     async fn open() {
-        let mut connection_count = 0;
-        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
-            Box::pin(async move {
-                connection_count += 1;
-                if connection_count > 1 {
-                    unreachable!("Only one connection should be performed!");
-                }
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().times(3).returning(|| {
-                    on_message_mock(RpcSettings {
-                        idle_timeout_ms: 3_000,
-                        ping_interval_ms: 3_000,
-                    })
-                });
-                transport.expect_send().return_once(|_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport.expect_on_state_change().return_once(|| {
-                    stream::once(async { TransportState::Open }).boxed()
-                });
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+        let connection_count = Cell::new(0);
+        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move || {
+            connection_count.set(connection_count.get() + 1);
+            if connection_count.get() > 1 {
+                unreachable!("Only one connection should be performed!");
+            }
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
+            transport.expect_on_message().times(3).returning(|| {
+                on_message_mock(RpcSettings {
+                    idle_timeout_ms: 3_000,
+                    ping_interval_ms: 3_000,
+                })
+            });
+            transport.expect_send().return_once(|_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport.expect_on_state_change().return_once(|| {
+                stream::once(async { TransportState::Open }).boxed()
+            });
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         })));
         ws.clone().connect(join_room_url()).await.unwrap();
 
@@ -544,31 +560,32 @@ mod on_connection_loss {
         ping_interval_ms: Option<u32>,
         transport_changes: Option<TransportState>,
     ) -> Rc<WebSocketRpcClient> {
-        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().times(3).returning(move || {
-                    on_message_mock(RpcSettings {
-                        idle_timeout_ms: idle_timeout_ms.unwrap_or(u32::MAX),
-                        ping_interval_ms: ping_interval_ms.unwrap_or(u32::MAX),
-                    })
-                });
-                transport.expect_set_close_reason().return_once(drop);
+        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move || {
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
+            transport.expect_on_message().times(3).returning(move || {
+                on_message_mock(RpcSettings {
+                    idle_timeout_ms: idle_timeout_ms.unwrap_or(u32::MAX),
+                    ping_interval_ms: ping_interval_ms.unwrap_or(u32::MAX),
+                })
+            });
+            transport.expect_set_close_reason().return_once(drop);
 
-                transport.expect_on_state_change().return_once(move || {
-                    stream::once(async move { TransportState::Open })
-                        .chain(
-                            transport_changes
-                                .map(|v| stream::once(async move { v }).boxed())
-                                .unwrap_or(stream::empty().boxed()),
-                        )
-                        .chain(stream::pending())
-                        .boxed()
-                });
-                transport.expect_send().returning(|_| Ok(()));
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+            transport.expect_on_state_change().return_once(move || {
+                stream::once(async move { TransportState::Open })
+                    .chain(
+                        transport_changes
+                            .map(|v| stream::once(async move { v }).boxed())
+                            .unwrap_or(stream::empty().boxed()),
+                    )
+                    .chain(stream::pending())
+                    .boxed()
+            });
+            transport.expect_send().returning(|_| Ok(()));
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         })));
         ws.clone().connect(join_room_url()).await.unwrap();
 
@@ -704,7 +721,6 @@ mod on_connection_loss {
 // TODO: this tests should be implemented for the RpcSession!
 #[cfg(feature = "disabled")]
 mod on_reconnected {
-
     use medea_reactive::ObservableCell;
 
     use crate::yield_now;
@@ -715,23 +731,24 @@ mod on_reconnected {
     /// first [`RpcClient`] connection.
     #[wasm_bindgen_test]
     async fn doesnt_fires_on_first_connection() {
-        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport.expect_on_message().times(3).returning(|| {
-                    on_message_mock(RpcSettings {
-                        idle_timeout_ms: 5_000,
-                        ping_interval_ms: 2_000,
-                    })
-                });
-                transport.expect_send().return_once(|_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport.expect_on_state_change().return_once(|| {
-                    stream::once(async { TransportState::Open }).boxed()
-                });
+        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move || {
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
+            transport.expect_on_message().times(3).returning(|| {
+                on_message_mock(RpcSettings {
+                    idle_timeout_ms: 5_000,
+                    ping_interval_ms: 2_000,
+                })
+            });
+            transport.expect_send().return_once(|_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport.expect_on_state_change().return_once(|| {
+                stream::once(async { TransportState::Open }).boxed()
+            });
 
-                Ok(Rc::new(transport) as Rc<dyn RpcTransport>)
-            })
+            Rc::new(transport) as Rc<dyn RpcTransport>
         })));
 
         let mut on_reconnected_stream = ws.on_reconnected();
@@ -754,23 +771,24 @@ mod on_reconnected {
         let on_close_mock_clone = on_state_change_mock.clone();
         let on_message_mock_clone = on_message_mock.clone();
 
-        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move |_| {
+        let ws = Rc::new(WebSocketRpcClient::new(Box::new(move || {
             let messages_mock = on_message_mock_clone.clone();
             let on_close_mock = on_close_mock_clone.clone();
-            Box::pin(async move {
-                let mut transport = MockRpcTransport::new();
-                transport
-                    .expect_on_message()
-                    .times(3)
-                    .returning_st(move || messages_mock.subscribe());
-                transport.expect_send().return_once(|_| Ok(()));
-                transport.expect_set_close_reason().return_once(drop);
-                transport
-                    .expect_on_state_change()
-                    .return_once_st(move || on_close_mock.subscribe());
-                let transport = Rc::new(transport);
-                Ok(transport as Rc<dyn RpcTransport>)
-            })
+            let mut transport = MockRpcTransport::new();
+            transport
+                .expect_connect()
+                .return_once(|_| Box::pin(future::ok(())));
+            transport
+                .expect_on_message()
+                .times(3)
+                .returning_st(move || messages_mock.subscribe());
+            transport.expect_send().return_once(|_| Ok(()));
+            transport.expect_set_close_reason().return_once(drop);
+            transport
+                .expect_on_state_change()
+                .return_once_st(move || on_close_mock.subscribe());
+            let transport = Rc::new(transport);
+            transport as Rc<dyn RpcTransport>
         })));
 
         let mut on_reconnected_stream = ws.on_reconnected();

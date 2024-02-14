@@ -15,9 +15,9 @@ use medea_client_api_proto::{
         RtcInboundRtpStreamMediaType, RtcOutboundRtpStreamMediaType, RtcStat,
         RtcStatsType, StatId, TrackStats, TrackStatsKind,
     },
-    AudioSettings, Direction, IceConnectionState, MediaSourceKind, MediaType,
-    MemberId, NegotiationRole, PeerId, Track, TrackId, TrackPatchEvent,
-    VideoSettings,
+    AudioSettings, ConnectionMode, Direction, IceConnectionState,
+    MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
+    PeerId, Track, TrackId, TrackPatchEvent, VideoSettings,
 };
 use medea_jason::{
     connection::Connections,
@@ -38,13 +38,16 @@ use crate::{
 
 wasm_bindgen_test_configure!(run_in_browser);
 
-#[inline]
-#[must_use]
 fn toggle_disable_track_update(id: TrackId, enabled: bool) -> TrackPatchEvent {
+    let media_direction = if enabled {
+        MediaDirection::SendRecv
+    } else {
+        MediaDirection::RecvOnly
+    };
     TrackPatchEvent {
         id,
-        enabled_individual: Some(enabled),
-        enabled_general: Some(enabled),
+        receivers: None,
+        media_direction: Some(media_direction),
         muted: None,
     }
 }
@@ -62,17 +65,20 @@ async fn disable_enable_audio() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, true);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -86,13 +92,15 @@ async fn disable_enable_audio() {
     assert!(peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(AUDIO_TRACK_ID, false));
+        .patch_track(toggle_disable_track_update(AUDIO_TRACK_ID, false))
+        .await;
     peer.state().when_updated().await;
     assert!(!peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(AUDIO_TRACK_ID, true));
+        .patch_track(toggle_disable_track_update(AUDIO_TRACK_ID, true))
+        .await;
     peer.state().when_updated().await;
     assert!(peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
@@ -109,17 +117,20 @@ async fn disable_enable_video() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, true);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -133,13 +144,15 @@ async fn disable_enable_video() {
     assert!(peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(VIDEO_TRACK_ID, false));
+        .patch_track(toggle_disable_track_update(VIDEO_TRACK_ID, false))
+        .await;
     peer.state().when_updated().await;
     assert!(peer.is_send_audio_enabled());
     assert!(!peer.is_send_video_enabled(None));
 
     peer.state()
-        .patch_track(&toggle_disable_track_update(VIDEO_TRACK_ID, true));
+        .patch_track(toggle_disable_track_update(VIDEO_TRACK_ID, true))
+        .await;
     peer.state().when_updated().await;
     assert!(peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
@@ -150,23 +163,31 @@ async fn new_with_disable_audio() {
     let (tx, _rx) = mpsc::unbounded();
     let manager = Rc::new(MediaManager::default());
     let (audio_track, video_track) = get_test_unrequired_tracks();
-    let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+    let peer_state = peer::State::new(
+        PeerId(1),
+        Vec::new(),
+        false,
+        None,
+        ConnectionMode::Mesh,
+    );
     let send_constraints = local_constraints(false, true);
     peer_state.insert_track(&audio_track, send_constraints.clone());
     peer_state.insert_track(&video_track, send_constraints.clone());
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
-    peer.state().when_all_updated().await;
+    peer.state().when_all_senders_processed().await;
 
     assert!(!peer.is_send_audio_enabled());
     assert!(peer.is_send_video_enabled(None));
@@ -177,17 +198,25 @@ async fn new_with_disable_video() {
     let (tx, _rx) = mpsc::unbounded();
     let manager = Rc::new(MediaManager::default());
     let (audio_track, video_track) = get_test_unrequired_tracks();
-    let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+    let peer_state = peer::State::new(
+        PeerId(1),
+        Vec::new(),
+        false,
+        None,
+        ConnectionMode::Mesh,
+    );
     let send_constraints = local_constraints(true, false);
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -213,16 +242,19 @@ async fn add_candidates_to_answerer_before_offer() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -232,16 +264,24 @@ async fn add_candidates_to_answerer_before_offer() {
         .insert_track(&video_track, LocalTracksConstraints::default());
     let pc1_offer = pc1.state().when_local_sdp_updated().await.unwrap();
 
-    let pc2_state = peer::State::new(PeerId(2), Vec::new(), false, None);
+    let pc2_state = peer::State::new(
+        PeerId(2),
+        Vec::new(),
+        false,
+        None,
+        ConnectionMode::Mesh,
+    );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -268,16 +308,19 @@ async fn add_candidates_to_offerer_before_answer() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -286,16 +329,24 @@ async fn add_candidates_to_offerer_before_answer() {
     pc1.state()
         .insert_track(&video_track, LocalTracksConstraints::default());
 
-    let pc2_state = peer::State::new(PeerId(2), Vec::new(), false, None);
+    let pc2_state = peer::State::new(
+        PeerId(2),
+        Vec::new(),
+        false,
+        None,
+        ConnectionMode::Mesh,
+    );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -329,16 +380,19 @@ async fn normal_exchange_of_candidates() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -347,16 +401,24 @@ async fn normal_exchange_of_candidates() {
     pc1.state()
         .insert_track(&video_track, LocalTracksConstraints::default());
 
-    let pc2_state = peer::State::new(PeerId(2), Vec::new(), false, None);
+    let pc2_state = peer::State::new(
+        PeerId(2),
+        Vec::new(),
+        false,
+        None,
+        ConnectionMode::Mesh,
+    );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             Rc::clone(&manager),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -415,18 +477,21 @@ async fn send_event_on_new_local_stream() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
     peer_state.insert_track(&audio_track, send_constraints.clone());
     peer_state.insert_track(&video_track, send_constraints.clone());
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let peer = peer::Component::new(
         peer::PeerConnection::new(
             &peer_state,
             tx,
             manager,
             send_constraints.clone(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -457,16 +522,19 @@ async fn ice_connection_state_changed_is_emitted() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc1 = peer::Component::new(
         peer::PeerConnection::new(
             &pc1_state,
             tx1,
             manager.clone(),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc1_state),
     );
@@ -481,16 +549,19 @@ async fn ice_connection_state_changed_is_emitted() {
         Vec::new(),
         false,
         Some(NegotiationRole::Answerer(pc1_offer)),
+        ConnectionMode::Mesh,
     );
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc2 = peer::Component::new(
         peer::PeerConnection::new(
             &pc2_state,
             tx2,
             manager,
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc2_state),
     );
@@ -581,19 +652,22 @@ impl InterconnectedPeers {
             Vec::new(),
             false,
             Some(NegotiationRole::Offerer),
+            ConnectionMode::Mesh,
         );
         for track in Self::get_peer1_tracks() {
             pc1_state.insert_track(&track, pc1_send_cons.clone());
         }
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let pc1 = peer::Component::new(
             peer::PeerConnection::new(
                 &pc1_state,
                 tx1,
                 manager.clone(),
                 pc1_send_cons,
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
+            .await
             .unwrap(),
             Rc::new(pc1_state),
         );
@@ -605,19 +679,22 @@ impl InterconnectedPeers {
             Vec::new(),
             false,
             Some(NegotiationRole::Answerer(pc1_offer)),
+            ConnectionMode::Mesh,
         );
         for track in Self::get_peer2_tracks() {
             pc2_state.insert_track(&track, pc2_send_cons.clone());
         }
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let pc2 = peer::Component::new(
             peer::PeerConnection::new(
                 &pc2_state,
                 tx2,
                 manager,
                 pc2_send_cons,
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
+            .await
             .unwrap(),
             Rc::new(pc2_state),
         );
@@ -719,6 +796,8 @@ impl InterconnectedPeers {
                     receivers: vec![MemberId::from("bob")],
                     mid: None,
                 },
+                media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -727,6 +806,8 @@ impl InterconnectedPeers {
                     receivers: vec![MemberId::from("bob")],
                     mid: None,
                 },
+                media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -744,6 +825,8 @@ impl InterconnectedPeers {
                     sender: MemberId::from("alice"),
                     mid: None,
                 },
+                media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             Track {
@@ -752,6 +835,8 @@ impl InterconnectedPeers {
                     sender: MemberId::from("alice"),
                     mid: None,
                 },
+                media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -767,10 +852,26 @@ impl InterconnectedPeers {
 async fn get_traffic_stats() {
     let peers = InterconnectedPeers::new().await;
 
-    let first_peer_stats = peers.first_peer.get_stats().await.unwrap();
+    // We might have to wait a bit for the target stat.
+    let mut first_peer_stats = None;
+    for _ in 0..10 {
+        let stats: RtcStats = peers.first_peer.get_stats().await.unwrap();
+        if stats
+            .0
+            .iter()
+            .find(|s| matches!(s.stats, RtcStatsType::OutboundRtp { .. }))
+            .is_some()
+        {
+            first_peer_stats = Some(stats);
+            break;
+        }
+        delay_for(100).await;
+    }
+
     let mut first_peer_video_outbound_stats_count = 0;
     let mut first_peer_audio_outbound_stats_count = 0;
-    for stat in first_peer_stats.0 {
+    let mut firs_peer_succeeded_pairs_count = 0;
+    for stat in first_peer_stats.unwrap().0 {
         match stat.stats {
             RtcStatsType::OutboundRtp(outbound) => match outbound.media_type {
                 RtcOutboundRtpStreamMediaType::Audio { .. } => {
@@ -782,26 +883,30 @@ async fn get_traffic_stats() {
             },
             RtcStatsType::InboundRtp(_) => {
                 unreachable!(
-                    "First Peer shouldn't have any InboundRtp
-stats."
+                    "First `Peer` shouldn't have any `InboundRtp` stats",
                 )
             }
             RtcStatsType::CandidatePair(candidate_pair) => {
-                assert_eq!(
-                    candidate_pair.state,
-                    NonExhaustive::Known(KnownIceCandidatePairState::Succeeded)
-                );
+                if let NonExhaustive::Known(
+                    KnownIceCandidatePairState::Succeeded,
+                ) = candidate_pair.state
+                {
+                    firs_peer_succeeded_pairs_count += 1;
+                }
             }
             _ => (),
         }
     }
     assert_eq!(first_peer_video_outbound_stats_count, 1);
     assert_eq!(first_peer_audio_outbound_stats_count, 1);
+    assert_eq!(firs_peer_succeeded_pairs_count, 1);
+
+    delay_for(100).await;
 
     let second_peer_stats = peers.second_peer.get_stats().await.unwrap();
     let mut second_peer_video_inbound_stats_count = 0;
     let mut second_peer_audio_inbound_stats_count = 0;
-    let mut has_succeeded_pair = false;
+    let mut second_peer_succeeded_pairs_count = 0;
     for stat in second_peer_stats.0 {
         match stat.stats {
             RtcStatsType::InboundRtp(inbound) => {
@@ -822,15 +927,15 @@ stats."
                     KnownIceCandidatePairState::Succeeded,
                 ) = candidate_pair.state
                 {
-                    has_succeeded_pair = true;
+                    second_peer_succeeded_pairs_count += 1;
                 }
             }
             _ => (),
         }
     }
-    assert!(has_succeeded_pair);
     assert_eq!(second_peer_video_inbound_stats_count, 1);
     assert_eq!(second_peer_audio_inbound_stats_count, 1);
+    assert_eq!(second_peer_succeeded_pairs_count, 1);
 }
 
 /// Tests for a [`RtcStat`]s caching mechanism of the [`PeerConnection`].
@@ -843,16 +948,24 @@ mod peer_stats_caching {
     async fn works() {
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
-        let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+        let peer_state = peer::State::new(
+            PeerId(1),
+            Vec::new(),
+            false,
+            None,
+            ConnectionMode::Mesh,
+        );
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
             peer::PeerConnection::new(
                 &peer_state,
                 tx,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
+            .await
             .unwrap(),
             Rc::new(peer_state),
         );
@@ -893,16 +1006,24 @@ mod peer_stats_caching {
     async fn takes_into_account_stat_id() {
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
-        let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+        let peer_state = peer::State::new(
+            PeerId(1),
+            Vec::new(),
+            false,
+            None,
+            ConnectionMode::Mesh,
+        );
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
             peer::PeerConnection::new(
                 &peer_state,
                 tx,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
+            .await
             .unwrap(),
             Rc::new(peer_state),
         );
@@ -945,16 +1066,24 @@ mod peer_stats_caching {
     async fn sends_updated_stats() {
         let (tx, peer_events_stream) = mpsc::unbounded();
         let manager = Rc::new(MediaManager::default());
-        let peer_state = peer::State::new(PeerId(1), Vec::new(), false, None);
+        let peer_state = peer::State::new(
+            PeerId(1),
+            Vec::new(),
+            false,
+            None,
+            ConnectionMode::Mesh,
+        );
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let peer = peer::Component::new(
             peer::PeerConnection::new(
                 &peer_state,
                 tx,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
+            .await
             .unwrap(),
             Rc::new(peer_state),
         );
@@ -1003,6 +1132,7 @@ async fn reset_transition_timers() {
         Vec::new(),
         false,
         Some(NegotiationRole::Offerer),
+        ConnectionMode::Mesh,
     );
     let send_constraints = local_constraints(true, true);
     let recv_constraints = Rc::new(RecvConstraints::default());
@@ -1018,9 +1148,10 @@ async fn reset_transition_timers() {
             tx,
             manager,
             send_constraints,
-            Rc::new(Connections::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
             recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(peer_state),
     );
@@ -1096,17 +1227,24 @@ async fn new_remote_track() {
             None,
         );
 
-        let sender_peer_state =
-            peer::State::new(PeerId(1), Vec::new(), false, None);
+        let sender_peer_state = peer::State::new(
+            PeerId(1),
+            Vec::new(),
+            false,
+            None,
+            ConnectionMode::Mesh,
+        );
+        let recv_constraints = Rc::new(RecvConstraints::default());
         let sender_peer = peer::Component::new(
             peer::PeerConnection::new(
                 &sender_peer_state,
                 tx1,
                 manager.clone(),
                 tx_caps.clone(),
-                Rc::new(Connections::default()),
-                Rc::new(RecvConstraints::default()),
+                Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+                recv_constraints,
             )
+            .await
             .unwrap(),
             Rc::new(sender_peer_state),
         );
@@ -1126,21 +1264,27 @@ async fn new_remote_track() {
         let sender_offer =
             sender_peer.state().when_local_sdp_updated().await.unwrap();
 
-        let rcv_caps = RecvConstraints::default();
-        rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio);
-        rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video);
+        let rcv_caps = Rc::new(RecvConstraints::default());
+        rcv_caps.set_enabled(audio_rx_enabled, MediaKind::Audio, None);
+        rcv_caps.set_enabled(video_rx_enabled, MediaKind::Video, None);
 
-        let rcvr_peer_state =
-            peer::State::new(PeerId(2), Vec::new(), false, None);
+        let rcvr_peer_state = peer::State::new(
+            PeerId(2),
+            Vec::new(),
+            false,
+            None,
+            ConnectionMode::Mesh,
+        );
         let rcvr_peer = peer::Component::new(
             peer::PeerConnection::new(
                 &rcvr_peer_state,
                 tx2,
                 manager,
                 LocalTracksConstraints::default(),
-                Rc::new(Connections::default()),
-                Rc::new(rcv_caps),
+                Rc::new(Connections::new(Rc::clone(&rcv_caps))),
+                rcv_caps,
             )
+            .await
             .unwrap(),
             Rc::new(rcvr_peer_state),
         );
@@ -1152,6 +1296,8 @@ async fn new_remote_track() {
                     sender: MemberId::from("whatever"),
                     mid: Some(String::from("0")),
                 },
+                media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Audio(AudioSettings { required: true }),
             },
             LocalTracksConstraints::default(),
@@ -1163,6 +1309,8 @@ async fn new_remote_track() {
                     sender: MemberId::from("whatever"),
                     mid: Some(String::from("1")),
                 },
+                media_direction: MediaDirection::SendRecv,
+                muted: false,
                 media_type: MediaType::Video(VideoSettings {
                     required: true,
                     source_kind: MediaSourceKind::Device,
@@ -1391,20 +1539,28 @@ async fn disable_and_enable_all_tracks() {
     let (audio_track, video_track) = get_test_unrequired_tracks();
     let audio_track_id = audio_track.id;
     let video_track_id = video_track.id;
-    let pc_state = peer::State::new(PeerId(0), Vec::new(), false, None);
+    let pc_state = peer::State::new(
+        PeerId(0),
+        Vec::new(),
+        false,
+        None,
+        ConnectionMode::Mesh,
+    );
     pc_state.insert_track(&audio_track, LocalTracksConstraints::default());
     pc_state.insert_track(&video_track, LocalTracksConstraints::default());
 
     let (tx, _rx) = mpsc::unbounded();
+    let recv_constraints = Rc::new(RecvConstraints::default());
     let pc = peer::Component::new(
         peer::PeerConnection::new(
             &pc_state,
             tx,
             Rc::new(MediaManager::default()),
             LocalTracksConstraints::default(),
-            Rc::new(Connections::default()),
-            Rc::new(RecvConstraints::default()),
+            Rc::new(Connections::new(Rc::clone(&recv_constraints))),
+            recv_constraints,
         )
+        .await
         .unwrap(),
         Rc::new(pc_state),
     );
@@ -1424,12 +1580,14 @@ async fn disable_and_enable_all_tracks() {
     audio_track_state
         .media_state_transition_to(Disabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: audio_track_id,
-        enabled_general: Some(false),
-        enabled_individual: Some(false),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(TrackPatchEvent {
+            id: audio_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::RecvOnly),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(audio_track.general_disabled());
     assert!(!video_track.general_disabled());
@@ -1437,12 +1595,14 @@ async fn disable_and_enable_all_tracks() {
     video_track_state
         .media_state_transition_to(Disabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: video_track_id,
-        enabled_general: Some(false),
-        enabled_individual: Some(false),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(TrackPatchEvent {
+            id: video_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::RecvOnly),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(audio_track.general_disabled());
     assert!(video_track.general_disabled());
@@ -1450,12 +1610,14 @@ async fn disable_and_enable_all_tracks() {
     audio_track_state
         .media_state_transition_to(Enabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: audio_track_id,
-        enabled_individual: Some(true),
-        enabled_general: Some(true),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(TrackPatchEvent {
+            id: audio_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::SendRecv),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(!audio_track.general_disabled());
     assert!(video_track.general_disabled());
@@ -1463,12 +1625,14 @@ async fn disable_and_enable_all_tracks() {
     video_track_state
         .media_state_transition_to(Enabled.into())
         .unwrap();
-    pc.state().patch_track(&TrackPatchEvent {
-        id: video_track_id,
-        enabled_individual: Some(true),
-        enabled_general: Some(true),
-        muted: None,
-    });
+    pc.state()
+        .patch_track(TrackPatchEvent {
+            id: video_track_id,
+            receivers: None,
+            media_direction: Some(MediaDirection::SendRecv),
+            muted: None,
+        })
+        .await;
     pc.state().when_updated().await;
     assert!(!audio_track.general_disabled());
     assert!(!video_track.general_disabled());

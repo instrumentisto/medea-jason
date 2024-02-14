@@ -1,13 +1,11 @@
 //! E2E tests [`World`][1].
 //!
-//! [1]: cucumber_rust::World
+//! [1]: cucumber::World
 
 pub mod member;
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{collections::HashMap, env, fmt, time::Duration};
 
-use async_trait::async_trait;
-use cucumber_rust::WorldInit;
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
     callback::{CallbackEvent, CallbackItem},
@@ -18,7 +16,7 @@ use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
     object::{self, Jason, MediaKind, MediaSourceKind, Object},
 };
-use tokio::time::interval;
+use tokio::time::{interval, sleep};
 use uuid::Uuid;
 
 use crate::{conf, control};
@@ -49,12 +47,14 @@ pub enum Error {
     MemberNotFound(#[error(not(source))] String),
 }
 
+#[allow(clippy::absolute_paths)]
 type Result<T> = std::result::Result<T, Error>;
 
 /// [`World`][1] used by all E2E tests.
 ///
-/// [1]: cucumber_rust::World
-#[derive(WorldInit)]
+/// [1]: cucumber::World
+#[derive(cucumber::World)]
+#[world(init = Self::try_new)]
 pub struct World {
     /// ID of the `Room` created for this [`World`].
     room_id: String,
@@ -84,11 +84,15 @@ impl fmt::Debug for World {
     }
 }
 
-#[async_trait(?Send)]
-impl cucumber_rust::World for World {
-    type Error = Error;
-
-    async fn new() -> Result<Self> {
+impl World {
+    /// Attempts to initialized a new fresh [`World`].
+    ///
+    /// # Errors
+    ///
+    /// If fails to instantiate a [`control::Client`] or a [WebDriver] client.
+    ///
+    /// [WebDriver]: https://w3.org/TR/webdriver
+    pub async fn try_new() -> Result<Self> {
         let room_id = Uuid::new_v4().to_string();
 
         let control_client = control::Client::new(&conf::CONTROL_API_ADDR);
@@ -105,29 +109,32 @@ impl cucumber_rust::World for World {
         Ok(Self {
             room_id,
             control_client,
-            window_factory: WebDriverClientBuilder::new(
-                &conf::WEBDRIVER_ADDR,
-                &conf::FILE_SERVER_HOST,
-            )
-            .headless_firefox(*conf::HEADLESS)
-            .headless_chrome(*conf::HEADLESS)
-            .connect(&conf::FILE_SERVER_HOST)
-            .await?
-            .into(),
+            window_factory: WebDriverClientBuilder::new(&conf::WEBDRIVER_ADDR)
+                .headless_firefox(*conf::HEADLESS)
+                .headless_chrome(*conf::HEADLESS)
+                .connect(&conf::FILE_SERVER_HOST)
+                .await?
+                .into(),
             members: HashMap::new(),
             jasons: HashMap::new(),
         })
     }
-}
 
-impl World {
     /// Creates a new [`Member`] from the provided [`MemberBuilder`].
     ///
     /// `Room` for this [`Member`] will be created, but joining won't be done.
+    ///
+    /// # Errors
+    ///
+    /// - If the performed request to Control API fails.
+    /// - If initializing the [`Member`] fails on JS side.
+    #[allow(clippy::too_many_lines)]
     pub async fn create_member(
         &mut self,
         builder: MemberBuilder,
     ) -> Result<()> {
+        let is_sfu = env::var("SFU").is_ok();
+
         let mut pipeline = HashMap::new();
         let mut send_state = HashMap::new();
         let mut recv_state = HashMap::new();
@@ -137,12 +144,20 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             send_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if is_sfu {
+                send_state
+                    .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             pipeline.insert(
                 "publish".to_owned(),
                 proto::Endpoint::WebRtcPublishEndpoint(
                     proto::WebRtcPublishEndpoint {
                         id: "publish".to_owned(),
-                        p2p: proto::P2pMode::Always,
+                        p2p: if is_sfu {
+                            proto::P2pMode::Never
+                        } else {
+                            proto::P2pMode::Always
+                        },
                         force_relay: false,
                         audio_settings: proto::AudioSettings::default(),
                         video_settings: proto::VideoSettings::default(),
@@ -155,6 +170,10 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             recv_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if is_sfu {
+                recv_state
+                    .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             self.members.values().filter(|m| m.is_send()).for_each(|m| {
                 let endpoint_id = format!("play-{}", m.id());
                 pipeline.insert(
@@ -177,7 +196,7 @@ impl World {
         self.control_client
             .create(
                 &format!("{}/{}", self.room_id, builder.id),
-                proto::Element::Member(proto::Member {
+                proto::Element::Member(Box::new(proto::Member {
                     id: builder.id.clone(),
                     pipeline,
                     credentials: Some(proto::Credentials::Plain(
@@ -188,22 +207,21 @@ impl World {
                     idle_timeout: None,
                     reconnect_timeout: None,
                     ping_interval: None,
-                }),
+                })),
             )
             .await?;
 
         if builder.is_send {
-            let recv_endpoints: HashMap<_, _> = self
+            let recv_endpoints = self
                 .members
                 .values()
                 .filter_map(|m| {
                     m.is_recv().then(|| {
                         let endpoint_id = format!("play-{}", builder.id);
                         let id = format!(
-                            "{}/{}/{}",
+                            "{}/{}/{endpoint_id}",
                             self.room_id,
                             m.id(),
-                            endpoint_id,
                         );
                         let elem = proto::Element::WebRtcPlayEndpoint(
                             proto::WebRtcPlayEndpoint {
@@ -218,7 +236,7 @@ impl World {
                         (id, elem)
                     })
                 })
-                .collect();
+                .collect::<HashMap<_, _>>();
             for (path, element) in recv_endpoints {
                 self.control_client.create(&path, element).await?;
             }
@@ -238,14 +256,26 @@ impl World {
     /// Returns reference to a [`Member`] with the provided ID.
     ///
     /// Returns [`None`] if a [`Member`] with the provided ID doesn't exist.
-    #[inline]
     #[must_use]
     pub fn get_member(&self, member_id: &str) -> Option<&Member> {
         self.members.get(member_id)
     }
 
+    /// Returns mutable reference to a [`Member`] with the provided ID.
+    ///
+    /// Returns [`None`] if a [`Member`] with the provided ID doesn't exist.
+    #[must_use]
+    pub fn get_member_mut(&mut self, member_id: &str) -> Option<&mut Member> {
+        self.members.get_mut(member_id)
+    }
+
     /// Joins a [`Member`] with the provided ID to the `Room` created for this
     /// [`World`].
+    ///
+    /// # Errors
+    ///
+    /// - If the specified [`Member`] doesn't exist in this [`World`].
+    /// - If joining the `Room` fails on JS side.
     pub async fn join_room(&mut self, member_id: &str) -> Result<()> {
         let member = self
             .members
@@ -257,13 +287,29 @@ impl World {
 
     /// Waits until a [`Member`] with the provided ID will connect with his
     /// responders.
+    ///
+    /// # Errors
+    ///
+    /// If waiting fails on JS side.
+    ///
+    /// # Panics
+    ///
+    /// If the specified [`Member`] doesn't exist in this [`World`].
     pub async fn wait_for_interconnection(
         &mut self,
         member_id: &str,
     ) -> Result<()> {
-        let interconnected_members = self.members.values().filter(|m| {
-            m.is_joined() && m.id() != member_id && (m.is_recv() || m.is_send())
-        });
+        let interconnected_members: Vec<_> = self
+            .members
+            .values()
+            .filter(|m| {
+                m.is_joined()
+                    && m.id() != member_id
+                    && (m.is_recv() || m.is_send())
+            })
+            .collect();
+        let is_sfu = env::var("SFU").is_ok();
+
         let member = self.members.get(member_id).unwrap();
         for partner in interconnected_members {
             let (send_count, recv_count) =
@@ -286,12 +332,71 @@ impl World {
                 .await?
                 .wait_for_count(send_count)
                 .await?;
-        }
 
+            if is_sfu {
+                if !partner.is_send_audio() {
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Audio, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !partner.is_send_video() {
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Display)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !member.is_send_audio() {
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Audio, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !member.is_send_video() {
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Display)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                sleep(Duration::from_millis(1000)).await;
+            }
+        }
         Ok(())
     }
 
     /// Closes a [`Room`] of the provided [`Member`].
+    ///
+    /// # Errors
+    ///
+    /// If the [`Room`] fails to be closed.
+    ///
+    /// # Panics
+    ///
+    /// If the provided [`Member`] doesn't exist in this [`World`], or there are
+    /// no [`Jason`] objects present in this [`World`] for him.
     ///
     /// [`Room`]: crate::object::room::Room
     pub async fn close_room(&mut self, member_id: &str) -> Result<()> {
@@ -304,6 +409,11 @@ impl World {
 
     /// Waits for the [`Member`]'s [`Room`] being closed.
     ///
+    /// # Errors
+    ///
+    /// - If the specified [`Member`] doesn't exist in this [`World`].
+    /// - If waiting for the [`Member`] fails on JS side.
+    ///
     /// [`Room`]: crate::object::room::Room
     pub async fn wait_for_on_close(&self, member_id: &str) -> Result<String> {
         let member = self
@@ -315,6 +425,8 @@ impl World {
     }
 
     /// Waits for `OnLeave` Control API callback for the provided [`Member`] ID.
+    ///
+    /// # Panics
     ///
     /// Asserts the `OnLeave` reason to be equal to the provided one.
     pub async fn wait_for_on_leave(
@@ -361,6 +473,10 @@ impl World {
 
     /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
     /// provided [`MembersPair`] using an `Apply` method of Control API.
+    ///
+    /// # Panics
+    ///
+    /// If the provided [`MembersPair`] is misconfigured.
     pub async fn interconnect_members_via_apply(&mut self, pair: MembersPair) {
         let mut spec = self.get_spec().await;
         if let Some(proto::RoomElement::Member(member)) =
@@ -404,6 +520,16 @@ impl World {
 
     /// Creates `WebRtcPublishEndpoint`s and `WebRtcPlayEndpoint`s for the
     /// provided [`MembersPair`].
+    ///
+    /// # Errors
+    ///
+    /// If the performed requests to Control API fail.
+    ///
+    /// # Panics
+    ///
+    /// If any [`Member`] of the provided [`MembersPair`] doesn't exist in this
+    /// [`World`].
+    #[allow(clippy::too_many_lines)]
     pub async fn interconnect_members(
         &mut self,
         pair: MembersPair,
@@ -533,6 +659,15 @@ impl World {
     }
 
     /// Disposes a [`Jason`] object of the provided [`Member`] ID.
+    ///
+    /// # Errors
+    ///
+    /// If the [`Jason`] object fails to be disposed on JS side.
+    ///
+    /// # Panics
+    ///
+    /// If no [`Jason`] objects exist for the provided [`Member`] in this
+    /// [`World`].
     pub async fn dispose_jason(&mut self, member_id: &str) -> Result<()> {
         let jason = self.jasons.remove(member_id).unwrap();
         jason.dispose().await?;
@@ -541,10 +676,14 @@ impl World {
 
     /// Deletes a Control API element of a `WebRtcPublishEndpoint` with the
     /// provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn delete_publish_endpoint(&mut self, member_id: &str) {
         let resp = self
             .control_client
-            .delete(&format!("{}/{}/publish", self.room_id, member_id))
+            .delete(&format!("{}/{member_id}/publish", self.room_id))
             .await
             .unwrap();
         assert!(resp.error.is_none());
@@ -552,34 +691,43 @@ impl World {
 
     /// Deletes a Control API element of a `WebRtcPlayEndpoint` with the
     /// provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn delete_play_endpoint(
         &mut self,
         member_id: &str,
         partner_member_id: &str,
     ) {
-        let play_endpoint_id = format!("play-{}", partner_member_id);
+        let play_endpoint_id = format!("play-{partner_member_id}");
         let resp = self
             .control_client
-            .delete(&format!(
-                "{}/{}/{}",
-                self.room_id, member_id, play_endpoint_id
-            ))
+            .delete(&format!("{}/{member_id}/{play_endpoint_id}", self.room_id))
             .await
             .unwrap();
         assert!(resp.error.is_none());
     }
 
     /// Deletes a Control API element of the [`Member`] with the provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn delete_member_element(&mut self, member_id: &str) {
         let resposne = self
             .control_client
-            .delete(&format!("{}/{}", self.room_id, member_id))
+            .delete(&format!("{}/{member_id}", self.room_id))
             .await
             .unwrap();
         assert!(resposne.error.is_none());
     }
 
     /// Deletes a Control API element of the [`Room`] with the provided ID.
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     ///
     /// [`Room`]: crate::object::room::Room
     pub async fn delete_room_element(&mut self) {
@@ -604,6 +752,11 @@ impl World {
     }
 
     /// Returns [`proto::Room`] spec of the `Room` created for this [`World`].
+    ///
+    /// # Panics
+    ///
+    /// - If the performed request to Control API fails.
+    /// - If the element returned by Control API is absent or is not a `Room`.
     pub async fn get_spec(&mut self) -> proto::Room {
         let el = self
             .control_client
@@ -615,12 +768,16 @@ impl World {
         if let proto::Element::Room(room) = el {
             room
         } else {
-            panic!("Returned not Room element")
+            panic!("Returned not `Room` element")
         }
     }
 
     /// Applies provided [`proto::Room`] spec to the `Room` created for this
     /// [`World`].
+    ///
+    /// # Panics
+    ///
+    /// If the performed request to Control API fails.
     pub async fn apply(&mut self, el: proto::Room) {
         self.control_client
             .apply(&self.room_id, proto::Element::Room(el))
@@ -659,37 +816,35 @@ pub struct PairedMember {
 
 impl PairedMember {
     /// Indicates whether this [`PairedMember`] should publish media.
-    #[inline]
-    #[must_use]
     fn is_send(&self) -> bool {
         self.send_audio.is_some() || self.send_video.is_some()
     }
 
     /// Returns a [`proto::WebRtcPublishEndpoint`] for this [`PairedMember`] if
     /// publishing is enabled.
-    #[must_use]
     fn publish_endpoint(&self) -> Option<proto::WebRtcPublishEndpoint> {
+        let is_sfu = env::var("SFU").is_ok();
+
         self.is_send().then(|| proto::WebRtcPublishEndpoint {
             id: "publish".to_owned(),
-            p2p: proto::P2pMode::Always,
+            p2p: if is_sfu {
+                proto::P2pMode::Never
+            } else {
+                proto::P2pMode::Always
+            },
             force_relay: false,
-            audio_settings: self.send_audio.clone().unwrap_or(
-                proto::AudioSettings {
-                    publish_policy: PublishPolicy::Disabled,
-                },
-            ),
-            video_settings: self.send_video.clone().unwrap_or(
-                proto::VideoSettings {
-                    publish_policy: PublishPolicy::Disabled,
-                },
-            ),
+            audio_settings: self.send_audio.unwrap_or(proto::AudioSettings {
+                publish_policy: PublishPolicy::Disabled,
+            }),
+            video_settings: self.send_video.unwrap_or(proto::VideoSettings {
+                publish_policy: PublishPolicy::Disabled,
+            }),
         })
     }
 
     /// Returns a [`proto::WebRtcPlayEndpoint`] for this [`PairedMember`] which
     /// will receive media from the provided [`PairedMember`] if receiving is
     /// enabled.
-    #[must_use]
     fn play_endpoint_for(
         &self,
         room_id: &str,
@@ -697,7 +852,7 @@ impl PairedMember {
     ) -> Option<proto::WebRtcPlayEndpoint> {
         self.recv.then(|| proto::WebRtcPlayEndpoint {
             id: format!("play-{}", publisher.id),
-            src: format!("local://{}/{}/{}", room_id, publisher.id, "publish"),
+            src: format!("local://{room_id}/{}/publish", publisher.id),
             force_relay: false,
         })
     }

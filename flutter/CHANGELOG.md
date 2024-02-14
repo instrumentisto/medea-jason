@@ -6,24 +6,78 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.1.0] · 2021-??-?? ~TBD
-[0.1.0]: /../../tree/medea-jason-flutter-0.1.0/jason/flutter
+## [0.4.1] · 2023-??-??
+[0.4.1]: /../../tree/medea-jason-0.4.1/flutter
 
-[Milestone](/../../milestone/3) | [Roadmap](/../../issues/182)
+### Added
 
-#### Added
+- More information in `toString()` on custom exceptions ([#140]).
 
-...
-
-#### Changed
-
-...
-
-#### Fixed
-
-...
+[#140]: /../../pull/140
 
 
 
 
+## [0.4.0] · 2023-07-11
+[0.4.0]: /../../tree/medea-jason-0.4.0/flutter
+
+### BC Breaks
+
+- Renamed all enum variants in `сamelCase` style ([#119]).
+
+### Fixed
+
+- Initial mute state on incoming tracks in [SFU] mode ([#119]).
+- Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
+
+[#119]: /../../pull/119
+
+
+
+
+## [0.3.0] · 2023-06-09
+[0.3.0]: /../../tree/medea-jason-0.3.0/flutter
+
+### Added
+
+- Bindings to [`medea-jason`] Rust crate.
+- Errors ([#4], [#9], [#28], [#31], [#52]).
+- Basic API objects ([#5], [#12], [#45]):
+    - `Jason`;
+    - `RoomHandle`;
+    - `ConnectionHandle`;
+    - `MediaManagerHandle`;
+    - `ReconnectHandle`;
+    - `MediaStreamSettings`, `AudioTrackConstraints`, `DeviceVideoTrackConstraints`, `DisplayVideoTrackConstraints` ([#79]);
+    - `MediaDeviceDetails`, `MediaDisplayDetails` ([#96]);
+    - `LocalMediaTrack`, `RemoteMediaTrack` ([#42], [#46], [#101], [#109]);
+    - `enumerate_displays` ([#81]);
+    - `microphoneVolumeIsAvailable`, `setMicrophoneVolume`, `microphoneVolume` ([#49]);
+    - `setOutputAudioId` ([#29]);
+    - `on_device_change` ([#30]).
+
+[#4]: https://github.com/instrumentisto/medea-jason/pull/4
+[#5]: https://github.com/instrumentisto/medea-jason/pull/5
+[#9]: https://github.com/instrumentisto/medea-jason/pull/9
+[#12]: https://github.com/instrumentisto/medea-jason/pull/12
+[#28]: https://github.com/instrumentisto/medea-jason/pull/28
+[#29]: https://github.com/instrumentisto/medea-jason/pull/29
+[#30]: https://github.com/instrumentisto/medea-jason/pull/30
+[#31]: https://github.com/instrumentisto/medea-jason/pull/31
+[#42]: https://github.com/instrumentisto/medea-jason/pull/42
+[#45]: https://github.com/instrumentisto/medea-jason/pull/45
+[#46]: https://github.com/instrumentisto/medea-jason/pull/46
+[#49]: https://github.com/instrumentisto/medea-jason/pull/49
+[#52]: https://github.com/instrumentisto/medea-jason/pull/52
+[#79]: https://github.com/instrumentisto/medea-jason/pull/79
+[#81]: https://github.com/instrumentisto/medea-jason/pull/81
+[#96]: https://github.com/instrumentisto/medea-jason/pull/96
+[#101]: https://github.com/instrumentisto/medea-jason/pull/101
+[#109]: https://github.com/instrumentisto/medea-jason/pull/109
+
+
+
+
+[`medea-jason`]: https://docs.rs/medea-jason
 [Semantic Versioning 2.0.0]: https://semver.org
+[SFU]: https://webrtcglossary.com/sfu

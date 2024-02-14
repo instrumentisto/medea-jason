@@ -1,9 +1,9 @@
 [package]
 name = "medea-jason"
-version = "0.3.0-dev"
-edition = "2018"
-resolver = "2"
-description = "Client library for Medea media server"
+version = "0.4.1-dev"
+edition = "2021"
+rust-version = "1.65"
+description = "Client library for Medea media server."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "MPL-2.0"
 documentation = "https://docs.rs/medea-jason"
@@ -12,7 +12,7 @@ repository = "https://github.com/instrumentisto/medea-jason"
 readme = "README.md"
 keywords = ["medea", "jason", "webrtc", "client", "browser"]
 categories = ["multimedia", "api-bindings", "web-programming", "wasm"]
-exclude = ["/demo/", "/e2e-demo/", "/flutter/"]
+include = ["/src/", "/build.rs", "/CHANGELOG.md", "/LICENSE.md"]
 
 [workspace]
 members = [
@@ -25,49 +25,56 @@ members = [
 ]
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib", "rlib", "staticlib"]
+
+[profile.release]
+lto = "fat"
 
 [features]
 default = ["console_error_panic_hook", "wee_alloc"]
-mockable = ["downcast", "fragile", "mockall", "predicates-tree"]
+dart-codegen = ["medea-macro/dart-codegen"]
+mockable = ["mockall"]
 
 [dependencies]
-async-recursion = "0.3"
+async-recursion = "1.0"
 async-trait = "0.1"
-backoff = { version = "0.3", features = ["futures"] }
-bitflags = "1.2"
-cfg-if = "1.0"
-derivative = "2.1"
+backoff = { version = "0.4", features = ["futures"] }
+bitflags = "2.0"
+derivative = "2.2"
 derive_more = "0.99"
-downcast = { version = "0.10", optional = true }
-fragile = { version = "1.0", optional = true }
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.3", features = ["jason"] }
-medea-macro = "0.2"
-medea-reactive = "0.1"
-mockall = { version = "0.10", optional = true }
-predicates-tree = { version = "1.0", optional = true }
+medea-client-api-proto = { version = "0.5", path = "proto/client-api" }
+medea-macro = { version = "0.3", path = "crates/medea-macro" }
+medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
+mockall = { version = "0.12", optional = true }
+sealed = "0.5"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tracerr = "0.2"
-url = "2.1"
+tracerr = "0.3"
+url = "2.3"
 
 [target.'cfg(target_os = "android")'.dependencies]
-android_logger = "0.10"
-dart-sys = "2.0"
+android_logger = "0.13"
+
+[target.'cfg(any(target_os = "ios", target_os = "linux", target_os = "macos", target_os = "windows"))'.dependencies]
+simple_logger = "4.0"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+dart-sys = "4.0"
+flutter_rust_bridge = { version = "=1.82.4", default-features = false }
 libc = "0.2"
 
-[target.'cfg(not(target_os = "android"))'.dependencies]
-backoff = { version = "0.3", features = ["wasm-bindgen"] }
+[target.'cfg(target_family = "wasm")'.dependencies]
+backoff = { version = "0.4", features = ["wasm-bindgen"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 js-sys = "0.3"
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
-[target.'cfg(not(target_os = "android"))'.dependencies.web-sys]
-    version = "0.3.47"
+[target.'cfg(target_family = "wasm")'.dependencies.web-sys]
+    version = "0.3.61"
     features = [
         "console",
         "ConstrainDomStringParameters", "ConstrainDoubleRange",
@@ -101,6 +108,6 @@ wee_alloc = { version = "0.4", optional = true }
 [build-dependencies]
 cc = "1.0"
 
-[target.'cfg(not(target_os = "android"))'.dev-dependencies]
+[target.'cfg(target_family = "wasm")'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }
 wasm-bindgen-test = "0.3"

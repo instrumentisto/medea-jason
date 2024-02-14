@@ -3,7 +3,7 @@
 pub mod constraints;
 pub mod error;
 pub mod ice_server;
-pub mod input_device_info;
+pub mod media_device_info;
 pub mod media_devices;
 pub mod media_track;
 pub mod peer_connection;
@@ -12,7 +12,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 
-use std::{convert::TryInto as _, time::Duration};
+use std::time::Duration;
 
 use futures::Future;
 use js_sys::{Promise, Reflect};
@@ -23,8 +23,8 @@ use web_sys::Window;
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
-    input_device_info::InputDeviceInfo,
-    media_devices::{enumerate_devices, get_display_media, get_user_media},
+    media_device_info::MediaDeviceInfo,
+    media_devices::MediaDevices,
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
@@ -33,11 +33,14 @@ pub use self::{
     utils::Function,
 };
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
+/// Unimplemented on WASM targets.
+pub type MediaDisplayInfo = ();
+
 #[cfg(feature = "wee_alloc")]
+/// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+/// allocator.
 #[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then
@@ -56,7 +59,6 @@ pub fn init_logger() {
 }
 
 /// Runs a Rust [`Future`] on the current thread.
-#[inline]
 pub fn spawn<F>(task: F)
 where
     F: Future<Output = ()> + 'static,
@@ -71,16 +73,18 @@ where
 /// If fails to interact with JS side.
 ///
 /// [`Future`]: std::future::Future
+#[allow(clippy::unwrap_used)]
 pub async fn delay_for(delay: Duration) {
     let delay_ms = delay.as_millis().try_into().unwrap_or(i32::MAX);
     JsFuture::from(Promise::new(&mut |yes, _| {
-        window()
+        _ = window()
             .set_timeout_with_callback_and_timeout_and_arguments_0(
                 &yes, delay_ms,
             )
             .unwrap();
     }))
     .await
+    .map(drop)
     .unwrap();
 }
 
@@ -92,8 +96,8 @@ pub fn get_property_by_name<T, F, U>(
     into: F,
 ) -> Option<U>
 where
-    T: AsRef<wasm_bindgen::JsValue>,
-    F: Fn(wasm_bindgen::JsValue) -> Option<U>,
+    T: AsRef<JsValue>,
+    F: Fn(JsValue) -> Option<U>,
 {
     Reflect::get(value.as_ref(), &JsValue::from_str(name))
         .ok()
@@ -109,10 +113,12 @@ where
 pub fn window() -> Window {
     // Cannot use `lazy_static` since `window` is `!Sync`.
     // Safe to unwrap.
+    #![allow(clippy::unwrap_used)]
     web_sys::window().unwrap()
 }
 
 /// Wrapper around interval timer ID.
+#[derive(Debug)]
 pub struct IntervalHandle(pub i32);
 
 impl Drop for IntervalHandle {

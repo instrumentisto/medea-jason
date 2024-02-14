@@ -3,7 +3,9 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 
 use derive_more::From;
+use js_sys::Promise;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
     api::{MediaKind, MediaSourceKind},
@@ -17,7 +19,7 @@ use crate::{
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack
 #[wasm_bindgen]
-#[derive(From)]
+#[derive(Debug, From)]
 pub struct LocalMediaTrack(local::LocalMediaTrack);
 
 #[wasm_bindgen]
@@ -35,6 +37,16 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn kind(&self) -> MediaKind {
         self.0.kind().into()
+    }
+
+    /// Returns a [`MediaKind::Audio`] if this [`LocalMediaTrack`] represents an
+    /// audio track, or a [`MediaKind::Video`] if it represents a video track.
+    #[allow(clippy::as_conversions)]
+    pub fn state(&self) -> Promise {
+        let this = self.0.clone();
+        future_to_promise(
+            async move { Ok(JsValue::from(this.state().await as u8)) },
+        )
     }
 
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is

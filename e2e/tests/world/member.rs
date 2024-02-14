@@ -1,10 +1,10 @@
 //! Medea media server member representation.
 
-use std::{cell::RefCell, collections::HashMap, fmt};
+use std::{cell::RefCell, collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_e2e::{
-    browser::{mock, Window},
+    browser::{mock, Statement, Window},
     object::{
         self, connections_store::ConnectionStore, AwaitCompletion, MediaKind,
         MediaSourceKind, Object, Room,
@@ -23,6 +23,7 @@ pub enum Error {
 /// Shortcut for a [`Result`] containing an [`Error`](enum@Error).
 ///
 /// [`Result`]: std::result::Result
+#[allow(clippy::absolute_paths)]
 type Result<T> = std::result::Result<T, Error>;
 
 /// Builder of a [`Member`].
@@ -57,6 +58,8 @@ impl Builder {
             room,
             connection_store,
             window,
+            enabled_audio: true,
+            enabled_video: true,
         })
     }
 }
@@ -71,6 +74,12 @@ pub struct Member {
 
     /// Indicator whether this [`Member`] should receive media.
     is_recv: bool,
+
+    /// Indicator whether this [`Member`] should publish audio.
+    enabled_audio: bool,
+
+    /// Indicator whether this [`Member`] should publish video.
+    enabled_video: bool,
 
     /// Indicator whether this [`Member`] is joined a [`Room`] on a media
     /// server.
@@ -113,41 +122,47 @@ impl fmt::Debug for Member {
 
 impl Member {
     /// Returns ID of this [`Member`] on a media server.
-    #[inline]
     #[must_use]
     pub fn id(&self) -> &str {
         &self.id
     }
 
     /// Indicates whether this [`Member`] should publish media.
-    #[inline]
     #[must_use]
     pub fn is_send(&self) -> bool {
         self.is_send
     }
 
+    /// Indicates whether this [`Member`] should publish video.
+    #[must_use]
+    pub fn is_send_video(&self) -> bool {
+        self.enabled_video
+    }
+
+    /// Indicates whether this [`Member`] should publish audio.
+    #[must_use]
+    pub fn is_send_audio(&self) -> bool {
+        self.enabled_audio
+    }
+
     /// Indicator whether this [`Member`] should receive media.
-    #[inline]
     #[must_use]
     pub fn is_recv(&self) -> bool {
         self.is_recv
     }
 
     /// Updates flag indicating that this [`Member`] should publish media.
-    #[inline]
     pub fn set_is_send(&mut self, is_send: bool) {
         self.is_send = is_send;
     }
 
     /// Updates flag indicating that this [`Member`] should receive media.
-    #[inline]
     pub fn set_is_recv(&mut self, is_recv: bool) {
         self.is_recv = is_recv;
     }
 
     /// Indicates whether this [`Member`] is joined a [`Room`] on a media
     /// server.
-    #[inline]
     #[must_use]
     pub fn is_joined(&self) -> bool {
         self.is_joined
@@ -157,9 +172,8 @@ impl Member {
     pub async fn join_room(&mut self, room_id: &str) -> Result<()> {
         self.room
             .join(format!(
-                "{}/{}/{}?token=test",
+                "{}/{room_id}/{}?token=test",
                 *conf::CLIENT_API_ADDR,
-                room_id,
                 self.id,
             ))
             .await?;
@@ -206,6 +220,11 @@ impl Member {
     /// [`RemoteTrack`]: crate::object::remote_track::RemoteTrack
     #[must_use]
     pub fn count_of_tracks_between_members(&self, other: &Self) -> (u64, u64) {
+        if env::var("SFU").is_ok() {
+            // All transceivers are always `sendrecv` in SFU mode.
+            return (3, 3);
+        }
+
         let send_count = self
             .send_state
             .borrow()
@@ -230,7 +249,7 @@ impl Member {
 
     /// Toggles media state of this [`Member`]'s [`Room`].
     pub async fn toggle_media(
-        &self,
+        &mut self,
         kind: Option<MediaKind>,
         source: Option<MediaSourceKind>,
         enabled: bool,
@@ -242,6 +261,10 @@ impl Member {
                 self.room
                     .enable_media_send(kind, source, maybe_await)
                     .await?;
+                match kind {
+                    MediaKind::Audio => self.enabled_audio = true,
+                    MediaKind::Video => self.enabled_video = true,
+                }
             } else {
                 self.room
                     .enable_media_send(MediaKind::Video, source, maybe_await)
@@ -249,11 +272,17 @@ impl Member {
                 self.room
                     .enable_media_send(MediaKind::Audio, source, maybe_await)
                     .await?;
+                self.enabled_audio = true;
+                self.enabled_video = true;
             }
         } else if let Some(kind) = kind {
             self.room
                 .disable_media_send(kind, source, maybe_await)
                 .await?;
+            match kind {
+                MediaKind::Audio => self.enabled_audio = false,
+                MediaKind::Video => self.enabled_video = false,
+            }
         } else {
             self.room
                 .disable_media_send(MediaKind::Audio, source, maybe_await)
@@ -261,6 +290,8 @@ impl Member {
             self.room
                 .disable_media_send(MediaKind::Video, source, maybe_await)
                 .await?;
+            self.enabled_audio = false;
+            self.enabled_video = false;
         }
         Ok(())
     }
@@ -329,18 +360,51 @@ impl Member {
         Ok(())
     }
 
+    /// Emulates video device switching.
+    pub async fn switch_video_device(&self) -> Result<()> {
+        self.room
+            .set_local_media_settings(false, true, true)
+            .await?;
+        self.room
+            .set_local_media_settings(true, true, false)
+            .await?;
+        Ok(())
+    }
+
+    /// Emulates the provided `latency` for `getUserMedia()` requests.
+    pub async fn add_gum_latency(&self, latency: Duration) {
+        self.window
+            .execute(Statement::new(
+                r#"
+                    async () => {
+                        const [duration] = args;
+
+                        var gUM = navigator.mediaDevices.getUserMedia.bind(
+                            navigator.mediaDevices
+                        );
+                        navigator.mediaDevices.getUserMedia =
+                            async function (cons) {
+                                await new Promise(r => setTimeout(r, duration));
+                                return await gUM(cons);
+                            };
+                    }
+                "#,
+                [u64::try_from(latency.as_millis()).unwrap().into()],
+            ))
+            .await
+            .unwrap();
+    }
+
     /// Returns reference to the Storage of [`Connection`]s thrown by this
     /// [`Member`]'s [`Room`].
     ///
     /// [`Connection`]: object::connection::Connection
-    #[inline]
     #[must_use]
     pub fn connections(&self) -> &Object<ConnectionStore> {
         &self.connection_store
     }
 
     /// Returns reference to the [`Room`] of this [`Member`].
-    #[inline]
     #[must_use]
     pub fn room(&self) -> &Object<Room> {
         &self.room
@@ -348,7 +412,6 @@ impl Member {
 
     /// Returns WebAPI `WebSocket` mock object for [`Window`] of this
     /// [`Member`].
-    #[inline]
     #[must_use]
     pub fn ws_mock(&self) -> mock::WebSocket {
         self.window.websocket_mock()
@@ -358,7 +421,6 @@ impl Member {
     /// [`Member`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
-    #[inline]
     #[must_use]
     pub fn media_devices_mock(&self) -> mock::MediaDevices {
         self.window.media_devices_mock()
@@ -367,7 +429,6 @@ impl Member {
 
 /// Returns list of [`MediaKind`]s and [`MediaSourceKind`] based on the provided
 /// [`Option`]s.
-#[must_use]
 fn kinds_combinations(
     kind: Option<MediaKind>,
     source_kind: Option<MediaSourceKind>,

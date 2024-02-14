@@ -1,4 +1,5 @@
 /.dart_tool/
+/.idea/
 /.pub/
 /.packages
 /.flutter-plugins-dependencies
@@ -8,3 +9,7 @@
 
 /doc/api/
 /build/
+
+# Tests related generated code
+/test/e2e/*.g.dart
+/test/e2e/api/*.g.dart

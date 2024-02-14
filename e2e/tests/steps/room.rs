@@ -1,6 +1,6 @@
-use cucumber_rust::{given, then, when};
+use cucumber::{given, then, when};
 
-use crate::world::World;
+use crate::World;
 
 #[then(regex = "^(\\S+)'s `on_close` room's callback fires with `(\\S+)` \
                  reason$")]
@@ -56,7 +56,7 @@ async fn when_member_enables_via_local_media_settings(
     let audio = kind.contains("audio");
     member
         .room()
-        .set_local_media_settings(video, audio)
+        .set_local_media_settings(video, audio, true)
         .await
         .unwrap();
 }
@@ -70,5 +70,4 @@ async fn then_room_failed_local_stream_fires(
 ) {
     let member = world.get_member(&id).unwrap();
     member.room().when_failed_local_stream_count(times).await;
-    assert!(true);
 }

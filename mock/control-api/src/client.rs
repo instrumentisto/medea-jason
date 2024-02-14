@@ -6,15 +6,19 @@
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
+    time::Duration,
 };
 
-use actix::Recipient;
+use actix::{clock::sleep, Recipient};
 use derive_more::{AsRef, From, Into};
 use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
 use tonic::{transport::Channel, Status};
 
-use crate::api::{ws::Notification, Element, Subscribers};
+use crate::{
+    api::{ws::Notification, Element, Subscribers},
+    log,
+};
 
 /// Fid to `Room` element.
 #[derive(Clone, Debug, AsRef, From, Into)]
@@ -22,17 +26,16 @@ use crate::api::{ws::Notification, Element, Subscribers};
 pub struct Fid(String);
 
 impl Fid {
-    /// Return `Room` id from this [`Fid`].
+    /// Returns `Room`'s ID from this [`Fid`].
     fn room_id(&self) -> &str {
-        match self.0.find('/') {
-            None => self.0.as_str(),
-            Some(i) => &self.0[..i],
-        }
+        // PANIC: Slicing is OK here, as the index is taken from the source.
+        #[allow(clippy::string_slice)]
+        self.0.find('/').map_or(self.0.as_str(), |i| &self.0[..i])
     }
 }
 
 impl From<()> for Fid {
-    fn from(_: ()) -> Self {
+    fn from((): ()) -> Self {
         Self(String::new())
     }
 }
@@ -50,7 +53,7 @@ impl From<(String, String, String)> for Fid {
 }
 
 /// Returns new [`proto::IdRequest`] with provided FIDs.
-fn id_request(ids: Vec<String>) -> proto::IdRequest {
+const fn id_request(ids: Vec<String>) -> proto::IdRequest {
     proto::IdRequest { fid: ids }
 }
 
@@ -58,7 +61,7 @@ fn id_request(ids: Vec<String>) -> proto::IdRequest {
 ///
 /// [Medea]: https://github.com/instrumentisto/medea
 /// [Control API]: https://tinyurl.com/yxsqplq7
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ControlClient {
     /// Map of subscribers to [`Notification`]s.
     subscribers: Subscribers,
@@ -82,10 +85,35 @@ impl ControlClient {
         medea_addr: String,
         subscribers: Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>,
     ) -> Result<Self, tonic::transport::Error> {
-        let client = ControlApiClient::connect(medea_addr).await?;
+        let grpc_client = {
+            /// Max number of retries for connecting to Medea.
+            const MAX_RETRIES: u64 = 5;
+
+            let mut current_try = 0;
+            loop {
+                current_try += 1;
+                let client =
+                    ControlApiClient::connect(medea_addr.clone()).await;
+
+                match client {
+                    Ok(client) => {
+                        break client;
+                    }
+                    Err(e) => {
+                        if current_try == MAX_RETRIES {
+                            log::error!("Error connection to medea: {e}");
+                            return Err(e);
+                        }
+                        log::error!("Error connection to medea: {e}, retrying");
+                        sleep(Duration::from_secs(1)).await;
+                    }
+                }
+            }
+        };
+
         Ok(Self {
             subscribers,
-            grpc_client: client,
+            grpc_client,
         })
     }
 
@@ -135,7 +163,7 @@ impl ControlClient {
         if response.is_ok() {
             if let Some(subs) = self.subscribers.lock().unwrap().get(&room_id) {
                 for sub in subs {
-                    drop(sub.do_send(notification.clone()));
+                    sub.do_send(notification.clone());
                 }
             };
         }
@@ -204,7 +232,7 @@ impl ControlClient {
             {
                 let notification = Notification::deleted(&fid);
                 for sub in subs {
-                    drop(sub.do_send(notification.clone()));
+                    sub.do_send(notification.clone());
                 }
             };
         }

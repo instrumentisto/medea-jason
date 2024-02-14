@@ -20,7 +20,7 @@ use super::Error;
 ///
 /// [`RoomHandle.on_connection_loss`]: crate::api::RoomHandle.on_connection_loss
 #[wasm_bindgen]
-#[derive(Clone, From)]
+#[derive(Clone, Debug, From)]
 pub struct ReconnectHandle(rpc::ReconnectHandle);
 
 #[wasm_bindgen]
@@ -31,7 +31,15 @@ impl ReconnectHandle {
     /// attempt won't be performed. Instead, it will wait for the first
     /// reconnection attempt result and use it.
     ///
+    /// # Errors
+    ///
+    /// With a [`RpcClientException`] if reconnecting attempt fails.
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// [`RpcClientException`]: crate::api::err::RpcClientException
     /// [`RpcSession`]: rpc::RpcSession
+    /// [`StateError`]: crate::api::err::StateError
     pub fn reconnect_with_delay(&self, delay_ms: u32) -> Promise {
         let this = self.0.clone();
         future_to_promise(async move {
@@ -65,7 +73,15 @@ impl ReconnectHandle {
     /// won't be performed. Instead, it will wait for the first reconnection
     /// attempt result and use it here.
     ///
+    /// # Errors
+    ///
+    /// With a [`RpcClientException`] if reconnecting attempt fails.
+    ///
+    /// With a [`StateError`] if the underlying pointer has been freed.
+    ///
+    /// [`RpcClientException`]: crate::api::err::RpcClientException
     /// [`RpcSession`]: rpc::RpcSession
+    /// [`StateError`]: crate::api::err::StateError
     pub fn reconnect_with_backoff(
         &self,
         starting_delay_ms: u32,

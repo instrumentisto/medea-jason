@@ -1,8 +1,8 @@
 //! Reactive vector based on [`Vec`].
 
-use std::{marker::PhantomData, slice::Iter};
+use std::{marker::PhantomData, mem, slice::Iter, vec::Vec as StdVec};
 
-use futures::stream::LocalBoxStream;
+use futures::stream::{self, LocalBoxStream};
 
 use crate::subscribers_store::{
     common, progressable,
@@ -83,7 +83,7 @@ pub type ObservableVec<T> = Vec<T, common::SubStore<T>, T>;
 #[derive(Debug)]
 pub struct Vec<T, S: SubscribersStore<T, O>, O> {
     /// Data stored by this [`Vec`].
-    store: std::vec::Vec<T>,
+    store: StdVec<T>,
 
     /// Subscribers of the [`Vec::on_push`] method.
     on_push_subs: S,
@@ -103,7 +103,6 @@ where
     /// [`Vec::on_push()`] subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_push_processed(&self) -> Processed<'static> {
         self.on_push_subs.when_all_processed()
     }
@@ -112,7 +111,6 @@ where
     /// by [`Vec::on_remove()`] subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_remove_processed(&self) -> Processed<'static> {
         self.on_remove_subs.when_all_processed()
     }
@@ -121,7 +119,6 @@ where
     /// processed by subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         crate::when_all_processed(vec![
             self.when_remove_processed().into(),
@@ -133,14 +130,12 @@ where
 impl<T, S: SubscribersStore<T, O>, O> Vec<T, S, O> {
     /// Returns new empty [`Vec`].
     #[must_use]
-    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// An iterator visiting all elements in arbitrary order. The iterator
     /// element type is `&'a T`.
-    #[inline]
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.into_iter()
     }
@@ -148,7 +143,6 @@ impl<T, S: SubscribersStore<T, O>, O> Vec<T, S, O> {
     /// Returns the [`Stream`] to which the pushed values will be sent.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn on_push(&self) -> LocalBoxStream<'static, O> {
         self.on_push_subs.subscribe()
     }
@@ -159,7 +153,6 @@ impl<T, S: SubscribersStore<T, O>, O> Vec<T, S, O> {
     /// [`Vec`] on drop.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn on_remove(&self) -> LocalBoxStream<'static, O> {
         self.on_remove_subs.subscribe()
     }
@@ -199,38 +192,38 @@ where
     /// inserted.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
+    #[allow(clippy::needless_collect)] // false positive: lifetimes
     pub fn replay_on_push(&self) -> LocalBoxStream<'static, O> {
-        Box::pin(futures::stream::iter(
+        Box::pin(stream::iter(
             self.store
                 .clone()
                 .into_iter()
                 .map(|val| self.on_push_subs.wrap(val))
-                .collect::<std::vec::Vec<_>>(),
+                .collect::<StdVec<_>>(),
         ))
     }
 }
 
+// Implemented manually to omit redundant `: Default` trait bounds, imposed by
+// `#[derive(Default)]`.
 impl<T, S: SubscribersStore<T, O>, O> Default for Vec<T, S, O> {
-    #[inline]
     fn default() -> Self {
         Self {
-            store: std::vec::Vec::new(),
+            store: StdVec::new(),
             on_push_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }
 
-impl<T, S: SubscribersStore<T, O>, O> From<std::vec::Vec<T>> for Vec<T, S, O> {
-    #[inline]
-    fn from(from: std::vec::Vec<T>) -> Self {
+impl<T, S: SubscribersStore<T, O>, O> From<StdVec<T>> for Vec<T, S, O> {
+    fn from(from: StdVec<T>) -> Self {
         Self {
             store: from,
             on_push_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }
@@ -239,7 +232,6 @@ impl<'a, T, S: SubscribersStore<T, O>, O> IntoIterator for &'a Vec<T, S, O> {
     type IntoIter = Iter<'a, T>;
     type Item = &'a T;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         self.store.iter()
     }
@@ -249,11 +241,9 @@ impl<T, S: SubscribersStore<T, O>, O> Drop for Vec<T, S, O> {
     /// Sends all items of a dropped [`Vec`] to the [`Vec::on_remove()`]
     /// subscriptions.
     fn drop(&mut self) {
-        let store = &mut self.store;
-        let on_remove_subs = &self.on_remove_subs;
-        store.drain(..).for_each(|value| {
-            on_remove_subs.send_update(value);
-        });
+        for value in mem::take(&mut self.store) {
+            self.on_remove_subs.send_update(value);
+        }
     }
 }
 
@@ -262,7 +252,6 @@ where
     T: Clone,
     S: SubscribersStore<T, O>,
 {
-    #[inline]
     fn as_ref(&self) -> &[T] {
         &self.store
     }

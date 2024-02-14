@@ -4,12 +4,12 @@
 use std::{
     fmt,
     pin::Pin,
-    task::{Context, Poll},
+    task::{ready, Context, Poll},
 };
 
 use futures::{
     future::{self, Future, LocalBoxFuture},
-    ready, FutureExt as _,
+    FutureExt as _,
 };
 
 /// Factory producing a [`Future`] in [`when_all_processed()`] function.
@@ -23,7 +23,6 @@ where
     I: IntoIterator<Item = Factory<'static, T>>,
     T: 'static,
 {
-    #[allow(clippy::needless_collect)]
     let futures: Vec<_> = futures.into_iter().collect();
     AllProcessed::new(Box::new(move || {
         let futures = futures.iter().map(AsRef::as_ref).map(|f| f());
@@ -44,7 +43,6 @@ pub struct Processed<'a, T = ()> {
 
 impl<'a, T> Processed<'a, T> {
     /// Creates new [`Processed`] from the provided [`Factory`].
-    #[inline]
     pub fn new(factory: Factory<'a, T>) -> Self {
         Self {
             fut: factory(),
@@ -56,7 +54,6 @@ impl<'a, T> Processed<'a, T> {
 impl<'a, T> Future for Processed<'a, T> {
     type Output = T;
 
-    #[inline]
     fn poll(
         mut self: Pin<&mut Self>,
         cx: &mut Context<'_>,
@@ -66,16 +63,14 @@ impl<'a, T> Future for Processed<'a, T> {
 }
 
 impl<'a, T> From<Processed<'a, T>> for Factory<'a, T> {
-    #[inline]
     fn from(p: Processed<'a, T>) -> Self {
         p.factory
     }
 }
 
 impl<'a, T> fmt::Debug for Processed<'a, T> {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Processed").finish()
+        f.debug_struct("Processed").finish_non_exhaustive()
     }
 }
 
@@ -97,7 +92,6 @@ pub struct AllProcessed<'a, T = ()> {
 }
 
 impl<'a, T> From<AllProcessed<'a, T>> for Factory<'a, T> {
-    #[inline]
     fn from(p: AllProcessed<'a, T>) -> Self {
         p.factory
     }
@@ -105,7 +99,6 @@ impl<'a, T> From<AllProcessed<'a, T>> for Factory<'a, T> {
 
 impl<'a, T> AllProcessed<'a, T> {
     /// Creates new [`AllProcessed`] from provided [`Factory`].
-    #[inline]
     fn new(factory: Factory<'a, T>) -> Self {
         Self {
             fut: factory(),
@@ -115,9 +108,8 @@ impl<'a, T> AllProcessed<'a, T> {
 }
 
 impl<'a, T> fmt::Debug for AllProcessed<'a, T> {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("AllProcessed").finish()
+        f.debug_struct("AllProcessed").finish_non_exhaustive()
     }
 }
 
@@ -178,7 +170,7 @@ mod tests {
                             updatable_cell_rx
                                 .select_next_some()
                                 .await
-                                .into_inner()
+                                .into_inner(),
                         );
 
                         updatable_cell.set(DELAYED_PROCESSED_UPDATE);
@@ -188,7 +180,7 @@ mod tests {
                             updatable_cell_rx
                                 .select_next_some()
                                 .await
-                                .into_inner()
+                                .into_inner(),
                         );
                     }
                 });
@@ -204,7 +196,7 @@ mod tests {
                         Poll::Ready(_),
                     ),
                     "ProgressableCell is not processed, but `join_all` \
-                     resolved."
+                     resolved.",
                 );
             })
             .await;

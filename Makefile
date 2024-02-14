@@ -20,11 +20,11 @@ IMAGE_NAME := $(strip \
 	$(if $(call eq,$(image),medea-demo-edge),medea-demo,\
 	$(or $(image),medea-control-api-mock)))
 
-RUST_VER := 1.54
-CHROME_VERSION := 92.0
-FIREFOX_VERSION := 91.0.2
+RUST_VER := 1.76
+CHROME_VERSION := 121.0
+FIREFOX_VERSION := 122.0.1-driver0.34.0
 
-CARGO_NDK_VER := 2.4.1-ndkr23-rust$(RUST_VER)
+CARGO_NDK_VER := 3.4.0-ndkr26b-rust$(RUST_VER)
 ANDROID_TARGETS := aarch64-linux-android \
                    armv7-linux-androideabi \
                    i686-linux-android \
@@ -35,6 +35,15 @@ ANDROID_SDK_COMPILE_VERSION = $(strip \
 ANDROID_SDK_MIN_VERSION = $(strip \
 	$(shell grep minSdkVersion flutter/android/build.gradle \
 	        | awk '{print $$2}'))
+FLUTTER_RUST_BRIDGE_VER ?= $(strip \
+	$(shell grep -A1 'name = "flutter_rust_bridge"' Cargo.lock \
+	        | grep -v 'flutter_rust_bridge' \
+	        | cut -d'"' -f2))
+IOS_TARGETS := aarch64-apple-ios x86_64-apple-ios
+LINUX_TARGETS := x86_64-unknown-linux-gnu
+MACOS_TARGETS := aarch64-apple-darwin x86_64-apple-darwin
+WEB_TARGETS := wasm32-unknown-unknown
+WINDOWS_TARGETS := x86_64-pc-windows-msvc
 
 crate-dir = .
 ifeq ($(crate),medea-client-api-proto)
@@ -87,10 +96,10 @@ docs: docs.rust
 down: down.dev
 
 
-fmt: cargo.fmt
+fmt: cargo.fmt flutter.fmt
 
 
-lint: cargo.lint
+lint: cargo.lint flutter.lint
 
 
 # Build and publish project crate everywhere.
@@ -99,7 +108,7 @@ lint: cargo.lint
 #	make release crate=(medea-jason|<crate-name>)
 #	             [publish=(no|yes)]
 
-release: release.crates release.npm
+release: release.cargo release.npm
 
 
 # Run all project tests.
@@ -112,7 +121,7 @@ test:
 	@make test.e2e up=yes dockerized=no
 
 
-up: up.dev
+up: up.web
 
 
 
@@ -130,9 +139,6 @@ down.control:
 	-killall medea-control-api-mock
 
 
-down.coturn: docker.down.coturn
-
-
 down.demo: docker.down.demo
 
 
@@ -144,7 +150,6 @@ down.demo: docker.down.demo
 down.dev:
 	@make docker.down.medea
 	@make down.control
-	@make docker.down.coturn
 
 
 down.medea: docker.down.medea
@@ -161,22 +166,39 @@ up.control:
 	cargo run -p medea-control-api-mock $(if $(call eq,$(background),yes),&,)
 
 
-up.coturn: docker.up.coturn
-
-
 up.demo: docker.up.demo
 
 
-# Run Medea and Jason development environment.
+# Run Medea and Jason Flutter version locally.
 #
 # Usage:
-#	make up.dev
+#	make up.flutter [device=<device-id>]
 
-up.dev: up.coturn
-	$(MAKE) -j3 up.jason docker.up.medea up.control
+up.flutter:
+	$(MAKE) -j3 up.jason.flutter docker.up.medea up.control
+
+
+# Run Medea and Jason web version locally.
+#
+# Usage:
+#	make up.web
+
+up.web:
+	$(MAKE) -j3 up.jason.web docker.up.medea up.control
 
 
 up.medea: docker.up.medea
+
+
+# Run Jason E2E demo in development mode on native platform.
+#
+# Usage:
+#	make up.jason.native [debug=(yes|no)] [device=<device-id>]
+
+up.jason.flutter:
+	cd flutter/example/ && \
+	flutter run $(if $(call eq,$(debug),no),--release,) \
+	            $(if $(call eq,$(device),),,-d $(device))
 
 
 # Run Jason E2E demo in development mode.
@@ -184,7 +206,7 @@ up.medea: docker.up.medea
 # Usage:
 #	make up.jason
 
-up.jason:
+up.jason.web:
 	npm run start --prefix=./e2e-demo
 
 
@@ -207,18 +229,31 @@ cargo:
 #
 # Usage:
 #	make cargo.build.jason [args=<cargo-build-args>]
-#		[( [platform=web]
-# 		 | platform=all
-#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])] )]
+#		[( [platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
+#		 | platform=all
+#		 | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
+#		 | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])] )]
 #		[debug=(yes|no)] [dockerized=(no|yes)]
 
 cargo-build-platform = $(or $(platform),web)
-cargo-build-targets = $(or $(targets),$(ANDROID_TARGETS))
+cargo-build-targets-android = $(or $(targets),$(ANDROID_TARGETS))
+cargo-build-targets-ios = $(or $(targets),$(IOS_TARGETS))
+cargo-build-targets-linux = $(or $(targets),$(LINUX_TARGETS))
+cargo-build-targets-macos = $(or $(targets),$(MACOS_TARGETS))
+cargo-build-targets-web = $(or $(targets),$(WEB_TARGETS))
+cargo-build-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.build.jason:
 ifeq ($(platform),all)
+	@make cargo.build.jason platform=android
+	@make cargo.build.jason platform=ios
+	@make cargo.build.jason platform=linux
+	@make cargo.build.jason platform=macos
 	@make cargo.build.jason platform=web
-	@make cargo.build.jason platform=android targets=$(targets)
+	@make cargo.build.jason platform=windows
 else
 ifeq ($(dockerized),yes)
 ifeq ($(cargo-build-platform),web)
@@ -230,6 +265,7 @@ ifeq ($(cargo-build-platform),web)
 		ghcr.io/instrumentisto/rust:$(RUST_VER) \
 			make cargo.build.jason debug=$(debug) dockerized=no \
 			                       platform=web args="$(args)" \
+			                       targets=$(targets) \
 			                       pre-install=yes
 endif
 ifeq ($(cargo-build-platform),android)
@@ -240,7 +276,7 @@ ifeq ($(cargo-build-platform),android)
 		-e XDG_CACHE_HOME=$(HOME) \
 		ghcr.io/instrumentisto/cargo-ndk:$(CARGO_NDK_VER) \
 			make cargo.build.jason debug=$(debug) dockerized=no \
-			                       platform=$(platform) args="$(args)"
+			                       platform=android args="$(args)" \
 			                       targets=$(targets)
 endif
 else
@@ -248,14 +284,40 @@ ifeq ($(cargo-build-platform),web)
 ifeq ($(pre-install),yes)
 	curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 endif
-	@rm -rf $(crate-dir)/pkg/
-	wasm-pack build -t web $(crate-dir) \
-		$(if $(call eq,$(debug),no),,--dev) \
-		$(args)
+	@rm -rf ./pkg/
+	wasm-pack build -t web ./ $(if $(call eq,$(debug),no),,--dev) $(args)
 endif
 ifeq ($(cargo-build-platform),android)
-	$(foreach target,$(subst $(comma), ,$(cargo-build-targets)),\
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-android)),\
 		$(call cargo.build.medea-jason.android,$(target),$(debug)))
+endif
+ifeq ($(cargo-build-platform),ios)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+		$(call cargo.build.medea-jason.ios,$(target),$(debug)))
+	$(eval build := $(if $(call eq,$(debug),no),release,debug))
+	@rm -rf flutter/ios/lib/MedeaJason.xcframework
+	@mkdir -p flutter/ios/lib/
+	xcodebuild -create-xcframework \
+	           $(foreach t,$(subst $(comma), ,$(cargo-build-targets-ios)),\
+	           -library target/$(t)/$(build)/libmedea_jason.a) \
+	           -output flutter/ios/lib/MedeaJason.xcframework
+endif
+ifeq ($(cargo-build-platform),linux)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-linux)),\
+		$(call cargo.build.medea-jason.linux,$(target),$(debug)))
+endif
+ifeq ($(cargo-build-platform),macos)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-macos)),\
+		$(call cargo.build.medea-jason.macos,$(target),$(debug)))
+	$(eval build := $(if $(call eq,$(debug),no),release,debug))
+	@mkdir -p ./flutter/macos/lib/
+	lipo -create $(foreach t,$(subst $(comma), ,$(cargo-build-targets-macos)),\
+	             target/$(t)/$(build)/libmedea_jason.dylib) \
+	     -output ./flutter/macos/lib/libmedea_jason.dylib
+endif
+ifeq ($(cargo-build-platform),windows)
+	$(foreach target,$(subst $(comma), ,$(cargo-build-targets-windows)),\
+		$(call cargo.build.medea-jason.windows,$(target),$(debug)))
 endif
 endif
 endif
@@ -266,6 +328,43 @@ define cargo.build.medea-jason.android
 	          -o ./flutter/android/src/main/jniLibs \
 	          --manifest-path=./Cargo.toml \
 		build $(if $(call eq,$(debug),no),--release,) $(args)
+endef
+define cargo.build.medea-jason.ios
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=staticlib --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/ios/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.a \
+	      ./flutter/ios/lib/$(target)/libmedea_jason.a
+endef
+define cargo.build.medea-jason.linux
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/linux/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/libmedea_jason.so \
+	      ./flutter/linux/lib/$(target)/libmedea_jason.so
+endef
+define cargo.build.medea-jason.macos
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
+	            $(args)
+endef
+define cargo.build.medea-jason.windows
+	$(eval target := $(strip $(1)))
+	$(eval debug := $(strip $(2)))
+	cargo rustc --target $(target) $(if $(call eq,$(debug),no),--release,) \
+	            --crate-type=cdylib --manifest-path=./Cargo.toml \
+	            $(args)
+	@mkdir -p ./flutter/windows/lib/$(target)/
+	cp -f target/$(target)/$(if $(call eq,$(debug),no),release,debug)/medea_jason.dll \
+	      ./flutter/windows/lib/$(target)/medea_jason.dll
 endef
 
 
@@ -290,32 +389,105 @@ cargo.fmt:
 	cargo +nightly fmt --all $(if $(call eq,$(check),yes),-- --check,)
 
 
-# Generate Rust sources with Cargo's build.rs script.
+# Generate sources using Cargo.
 #
 # Usage:
-#	make cargo.gen crate=medea-control-api-proto
+#	make cargo.gen [( crate=medea-control-api-proto
+#	                | crate=medea-jason [dockerized=(no|yes) )]
 
 cargo.gen:
 ifeq ($(crate),medea-control-api-proto)
-	@rm -rf $(crate-dir)/src/grpc/api*.rs
-	cd $(crate-dir)/ && \
-	cargo build
+	@rm -rf $(crate-dir)/src/grpc/api.rs \
+	        $(crate-dir)/src/grpc/callback.rs
+	cargo build -p $(crate) --all-features
 endif
+ifeq ($(crate),medea-jason)
+	cargo clean -p $(crate)
+	make cargo.build.jason platform=android args="--features dart-codegen" \
+	     dockerized=$(dockerized)
+	make cargo.gen.bridge
+	make flutter.fmt
+endif
+
+
+# Generate Rust/Dart interop bridge.
+#
+# Usage:
+#	make cargo.gen.bridge
+
+cargo.gen.bridge:
+ifeq ($(shell which flutter_rust_bridge_codegen),)
+	cargo install flutter_rust_bridge_codegen --vers=$(FLUTTER_RUST_BRIDGE_VER)
+else
+ifneq ($(strip $(shell flutter_rust_bridge_codegen --version \
+                       | cut -d ' ' -f2)),$(FLUTTER_RUST_BRIDGE_VER))
+	cargo install flutter_rust_bridge_codegen --force \
+	                                          --vers=$(FLUTTER_RUST_BRIDGE_VER)
+endif
+endif
+ifeq ($(shell which cbindgen),)
+	cargo install cbindgen
+endif
+ifeq ($(CURRENT_OS),macos)
+ifeq ($(shell brew list | grep -Fx llvm),)
+	brew install llvm
+endif
+endif
+	flutter_rust_bridge_codegen \
+		--rust-input src/api/dart/api.rs \
+		--dart-output flutter/lib/src/native/ffi/jason_api.g.dart \
+		--rust-output src/api/dart/api_bridge_generated.rs \
+		--dart-enums-style \
+		--inline-rust \
+		--no-build-runner \
+		--skip-add-mod-to-lib
+	cd flutter && \
+	dart pub run build_runner build --delete-conflicting-outputs
 
 
 # Lint Rust sources with Clippy.
 #
 # Usage:
 #	make cargo.lint
+#		[( workspace=yes
+#		 | [workspace=no]
+#		    [( [platform=all [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]]
+#		     | platform=web [targets=($(WEB_TARGETS)|<t1>[,<t2>...])]
+#		     | platform=android [targets=($(ANDROID_TARGETS)|<t1>[,<t2>...])]
+#		     | platform=ios [targets=($(IOS_TARGETS)|<t1>[,<t2>...])]
+#		     | platform=linux [targets=($(LINUX_TARGETS)|<t1>[,<t2>...])]
+#		     | platform=macos [targets=($(MACOS_TARGETS)|<t1>[,<t2>...])]
+#		     | platform=windows [targets=($(WINDOWS_TARGETS)|<t1>[,<t2>...])]
+#		     )] )]
+
+cargo-lint-platform = $(or $(platform),all)
+cargo-lint-targets-android = $(or $(targets),$(ANDROID_TARGETS))
+cargo-lint-targets-ios = $(or $(targets),$(IOS_TARGETS))
+cargo-lint-targets-linux = $(or $(targets),$(LINUX_TARGETS))
+cargo-lint-targets-macos = $(or $(targets),$(MACOS_TARGETS))
+cargo-lint-targets-web = $(or $(targets),$(WEB_TARGETS))
+cargo-lint-targets-windows = $(or $(targets),$(WINDOWS_TARGETS))
 
 cargo.lint:
-	cargo clippy --workspace -- -D clippy::pedantic -D warnings
-	$(foreach target,$(subst $(comma), ,$(ANDROID_TARGETS)),\
-		$(call cargo.lint.medea-jason.android,$(target)))
-define cargo.lint.medea-jason.android
-	$(eval target := $(strip $(1)))
-	cargo clippy --manifest-path Cargo.toml --target=$(target) -- \
-		-D clippy::pedantic -D warnings
+ifeq ($(workspace),yes)
+	cargo clippy --workspace --all-features -- -D warnings
+else
+ifeq ($(cargo-lint-platform),all)
+	@make cargo.lint platform=android
+	@make cargo.lint platform=ios
+	@make cargo.lint platform=linux
+	@make cargo.lint platform=macos
+	@make cargo.lint platform=web
+	@make cargo.lint platform=windows
+else
+	$(foreach target,$(subst $(comma), ,$(cargo-lint-targets-$(platform))),\
+		$(call cargo.lint.medea-jason,$(target)))
+endif
+endif
+define cargo.lint.medea-jason
+	$(eval t := $(strip $(1)))
+	cargo $(if $(call eq,$(filter $(t),$(cargo-lint-targets-android)),),,ndk) \
+		clippy -p medea-jason --target=$(t) -- -D warnings
 endef
 
 
@@ -328,13 +500,38 @@ cargo.version:
 	@printf "$(crate-ver)"
 
 
-# Install or upgrade project's Android targets for Rust.
+# Install or upgrade all the required project's targets for Rust.
 #
 # Usage:
-#	make rustup.android
+#	make rustup.targets [only=(android|ios|linux|web|windows)]
 
-rustup.android:
-	rustup target add $(ANDROID_TARGETS)
+rustup-targets = $(ANDROID_TARGETS) \
+                 $(IOS_TARGETS) \
+                 $(LINUX_TARGETS) \
+                 $(MACOS_TARGETS) \
+                 $(WEB_TARGETS) \
+                 $(WINDOWS_TARGETS)
+ifeq ($(only),android)
+rustup-targets = $(ANDROID_TARGETS)
+endif
+ifeq ($(only),ios)
+rustup-targets = $(IOS_TARGETS)
+endif
+ifeq ($(only),linux)
+rustup-targets = $(LINUX_TARGETS)
+endif
+ifeq ($(only),macos)
+rustup-targets = $(MACOS_TARGETS)
+endif
+ifeq ($(only),web)
+rustup-targets = $(WEB_TARGETS)
+endif
+ifeq ($(only),windows)
+rustup-targets = $(WINDOWS_TARGETS)
+endif
+
+rustup.targets:
+	rustup target add $(rustup-targets)
 
 
 
@@ -346,7 +543,7 @@ rustup.android:
 # Show Android SDK compile API version of medea_jason Flutter plugin.
 #
 # Usage:
-#	make flutter.android.compile_api_version
+#	make flutter.android.version.compile
 
 flutter.android.version.compile:
 	@printf "$(ANDROID_SDK_COMPILE_VERSION)"
@@ -377,8 +574,27 @@ flutter:
 #	make flutter.fmt [check=(no|yes)]
 
 flutter.fmt:
-	flutter format $(if $(call eq,$(check),yes),-n --set-exit-if-changed,) \
-		flutter/
+	dart format $(if $(call eq,$(check),yes), --set-exit-if-changed,) flutter/
+ifeq ($(wildcard flutter/.packages),)
+	@make flutter cmd='pub get'
+endif
+	@make flutter cmd='pub run import_sorter:main --no-comments \
+	                   $(if $(call eq,$(check),yes),--exit-if-changed,)'
+
+
+# Run `build_runner` Flutter tool to generate project Dart sources.
+#
+# Usage:
+#	make flutter.gen [overwrite=(yes|no)]
+
+flutter.gen:
+ifeq ($(wildcard flutter/pubspec.lock),)
+	@make flutter
+endif
+	cd flutter && \
+	flutter pub get && \
+	dart run build_runner build \
+		$(if $(call eq,$(overwrite),no),,--delete-conflicting-outputs)
 
 
 # Lint Flutter Dart sources with dartanalyzer.
@@ -387,6 +603,9 @@ flutter.fmt:
 #	make flutter.lint
 
 flutter.lint:
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes
+endif
 	flutter analyze flutter/
 
 
@@ -399,6 +618,26 @@ flutter.run:
 	cd flutter/example/ && \
 	flutter run $(if $(call eq,$(debug),no),--release,) \
 		$(if $(call eq,$(device),),,-d $(device))
+
+
+# Generates assets required for Flutter Web Jason plugin.
+#
+# Usage:
+#	make flutter.web.assets
+
+flutter.web.assets:
+	@rm -rf flutter/assets/pkg
+	wasm-pack build -d flutter/assets/pkg --no-typescript -t web
+	sed "s/medea_jason_bg.wasm/medea_jason_bg.wasm?$(strip \
+			$$(sha256sum flutter/assets/pkg/medea_jason_bg.wasm \
+			   | cut -f 1 -d ' '))/g" \
+		flutter/assets/pkg/medea_jason.js > flutter/assets/pkg/.tmp.js
+	cp -f flutter/assets/pkg/.tmp.js flutter/assets/pkg/medea_jason.js
+	rm -rf flutter/assets/pkg/*.md \
+	       flutter/assets/pkg/.gitignore \
+	       flutter/assets/pkg/.tmp.js \
+	       flutter/assets/pkg/package.json
+	@touch flutter/assets/pkg/.gitkeep
 
 
 
@@ -476,7 +715,7 @@ endif
 #
 # Usage:
 #	make test.unit [( [crate=@all]
-#	                | crate=<crate-name>
+#	                | crate=<crate-name> [features=(all|<f1>[,<f2>...])]
 #	                | crate=medea-jason
 #	                  [browser=(chrome|firefox|default)]
 #	                  [timeout=(60|<seconds>)] )]
@@ -506,16 +745,21 @@ else
 	@make docker.down.webdriver browser=$(browser)
 endif
 else
-	cd $(crate-dir)/ && \
-	cargo test --all-features
+	cargo test -p $(crate) $(if $(call eq,$(or $(features),all),all),\
+		--all-features ,\
+		--features $(features) )
 endif
 endif
 
 
-# Run E2E tests of project.
+test.e2e: test.e2e.browser
+
+
+# Run browser E2E tests of project.
 #
 # Usage:
-#	make test.e2e [only=<regex>]
+#	make test.e2e.browser [(only=<regex>|only-tags=<tag-expression>)]
+#		[sfu=(no|yes)]
 #		[( [up=no]
 #		 | up=yes [browser=(chrome|firefox)]
 #		          [( [dockerized=no]
@@ -524,7 +768,9 @@ endif
 #		          [( [background=no]
 #		           | background=yes [log=(no|yes)] )]
 
-test.e2e:
+test-e2e-tags = $(if $(call eq,$(sfu),yes),not @mesh,not @sfu)
+
+test.e2e.browser:
 ifeq ($(up),yes)
 ifeq ($(dockerized),yes)
 ifeq ($(rebuild),yes)
@@ -532,11 +778,56 @@ ifeq ($(rebuild),yes)
 endif
 endif
 	@make docker.up.e2e browser=$(browser) background=yes log=$(log) \
-	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug)
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug) \
+	                    rebuild=yes
 	@make wait.port port=4444
 endif
+	$(if $(call eq,$(sfu),yes),SFU=true,) \
 	cargo test -p medea-e2e --test e2e \
-		$(if $(call eq,$(only),),,-- --scenario '$(only)')
+		$(if $(call eq,$(only),),\
+			-- --tags $(if $(call eq,$(only-tags),),\
+			          '$(test-e2e-tags)','$(only-tags)'),\
+			-- --name '$(only)')
+ifeq ($(up),yes)
+	@make docker.down.e2e
+endif
+
+
+# Run E2E native tests of project.
+#
+# Usage:
+#	make test.e2e.native [(only=<regex>|only-tags=<tag-expression>)]
+#		[sfu=(no|yes)]
+#		[device=<device-id>]
+#		[server=<server-ip>]
+#		[( [up=no]
+#		 | up=yes [( [dockerized=no]
+#		           | dockerized=yes [tag=(dev|<tag>)] [rebuild=(no|yes)] )]
+#		          [debug=(yes|no)]
+#		          [( [background=no]
+#		           | background=yes [log=(no|yes)] )]
+
+test.e2e.native:
+ifeq ($(up),yes)
+ifeq ($(dockerized),yes)
+ifeq ($(rebuild),yes)
+	@make docker.build image=medea-control-api-mock debug=$(debug) tag=$(tag)
+endif
+endif
+	@make docker.up.e2e background=yes log=$(log) \
+	                    dockerized=$(dockerized) tag=$(tag) debug=$(debug) \
+	                    rebuild=no
+endif
+ifeq ($(wildcard flutter/test/e2e/suite.g.dart),)
+	@make flutter.gen overwrite=yes dockerized=$(dockerized)
+endif
+	cd flutter/example/ && \
+	flutter drive --driver=test_driver/integration_test.dart \
+		--target=../test/e2e/suite.dart \
+		--dart-define=MOCKABLE=true \
+		$(if $(call eq,$(sfu),yes),--dart-define=SFU=true,) \
+		$(if $(call eq,$(server),),,--dart-define=IP_TEST_BASE=$(server)) \
+		$(if $(call eq,$(device),),,-d $(device))
 ifeq ($(up),yes)
 	@make docker.down.e2e
 endif
@@ -578,15 +869,15 @@ wait.port:
 # Build and publish project crate to crates.io.
 #
 # Usage:
-#	make release.crates crate=(medea-jason|<crate-name>)
-#	                    [token=($CARGO_TOKEN|<cargo-token>)]
-#	                    [publish=(no|yes)]
+#	make release.cargo crate=(medea-jason|<crate-name>)
+#	                   [token=($CARGO_REGISTRY_TOKEN|<cargo-token>)]
+#	                   [publish=(no|yes)]
 
-release.crates:
+release.cargo:
 ifneq ($(filter $(crate),medea-jason medea-client-api-proto medea-control-api-proto medea-macro medea-reactive),)
 	cd $(crate-dir)/ && \
 	$(if $(call eq,$(publish),yes),\
-		cargo publish --token $(or $(token),${CARGO_TOKEN}) ,\
+		cargo publish --token $(or $(token),$$CARGO_REGISTRY_TOKEN) ,\
 		cargo package --allow-dirty )
 endif
 
@@ -602,9 +893,9 @@ release.helm: helm.package.release
 
 release.npm:
 ifneq ($(filter $(crate),medea-jason),)
-	@make cargo.build debug=no dockerized=no
+	make cargo.build.jason platform=web debug=no dockerized=no
 ifeq ($(publish),yes)
-	wasm-pack publish $(crate-dir)/
+	wasm-pack publish $(crate-dir)/pkg/
 endif
 endif
 
@@ -659,16 +950,6 @@ docker.build:
 
 docker.down.control:
 	-docker stop medea-control-api-mock
-
-
-# Stop Coturn STUN/TURN server in Docker Compose environment
-# and remove all related containers.
-#
-# Usage:
-#	make docker.down.coturn
-
-docker.down.coturn:
-	docker-compose -f docker-compose.coturn.yml down --rmi=local -v
 
 
 # Stop demo application in Docker Compose environment
@@ -829,16 +1110,6 @@ docker.up.control:
 		$(IMAGE_REPO)/medea-control-api-mock:$(or $(tag),dev)
 
 
-# Run Coturn STUN/TURN server in Docker Compose environment.
-#
-# Usage:
-#	make docker.up.coturn [background=(yes|no)]
-
-docker.up.coturn: docker.down.coturn
-	docker-compose -f docker-compose.coturn.yml up \
-		$(if $(call eq,$(background),no),--abort-on-container-exit,-d)
-
-
 # Run demo application in Docker Compose environment.
 #
 # Usage:
@@ -852,6 +1123,7 @@ docker.up.demo: docker.down.demo
 #
 # Usage:
 #	make docker.up.e2e [browser=(chrome|firefox)]
+#                      [rebuild=(no|yes)]
 #	                   [( [dockerized=no]
 #	                    | dockerized=yes [medea-tag=(dev|<tag>)]
 #                         [control-tag=(dev|<tag>)] )]
@@ -872,10 +1144,17 @@ docker-up-e2e-env = RUST_BACKTRACE=1 \
 	COMPOSE_WEBDRIVER_IMAGE_VER=$(strip \
 		$(if $(call eq,$(browser),firefox),\
 			$(FIREFOX_VERSION) ,\
-			$(CHROME_VERSION) ))
+			$(CHROME_VERSION) )) \
+	COMPOSE_WEBDRIVER_ENTRYPOINT=$(strip \
+		$(if $(call eq,$(browser),firefox),\
+			"geckodriver --binary=/opt/firefox/firefox" ,\
+			/entrypoint.sh ))
 
 docker.up.e2e: docker.down.e2e
+ifeq ($(rebuild),yes)
 	@make build.jason target=web debug=$(debug) dockerized=no
+endif
+	@mkdir -p pkg/
 	env $(docker-up-e2e-env) \
 	docker-compose -f e2e/docker-compose$(if $(call eq,$(dockerized),yes),,.host).yml \
 		up $(if $(call eq,$(dockerized),yes),\
@@ -925,9 +1204,10 @@ docker.up.webdriver:
 ifeq ($(browser),firefox)
 	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-firefox \
-		ghcr.io/instrumentisto/geckodriver:$(FIREFOX_VERSION)
+		ghcr.io/instrumentisto/geckodriver:$(FIREFOX_VERSION) \
+			--binary=/opt/firefox/firefox
 else
-	docker run --rm -d --network=host \
+	docker run --rm -d --network=host --shm-size 512m \
 		--name medea-webdriver-chrome \
 		selenoid/chrome:$(CHROME_VERSION)
 endif
@@ -948,7 +1228,8 @@ helm-chart-vals-dir = demo
 
 helm-release = $(if $(call eq,$(release),),,$(release)-)$(helm-chart)
 helm-release-namespace = $(strip \
-	$(if $(call eq,$(helm-cluster),staging),staging,default))
+	$(if $(call eq,$(helm-cluster),staging),staging,\
+	$(if $(call eq,$(helm-cluster),review),staging-review,default)))
 
 # Run Helm command in context of concrete Kubernetes cluster.
 #
@@ -1056,9 +1337,12 @@ endif
 #	                                    | rebuild=yes [no-cache=(no|yes)] )]
 #	              | cluster=staging )]
 
+helm-up-port-prefix := $(strip $(shell shuf -i 10-99 -n 1))
+helm-file-name := $(if $(call eq,$(helm-cluster),minikue),minikube,staging)
+
 helm.up:
-ifeq ($(wildcard $(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml),)
-	touch $(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml
+ifeq ($(wildcard $(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml),)
+	touch $(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml
 endif
 ifeq ($(helm-cluster),minikube)
 ifeq ($(helm-chart),medea-demo)
@@ -1073,8 +1357,12 @@ endif
 	helm $(helm-cluster-args) upgrade --install \
 		$(helm-release) $(helm-chart-dir)/ \
 			--namespace=$(helm-release-namespace) \
-			--values=$(helm-chart-vals-dir)/$(helm-cluster).vals.yaml \
-			--values=$(helm-chart-vals-dir)/my.$(helm-cluster).vals.yaml \
+			--values=$(helm-chart-vals-dir)/$(helm-file-name).vals.yaml \
+			--values=$(helm-chart-vals-dir)/my.$(helm-file-name).vals.yaml \
+			--set server.conf.ice.embedded.bind_port="7$(helm-up-port-prefix)0" \
+			--set server.conf.server.client.http.bind_port="7$(helm-up-port-prefix)1" \
+			--set server.conf.server.control.grpc.bind_port="7$(helm-up-port-prefix)2" \
+			--set server.control-mock.conf.bind_port="7$(helm-up-port-prefix)3" \
 			--set server.deployment.revision=$(shell date +%s) \
 			--set web-client.deployment.revision=$(shell date +%s) \
 			$(if $(call eq,$(force),yes),\
@@ -1128,24 +1416,25 @@ endef
 
 .PHONY: build build.jason \
         cargo cargo.build.jason cargo.changelog.link cargo.fmt cargo.gen \
-        	cargo.lint cargo.version \
+        	cargo.gen.bridge cargo.lint cargo.version \
         docker.build \
-        	docker.down.control docker.down.coturn docker.down.demo \
-        	docker.down.e2e docker.down.medea docker.down.webdriver  \
+        	docker.down.control docker.down.demo docker.down.e2e \
+        	docker.down.medea docker.down.webdriver  \
         	docker.pull docker.push docker.tag docker.tar docker.untar \
-        	docker.up.control docker.up.coturn docker.up.demo docker.up.e2e \
+        	docker.up.control docker.up.demo docker.up.e2e \
         	docker.up.medea docker.up.webdriver \
         docs docs.rust \
-        down down.control down.coturn down.demo down.dev down.medea \
-        flutter flutter.fmt flutter.lint flutter.run flutter.test \
-        	flutter.android.compile_api_version \
-        	flutter.android.min_api_version \
+        down down.control down.demo down.dev down.medea \
+        flutter flutter.fmt flutter.gen flutter.lint flutter.run \
+        	flutter.android.version.compile flutter.android.version.min \
+        	flutter.web.assets \
         helm helm.dir helm.down helm.lint helm.list \
         	helm.package helm.package.release helm.up \
         minikube.boot \
-        release release.crates release.helm release.npm \
-        rustup.android \
-        test test.e2e test.flutter test.unit \
-        up up.control up.coturn up.demo up.dev up.jason up.medea \
+        release release.cargo release.helm release.npm \
+        rustup.targets \
+        test test.e2e test.e2e.browser test.e2e.native test.flutter test.unit \
+        up up.control up.demo up.flutter up.web up.jason.flutter up.jason.web \
+        	up.medea \
         wait.port \
         yarn yarn.version

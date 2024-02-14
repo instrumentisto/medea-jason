@@ -75,9 +75,8 @@ impl MediaState {
     }
 
     /// Returns the opposite value to this [`mute_state::Stable`].
-    #[inline]
     #[must_use]
-    pub fn opposite(self) -> Self {
+    pub const fn opposite(self) -> Self {
         match self {
             Self::Mute(mute) => Self::Mute(mute.opposite()),
             Self::MediaExchange(media_exchange) => {
@@ -133,8 +132,8 @@ pub enum TransitableState<S, T> {
 
 impl<S, T> TransitableState<S, T>
 where
-    T: InTransition<Stable = S> + Into<TransitableState<S, T>>,
-    S: InStable<Transition = T> + Into<TransitableState<S, T>>,
+    T: InTransition<Stable = S> + Into<Self>,
+    S: InStable<Transition = T> + Into<Self>,
 {
     /// Starts transition into the `desired_state` changing the state to
     /// [`TransitableState::Transition`].
@@ -158,7 +157,6 @@ where
     }
 
     /// Cancels an ongoing transition, if any.
-    #[inline]
     #[must_use]
     pub fn cancel_transition(self) -> Self {
         match self {
@@ -169,28 +167,24 @@ where
 }
 
 impl From<media_exchange_state::Stable> for MediaExchangeState {
-    #[inline]
     fn from(from: media_exchange_state::Stable) -> Self {
         Self::Stable(from)
     }
 }
 
 impl From<media_exchange_state::Transition> for MediaExchangeState {
-    #[inline]
     fn from(from: media_exchange_state::Transition) -> Self {
         Self::Transition(from)
     }
 }
 
 impl From<mute_state::Stable> for MuteState {
-    #[inline]
     fn from(from: mute_state::Stable) -> Self {
         Self::Stable(from)
     }
 }
 
 impl From<mute_state::Transition> for MuteState {
-    #[inline]
     fn from(from: mute_state::Transition) -> Self {
         Self::Transition(from)
     }
@@ -229,60 +223,60 @@ mod test {
     fn transition_to() {
         assert_eq!(
             DISABLED.transition_to(media_exchange_state::Stable::Disabled),
-            DISABLED
+            DISABLED,
         );
         assert_eq!(
             DISABLED.transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_DISABLED
+            ENABLING_DISABLED,
         );
         assert_eq!(
             ENABLED.transition_to(media_exchange_state::Stable::Enabled),
-            ENABLED
+            ENABLED,
         );
         assert_eq!(
             ENABLED.transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_ENABLED
+            DISABLING_ENABLED,
         );
 
         assert_eq!(
             ENABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_DISABLED
+            DISABLING_DISABLED,
         );
         assert_eq!(
             ENABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_DISABLED
+            ENABLING_DISABLED,
         );
         assert_eq!(
             DISABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_ENABLED
+            DISABLING_ENABLED,
         );
         assert_eq!(
             DISABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_ENABLED
+            ENABLING_ENABLED,
         );
         assert_eq!(
             DISABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_DISABLED
+            DISABLING_DISABLED,
         );
         assert_eq!(
             DISABLING_DISABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_DISABLED
+            ENABLING_DISABLED,
         );
         assert_eq!(
             ENABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Disabled),
-            DISABLING_ENABLED
+            DISABLING_ENABLED,
         );
         assert_eq!(
             ENABLING_ENABLED
                 .transition_to(media_exchange_state::Stable::Enabled),
-            ENABLING_ENABLED
+            ENABLING_ENABLED,
         );
     }
 

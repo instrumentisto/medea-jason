@@ -37,7 +37,6 @@ pub struct TracksRepository<S: 'static>(
 
 impl<S> TracksRepository<S> {
     /// Creates a new [`TracksRepository`].
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self(RefCell::new(ProgressableHashMap::new()))
@@ -46,28 +45,29 @@ impl<S> TracksRepository<S> {
     /// Returns [`Future`] resolving once all inserts/removes are processed.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         self.0.borrow().when_all_processed()
     }
 
     /// Inserts the provided track identified by the given `id`.
-    #[inline]
     pub fn insert(&self, id: TrackId, track: Rc<S>) {
-        self.0.borrow_mut().insert(id, track);
+        drop(self.0.borrow_mut().insert(id, track));
     }
 
     /// Returns a track with the provided `id`.
-    #[inline]
     #[must_use]
     pub fn get(&self, id: TrackId) -> Option<Rc<S>> {
         self.0.borrow().get(&id).cloned()
     }
 
+    /// Returns all the [`TrackId`]s this [`TracksRepository`] contains.
+    pub fn ids(&self) -> Vec<TrackId> {
+        self.0.borrow().iter().map(|(id, _)| *id).collect()
+    }
+
     /// Returns a [`Stream`] streaming all the [`TracksRepository::insert`]ions.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn on_insert(
         &self,
     ) -> LocalBoxStream<'static, Guarded<(TrackId, Rc<S>)>> {
@@ -77,7 +77,6 @@ impl<S> TracksRepository<S> {
     /// Returns a [`Stream`] streaming all the [`TracksRepository::remove`]s.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn on_remove(
         &self,
     ) -> LocalBoxStream<'static, Guarded<(TrackId, Rc<S>)>> {
@@ -86,7 +85,6 @@ impl<S> TracksRepository<S> {
 
     /// Removes a track with the provided [`TrackId`], reporting whether it has
     /// been removed or it hasn't existed at all.
-    #[inline]
     pub fn remove(&self, id: TrackId) -> bool {
         self.0.borrow_mut().remove(&id).is_some()
     }
@@ -95,7 +93,6 @@ impl<S> TracksRepository<S> {
 impl TracksRepository<sender::State> {
     /// Returns all the [`sender::State`]s which require a local `MediaStream`
     /// update.
-    #[inline]
     #[must_use]
     pub fn get_outdated(&self) -> Vec<Rc<sender::State>> {
         self.0
@@ -161,13 +158,16 @@ where
     fn apply(&self, input: Self::Input, send_cons: &LocalTracksConstraints) {
         self.0.borrow_mut().remove_not_present(&input);
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, track) in input {
             if let Some(sync_track) = self.0.borrow().get(&id) {
                 sync_track.apply(track, send_cons);
             } else {
-                self.0
-                    .borrow_mut()
-                    .insert(id, Rc::new(S::from_proto(track, send_cons)));
+                drop(
+                    self.0
+                        .borrow_mut()
+                        .insert(id, Rc::new(S::from_proto(track, send_cons))),
+                );
             }
         }
     }
@@ -206,13 +206,11 @@ where
     }
 
     /// Notifies all the tracks about RPC connection loss.
-    #[inline]
     fn connection_lost(&self) {
         self.0.borrow().values().for_each(|s| s.connection_lost());
     }
 
     /// Notifies all the tracks about RPC connection recovering.
-    #[inline]
     fn connection_recovered(&self) {
         self.0
             .borrow()
@@ -227,7 +225,6 @@ where
 {
     type Output = HashMap<TrackId, S::Output>;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         self.0
             .borrow()
@@ -240,17 +237,16 @@ where
 #[cfg(feature = "mockable")]
 impl<S> TracksRepository<S> {
     /// Waits until all the track inserts will be processed.
-    #[inline]
     pub fn when_insert_processed(&self) -> medea_reactive::Processed<'static> {
         self.0.borrow().when_insert_processed()
     }
 }
 
 #[cfg(feature = "mockable")]
+#[allow(clippy::multiple_inherent_impl)]
 impl TracksRepository<sender::State> {
     /// Sets [`SyncState`] of all [`sender::State`]s to the
     /// [`SyncState::Synced`].
-    #[inline]
     pub fn synced(&self) {
         self.0.borrow().values().for_each(|s| s.synced());
     }
@@ -259,14 +255,12 @@ impl TracksRepository<sender::State> {
 #[cfg(feature = "mockable")]
 impl TracksRepository<super::receiver::State> {
     /// Stabilize all [`receiver::State`] from this [`State`].
-    #[inline]
     pub fn stabilize_all(&self) {
         self.0.borrow().values().for_each(|r| r.stabilize());
     }
 
     /// Sets [`SyncState`] of all [`receiver::State`]s to the
     /// [`SyncState::Synced`].
-    #[inline]
     pub fn synced(&self) {
         self.0.borrow().values().for_each(|r| r.synced());
     }

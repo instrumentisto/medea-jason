@@ -57,16 +57,33 @@ pub struct Notification(Value);
 #[derive(Serialize)]
 #[serde(tag = "method")]
 enum NotificationVariants<'a> {
-    Broadcast { payload: Value },
-    Created { fid: &'a str, element: &'a Element },
-    Deleted { fid: &'a str },
+    /// [`Notification`] broadcast to all participants.
+    Broadcast {
+        /// Payload to be broadcast to all participants.
+        payload: Value,
+    },
+
+    /// [`Notification`] about an [`Element`] being created.
+    Created {
+        /// FID of the created [`Element`].
+        fid: &'a str,
+
+        /// Created [`Element`].
+        element: &'a Element,
+    },
+
+    /// [`Notification`] about an [`Element`] being deleted.
+    Deleted {
+        /// FID of the deleted [`Element`].
+        fid: &'a str,
+    },
 }
 
 impl Notification {
     /// Builds `method: Created` [`Notification`].
     #[allow(clippy::missing_panics_doc)]
     #[must_use]
-    pub fn created(fid: &Fid, element: &Element) -> Notification {
+    pub fn created(fid: &Fid, element: &Element) -> Self {
         Self(
             serde_json::to_value(NotificationVariants::Created {
                 fid: fid.as_ref(),
@@ -79,7 +96,7 @@ impl Notification {
     /// Builds `method: Deleted` [`Notification`].
     #[allow(clippy::missing_panics_doc)]
     #[must_use]
-    pub fn deleted(fid: &Fid) -> Notification {
+    pub fn deleted(fid: &Fid) -> Self {
         Self(
             serde_json::to_value(NotificationVariants::Deleted {
                 fid: fid.as_ref(),
@@ -91,7 +108,7 @@ impl Notification {
     /// Builds `method: Broadcast` [`Notification`].
     #[allow(clippy::missing_panics_doc)]
     #[must_use]
-    pub fn broadcast(payload: Value) -> Notification {
+    pub fn broadcast(payload: Value) -> Self {
         Self(
             serde_json::to_value(NotificationVariants::Broadcast { payload })
                 .unwrap(),
@@ -106,8 +123,10 @@ impl Notification {
 struct WsSession {
     /// `Room` id that this [`WsSession`] is subscribed to.
     room_id: String,
+
     /// Map of subscribers to [`Notification`]s.
     subscribers: Subscribers,
+
     /// `Ping` messages counter.
     last_ping_num: u32,
 }
@@ -117,22 +136,19 @@ impl Actor for WsSession {
 
     /// Adds [`WsSession`] to [`WsSession`]s map and schedules `Ping` task.
     fn started(&mut self, ctx: &mut Self::Context) {
-        let this = ctx.address().recipient();
+        let recp = ctx.address().recipient();
 
         self.subscribers
             .lock()
             .unwrap()
             .entry(self.room_id.clone())
             .or_default()
-            .push(this);
+            .push(recp);
 
-        ctx.run_interval(
-            Duration::from_secs(10),
-            |this: &mut WsSession, ctx| {
-                this.last_ping_num += 1;
-                ctx.ping(&this.last_ping_num.to_be_bytes());
-            },
-        );
+        _ = ctx.run_interval(Duration::from_secs(10), |this: &mut Self, cx| {
+            this.last_ping_num += 1;
+            cx.ping(&this.last_ping_num.to_be_bytes());
+        });
     }
 
     /// Removes [`WsSession`] from [`WsSession`]s map.
@@ -172,7 +188,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                 ws::Message::Pong(_) => {}
                 ws::Message::Text(text) => {
                     match serde_json::from_str::<Value>(&text) {
-                        Ok(msg) => {
+                        Ok(json) => {
                             let this = ctx.address().recipient();
                             if let Some(subs) = self
                                 .subscribers
@@ -183,25 +199,26 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                                 subs.iter()
                                     .filter(|sub| **sub != this)
                                     .for_each(|sub| {
-                                        drop(sub.do_send(
-                                            Notification::broadcast(
-                                                msg.clone(),
-                                            ),
+                                        sub.do_send(Notification::broadcast(
+                                            json.clone(),
                                         ));
                                     });
                             }
                         }
                         Err(err) => error!(
                             "Received broadcast message but it is not a valid \
-                             JSON: {:?}",
-                            err,
+                             JSON: {err:?}",
                         ),
                     }
                 }
-                _ => error!("Unsupported client message: {:?}", msg),
+                ws::Message::Binary(_)
+                | ws::Message::Continuation(_)
+                | ws::Message::Nop => {
+                    error!("Unsupported client message: {msg:?}");
+                }
             },
-            Err(err) => {
-                error!("WS StreamHandler error {}", err);
+            Err(e) => {
+                error!("WS StreamHandler error: {e}");
             }
         };
     }

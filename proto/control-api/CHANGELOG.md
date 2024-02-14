@@ -6,6 +6,143 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.11.0] · 2024-02-12
+[0.11.0]: /../../tree/medea-control-api-proto-0.11.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.10.0...medea-control-api-proto-0.11.0)
+
+### Upgraded
+
+- Dependencies:
+    - [`tonic`] to `0.11` ([b504f9dc]).
+
+[b504f9dc]: /../../commit/b504f9dc97451135e2138afabf67935e3bc53475
+
+
+
+
+## [0.10.0] · 2023-09-25
+[0.10.0]: /../../tree/medea-control-api-proto-0.10.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.9.0...medea-control-api-proto-0.10.0)
+
+### Upgraded
+
+- Dependencies:
+    - [`prost`] to `0.12` ([7ab40e8a]);
+    - [`tonic`] to `0.10` ([7ab40e8a]).
+
+[7ab40e8a]: /../../commit/7ab40e8a48b4add3ddee31935f11dbcd09cecece
+
+
+
+
+## [0.9.0] · 2023-07-12
+[0.9.0]: /../../tree/medea-control-api-proto-0.9.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.8.0...medea-control-api-proto-0.9.0)
+
+### Upgraded
+
+- Dependencies:
+    - [`medea-client-api-proto`] to `0.5` ([#123]).
+
+[#123]: /../../pull/123
+
+
+
+
+## [0.8.0] · 2023-06-09
+[0.8.0]: /../../tree/medea-control-api-proto-0.8.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.7.0...medea-control-api-proto-0.8.0)
+
+### Added
+
+- Abstractions:
+    - `ControlApi` and `CallbackApi` ([#55]).
+- gRPC:
+    - `ControlApi` and `CallbackApi` implementations ([#56]).
+- Direct:
+    - `ControlApi` and `CallbackApi` implementations ([#65]).
+- Cargo features:
+    - `client` and `server` ([#56]);
+    - `serde` ([#67]);
+    - `client-api` ([#68]).
+
+### Upgraded
+
+- Dependencies:
+    - [`prost`] to `0.11` ([c8332ea9]);
+    - [`tonic`] to `0.9` ([6234b23f]).
+
+[#55]: /../../pull/55
+[#56]: /../../pull/56
+[#67]: /../../pull/67
+[#68]: /../../pull/68
+[6234b23f]: /../../commit/6234b23f66e81c0ce411dfb8cdf983eda51cd2ad
+[c8332ea9]: /../../commit/c8332ea9b6310958549e750a5553294f894c2d7b
+
+
+
+
+## [0.7.0] · 2022-05-05
+[0.7.0]: /../../tree/medea-control-api-proto-0.7.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.6.0...medea-control-api-proto-0.7.0)
+
+### Added
+
+- gRPC:
+    - `ControlApi` service:
+        - Methods:
+            - `Healthz` ([#51]).
+        - Messages:
+            - `Ping` ([#51]);
+            - `Pong` ([#51]).
+
+[#51]: /../../pull/51
+
+
+
+
+## [0.6.0] · 2022-04-13
+[0.6.0]: /../../tree/medea-control-api-proto-0.6.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.5.0...medea-control-api-proto-0.6.0)
+
+### Upgraded
+
+- Dependencies: ([b3acc904])
+    - [`prost`] to `0.10`;
+    - [`tonic`] to `0.7`.
+
+[b3acc904]: /../../commit/b3acc904165329946d0efbf2f1e7bf9dff1271df
+
+
+
+
+## [0.5.0] · 2021-12-20
+[0.5.0]: /../../tree/medea-control-api-proto-0.5.0/proto/control-api
+
+[Diff](/../../compare/medea-control-api-proto-0.4.0...medea-control-api-proto-0.5.0)
+
+### Upgraded
+
+- Dependencies: ([#16])
+    - [`prost`] to `0.9`;
+    - [`tonic`] to `0.6`.
+
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([#16]).
+
+[#16]: /../../pull/16
+[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+
+
+
+
 ## [0.4.0] · 2021-08-25
 [0.4.0]: /../../tree/medea-control-api-proto-0.4.0/proto/control-api
 
@@ -87,7 +224,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
+[`medea-client-api-proto`]: https://docs.rs/medea-client-api-proto
 [`prost`]: https://docs.rs/prost
 [`tonic`]: https://docs.rs/tonic
 

@@ -10,12 +10,13 @@ use std::str::FromStr;
 
 use derive_more::{AsRef, Display, From};
 use medea_client_api_proto::{
-    CloseReason as CloseByServerReason, Credential, MemberId, RoomId,
+    CloseDescription, CloseReason as CloseByServerReason, Credential, MemberId,
+    RoomId,
 };
 use tracerr::Traced;
 use url::Url;
 
-use crate::{platform, utils::JsCaused};
+use crate::{platform, utils::Caused};
 
 #[cfg(feature = "mockable")]
 pub use self::rpc_session::MockRpcSession;
@@ -53,38 +54,34 @@ pub struct ConnectionInfo {
 
 impl ConnectionInfo {
     /// Returns [`ApiUrl`] to which transport layer will connect.
-    #[inline]
     #[must_use]
-    pub fn url(&self) -> &ApiUrl {
+    pub const fn url(&self) -> &ApiUrl {
         &self.url
     }
 
     /// Returns [`RoomId`] of the `Room` for which [`RpcSession`] is created.
-    #[inline]
     #[must_use]
-    pub fn room_id(&self) -> &RoomId {
+    pub const fn room_id(&self) -> &RoomId {
         &self.room_id
     }
 
     /// Returns [`MemberId`] of the `Member` for which [`RpcSession`] is
     /// created.
-    #[inline]
     #[must_use]
-    pub fn member_id(&self) -> &MemberId {
+    pub const fn member_id(&self) -> &MemberId {
         &self.member_id
     }
 
     /// Returns [`Credential`] for connecting [`RpcSession`].
-    #[inline]
     #[must_use]
-    pub fn credential(&self) -> &Credential {
+    pub const fn credential(&self) -> &Credential {
         &self.credential
     }
 }
 
 /// Errors which can occur while [`ConnectionInfo`] parsing from the [`str`].
-#[derive(Clone, Debug, Display, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Copy, Debug, Display)]
+#[cause(error = platform::Error)]
 pub enum ConnectionInfoParseError {
     /// [`Url::parse`] returned error.
     #[display(fmt = "Failed to parse provided URL: {}", _0)]
@@ -102,11 +99,11 @@ pub enum ConnectionInfoParseError {
 impl FromStr for ConnectionInfo {
     type Err = Traced<ConnectionInfoParseError>;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(string: &str) -> Result<Self, Self::Err> {
         use ConnectionInfoParseError as E;
 
-        let mut url =
-            Url::parse(s).map_err(|err| tracerr::new!(E::UrlParse(err)))?;
+        let mut url = Url::parse(string)
+            .map_err(|err| tracerr::new!(E::UrlParse(err)))?;
 
         let credential = url
             .query_pairs()
@@ -134,11 +131,12 @@ impl FromStr for ConnectionInfo {
             .to_owned()
             .into();
 
-        // Remove last two segments. Safe to unwrap cause we already made all
-        // necessary checks.
-        url.path_segments_mut().unwrap().pop().pop();
+        // Removes last two segments.
+        if let Ok(mut s) = url.path_segments_mut() {
+            _ = s.pop().pop();
+        }
 
-        Ok(ConnectionInfo {
+        Ok(Self {
             url: url.into(),
             room_id,
             member_id,
@@ -148,7 +146,7 @@ impl FromStr for ConnectionInfo {
 }
 
 /// Reasons of closing by client side and server side.
-#[derive(Copy, Clone, Display, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Display, Eq, PartialEq)]
 pub enum CloseReason {
     /// Closed by server.
     ByServer(CloseByServerReason),
@@ -187,7 +185,7 @@ pub enum ClosedStateReason {
 
 /// Reason of why [`WebSocketRpcClient`]/[`platform::RpcTransport`] lost
 /// connection with a server.
-#[derive(Clone, Copy, Debug, Display, PartialEq)]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
 pub enum ConnectionLostReason {
     /// Connection has been closed with a close frame and the provided message.
     WithMessage(CloseMsg),
@@ -198,12 +196,12 @@ pub enum ConnectionLostReason {
 }
 
 /// Errors that may occur in [`WebSocketRpcClient`].
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum RpcClientError {
     /// Occurs if WebSocket connection to remote media server failed.
     #[display(fmt = "Connection failed: {}", _0)]
-    RpcTransportError(#[js(cause)] platform::TransportError),
+    RpcTransportError(#[cause] platform::TransportError),
 
     /// Occurs if [`Weak`] pointer to the [`WebSocketRpcClient`] can't be
     /// upgraded to [`Rc`].
@@ -219,7 +217,7 @@ pub enum RpcClientError {
 }
 
 /// Connection with remote was closed.
-#[derive(Clone, Copy, Debug, Display, PartialEq)]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
 pub enum CloseMsg {
     /// Transport was gracefully closed by remote.
     ///
@@ -234,4 +232,16 @@ pub enum CloseMsg {
     /// `1000` without reason.
     #[display(fmt = "Abnormal. Code: {}", _0)]
     Abnormal(u16),
+}
+
+impl From<(u16, String)> for CloseMsg {
+    fn from((code, reason): (u16, String)) -> Self {
+        match code {
+            1000 => serde_json::from_str::<CloseDescription>(&reason)
+                .map_or(Self::Abnormal(code), |desc| {
+                    Self::Normal(code, desc.reason)
+                }),
+            _ => Self::Abnormal(code),
+        }
+    }
 }

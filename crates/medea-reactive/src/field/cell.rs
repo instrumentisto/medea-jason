@@ -8,7 +8,10 @@
 
 #![allow(clippy::module_name_repetitions)]
 
-use std::cell::{Ref, RefCell};
+use std::{
+    cell::{Ref, RefCell},
+    mem,
+};
 
 use futures::{future::LocalBoxFuture, stream::LocalBoxStream};
 
@@ -92,13 +95,11 @@ where
     ///
     /// This container can mutate internally. See [`ObservableCell`] docs
     /// for more info.
-    #[inline]
-    pub fn new(data: D) -> Self {
+    pub const fn new(data: D) -> Self {
         Self(RefCell::new(Observable::new(data)))
     }
 
     /// Returns immutable reference to an underlying data.
-    #[inline]
     pub fn borrow(&self) -> Ref<'_, D> {
         let reference = self.0.borrow();
         Ref::map(reference, |observable| &**observable)
@@ -108,7 +109,6 @@ where
     /// the given `assert_fn` returns `true` on.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when<F>(
         &self,
         assert_fn: F,
@@ -125,7 +125,6 @@ where
     D: Clone + 'static,
 {
     /// Returns copy of an underlying data.
-    #[inline]
     pub fn get(&self) -> D {
         self.0.borrow().data.clone()
     }
@@ -133,7 +132,6 @@ where
     /// Returns [`Stream`] into which underlying data updates will be emitted.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     pub fn subscribe(&self) -> LocalBoxStream<'static, D> {
         self.0.borrow().subscribe()
     }
@@ -147,7 +145,6 @@ where
     /// [`ObservableCell`] will become equal to the provided `should_be` value.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_eq(
         &self,
         should_be: D,
@@ -161,22 +158,19 @@ where
     D: Clone + PartialEq + 'static,
 {
     /// Sets the `new_data` value as an underlying data.
-    #[inline]
     pub fn set(&self, new_data: D) {
         *self.0.borrow_mut().borrow_mut() = new_data;
     }
 
     /// Replaces the contained underlying data with the given `new_data` value,
     /// and returns the old one.
-    #[inline]
     pub fn replace(&self, mut new_data: D) -> D {
-        std::mem::swap(&mut *self.0.borrow_mut().borrow_mut(), &mut new_data);
+        mem::swap(&mut *self.0.borrow_mut().borrow_mut(), &mut new_data);
         new_data
     }
 
     /// Updates an underlying data using the provided function, which will
     /// accept a mutable reference to an underlying data.
-    #[inline]
     pub fn mutate<F>(&self, f: F)
     where
         F: FnOnce(MutObservableFieldGuard<'_, D, DefaultSubscribers<D>>),

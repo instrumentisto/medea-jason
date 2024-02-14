@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::{env, time::Duration};
 
-use cucumber_rust::then;
+use cucumber::then;
 use medea_e2e::object::{MediaKind, MediaSourceKind};
 use tokio::time::sleep;
 
@@ -36,16 +36,16 @@ async fn then_member_has_remote_track(
     let tracks_store = connection.tracks_store().await.unwrap();
 
     if kind.contains("audio") {
-        assert!(tracks_store
+        tracks_store
             .get_track(MediaKind::Audio, MediaSourceKind::Device)
             .await
-            .is_ok());
+            .unwrap();
     }
     if kind.contains("video") {
-        assert!(tracks_store
+        tracks_store
             .get_track(MediaKind::Video, MediaSourceKind::Device)
             .await
-            .is_ok());
+            .unwrap();
     }
 }
 
@@ -66,7 +66,7 @@ async fn then_has_local_track(world: &mut World, id: String, kind: String) {
         source_kinds.push(MediaSourceKind::Device);
     }
     for source_kind in source_kinds {
-        assert!(tracks.get_track(media_kind, source_kind).await.is_ok());
+        tracks.get_track(media_kind, source_kind).await.unwrap();
     }
 }
 
@@ -117,21 +117,20 @@ async fn then_callback_fires_on_remote_track(
 
     match callback_kind.as_str() {
         "enabled" => {
-            assert!(track.wait_for_on_enabled_fire_count(times).await.is_ok());
+            track.wait_for_on_enabled_fire_count(times).await.unwrap();
         }
         "disabled" => {
-            assert!(track.wait_for_on_disabled_fire_count(times).await.is_ok());
+            track.wait_for_on_disabled_fire_count(times).await.unwrap();
         }
         "muted" => {
-            assert!(track.wait_for_on_muted_fire_count(times).await.is_ok());
+            track.wait_for_on_muted_fire_count(times).await.unwrap();
         }
         "unmuted" => {
-            assert!(track.wait_for_on_unmuted_fire_count(times).await.is_ok());
+            track.wait_for_on_unmuted_fire_count(times).await.unwrap();
         }
         _ => {
             unreachable!(
-                "unknown RemoteMediaTrack callback: `on_{}`",
-                callback_kind,
+                "unknown RemoteMediaTrack callback: `on_{callback_kind}`",
             );
         }
     }
@@ -154,27 +153,32 @@ async fn then_remote_media_track(
         .unwrap();
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
 
+    sleep(Duration::from_millis(500)).await;
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
     let track = tracks_with_partner
         .get_track(media_kind, source_kind)
         .await
         .unwrap();
+    sleep(Duration::from_millis(500)).await;
 
     match state.as_str() {
-        "enabled" => assert!(track.wait_for_enabled().await.is_ok()),
-        "disabled" => assert!(track.wait_for_disabled().await.is_ok()),
+        "enabled" => track.wait_for_enabled().await.unwrap(),
+        "disabled" => track.wait_for_disabled().await.unwrap(),
         _ => unreachable!(),
     };
 }
 
-#[then(regex = "^(\\S+) doesn't have (audio|(?:device|display) video) \
-                 remote track from (\\S+)$")]
+#[then(regex = "^(\\S+) doesn't have (live )?\
+                 (audio|(?:device|display) video) remote track from (\\S+)$")]
 async fn then_doesnt_have_remote_track(
     world: &mut World,
     id: String,
+    live: String,
     kind: String,
     partner_id: String,
 ) {
+    let should_not_be_live = env::var("SFU").is_ok() && !live.is_empty();
+
     let member = world.get_member(&id).unwrap();
     let partner_connection = member
         .connections()
@@ -184,10 +188,33 @@ async fn then_doesnt_have_remote_track(
     let tracks_with_partner = partner_connection.tracks_store().await.unwrap();
     let (media_kind, source_kind) = parse_media_kinds(&kind).unwrap();
 
-    assert!(!tracks_with_partner
-        .has_track(media_kind, Some(source_kind))
-        .await
-        .unwrap());
+    if should_not_be_live {
+        let track = tracks_with_partner
+            .get_track(media_kind, source_kind)
+            .await
+            .unwrap();
+
+        let mut track_live_state = track.lived().await.unwrap();
+        if track_live_state {
+            for _ in 0..5 {
+                track_live_state = track.lived().await.unwrap();
+                if track_live_state {
+                    sleep(Duration::from_millis(300)).await;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        assert!(!track_live_state, "live track is present");
+    } else {
+        let has_track = tracks_with_partner
+            .has_track(media_kind, Some(source_kind))
+            .await
+            .unwrap();
+
+        assert!(!has_track, "track is present");
+    }
 }
 
 #[then(regex = r"^(\S+) doesn't have remote tracks from (\S+)$")]
@@ -215,7 +242,7 @@ async fn then_member_doesnt_have_live_local_tracks(
     let member = world.get_member(&id).unwrap();
     let local_tracks = member.room().local_tracks().await.unwrap();
     let count = local_tracks
-        .count_tracks_by_selector(true, true)
+        .count_tracks_by_live(true, false)
         .await
         .unwrap();
     assert_eq!(count, 0);
@@ -236,18 +263,12 @@ async fn then_member_has_n_remote_tracks_from(
         .await
         .unwrap();
     let tracks_store = connection.tracks_store().await.unwrap();
-    let (muted, stopped) = if live_or_stopped == "live" {
-        (false, false)
-    } else {
-        (true, true)
-    };
+    let live = live_or_stopped == "live";
 
     let mut actual_count = 0;
     for _ in 0..5 {
-        actual_count = tracks_store
-            .count_tracks_by_selector(muted, stopped)
-            .await
-            .unwrap();
+        actual_count =
+            tracks_store.count_tracks_by_live(live, true).await.unwrap();
         if actual_count != expected_count {
             sleep(Duration::from_millis(300)).await;
         }

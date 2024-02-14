@@ -6,10 +6,30 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
+[*.m]
+indent_style = space
+indent_size = 4
+
+[*.swift]
+indent_style = space
+indent_size = 2
+
 [*.gradle]
 indent_style = space
 indent_size = 4
 
-[*.xml]
+[{*.podspec,Podfile}]
+indent_style = space
+indent_size = 2
+
+[*.{plist,pbxproj,xcsettings}]
+indent_style = tab
+indent_size = 4
+
+[*.{xcscheme,xcwokspacedata}]
+indent_style = space
+indent_size = 3
+
+[*.{xml,storyboard}]
 indent_style = space
 indent_size = 4

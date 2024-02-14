@@ -1,9 +1,6 @@
 //! Component responsible for the [`peer::Component`] creating and removing.
 
-use std::{
-    cell::RefCell, collections::HashMap, convert::Infallible, rc::Rc,
-    time::Duration,
-};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Duration};
 
 use futures::{channel::mpsc, future};
 use medea_client_api_proto::{self as proto, PeerId};
@@ -29,14 +26,12 @@ pub type Component = component::Component<State, Repository>;
 
 impl Component {
     /// Returns [`PeerConnection`] stored in the repository by its ID.
-    #[inline]
     #[must_use]
     pub fn get(&self, id: PeerId) -> Option<Rc<PeerConnection>> {
         self.peers.borrow().get(&id).map(component::Component::obj)
     }
 
     /// Returns all [`PeerConnection`]s stored in the repository.
-    #[inline]
     #[must_use]
     pub fn get_all(&self) -> Vec<Rc<PeerConnection>> {
         self.peers
@@ -47,16 +42,16 @@ impl Component {
     }
 
     /// Notifies all [`peer::Component`]s about a RPC connection loss.
-    #[inline]
     pub fn connection_lost(&self) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for peer in self.peers.borrow().values() {
             peer.state().connection_lost();
         }
     }
 
     /// Notifies all [`peer::Component`]s about a RPC connection restore.
-    #[inline]
     pub fn connection_recovered(&self) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for peer in self.peers.borrow().values() {
             peer.state().connection_recovered();
         }
@@ -69,25 +64,27 @@ impl Component {
 
         state.0.borrow_mut().remove_not_present(&new_state.peers);
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, peer_state) in new_state.peers {
             let peer = state.0.borrow().get(&id).cloned();
-            if let Some(peer) = peer {
-                peer.apply(peer_state, send_cons);
+            if let Some(p) = peer {
+                p.apply(peer_state, send_cons);
             } else {
-                state.0.borrow_mut().insert(
+                drop(state.0.borrow_mut().insert(
                     id,
                     Rc::new(peer::State::from_proto(peer_state, send_cons)),
-                );
+                ));
             }
         }
     }
 }
 
 /// State of the [`Component`].
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct State(RefCell<ObservableHashMap<PeerId, Rc<peer::State>>>);
 
 /// Context of the [`Component`].
+#[derive(Debug)]
 pub struct Repository {
     /// [`MediaManager`] for injecting into new created [`PeerConnection`]s.
     media_manager: Rc<MediaManager>,
@@ -164,6 +161,8 @@ impl Repository {
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
         let (fut, abort) = future::abortable(async move {
+            // Cannot annotate `async` block with `-> !`.
+            #[allow(clippy::infinite_loop)]
             loop {
                 platform::delay_for(Duration::from_secs(1)).await;
 
@@ -172,15 +171,17 @@ impl Repository {
                     .values()
                     .map(component::Component::obj)
                     .collect::<Vec<_>>();
-                future::join_all(
-                    peers.iter().map(|p| p.scrape_and_send_peer_stats()),
-                )
-                .await;
+                drop(
+                    future::join_all(
+                        peers.iter().map(|p| p.scrape_and_send_peer_stats()),
+                    )
+                    .await,
+                );
             }
         });
 
         platform::spawn(async move {
-            fut.await.ok();
+            _ = fut.await.ok();
         });
 
         abort.into()
@@ -189,29 +190,25 @@ impl Repository {
 
 impl State {
     /// Inserts the provided [`peer::State`].
-    #[inline]
     pub fn insert(&self, peer_id: PeerId, peer_state: peer::State) {
-        self.0.borrow_mut().insert(peer_id, Rc::new(peer_state));
+        drop(self.0.borrow_mut().insert(peer_id, Rc::new(peer_state)));
     }
 
     /// Lookups [`peer::State`] by the provided [`PeerId`].
-    #[inline]
     #[must_use]
     pub fn get(&self, peer_id: PeerId) -> Option<Rc<peer::State>> {
         self.0.borrow().get(&peer_id).cloned()
     }
 
     /// Removes [`peer::State`] with the provided [`PeerId`].
-    #[inline]
     pub fn remove(&self, peer_id: PeerId) {
-        self.0.borrow_mut().remove(&peer_id);
+        drop(self.0.borrow_mut().remove(&peer_id));
     }
 }
 
 impl AsProtoState for State {
     type Output = proto::state::Room;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             peers: self
@@ -244,11 +241,12 @@ impl Component {
                 Rc::clone(&peers.connections),
                 Rc::clone(&peers.recv_constraints),
             )
+            .await
             .map_err(tracerr::map_from_and_wrap!())?,
             new_peer,
         );
 
-        peers.peers.borrow_mut().insert(peer_id, peer);
+        drop(peers.peers.borrow_mut().insert(peer_id, peer));
 
         Ok(())
     }
@@ -259,15 +257,18 @@ impl Component {
     /// [`Connections::close_connection()`].
     ///
     /// [`Connection`]: crate::connection::Connection
-    #[inline]
     #[watch(self.0.borrow().on_remove())]
-    async fn peer_removed(
-        peers: Rc<Repository>,
-        _: Rc<State>,
-        (peer_id, _): (PeerId, Rc<peer::State>),
-    ) -> Result<(), Infallible> {
-        peers.peers.borrow_mut().remove(&peer_id);
-        peers.connections.close_connection(peer_id);
-        Ok(())
+    fn peer_removed(
+        peers: &Repository,
+        _: &State,
+        (peer_id, peer): (PeerId, Rc<peer::State>),
+    ) {
+        drop(peers.peers.borrow_mut().remove(&peer_id));
+        for t in peer.get_recv_tracks() {
+            peers.connections.remove_track(&t);
+        }
+        for t in peer.get_send_tracks() {
+            peers.connections.remove_track(&t);
+        }
     }
 }

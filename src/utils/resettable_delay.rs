@@ -10,6 +10,8 @@ use futures::{
 
 use crate::platform;
 
+/// Shortcut for a handle resolving a [`Future`] returned by
+/// [`resettable_delay_for()`].
 type FutureResolver = Rc<RefCell<Option<oneshot::Sender<()>>>>;
 
 /// Returns [`Future`] that will be resolved after provided [`Duration`] and
@@ -80,16 +82,16 @@ impl ResettableDelayHandle {
 
     /// Spawns timer, that will resolve delay [`Future`].
     fn spawn_timer(&self) {
-        let future_resolver = self.future_resolver.clone();
+        let future_resolver = Rc::clone(&self.future_resolver);
         let timeout = self.timeout;
         let (fut, abort) = future::abortable(async move {
             platform::delay_for(timeout).await;
             if let Some(rsvr) = future_resolver.borrow_mut().take() {
-                let _ = rsvr.send(());
+                _ = rsvr.send(());
             }
         });
         platform::spawn(fut.map(drop));
 
-        self.abort_handle.replace(abort);
+        drop(self.abort_handle.replace(abort));
     }
 }

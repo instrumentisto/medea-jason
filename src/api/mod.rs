@@ -1,11 +1,13 @@
 //! External [`Jason`] API.
 
-cfg_if::cfg_if! {
-    if #[cfg(target_os = "android")] {
-        mod dart;
-        pub use self::dart::*;
-    } else {
-        mod wasm;
-        pub use self::wasm::*;
-    }
-}
+pub mod err;
+
+#[cfg(not(target_family = "wasm"))]
+pub mod dart;
+#[cfg(not(target_family = "wasm"))]
+pub use self::dart::*;
+
+#[cfg(target_family = "wasm")]
+mod wasm;
+#[cfg(target_family = "wasm")]
+pub use self::wasm::*;

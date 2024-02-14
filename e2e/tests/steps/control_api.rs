@@ -1,19 +1,19 @@
 use std::time::Duration;
 
-use cucumber_rust::{then, when};
+use cucumber::{then, when};
 use medea_control_api_mock::proto::{
     self as proto, AudioSettings, VideoSettings,
 };
 use tokio::time::{sleep, timeout};
 
-use crate::world::{MembersPair, PairedMember, World};
+use crate::world::{member, MembersPair, PairedMember, World};
 
 #[when(regex = r"^Control API removes member (\S+)$")]
 async fn when_control_api_removes_member(world: &mut World, id: String) {
     world.delete_member_element(&id).await;
 }
 
-#[when(regex = r"^Control API removes the room$")]
+#[when("Control API removes the room")]
 async fn when_control_api_removes_room(world: &mut World) {
     world.delete_room_element().await;
 }
@@ -25,10 +25,10 @@ async fn when_interconnects_kind(
     left_member_id: String,
     right_member_id: String,
 ) {
-    let send_video = kind.contains("video").then(|| VideoSettings {
+    let send_video = kind.contains("video").then_some(VideoSettings {
         publish_policy: proto::PublishPolicy::Optional,
     });
-    let send_audio = kind.contains("audio").then(|| AudioSettings {
+    let send_audio = kind.contains("audio").then_some(AudioSettings {
         publish_policy: proto::PublishPolicy::Optional,
     });
 
@@ -37,8 +37,8 @@ async fn when_interconnects_kind(
             left: PairedMember {
                 id: left_member_id,
                 recv: true,
-                send_video: send_video.clone(),
-                send_audio: send_audio.clone(),
+                send_video,
+                send_audio,
             },
             right: PairedMember {
                 id: right_member_id,
@@ -77,9 +77,21 @@ async fn then_control_api_doesnt_sends_on_leave(world: &mut World, id: String) {
 
 #[then(regex = r"^Control API sends `OnJoin` callback for member (\S+)$")]
 async fn then_control_api_sends_on_join(world: &mut World, id: String) {
-    assert!(timeout(Duration::from_secs(10), world.wait_for_on_join(id))
+    timeout(Duration::from_secs(10), world.wait_for_on_join(id))
         .await
-        .is_ok());
+        .unwrap();
+}
+
+#[when(regex = r"^Control API creates member (\S+) with `Apply` method$")]
+async fn when_control_api_creates_member(world: &mut World, id: String) {
+    world
+        .create_member(member::Builder {
+            id,
+            is_send: false,
+            is_recv: false,
+        })
+        .await
+        .unwrap();
 }
 
 #[when(regex = "^Control API starts (\\S+)'s (audio|video|media) publishing \

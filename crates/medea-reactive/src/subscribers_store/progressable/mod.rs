@@ -32,8 +32,9 @@ pub struct SubStore<T> {
     counter: Rc<ObservableCell<u32>>,
 }
 
+// Implemented manually to omit redundant `T: Default` trait bound, imposed by
+// `#[derive(Default)]`.
 impl<T> Default for SubStore<T> {
-    #[inline]
     fn default() -> Self {
         Self {
             store: RefCell::new(Vec::new()),
@@ -50,8 +51,10 @@ impl<T> SubStore<T> {
         let counter = Rc::clone(&self.counter);
         Processed::new(Box::new(move || {
             let counter = Rc::clone(&counter);
+            // `async move` required to capture `Rc` into the created `Future`,
+            // avoiding dropping it in-place.
             Box::pin(async move {
-                let _ = counter.when_eq(0).await;
+                _ = counter.when_eq(0).await;
             })
         }))
     }
@@ -73,7 +76,6 @@ where
         Box::pin(rx)
     }
 
-    #[inline]
     fn wrap(&self, value: T) -> Guarded<T> {
         Guarded::wrap(value, Rc::clone(&self.counter))
     }

@@ -6,10 +6,13 @@ use medea_control_api_proto::grpc::callback as proto;
 use serde::{Deserialize, Serialize};
 
 /// All callbacks which can happen.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum CallbackEvent {
+    /// `OnJoin` callback of Control API.
     OnJoin(join::OnJoin),
+
+    /// `OnLeave` callback of Control API.
     OnLeave(leave::OnLeave),
 }
 
@@ -27,7 +30,7 @@ impl From<proto::request::Event> for CallbackEvent {
 }
 
 /// Control API callback.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CallbackItem {
     /// FID (Full ID) of element with which this event was occurred.
     pub fid: String,
@@ -39,6 +42,7 @@ pub struct CallbackItem {
     pub at: String,
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<proto::Request> for CallbackItem {
     fn from(proto: proto::Request) -> Self {
         Self {
@@ -55,7 +59,7 @@ mod join {
     use serde::{Deserialize, Serialize};
 
     /// `OnJoin` callback for Control API.
-    #[derive(Clone, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
     pub struct OnJoin;
 
     impl From<proto::OnJoin> for OnJoin {
@@ -72,7 +76,7 @@ mod leave {
     use serde::{Deserialize, Serialize};
 
     /// `OnLeave` callback of Control API.
-    #[derive(Clone, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
     pub struct OnLeave {
         /// Reason of why `Member` leaves.
         pub reason: OnLeaveReason,
@@ -81,7 +85,7 @@ mod leave {
     impl From<proto::OnLeave> for OnLeave {
         fn from(proto: proto::OnLeave) -> Self {
             Self {
-                reason: proto::on_leave::Reason::from_i32(proto.reason)
+                reason: proto::on_leave::Reason::try_from(proto.reason)
                     .unwrap_or_default()
                     .into(),
             }
@@ -89,13 +93,13 @@ mod leave {
     }
 
     /// Reason of why `Member` leaves.
-    #[derive(Clone, Deserialize, Display, Serialize)]
+    #[derive(Clone, Copy, Debug, Deserialize, Display, Serialize)]
     pub enum OnLeaveReason {
         /// `Member` was normally disconnected.
         Disconnected,
 
         /// Connection with `Member` was lost.
-        LostConnection,
+        Lost,
 
         /// Server is shutting down.
         ServerShutdown,
@@ -109,8 +113,8 @@ mod leave {
             use proto::on_leave::Reason as R;
 
             match proto {
-                R::ServerShutdown => Self::ServerShutdown,
-                R::LostConnection => Self::LostConnection,
+                R::Shutdown => Self::ServerShutdown,
+                R::Lost => Self::Lost,
                 R::Disconnected => Self::Disconnected,
                 R::Kicked => Self::Kicked,
             }

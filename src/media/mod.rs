@@ -18,10 +18,12 @@ pub use self::{
         VideoSource, VideoTrackConstraints,
     },
     manager::{
-        EnumerateDevicesError, GetDisplayMediaError, GetUserMediaError,
-        InitLocalTracksError, MediaManager, MediaManagerHandle,
+        EnumerateDevicesError, EnumerateDisplaysError, GetDisplayMediaError,
+        GetUserMediaError, HandleDetachedError, InitLocalTracksError,
+        InvalidOutputAudioDeviceIdError, MediaManager, MediaManagerHandle,
+        MicVolumeError,
     },
-    track::MediaSourceKind,
+    track::{remote::MediaDirection, MediaSourceKind, MediaStreamTrackState},
 };
 
 /// [MediaStreamTrack.kind][1] representation.
@@ -41,12 +43,36 @@ pub enum MediaKind {
 
 impl MediaKind {
     /// Returns string representation of a [`MediaKind`].
-    #[inline]
     #[must_use]
-    pub fn as_str(self) -> &'static str {
+    pub const fn as_str(self) -> &'static str {
         match self {
             Self::Audio => "audio",
             Self::Video => "video",
         }
     }
+}
+
+impl From<&TrackConstraints> for MediaKind {
+    fn from(media_type: &TrackConstraints) -> Self {
+        match media_type {
+            TrackConstraints::Audio(_) => Self::Audio,
+            TrackConstraints::Video(_) => Self::Video,
+        }
+    }
+}
+
+/// [MediaDeviceInfo.kind][1] representation.
+///
+/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadeviceinfo-kind
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum MediaDeviceKind {
+    /// Audio input device (for example, a microphone).
+    AudioInput = 0,
+
+    /// Video input device (for example, a webcam).
+    VideoInput = 1,
+
+    /// Audio output device (for example, a pair of headphones).
+    AudioOutput = 2,
 }

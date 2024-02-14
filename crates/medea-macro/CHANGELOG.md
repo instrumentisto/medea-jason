@@ -6,6 +6,34 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.3.0] · 2023-06-09
+[0.3.0]: /../../tree/medea-macro-0.3.0/crates/medea-macro
+
+### BC Breaks
+
+- `#[derive(JsCaused)]` ([#4]):
+    - Renamed to `#[derive(Caused)]`;
+    - `#[js(cause)]` renamed to `#[cause]`;
+    - `#[js(error = "...")]` renamed to `#[cause(error = ...)]` ([6234b23f]).
+
+### Added
+
+- `#[dart_bridge]` macro for generating code glue for `extern` Dart functions ([#14]).
+
+### Updated
+
+- Switched to [2021 Rust edition][012-1] ([#16]).
+- Switched to 2.0 version of [`syn`] ([6234b23f]).
+
+[#4]: /../../pull/4
+[#14]: /../../pull/14
+[#16]: /../../pull/16
+[012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+[6234b23f]: /../../commit/6234b23f66e81c0ce411dfb8cdf983eda51cd2ad
+
+
+
+
 ## [0.2.1] · 2021-04-09
 [0.2.1]: https://github.com/instrumentisto/medea/tree/medea-macro-0.2.1/crates/medea-macro
 
@@ -36,7 +64,7 @@ All user visible changes to this project will be documented in this file. This p
 - `#[derive(JsCaused)]` macro for deriving `JsCaused` trait from `medea-jason` crate ([#68]).
 - `#[dispatchable]` macro:
     - Optional argument to specify `self` type for methods of `*Handler` trait (e.g. `#[dispatchable(self: &Self)]`) ([#112]);
-    - Optional argument that enables [async-trait] integration (e.g. `#[dispatchable(async_trait(?Send))]`) ([#112]).
+    - Optional argument that enables [`async-trait`] integration (e.g. `#[dispatchable(async_trait(?Send))]`) ([#112]).
 - `#[watchers]` macro for generating `Component::spawn` method in `medea-jason` crate ([#169]).
 
 ### Fixed
@@ -68,6 +96,6 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
-[async-trait]: https://docs.rs/async-trait
+[`async-trait`]: https://docs.rs/async-trait
+[`syn`]: https://docs.rs/syn
 [Semantic Versioning 2.0.0]: https://semver.org

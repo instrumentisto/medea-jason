@@ -5,34 +5,22 @@ mod control;
 mod steps;
 mod world;
 
-use cucumber_rust::{World as _, WorldInit as _};
-use regex::Regex;
-use structopt::StructOpt;
-
-use self::world::World;
-
-#[derive(StructOpt)]
-struct Conf {
-    #[structopt(long)]
-    scenario: Option<String>,
-}
+pub use self::world::World;
 
 #[tokio::main]
 async fn main() {
-    let conf: Conf = Conf::from_args();
+    let concurrent = if supports_multiple_webdriver_clients().await {
+        4
+    } else {
+        1
+    };
 
-    let concurrent = supports_multiple_webdriver_clients()
-        .await
-        .then(|| 10)
-        .unwrap_or(1);
-
-    let filter = conf.scenario.as_ref().map(|s| Regex::new(s).unwrap());
-    World::cucumber()
+    <World as cucumber::World>::cucumber()
+        .with_writer(cucumber::writer::Libtest::or_basic())
+        .repeat_failed()
         .fail_on_skipped()
         .max_concurrent_scenarios(concurrent)
-        .filter_run_and_exit(conf::FEATURES_PATH.as_str(), move |_, _, s| {
-            filter.as_ref().map_or(true, |f| f.find(&s.name).is_some())
-        })
+        .run_and_exit(conf::FEATURES_PATH.as_str())
         .await;
 }
 
@@ -44,5 +32,5 @@ async fn main() {
 ///
 /// [1]: https://github.com/mozilla/geckodriver/issues/1523
 async fn supports_multiple_webdriver_clients() -> bool {
-    World::new().await.and(World::new().await).is_ok()
+    World::try_new().await.and(World::try_new().await).is_ok()
 }

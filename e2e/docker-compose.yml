@@ -5,8 +5,6 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}-frontend
     image: nginx:stable-alpine
     ports:
-      - "4444:4444"      # browser webdriver
-      - "6379:6379"      # coturn redis
       - "6565:6565"      # medea grpc
       - "8000:8000"      # control-api-mock http
       - "8001:8001"      # medea http (ws)
@@ -18,27 +16,9 @@ services:
   medea:
     container_name: ${COMPOSE_PROJECT_NAME}-medea
     image: ${COMPOSE_MEDEA_IMAGE_NAME}:${COMPOSE_MEDEA_IMAGE_VER}
-    depends_on: ["coturn"]
     environment:
       RUST_LOG: ${RUST_LOG}
-      MEDEA_SERVER__CLIENT__HTTP__BIND_PORT: 8001
-    network_mode: service:frontend
-  coturn:
-    container_name: ${COMPOSE_PROJECT_NAME}-coturn
-    image: ghcr.io/coturn/coturn:4.5-alpine
-    depends_on: ["coturn-db"]
-    command:
-      - --log-file=stdout
-    volumes:
-      - ../_dev/coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
-      - ../.cache/coturn/data/:/var/lib/coturn/
-    network_mode: service:frontend
-  coturn-db:
-    container_name: ${COMPOSE_PROJECT_NAME}-coturn-db
-    image: redis:alpine
-    command: ["redis-server", "/etc/redis.conf"]
-    volumes:
-      - ../_dev/coturn/redis.conf:/etc/redis.conf:ro
+      MEDEA__SERVER__CLIENT__HTTP__BIND_PORT: 8001
     network_mode: service:frontend
   control-api-mock:
     container_name: ${COMPOSE_PROJECT_NAME}-control-api-mock
@@ -48,6 +28,7 @@ services:
   webdriver:
     container_name: ${COMPOSE_PROJECT_NAME}-webdriver
     image: ${COMPOSE_WEBDRIVER_IMAGE_NAME}:${COMPOSE_WEBDRIVER_IMAGE_VER}
-    depends_on: ["control-api-mock", "coturn", "frontend", "medea"]
+    depends_on: ["control-api-mock", "frontend", "medea"]
     shm_size: 512m
-    network_mode: service:frontend
+    entrypoint: ${COMPOSE_WEBDRIVER_ENTRYPOINT}
+    network_mode: host

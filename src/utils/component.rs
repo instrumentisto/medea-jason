@@ -1,10 +1,11 @@
 //! Implementation of the [`Component`].
 
-use std::{fmt::Display, rc::Rc};
+use std::{borrow::Borrow, convert::Infallible, fmt::Display, rc::Rc};
 
 use derive_more::Deref;
 use futures::{future, Future, FutureExt as _, Stream, StreamExt};
 use medea_reactive::AllProcessed;
+use sealed::sealed;
 
 use crate::{media::LocalTracksConstraints, platform, utils::TaskHandle};
 
@@ -59,24 +60,27 @@ pub trait Updatable {
 /// It consists of two parts: state and object. Object is listening to its state
 /// changes and updates accordingly, so all mutations are meant to be applied to
 /// the state.
-#[derive(Deref)]
+#[derive(Debug, Deref)]
 pub struct Component<S, O> {
+    /// Object holding the state.
     #[deref]
     obj: Rc<O>,
+
+    /// State being reactively listened.
     state: Rc<S>,
+
+    /// All the spawned watchers of the state.
     _spawned_watchers: Vec<TaskHandle>,
 }
 
 impl<S, O> Component<S, O> {
     /// Returns [`Rc`] to the object managed by this [`Component`].
-    #[inline]
     #[must_use]
     pub fn obj(&self) -> Rc<O> {
         Rc::clone(&self.obj)
     }
 
     /// Returns reference to the state of this [`Component`].
-    #[inline]
     #[must_use]
     pub fn state(&self) -> Rc<S> {
         Rc::clone(&self.state)
@@ -101,9 +105,15 @@ impl<S: ComponentState<O> + 'static, O: 'static> Component<S, O> {
 }
 
 /// Spawner for the [`Component`]'s watchers.
+#[derive(Debug)]
 pub struct WatchersSpawner<S, O> {
+    /// State being watched.
     state: Rc<S>,
+
+    /// Object holding the state.
     obj: Rc<O>,
+
+    /// All the spawned watchers of the state.
     spawned_watchers: Vec<TaskHandle>,
 }
 
@@ -114,22 +124,24 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
     /// log.
     ///
     /// You can stop all listeners tasks spawned by this function by
-    /// [`Drop`]ping [`Component`].
-    pub fn spawn<R, V, F, H, E>(&mut self, mut rx: R, handle: F)
+    /// [`Drop`]ping the [`Component`].
+    pub fn spawn<R, V, F, H>(&mut self, mut rx: R, handle: F)
     where
-        F: Fn(Rc<O>, Rc<S>, V) -> H + 'static,
         R: Stream<Item = V> + Unpin + 'static,
-        H: Future<Output = Result<(), E>> + 'static,
-        E: Display,
+        F: Fn(Rc<O>, Rc<S>, V) -> H + 'static,
+        H: Future + 'static,
+        <H as Future>::Output: IntoResult,
     {
         let obj = Rc::clone(&self.obj);
         let state = Rc::clone(&self.state);
         let (fut, handle) = future::abortable(async move {
             while let Some(value) = rx.next().await {
                 if let Err(e) =
-                    (handle)(Rc::clone(&obj), Rc::clone(&state), value).await
+                    (handle)(Rc::clone(&obj), Rc::clone(&state), value)
+                        .await
+                        .into_result()
                 {
-                    log::error!("{}", e);
+                    log::error!("{e}");
                 }
             }
         });
@@ -138,9 +150,27 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
         self.spawned_watchers.push(handle.into());
     }
 
+    /// Spawns synchronous watchers for the provided [`Stream`].
+    ///
+    /// If watcher returns an error then this error will be printed to the error
+    /// log.
+    ///
+    /// You can stop all listeners tasks spawned by this function by
+    /// [`Drop`]ping the [`Component`].
+    pub fn spawn_sync<R, V, F, Obj, St, H>(&mut self, rx: R, handle: F)
+    where
+        R: Stream<Item = V> + Unpin + 'static,
+        F: Fn(&Obj, &St, V) -> H + 'static,
+        Rc<O>: Borrow<Obj>,
+        Rc<S>: Borrow<St>,
+        H: IntoResult + 'static,
+    {
+        self.spawn(rx, move |o, s, v| {
+            future::ready(handle(o.borrow(), s.borrow(), v))
+        });
+    }
+
     /// Creates new [`WatchersSpawner`] for the provided object and state.
-    #[inline]
-    #[must_use]
     fn new(state: Rc<S>, obj: Rc<O>) -> Self {
         Self {
             state,
@@ -151,8 +181,8 @@ impl<S: 'static, O: 'static> WatchersSpawner<S, O> {
 
     /// Returns [`TaskHandle`]s for the watchers spawned by this
     /// [`WatchersSpawner`].
-    #[inline]
-    #[must_use]
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
     fn finish(self) -> Vec<TaskHandle> {
         self.spawned_watchers
     }
@@ -178,4 +208,37 @@ pub trait ComponentTypes {
 impl<S, O> ComponentTypes for Component<S, O> {
     type Obj = O;
     type State = S;
+}
+
+/// [`Result`] coercion for a `handle` accepted by the
+/// [`WatchersSpawner::spawn()`] method.
+#[sealed]
+pub trait IntoResult {
+    /// Type of the coerced [`Result::Err`].
+    type Error: Display;
+
+    /// Coerces into the [`Result`].
+    ///
+    /// # Errors
+    ///
+    /// If coerces into a [`Result::Err`].
+    fn into_result(self) -> Result<(), Self::Error>;
+}
+
+#[sealed]
+impl IntoResult for () {
+    type Error = Infallible;
+
+    fn into_result(self) -> Result<Self, Self::Error> {
+        Ok(self)
+    }
+}
+
+#[sealed]
+impl<E: Display> IntoResult for Result<(), E> {
+    type Error = E;
+
+    fn into_result(self) -> Result<(), Self::Error> {
+        self
+    }
 }

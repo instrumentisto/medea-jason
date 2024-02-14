@@ -1,9 +1,26 @@
-use cucumber_rust::{then, when};
-use medea_e2e::object::AwaitCompletion;
+use std::time::Duration;
 
-use crate::world::World;
+use cucumber::{given, then, when};
+use medea_e2e::object::{
+    remote_track::MediaDirection, AwaitCompletion, MediaSourceKind,
+};
+use tokio::time::timeout;
+
+use crate::World;
 
 use super::{parse_media_kind, parse_media_kinds};
+
+#[given(regex = r"^(\S+)'s `getUserMedia\(\)` request has added latency$")]
+async fn given_gum_delay(world: &mut World, id: String) {
+    let member = world.get_member(&id).unwrap();
+    member.add_gum_latency(Duration::from_millis(500)).await;
+}
+
+#[when(regex = r"^(\S+) frees all local tracks$")]
+async fn when_member_frees_all_local_tracks(world: &mut World, id: String) {
+    let member = world.get_member(&id).unwrap();
+    member.room().forget_local_tracks().await;
+}
 
 #[then(regex = "^(\\S+)'s (audio|(?:device|display) video) local track is \
                  (not )?muted$")]
@@ -45,8 +62,45 @@ async fn then_track_is_stopped(world: &mut World, id: String, kind: String) {
     assert!(is_stopped);
 }
 
-#[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video)\
-                 ( and awaits it (complete|error)s)?$")]
+#[then(regex = "^(\\S+)'s (audio|video) from (\\S+) has \
+                 `(SendRecv|SendOnly|RecvOnly|Inactive)` direction$")]
+async fn then_remote_media_direction_is(
+    world: &mut World,
+    id: String,
+    kind: String,
+    remote_id: String,
+    direction: String,
+) {
+    let media_kind = kind.parse().unwrap();
+    let media_direction = match direction.as_str() {
+        "SendRecv" => MediaDirection::SendRecv,
+        "SendOnly" => MediaDirection::SendOnly,
+        "RecvOnly" => MediaDirection::RecvOnly,
+        _inactive => MediaDirection::Inactive,
+    };
+
+    let member = world.get_member(&id).unwrap();
+    let connection = member
+        .connections()
+        .wait_for_connection(remote_id)
+        .await
+        .unwrap();
+    let tracks_store = connection.tracks_store().await.unwrap();
+    let track = tracks_store
+        .get_track(media_kind, MediaSourceKind::Device)
+        .await
+        .unwrap();
+    timeout(
+        Duration::from_secs(10),
+        track.wait_for_media_direction(media_direction),
+    )
+    .await
+    .unwrap()
+    .unwrap();
+}
+
+#[when(regex = "^(\\S+) (enables|disables|mutes|unmutes) (audio|video) and \
+                 (awaits it completes|awaits it errors|ignores the result)?$")]
 async fn when_enables_or_mutes(
     world: &mut World,
     id: String,
@@ -54,11 +108,11 @@ async fn when_enables_or_mutes(
     audio_or_video: String,
     awaits: String,
 ) {
-    let member = world.get_member(&id).unwrap();
-    let maybe_await = if awaits.is_empty() {
-        AwaitCompletion::Dont
-    } else {
+    let member = world.get_member_mut(&id).unwrap();
+    let maybe_await = if awaits.contains("awaits") {
         AwaitCompletion::Do
+    } else {
+        AwaitCompletion::Dont
     };
 
     let result = match action.as_str() {
@@ -111,6 +165,17 @@ async fn when_enables_or_mutes(
             result.unwrap();
         }
     }
+}
+
+#[when(regex = "^(\\S+) switches device with latency$")]
+async fn when_member_switches_device_with_latency(
+    world: &mut World,
+    id: String,
+) {
+    let member = world.get_member(&id).unwrap();
+
+    member.add_gum_latency(Duration::from_secs(3)).await;
+    member.switch_video_device().await.unwrap();
 }
 
 #[when(regex = "^(\\S+) (enables|disables) remote \

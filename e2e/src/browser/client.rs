@@ -7,12 +7,14 @@ use std::{
     time::Duration,
 };
 
-use fantoccini::{Client, ClientBuilder, Locator};
+use fantoccini::{
+    wd::{Capabilities, WindowHandle},
+    Client, ClientBuilder, Locator,
+};
 use futures::lock::Mutex;
 use serde::Deserialize;
 use serde_json::{json, Value as Json};
 use tokio::task;
-use webdriver::{capabilities::Capabilities, common::WebWindow};
 
 use super::{js::Statement, Error, Result};
 
@@ -40,7 +42,6 @@ enum JsResult {
 }
 
 impl From<JsResult> for Result<Json> {
-    #[inline]
     fn from(from: JsResult) -> Self {
         match from {
             JsResult::Ok(ok) => Self::Ok(ok),
@@ -55,7 +56,10 @@ impl From<JsResult> for Result<Json> {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, Debug)]
 pub struct WebDriverClient {
+    /// Inner implementation of this [`WebDriverClient`].
     inner: Arc<Mutex<Inner>>,
+
+    /// Host of the file server to load `index.html` page from.
     file_server_host: String,
 }
 
@@ -64,9 +68,8 @@ impl WebDriverClient {
     ///
     /// # Errors
     ///
-    /// If failed to create or switch to a new [`WebWindow`].
-    #[inline]
-    pub async fn new_window(&self) -> Result<WebWindow> {
+    /// If failed to create or switch to a new browser window.
+    pub async fn new_window(&self) -> Result<WindowHandle> {
         self.inner
             .lock()
             .await
@@ -74,17 +77,16 @@ impl WebDriverClient {
             .await
     }
 
-    /// Switches to the provided [`WebWindow`] and executes the provided
+    /// Switches to the provided browser window and executes the provided
     /// [`Statement`] in it.
     ///
     /// # Errors
     ///
-    /// - If failed to switch to the provided [`WebWindow`].
+    /// - If failed to switch to the provided browser window.
     /// - If failed to execute JS statement.
-    #[inline]
     pub async fn switch_to_window_and_execute(
         &self,
-        window: WebWindow,
+        window: WindowHandle,
         exec: Statement,
     ) -> Result<Json> {
         self.inner
@@ -103,30 +105,30 @@ impl WebDriverClient {
     /// If [`tokio::spawn()`] panics.
     pub fn blocking_close(&self) {
         let (tx, rx) = mpsc::channel();
-        let client = self.inner.clone();
-        tokio::spawn(async move {
-            let mut inner = client.lock().await;
-            inner.0.close().await.map_err(|e| dbg!("{:?}", e)).unwrap();
+        let client = Arc::clone(&self.inner);
+        drop(tokio::spawn(async move {
+            let inner = client.lock().await;
+            inner.0.clone().close().await.unwrap();
             tx.send(()).unwrap();
-        });
+        }));
         task::block_in_place(move || {
             rx.recv().unwrap();
         });
     }
 
-    /// Synchronously closes the provided [`WebWindow`].
+    /// Synchronously closes the provided browser window.
     ///
     /// # Panics
     ///
     /// If [`tokio::spawn()`] panics.
-    pub fn blocking_window_close(&self, window: WebWindow) {
+    pub fn blocking_window_close(&self, window: WindowHandle) {
         let (tx, rx) = mpsc::channel();
-        let client = self.inner.clone();
-        tokio::spawn(async move {
+        let client = Arc::clone(&self.inner);
+        drop(tokio::spawn(async move {
             let mut client = client.lock().await;
             client.close_window(window).await;
             tx.send(()).unwrap();
-        });
+        }));
         task::block_in_place(move || {
             rx.recv().unwrap();
         });
@@ -135,39 +137,59 @@ impl WebDriverClient {
 
 /// Builder for [`WebDriverClientBuilder`].
 #[derive(Clone, Debug)]
-pub struct WebDriverClientBuilder<'a> {
+pub struct WebDriverClientBuilder<'a, Caps = AutoCapabilities> {
+    /// Address of a [WebDriver] server.
+    ///
+    /// [WebDriver]: https://w3.org/TR/webdriver
     webdriver_address: &'a str,
-    file_server_host: String,
-    headless_firefox: bool,
-    headless_chrome: bool,
+
+    /// [`WebDriverClient`] [`Capabilities`].
+    capabilities: Caps,
 }
 
 impl<'a> WebDriverClientBuilder<'a> {
     /// Creates new [`WebDriverClientBuilder`].
     #[must_use]
-    pub fn new(webdriver_address: &'a str, file_server_host: &str) -> Self {
+    pub const fn new(webdriver_address: &'a str) -> Self {
         Self {
             webdriver_address,
-            file_server_host: file_server_host.to_owned(),
-            headless_firefox: false,
-            headless_chrome: false,
+            capabilities: AutoCapabilities {
+                headless_firefox: false,
+                headless_chrome: false,
+            },
+        }
+    }
+
+    /// Sets manually provided browser [`Capabilities`].
+    // false positive: destructors cannot be evaluated at compile-time
+    #[allow(clippy::missing_const_for_fn)]
+    #[must_use]
+    pub fn capabilities(
+        self,
+        capabilities: Capabilities,
+    ) -> WebDriverClientBuilder<'a, Capabilities> {
+        WebDriverClientBuilder {
+            webdriver_address: self.webdriver_address,
+            capabilities,
         }
     }
 
     /// Sets `moz:firefoxOptions` `--headless` for Firefox browser.
     #[must_use]
-    pub fn headless_firefox(mut self, value: bool) -> Self {
-        self.headless_firefox = value;
+    pub const fn headless_firefox(mut self, value: bool) -> Self {
+        self.capabilities.headless_firefox = value;
         self
     }
 
     /// Sets `goog:chromeOptions` `--headless` for Chrome browser.
     #[must_use]
-    pub fn headless_chrome(mut self, value: bool) -> Self {
-        self.headless_chrome = value;
+    pub const fn headless_chrome(mut self, value: bool) -> Self {
+        self.capabilities.headless_chrome = value;
         self
     }
+}
 
+impl<'a, Caps: Into<Capabilities>> WebDriverClientBuilder<'a, Caps> {
     /// Creates a new [`WebDriverClient`] connected to a [WebDriver].
     ///
     /// # Errors
@@ -181,12 +203,8 @@ impl<'a> WebDriverClientBuilder<'a> {
     ) -> Result<WebDriverClient> {
         Ok(WebDriverClient {
             inner: Arc::new(Mutex::new(
-                Inner::new(
-                    self.webdriver_address,
-                    self.headless_firefox,
-                    self.headless_chrome,
-                )
-                .await?,
+                Inner::new(self.webdriver_address, self.capabilities.into())
+                    .await?,
             )),
             file_server_host: file_server_host.to_owned(),
         })
@@ -200,29 +218,22 @@ impl Inner {
     /// Creates a new [WebDriver] session.
     ///
     /// [WebDriver]: https://w3.org/TR/webdriver
-    pub async fn new(
-        webdriver_address: &str,
-        headless_firefox: bool,
-        headless_chrome: bool,
-    ) -> Result<Self> {
+    async fn new(webdriver_address: &str, caps: Capabilities) -> Result<Self> {
         Ok(Self(
-            ClientBuilder::native()
-                .capabilities(Self::get_webdriver_capabilities(
-                    headless_firefox,
-                    headless_chrome,
-                ))
+            ClientBuilder::rustls()
+                .capabilities(caps)
                 .connect(webdriver_address)
                 .await?,
         ))
     }
 
-    /// Executes the provided [`Statement`] in the current [`WebWindow`].
+    /// Executes the provided [`Statement`] in the current browser window.
     ///
     /// # Errors
     ///
     /// - If JS exception was thrown while executing a JS code.
     /// - If failed to deserialize a result of the executed JS code.
-    pub async fn execute(&mut self, statement: Statement) -> Result<Json> {
+    async fn execute(&mut self, statement: Statement) -> Result<Json> {
         let (inner_js, args) = statement.prepare();
 
         // language=JavaScript
@@ -232,91 +243,106 @@ impl Inner {
                 async () => {{
                     let callback = arguments[arguments.length - 1];
                     try {{
-                        {executable_js}
+                        {inner_js}
                         callback({{ ok: lastResult }});
                     }} catch (e) {{
-                        if (e.ptr != undefined) {{
+                        if (e.__wbg_ptr > 0) {{
                             callback({{
                                 err: {{
-                                    name: e.name(),
+                                    kind: e.kind ? e.kind() : undefined,
                                     message: e.message(),
                                     trace: e.trace(),
-                                    source: e.source()
+                                    cause: e.cause ? e.cause() : undefined
                                 }}
                             }});
                         }} else {{
-                            callback({{ err: e.toString() }});
+                            callback({{ err: JSON.stringify(e) }});
                         }}
                     }}
                 }}
             )();
             "#,
-            executable_js = inner_js,
         );
         let res = self.0.execute_async(&js, args).await?;
 
         serde_json::from_value::<JsResult>(res)?.into()
     }
 
-    /// Creates a new [`WebWindow`] and returns it's ID.
+    /// Creates a new browser window and returns its ID.
     ///
-    /// Creates a `registry` in the created [`WebWindow`].
+    /// Creates a `registry` in the created browser window.
     ///
     /// # Errors
     ///
-    /// - If failed to create new [`WebWindow`].
+    /// - If failed to create a new browser window.
     /// - If `index.html` wasn't found at `file_server_host`.
-    pub async fn new_window(
+    async fn new_window(
         &mut self,
         file_server_host: &str,
-    ) -> Result<WebWindow> {
-        let window = WebWindow(self.0.new_window(true).await?.handle);
+    ) -> Result<WindowHandle> {
+        let window = self.0.new_window(true).await?.handle;
         self.0.switch_to_window(window.clone()).await?;
         self.0
-            .goto(&format!("http://{}/index.html", file_server_host))
+            .goto(&format!("http://{file_server_host}/index.html"))
             .await?;
         self.0
             .wait()
             .at_most(Duration::from_secs(120))
             .for_element(Locator::Id("loaded"))
-            .await?;
+            .await
+            .map(drop)?;
 
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
-                async () => {
-                    window.registry = new Map();
-                }
-            "#,
+            "
+            async () => {
+                window.registry = new Map();
+            }
+            ",
             vec![],
         ))
-        .await?;
+        .await
+        .map(drop)?;
 
         Ok(window)
     }
 
-    /// Switches to the provided [`WebWindow`] and executes the provided
+    /// Switches to the provided browser window and executes the provided
     /// [`Statement`].
-    pub async fn switch_to_window_and_execute(
+    async fn switch_to_window_and_execute(
         &mut self,
-        window: WebWindow,
+        window: WindowHandle,
         exec: Statement,
     ) -> Result<Json> {
         self.0.switch_to_window(window).await?;
         self.execute(exec).await
     }
 
-    /// Closes the provided [`WebWindow`].
-    pub async fn close_window(&mut self, window: WebWindow) {
+    /// Closes the provided browser window.
+    async fn close_window(&mut self, window: WindowHandle) {
         if self.0.switch_to_window(window).await.is_ok() {
             drop(self.0.close_window().await);
         }
     }
+}
 
+/// Settings to build [`Capabilities`] automatically.
+#[derive(Clone, Copy, Debug)]
+pub struct AutoCapabilities {
+    /// Indicator whether [`WebDriverClient`] will run against headless Firefox
+    /// browser.
+    headless_firefox: bool,
+
+    /// Indicator whether [`WebDriverClient`] will run against headless Chrome
+    /// browser.
+    headless_chrome: bool,
+}
+
+impl AutoCapabilities {
     /// Returns `moz:firefoxOptions` for a Firefox browser.
-    fn get_firefox_caps(value: bool) -> serde_json::Value {
+    fn firefox(self) -> serde_json::Value {
         let mut args = FIREFOX_ARGS.to_vec();
-        if value {
+        if self.headless_firefox {
             args.push("--headless");
         }
         json!({
@@ -333,30 +359,20 @@ impl Inner {
     }
 
     /// Returns `goog:chromeOptions` for a Chrome browser.
-    fn get_chrome_caps(value: bool) -> serde_json::Value {
+    fn chrome(self) -> serde_json::Value {
         let mut args = CHROME_ARGS.to_vec();
-        if value {
+        if self.headless_chrome {
             args.push("--headless");
         }
         json!({ "args": args })
     }
+}
 
-    /// Returns [WebDriver capabilities][1] for Chrome and Firefox browsers.
-    ///
-    /// [1]: https:/mdn.io/Web/WebDriver/Capabilities
-    fn get_webdriver_capabilities(
-        headless_firefox: bool,
-        headless_chrome: bool,
-    ) -> Capabilities {
-        let mut caps = Capabilities::new();
-        caps.insert(
-            "moz:firefoxOptions".to_owned(),
-            Self::get_firefox_caps(headless_firefox),
-        );
-        caps.insert(
-            "goog:chromeOptions".to_owned(),
-            Self::get_chrome_caps(headless_chrome),
-        );
+impl From<AutoCapabilities> for Capabilities {
+    fn from(auto: AutoCapabilities) -> Self {
+        let mut caps = Self::new();
+        drop(caps.insert("moz:firefoxOptions".to_owned(), auto.firefox()));
+        drop(caps.insert("goog:chromeOptions".to_owned(), auto.chrome()));
         caps
     }
 }

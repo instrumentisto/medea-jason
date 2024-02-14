@@ -7,6 +7,7 @@ use crate::{
 };
 
 /// Storage for [`Connection`]s thrown by `Room.on_new_connection()` callback.
+#[derive(Clone, Copy, Debug)]
 pub struct ConnectionStore;
 
 impl Object<ConnectionStore> {
@@ -24,17 +25,17 @@ impl Object<ConnectionStore> {
         let connection = self
             .execute_and_fetch(Statement::new(
                 // language=JavaScript
-                r#"
-                    async (store) => {
-                        const [id] = args;
-                        return store.connections.get(id);
-                    }
-                "#,
+                "
+                async (store) => {
+                    const [id] = args;
+                    return store.connections.get(id);
+                }
+                ",
                 [remote_id.into()],
             ))
             .await?;
 
-        Ok((!connection.is_undefined().await?).then(|| connection))
+        Ok((!connection.is_undefined().await?).then_some(connection))
     }
 
     /// Returns a [`Connection`] for the provided remote member, awaiting for it
@@ -49,20 +50,20 @@ impl Object<ConnectionStore> {
     ) -> Result<Object<Connection>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"
-                async (store) => {
-                    const [remoteId] = args;
-                    let conn = store.connections.get(remoteId);
-                    if (conn !== undefined) {
-                        return conn;
-                    } else {
-                        let waiter = new Promise((resolve) => {
-                            store.subs.set(remoteId, resolve);
-                        });
-                        return await waiter;
-                    }
+            "
+            async (store) => {
+                const [remoteId] = args;
+                let conn = store.connections.get(remoteId);
+                if (conn !== undefined) {
+                    return conn;
+                } else {
+                    let waiter = new Promise((resolve) => {
+                        store.subs.set(remoteId, resolve);
+                    });
+                    return await waiter;
                 }
-            "#,
+            }
+            ",
             [remote_id.into()],
         ))
         .await

@@ -20,7 +20,6 @@ use actix_web::{
     web::{self, Data, Json, Path},
     App, HttpResponse, HttpServer,
 };
-use clap::ArgMatches;
 use derive_more::From;
 use medea_control_api_proto::grpc::api as proto;
 use serde::{Deserialize, Serialize};
@@ -30,6 +29,7 @@ use crate::{
     callback::server::{GetCallbackItems, GrpcCallbackServer},
     client::{ControlClient, Fid},
     prelude::*,
+    Cli,
 };
 
 use self::{
@@ -43,6 +43,7 @@ pub type Subscribers =
     Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>;
 
 /// Context of [`actix_web`] server.
+#[derive(Debug)]
 pub struct AppContext {
     /// Client for [Medea]'s [Control API].
     ///
@@ -61,20 +62,18 @@ pub struct AppContext {
 ///
 /// # Panics
 ///
-/// If the given `args` don't contain an expected `medea_addr` value.
+/// If cannot bind and run HTTP server.
 ///
 /// [Control API]: https://tinyurl.com/yxsqplq7
-pub async fn run(
-    args: &ArgMatches<'static>,
-    callback_server: Addr<GrpcCallbackServer>,
-) {
-    let medea_addr: String = args.value_of("medea_addr").unwrap().to_string();
+pub async fn run(opts: &Cli, callback_server: Addr<GrpcCallbackServer>) {
     let subscribers = Arc::new(Mutex::new(HashMap::new()));
-    let client = ControlClient::new(medea_addr, Arc::clone(&subscribers))
-        .await
-        .unwrap();
     let app_data = Data::new(AppContext {
-        client,
+        client: ControlClient::new(
+            opts.medea_addr.clone().into(),
+            Arc::clone(&subscribers),
+        )
+        .await
+        .unwrap(),
         subscribers,
         callback_server,
     });
@@ -113,7 +112,7 @@ pub async fn run(
                 web::resource("/callbacks").route(web::get().to(get_callbacks)),
             )
     })
-    .bind(args.value_of("addr").unwrap())
+    .bind(&*opts.addr)
     .unwrap()
     .run()
     .await
@@ -145,10 +144,9 @@ macro_rules! gen_request_macro {
                         .$call_fn(path.into_inner().into())
                         .await
                         .map_err(|e| {
-                            actix_web::error::ErrorInternalServerError(format!(
-                                "{:?}",
-                                e
-                            ))
+                            actix_web::error::ErrorInternalServerError(
+                                e.to_string(),
+                            )
                         })
                         .map(|r| <$resp>::from(r).into())
                 }
@@ -172,7 +170,7 @@ pub async fn get_callbacks(
         .send(GetCallbackItems)
         .await
         .map_err(|e| {
-            InternalError(format!("GrpcCallbackServer mailbox error. {:?}", e))
+            InternalError(format!("GrpcCallbackServer mailbox error. {e}"))
         })
         .map(|callbacks| HttpResponse::Ok().json(&callbacks.unwrap()))
 }
@@ -215,6 +213,8 @@ mod create {
         HttpResponse, InternalError, Json, Path,
     };
 
+    /// Creates the given [`Element`] under the given FID represented as
+    /// one-segment `path`.
     pub async fn create1(
         path: Path<String>,
         state: Data<AppContext>,
@@ -224,10 +224,12 @@ mod create {
             .client
             .create(path.into_inner(), Fid::from(()), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 
+    /// Creates the given [`Element`] under the given FID represented as
+    /// two-segments `path`.
     pub async fn create2(
         path: Path<(String, String)>,
         state: Data<AppContext>,
@@ -238,10 +240,12 @@ mod create {
             .client
             .create(uri.1, Fid::from(uri.0), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 
+    /// Creates the given [`Element`] under the given FID represented as
+    /// three-segments `path`.
     pub async fn create3(
         path: Path<(String, String, String)>,
         state: Data<AppContext>,
@@ -252,7 +256,7 @@ mod create {
             .client
             .create(uri.2, Fid::from((uri.0, uri.1)), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 }
@@ -266,6 +270,7 @@ mod apply {
         HttpResponse, InternalError, Json, Path,
     };
 
+    /// Renews the [`Element`] by its FID represented as one-segment `path`.
     pub async fn apply1(
         path: Path<String>,
         state: Data<AppContext>,
@@ -275,10 +280,11 @@ mod apply {
             .client
             .apply(path.clone(), Fid::from(path.into_inner()), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 
+    /// Renews the [`Element`] by its FID represented as two-segments `path`.
     pub async fn apply2(
         path: Path<(String, String)>,
         state: Data<AppContext>,
@@ -289,7 +295,7 @@ mod apply {
             .client
             .apply(uri.1.clone(), Fid::from((uri.0, uri.1)), data.0)
             .await
-            .map_err(|e| InternalError(format!("{:?}", e)))
+            .map_err(|e| InternalError(e.to_string()))
             .map(|r| CreateResponse::from(r).into())
     }
 }
@@ -310,7 +316,6 @@ pub struct ErrorResponse {
 }
 
 impl From<proto::Error> for ErrorResponse {
-    #[inline]
     fn from(e: proto::Error) -> Self {
         Self {
             code: e.code,
@@ -403,9 +408,16 @@ impl From<proto::CreateResponse> for CreateResponse {
 #[derive(Debug, Deserialize, From, Serialize)]
 #[serde(tag = "kind")]
 pub enum Element {
-    Member(Member),
+    /// [`Member`] element.
+    Member(Box<Member>),
+
+    /// [`WebRtcPublishEndpoint`] element.
     WebRtcPublishEndpoint(WebRtcPublishEndpoint),
+
+    /// [`WebRtcPlayEndpoint`] element.
     WebRtcPlayEndpoint(WebRtcPlayEndpoint),
+
+    /// [`Room`] element.
     Room(Room),
 }
 
@@ -421,19 +433,22 @@ impl Element {
             Self::Member(m) => {
                 proto::room::element::El::Member(m.into_proto(id))
             }
-            _ => unimplemented!(),
+            Self::WebRtcPublishEndpoint(_)
+            | Self::WebRtcPlayEndpoint(_)
+            | Self::Room(_) => unimplemented!(),
         };
         proto::room::Element { el: Some(el) }
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<proto::Element> for Element {
     fn from(proto: proto::Element) -> Self {
         use proto::element::El;
 
         match proto.el.unwrap() {
             El::Room(room) => Self::Room(room.into()),
-            El::Member(member) => Self::Member(member.into()),
+            El::Member(member) => Self::Member(Box::new(member.into())),
             El::WebrtcPub(webrtc_pub) => {
                 Self::WebRtcPublishEndpoint(webrtc_pub.into())
             }
@@ -444,15 +459,17 @@ impl From<proto::Element> for Element {
     }
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<proto::room::Element> for Element {
     fn from(proto: proto::room::Element) -> Self {
         match proto.el.unwrap() {
             proto::room::element::El::Member(member) => {
-                Self::Member(member.into())
+                Self::Member(Box::new(member.into()))
             }
-            _ => unimplemented!(
+            proto::room::element::El::WebrtcPlay(_)
+            | proto::room::element::El::WebrtcPub(_) => unimplemented!(
                 "Currently Control API mock server supports only Member \
-                 element in Room pipeline."
+                 element in Room pipeline.",
             ),
         }
     }
@@ -478,11 +495,7 @@ impl From<proto::GetResponse> for SingleGetResponse {
         proto.error.map_or(
             Self {
                 error: None,
-                element: proto
-                    .elements
-                    .into_iter()
-                    .map(|(_, e)| e.into())
-                    .next(),
+                element: proto.elements.into_values().map(Element::from).next(),
             },
             |error| Self {
                 element: None,

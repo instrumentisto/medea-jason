@@ -1,6 +1,6 @@
 //! Reconnection for [`RpcSession`].
 
-use std::{rc::Weak, time::Duration};
+use std::{fmt, rc::Weak, time::Duration};
 
 use derive_more::{Display, From};
 use tracerr::Traced;
@@ -8,15 +8,15 @@ use tracerr::Traced;
 use crate::{
     platform,
     rpc::{BackoffDelayer, RpcSession, SessionError},
-    utils::JsCaused,
+    utils::Caused,
 };
 
 /// Errors occurring in a [`ReconnectHandle`].
-#[derive(Clone, Debug, From, Display, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, From, Display)]
+#[cause(error = platform::Error)]
 pub enum ReconnectError {
     /// Some [`SessionError`] has occurred while reconnecting.
-    Session(#[js(cause)] SessionError),
+    Session(#[cause] SessionError),
 
     /// [`ReconnectHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "ReconnectHandle is in detached state")]
@@ -29,10 +29,15 @@ pub enum ReconnectError {
 #[derive(Clone)]
 pub struct ReconnectHandle(Weak<dyn RpcSession>);
 
+impl fmt::Debug for ReconnectHandle {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("ReconnectHandle").finish()
+    }
+}
+
 impl ReconnectHandle {
     /// Instantiates new [`ReconnectHandle`] from the given [`RpcSession`]
     /// reference.
-    #[inline]
     #[must_use]
     pub fn new(rpc: Weak<dyn RpcSession>) -> Self {
         Self(rpc)
@@ -110,7 +115,7 @@ impl ReconnectHandle {
                 .reconnect()
                 .await
                 .map_err(tracerr::map_from_and_wrap!())
-                .map_err(backoff::Error::Transient)
+                .map_err(backoff::Error::transient)
         })
         .await
     }

@@ -3,13 +3,15 @@
 //! [1]: std::collections::HashMap
 
 use std::{
-    collections::hash_map::{Iter, Values},
+    collections::{
+        hash_map::{Iter, Values},
+        HashMap as StdHashMap,
+    },
     hash::Hash,
-    iter::FromIterator,
     marker::PhantomData,
 };
 
-use futures::stream::{LocalBoxStream, StreamExt as _};
+use futures::stream::{self, LocalBoxStream, StreamExt as _};
 
 use crate::subscribers_store::{
     common, progressable,
@@ -101,7 +103,7 @@ pub type ObservableHashMap<K, V> =
 #[derive(Debug, Clone)]
 pub struct HashMap<K, V, S: SubscribersStore<(K, V), O>, O> {
     /// Data stored by this [`HashMap`].
-    store: std::collections::HashMap<K, V>,
+    store: StdHashMap<K, V>,
 
     /// Subscribers of the [`HashMap::on_insert()`] method.
     on_insert_subs: S,
@@ -123,7 +125,6 @@ where
     /// processed by [`HashMap::on_insert()`] subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_insert_processed(&self) -> Processed<'static> {
         self.on_insert_subs.when_all_processed()
     }
@@ -132,7 +133,6 @@ where
     /// by [`HashMap::on_remove()`] subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_remove_processed(&self) -> Processed<'static> {
         self.on_remove_subs.when_all_processed()
     }
@@ -141,7 +141,6 @@ where
     /// processed by subscribers.
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_all_processed(&self) -> AllProcessed<'static> {
         crate::when_all_processed(vec![
             self.when_remove_processed().into(),
@@ -152,20 +151,17 @@ where
 
 impl<K, V, S: SubscribersStore<(K, V), O>, O> HashMap<K, V, S, O> {
     /// Creates new empty [`HashMap`].
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// [`Iterator`] visiting all key-value pairs in an arbitrary order.
-    #[inline]
     pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
         self.into_iter()
     }
 
     /// [`Iterator`] visiting all values in an arbitrary order.
-    #[inline]
     #[must_use]
     pub fn values(&self) -> Values<'_, K, V> {
         self.store.values()
@@ -175,7 +171,6 @@ impl<K, V, S: SubscribersStore<(K, V), O>, O> HashMap<K, V, S, O> {
     /// [`HashMap`].
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     #[must_use]
     pub fn on_insert(&self) -> LocalBoxStream<'static, O> {
         self.on_insert_subs.subscribe()
@@ -188,7 +183,6 @@ impl<K, V, S: SubscribersStore<(K, V), O>, O> HashMap<K, V, S, O> {
     /// [`HashMap`] on [`Drop`].
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
     #[must_use]
     pub fn on_remove(&self) -> LocalBoxStream<'static, O> {
         self.on_remove_subs.subscribe()
@@ -210,9 +204,9 @@ where
     /// values and values that will be inserted.
     ///
     /// [`Stream`]: futures::Stream
-    #[inline]
+    #[allow(clippy::needless_collect)] // false positive: lifetimes
     pub fn replay_on_insert(&self) -> LocalBoxStream<'static, O> {
-        Box::pin(futures::stream::iter(
+        Box::pin(stream::iter(
             self.store
                 .iter()
                 .map(|(k, v)| self.on_insert_subs.wrap((k.clone(), v.clone())))
@@ -221,7 +215,6 @@ where
     }
 
     /// Chains [`HashMap::replay_on_insert()`] with a [`HashMap::on_insert()`].
-    #[inline]
     pub fn on_insert_with_replay(&self) -> LocalBoxStream<'static, O> {
         Box::pin(self.replay_on_insert().chain(self.on_insert()))
     }
@@ -233,7 +226,6 @@ where
     S: SubscribersStore<(K, V), O>,
 {
     /// Returns a reference to the value corresponding to the `key`.
-    #[inline]
     #[must_use]
     pub fn get(&self, key: &K) -> Option<&V> {
         self.store.get(key)
@@ -248,7 +240,6 @@ where
     /// it.
     ///
     /// [`Observable`]: crate::Observable
-    #[inline]
     #[must_use]
     pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
         self.store.get_mut(key)
@@ -264,10 +255,7 @@ where
     /// Removes all entries which are not present in the provided [`HashMap`].
     ///
     /// [`HashMap`]: std::collections::HashMap
-    pub fn remove_not_present<A>(
-        &mut self,
-        other: &std::collections::HashMap<K, A>,
-    ) {
+    pub fn remove_not_present<A>(&mut self, other: &StdHashMap<K, A>) {
         self.iter()
             .filter_map(|(id, _)| {
                 if other.contains_key(id) {
@@ -288,9 +276,8 @@ where
     /// this [`HashMap`].
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
         let removed_value = self.store.insert(key.clone(), value.clone());
-        if let Some(removed_value) = &removed_value {
-            self.on_remove_subs
-                .send_update((key.clone(), removed_value.clone()));
+        if let Some(val) = &removed_value {
+            self.on_remove_subs.send_update((key.clone(), val.clone()));
         }
 
         self.on_insert_subs.send_update((key, value));
@@ -313,28 +300,28 @@ where
     }
 }
 
+// Implemented manually to omit redundant `: Default` trait bounds, imposed by
+// `#[derive(Default)]`.
 impl<K, V, S: SubscribersStore<(K, V), O>, O> Default for HashMap<K, V, S, O> {
-    #[inline]
     fn default() -> Self {
         Self {
-            store: std::collections::HashMap::new(),
+            store: StdHashMap::new(),
             on_insert_subs: S::default(),
             on_remove_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }
 
-impl<K, V, S: SubscribersStore<(K, V), O>, O>
-    From<std::collections::HashMap<K, V>> for HashMap<K, V, S, O>
+impl<K, V, S: SubscribersStore<(K, V), O>, O> From<StdHashMap<K, V>>
+    for HashMap<K, V, S, O>
 {
-    #[inline]
-    fn from(from: std::collections::HashMap<K, V>) -> Self {
+    fn from(from: StdHashMap<K, V>) -> Self {
         Self {
             store: from,
             on_remove_subs: S::default(),
             on_insert_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }
@@ -345,7 +332,6 @@ impl<'a, K, V, S: SubscribersStore<(K, V), O>, O> IntoIterator
     type IntoIter = Iter<'a, K, V>;
     type Item = (&'a K, &'a V);
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         self.store.iter()
     }
@@ -355,6 +341,7 @@ impl<K, V, S: SubscribersStore<(K, V), O>, O> Drop for HashMap<K, V, S, O> {
     /// Sends all key-values of a dropped [`HashMap`] to the
     /// [`HashMap::on_remove`] subs.
     fn drop(&mut self) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (k, v) in self.store.drain() {
             self.on_remove_subs.send_update((k, v));
         }
@@ -366,13 +353,12 @@ impl<K, V, S: SubscribersStore<(K, V), O>, O> FromIterator<(K, V)>
 where
     K: Hash + Eq,
 {
-    #[inline]
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
         Self {
-            store: std::collections::HashMap::from_iter(iter),
+            store: StdHashMap::from_iter(iter),
             on_remove_subs: S::default(),
             on_insert_subs: S::default(),
-            _output: PhantomData::default(),
+            _output: PhantomData,
         }
     }
 }

@@ -6,22 +6,152 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2021-??-?? · To-be-done
-[0.3.0]: /../../tree/medea-jason-0.3.0
+## [0.4.1] · 2024-??-?? (unreleased)
+[0.4.1]: /../../tree/medea-jason-0.4.1
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0) | [Milestone](https://github.com/instrumentisto/medea/milestone/3) | [Roadmap](https://github.com/instrumentisto/medea/issues/182)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.4.0...medea-jason-0.4.1)
+
+### Added
+
+- Logging:
+    - Exceptions thrown from Dart callbacks called by Rust ([#138]).
+
+### Fixed
+
+- Screen sharing in Firefox ([#135]).
+
+[#135]: /../../pull/135
+[#138]: /../../pull/138
+
+
+
+
+## [0.4.0] · 2023-07-11
+[0.4.0]: /../../tree/medea-jason-0.4.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.3.0...medea-jason-0.4.0)
 
 ### BC Breaks
-TODO: Mention #209
+
+- Minimal supported version of `medea-client-api-proto` is `0.5.0` ([#119]).
+
+### Fixed
+
+- Initial mute state on incoming tracks in [SFU] mode ([#119]).
+- Incorrect `ConnectionHandle`s creation and disposal in [SFU] mode ([#119]).
+
+[#119]: /../../pull/119
+
+
+
+
+## [0.3.0] · 2023-06-09
+[0.3.0]: /../../tree/medea-jason-0.3.0
+
+[Diff](https://github.com/instrumentisto/medea-jason/compare/a2ce6b92...medea-jason-0.3.0)
+
+### BC Breaks
+
 - Library API:
-    - `ReconnectHandle.reconnect_with_backoff()` performs first reconnect attempt immediately now ([#206]).
+    - `ReconnectHandle.reconnect_with_backoff()` now performs first reconnect attempt immediately ([instrumentisto/medea#206]).
+    - Removed `JasonError` and changed thrown exceptions kind ([#4]):
+        - `ConnectionHandle`:
+            - `on_close` - `StateError`;
+            - `get_remote_member_id` - `StateError`;
+            - `on_remote_track_added` - `StateError`;
+            - `on_quality_score_update` - `StateError`.
+        - `MediaManager`:
+            - `enumerate_devices` - `EnumerateDevicesException`.
+            - `init_local_tracks` - `LocalMediaInitException`.
+        - `RoomHandle`:
+            - `join`:
+                - `StateError`;
+                - `FormatException`;
+                - `RpcClientException`;
+                - `InternalException`.
+            - `on_new_connection` - `StateError`;
+            - `on_close` - `StateError`;
+            - `on_local_track` - `StateError`;
+            - `on_failed_local_media` - `StateError`;
+            - `on_connection_loss` - `StateError`;
+            - `set_local_media_settings` - `MediaSettingsUpdateException`;
+            - `mute_audio`, `unmute_audio`, `mute_video`, `unmute_video`, `disable_audio`, `enable_audio`,
+              `disable_video`, `enable_video`, `disable_remote_video`, `enable_remote_video`, `disable_remote_audio`,
+              `enable_remote_audio`:
+                - `StateError`;
+                - `MediaStateTransitionException`;
+                - `InternalException`;
+                - `LocalMediaInitException`.
+    - Renamed `InputDeviceInfo` object to `MediaDeviceDetails` ([#29], [#106]).
+    - `RemoteMediaTrack`:
+        - Replaced `on_enabled` and `on_disabled` callbacks with `on_media_direction_changed` callback ([#46]);
+        - Replaced `enabled` method with `media_direction` method ([#46]).
 
 ### Added
 
 - Library API:
     - Optional argument to `ReconnectHandle.reconnect_with_backoff()` function that limits max elapsed time ([#206]).
+    - Exceptions ([#4], [#31]):
+        - `StateError`;
+        - `LocalMediaInitException`;
+        - `EnumerateDevicesException`;
+        - `RpcClientException`;
+        - `InternalException`;
+        - `FormatException`;
+        - `MediaStateTransitionException`;
+        - `MediaSettingsUpdateException`.
+    - `MediaManagerHandle.set_output_audio_id()` method switching output audio device on Dart platform ([#29]);
+    - `MediaManagerHandle.on_device_change()` callback firing whenever `MediaManagerHandle.enumerate_devices()` list changes ([#30]);
+    - `ConnectionHandle` methods ([#43], [#59]):
+        - `enable_remote_video`;
+        - `disable_remote_video`;
+        - `enable_remote_audio`;
+        - `disable_remote_audio`.
+    - `MediaDirection` type ([#46]).
+    - `MediaManagerHandle` methods for microphone volume on Dart platform ([#49]):
+        - `microphone_volume_is_available`;
+        - `microphone_volume`;
+        - `set_microphone_volume`.
+    - `LocalMediaInitExceptionKind` variants ([#52]):
+        - `GetUserMediaAudioFailed`;
+        - `GetUserMediaVideoFailed`.
+    - `MediaManager.enumerate_displays()` ([#81]);
+    - `LocalMediaTrack` ([#109]):
+        - `on_ended`;
+        - `state`.
+    - Exposing all APIs via FFI to Dart ([#8], [#9], [#10], [#12], [#14], [#26], [#28]).
 
-[#206]: https://github.com/instrumentisto/medea/pull/206
+### Fixed
+
+- Library API:
+    - Unconverted into Dart exception error in `RoomHandle.onFailedLocalMedia()` ([#57]).
+
+### Updated
+
+- Switch to [2021 Rust edition][012-1] ([#16]).
+
+[instrumentisto/medea#206]: https://github.com/instrumentisto/medea/pull/206
+[#4]: /../../pull/4
+[#8]: /../../pull/8
+[#9]: /../../pull/9
+[#10]: /../../pull/10
+[#12]: /../../pull/12
+[#14]: /../../pull/14
+[#16]: /../../pull/16
+[#26]: /../../pull/26
+[#28]: /../../pull/28
+[#29]: /../../pull/29
+[#30]: /../../pull/30
+[#31]: /../../pull/31
+[#43]: /../../pull/43
+[#46]: /../../pull/46
+[#49]: /../../pull/49
+[#52]: /../../pull/52
+[#57]: /../../pull/57
+[#59]: /../../pull/59
+[#81]: /../../pull/81
+[#106]: /../../pull/106
+[#106]: /../../pull/109
 
 
 
@@ -206,5 +336,5 @@ TODO: Mention #209
 
 
 
-
 [Semantic Versioning 2.0.0]: https://semver.org
+[SFU]: https://webrtcglossary.com/sfu

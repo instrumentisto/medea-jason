@@ -1,0 +1,3 @@
+# Overrides the `.gitignore` file since we want to publish the `pkg/` dir.
+
+pkg/.gitkeep

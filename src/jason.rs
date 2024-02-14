@@ -17,9 +17,11 @@ use crate::{
 ///
 /// Responsible for managing shared transports, local media and room
 /// initialization.
+#[derive(Debug)]
 pub struct Jason(Rc<RefCell<Inner>>);
 
 /// Inner representation if a [`Jason`].
+#[derive(Debug)]
 struct Inner {
     /// [`Jason`]s [`MediaManager`].
     ///
@@ -40,20 +42,17 @@ impl Jason {
     /// Instantiates a new [`Jason`] interface to interact with this library.
     #[must_use]
     pub fn new() -> Self {
+        platform::set_panic_hook();
+        if !log::logger().enabled(&log::Metadata::builder().build()) {
+            platform::init_logger();
+        }
+
         Self::with_rpc_client(Rc::new(WebSocketRpcClient::new(Box::new(
-            |url| {
-                Box::pin(async move {
-                    let ws = platform::WebSocketRpcTransport::new(url)
-                        .await
-                        .map_err(|e| tracerr::new!(e))?;
-                    Ok(Rc::new(ws) as Rc<dyn platform::RpcTransport>)
-                })
-            },
+            || Rc::new(platform::WebSocketRpcTransport::new()),
         ))))
     }
 
     /// Creates a new [`Room`] and returns its [`RoomHandle`].
-    #[inline]
     #[must_use]
     pub fn init_room(&self) -> RoomHandle {
         let rpc = Rc::clone(&self.0.borrow().rpc);
@@ -61,7 +60,6 @@ impl Jason {
     }
 
     /// Returns a [`MediaManagerHandle`].
-    #[inline]
     #[must_use]
     pub fn media_manager(&self) -> MediaManagerHandle {
         self.0.borrow().media_manager.new_handle()
@@ -70,14 +68,26 @@ impl Jason {
     /// Closes the provided [`RoomHandle`].
     #[allow(clippy::needless_pass_by_value)]
     pub fn close_room(&self, room_to_delete: RoomHandle) {
-        self.0.borrow_mut().rooms.retain(|room| {
-            let should_be_closed = room.inner_ptr_eq(&room_to_delete);
-            if should_be_closed {
-                room.set_close_reason(ClientDisconnect::RoomClosed.into());
-            }
+        let index = self
+            .0
+            .borrow()
+            .rooms
+            .iter()
+            .enumerate()
+            .find(|(_, room)| room.inner_ptr_eq(&room_to_delete))
+            .map(|(i, _)| i);
 
-            !should_be_closed
-        });
+        if let Some(i) = index {
+            let this = &mut self.0.borrow_mut();
+            let room = this.rooms.swap_remove(i);
+            room.set_close_reason(ClientDisconnect::RoomClosed.into());
+            drop(room);
+            if this.rooms.is_empty() {
+                this.rpc = Rc::new(WebSocketRpcClient::new(Box::new(|| {
+                    Rc::new(platform::WebSocketRpcTransport::new())
+                })));
+            }
+        }
     }
 
     /// Drops this [`Jason`] API object, so all the related objects (rooms,
@@ -91,7 +101,6 @@ impl Jason {
     }
 
     /// Returns a new [`Jason`] with the provided [`WebSocketRpcClient`].
-    #[inline]
     pub fn with_rpc_client(rpc: Rc<WebSocketRpcClient>) -> Self {
         Self(Rc::new(RefCell::new(Inner {
             rpc,
@@ -108,18 +117,15 @@ impl Jason {
         let weak_room = room.downgrade();
         let weak_inner = Rc::downgrade(&self.0);
         platform::spawn(on_normal_close.map(move |reason| {
-            (|| {
-                let room = weak_room.upgrade()?;
+            _ = (|| {
+                let this_room = weak_room.upgrade()?;
                 let inner = weak_inner.upgrade()?;
                 let mut inner = inner.borrow_mut();
-                let index = inner.rooms.iter().position(|r| r.ptr_eq(&room));
-                if let Some(index) = index {
-                    inner.rooms.remove(index).close(reason);
+                let index =
+                    inner.rooms.iter().position(|r| r.ptr_eq(&this_room));
+                if let Some(i) = index {
+                    inner.rooms.remove(i).close(reason);
                 }
-                if inner.rooms.is_empty() {
-                    inner.media_manager = Rc::default();
-                }
-
                 Some(())
             })();
         }));
@@ -131,7 +137,6 @@ impl Jason {
 }
 
 impl Default for Jason {
-    #[inline]
     fn default() -> Self {
         Self::new()
     }

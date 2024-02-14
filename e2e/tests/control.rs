@@ -13,6 +13,7 @@ pub enum Error {
     Reqwest(reqwest::Error),
 }
 
+#[allow(clippy::absolute_paths)]
 type Result<T> = std::result::Result<T, Error>;
 
 /// Client of a Control API.
@@ -23,7 +24,6 @@ pub struct Client {
 
 impl Client {
     /// Returns a new Control API [`Client`].
-    #[inline]
     #[must_use]
     pub fn new(control_api_address: &str) -> Self {
         Self {
@@ -104,7 +104,6 @@ impl Client {
 }
 
 /// Returns URL of a media [`Element`] identified by the provided `path`.
-#[must_use]
 fn get_url(control_api_address: &str, path: &str) -> String {
-    format!("{}/control-api/{}", control_api_address, path)
+    format!("{control_api_address}/control-api/{path}")
 }

@@ -6,7 +6,7 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use derive_more::{Display, From, Into};
+use derive_more::{Display, From};
 use medea_client_api_proto::MediaSourceKind;
 use tracerr::Traced;
 
@@ -16,20 +16,41 @@ use crate::{
         MultiSourceTracksConstraints,
     },
     platform,
-    utils::JsCaused,
+    utils::Caused,
 };
 
 use super::track::local;
 
 /// Errors returned from the [`MediaManagerHandle::enumerate_devices()`] method.
-#[derive(Clone, Debug, Display, From, JsCaused, Into)]
-#[js(error = "platform::Error")]
-#[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
-pub struct EnumerateDevicesError(platform::Error);
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
+pub enum EnumerateDevicesError {
+    /// Occurs if the `enumerateDevices` request fails.
+    #[display(fmt = "MediaDevices.enumerateDevices() failed: {}", _0)]
+    Failed(platform::Error),
+
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    #[display(fmt = "MediaManagerHandle is in detached state")]
+    Detached,
+}
+
+/// Errors returned from the [`MediaManagerHandle::enumerate_displays()`]
+/// method.
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
+pub enum EnumerateDisplaysError {
+    /// Occurs if the `enumerateDisplays` request fails.
+    #[display(fmt = "MediaDevices.enumerateDisplays() failed: {}", _0)]
+    Failed(platform::Error),
+
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    #[display(fmt = "MediaManagerHandle is in detached state")]
+    Detached,
+}
 
 /// Errors returned from the [`MediaManagerHandle::init_local_tracks()`] method.
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum InitLocalTracksError {
     /// [`MediaManagerHandle`]'s inner [`Weak`] pointer could not be upgraded.
     #[display(fmt = "MediaManagerHandle is in detached state")]
@@ -39,14 +60,40 @@ pub enum InitLocalTracksError {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[display(fmt = "Failed to get local tracks: {}", _0)]
-    GetUserMediaFailed(#[js(cause)] GetUserMediaError),
+    GetUserMediaFailed(#[cause] GetUserMediaError),
 
     /// Occurs if the [getDisplayMedia()][1] request fails.
     ///
     /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
     #[display(fmt = "Failed to get local tracks: {}", _0)]
-    GetDisplayMediaFailed(#[js(cause)] GetDisplayMediaError),
+    GetDisplayMediaFailed(#[cause] GetDisplayMediaError),
 }
+
+/// Error returned from the [`MediaManagerHandle::set_output_audio_id`] method.
+///
+/// Occurs if the provided audio output device ID is incorrect.
+#[derive(Clone, Copy, Debug, Display)]
+#[display(fmt = "Invalid audio device ID provided")]
+pub struct InvalidOutputAudioDeviceIdError;
+
+/// Error returned from the [`MediaManagerHandle::microphone_volume()`] or
+/// [`MediaManagerHandle::set_microphone_volume()`] methods.
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
+pub enum MicVolumeError {
+    /// Error accessing microphone volume settings.
+    #[display(fmt = "Error accessing microphone volume settings: {}", _0)]
+    MicVolumeError(platform::Error),
+
+    /// [`MediaManagerHandle`]'s inner [`Weak`] pointer cannot be upgraded.
+    #[display(fmt = "`MediaManagerHandle` is in detached state")]
+    Detached,
+}
+
+/// Error indicating about a [`MediaManagerHandle`] in detached state.
+#[derive(Clone, Copy, Debug, Display)]
+#[display(fmt = "MediaManagerHandle is in detached state")]
+pub struct HandleDetachedError;
 
 /// Error occurring when [`local::Track`] was [`ended`][1] right after
 /// [getUserMedia()][2] or [getDisplayMedia()][3] request.
@@ -61,14 +108,14 @@ struct LocalTrackIsEndedError(MediaKind);
 /// Errors occurring when [getUserMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum GetUserMediaError {
     /// [getUserMedia()][1] request failed.
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     #[display(fmt = "MediaDevices.getUserMedia() failed: {}", _0)]
-    PlatformRequestFailed(platform::Error),
+    PlatformRequestFailed(platform::GetUserMediaError),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
     /// [getDisplayMedia()][3] request.
@@ -81,7 +128,6 @@ pub enum GetUserMediaError {
 }
 
 impl From<LocalTrackIsEndedError> for GetUserMediaError {
-    #[inline]
     fn from(err: LocalTrackIsEndedError) -> Self {
         Self::LocalTrackIsEnded(err.0)
     }
@@ -90,13 +136,14 @@ impl From<LocalTrackIsEndedError> for GetUserMediaError {
 /// Error occurring when [getDisplayMedia()][1] request fails.
 ///
 /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[derive(Clone, Debug, Display, From, JsCaused)]
-#[js(error = "platform::Error")]
+#[allow(variant_size_differences)] // `Box`ing still reports this
+#[derive(Caused, Clone, Debug, Display, From)]
+#[cause(error = platform::Error)]
 pub enum GetDisplayMediaError {
     /// [getDisplayMedia()][1] request failed.
     ///
     /// [1]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    #[display(fmt = "MediaDevices.getDisplayMedia() failed: {}", _0)]
+    #[display(fmt = "`MediaDevices.getDisplayMedia()` failed: {}", _0)]
     PlatformRequestFailed(platform::Error),
 
     /// [`local::Track`] was [`ended`][1] right after [getUserMedia()][2] or
@@ -110,7 +157,6 @@ pub enum GetDisplayMediaError {
 }
 
 impl From<LocalTrackIsEndedError> for GetDisplayMediaError {
-    #[inline]
     fn from(err: LocalTrackIsEndedError) -> Self {
         Self::LocalTrackIsEnded(err.0)
     }
@@ -126,22 +172,43 @@ impl From<LocalTrackIsEndedError> for GetDisplayMediaError {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct MediaManager(Rc<InnerMediaManager>);
 
 /// Actual data of [`MediaManager`].
-#[derive(Default)]
+#[derive(Debug, Default)]
 struct InnerMediaManager {
     /// Obtained tracks storage
-    tracks: Rc<RefCell<HashMap<String, Weak<local::Track>>>>,
+    tracks: RefCell<HashMap<String, Weak<local::Track>>>,
+
+    /// Media devices platform controller.
+    media_devices: platform::MediaDevices,
 }
 
 impl InnerMediaManager {
-    /// Returns a list of [`platform::InputDeviceInfo`] objects.
-    #[inline]
+    /// Subscribes onto the `devicechange` event of this [`InnerMediaManager`].
+    pub fn on_device_change(&self, cb: platform::Function<()>) {
+        self.media_devices.on_device_change(Some(move || {
+            cb.call0();
+        }));
+    }
+
+    /// Returns a list of [`platform::MediaDeviceInfo`] objects.
     async fn enumerate_devices(
-    ) -> Result<Vec<platform::InputDeviceInfo>, Traced<platform::Error>> {
-        platform::enumerate_devices()
+        &self,
+    ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<platform::Error>> {
+        self.media_devices
+            .enumerate_devices()
+            .await
+            .map_err(tracerr::wrap!())
+    }
+
+    /// Returns a list of [`platform::MediaDisplayInfo`] objects.
+    async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<platform::Error>> {
+        self.media_devices
+            .enumerate_displays()
             .await
             .map_err(tracerr::wrap!())
     }
@@ -168,6 +235,7 @@ impl InnerMediaManager {
     {
         let tracks_from_storage = self
             .get_from_storage(&mut caps)
+            .await
             .into_iter()
             .map(|t| (t, false));
         match caps.into() {
@@ -224,7 +292,7 @@ impl InnerMediaManager {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediadevices-getusermedia
     /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-    fn get_from_storage(
+    async fn get_from_storage(
         &self,
         caps: &mut MediaStreamSettings,
     ) -> Vec<Rc<local::Track>> {
@@ -233,7 +301,9 @@ impl InnerMediaManager {
             .borrow_mut()
             .retain(|_, track| Weak::strong_count(track) > 0);
 
-        let mut tracks = Vec::new();
+        // PANIC: It's OK to unwrap `Weak` here as we have cleaned the absent
+        //        ones in the line above.
+        #[allow(clippy::unwrap_used)]
         let storage: Vec<_> = self
             .tracks
             .borrow()
@@ -241,26 +311,22 @@ impl InnerMediaManager {
             .map(|(_, track)| Weak::upgrade(track).unwrap())
             .collect();
 
+        let mut tracks = Vec::new();
         if caps.is_audio_enabled() {
-            let track = storage
-                .iter()
-                .find(|&track| caps.get_audio().satisfies(track.as_ref()))
-                .cloned();
-
-            if let Some(track) = track {
-                caps.set_audio_publish(false);
-                tracks.push(track);
+            for track in &storage {
+                if caps.get_audio().satisfies(track.as_ref()).await {
+                    caps.set_audio_publish(false);
+                    tracks.push(Rc::clone(track));
+                    break;
+                }
             }
         }
 
-        tracks.extend(
-            storage
-                .iter()
-                .filter(|&track| {
-                    caps.unconstrain_if_satisfies_video(track.as_ref())
-                })
-                .cloned(),
-        );
+        for track in storage {
+            if caps.unconstrain_if_satisfies_video(track.as_ref()).await {
+                tracks.push(track);
+            }
+        }
 
         tracks
     }
@@ -274,12 +340,15 @@ impl InnerMediaManager {
         &self,
         caps: platform::MediaStreamConstraints,
     ) -> Result<Vec<Rc<local::Track>>, Traced<GetUserMediaError>> {
-        let tracks = platform::get_user_media(caps)
+        let tracks = self
+            .media_devices
+            .get_user_media(caps)
             .await
             .map_err(tracerr::map_from_and_wrap!())?;
 
         let tracks = self
             .parse_and_save_tracks(tracks, MediaSourceKind::Device)
+            .await
             .map_err(tracerr::map_from_and_wrap!())?;
 
         Ok(tracks)
@@ -294,12 +363,15 @@ impl InnerMediaManager {
         &self,
         caps: platform::DisplayMediaStreamConstraints,
     ) -> Result<Vec<Rc<local::Track>>, Traced<GetDisplayMediaError>> {
-        let tracks = platform::get_display_media(caps)
+        let tracks = self
+            .media_devices
+            .get_display_media(caps)
             .await
             .map_err(tracerr::map_from_and_wrap!())?;
 
         let track = self
             .parse_and_save_tracks(tracks, MediaSourceKind::Display)
+            .await
             .map_err(tracerr::map_from_and_wrap!())?;
 
         Ok(track)
@@ -317,34 +389,82 @@ impl InnerMediaManager {
     /// [`MediaManager`]'s tracks storage.
     ///
     /// [1]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    #[allow(clippy::needless_pass_by_value)]
-    fn parse_and_save_tracks(
+    async fn parse_and_save_tracks(
         &self,
         tracks: Vec<platform::MediaStreamTrack>,
         kind: MediaSourceKind,
     ) -> Result<Vec<Rc<local::Track>>, Traced<LocalTrackIsEndedError>> {
-        let mut storage = self.tracks.borrow_mut();
-
         // Tracks returned by getDisplayMedia()/getUserMedia() request should be
         // `live`. Otherwise, we should err without caching tracks in
         // `MediaManager`. Tracks will be stopped on `Drop`.
         for track in &tracks {
-            if track.ready_state() != MediaStreamTrackState::Live {
+            if track.ready_state().await != MediaStreamTrackState::Live {
                 return Err(tracerr::new!(LocalTrackIsEndedError(
                     track.kind()
                 )));
             }
         }
 
+        let mut storage = self.tracks.borrow_mut();
         let tracks = tracks
             .into_iter()
             .map(|tr| Rc::new(local::Track::new(tr, kind)))
             .inspect(|track| {
-                storage.insert(track.id(), Rc::downgrade(track));
+                drop(storage.insert(track.id(), Rc::downgrade(track)));
             })
             .collect();
 
         Ok(tracks)
+    }
+
+    /// Switches the current audio output device to the device with the provided
+    /// `device_id`.
+    ///
+    /// # Errors
+    ///
+    /// With [`InvalidOutputAudioDeviceIdError`] if the provided `device_id` is
+    /// not available.
+    async fn set_output_audio_id(
+        &self,
+        device_id: String,
+    ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+        #[allow(clippy::map_err_ignore)]
+        self.media_devices
+            .set_output_audio_id(device_id)
+            .await
+            .map_err(|_| tracerr::new!(InvalidOutputAudioDeviceIdError))
+    }
+
+    /// Indicates whether it's possible to access microphone volume settings.
+    async fn microphone_volume_is_available(&self) -> bool {
+        self.media_devices.microphone_volume_is_available().await
+    }
+
+    /// Sets the microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// With [`MicVolumeError`] if platform call errors.
+    async fn set_microphone_volume(
+        &self,
+        level: i64,
+    ) -> Result<(), Traced<MicVolumeError>> {
+        self.media_devices
+            .set_microphone_volume(level)
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Gets the current microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// With [`MicVolumeError`] if platform call errors.
+    async fn microphone_volume(&self) -> Result<i64, Traced<MicVolumeError>> {
+        self.media_devices
+            .microphone_volume()
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
     }
 }
 
@@ -375,7 +495,6 @@ impl MediaManager {
     }
 
     /// Instantiates a new [`MediaManagerHandle`] for external usage.
-    #[inline]
     #[must_use]
     pub fn new_handle(&self) -> MediaManagerHandle {
         MediaManagerHandle(Rc::downgrade(&self.0))
@@ -394,23 +513,45 @@ impl MediaManager {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct MediaManagerHandle(Weak<InnerMediaManager>);
 
 impl MediaManagerHandle {
-    /// Returns a list of [`platform::InputDeviceInfo`] objects representing
+    /// Returns a list of [`platform::MediaDeviceInfo`] objects representing
     /// available media input and devices, such as microphones, cameras, and so
     /// forth.
     ///
     /// # Errors
     ///
     /// See [`EnumerateDevicesError`] for details.
-    #[allow(clippy::unused_self)]
     pub async fn enumerate_devices(
         &self,
-    ) -> Result<Vec<platform::InputDeviceInfo>, Traced<EnumerateDevicesError>>
+    ) -> Result<Vec<platform::MediaDeviceInfo>, Traced<EnumerateDevicesError>>
     {
-        InnerMediaManager::enumerate_devices()
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(EnumerateDevicesError::Detached))?;
+        this.enumerate_devices()
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Returns a list of [`platform::MediaDisplayInfo`] objects representing
+    /// available displays.
+    ///
+    /// # Errors
+    ///
+    /// See [`EnumerateDisplaysError`] for details.
+    pub async fn enumerate_displays(
+        &self,
+    ) -> Result<Vec<platform::MediaDisplayInfo>, Traced<EnumerateDisplaysError>>
+    {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(EnumerateDisplaysError::Detached))?;
+        this.enumerate_displays()
             .await
             .map_err(tracerr::map_from_and_wrap!())
     }
@@ -441,5 +582,93 @@ impl MediaManagerHandle {
                     .collect::<Vec<_>>()
             })
             .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Switches the current audio output device to the device with the provided
+    /// `device_id`.
+    ///
+    /// # Errors
+    ///
+    /// With [`InvalidOutputAudioDeviceIdError`] if the provided `device_id` is
+    /// not available.
+    pub async fn set_output_audio_id(
+        &self,
+        device_id: String,
+    ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(InvalidOutputAudioDeviceIdError))?;
+        this.set_output_audio_id(device_id)
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Sets the microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// See [`MicVolumeError`] for details.
+    pub async fn set_microphone_volume(
+        &self,
+        level: i64,
+    ) -> Result<(), Traced<MicVolumeError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(MicVolumeError::Detached))?;
+
+        this.set_microphone_volume(level)
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Indicates whether it's possible to access microphone volume settings.
+    ///
+    /// # Errors
+    ///
+    /// If the underlying [`MediaManagerHandle`] is dropped.
+    pub async fn microphone_volume_is_available(
+        &self,
+    ) -> Result<bool, Traced<HandleDetachedError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(HandleDetachedError))?;
+        Ok(this.microphone_volume_is_available().await)
+    }
+
+    /// Returns the current microphone volume level in percents.
+    ///
+    /// # Errors
+    ///
+    /// See [`MicVolumeError`] for details.
+    pub async fn microphone_volume(
+        &self,
+    ) -> Result<i64, Traced<MicVolumeError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(MicVolumeError::Detached))?;
+        this.microphone_volume()
+            .await
+            .map_err(tracerr::map_from_and_wrap!())
+    }
+
+    /// Subscribes onto the `devicechange` event of this [`MediaManagerHandle`].
+    ///
+    /// # Errors
+    ///
+    /// If the underlying [`MediaManagerHandle`] is dropped.
+    pub fn on_device_change(
+        &self,
+        cb: platform::Function<()>,
+    ) -> Result<(), Traced<HandleDetachedError>> {
+        let this = self
+            .0
+            .upgrade()
+            .ok_or_else(|| tracerr::new!(HandleDetachedError))?;
+        this.on_device_change(cb);
+        Ok(())
     }
 }

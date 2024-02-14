@@ -9,6 +9,7 @@ use futures::{channel::oneshot, future::BoxFuture, Future, FutureExt as _};
 use crate::platform;
 
 /// [`ExponentialBackoff`] adapted for the used async runtime.
+#[derive(Debug)]
 pub struct BackoffDelayer(ExponentialBackoff);
 
 impl BackoffDelayer {
@@ -19,14 +20,14 @@ impl BackoffDelayer {
         multiplier: f64,
         max_interval: Duration,
         max_elapsed_time: Option<Duration>,
-    ) -> BackoffDelayer {
+    ) -> Self {
         // max_interval = max_elapsed if max_delay > max_elapsed
         let max_interval = max_elapsed_time
             .map_or(max_interval, |max_elapsed| max_interval.min(max_elapsed));
         // initial_interval = max_interval if initial_interval > max_delay
         let initial_interval = initial_interval.min(max_interval);
 
-        BackoffDelayer(ExponentialBackoff {
+        Self(ExponentialBackoff {
             current_interval: initial_interval,
             initial_interval,
             randomization_factor: 0.0,
@@ -43,7 +44,6 @@ impl BackoffDelayer {
     /// # Errors
     ///
     /// Propagates the error returned by the provided `operation`.
-    #[inline]
     pub async fn retry<Fn, Fut, I, E>(self, operation: Fn) -> Result<I, E>
     where
         Fn: FnMut() -> Fut,
@@ -63,7 +63,7 @@ impl backoff::future::Sleeper for Sleeper {
         let (tx, rx) = oneshot::channel();
         platform::spawn(async move {
             platform::delay_for(delay).await;
-            let _ = tx.send(());
+            _ = tx.send(());
         });
         Box::pin(rx.map(drop))
     }

@@ -2,12 +2,15 @@
 //!
 //! [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
 
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, future::Future, rc::Rc};
 
 use derive_more::AsRef;
+use futures::future;
 
 use crate::{
-    media::{track::MediaStreamTrackState, FacingMode, MediaKind},
+    media::{
+        track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
+    },
     platform::wasm::{get_property_by_name, utils::EventListener},
 };
 
@@ -19,9 +22,21 @@ use crate::{
 /// [3]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
 #[derive(AsRef, Debug)]
 pub struct MediaStreamTrack {
-    #[as_ref]
+    /// Underlying [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    #[as_ref(forward)]
     sys_track: Rc<web_sys::MediaStreamTrack>,
+
+    /// Kind of the underlying [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     kind: MediaKind,
+
+    /// Media source kind of this [MediaStreamTrack][1].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+    source_kind: Option<MediaSourceKind>,
 
     /// Listener for an [ended][1] event.
     ///
@@ -31,41 +46,39 @@ pub struct MediaStreamTrack {
     >,
 }
 
-impl<T> From<T> for MediaStreamTrack
-where
-    web_sys::MediaStreamTrack: From<T>,
-{
-    #[inline]
-    fn from(from: T) -> MediaStreamTrack {
-        let sys_track = web_sys::MediaStreamTrack::from(from);
+impl MediaStreamTrack {
+    /// Creates a new [`MediaStreamTrack`].
+    #[must_use]
+    pub fn new<T>(sys_track: T, source_kind: Option<MediaSourceKind>) -> Self
+    where
+        web_sys::MediaStreamTrack: From<T>,
+    {
+        let sys_track = web_sys::MediaStreamTrack::from(sys_track);
         let kind = match sys_track.kind().as_ref() {
             "audio" => MediaKind::Audio,
             "video" => MediaKind::Video,
             _ => unreachable!(),
         };
-        MediaStreamTrack {
+        Self {
             sys_track: Rc::new(sys_track),
+            source_kind,
             kind,
             on_ended: RefCell::new(None),
         }
     }
-}
 
-impl MediaStreamTrack {
     /// Returns [`id`] of the underlying [MediaStreamTrack][2].
     ///
     /// [`id`]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn id(&self) -> String {
         self.sys_track.id()
     }
 
     /// Returns this [`MediaStreamTrack`]'s kind (audio/video).
-    #[inline]
     #[must_use]
-    pub fn kind(&self) -> MediaKind {
+    pub const fn kind(&self) -> MediaKind {
         self.kind
     }
 
@@ -80,8 +93,8 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrackstate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-    #[must_use]
-    pub fn ready_state(&self) -> MediaStreamTrackState {
+    #[allow(clippy::unused_async)] // for platform code uniformity
+    pub async fn ready_state(&self) -> MediaStreamTrackState {
         let state = self.sys_track.ready_state();
         match state {
             web_sys::MediaStreamTrackState::Live => MediaStreamTrackState::Live,
@@ -89,18 +102,22 @@ impl MediaStreamTrack {
                 MediaStreamTrackState::Ended
             }
             web_sys::MediaStreamTrackState::__Nonexhaustive => {
-                unreachable!("Unknown MediaStreamTrackState::{:?}", state)
+                unreachable!("Unknown `MediaStreamTrackState`: {state:?}")
             }
         }
     }
 
     /// Returns a [`deviceId`][1] of the underlying [MediaStreamTrack][2].
     ///
+    /// # Panics
+    ///
+    /// If the underlying [MediaStreamTrack][2] doesn't have [`deviceId`][1].
+    ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-deviceid
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn device_id(&self) -> Option<String> {
+        #[allow(clippy::unwrap_used)]
         get_property_by_name(&self.sys_track.get_settings(), "deviceId", |v| {
             v.as_string()
         })
@@ -117,13 +134,13 @@ impl MediaStreamTrack {
             "facingMode",
             |v| v.as_string(),
         );
-        facing_mode.and_then(|facing_mode| match facing_mode.as_ref() {
+        facing_mode.and_then(|fm| match fm.as_ref() {
             "user" => Some(FacingMode::User),
             "environment" => Some(FacingMode::Environment),
             "left" => Some(FacingMode::Left),
             "right" => Some(FacingMode::Right),
             _ => {
-                log::error!("Unknown FacingMode: {}", facing_mode);
+                log::error!("Unknown FacingMode: {fm}");
                 None
             }
         })
@@ -133,12 +150,15 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediatracksettings-height
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        get_property_by_name(&self.sys_track.get_settings(), "height", |v| {
-            v.as_f64().map(|v| v as u32)
+        #[allow(
+            clippy::as_conversions,
+            clippy::cast_possible_truncation,
+            clippy::cast_sign_loss
+        )]
+        get_property_by_name(&self.sys_track.get_settings(), "height", |h| {
+            h.as_f64().map(|v| v as u32)
         })
     }
 
@@ -146,12 +166,15 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediatracksettings-width
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        get_property_by_name(&self.sys_track.get_settings(), "width", |v| {
-            v.as_f64().map(|v| v as u32)
+        #[allow(
+            clippy::as_conversions,
+            clippy::cast_possible_truncation,
+            clippy::cast_sign_loss
+        )]
+        get_property_by_name(&self.sys_track.get_settings(), "width", |w| {
+            w.as_f64().map(|v| v as u32)
         })
     }
 
@@ -160,7 +183,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     pub fn set_enabled(&self, enabled: bool) {
         self.sys_track.set_enabled(enabled);
     }
@@ -171,9 +193,10 @@ impl MediaStreamTrack {
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
     /// [3]: https://tinyurl.com/w3-streams#idl-def-MediaStreamTrackState.ended
-    #[inline]
-    pub fn stop(&self) {
+    pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         self.sys_track.stop();
+        // For platform code uniformity.
+        future::ready(())
     }
 
     /// Returns an [`enabled`][1] attribute of the underlying
@@ -181,7 +204,6 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
-    #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
         self.sys_track.enabled()
@@ -195,22 +217,7 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/screen-capture/#extensions-to-mediatracksettings
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
-        let settings = self.sys_track.get_settings();
-
-        let has_display_surface =
-            get_property_by_name(&settings, "displaySurface", |val| {
-                val.as_string()
-            })
-            .is_some();
-
-        if has_display_surface {
-            true
-        } else {
-            get_property_by_name(&settings, "logicalSurface", |val| {
-                val.as_string()
-            })
-            .is_some()
-        }
+        self.source_kind == Some(MediaSourceKind::Display)
     }
 
     /// Forks this [`MediaStreamTrack`].
@@ -220,14 +227,15 @@ impl MediaStreamTrack {
     /// callbacks.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
-    pub fn fork(&self) -> Self {
-        Self {
+    pub fn fork(&self) -> impl Future<Output = Self> + 'static {
+        future::ready(Self {
             sys_track: Rc::new(web_sys::MediaStreamTrack::clone(
                 &self.sys_track,
             )),
             kind: self.kind,
+            source_kind: self.source_kind,
             on_ended: RefCell::new(None),
-        }
+        })
     }
 
     /// Sets handler for the [`ended`][1] event on underlying
@@ -238,20 +246,18 @@ impl MediaStreamTrack {
     /// If binding to the [`ended`][1] event fails. Not supposed to ever happen.
     ///
     /// [1]: https://tinyurl.com/w3-streams#event-mediastreamtrack-ended
-    #[allow(clippy::needless_pass_by_value)]
     pub fn on_ended<F>(&self, f: Option<F>)
     where
         F: 'static + FnOnce(),
     {
         let mut on_ended = self.on_ended.borrow_mut();
-        match f {
-            None => {
-                on_ended.take();
-            }
+        drop(match f {
+            None => on_ended.take(),
             Some(f) => {
                 on_ended.replace(
-                    // Unwrapping is OK here, because this function shouldn't
-                    // error ever.
+                    // PANIC: Unwrapping is OK here, because this function
+                    //        shouldn't error ever.
+                    #[allow(clippy::unwrap_used)]
                     EventListener::new_once(
                         Rc::clone(&self.sys_track),
                         "ended",
@@ -260,8 +266,8 @@ impl MediaStreamTrack {
                         },
                     )
                     .unwrap(),
-                );
+                )
             }
-        }
+        });
     }
 }

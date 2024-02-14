@@ -1,0 +1,28 @@
+PODS:
+  - FlutterMacOS (1.0.0)
+  - medea_flutter_webrtc (0.9.0):
+    - FlutterMacOS
+  - medea_jason (0.4.0):
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - FlutterMacOS (from `Flutter/ephemeral`)
+  - medea_flutter_webrtc (from `Flutter/ephemeral/.symlinks/plugins/medea_flutter_webrtc/macos`)
+  - medea_jason (from `Flutter/ephemeral/.symlinks/plugins/medea_jason/macos`)
+
+EXTERNAL SOURCES:
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+  medea_flutter_webrtc:
+    :path: Flutter/ephemeral/.symlinks/plugins/medea_flutter_webrtc/macos
+  medea_jason:
+    :path: Flutter/ephemeral/.symlinks/plugins/medea_jason/macos
+
+SPEC CHECKSUMS:
+  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  medea_flutter_webrtc: 95bdfc76c203d3cff81b8b38ccfdb6410cf9404b
+  medea_jason: b3355be56a78da19da91aee19a3ac56356d18997
+
+PODFILE CHECKSUM: 353c8bcc5d5b0994e508d035b5431cfe18c1dea7
+
+COCOAPODS: 1.14.2

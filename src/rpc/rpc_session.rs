@@ -27,12 +27,12 @@ use crate::{
         websocket::RpcEventHandler, ClientDisconnect, CloseReason,
         ConnectionInfo, RpcClientError, WebSocketRpcClient,
     },
-    utils::JsCaused,
+    utils::Caused,
 };
 
 /// Errors which can be returned from the [`WebSocketRpcSession`].
-#[derive(Clone, Debug, From, JsCaused, Display)]
-#[js(error = "platform::Error")]
+#[derive(Caused, Clone, Debug, From, Display)]
+#[cause(error = platform::Error)]
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't
     /// be used.
@@ -50,8 +50,8 @@ pub enum SessionError {
     AuthorizationFailed,
 
     /// [`WebSocketRpcClient`] returned [`RpcClientError`].
-    #[display(fmt = "RpcClientError: {:?}", _0)]
-    RpcClient(#[js(cause)] RpcClientError),
+    #[display(fmt = "RpcClientError: {}", _0)]
+    RpcClient(#[cause] RpcClientError),
 
     /// [`WebSocketRpcSession`] was unexpectedly dropped.
     #[display(fmt = "RPC Session was unexpectedly dropped")]
@@ -79,24 +79,13 @@ pub enum ConnectionLostReason {
     Lost(super::ConnectionLostReason),
 }
 
-impl JsCaused for ConnectionLostReason {
+impl Caused for ConnectionLostReason {
     type Error = platform::Error;
 
-    #[inline]
-    fn name(&self) -> &'static str {
+    fn cause(self) -> Option<Self::Error> {
         match self {
-            ConnectionLostReason::ConnectError(_) => "ConnectError",
-            ConnectionLostReason::Lost(_) => "Lost",
-        }
-    }
-
-    #[inline]
-    fn js_cause(self) -> Option<Self::Error> {
-        match self {
-            ConnectionLostReason::ConnectError(err) => {
-                err.into_inner().js_cause()
-            }
-            ConnectionLostReason::Lost(_) => None,
+            Self::ConnectError(err) => err.into_inner().cause(),
+            Self::Lost(_) => None,
         }
     }
 }
@@ -104,6 +93,7 @@ impl JsCaused for ConnectionLostReason {
 /// Client to talk with server via Client API RPC.
 #[async_trait(?Send)]
 #[cfg_attr(feature = "mockable", mockall::automock)]
+#[cfg_attr(feature = "mockable", allow(clippy::missing_docs_in_private_items))]
 pub trait RpcSession {
     /// Tries to upgrade [`SessionState`] of this [`RpcSession`] to
     /// [`SessionState::Opened`].
@@ -171,6 +161,7 @@ pub trait RpcSession {
 /// Responsible for [`Room`] authorization and closing.
 ///
 /// [`Room`]: crate::room::Room
+#[derive(Debug)]
 pub struct WebSocketRpcSession {
     /// [WebSocket] based Rpc Client used to talk with `Medea` server.
     ///
@@ -267,7 +258,7 @@ impl WebSocketRpcSession {
                 S::Finished(reason) => {
                     return Err(tracerr::new!(E::SessionFinished(reason)));
                 }
-                _ => {}
+                S::Connecting(_) | S::Authorizing(_) => {}
             }
         }
 
@@ -285,22 +276,20 @@ impl WebSocketRpcSession {
             while let Some(state) = state_updates.next().await {
                 let this = upgrade_or_break!(weak_this);
                 match state {
-                    S::Connecting(info) => {
-                        match Rc::clone(&this.client)
-                            .connect(info.url.clone())
-                            .await
-                        {
-                            Ok(_) => {
-                                this.state.set(S::Authorizing(info));
-                            }
-                            Err(e) => {
-                                this.state.set(S::Lost(
-                                    ConnectionLostReason::ConnectError(e),
-                                    info,
-                                ));
-                            }
+                    S::Connecting(info) => match Rc::clone(&this.client)
+                        .connect(info.url.clone())
+                        .await
+                    {
+                        Ok(()) => {
+                            this.state.set(S::Authorizing(info));
                         }
-                    }
+                        Err(e) => {
+                            this.state.set(S::Lost(
+                                ConnectionLostReason::ConnectError(e),
+                                info,
+                            ));
+                        }
+                    },
                     S::Authorizing(info) => {
                         this.client.authorize(
                             info.room_id.clone(),
@@ -308,7 +297,11 @@ impl WebSocketRpcSession {
                             info.credential.clone(),
                         );
                     }
-                    _ => {}
+                    S::Uninitialized
+                    | S::Initialized(_)
+                    | S::Lost(..)
+                    | S::Opened(_)
+                    | S::Finished(_) => {}
                 }
             }
         });
@@ -411,7 +404,7 @@ impl RpcSession for WebSocketRpcSession {
                 if info.as_ref() != &connection_info {
                     unimplemented!(
                         "Changing `ConnectionInfo` with active or pending \
-                         authorization is not supported"
+                         authorization is not supported",
                     );
                 }
             }
@@ -441,7 +434,6 @@ impl RpcSession for WebSocketRpcSession {
 
     /// Sends [`Command`] to the server if current [`SessionState`] is
     /// [`SessionState::Opened`].
-    #[inline]
     fn send_command(&self, command: Command) {
         if let SessionState::Opened(info) = self.state.get() {
             self.client.send_command(info.room_id.clone(), command);
@@ -523,13 +515,9 @@ impl RpcSession for WebSocketRpcSession {
             .filter_map(move |current_state| {
                 let can_reconnect = Rc::clone(&can_reconnect);
                 async move {
-                    if matches!(current_state, SessionState::Opened(_))
-                        && can_reconnect.get()
-                    {
-                        Some(())
-                    } else {
-                        None
-                    }
+                    (matches!(current_state, SessionState::Opened(_))
+                        && can_reconnect.get())
+                    .then_some(())
                 }
             })
             .boxed_local()
@@ -568,7 +556,11 @@ impl RpcEventHandler for WebSocketRpcSession {
                     return;
                 }
             }
-            _ => return,
+            SessionState::Uninitialized
+            | SessionState::Initialized(_)
+            | SessionState::Connecting(_)
+            | SessionState::Lost(..)
+            | SessionState::Finished(_) => return,
         }
 
         match state {
@@ -578,7 +570,11 @@ impl RpcEventHandler for WebSocketRpcSession {
             SessionState::Authorizing(_) => {
                 self.state.set(SessionState::Uninitialized);
             }
-            _ => {}
+            SessionState::Uninitialized
+            | SessionState::Initialized(_)
+            | SessionState::Connecting(_)
+            | SessionState::Lost(..)
+            | SessionState::Finished(_) => {}
         }
     }
 

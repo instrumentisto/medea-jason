@@ -2,7 +2,7 @@
 
 use std::{cell::RefCell, collections::HashSet};
 
-use futures::stream::LocalBoxStream;
+use futures::stream::{self, LocalBoxStream};
 use medea_client_api_proto::IceCandidate;
 use medea_reactive::ObservableHashSet;
 
@@ -19,34 +19,31 @@ pub struct IceCandidates(RefCell<ObservableHashSet<IceCandidate>>);
 
 impl IceCandidates {
     /// Returns a new empty [`IceCandidates`] store.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self(RefCell::new(ObservableHashSet::new()))
     }
 
     /// Adds a new [`IceCandidate`] to this [`IceCandidates`] store.
-    #[inline]
     pub fn add(&self, candidate: IceCandidate) {
-        self.0.borrow_mut().insert(candidate);
+        _ = self.0.borrow_mut().insert(candidate);
     }
 
-    /// Returns [`LocalBoxStream`] streaming all the added [`IceCandidate`]s.
-    #[inline]
+    /// Returns [`LocalBoxStream`] with all the already added [`IceCandidate`]s
+    /// and the [`IceCandidate`]s which will be added in future.
     pub fn on_add(&self) -> LocalBoxStream<'static, IceCandidate> {
-        self.0.borrow().on_insert()
+        let this = self.0.borrow();
+        Box::pin(stream::select(this.replay_on_insert(), this.on_insert()))
     }
 }
 
 impl SynchronizableState for IceCandidates {
     type Input = HashSet<IceCandidate>;
 
-    #[inline]
     fn from_proto(input: Self::Input, _: &LocalTracksConstraints) -> Self {
         Self(RefCell::new(input.into()))
     }
 
-    #[inline]
     fn apply(&self, input: Self::Input, _: &LocalTracksConstraints) {
         self.0.borrow_mut().update(input);
     }
@@ -55,7 +52,6 @@ impl SynchronizableState for IceCandidates {
 impl AsProtoState for IceCandidates {
     type Output = HashSet<IceCandidate>;
 
-    #[inline]
     fn as_proto(&self) -> Self::Output {
         self.0.borrow().iter().cloned().collect()
     }

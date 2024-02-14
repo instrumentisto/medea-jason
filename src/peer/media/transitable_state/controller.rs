@@ -51,10 +51,17 @@ where
     S: InStable<Transition = T> + Into<TransitableState<S, T>> + 'static,
     T: InTransition<Stable = S> + Into<TransitableState<S, T>> + 'static,
 {
-    #[cfg(not(feature = "mockable"))]
-    const TRANSITION_TIMEOUT: Duration = Duration::from_secs(10);
-    #[cfg(feature = "mockable")]
-    const TRANSITION_TIMEOUT: Duration = Duration::from_millis(500);
+    /// Timeout for the current state to transit into the desired one.
+    const TRANSITION_TIMEOUT: Duration = {
+        #[cfg(not(feature = "mockable"))]
+        {
+            Duration::from_secs(10)
+        }
+        #[cfg(feature = "mockable")]
+        {
+            Duration::from_millis(500)
+        }
+    };
 
     /// Returns new [`TransitableStateController`] with the provided
     /// stable state.
@@ -65,7 +72,7 @@ where
             timeout_handle: RefCell::new(None),
             is_transition_timeout_stopped: Cell::new(false),
         });
-        this.clone().spawn();
+        Rc::clone(&this).spawn();
         this
     }
 
@@ -77,11 +84,11 @@ where
         // We don't care about initial state, be cause transceiver is inactive
         // at that moment.
         let mut state_changes = self.state.subscribe().skip(1);
-        let weak_this = Rc::downgrade(&self);
+        let weak_self = Rc::downgrade(&self);
         platform::spawn(async move {
             while let Some(state) = state_changes.next().await {
                 let (state, _guard) = state.into_parts();
-                if let Some(this) = weak_this.upgrade() {
+                if let Some(this) = weak_self.upgrade() {
                     if let TransitableState::Transition(_) = state {
                         let weak_this = Rc::downgrade(&this);
                         platform::spawn(async move {
@@ -91,9 +98,11 @@ where
                                     Self::TRANSITION_TIMEOUT,
                                     this.is_transition_timeout_stopped.get(),
                                 );
-                            this.timeout_handle
-                                .borrow_mut()
-                                .replace(timeout_handle);
+                            drop(
+                                this.timeout_handle
+                                    .borrow_mut()
+                                    .replace(timeout_handle),
+                            );
                             match future::select(
                                 states.next(),
                                 Box::pin(timeout),
@@ -102,6 +111,7 @@ where
                             {
                                 Either::Left(_) => (),
                                 Either::Right(_) => {
+                                    #[allow(clippy::shadow_unrelated)]
                                     if let Some(this) = weak_this.upgrade() {
                                         let stable = this
                                             .state
@@ -173,7 +183,6 @@ where
     }
 
     /// Returns current [`TransitableStateController::state`].
-    #[inline]
     #[must_use]
     pub fn state(&self) -> TransitableState<S, T> {
         self.state.get()
@@ -222,7 +231,6 @@ where
 
     /// Returns [`Processed`] that will be resolved once all the underlying data
     /// updates are processed by all subscribers.
-    #[inline]
     pub fn when_processed(&self) -> Processed<'static> {
         self.state.when_all_processed()
     }
@@ -231,7 +239,6 @@ where
     /// transited to the [`TransitableState::Stable`].
     ///
     /// [`Future`]: std::future::Future
-    #[inline]
     pub fn when_stabilized(self: Rc<Self>) -> Processed<'static, ()> {
         Processed::new(Box::new(move || {
             let stable = self.subscribe_stable();
@@ -263,7 +270,6 @@ where
 impl MuteStateController {
     /// Indicates whether [`TransitableStateController`]'s mute state is in
     /// [`mute_state::Stable::Muted`].
-    #[inline]
     #[must_use]
     pub fn muted(&self) -> bool {
         self.state.get() == mute_state::Stable::Muted.into()
@@ -271,7 +277,6 @@ impl MuteStateController {
 
     /// Indicates whether [`TransitableStateController`]'s mute state is in
     /// [`mute_state::Stable::Unmuted`].
-    #[inline]
     #[must_use]
     pub fn unmuted(&self) -> bool {
         self.state.get() == mute_state::Stable::Unmuted.into()
@@ -281,7 +286,6 @@ impl MuteStateController {
 impl MediaExchangeStateController {
     /// Indicates whether [`TransitableStateController`]'s media exchange state
     /// is in [`media_exchange_state::Stable::Disabled`].
-    #[inline]
     #[must_use]
     pub fn disabled(&self) -> bool {
         self.state.get() == media_exchange_state::Stable::Disabled.into()
@@ -289,7 +293,6 @@ impl MediaExchangeStateController {
 
     /// Indicates whether [`TransitableStateController`]'s media exchange state
     /// is in [`media_exchange_state::Stable::Enabled`].
-    #[inline]
     #[must_use]
     pub fn enabled(&self) -> bool {
         self.state.get() == media_exchange_state::Stable::Enabled.into()
