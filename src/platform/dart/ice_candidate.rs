@@ -81,11 +81,7 @@ impl IceCandidateError {
 
     /// Port used to communicate with a STUN or TURN server.
     pub fn port(&self) -> u32 {
-        unsafe {
-            ice_candidate_error::port(self.0.get())
-                .try_into()
-                .unwrap()
-        }
+        unsafe { ice_candidate_error::port(self.0.get()).try_into().unwrap() }
     }
 
     /// STUN or TURN URL identifying the STUN or TURN server for which the

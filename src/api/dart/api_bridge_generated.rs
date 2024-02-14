@@ -13,20 +13,19 @@
 
 use crate::api::dart::api::*;
 use core::panic::UnwindSafe;
-use flutter_rust_bridge::rust2dart::IntoIntoDart;
-use flutter_rust_bridge::*;
-use std::ffi::c_void;
-use std::sync::Arc;
+use flutter_rust_bridge::{rust2dart::IntoIntoDart, *};
+use std::{ffi::c_void, sync::Arc};
 
 // Section: imports
 
-use crate::media::constraints::ConstrainU32;
-use crate::media::constraints::FacingMode;
-use crate::media::track::remote::MediaDirection;
-use crate::media::track::MediaSourceKind;
-use crate::media::MediaDeviceKind;
-use crate::media::MediaKind;
-use crate::room::RoomCloseReason;
+use crate::{
+    media::{
+        constraints::{ConstrainU32, FacingMode},
+        track::{remote::MediaDirection, MediaSourceKind},
+        MediaDeviceKind, MediaKind,
+    },
+    room::RoomCloseReason,
+};
 
 // Section: wire functions
 
