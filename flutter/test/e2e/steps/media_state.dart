@@ -105,7 +105,9 @@ StepDefinitionGeneric thenRemoteMediaDirectionIs =
     var dir = TrackMediaDirection.values
         .firstWhere((e) => e.name.toLowerCase() == direction.toLowerCase());
 
-    await member.waitMediaDirectionTrack(dir, track);
+    await member
+        .waitMediaDirectionTrack(dir, track)
+        .timeout(const Duration(seconds: 10));
   },
 );
 

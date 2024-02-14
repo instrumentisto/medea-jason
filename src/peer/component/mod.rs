@@ -485,6 +485,7 @@ impl SynchronizableState for State {
             from.connection_mode,
         );
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, sender) in from.senders {
             if !sender.receivers.is_empty() {
                 state.senders.insert(
@@ -493,12 +494,14 @@ impl SynchronizableState for State {
                 );
             }
         }
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, receiver) in from.receivers {
             state.receivers.insert(
                 id,
                 Rc::new(receiver::State::from_proto(receiver, send_cons)),
             );
         }
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for ice_candidate in from.ice_candidates {
             state.ice_candidates.add(ice_candidate);
         }

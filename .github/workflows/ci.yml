@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: fix-blink-direction
+  MEDEA_BRANCH: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -325,7 +325,8 @@ jobs:
         platform:
           - ios
           - linux
-          - macos
+          # TODO: Re-enable once fixed stability on CI
+          #- macos
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}

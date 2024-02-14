@@ -158,6 +158,7 @@ where
     fn apply(&self, input: Self::Input, send_cons: &LocalTracksConstraints) {
         self.0.borrow_mut().remove_not_present(&input);
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, track) in input {
             if let Some(sync_track) = self.0.borrow().get(&id) {
                 sync_track.apply(track, send_cons);
