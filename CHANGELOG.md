@@ -15,6 +15,8 @@ All user visible changes to this project will be documented in this file. This p
 
 - Logging:
     - Exceptions thrown from Dart callbacks called by Rust ([#138]).
+- Monitoring:
+    - `IceCandidateError` metric sending to server ([#???]).
 
 ### Fixed
 
