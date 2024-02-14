@@ -692,6 +692,7 @@ impl Drop for RtcPeerConnection {
     fn drop(&mut self) {
         drop(self.on_track.borrow_mut().take());
         drop(self.on_ice_candidate.borrow_mut().take());
+        drop(self.on_ice_candidate_error.borrow_mut().take());
         drop(self.on_ice_connection_state_changed.borrow_mut().take());
         drop(self.on_connection_state_changed.borrow_mut().take());
         self.peer.close();
