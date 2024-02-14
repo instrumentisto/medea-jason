@@ -18,9 +18,10 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
-    RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceEvent,
-    RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
-    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
+    RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
+    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcRtpTransceiverInit,
+    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
+    RtcTrackEvent,
 };
 
 use crate::{
@@ -28,8 +29,9 @@ use crate::{
     platform::{
         self,
         wasm::{get_property_by_name, utils::EventListener},
-        IceCandidate, MediaStreamTrack, RtcPeerConnectionError, RtcStats,
-        SdpType, Transceiver, TransceiverDirection,
+        IceCandidate, IceCandidateError, MediaStreamTrack,
+        RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
+        TransceiverDirection,
     },
 };
 
@@ -62,6 +64,21 @@ pub struct RtcPeerConnection {
     /// [4]: https://w3.org/TR/webrtc#dom-rtcicecandidate
     on_ice_candidate: RefCell<
         Option<EventListener<SysRtcPeerConnection, RtcPeerConnectionIceEvent>>,
+    >,
+
+    /// [`onicecandidateerror`][2] callback of [RTCPeerConnection][1] to handle
+    /// [`icecandidateerror`][3] event. It fires when
+    /// [RTCPeerConnectionIceErrorEvent][4] event occurs on
+    /// [RTCPeerConnection][1].
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidateerror
+    /// [3]: https://w3.org/TR/webrtc/#event-icecandidateerror
+    /// [4]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceerrorevent
+    on_ice_candidate_error: RefCell<
+        Option<
+            EventListener<SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent>,
+        >,
     >,
 
     /// [`iceconnectionstatechange`][2] callback of [RTCPeerConnection][1],
@@ -132,6 +149,7 @@ impl RtcPeerConnection {
             peer: Rc::new(peer),
             ice_restart: Cell::new(false),
             on_ice_candidate: RefCell::new(None),
+            on_ice_candidate_error: RefCell::new(None),
             on_ice_connection_state_changed: RefCell::new(None),
             on_connection_state_changed: RefCell::new(None),
             on_track: RefCell::new(None),
@@ -189,6 +207,50 @@ impl RtcPeerConnection {
                                 MediaStreamTrack::new(msg.track(), None),
                                 Transceiver::from(msg.transceiver()),
                             );
+                        },
+                    )
+                    .unwrap(),
+                )
+            }
+        });
+    }
+
+    /// Sets handler for a [`RtcPeerConnectionIceErrorEvent`] (see
+    /// [RTCPeerConnectionIceErrorEvent][1] and [`onicecandidateerror`
+    /// callback][2]).
+    ///
+    /// # Panics
+    ///
+    /// If binding to the [`icecandidateerror`][3] event fails. Not supposed to
+    /// ever happen.
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceerrorevent
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidateerror
+    /// [3]: https://w3.org/TR/webrtc/#event-icecandidateerror
+    pub fn on_ice_candidate_error<F>(&self, f: Option<F>)
+    where
+        F: 'static + FnMut(IceCandidateError),
+    {
+        let mut on_ice_candidate_error =
+            self.on_ice_candidate_error.borrow_mut();
+        drop(match f {
+            None => on_ice_candidate_error.take(),
+            Some(mut f) => {
+                on_ice_candidate_error.replace(
+                    // Unwrapping is OK here, because this function shouldn't
+                    // error ever.
+                    EventListener::new_mut(
+                        Rc::clone(&self.peer),
+                        "icecandidateerror",
+                        move |msg: RtcPeerConnectionIceErrorEvent| {
+                            // TODO(evdokimovs): Remove unwraps
+                            f(IceCandidateError {
+                                address: msg.address().unwrap(),
+                                port: u32::from(msg.port().unwrap()),
+                                url: msg.url(),
+                                error_code: i32::from(msg.error_code()),
+                                error_text: msg.error_text(),
+                            });
                         },
                     )
                     .unwrap(),
