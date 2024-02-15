@@ -377,11 +377,18 @@ impl PeerConnection {
             recv_constraints,
         };
 
+        peer.bind_event_listeners(state);
+
+        Ok(Rc::new(peer))
+    }
+
+    /// Binds all neccessary event listeners to this [`PeerConnection`].
+    fn bind_event_listeners(&self, state: &State) {
         // Bind to `icecandidate` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_ice_candidate(Some(move |candidate| {
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_candidate(Some(move |candidate| {
                 if let Some(sender) = weak_sender.upgrade() {
                     Self::on_ice_candidate(id, &sender, candidate);
                 }
@@ -390,9 +397,9 @@ impl PeerConnection {
 
         // Bind to `icecandidateerror` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_ice_candidate_error(Some(move |error| {
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_candidate_error(Some(move |error| {
                 if let Some(sender) = weak_sender.upgrade() {
                     Self::on_ice_candidate_error(id, &sender, error);
                 }
@@ -401,9 +408,9 @@ impl PeerConnection {
 
         // Bind to `iceconnectionstatechange` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_ice_connection_state_change(Some(
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_connection_state_change(Some(
                 move |ice_connection_state| {
                     if let Some(sender) = weak_sender.upgrade() {
                         Self::on_ice_connection_state_changed(
@@ -418,9 +425,9 @@ impl PeerConnection {
 
         // Bind to `connectionstatechange` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_connection_state_change(Some(
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_connection_state_change(Some(
                 move |peer_connection_state| {
                     if let Some(sender) = weak_sender.upgrade() {
                         Self::on_connection_state_changed(
@@ -435,9 +442,9 @@ impl PeerConnection {
 
         // Bind to `track` event.
         {
-            let media_conns = Rc::downgrade(&peer.media_connections);
+            let media_conns = Rc::downgrade(&self.media_connections);
             let connection_mode = state.connection_mode();
-            peer.peer.on_track(Some(move |track, transceiver| {
+            self.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
                     platform::spawn(async move {
                         if let (Err(mid), ConnectionMode::Mesh) = (
@@ -452,8 +459,6 @@ impl PeerConnection {
                 }
             }));
         }
-
-        Ok(Rc::new(peer))
     }
 
     /// Handles [`TrackEvent`]s emitted from a [`Sender`] or a [`Receiver`].

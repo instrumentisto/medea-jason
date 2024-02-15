@@ -74,18 +74,21 @@ pub struct IceCandidateError(DartHandle);
 
 impl IceCandidateError {
     /// Local IP address used to communicate with a STUN or TURN server.
+    #[must_use]
     pub fn address(&self) -> String {
         let address = unsafe { ice_candidate_error::address(self.0.get()) };
         unsafe { dart_string_into_rust(address) }
     }
 
     /// Port used to communicate with a STUN or TURN server.
+    #[must_use]
     pub fn port(&self) -> u32 {
-        unsafe { ice_candidate_error::port(self.0.get()).try_into().unwrap() }
+        unsafe { ice_candidate_error::port(self.0.get()) }
     }
 
     /// STUN or TURN URL identifying the STUN or TURN server for which the
     /// failure occurred.
+    #[must_use]
     pub fn url(&self) -> String {
         let url = unsafe { ice_candidate_error::url(self.0.get()) };
         unsafe { dart_string_into_rust(url) }
@@ -96,17 +99,15 @@ impl IceCandidateError {
     /// which is outside the STUN error code range. This error is only fired
     /// once per server URL while in the `RTCIceGatheringState` of
     /// "gathering".
+    #[must_use]
     pub fn error_code(&self) -> i32 {
-        unsafe {
-            ice_candidate_error::error_code(self.0.get())
-                .try_into()
-                .unwrap()
-        }
+        unsafe { ice_candidate_error::error_code(self.0.get()) }
     }
 
     /// STUN reason text returned by the STUN or TURN server. If the server
     /// could not be reached, `errorText` will be set to an
     /// implementation-specific value providing details about the error.
+    #[must_use]
     pub fn error_text(&self) -> String {
         let error_text =
             unsafe { ice_candidate_error::error_text(self.0.get()) };

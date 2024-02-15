@@ -382,7 +382,7 @@ pub enum PeerMetrics {
 /// Errors related to a `PeerConnection`.
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum PeerConnectionError {
     /// Error occurred with ICE candidate from a `PeerConnection`.
     IceCandidate(IceCandidateError),
@@ -392,7 +392,7 @@ pub enum PeerConnectionError {
 /// `PeerConnection`.
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct IceCandidateError {
     /// Local IP address used to communicate with a STUN or TURN server.
     pub address: Option<String>,
