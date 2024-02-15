@@ -11,9 +11,11 @@ All user visible changes to this project will be documented in this file. This p
 
 ## BC Breaks
 
-- `PeerConnectionError` type ([#???]).
-- `PeerMetrics::PeerConnectionError` variant ([#???]).
-- `IceCandidateError` type ([#???]).
+- `PeerConnectionError` type ([#151]).
+- `PeerMetrics::PeerConnectionError` variant ([#151]).
+- `IceCandidateError` type ([#151]).
+
+[#151]: /../../pull/151
 
 
 
