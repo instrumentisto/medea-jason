@@ -1,7 +1,7 @@
 Contribution Guide
 ==================
 
-We love contributions from everyone, whether it's raising an issue, reporting a bug, adding a feature, or helping improve a documentation. Maintaining the `medea_jason` for all the platforms is not an easy task, so everything you do is support for the project.
+We love contributions from everyone, whether it's raising an issue, reporting a bug, adding a feature, or helping improve a documentation. Maintaining the `medea-jason` for all the platforms is not an easy task, so everything you do is support for the project.
 
 1. [Code style](#code-style)
     - [Rust](#rust)
