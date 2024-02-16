@@ -379,7 +379,7 @@ pub enum PeerMetrics {
     RtcStats(Vec<RtcStat>),
 }
 
-/// Errors related to a `PeerConnection`.
+/// Possible errors related to a `PeerConnection`.
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -388,32 +388,49 @@ pub enum PeerConnectionError {
     IceCandidate(IceCandidateError),
 }
 
-/// Description of the error occurred with ICE candidate from a
-/// `PeerConnection`.
+/// Error occurred with an [ICE] candidate from a `PeerConnection`.
+///
+/// [ICE]: https://webrtcglossary.com/ice
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct IceCandidateError {
-    /// Local IP address used to communicate with a STUN or TURN server.
+    /// Local IP address used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     pub address: Option<String>,
 
-    /// Port used to communicate with a STUN or TURN server.
+    /// Port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     pub port: Option<u32>,
 
-    /// STUN or TURN URL identifying the STUN or TURN server for which the
-    /// failure occurred.
+    /// URL identifying the [STUN]/[TURN] server for which the failure occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     pub url: String,
 
-    /// Numeric STUN error code returned by the STUN or TURN server. If no host
-    /// candidate can reach the server, `errorCode` will be set to the value
-    /// 701 which is outside the STUN error code range. This error is only
-    /// fired once per server URL while in the `RTCIceGatheringState` of
-    /// "gathering".
+    /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     pub error_code: i32,
 
-    /// STUN reason text returned by the STUN or TURN server. If the server
-    /// could not be reached, `errorText` will be set to an
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
     /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     pub error_text: String,
 }
 

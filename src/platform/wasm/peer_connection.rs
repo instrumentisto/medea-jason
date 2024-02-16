@@ -66,14 +66,15 @@ pub struct RtcPeerConnection {
         Option<EventListener<SysRtcPeerConnection, RtcPeerConnectionIceEvent>>,
     >,
 
-    /// [`onicecandidateerror`][2] callback of [RTCPeerConnection][1] to handle
-    /// [`icecandidateerror`][3] event. It fires when
-    /// [RTCPeerConnectionIceErrorEvent][4] event occurs on
+    /// [`onicecandidateerror`][2] callback of an [RTCPeerConnection][1] to
+    /// handle the [`icecandidateerror`][3] event.
+    ///
+    /// It fires when an [RTCPeerConnectionIceErrorEvent][4] occurs on an
     /// [RTCPeerConnection][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#rtcpeerconnection-interface
+    /// [1]: https://w3.org/TR/webrtc#rtcpeerconnection-interface
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidateerror
-    /// [3]: https://w3.org/TR/webrtc/#event-icecandidateerror
+    /// [3]: https://w3.org/TR/webrtc#event-icecandidateerror
     /// [4]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceerrorevent
     on_ice_candidate_error: RefCell<
         Option<
@@ -215,9 +216,9 @@ impl RtcPeerConnection {
         });
     }
 
-    /// Sets handler for a [`RtcPeerConnectionIceErrorEvent`] (see
-    /// [RTCPeerConnectionIceErrorEvent][1] and [`onicecandidateerror`
-    /// callback][2]).
+    /// Sets handler for an [`RtcPeerConnectionIceErrorEvent`] (see the
+    /// [RTCPeerConnectionIceErrorEvent][1] and the
+    /// [`onicecandidateerror` callback][2]).
     ///
     /// # Panics
     ///
@@ -226,7 +227,7 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceerrorevent
     /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidateerror
-    /// [3]: https://w3.org/TR/webrtc/#event-icecandidateerror
+    /// [3]: https://w3.org/TR/webrtc#event-icecandidateerror
     pub fn on_ice_candidate_error<F>(&self, f: Option<F>)
     where
         F: 'static + FnMut(IceCandidateError),

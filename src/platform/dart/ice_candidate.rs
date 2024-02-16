@@ -42,71 +42,109 @@ mod ice_candidate_error {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Returns local IP address used to communicate with a STUN or TURN
-        /// server.
+        /// Returns the local IP address used to communicate with a
+        /// [STUN]/[TURN] server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         pub fn address(error: Dart_Handle) -> ptr::NonNull<c_char>;
 
-        /// Port used to communicate with a STUN or TURN server.
+        /// Returns the port used to communicate with a [STUN]/[TURN] server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         pub fn port(error: Dart_Handle) -> u32;
 
-        /// Returns STUN or TURN URL identifying the STUN or TURN server for
-        /// which the failure occurred.
+        /// Returns the URL identifying the [STUN]/[TURN] server for which the
+        /// failure occurred.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         pub fn url(error: Dart_Handle) -> ptr::NonNull<c_char>;
 
-        /// Returns numeric STUN error code returned by the STUN or TURN server.
-        /// If no host candidate can reach the server, `errorCode` will
-        /// be set to the value 701 which is outside the STUN error code
-        /// range. This error is only fired once per server URL while in
-        /// the `RTCIceGatheringState` of "gathering".
+        /// Returns the Numeric [STUN] error code returned by the [STUN]/[TURN]
+        /// server.
+        ///
+        /// If no host candidate can reach the server, this error code will be
+        /// set to the value `701`, which is outside the [STUN] error code
+        /// range. This error is only fired once per server URL while in the
+        /// `RTCIceGatheringState` of "gathering".
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         pub fn error_code(error: Dart_Handle) -> i32;
 
-        /// Returns STUN reason text returned by the STUN or TURN server. If the
-        /// server could not be reached, `errorText` will be set to an
-        /// implementation-specific value providing details about the
-        /// error.
+        /// [STUN] reason text returned by the [STUN]/[TURN] server.
+        ///
+        /// If the server could not be reached, this reason test will be set to
+        /// an implementation-specific value providing details about the error.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         pub fn error_text(error: Dart_Handle) -> ptr::NonNull<c_char>;
     }
 }
 
-/// Description of the error occurred with ICE candidate from a peer connection.
+/// Error occurred with an [ICE] candidate from a [`PeerConnection`].
+///
+/// [`PeerConnection`]: crate::peer::PeerConnection
 #[derive(Debug, From)]
 pub struct IceCandidateError(DartHandle);
 
 impl IceCandidateError {
-    /// Local IP address used to communicate with a STUN or TURN server.
+    /// Returns the local IP address used to communicate with a [STUN]/[TURN]
+    /// server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn address(&self) -> String {
         let address = unsafe { ice_candidate_error::address(self.0.get()) };
         unsafe { dart_string_into_rust(address) }
     }
 
-    /// Port used to communicate with a STUN or TURN server.
+    /// Returns the port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn port(&self) -> u32 {
         unsafe { ice_candidate_error::port(self.0.get()) }
     }
 
-    /// STUN or TURN URL identifying the STUN or TURN server for which the
+    /// Returns the URL identifying the [STUN]/[TURN] server for which the
     /// failure occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn url(&self) -> String {
         let url = unsafe { ice_candidate_error::url(self.0.get()) };
         unsafe { dart_string_into_rust(url) }
     }
 
-    /// Numeric STUN error code returned by the STUN or TURN server. If no host
-    /// candidate can reach the server, `errorCode` will be set to the value 701
-    /// which is outside the STUN error code range. This error is only fired
-    /// once per server URL while in the `RTCIceGatheringState` of
-    /// "gathering".
+    /// Returns the Numeric [STUN] error code returned by the [STUN]/[TURN]
+    /// server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn error_code(&self) -> i32 {
         unsafe { ice_candidate_error::error_code(self.0.get()) }
     }
 
-    /// STUN reason text returned by the STUN or TURN server. If the server
-    /// could not be reached, `errorText` will be set to an
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
     /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
     #[must_use]
     pub fn error_text(&self) -> String {
         let error_text =

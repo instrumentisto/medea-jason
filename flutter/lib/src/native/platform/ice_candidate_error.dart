@@ -17,36 +17,52 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns local IP address used to communicate with a STUN or TURN
+/// Returns the local IP address used to communicate with a [STUN]/[TURN]
 /// server.
+///
+/// [STUN]: https://webrtcglossary.com/stun
+/// [TURN]: https://webrtcglossary.com/turn
 Pointer<Utf8> _address(webrtc.IceCandidateErrorEvent error) {
   return error.address.toNativeUtf8();
 }
 
-/// Port used to communicate with a STUN or TURN server.
+/// Returns the port used to communicate with a [STUN]/[TURN] server.
+///
+/// [STUN]: https://webrtcglossary.com/stun
+/// [TURN]: https://webrtcglossary.com/turn
 int _port(webrtc.IceCandidateErrorEvent error) {
   return error.port;
 }
 
-/// Returns STUN or TURN URL identifying the STUN or TURN server for
-/// which the failure occurred.
+/// Returns the URL identifying the [STUN]/[TURN] server for which the failure
+/// occurred.
+///
+/// [STUN]: https://webrtcglossary.com/stun
+/// [TURN]: https://webrtcglossary.com/turn
 Pointer<Utf8> _url(webrtc.IceCandidateErrorEvent error) {
   return error.url.toNativeUtf8();
 }
 
-/// Returns numeric STUN error code returned by the STUN or TURN server.
-/// If no host candidate can reach the server, `errorCode` will
-/// be set to the value 701 which is outside the STUN error code
-/// range. This error is only fired once per server URL while in
-/// the `RTCIceGatheringState` of "gathering".
+/// Returns the Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+///
+/// If no host candidate can reach the server, this error code will be set to
+/// the value `701`, which is outside the [STUN] error code range. This error is
+/// only fired once per server URL while in the `RTCIceGatheringState` of
+/// "gathering".
+///
+/// [STUN]: https://webrtcglossary.com/stun
+/// [TURN]: https://webrtcglossary.com/turn
 int _errorCode(webrtc.IceCandidateErrorEvent error) {
   return error.errorCode;
 }
 
-/// Returns STUN reason text returned by the STUN or TURN server. If the
-/// server could not be reached, `errorText` will be set to an
-/// implementation-specific value providing details about the
-/// error.
+/// [STUN] reason text returned by the [STUN]/[TURN] server.
+///
+/// If the server could not be reached, this reason test will be set to an
+/// implementation-specific value providing details about the error.
+///
+/// [STUN]: https://webrtcglossary.com/stun
+/// [TURN]: https://webrtcglossary.com/turn
 Pointer<Utf8> _errorText(webrtc.IceCandidateErrorEvent error) {
   return error.errorText.toNativeUtf8();
 }

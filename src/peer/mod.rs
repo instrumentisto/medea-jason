@@ -136,32 +136,51 @@ pub enum PeerEvent {
         sdp_mid: Option<String>,
     },
 
-    /// Error occurred with ICE candidate from a peer connection.
+    /// Error occurred with an [ICE] candidate from a [`PeerConnection`].
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
     IceCandidateError {
         /// ID of the [`PeerConnection`] that errored.
         peer_id: Id,
 
-        /// Local IP address used to communicate with a STUN or TURN server.
+        /// Local IP address used to communicate with a [STUN]/[TURN]
+        /// server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         address: Option<String>,
 
-        /// Port used to communicate with a STUN or TURN server.
+        /// Port used to communicate with a [STUN]/[TURN] server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         port: Option<u32>,
 
-        /// STUN or TURN URL identifying the STUN or TURN server for which the
-        /// failure occurred.
+        /// URL identifying the [STUN]/[TURN] server for which the failure
+        /// occurred.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         url: String,
 
-        /// Numeric STUN error code returned by the STUN or TURN server. If no
-        /// host candidate can reach the server, `errorCode` will be
-        /// set to the value 701 which is outside the STUN error code
-        /// range. This error is only fired once per server URL while
-        /// in the `RTCIceGatheringState` of "gathering".
+        /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+        ///
+        /// If no host candidate can reach the server, this error code will be
+        /// set to the value `701`, which is outside the [STUN] error code
+        /// range. This error is only fired once per server URL while in the
+        /// `RTCIceGatheringState` of "gathering".
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         error_code: i32,
 
-        /// STUN reason text returned by the STUN or TURN server. If the server
-        /// could not be reached, `errorText` will be set to an
-        /// implementation-specific value providing details about the
-        /// error.
+        /// [STUN] reason text returned by the [STUN]/[TURN] server.
+        ///
+        /// If the server could not be reached, this reason test will be set to an
+        /// implementation-specific value providing details about the error.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
         error_text: String,
     },
 
@@ -382,7 +401,7 @@ impl PeerConnection {
         Ok(Rc::new(peer))
     }
 
-    /// Binds all neccessary event listeners to this [`PeerConnection`].
+    /// Binds all the necessary event listeners to this [`PeerConnection`].
     fn bind_event_listeners(&self, state: &State) {
         // Bind to `icecandidate` event.
         {

@@ -238,7 +238,7 @@ impl RtcPeerConnection {
         }
     }
 
-    /// Sets `handler` for a [RTCPeerConnectionIceEvent][1] (see
+    /// Sets `handler` for an [RTCPeerConnectionIceEvent][1] (see the
     /// [`onicecandidateerror` callback][2]).
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceevent
