@@ -407,7 +407,8 @@ pub struct IceCandidateError {
     /// [TURN]: https://webrtcglossary.com/turn
     pub port: Option<u32>,
 
-    /// URL identifying the [STUN]/[TURN] server for which the failure occurred.
+    /// URL identifying the [STUN]/[TURN] server for which the failure
+    /// occurred.
     ///
     /// [STUN]: https://webrtcglossary.com/stun
     /// [TURN]: https://webrtcglossary.com/turn

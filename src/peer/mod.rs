@@ -176,8 +176,9 @@ pub enum PeerEvent {
 
         /// [STUN] reason text returned by the [STUN]/[TURN] server.
         ///
-        /// If the server could not be reached, this reason test will be set to an
-        /// implementation-specific value providing details about the error.
+        /// If the server could not be reached, this reason test will be set to
+        /// an implementation-specific value providing details about
+        /// the error.
         ///
         /// [STUN]: https://webrtcglossary.com/stun
         /// [TURN]: https://webrtcglossary.com/turn
