@@ -1,6 +1,6 @@
 name: medea_jason
 description: Cross-platform client library of Medea media server for Flutter.
-version: 0.4.1-dev
+version: 0.5.0-dev
 homepage: https://github.com/instrumentisto/medea-jason/blob/master/flutter
 
 environment:
@@ -24,7 +24,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.5
-  ffigen: 11.0.0
+  ffigen: 9.0.0
   flutter_gherkin: 3.0.0-rc.17
   flutter_lints: ^3.0.1
   flutter_test:
@@ -43,6 +43,9 @@ dependency_overrides:
   # Pinned until gql-dart updates to v4
   # https://github.com/gql-dart/gql/blob/master/links/gql_websocket_link/pubspec.yaml#L13
   uuid: ^3.0.7
+  # Pinned until flutter_rust_bridge update to v11
+  # https://github.com/fzyzcjy/flutter_rust_bridge/pull/1757
+  ffigen: 9.0.0
 
 
 flutter:

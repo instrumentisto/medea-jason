@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'constraints.dart' as constraints;
 import 'ice_candidate.dart' as ice_candidate;
+import 'ice_candidate_error.dart' as ice_candidate_error;
 import 'ice_servers.dart' as ice_servers;
 import 'media_device_info.dart' as media_device_info;
 import 'media_devices.dart' as media_devices;
@@ -25,4 +26,5 @@ void registerFunctions(DynamicLibrary dl) {
   media_device_info.registerFunctions(dl);
   media_display_info.registerFunctions(dl);
   ice_candidate.registerFunctions(dl);
+  ice_candidate_error.registerFunctions(dl);
 }
