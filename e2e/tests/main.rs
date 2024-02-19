@@ -15,6 +15,18 @@ async fn main() {
         1
     };
 
+    /// Disable concurrent execution and use basic writer so printlns would
+    /// properly work.
+    // <World as cucumber::World>::cucumber()
+    //     .with_writer(writer::Basic::raw(io::stdout(), writer::Coloring::Never, 0)
+    //         .summarized()
+    //         .assert_normalized())
+    //     .repeat_failed()
+    //     .fail_on_skipped()
+    //     .max_concurrent_scenarios(1)
+    //     .run_and_exit(conf::FEATURES_PATH.as_str())
+    //     .await;
+
     <World as cucumber::World>::cucumber()
         .with_writer(cucumber::writer::Libtest::or_basic())
         .repeat_failed()

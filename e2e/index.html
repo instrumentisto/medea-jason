@@ -5,6 +5,24 @@
   <script type="module">
     import init from "/pkg/medea_jason.js";
 
+    // Override logging functions so logs are appended to a global variable
+    // that can be later accessed by the test runner.
+    function logOverride(message, level) {
+      window.e2eLogs += level + ": " + message + "\n";
+    };
+    console.error = function(m) {
+      logOverride(m, "E");
+    }
+    console.debug = function(m) {
+      logOverride(m, "D");
+    }
+    console.info = function(m) {
+      logOverride(m, "I");
+    }
+    console.log = function(m) {
+      logOverride(m, "L");
+    }
+
     window.originalWs = WebSocket;
     let oldProto = WebSocket.prototype;
     WebSocket = function(url) {

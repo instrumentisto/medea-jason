@@ -395,6 +395,23 @@ impl Member {
             .unwrap();
     }
 
+    pub async fn fetch_logs(&self) -> String {
+        self.execute(Statement::new(
+            // language=JavaScript
+            "
+            async (track) => {
+                return window.e2eLogs;
+            }
+            ",
+            [],
+        ))
+        .await.unwrap()
+        .as_str()
+        .unwrap()
+        .ok_or(Error::TypeCast)
+        .map(ToOwned::to_owned)
+    }
+
     /// Returns reference to the Storage of [`Connection`]s thrown by this
     /// [`Member`]'s [`Room`].
     ///
