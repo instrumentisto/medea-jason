@@ -157,8 +157,6 @@ StepDefinitionGeneric thenCallbackFiresOnRemoteTrack =
     var member = context.world.members[id]!;
     await member.waitForConnect(remoteId);
 
-    await member.waitForConnect(remoteId);
-
     var parsedKind = parseMediaKind(kind);
     var track = await member.waitRemoteTrackFrom(
         remoteId, parsedKind.item2, parsedKind.item1);

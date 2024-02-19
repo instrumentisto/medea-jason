@@ -303,6 +303,7 @@ where
     /// Sends all values of a dropped [`HashSet`] to the
     /// [`HashSet::on_remove()`] subscriptions.
     fn drop(&mut self) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for val in self.store.drain() {
             self.on_remove_subs.send_update(val);
         }

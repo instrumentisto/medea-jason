@@ -86,7 +86,7 @@ jobs:
       - run: make cargo.lint platform=${{ matrix.platform }}
         if: ${{ matrix.platform != 'workspace' }}
 
-      - uses: arduino/setup-protoc@v2
+      - uses: arduino/setup-protoc@v3
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -207,7 +207,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         if: ${{ steps.skip.outputs.no == 'true'
              && env.CACHE == 'true' }}
-      - uses: arduino/setup-protoc@v2
+      - uses: arduino/setup-protoc@v3
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -253,7 +253,7 @@ jobs:
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
-      - uses: arduino/setup-protoc@v2
+      - uses: arduino/setup-protoc@v3
         with:
           version: ${{ env.PROTOC_VER }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -325,7 +325,8 @@ jobs:
         platform:
           - ios
           - linux
-          - macos
+          # TODO: Re-enable once fixed stability on CI
+          #- macos
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}

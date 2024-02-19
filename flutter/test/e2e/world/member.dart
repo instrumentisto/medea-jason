@@ -305,9 +305,14 @@ class Member {
       return a == b;
     }
 
-    if (connectionStore.remoteTracks[id]!.values.any((element) =>
-        sourceCheck(element.last.mediaSourceKind(), source) &&
-        kindCheck(element.last.kind(), kind))) {
+    if (connectionStore.remoteTracks[id]!.values.any((element) {
+      var stopped = connectionStore
+              .callbackCounter[element.last.getTrack().id()]!['stopped']! >
+          0;
+      return sourceCheck(element.last.mediaSourceKind(), source) &&
+          kindCheck(element.last.kind(), kind) &&
+          !stopped;
+    })) {
       return connectionStore.remoteTracks[id]!.values.lastWhere((element) {
         var stopped = connectionStore
                 .callbackCounter[element.last.getTrack().id()]!['stopped']! >
