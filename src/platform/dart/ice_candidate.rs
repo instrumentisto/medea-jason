@@ -88,6 +88,7 @@ mod ice_candidate_error {
 /// Error occurred with an [ICE] candidate from a [`PeerConnection`].
 ///
 /// [`PeerConnection`]: crate::peer::PeerConnection
+/// [ICE]: https://webrtcglossary.com/ice
 #[derive(Debug, From)]
 pub struct IceCandidateError(DartHandle);
 
