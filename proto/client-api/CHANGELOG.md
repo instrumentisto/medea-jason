@@ -6,6 +6,23 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.6.0] · 2024-??-?? (unreleased)
+[0.6.0]: /../../tree/medea-client-api-proto-0.6.0/proto/client-api
+
+## BC Breaks
+
+- `PeerMetrics::PeerConnectionError` variant ([#151]).
+
+## Added
+
+- `PeerConnectionError` type ([#151]).
+- `IceCandidateError` type ([#151]).
+
+[#151]: /../../pull/151
+
+
+
+
 ## [0.5.0] · 2023-07-11
 [0.5.0]: /../../tree/medea-client-api-proto-0.5.0/proto/client-api
 

@@ -136,6 +136,55 @@ pub enum PeerEvent {
         sdp_mid: Option<String>,
     },
 
+    /// Error occurred with an [ICE] candidate from a [`PeerConnection`].
+    ///
+    /// [ICE]: https://webrtcglossary.com/ice
+    IceCandidateError {
+        /// ID of the [`PeerConnection`] that errored.
+        peer_id: Id,
+
+        /// Local IP address used to communicate with a [STUN]/[TURN]
+        /// server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        address: Option<String>,
+
+        /// Port used to communicate with a [STUN]/[TURN] server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        port: Option<u32>,
+
+        /// URL identifying the [STUN]/[TURN] server for which the failure
+        /// occurred.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        url: String,
+
+        /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+        ///
+        /// If no host candidate can reach the server, this error code will be
+        /// set to the value `701`, which is outside the [STUN] error code
+        /// range. This error is only fired once per server URL while in the
+        /// `RTCIceGatheringState` of "gathering".
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        error_code: i32,
+
+        /// [STUN] reason text returned by the [STUN]/[TURN] server.
+        ///
+        /// If the server could not be reached, this reason test will be set to
+        /// an implementation-specific value providing details about
+        /// the error.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        error_text: String,
+    },
+
     /// [`platform::RtcPeerConnection`] received a new [`remote::Track`] from
     /// a remote sender.
     NewRemoteTrack {
@@ -348,22 +397,40 @@ impl PeerConnection {
             recv_constraints,
         };
 
+        peer.bind_event_listeners(state);
+
+        Ok(Rc::new(peer))
+    }
+
+    /// Binds all the necessary event listeners to this [`PeerConnection`].
+    fn bind_event_listeners(&self, state: &State) {
         // Bind to `icecandidate` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_ice_candidate(Some(move |candidate| {
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_candidate(Some(move |candidate| {
                 if let Some(sender) = weak_sender.upgrade() {
                     Self::on_ice_candidate(id, &sender, candidate);
                 }
             }));
         }
 
+        // Bind to `icecandidateerror` event.
+        {
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_candidate_error(Some(move |error| {
+                if let Some(sender) = weak_sender.upgrade() {
+                    Self::on_ice_candidate_error(id, &sender, error);
+                }
+            }));
+        }
+
         // Bind to `iceconnectionstatechange` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_ice_connection_state_change(Some(
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_ice_connection_state_change(Some(
                 move |ice_connection_state| {
                     if let Some(sender) = weak_sender.upgrade() {
                         Self::on_ice_connection_state_changed(
@@ -378,9 +445,9 @@ impl PeerConnection {
 
         // Bind to `connectionstatechange` event.
         {
-            let id = peer.id;
-            let weak_sender = Rc::downgrade(&peer.peer_events_sender);
-            peer.peer.on_connection_state_change(Some(
+            let id = self.id;
+            let weak_sender = Rc::downgrade(&self.peer_events_sender);
+            self.peer.on_connection_state_change(Some(
                 move |peer_connection_state| {
                     if let Some(sender) = weak_sender.upgrade() {
                         Self::on_connection_state_changed(
@@ -395,9 +462,9 @@ impl PeerConnection {
 
         // Bind to `track` event.
         {
-            let media_conns = Rc::downgrade(&peer.media_connections);
+            let media_conns = Rc::downgrade(&self.media_connections);
             let connection_mode = state.connection_mode();
-            peer.peer.on_track(Some(move |track, transceiver| {
+            self.peer.on_track(Some(move |track, transceiver| {
                 if let Some(c) = media_conns.upgrade() {
                     platform::spawn(async move {
                         if let (Err(mid), ConnectionMode::Mesh) = (
@@ -412,8 +479,6 @@ impl PeerConnection {
                 }
             }));
         }
-
-        Ok(Rc::new(peer))
     }
 
     /// Handles [`TrackEvent`]s emitted from a [`Sender`] or a [`Receiver`].
@@ -561,6 +626,24 @@ impl PeerConnection {
             candidate: candidate.candidate,
             sdp_m_line_index: candidate.sdp_m_line_index,
             sdp_mid: candidate.sdp_mid,
+        }));
+    }
+
+    /// Handle `icecandidateerror` event from underlying peer emitting
+    /// [`PeerEvent::IceCandidateError`] event into this peers
+    /// `peer_events_sender`.
+    fn on_ice_candidate_error(
+        id: Id,
+        sender: &mpsc::UnboundedSender<PeerEvent>,
+        error: platform::IceCandidateError,
+    ) {
+        drop(sender.unbounded_send(PeerEvent::IceCandidateError {
+            peer_id: id,
+            address: error.address,
+            port: error.port,
+            url: error.url,
+            error_code: error.error_code,
+            error_text: error.error_text,
         }));
     }
 
@@ -1064,5 +1147,9 @@ impl Drop for PeerConnection {
         >>(None);
         self.peer
             .on_ice_candidate::<Box<dyn FnMut(platform::IceCandidate)>>(None);
+        self.peer
+            .on_ice_candidate_error::<Box<dyn FnMut(
+                platform::IceCandidateError
+            )>>(None);
     }
 }

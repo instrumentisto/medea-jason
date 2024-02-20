@@ -6,15 +6,21 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.4.1] · 2024-??-?? (unreleased)
-[0.4.1]: /../../tree/medea-jason-0.4.1
+## [0.5.0] · 2024-??-?? (unreleased)
+[0.5.0]: /../../tree/medea-jason-0.5.0
 
-[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.4.0...medea-jason-0.4.1)
+[Diff](https://github.com/instrumentisto/medea-jason/compare/medea-jason-0.4.0...medea-jason-0.5.0)
+
+### BC Breaks
+
+- Minimal supported version of `medea-client-api-proto` is `0.6.0` ([#151]).
 
 ### Added
 
 - Logging:
     - Exceptions thrown from Dart callbacks called by Rust ([#138]).
+- Monitoring:
+    - `IceCandidateError` metric sending to server ([#151]).
 
 ### Fixed
 
@@ -22,6 +28,7 @@ All user visible changes to this project will be documented in this file. This p
 
 [#135]: /../../pull/135
 [#138]: /../../pull/138
+[#151]: /../../pull/151
 
 
 
