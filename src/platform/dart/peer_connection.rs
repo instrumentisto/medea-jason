@@ -6,7 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState, SvcSetting,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -469,6 +469,7 @@ impl RtcPeerConnection {
         kind: MediaKind,
         direction: TransceiverDirection,
         encodings: Vec<EncodingParameters>,
+        svc: Option<Vec<SvcSetting>>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let handle = self.handle.get();
         async move {
