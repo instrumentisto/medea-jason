@@ -423,6 +423,7 @@ impl MediaConnections {
         let inner = self.0.borrow();
         let mut mids =
             HashMap::with_capacity(inner.senders.len() + inner.receivers.len());
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (track_id, sender) in &inner.senders {
             drop(
                 mids.insert(
@@ -434,6 +435,7 @@ impl MediaConnections {
                 ),
             );
         }
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (track_id, receiver) in &inner.receivers {
             drop(
                 mids.insert(
@@ -522,6 +524,7 @@ impl MediaConnections {
         kinds: LocalStreamUpdateCriteria,
     ) -> Option<TracksRequest> {
         let mut stream_request = None;
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for sender in self.0.borrow().senders.values() {
             if kinds
                 .has(sender.state().media_kind(), sender.state().media_source())

@@ -3,7 +3,7 @@
 //! [1]: https://w3.org/TR/mediacapture-streams#mediadevices
 
 #![allow(clippy::unwrap_used)]
-// TODO: False positive in function signatures, try remove on 1.76 Rust upgrade.
+// TODO: False positive in function signatures, try remove on 1.77 Rust upgrade.
 #![allow(clippy::let_underscore_untyped, let_underscore_drop)]
 
 use std::{cell::RefCell, rc::Rc};
@@ -235,8 +235,8 @@ impl MediaDevices {
         _: String,
     ) -> Result<(), Traced<InvalidOutputAudioDeviceIdError>> {
         unreachable!(
-            "`set_output_audio_id()` is implemented on the Dart side,\
-         so this method call is unreachable",
+            "`set_output_audio_id()` is implemented on the Dart side, \
+             so this method call is unreachable",
         )
     }
 

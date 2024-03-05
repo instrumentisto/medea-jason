@@ -5,6 +5,7 @@ import 'package:gherkin/gherkin.dart';
 
 import '../api/endpoint.dart';
 import '../world/custom_world.dart';
+import '../world/member.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
@@ -12,6 +13,7 @@ List<StepDefinitionGeneric> steps() {
     whenControlApiRemovesRoom,
     whenInterconnectsKind,
     whenControlApiRemovesMemberViaApply,
+    whenControlApiCreatesMemberViaApply,
     whenControlApiInterconnectsMembers,
     whenControlApiInterconnectsViaApply,
     thenControlApiSendsOnJoin,
@@ -54,6 +56,16 @@ StepDefinitionGeneric whenInterconnectsKind =
       PairedMember(rightMemberId, audioSetting, videoSetting, true),
     );
     await context.world.interconnectMembers(memberPair);
+  },
+);
+
+StepDefinitionGeneric whenControlApiCreatesMemberViaApply =
+    when1<String, CustomWorld>(
+  r'Control API creates member (\S+) with `Apply` method$',
+  (memberId, context) async {
+    var memberBuilder = MemberBuilder(memberId, false, false);
+
+    await context.world.createMember(memberBuilder);
   },
 );
 

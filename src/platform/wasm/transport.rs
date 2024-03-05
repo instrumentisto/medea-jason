@@ -166,8 +166,8 @@ impl WebSocketRpcTransport {
                     match ServerMessage::try_from(&msg).map(ServerMsg::from) {
                         Ok(parsed) => parsed,
                         Err(e) => {
-                            // TODO: protocol versions mismatch? should drop
-                            //       connection if so
+                            // TODO: Protocol versions mismatch? Should drop
+                            //       connection if so.
                             log::error!("{}", tracerr::new!(e));
                             return;
                         }
