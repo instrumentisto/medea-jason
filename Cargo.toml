@@ -74,7 +74,7 @@ wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.61"
+    version = "0.3.68"
     features = [
         "console",
         "ConstrainDomStringParameters", "ConstrainDoubleRange",
@@ -105,12 +105,6 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcTrackEvent",
         "WebSocket", "Window",
     ]
-
-[patch.crates-io]
-web-sys = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "12889ef666f9b355585602e268be2b70d7f3ec80" }
-js-sys = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "12889ef666f9b355585602e268be2b70d7f3ec80" }
-wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "12889ef666f9b355585602e268be2b70d7f3ec80" }
-wasm-bindgen-shared = { git = "https://github.com/rustwasm/wasm-bindgen.git", rev = "12889ef666f9b355585602e268be2b70d7f3ec80" }
 
 [build-dependencies]
 cc = "1.0"
