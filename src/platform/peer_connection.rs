@@ -9,17 +9,17 @@ use crate::{
 
 /// Representation of [RTCSdpType].
 ///
-/// [RTCSdpType]: https://w3.org/TR/webrtc/#dom-rtcsdptype
+/// [RTCSdpType]: https://w3.org/TR/webrtc#dom-rtcsdptype
 #[derive(Debug)]
 pub enum SdpType {
     /// [`offer` type][1] of SDP.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcsdptype-offer
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcsdptype-offer
     Offer(String),
 
     /// [`answer` type][1] of SDP.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcsdptype-answer
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcsdptype-answer
     Answer(String),
 }
 
@@ -30,34 +30,79 @@ pub enum SdpType {
 pub struct IceCandidate {
     /// [`candidate` field][2] of the discovered [RTCIceCandidate][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidate
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcicecandidate-candidate
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidate
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcicecandidate-candidate
     pub candidate: String,
 
     /// [`sdpMLineIndex` field][2] of the discovered [RTCIceCandidate][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidate
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcicecandidate-sdpmlineindex
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidate
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcicecandidate-sdpmlineindex
     pub sdp_m_line_index: Option<u16>,
 
     /// [`sdpMid` field][2] of the discovered [RTCIceCandidate][1].
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidate
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcicecandidate-sdpmid
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidate
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcicecandidate-sdpmid
     pub sdp_mid: Option<String>,
+}
+
+/// Error occurred with an [ICE] candidate from a `PeerConnection`.
+///
+/// [ICE]: https://webrtcglossary.com/ice
+#[derive(Debug)]
+pub struct IceCandidateError {
+    /// Local IP address used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub address: Option<String>,
+
+    /// Port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub port: Option<u32>,
+
+    /// URL identifying the [STUN]/[TURN] server for which the failure
+    /// occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub url: String,
+
+    /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_code: i32,
+
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
+    /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_text: String,
 }
 
 /// Errors that may occur during signaling between this and remote
 /// [RTCPeerConnection][1] and event handlers setting errors.
 ///
-/// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+/// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum RtcPeerConnectionError {
     /// Occurs when cannot adds new remote candidate to the
     /// [RTCPeerConnection][1]'s remote description.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
     #[display(fmt = "Failed to add ICE candidate: {}", _0)]
     #[from(ignore)]
     AddIceCandidateFailed(platform::Error),

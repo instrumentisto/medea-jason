@@ -6,7 +6,8 @@ use std::rc::Rc;
 
 use futures::channel::mpsc;
 use medea_client_api_proto::{
-    AudioSettings, Direction, MediaType, MemberId, Track, TrackId,
+    AudioSettings, ConnectionMode, Direction, MediaType, MemberId, Track,
+    TrackId,
 };
 use medea_jason::{
     media::{MediaDirection, MediaManager, RecvConstraints},
@@ -32,6 +33,8 @@ async fn sendrecv_works() {
             receivers: vec![MemberId::from("bob")],
             mid: None,
         },
+        media_direction: MediaDirection::SendRecv.into(),
+        muted: false,
         media_type: MediaType::Audio(AudioSettings { required: false }),
     };
     let recv_audio_track = Track {
@@ -40,6 +43,8 @@ async fn sendrecv_works() {
             mid: None,
             sender: MemberId::from("alice"),
         },
+        media_direction: MediaDirection::SendRecv.into(),
+        muted: false,
         media_type: MediaType::Audio(AudioSettings { required: false }),
     };
     media_connections
@@ -47,6 +52,7 @@ async fn sendrecv_works() {
             vec![send_audio_track, recv_audio_track],
             &get_media_stream_settings(true, false).into(),
             &RecvConstraints::default(),
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();

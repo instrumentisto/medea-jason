@@ -13,9 +13,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{propagate_panic, DartValue, DartValueArg},
-    platform::{
-        self, dart::utils::dart_api::Dart_NewFinalizableHandle_DL_Trampolined,
-    },
+    platform::{self, utils::dart_api},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/callback.g.dart")]
@@ -165,9 +163,6 @@ impl Callback {
     /// Returns a [`Callback`] wrapping the provided [`FnMut`] with two
     /// arguments, that can be converted to a [`Dart_Handle`] and passed to
     /// Dart.
-    // TODO: False positive: complex bounds.
-    //       https://github.com/rust-lang/rust-clippy/issues/9076
-    #[allow(clippy::trait_duplication_in_bounds)]
     pub fn from_two_arg_fn_mut<F, T, S>(mut f: F) -> Self
     where
         F: FnMut(T, S) + 'static,
@@ -194,25 +189,26 @@ impl Callback {
     pub fn into_dart(self) -> Dart_Handle {
         let is_finalizable = !matches!(&self.0, Kind::FnOnce(_));
         let is_two_arg = matches!(&self.0, Kind::TwoArgFnMut(_));
-        unsafe {
-            let f = ptr::NonNull::from(Box::leak(Box::new(self)));
-            let handle = if is_two_arg {
-                callback::call_two_arg_proxy(f)
-            } else {
-                callback::call_proxy(f)
-            };
 
-            if is_finalizable {
-                let _ = Dart_NewFinalizableHandle_DL_Trampolined(
+        let f = ptr::NonNull::from(Box::leak(Box::new(self)));
+        let handle = if is_two_arg {
+            unsafe { callback::call_two_arg_proxy(f) }
+        } else {
+            unsafe { callback::call_proxy(f) }
+        };
+
+        if is_finalizable {
+            unsafe {
+                _ = dart_api::new_finalizable_handle(
                     handle,
                     f.as_ptr().cast::<c_void>(),
                     mem::size_of::<Self>() as libc::intptr_t,
-                    callback_finalizer,
+                    Some(callback_finalizer),
                 );
             }
-
-            handle
         }
+
+        handle
     }
 }
 
@@ -247,7 +243,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: i64 = expects.try_into().unwrap();
         Callback::from_once(move |val: i64| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }
@@ -258,7 +254,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: String = expects.try_into().unwrap();
         Callback::from_once(move |val: String| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }
@@ -269,7 +265,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: Option<i64> = expects.try_into().unwrap();
         Callback::from_once(move |val: Option<i64>| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }
@@ -280,7 +276,7 @@ pub mod tests {
     ) -> Dart_Handle {
         let expects: Option<String> = expects.try_into().unwrap();
         Callback::from_once(move |val: Option<String>| {
-            assert_eq!(val, expects);
+            assert_eq!(val, expects, "`Callback` received invalid value");
         })
         .into_dart()
     }

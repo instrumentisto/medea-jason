@@ -5,7 +5,7 @@ mod transitable_state;
 use std::{mem, rc::Rc};
 
 use futures::channel::mpsc;
-use medea_client_api_proto::{TrackId, TrackPatchEvent};
+use medea_client_api_proto::{ConnectionMode, TrackId, TrackPatchEvent};
 use medea_jason::{
     media::{LocalTracksConstraints, MediaManager, RecvConstraints},
     peer::{
@@ -41,6 +41,7 @@ async fn get_test_media_connections(
             vec![audio_track, video_track],
             &get_media_stream_settings(enabled_audio, enabled_video).into(),
             &RecvConstraints::default(),
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();
@@ -93,6 +94,7 @@ async fn get_tracks_request1() {
             vec![audio_track, video_track],
             &local_constraints(true, true),
             &RecvConstraints::default(),
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();
@@ -114,6 +116,7 @@ async fn get_tracks_request2() {
             Vec::new(),
             &LocalTracksConstraints::default(),
             &RecvConstraints::default(),
+            ConnectionMode::Mesh,
         )
         .await
         .unwrap();
@@ -158,7 +161,9 @@ async fn new_media_connections_with_disabled_video_tracks() {
 ///
 /// This tests checks that [`TrackPatch`] works as expected.
 mod sender_patch {
-    use medea_client_api_proto::{AudioSettings, MediaDirection, MediaType};
+    use medea_client_api_proto::{
+        AudioSettings, ConnectionMode, MediaDirection, MediaType,
+    };
     use medea_jason::{
         peer::{sender, MediaExchangeState},
         utils::{AsProtoState, SynchronizableState},
@@ -177,9 +182,12 @@ mod sender_patch {
             .create_sender(
                 TrackId(0),
                 MediaType::Audio(AudioSettings { required: false }),
+                MediaDirection::SendRecv,
+                false,
                 None,
                 vec!["bob".into()],
                 &LocalTracksConstraints::default(),
+                ConnectionMode::Mesh,
             )
             .await
             .unwrap();
@@ -190,8 +198,9 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn wrong_track_id() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: TrackId(track_id.0 + 100),
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -203,8 +212,9 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn disable() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -216,8 +226,9 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn enabled_enabled() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
+            receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
         });
@@ -229,16 +240,18 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn disable_disabled() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
         sender.state().when_updated().await;
         assert!(sender.general_disabled());
 
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -250,8 +263,9 @@ mod sender_patch {
     #[wasm_bindgen_test]
     async fn empty_patch() {
         let (sender, track_id, _media_connections) = get_sender().await;
-        sender.state().update(&TrackPatchEvent {
+        sender.state().update(TrackPatchEvent {
             id: track_id,
+            receivers: None,
             media_direction: None,
             muted: None,
         });
@@ -310,9 +324,12 @@ mod receiver_patch {
             .create_receiver(
                 TRACK_ID,
                 MediaType::Audio(AudioSettings { required: true }).into(),
+                MediaDirection::SendRecv,
+                false,
                 Some(MID.to_string()),
                 MemberId(SENDER_ID.to_string()),
                 &RecvConstraints::default(),
+                ConnectionMode::Mesh,
             )
             .await;
 
@@ -324,6 +341,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TrackId(TRACK_ID.0 + 100),
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -337,6 +355,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -350,6 +369,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
+            receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
         });
@@ -363,6 +383,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -371,6 +392,7 @@ mod receiver_patch {
 
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
+            receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
         });
@@ -384,6 +406,7 @@ mod receiver_patch {
         let (receiver, _tx) = get_receiver().await;
         receiver.state().update(&TrackPatchEvent {
             id: TRACK_ID,
+            receivers: None,
             media_direction: None,
             muted: None,
         });

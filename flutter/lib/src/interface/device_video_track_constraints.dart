@@ -1,26 +1,9 @@
 import '/src/util/rust_handles_storage.dart';
+import 'enums.dart' show FacingMode;
 
-/// Describes the directions that the camera can face, as seen from a user's
-/// perspective.
-///
-/// Representation of the [`VideoFacingModeEnum`][1].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-videofacingmodeenum
-enum FacingMode {
-  /// Facing towards the user (a self-view camera).
-  User,
+export 'enums.dart' show FacingMode;
 
-  /// Facing away from the user (viewing an environment).
-  Environment,
-
-  /// Facing to the left of the user.
-  Left,
-
-  /// Facing to the right of the user.
-  Right,
-}
-
-abstract class DeviceVideoTrackConstraints implements PlatformHandle {
+abstract class DeviceVideoTrackConstraints implements SyncPlatformHandle {
   /// Sets an exact [`deviceId`][1] constraint.
   ///
   /// [1]: https://w3.org/TR/mediacapture-streams#def-constraint-deviceId

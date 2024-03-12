@@ -19,13 +19,13 @@ impl<'a> MediaDevices<'a> {
         window
             .execute(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async () => {
                     window.gumMock = {
                         original: navigator.mediaDevices.getUserMedia
                     };
                 }
-                "#,
+                ",
                 [],
             ))
             .await
@@ -45,7 +45,7 @@ impl<'a> MediaDevices<'a> {
         self.0
             .execute(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async () => {
                     const [isVideoBroken, isAudioBroken] = args;
                     navigator.mediaDevices.getUserMedia = async (cons) => {
@@ -58,7 +58,7 @@ impl<'a> MediaDevices<'a> {
                         return await window.gumMock.original(cons);
                     }
                 }
-                "#,
+                ",
                 [video.into(), audio.into()],
             ))
             .await

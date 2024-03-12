@@ -43,6 +43,7 @@ impl Component {
 
     /// Notifies all [`peer::Component`]s about a RPC connection loss.
     pub fn connection_lost(&self) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for peer in self.peers.borrow().values() {
             peer.state().connection_lost();
         }
@@ -50,6 +51,7 @@ impl Component {
 
     /// Notifies all [`peer::Component`]s about a RPC connection restore.
     pub fn connection_recovered(&self) {
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for peer in self.peers.borrow().values() {
             peer.state().connection_recovered();
         }
@@ -62,6 +64,7 @@ impl Component {
 
         state.0.borrow_mut().remove_not_present(&new_state.peers);
 
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (id, peer_state) in new_state.peers {
             let peer = state.0.borrow().get(&id).cloned();
             if let Some(p) = peer {
@@ -158,6 +161,8 @@ impl Repository {
         peers: Rc<RefCell<HashMap<PeerId, peer::Component>>>,
     ) -> TaskHandle {
         let (fut, abort) = future::abortable(async move {
+            // Cannot annotate `async` block with `-> !`.
+            #[allow(clippy::infinite_loop)]
             loop {
                 platform::delay_for(Duration::from_secs(1)).await;
 
@@ -176,7 +181,7 @@ impl Repository {
         });
 
         platform::spawn(async move {
-            let _ = fut.await.ok();
+            _ = fut.await.ok();
         });
 
         abort.into()
@@ -256,9 +261,14 @@ impl Component {
     fn peer_removed(
         peers: &Repository,
         _: &State,
-        (peer_id, _): (PeerId, Rc<peer::State>),
+        (peer_id, peer): (PeerId, Rc<peer::State>),
     ) {
         drop(peers.peers.borrow_mut().remove(&peer_id));
-        peers.connections.close_connection(peer_id);
+        for t in peer.get_recv_tracks() {
+            peers.connections.remove_track(&t);
+        }
+        for t in peer.get_send_tracks() {
+            peers.connections.remove_track(&t);
+        }
     }
 }

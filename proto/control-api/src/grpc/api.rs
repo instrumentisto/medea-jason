@@ -1,4 +1,5 @@
 /// Request for creating a new `Element` on a media server.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateRequest {
     /// FID (Full ID) of the parent `Element` to create the provided `Element` in.
@@ -11,6 +12,7 @@ pub struct CreateRequest {
 /// Nested message and enum types in `CreateRequest`.
 pub mod create_request {
     /// Spec of the created `Element`.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum El {
         #[prost(message, tag = "2")]
@@ -24,6 +26,7 @@ pub mod create_request {
     }
 }
 /// Request with many FIDs (Full IDs) of `Element`s.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct IdRequest {
     /// List of `Element`s FIDs.
@@ -31,6 +34,7 @@ pub struct IdRequest {
     pub fid: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Request for applying a spec to an exiting `Element` on a media server.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ApplyRequest {
     /// FID (full ID) of the parent `Element` to apply the provided spec to.
@@ -43,6 +47,7 @@ pub struct ApplyRequest {
 /// Nested message and enum types in `ApplyRequest`.
 pub mod apply_request {
     /// Spec of the `Element` to be applied.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum El {
         #[prost(message, tag = "2")]
@@ -60,6 +65,7 @@ pub mod apply_request {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Response {
     /// Error of this `Response`.
@@ -70,6 +76,7 @@ pub struct Response {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateResponse {
     /// Hashmap with IDs (key) and URIs (value) of `Element`s, which should be used
@@ -89,6 +96,7 @@ pub struct CreateResponse {
 ///
 /// If operation fails then an `Error` will be returned.
 /// The response is considered successful only if it doesn't contain an `Error`.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetResponse {
     /// Hashmap with IDs (key) and specs (value) of the requested `Elements`.
@@ -103,6 +111,7 @@ pub struct GetResponse {
 /// Error of a failed request.
 ///
 /// If an `Error` is not returned then a request is considered as successful.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Error {
     /// Concrete unique code of this `Error`.
@@ -125,6 +134,7 @@ pub struct Error {
     pub element: ::prost::alloc::string::String,
 }
 /// Possible media elements forming a media pipeline.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Element {
     #[prost(oneof = "element::El", tags = "1, 2, 3, 4")]
@@ -132,6 +142,7 @@ pub struct Element {
 }
 /// Nested message and enum types in `Element`.
 pub mod element {
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum El {
         #[prost(message, tag = "1")]
@@ -146,6 +157,7 @@ pub mod element {
 }
 /// Media element representing a single space where multiple `Member`s can
 /// interact with each other.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Room {
     /// ID of this `Room`.
@@ -161,6 +173,7 @@ pub struct Room {
 /// Nested message and enum types in `Room`.
 pub mod room {
     /// Possible media elements forming a `Room` pipeline.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Element {
         #[prost(oneof = "element::El", tags = "1, 2, 3")]
@@ -168,6 +181,7 @@ pub mod room {
     }
     /// Nested message and enum types in `Element`.
     pub mod element {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum El {
             #[prost(message, tag = "1")]
@@ -181,6 +195,7 @@ pub mod room {
 }
 /// Media element representing a client authorized to participate in some bigger
 /// media pipeline (`Room`, for example).
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Member {
     /// ID of this `Member`.
@@ -229,6 +244,7 @@ pub struct Member {
 /// Nested message and enum types in `Member`.
 pub mod member {
     /// Elements which Member's pipeline can contain.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Element {
         #[prost(oneof = "element::El", tags = "1, 2")]
@@ -236,6 +252,7 @@ pub mod member {
     }
     /// Nested message and enum types in `Element`.
     pub mod element {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum El {
             #[prost(message, tag = "1")]
@@ -253,6 +270,7 @@ pub mod member {
     /// Hashed variant only supports Argon2 hash at the moment.
     /// `Member` sid won't contain a `token` query parameter if hashed credentials
     /// are used, so it should be appended manually on a client side.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Credentials {
         /// Argon2 hash of credentials.
@@ -265,6 +283,7 @@ pub mod member {
 }
 /// Media element receiving media data from a client via WebRTC (allows to
 /// publish media data).
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WebRtcPublishEndpoint {
     /// ID of this `WebRtcPublishEndpoint`.
@@ -292,6 +311,7 @@ pub struct WebRtcPublishEndpoint {
 /// Nested message and enum types in `WebRtcPublishEndpoint`.
 pub mod web_rtc_publish_endpoint {
     /// Audio media type settings of a `WebRtcPublishEndpoint`.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct AudioSettings {
         /// Policy to publish the audio media type with.
@@ -299,6 +319,7 @@ pub mod web_rtc_publish_endpoint {
         pub publish_policy: i32,
     }
     /// Video media type settings of `WebRtcPublishEndpoint`.
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct VideoSettings {
         /// Policy to publish the video media type with.
@@ -350,6 +371,15 @@ pub mod web_rtc_publish_endpoint {
                 PublishPolicy::Disabled => "DISABLED",
             }
         }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "OPTIONAL" => Some(Self::Optional),
+                "REQUIRED" => Some(Self::Required),
+                "DISABLED" => Some(Self::Disabled),
+                _ => None,
+            }
+        }
     }
     /// Possible peer-to-peer modes of WebRTC interaction in a
     /// `WebRtcPublishEndpoint`.
@@ -388,9 +418,19 @@ pub mod web_rtc_publish_endpoint {
                 P2p::Always => "ALWAYS",
             }
         }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "NEVER" => Some(Self::Never),
+                "IF_POSSIBLE" => Some(Self::IfPossible),
+                "ALWAYS" => Some(Self::Always),
+                _ => None,
+            }
+        }
     }
 }
 /// Media element playing media data for a client via WebRTC.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WebRtcPlayEndpoint {
     /// ID of this `WebRtcPlayEndpoint`.
@@ -411,6 +451,7 @@ pub struct WebRtcPlayEndpoint {
 }
 /// Ping message received by a media server periodically for probing its
 /// healthiness.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Ping {
     /// Each new `Ping` should increment its nonce, starting with 0.
@@ -418,6 +459,7 @@ pub struct Ping {
     pub nonce: u32,
 }
 /// Pong message sent by a media server in response to a received `Ping` message.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Pong {
     /// / Nonce of the answered `Ping` message.
@@ -439,7 +481,7 @@ pub mod control_api_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -495,13 +537,29 @@ pub mod control_api_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
         /// Creates a new `Element` on the media server.
         ///
         /// Non-idempotent. Errors if an `Element` with such ID already exists.
         pub async fn create(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -513,7 +571,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Create");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Create"));
+            self.inner.unary(req, path, codec).await
         }
         /// Removes `Element`s from the media server.
         /// Allows referring multiple `Element`s on the last two levels of a FID.
@@ -522,7 +582,7 @@ pub mod control_api_client {
         pub async fn delete(
             &mut self,
             request: impl tonic::IntoRequest<super::IdRequest>,
-        ) -> Result<tonic::Response<super::Response>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -534,7 +594,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Delete");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Delete"));
+            self.inner.unary(req, path, codec).await
         }
         /// Lookups `Element`s by their FIDs on the media server.
         /// If no FIDs are specified, then returns all the current `Element`s on the
@@ -542,7 +604,7 @@ pub mod control_api_client {
         pub async fn get(
             &mut self,
             request: impl tonic::IntoRequest<super::IdRequest>,
-        ) -> Result<tonic::Response<super::GetResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -554,7 +616,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Get");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Get"));
+            self.inner.unary(req, path, codec).await
         }
         /// Applies changes to an existing `Element` on the media server, or creates a
         /// new one in case there is no `Element` with such ID.
@@ -566,7 +630,7 @@ pub mod control_api_client {
         pub async fn apply(
             &mut self,
             request: impl tonic::IntoRequest<super::ApplyRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -578,7 +642,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Apply");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Apply"));
+            self.inner.unary(req, path, codec).await
         }
         /// Checks healthiness of the media server.
         /// Caller should assert that the returned `Pong` has the same nonce as the
@@ -586,7 +652,7 @@ pub mod control_api_client {
         pub async fn healthz(
             &mut self,
             request: impl tonic::IntoRequest<super::Ping>,
-        ) -> Result<tonic::Response<super::Pong>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -598,7 +664,9 @@ pub mod control_api_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/api.ControlApi/Healthz");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new("api.ControlApi", "Healthz"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -606,7 +674,7 @@ pub mod control_api_client {
 pub mod control_api_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    ///Generated trait containing gRPC methods that should be implemented for use with ControlApiServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with ControlApiServer.
     #[async_trait]
     pub trait ControlApi: Send + Sync + 'static {
         /// Creates a new `Element` on the media server.
@@ -615,7 +683,7 @@ pub mod control_api_server {
         async fn create(
             &self,
             request: tonic::Request<super::CreateRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status>;
         /// Removes `Element`s from the media server.
         /// Allows referring multiple `Element`s on the last two levels of a FID.
         ///
@@ -623,14 +691,14 @@ pub mod control_api_server {
         async fn delete(
             &self,
             request: tonic::Request<super::IdRequest>,
-        ) -> Result<tonic::Response<super::Response>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::Response>, tonic::Status>;
         /// Lookups `Element`s by their FIDs on the media server.
         /// If no FIDs are specified, then returns all the current `Element`s on the
         /// media server.
         async fn get(
             &self,
             request: tonic::Request<super::IdRequest>,
-        ) -> Result<tonic::Response<super::GetResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::GetResponse>, tonic::Status>;
         /// Applies changes to an existing `Element` on the media server, or creates a
         /// new one in case there is no `Element` with such ID.
         ///
@@ -641,14 +709,14 @@ pub mod control_api_server {
         async fn apply(
             &self,
             request: tonic::Request<super::ApplyRequest>,
-        ) -> Result<tonic::Response<super::CreateResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::CreateResponse>, tonic::Status>;
         /// Checks healthiness of the media server.
         /// Caller should assert that the returned `Pong` has the same nonce as the
         /// sent `Ping`.
         async fn healthz(
             &self,
             request: tonic::Request<super::Ping>,
-        ) -> Result<tonic::Response<super::Pong>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::Pong>, tonic::Status>;
     }
     /// Service allowing to control a media server dynamically, by creating, updating
     /// and destroying pipelines of media `Element`s on it.
@@ -657,6 +725,8 @@ pub mod control_api_server {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: ControlApi> ControlApiServer<T> {
@@ -669,6 +739,8 @@ pub mod control_api_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -692,6 +764,22 @@ pub mod control_api_server {
             self.send_compression_encodings.enable(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
     }
     impl<T, B> tonic::codegen::Service<http::Request<B>> for ControlApiServer<T>
     where
@@ -705,7 +793,7 @@ pub mod control_api_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -725,13 +813,17 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::CreateRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).create(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ControlApi>::create(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -741,6 +833,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -761,13 +857,17 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::IdRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).delete(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ControlApi>::delete(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -777,6 +877,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -797,13 +901,17 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::IdRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ControlApi>::get(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -813,6 +921,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -833,13 +945,17 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::ApplyRequest>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).apply(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ControlApi>::apply(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -849,6 +965,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -869,13 +989,17 @@ pub mod control_api_server {
                             &mut self,
                             request: tonic::Request<super::Ping>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).healthz(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as ControlApi>::healthz(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -885,6 +1009,10 @@ pub mod control_api_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -913,12 +1041,14 @@ pub mod control_api_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: ControlApi> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {

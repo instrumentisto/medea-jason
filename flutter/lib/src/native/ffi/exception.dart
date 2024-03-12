@@ -11,7 +11,6 @@ import 'native_string.dart';
 /// Registers functions allowing Rust to create Dart [Exception]s and [Error]s.
 void registerFunctions(DynamicLibrary dl) {
   bridge.registerFunction(dl,
-      newArgumentError: Pointer.fromFunction(_newArgumentError),
       newStateError: Pointer.fromFunction(_newStateError),
       newFormatException: Pointer.fromFunction(_newFormatException),
       newLocalMediaInitException:
@@ -28,14 +27,6 @@ void registerFunctions(DynamicLibrary dl) {
           Pointer.fromFunction(_newInvalidOutputAudioDeviceIdException),
       throwPanicException: Pointer.fromFunction(_throwPanicException),
       newMicVolumeException: Pointer.fromFunction(_newMicVolumeException));
-}
-
-/// Creates a new [ArgumentError] from the provided invalid [value], its [name]
-/// and the [message] describing the problem.
-Object _newArgumentError(
-    ForeignValue value, Pointer<Utf8> name, Pointer<Utf8> message) {
-  return ArgumentError.value(value.toDart(), name.nativeStringToDartString(),
-      message.nativeStringToDartString());
 }
 
 /// Creates a new [StateError] with the provided [message].
@@ -135,8 +126,7 @@ class NativePanicException implements Exception {
 }
 
 /// Exception thrown when local media acquisition fails.
-class NativeLocalMediaInitException extends LocalMediaInitException
-    implements Exception {
+class NativeLocalMediaInitException extends LocalMediaInitException {
   /// Concrete error kind of this [NativeLocalMediaInitException].
   late final LocalMediaInitExceptionKind _kind;
 
@@ -177,8 +167,7 @@ class NativeLocalMediaInitException extends LocalMediaInitException
 /// Exception thrown when cannot get info about connected [MediaDevices][1].
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#mediadevices
-class NativeEnumerateDevicesException extends EnumerateDevicesException
-    implements Exception {
+class NativeEnumerateDevicesException extends EnumerateDevicesException {
   /// Dart [Exception] or [Error] that caused this [NativeEnumerateDevicesException].
   late final Object _cause;
 
@@ -238,7 +227,7 @@ class NativeMicVolumeException extends MicVolumeException {
 
 /// Exceptions thrown from `Jason`'s `RpcClient` which implements messaging with
 /// media server.
-class NativeRpcClientException extends RpcClientException implements Exception {
+class NativeRpcClientException extends RpcClientException {
   /// Concrete error kind of this [NativeRpcClientException].
   late final RpcClientExceptionKind _kind;
 
@@ -278,8 +267,8 @@ class NativeRpcClientException extends RpcClientException implements Exception {
 
 /// Exception thrown when the requested media state transition could not be
 /// performed.
-class NativeMediaStateTransitionException extends MediaStateTransitionException
-    implements Exception {
+class NativeMediaStateTransitionException
+    extends MediaStateTransitionException {
   /// Error message describing the problem.
   late final String _message;
 
@@ -313,7 +302,7 @@ class NativeMediaStateTransitionException extends MediaStateTransitionException
 ///
 /// This is either a programmatic error or some unexpected platform component
 /// failure that cannot be handled in any way.
-class NativeInternalException extends InternalException implements Exception {
+class NativeInternalException extends InternalException {
   /// Error message describing the problem.
   late final String _message;
 
@@ -344,8 +333,7 @@ class NativeInternalException extends InternalException implements Exception {
 
 /// Exception that might happen when updating local media settings via
 /// `RoomHandle.setLocalMediaSettings`.
-class NativeMediaSettingsUpdateException extends MediaSettingsUpdateException
-    implements Exception {
+class NativeMediaSettingsUpdateException extends MediaSettingsUpdateException {
   /// Error message describing the problem.
   late final String _message;
 

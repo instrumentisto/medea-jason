@@ -32,7 +32,7 @@ use crate::{
 
 /// Errors which can be returned from the [`WebSocketRpcSession`].
 #[derive(Caused, Clone, Debug, From, Display)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum SessionError {
     /// [`WebSocketRpcSession`] goes into [`SessionState::Finished`] and can't
     /// be used.
@@ -84,8 +84,8 @@ impl Caused for ConnectionLostReason {
 
     fn cause(self) -> Option<Self::Error> {
         match self {
-            ConnectionLostReason::ConnectError(err) => err.into_inner().cause(),
-            ConnectionLostReason::Lost(_) => None,
+            Self::ConnectError(err) => err.into_inner().cause(),
+            Self::Lost(_) => None,
         }
     }
 }
@@ -276,22 +276,20 @@ impl WebSocketRpcSession {
             while let Some(state) = state_updates.next().await {
                 let this = upgrade_or_break!(weak_this);
                 match state {
-                    S::Connecting(info) => {
-                        match Rc::clone(&this.client)
-                            .connect(info.url.clone())
-                            .await
-                        {
-                            Ok(_) => {
-                                this.state.set(S::Authorizing(info));
-                            }
-                            Err(e) => {
-                                this.state.set(S::Lost(
-                                    ConnectionLostReason::ConnectError(e),
-                                    info,
-                                ));
-                            }
+                    S::Connecting(info) => match Rc::clone(&this.client)
+                        .connect(info.url.clone())
+                        .await
+                    {
+                        Ok(()) => {
+                            this.state.set(S::Authorizing(info));
                         }
-                    }
+                        Err(e) => {
+                            this.state.set(S::Lost(
+                                ConnectionLostReason::ConnectError(e),
+                                info,
+                            ));
+                        }
+                    },
                     S::Authorizing(info) => {
                         this.client.authorize(
                             info.room_id.clone(),

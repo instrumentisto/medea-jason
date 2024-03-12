@@ -24,7 +24,7 @@ pub enum MediaDirection {
 impl From<MediaDirection> for u8 {
     #[allow(clippy::as_conversions)] // it's safe conversion
     fn from(d: MediaDirection) -> Self {
-        d as u8
+        d as Self
     }
 }
 
@@ -41,7 +41,7 @@ impl Object<RemoteTrack> {
     pub async fn wait_for_enabled(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const currentDirection = track.track.media_direction()
                 if (currentDirection != 0) {
@@ -51,7 +51,7 @@ impl Object<RemoteTrack> {
                     await waiter;
                 }
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -67,7 +67,7 @@ impl Object<RemoteTrack> {
     pub async fn wait_for_disabled(&self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const currentDirection = track.track.media_direction()
                 if (currentDirection == 0) {
@@ -77,7 +77,7 @@ impl Object<RemoteTrack> {
                     await waiter;
                 }
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -93,12 +93,34 @@ impl Object<RemoteTrack> {
     pub async fn disabled(&self) -> Result<bool, Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (t) => {
                 const currentDirection = t.track.media_direction();
                 return currentDirection != 0;
             }
-            "#,
+            ",
+            [],
+        ))
+        .await?
+        .as_bool()
+        .ok_or(Error::TypeCast)
+    }
+
+    /// Indicates whether this [`RemoteTrack`]'s underlying `MediaStreamTrack`
+    /// is live.
+    ///
+    /// # Errors
+    ///
+    /// If failed to execute JS statement.
+    pub async fn lived(&self) -> Result<bool, Error> {
+        self.execute(Statement::new(
+            // language=JavaScript
+            "
+            async (t) => {
+                const currentDirection = t.track.media_direction();
+                return currentDirection == 0 && !t.track.stopped;
+            }
+            ",
             [],
         ))
         .await?
@@ -118,7 +140,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_disabled_fire_count !== count) {
@@ -131,7 +153,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -150,7 +172,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_enabled_fire_count !== count) {
@@ -163,7 +185,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -182,7 +204,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_muted_fire_count !== count) {
@@ -195,7 +217,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -214,7 +236,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [count] = args;
                 while (track.on_unmuted_fire_count !== count) {
@@ -227,7 +249,7 @@ impl Object<RemoteTrack> {
                     });
                 }
             }
-            "#,
+            ",
             [count.into()],
         ))
         .await
@@ -246,7 +268,7 @@ impl Object<RemoteTrack> {
     ) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (track) => {
                 const [direction] = args;
                     if (track.track.media_direction() != direction) {
@@ -260,7 +282,7 @@ impl Object<RemoteTrack> {
                     await waiter;
                 }
             }
-            "#,
+            ",
             [u8::from(direction).into()],
         ))
         .await

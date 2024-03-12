@@ -86,7 +86,8 @@ impl Handler<GetCallbackItems> for GrpcCallbackServer {
 /// # Panics
 ///
 /// If cannot bind and run gRPC server.
-pub async fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
+#[must_use]
+pub fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
     let events = Arc::new(Mutex::new(Vec::new()));
 
     let service =
@@ -95,7 +96,7 @@ pub async fn run(opts: &Cli) -> Addr<GrpcCallbackServer> {
         .parse()
         .unwrap();
 
-    let _ = Arbiter::current().spawn(async move {
+    _ = Arbiter::current().spawn(async move {
         Server::builder()
             .add_service(service)
             .serve(addr)

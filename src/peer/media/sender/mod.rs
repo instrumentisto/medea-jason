@@ -30,7 +30,7 @@ pub use self::component::{Component, State};
 
 /// Errors occurring when creating a new [`Sender`].
 #[derive(Caused, Clone, Debug, Display)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum CreateError {
     /// [`Sender`] cannot be disabled because it's marked as `required`.
     #[display(fmt = "MediaExchangeState of Sender cannot transit to \
@@ -46,7 +46,7 @@ pub enum CreateError {
 ///
 /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 #[display(fmt = "MediaManagerHandle is in detached state")]
 pub struct InsertTrackError(platform::Error);
 
@@ -99,7 +99,7 @@ impl Sender {
     /// [`LocalTracksConstraints`] are configured to disable this [`Sender`],
     /// but it cannot be disabled according to the provide [`State`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     pub async fn new(
         state: &State,
         media_connections: &MediaConnections,
@@ -169,11 +169,9 @@ impl Sender {
             track: RefCell::new(None),
         });
 
-        if !enabled_in_cons {
-            state.media_exchange_state_controller().transition_to(
-                media_exchange_state::Stable::from(enabled_in_cons),
-            );
-        }
+        state
+            .media_exchange_state_controller()
+            .transition_to(media_exchange_state::Stable::from(enabled_in_cons));
         if muted_in_cons {
             state
                 .mute_state_controller()
@@ -205,7 +203,7 @@ impl Sender {
     /// should never fail for any other reason.
     ///
     /// [1]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
-    /// [2]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
     pub async fn remove_track(&self) {
         drop(self.track.take());
         drop(self.transceiver.set_send_track(None).await);
@@ -260,7 +258,7 @@ impl Sender {
 
     /// Returns [`mid`] of this [`Sender`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         self.transceiver.mid()
@@ -281,7 +279,7 @@ impl Sender {
         &self,
         state: media_exchange_state::Transition,
     ) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MediaExchangeIntention {
                 id: self.track_id,
                 enabled: matches!(
@@ -295,7 +293,7 @@ impl Sender {
     /// Sends [`TrackEvent::MuteUpdateIntention`] with the provided
     /// [`mute_state`].
     pub fn send_mute_state_intention(&self, state: mute_state::Transition) {
-        let _ = self.track_events_sender.unbounded_send(
+        _ = self.track_events_sender.unbounded_send(
             TrackEvent::MuteUpdateIntention {
                 id: self.track_id,
                 muted: matches!(state, mute_state::Transition::Muting(_)),

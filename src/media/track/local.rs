@@ -14,6 +14,8 @@ use crate::{
     platform,
 };
 
+use super::MediaStreamTrackState;
+
 /// Wrapper around a [`platform::MediaStreamTrack`] received from a
 /// [getUserMedia()][1]/[getDisplayMedia()][2] request.
 ///
@@ -92,6 +94,17 @@ impl Track {
         self.track.kind()
     }
 
+    /// Sets a callback to invoke when this [`Track`] is ended.
+    pub fn on_ended(&self, callback: platform::Function<()>) {
+        self.track.on_ended(Some(move || callback.call0()));
+    }
+
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`Track`] is active,
+    /// or a [`MediaStreamTrackState::Ended`] if it has ended.
+    pub async fn state(&self) -> MediaStreamTrackState {
+        self.track.ready_state().await
+    }
+
     /// Forks this [`Track`].
     ///
     /// Creates a new [`Track`] from this [`Track`]'s
@@ -109,14 +122,18 @@ impl Track {
             _parent: Some(parent),
         }
     }
+
+    /// [Stops][1] this [`Track`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
+    pub async fn stop(&self) {
+        self.track.stop().await;
+    }
 }
 
 impl Drop for Track {
     fn drop(&mut self) {
-        let stop = Box::pin(self.track.stop());
-        platform::spawn(async move {
-            stop.await;
-        });
+        platform::spawn(Box::pin(self.track.stop()));
     }
 }
 
@@ -125,7 +142,7 @@ impl Drop for Track {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LocalMediaTrack(Rc<Track>);
 
 impl LocalMediaTrack {
@@ -149,6 +166,17 @@ impl LocalMediaTrack {
         self.0.kind()
     }
 
+    /// Sets a callback to invoke when this [`LocalMediaTrack`] is ended.
+    pub fn on_ended(&self, callback: platform::Function<()>) {
+        self.0.on_ended(callback);
+    }
+
+    /// Returns a [`MediaStreamTrackState::Live`] if this [`LocalMediaTrack`] is
+    /// active, or a [`MediaStreamTrackState::Ended`] if it has ended.
+    pub async fn state(&self) -> MediaStreamTrackState {
+        self.0.state().await
+    }
+
     /// Returns a [`MediaSourceKind::Device`] if this [`LocalMediaTrack`] is
     /// sourced from some device (webcam/microphone), or
     /// a [`MediaSourceKind::Display`] if it's captured via
@@ -158,5 +186,15 @@ impl LocalMediaTrack {
     #[must_use]
     pub fn media_source_kind(&self) -> MediaSourceKind {
         self.0.media_source_kind().into()
+    }
+
+    /// [Stops][1] this [`LocalMediaTrack`] if this is the last wrapper for the
+    /// underlying [`Track`].
+    ///
+    /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-stop
+    pub async fn maybe_stop(mut self) {
+        if let Some(track) = Rc::get_mut(&mut self.0) {
+            track.stop().await;
+        }
     }
 }

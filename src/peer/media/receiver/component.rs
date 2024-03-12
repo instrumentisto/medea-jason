@@ -1,6 +1,6 @@
 //! [`Component`] for `MediaTrack` with a `Recv` direction.
 
-use std::rc::Rc;
+use std::{iter, rc::Rc};
 
 use futures::StreamExt as _;
 use medea_client_api_proto as proto;
@@ -12,6 +12,7 @@ use medea_reactive::{
     when_all_processed, AllProcessed, Guarded, ObservableCell, Processed,
     ProgressableCell,
 };
+use proto::ConnectionMode;
 
 use crate::{
     media::{LocalTracksConstraints, MediaDirection, MediaKind},
@@ -74,6 +75,13 @@ pub struct State {
     /// [`remote::Track`]: crate::media::track::remote::Track
     muted: ObservableCell<bool>,
 
+    /// Indicator whether this [`Receiver`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    connection_mode: ConnectionMode,
+
     /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
 }
@@ -84,6 +92,7 @@ impl AsProtoState for State {
     fn as_proto(&self) -> Self::Output {
         Self::Output {
             id: self.id,
+            connection_mode: self.connection_mode,
             mid: self.mid.clone(),
             media_type: self.media_type,
             sender_id: self.sender_id.clone(),
@@ -114,6 +123,7 @@ impl SynchronizableState for State {
             ),
             muted: ObservableCell::new(input.muted),
             media_direction: ObservableCell::new(input.media_direction.into()),
+            connection_mode: input.connection_mode,
             sync_state: ObservableCell::new(SyncState::Synced),
         }
     }
@@ -149,7 +159,7 @@ impl Updatable for State {
     /// [`Future`]: std::future::Future
     fn when_stabilized(&self) -> AllProcessed<'static> {
         let controller = Rc::clone(&self.enabled_individual);
-        when_all_processed(std::iter::once(
+        when_all_processed(iter::once(
             Processed::new(Box::new(move || {
                 let controller = Rc::clone(&controller);
                 Box::pin(async move {
@@ -186,6 +196,7 @@ impl From<&State> for proto::state::Receiver {
     fn from(from: &State) -> Self {
         Self {
             id: from.id,
+            connection_mode: from.connection_mode,
             mid: from.mid.clone(),
             media_type: from.media_type,
             sender_id: from.sender_id.clone(),
@@ -202,7 +213,10 @@ impl State {
         id: TrackId,
         mid: Option<String>,
         media_type: MediaType,
+        media_direction: medea_client_api_proto::MediaDirection,
+        muted: bool,
         sender: MemberId,
+        connection_mode: ConnectionMode,
     ) -> Self {
         Self {
             id,
@@ -210,14 +224,15 @@ impl State {
             media_type,
             sender_id: sender,
             enabled_individual: MediaExchangeStateController::new(
-                media_exchange_state::Stable::Enabled,
+                media_direction.is_recv_enabled().into(),
             ),
             enabled_general: ProgressableCell::new(
-                media_exchange_state::Stable::Enabled,
+                media_direction.is_enabled_general().into(),
             ),
-            muted: ObservableCell::new(false),
+            muted: ObservableCell::new(muted),
             sync_state: ObservableCell::new(SyncState::Synced),
-            media_direction: ObservableCell::new(MediaDirection::SendRecv),
+            connection_mode,
+            media_direction: ObservableCell::new(media_direction.into()),
         }
     }
 
@@ -303,35 +318,34 @@ impl Component {
     #[watch(self.enabled_general.subscribe())]
     async fn general_media_exchange_state_changed(
         receiver: Rc<Receiver>,
-        _: Rc<State>,
+        st: Rc<State>,
         state: Guarded<media_exchange_state::Stable>,
     ) {
         let (state, _guard) = state.into_parts();
         receiver
             .enabled_general
             .set(state == media_exchange_state::Stable::Enabled);
-        match state {
-            media_exchange_state::Stable::Disabled => {
-                let sub_recv = {
-                    receiver
-                        .transceiver
-                        .borrow()
-                        .as_ref()
-                        .map(|trnscvr| trnscvr.set_recv(false))
-                };
-                if let Some(fut) = sub_recv {
-                    fut.await;
-                }
-            }
-            media_exchange_state::Stable::Enabled => {
-                let add_recv = receiver
+        if (st.connection_mode, state)
+            == (ConnectionMode::Mesh, media_exchange_state::Stable::Disabled)
+        {
+            let sub_recv = {
+                receiver
                     .transceiver
                     .borrow()
                     .as_ref()
-                    .map(|trnscvr| trnscvr.set_recv(true));
-                if let Some(fut) = add_recv {
-                    fut.await;
-                }
+                    .map(|trnscvr| trnscvr.set_recv(false))
+            };
+            if let Some(fut) = sub_recv {
+                fut.await;
+            }
+        } else {
+            let add_recv = receiver
+                .transceiver
+                .borrow()
+                .as_ref()
+                .map(|trnscvr| trnscvr.set_recv(true));
+            if let Some(fut) = add_recv {
+                fut.await;
             }
         }
         receiver.maybe_notify_track().await;
@@ -467,9 +481,9 @@ impl TransceiverSide for State {
 #[cfg(feature = "mockable")]
 #[allow(clippy::multiple_inherent_impl)]
 impl State {
-    /// Stabilizes [`MediaExchangeState`] of this [`State`].
+    /// Stabilizes the [`MediaExchangeState`] of this [`State`].
     pub fn stabilize(&self) {
-        if let crate::peer::MediaExchangeState::Transition(transition) =
+        if let MediaExchangeState::Transition(transition) =
             self.enabled_individual.state()
         {
             self.enabled_individual.update(transition.intended());

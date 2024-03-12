@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'callback.g.dart';
@@ -57,7 +59,7 @@ enum OnLeaveReason {
   /// Connection with the [Member] was lost.
   Lost,
 
-  /// [Member[ was forcibly disconnected by a media server.
+  /// [Member] was forcibly disconnected by a media server.
   Kicked,
 
   /// Media server was shut down.

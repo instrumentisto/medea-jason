@@ -95,7 +95,7 @@ impl From<proto::web_rtc_publish_endpoint::AudioSettings> for AudioSettings {
     fn from(proto: proto::web_rtc_publish_endpoint::AudioSettings) -> Self {
         Self {
             publish_policy:
-                proto::web_rtc_publish_endpoint::PublishPolicy::from_i32(
+                proto::web_rtc_publish_endpoint::PublishPolicy::try_from(
                     proto.publish_policy,
                 )
                 .unwrap_or_default()
@@ -135,7 +135,7 @@ impl From<proto::web_rtc_publish_endpoint::VideoSettings> for VideoSettings {
     fn from(proto: proto::web_rtc_publish_endpoint::VideoSettings) -> Self {
         Self {
             publish_policy:
-                proto::web_rtc_publish_endpoint::PublishPolicy::from_i32(
+                proto::web_rtc_publish_endpoint::PublishPolicy::try_from(
                     proto.publish_policy,
                 )
                 .unwrap_or_default()
@@ -191,7 +191,7 @@ impl From<proto::WebRtcPublishEndpoint> for WebRtcPublishEndpoint {
     fn from(proto: proto::WebRtcPublishEndpoint) -> Self {
         Self {
             id: proto.id,
-            p2p: proto::web_rtc_publish_endpoint::P2p::from_i32(proto.p2p)
+            p2p: proto::web_rtc_publish_endpoint::P2p::try_from(proto.p2p)
                 .unwrap_or_default()
                 .into(),
             force_relay: proto.force_relay,

@@ -15,7 +15,7 @@ use futures::{
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
-use medea_client_api_proto::{MediaType, MemberId};
+use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
 use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
@@ -215,7 +215,7 @@ pub enum ProhibitedStateError {
 
 /// Errors occurring in [`MediaConnections::insert_local_tracks()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum InsertLocalTracksError {
     /// [`local::Track`] doesn't satisfy [`Sender`]'s constraints.
     #[display(fmt = "Provided Track doesn't satisfy senders constraints")]
@@ -421,6 +421,7 @@ impl MediaConnections {
         let inner = self.0.borrow();
         let mut mids =
             HashMap::with_capacity(inner.senders.len() + inner.receivers.len());
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (track_id, sender) in &inner.senders {
             drop(
                 mids.insert(
@@ -432,6 +433,7 @@ impl MediaConnections {
                 ),
             );
         }
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for (track_id, receiver) in &inner.receivers {
             drop(
                 mids.insert(
@@ -520,6 +522,7 @@ impl MediaConnections {
         kinds: LocalStreamUpdateCriteria,
     ) -> Option<TracksRequest> {
         let mut stream_request = None;
+        #[allow(clippy::iter_over_hash_type)] // order doesn't matter here
         for sender in self.0.borrow().senders.values() {
             if kinds
                 .has(sender.state().media_kind(), sender.state().media_source())
@@ -581,7 +584,7 @@ impl MediaConnections {
                     InsertLocalTracksError::NotEnoughTracks
                 ));
             } else {
-                let _ = media_exchange_state_updates
+                _ = media_exchange_state_updates
                     .insert(state.id(), media_exchange_state::Stable::Disabled);
             }
         }
@@ -695,16 +698,19 @@ impl MediaConnections {
     /// [`LocalStreamUpdateCriteria`].
     pub async fn drop_send_tracks(&self, kinds: LocalStreamUpdateCriteria) {
         let remove_tracks_fut = future::join_all(
-            self.0.borrow().senders.values().filter_map(|s| {
-                kinds.has(s.state().kind(), s.state().source_kind()).then(
-                    || {
-                        let sender = s.obj();
-                        async move {
-                            sender.remove_track().await;
-                        }
-                    },
-                )
-            }),
+            self.0
+                .borrow()
+                .senders
+                .values()
+                .filter(|&s| {
+                    kinds.has(s.state().kind(), s.state().source_kind())
+                })
+                .map(|s| {
+                    let sender = s.obj();
+                    async move {
+                        sender.remove_track().await;
+                    }
+                }),
         );
         drop(remove_tracks_fut.await);
     }
@@ -811,20 +817,27 @@ impl MediaConnections {
     /// # Errors
     ///
     /// See [`sender::CreateError`] for details.
+    #[allow(clippy::too_many_arguments)] // TODO: refactor
     pub async fn create_sender(
         &self,
         id: TrackId,
         media_type: MediaType,
+        media_direction: proto::MediaDirection,
+        muted: bool,
         mid: Option<String>,
         receivers: Vec<MemberId>,
         send_constraints: &LocalTracksConstraints,
+        connection_mode: ConnectionMode,
     ) -> Result<sender::Component, Traced<sender::CreateError>> {
         let sender_state = sender::State::new(
             id,
             mid,
             media_type,
+            media_direction,
+            muted,
             receivers,
             send_constraints.clone(),
+            connection_mode,
         );
         let sender = sender::Sender::new(
             &sender_state,
@@ -838,20 +851,33 @@ impl MediaConnections {
     }
 
     /// Creates a new [`receiver::Component`] with the provided data.
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_receiver(
         &self,
         id: TrackId,
         media_type: MediaType,
+        media_direction: proto::MediaDirection,
+        muted: bool,
         mid: Option<String>,
         sender: MemberId,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> receiver::Component {
-        let state = receiver::State::new(id, mid, media_type, sender);
+        let state = receiver::State::new(
+            id,
+            mid,
+            media_type,
+            media_direction,
+            muted,
+            sender,
+            connection_mode,
+        );
         let receiver = receiver::Receiver::new(
             &state,
             self,
             mpsc::unbounded().0,
             recv_constraints,
+            connection_mode,
         )
         .await;
 
@@ -869,32 +895,38 @@ impl MediaConnections {
         tracks: Vec<proto::Track>,
         send_constraints: &LocalTracksConstraints,
         recv_constraints: &RecvConstraints,
+        connection_mode: ConnectionMode,
     ) -> Result<(), Traced<sender::CreateError>> {
-        use medea_client_api_proto::Direction;
         for track in tracks {
             match track.direction {
-                Direction::Send { mid, receivers } => {
+                proto::Direction::Send { mid, receivers } => {
                     let component = self
                         .create_sender(
                             track.id,
                             track.media_type,
+                            proto::MediaDirection::SendRecv,
+                            send_constraints.muted(track.media_type),
                             mid,
                             receivers,
                             send_constraints,
+                            connection_mode,
                         )
                         .await?;
                     drop(
                         self.0.borrow_mut().senders.insert(track.id, component),
                     );
                 }
-                Direction::Recv { mid, sender } => {
+                proto::Direction::Recv { mid, sender } => {
                     let component = self
                         .create_receiver(
                             track.id,
                             track.media_type,
+                            proto::MediaDirection::SendRecv,
+                            false,
                             mid,
                             sender,
                             recv_constraints,
+                            connection_mode,
                         )
                         .await;
                     drop(

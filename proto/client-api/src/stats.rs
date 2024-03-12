@@ -1507,23 +1507,17 @@ pub struct RtcCertificateStats {
 pub struct HighResTimeStamp(pub f64);
 
 impl From<HighResTimeStamp> for SystemTime {
-    #[allow(
-        clippy::as_conversions,
-        clippy::cast_possible_truncation,
-        clippy::cast_sign_loss
-    )]
     fn from(timestamp: HighResTimeStamp) -> Self {
-        Self::UNIX_EPOCH + Duration::from_millis(timestamp.0 as u64)
+        Self::UNIX_EPOCH + Duration::from_secs_f64(timestamp.0 / 100.0)
     }
 }
 
 impl TryFrom<SystemTime> for HighResTimeStamp {
     type Error = SystemTimeError;
 
-    #[allow(clippy::as_conversions, clippy::cast_precision_loss)]
     fn try_from(time: SystemTime) -> Result<Self, Self::Error> {
         Ok(Self(
-            time.duration_since(SystemTime::UNIX_EPOCH)?.as_millis() as f64,
+            time.duration_since(SystemTime::UNIX_EPOCH)?.as_secs_f64() * 100.0,
         ))
     }
 }

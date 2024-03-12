@@ -29,6 +29,10 @@ pub mod utils;
 
 use std::panic;
 
+use libc::c_void;
+
+use crate::platform::utils::dart_api;
+
 pub use self::{
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
@@ -43,6 +47,16 @@ pub use self::{
     transport::WebSocketRpcTransport,
     utils::{completer::delay_for, Function},
 };
+
+/// Function to initialize `dart_api_dl` functions.
+///
+/// # Safety
+///
+/// This function should never be called manually.
+#[no_mangle]
+pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
+    dart_api::initialize_api(data)
+}
 
 /// Sets Rust's [`panic!`] hook providing backtrace of the occurred panic to
 /// Dart's functions.
@@ -68,12 +82,13 @@ pub fn set_panic_callback(cb: Function<String>) {
 }
 
 #[cfg(target_os = "android")]
-/// Initializes [`android_logger`] as the default application logger with
-/// minimal log level set to [`log::Level::Debug`].
+/// Initializes [`android_logger`] as the default application logger with filter
+/// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
     // TODO: `android_logger::init_once()` should be called only once.
     android_logger::init_once(
-        android_logger::Config::default().with_min_level(log::Level::Debug),
+        android_logger::Config::default()
+            .with_max_level(log::LevelFilter::Debug),
     );
 }
 
@@ -87,7 +102,7 @@ pub fn init_logger() {
 /// level set to [`log::LevelFilter::Debug`].
 pub fn init_logger() {
     // TODO: Should be called only once.
-    let _ = simple_logger::SimpleLogger::new()
+    _ = simple_logger::SimpleLogger::new()
         .with_level(log::LevelFilter::Debug)
         .init();
 }

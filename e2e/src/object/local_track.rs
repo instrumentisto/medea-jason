@@ -43,7 +43,7 @@ impl Object<LocalTrack> {
             // Not a bug, but a naming specific of WebRTC.
             // See: https:/mdn.io/Web/API/MediaStreamTrack/enabled
             // language=JavaScript
-            r#"async (t) => !t.track.get_track().enabled"#,
+            "async (t) => !t.track.get_track().enabled",
             [],
         ))
         .await?

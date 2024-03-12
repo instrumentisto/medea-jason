@@ -7,15 +7,15 @@ import '../jason.dart';
 import 'box_handle.dart';
 import 'nullable_pointer.dart';
 
-typedef _boxForeignValue_C = Pointer Function(ForeignValue);
-typedef _boxForeignValue_Dart = Pointer Function(ForeignValue);
+typedef _BoxForeignValueC = Pointer Function(ForeignValue);
+typedef _BoxForeignValueDart = Pointer Function(ForeignValue);
 
-final _boxForeignValue_Dart _boxForeignValue =
-    dl.lookupFunction<_boxForeignValue_C, _boxForeignValue_Dart>(
+final _BoxForeignValueDart _boxForeignValue =
+    dl.lookupFunction<_BoxForeignValueC, _BoxForeignValueDart>(
         'box_foreign_value');
 
 /// Type-erased value that can be transferred via FFI boundaries to/from Rust.
-class ForeignValue extends Struct {
+final class ForeignValue extends Struct {
   /// Index of the used [_ForeignValueFields] union field.
   ///
   /// `0` goes for no value.
@@ -46,6 +46,10 @@ class ForeignValue extends Struct {
         return _payload.stringPtr.string.toDartString();
       case 4:
         return _payload.number;
+      case 5:
+        return _payload.float;
+      case 6:
+        return _payload.boolean;
       default:
         throw TypeError();
     }
@@ -57,6 +61,10 @@ class ForeignValue extends Struct {
       return ForeignValue.none();
     } else if (val is int) {
       return ForeignValue.fromInt(val);
+    } else if (val is double) {
+      return ForeignValue.fromDouble(val);
+    } else if (val is bool) {
+      return ForeignValue.fromBool(val);
     } else if (val is String) {
       return ForeignValue.fromString(val);
     } else if (val is NullablePointer) {
@@ -106,6 +114,20 @@ class ForeignValue extends Struct {
     fVal.ref._payload.number = num;
     return fVal;
   }
+
+  static Pointer<ForeignValue> fromDouble(double num) {
+    var fVal = calloc<ForeignValue>();
+    fVal.ref._tag = 5;
+    fVal.ref._payload.float = num;
+    return fVal;
+  }
+
+  static Pointer<ForeignValue> fromBool(bool boolean) {
+    var fVal = calloc<ForeignValue>();
+    fVal.ref._tag = 6;
+    fVal.ref._payload.boolean = boolean;
+    return fVal;
+  }
 }
 
 extension ForeignValuePointer on Pointer<ForeignValue> {
@@ -129,7 +151,7 @@ extension ForeignValuePointer on Pointer<ForeignValue> {
 }
 
 /// Possible fields of a [ForeignValue].
-class _ForeignValueFields extends Union {
+final class _ForeignValueFields extends Union {
   /// [Pointer] to some Rust object.
   external Pointer ptr;
 
@@ -142,10 +164,18 @@ class _ForeignValueFields extends Union {
   /// Integer value.
   @Int64()
   external int number;
+
+  /// Double value.
+  @Double()
+  external double float;
+
+  /// Bool value.
+  @Bool()
+  external bool boolean;
 }
 
 /// [Pointer] to a native string along with information of its owner.
-class _StringPointer extends Struct {
+final class _StringPointer extends Struct {
   /// [Pointer] to the native string.
   external Pointer<Utf8> string;
 

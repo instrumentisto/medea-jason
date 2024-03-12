@@ -16,9 +16,8 @@ use synstructure::{BindStyle, Structure};
 ///     - otherwise returns `None`.
 /// 3. Generate implementation of `Caused` trait for this enum with generated
 ///    methods from step 1 and 2.
-#[allow(clippy::needless_pass_by_value)]
-pub(crate) fn derive(mut s: Structure<'_>) -> Result<TokenStream> {
-    let error_type = error_type(&s)?;
+pub(crate) fn derive(s: &mut Structure<'_>) -> Result<TokenStream> {
+    let error_type = error_type(s)?;
 
     let cause_body = s.bind_with(|_| BindStyle::Move).each_variant(|v| {
         v.bindings().iter().find(|&bi| is_caused(bi)).map_or_else(
@@ -49,56 +48,47 @@ pub(crate) fn derive(mut s: Structure<'_>) -> Result<TokenStream> {
     Ok(quote! { #caused })
 }
 
-/// Parse and returns argument of `#[cause(error = "path::to::Error"))]`
+/// Parse and returns argument of `#[cause(error = path::to::Error))]`
 /// attribute. If no such attribute exists the defaults to `Error`.
 fn error_type(s: &Structure<'_>) -> Result<syn::Path> {
     let mut error_type = None;
     for attr in &s.ast().attrs {
-        if let Ok(meta) = attr.parse_meta() {
-            if meta.path().is_ident("cause") {
-                if error_type.is_some() {
-                    return Err(Error::new_spanned(
-                        meta,
-                        "Cannot have two #[cause(...)] attributes",
-                    ));
-                }
-                let syn::Meta::List(list) = meta else {
-                    return Err(Error::new_spanned(
-                        meta,
-                        "#[cause] attribute must take a list in parentheses",
-                    ));
-                };
-                if list.nested.is_empty() {
-                    return Err(Error::new_spanned(
-                        list,
-                        "Expected at least one argument to #[cause(...)] \
-                         attribute",
-                    ));
-                }
-                error_type = match &list.nested[0] {
-                    syn::NestedMeta::Meta(syn::Meta::NameValue(nv))
-                        if nv.path.is_ident("error") =>
-                    {
-                        let syn::MetaNameValue {
-                                lit: syn::Lit::Str(lit_str),
-                                ..
-                            } = nv else {
-                                return Err(Error::new_spanned(
-                                    nv,
-                                    "Expected `path::to::error`",
-                                ));
-                            };
-                        Some(lit_str.parse_with(syn::Path::parse_mod_style)?)
-                    }
-                    syn::NestedMeta::Meta(_) | syn::NestedMeta::Lit(_) => {
-                        return Err(Error::new_spanned(
-                            list,
-                            "Expected attribute like #[cause(error = \
-                             \"path::to::error\")]",
-                        ));
-                    }
-                };
+        if attr.meta.path().is_ident("cause") {
+            if error_type.is_some() {
+                return Err(Error::new_spanned(
+                    attr,
+                    "Cannot have two #[cause(...)] attributes",
+                ));
             }
+            let syn::Meta::List(list) = &attr.meta else {
+                return Err(Error::new_spanned(
+                    &attr.meta,
+                    "#[cause] attribute must take a list in parentheses",
+                ));
+            };
+            let nv = syn::parse2::<syn::MetaNameValue>(list.tokens.clone())
+                .map_err(|e| {
+                    Error::new_spanned(
+                        &list.tokens,
+                        format!(
+                            "Expected attribute like \
+                             #[cause(error = path::to::error)], but: {e}",
+                        ),
+                    )
+                })?;
+            if !nv.path.is_ident("error") {
+                return Err(Error::new_spanned(
+                    &list.tokens,
+                    "Expected attribute like #[cause(error = path::to::error)]",
+                ));
+            }
+            let syn::Expr::Path(expr) = nv.value else {
+                return Err(Error::new_spanned(
+                    &nv.value,
+                    "Expected `path::to::error`",
+                ));
+            };
+            error_type = Some(expr.path);
         }
     }
     error_type.ok_or_else(|| {
@@ -108,15 +98,14 @@ fn error_type(s: &Structure<'_>) -> Result<syn::Path> {
 
 /// Checks that enum variant has `#[cause]` attribute.
 fn is_caused(bi: &synstructure::BindingInfo<'_>) -> bool {
-    let mut found_cause = false;
     for attr in &bi.ast().attrs {
-        if let Ok(syn::Meta::Path(path)) = attr.parse_meta() {
+        if let syn::Meta::Path(path) = &attr.meta {
             if path.is_ident("cause") {
-                found_cause = true;
+                return true;
             }
         }
     }
-    found_cause
+    false
 }
 
 /// Checks that enum variant contains JS error.

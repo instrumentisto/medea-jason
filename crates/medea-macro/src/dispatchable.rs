@@ -6,9 +6,7 @@ use proc_macro2::{Ident, Span, TokenStream as TokenStream2, TokenTree};
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Parse, ParseStream, Result},
-    parse_quote,
-    spanned::Spanned as _,
-    FnArg, ItemEnum, Pat, PatIdent, PatType, Token,
+    parse_quote, token, FnArg, ItemEnum, Pat, PatIdent, Token,
 };
 
 /// Additional keywords to be parsed by [`syn`].
@@ -151,8 +149,8 @@ impl Item {
                     &to_handler_fn_name(&v.ident.to_string()),
                     Span::call_site(),
                 );
-                let handler_fn_args = match v.fields {
-                    syn::Fields::Named(ref fields) => {
+                let handler_fn_args = match &v.fields {
+                    syn::Fields::Named(fields) => {
                         let handler_fn_args: Vec<_> = fields
                             .named
                             .iter()
@@ -164,7 +162,7 @@ impl Item {
                             .collect();
                         quote! { #(#handler_fn_args),* }
                     }
-                    syn::Fields::Unnamed(ref fields) => {
+                    syn::Fields::Unnamed(fields) => {
                         let handler_fn_args: Vec<_> = fields
                             .unnamed
                             .iter()
@@ -223,8 +221,8 @@ impl Parse for IsLocal {
         } else {
             let inner;
             syn::parenthesized!(inner in input);
-            let _ = inner.parse::<Token![?]>()?;
-            let _ = inner.parse::<kw::Send>()?;
+            _ = inner.parse::<Token![?]>()?;
+            _ = inner.parse::<kw::Send>()?;
             Ok(Self(true))
         }
     }
@@ -234,7 +232,7 @@ impl Parse for IsLocal {
 #[derive(Debug, PartialEq)]
 pub(crate) struct Args {
     /// `self` type that will be consumed by handler trait functions.
-    self_kind: PatType,
+    self_kind: syn::Receiver,
 
     /// Whether to use [`async_trait`](https://crates.io/crates/async-trait)
     /// or not.
@@ -272,14 +270,18 @@ impl Args {
 
     /// Transforms `self: &mut Self` to `handler: &mut T`.
     fn dispatch_with_handler_arg(&self) -> FnArg {
-        let mut handler_arg = self.self_kind.clone();
-        handler_arg.pat = Box::new(Pat::Ident(PatIdent {
-            attrs: Vec::new(),
-            by_ref: None,
-            mutability: None,
-            ident: Ident::new("handler", Span::call_site()),
-            subpat: None,
-        }));
+        let handler_arg = syn::PatType {
+            attrs: vec![],
+            pat: Box::new(Pat::Ident(PatIdent {
+                attrs: Vec::new(),
+                by_ref: None,
+                mutability: None,
+                ident: Ident::new("handler", Span::call_site()),
+                subpat: None,
+            })),
+            colon_token: token::Colon::default(),
+            ty: self.self_kind.ty.clone(),
+        };
         let handler_arg: TokenStream2 = handler_arg
             .to_token_stream()
             .into_iter()
@@ -304,8 +306,8 @@ impl Default for Args {
     fn default() -> Self {
         let self_kind = parse_quote! { self: &mut Self };
         let self_kind = match self_kind {
-            FnArg::Typed(self_kind) => self_kind,
-            FnArg::Receiver(_) => unreachable!(),
+            FnArg::Receiver(rcv) => rcv,
+            FnArg::Typed(_) => unreachable!(),
         };
         Self {
             self_kind,
@@ -324,10 +326,10 @@ impl Parse for Args {
         if input.peek(Token![self]) && input.peek2(Token![:]) {
             let self_kind = FnArg::parse(input)?;
             let self_kind = match self_kind {
-                FnArg::Typed(k) => k,
-                FnArg::Receiver(_) => {
-                    return Err(syn::Error::new(
-                        self_kind.span(),
+                FnArg::Receiver(rcv) => rcv,
+                FnArg::Typed(_) => {
+                    return Err(syn::Error::new_spanned(
+                        self_kind,
                         "Invalid argument",
                     ));
                 }
@@ -335,10 +337,10 @@ impl Parse for Args {
             args.self_kind = self_kind;
         }
         if input.peek(Token![,]) {
-            let _ = input.parse::<Token![,]>()?;
+            _ = input.parse::<Token![,]>()?;
         }
         if input.peek(kw::async_trait) {
-            let _ = input.parse::<kw::async_trait>()?;
+            _ = input.parse::<kw::async_trait>()?;
             args.async_trait = Some(IsLocal::parse(input)?);
         }
 
@@ -390,7 +392,7 @@ mod to_handler_fn_name_spec {
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
-                FnArg::Typed(args.self_kind),
+                FnArg::Receiver(args.self_kind),
                 FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
@@ -404,8 +406,8 @@ mod to_handler_fn_name_spec {
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
-                FnArg::Typed(args.self_kind),
-                FnArg::parse.parse2(quote! {self: &Self}).unwrap(),
+                FnArg::Receiver(args.self_kind),
+                FnArg::parse.parse2(quote! { self: &Self }).unwrap(),
             );
         }
 
@@ -422,7 +424,7 @@ mod to_handler_fn_name_spec {
             );
             assert!(args.async_trait.is_none());
             assert_eq!(
-                FnArg::Typed(args.self_kind),
+                FnArg::Receiver(args.self_kind),
                 FnArg::parse
                     .parse2(quote! {self: std::rc::Rc<Self>})
                     .unwrap(),
@@ -438,7 +440,7 @@ mod to_handler_fn_name_spec {
             );
             assert!(!args.async_trait.unwrap().0);
             assert_eq!(
-                FnArg::Typed(args.self_kind),
+                FnArg::Receiver(args.self_kind),
                 FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
@@ -452,7 +454,7 @@ mod to_handler_fn_name_spec {
             );
             assert!(args.async_trait.unwrap().0);
             assert_eq!(
-                FnArg::Typed(args.self_kind),
+                FnArg::Receiver(args.self_kind),
                 FnArg::parse.parse2(quote! {self: &mut Self}).unwrap(),
             );
         }
@@ -468,7 +470,7 @@ mod to_handler_fn_name_spec {
             );
             assert!(!args.async_trait.unwrap().0);
             assert_eq!(
-                FnArg::Typed(args.self_kind),
+                FnArg::Receiver(args.self_kind),
                 FnArg::parse.parse2(quote! {self: Arc<Self>}).unwrap(),
             );
         }

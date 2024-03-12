@@ -8,7 +8,10 @@
 
 #![allow(clippy::module_name_repetitions)]
 
-use std::cell::{Ref, RefCell};
+use std::{
+    cell::{Ref, RefCell},
+    mem,
+};
 
 use futures::{future::LocalBoxFuture, stream::LocalBoxStream};
 
@@ -162,7 +165,7 @@ where
     /// Replaces the contained underlying data with the given `new_data` value,
     /// and returns the old one.
     pub fn replace(&self, mut new_data: D) -> D {
-        std::mem::swap(&mut *self.0.borrow_mut().borrow_mut(), &mut new_data);
+        mem::swap(&mut *self.0.borrow_mut().borrow_mut(), &mut new_data);
         new_data
     }
 

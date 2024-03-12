@@ -8,14 +8,14 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::dart_string_into_rust,
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
     platform::{
         self,
         dart::utils::{
-            callback::Callback, handle::DartHandle, NonNullDartValueArgExt as _,
+            callback::Callback, dart_string_into_rust, handle::DartHandle,
+            NonNullDartValueArgExt as _,
         },
         utils::dart_future::FutureFromDart,
     },
@@ -103,11 +103,15 @@ mod media_stream_track {
         /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-onended
         pub fn on_ended(track: Dart_Handle, cb: Dart_Handle);
 
-        /// Creates a new instance of [`MediaStreamTrack`] depending on the same
-        /// media source as this [`MediaStreamTrack`].
+        /// Creates a new instance of [MediaStreamTrack][0] depending on the
+        /// same media source as the provided one has.
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn clone(track: Dart_Handle) -> Dart_Handle;
 
-        /// Disposes of this [`MediaStreamTrack`].
+        /// Disposes the provided [MediaStreamTrack][0].
+        ///
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn dispose(track: Dart_Handle) -> Dart_Handle;
     }
 }
@@ -150,9 +154,8 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-id
     #[must_use]
     pub fn id(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_stream_track::id(self.inner.get()))
-        }
+        let id = unsafe { media_stream_track::id(self.inner.get()) };
+        unsafe { dart_string_into_rust(id) }
     }
 
     /// Returns [device ID][1] of this [`MediaStreamTrack`].
@@ -160,12 +163,10 @@ impl MediaStreamTrack {
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-deviceid
     #[inline]
     #[must_use]
-    pub fn device_id(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_stream_track::device_id(
-                self.inner.get(),
-            ))
-        }
+    pub fn device_id(&self) -> Option<String> {
+        let device_id =
+            unsafe { media_stream_track::device_id(self.inner.get()) };
+        Some(unsafe { dart_string_into_rust(device_id) })
     }
 
     /// Returns [kind][1] of this [`MediaStreamTrack`].
@@ -186,13 +187,13 @@ impl MediaStreamTrack {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn facing_mode(&self) -> Option<FacingMode> {
-        Option::<i64>::try_from(unsafe {
-            media_stream_track::facing_mode(self.inner.get()).unbox()
-        })
-        .unwrap()
-        .map(FacingMode::try_from)
-        .transpose()
-        .unwrap()
+        let facing_mode =
+            unsafe { media_stream_track::facing_mode(self.inner.get()) };
+        Option::<i64>::try_from(unsafe { facing_mode.unbox() })
+            .unwrap()
+            .map(FacingMode::try_from)
+            .transpose()
+            .unwrap()
     }
 
     /// Returns [height][1] of this [`MediaStreamTrack`].
@@ -201,10 +202,8 @@ impl MediaStreamTrack {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn height(&self) -> Option<u32> {
-        Option::try_from(unsafe {
-            media_stream_track::height(self.inner.get()).unbox()
-        })
-        .unwrap()
+        let height = unsafe { media_stream_track::height(self.inner.get()) };
+        Option::try_from(unsafe { height.unbox() }).unwrap()
     }
 
     /// Returns [width][1] of this [`MediaStreamTrack`].
@@ -213,10 +212,8 @@ impl MediaStreamTrack {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn width(&self) -> Option<u32> {
-        Option::try_from(unsafe {
-            media_stream_track::width(self.inner.get()).unbox()
-        })
-        .unwrap()
+        let width = unsafe { media_stream_track::width(self.inner.get()) };
+        Option::try_from(unsafe { width.unbox() }).unwrap()
     }
 
     /// Returns [enabled][1] field of this [`MediaStreamTrack`].
@@ -240,16 +237,12 @@ impl MediaStreamTrack {
     /// Returns [readiness state][1] of this [`MediaStreamTrack`].
     ///
     /// [1]: https://tinyurl.com/w3-streams#dom-mediastreamtrack-readystate
-    #[allow(clippy::unused_self)]
     pub async fn ready_state(&self) -> MediaStreamTrackState {
         let handle = self.inner.get();
-        let state = unsafe {
-            FutureFromDart::execute::<i32>(media_stream_track::ready_state(
-                handle,
-            ))
+        let state = unsafe { media_stream_track::ready_state(handle) };
+        let state = unsafe { FutureFromDart::execute::<i64>(state) }
             .await
-        }
-        .unwrap();
+            .unwrap();
 
         match state {
             0 => MediaStreamTrackState::Live,
@@ -265,13 +258,8 @@ impl MediaStreamTrack {
     pub fn stop(&self) -> impl Future<Output = ()> + 'static {
         let inner = self.inner.clone();
         async move {
-            unsafe {
-                FutureFromDart::execute::<()>(media_stream_track::stop(
-                    inner.get(),
-                ))
-                .await
-                .unwrap();
-            }
+            let fut = unsafe { media_stream_track::stop(inner.get()) };
+            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         }
     }
 
@@ -281,7 +269,6 @@ impl MediaStreamTrack {
     /// Only works in Chrome browser at the moment.
     ///
     /// [1]: https://w3.org/TR/screen-capture#extensions-to-mediatracksettings
-    #[allow(clippy::unused_self)]
     #[must_use]
     pub fn guess_is_from_display(&self) -> bool {
         self.source_kind == Some(MediaSourceKind::Display)
@@ -299,16 +286,13 @@ impl MediaStreamTrack {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-clone
     pub fn fork(&self) -> impl Future<Output = Self> + 'static {
-        unsafe {
-            let handle = self.inner.get();
-            let source_kind = self.source_kind;
-            async move {
-                let new_track: DartHandle =
-                    FutureFromDart::execute(media_stream_track::clone(handle))
-                        .await
-                        .unwrap();
-                Self::new(new_track, source_kind)
-            }
+        let handle = self.inner.get();
+        let source_kind = self.source_kind;
+        async move {
+            let fut = unsafe { media_stream_track::clone(handle) };
+            let new_track: DartHandle =
+                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+            Self::new(new_track, source_kind)
         }
     }
 
@@ -320,7 +304,7 @@ impl MediaStreamTrack {
         F: 'static + FnOnce(),
     {
         if let Some(cb) = f {
-            let cb = Callback::from_once(|_: ()| cb());
+            let cb = Callback::from_once(|(): ()| cb());
             unsafe {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
             };
@@ -332,13 +316,8 @@ impl Drop for MediaStreamTrack {
     fn drop(&mut self) {
         let track = self.inner.clone();
         platform::spawn(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(media_stream_track::dispose(
-                    track.get(),
-                ))
-                .await
-                .unwrap();
-            }
+            let fut = unsafe { media_stream_track::dispose(track.get()) };
+            unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
         });
     }
 }

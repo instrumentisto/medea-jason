@@ -15,13 +15,12 @@ use medea_e2e::object::{
 
 use crate::world::{member::Builder as MemberBuilder, World};
 
-#[allow(clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments, clippy::too_many_lines)]
 #[given(regex = "^(?:room with )?(joined )?member(?:s)? (\\S+)\
                   (?:(?:, | and )(\\S+)(?: and (\\S+)?)?)?\
                   (?: with (no (play |publish )?WebRTC endpoints\
                           |(?:disabled|muted) (media|audio|video) \
                                               (publishing|playing)?))?$")]
-#[allow(clippy::too_many_lines)]
 #[async_recursion(?Send)]
 async fn new_given_member(
     world: &mut World,
@@ -50,24 +49,16 @@ async fn new_given_member(
         is_recv: !is_recv_disabled,
     };
     world.create_member(member_builder).await.unwrap();
-    if joined.0 {
-        world.join_room(&first_member_id).await.unwrap();
-        world
-            .wait_for_interconnection(&first_member_id)
-            .await
-            .unwrap();
-    }
 
-    let member = world.get_member(&first_member_id).unwrap();
+    let member = world.get_member_mut(&first_member_id).unwrap();
     let is_audio = disabled_media_type == DisabledMediaType::Audio
         || disabled_media_type == DisabledMediaType::All;
     let is_video = disabled_media_type == DisabledMediaType::Video
         || disabled_media_type == DisabledMediaType::All;
+
     match media_settings {
         MediaSettings::DisabledMedia => {
             let is_publish = disabled_direction == Direction::Publish
-                || disabled_direction == Direction::None;
-            let is_play = disabled_direction == Direction::Play
                 || disabled_direction == Direction::None;
 
             if is_publish {
@@ -89,28 +80,6 @@ async fn new_given_member(
                             None,
                             false,
                             AwaitCompletion::Do,
-                        )
-                        .await
-                        .unwrap();
-                }
-            }
-            if is_play {
-                if is_audio {
-                    member
-                        .toggle_remote_media(
-                            Some(MediaKind::Audio),
-                            None,
-                            false,
-                        )
-                        .await
-                        .unwrap();
-                }
-                if is_video {
-                    member
-                        .toggle_remote_media(
-                            Some(MediaKind::Video),
-                            None,
-                            false,
                         )
                         .await
                         .unwrap();
@@ -139,6 +108,45 @@ async fn new_given_member(
                     )
                     .await
                     .unwrap();
+            }
+        }
+        _ => (),
+    }
+
+    if joined.0 {
+        world.join_room(&first_member_id).await.unwrap();
+        world
+            .wait_for_interconnection(&first_member_id)
+            .await
+            .unwrap();
+    }
+
+    let member = world.get_member(&first_member_id).unwrap();
+    match media_settings {
+        MediaSettings::DisabledMedia => {
+            let is_play = disabled_direction == Direction::Play
+                || disabled_direction == Direction::None;
+            if is_play {
+                if is_audio {
+                    member
+                        .toggle_remote_media(
+                            Some(MediaKind::Audio),
+                            None,
+                            false,
+                        )
+                        .await
+                        .unwrap();
+                }
+                if is_video {
+                    member
+                        .toggle_remote_media(
+                            Some(MediaKind::Video),
+                            None,
+                            false,
+                        )
+                        .await
+                        .unwrap();
+                }
             }
         }
         _ => (),

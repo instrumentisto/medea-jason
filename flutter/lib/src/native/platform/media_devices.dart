@@ -7,11 +7,11 @@ import 'package:medea_jason/src/native/ffi/native_string.dart';
 import 'media_devices.g.dart' as bridge;
 
 /// Option to mock `getUserMedia()` request.
-const bool MOCKABLE = bool.fromEnvironment('MOCKABLE', defaultValue: false);
+const bool mockable = bool.fromEnvironment('MOCKABLE', defaultValue: false);
 
 /// Registers functions allowing Rust to operate Dart media devices.
 void registerFunctions(DynamicLibrary dl) {
-  if (MOCKABLE) {
+  if (mockable) {
     bridge.registerFunction(
       dl,
       enumerateDevices: Pointer.fromFunction(_enumerateDevices),
@@ -46,7 +46,7 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Provider to mock `getUserMedia()` request.
 ///
-/// [MOCKABLE] must be `true`.
+/// [mockable] must be `true`.
 class MockMediaDevices {
   /// Default `getUserMedia()` request.
   static const _defaultGUM = webrtc.getUserMedia;
@@ -55,7 +55,7 @@ class MockMediaDevices {
   static Function _getUserMedia = _defaultGUM;
 
   /// Sets `getUserMedia()` request to the provided function.
-  static set GUM(Function(webrtc.DeviceConstraints) f) {
+  static set gum(Function(webrtc.DeviceConstraints) f) {
     _getUserMedia = f;
   }
 

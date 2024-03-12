@@ -13,6 +13,8 @@ let disableAudioSend = document.getElementById('control__disable_audio_send');
 let disableVideoSend = document.getElementById('control__disable_video_send');
 let disableAudioRecv = document.getElementById('control__disable_audio_recv');
 let disableVideoRecv = document.getElementById('control__disable_video_recv');
+let disableDisplayVideoRecv = document.getElementById('control__disable_display_video_recv');
+let disableCameraDisplayVideoRecv = document.getElementById('control__disable_camera_video_recv');
 let muteAudioSend = document.getElementById('control__mute_audio_send');
 let muteVideoSend = document.getElementById('control__mute_video_send');
 let closeApp = document.getElementById('control__close_app');
@@ -95,7 +97,8 @@ async function createMember(roomId, memberId) {
   let isPublish = document.getElementById('connection-settings__publish_is-enabled').checked;
 
   let controlRoom = await axios.get(controlUrl + roomId);
-  let anotherMembers = Object.values(controlRoom.data.element.pipeline);
+  let isRoomExist = Object.keys(controlRoom.data).length;
+  let anotherMembers = isRoomExist ? Object.values(controlRoom.data.element.pipeline) : [];
   let pipeline = {};
 
   let memberIds = [];
@@ -125,17 +128,40 @@ async function createMember(roomId, memberId) {
     }
   }
 
-  let resp = await axios({
-    method: 'post',
-    url: controlUrl + roomId + '/' + memberId,
-    data: {
-      kind: 'Member',
-      credentials: { plain: 'test' },
-      pipeline: pipeline,
-      on_join: 'grpc://127.0.0.1:9099',
-      on_leave: 'grpc://127.0.0.1:9099'
-    }
-  });
+  let resp;
+
+  if (isRoomExist) {
+    resp = await axios({
+      method: 'post',
+      url: controlUrl + roomId + '/' + memberId,
+      data: {
+        kind: 'Member',
+        credentials: { plain: 'test' },
+        pipeline: pipeline,
+        on_join: 'grpc://127.0.0.1:9099',
+        on_leave: 'grpc://127.0.0.1:9099'
+      }
+    });
+  } else {
+    resp = await axios({
+      method: 'post',
+      url: controlUrl + roomId,
+      data: {
+        kind: 'Room',
+        pipeline: {
+          [memberId]: {
+            kind: 'Member',
+            credentials: { plain: 'test' },
+            pipeline: pipeline,
+            on_join: 'grpc://127.0.0.1:9099',
+            on_leave: 'grpc://127.0.0.1:9099'
+          }
+        }
+      }
+    });
+  }
+
+  console.dir(resp);
 
   if (isPublish) {
     try {
@@ -455,6 +481,8 @@ window.onload = async function() {
   let isVideoSendEnabled = true;
   let isAudioRecvEnabled = true;
   let isVideoRecvEnabled = true;
+  let isDisplayVideoRecvEnabled = true;
+  let isCameraVideoRecvEnabled = true;
   let isAudioMuted = false;
   let isVideoMuted = false;
   let room = await newRoom();
@@ -467,7 +495,7 @@ window.onload = async function() {
       try {
         localTracks = await jason.media_manager().init_local_tracks(constraints)
       } catch (e) {
-        let origError = e.source();
+        let origError = e.cause();
         if (origError && (origError.name === 'NotReadableError' || origError.name === 'AbortError')) {
           if (origError.message.includes('audio')) {
             constraints = await build_constraints(null, videoSelect);
@@ -589,27 +617,67 @@ window.onload = async function() {
       let remoteVideos = document.getElementsByClassName('remote-videos')[0];
       if (memberVideoDiv === undefined) {
         memberVideoDiv = document.createElement('div');
-        memberVideoDiv.classList.add('video');
-        memberVideoDiv.classList.add('d-flex');
-        memberVideoDiv.classList.add('flex-column');
-        memberVideoDiv.classList.add('align-items-center');
+        memberVideoDiv.classList.add('video', 'd-flex', 'flex-column', 'align-items-center');
         memberVideoDiv.style = 'margin: 10px';
         remoteVideos.appendChild(memberVideoDiv);
         remote_videos[remoteMemberId] = memberVideoDiv;
+
+        let recvDeviceVideo = true;
+        let buttonDeviceVideoToggleElement = document.createElement('button');
+        buttonDeviceVideoToggleElement.innerHTML = "Disable device video recv";
+        buttonDeviceVideoToggleElement.onclick = function () {
+          recvDeviceVideo = !recvDeviceVideo;
+          if (recvDeviceVideo) {
+            connection.enable_remote_video(rust.MediaSourceKind.Device);
+            buttonDeviceVideoToggleElement.innerHTML = "Disable device video recv";
+          } else {
+            connection.disable_remote_video(rust.MediaSourceKind.Device);
+            buttonDeviceVideoToggleElement.innerHTML = "Enable device video recv";
+          }
+        };
+        memberVideoDiv.appendChild(buttonDeviceVideoToggleElement);
+
+        let recvDisplayVideo = true;
+        let buttonDisplayVideoToggleElement = document.createElement('button');
+        buttonDisplayVideoToggleElement.innerHTML = "Disable display video recv";
+        buttonDisplayVideoToggleElement.onclick = function () {
+          recvDisplayVideo = !recvDisplayVideo;
+          if (recvDisplayVideo) {
+            connection.enable_remote_video(rust.MediaSourceKind.Display);
+            buttonDisplayVideoToggleElement.innerHTML = "Disable display video recv";
+          } else {
+            connection.disable_remote_video(rust.MediaSourceKind.Display);
+            buttonDisplayVideoToggleElement.innerHTML = "Enable display video recv";
+          }
+        };
+        memberVideoDiv.appendChild(buttonDisplayVideoToggleElement);
+
+        let recvAudio = true;
+        let buttonAudioToggleElement = document.createElement('button');
+        buttonAudioToggleElement.innerHTML = "Disable audio recv";
+        buttonAudioToggleElement.onclick = function () {
+          recvAudio = !recvAudio;
+          if (recvAudio) {
+            connection.enable_remote_audio();
+            buttonAudioToggleElement.innerHTML = "Disable audio recv";
+          } else {
+            connection.disable_remote_audio();
+            buttonAudioToggleElement.innerHTML = "Enable audio recv";
+          }
+        };
+        memberVideoDiv.appendChild(buttonAudioToggleElement);
       }
 
       let memberIdEl = document.createElement('span');
       memberIdEl.innerHTML = remoteMemberId;
-      memberIdEl.classList.add('member-id');
-      memberIdEl.classList.add('order-4');
+      memberIdEl.classList.add('member-id', 'order-4');
       memberVideoDiv.appendChild(memberIdEl);
 
       connection.on_quality_score_update((score) => {
         let qualityScoreEl = memberVideoDiv.getElementsByClassName('quality-score')[0];
         if (qualityScoreEl === undefined) {
           qualityScoreEl = document.createElement('span');
-          qualityScoreEl.classList.add('quality-score');
-          qualityScoreEl.classList.add('order-5');
+          qualityScoreEl.classList.add('quality-score', 'order-5');
           memberVideoDiv.appendChild(qualityScoreEl);
         }
         qualityScoreEl.innerHTML = score;
@@ -623,11 +691,14 @@ window.onload = async function() {
             playElement = memberVideoDiv.getElementsByClassName('display-video')[0];
             if (playElement === undefined) {
               playElement = document.createElement('video');
-              playElement.classList.add('display-video');
-              playElement.classList.add('order-2');
+              playElement.classList.add('display-video', 'order-2');
               playElement.playsinline = 'true';
               playElement.controls = 'true';
               playElement.autoplay = 'true';
+              if (track.media_direction() != 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
@@ -638,11 +709,14 @@ window.onload = async function() {
             if (playElement === undefined) {
               playElement = document.createElement('video');
               playElement.className = 'camera-video';
-              playElement.classList.add('camera-video');
-              playElement.classList.add('order-1');
+              playElement.classList.add('camera-video', 'order-1');
               playElement.playsinline = 'true';
               playElement.controls = 'true';
               playElement.autoplay = 'true';
+              if (track.media_direction() != 0) {
+                playElement.pause();
+                playElement.style.display = 'none';
+              }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
@@ -654,10 +728,13 @@ window.onload = async function() {
           if (playElement === undefined) {
             playElement = document.createElement('audio');
             playElement.className = 'audio';
-            playElement.classList.add('audio');
-            playElement.classList.add('order-3');
+            playElement.classList.add('audio', 'order-3');
             playElement.controls = 'true';
             playElement.autoplay = 'true';
+            if (track.media_direction() != 0) {
+              playElement.pause();
+              playElement.style.display = 'none';
+            }
             memberVideoDiv.appendChild(playElement);
           }
           let mediaStream = new MediaStream();
@@ -665,8 +742,16 @@ window.onload = async function() {
           playElement.srcObject = mediaStream;
         }
 
-        track.on_media_direction_changed((direction) => {
+        track.on_media_direction_changed(async (direction) => {
           console.log('New TransceiverDirection: ' + direction);
+
+          if (direction == 0) {
+            await playElement.play();
+            playElement.style.display = 'block';
+          } else {
+            playElement.pause();
+            playElement.style.display = 'none';
+          }
         });
         track.on_muted( () => {
           console.log(`Track muted: ${track.kind()}`);
@@ -775,8 +860,11 @@ window.onload = async function() {
             await initLocalStream();
           }
           await room.set_local_media_settings(constraints, true, true);
+          if (screenshareSwitchEl.checked) {
+            await room.enable_video(rust.MediaSourceKind.Display);
+          }
         } catch (e) {
-          let name = e.name();
+          let name = e.kind();
           if (name === 'RecoveredException') {
             alert('MediaStreamSettings set failed and current MediaStreamSettings was successfully recovered.');
           } else if (name === 'RecoverFailedException') {
@@ -898,6 +986,28 @@ window.onload = async function() {
         disableVideoRecv.textContent = 'Disable video recv'
       }
     });
+    disableDisplayVideoRecv.addEventListener('click', async () => {
+      if (isDisplayVideoRecvEnabled) {
+        await room.disable_remote_video(rust.MediaSourceKind.Display);
+        isDisplayVideoRecvEnabled = false;
+        disableDisplayVideoRecv.textContent = 'Enable display video recv'
+      } else {
+        await room.enable_remote_video(rust.MediaSourceKind.Display);
+        isDisplayVideoRecvEnabled = true;
+        disableDisplayVideoRecv.textContent = 'Disable display video recv'
+      }
+    });
+    disableCameraDisplayVideoRecv.addEventListener('click', async () => {
+      if (isCameraVideoRecvEnabled) {
+        await room.disable_remote_video(rust.MediaSourceKind.Device);
+        isCameraVideoRecvEnabled = false;
+        disableCameraDisplayVideoRecv.textContent = 'Enable camera video recv'
+      } else {
+        await room.enable_remote_video(rust.MediaSourceKind.Device);
+        isCameraVideoRecvEnabled = true;
+        disableCameraDisplayVideoRecv.textContent = 'Disable camera video recv'
+      }
+    });
     closeApp.addEventListener('click', () => {
       jason.dispose();
     });
@@ -913,20 +1023,12 @@ window.onload = async function() {
 
         try {
           let username = usernameInput.value;
-          try {
-            await axios.get(controlUrl + roomId);
-          } catch (e) {
-            if (e.response.status === 400) {
-              console.log('Room not found. Creating new room...');
-              await room.join(await createRoom(roomId, username));
-              return;
-            } else {
-              throw e;
-            }
+          if (!Object.keys((await axios.get(controlUrl + roomId)).data).length) {
+            console.log('Room not found. Creating new room...');
+            await room.join(await createRoom(roomId, username));
+            return;
           }
-          try {
-            await axios.get(controlUrl + roomId + '/' + username);
-          } catch (e) {
+          if (!Object.keys((await axios.get(controlUrl + roomId + '/' + username)).data).length) {
             console.log('Member not found. Creating new member...');
             await room.join(await createMember(roomId, username));
             return;
@@ -935,8 +1037,8 @@ window.onload = async function() {
         } catch (e) {
           console.error(e);
           console.error(
-            'Join to room failed: Error[name:[', e.name(), '], ',
-            '[msg:', e.message(), '], [source', e.source(), ']]',
+            'Join to room failed: Error[name:[', e.kind(), '], ',
+            '[msg:', e.message(), '], [source', e.cause(), ']]',
           );
           console.error(e.trace());
         }

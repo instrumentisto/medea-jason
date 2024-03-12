@@ -18,9 +18,10 @@ use futures::{
 use medea_client_api_proto::{
     self as proto, Command, ConnectionQualityScore, Event as RpcEvent,
     EventHandler, IceCandidate, IceConnectionState, IceServer, MemberId,
-    NegotiationRole, PeerConnectionState, PeerId, PeerMetrics, PeerUpdate,
-    Track, TrackId,
+    NegotiationRole, PeerConnectionError, PeerConnectionState, PeerId,
+    PeerMetrics, PeerUpdate, Track, TrackId,
 };
+use proto::{ConnectionMode, IceCandidateError};
 use tracerr::Traced;
 
 use crate::{
@@ -56,15 +57,15 @@ pub struct RoomCloseReason {
     /// Indicator if [`Room`] is closed by server.
     ///
     /// `true` if [`CloseReason::ByServer`].
-    is_closed_by_server: bool,
+    pub(crate) is_closed_by_server: bool,
 
     /// Reason of closing.
-    reason: String,
+    pub(crate) reason: String,
 
     /// Indicator if closing is considered as error.
     ///
     /// This field may be `true` only on closing by client.
-    is_err: bool,
+    pub(crate) is_err: bool,
 }
 
 impl RoomCloseReason {
@@ -113,7 +114,7 @@ impl RoomCloseReason {
 
 /// Errors occurring in [`RoomHandle::join()`] method.
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum RoomJoinError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "RoomHandle is in detached state")]
@@ -135,7 +136,7 @@ pub enum RoomJoinError {
 
 /// Error of [`RoomHandle`]'s [`Weak`] pointer being detached.
 #[derive(Caused, Clone, Copy, Debug, Display, Eq, From, PartialEq)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub struct HandleDetachedError;
 
 /// Errors occurring when changing media state of [`Sender`]s and [`Receiver`]s.
@@ -143,7 +144,7 @@ pub struct HandleDetachedError;
 /// [`Sender`]: peer::media::Sender
 /// [`Receiver`]: peer::media::Receiver
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum ChangeMediaStateError {
     /// [`RoomHandle`]'s [`Weak`] pointer is detached.
     #[display(fmt = "RoomHandle is in detached state")]
@@ -203,7 +204,7 @@ impl From<UpdateLocalStreamError> for ChangeMediaStateError {
 /// Errors occurring when a [`Room`] tries to acquire [`local::Track`]s via
 /// [`MediaManager`].
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum GetLocalTracksError {
     /// Validating [`TracksRequest`] doesn't pass.
     ///
@@ -445,9 +446,9 @@ impl RoomHandle {
             // required messaging.
             // Hold tracks through all process, to ensure that they will be
             // reused without additional requests.
-            let _tracks_handles;
+            let tracks_handles;
             if direction_send && enabling {
-                _tracks_handles = inner
+                tracks_handles = inner
                     .get_local_tracks(kind, source_kind)
                     .await
                     .map_err(|e| {
@@ -457,6 +458,8 @@ impl RoomHandle {
                             direction,
                             source_kind,
                         );
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         tracerr::map_from_and_wrap!()(e)
                     })?;
                 if !inner.send_constraints.is_track_enabled(kind, source_kind) {
@@ -467,7 +470,7 @@ impl RoomHandle {
                     ));
                 }
             } else {
-                _tracks_handles = Vec::new();
+                tracks_handles = Vec::new();
             };
 
             while !inner.is_all_peers_in_media_state(
@@ -502,6 +505,7 @@ impl RoomHandle {
                 }
             }
 
+            drop(tracks_handles);
             Ok(())
         })
     }
@@ -817,7 +821,6 @@ pub struct Room(Rc<InnerRoom>);
 
 impl Room {
     /// Creates new [`Room`] and associates it with the provided [`RpcSession`].
-    #[allow(clippy::mut_mut)]
     pub fn new(
         rpc: Rc<dyn RpcSession>,
         media_manager: Rc<MediaManager>,
@@ -849,11 +852,11 @@ impl Room {
             peer_events_rx.map(RoomEvent::PeerEvent).fuse();
         let mut rpc_connection_lost = rpc
             .on_connection_loss()
-            .map(|_| RoomEvent::RpcClientLostConnection)
+            .map(|()| RoomEvent::RpcClientLostConnection)
             .fuse();
         let mut rpc_client_reconnected = rpc
             .on_reconnected()
-            .map(|_| RoomEvent::RpcClientReconnected)
+            .map(|()| RoomEvent::RpcClientReconnected)
             .fuse();
 
         let room = Rc::new(InnerRoom::new(rpc, media_manager, tx));
@@ -1201,7 +1204,7 @@ impl InnerRoom {
     /// [`Drop`] implementation of [`InnerRoom`] is supposed to be triggered
     /// after this function call.
     fn set_close_reason(&self, reason: CloseReason) {
-        let _ = self.close_reason.replace(reason);
+        _ = self.close_reason.replace(reason);
     }
 
     /// Toggles [`TransceiverSide`]s [`MediaState`] by the provided
@@ -1479,6 +1482,8 @@ impl InnerRoom {
                         e.as_ref(),
                         UpdateLocalStreamError::CouldNotGetLocalMedia(_)
                     ) {
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         return Err(E::errored(tracerr::map_from_and_wrap!()(
                             e.clone(),
                         )));
@@ -1492,11 +1497,16 @@ impl InnerRoom {
                         )
                         .await
                         .map_err(|err| {
+                            // false positive: output expression is not input
+                            //                 one
+                            #[allow(clippy::redundant_closure_call)]
                             err.recovery_failed(tracerr::map_from_and_wrap!()(
                                 e.clone(),
                             ))
                         })?;
 
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::recovered(tracerr::map_from_and_wrap!()(e.clone()))
                     } else if stop_first {
                         self.disable_senders_without_tracks(
@@ -1516,8 +1526,12 @@ impl InnerRoom {
                             }
                         })?;
 
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     } else {
+                        // false positive: output expression is not input one
+                        #[allow(clippy::redundant_closure_call)]
                         E::errored(tracerr::map_from_and_wrap!()(e.clone()))
                     };
 
@@ -1574,6 +1588,7 @@ impl EventHandler for InnerRoom {
         &self,
         peer_id: PeerId,
         negotiation_role: NegotiationRole,
+        connection_mode: ConnectionMode,
         tracks: Vec<Track>,
         ice_servers: Vec<IceServer>,
         is_force_relayed: bool,
@@ -1583,6 +1598,7 @@ impl EventHandler for InnerRoom {
             ice_servers,
             is_force_relayed,
             Some(negotiation_role),
+            connection_mode,
         );
         for track in &tracks {
             peer_state.insert_track(track, self.send_constraints.clone());
@@ -1673,7 +1689,9 @@ impl EventHandler for InnerRoom {
             match update {
                 PeerUpdate::Added(track) => peer_state
                     .insert_track(&track, self.send_constraints.clone()),
-                PeerUpdate::Updated(patch) => peer_state.patch_track(&patch),
+                PeerUpdate::Updated(patch) => {
+                    peer_state.patch_track(patch).await;
+                }
                 PeerUpdate::IceRestart => {
                     peer_state.restart_ice();
                 }
@@ -1716,11 +1734,13 @@ impl EventHandler for InnerRoom {
         unreachable!("Room can't receive Event::RoomLeft")
     }
 
-    /// Updates [`peer::repo::State`] with the provided [`proto::state::Room`].
+    /// Updates the [`peer::repo::State`] and the [`Connections`] with the
+    /// provided [`proto::state::Room`].
     async fn on_state_synchronized(
         &self,
         state: proto::state::Room,
     ) -> Self::Output {
+        self.connections.apply(&state);
         self.peers.apply(state);
         Ok(())
     }
@@ -1753,6 +1773,32 @@ impl PeerEventHandler for InnerRoom {
                 sdp_m_line_index,
                 sdp_mid,
             },
+        });
+        Ok(())
+    }
+
+    /// Handles [`PeerEvent::IceCandidateError`] event and sends the received
+    /// error to RPC server.
+    async fn on_ice_candidate_error(
+        &self,
+        peer_id: PeerId,
+        address: Option<String>,
+        port: Option<u32>,
+        url: String,
+        error_code: i32,
+        error_text: String,
+    ) -> Self::Output {
+        self.rpc.send_command(Command::AddPeerConnectionMetrics {
+            peer_id,
+            metrics: PeerMetrics::PeerConnectionError(
+                PeerConnectionError::IceCandidate(IceCandidateError {
+                    address,
+                    port,
+                    url,
+                    error_code,
+                    error_text,
+                }),
+            ),
         });
         Ok(())
     }

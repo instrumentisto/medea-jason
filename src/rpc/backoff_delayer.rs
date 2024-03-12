@@ -63,7 +63,7 @@ impl backoff::future::Sleeper for Sleeper {
         let (tx, rx) = oneshot::channel();
         platform::spawn(async move {
             platform::delay_for(delay).await;
-            let _ = tx.send(());
+            _ = tx.send(());
         });
         Box::pin(rx.map(drop))
     }

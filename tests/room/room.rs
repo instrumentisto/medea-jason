@@ -14,10 +14,10 @@ use futures::{
     stream::{self, BoxStream, LocalBoxStream, StreamExt as _},
 };
 use medea_client_api_proto::{
-    self as proto, Command, Direction, Event, IceConnectionState,
-    MediaDirection, MediaSourceKind, MediaType, MemberId, NegotiationRole,
-    PeerId, PeerMetrics, PeerUpdate, Track, TrackId, TrackPatchCommand,
-    TrackPatchEvent, VideoSettings,
+    self as proto, AudioSettings, Command, ConnectionMode, Direction, Event,
+    IceConnectionState, MediaDirection, MediaSourceKind, MediaType, MemberId,
+    NegotiationRole, PeerId, PeerMetrics, PeerUpdate, Track, TrackId,
+    TrackPatchCommand, TrackPatchEvent, VideoSettings,
 };
 use medea_jason::{
     api::{
@@ -28,19 +28,19 @@ use medea_jason::{
     },
     media::MediaKind,
     peer::PeerConnection,
+    platform,
     room::Room,
     rpc::MockRpcSession,
     utils::Updatable,
 };
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{prelude::*, JsValue};
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use wasm_bindgen_test::*;
 
 use crate::{
     delay_for, get_test_recv_tracks, get_test_required_tracks, get_test_tracks,
-    get_test_unrequired_tracks, media_stream_settings, timeout,
-    unchecked_jsval_cast, wait_and_check_test_result, yield_now, MockNavigator,
-    TEST_ROOM_URL,
+    get_test_unrequired_tracks, jsval_cast, media_stream_settings, timeout,
+    wait_and_check_test_result, yield_now, MockNavigator, TEST_ROOM_URL,
 };
 
 wasm_bindgen_test_configure!(run_in_browser);
@@ -130,6 +130,7 @@ async fn get_test_room_and_exist_peer(
             tracks,
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
 
@@ -152,7 +153,8 @@ async fn error_get_local_stream_on_new_peer() {
     .await
     .unwrap();
     let (cb, test_result) = js_callback!(|err: JsValue| {
-        let err: LocalMediaInitException = unchecked_jsval_cast(err);
+        let err: LocalMediaInitException =
+            jsval_cast(err, "LocalMediaInitException").unwrap();
         let cause = err.cause().unwrap();
 
         assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed);
@@ -179,6 +181,7 @@ async fn error_get_local_stream_on_new_peer() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
 
@@ -202,11 +205,13 @@ async fn error_join_room_without_on_failed_stream_callback() {
         .on_connection_loss(js_sys::Function::new_no_args(""))
         .unwrap();
 
-    let err: StateError = unchecked_jsval_cast(
+    let err: StateError = jsval_cast(
         JsFuture::from(room_handle.join(String::from(TEST_ROOM_URL)))
             .await
             .unwrap_err(),
-    );
+        "StateError",
+    )
+    .unwrap();
 
     assert_eq!(
         err.message(),
@@ -231,11 +236,13 @@ async fn error_join_room_without_on_connection_loss_callback() {
         .on_failed_local_media(js_sys::Function::new_no_args(""))
         .unwrap();
 
-    let err: StateError = unchecked_jsval_cast(
+    let err: StateError = jsval_cast(
         JsFuture::from(room_handle.join(String::from(TEST_ROOM_URL)))
             .await
             .unwrap_err(),
-    );
+        "StateError",
+    )
+    .unwrap();
 
     assert_eq!(
         err.message(),
@@ -244,10 +251,68 @@ async fn error_join_room_without_on_connection_loss_callback() {
     assert!(!err.trace().is_empty());
 }
 
+mod connection_mode {
+    use medea_client_api_proto::ConnectionMode;
+
+    use super::*;
+
+    #[wasm_bindgen_test]
+    async fn p2p() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let room_handle = api::RoomHandle::from(room.new_handle());
+
+        JsFuture::from(room_handle.set_local_media_settings(
+            &media_stream_settings(true, true),
+            false,
+            false,
+        ))
+        .await
+        .unwrap();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Offerer,
+                tracks: Vec::new(),
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
+            })
+            .unwrap();
+    }
+
+    #[wasm_bindgen_test]
+    async fn sfu() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, commands_rx) = get_test_room(Box::pin(event_rx));
+        let room_handle = api::RoomHandle::from(room.new_handle());
+
+        JsFuture::from(room_handle.set_local_media_settings(
+            &media_stream_settings(true, true),
+            false,
+            false,
+        ))
+        .await
+        .unwrap();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Offerer,
+                tracks: Vec::new(),
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::Sfu,
+            })
+            .unwrap();
+    }
+}
+
 mod disable_recv_tracks {
     use medea_client_api_proto::{
-        AudioSettings, Direction, MediaSourceKind, MediaType, MemberId,
-        VideoSettings,
+        AudioSettings, ConnectionMode, Direction, MediaSourceKind, MediaType,
+        MemberId, VideoSettings,
     };
 
     use super::*;
@@ -273,6 +338,8 @@ mod disable_recv_tracks {
                             receivers: vec![MemberId::from("bob")],
                             mid: None,
                         },
+                        media_direction: MediaDirection::SendRecv,
+                        muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -283,6 +350,8 @@ mod disable_recv_tracks {
                             sender: MemberId::from("bob"),
                             mid: None,
                         },
+                        media_direction: MediaDirection::SendRecv,
+                        muted: false,
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
@@ -294,6 +363,8 @@ mod disable_recv_tracks {
                             sender: MemberId::from("bob"),
                             mid: None,
                         },
+                        media_direction: MediaDirection::SendRecv,
+                        muted: false,
                         media_type: MediaType::Audio(AudioSettings {
                             required: true,
                         }),
@@ -301,6 +372,7 @@ mod disable_recv_tracks {
                 ],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -330,6 +402,220 @@ mod disable_recv_tracks {
         }
 
         // TODO: add is_recv_audio/video asserts
+    }
+}
+
+mod init_track_states {
+    use medea_client_api_proto::{
+        AudioSettings, ConnectionMode, Direction, MediaType, MemberId,
+    };
+    use medea_jason::peer;
+
+    use super::*;
+
+    #[wasm_bindgen_test]
+    async fn init_sender_states() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let media_directions = Vec::from([
+            MediaDirection::SendOnly,
+            MediaDirection::SendOnly,
+            MediaDirection::RecvOnly,
+            MediaDirection::Inactive,
+        ]);
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(i.try_into().unwrap()),
+                direction: Direction::Send {
+                    receivers: Vec::from([MemberId::from("bob")]),
+                    mid: None,
+                },
+                media_direction: *media_direction,
+                muted: false,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
+            })
+            .unwrap();
+
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        for (i, media_direction) in media_directions.iter().enumerate() {
+            let sender = peer_state
+                .get_sender(TrackId(i.try_into().unwrap()))
+                .unwrap();
+            assert_eq!(
+                sender.is_enabled_general(),
+                media_direction.is_enabled_general()
+            );
+            assert_eq!(
+                sender.is_enabled_individual(),
+                media_direction.is_send_enabled()
+            );
+        }
+    }
+
+    #[wasm_bindgen_test]
+    async fn init_receiver_states() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        let media_directions = Vec::from([
+            MediaDirection::SendRecv,
+            MediaDirection::SendOnly,
+            MediaDirection::RecvOnly,
+            MediaDirection::Inactive,
+        ]);
+
+        let tracks = media_directions
+            .iter()
+            .enumerate()
+            .map(|(i, media_direction)| Track {
+                id: TrackId(i.try_into().unwrap()),
+                direction: Direction::Recv {
+                    sender: MemberId::from("bob"),
+                    mid: None,
+                },
+                media_direction: *media_direction,
+                muted: false,
+                media_type: MediaType::Audio(AudioSettings { required: true }),
+            })
+            .collect();
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks,
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
+            })
+            .unwrap();
+
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        for (i, media_direction) in media_directions.iter().enumerate() {
+            let receiver = peer_state
+                .get_receiver(TrackId(i.try_into().unwrap()))
+                .unwrap();
+            assert_eq!(receiver.media_direction(), (*media_direction).into());
+            assert_eq!(
+                receiver.enabled_general(),
+                media_direction.is_enabled_general()
+            );
+            assert_eq!(
+                receiver.enabled_individual(),
+                media_direction.is_recv_enabled()
+            );
+        }
+    }
+}
+
+mod receivers_patch_send_tracks {
+    use medea_client_api_proto::{
+        AudioSettings, ConnectionMode, Direction, MediaType, MemberId,
+    };
+    use medea_jason::peer;
+
+    use super::*;
+
+    #[wasm_bindgen_test]
+    async fn update_sender_receivers() {
+        let (event_tx, event_rx) = mpsc::unbounded();
+        let (room, _) = get_test_room(Box::pin(event_rx));
+
+        event_tx
+            .unbounded_send(Event::PeerCreated {
+                peer_id: PeerId(1),
+                negotiation_role: NegotiationRole::Answerer("offer".into()),
+                tracks: Vec::from([Track {
+                    id: TrackId(0),
+                    direction: Direction::Send {
+                        receivers: vec![MemberId::from("bob")],
+                        mid: None,
+                    },
+                    media_direction: MediaDirection::SendRecv,
+                    muted: false,
+                    media_type: MediaType::Audio(AudioSettings {
+                        required: true,
+                    }),
+                }]),
+                ice_servers: Vec::new(),
+                force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        let peer_state: Rc<peer::State> =
+            room.get_peer_state_by_id(PeerId(1)).unwrap();
+        peer_state.when_updated().await;
+
+        let sender = peer_state.get_sender(TrackId(0)).unwrap();
+
+        assert_eq!(sender.receivers().len(), 1);
+        assert!(sender.receivers().contains(&MemberId::from("bob")));
+
+        event_tx
+            .unbounded_send(Event::PeerUpdated {
+                peer_id: PeerId(1),
+                updates: Vec::from([PeerUpdate::Updated(TrackPatchEvent {
+                    id: TrackId(0),
+                    media_direction: None,
+                    receivers: Some(Vec::new()),
+                    muted: None,
+                })]),
+                negotiation_role: None,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        peer_state.when_updated().await;
+        assert!(sender.receivers().is_empty());
+
+        event_tx
+            .unbounded_send(Event::PeerUpdated {
+                peer_id: PeerId(1),
+                updates: Vec::from([PeerUpdate::Updated(TrackPatchEvent {
+                    id: TrackId(0),
+                    media_direction: None,
+                    receivers: Some(Vec::from([
+                        MemberId::from("bob"),
+                        MemberId::from("eva"),
+                    ])),
+                    muted: None,
+                })]),
+                negotiation_role: None,
+            })
+            .unwrap();
+        delay_for(200).await;
+
+        peer_state.when_updated().await;
+        assert_eq!(sender.receivers().len(), 2);
+        assert!(sender.receivers().contains(&MemberId::from("bob")));
+        assert!(sender.receivers().contains(&MemberId::from("eva")));
     }
 }
 
@@ -393,6 +679,8 @@ mod disable_send_tracks {
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv,
+            muted: false,
             media_type: MediaType::Audio(AudioSettings { required }),
         }
     }
@@ -408,6 +696,8 @@ mod disable_send_tracks {
                 receivers: vec![MemberId::from("bob")],
                 mid: None,
             },
+            media_direction: MediaDirection::SendRecv,
+            muted: false,
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
@@ -743,6 +1033,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -768,6 +1059,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
+                    receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
@@ -822,6 +1114,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -847,6 +1140,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(1),
+                    receivers: None,
                     media_direction: None,
                     muted: Some(true),
                 })],
@@ -904,6 +1198,7 @@ mod disable_send_tracks {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -929,6 +1224,7 @@ mod disable_send_tracks {
                 peer_id: PeerId(1),
                 updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                     id: TrackId(2),
+                    receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
                 })],
@@ -1230,6 +1526,8 @@ mod patches_generation {
                 .map(|(track_i, (media_type, direction))| Track {
                     id: TrackId(track_i as u32),
                     direction: direction.clone(),
+                    media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: media_type.clone(),
                 })
                 .inspect(|track| {
@@ -1245,6 +1543,7 @@ mod patches_generation {
                     tracks,
                     ice_servers: Vec::new(),
                     force_relay: false,
+                    connection_mode: ConnectionMode::Mesh,
                 })
                 .unwrap();
 
@@ -1266,6 +1565,7 @@ mod patches_generation {
                         peer_id: PeerId(i + 1),
                         updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                             id: audio_track_id,
+                            receivers: None,
                             media_direction: Some(media_direction),
                             muted: Some(matches!(
                                 state,
@@ -1425,53 +1725,6 @@ mod patches_generation {
         assert!(timeout(5, command_rx.next()).await.is_err());
     }
 
-    /// Tests that [`Room`] will generate [`Command::UpdateTracks`] only for
-    /// enabled [`PeerConnection`].
-    ///
-    /// # Algorithm
-    ///
-    /// 1. Get mock of [`Room`] and [`Command`]s receiver of this [`Room`] with
-    ///    one enabled [`PeerConnection`]s and one disabled [`PeerConnection`].
-    ///
-    /// 2. Call [`RoomHandle::disable_audio`].
-    ///
-    /// 3. Check that [`Room`] tries to send [`Command::UpdateTracks`] only for
-    ///    enabled [`PeerConnection`].
-    #[wasm_bindgen_test]
-    async fn disable_room_with_one_disabled_track() {
-        let (room, mut command_rx) = get_room_and_commands_receiver(
-            2,
-            |i| {
-                if i % 2 == 1 {
-                    media_exchange_state::Stable::Enabled.into()
-                } else {
-                    media_exchange_state::Stable::Disabled.into()
-                }
-            },
-            audio_and_device_video_tracks_content(),
-        )
-        .await;
-        let room_handle = api::RoomHandle::from(room.new_handle());
-
-        spawn_local(async move {
-            JsFuture::from(room_handle.disable_audio())
-                .await
-                .unwrap_err();
-        });
-
-        assert_eq!(
-            command_rx.next().await.unwrap(),
-            Command::UpdateTracks {
-                peer_id: PeerId(2),
-                tracks_patches: vec![TrackPatchCommand {
-                    id: TrackId(0),
-                    enabled: Some(false),
-                    muted: None,
-                }]
-            }
-        );
-    }
-
     /// Checks that on device video muting, correct [`Command::UpdateTracks`]
     /// will be sent to the `Media Server`.
     ///
@@ -1600,7 +1853,7 @@ mod patches_generation {
         });
 
         assert_eq!(
-            command_rx.next().await.unwrap(),
+            command_rx.skip(1).next().await.unwrap(),
             Command::UpdateTracks {
                 peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
@@ -1630,7 +1883,7 @@ mod patches_generation {
         });
 
         assert_eq!(
-            command_rx.next().await.unwrap(),
+            command_rx.skip(1).next().await.unwrap(),
             Command::UpdateTracks {
                 peer_id: PeerId(1),
                 tracks_patches: vec![TrackPatchCommand {
@@ -1719,6 +1972,7 @@ async fn disable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1749,6 +2003,7 @@ async fn enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1767,6 +2022,7 @@ async fn enable_by_server() {
             )),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
             })],
@@ -1802,6 +2058,7 @@ async fn only_one_gum_performed_on_enable() {
             negotiation_role: Some(NegotiationRole::Offerer),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1820,6 +2077,7 @@ async fn only_one_gum_performed_on_enable() {
             negotiation_role: Some(NegotiationRole::Offerer),
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1851,11 +2109,13 @@ async fn no_updates_sent_if_gum_fails_on_enable() {
 
     mock.error_get_user_media("gum error".into());
 
-    let err: LocalMediaInitException = unchecked_jsval_cast(
+    let err: LocalMediaInitException = jsval_cast(
         JsFuture::from(room_handle.enable_audio())
             .await
             .unwrap_err(),
-    );
+        "LocalMediaInitException",
+    )
+    .unwrap();
 
     assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed);
     assert!(err.message().contains("gum error"));
@@ -1897,11 +2157,13 @@ async fn set_media_state_return_media_error() {
 
     mock.error_get_user_media(ERROR_MSG.into());
 
-    let err: LocalMediaInitException = unchecked_jsval_cast(
+    let err: LocalMediaInitException = jsval_cast(
         JsFuture::from(room_handle.enable_audio())
             .await
             .unwrap_err(),
-    );
+        "LocalMediaInitException",
+    )
+    .unwrap();
 
     assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed);
     assert_eq!(
@@ -1936,6 +2198,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -1953,6 +2216,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: audio_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -2003,6 +2267,7 @@ async fn send_enabling_holds_local_tracks() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
     // wait until Event::PeerCreated is handled
@@ -2013,6 +2278,7 @@ async fn send_enabling_holds_local_tracks() {
             negotiation_role: None,
             updates: vec![PeerUpdate::Updated(TrackPatchEvent {
                 id: video_track_id,
+                receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
             })],
@@ -2023,11 +2289,13 @@ async fn send_enabling_holds_local_tracks() {
 
     let mock = MockNavigator::new();
     mock.error_get_user_media("foobar".into());
-    let err: LocalMediaInitException = unchecked_jsval_cast(
+    let err: LocalMediaInitException = jsval_cast(
         JsFuture::from(room_handle.enable_video(None))
             .await
             .unwrap_err(),
-    );
+        "LocalMediaInitException",
+    )
+    .unwrap();
     assert_eq!(err.kind(), LocalMediaInitExceptionKind::GetUserMediaFailed);
     assert_eq!(
         err.message(),
@@ -2042,8 +2310,9 @@ mod set_local_media_settings {
     use super::*;
 
     use medea_jason::api::err::{
-        LocalMediaInitException, MediaSettingsUpdateException,
-        MediaStateTransitionException,
+        InternalException, LocalMediaInitException,
+        MediaSettingsUpdateException, MediaStateTransitionException,
+        MediaStateTransitionExceptionKind,
     };
 
     /// Sets up connection between two peers in single room with first peer
@@ -2063,6 +2332,8 @@ mod set_local_media_settings {
                         receivers: vec![MemberId::from("bob")],
                         mid: None,
                     },
+                    media_direction: MediaDirection::SendRecv,
+                    muted: false,
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
@@ -2070,6 +2341,7 @@ mod set_local_media_settings {
                 }],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -2091,6 +2363,8 @@ mod set_local_media_settings {
                                     sender: MemberId::from("Alice"),
                                     mid: Some(String::from("1")),
                                 },
+                                media_direction: MediaDirection::SendRecv,
+                                muted: false,
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
@@ -2098,6 +2372,7 @@ mod set_local_media_settings {
                             }],
                             ice_servers: Vec::new(),
                             force_relay: false,
+                            connection_mode: ConnectionMode::Mesh,
                         })
                         .unwrap();
                 }
@@ -2203,7 +2478,8 @@ mod set_local_media_settings {
         let room_handle = api::RoomHandle::from(room.new_handle());
 
         let (cb, test_result) = js_callback!(|err: JsValue| {
-            let err: MediaStateTransitionException = unchecked_jsval_cast(err);
+            let err: MediaStateTransitionException =
+                jsval_cast(err, "MediaStateTransitionException")?;
             cb_assert_eq!(
                 err.message(),
                 "MediaExchangeState of Sender cannot transit to \
@@ -2232,6 +2508,7 @@ mod set_local_media_settings {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
 
@@ -2249,7 +2526,8 @@ mod set_local_media_settings {
     #[wasm_bindgen_test]
     async fn error_inject_invalid_local_stream_into_room_on_exists_peer() {
         let (cb, test_result) = js_callback!(|err: JsValue| {
-            let err: MediaStateTransitionException = unchecked_jsval_cast(err);
+            let err: MediaStateTransitionException =
+                jsval_cast(err, "MediaStateTransitionException")?;
             cb_assert_eq!(
                 &err.message(),
                 "provided multiple device video MediaStreamTracks"
@@ -2265,7 +2543,7 @@ mod set_local_media_settings {
 
         let room_handle = api::RoomHandle::from(room.new_handle());
         room_handle.on_failed_local_media(cb.into()).unwrap();
-        let err: MediaSettingsUpdateException = unchecked_jsval_cast(
+        let err: MediaSettingsUpdateException = jsval_cast(
             JsFuture::from(room_handle.set_local_media_settings(
                 &constraints,
                 false,
@@ -2273,9 +2551,12 @@ mod set_local_media_settings {
             ))
             .await
             .unwrap_err(),
-        );
+            "MediaSettingsUpdateException",
+        )
+        .unwrap();
         let cause: MediaStateTransitionException =
-            unchecked_jsval_cast(err.cause().into());
+            jsval_cast(err.cause().into(), "MediaStateTransitionException")
+                .unwrap();
         assert_eq!(err.rolled_back(), false);
         assert_eq!(
             cause.message(),
@@ -2380,6 +2661,7 @@ mod set_local_media_settings {
                 tracks: vec![audio_track, video_track],
                 ice_servers: Vec::new(),
                 force_relay: false,
+                connection_mode: ConnectionMode::Mesh,
             })
             .unwrap();
         delay_for(10).await;
@@ -2421,7 +2703,7 @@ mod set_local_media_settings {
         let room_handle = api::RoomHandle::from(room.new_handle());
         let mock_navigator = MockNavigator::new();
         mock_navigator.error_get_user_media("disables_on_fail".into());
-        let err: MediaSettingsUpdateException = unchecked_jsval_cast(
+        let err: MediaSettingsUpdateException = jsval_cast(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 true,
@@ -2429,11 +2711,13 @@ mod set_local_media_settings {
             ))
             .await
             .unwrap_err(),
-        );
+            "MediaSettingsUpdateException",
+        )
+        .unwrap();
         mock_navigator.stop();
 
         let cause: LocalMediaInitException =
-            unchecked_jsval_cast(err.cause().into());
+            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
         assert!(cause.message().contains("disables_on_fail"));
         assert_eq!(err.rolled_back(), false);
 
@@ -2457,7 +2741,7 @@ mod set_local_media_settings {
         .unwrap();
 
         let mock_navigator = MockNavigator::new();
-        let err: MediaSettingsUpdateException = unchecked_jsval_cast(
+        let err: MediaSettingsUpdateException = jsval_cast(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 true,
@@ -2465,11 +2749,13 @@ mod set_local_media_settings {
             ))
             .await
             .unwrap_err(),
-        );
+            "MediaSettingsUpdateException",
+        )
+        .unwrap();
         mock_navigator.stop();
 
         let cause: LocalMediaInitException =
-            unchecked_jsval_cast(err.cause().into());
+            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
         assert_eq!(err.rolled_back(), true);
         assert!(cause.message().contains(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed",
@@ -2497,7 +2783,7 @@ mod set_local_media_settings {
 
         let mock_navigator = MockNavigator::new();
         mock_navigator.error_get_user_media("disables_on_rollback_fail".into());
-        let err: MediaSettingsUpdateException = unchecked_jsval_cast(
+        let err: MediaSettingsUpdateException = jsval_cast(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 true,
@@ -2505,11 +2791,13 @@ mod set_local_media_settings {
             ))
             .await
             .unwrap_err(),
-        );
+            "MediaSettingsUpdateException",
+        )
+        .unwrap();
         mock_navigator.stop();
 
         let cause: LocalMediaInitException =
-            unchecked_jsval_cast(err.cause().into());
+            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
         assert_eq!(err.rolled_back(), false);
         assert!(cause.message().contains(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed",
@@ -2537,7 +2825,7 @@ mod set_local_media_settings {
         mock_navigator
             .error_get_user_media("doesnt_disables_if_not_stop_first".into());
 
-        let err: MediaSettingsUpdateException = unchecked_jsval_cast(
+        let err: MediaSettingsUpdateException = jsval_cast(
             JsFuture::from(room_handle.set_local_media_settings(
                 &media_settings_with_device_id(),
                 false,
@@ -2545,11 +2833,13 @@ mod set_local_media_settings {
             ))
             .await
             .unwrap_err(),
-        );
+            "MediaSettingsUpdateException",
+        )
+        .unwrap();
         mock_navigator.stop();
 
         let cause: LocalMediaInitException =
-            unchecked_jsval_cast(err.cause().into());
+            jsval_cast(err.cause().into(), "LocalMediaInitException").unwrap();
         assert_eq!(err.rolled_back(), true);
         assert!(cause.message().contains(
             "Failed to get local tracks: MediaDevices.getUserMedia() failed",
@@ -2568,8 +2858,8 @@ mod state_synchronization {
 
     use futures::{channel::mpsc, stream, StreamExt as _};
     use medea_client_api_proto::{
-        state, AudioSettings, Command, Event, MediaDirection, MediaType,
-        NegotiationRole, PeerId, TrackId,
+        state, AudioSettings, Command, ConnectionMode, Event, MediaDirection,
+        MediaType, MemberId, NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
         media::MediaManager, room::Room, rpc::MockRpcSession,
@@ -2610,9 +2900,10 @@ mod state_synchronization {
                 id: TrackId(0),
                 muted: false,
                 media_direction: MediaDirection::SendRecv,
-                receivers: Vec::new(),
+                receivers: vec![MemberId::from("Test")],
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
+                connection_mode: ConnectionMode::Mesh,
             },
         );
         let mut receivers = HashMap::new();
@@ -2625,6 +2916,7 @@ mod state_synchronization {
                 sender_id: "".into(),
                 media_type: MediaType::Audio(AudioSettings { required: true }),
                 mid: None,
+                connection_mode: ConnectionMode::Mesh,
             },
         );
         let mut room_proto = room.peers_state().as_proto();
@@ -2641,6 +2933,7 @@ mod state_synchronization {
                 local_sdp: None,
                 remote_sdp: None,
                 ice_candidates: HashSet::new(),
+                connection_mode: ConnectionMode::Mesh,
             },
         );
         event_tx
@@ -2681,6 +2974,7 @@ async fn intentions_are_sent_on_reconnect() {
             tracks: vec![audio_track, video_track],
             ice_servers: Vec::new(),
             force_relay: false,
+            connection_mode: ConnectionMode::Mesh,
         })
         .unwrap();
     while let Some(cmd) = commands_rx.next().await {
@@ -2731,4 +3025,92 @@ async fn intentions_are_sent_on_reconnect() {
     })
     .await
     .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn sender_answerer() {
+    let (event_tx, event_rx) = mpsc::unbounded();
+    let (room, mut commands_rx) = get_test_room(Box::pin(event_rx));
+    let room_handle = api::RoomHandle::from(room.new_handle());
+    JsFuture::from(room_handle.set_local_media_settings(
+        &media_stream_settings(true, true),
+        false,
+        false,
+    ))
+    .await
+    .unwrap();
+
+    let peer = platform::RtcPeerConnection::new(Vec::new(), false)
+        .await
+        .unwrap();
+
+    let a_tr = peer
+        .add_transceiver(MediaKind::Audio, platform::TransceiverDirection::RECV)
+        .await;
+    let v_tr = peer
+        .add_transceiver(MediaKind::Video, platform::TransceiverDirection::RECV)
+        .await;
+    let offer = peer.create_offer().await.unwrap();
+    peer.set_offer(&offer).await.unwrap();
+
+    event_tx
+        .unbounded_send(Event::PeerCreated {
+            peer_id: PeerId(1),
+            negotiation_role: NegotiationRole::Answerer(offer),
+            tracks: vec![
+                Track {
+                    id: TrackId(1),
+                    direction: Direction::Send {
+                        receivers: Vec::new(),
+                        mid: Some(a_tr.mid().unwrap()),
+                    },
+                    media_direction: MediaDirection::SendRecv,
+                    muted: false,
+                    media_type: MediaType::Audio(AudioSettings {
+                        required: true,
+                    }),
+                },
+                Track {
+                    id: TrackId(2),
+                    direction: Direction::Send {
+                        receivers: Vec::new(),
+                        mid: Some(v_tr.mid().unwrap()),
+                    },
+                    media_direction: MediaDirection::SendRecv,
+                    muted: false,
+                    media_type: MediaType::Video(VideoSettings {
+                        required: true,
+                        source_kind: MediaSourceKind::Device,
+                    }),
+                },
+            ],
+            ice_servers: Vec::new(),
+            force_relay: false,
+            connection_mode: ConnectionMode::Mesh,
+        })
+        .unwrap();
+
+    loop {
+        let command = timeout(200, commands_rx.next()).await.unwrap().unwrap();
+
+        match command {
+            Command::MakeSdpAnswer {
+                sdp_answer,
+                transceivers_statuses,
+                ..
+            } => {
+                assert!(sdp_answer
+                    .contains(&format!("a=mid:{}", a_tr.mid().unwrap())));
+                assert!(sdp_answer
+                    .contains(&format!("a=mid:{}", v_tr.mid().unwrap())));
+                assert_eq!(sdp_answer.match_indices("a=sendonly").count(), 2);
+
+                assert_eq!(transceivers_statuses.get(&TrackId(1)), Some(&true));
+                assert_eq!(transceivers_statuses.get(&TrackId(2)), Some(&true));
+
+                break;
+            }
+            _ => continue,
+        }
+    }
 }

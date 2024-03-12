@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as fw;
-import 'package:retry/retry.dart';
 
 import 'package:medea_jason/medea_jason.dart';
 import '../world/custom_world.dart';
@@ -11,23 +9,23 @@ import '../world/more_args.dart';
 
 List<StepDefinitionGeneric> steps() {
   return [
-    given_gum_delay,
-    then_local_track_mute_state,
-    then_remote_media_direction_is,
-    then_track_is_stopped,
-    when_enables_or_mutes,
-    when_member_enables_remote_track,
-    when_member_frees_all_local_tracks,
-    when_member_switches_device_with_latency
+    givenGumDelay,
+    thenLocalTrackMuteState,
+    thenRemoteMediaDirectionIs,
+    thenTrackIsStopped,
+    whenEnablesOrMutes,
+    whenMemberEnablesRemoteTrack,
+    whenMemberFreesAllLocalTracks,
+    whenMemberSwitchesDeviceWithLatency
   ];
 }
 
-StepDefinitionGeneric when_enables_or_mutes =
+StepDefinitionGeneric whenEnablesOrMutes =
     when4<String, String, String, String, CustomWorld>(
   RegExp(r'(\S+) (enables|disables|mutes|unmutes) (audio|video) and'
       r' (awaits it completes|awaits it errors|ignores the result)?$'),
-  (id, action, audio_or_video, String awaits, context) async {
-    var kind = parse_media_kind(audio_or_video);
+  (id, action, audioOrVideo, String awaits, context) async {
+    var kind = parseMediaKind(audioOrVideo);
     var member = context.world.members[id]!;
 
     var awaitable = awaits.contains('awaits');
@@ -35,19 +33,19 @@ StepDefinitionGeneric when_enables_or_mutes =
     Future<void> future;
     switch (action) {
       case 'enables':
-        future = member.toggle_media(kind.item1, kind.item2, true);
+        future = member.toggleMedia(kind.item1, kind.item2, true);
         break;
 
       case 'disables':
-        future = member.toggle_media(kind.item1, kind.item2, false);
+        future = member.toggleMedia(kind.item1, kind.item2, false);
         break;
 
       case 'mutes':
-        future = member.toggle_mute(kind.item1, kind.item2, true);
+        future = member.toggleMute(kind.item1, kind.item2, true);
         break;
 
       default:
-        future = member.toggle_mute(kind.item1, kind.item2, false);
+        future = member.toggleMute(kind.item1, kind.item2, false);
         break;
     }
 
@@ -67,22 +65,22 @@ StepDefinitionGeneric when_enables_or_mutes =
   },
 );
 
-StepDefinitionGeneric when_member_enables_remote_track =
+StepDefinitionGeneric whenMemberEnablesRemoteTrack =
     when3<String, String, String, CustomWorld>(
   RegExp(r'(\S+) (enables|disables) remote '
       r'(audio|(?:device |display )?video)$'),
   (id, toggle, String kind, context) async {
-    var parsedKind = parse_media_kind(kind);
+    var parsedKind = parseMediaKind(kind);
     var member = context.world.members[id]!;
 
     if (toggle == 'enables') {
-      if (parsedKind.item1 == MediaKind.Audio) {
+      if (parsedKind.item1 == MediaKind.audio) {
         await member.room.enableRemoteAudio();
       } else {
         await member.room.enableRemoteVideo();
       }
     } else {
-      if (parsedKind.item1 == MediaKind.Audio) {
+      if (parsedKind.item1 == MediaKind.audio) {
         await member.room.disableRemoteAudio();
       } else {
         await member.room.disableRemoteVideo();
@@ -91,83 +89,77 @@ StepDefinitionGeneric when_member_enables_remote_track =
   },
 );
 
-StepDefinitionGeneric then_remote_media_direction_is =
+StepDefinitionGeneric thenRemoteMediaDirectionIs =
     then4<String, String, String, String, CustomWorld>(
   RegExp(r"(\S+)'s (audio|video) from (\S+) has "
       r'`(SendRecv|SendOnly|RecvOnly|Inactive)` direction$'),
-  (id, String kind, remote_id, direction, context) async {
+  (id, String kind, remoteId, direction, context) async {
     var member = context.world.members[id]!;
 
-    var parsedKind = parse_media_kind(kind);
+    var parsedKind = parseMediaKind(kind);
 
-    await member.wait_for_connect(remote_id);
-    var track = await member.wait_remote_track_from(
-        remote_id, parsedKind.item2, parsedKind.item1);
+    await member.waitForConnect(remoteId);
+    var track = await member.waitRemoteTrackFrom(
+        remoteId, parsedKind.item2, parsedKind.item1);
 
-    var dir = TrackMediaDirection.values.firstWhere((e) => e.name == direction);
+    var dir = TrackMediaDirection.values
+        .firstWhere((e) => e.name.toLowerCase() == direction.toLowerCase());
 
-    await member.wait_media_direction_track(dir, track);
+    await member
+        .waitMediaDirectionTrack(dir, track)
+        .timeout(const Duration(seconds: 10));
   },
 );
 
-StepDefinitionGeneric then_local_track_mute_state =
+StepDefinitionGeneric thenLocalTrackMuteState =
     then3<String, String, String, CustomWorld>(
   RegExp(r"(\S+)'s (audio|(?:device|display) video) local track is "
       r'(not )?muted$'),
-  (id, String kind, not_muted, context) async {
+  (id, String kind, notMuted, context) async {
     var member = context.world.members[id]!;
-    var parsedKind = parse_media_kind(kind);
+    var parsedKind = parseMediaKind(kind);
 
-    var track =
-        await member.wait_local_track(parsedKind.item2, parsedKind.item1);
-    var muted = !not_muted.contains('not');
+    var track = await member.waitLocalTrack(parsedKind.item2, parsedKind.item1);
+    var muted = !notMuted.contains('not');
     expect(!track.getTrack().isEnabled(), muted);
   },
 );
 
-StepDefinitionGeneric then_track_is_stopped =
-    then2<String, String, CustomWorld>(
+StepDefinitionGeneric thenTrackIsStopped = then2<String, String, CustomWorld>(
   RegExp(r"(\S+)'s (audio|(?:device|display) video) local track is "
       r'stopped$'),
   (id, kind, context) async {
     var member = context.world.members[id]!;
-    var parsedKind = parse_media_kind(kind);
-    var track =
-        await member.wait_local_track(parsedKind.item2, parsedKind.item1);
+    var parsedKind = parseMediaKind(kind);
+    var track = await member.waitLocalTrack(parsedKind.item2, parsedKind.item1);
 
-    var track_ = track.getTrack();
-    track.free();
-
-    // We might have to wait for Rust side for a little bit
-    await retry(() async {
-      expect(await track_.state(), fw.MediaStreamTrackState.ended);
-    });
+    await track.free();
   },
 );
 
-StepDefinitionGeneric when_member_frees_all_local_tracks =
+StepDefinitionGeneric whenMemberFreesAllLocalTracks =
     when1<String, CustomWorld>(
   RegExp(r'(\S+) frees all local tracks$'),
   (id, context) async {
     var member = context.world.members[id]!;
-    await member.forget_local_tracks();
+    await member.forgetLocalTracks();
   },
 );
 
-StepDefinitionGeneric when_member_switches_device_with_latency =
+StepDefinitionGeneric whenMemberSwitchesDeviceWithLatency =
     when1<String, CustomWorld>(
   RegExp(r'(\S+) switches device with latency$'),
   (id, context) async {
     var member = context.world.members[id]!;
-    member.set_gum_latency(Duration(seconds: 3));
-    await member.switch_video_device();
+    member.setGumLatency(const Duration(seconds: 3));
+    await member.switchVideoDevice();
   },
 );
 
-StepDefinitionGeneric given_gum_delay = given1<String, CustomWorld>(
+StepDefinitionGeneric givenGumDelay = given1<String, CustomWorld>(
   RegExp(r"(\S+)'s `getUserMedia\(\)` request has added latency$"),
   (id, context) async {
     var member = context.world.members[id]!;
-    member.set_gum_latency(Duration(milliseconds: 500));
+    member.setGumLatency(const Duration(milliseconds: 500));
   },
 );

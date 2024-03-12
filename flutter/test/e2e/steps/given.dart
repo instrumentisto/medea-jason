@@ -13,84 +13,82 @@ List<StepDefinitionGeneric> steps() {
   ];
 }
 
-Future<void> new_given_member(
+Future<void> newGivenMember(
     String joined,
-    first_member_id,
-    second_member_id,
-    third_member_id,
-    String media_settings,
-    disabled_media_type,
-    String disabled_direction,
+    firstMemberId,
+    secondMemberId,
+    thirdMemberId,
+    String mediaSettings,
+    disabledMediaType,
+    String disabledDirection,
     StepContext<CustomWorld> context) async {
-  var not_endpoint_direction = '';
-  if (media_settings.contains('publish')) {
-    not_endpoint_direction = 'publish';
+  var notEndpointDirection = '';
+  if (mediaSettings.contains('publish')) {
+    notEndpointDirection = 'publish';
   }
-  if (media_settings.contains('play')) {
-    not_endpoint_direction = 'play';
+  if (mediaSettings.contains('play')) {
+    notEndpointDirection = 'play';
   }
 
-  var endpoints_disabled = media_settings.contains(' with no WebRTC endpoints');
+  var endpointsDisabled = mediaSettings.contains(' with no WebRTC endpoints');
 
-  var all_endpoints_disabled =
-      endpoints_disabled && not_endpoint_direction == '';
-  var is_send_disabled = endpoints_disabled &&
-      (all_endpoints_disabled || not_endpoint_direction == 'publish');
-  var is_recv_disabled = endpoints_disabled &&
-      (all_endpoints_disabled || not_endpoint_direction == 'play');
+  var allEndpointsDisabled = endpointsDisabled && notEndpointDirection == '';
+  var isSendDisabled = endpointsDisabled &&
+      (allEndpointsDisabled || notEndpointDirection == 'publish');
+  var isRecvDisabled = endpointsDisabled &&
+      (allEndpointsDisabled || notEndpointDirection == 'play');
 
-  var member_builder =
-      MemberBuilder(first_member_id, !is_send_disabled, !is_recv_disabled);
+  var memberBuilder =
+      MemberBuilder(firstMemberId, !isSendDisabled, !isRecvDisabled);
 
-  await context.world.create_member(member_builder);
+  await context.world.createMember(memberBuilder);
+
+  var member = context.world.members[firstMemberId]!;
+
+  var isAudio = disabledMediaType == ' audio' || disabledMediaType == ' media';
+  var isVideo = disabledMediaType == ' video' || disabledMediaType == ' media';
+  var isPublish =
+      disabledDirection.contains(' publishing') || disabledDirection.isEmpty;
+  var isPlaying =
+      disabledDirection.contains(' playing') || disabledDirection.isEmpty;
+
+  if (mediaSettings.contains(' disabled')) {
+    if (isPublish) {
+      if (isAudio) {
+        await member.toggleMedia(MediaKind.audio, null, false);
+      }
+      if (isVideo) {
+        await member.toggleMedia(MediaKind.video, null, false);
+      }
+    }
+  }
+
+  if (mediaSettings.contains(' muted')) {
+    if (isAudio) {
+      await member.toggleMute(MediaKind.audio, null, true);
+    }
+    if (isVideo) {
+      await member.toggleMute(MediaKind.video, null, true);
+    }
+  }
+
   if (joined.contains('joined ')) {
-    await context.world.join_room(first_member_id);
-    await context.world.wait_for_interconnection(first_member_id);
+    await context.world.joinRoom(firstMemberId);
+    await context.world.waitForInterconnection(firstMemberId);
   }
 
-  var member = context.world.members[first_member_id]!;
-
-  var is_audio =
-      disabled_media_type == ' audio' || disabled_media_type == ' media';
-  var is_video =
-      disabled_media_type == ' video' || disabled_media_type == ' media';
-
-  if (media_settings.contains(' disabled')) {
-    var is_publish = disabled_direction.contains(' publishing') ||
-        disabled_direction.isEmpty;
-    var is_playing =
-        disabled_direction.contains(' playing') || disabled_direction.isEmpty;
-
-    if (is_publish) {
-      if (is_audio) {
-        await member.toggle_media(MediaKind.Audio, null, false);
-      }
-      if (is_video) {
-        await member.toggle_media(MediaKind.Video, null, false);
-      }
+  if (isPlaying) {
+    if (isAudio) {
+      await member.toggleRemoteMedia(MediaKind.audio, null, false);
     }
-    if (is_playing) {
-      if (is_audio) {
-        await member.toggle_remote_media(MediaKind.Audio, null, false);
-      }
-      if (is_video) {
-        await member.toggle_remote_media(MediaKind.Video, null, false);
-      }
+    if (isVideo) {
+      await member.toggleRemoteMedia(MediaKind.video, null, false);
     }
   }
 
-  if (media_settings.contains(' muted')) {
-    if (is_audio) {
-      await member.toggle_mute(MediaKind.Audio, null, true);
-    }
-    if (is_video) {
-      await member.toggle_mute(MediaKind.Video, null, true);
-    }
-  }
-
-  if (second_member_id != '') {
-    await new_given_member(joined, second_member_id, third_member_id, '',
-        media_settings, disabled_media_type, disabled_direction, context);
+  if (secondMemberId != '') {
+    await newGivenMember(joined, secondMemberId, thirdMemberId, '',
+        mediaSettings, disabledMediaType, disabledDirection, context);
   }
 }
 
@@ -100,10 +98,10 @@ StepDefinitionGeneric givenOneMember =
   r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
   r'( media| audio| video|)( publishing| playing|)$',
-  (joined, first_member_id, endpoints, disabled_media_type, disabled_direction,
+  (joined, firstMemberId, endpoints, disabledMediaType, disabledDirection,
       context) async {
-    await new_given_member(joined, first_member_id, '', '', endpoints,
-        disabled_media_type, disabled_direction, context);
+    await newGivenMember(joined, firstMemberId, '', '', endpoints,
+        disabledMediaType, disabledDirection, context);
   },
 );
 
@@ -113,10 +111,10 @@ StepDefinitionGeneric givenTwoMembers =
   r'(\S+)( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
   r'( media| audio| video|)( publishing| playing|)$',
-  (joined, first_member_id, second_member_id, endpoints, disabled_media_type,
-      disabled_direction, context) async {
-    await new_given_member(joined, first_member_id, second_member_id, '',
-        endpoints, disabled_media_type, disabled_direction, context);
+  (joined, firstMemberId, secondMemberId, endpoints, disabledMediaType,
+      disabledDirection, context) async {
+    await newGivenMember(joined, firstMemberId, secondMemberId, '', endpoints,
+        disabledMediaType, disabledDirection, context);
   },
 );
 
@@ -127,16 +125,9 @@ StepDefinitionGeneric givenTreeMembers =
   r'( with no WebRTC endpoints| with no publish WebRTC endpoints| '
   r'with no play WebRTC endpoints| with disabled| with muted|)'
   r'( media| audio| video|)( publishing| playing|)$',
-  (joined, first_member_id, second_member_id, third_member_id, endpoints,
-      disabled_media_type, disabled_direction, context) async {
-    await new_given_member(
-        joined,
-        first_member_id,
-        second_member_id,
-        third_member_id,
-        endpoints,
-        disabled_media_type,
-        disabled_direction,
-        context);
+  (joined, firstMemberId, secondMemberId, thirdMemberId, endpoints,
+      disabledMediaType, disabledDirection, context) async {
+    await newGivenMember(joined, firstMemberId, secondMemberId, thirdMemberId,
+        endpoints, disabledMediaType, disabledDirection, context);
   },
 );

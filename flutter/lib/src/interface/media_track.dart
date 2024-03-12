@@ -2,43 +2,18 @@ import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 
 import '../util/rust_handles_storage.dart';
 
-/// Representation of a [`MediaStreamTrack.kind`][1].
-///
-/// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-kind
-enum MediaKind {
-  /// Audio track.
-  Audio,
+import 'enums.dart'
+    show MediaDirection, MediaKind, MediaSourceKind, MediaStreamTrackState;
 
-  /// Video track.
-  Video,
-}
+export 'enums.dart' show MediaKind, MediaSourceKind;
 
-/// Media source type.
-enum MediaSourceKind {
-  /// Media is sourced from some media device (webcam or microphone).
-  Device,
+typedef TrackMediaDirection = MediaDirection;
 
-  /// Media is obtained via screen capturing.
-  Display,
-}
-
-/// Media exchange direction of a [RemoteMediaTrack].
-enum TrackMediaDirection {
-  /// [RemoteMediaTrack] is enabled on both receiver and sender sides.
-  SendRecv,
-
-  /// [RemoteMediaTrack] is enabled on sender side only.
-  SendOnly,
-
-  /// [RemoteMediaTrack] is enabled on receiver side only.
-  RecvOnly,
-
-  /// [RemoteMediaTrack] is disabled on both sides.
-  Inactive,
-}
+/// Representation of the `onEnded` callback.
+typedef OnEndedCallback = void Function();
 
 /// Abstraction of a handle to an object allocated on the Rust side.
-abstract class MediaTrack implements PlatformHandle {
+abstract class MediaTrack implements AsyncPlatformHandle {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
   /// audio track, or the [MediaKind.Video] if it represents a video track.
   MediaKind kind();
@@ -59,7 +34,16 @@ abstract class MediaTrack implements PlatformHandle {
 ///
 /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediadevices-getusermedia
 /// [2]: https://w3.org/TR/screen-capture#dom-mediadevices-getdisplaymedia
-abstract class LocalMediaTrack implements MediaTrack {}
+abstract class LocalMediaTrack implements MediaTrack {
+  /// Sets a callback to invoke when this [LocalMediaTrack] is ended.
+  ///
+  /// This only works on Web.
+  void onEnded(OnEndedCallback f);
+
+  /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
+  /// active, or a [MediaStreamTrackState.ended] if it has ended.
+  Future<MediaStreamTrackState> state();
+}
 
 /// Representation of a received remote [`MediaStreamTrack`][1].
 ///

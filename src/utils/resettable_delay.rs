@@ -87,7 +87,7 @@ impl ResettableDelayHandle {
         let (fut, abort) = future::abortable(async move {
             platform::delay_for(timeout).await;
             if let Some(rsvr) = future_resolver.borrow_mut().take() {
-                let _ = rsvr.send(());
+                _ = rsvr.send(());
             }
         });
         platform::spawn(fut.map(drop));

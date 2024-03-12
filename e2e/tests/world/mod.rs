@@ -4,7 +4,7 @@
 
 pub mod member;
 
-use std::{collections::HashMap, fmt, time::Duration};
+use std::{collections::HashMap, env, fmt, time::Duration};
 
 use derive_more::{Display, Error, From};
 use medea_control_api_mock::{
@@ -16,7 +16,7 @@ use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
     object::{self, Jason, MediaKind, MediaSourceKind, Object},
 };
-use tokio::time::interval;
+use tokio::time::{interval, sleep};
 use uuid::Uuid;
 
 use crate::{conf, control};
@@ -47,6 +47,7 @@ pub enum Error {
     MemberNotFound(#[error(not(source))] String),
 }
 
+#[allow(clippy::absolute_paths)]
 type Result<T> = std::result::Result<T, Error>;
 
 /// [`World`][1] used by all E2E tests.
@@ -132,6 +133,8 @@ impl World {
         &mut self,
         builder: MemberBuilder,
     ) -> Result<()> {
+        let is_sfu = env::var("SFU").is_ok();
+
         let mut pipeline = HashMap::new();
         let mut send_state = HashMap::new();
         let mut recv_state = HashMap::new();
@@ -141,12 +144,20 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             send_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if is_sfu {
+                send_state
+                    .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             pipeline.insert(
                 "publish".to_owned(),
                 proto::Endpoint::WebRtcPublishEndpoint(
                     proto::WebRtcPublishEndpoint {
                         id: "publish".to_owned(),
-                        p2p: proto::P2pMode::Always,
+                        p2p: if is_sfu {
+                            proto::P2pMode::Never
+                        } else {
+                            proto::P2pMode::Always
+                        },
                         force_relay: false,
                         audio_settings: proto::AudioSettings::default(),
                         video_settings: proto::VideoSettings::default(),
@@ -159,6 +170,10 @@ impl World {
                 .insert((MediaKind::Audio, MediaSourceKind::Device), true);
             recv_state
                 .insert((MediaKind::Video, MediaSourceKind::Device), true);
+            if is_sfu {
+                recv_state
+                    .insert((MediaKind::Video, MediaSourceKind::Display), true);
+            }
             self.members.values().filter(|m| m.is_send()).for_each(|m| {
                 let endpoint_id = format!("play-{}", m.id());
                 pipeline.insert(
@@ -246,6 +261,14 @@ impl World {
         self.members.get(member_id)
     }
 
+    /// Returns mutable reference to a [`Member`] with the provided ID.
+    ///
+    /// Returns [`None`] if a [`Member`] with the provided ID doesn't exist.
+    #[must_use]
+    pub fn get_member_mut(&mut self, member_id: &str) -> Option<&mut Member> {
+        self.members.get_mut(member_id)
+    }
+
     /// Joins a [`Member`] with the provided ID to the `Room` created for this
     /// [`World`].
     ///
@@ -276,9 +299,17 @@ impl World {
         &mut self,
         member_id: &str,
     ) -> Result<()> {
-        let interconnected_members = self.members.values().filter(|m| {
-            m.is_joined() && m.id() != member_id && (m.is_recv() || m.is_send())
-        });
+        let interconnected_members: Vec<_> = self
+            .members
+            .values()
+            .filter(|m| {
+                m.is_joined()
+                    && m.id() != member_id
+                    && (m.is_recv() || m.is_send())
+            })
+            .collect();
+        let is_sfu = env::var("SFU").is_ok();
+
         let member = self.members.get(member_id).unwrap();
         for partner in interconnected_members {
             let (send_count, recv_count) =
@@ -301,6 +332,57 @@ impl World {
                 .await?
                 .wait_for_count(send_count)
                 .await?;
+
+            if is_sfu {
+                if !partner.is_send_audio() {
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Audio, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !partner.is_send_video() {
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                    conn.tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Display)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !member.is_send_audio() {
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Audio, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                if !member.is_send_video() {
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Device)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                    partner_conn
+                        .tracks_store()
+                        .await?
+                        .get_track(MediaKind::Video, MediaSourceKind::Display)
+                        .await?
+                        .wait_for_disabled()
+                        .await?;
+                }
+                sleep(Duration::from_millis(1000)).await;
+            }
         }
         Ok(())
     }
@@ -741,9 +823,15 @@ impl PairedMember {
     /// Returns a [`proto::WebRtcPublishEndpoint`] for this [`PairedMember`] if
     /// publishing is enabled.
     fn publish_endpoint(&self) -> Option<proto::WebRtcPublishEndpoint> {
+        let is_sfu = env::var("SFU").is_ok();
+
         self.is_send().then(|| proto::WebRtcPublishEndpoint {
             id: "publish".to_owned(),
-            p2p: proto::P2pMode::Always,
+            p2p: if is_sfu {
+                proto::P2pMode::Never
+            } else {
+                proto::P2pMode::Always
+            },
             force_relay: false,
             audio_settings: self.send_audio.unwrap_or(proto::AudioSettings {
                 publish_policy: PublishPolicy::Disabled,

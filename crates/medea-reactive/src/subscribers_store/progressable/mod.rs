@@ -54,7 +54,7 @@ impl<T> SubStore<T> {
             // `async move` required to capture `Rc` into the created `Future`,
             // avoiding dropping it in-place.
             Box::pin(async move {
-                let _ = counter.when_eq(0).await;
+                _ = counter.when_eq(0).await;
             })
         }))
     }

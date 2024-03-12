@@ -6,7 +6,36 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.4.0] · ????-??-?? · To-be-done
+## [0.6.0] · 2024-??-?? (unreleased)
+[0.6.0]: /../../tree/medea-client-api-proto-0.6.0/proto/client-api
+
+## BC Breaks
+
+- `PeerMetrics::PeerConnectionError` variant ([#151]).
+
+## Added
+
+- `PeerConnectionError` type ([#151]).
+- `IceCandidateError` type ([#151]).
+
+[#151]: /../../pull/151
+
+
+
+
+## [0.5.0] · 2023-07-11
+[0.5.0]: /../../tree/medea-client-api-proto-0.5.0/proto/client-api
+
+### BC Breaks
+
+- Added `Track.muted` field ([#119]).
+
+[#119]: /../../pull/119
+
+
+
+
+## [0.4.0] · 2023-06-09
 [0.4.0]: /../../tree/medea-client-api-proto-0.4.0/proto/client-api
 
 ### BC Breaks
@@ -18,10 +47,14 @@ All user visible changes to this project will be documented in this file. This p
 - Replaced `From<SystemTime> for HighResTimeStamp` implementation with `TryFrom` ([#16]).
 - Made `RtcOutboundRtpStreamStats::bytes_sent` and `RtcOutboundRtpStreamStats::packets_sent` optional ([#26]).
 - Replaced `enabled_individual` and `enabled_individual` fields with `MediaDirection` in `TrackPatchEvent`, `state::Receiver` and `state::Sender` ([#46]).
+- Added `media_direction` to `Track` ([#107]).
+- Added `receivers` to `TrackPatchEvent` ([#107]).
+- Added `connection_mode` to `Event::PeerCreated`, `state::Sender`, `state::Receiver` and `state::Peer` ([#113], [#116]).
 
 ### Added
 
 - `MediaDirection` type ([#46]).
+- `ConnectionMode` type ([#113]).
 
 ### Updated
 
@@ -30,6 +63,9 @@ All user visible changes to this project will be documented in this file. This p
 [#16]: /../../pull/16
 [#26]: /../../pull/26
 [#46]: /../../pull/46
+[#107]: /../../pull/107
+[#113]: /../../pull/113
+[#116]: /../../pull/116
 [012-1]: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
 
 

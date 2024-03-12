@@ -17,12 +17,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     api::{utils::DartError, DartValue},
-    platform::dart::utils::dart_future::FutureFromDart,
-};
-
-use super::dart_api::{
-    Dart_HandleFromPersistent_DL_Trampolined,
-    Dart_NewPersistentHandle_DL_Trampolined,
+    platform::dart::utils::{dart_api, dart_future::FutureFromDart},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/completer.g.dart")]
@@ -82,8 +77,9 @@ mod completer {
 pub async fn delay_for(delay: Duration) {
     #[allow(clippy::cast_possible_truncation)]
     let delay = delay.as_millis() as i32;
-    unsafe { FutureFromDart::execute::<()>(completer::delayed(delay)).await }
-        .unwrap();
+    let delayed = unsafe { completer::delayed(delay) };
+    let delayed_fut = unsafe { FutureFromDart::execute::<()>(delayed) };
+    delayed_fut.await.unwrap();
 }
 
 /// Dart [Future] which can be resolved from Rust.
@@ -117,14 +113,12 @@ impl<T, E> Completer<T, E> {
     /// [1]: https://api.dart.dev/dart-async/Completer-class.html
     #[must_use]
     pub fn new() -> Self {
-        let handle = unsafe {
-            let completer = completer::init();
-            Dart_NewPersistentHandle_DL_Trampolined(completer)
-        };
+        let completer = unsafe { completer::init() };
+        let handle = unsafe { dart_api::new_persistent_handle(completer) };
         Self {
             handle,
-            _success_kind: PhantomData::default(),
-            _error_kind: PhantomData::default(),
+            _success_kind: PhantomData,
+            _error_kind: PhantomData,
         }
     }
 
@@ -134,10 +128,8 @@ impl<T, E> Completer<T, E> {
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     #[must_use]
     pub fn future(&self) -> Dart_Handle {
-        unsafe {
-            let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
-            completer::future(handle)
-        }
+        let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
+        unsafe { completer::future(handle) }
     }
 }
 
@@ -153,8 +145,8 @@ impl<T: Into<DartValue>, E> Completer<T, E> {
     ///
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete(&self, arg: T) {
+        let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
             completer::complete(handle, arg.into());
         }
     }
@@ -165,8 +157,8 @@ impl<T> Completer<T, DartError> {
     ///
     /// [Future]: https://api.dart.dev/dart-async/Future-class.html
     pub fn complete_error(&self, e: DartError) {
+        let handle = unsafe { dart_api::handle_from_persistent(self.handle) };
         unsafe {
-            let handle = Dart_HandleFromPersistent_DL_Trampolined(self.handle);
             completer::complete_error(handle, e);
         }
     }

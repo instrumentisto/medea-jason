@@ -12,16 +12,16 @@ use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned as _, token};
 use crate::dart_codegen::{DartCodegen, FnRegistrationBuilder};
 
 /// Expands `#[dart_bridge]` attribute placed on a Rust module declaration.
-#[allow(clippy::needless_pass_by_value)] // due to feature
 pub(crate) fn expand(
-    #[cfg(feature = "dart-codegen")] args: TokenStream,
-    #[cfg(not(feature = "dart-codegen"))] _: TokenStream,
+    args: TokenStream,
     input: TokenStream,
 ) -> syn::Result<TokenStream> {
     let expander = ModExpander::try_from(syn::parse2::<syn::ItemMod>(input)?)?;
 
     #[cfg(feature = "dart-codegen")]
     expander.generate_dart_code(&syn::parse2(args)?)?;
+    #[cfg(not(feature = "dart-codegen"))]
+    drop(args);
 
     Ok(expander.expand())
 }
@@ -64,8 +64,6 @@ impl TryFrom<syn::ItemMod> for ModExpander {
         let mut use_items = Vec::new();
         let register_prefix = &module.ident;
         for item in parser::try_unwrap_mod_content(module.content)? {
-            // false positive: non_exhaustive
-            #[allow(clippy::wildcard_enum_match_arm)]
             match item {
                 syn::Item::ForeignMod(r#mod) => {
                     for i in r#mod.items {
@@ -78,10 +76,29 @@ impl TryFrom<syn::ItemMod> for ModExpander {
                 syn::Item::Use(r#use) => {
                     use_items.push(r#use);
                 }
-                _ => {
+                syn::Item::Const(_)
+                | syn::Item::Enum(_)
+                | syn::Item::ExternCrate(_)
+                | syn::Item::Fn(_)
+                | syn::Item::Impl(_)
+                | syn::Item::Macro(_)
+                | syn::Item::Mod(_)
+                | syn::Item::Static(_)
+                | syn::Item::Struct(_)
+                | syn::Item::Trait(_)
+                | syn::Item::TraitAlias(_)
+                | syn::Item::Type(_)
+                | syn::Item::Union(_)
+                | syn::Item::Verbatim(_) => {
                     return Err(syn::Error::new(
                         item.span(),
                         "Module contains unsupported content",
+                    ));
+                }
+                _ => {
+                    return Err(syn::Error::new(
+                        item.span(),
+                        "Module contains unknown content",
                     ));
                 }
             }
@@ -370,7 +387,7 @@ impl FnExpander {
                 .attrs
                 .into_iter()
                 .map(|attr| {
-                    if attr.path.get_ident().map_or(false, |i| i == "doc") {
+                    if attr.path().get_ident().map_or(false, |i| i == "doc") {
                         Ok(attr)
                     } else {
                         Err(syn::Error::new(

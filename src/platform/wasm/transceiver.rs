@@ -66,7 +66,7 @@ impl Transceiver {
     ///
     /// Errors with JS error if the underlying [`replaceTrack`][1] call fails.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-replacetrack
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtpsender-replacetrack
     pub async fn set_send_track(
         &self,
         new_track: Option<&Rc<local::Track>>,
@@ -82,7 +82,7 @@ impl Transceiver {
 
     /// Returns [`mid`] of this [`Transceiver`].
     ///
-    /// [`mid`]: https://w3.org/TR/webrtc/#dom-rtptransceiver-mid
+    /// [`mid`]: https://w3.org/TR/webrtc#dom-rtptransceiver-mid
     #[must_use]
     pub fn mid(&self) -> Option<String> {
         self.0.mid()

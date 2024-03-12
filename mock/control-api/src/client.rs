@@ -6,15 +6,19 @@
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
+    time::Duration,
 };
 
-use actix::Recipient;
+use actix::{clock::sleep, Recipient};
 use derive_more::{AsRef, From, Into};
 use medea_control_api_proto::grpc::api as proto;
 use proto::control_api_client::ControlApiClient;
 use tonic::{transport::Channel, Status};
 
-use crate::api::{ws::Notification, Element, Subscribers};
+use crate::{
+    api::{ws::Notification, Element, Subscribers},
+    log,
+};
 
 /// Fid to `Room` element.
 #[derive(Clone, Debug, AsRef, From, Into)]
@@ -31,7 +35,7 @@ impl Fid {
 }
 
 impl From<()> for Fid {
-    fn from(_: ()) -> Self {
+    fn from((): ()) -> Self {
         Self(String::new())
     }
 }
@@ -81,10 +85,35 @@ impl ControlClient {
         medea_addr: String,
         subscribers: Arc<Mutex<HashMap<String, Vec<Recipient<Notification>>>>>,
     ) -> Result<Self, tonic::transport::Error> {
-        let client = ControlApiClient::connect(medea_addr).await?;
+        let grpc_client = {
+            /// Max number of retries for connecting to Medea.
+            const MAX_RETRIES: u64 = 5;
+
+            let mut current_try = 0;
+            loop {
+                current_try += 1;
+                let client =
+                    ControlApiClient::connect(medea_addr.clone()).await;
+
+                match client {
+                    Ok(client) => {
+                        break client;
+                    }
+                    Err(e) => {
+                        if current_try == MAX_RETRIES {
+                            log::error!("Error connection to medea: {e}");
+                            return Err(e);
+                        }
+                        log::error!("Error connection to medea: {e}, retrying");
+                        sleep(Duration::from_secs(1)).await;
+                    }
+                }
+            }
+        };
+
         Ok(Self {
             subscribers,
-            grpc_client: client,
+            grpc_client,
         })
     }
 

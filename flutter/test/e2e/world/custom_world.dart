@@ -7,6 +7,7 @@ import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:medea_jason/medea_jason.dart';
+import 'package:medea_jason/src/interface/enums.dart';
 import 'package:medea_jason/src/native/platform/transport.dart';
 import '../api/callback.dart';
 import '../api/endpoint.dart';
@@ -16,13 +17,15 @@ import '../conf.dart';
 import '../control.dart';
 import 'member.dart';
 
+const bool isSfu = bool.fromEnvironment('SFU', defaultValue: false);
+
 /// [FlutterWidgetTesterWorld] used by all E2E tests.
 class CustomWorld extends FlutterWidgetTesterWorld {
   /// ID of the [Room] created for this [FlutterWidgetTesterWorld].
-  late String room_id;
+  late String roomId;
 
   /// Control API client to control the media server.
-  late Client control_client;
+  late Client controlClient;
 
   /// All [Member]s created in this [FlutterWidgetTesterWorld].
   var members = HashMap<String, Member>();
@@ -32,81 +35,96 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   /// Creates a new fresh [CustomWorld].
   CustomWorld() {
-    var uuid = Uuid();
-    room_id = uuid.v4();
-    control_client = Client(CONTROL_API_ADDR);
+    var uuid = const Uuid();
+    roomId = uuid.v4();
+    controlClient = Client(controlApiAddr);
   }
 
   /// Creates a new [Member] from the provided [MemberBuilder].
   ///
   /// [Room] for this [Member] will be created, but joining won't be done.
-  Future<void> create_member(MemberBuilder builder) async {
+  Future<void> createMember(MemberBuilder builder) async {
     var pipeline = HashMap<String, Endpoint>();
-    var send_state = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
-    var recv_state = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
-    var builder_id = builder.id;
+    var sendState = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
+    var recvState = HashMap<Tuple2<MediaKind, MediaSourceKind>, bool>();
+    var builderId = builder.id;
 
-    if (builder.is_send) {
-      send_state.addAll({
-        Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Audio, MediaSourceKind.Device): true
+    if (builder.isSend) {
+      sendState.addAll({
+        const Tuple2<MediaKind, MediaSourceKind>(
+            MediaKind.audio, MediaSourceKind.device): true
       });
-      send_state.addAll({
-        Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Video, MediaSourceKind.Device): true
+      sendState.addAll({
+        const Tuple2<MediaKind, MediaSourceKind>(
+            MediaKind.video, MediaSourceKind.device): true
       });
+      if (isSfu) {
+        sendState.addAll({
+          const Tuple2<MediaKind, MediaSourceKind>(
+              MediaKind.video, MediaSourceKind.display): true
+        });
+      }
 
-      pipeline.addAll(
-          {'publish': WebRtcPublishEndpoint('publish', P2pMode.Always)});
+      pipeline.addAll({
+        'publish': WebRtcPublishEndpoint(
+            'publish', isSfu ? P2pMode.Never : P2pMode.Always)
+      });
     }
 
-    if (builder.is_recv) {
-      recv_state.addAll({
-        Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Audio, MediaSourceKind.Device): true
+    if (builder.isRecv) {
+      recvState.addAll({
+        const Tuple2<MediaKind, MediaSourceKind>(
+            MediaKind.audio, MediaSourceKind.device): true
       });
-      recv_state.addAll({
-        Tuple2<MediaKind, MediaSourceKind>(
-            MediaKind.Video, MediaSourceKind.Device): true
+      recvState.addAll({
+        const Tuple2<MediaKind, MediaSourceKind>(
+            MediaKind.video, MediaSourceKind.device): true
       });
 
+      if (isSfu) {
+        recvState.addAll({
+          const Tuple2<MediaKind, MediaSourceKind>(
+              MediaKind.video, MediaSourceKind.display): true
+        });
+      }
+
       members.forEach((key, value) {
-        if (value.is_send) {
+        if (value.isSend) {
           var id = value.id;
-          var endpoint_id = 'play-$id';
+          var endpointId = 'play-$id';
           pipeline.addAll({
-            endpoint_id:
-                WebRtcPlayEndpoint(endpoint_id, 'local://$room_id/$id/publish')
+            endpointId:
+                WebRtcPlayEndpoint(endpointId, 'local://$roomId/$id/publish')
           });
         }
       });
     }
 
-    var create_member = api.Member(builder_id, pipeline, api.Plain('test'),
+    var createMember = api.Member(builderId, pipeline, api.Plain('test'),
         'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
-    await control_client.create('$room_id/$builder_id', create_member);
+    await controlClient.create('$roomId/$builderId', createMember);
 
-    if (builder.is_send) {
-      var recv_endpoints =
-          members.entries.where((element) => element.value.is_recv).map((e) {
-        var endpoint_id = 'play-$builder_id';
-        var m_id = e.value.id;
-        var id = '$room_id/$m_id/$endpoint_id';
+    if (builder.isSend) {
+      var recvEndpoints =
+          members.entries.where((element) => element.value.isRecv).map((e) {
+        var endpointId = 'play-$builderId';
+        var mId = e.value.id;
+        var id = '$roomId/$mId/$endpointId';
         var elem = WebRtcPlayEndpoint(
-            endpoint_id, 'local://$room_id/$builder_id/publish');
+            endpointId, 'local://$roomId/$builderId/publish');
         return Tuple2(id, elem);
       }).toList();
 
-      recv_endpoints.forEach((element) async {
-        await control_client.create(element.item1, element.item2);
-      });
+      for (var element in recvEndpoints) {
+        await controlClient.create(element.item1, element.item2);
+      }
     }
 
     var jason = Jason();
     var room = jason.initRoom();
-    await room.disableVideo(MediaSourceKind.Display);
+    await room.disableVideo(MediaSourceKind.display);
 
-    var member = builder.build(room, send_state, recv_state);
+    var member = builder.build(room, sendState, recvState);
 
     jasons.addAll({member.id: jason});
     members.addAll({member.id: member});
@@ -114,46 +132,46 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   /// Joins a [Member] with the provided ID to the [Room] created for this
   /// [FlutterWidgetTesterWorld].
-  Future<void> join_room(String member_id) async {
-    await members[member_id]!.join_room(room_id);
-    MockWebSocket.add_member(member_id);
+  Future<void> joinRoom(String memberId) async {
+    await members[memberId]!.joinRoom(roomId);
+    MockWebSocket.addMember(memberId);
   }
 
   /// Closes a [Room] of the provided [Member].
-  void close_room(String member_id) {
-    var jason = jasons[member_id]!;
-    var member = members[member_id]!;
+  void closeRoom(String memberId) {
+    var jason = jasons[memberId]!;
+    var member = members[memberId]!;
     var room = member.room;
     jason.closeRoom(room);
   }
 
   /// Waits for an [OnLeave] Control API callback for the provided [Member] ID.
-  Future<void> wait_for_on_leave(String member_id, String reason) async {
+  Future<void> waitForOnLeave(String memberId, String reason) async {
     while (true) {
-      var callbacks = await get_callbacks(member_id);
+      var callbacks = await getCallbacks(memberId);
       var events = callbacks
           .where((element) =>
-              element.fid.contains(member_id) && element.event is OnLeave)
+              element.fid.contains(memberId) && element.event is OnLeave)
           .map((e) => e.event as OnLeave);
       if (events.isNotEmpty) {
         var ev = events.first;
         expect(ev.reason.name, reason);
         break;
       }
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   }
 
   /// Waits for the [Member]'s [Room] being closed.
-  Future<RoomCloseReason> wait_for_on_close(String member_id) async {
-    var member = members[member_id]!;
-    return member.connection_store.close_reason.future;
+  Future<RoomCloseReason> waitForOnClose(String memberId) async {
+    var member = members[memberId]!;
+    return member.connectionStore.closeReason.future;
   }
 
   /// Deletes a Control API element of the [WebRtcPublishEndpoint] with the
   /// provided ID.
-  Future<void> delete_publish_endpoint(String member_id) async {
-    var resp = await control_client.delete('$room_id/$member_id/publish');
+  Future<void> deletePublishEndpoint(String memberId) async {
+    var resp = await controlClient.delete('$roomId/$memberId/publish');
     if (resp.statusCode != 200) {
       throw resp.body;
     }
@@ -161,100 +179,142 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   /// Deletes a Control API element of the [WebRtcPlayEndpoint] with the
   /// provided ID.
-  Future<void> delete_play_endpoint(
-      String member_id, String partner_member_id) async {
-    var play_endpoint_id = 'play-$partner_member_id';
+  Future<void> deletePlayEndpoint(
+      String memberId, String partnerMemberId) async {
+    var playEndpointId = 'play-$partnerMemberId';
 
-    var resp =
-        await control_client.delete('$room_id/$member_id/$play_endpoint_id');
+    var resp = await controlClient.delete('$roomId/$memberId/$playEndpointId');
     if (resp.statusCode != 200) {
       throw resp.body;
     }
   }
 
   /// Deletes a Control API element of the [Member] with the provided ID.
-  Future<void> delete_member_element(String member_id) async {
-    var resp = await control_client.delete('$room_id/$member_id');
+  Future<void> deleteMemberElement(String memberId) async {
+    var resp = await controlClient.delete('$roomId/$memberId');
     if (resp.statusCode != 200) {
       throw resp.body;
     }
   }
 
   /// Deletes a Control API element of the [Room] with the provided ID.
-  Future<void> delete_room_element() async {
-    var resp = await control_client.delete(room_id);
+  Future<void> deleteRoomElement() async {
+    var resp = await controlClient.delete(roomId);
     if (resp.statusCode != 200) {
       throw resp.body;
     }
   }
 
   /// Returns [Room] created for this [FlutterWidgetTesterWorld].
-  Future<Room> get_spec() async {
-    var resp = await control_client.get(room_id);
-    var json_room = (json.decode(resp.body) as Map<String, dynamic>)['element'];
-    var room = Room.fromJson(json_room);
+  Future<Room> getSpec() async {
+    var resp = await controlClient.get(roomId);
+    var jsonRoom = (json.decode(resp.body) as Map<String, dynamic>)['element'];
+    var room = Room.fromJson(jsonRoom);
     return room;
   }
 
   /// Returns all [CallbackItem]s sent by Control API for this
   /// [FlutterWidgetTesterWorld]'s [Room].
-  Future<List<CallbackItem>> get_callbacks(String member_id) async {
-    var cbs = await control_client.callbacks();
+  Future<List<CallbackItem>> getCallbacks(String memberId) async {
+    var cbs = await controlClient.callbacks();
     return (json.decode(cbs.body) as List)
         .map((item) => CallbackItem.fromJson(item))
-        .where((element) => element.fid.contains(room_id))
+        .where((element) => element.fid.contains(roomId))
         .toList();
   }
 
   /// Applies provided [Room] spec to the [Room] created for this
   /// [FlutterWidgetTesterWorld].
   Future<void> apply(Room room) async {
-    await control_client.apply(room_id, room);
+    await controlClient.apply(roomId, room);
   }
 
   /// Waits until a [Member] with the provided ID will connect with his
   /// responders.
-  Future<void> wait_for_interconnection(String member_id) async {
-    var interconnected_members = members.entries
+  Future<void> waitForInterconnection(String memberId) async {
+    var interconnectedMembers = members.entries
         .where((element) =>
-            element.value.is_joined &&
-            element.value.id != member_id &&
-            (element.value.is_recv || element.value.is_send))
+            element.value.isJoined &&
+            element.value.id != memberId &&
+            (element.value.isRecv || element.value.isSend))
         .toList();
-    var member = members[member_id]!;
+    var member = members[memberId]!;
 
-    for (var i = 0; i < interconnected_members.length; ++i) {
-      var element = interconnected_members[i];
-      var temp = member.count_of_tracks_between_members(element.value);
-      var send_count = temp.item1;
-      var recv_count = temp.item2;
+    for (var i = 0; i < interconnectedMembers.length; ++i) {
+      var element = interconnectedMembers[i];
+      var temp = member.countOfTracksBetweenMembers(element.value);
+      var sendCount = temp.item1;
+      var recvCount = temp.item2;
 
-      var other_member = members[element.key]!;
-      await member.wait_for_connect(element.key);
-      await member.wait_for_track_count(element.key, recv_count);
+      var otherMember = members[element.key]!;
+      await member.waitForConnect(element.key);
+      await member.waitForTrackCount(element.key, recvCount);
 
-      await other_member.wait_for_connect(member.id);
-      await other_member.wait_for_track_count(member.id, send_count);
+      await otherMember.waitForConnect(member.id);
+      await otherMember.waitForTrackCount(member.id, sendCount);
+
+      if (isSfu) {
+        if (!otherMember.enabledAudio) {
+          for (var track in member
+              .connectionStore.remoteTracks[element.key]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.audio)) {
+            await member.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+
+        if (!otherMember.enabledVideo) {
+          for (var track in member
+              .connectionStore.remoteTracks[element.key]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.video)) {
+            await member.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+        if (!member.enabledAudio) {
+          for (var track in otherMember
+              .connectionStore.remoteTracks[memberId]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.audio)) {
+            await otherMember.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+
+        if (!member.enabledVideo) {
+          for (var track in otherMember
+              .connectionStore.remoteTracks[memberId]!.values
+              .map((e) => e.last)
+              .where((element) => element.kind() == MediaKind.video)) {
+            await otherMember.waitMediaDirectionTrack(
+                MediaDirection.recvOnly, track);
+          }
+        }
+      }
+
+      await Future.delayed(const Duration(milliseconds: 1000));
     }
   }
 
   /// Creates [WebRtcPublishEndpoint]s and [WebRtcPlayEndpoint]s for the
   /// provided [MembersPair].
-  Future<void> interconnect_members(MembersPair pair) async {
-    if (pair.left.publish_endpoint() != null) {
-      var publish_endpoint = pair.left.publish_endpoint()!;
-      var left_member = members[pair.left.id]!;
-      if (publish_endpoint.audio_settings.publish_policy !=
+  Future<void> interconnectMembers(MembersPair pair) async {
+    if (pair.left.publishEndpoint() != null) {
+      var publishEndpoint = pair.left.publishEndpoint()!;
+      var leftMember = members[pair.left.id]!;
+      if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        left_member.update_send_media_state(MediaKind.Audio, null, true);
+        leftMember.updateSendMediaState(MediaKind.audio, null, true);
       }
-      if (publish_endpoint.video_settings.publish_policy !=
+      if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        left_member.update_send_media_state(MediaKind.Video, null, true);
+        leftMember.updateSendMediaState(MediaKind.video, null, true);
       }
       try {
-        await control_client.create(
-            '$room_id/' + pair.left.id + '/publish', publish_endpoint);
+        await controlClient.create(
+            '$roomId/${pair.left.id}/publish', publishEndpoint);
       } catch (e) {
         if (!e
             .toString()
@@ -264,21 +324,21 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       }
     }
 
-    if (pair.right.publish_endpoint() != null) {
-      var publish_endpoint = pair.right.publish_endpoint()!;
-      var right_member = members[pair.right.id]!;
-      if (publish_endpoint.audio_settings.publish_policy !=
+    if (pair.right.publishEndpoint() != null) {
+      var publishEndpoint = pair.right.publishEndpoint()!;
+      var rightMember = members[pair.right.id]!;
+      if (publishEndpoint.audio_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        right_member.update_send_media_state(MediaKind.Audio, null, true);
+        rightMember.updateSendMediaState(MediaKind.audio, null, true);
       }
-      if (publish_endpoint.video_settings.publish_policy !=
+      if (publishEndpoint.video_settings.publish_policy !=
           PublishPolicy.Disabled) {
-        right_member.update_send_media_state(MediaKind.Video, null, true);
+        rightMember.updateSendMediaState(MediaKind.video, null, true);
       }
 
       try {
-        await control_client.create(
-            '$room_id/' + pair.right.id + '/publish', publish_endpoint);
+        await controlClient.create(
+            '$roomId/${pair.right.id}/publish', publishEndpoint);
       } catch (e) {
         if (!e
             .toString()
@@ -288,78 +348,76 @@ class CustomWorld extends FlutterWidgetTesterWorld {
       }
     }
 
-    if (pair.left.play_endpoint_for(room_id, pair.right) != null) {
-      var publish_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
-      var left_member = members[pair.left.id]!;
+    if (pair.left.playEndpointFor(roomId, pair.right) != null) {
+      var publishEndpoint = pair.left.playEndpointFor(roomId, pair.right)!;
+      var leftMember = members[pair.left.id]!;
 
-      await left_member.update_recv_media_state(MediaKind.Video, null, true);
-      await left_member.update_recv_media_state(MediaKind.Audio, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.video, null, true);
+      await leftMember.updateRecvMediaState(MediaKind.audio, null, true);
 
-      await control_client.create(
-          '$room_id/' + pair.left.id + '/' + publish_endpoint.id,
-          publish_endpoint);
+      await controlClient.create(
+          '$roomId/${pair.left.id}/${publishEndpoint.id}', publishEndpoint);
     }
 
-    if (pair.right.play_endpoint_for(room_id, pair.left) != null) {
-      var publish_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
-      var right_member = members[pair.right.id]!;
+    if (pair.right.playEndpointFor(roomId, pair.left) != null) {
+      var publishEndpoint = pair.right.playEndpointFor(roomId, pair.left)!;
+      var rightMember = members[pair.right.id]!;
 
-      await right_member.update_recv_media_state(MediaKind.Video, null, true);
-      await right_member.update_recv_media_state(MediaKind.Audio, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.video, null, true);
+      await rightMember.updateRecvMediaState(MediaKind.audio, null, true);
 
-      await control_client.create(
-          '$room_id/' + pair.right.id + '/' + publish_endpoint.id,
-          publish_endpoint);
-    }
-
-    {
-      var left_member = members[pair.left.id]!;
-      left_member.is_send = pair.left.is_send();
-      left_member.is_recv = pair.right.recv;
+      await controlClient.create(
+          '$roomId/${pair.right.id}/${publishEndpoint.id}', publishEndpoint);
     }
 
     {
-      var right_member = members[pair.right.id]!;
-      right_member.is_send = pair.right.is_send();
-      right_member.is_recv = pair.right.recv;
+      var leftMember = members[pair.left.id]!;
+      leftMember.isSend = pair.left.isSend();
+      leftMember.isRecv = pair.right.recv;
+    }
+
+    {
+      var rightMember = members[pair.right.id]!;
+      rightMember.isSend = pair.right.isSend();
+      rightMember.isRecv = pair.right.recv;
     }
   }
 
   /// Creates [WebRtcPublishEndpoint]s and [WebRtcPlayEndpoint]s for the
   /// provided [MembersPair] using an `Apply` method of Control API.
-  Future<void> interconnect_members_via_apply(MembersPair pair) async {
-    var spec = await get_spec();
+  Future<void> interconnectMembersViaApply(MembersPair pair) async {
+    var spec = await getSpec();
     if (spec.pipeline.containsKey(pair.left.id)) {
       var member = spec.pipeline[pair.left.id]!;
-      member.pipeline.addAll({'publish': pair.left.publish_endpoint()!});
+      member.pipeline.addAll({'publish': pair.left.publishEndpoint()!});
 
-      var play_endpoint = pair.left.play_endpoint_for(room_id, pair.right)!;
-      member.pipeline.addAll({play_endpoint.id: play_endpoint});
+      var playEndpoint = pair.left.playEndpointFor(roomId, pair.right)!;
+      member.pipeline.addAll({playEndpoint.id: playEndpoint});
     }
 
     if (spec.pipeline.containsKey(pair.right.id)) {
       var member = spec.pipeline[pair.right.id]!;
 
-      member.pipeline.addAll({'publish': pair.right.publish_endpoint()!});
+      member.pipeline.addAll({'publish': pair.right.publishEndpoint()!});
 
-      var play_endpoint = pair.right.play_endpoint_for(room_id, pair.left)!;
-      member.pipeline.addAll({play_endpoint.id: play_endpoint});
+      var playEndpoint = pair.right.playEndpointFor(roomId, pair.left)!;
+      member.pipeline.addAll({playEndpoint.id: playEndpoint});
     }
 
     await apply(spec);
   }
 
   /// Waits for [OnJoin] Control API callback for the provided [Member] ID.
-  Future<void> wait_for_on_join(String member_id) async {
+  Future<void> waitForOnJoin(String memberId) async {
     while (true) {
-      var callbacks = await get_callbacks(member_id);
-      var on_join_found = callbacks
-          .where((element) => element.fid.contains(member_id))
+      var callbacks = await getCallbacks(memberId);
+      var onJoinFound = callbacks
+          .where((element) => element.fid.contains(memberId))
           .any((element) => element.event is OnJoin);
-      if (on_join_found) {
+      if (onJoinFound) {
         break;
       }
-      await Future.delayed(Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 50));
     }
   }
 }
@@ -385,39 +443,43 @@ class PairedMember {
   String id;
 
   /// Audio settings to be sent by this [PairedMember].
-  AudioSettings? send_audio;
+  AudioSettings? sendAudio;
 
   /// Video settings to be sent by this [PairedMember].
-  VideoSettings? send_video;
+  VideoSettings? sendVideo;
 
   /// Indicator whether this is a receiving configuration, rather than
   /// publishing.
   bool recv = false;
 
   /// Creates a new [PairedMember].
-  PairedMember(this.id, this.send_audio, this.send_video, this.recv);
+  PairedMember(this.id, this.sendAudio, this.sendVideo, this.recv);
 
   /// Indicates whether this [PairedMember] should publish media.
-  bool is_send() {
-    return send_audio != null || send_video != null;
+  bool isSend() {
+    return sendAudio != null || sendVideo != null;
   }
 
   /// Returns a [WebRtcPublishEndpoint] for this [PairedMember] if publishing is
   /// enabled.
-  WebRtcPublishEndpoint? publish_endpoint() {
+  WebRtcPublishEndpoint? publishEndpoint() {
     WebRtcPublishEndpoint? res;
-    if (is_send()) {
-      res = WebRtcPublishEndpoint('publish', P2pMode.Always);
-      if (send_audio == null) {
+    if (isSend()) {
+      var mode = P2pMode.Always;
+      if (isSfu) {
+        mode = P2pMode.Never;
+      }
+      res = WebRtcPublishEndpoint('publish', mode);
+      if (sendAudio == null) {
         res.audio_settings = AudioSettings(PublishPolicy.Disabled);
       } else {
-        res.audio_settings = send_audio!;
+        res.audio_settings = sendAudio!;
       }
 
-      if (send_video == null) {
+      if (sendVideo == null) {
         res.video_settings = VideoSettings(PublishPolicy.Disabled);
       } else {
-        res.video_settings = send_video!;
+        res.video_settings = sendVideo!;
       }
     }
     return res;
@@ -425,11 +487,10 @@ class PairedMember {
 
   /// Returns a [WebRtcPlayEndpoint] for this [PairedMember] which will receive
   /// media from the provided [PairedMember] if receiving is enabled.
-  WebRtcPlayEndpoint? play_endpoint_for(
-      String room_id, PairedMember publisher) {
+  WebRtcPlayEndpoint? playEndpointFor(String roomId, PairedMember publisher) {
     if (recv) {
-      var res = WebRtcPlayEndpoint('play-' + publisher.id,
-          'local://$room_id/' + publisher.id + '/publish');
+      var res = WebRtcPlayEndpoint(
+          'play-${publisher.id}', 'local://$roomId/${publisher.id}/publish');
       return res;
     }
     return null;

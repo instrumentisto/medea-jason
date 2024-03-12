@@ -10,11 +10,11 @@ use crate::{platform, utils::Caused};
 ///
 /// [`RtcStatsType`]: medea_client_api_proto::stats::RtcStatsType
 #[derive(Caused, Clone, Debug, Display, From)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 pub enum RtcStatsError {
     /// [RTCStats.id][1] is undefined.
     ///
-    /// [1]: https://w3.org/TR/webrtc/#dom-rtcstats-id
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcstats-id
     #[display(fmt = "RTCStats.id is undefined")]
     UndefinedId,
 

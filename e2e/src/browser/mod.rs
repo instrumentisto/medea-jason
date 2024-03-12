@@ -46,6 +46,7 @@ pub enum Error {
 /// Shortcut for a [`Result`] with an [`Error`](enum@Error) inside.
 ///
 /// [`Result`]: std::result::Result
+#[allow(clippy::absolute_paths)]
 type Result<T> = std::result::Result<T, Error>;
 
 /// [WebDriver] handle of a browser window.
@@ -75,7 +76,7 @@ pub struct Window {
 
 impl Clone for Window {
     fn clone(&self) -> Self {
-        let _ = self.rc.fetch_add(1, Ordering::SeqCst);
+        _ = self.rc.fetch_add(1, Ordering::SeqCst);
         Self {
             client: self.client.clone(),
             window: self.window.clone(),

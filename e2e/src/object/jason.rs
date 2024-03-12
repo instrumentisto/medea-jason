@@ -15,7 +15,7 @@ impl Builder for Jason {
     fn build(self) -> Statement {
         Statement::new(
             // language=JavaScript
-            r#"async () => new window.rust.Jason()"#,
+            "async () => new window.rust.Jason()",
             [],
         )
     }
@@ -30,7 +30,7 @@ impl Object<Jason> {
     pub async fn init_room(&self) -> Result<Object<Room>, Error> {
         self.execute_and_fetch(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (jason) => {
                 let room = await jason.init_room();
                 let onFailedLocalStreamListener = {
@@ -96,7 +96,7 @@ impl Object<Jason> {
                     onFailedLocalStreamListener: onFailedLocalStreamListener
                 };
             }
-            "#,
+            ",
             [],
         ))
         .await
@@ -110,12 +110,12 @@ impl Object<Jason> {
     pub async fn close_room(&self, room: &Object<Room>) -> Result<(), Error> {
         self.execute(Statement::with_objs(
             // language=JavaScript
-            r#"
+            "
             async (jason) => {
                 const [room] = objs;
                 jason.close_room(room.room);
             }
-            "#,
+            ",
             [],
             [room.ptr()],
         ))
@@ -132,11 +132,11 @@ impl Object<Jason> {
     pub async fn dispose(self) -> Result<(), Error> {
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async (jason) => {
                 jason.dispose();
             }
-            "#,
+            ",
             [],
         ))
         .await

@@ -3,11 +3,9 @@
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::{
-    api::dart_string_into_rust, platform::dart::utils::handle::DartHandle,
-};
+use crate::platform::dart::utils::handle::DartHandle;
 
-use super::utils::NonNullDartValueArgExt as _;
+use super::utils::{dart_string_into_rust, NonNullDartValueArgExt as _};
 
 #[dart_bridge("flutter/lib/src/native/platform/media_display_info.g.dart")]
 mod media_display_info {
@@ -37,18 +35,15 @@ impl MediaDisplayInfo {
     /// [`MediaDisplayInfo`].
     #[must_use]
     pub fn device_id(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_display_info::device_id(self.0.get()))
-        }
+        let device_id = unsafe { media_display_info::device_id(self.0.get()) };
+        unsafe { dart_string_into_rust(device_id) }
     }
 
     /// Returns a title describing the represented display.
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn title(&self) -> Option<String> {
-        Option::try_from(unsafe {
-            media_display_info::title(self.0.get()).unbox()
-        })
-        .unwrap()
+        let title = unsafe { media_display_info::title(self.0.get()) };
+        Option::try_from(unsafe { title.unbox() }).unwrap()
     }
 }

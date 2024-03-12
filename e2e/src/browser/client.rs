@@ -246,17 +246,17 @@ impl Inner {
                         {inner_js}
                         callback({{ ok: lastResult }});
                     }} catch (e) {{
-                        if (e.ptr != undefined) {{
+                        if (e.__wbg_ptr > 0) {{
                             callback({{
                                 err: {{
-                                    name: e.name(),
+                                    kind: e.kind ? e.kind() : undefined,
                                     message: e.message(),
                                     trace: e.trace(),
-                                    source: e.source()
+                                    cause: e.cause ? e.cause() : undefined
                                 }}
                             }});
                         }} else {{
-                            callback({{ err: e.toString() }});
+                            callback({{ err: JSON.stringify(e) }});
                         }}
                     }}
                 }}
@@ -294,11 +294,11 @@ impl Inner {
 
         self.execute(Statement::new(
             // language=JavaScript
-            r#"
+            "
             async () => {
                 window.registry = new Map();
             }
-            "#,
+            ",
             vec![],
         ))
         .await

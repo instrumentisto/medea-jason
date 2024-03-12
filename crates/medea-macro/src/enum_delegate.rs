@@ -16,8 +16,8 @@ use syn::{
 ///
 /// 1. Check that input `enum` is not empty.
 /// 2. Add `{}` to the macro argument (given function declaration).
-/// 3. Check that delegation function is not static (presence of
-///    `[&][&mut] self` arguments).
+/// 3. Check that delegation function is not static (presence of `[&][&mut]
+///    self` arguments).
 /// 4. Collect all the delegation function arguments.
 /// 5. Generate wrapper-function with dispatching delegation function call to
 ///    all the `enum` variants.
@@ -32,10 +32,10 @@ pub(crate) fn derive(
     let mut output = input.clone();
     let inp: syn::DeriveInput = syn::parse(input)?;
 
-    let enum_name = inp.ident.clone();
-    let enum_name_iter = iter::repeat(enum_name.clone());
+    let enum_name = &inp.ident;
+    let enum_name_iter = iter::repeat(enum_name);
 
-    let variants = if let syn::Data::Enum(ref data) = &inp.data {
+    let variants = if let syn::Data::Enum(data) = &inp.data {
         data.variants
             .iter()
             .map(|c| c.ident.clone())

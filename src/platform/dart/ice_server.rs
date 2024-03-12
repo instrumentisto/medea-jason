@@ -6,7 +6,7 @@ use dart_sys::Dart_Handle;
 use medea_client_api_proto::IceServer;
 use medea_macro::dart_bridge;
 
-use crate::{api::string_into_c_str, platform::utils::handle::DartHandle};
+use crate::platform::utils::{handle::DartHandle, string_into_c_str};
 
 #[dart_bridge("flutter/lib/src/native/platform/ice_servers.g.dart")]
 mod ice_servers {
@@ -50,7 +50,8 @@ where
     I: IntoIterator<Item = IceServer>,
 {
     fn from(servers: I) -> Self {
-        let ice_servers = unsafe { DartHandle::new(ice_servers::init()) };
+        let ice_servers = unsafe { ice_servers::init() };
+        let ice_servers = unsafe { DartHandle::new(ice_servers) };
         for srv in servers {
             for url in srv.urls {
                 unsafe {

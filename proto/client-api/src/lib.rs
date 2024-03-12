@@ -4,22 +4,26 @@
     macro_use_extern_crate,
     nonstandard_style,
     rust_2018_idioms,
-    rustdoc::broken_intra_doc_links,
-    rustdoc::private_intra_doc_links,
+    rustdoc::all,
     trivial_casts,
     trivial_numeric_casts
 )]
 #![forbid(non_ascii_idents, unsafe_code)]
 #![warn(
+    clippy::absolute_paths,
     clippy::as_conversions,
+    clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
     clippy::branches_sharing_code,
+    clippy::clear_with_drain,
     clippy::clone_on_ref_ptr,
+    clippy::collection_is_never_read,
     clippy::create_dir,
     clippy::dbg_macro,
     clippy::debug_assert_with_mut_call,
     clippy::decimal_literal_representation,
     clippy::default_union_representation,
+    clippy::derive_partial_eq_without_eq,
     clippy::else_if_without_else,
     clippy::empty_drop,
     clippy::empty_line_after_outer_attr,
@@ -37,37 +41,61 @@
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
+    clippy::infinite_loop,
     clippy::iter_on_empty_collections,
     clippy::iter_on_single_items,
+    clippy::iter_over_hash_type,
     clippy::iter_with_drain,
     clippy::large_include_file,
+    clippy::large_stack_frames,
+    clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
+    clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
+    clippy::missing_assert_message,
+    clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
+    clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
     clippy::mutex_integer,
+    clippy::needless_collect,
+    clippy::needless_pass_by_ref_mut,
+    clippy::needless_raw_strings,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
+    clippy::or_fun_call,
     clippy::panic_in_result_fn,
+    clippy::partial_pub_fields,
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
+    clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::read_zero_byte_vec,
+    clippy::readonly_write_lock,
+    clippy::redundant_clone,
+    clippy::redundant_type_annotations,
+    clippy::ref_patterns,
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
+    clippy::semicolon_inside_block,
     clippy::shadow_unrelated,
     clippy::significant_drop_in_scrutinee,
+    clippy::significant_drop_tightening,
     clippy::str_to_string,
     clippy::string_add,
     clippy::string_lit_as_bytes,
+    clippy::string_lit_chars_any,
     clippy::string_slice,
     clippy::string_to_string,
     clippy::suboptimal_flops,
     clippy::suspicious_operation_groupings,
+    clippy::suspicious_xor_used_as_pow,
+    clippy::tests_outside_test_module,
     clippy::todo,
     clippy::trailing_empty_array,
     clippy::transmute_undefined_repr,
@@ -75,7 +103,11 @@
     clippy::try_err,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
+    clippy::uninhabited_references,
+    clippy::unnecessary_safety_comment,
+    clippy::unnecessary_safety_doc,
     clippy::unnecessary_self_imports,
+    clippy::unnecessary_struct_initialization,
     clippy::unneeded_field_pattern,
     clippy::unused_peekable,
     clippy::unwrap_in_result,
@@ -91,8 +123,8 @@
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
-    noop_method_call,
     semicolon_in_expressions_from_macros,
+    unit_bindings,
     unreachable_pub,
     unused_crate_dependencies,
     unused_extern_crates,
@@ -104,9 +136,6 @@
     unused_tuple_struct_fields,
     variant_size_differences
 )]
-// TODO: Remove once annoying false positive is fixed:
-//       https://github.com/rust-lang/rust-clippy/issues/6902
-#![allow(clippy::use_self)]
 
 pub mod state;
 pub mod stats;
@@ -242,7 +271,6 @@ pub struct RpcSettings {
 
 /// Possible commands sent by Web Client to Media Server.
 #[dispatchable]
-#[allow(unused_results)] // false positive: on `Deserialize`
 #[cfg_attr(feature = "client", derive(Serialize))]
 #[cfg_attr(feature = "server", derive(Deserialize))]
 #[derive(Clone, Debug, PartialEq)]
@@ -344,8 +372,67 @@ pub enum PeerMetrics {
     /// `PeerConnection`'s connection state.
     PeerConnectionState(PeerConnectionState),
 
+    /// `PeerConnection` related error occurred.
+    PeerConnectionError(PeerConnectionError),
+
     /// `PeerConnection`'s RTC stats.
     RtcStats(Vec<RtcStat>),
+}
+
+/// Possible errors related to a `PeerConnection`.
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum PeerConnectionError {
+    /// Error occurred with ICE candidate from a `PeerConnection`.
+    IceCandidate(IceCandidateError),
+}
+
+/// Error occurred with an [ICE] candidate from a `PeerConnection`.
+///
+/// [ICE]: https://webrtcglossary.com/ice
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct IceCandidateError {
+    /// Local IP address used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub address: Option<String>,
+
+    /// Port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub port: Option<u32>,
+
+    /// URL identifying the [STUN]/[TURN] server for which the failure
+    /// occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub url: String,
+
+    /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_code: i32,
+
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
+    /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_text: String,
 }
 
 /// `PeerConnection`'s ICE connection state.
@@ -519,6 +606,13 @@ pub enum Event {
         /// [`NegotiationRole`] of the `Peer`.
         negotiation_role: NegotiationRole,
 
+        /// Indicator whether this `Peer` is working in a [P2P mesh] or [SFU]
+        /// mode.
+        ///
+        /// [P2P mesh]: https://webrtcglossary.com/mesh
+        /// [SFU]: https://webrtcglossary.com/sfu
+        connection_mode: ConnectionMode,
+
         /// [`Track`]s to create RTCPeerConnection with.
         tracks: Vec<Track>,
 
@@ -614,6 +708,23 @@ pub enum NegotiationRole {
     Answerer(String),
 }
 
+/// Indication whether a `Peer` is working in a [P2P mesh] or [SFU] mode.
+///
+/// [P2P mesh]: https://webrtcglossary.com/mesh
+/// [SFU]: https://webrtcglossary.com/sfu
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ConnectionMode {
+    /// `Peer` is configured to work in a [P2P mesh] mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    Mesh,
+
+    /// `Peer` is configured to work in an [SFU] mode.
+    ///
+    /// [SFU]: https://webrtcglossary.com/sfu
+    Sfu,
+}
+
 /// [`Track`] update which should be applied to the `Peer`.
 #[allow(variant_size_differences)]
 #[cfg_attr(feature = "client", derive(Deserialize))]
@@ -639,7 +750,7 @@ pub enum PeerUpdate {
 
 /// Representation of [RTCIceCandidateInit][1] object.
 ///
-/// [1]: https://w3.org/TR/webrtc/#dom-rtcicecandidateinit
+/// [1]: https://w3.org/TR/webrtc#dom-rtcicecandidateinit
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct IceCandidate {
     /// [`candidate-attribute`][0] of this [`IceCandidate`].
@@ -671,6 +782,12 @@ pub struct Track {
 
     /// [`Direction`] of this [`Track`].
     pub direction: Direction,
+
+    /// [`MediaDirection`] of this [`Track`].
+    pub media_direction: MediaDirection,
+
+    /// [`Track`]'s mute state.
+    pub muted: bool,
 
     /// [`MediaType`] of this [`Track`].
     pub media_type: MediaType,
@@ -707,13 +824,25 @@ pub struct TrackPatchCommand {
 /// [`Event::PeerUpdated`].
 #[cfg_attr(feature = "client", derive(Deserialize))]
 #[cfg_attr(feature = "server", derive(Serialize))]
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TrackPatchEvent {
     /// ID of the [`Track`] which should be patched.
     pub id: TrackId,
 
     /// General media exchange direction of the `Track`.
     pub media_direction: Option<MediaDirection>,
+
+    /// IDs of the `Member`s who should receive this outgoing [`Track`].
+    ///
+    /// If [`Some`], then it means there are some changes in this outgoing
+    /// [`Track`]'s `receivers` (or we just want to sync this outgoing
+    /// [`Track`]'s `receivers`). It describes not changes, but the actual
+    /// [`Vec<MemberId>`] of this outgoing [`Track`], that have to be reached
+    /// once this [`TrackPatchEvent`] applied.
+    ///
+    /// If [`None`], then it means there is no need to check and recalculate
+    /// this outgoing [`Track`]'s `receivers`.
+    pub receivers: Option<Vec<MemberId>>,
 
     /// [`Track`]'s mute state.
     ///
@@ -771,6 +900,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                     MediaDirection::Inactive
                 }
             }),
+            receivers: None,
         }
     }
 }
@@ -783,6 +913,7 @@ impl TrackPatchEvent {
             id,
             muted: None,
             media_direction: None,
+            receivers: None,
         }
     }
 
@@ -801,6 +932,10 @@ impl TrackPatchEvent {
 
         if let Some(direction) = another.media_direction {
             self.media_direction = Some(direction);
+        }
+
+        if let Some(receivers) = &another.receivers {
+            self.receivers = Some(receivers.clone());
         }
     }
 }

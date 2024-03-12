@@ -12,7 +12,7 @@ use crate::{platform, utils::Caused};
 ///
 /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget
 #[derive(Caused, Clone, Debug, Display, Eq, From, PartialEq)]
-#[cause(error = "platform::Error")]
+#[cause(error = platform::Error)]
 #[display(fmt = "EventTarget.addEventListener() failed: {}", _0)]
 pub struct EventListenerBindError(platform::Error);
 

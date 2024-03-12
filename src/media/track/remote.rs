@@ -61,7 +61,6 @@ impl Track {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-enabled
     /// [2]: https://w3.org/TR/mediacapture-streams#dom-mediastreamtrack-muted
-    #[allow(clippy::mut_mut)]
     #[must_use]
     pub fn new<T>(
         track: T,
@@ -154,8 +153,9 @@ impl Track {
     /// Stops this [`Track`] invoking an `on_stopped` callback if it's in a
     /// [`MediaStreamTrackState::Live`] state.
     pub async fn stop(self) {
-        if self.0.track.ready_state().await == MediaStreamTrackState::Live {
-            self.0.track.stop().await;
+        let state = self.0.track.ready_state().await;
+        self.0.track.stop().await;
+        if state == MediaStreamTrackState::Live {
             self.0.on_stopped.call0();
         }
     }

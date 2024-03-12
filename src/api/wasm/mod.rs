@@ -3,11 +3,14 @@
 //!
 //! [`Jason`]: crate::api::Jason
 
+// For `wasm_bindgen`.
+#![allow(clippy::mem_forget)]
+
 pub mod connection_handle;
 pub mod err;
 pub mod jason;
 pub mod local_media_track;
-pub mod media_device_info;
+pub mod media_device_details;
 pub mod media_manager_handle;
 pub mod media_stream_settings;
 pub mod reconnect_handle;
@@ -25,7 +28,7 @@ pub use self::{
     err::Error,
     jason::Jason,
     local_media_track::LocalMediaTrack,
-    media_device_info::MediaDeviceInfo,
+    media_device_details::MediaDeviceDetails,
     media_manager_handle::MediaManagerHandle,
     media_stream_settings::{
         AudioTrackConstraints, DeviceVideoTrackConstraints,
@@ -125,6 +128,41 @@ impl From<MediaSourceKind> for media::MediaSourceKind {
     }
 }
 
+/// Liveness state of a [`MediaStreamTrack`][1].
+///
+/// [1]: crate::platform::MediaStreamTrack
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+pub enum MediaStreamTrackState {
+    /// Active track (the track's underlying media source is making a
+    /// best-effort attempt to provide a data in real time).
+    Live,
+
+    /// Ended track (the track's underlying media source is no longer providing
+    /// any data, and will never provide more data for this track).
+    ///
+    /// This is a final state.
+    Ended,
+}
+
+impl From<media::MediaStreamTrackState> for MediaStreamTrackState {
+    fn from(that: media::MediaStreamTrackState) -> Self {
+        match that {
+            media::MediaStreamTrackState::Live => Self::Live,
+            media::MediaStreamTrackState::Ended => Self::Ended,
+        }
+    }
+}
+
+impl From<MediaStreamTrackState> for media::MediaStreamTrackState {
+    fn from(that: MediaStreamTrackState) -> Self {
+        match that {
+            MediaStreamTrackState::Live => Self::Live,
+            MediaStreamTrackState::Ended => Self::Ended,
+        }
+    }
+}
+
 /// Describes directions that a camera can face, as seen from a user's
 /// perspective. Representation of a [VideoFacingModeEnum][1].
 ///
@@ -207,12 +245,5 @@ impl From<media::MediaDirection> for MediaDirection {
             D::RecvOnly => Self::RecvOnly,
             D::Inactive => Self::Inactive,
         }
-    }
-}
-
-impl From<MediaDirection> for JsValue {
-    #[allow(clippy::as_conversions)]
-    fn from(val: MediaDirection) -> Self {
-        JsValue::from(val as u8)
     }
 }

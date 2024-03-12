@@ -1,15 +1,15 @@
 //! Facilities for creating Dart exceptions from Rust.
 
-use std::{borrow::Cow, ptr};
+use std::ptr;
 
 use dart_sys::Dart_Handle;
 use derive_more::Into;
+use flutter_rust_bridge::DartOpaque;
 use medea_macro::dart_bridge;
 
 use crate::{
     api::{
         box_dart_handle,
-        dart::{utils::string_into_c_str, DartValue},
         err::{
             EnumerateDevicesException, FormatException, InternalException,
             InvalidOutputAudioDeviceIdException, LocalMediaInitException,
@@ -17,7 +17,7 @@ use crate::{
             MicVolumeException, RpcClientException, StateError,
         },
     },
-    platform,
+    platform::{self, utils::string_into_c_str},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/exception.g.dart")]
@@ -33,17 +33,6 @@ mod exception {
 
     /// Invokes other Dart closures that accept a [`DartValue`] argument.
     extern "C" {
-        /// Returns a new Dart [`ArgumentError`] with the provided invalid
-        /// argument, its `name` and error `message` describing the problem.
-        ///
-        /// [`ArgumentError`]:
-        /// https://api.dart.dev/dart-core/ArgumentError-class.html
-        pub fn new_argument_error(
-            value: DartValue,
-            name: ptr::NonNull<c_char>,
-            message: ptr::NonNull<c_char>,
-        ) -> Dart_Handle;
-
         /// Returns a new Dart [`StateError`] with the provided message.
         ///
         /// [`StateError`]: https://api.dart.dev/dart-core/StateError-class.html
@@ -149,53 +138,16 @@ impl DartError {
     }
 }
 
+impl From<DartError> for DartOpaque {
+    fn from(val: DartError) -> Self {
+        let boxed = unsafe { Box::from_raw(val.0.as_ptr()) };
+        unsafe { Self::new_non_droppable(*boxed) }
+    }
+}
+
 impl From<platform::Error> for DartError {
     fn from(err: platform::Error) -> Self {
         Self::new(err.get_handle())
-    }
-}
-
-/// Error returning by Rust when an unacceptable argument is passed to a
-/// function through FFI.
-///
-/// It can be converted into a [`DartError`] and passed to Dart.
-#[derive(Debug)]
-pub struct ArgumentError<T> {
-    /// Invalid value of the argument.
-    val: T,
-
-    /// Name of the invalid argument.
-    name: &'static str,
-
-    /// Message describing the problem.
-    message: Cow<'static, str>,
-}
-
-impl<T> ArgumentError<T> {
-    /// Creates a new [`ArgumentError`] from the provided invalid argument, its
-    /// `name` and error `message` describing the problem.
-    #[must_use]
-    pub fn new<V>(val: T, name: &'static str, message: V) -> Self
-    where
-        V: Into<Cow<'static, str>>,
-    {
-        Self {
-            val,
-            name,
-            message: message.into(),
-        }
-    }
-}
-
-impl<T: Into<DartValue>> From<ArgumentError<T>> for DartError {
-    fn from(err: ArgumentError<T>) -> Self {
-        unsafe {
-            Self::new(exception::new_argument_error(
-                err.val.into(),
-                string_into_c_str(err.name.to_owned()),
-                string_into_c_str(err.message.into_owned()),
-            ))
-        }
     }
 }
 

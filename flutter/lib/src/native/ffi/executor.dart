@@ -1,11 +1,11 @@
 import 'dart:ffi';
 import 'dart:isolate';
 
-typedef _executorInit_C = Void Function(Int64);
-typedef _executorInit_Dart = void Function(int);
+typedef _ExecutorInitC = Void Function(Int64);
+typedef _ExecutorInitDart = void Function(int);
 
-typedef _executorPollTask_C = Void Function(Pointer);
-typedef _executorPollTask_Dart = void Function(Pointer);
+typedef _ExecutorPollTaskC = Void Function(Pointer);
+typedef _ExecutorPollTaskDart = void Function(Pointer);
 
 /// Executor used to drive Rust futures.
 ///
@@ -13,10 +13,10 @@ typedef _executorPollTask_Dart = void Function(Pointer);
 class Executor {
   /// Pointer to a Rust function used to initialize Rust side of this
   /// [Executor].
-  final _executorInit_Dart _loopInit;
+  final _ExecutorInitDart _loopInit;
 
   /// Pointer to a Rust function used to poll Rust futures.
-  final _executorPollTask_Dart _taskPoll;
+  final _ExecutorPollTaskDart _taskPoll;
 
   /// [ReceivePort] used to receive commands for polling Rust futures.
   late ReceivePort _wakePort;
@@ -27,10 +27,10 @@ class Executor {
   /// accepts commands to poll Rust futures.
   Executor(DynamicLibrary dylib)
       : _loopInit = dylib
-            .lookup<NativeFunction<_executorInit_C>>('rust_executor_init')
+            .lookup<NativeFunction<_ExecutorInitC>>('rust_executor_init')
             .asFunction(),
         _taskPoll = dylib
-            .lookup<NativeFunction<_executorPollTask_C>>(
+            .lookup<NativeFunction<_ExecutorPollTaskC>>(
                 'rust_executor_poll_task')
             .asFunction() {
     _wakePort = ReceivePort()..listen(_pollTask);

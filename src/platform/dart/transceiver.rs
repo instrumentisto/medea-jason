@@ -4,7 +4,6 @@
 
 use std::{future::Future, rc::Rc};
 
-use derive_more::From;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -58,7 +57,7 @@ mod transceiver {
         /// Changes the send direction of the specified [`Transceiver`].
         pub fn set_send(transceiver: Dart_Handle, active: bool) -> Dart_Handle;
 
-        /// Disposes of this [`Transceiver`].
+        /// Disposes the provided [`Transceiver`].
         pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
     }
 }
@@ -67,7 +66,7 @@ mod transceiver {
 /// direction changes.
 ///
 /// [RTCRtpTransceiver]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-#[derive(Clone, Debug, From)]
+#[derive(Clone, Debug)]
 pub struct Transceiver(Rc<DartHandle>);
 
 impl From<DartHandle> for Transceiver {
@@ -82,12 +81,13 @@ impl Transceiver {
     pub fn set_recv(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_recv(
-                    handle, active,
-                ))
-                .await
-                .unwrap();
+            let fut = unsafe { transceiver::set_recv(handle, active) };
+
+            // TODO: Not supposed to error, but seems to. Log for further
+            //       investigation.
+            let res = unsafe { FutureFromDart::execute::<()>(fut) }.await;
+            if let Err(e) = res {
+                log::error!("Error in `Transceiver::set_recv`: {e}");
             }
         })
     }
@@ -97,12 +97,13 @@ impl Transceiver {
     pub fn set_send(&self, active: bool) -> LocalBoxFuture<'static, ()> {
         let handle = self.0.get();
         Box::pin(async move {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::set_send(
-                    handle, active,
-                ))
-                .await
-                .unwrap();
+            let fut = unsafe { transceiver::set_send(handle, active) };
+
+            // TODO: Not supposed to error, but seems to. Log for further
+            //       investigation.
+            let res = unsafe { FutureFromDart::execute::<()>(fut) }.await;
+            if let Err(e) = res {
+                log::error!("Error in `Transceiver::set_send`: {e}");
             }
         })
     }
@@ -127,23 +128,16 @@ impl Transceiver {
         &self,
         new_track: Option<&Rc<local::Track>>,
     ) -> Result<(), platform::Error> {
-        if let Some(track) = new_track {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::replace_track(
+        let fut = new_track.map_or_else(
+            || unsafe { transceiver::drop_sender(self.0.get()) },
+            |track| unsafe {
+                transceiver::replace_track(
                     self.0.get(),
                     track.platform_track().handle(),
-                ))
-                .await?;
-            }
-        } else {
-            unsafe {
-                FutureFromDart::execute::<()>(transceiver::drop_sender(
-                    self.0.get(),
-                ))
-                .await?;
-            }
-        }
-        Ok(())
+                )
+            },
+        );
+        unsafe { FutureFromDart::execute::<()>(fut) }.await
     }
 
     /// Returns [`mid`] of this [`Transceiver`].
@@ -152,10 +146,8 @@ impl Transceiver {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn mid(&self) -> Option<String> {
-        unsafe {
-            let mid = transceiver::mid(self.0.get());
-            (*Box::from_raw(mid.as_ptr())).try_into().unwrap()
-        }
+        let mid = unsafe { transceiver::mid(self.0.get()) };
+        unsafe { (*Box::from_raw(mid.as_ptr())).try_into().unwrap() }
     }
 
     /// Indicates whether the underlying [RTCRtpTransceiver] is stopped.
@@ -170,14 +162,11 @@ impl Transceiver {
     fn direction(&self) -> impl Future<Output = TransceiverDirection> {
         let handle = self.0.get();
         async move {
-            unsafe {
-                FutureFromDart::execute::<i32>(transceiver::get_direction(
-                    handle,
-                ))
+            let fut = unsafe { transceiver::get_direction(handle) };
+            unsafe { FutureFromDart::execute::<i32>(fut) }
                 .await
-            }
-            .unwrap()
-            .into()
+                .unwrap()
+                .into()
         }
     }
 }
@@ -187,13 +176,8 @@ impl Drop for Transceiver {
         if Rc::get_mut(&mut self.0).is_some() {
             let transceiver = Rc::clone(&self.0);
             platform::spawn(async move {
-                unsafe {
-                    FutureFromDart::execute::<()>(transceiver::dispose(
-                        transceiver.get(),
-                    ))
-                    .await
-                    .unwrap();
-                }
+                let fut = unsafe { transceiver::dispose(transceiver.get()) };
+                unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
             });
         }
     }

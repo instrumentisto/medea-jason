@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'package:js/js.dart';
 import 'package:medea_flutter_webrtc/medea_flutter_webrtc.dart' as webrtc;
 import 'package:medea_flutter_webrtc/src/platform/web/media_stream_track.dart';
@@ -7,7 +9,7 @@ import '../util/move_semantic.dart';
 import 'exceptions.dart';
 import 'jason_wasm.dart' as wasm;
 
-class WebRemoteMediaTrack extends RemoteMediaTrack {
+class WebRemoteMediaTrack implements RemoteMediaTrack {
   late wasm.RemoteMediaTrack obj;
 
   WebRemoteMediaTrack(this.obj);
@@ -56,7 +58,7 @@ class WebRemoteMediaTrack extends RemoteMediaTrack {
 
   @moveSemantics
   @override
-  void free() {
+  Future<void> free() async {
     obj.free();
   }
 

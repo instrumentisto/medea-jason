@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 
 use crate::{
-    api::{LocalMediaTrack, MediaDeviceInfo, MediaStreamSettings},
+    api::{LocalMediaTrack, MediaDeviceDetails, MediaStreamSettings},
     media,
 };
 
@@ -35,10 +35,9 @@ use super::Error;
 #[derive(Debug, From)]
 pub struct MediaManagerHandle(media::MediaManagerHandle);
 
-#[allow(clippy::unused_unit)]
 #[wasm_bindgen]
 impl MediaManagerHandle {
-    /// Returns a list of [`MediaDeviceInfo`] objects representing available
+    /// Returns a list of [`MediaDeviceDetails`] objects representing available
     /// media input and output devices, such as microphones, cameras, and so
     /// forth.
     ///
@@ -64,8 +63,8 @@ impl MediaManagerHandle {
                     devices
                         .into_iter()
                         .fold(js_sys::Array::new(), |devices_info, info| {
-                            let _ = devices_info.push(&JsValue::from(
-                                MediaDeviceInfo::from(info),
+                            _ = devices_info.push(&JsValue::from(
+                                MediaDeviceDetails::from(info),
                             ));
                             devices_info
                         })
@@ -111,6 +110,15 @@ impl MediaManagerHandle {
     }
 
     /// Subscribes onto the [`MediaManagerHandle`]'s `devicechange` event.
+    ///
+    /// # Errors
+    ///
+    /// With a [`StateError`] if an underlying object has been disposed, e.g.
+    /// `free` was called on this [`MediaManagerHandle`], or on a [`Jason`] that
+    /// implicitly owns native object behind this [`MediaManagerHandle`].
+    ///
+    /// [`Jason`]: crate::api::Jason
+    /// [`StateError`]: crate::api::err::StateError
     pub fn on_device_change(
         &self,
         cb: js_sys::Function,

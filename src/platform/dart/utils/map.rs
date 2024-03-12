@@ -6,8 +6,8 @@ use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::{string_into_c_str, DartValue},
-    platform::dart::utils::handle::DartHandle,
+    api::DartValue,
+    platform::dart::utils::{handle::DartHandle, string_into_c_str},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/map.g.dart")]
@@ -58,7 +58,8 @@ impl DartMap {
     /// Creates a new empty [`DartMap`].
     #[must_use]
     pub fn new() -> Self {
-        Self(unsafe { DartHandle::new(map::init()) })
+        let map = unsafe { map::init() };
+        Self(unsafe { DartHandle::new(map) })
     }
 
     /// Sets the provided `value` under the provided `key` to this [`DartMap`].

@@ -6,8 +6,8 @@ use std::collections::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    IceCandidate, IceServer, MediaDirection, MediaType, MemberId,
-    NegotiationRole, PeerId, TrackId,
+    ConnectionMode, IceCandidate, IceServer, MediaDirection, MediaType,
+    MemberId, NegotiationRole, PeerId, TrackId,
 };
 
 /// State of a `Room` element.
@@ -22,6 +22,13 @@ pub struct Room {
 pub struct Peer {
     /// ID of this [`Peer`].
     pub id: PeerId,
+
+    /// Indicator whether this [`Peer`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    pub connection_mode: ConnectionMode,
 
     /// All [`Sender`]s of this [`Peer`].
     pub senders: HashMap<TrackId, Sender>,
@@ -58,6 +65,13 @@ pub struct Sender {
     /// ID of this [`Sender`].
     pub id: TrackId,
 
+    /// Indicator whether this [`Sender`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    pub connection_mode: ConnectionMode,
+
     /// Mid of this [`Sender`].
     pub mid: Option<String>,
 
@@ -79,6 +93,13 @@ pub struct Sender {
 pub struct Receiver {
     /// ID of this [`Receiver`].
     pub id: TrackId,
+
+    /// Indicator whether this [`Receiver`] is working in a [P2P mesh] or [SFU]
+    /// mode.
+    ///
+    /// [P2P mesh]: https://webrtcglossary.com/mesh
+    /// [SFU]: https://webrtcglossary.com/sfu
+    pub connection_mode: ConnectionMode,
 
     /// Mid of this [`Receiver`].
     pub mid: Option<String>,

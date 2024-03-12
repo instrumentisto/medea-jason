@@ -7,6 +7,7 @@ import '../interface/jason.dart' as base;
 import '../interface/media_manager.dart';
 import '../interface/room_handle.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
 import 'ffi/callback.dart' as callback;
 import 'ffi/completer.dart' as completer;
@@ -14,52 +15,23 @@ import 'ffi/exception.dart' as exceptions;
 import 'ffi/executor.dart';
 import 'ffi/function.dart' as function;
 import 'ffi/future.dart' as future;
+import 'ffi/jason_api.g.dart' as frb;
 import 'ffi/list.dart' as list;
 import 'ffi/map.dart' as map;
 import 'ffi/native_string.dart' as native_string;
-import 'ffi/nullable_pointer.dart';
 import 'media_manager.dart';
 import 'platform/functions_registerer.dart' as platform_utils_registerer;
 import 'room_handle.dart';
 
-typedef _new_C = Pointer Function();
-typedef _new_Dart = Pointer Function();
-
-typedef _mediaManager_C = Pointer Function(Pointer);
-typedef _mediaManager_Dart = Pointer Function(Pointer);
-
-typedef _closeRoom_C = Void Function(Pointer, Pointer);
-typedef _closeRoom_Dart = void Function(Pointer, Pointer);
-
-typedef _initRoom_C = Pointer Function(Pointer);
-typedef _initRoom_Dart = Pointer Function(Pointer);
-
-typedef _onPanic_C = Void Function(Handle);
-typedef _onPanic_Dart = void Function(Object);
-
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
-
-final DynamicLibrary dl = _dl_load();
+/// Bindings to the Rust side API.
+frb.MedeaJason api = _initApi();
+DynamicLibrary dl = _dlLoad();
 
 /// [Executor] that drives Rust futures.
 ///
 /// Instantiated in the [_dl_load()] function, and must not be touched ever
 /// after that.
-var executor;
-
-final _new = dl.lookupFunction<_new_C, _new_Dart>('Jason__new');
-
-final _media_manager = dl.lookupFunction<_mediaManager_C, _mediaManager_Dart>(
-    'Jason__media_manager');
-
-final _initRoom =
-    dl.lookupFunction<_initRoom_C, _initRoom_Dart>('Jason__init_room');
-
-final _close_room =
-    dl.lookupFunction<_closeRoom_C, _closeRoom_Dart>('Jason__close_room');
-
-final _free = dl.lookupFunction<_free_C, _free_Dart>('Jason__free');
+late Executor executor;
 
 /// Callback to be fired whenever Rust code panics.
 void Function(String)? _onPanicCallback;
@@ -72,7 +44,7 @@ void onPanic(void Function(String)? cb) {
   _onPanicCallback = cb;
 }
 
-DynamicLibrary _dl_load() {
+DynamicLibrary _dlLoad() {
   if (!(Platform.isAndroid ||
       Platform.isLinux ||
       Platform.isWindows ||
@@ -95,14 +67,14 @@ DynamicLibrary _dl_load() {
           ? DynamicLibrary.executable()
           : DynamicLibrary.open(path);
 
-  var initResult = dl.lookupFunction<
-      IntPtr Function(Pointer<Void>),
-      int Function(
-          Pointer<Void>)>('init_dart_api_dl')(NativeApi.initializeApiDLData);
+  var initResult = dl.lookupFunction<IntPtr Function(Pointer<Void>),
+          int Function(Pointer<Void>)>('init_jason_dart_api_dl')(
+      NativeApi.initializeApiDLData);
 
   if (initResult != 0) {
     throw 'Failed to initialize Dart API. Code: $initResult';
   }
+
   callback.registerFunctions(dl);
   completer.registerFunctions(dl);
   exceptions.registerFunctions(dl);
@@ -115,22 +87,27 @@ DynamicLibrary _dl_load() {
 
   executor = Executor(dl);
 
-  final _onPanic = dl.lookupFunction<_onPanic_C, _onPanic_Dart>('on_panic');
-  _onPanic((msg) {
+  return dl;
+}
+
+frb.MedeaJason _initApi() {
+  var api = frb.MedeaJasonImpl(dl);
+  api.onPanic(cb: (msg) async {
     msg as String;
-    RustHandlesStorage().freeAll();
+    await RustHandlesStorage().freeAll();
     if (_onPanicCallback != null) {
       _onPanicCallback!(msg);
     }
   });
-
-  return dl;
+  return api;
 }
 
-class Jason extends base.Jason {
-  /// [Pointer] to the Rust struct backing this object.
-  final NullablePointer ptr = NullablePointer(_new());
+class Jason implements base.Jason {
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final RustOpaque<frb.Jason> opaque = RustOpaque(api.jasonNew());
 
+  /// Constructs a new [Jason] backed by the Rust struct behind the provided
+  /// [frb.Jason].
   Jason() {
     RustHandlesStorage().insertHandle(this);
   }
@@ -138,28 +115,27 @@ class Jason extends base.Jason {
   @override
   MediaManagerHandle mediaManager() {
     return NativeMediaManagerHandle(
-        NullablePointer(_media_manager(ptr.getInnerPtr())));
+        api.jasonMediaManager(jason: opaque.innerOpaque));
   }
 
   @override
   RoomHandle initRoom() {
-    return NativeRoomHandle(NullablePointer(_initRoom(ptr.getInnerPtr())));
+    return NativeRoomHandle(api.jasonInitRoom(jason: opaque.innerOpaque));
   }
 
   @override
   void closeRoom(@moveSemantics RoomHandle room) {
-    _close_room(
-        ptr.getInnerPtr(), (room as NativeRoomHandle).ptr.getInnerPtr());
-    room.ptr.free();
+    api.jasonCloseRoom(
+        jason: opaque.innerOpaque,
+        roomToDelete: (room as NativeRoomHandle).opaque.moveOpaque);
   }
 
   @override
   @moveSemantics
   void free() {
-    if (!ptr.isFreed()) {
+    if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
-      ptr.free();
+      api.jasonDispose(jason: opaque.moveOpaque);
     }
   }
 }

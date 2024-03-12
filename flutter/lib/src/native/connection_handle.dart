@@ -1,148 +1,81 @@
-import 'dart:ffi';
-
+import 'package:medea_jason/src/native/remote_media_track.dart';
 import '../interface/connection_handle.dart';
 import '../interface/media_track.dart';
 import '../util/move_semantic.dart';
+import '../util/rust_opaque.dart';
 import '/src/util/rust_handles_storage.dart';
-import 'ffi/foreign_value.dart';
-import 'ffi/nullable_pointer.dart';
-import 'ffi/result.dart';
+import 'ffi/jason_api.g.dart' as frb;
 import 'jason.dart';
-import 'remote_media_track.dart';
 
-typedef _getRemoteMemberId_C = Result Function(Pointer);
-typedef _getRemoteMemberId_Dart = Result Function(Pointer);
-
-typedef _free_C = Void Function(Pointer);
-typedef _free_Dart = void Function(Pointer);
-
-typedef _onClose_C = Result Function(Pointer, Handle);
-typedef _onClose_Dart = Result Function(Pointer, void Function());
-
-typedef _onRemoteTrackAdded_C = Result Function(Pointer, Handle);
-typedef _onRemoteTrackAdded_Dart = Result Function(
-    Pointer, void Function(Pointer));
-
-typedef _onQualityScoreUpdate_C = Result Function(Pointer, Handle);
-typedef _onQualityScoreUpdate_Dart = Result Function(
-    Pointer, void Function(int));
-
-typedef _disableRemoteAudio_C = Handle Function(Pointer);
-typedef _disableRemoteAudio_Dart = Object Function(Pointer);
-
-typedef _enableRemoteAudio_C = Handle Function(Pointer);
-typedef _enableRemoteAudio_Dart = Object Function(Pointer);
-
-typedef _disableRemoteVideo_C = Handle Function(Pointer, ForeignValue);
-typedef _disableRemoteVideo_Dart = Object Function(Pointer, ForeignValue);
-
-typedef _enableRemoteVideo_C = Handle Function(Pointer, ForeignValue);
-typedef _enableRemoteVideo_Dart = Object Function(Pointer, ForeignValue);
-
-final _getRemoteMemberId =
-    dl.lookupFunction<_getRemoteMemberId_C, _getRemoteMemberId_Dart>(
-        'ConnectionHandle__get_remote_member_id');
-
-final _free = dl.lookupFunction<_free_C, _free_Dart>('ConnectionHandle__free');
-
-final _onClose =
-    dl.lookupFunction<_onClose_C, _onClose_Dart>('ConnectionHandle__on_close');
-
-final _onRemoteTrackAdded =
-    dl.lookupFunction<_onRemoteTrackAdded_C, _onRemoteTrackAdded_Dart>(
-        'ConnectionHandle__on_remote_track_added');
-
-final _onQualityScoreUpdate =
-    dl.lookupFunction<_onQualityScoreUpdate_C, _onQualityScoreUpdate_Dart>(
-        'ConnectionHandle__on_quality_score_update');
-
-final _disableRemoteAudio =
-    dl.lookupFunction<_disableRemoteAudio_C, _disableRemoteAudio_Dart>(
-        'ConnectionHandle__disable_remote_audio');
-
-final _enableRemoteAudio =
-    dl.lookupFunction<_enableRemoteAudio_C, _enableRemoteAudio_Dart>(
-        'ConnectionHandle__enable_remote_audio');
-
-final _disableRemoteVideo =
-    dl.lookupFunction<_disableRemoteVideo_C, _disableRemoteVideo_Dart>(
-        'ConnectionHandle__disable_remote_video');
-
-final _enableRemoteVideo =
-    dl.lookupFunction<_enableRemoteVideo_C, _enableRemoteVideo_Dart>(
-        'ConnectionHandle__enable_remote_video');
-
-class NativeConnectionHandle extends ConnectionHandle {
-  /// [Pointer] to the Rust struct backing this object.
-  late NullablePointer ptr;
+class NativeConnectionHandle implements ConnectionHandle {
+  /// `flutter_rust_bridge` Rust opaque type backing this object.
+  final RustOpaque<frb.ConnectionHandle> opaque;
 
   /// Constructs a new [ConnectionHandle] backed by a Rust struct behind the
-  /// provided [Pointer].
-  NativeConnectionHandle(this.ptr) {
+  /// provided [frb.ConnectionHandle].
+  NativeConnectionHandle(frb.ConnectionHandle connectionHandle)
+      : opaque = RustOpaque(connectionHandle) {
     RustHandlesStorage().insertHandle(this);
   }
 
   @override
   String getRemoteMemberId() {
-    return _getRemoteMemberId(ptr.getInnerPtr()).unwrap();
+    return api.connectionHandleGetRemoteMemberId(
+        connection: opaque.innerOpaque);
   }
 
   @override
   void onClose(void Function() f) {
-    _onClose(ptr.getInnerPtr(), f).unwrap();
+    api.connectionHandleOnClose(connection: opaque.innerOpaque, f: f);
   }
 
   @override
   void onRemoteTrackAdded(void Function(RemoteMediaTrack) f) {
-    _onRemoteTrackAdded(ptr.getInnerPtr(), (t) {
-      f(NativeRemoteMediaTrack(NullablePointer(t)));
-    }).unwrap();
+    api.connectionHandleOnRemoteTrackAdded(
+        connection: opaque.innerOpaque,
+        f: (t) {
+          f(NativeRemoteMediaTrack(
+              api.remoteMediaTrackFromPtr(ptr: t.address)));
+        });
   }
 
   @override
   void onQualityScoreUpdate(void Function(int) f) {
-    _onQualityScoreUpdate(ptr.getInnerPtr(), f).unwrap();
+    api.connectionHandleOnQualityScoreUpdate(
+        connection: opaque.innerOpaque, f: f);
   }
 
   @moveSemantics
   @override
   void free() {
-    if (!ptr.isFreed()) {
+    if (!opaque.isStale()) {
       RustHandlesStorage().removeHandle(this);
-      _free(ptr.getInnerPtr());
-      ptr.free();
+
+      opaque.dispose();
     }
   }
 
   @override
   Future<void> enableRemoteAudio() async {
-    await (_enableRemoteAudio(ptr.getInnerPtr()) as Future);
+    await (api.connectionHandleEnableRemoteAudio(connection: opaque.innerOpaque)
+        as Future);
   }
 
   @override
   Future<void> disableRemoteAudio() async {
-    await (_disableRemoteAudio(ptr.getInnerPtr()) as Future);
+    await (api.connectionHandleDisableRemoteAudio(
+        connection: opaque.innerOpaque) as Future);
   }
 
   @override
   Future<void> enableRemoteVideo([MediaSourceKind? kind]) async {
-    var kind_arg =
-        kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
-    try {
-      await (_enableRemoteVideo(ptr.getInnerPtr(), kind_arg.ref) as Future);
-    } finally {
-      kind_arg.free();
-    }
+    await (api.connectionHandleEnableRemoteVideo(
+        connection: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 
   @override
   Future<void> disableRemoteVideo([MediaSourceKind? kind]) async {
-    var kind_arg =
-        kind == null ? ForeignValue.none() : ForeignValue.fromInt(kind.index);
-    try {
-      await (_disableRemoteVideo(ptr.getInnerPtr(), kind_arg.ref) as Future);
-    } finally {
-      kind_arg.free();
-    }
+    await (api.connectionHandleDisableRemoteVideo(
+        connection: opaque.innerOpaque, sourceKind: kind) as Future);
   }
 }

@@ -31,7 +31,7 @@ struct ServerMessage(ServerMsg);
 impl TryFrom<&MessageEvent> for ServerMessage {
     type Error = TransportError;
 
-    fn try_from(msg: &MessageEvent) -> std::result::Result<Self, Self::Error> {
+    fn try_from(msg: &MessageEvent) -> Result<Self, Self::Error> {
         use TransportError::{MessageNotString, ParseServerMessage};
 
         let payload = msg.data().as_string().ok_or(MessageNotString)?;
@@ -43,9 +43,7 @@ impl TryFrom<&MessageEvent> for ServerMessage {
 }
 
 /// Shortcut for a [`Result`] containing a [`Traced`] [`TransportError`].
-///
-/// [`Result`]: std::result::Result
-type Result<T, E = Traced<TransportError>> = std::result::Result<T, E>;
+type TransportResult<T> = Result<T, Traced<TransportError>>;
 
 /// Inner data of a [`WebSocketRpcTransport`].
 #[derive(Debug)]
@@ -92,7 +90,7 @@ struct InnerSocket {
 impl InnerSocket {
     /// Creates a new [`InnerSocket`] which can be connected to the server with
     /// the [`RpcTransport::connect()`] method call.
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             socket_state: ObservableCell::new(TransportState::Connecting),
             socket: RefCell::new(None),
@@ -168,8 +166,8 @@ impl WebSocketRpcTransport {
                     match ServerMessage::try_from(&msg).map(ServerMsg::from) {
                         Ok(parsed) => parsed,
                         Err(e) => {
-                            // TODO: protocol versions mismatch? should drop
-                            //       connection if so
+                            // TODO: Protocol versions mismatch? Should drop
+                            //       connection if so.
                             log::error!("{}", tracerr::new!(e));
                             return;
                         }
@@ -194,7 +192,7 @@ impl Default for WebSocketRpcTransport {
 
 #[async_trait(?Send)]
 impl RpcTransport for WebSocketRpcTransport {
-    async fn connect(&self, url: ApiUrl) -> Result<()> {
+    async fn connect(&self, url: ApiUrl) -> TransportResult<()> {
         let socket = SysWebSocket::new(url.as_ref())
             .map_err(Into::into)
             .map_err(TransportError::CreateSocket)
@@ -261,7 +259,7 @@ impl RpcTransport for WebSocketRpcTransport {
         self.0.borrow_mut().close_reason = close_reason;
     }
 
-    fn send(&self, msg: &ClientMsg) -> Result<()> {
+    fn send(&self, msg: &ClientMsg) -> TransportResult<()> {
         let inner = self.0.borrow();
         let message = serde_json::to_string(msg)
             .map_err(|e| TransportError::SerializeClientMessage(e.into()))

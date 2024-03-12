@@ -38,8 +38,7 @@ impl<T: CallbackApi> CallbackApiServer<T> {
     pub async fn run(self, limit: impl Into<Option<usize>>) {
         self.receiver
             .for_each_concurrent(limit, |ev| async {
-                let _ =
-                    ev.sender.send(self.api.on_event(ev.request).await).ok();
+                _ = ev.sender.send(self.api.on_event(ev.request).await).ok();
             })
             .await;
     }

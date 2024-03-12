@@ -1,14 +1,12 @@
 //! ICE candidate of a [RTCPeerConnection][1].
 //!
-//! [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+//! [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 
 use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::{
-    api::dart_string_into_rust, platform::dart::utils::handle::DartHandle,
-};
+use crate::platform::dart::utils::{dart_string_into_rust, handle::DartHandle};
 
 #[dart_bridge("flutter/lib/src/native/platform/ice_candidate.g.dart")]
 mod ice_candidate {
@@ -37,10 +35,129 @@ mod ice_candidate {
     }
 }
 
+#[dart_bridge("flutter/lib/src/native/platform/ice_candidate_error.g.dart")]
+mod ice_candidate_error {
+    use std::{os::raw::c_char, ptr};
+
+    use dart_sys::Dart_Handle;
+
+    extern "C" {
+        /// Returns the local IP address used to communicate with a
+        /// [STUN]/[TURN] server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        pub fn address(error: Dart_Handle) -> ptr::NonNull<c_char>;
+
+        /// Returns the port used to communicate with a [STUN]/[TURN] server.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        pub fn port(error: Dart_Handle) -> u32;
+
+        /// Returns the URL identifying the [STUN]/[TURN] server for which the
+        /// failure occurred.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        pub fn url(error: Dart_Handle) -> ptr::NonNull<c_char>;
+
+        /// Returns the Numeric [STUN] error code returned by the [STUN]/[TURN]
+        /// server.
+        ///
+        /// If no host candidate can reach the server, this error code will be
+        /// set to the value `701`, which is outside the [STUN] error code
+        /// range. This error is only fired once per server URL while in the
+        /// `RTCIceGatheringState` of "gathering".
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        pub fn error_code(error: Dart_Handle) -> i32;
+
+        /// [STUN] reason text returned by the [STUN]/[TURN] server.
+        ///
+        /// If the server could not be reached, this reason test will be set to
+        /// an implementation-specific value providing details about the error.
+        ///
+        /// [STUN]: https://webrtcglossary.com/stun
+        /// [TURN]: https://webrtcglossary.com/turn
+        pub fn error_text(error: Dart_Handle) -> ptr::NonNull<c_char>;
+    }
+}
+
+/// Error occurred with an [ICE] candidate from a [`PeerConnection`].
+///
+/// [`PeerConnection`]: crate::peer::PeerConnection
+/// [ICE]: https://webrtcglossary.com/ice
+#[derive(Debug, From)]
+pub struct IceCandidateError(DartHandle);
+
+impl IceCandidateError {
+    /// Returns the local IP address used to communicate with a [STUN]/[TURN]
+    /// server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    #[must_use]
+    pub fn address(&self) -> String {
+        let address = unsafe { ice_candidate_error::address(self.0.get()) };
+        unsafe { dart_string_into_rust(address) }
+    }
+
+    /// Returns the port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    #[must_use]
+    pub fn port(&self) -> u32 {
+        unsafe { ice_candidate_error::port(self.0.get()) }
+    }
+
+    /// Returns the URL identifying the [STUN]/[TURN] server for which the
+    /// failure occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    #[must_use]
+    pub fn url(&self) -> String {
+        let url = unsafe { ice_candidate_error::url(self.0.get()) };
+        unsafe { dart_string_into_rust(url) }
+    }
+
+    /// Returns the Numeric [STUN] error code returned by the [STUN]/[TURN]
+    /// server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    #[must_use]
+    pub fn error_code(&self) -> i32 {
+        unsafe { ice_candidate_error::error_code(self.0.get()) }
+    }
+
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
+    /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    #[must_use]
+    pub fn error_text(&self) -> String {
+        let error_text =
+            unsafe { ice_candidate_error::error_text(self.0.get()) };
+        unsafe { dart_string_into_rust(error_text) }
+    }
+}
+
 /// Wrapper around a [`DartHandle`] representing an ICE candidate of a
 /// [RTCPeerConnection][1].
 ///
-/// [1]: https://w3.org/TR/webrtc/#dom-rtcpeerconnection
+/// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnection
 #[derive(Debug, From)]
 pub struct IceCandidate(DartHandle);
 
@@ -71,7 +188,8 @@ impl IceCandidate {
     /// Returns candidate of this [`IceCandidate`].
     #[must_use]
     pub fn candidate(&self) -> String {
-        unsafe { dart_string_into_rust(ice_candidate::candidate(self.0.get())) }
+        let candidate = unsafe { ice_candidate::candidate(self.0.get()) };
+        unsafe { dart_string_into_rust(candidate) }
     }
 
     /// Returns SDP M line index of this [`IceCandidate`].
@@ -88,8 +206,7 @@ impl IceCandidate {
     /// Returns SDP MID of this [`IceCandidate`].
     #[must_use]
     pub fn sdp_mid(&self) -> Option<String> {
-        Some(unsafe {
-            dart_string_into_rust(ice_candidate::sdp_mid(self.0.get()))
-        })
+        let mid = unsafe { ice_candidate::sdp_mid(self.0.get()) };
+        Some(unsafe { dart_string_into_rust(mid) })
     }
 }

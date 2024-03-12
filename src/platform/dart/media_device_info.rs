@@ -5,9 +5,10 @@
 use medea_macro::dart_bridge;
 
 use crate::{
-    api::dart_string_into_rust,
     media::MediaDeviceKind,
-    platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
+    platform::dart::utils::{
+        dart_string_into_rust, handle::DartHandle, NonNullDartValueArgExt,
+    },
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/media_device_info.g.dart")]
@@ -36,6 +37,10 @@ mod media_device_info {
         pub fn group_id(
             info: Dart_Handle,
         ) -> ptr::NonNull<DartValueArg<Option<String>>>;
+
+        /// Indicates whether the last attempt to use the provided device
+        /// failed.
+        pub fn is_failed(info: Dart_Handle) -> bool;
     }
 }
 
@@ -56,11 +61,9 @@ impl MediaDeviceInfo {
     /// [`MediaDeviceInfo`].
     #[must_use]
     pub fn device_id(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_device_info::device_id(
-                self.handle.get(),
-            ))
-        }
+        let device_id =
+            unsafe { media_device_info::device_id(self.handle.get()) };
+        unsafe { dart_string_into_rust(device_id) }
     }
 
     /// Returns a kind of the device represented by this [`MediaDeviceInfo`].
@@ -75,9 +78,8 @@ impl MediaDeviceInfo {
     /// If the device has no associated label, then returns an empty string.
     #[must_use]
     pub fn label(&self) -> String {
-        unsafe {
-            dart_string_into_rust(media_device_info::label(self.handle.get()))
-        }
+        let label = unsafe { media_device_info::label(self.handle.get()) };
+        unsafe { dart_string_into_rust(label) }
     }
 
     /// Returns a group identifier of the device represented by this
@@ -92,10 +94,15 @@ impl MediaDeviceInfo {
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
     pub fn group_id(&self) -> Option<String> {
-        Option::try_from(unsafe {
-            media_device_info::group_id(self.handle.get()).unbox()
-        })
-        .unwrap()
+        let group_id =
+            unsafe { media_device_info::group_id(self.handle.get()) };
+        Option::try_from(unsafe { group_id.unbox() }).unwrap()
+    }
+
+    /// Indicates whether the last attempt to use this device failed.
+    #[must_use]
+    pub fn is_failed(&self) -> bool {
+        unsafe { media_device_info::is_failed(self.handle.get()) }
     }
 }
 

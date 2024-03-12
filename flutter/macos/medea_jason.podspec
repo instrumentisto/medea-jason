@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'medea_jason'
-  s.version          = '0.3.0-dev'
+  s.version          = '0.4.0'
   s.summary          = 'Cross-platform client library of Medea media server for Flutter.'
   s.description      = 'Cross-platform client library of Medea media server for Flutter.'
   s.homepage         = 'https://github.com/instrumentisto/medea-jason'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.source_files     = 'Classes/**/*'
   s.dependency 'FlutterMacOS'
 
-  s.vendored_libraries = 'lib/x86_64-apple-darwin/*.dylib'
+  s.vendored_libraries = 'lib/*.dylib'
 
   s.platform = :osx, '10.11'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }

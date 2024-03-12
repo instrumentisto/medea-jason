@@ -3,22 +3,26 @@
     macro_use_extern_crate,
     nonstandard_style,
     rust_2018_idioms,
-    rustdoc::broken_intra_doc_links,
-    rustdoc::private_intra_doc_links,
+    rustdoc::all,
     trivial_casts,
     trivial_numeric_casts
 )]
 #![forbid(non_ascii_idents, unsafe_code)]
 #![warn(
+    clippy::absolute_paths,
     clippy::as_conversions,
+    clippy::as_ptr_cast_mut,
     clippy::assertions_on_result_states,
     clippy::branches_sharing_code,
+    clippy::clear_with_drain,
     clippy::clone_on_ref_ptr,
+    clippy::collection_is_never_read,
     clippy::create_dir,
     clippy::dbg_macro,
     clippy::debug_assert_with_mut_call,
     clippy::decimal_literal_representation,
     clippy::default_union_representation,
+    clippy::derive_partial_eq_without_eq,
     clippy::else_if_without_else,
     clippy::empty_drop,
     clippy::empty_line_after_outer_attr,
@@ -36,37 +40,61 @@
     clippy::if_then_some_else_none,
     clippy::imprecise_flops,
     clippy::index_refutable_slice,
+    clippy::infinite_loop,
     clippy::iter_on_empty_collections,
     clippy::iter_on_single_items,
+    clippy::iter_over_hash_type,
     clippy::iter_with_drain,
     clippy::large_include_file,
+    clippy::large_stack_frames,
+    clippy::let_underscore_untyped,
     clippy::lossy_float_literal,
+    clippy::manual_clamp,
     clippy::map_err_ignore,
     clippy::mem_forget,
+    clippy::missing_assert_message,
+    clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
     clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
+    clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
     clippy::mutex_integer,
+    clippy::needless_collect,
+    clippy::needless_pass_by_ref_mut,
+    clippy::needless_raw_strings,
     clippy::nonstandard_macro_braces,
     clippy::option_if_let_else,
+    clippy::or_fun_call,
     clippy::panic_in_result_fn,
+    clippy::partial_pub_fields,
     clippy::pedantic,
     clippy::print_stderr,
     clippy::print_stdout,
+    clippy::pub_without_shorthand,
     clippy::rc_buffer,
     clippy::rc_mutex,
+    clippy::read_zero_byte_vec,
+    clippy::readonly_write_lock,
+    clippy::redundant_clone,
+    clippy::redundant_type_annotations,
+    clippy::ref_patterns,
     clippy::rest_pat_in_fully_bound_structs,
     clippy::same_name_method,
+    clippy::semicolon_inside_block,
     clippy::shadow_unrelated,
     clippy::significant_drop_in_scrutinee,
+    clippy::significant_drop_tightening,
     clippy::str_to_string,
     clippy::string_add,
     clippy::string_lit_as_bytes,
+    clippy::string_lit_chars_any,
     clippy::string_slice,
     clippy::string_to_string,
     clippy::suboptimal_flops,
     clippy::suspicious_operation_groupings,
+    clippy::suspicious_xor_used_as_pow,
+    clippy::tests_outside_test_module,
     clippy::todo,
     clippy::trailing_empty_array,
     clippy::transmute_undefined_repr,
@@ -74,7 +102,11 @@
     clippy::try_err,
     clippy::undocumented_unsafe_blocks,
     clippy::unimplemented,
+    clippy::uninhabited_references,
+    clippy::unnecessary_safety_comment,
+    clippy::unnecessary_safety_doc,
     clippy::unnecessary_self_imports,
+    clippy::unnecessary_struct_initialization,
     clippy::unneeded_field_pattern,
     clippy::unused_peekable,
     clippy::unwrap_in_result,
@@ -90,8 +122,8 @@
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
-    noop_method_call,
     semicolon_in_expressions_from_macros,
+    unit_bindings,
     unreachable_pub,
     unused_crate_dependencies,
     unused_extern_crates,
@@ -113,7 +145,6 @@ mod enum_delegate;
 mod watchers;
 
 use proc_macro::TokenStream;
-use synstructure::decl_derive;
 
 #[cfg(test)]
 use async_trait as _;
@@ -479,7 +510,6 @@ pub fn watchers(_: TokenStream, input: TokenStream) -> TokenStream {
         .unwrap_or_else(|e| e.to_compile_error().into())
 }
 
-decl_derive!([Caused, attributes(cause)] =>
 /// Generate implementation of `Caused` trait for errors represented as enum.
 ///
 /// # How to use
@@ -487,8 +517,8 @@ decl_derive!([Caused, attributes(cause)] =>
 /// ### 1. Declare custom error and enum for error variants.
 ///
 /// The `cause()` method returns error if nested error has its type declared
-/// as an argument of the attribute `#[cause(error = "path::to::Error")]` or
-/// the error type is assumed to be imported as `Error`.
+/// as an argument of the attribute `#[cause(error = path::to::Error)]` or the
+/// error type is assumed to be imported as `Error`.
 ///
 /// ```rust
 /// use medea_jason::utils::Caused;
@@ -496,7 +526,7 @@ decl_derive!([Caused, attributes(cause)] =>
 /// struct MyError;
 ///
 /// #[derive(Caused)]
-/// #[cause(error = "MyError")]
+/// #[cause(error = MyError)]
 /// enum FooError {
 ///     Internal,
 ///     MyError(MyError),
@@ -518,14 +548,14 @@ decl_derive!([Caused, attributes(cause)] =>
 /// # struct MyError;
 /// #
 /// # #[derive(Caused)]
-/// # #[cause(error = "MyError")]
+/// # #[cause(error = MyError)]
 /// # enum FooError {
 /// #     Internal,
 /// #     MyError(MyError),
 /// # }
 /// #
 /// #[derive(Caused)]
-/// #[cause(error = "MyError")]
+/// #[cause(error = MyError)]
 /// enum BarError {
 ///     Foo(#[cause] FooError),
 /// }
@@ -536,7 +566,16 @@ decl_derive!([Caused, attributes(cause)] =>
 /// let err = BarError::Foo(FooError::MyError(MyError {}));
 /// assert!(err.cause().is_some());
 /// ```
-caused::derive);
+#[proc_macro_derive(Caused, attributes(cause))]
+pub fn derive_caused(input: TokenStream) -> TokenStream {
+    syn::parse::<syn::DeriveInput>(input)
+        .and_then(|i| {
+            synstructure::Structure::try_new(&i)
+                .and_then(|mut s| caused::derive(&mut s))
+        })
+        .unwrap_or_else(|e| e.to_compile_error())
+        .into()
+}
 
 /// Generates code for `extern` Dart functions registration and calling.
 ///

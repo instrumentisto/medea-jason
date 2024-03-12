@@ -64,6 +64,8 @@ impl Inner {
     /// Sends [`ClientMsg::Pong`] to a server.
     ///
     /// If some error happen then it will be printed with [`log::error`].
+    // TODO: False positive, try remove on Rust 1.77 upgrade.
+    #[allow(unused_must_use)]
     fn send_pong(&self, n: u32) {
         self.transport
             .send(&ClientMsg::Pong(n))
@@ -150,7 +152,7 @@ fn spawn_idle_watchdog_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
         });
 
     platform::spawn(async move {
-        let _ = idle_watchdog_fut.await.ok();
+        _ = idle_watchdog_fut.await.ok();
     });
 
     idle_watchdog_handle.into()
@@ -175,7 +177,7 @@ fn spawn_ping_handle_task(this: Rc<RefCell<Inner>>) -> TaskHandle {
         }
     });
     platform::spawn(async move {
-        let _ = handle_ping_fut.await.ok();
+        _ = handle_ping_fut.await.ok();
     });
     handle_ping_task.into()
 }

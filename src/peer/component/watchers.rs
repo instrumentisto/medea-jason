@@ -1,10 +1,12 @@
 //! Implementation of a [`Component`] watchers.
 
-use std::rc::Rc;
+use std::{collections::HashSet, rc::Rc};
 
 use derive_more::{Display, From};
 use futures::{future, StreamExt as _};
-use medea_client_api_proto::{IceCandidate, NegotiationRole, TrackId};
+use medea_client_api_proto::{
+    IceCandidate, MemberId, NegotiationRole, TrackId,
+};
 use medea_macro::watchers;
 use medea_reactive::Guarded;
 use tracerr::Traced;
@@ -108,6 +110,7 @@ impl Component {
     ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
+        peer.connections.remove_track(&track_id);
     }
 
     /// Watcher for the [`State::receivers`] remove update.
@@ -121,6 +124,7 @@ impl Component {
     ) {
         let ((track_id, _), _guard) = val.into_parts();
         peer.remove_track(track_id);
+        peer.connections.remove_track(&track_id);
     }
 
     /// Watcher for the [`State::senders`] insert update.
@@ -143,7 +147,10 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<sender::State>)>,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        let mut wait_futs = vec![state.when_all_receivers_processed().into()];
+        let mut wait_futs = vec![
+            state.negotiation_role.when_all_processed().into(),
+            state.when_all_receivers_processed().into(),
+        ];
         if matches!(
             state.negotiation_role.get(),
             Some(NegotiationRole::Answerer(_))
@@ -152,10 +159,11 @@ impl Component {
         }
         medea_reactive::when_all_processed(wait_futs).await;
 
-        let ((_, new_sender), _guard) = val.into_parts();
-        for receiver in new_sender.receivers() {
-            drop(peer.connections.create_connection(state.id, receiver));
-        }
+        let ((track_id, new_sender), _guard) = val.into_parts();
+        drop(peer.connections.update_connections(
+            &track_id,
+            new_sender.receivers().into_iter().collect(),
+        ));
         let sender = sender::Sender::new(
             &new_sender,
             &peer.media_connections,
@@ -191,15 +199,17 @@ impl Component {
         state: Rc<State>,
         val: Guarded<(TrackId, Rc<receiver::State>)>,
     ) {
-        let ((_, rcvr_state), _guard) = val.into_parts();
-        let conn = peer
-            .connections
-            .create_connection(state.id, rcvr_state.sender_id());
+        let ((track_id, rcvr_state), _guard) = val.into_parts();
+        let conns = peer.connections.update_connections(
+            &track_id,
+            HashSet::from([rcvr_state.sender_id().clone()]),
+        );
         let receiver = receiver::Receiver::new(
             &rcvr_state,
             &peer.media_connections,
             peer.track_events_sender.clone(),
             &peer.recv_constraints,
+            state.connection_mode,
         )
         .await;
         peer.media_connections
@@ -207,7 +217,26 @@ impl Component {
                 Rc::new(receiver),
                 Rc::clone(&rcvr_state),
             ));
-        conn.add_receiver(rcvr_state);
+        for conn in conns {
+            conn.add_receiver(Rc::clone(&rcvr_state));
+        }
+    }
+
+    /// Watcher for the [`State::connections`] insert update.
+    ///
+    /// Creates a new [`Connection`] for the given [`PeerConnection`].
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(
+        self.maybe_update_connections.subscribe().filter_map(future::ready)
+    )]
+    fn maybe_update_connections(
+        peer: &PeerConnection,
+        state: &State,
+        val: (TrackId, HashSet<MemberId>),
+    ) {
+        drop(peer.connections.update_connections(&val.0, val.1));
+
+        state.maybe_update_connections.set(None);
     }
 
     /// Watcher for the [`State::local_sdp`] updates.
@@ -231,13 +260,17 @@ impl Component {
         state: Rc<State>,
         sdp: String,
     ) -> Result<(), Traced<PeerWatcherError>> {
-        let _ = state.sync_state.when_eq(SyncState::Synced).await;
+        _ = state.sync_state.when_eq(SyncState::Synced).await;
         if let Some(role) = state.negotiation_role.get() {
             if state.local_sdp.is_rollback() {
-                peer.peer
-                    .rollback()
-                    .await
-                    .map_err(tracerr::map_from_and_wrap!())?;
+                // TODO: Temporary fix that allows us to ignore rollback
+                //       since it won't work anyway.
+                if state.negotiation_state.get() != NegotiationState::Stable {
+                    peer.peer
+                        .rollback()
+                        .await
+                        .map_err(tracerr::map_from_and_wrap!())?;
+                }
                 if state.local_sdp.is_restart_needed() {
                     state.negotiation_state.set(NegotiationState::WaitLocalSdp);
                 } else {
@@ -255,7 +288,7 @@ impl Component {
                         let mids = peer
                             .get_mids()
                             .map_err(tracerr::map_from_and_wrap!())?;
-                        let _ = peer
+                        _ = peer
                             .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpOffer {
                                 peer_id: peer.id(),
@@ -276,7 +309,7 @@ impl Component {
                             .await
                             .map_err(tracerr::map_from_and_wrap!())?;
                         peer.media_connections.sync_receivers().await;
-                        let _ = peer
+                        _ = peer
                             .peer_events_sender
                             .unbounded_send(PeerEvent::NewSdpAnswer {
                                 peer_id: peer.id(),
@@ -308,7 +341,7 @@ impl Component {
     /// [`Stable`]: NegotiationState::Stable
     /// [`WaitRemoteSdp`]: NegotiationState::WaitRemoteSdp
     #[watch(self.local_sdp.on_approve().skip(1))]
-    fn local_sdp_approved(_: &PeerConnection, state: &State, _: ()) {
+    fn local_sdp_approved(_: &PeerConnection, state: &State, (): ()) {
         if let Some(negotiation_role) = state.negotiation_role.get() {
             match negotiation_role {
                 NegotiationRole::Offerer => {
@@ -383,14 +416,16 @@ impl Component {
     /// Waits for [`sender::Component`]s' and [`receiver::Component`]s'
     /// creation/update, updates local `MediaStream` (if required) and
     /// renegotiates [`PeerConnection`].
-    #[watch(self.negotiation_role.subscribe().filter_map(future::ready))]
+    #[watch(self.negotiation_role.subscribe().filter_map(transpose_guarded))]
     async fn negotiation_role_changed(
         _: Rc<PeerConnection>,
         state: Rc<State>,
-        role: NegotiationRole,
+        role: Guarded<NegotiationRole>,
     ) {
+        let (role, guard) = role.into_parts();
         match role {
             NegotiationRole::Offerer => {
+                drop(guard);
                 medea_reactive::when_all_processed(vec![
                     state.when_all_senders_processed().into(),
                     state.when_all_receivers_processed().into(),
@@ -405,8 +440,8 @@ impl Component {
                 .await;
             }
             NegotiationRole::Answerer(remote_sdp) => {
-                state.when_all_receivers_processed().await;
                 state.set_remote_sdp(remote_sdp);
+                drop(guard);
 
                 medea_reactive::when_all_processed(vec![
                     state.receivers.when_updated().into(),
@@ -425,7 +460,7 @@ impl Component {
         }
 
         state.maybe_update_local_stream.set(true);
-        let _ = state.maybe_update_local_stream.when_eq(false).await;
+        _ = state.maybe_update_local_stream.when_eq(false).await;
 
         state.negotiation_state.set(NegotiationState::WaitLocalSdp);
     }

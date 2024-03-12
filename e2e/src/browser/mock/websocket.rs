@@ -54,18 +54,14 @@ impl<'a> WebSocket<'a> {
         self.0
             .execute(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async () => {
                     const [code] = args;
                     for (socket of window.wsMock.allSockets) {
-                        window.wsMock.isClosed = true;
-                        window.wsMock.closeCode = code;
-                        socket.dispatchEvent(
-                            new CloseEvent("close", { code: code })
-                        );
+                        socket.close(code);
                     }
                 }
-                "#,
+                ",
                 [code.into()],
             ))
             .await
@@ -85,12 +81,12 @@ impl<'a> WebSocket<'a> {
         self.0
             .execute(Statement::new(
                 // language=JavaScript
-                r#"
+                "
                 async () => {
                     window.wsMock.isClosed = false;
                     window.wsMock.closeCode = 0;
                 }
-                "#,
+                ",
                 [],
             ))
             .await

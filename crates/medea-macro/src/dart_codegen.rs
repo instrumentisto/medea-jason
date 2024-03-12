@@ -138,11 +138,16 @@ impl DartType {
                 }
                 syn::GenericArgument::Lifetime(_)
                 | syn::GenericArgument::Type(_)
-                | syn::GenericArgument::Binding(_)
-                | syn::GenericArgument::Constraint(_)
-                | syn::GenericArgument::Const(_) => Err(syn::Error::new(
+                | syn::GenericArgument::Const(_)
+                | syn::GenericArgument::AssocType(_)
+                | syn::GenericArgument::AssocConst(_)
+                | syn::GenericArgument::Constraint(_) => Err(syn::Error::new(
                     bracketed.span(),
                     "Unsupported generic argument",
+                )),
+                _ => Err(syn::Error::new(
+                    bracketed.span(),
+                    "Unsupported unknown generic argument",
                 )),
             }
         } else {
@@ -157,7 +162,6 @@ impl DartType {
 impl TryFrom<syn::Type> for DartType {
     type Error = syn::Error;
 
-    #[allow(clippy::wildcard_enum_match_arm)] // false positive: non_exhaustive
     fn try_from(value: syn::Type) -> syn::Result<Self> {
         Ok(match value {
             syn::Type::Path(p) => {
@@ -185,8 +189,24 @@ impl TryFrom<syn::Type> for DartType {
                     }
                 }
             }
-            _ => {
+            syn::Type::Array(_)
+            | syn::Type::BareFn(_)
+            | syn::Type::Group(_)
+            | syn::Type::ImplTrait(_)
+            | syn::Type::Infer(_)
+            | syn::Type::Macro(_)
+            | syn::Type::Never(_)
+            | syn::Type::Paren(_)
+            | syn::Type::Ptr(_)
+            | syn::Type::Reference(_)
+            | syn::Type::Slice(_)
+            | syn::Type::TraitObject(_)
+            | syn::Type::Tuple(_)
+            | syn::Type::Verbatim(_) => {
                 return Err(syn::Error::new(value.span(), "Unsupported type"));
+            }
+            _ => {
+                return Err(syn::Error::new(value.span(), "Unknown type"));
             }
         })
     }

@@ -6,18 +6,8 @@ use std::{fmt, rc::Rc};
 use dart_sys::{Dart_Handle, Dart_PersistentHandle};
 use medea_macro::dart_bridge;
 
-use crate::{
-    api::{c_str_into_string, dart_string_into_rust},
-    platform::{
-        dart::utils::dart_api::{
-            Dart_DeletePersistentHandle_DL_Trampolined,
-            Dart_HandleFromPersistent_DL_Trampolined,
-            Dart_NewPersistentHandle_DL_Trampolined,
-        },
-        utils::dart_api::{
-            Dart_GetError_DL_Trampolined, Dart_IsError_DL_Trampolined,
-        },
-    },
+use crate::platform::utils::{
+    c_str_into_string, dart_api, dart_string_into_rust,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/object.g.dart")]
@@ -57,12 +47,12 @@ impl DartHandle {
     /// unexpected situation.
     #[must_use]
     pub unsafe fn new(handle: Dart_Handle) -> Self {
-        if Dart_IsError_DL_Trampolined(handle) {
-            let err_msg =
-                c_str_into_string(Dart_GetError_DL_Trampolined(handle));
+        if dart_api::is_error(handle) {
+            let pointer = dart_api::get_error(handle);
+            let err_msg = c_str_into_string(pointer.as_ref().unwrap().into());
             panic!("Unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(Dart_NewPersistentHandle_DL_Trampolined(handle)))
+        Self(Rc::new(dart_api::new_persistent_handle(handle)))
     }
 
     /// Returns the underlying [`Dart_Handle`].
@@ -70,22 +60,22 @@ impl DartHandle {
     pub fn get(&self) -> Dart_Handle {
         // SAFETY: We don't expose the inner `Dart_PersistentHandle` anywhere,
         //         so we're sure that it's valid at this point.
-        unsafe { Dart_HandleFromPersistent_DL_Trampolined(*self.0) }
+        unsafe { dart_api::handle_from_persistent(*self.0) }
     }
 
     /// Returns string representation of a runtime Dart type behind this
     /// [`DartHandle`].
     #[must_use]
     pub fn name(&self) -> String {
-        unsafe { dart_string_into_rust(handle::runtime_type(self.get())) }
+        let type_name = unsafe { handle::runtime_type(self.get()) };
+        unsafe { dart_string_into_rust(type_name) }
     }
 }
 
 impl fmt::Display for DartHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string =
-            unsafe { dart_string_into_rust(handle::to_string(self.get())) };
-
+        let string = unsafe { handle::to_string(self.get()) };
+        let string = unsafe { dart_string_into_rust(string) };
         write!(f, "{string}")
     }
 }
@@ -94,7 +84,7 @@ impl Drop for DartHandle {
     fn drop(&mut self) {
         if let Some(handle) = Rc::get_mut(&mut self.0) {
             unsafe {
-                Dart_DeletePersistentHandle_DL_Trampolined(*handle);
+                dart_api::delete_persistent_handle(*handle);
             }
         }
     }
