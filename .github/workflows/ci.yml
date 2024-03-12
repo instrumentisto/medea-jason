@@ -328,7 +328,7 @@ jobs:
           - android
           # TODO: Re-enable once fixed stability on CI
           #- macos
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -372,8 +372,9 @@ jobs:
         id: simulator
         uses: futureware-tech/simulator-action@v3
         with:
-          os_version: '>=13.0'
           os: iOS
+          os_version: '>=13.0'
+          model: 'iPhone 13 Pro'
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Download `medea-jason` lib
