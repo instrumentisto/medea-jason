@@ -362,9 +362,8 @@ jobs:
         id: simulator
         uses: futureware-tech/simulator-action@v3
         with:
-          os: iOS
           os_version: '>=13.0'
-          model: 'iPhone 13 Pro'
+          os: iOS
         if: ${{ matrix.platform == 'ios' }}
 
       - name: Download `medea-jason` lib
