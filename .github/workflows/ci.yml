@@ -327,7 +327,7 @@ jobs:
           - linux
           # TODO: Re-enable once fixed stability on CI
           #- macos
-    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-13')
+    runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
@@ -335,13 +335,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-
-      - name: Fix Python conflicts between macOS runner and Homebrew
-        run: |
-          # see https://github.com/actions/setup-python/issues/577
-          brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done
-        if: ${{ contains('ios macos', matrix.platform) }}
-
       - name: Setup Docker and Docker Compose
         run: |
           brew install colima docker docker-compose
