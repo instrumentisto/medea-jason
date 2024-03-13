@@ -16,6 +16,7 @@ use medea_e2e::{
     browser::{self, WebDriverClientBuilder, WindowFactory},
     object::{self, Jason, MediaKind, MediaSourceKind, Object},
 };
+use reqwest::StatusCode;
 use tokio::time::{interval, sleep};
 use uuid::Uuid;
 
@@ -50,6 +51,27 @@ pub enum Error {
 #[allow(clippy::absolute_paths)]
 type Result<T> = std::result::Result<T, Error>;
 
+/// HTTP response.
+#[derive(Clone, Copy, Debug)]
+#[must_use]
+pub struct Response<Body = String> {
+    /// [`StatusCode`] of this [`Response`].
+    pub code: StatusCode,
+
+    /// [`Response`] body.
+    pub body: Body,
+}
+
+impl Response {
+    /// Extracts a new [`Response`] from the given [`reqwest::Response`].
+    pub async fn from_reqwest(resp: reqwest::Response) -> Self {
+        Response {
+            code: resp.status(),
+            body: resp.text().await.expect("Response body is not a text"),
+        }
+    }
+}
+
 /// [`World`][1] used by all E2E tests.
 ///
 /// [1]: cucumber::World
@@ -64,6 +86,9 @@ pub struct World {
 
     /// All [`Member`]s created in this [`World`].
     members: HashMap<String, Member>,
+
+    /// [`Response`]s collected by this [`World`].
+    metrics_responses: Vec<Response>,
 
     /// All [`Jason`] [`Object`]s created in this [`World`].
     jasons: HashMap<String, Object<Jason>>,
@@ -85,6 +110,10 @@ impl fmt::Debug for World {
 }
 
 impl World {
+    pub fn metrics_responses(&mut self) -> &mut Vec<Response> {
+        &mut self.metrics_responses
+    }
+
     /// Attempts to initialized a new fresh [`World`].
     ///
     /// # Errors
@@ -116,6 +145,7 @@ impl World {
                 .await?
                 .into(),
             members: HashMap::new(),
+            metrics_responses: Vec::new(),
             jasons: HashMap::new(),
         })
     }
