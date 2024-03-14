@@ -4,7 +4,7 @@ use reqwest::{get, StatusCode};
 
 use crate::{world::Response, World};
 
-use cucumber::{when, then};
+use cucumber::{then, when};
 
 /// URL address where `metrics` HTTP server for E2E tests is served.
 const URL: &str = "http://127.0.0.1:9372/metrics";
