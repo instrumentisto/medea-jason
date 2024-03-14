@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' show Response;
 import 'package:tuple/tuple.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,6 +30,8 @@ class CustomWorld extends FlutterWidgetTesterWorld {
 
   /// All [Member]s created in this [FlutterWidgetTesterWorld].
   var members = HashMap<String, Member>();
+
+  List<Response> metricsResponses = List.empty(growable: true);
 
   /// All [Jason]s created in this [FlutterWidgetTesterWorld].
   var jasons = HashMap<String, Jason>();

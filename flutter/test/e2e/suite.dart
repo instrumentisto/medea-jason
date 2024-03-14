@@ -17,6 +17,7 @@ import 'steps/media_state.dart' as media_state;
 import 'steps/room.dart' as room;
 import 'steps/track.dart' as track;
 import 'steps/websockets.dart' as websocket;
+import 'steps/monit.dart' as monit;
 import 'world/custom_world.dart';
 
 part 'suite.g.dart';
@@ -85,7 +86,8 @@ final testConfigs = FlutterTestConfiguration(
         track.steps() +
         media_state.steps() +
         websocket.steps() +
-        given.steps(),
+        given.steps() +
+        monit.steps(),
     createWorld: (config) => Future.sync(() async {
           await clearWorld();
           await webrtc.enableFakeMedia();
