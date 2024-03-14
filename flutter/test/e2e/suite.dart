@@ -14,10 +14,10 @@ import 'steps/connection.dart' as connection;
 import 'steps/control_api.dart' as control_api;
 import 'steps/given.dart' as given;
 import 'steps/media_state.dart' as media_state;
+import 'steps/monit.dart' as monit;
 import 'steps/room.dart' as room;
 import 'steps/track.dart' as track;
 import 'steps/websockets.dart' as websocket;
-import 'steps/monit.dart' as monit;
 import 'world/custom_world.dart';
 
 part 'suite.g.dart';
