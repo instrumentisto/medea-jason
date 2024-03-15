@@ -984,7 +984,7 @@ Future controlApiCreateMemberDialog(BuildContext context, Call call) {
               TextButton(
                   onPressed: () async {
                     var member = Member(memberId, {}, Plain(credentials),
-                        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
+                        'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099', 'grpc://127.0.0.1:9099');
 
                     member.idle_timeout = idle;
                     member.reconnect_timeout = reconnectTimeout;

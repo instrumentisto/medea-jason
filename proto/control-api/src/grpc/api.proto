@@ -168,11 +168,11 @@ message Member {
   // URL of the callback to fire when this `Member` finishes a persistent
   // connection with a media server via Client API.
   string on_leave = 3;
-  /// URL of the callback to fire when this [`Member`] start traffic
-  /// with a media server via [Client API].
+  // URL of the callback to fire when this [`Member`] start traffic
+  // with a media server via [Client API].
   string on_start = 4;
-  /// URL of the callback to fire when this [`Member`] stopped traffic
-  /// with a media server via [Client API].
+  // URL of the callback to fire when this [`Member`] stopped traffic
+  // with a media server via [Client API].
   string on_stop = 5;
   // Credentials to authenticate this `Member` in Client API with.
   //
@@ -283,7 +283,7 @@ message WebRtcPublishEndpoint {
 message WebRtcPlayEndpoint {
   // ID of this `WebRtcPlayEndpoint`.
   string id = 1;
-  /// Source to play media data from.
+  // Source to play media data from.
   string src = 2;
   // Callback firing when a client starts playing media data from the source.
   string on_start = 3;

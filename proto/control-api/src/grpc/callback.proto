@@ -59,9 +59,9 @@ message OnStart {
 
 // Event which fires when Endpoint stops sending/receiving media traffic.
 message OnStop {
-  /// Media type of the traffic which stops flowing in some Endpoint.
+  // Media type of the traffic which stops flowing in some Endpoint.
   MediaType media_type = 1;
-  /// Media Endpoint for which this callback was received.
+  // Media Endpoint for which this callback was received.
   MediaDirection media_direction = 2;
   // Reason of why Endpoint was stopped.
   Reason reason = 3;

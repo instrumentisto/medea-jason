@@ -147,7 +147,7 @@ pub enum MediaType {
     Both,
 }
 
-/// Media Endpoint for which OnStart or OnStop Control API callback
+/// Media Endpoint for which `OnStart` or `OnStop` Control API callback
 /// was received.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum MediaDirection {
@@ -177,16 +177,21 @@ impl From<proto::MediaType> for MediaType {
     }
 }
 
+/// `on_start` callback's related entities and implementations.
 mod start {
     use medea_control_api_proto::grpc::callback as proto;
     use serde::{Deserialize, Serialize};
 
     use super::{MediaDirection, MediaType};
 
-    /// `OnJoin` callback for Control API.
+    /// `OnStart` callback for Control API.
     #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
     pub struct OnStart {
+        /// [`MediaType`] of the traffic which starts flowing in some
+        /// `Endpoint`.
         media_type: MediaType,
+        /// [`MediaDirection`] of the `Endpoint` for which this callback was
+        /// received.
         media_direction: MediaDirection,
     }
 
@@ -206,6 +211,7 @@ mod start {
     }
 }
 
+/// `on_stop` callback's related entities and implementations.
 mod stop {
     use derive_more::Display;
     use medea_control_api_proto::grpc::callback as proto;
@@ -213,10 +219,18 @@ mod stop {
 
     use super::{MediaDirection, MediaType};
 
+    /// `OnStop` callback of Control API.
     #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
     pub struct OnStop {
+        /// Reason of why `Endpoint` was stopped.
         pub reason: OnStopReason,
+
+        /// [`MediaType`] of the traffic which starts flowing in some
+        /// `Endpoint`.
         pub media_type: MediaType,
+
+        /// [`MediaDirection`] of the `Endpoint` for which this callback was
+        /// received.
         pub media_direction: MediaDirection,
     }
 
@@ -238,6 +252,7 @@ mod stop {
         }
     }
 
+    /// Reason of why some `Endpoint` was stopped.
     #[derive(Clone, Copy, Debug, Deserialize, Display, Serialize)]
     pub enum OnStopReason {
         /// All traffic of some `Endpoint` was stopped flowing.
