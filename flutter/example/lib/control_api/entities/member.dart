@@ -107,7 +107,8 @@ class Member {
   /// API.
   String? ping_interval;
 
-  Member(this.id, this.pipeline, this.credentials, this.on_join, this.on_leave, this.on_start, this.on_stop);
+  Member(this.id, this.pipeline, this.credentials, this.on_join, this.on_leave,
+      this.on_start, this.on_stop);
 
   factory Member.fromJson(Map<String, dynamic> json) {
     json.remove('kind');
