@@ -1,9 +1,8 @@
 //! API for receiving callbacks from a media server.
 
 use async_trait::async_trait;
-use derive_more::From;
+use derive_more::{Display, From};
 use time::OffsetDateTime as DateTime;
-use derive_more::Display;
 
 use crate::Fid;
 
@@ -140,7 +139,7 @@ impl MediaType {
     }
 }
 
-/// Media Endpoint for which OnStart or OnStop Control API callback
+/// Media Endpoint for which `OnStart` or `OnStop` Control API callback
 /// was received.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum MediaDirection {
