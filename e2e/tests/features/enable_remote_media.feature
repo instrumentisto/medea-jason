@@ -43,4 +43,3 @@ Feature: Enable remote media
     When Bob disables audio and awaits it completes
     And Bob enables audio and awaits it completes
     Then `on_enabled` callback fires 1 times on Alice's remote audio track from Bob
-
