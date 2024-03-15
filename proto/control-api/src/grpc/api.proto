@@ -168,12 +168,6 @@ message Member {
   // URL of the callback to fire when this `Member` finishes a persistent
   // connection with a media server via Client API.
   string on_leave = 3;
-  // URL of the callback to fire when this [`Member`] start traffic
-  // with a media server via [Client API].
-  string on_start = 4;
-  // URL of the callback to fire when this [`Member`] stopped traffic
-  // with a media server via [Client API].
-  string on_stop = 5;
   // Credentials to authenticate this `Member` in Client API with.
   //
   // Plain and hashed credentials are supported. If no credentials provided,
@@ -185,23 +179,29 @@ message Member {
   // are used, so it should be appended manually on a client side.
   oneof credentials {
     // Argon2 hash of credentials.
-    string hash = 6;
+    string hash = 4;
     // Plain text credentials.
-    string plain = 7;
+    string plain = 5;
   }
   // Timeout of receiving heartbeat messages from this `Member` via Client API.
   // Once reached, this `Member` is considered being idle.
-  google.protobuf.Duration idle_timeout = 8;
+  google.protobuf.Duration idle_timeout = 6;
   // Timeout of reconnecting this `Member` via Client API.
   // Once reached, this `Member` is considered disconnected.
-  google.protobuf.Duration reconnect_timeout = 9;
+  google.protobuf.Duration reconnect_timeout = 7;
   // Interval of pinging with heartbeat messages this `Member` via Client API
   // by a media server.
   // If empty then the default interval of a media server is used, if
   // configured.
-  google.protobuf.Duration ping_interval = 10;
+  google.protobuf.Duration ping_interval = 8;
   // Media pipeline representing this `Member`.
-  map<string, Member.Element> pipeline = 11;
+  map<string, Member.Element> pipeline = 9;
+  // URL of the callback to fire when this [`Member`] start traffic
+  // with a media server via [Client API].
+  string on_start = 10;
+  // URL of the callback to fire when this [`Member`] stopped traffic
+  // with a media server via [Client API].
+  string on_stop = 11;
 
   // Elements which Member's pipeline can contain.
   message Element {
