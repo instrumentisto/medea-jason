@@ -226,11 +226,18 @@ impl RtcPeerConnection {
                     self.handle.get(),
                     Callback::from_fn_mut(move |handle: DartHandle| {
                         let candidate = PlatformIceCandidate::from(handle);
-                        h(IceCandidate {
-                            candidate: candidate.candidate(),
-                            sdp_m_line_index: candidate.sdp_m_line_index(),
-                            sdp_mid: candidate.sdp_mid(),
-                        });
+                        // Empty `candidate.candidate()` means that all the ICE
+                        // transports have finished gathering candidates.
+                        //
+                        // Doesn't need to be delivered onward to the remote
+                        // peer.
+                        if !candidate.candidate().is_empty() {
+                            h(IceCandidate {
+                                candidate: candidate.candidate(),
+                                sdp_m_line_index: candidate.sdp_m_line_index(),
+                                sdp_mid: candidate.sdp_mid(),
+                            });
+                        }
                     })
                     .into_dart(),
                 );
