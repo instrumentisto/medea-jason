@@ -3,6 +3,7 @@
 use async_trait::async_trait;
 use derive_more::From;
 use time::OffsetDateTime as DateTime;
+use derive_more::Display;
 
 use crate::Fid;
 
@@ -54,6 +55,115 @@ pub enum Event {
     /// [`Member`]: crate::Member
     /// [`Room`]: crate::Room
     OnLeave(OnLeaveEvent),
+
+    /// [`Member`] Started traffic.
+    ///
+    /// [`Member`]: crate::Member
+    OnStart(OnStartEvent),
+
+    /// [`Member`] Stopped traffic.
+    ///
+    /// [`Member`]: crate::Member
+    OnStop(OnStopEvent),
+}
+
+/// `OnStart` callback of Control API.
+#[derive(Clone, Copy, Debug)]
+pub struct OnStartEvent {
+    /// [`MediaDirection`] of the `Endpoint` for which
+    /// his callback was received.
+    pub media_direction: MediaDirection,
+    /// [`MediaType`] of the traffic which starts flowing in some `Endpoint`.
+    pub media_type: MediaType,
+}
+
+/// Reason of why some `Endpoint` was stopped.
+#[derive(Clone, Copy, Debug)]
+pub enum OnStopReason {
+    /// All traffic of some `Endpoint` was stopped flowing.
+    TrafficNotFlowing,
+
+    /// `Endpoint` was muted.
+    Muted,
+
+    /// Some traffic flows within `Endpoint`, but incorrectly.
+    WrongTrafficFlowing,
+
+    /// Traffic stopped because Endpoint was removed.
+    EndpointRemoved,
+}
+
+/// Media type of the traffic which starts/stops flowing in some `Endpoint`.
+#[derive(Clone, Copy, Debug, Display, Eq, PartialEq)]
+#[repr(u8)]
+pub enum MediaType {
+    /// Started/stopped audio traffic.
+    Audio = 0b1,
+
+    /// Started/stopped video traffic.
+    Video = 0b10,
+
+    /// Started/stopped video and audio traffic.
+    Both = 0b11,
+}
+
+impl From<MediaType> for u8 {
+    #[allow(clippy::as_conversions)] // no other way
+    fn from(t: MediaType) -> Self {
+        t as Self
+    }
+}
+
+impl MediaType {
+    /// Returns [`MediaType`] which was started based on the provided
+    /// [`MediaType`]s.
+    ///
+    /// This [`MediaType`] should be what was before `RTCStat` update and
+    /// as argument is [`MediaType`] which was got after `RTCStat` update.
+    #[must_use]
+    pub const fn get_started(self, after: Self) -> Option<Self> {
+        match self {
+            Self::Audio => match after {
+                Self::Video => Some(Self::Audio),
+                Self::Audio | Self::Both => None,
+            },
+            Self::Video => match after {
+                Self::Audio => Some(Self::Video),
+                Self::Video | Self::Both => None,
+            },
+            Self::Both => match after {
+                Self::Audio => Some(Self::Video),
+                Self::Video => Some(Self::Audio),
+                Self::Both => None,
+            },
+        }
+    }
+}
+
+/// Media Endpoint for which OnStart or OnStop Control API callback
+/// was received.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+pub enum MediaDirection {
+    /// `Endpoint` is a publisher.
+    Publish,
+
+    /// `Endpoint` is a player.
+    Play,
+}
+
+/// `OnStop` callback of Control API.
+#[derive(Clone, Copy, Debug)]
+pub struct OnStopEvent {
+    /// [`MediaType`] of the traffic which stops flowing in some
+    /// `Endpoint`.
+    pub media_type: MediaType,
+
+    /// [`MediaDirection`] of the `Endpoint` for which this callback was
+    /// received.
+    pub media_direction: MediaDirection,
+
+    /// Reason of why `Endpoint` was stopped.
+    pub reason: OnStopReason,
 }
 
 /// [`Event`] notifying about a [`Member`] joining a [`Room`].

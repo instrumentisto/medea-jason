@@ -209,22 +209,30 @@ pub struct Member {
     /// connection with a media server via Client API.
     #[prost(string, tag = "3")]
     pub on_leave: ::prost::alloc::string::String,
+    /// / URL of the callback to fire when this \[`Member`\] start traffic
+    /// / with a media server via \[Client API\].
+    #[prost(string, tag = "4")]
+    pub on_start: ::prost::alloc::string::String,
+    /// / URL of the callback to fire when this \[`Member`\] stopped traffic
+    /// / with a media server via \[Client API\].
+    #[prost(string, tag = "5")]
+    pub on_stop: ::prost::alloc::string::String,
     /// Timeout of receiving heartbeat messages from this `Member` via Client API.
     /// Once reached, this `Member` is considered being idle.
-    #[prost(message, optional, tag = "6")]
+    #[prost(message, optional, tag = "8")]
     pub idle_timeout: ::core::option::Option<::prost_types::Duration>,
     /// Timeout of reconnecting this `Member` via Client API.
     /// Once reached, this `Member` is considered disconnected.
-    #[prost(message, optional, tag = "7")]
+    #[prost(message, optional, tag = "9")]
     pub reconnect_timeout: ::core::option::Option<::prost_types::Duration>,
     /// Interval of pinging with heartbeat messages this `Member` via Client API
     /// by a media server.
     /// If empty then the default interval of a media server is used, if
     /// configured.
-    #[prost(message, optional, tag = "8")]
+    #[prost(message, optional, tag = "10")]
     pub ping_interval: ::core::option::Option<::prost_types::Duration>,
     /// Media pipeline representing this `Member`.
-    #[prost(map = "string, message", tag = "9")]
+    #[prost(map = "string, message", tag = "11")]
     pub pipeline: ::std::collections::HashMap<
         ::prost::alloc::string::String,
         member::Element,
@@ -238,7 +246,7 @@ pub struct Member {
     /// Hashed variant only supports Argon2 hash at the moment.
     /// `Member` sid won't contain a `token` query parameter if hashed credentials
     /// are used, so it should be appended manually on a client side.
-    #[prost(oneof = "member::Credentials", tags = "4, 5")]
+    #[prost(oneof = "member::Credentials", tags = "6, 7")]
     pub credentials: ::core::option::Option<member::Credentials>,
 }
 /// Nested message and enum types in `Member`.
@@ -274,10 +282,10 @@ pub mod member {
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Credentials {
         /// Argon2 hash of credentials.
-        #[prost(string, tag = "4")]
+        #[prost(string, tag = "6")]
         Hash(::prost::alloc::string::String),
         /// Plain text credentials.
-        #[prost(string, tag = "5")]
+        #[prost(string, tag = "7")]
         Plain(::prost::alloc::string::String),
     }
 }

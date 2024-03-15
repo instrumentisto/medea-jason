@@ -9,8 +9,14 @@ use time::{
 };
 
 use crate::{
-    callback::{Event, OnJoinEvent, OnLeaveEvent, OnLeaveReason, Request},
-    grpc::{callback as proto, ProtobufError},
+    callback::{
+        Event, MediaDirection, MediaType, OnJoinEvent, OnLeaveEvent,
+        OnLeaveReason, OnStartEvent, OnStopEvent, OnStopReason, Request,
+    },
+    grpc::{
+        callback::{self as proto},
+        ProtobufError,
+    },
 };
 
 impl TryFrom<proto::Request> for Request {
@@ -48,6 +54,8 @@ impl From<proto::request::Event> for Event {
         match ev {
             Event::OnJoin(on_join) => Self::OnJoin(on_join.into()),
             Event::OnLeave(on_leave) => Self::OnLeave(on_leave.into()),
+            Event::OnStart(on_start) => Self::OnStart(on_start.into()),
+            Event::OnStop(on_stop) => Self::OnStop(on_stop.into()),
         }
     }
 }
@@ -57,6 +65,8 @@ impl From<Event> for proto::request::Event {
         match ev {
             Event::OnJoin(on_join) => Self::OnJoin(on_join.into()),
             Event::OnLeave(on_leave) => Self::OnLeave(on_leave.into()),
+            Event::OnStart(on_start) => Self::OnStart(on_start.into()),
+            Event::OnStop(on_stop) => Self::OnStop(on_stop.into()),
         }
     }
 }
@@ -91,6 +101,60 @@ impl From<OnLeaveEvent> for proto::OnLeave {
     }
 }
 
+impl From<OnStartEvent> for proto::OnStart {
+    fn from(ev: OnStartEvent) -> Self {
+        Self {
+            media_type: proto::MediaType::from(ev.media_type).into(),
+            media_direction: proto::MediaDirection::from(ev.media_direction)
+                .into(),
+        }
+    }
+}
+
+impl From<proto::OnStart> for OnStartEvent {
+    fn from(ev: proto::OnStart) -> Self {
+        Self {
+            media_direction: proto::MediaDirection::try_from(
+                ev.media_direction,
+            )
+            .unwrap_or_default()
+            .into(),
+            media_type: proto::MediaType::try_from(ev.media_type)
+                .unwrap_or_default()
+                .into(),
+        }
+    }
+}
+
+impl From<OnStopEvent> for proto::OnStop {
+    fn from(ev: OnStopEvent) -> Self {
+        Self {
+            reason: proto::on_stop::Reason::from(ev.reason).into(),
+            media_type: proto::MediaType::from(ev.media_type).into(),
+            media_direction: proto::MediaDirection::from(ev.media_direction)
+                .into(),
+        }
+    }
+}
+
+impl From<proto::OnStop> for OnStopEvent {
+    fn from(ev: proto::OnStop) -> Self {
+        Self {
+            reason: proto::on_stop::Reason::try_from(ev.reason)
+                .unwrap_or_default()
+                .into(),
+            media_type: proto::MediaType::try_from(ev.media_type)
+                .unwrap_or_default()
+                .into(),
+            media_direction: proto::MediaDirection::try_from(
+                ev.media_direction,
+            )
+            .unwrap_or_default()
+            .into(),
+        }
+    }
+}
+
 impl From<proto::on_leave::Reason> for OnLeaveReason {
     fn from(rsn: proto::on_leave::Reason) -> Self {
         use proto::on_leave::Reason;
@@ -111,6 +175,68 @@ impl From<OnLeaveReason> for proto::on_leave::Reason {
             OnLeaveReason::Shutdown => Self::Shutdown,
             OnLeaveReason::Disconnected => Self::Disconnected,
             OnLeaveReason::Kicked => Self::Kicked,
+        }
+    }
+}
+
+impl From<proto::on_stop::Reason> for OnStopReason {
+    fn from(rsn: proto::on_stop::Reason) -> Self {
+        use proto::on_stop::Reason;
+
+        match rsn {
+            Reason::TrafficNotFlowing => Self::TrafficNotFlowing,
+            Reason::Muted => Self::Muted,
+            Reason::WrongTrafficFlowing => Self::WrongTrafficFlowing,
+            Reason::EndpointRemoved => Self::EndpointRemoved,
+        }
+    }
+}
+
+impl From<OnStopReason> for proto::on_stop::Reason {
+    fn from(rsn: OnStopReason) -> Self {
+        match rsn {
+            OnStopReason::TrafficNotFlowing => Self::TrafficNotFlowing,
+            OnStopReason::Muted => Self::Muted,
+            OnStopReason::WrongTrafficFlowing => Self::WrongTrafficFlowing,
+            OnStopReason::EndpointRemoved => Self::EndpointRemoved,
+        }
+    }
+}
+
+impl From<MediaDirection> for proto::MediaDirection {
+    fn from(end: MediaDirection) -> Self {
+        match end {
+            MediaDirection::Publish => Self::Publish,
+            MediaDirection::Play => Self::Play,
+        }
+    }
+}
+
+impl From<MediaType> for proto::MediaType {
+    fn from(kind: MediaType) -> Self {
+        match kind {
+            MediaType::Audio => Self::Audio,
+            MediaType::Video => Self::Video,
+            MediaType::Both => Self::Both,
+        }
+    }
+}
+
+impl From<proto::MediaDirection> for MediaDirection {
+    fn from(end: proto::MediaDirection) -> Self {
+        match end {
+            proto::MediaDirection::Publish => Self::Publish,
+            proto::MediaDirection::Play => Self::Play,
+        }
+    }
+}
+
+impl From<proto::MediaType> for MediaType {
+    fn from(kind: proto::MediaType) -> Self {
+        match kind {
+            proto::MediaType::Audio => Self::Audio,
+            proto::MediaType::Video => Self::Video,
+            proto::MediaType::Both => Self::Both,
         }
     }
 }

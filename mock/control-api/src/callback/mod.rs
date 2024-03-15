@@ -14,6 +14,12 @@ pub enum CallbackEvent {
 
     /// `OnLeave` callback of Control API.
     OnLeave(leave::OnLeave),
+
+    /// `OnStart` callback of Control API.
+    OnStart(start::OnStart),
+
+    /// `OnStop` callback of Control API.
+    OnStop(stop::OnStop),
 }
 
 impl From<proto::request::Event> for CallbackEvent {
@@ -24,6 +30,12 @@ impl From<proto::request::Event> for CallbackEvent {
             }
             proto::request::Event::OnJoin(on_join) => {
                 Self::OnJoin(on_join.into())
+            }
+            proto::request::Event::OnStart(on_start) => {
+                Self::OnStart(on_start.into())
+            }
+            proto::request::Event::OnStop(on_stop) => {
+                Self::OnStop(on_stop.into())
             }
         }
     }
@@ -117,6 +129,143 @@ mod leave {
                 R::Lost => Self::Lost,
                 R::Disconnected => Self::Disconnected,
                 R::Kicked => Self::Kicked,
+            }
+        }
+    }
+}
+
+/// Media type of the traffic which starts/stops flowing in some `Endpoint`.
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub enum MediaType {
+    /// Started/stopped audio traffic.
+    Audio,
+
+    /// Started/stopped video traffic.
+    Video,
+
+    /// Started/stopped audio and video traffic.
+    Both,
+}
+
+/// Media Endpoint for which OnStart or OnStop Control API callback
+/// was received.
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub enum MediaDirection {
+    /// Endpoint is a publisher.
+    Publish,
+
+    /// Endpoint is a player.
+    Play,
+}
+
+impl From<proto::MediaDirection> for MediaDirection {
+    fn from(end: proto::MediaDirection) -> Self {
+        match end {
+            proto::MediaDirection::Publish => Self::Publish,
+            proto::MediaDirection::Play => Self::Play,
+        }
+    }
+}
+
+impl From<proto::MediaType> for MediaType {
+    fn from(kind: proto::MediaType) -> Self {
+        match kind {
+            proto::MediaType::Audio => Self::Audio,
+            proto::MediaType::Video => Self::Video,
+            proto::MediaType::Both => Self::Both,
+        }
+    }
+}
+
+mod start {
+    use medea_control_api_proto::grpc::callback as proto;
+    use serde::{Deserialize, Serialize};
+
+    use super::{MediaDirection, MediaType};
+
+    /// `OnJoin` callback for Control API.
+    #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+    pub struct OnStart {
+        media_type: MediaType,
+        media_direction: MediaDirection,
+    }
+
+    impl From<proto::OnStart> for OnStart {
+        fn from(ev: proto::OnStart) -> Self {
+            Self {
+                media_type: proto::MediaType::try_from(ev.media_type)
+                    .unwrap_or_default()
+                    .into(),
+                media_direction: proto::MediaDirection::try_from(
+                    ev.media_direction,
+                )
+                .unwrap_or_default()
+                .into(),
+            }
+        }
+    }
+}
+
+mod stop {
+    use derive_more::Display;
+    use medea_control_api_proto::grpc::callback as proto;
+    use serde::{Deserialize, Serialize};
+
+    use super::{MediaDirection, MediaType};
+
+    #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+    pub struct OnStop {
+        pub reason: OnStopReason,
+        pub media_type: MediaType,
+        pub media_direction: MediaDirection,
+    }
+
+    impl From<proto::OnStop> for OnStop {
+        fn from(proto: proto::OnStop) -> Self {
+            Self {
+                reason: proto::on_stop::Reason::try_from(proto.reason)
+                    .unwrap_or_default()
+                    .into(),
+                media_type: proto::MediaType::try_from(proto.media_type)
+                    .unwrap_or_default()
+                    .into(),
+                media_direction: proto::MediaDirection::try_from(
+                    proto.media_direction,
+                )
+                .unwrap_or_default()
+                .into(),
+            }
+        }
+    }
+
+    #[derive(Clone, Copy, Debug, Deserialize, Display, Serialize)]
+    pub enum OnStopReason {
+        /// All traffic of some `Endpoint` was stopped flowing.
+        TrafficNotFlowing,
+
+        /// `Endpoint` was muted.
+        Muted,
+
+        /// Source `Endpoint` of a `Endpoint` for which received this `on_stop`
+        /// callback was muted.
+        SrcMuted,
+
+        /// Some traffic flows within `Endpoint`, but incorrectly.
+        WrongTrafficFlowing,
+
+        /// Traffic stopped because Endpoint was removed.
+        EndpointRemoved,
+    }
+
+    impl From<proto::on_stop::Reason> for OnStopReason {
+        fn from(proto: proto::on_stop::Reason) -> Self {
+            use proto::on_stop::Reason as R;
+
+            match proto {
+                R::TrafficNotFlowing => Self::TrafficNotFlowing,
+                R::Muted => Self::Muted,
+                R::WrongTrafficFlowing => Self::WrongTrafficFlowing,
+                R::EndpointRemoved => Self::EndpointRemoved,
             }
         }
     }
