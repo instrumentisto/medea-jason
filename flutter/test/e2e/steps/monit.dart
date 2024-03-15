@@ -20,8 +20,9 @@ StepDefinitionGeneric responseCodeIs = then1<String, CustomWorld>(
   RegExp(r'response code is `(\d+)`$'),
   (expected, context) async {
     var resp = context.world.metricsResponses.last;
+    var expectedCode = int.parse(expected);
 
-    expect(resp.statusCode, int.parse(expected));
+    expect(resp.statusCode, expectedCode);
   },
 );
 
