@@ -31,6 +31,7 @@ class CustomWorld extends FlutterWidgetTesterWorld {
   /// All [Member]s created in this [FlutterWidgetTesterWorld].
   var members = HashMap<String, Member>();
 
+  /// Metrics [Response]s collected in this [FlutterWidgetTesterWorld].
   List<Response> metricsResponses = List.empty(growable: true);
 
   /// All [Jason]s created in this [FlutterWidgetTesterWorld].
