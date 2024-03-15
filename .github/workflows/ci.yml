@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: edge
+  MEDEA_BRANCH: sfu-new-con-196
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -1093,7 +1093,7 @@ jobs:
              >> $GITHUB_OUTPUT
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.release.outputs.group1 }} ${{ steps.release.outputs.group2 }}
           body: |
