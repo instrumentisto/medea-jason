@@ -9,24 +9,24 @@ List<StepDefinitionGeneric> steps() {
 }
 
 StepDefinitionGeneric checkMetrics = when<CustomWorld>(
-  RegExp(r'^I check metrics$'),
+  RegExp(r'I check metrics$'),
   (context) async {
     var resp = await get(Uri.http('127.0.0.1:9372', '/metrics'));
     context.world.metricsResponses.add(resp);
   },
 );
 
-StepDefinitionGeneric responseCodeIs = then1<int, CustomWorld>(
-  RegExp(r'^response code is `(\d+)`$'),
+StepDefinitionGeneric responseCodeIs = then1<String, CustomWorld>(
+  RegExp(r'response code is `(\d+)`$'),
   (expected, context) async {
     var resp = context.world.metricsResponses.last;
 
-    expect(resp.statusCode, expected);
+    expect(resp.statusCode, int.parse(expected));
   },
 );
 
 StepDefinitionGeneric metricRespContains = then1<String, CustomWorld>(
-  RegExp(r'^response contains `(\S+)` metrics?$'),
+  RegExp(r'response contains `(\S+)` metrics?$'),
   (metric, context) async {
     var body = context.world.metricsResponses.last.body;
 
