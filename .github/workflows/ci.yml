@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: master
+  MEDEA_BRANCH: add-metrics
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
