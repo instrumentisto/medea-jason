@@ -979,7 +979,7 @@ pub struct VideoSettings {
     pub encodings: Vec<EncodingParameters>,
 
     /// [`SvcSetting`]s of this [`VideoSettings`] media.
-    pub svc: Option<Vec<SvcSetting>>,
+    pub svc: Vec<SvcSetting>,
 }
 
 /// Possible media sources of a video [`Track`].

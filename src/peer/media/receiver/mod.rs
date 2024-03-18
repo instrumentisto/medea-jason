@@ -132,7 +132,7 @@ impl Receiver {
                         kind,
                         platform::TransceiverDirection::INACTIVE,
                         Vec::new(),
-                        None,
+                        Vec::new(),
                     );
                 new_transceiver.await
             };

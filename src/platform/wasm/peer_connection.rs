@@ -579,7 +579,7 @@ impl RtcPeerConnection {
         kind: MediaKind,
         direction: TransceiverDirection,
         mut encodings: Vec<EncodingParameters>,
-        svc: Option<Vec<SvcSetting>>,
+        svc: Vec<SvcSetting>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
@@ -594,8 +594,8 @@ impl RtcPeerConnection {
             let mut target_codec = None;
             let mut target_scalability_mode = ScalabilityMode::L1T1;
 
-            if let (Some(svc_settings), Some(capabs)) = (svc, capabs) {
-                for svc_setting in svc_settings {
+            if let (false, Some(capabs)) = (svc.is_empty(), capabs) {
+                for svc_setting in svc {
                     let res = Array::from(&capabs).iter().find(|codec| {
                         Reflect::get(codec, &JsString::from("mimeType"))
                             .ok()

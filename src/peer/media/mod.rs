@@ -320,7 +320,7 @@ impl InnerMediaConnections {
         kind: MediaKind,
         direction: platform::TransceiverDirection,
         encodings: Vec<EncodingParameters>,
-        svc: Option<Vec<SvcSetting>>,
+        svc: Vec<SvcSetting>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
         self.peer.add_transceiver(kind, direction, encodings, svc)
     }

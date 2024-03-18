@@ -875,7 +875,7 @@ impl VideoSource {
 
     /// Returns configured [`Vec<SvcSetting>`].
     #[must_use]
-    pub fn svc(&self) -> Option<Vec<SvcSetting>> {
+    pub fn svc(&self) -> Vec<SvcSetting> {
         match self {
             Self::Device(s) => s.svc.clone(),
             Self::Display(s) => s.svc.clone(),
@@ -976,9 +976,9 @@ impl TrackConstraints {
 
     /// Returns configured [`SvcSetting`]s.
     #[must_use]
-    pub fn svc(&self) -> Option<Vec<SvcSetting>> {
+    pub fn svc(&self) -> Vec<SvcSetting> {
         match &self {
-            Self::Audio(_) => None,
+            Self::Audio(_) => Vec::new(),
             Self::Video(vs) => vs.svc(),
         }
     }
@@ -1174,7 +1174,7 @@ pub struct DeviceVideoTrackConstraints {
     pub encodings: Vec<EncodingParameters>,
 
     /// [`SvcSetting`]s in decreasing priority.
-    pub svc: Option<Vec<SvcSetting>>,
+    pub svc: Vec<SvcSetting>,
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1329,7 +1329,7 @@ pub struct DisplayVideoTrackConstraints {
     pub encodings: Vec<EncodingParameters>,
 
     /// [`SvcSetting`]s in decreasing priority.
-    pub svc: Option<Vec<SvcSetting>>,
+    pub svc: Vec<SvcSetting>,
 }
 
 impl DisplayVideoTrackConstraints {
