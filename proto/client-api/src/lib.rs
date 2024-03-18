@@ -372,8 +372,67 @@ pub enum PeerMetrics {
     /// `PeerConnection`'s connection state.
     PeerConnectionState(PeerConnectionState),
 
+    /// `PeerConnection` related error occurred.
+    PeerConnectionError(PeerConnectionError),
+
     /// `PeerConnection`'s RTC stats.
     RtcStats(Vec<RtcStat>),
+}
+
+/// Possible errors related to a `PeerConnection`.
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum PeerConnectionError {
+    /// Error occurred with ICE candidate from a `PeerConnection`.
+    IceCandidate(IceCandidateError),
+}
+
+/// Error occurred with an [ICE] candidate from a `PeerConnection`.
+///
+/// [ICE]: https://webrtcglossary.com/ice
+#[cfg_attr(feature = "client", derive(Serialize))]
+#[cfg_attr(feature = "server", derive(Deserialize))]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct IceCandidateError {
+    /// Local IP address used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub address: Option<String>,
+
+    /// Port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub port: Option<u32>,
+
+    /// URL identifying the [STUN]/[TURN] server for which the failure
+    /// occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub url: String,
+
+    /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_code: i32,
+
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
+    /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_text: String,
 }
 
 /// `PeerConnection`'s ICE connection state.

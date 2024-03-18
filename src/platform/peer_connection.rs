@@ -47,6 +47,51 @@ pub struct IceCandidate {
     pub sdp_mid: Option<String>,
 }
 
+/// Error occurred with an [ICE] candidate from a `PeerConnection`.
+///
+/// [ICE]: https://webrtcglossary.com/ice
+#[derive(Debug)]
+pub struct IceCandidateError {
+    /// Local IP address used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub address: Option<String>,
+
+    /// Port used to communicate with a [STUN]/[TURN] server.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub port: Option<u32>,
+
+    /// URL identifying the [STUN]/[TURN] server for which the failure
+    /// occurred.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub url: String,
+
+    /// Numeric [STUN] error code returned by the [STUN]/[TURN] server.
+    ///
+    /// If no host candidate can reach the server, this error code will be set
+    /// to the value `701`, which is outside the [STUN] error code range. This
+    /// error is only fired once per server URL while in the
+    /// `RTCIceGatheringState` of "gathering".
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_code: i32,
+
+    /// [STUN] reason text returned by the [STUN]/[TURN] server.
+    ///
+    /// If the server could not be reached, this reason test will be set to an
+    /// implementation-specific value providing details about the error.
+    ///
+    /// [STUN]: https://webrtcglossary.com/stun
+    /// [TURN]: https://webrtcglossary.com/turn
+    pub error_text: String,
+}
+
 /// Errors that may occur during signaling between this and remote
 /// [RTCPeerConnection][1] and event handlers setting errors.
 ///

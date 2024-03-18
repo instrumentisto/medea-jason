@@ -15,6 +15,8 @@ void registerFunction(
   required Pointer<NativeFunction<Void Function(Handle, Handle)>> onTrack,
   required Pointer<NativeFunction<Void Function(Handle, Handle)>>
       onIceCandidate,
+  required Pointer<NativeFunction<Void Function(Handle, Handle)>>
+      onIceCandidateError,
   required Pointer<NativeFunction<Handle Function(Handle, Pointer<Utf8>)>>
       getTransceiverByMid,
   required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
@@ -52,8 +54,10 @@ void registerFunction(
           Pointer,
           Pointer,
           Pointer,
+          Pointer,
           Pointer),
       void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -78,6 +82,7 @@ void registerFunction(
     rollback,
     onTrack,
     onIceCandidate,
+    onIceCandidateError,
     getTransceiverByMid,
     addIceCandidate,
     onIceConnectionStateChange,

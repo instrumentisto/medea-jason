@@ -20,6 +20,7 @@ void registerFunctions(DynamicLibrary dl) {
     rollback: Pointer.fromFunction(_rollback),
     onTrack: Pointer.fromFunction(_onTrack),
     onIceCandidate: Pointer.fromFunction(_onIceCandidate),
+    onIceCandidateError: Pointer.fromFunction(_onIceCandidateError),
     onIceConnectionStateChange:
         Pointer.fromFunction(_onIceConnectionStateChange),
     newPeer: Pointer.fromFunction(_newPeer),
@@ -58,6 +59,13 @@ void _onTrack(PeerConnection conn, Function f) {
 /// Sets the provided [f] to the [PeerConnection.onIceCandidate] callback.
 void _onIceCandidate(PeerConnection conn, Function f) {
   conn.onIceCandidate((e) {
+    f(e);
+  });
+}
+
+/// Sets the provided [f] to the [PeerConnection.onIceCandidateError] callback.
+void _onIceCandidateError(PeerConnection conn, Function f) {
+  conn.onIceCandidateError((e) {
     f(e);
   });
 }

@@ -1,6 +1,6 @@
 [package]
 name = "medea-jason"
-version = "0.4.1-dev"
+version = "0.5.0-dev"
 edition = "2021"
 rust-version = "1.65"
 description = "Client library for Medea media server."
@@ -44,7 +44,7 @@ derivative = "2.2"
 derive_more = "0.99"
 futures = "0.3"
 log = "0.4"
-medea-client-api-proto = { version = "0.5", path = "proto/client-api" }
+medea-client-api-proto = { version = "0.6.0-dev", path = "proto/client-api" }
 medea-macro = { version = "0.3", path = "crates/medea-macro" }
 medea-reactive = { version = "0.1", path = "crates/medea-reactive" }
 mockall = { version = "0.12", optional = true }
@@ -74,7 +74,7 @@ wasm-bindgen-futures = "0.4"
 wasm-logger = "0.2"
 wee_alloc = { version = "0.4", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies.web-sys]
-    version = "0.3.64"
+    version = "0.3.68"
     features = [
         "console",
         "ConstrainDomStringParameters", "ConstrainDoubleRange",
@@ -95,6 +95,7 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcIceTransportPolicy",
         "RtcOfferOptions",
         "RtcPeerConnection", "RtcPeerConnectionIceEvent",
+        "RtcPeerConnectionIceErrorEvent",
         "RtcRtpReceiver", "RtcRtpSender",
         "RtcRtpParameters", "RtcRtpCodecParameters",
         "RtcRtpEncodingParameters",

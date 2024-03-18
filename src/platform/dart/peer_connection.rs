@@ -6,7 +6,8 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState, SvcSetting,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
+    SvcSetting,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -23,16 +24,20 @@ use crate::{
                 peer_connection_state_from_int,
             },
         },
-        IceCandidate, RtcPeerConnectionError, RtcStats, SdpType,
-        TransceiverDirection,
+        IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
+        SdpType, TransceiverDirection,
     },
 };
 
 use super::{
-    ice_candidate::IceCandidate as PlatformIceCandidate,
+    ice_candidate::{
+        IceCandidate as PlatformIceCandidate,
+        IceCandidateError as PlatformIceCandidateError,
+    },
     media_track::MediaStreamTrack,
     send_encoding_parameters::SendEncodingParameters,
-    transceiver::TransceiverInit, utils::string_into_c_str,
+    transceiver::TransceiverInit,
+    utils::string_into_c_str,
 };
 
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -72,6 +77,10 @@ mod peer_connection {
 
         /// Sets `onIceCandidate` callback of the provided [`PeerConnection`].
         pub fn on_ice_candidate(peer: Dart_Handle, cb: Dart_Handle);
+
+        /// Sets `onIceCandidateError` callback of the provided
+        /// [`PeerConnection`].
+        pub fn on_ice_candidate_error(peer: Dart_Handle, cb: Dart_Handle);
 
         /// Looks ups [`Transceiver`] in the provided [`PeerConnection`] by the
         /// provided [`String`].
@@ -220,10 +229,46 @@ impl RtcPeerConnection {
                     self.handle.get(),
                     Callback::from_fn_mut(move |handle: DartHandle| {
                         let candidate = PlatformIceCandidate::from(handle);
-                        h(IceCandidate {
-                            candidate: candidate.candidate(),
-                            sdp_m_line_index: candidate.sdp_m_line_index(),
-                            sdp_mid: candidate.sdp_mid(),
+                        // Empty `candidate.candidate()` means that all the ICE
+                        // transports have finished gathering candidates.
+                        //
+                        // Doesn't need to be delivered onward to the remote
+                        // peer.
+                        if !candidate.candidate().is_empty() {
+                            h(IceCandidate {
+                                candidate: candidate.candidate(),
+                                sdp_m_line_index: candidate.sdp_m_line_index(),
+                                sdp_mid: candidate.sdp_mid(),
+                            });
+                        }
+                    })
+                    .into_dart(),
+                );
+            }
+        }
+    }
+
+    /// Sets `handler` for an [RTCPeerConnectionIceEvent][1] (see the
+    /// [`onicecandidateerror` callback][2]).
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcpeerconnectioniceevent
+    /// [2]: https://w3.org/TR/webrtc#dom-rtcpeerconnection-onicecandidateerror
+    pub fn on_ice_candidate_error<F>(&self, handler: Option<F>)
+    where
+        F: 'static + FnMut(IceCandidateError),
+    {
+        if let Some(mut h) = handler {
+            unsafe {
+                peer_connection::on_ice_candidate_error(
+                    self.handle.get(),
+                    Callback::from_fn_mut(move |handle: DartHandle| {
+                        let candidate = PlatformIceCandidateError::from(handle);
+                        h(IceCandidateError {
+                            address: Some(candidate.address()),
+                            port: Some(candidate.port()),
+                            url: candidate.url(),
+                            error_code: candidate.error_code(),
+                            error_text: candidate.error_text(),
                         });
                     })
                     .into_dart(),
