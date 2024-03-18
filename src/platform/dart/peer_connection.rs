@@ -469,7 +469,7 @@ impl RtcPeerConnection {
         kind: MediaKind,
         direction: TransceiverDirection,
         encodings: Vec<EncodingParameters>,
-        svc: Option<Vec<SvcSetting>>,
+        svc: Vec<SvcSetting>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let handle = self.handle.get();
         async move {
