@@ -3962,23 +3962,3 @@ dependencies = [
  "cc",
  "pkg-config",
 ]
-
-[[patch.unused]]
-name = "js-sys"
-version = "0.3.68"
-source = "git+https://github.com/rustwasm/wasm-bindgen.git?rev=b56728f0f46473e648b31719af2b8013db83e024#b56728f0f46473e648b31719af2b8013db83e024"
-
-[[patch.unused]]
-name = "wasm-bindgen"
-version = "0.2.91"
-source = "git+https://github.com/rustwasm/wasm-bindgen.git?rev=b56728f0f46473e648b31719af2b8013db83e024#b56728f0f46473e648b31719af2b8013db83e024"
-
-[[patch.unused]]
-name = "wasm-bindgen-shared"
-version = "0.2.91"
-source = "git+https://github.com/rustwasm/wasm-bindgen.git?rev=b56728f0f46473e648b31719af2b8013db83e024#b56728f0f46473e648b31719af2b8013db83e024"
-
-[[patch.unused]]
-name = "web-sys"
-version = "0.3.68"
-source = "git+https://github.com/rustwasm/wasm-bindgen.git?rev=b56728f0f46473e648b31719af2b8013db83e024#b56728f0f46473e648b31719af2b8013db83e024"
