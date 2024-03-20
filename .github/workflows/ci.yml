@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: sfu-new-con-196
+  MEDEA_BRANCH: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -415,10 +415,19 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
-              || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'macos-13' }}
+    runs-on: ${{ (contains('linux android', matrix.platform) && 'ubuntu-22.04')
+              || (matrix.platform == 'windows'               && 'windows-latest')
+              ||                                                'macos-13' }}
     steps:
+      - name: Enable KVM for Android HW acceleration
+        if: ${{ matrix.platform == 'android' }}
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", \
+                OPTIONS+="static_node=kvm"' \
+                | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
