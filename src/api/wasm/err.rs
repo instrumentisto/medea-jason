@@ -41,7 +41,8 @@ impl FromWasmAbi for Error {
     type Abi = <JsValue as FromWasmAbi>::Abi;
 
     unsafe fn from_abi(js: Self::Abi) -> Self {
-        Self(FromWasmAbi::from_abi(js))
+        // SAFETY: Up to the caller.
+        Self(unsafe { FromWasmAbi::from_abi(js) })
     }
 }
 

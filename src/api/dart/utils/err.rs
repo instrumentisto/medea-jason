@@ -122,7 +122,7 @@ mod exception {
 /// `Dart_IsError` function will return `true` on the returned [`Dart_Handle`].
 #[must_use]
 pub unsafe fn new_panic_error() -> Dart_Handle {
-    exception::throw_panic_exception()
+    unsafe { exception::throw_panic_exception() }
 }
 
 /// An error that can be returned from Rust to Dart.

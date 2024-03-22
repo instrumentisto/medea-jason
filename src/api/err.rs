@@ -140,8 +140,7 @@ impl LocalMediaInitException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl LocalMediaInitException {
     /// Returns concrete error kind of this [`LocalMediaInitException`].
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
+    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> LocalMediaInitExceptionKind {
         self.kind
@@ -322,7 +321,7 @@ impl RpcClientException {
 #[cfg_attr(target_family = "wasm", wasm_bindgen)]
 impl RpcClientException {
     /// Returns concrete error kind of this [`RpcClientException`].
-    #[allow(clippy::missing_const_for_fn)] // because of `wasm_bindgen`
+    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> RpcClientExceptionKind {
         self.kind
@@ -489,8 +488,7 @@ impl MediaStateTransitionException {
     }
 
     /// Returns concrete error kind of this [`MediaStateTransitionException`].
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
+    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn kind(&self) -> MediaStateTransitionExceptionKind {
         self.kind
@@ -549,8 +547,7 @@ impl MediaSettingsUpdateException {
 
     /// Returns whether media settings were successfully rolled back after new
     /// settings application failed.
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
+    #[allow(clippy::missing_const_for_fn)] // required by `wasm_bindgen`
     #[must_use]
     pub fn rolled_back(&self) -> bool {
         self.rolled_back

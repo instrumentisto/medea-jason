@@ -27,7 +27,10 @@ static mut FREE_DART_NATIVE_STRING: Option<FreeDartNativeStringFunction> = None;
 /// Same as for [`CStr::from_ptr()`].
 #[must_use]
 pub unsafe fn c_str_into_string(string: ptr::NonNull<c_char>) -> String {
-    CStr::from_ptr(string.as_ptr()).to_str().unwrap().to_owned()
+    unsafe { CStr::from_ptr(string.as_ptr()) }
+        .to_str()
+        .unwrap()
+        .to_owned()
 }
 
 /// Leaks the given [`String`] returning a raw C string that can be passed
@@ -54,8 +57,10 @@ pub fn string_into_c_str(string: String) -> ptr::NonNull<c_char> {
 pub unsafe fn dart_string_into_rust(
     dart_string: ptr::NonNull<c_char>,
 ) -> String {
-    let rust_string = c_str_into_string(dart_string);
-    free_dart_native_string(dart_string);
+    let rust_string = unsafe { c_str_into_string(dart_string) };
+    unsafe {
+        free_dart_native_string(dart_string);
+    }
 
     rust_string
 }
@@ -69,7 +74,7 @@ pub unsafe fn dart_string_into_rust(
 #[no_mangle]
 pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
     propagate_panic(move || {
-        drop(CString::from_raw(s.as_ptr()));
+        drop(unsafe { CString::from_raw(s.as_ptr()) });
     });
 }
 
@@ -83,7 +88,9 @@ pub unsafe extern "C" fn String_free(s: ptr::NonNull<c_char>) {
 pub unsafe extern "C" fn register_free_dart_native_string(
     f: FreeDartNativeStringFunction,
 ) {
-    FREE_DART_NATIVE_STRING = Some(f);
+    unsafe {
+        FREE_DART_NATIVE_STRING = Some(f);
+    }
 }
 
 /// Calls Dart to release memory allocated for the provided native string.
@@ -96,5 +103,5 @@ pub unsafe extern "C" fn register_free_dart_native_string(
 /// `FREE_DART_NATIVE_STRING` function must be registered and the provided
 /// pointer must be a valid native string.
 pub unsafe fn free_dart_native_string(s: ptr::NonNull<c_char>) {
-    FREE_DART_NATIVE_STRING.unwrap()(s);
+    (unsafe { FREE_DART_NATIVE_STRING.unwrap() })(s);
 }
