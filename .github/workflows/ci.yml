@@ -469,6 +469,7 @@ jobs:
           echo "target=$(make flutter.android.version.compile)" \
           >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -477,8 +478,10 @@ jobs:
           arch: x86_64
           cores: 3
           profile: pixel_2
+          disk-size: 4096M
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -487,6 +490,7 @@ jobs:
           arch: x86_64
           cores: 3
           profile: pixel_2
+          disk-size: 4096M
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
