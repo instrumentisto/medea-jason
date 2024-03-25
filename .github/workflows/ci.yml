@@ -479,6 +479,8 @@ jobs:
           cores: 3
           profile: pixel_2
           disk-size: 4096M
+          sdcard-path-or-size: 100M
+          emulator-options: -no-snapshot-save -no-boot-anim
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
@@ -491,6 +493,8 @@ jobs:
           cores: 3
           profile: pixel_2
           disk-size: 4096M
+          sdcard-path-or-size: 100M
+          emulator-options: -no-snapshot-save -no-boot-anim
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
