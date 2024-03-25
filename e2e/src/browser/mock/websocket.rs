@@ -6,7 +6,7 @@ use crate::browser::{Statement, Window};
 #[derive(Debug)]
 pub struct WebSocket<'a>(pub(super) &'a Window);
 
-impl<'a> WebSocket<'a> {
+impl WebSocket<'_> {
     /// Instantiates a new `WebSocket` mock in the provided [`Window`].
     pub(super) async fn instantiate(window: &Window) {
         window

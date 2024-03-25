@@ -369,7 +369,7 @@ where
     value_before_mutation: D,
 }
 
-impl<'a, D, S> Deref for MutObservableFieldGuard<'a, D, S>
+impl<D, S> Deref for MutObservableFieldGuard<'_, D, S>
 where
     S: OnObservableFieldModification<D>,
     D: PartialEq,
@@ -381,7 +381,7 @@ where
     }
 }
 
-impl<'a, D, S> DerefMut for MutObservableFieldGuard<'a, D, S>
+impl<D, S> DerefMut for MutObservableFieldGuard<'_, D, S>
 where
     S: OnObservableFieldModification<D>,
     D: PartialEq,
@@ -391,7 +391,7 @@ where
     }
 }
 
-impl<'a, D, S> Drop for MutObservableFieldGuard<'a, D, S>
+impl<D, S> Drop for MutObservableFieldGuard<'_, D, S>
 where
     S: OnObservableFieldModification<D>,
     D: PartialEq,

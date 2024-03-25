@@ -47,12 +47,13 @@ impl DartHandle {
     /// unexpected situation.
     #[must_use]
     pub unsafe fn new(handle: Dart_Handle) -> Self {
-        if dart_api::is_error(handle) {
-            let pointer = dart_api::get_error(handle);
-            let err_msg = c_str_into_string(pointer.as_ref().unwrap().into());
-            panic!("Unexpected Dart error: {err_msg}")
+        if unsafe { dart_api::is_error(handle) } {
+            let pointer = unsafe { dart_api::get_error(handle) };
+            let c_str = unsafe { pointer.as_ref() }.unwrap().into();
+            let err_msg = unsafe { c_str_into_string(c_str) };
+            panic!("unexpected Dart error: {err_msg}")
         }
-        Self(Rc::new(dart_api::new_persistent_handle(handle)))
+        Self(Rc::new(unsafe { dart_api::new_persistent_handle(handle) }))
     }
 
     /// Returns the underlying [`Dart_Handle`].

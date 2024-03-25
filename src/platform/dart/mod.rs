@@ -55,7 +55,7 @@ pub use self::{
 /// This function should never be called manually.
 #[no_mangle]
 pub unsafe extern "C" fn init_jason_dart_api_dl(data: *mut c_void) -> isize {
-    dart_api::initialize_api(data)
+    unsafe { dart_api::initialize_api(data) }
 }
 
 /// Sets Rust's [`panic!`] hook providing backtrace of the occurred panic to

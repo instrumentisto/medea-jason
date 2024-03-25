@@ -10,7 +10,7 @@ use crate::browser::{Statement, Window};
 #[derive(Debug)]
 pub struct MediaDevices<'a>(pub(super) &'a Window);
 
-impl<'a> MediaDevices<'a> {
+impl MediaDevices<'_> {
     /// Instantiates a [MediaDevices][1] interface mock in the provided
     /// [`Window`].
     ///

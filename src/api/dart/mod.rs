@@ -92,7 +92,7 @@ pub trait ForeignClass: Sized {
     /// Same as for [`Box::from_raw()`].
     #[must_use]
     unsafe fn from_ptr(this: ptr::NonNull<Self>) -> Self {
-        *Box::from_raw(this.as_ptr())
+        unsafe { *Box::from_raw(this.as_ptr()) }
     }
 }
 
@@ -718,13 +718,11 @@ impl TryFrom<i64> for MediaDirection {
 }
 
 /// Returns a [`Dart_Handle`] dereferenced from the provided pointer.
-// false positive: dereferencing raw mutable pointers in const is unstable
-#[allow(clippy::missing_const_for_fn)]
 #[no_mangle]
 pub unsafe extern "C" fn unbox_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) -> Dart_Handle {
-    *val.as_ptr()
+    unsafe { *val.as_ptr() }
 }
 
 /// Frees the provided [`ptr::NonNull`] pointer to a [`Dart_Handle`].
@@ -732,8 +730,10 @@ pub unsafe extern "C" fn unbox_dart_handle(
 pub unsafe extern "C" fn free_boxed_dart_handle(
     val: ptr::NonNull<Dart_Handle>,
 ) {
-    let handle = Box::from_raw(val.as_ptr());
-    dart_api::delete_persistent_handle(*handle);
+    let handle = unsafe { Box::from_raw(val.as_ptr()) };
+    unsafe {
+        dart_api::delete_persistent_handle(*handle);
+    }
 }
 
 /// Returns a pointer to a boxed [`Dart_Handle`] created from the provided
@@ -742,7 +742,7 @@ pub unsafe extern "C" fn free_boxed_dart_handle(
 pub unsafe extern "C" fn box_dart_handle(
     val: Dart_Handle,
 ) -> ptr::NonNull<Dart_Handle> {
-    let persisted = dart_api::new_persistent_handle(val);
+    let persisted = unsafe { dart_api::new_persistent_handle(val) };
     ptr::NonNull::from(Box::leak(Box::new(persisted)))
 }
 

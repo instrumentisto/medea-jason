@@ -113,22 +113,24 @@ impl Task {
         // understanding of what the following functions do.
 
         unsafe fn raw_clone(ptr: *const ()) -> RawWaker {
-            let ptr = ManuallyDrop::new(Rc::from_raw(ptr.cast::<Task>()));
+            let ptr =
+                ManuallyDrop::new(unsafe { Rc::from_raw(ptr.cast::<Task>()) });
             Task::into_raw_waker(Rc::clone(&(*ptr)))
         }
 
         unsafe fn raw_wake(ptr: *const ()) {
-            let ptr = Rc::from_raw(ptr.cast::<Task>());
+            let ptr = unsafe { Rc::from_raw(ptr.cast::<Task>()) };
             Task::wake_by_ref(&ptr);
         }
 
         unsafe fn raw_wake_by_ref(ptr: *const ()) {
-            let ptr = ManuallyDrop::new(Rc::from_raw(ptr.cast::<Task>()));
+            let ptr =
+                ManuallyDrop::new(unsafe { Rc::from_raw(ptr.cast::<Task>()) });
             Task::wake_by_ref(&ptr);
         }
 
         unsafe fn raw_drop(ptr: *const ()) {
-            drop(Rc::from_raw(ptr.cast::<Task>()));
+            drop(unsafe { Rc::from_raw(ptr.cast::<Task>()) });
         }
 
         const VTABLE: RawWakerVTable =

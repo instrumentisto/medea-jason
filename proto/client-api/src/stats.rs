@@ -787,6 +787,7 @@ pub enum SenderStatsKind {
 ///
 /// [RTCRtpReceiver]: https://w3.org/TR/webrtc#dom-rtcrtpreceiver
 /// [1]: https://w3.org/TR/webrtc-stats/#dom-rtcstatstype-receiver
+#[allow(clippy::empty_enum_variants_with_brackets)] // required by `serde`
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
