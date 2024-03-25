@@ -113,8 +113,6 @@ impl Track {
 
     /// Sets general [`MediaDirection`] of this [`Track`].
     pub fn set_media_direction(&self, direction: MediaDirection) {
-
-        log::error!("on_media_direction_changed for {:?}-{:?} {:?} to {:?} => {:?}", self.0.track.kind(), self.media_source_kind(), self.0.track.id(), self.0.media_direction.get(), direction);
         self.0.media_direction.set(direction);
         self.0.on_media_direction_changed.call1(direction);
     }

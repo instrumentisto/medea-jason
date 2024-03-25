@@ -511,7 +511,6 @@ impl PeerConnection {
             }
         };
 
-        log::error!("UpdateTracks peer_id {peer_id}, {:?}", patch);
         _ = peer_events_sender
             .unbounded_send(PeerEvent::MediaUpdateCommand {
                 command: Command::UpdateTracks {

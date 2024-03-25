@@ -145,8 +145,6 @@ impl Connections {
                         mid.clone(),
                         &self.room_recv_constraints,
                     );
-
-                    log::error!("on_new_connection for {mid}");
                     self.on_new_connection.call1(connection.new_handle());
                     drop(connections.insert(mid.clone(), connection));
                 }
@@ -208,7 +206,6 @@ impl Connections {
                     partner.clone(),
                     &self.room_recv_constraints,
                 );
-                log::error!("on_new_connection for {partner}");
                 self.on_new_connection.call1(connection.new_handle());
                 drop(connections.insert(partner.clone(), connection));
             }
