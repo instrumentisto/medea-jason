@@ -8,6 +8,7 @@ services:
       - "6565:6565"      # medea grpc
       - "8000:8000"      # control-api-mock http
       - "8001:8001"      # medea http (ws)
+      - "9372:9372"      # medea monit
       - "30000:30000"    # frontend http
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro

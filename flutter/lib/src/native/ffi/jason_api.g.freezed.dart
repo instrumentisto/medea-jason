@@ -96,25 +96,25 @@ class _$ApiConstrainFacingModeCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res>
+abstract class _$$ApiConstrainFacingMode_ExactCopyWith<$Res>
     implements $ApiConstrainFacingModeCopyWith<$Res> {
-  factory _$$ApiConstrainFacingMode_ExactImplCopyWith(
-          _$ApiConstrainFacingMode_ExactImpl value,
-          $Res Function(_$ApiConstrainFacingMode_ExactImpl) then) =
-      __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>;
+  factory _$$ApiConstrainFacingMode_ExactCopyWith(
+          _$ApiConstrainFacingMode_Exact value,
+          $Res Function(_$ApiConstrainFacingMode_Exact) then) =
+      __$$ApiConstrainFacingMode_ExactCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({FacingMode field0});
 }
 
 /// @nodoc
-class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
+class __$$ApiConstrainFacingMode_ExactCopyWithImpl<$Res>
     extends _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        _$ApiConstrainFacingMode_ExactImpl>
-    implements _$$ApiConstrainFacingMode_ExactImplCopyWith<$Res> {
-  __$$ApiConstrainFacingMode_ExactImplCopyWithImpl(
-      _$ApiConstrainFacingMode_ExactImpl _value,
-      $Res Function(_$ApiConstrainFacingMode_ExactImpl) _then)
+        _$ApiConstrainFacingMode_Exact>
+    implements _$$ApiConstrainFacingMode_ExactCopyWith<$Res> {
+  __$$ApiConstrainFacingMode_ExactCopyWithImpl(
+      _$ApiConstrainFacingMode_Exact _value,
+      $Res Function(_$ApiConstrainFacingMode_Exact) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -122,7 +122,7 @@ class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(_$ApiConstrainFacingMode_ExactImpl(
+    return _then(_$ApiConstrainFacingMode_Exact(
       null == field0
           ? _value.field0
           : field0 // ignore: cast_nullable_to_non_nullable
@@ -133,9 +133,8 @@ class __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ApiConstrainFacingMode_ExactImpl
-    implements ApiConstrainFacingMode_Exact {
-  const _$ApiConstrainFacingMode_ExactImpl(this.field0);
+class _$ApiConstrainFacingMode_Exact implements ApiConstrainFacingMode_Exact {
+  const _$ApiConstrainFacingMode_Exact(this.field0);
 
   @override
   final FacingMode field0;
@@ -149,7 +148,7 @@ class _$ApiConstrainFacingMode_ExactImpl
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ApiConstrainFacingMode_ExactImpl &&
+            other is _$ApiConstrainFacingMode_Exact &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -159,10 +158,9 @@ class _$ApiConstrainFacingMode_ExactImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ApiConstrainFacingMode_ExactImplCopyWith<
-          _$ApiConstrainFacingMode_ExactImpl>
-      get copyWith => __$$ApiConstrainFacingMode_ExactImplCopyWithImpl<
-          _$ApiConstrainFacingMode_ExactImpl>(this, _$identity);
+  _$$ApiConstrainFacingMode_ExactCopyWith<_$ApiConstrainFacingMode_Exact>
+      get copyWith => __$$ApiConstrainFacingMode_ExactCopyWithImpl<
+          _$ApiConstrainFacingMode_Exact>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -229,37 +227,36 @@ class _$ApiConstrainFacingMode_ExactImpl
 
 abstract class ApiConstrainFacingMode_Exact implements ApiConstrainFacingMode {
   const factory ApiConstrainFacingMode_Exact(final FacingMode field0) =
-      _$ApiConstrainFacingMode_ExactImpl;
+      _$ApiConstrainFacingMode_Exact;
 
   @override
   FacingMode get field0;
   @override
   @JsonKey(ignore: true)
-  _$$ApiConstrainFacingMode_ExactImplCopyWith<
-          _$ApiConstrainFacingMode_ExactImpl>
+  _$$ApiConstrainFacingMode_ExactCopyWith<_$ApiConstrainFacingMode_Exact>
       get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res>
+abstract class _$$ApiConstrainFacingMode_IdealCopyWith<$Res>
     implements $ApiConstrainFacingModeCopyWith<$Res> {
-  factory _$$ApiConstrainFacingMode_IdealImplCopyWith(
-          _$ApiConstrainFacingMode_IdealImpl value,
-          $Res Function(_$ApiConstrainFacingMode_IdealImpl) then) =
-      __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>;
+  factory _$$ApiConstrainFacingMode_IdealCopyWith(
+          _$ApiConstrainFacingMode_Ideal value,
+          $Res Function(_$ApiConstrainFacingMode_Ideal) then) =
+      __$$ApiConstrainFacingMode_IdealCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({FacingMode field0});
 }
 
 /// @nodoc
-class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
+class __$$ApiConstrainFacingMode_IdealCopyWithImpl<$Res>
     extends _$ApiConstrainFacingModeCopyWithImpl<$Res,
-        _$ApiConstrainFacingMode_IdealImpl>
-    implements _$$ApiConstrainFacingMode_IdealImplCopyWith<$Res> {
-  __$$ApiConstrainFacingMode_IdealImplCopyWithImpl(
-      _$ApiConstrainFacingMode_IdealImpl _value,
-      $Res Function(_$ApiConstrainFacingMode_IdealImpl) _then)
+        _$ApiConstrainFacingMode_Ideal>
+    implements _$$ApiConstrainFacingMode_IdealCopyWith<$Res> {
+  __$$ApiConstrainFacingMode_IdealCopyWithImpl(
+      _$ApiConstrainFacingMode_Ideal _value,
+      $Res Function(_$ApiConstrainFacingMode_Ideal) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -267,7 +264,7 @@ class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(_$ApiConstrainFacingMode_IdealImpl(
+    return _then(_$ApiConstrainFacingMode_Ideal(
       null == field0
           ? _value.field0
           : field0 // ignore: cast_nullable_to_non_nullable
@@ -278,9 +275,8 @@ class __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ApiConstrainFacingMode_IdealImpl
-    implements ApiConstrainFacingMode_Ideal {
-  const _$ApiConstrainFacingMode_IdealImpl(this.field0);
+class _$ApiConstrainFacingMode_Ideal implements ApiConstrainFacingMode_Ideal {
+  const _$ApiConstrainFacingMode_Ideal(this.field0);
 
   @override
   final FacingMode field0;
@@ -294,7 +290,7 @@ class _$ApiConstrainFacingMode_IdealImpl
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ApiConstrainFacingMode_IdealImpl &&
+            other is _$ApiConstrainFacingMode_Ideal &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -304,10 +300,9 @@ class _$ApiConstrainFacingMode_IdealImpl
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ApiConstrainFacingMode_IdealImplCopyWith<
-          _$ApiConstrainFacingMode_IdealImpl>
-      get copyWith => __$$ApiConstrainFacingMode_IdealImplCopyWithImpl<
-          _$ApiConstrainFacingMode_IdealImpl>(this, _$identity);
+  _$$ApiConstrainFacingMode_IdealCopyWith<_$ApiConstrainFacingMode_Ideal>
+      get copyWith => __$$ApiConstrainFacingMode_IdealCopyWithImpl<
+          _$ApiConstrainFacingMode_Ideal>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -374,14 +369,13 @@ class _$ApiConstrainFacingMode_IdealImpl
 
 abstract class ApiConstrainFacingMode_Ideal implements ApiConstrainFacingMode {
   const factory ApiConstrainFacingMode_Ideal(final FacingMode field0) =
-      _$ApiConstrainFacingMode_IdealImpl;
+      _$ApiConstrainFacingMode_Ideal;
 
   @override
   FacingMode get field0;
   @override
   @JsonKey(ignore: true)
-  _$$ApiConstrainFacingMode_IdealImplCopyWith<
-          _$ApiConstrainFacingMode_IdealImpl>
+  _$$ApiConstrainFacingMode_IdealCopyWith<_$ApiConstrainFacingMode_Ideal>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -472,22 +466,22 @@ class _$ConstrainU32CopyWithImpl<$Res, $Val extends ConstrainU32>
 }
 
 /// @nodoc
-abstract class _$$ConstrainU32_ExactImplCopyWith<$Res>
+abstract class _$$ConstrainU32_ExactCopyWith<$Res>
     implements $ConstrainU32CopyWith<$Res> {
-  factory _$$ConstrainU32_ExactImplCopyWith(_$ConstrainU32_ExactImpl value,
-          $Res Function(_$ConstrainU32_ExactImpl) then) =
-      __$$ConstrainU32_ExactImplCopyWithImpl<$Res>;
+  factory _$$ConstrainU32_ExactCopyWith(_$ConstrainU32_Exact value,
+          $Res Function(_$ConstrainU32_Exact) then) =
+      __$$ConstrainU32_ExactCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int field0});
 }
 
 /// @nodoc
-class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
-    extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_ExactImpl>
-    implements _$$ConstrainU32_ExactImplCopyWith<$Res> {
-  __$$ConstrainU32_ExactImplCopyWithImpl(_$ConstrainU32_ExactImpl _value,
-      $Res Function(_$ConstrainU32_ExactImpl) _then)
+class __$$ConstrainU32_ExactCopyWithImpl<$Res>
+    extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_Exact>
+    implements _$$ConstrainU32_ExactCopyWith<$Res> {
+  __$$ConstrainU32_ExactCopyWithImpl(
+      _$ConstrainU32_Exact _value, $Res Function(_$ConstrainU32_Exact) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -495,7 +489,7 @@ class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(_$ConstrainU32_ExactImpl(
+    return _then(_$ConstrainU32_Exact(
       null == field0
           ? _value.field0
           : field0 // ignore: cast_nullable_to_non_nullable
@@ -506,8 +500,8 @@ class __$$ConstrainU32_ExactImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
-  const _$ConstrainU32_ExactImpl(this.field0);
+class _$ConstrainU32_Exact implements ConstrainU32_Exact {
+  const _$ConstrainU32_Exact(this.field0);
 
   @override
   final int field0;
@@ -521,7 +515,7 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ConstrainU32_ExactImpl &&
+            other is _$ConstrainU32_Exact &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -531,8 +525,8 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
-      __$$ConstrainU32_ExactImplCopyWithImpl<_$ConstrainU32_ExactImpl>(
+  _$$ConstrainU32_ExactCopyWith<_$ConstrainU32_Exact> get copyWith =>
+      __$$ConstrainU32_ExactCopyWithImpl<_$ConstrainU32_Exact>(
           this, _$identity);
 
   @override
@@ -605,33 +599,33 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
 }
 
 abstract class ConstrainU32_Exact implements ConstrainU32 {
-  const factory ConstrainU32_Exact(final int field0) = _$ConstrainU32_ExactImpl;
+  const factory ConstrainU32_Exact(final int field0) = _$ConstrainU32_Exact;
 
   @override
   int get field0;
   @override
   @JsonKey(ignore: true)
-  _$$ConstrainU32_ExactImplCopyWith<_$ConstrainU32_ExactImpl> get copyWith =>
+  _$$ConstrainU32_ExactCopyWith<_$ConstrainU32_Exact> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ConstrainU32_IdealImplCopyWith<$Res>
+abstract class _$$ConstrainU32_IdealCopyWith<$Res>
     implements $ConstrainU32CopyWith<$Res> {
-  factory _$$ConstrainU32_IdealImplCopyWith(_$ConstrainU32_IdealImpl value,
-          $Res Function(_$ConstrainU32_IdealImpl) then) =
-      __$$ConstrainU32_IdealImplCopyWithImpl<$Res>;
+  factory _$$ConstrainU32_IdealCopyWith(_$ConstrainU32_Ideal value,
+          $Res Function(_$ConstrainU32_Ideal) then) =
+      __$$ConstrainU32_IdealCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int field0});
 }
 
 /// @nodoc
-class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
-    extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_IdealImpl>
-    implements _$$ConstrainU32_IdealImplCopyWith<$Res> {
-  __$$ConstrainU32_IdealImplCopyWithImpl(_$ConstrainU32_IdealImpl _value,
-      $Res Function(_$ConstrainU32_IdealImpl) _then)
+class __$$ConstrainU32_IdealCopyWithImpl<$Res>
+    extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_Ideal>
+    implements _$$ConstrainU32_IdealCopyWith<$Res> {
+  __$$ConstrainU32_IdealCopyWithImpl(
+      _$ConstrainU32_Ideal _value, $Res Function(_$ConstrainU32_Ideal) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -639,7 +633,7 @@ class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(_$ConstrainU32_IdealImpl(
+    return _then(_$ConstrainU32_Ideal(
       null == field0
           ? _value.field0
           : field0 // ignore: cast_nullable_to_non_nullable
@@ -650,8 +644,8 @@ class __$$ConstrainU32_IdealImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
-  const _$ConstrainU32_IdealImpl(this.field0);
+class _$ConstrainU32_Ideal implements ConstrainU32_Ideal {
+  const _$ConstrainU32_Ideal(this.field0);
 
   @override
   final int field0;
@@ -665,7 +659,7 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ConstrainU32_IdealImpl &&
+            other is _$ConstrainU32_Ideal &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -675,8 +669,8 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
-      __$$ConstrainU32_IdealImplCopyWithImpl<_$ConstrainU32_IdealImpl>(
+  _$$ConstrainU32_IdealCopyWith<_$ConstrainU32_Ideal> get copyWith =>
+      __$$ConstrainU32_IdealCopyWithImpl<_$ConstrainU32_Ideal>(
           this, _$identity);
 
   @override
@@ -749,33 +743,33 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
 }
 
 abstract class ConstrainU32_Ideal implements ConstrainU32 {
-  const factory ConstrainU32_Ideal(final int field0) = _$ConstrainU32_IdealImpl;
+  const factory ConstrainU32_Ideal(final int field0) = _$ConstrainU32_Ideal;
 
   @override
   int get field0;
   @override
   @JsonKey(ignore: true)
-  _$$ConstrainU32_IdealImplCopyWith<_$ConstrainU32_IdealImpl> get copyWith =>
+  _$$ConstrainU32_IdealCopyWith<_$ConstrainU32_Ideal> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ConstrainU32_RangeImplCopyWith<$Res>
+abstract class _$$ConstrainU32_RangeCopyWith<$Res>
     implements $ConstrainU32CopyWith<$Res> {
-  factory _$$ConstrainU32_RangeImplCopyWith(_$ConstrainU32_RangeImpl value,
-          $Res Function(_$ConstrainU32_RangeImpl) then) =
-      __$$ConstrainU32_RangeImplCopyWithImpl<$Res>;
+  factory _$$ConstrainU32_RangeCopyWith(_$ConstrainU32_Range value,
+          $Res Function(_$ConstrainU32_Range) then) =
+      __$$ConstrainU32_RangeCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int field0, int field1});
 }
 
 /// @nodoc
-class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
-    extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_RangeImpl>
-    implements _$$ConstrainU32_RangeImplCopyWith<$Res> {
-  __$$ConstrainU32_RangeImplCopyWithImpl(_$ConstrainU32_RangeImpl _value,
-      $Res Function(_$ConstrainU32_RangeImpl) _then)
+class __$$ConstrainU32_RangeCopyWithImpl<$Res>
+    extends _$ConstrainU32CopyWithImpl<$Res, _$ConstrainU32_Range>
+    implements _$$ConstrainU32_RangeCopyWith<$Res> {
+  __$$ConstrainU32_RangeCopyWithImpl(
+      _$ConstrainU32_Range _value, $Res Function(_$ConstrainU32_Range) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -784,7 +778,7 @@ class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
     Object? field0 = null,
     Object? field1 = null,
   }) {
-    return _then(_$ConstrainU32_RangeImpl(
+    return _then(_$ConstrainU32_Range(
       null == field0
           ? _value.field0
           : field0 // ignore: cast_nullable_to_non_nullable
@@ -799,8 +793,8 @@ class __$$ConstrainU32_RangeImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
-  const _$ConstrainU32_RangeImpl(this.field0, this.field1);
+class _$ConstrainU32_Range implements ConstrainU32_Range {
+  const _$ConstrainU32_Range(this.field0, this.field1);
 
   @override
   final int field0;
@@ -816,7 +810,7 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ConstrainU32_RangeImpl &&
+            other is _$ConstrainU32_Range &&
             (identical(other.field0, field0) || other.field0 == field0) &&
             (identical(other.field1, field1) || other.field1 == field1));
   }
@@ -827,8 +821,8 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
-      __$$ConstrainU32_RangeImplCopyWithImpl<_$ConstrainU32_RangeImpl>(
+  _$$ConstrainU32_RangeCopyWith<_$ConstrainU32_Range> get copyWith =>
+      __$$ConstrainU32_RangeCopyWithImpl<_$ConstrainU32_Range>(
           this, _$identity);
 
   @override
@@ -902,13 +896,13 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
 
 abstract class ConstrainU32_Range implements ConstrainU32 {
   const factory ConstrainU32_Range(final int field0, final int field1) =
-      _$ConstrainU32_RangeImpl;
+      _$ConstrainU32_Range;
 
   @override
   int get field0;
   int get field1;
   @override
   @JsonKey(ignore: true)
-  _$$ConstrainU32_RangeImplCopyWith<_$ConstrainU32_RangeImpl> get copyWith =>
+  _$$ConstrainU32_RangeCopyWith<_$ConstrainU32_Range> get copyWith =>
       throw _privateConstructorUsedError;
 }

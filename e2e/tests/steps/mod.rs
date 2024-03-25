@@ -1,6 +1,7 @@
 mod connection;
 mod control_api;
 mod media_state;
+mod monit;
 mod room;
 mod track;
 mod websocket;
