@@ -31,6 +31,6 @@ StepDefinitionGeneric metricRespContains = then1<String, CustomWorld>(
   (metric, context) async {
     var body = context.world.metricsResponses.last.body;
 
-    expect(body.contains('# TYPE $metric gauge'), isTrue);
+    expect(body.contains('# TYPE $metric counter'), isTrue);
   },
 );
