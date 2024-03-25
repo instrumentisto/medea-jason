@@ -415,19 +415,10 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (contains('linux android', matrix.platform) && 'ubuntu-22.04')
-              || (matrix.platform == 'windows'               && 'windows-latest')
-              ||                                                'macos-13' }}
+    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
+              || (matrix.platform == 'windows' && 'windows-latest')
+              ||                                  'macos-13' }}
     steps:
-      - name: Enable KVM for Android HW acceleration
-        if: ${{ matrix.platform == 'android' }}
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", \
-                OPTIONS+="static_node=kvm"' \
-                | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -469,7 +460,6 @@ jobs:
           echo "target=$(make flutter.android.version.compile)" \
           >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
-
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -478,12 +468,8 @@ jobs:
           arch: x86_64
           cores: 3
           profile: pixel_2
-          disk-size: 4096M
-          sdcard-path-or-size: 100M
-          emulator-options: -no-snapshot-save -no-boot-anim
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -492,9 +478,6 @@ jobs:
           arch: x86_64
           cores: 3
           profile: pixel_2
-          disk-size: 4096M
-          sdcard-path-or-size: 100M
-          emulator-options: -no-snapshot-save -no-boot-anim
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
