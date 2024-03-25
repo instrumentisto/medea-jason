@@ -38,7 +38,7 @@ use crate::{
 
 #[doc(inline)]
 pub use self::{
-    component::{Component, State},
+    component::{Component, State, DESCRIPTION_APPROVE_TIMEOUT},
     media::{
         media_exchange_state, mute_state, receiver, sender, GetMidsError,
         InsertLocalTracksError, MediaConnections, MediaExchangeState,

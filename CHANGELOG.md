@@ -24,11 +24,13 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Fixed
 
-- Screen sharing in Firefox ([#135]).
+- Screen sharing in Firefox ([#135]);
+- State synchronization during initial negotiation in mesh mode ([#162]).
 
 [#135]: /../../pull/135
 [#138]: /../../pull/138
 [#151]: /../../pull/151
+[#162]: /../../pull/162
 
 
 

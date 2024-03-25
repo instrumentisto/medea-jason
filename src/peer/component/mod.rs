@@ -32,6 +32,9 @@ use self::{
     tracks_repository::TracksRepository,
 };
 
+#[doc(inline)]
+pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
+
 /// Synchronization state of a [`Component`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SyncState {
@@ -518,6 +521,8 @@ impl SynchronizableState for State {
         }
         if let Some(sdp_offer) = state.local_sdp {
             self.local_sdp.approved_set(sdp_offer);
+        } else {
+            self.negotiation_state.set(NegotiationState::WaitLocalSdp);
         }
         self.remote_sdp.set(state.remote_sdp);
         self.ice_candidates.apply(state.ice_candidates, send_cons);
