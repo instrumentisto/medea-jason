@@ -22,7 +22,7 @@ use dart_sys::{
 ///
 /// [1]: https://api.dart.dev/dart-ffi/NativeApi/initializeApiDLData.html
 pub unsafe fn initialize_api(data: *mut ffi::c_void) -> isize {
-    Dart_InitializeApiDL(data)
+    unsafe { Dart_InitializeApiDL(data) }
 }
 
 /// Allocates a [`Dart_PersistentHandle`] for provided [`Dart_Handle`].
@@ -36,10 +36,12 @@ pub unsafe fn initialize_api(data: *mut ffi::c_void) -> isize {
 pub unsafe fn new_persistent_handle(
     object: Dart_Handle,
 ) -> Dart_PersistentHandle {
-    #[allow(clippy::expect_used)]
-    Dart_NewPersistentHandle_DL.expect("dart_api_dl has not been initialized")(
-        object,
-    )
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_NewPersistentHandle_DL
+            .expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe { func(object) }
 }
 
 /// Allocates a [`Dart_Handle`] in the current scope from the given
@@ -53,10 +55,12 @@ pub unsafe fn new_persistent_handle(
 pub unsafe fn handle_from_persistent(
     object: Dart_PersistentHandle,
 ) -> Dart_Handle {
-    #[allow(clippy::expect_used)]
-    Dart_HandleFromPersistent_DL.expect("dart_api_dl has not been initialized")(
-        object,
-    )
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_HandleFromPersistent_DL
+            .expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe { func(object) }
 }
 
 /// Deallocates the provided [`Dart_PersistentHandle`].
@@ -65,9 +69,14 @@ pub unsafe fn handle_from_persistent(
 ///
 /// [`initialize_api`] must be called before this function.
 pub unsafe fn delete_persistent_handle(object: Dart_Handle) {
-    #[allow(clippy::expect_used)]
-    Dart_DeletePersistentHandle_DL
-        .expect("dart_api_dl has not been initialized")(object);
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_DeletePersistentHandle_DL
+            .expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe {
+        func(object);
+    }
 }
 
 /// Posts a `message` on some port. It will contain a [`Dart_CObject`]
@@ -92,10 +101,11 @@ pub unsafe fn post_c_object(
     port_id: Dart_Port_DL,
     message: *mut Dart_CObject,
 ) -> bool {
-    #[allow(clippy::expect_used)]
-    Dart_PostCObject_DL.expect("dart_api_dl has not been initialized")(
-        port_id, message,
-    )
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_PostCObject_DL.expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe { func(port_id, message) }
 }
 
 /// Allocates a finalizable handle for an object.
@@ -124,13 +134,12 @@ pub unsafe fn new_finalizable_handle(
     external_allocation_size: isize,
     callback: Dart_HandleFinalizer,
 ) -> Dart_FinalizableHandle {
-    #[allow(clippy::expect_used)]
-    Dart_NewFinalizableHandle_DL.expect("dart_api_dl has not been initialized")(
-        object,
-        peer,
-        external_allocation_size,
-        callback,
-    )
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_NewFinalizableHandle_DL
+            .expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe { func(object, peer, external_allocation_size, callback) }
 }
 
 /// Checks whether the provided [`Dart_Handle`] represents a Dart error.
@@ -141,8 +150,11 @@ pub unsafe fn new_finalizable_handle(
 ///
 /// [`initialize_api`] must be called before this function.
 pub unsafe fn is_error(handle: Dart_Handle) -> bool {
-    #[allow(clippy::expect_used)]
-    Dart_IsError_DL.expect("dart_api_dl has not been initialized")(handle)
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_IsError_DL.expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe { func(handle) }
 }
 
 /// Returns the error message from the provided Dart error handle.
@@ -156,8 +168,11 @@ pub unsafe fn is_error(handle: Dart_Handle) -> bool {
 ///
 /// [`initialize_api`] must be called before this function.
 pub unsafe fn get_error(handle: Dart_Handle) -> *const ffi::c_char {
-    #[allow(clippy::expect_used)]
-    Dart_GetError_DL.expect("dart_api_dl has not been initialized")(handle)
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_GetError_DL.expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe { func(handle) }
 }
 
 /// Propagates the given Dart error to the Dart side.
@@ -176,8 +191,11 @@ pub unsafe fn get_error(handle: Dart_Handle) -> *const ffi::c_char {
 ///
 /// [1]: https://api.dart.dev/dart-ffi/NativeApi/initializeApiDLData.html
 pub unsafe fn propagate_error(handle: Dart_Handle) {
-    #[allow(clippy::expect_used)]
-    Dart_PropagateError_DL.expect("dart_api_dl has not been initialized")(
-        handle,
-    );
+    let func = unsafe {
+        #[allow(clippy::expect_used)]
+        Dart_PropagateError_DL.expect("`dart_api_dl` has not been initialized")
+    };
+    unsafe {
+        func(handle);
+    }
 }

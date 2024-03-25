@@ -428,20 +428,20 @@ unsafe fn set_constrain_string<T>(
     DartValue: From<T>,
 {
     match constrain {
-        ConstrainString::Exact(val) => {
+        ConstrainString::Exact(val) => unsafe {
             constraints::set_video_constraint_value(
                 mandatory.get(),
                 kind as i64,
                 DartValue::from(val),
             );
-        }
-        ConstrainString::Ideal(val) => {
+        },
+        ConstrainString::Ideal(val) => unsafe {
             constraints::set_video_constraint_value(
                 optional.get(),
                 kind as i64,
                 DartValue::from(val),
             );
-        }
+        },
     }
 }
 
@@ -454,26 +454,26 @@ unsafe fn set_video_constrain_u32(
     mandatory: &DartHandle,
 ) {
     match constrain {
-        ConstrainU32::Ideal(val) => {
+        ConstrainU32::Ideal(val) => unsafe {
             constraints::set_video_constraint_value(
                 optional.get(),
                 kind as i64,
                 DartValue::from(val),
             );
-        }
-        ConstrainU32::Exact(val) => {
+        },
+        ConstrainU32::Exact(val) => unsafe {
             constraints::set_video_constraint_value(
                 mandatory.get(),
                 kind as i64,
                 DartValue::from(val),
             );
-        }
-        ConstrainU32::Range(min, max) => {
+        },
+        ConstrainU32::Range(min, max) => unsafe {
             constraints::set_video_constraint_value(
                 mandatory.get(),
                 kind as i64,
                 DartValue::from(min),
             );
-        }
+        },
     }
 }

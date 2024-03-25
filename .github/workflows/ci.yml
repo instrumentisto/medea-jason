@@ -289,30 +289,30 @@ jobs:
 
       - name: Pull edge Medea Docker image
         run: docker pull hub.instrumentisto.com/streaming/medea:edge
-        if: ${{ env.MEDEA_BRANCH == 'edge' }}
+        if: ${{ env.MEDEA_TAG == 'edge' }}
       - name: Pull review Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
-        if: ${{ env.MEDEA_BRANCH != 'edge' }}
+        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_TAG }}
+        if: ${{ env.MEDEA_TAG != 'edge' }}
 
       - name: Chrome (P2P mesh)
         run: make test.e2e browser=chrome sfu=no
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
       - name: Chrome (SFU)
         run: make test.e2e browser=chrome sfu=yes
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
       - name: Firefox (P2P mesh)
         run: make test.e2e browser=firefox sfu=no
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
       - name: Firefox (SFU)
         run: make test.e2e browser=firefox sfu=yes
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
 
   test-e2e-native:
@@ -388,7 +388,7 @@ jobs:
                               && steps.simulator.outputs.udid)
                           ||     matrix.platform }}
                   up=yes debug=no dockerized=yes
-                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  medea-tag=${{ env.MEDEA_TAG }}
                   control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
@@ -400,7 +400,7 @@ jobs:
                               && steps.simulator.outputs.udid)
                           ||     matrix.platform }}
                   up=yes debug=no dockerized=yes
-                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  medea-tag=${{ env.MEDEA_TAG }}
                   control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
