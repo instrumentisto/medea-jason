@@ -36,6 +36,6 @@ async fn metric_resp_contains(w: &mut World, metric: String) {
 
     assert!(
         body.contains(&format!("# TYPE {metric} counter")),
-        &format!("Response has no `{metric}` counter metric"),
+        "Response has no `{metric}` counter metric",
     );
 }
