@@ -121,14 +121,17 @@ StepDefinitionGeneric thenRemoteMediaTrack =
     var member = context.world.members[id]!;
     var parsedKind = parseMediaKind(kind);
 
+    print('thenRemoteMediaTrack 000 ${id}');
     await member.waitForConnect(partnerId);
-
+    print('thenRemoteMediaTrack 111 ${id}');
     var track = await member.waitRemoteTrackFrom(
         partnerId, parsedKind.item2, parsedKind.item1);
-
+    print('thenRemoteMediaTrack 222 ${id}');
     if (state == 'enabled') {
+      print('thenRemoteMediaTrack 333 ${id}');
       await member.waitEnabledTrack(track);
     } else {
+      print('thenRemoteMediaTrack 444 ${id}');
       await member.waitDisabledTrack(track);
     }
   },

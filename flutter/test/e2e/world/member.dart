@@ -212,21 +212,23 @@ class Member {
 
         remoteTrack.onMediaDirectionChanged((direction) {
           if (direction != TrackMediaDirection.sendRecv) {
+            print("onMediaDirectionChanged disabled for ${remoteTrack.kind()} ${remoteTrack.getTrack().id()}");
             connectionStore.callbackCounter[remoteTrackId]!
                 .update('disabled', (value) => value += 1);
 
             connectionStore.onCallbackCounter[remoteTrackId]!['disabled']!(
                 connectionStore.callbackCounter[remoteTrackId]!['disabled']!);
           } else {
+
+            print("onMediaDirectionChanged enabled for ${remoteTrack.kind()} ${remoteTrack.getTrack().id()}");
             connectionStore.callbackCounter[remoteTrackId]!
                 .update('enabled', (value) => value += 1);
             connectionStore.onCallbackCounter[remoteTrackId]!['enabled']!(
                 connectionStore.callbackCounter[remoteTrackId]!['enabled']!);
           }
+          print("onMediaDirectionChanged callbacks count ${connectionStore.onMediaDirectionChanged.length}");
           var keys = connectionStore.onMediaDirectionChanged.keys;
-          for (var i = 0;
-              i < connectionStore.onMediaDirectionChanged.length;
-              ++i) {
+          for (var i = 0; i < connectionStore.onMediaDirectionChanged.length; ++i) {
             var cb = connectionStore.onMediaDirectionChanged[keys.elementAt(i)];
             cb!(direction);
           }
@@ -547,17 +549,22 @@ class Member {
   /// [direction].
   Future<void> waitMediaDirectionTrack(
       TrackMediaDirection direction, RemoteMediaTrack track) async {
+      print("waitMediaDirectionTrack 000");
     var id = track.getTrack().id();
     if (track.mediaDirection() != direction) {
+    print("waitMediaDirectionTrack 111 ${track.mediaDirection()} != ${direction}");
       var directionFuture = Completer();
       connectionStore.onMediaDirectionChanged[id] = (d) {
+      print("waitMediaDirectionTrack 222");
         if (d == direction) {
+        print("waitMediaDirectionTrack 333");
           directionFuture.complete();
           connectionStore.onMediaDirectionChanged.remove(track.getTrack().id());
         }
       };
       return directionFuture.future;
     }
+    print("waitMediaDirectionTrack 444");
   }
 
   /// Waits for a [Member] with the specified [id] to close.

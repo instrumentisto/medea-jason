@@ -243,6 +243,8 @@ impl RoomHandle {
     ///
     /// See [`RoomJoinError`] for details.
     pub async fn join(&self, url: String) -> Result<(), Traced<RoomJoinError>> {
+        log::error!("Room::join({url})");
+
         let inner = self
             .0
             .upgrade()
@@ -641,6 +643,7 @@ impl RoomHandle {
     pub fn enable_audio(
         &self,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+        log::error!("enable_audio");
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Audio,
@@ -697,6 +700,8 @@ impl RoomHandle {
         &self,
         source_kind: Option<MediaSourceKind>,
     ) -> impl Future<Output = ChangeMediaStateResult> + 'static {
+        log::error!("enable_video {:?}", source_kind);
+
         self.change_media_state(
             media_exchange_state::Stable::Enabled,
             MediaKind::Video,
@@ -1593,6 +1598,7 @@ impl EventHandler for InnerRoom {
         ice_servers: Vec<IceServer>,
         is_force_relayed: bool,
     ) -> Self::Output {
+        log::error!("on_peer_created {peer_id} {:?}", tracks);
         let peer_state = peer::State::new(
             peer_id,
             ice_servers,
@@ -1740,6 +1746,7 @@ impl EventHandler for InnerRoom {
         &self,
         state: proto::state::Room,
     ) -> Self::Output {
+        log::error!("on_state_synchronized");
         self.connections.apply(&state);
         self.peers.apply(state);
         Ok(())
@@ -1813,6 +1820,8 @@ impl PeerEventHandler for InnerRoom {
         sender_id: MemberId,
         track: remote::Track,
     ) -> Self::Output {
+
+        log::error!("on_new_remote_track from {sender_id} kind {:?}-{:?} with dir {:?} {:?}", track.kind(), track.media_source_kind(), track.media_direction(), track.id());
         let conn = self.connections.get(&sender_id).ok_or_else(|| {
             tracerr::new!(UnknownRemoteMemberError(sender_id))
         })?;
@@ -1872,10 +1881,10 @@ impl PeerEventHandler for InnerRoom {
         peer_id: PeerId,
         stats: platform::RtcStats,
     ) -> Self::Output {
-        self.rpc.send_command(Command::AddPeerConnectionMetrics {
-            peer_id,
-            metrics: PeerMetrics::RtcStats(stats.0),
-        });
+        // self.rpc.send_command(Command::AddPeerConnectionMetrics {
+        //     peer_id,
+        //     metrics: PeerMetrics::RtcStats(stats.0),
+        // });
         Ok(())
     }
 
