@@ -3,13 +3,17 @@
 use std::{future::Future, rc::Rc};
 
 use derive_more::From;
+use js_sys::Array;
+use medea_client_api_proto::EncodingParameters;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::RtcRtpTransceiver;
+use web_sys::{RtcRtpEncodingParameters, RtcRtpTransceiver};
 
 use crate::{
     media::track::local,
     platform::{Error, TransceiverDirection},
 };
+
+use super::get_property_by_name;
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
 /// direction changes.
@@ -92,6 +96,57 @@ impl Transceiver {
     #[must_use]
     pub fn is_stopped(&self) -> bool {
         self.0.stopped()
+    }
+
+    /// Updates parameters of encoding for underlying `sender`.
+    ///
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
+    /// call fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    #[allow(clippy::missing_panics_doc)]
+    pub async fn update_send_encodings(
+        &self,
+        encodings: Vec<EncodingParameters>,
+    ) -> Result<(), Error> {
+        let params = self.0.sender().get_parameters();
+        #[allow(clippy::unwrap_used)]
+        let encs = get_property_by_name(&params, "encodings", |v| {
+            v.is_array().then_some(Array::from(&v))
+        })
+        .unwrap();
+
+        for mut enc in encs.iter().map(RtcRtpEncodingParameters::from) {
+            #[allow(clippy::unwrap_used)]
+            let rid =
+                get_property_by_name(&enc, "rid", |v| v.as_string()).unwrap();
+
+            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
+                continue;
+            };
+
+            _ = enc.active(encoding.active);
+            if let Some(max_bitrate) = encoding.max_bitrate {
+                _ = enc.max_bitrate(max_bitrate);
+            }
+            if let Some(scale_resolution_down_by) =
+                encoding.scale_resolution_down_by
+            {
+                _ = enc
+                    .scale_resolution_down_by(scale_resolution_down_by.into());
+            }
+        }
+
+        drop(
+            JsFuture::from(
+                self.0.sender().set_parameters_with_parameters(&params),
+            )
+            .await?,
+        );
+
+        Ok(())
     }
 }
 

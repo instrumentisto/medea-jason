@@ -12,7 +12,7 @@ use medea_client_api_proto::{
 };
 use medea_macro::watchers;
 use medea_reactive::{AllProcessed, Guarded, ObservableCell, ProgressableCell};
-use proto::ConnectionMode;
+use proto::{ConnectionMode, EncodingParameters};
 use tracerr::Traced;
 
 use crate::{
@@ -26,6 +26,7 @@ use crate::{
         MediaExchangeStateController, MediaState, MediaStateControllable,
         MuteStateController, TransceiverSide, UpdateLocalStreamError,
     },
+    platform,
     utils::{component, AsProtoState, SynchronizableState, Updatable},
 };
 
@@ -138,6 +139,10 @@ pub struct State {
 
     /// Synchronization state of the [`Component`].
     sync_state: ObservableCell<SyncState>,
+
+    /// Indicator whether needs to update this [`local::Track`]'s encoding
+    /// parameters.
+    update_encodings: ObservableCell<Option<Vec<EncodingParameters>>>,
 }
 
 impl AsProtoState for State {
@@ -148,7 +153,7 @@ impl AsProtoState for State {
             id: self.id,
             connection_mode: self.connection_mode,
             mid: self.mid.clone(),
-            media_type: self.media_type,
+            media_type: self.media_type.clone(),
             receivers: self.receivers.borrow().clone(),
             media_direction: self.media_direction.get(),
             muted: self.mute_state.muted(),
@@ -186,6 +191,7 @@ impl SynchronizableState for State {
             connection_mode: input.connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
             sync_state: ObservableCell::new(SyncState::Synced),
+            update_encodings: ObservableCell::new(None),
         }
     }
 
@@ -264,7 +270,7 @@ impl From<&State> for proto::state::Sender {
             id: state.id,
             connection_mode: state.connection_mode,
             mid: state.mid.clone(),
-            media_type: state.media_type,
+            media_type: state.media_type.clone(),
             receivers: state.receivers.borrow().clone(),
             media_direction: state.media_direction.get(),
             muted: state.mute_state.muted(),
@@ -309,6 +315,7 @@ impl State {
             send_constraints,
             connection_mode,
             local_track_state: ObservableCell::new(LocalTrackState::Stable),
+            update_encodings: ObservableCell::new(None),
         }
     }
 
@@ -333,8 +340,8 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub const fn media_type(&self) -> MediaType {
-        self.media_type
+    pub fn media_type(&self) -> MediaType {
+        self.media_type.clone()
     }
 
     /// Returns current [`MemberId`]s of the `Member`s that this [`State`]
@@ -407,6 +414,9 @@ impl State {
         }
         if let Some(receivers) = track_patch.receivers {
             *self.receivers.borrow_mut() = receivers;
+        }
+        if !track_patch.encodings.is_empty() {
+            self.update_encodings.set(Some(track_patch.encodings));
         }
     }
 
@@ -619,6 +629,31 @@ impl Component {
         }
         Ok(())
     }
+
+    /// Updates [`Sender`]'s encoding parameters.
+    ///
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if setting the [`EncodingParameters`]
+    /// fails.
+    #[allow(clippy::needless_pass_by_value)]
+    #[watch(self.update_encodings.subscribe())]
+    async fn update_encodings_changed(
+        sender: Rc<Sender>,
+        state: Rc<State>,
+        encs: Option<Vec<EncodingParameters>>,
+    ) -> Result<(), platform::Error> {
+        if let Some(encodings) = encs {
+            sender
+                .transceiver()
+                .update_send_encodings(encodings)
+                .await?;
+        }
+
+        state.update_encodings.set(None);
+
+        Ok(())
+    }
 }
 
 impl TransceiverSide for State {
@@ -635,7 +670,7 @@ impl TransceiverSide for State {
     }
 
     fn is_transitable(&self) -> bool {
-        let caps = TrackConstraints::from(self.media_type);
+        let caps = TrackConstraints::from(self.media_type.clone());
         match &caps {
             TrackConstraints::Video(VideoSource::Device(_)) => {
                 self.send_constraints.inner().get_device_video().is_some()

@@ -13,6 +13,7 @@
 )]
 
 pub mod constraints;
+pub mod codec_capability;
 pub mod error;
 pub mod executor;
 pub mod ice_candidate;
@@ -21,8 +22,10 @@ pub mod media_device_info;
 pub mod media_devices;
 pub mod media_display_info;
 pub mod media_track;
+pub mod parameters;
 pub mod peer_connection;
 pub mod rtc_stats;
+pub mod send_encoding_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;

@@ -10,8 +10,10 @@ use std::{
     rc::Rc,
 };
 
+use js_sys::{Array, JsString, Reflect};
 use medea_client_api_proto::{
-    IceConnectionState, IceServer, PeerConnectionState,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
+    ScalabilityMode, SvcSetting,
 };
 use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
@@ -19,9 +21,9 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
-    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcRtpTransceiverInit,
-    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
-    RtcTrackEvent,
+    RtcPeerConnectionIceEvent, RtcRtpEncodingParameters, RtcRtpSender,
+    RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
+    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
 
 use crate::{
@@ -637,13 +639,85 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
+        mut encodings: Vec<EncodingParameters>,
+        svc: Vec<SvcSetting>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
             let mut init = RtcRtpTransceiverInit::new();
             _ = init.direction(direction.into());
+
+            let codecs =
+                RtcRtpSender::get_capabilities("video").and_then(|capabs| {
+                    Reflect::get(&capabs, &JsString::from("codecs")).ok()
+                });
+
+            let mut target_codec = None;
+            let mut target_scalability_mode = ScalabilityMode::L1T1;
+
+            if let (false, Some(codecs)) = (svc.is_empty(), codecs) {
+                for svc_setting in svc {
+                    let res = Array::from(&codecs).iter().find(|codec| {
+                        Reflect::get(codec, &JsString::from("mimeType"))
+                            .ok()
+                            .and_then(|a| a.as_string())
+                            .map_or(false, |mime| {
+                                mime == format!(
+                                    "video/{}",
+                                    svc_setting.codec.to_string()
+                                )
+                            })
+                    });
+
+                    if res.is_some() {
+                        target_codec = res;
+                        target_scalability_mode = svc_setting.scalability_mode;
+
+                        break;
+                    }
+                }
+            }
+
+            if encodings.is_empty() && target_codec.is_some() {
+                encodings.push(EncodingParameters {
+                    rid: "0".to_owned(),
+                    active: true,
+                    max_bitrate: None,
+                    scale_resolution_down_by: None,
+                });
+            }
+
+            let send_encodings = ::js_sys::Array::new();
+
+            for encoding in &encodings {
+                let mut params = RtcRtpEncodingParameters::new();
+                _ = params.rid(&encoding.rid);
+                _ = params.active(encoding.active);
+                if let Some(max_bitrate) = &encoding.max_bitrate {
+                    _ = params.max_bitrate(*max_bitrate);
+                }
+                if let Some(scale_resolution_down_by) =
+                    &encoding.scale_resolution_down_by
+                {
+                    _ = params.scale_resolution_down_by(
+                        (*scale_resolution_down_by).into(),
+                    );
+                }
+                _ = params
+                    .scalability_mode(&target_scalability_mode.to_string());
+
+                _ = send_encodings.push(&params);
+            }
+            _ = init.send_encodings(&send_encodings);
+
             let transceiver =
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
+
+            if let Some(codec) = target_codec {
+                transceiver
+                    .set_codec_preferences(&::js_sys::Array::of1(&codec));
+            }
+
             Transceiver::from(transceiver)
         }
     }

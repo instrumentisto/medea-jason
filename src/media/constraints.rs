@@ -5,8 +5,9 @@ use std::{cell::RefCell, rc::Rc};
 use derive_more::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
-    AudioSettings as ProtoAudioConstraints, MediaSourceKind,
-    MediaType as ProtoTrackConstraints, MediaType, VideoSettings,
+    AudioSettings as ProtoAudioConstraints, EncodingParameters,
+    MediaSourceKind, MediaType as ProtoTrackConstraints, MediaType, SvcSetting,
+    VideoSettings,
 };
 use medea_reactive::ObservableCell;
 
@@ -659,7 +660,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is enabled and constrained in
     /// this [`MediaStreamSettings`].
     #[must_use]
-    pub const fn enabled(&self, kind: MediaType) -> bool {
+    pub fn enabled(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => self.is_track_enabled_and_constrained(
                 MediaKind::Video,
@@ -675,7 +676,7 @@ impl MediaStreamSettings {
     /// Indicates whether the given [`MediaType`] is muted in this
     /// [`MediaStreamSettings`].
     #[must_use]
-    pub const fn muted(&self, kind: MediaType) -> bool {
+    pub fn muted(&self, kind: MediaType) -> bool {
         match kind {
             MediaType::Video(video) => match video.source_kind {
                 MediaSourceKind::Device => self.device_video.muted,
@@ -862,6 +863,24 @@ impl VideoSource {
             Self::Device(device) => device.satisfies(track).await,
         }
     }
+
+    /// Returns configured [`EncodingParameters`].
+    #[must_use]
+    pub fn encodings(&self) -> Vec<EncodingParameters> {
+        match self {
+            Self::Device(s) => s.encodings.clone(),
+            Self::Display(s) => s.encodings.clone(),
+        }
+    }
+
+    /// Returns configured [`Vec<SvcSetting>`].
+    #[must_use]
+    pub fn svc(&self) -> Vec<SvcSetting> {
+        match self {
+            Self::Device(s) => s.svc.clone(),
+            Self::Display(s) => s.svc.clone(),
+        }
+    }
 }
 
 impl From<VideoSettings> for VideoSource {
@@ -874,6 +893,8 @@ impl From<VideoSettings> for VideoSource {
                     width: None,
                     height: None,
                     required: settings.required,
+                    encodings: settings.encodings,
+                    svc: settings.svc,
                 })
             }
             MediaSourceKind::Display => {
@@ -883,6 +904,8 @@ impl From<VideoSettings> for VideoSource {
                     frame_rate: None,
                     required: settings.required,
                     device_id: None,
+                    encodings: settings.encodings,
+                    svc: settings.svc,
                 })
             }
         }
@@ -939,6 +962,24 @@ impl TrackConstraints {
             TrackConstraints::Video(VideoSource::Display(_)) => {
                 MediaSourceKind::Display
             }
+        }
+    }
+
+    /// Returns configured [`EncodingParameters`].
+    #[must_use]
+    pub fn encodings(&self) -> Vec<EncodingParameters> {
+        match &self {
+            Self::Audio(_) => Vec::new(),
+            Self::Video(vs) => vs.encodings(),
+        }
+    }
+
+    /// Returns configured [`SvcSetting`]s.
+    #[must_use]
+    pub fn svc(&self) -> Vec<SvcSetting> {
+        match &self {
+            Self::Audio(_) => Vec::new(),
+            Self::Video(vs) => vs.svc(),
         }
     }
 
@@ -1128,6 +1169,12 @@ pub struct DeviceVideoTrackConstraints {
 
     /// Width of the video in pixels.
     pub width: Option<ConstrainU32>,
+
+    /// [`EncodingParameters`] for the track.
+    pub encodings: Vec<EncodingParameters>,
+
+    /// [`SvcSetting`]s in decreasing priority.
+    pub svc: Vec<SvcSetting>,
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1277,6 +1324,12 @@ pub struct DisplayVideoTrackConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dfn-framerate
     pub frame_rate: Option<ConstrainU32>,
+
+    /// [`EncodingParameters`] for the track.
+    pub encodings: Vec<EncodingParameters>,
+
+    /// [`SvcSetting`]s in decreasing priority.
+    pub svc: Vec<SvcSetting>,
 }
 
 impl DisplayVideoTrackConstraints {

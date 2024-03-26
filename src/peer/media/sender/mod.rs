@@ -141,6 +141,8 @@ impl Sender {
                         media_connections.0.borrow().add_transceiver(
                             kind,
                             platform::TransceiverDirection::INACTIVE,
+                            caps.encodings(),
+                            caps.svc(),
                         );
                     add_transceiver.await
                 }

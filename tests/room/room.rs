@@ -355,6 +355,8 @@ mod disable_recv_tracks {
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
+                            encodings: Vec::new(),
+                            svc: None,
                         }),
                     },
                     Track {
@@ -586,6 +588,7 @@ mod receivers_patch_send_tracks {
                     media_direction: None,
                     receivers: Some(Vec::new()),
                     muted: None,
+                    encodings: Vec::new(),
                 })]),
                 negotiation_role: None,
             })
@@ -606,6 +609,7 @@ mod receivers_patch_send_tracks {
                         MemberId::from("eva"),
                     ])),
                     muted: None,
+                    encodings: Vec::new(),
                 })]),
                 negotiation_role: None,
             })
@@ -701,6 +705,8 @@ mod disable_send_tracks {
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
+                encodings: Vec::new(),
+                svc: None,
             }),
         }
     }
@@ -1062,6 +1068,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
+                    encodings: Vec::new(),
                 })],
                 negotiation_role: None,
             })
@@ -1143,6 +1150,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: None,
                     muted: Some(true),
+                    encodings: Vec::new(),
                 })],
                 negotiation_role: None,
             })
@@ -1227,6 +1235,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
+                    encodings: Vec::new(),
                 })],
                 negotiation_role: None,
             })
@@ -1481,6 +1490,8 @@ mod patches_generation {
                 MediaType::Video(VideoSettings {
                     required: false,
                     source_kind: proto::MediaSourceKind::Device,
+                    encodings: Vec::new(),
+                    svc: None,
                 }),
                 Direction::Send {
                     receivers: Vec::new(),
@@ -1571,6 +1582,7 @@ mod patches_generation {
                                 state,
                                 MediaState::Mute(mute_state::Stable::Muted)
                             )),
+                            encodings: Vec::new(),
                         })],
                         negotiation_role: None,
                     })
@@ -1740,6 +1752,8 @@ mod patches_generation {
             MediaType::Video(VideoSettings {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
+                encodings: Vec::new(),
+                svc: None,
             }),
             Direction::Send {
                 mid: None,
@@ -1796,6 +1810,8 @@ mod patches_generation {
             MediaType::Video(VideoSettings {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
+                encodings: Vec::new(),
+                svc: None,
             }),
             Direction::Send {
                 mid: None,
@@ -1975,6 +1991,7 @@ async fn disable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2006,6 +2023,7 @@ async fn enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2025,6 +2043,7 @@ async fn enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2061,6 +2080,7 @@ async fn only_one_gum_performed_on_enable() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2080,6 +2100,7 @@ async fn only_one_gum_performed_on_enable() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2201,6 +2222,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2219,6 +2241,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2281,6 +2304,7 @@ async fn send_enabling_holds_local_tracks() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
+                encodings: Vec::new(),
             })],
         })
         .unwrap();
@@ -2337,6 +2361,8 @@ mod set_local_media_settings {
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
+                        encodings: Vec::new(),
+                        svc: None,
                     }),
                 }],
                 ice_servers: Vec::new(),
@@ -2368,6 +2394,8 @@ mod set_local_media_settings {
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
+                                    encodings: Vec::new(),
+                                    svc: None,
                                 }),
                             }],
                             ice_servers: Vec::new(),
@@ -3045,10 +3073,18 @@ async fn sender_answerer() {
         .unwrap();
 
     let a_tr = peer
-        .add_transceiver(MediaKind::Audio, platform::TransceiverDirection::RECV)
+        .add_transceiver(
+            MediaKind::Audio,
+            platform::TransceiverDirection::RECV,
+            Vec::new(),
+        )
         .await;
     let v_tr = peer
-        .add_transceiver(MediaKind::Video, platform::TransceiverDirection::RECV)
+        .add_transceiver(
+            MediaKind::Video,
+            platform::TransceiverDirection::RECV,
+            Vec::new(),
+        )
         .await;
     let offer = peer.create_offer().await.unwrap();
     peer.set_offer(&offer).await.unwrap();
@@ -3081,6 +3117,8 @@ async fn sender_answerer() {
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
                         source_kind: MediaSourceKind::Device,
+                        encodings: Vec::new(),
+                        svc: None,
                     }),
                 },
             ],

@@ -854,6 +854,9 @@ pub struct TrackPatchEvent {
     /// Muting and unmuting can be performed without adding/removing tracks
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
+
+    /// Settings for this [`Track`] encoding.
+    pub encodings: Vec<EncodingParameters>,
 }
 
 /// Media exchange direction of a `Track`.
@@ -906,6 +909,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
+            encodings: Vec::new(),
         }
     }
 }
@@ -919,6 +923,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
+            encodings: Vec::new(),
         }
     }
 
@@ -994,7 +999,7 @@ pub enum Direction {
 }
 
 /// Possible media types of a [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MediaType {
     /// Audio [`Track`].
     Audio(AudioSettings),
@@ -1024,7 +1029,7 @@ pub struct AudioSettings {
 }
 
 /// Settings of a video [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct VideoSettings {
     /// Importance of the video.
     ///
@@ -1033,6 +1038,12 @@ pub struct VideoSettings {
 
     /// Source kind of this [`VideoSettings`] media.
     pub source_kind: MediaSourceKind,
+
+    /// [`EncodingParameters`] of this [`VideoSettings`] media.
+    pub encodings: Vec<EncodingParameters>,
+
+    /// [`SvcSetting`]s of this [`VideoSettings`] media.
+    pub svc: Vec<SvcSetting>,
 }
 
 /// Possible media sources of a video [`Track`].
@@ -1043,6 +1054,192 @@ pub enum MediaSourceKind {
 
     /// Media is obtained with screen-capture.
     Display,
+}
+
+/// [Codec]s used in `Jason`.
+///
+/// [Codec]: https://bloggeek.me/codec/
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum Codec {
+    /// [H264] codec.
+    ///
+    /// [H264]: https://bloggeek.me/h-264/
+    H264,
+
+    /// [VP8] codec.
+    ///
+    /// [VP8]: https://bloggeek.me/vp8/
+    VP8,
+
+    /// [VP9] codec.
+    ///
+    /// [VP9]: https://bloggeek.me/vp9/
+    VP9,
+
+    /// [AV1] codec.
+    ///
+    /// [AV1]: https://bloggeek.me/av1/
+    AV1,
+}
+
+impl ToString for Codec {
+    fn to_string(&self) -> String {
+        match self {
+            Self::H264 => String::from("H264"),
+            Self::VP8 => String::from("VP8"),
+            Self::VP9 => String::from("VP9"),
+            Self::AV1 => String::from("AV1"),
+        }
+    }
+}
+
+/// [ScalabilityMode] for [SVC].
+///
+/// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+/// [SVC]: https://bloggeek.me/svc/
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ScalabilityMode {
+    /// [L1T1] [ScalabilityMode].
+    ///
+    /// [L1T1]: https://w3.org/TR/webrtc-svc/#L1T1*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L1T1,
+
+    /// [L1T2] [ScalabilityMode].
+    ///
+    /// [L1T2]: https://w3.org/TR/webrtc-svc/#L1T2*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L1T2,
+
+    /// [L1T3] [ScalabilityMode].
+    ///
+    /// [L1T3]: https://w3.org/TR/webrtc-svc/#L1T3*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L1T3,
+
+    /// [L2T1] [ScalabilityMode].
+    ///
+    /// [L2T1]: https://w3.org/TR/webrtc-svc/#L2T1*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L2T1,
+
+    /// [L2T2] [ScalabilityMode].
+    ///
+    /// [L2T2]: https://w3.org/TR/webrtc-svc/#L2T2*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L2T2,
+
+    /// [L2T3] [ScalabilityMode].
+    ///
+    /// [L2T3]: https://w3.org/TR/webrtc-svc/#L2T3*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L2T3,
+
+    /// [L3T1] [ScalabilityMode].
+    ///
+    /// [L3T1]: https://w3.org/TR/webrtc-svc/#L3T1*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L3T1,
+
+    /// [L3T2] [ScalabilityMode].
+    ///
+    /// [L3T2]: https://w3.org/TR/webrtc-svc/#L3T2*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L3T2,
+
+    /// [L3T3] [ScalabilityMode].
+    ///
+    /// [L3T3]: https://w3.org/TR/webrtc-svc/#L3T3*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    L3T3,
+
+    /// [S2T1] [ScalabilityMode].
+    ///
+    /// [S2T1]: https://w3.org/TR/webrtc-svc/#S2T1*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    S2T1,
+
+    /// [S2T2] [ScalabilityMode].
+    ///
+    /// [S2T2]: https://w3.org/TR/webrtc-svc/#S2T2*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    S2T2,
+
+    /// [S2T3] [ScalabilityMode].
+    ///
+    /// [S2T3]: https://w3.org/TR/webrtc-svc/#S2T3*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    S2T3,
+
+    /// [S3T1] [ScalabilityMode].
+    ///
+    /// [S3T1]: https://w3.org/TR/webrtc-svc/#S3T1*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    S3T1,
+
+    /// [S3T2] [ScalabilityMode].
+    ///
+    /// [S3T2]: https://w3.org/TR/webrtc-svc/#S3T2*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    S3T2,
+
+    /// [S3T3] [ScalabilityMode].
+    ///
+    /// [S3T3]: https://w3.org/TR/webrtc-svc/#S3T3*
+    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    S3T3,
+}
+
+impl ToString for ScalabilityMode {
+    fn to_string(&self) -> String {
+        match self {
+            Self::L1T1 => String::from("L1T1"),
+            Self::L1T2 => String::from("L1T2"),
+            Self::L1T3 => String::from("L1T3"),
+            Self::L2T1 => String::from("L2T1"),
+            Self::L2T2 => String::from("L2T2"),
+            Self::L2T3 => String::from("L2T3"),
+            Self::L3T1 => String::from("L3T1"),
+            Self::L3T2 => String::from("L3T2"),
+            Self::L3T3 => String::from("L3T3"),
+            Self::S2T1 => String::from("S2T1"),
+            Self::S2T2 => String::from("S2T2"),
+            Self::S2T3 => String::from("S2T3"),
+            Self::S3T1 => String::from("S3T1"),
+            Self::S3T2 => String::from("S3T2"),
+            Self::S3T3 => String::from("S3T3"),
+        }
+    }
+}
+
+/// Settings for [SVC] configuration.
+///
+/// [SVC]: https://bloggeek.me/svc/
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SvcSetting {
+    /// Prefered [`Codec`].
+    pub codec: Codec,
+
+    /// Prefered [`ScalabilityMode`].
+    pub scalability_mode: ScalabilityMode,
+}
+
+/// Representation of the [RTCRtpEncodingParameters][0].
+///
+/// [0]: https://tinyurl.com/mr3dt9ch
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct EncodingParameters {
+    /// RTP stream ID of this [`EncodingParameters`].
+    pub rid: String,
+
+    /// Indicates whether this encoding is actively being used or not.
+    pub active: bool,
+
+    /// The maximum bitrate that can be used to send this encoding.
+    pub max_bitrate: Option<u32>,
+
+    /// A factor by which to scale down the video during encoding.
+    pub scale_resolution_down_by: Option<u8>,
 }
 
 /// Estimated connection quality.
