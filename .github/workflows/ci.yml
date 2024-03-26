@@ -405,7 +405,7 @@ jobs:
           arch: x86_64
           cores: 3
           profile: pixel_2
-          script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_BRANCH }} control-tag=build-${{ github.run_number }}
+          script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_TAG }} control-tag=build-${{ github.run_number }}
         if: ${{ matrix.platform == 'android' }}
 
       - name: P2P mesh
