@@ -23,11 +23,27 @@ void registerFunction(
   required Pointer<NativeFunction<Handle Function(Handle)>> getSendParameters,
   required Pointer<NativeFunction<Handle Function(Handle, Handle)>>
       setSendParameters,
+  required Pointer<NativeFunction<Void Function(Handle, Handle)>>
+      setPreferredCodec,
 }) {
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer,
-          Pointer, Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
+      Void Function(
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer,
+          Pointer),
       void Function(
+          Pointer,
           Pointer,
           Pointer,
           Pointer,
@@ -54,5 +70,6 @@ void registerFunction(
     addSendingEncodings,
     getSendParameters,
     setSendParameters,
+    setPreferredCodec,
   );
 }

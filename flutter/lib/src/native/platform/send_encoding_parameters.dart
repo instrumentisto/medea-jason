@@ -15,12 +15,13 @@ void registerFunctions(DynamicLibrary dl) {
     setActive: Pointer.fromFunction(_setActive),
     setMaxBitrate: Pointer.fromFunction(_setMaxBitrate),
     setScaleResolutionDownBy: Pointer.fromFunction(_setScaleResolutionDownBy),
+    setScalabilityMode: Pointer.fromFunction(_setScalabilityMode),
   );
 }
 
 /// Creates a new [SendEncodingParameters].
 Object _newSendEncodingParameters(Pointer<Utf8> rid, bool active) {
-  return SendEncodingParameters(rid.nativeStringToDartString(), active);
+  return SendEncodingParameters.create(rid.nativeStringToDartString(), active);
 }
 
 /// Returns [SendEncodingParameters.rid].
@@ -42,4 +43,9 @@ void _setMaxBitrate(SendEncodingParameters encoding, int maxBitrate) {
 void _setScaleResolutionDownBy(
     SendEncodingParameters encoding, int scaleResolutionDownBy) {
   encoding.scaleResolutionDownBy = scaleResolutionDownBy.toDouble();
+}
+
+void _setScalabilityMode(
+    SendEncodingParameters encoding, Pointer<Utf8> scalabilityMode) {
+  encoding.scalabilityMode = scalabilityMode.nativeStringToDartString();
 }

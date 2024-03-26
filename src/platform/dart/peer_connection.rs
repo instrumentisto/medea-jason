@@ -7,7 +7,7 @@ use std::future::Future;
 use derive_more::Display;
 use medea_client_api_proto::{
     EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
-    SvcSetting,
+    ScalabilityMode, SvcSetting,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -30,6 +30,7 @@ use crate::{
 };
 
 use super::{
+    codec_capability::CodecCapability,
     ice_candidate::{
         IceCandidate as PlatformIceCandidate,
         IceCandidateError as PlatformIceCandidateError,
@@ -513,13 +514,51 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        encodings: Vec<EncodingParameters>,
+        mut encodings: Vec<EncodingParameters>,
         svc: Vec<SvcSetting>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let handle = self.handle.get();
+        let mut target_codec = None;
         async move {
             let fut = unsafe {
                 let init = TransceiverInit::new(direction);
+
+                let codecs = CodecCapability::get_sender_codec_capabilities(
+                    MediaKind::Video,
+                )
+                .await;
+
+                let mut target_scalability_mode = ScalabilityMode::L1T1;
+
+                if let (false, Ok(codecs)) = (svc.is_empty(), codecs) {
+                    for svc_setting in svc {
+                        let res = codecs.iter().find(|codec| {
+                            codec.mime_type()
+                                == format!(
+                                    "video/{}",
+                                    svc_setting.codec.to_string()
+                                )
+                        });
+
+                        if res.is_some() {
+                            target_codec = res.cloned();
+                            target_scalability_mode =
+                                svc_setting.scalability_mode;
+
+                            break;
+                        }
+                    }
+                }
+
+                if encodings.is_empty() && target_codec.is_some() {
+                    encodings.push(EncodingParameters {
+                        rid: "0".to_owned(),
+                        active: true,
+                        max_bitrate: None,
+                        scale_resolution_down_by: None,
+                    });
+                }
+
                 for encoding in encodings {
                     let enc = SendEncodingParameters::new(
                         encoding.rid,
@@ -535,6 +574,9 @@ impl RtcPeerConnection {
                             scale_resolution_down_by.into(),
                         );
                     }
+
+                    enc.set_scalability_mode(target_scalability_mode);
+
                     init.add_sending_encodings(enc);
                 }
                 peer_connection::add_transceiver(
@@ -545,7 +587,13 @@ impl RtcPeerConnection {
             };
             let trnsvr: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            Transceiver::from(trnsvr)
+            let tr = Transceiver::from(trnsvr);
+
+            if let Some(codec) = target_codec {
+                tr.set_preferred_codec(codec);
+            }
+
+            tr
         }
     }
 

@@ -12,11 +12,11 @@ void registerFunctions(DynamicLibrary dl) {
 
 /// Returns [SendEncodingParameters] from this [RtpParameters].
 Object _encodings(RtpParameters parameters) {
-  return () => parameters.encodings();
+  return () => parameters.encodings;
 }
 
 /// Sets [SendEncodingParameters] into this [RtpParameters].
 Object _setEncodings(
     RtpParameters parameters, SendEncodingParameters encoding) {
-  return () => parameters.setEncodings(encoding);
+  return () => parameters.encodings.add(encoding);
 }

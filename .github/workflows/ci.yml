@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-  MEDEA_BRANCH: sfu-new-con-196
+  MEDEA_TAG: edge
   PROTOC_VER: 23.x
   RUST_BACKTRACE: 1
 
@@ -289,30 +289,30 @@ jobs:
 
       - name: Pull edge Medea Docker image
         run: docker pull hub.instrumentisto.com/streaming/medea:edge
-        if: ${{ env.MEDEA_BRANCH == 'edge' }}
+        if: ${{ env.MEDEA_TAG == 'edge' }}
       - name: Pull review Medea Docker image
-        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_BRANCH }}
-        if: ${{ env.MEDEA_BRANCH != 'edge' }}
+        run: docker pull hub.instrumentisto.com/streaming/medea/review:${{ env.MEDEA_TAG }}
+        if: ${{ env.MEDEA_TAG != 'edge' }}
 
       - name: Chrome (P2P mesh)
         run: make test.e2e browser=chrome sfu=no
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
       - name: Chrome (SFU)
         run: make test.e2e browser=chrome sfu=yes
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
       - name: Firefox (P2P mesh)
         run: make test.e2e browser=firefox sfu=no
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
       - name: Firefox (SFU)
         run: make test.e2e browser=firefox sfu=yes
                            up=yes debug=no dockerized=yes
-                           medea-tag=${{ env.MEDEA_BRANCH }}
+                           medea-tag=${{ env.MEDEA_TAG }}
                            control-tag=build-${{ github.run_number }}
 
   test-e2e-native:
@@ -388,7 +388,7 @@ jobs:
                               && steps.simulator.outputs.udid)
                           ||     matrix.platform }}
                   up=yes debug=no dockerized=yes
-                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  medea-tag=${{ env.MEDEA_TAG }}
                   control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
@@ -400,7 +400,7 @@ jobs:
                               && steps.simulator.outputs.udid)
                           ||     matrix.platform }}
                   up=yes debug=no dockerized=yes
-                  medea-tag=${{ env.MEDEA_BRANCH }}
+                  medea-tag=${{ env.MEDEA_TAG }}
                   control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
@@ -921,7 +921,7 @@ jobs:
              && startsWith(github.ref, 'refs/tags/medea-') }}
       - name: Prepare final image tags
         id: tags
-        uses: bluwy/substitute-string-action@v2
+        uses: bluwy/substitute-string-action@v3
         with:
           _input-text: ${{ (startsWith(github.ref, 'refs/tags/medea-')
                             && 'latest,@versions')
@@ -930,7 +930,7 @@ jobs:
         if: ${{ steps.skip.outputs.no == 'true' }}
       - name: Prepare real image name
         id: image
-        uses: bluwy/substitute-string-action@v2
+        uses: bluwy/substitute-string-action@v3
         with:
           _input-text: ${{ matrix.image }}
           -edge: ""

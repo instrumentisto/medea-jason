@@ -51,7 +51,7 @@ impl<'a, T> Processed<'a, T> {
     }
 }
 
-impl<'a, T> Future for Processed<'a, T> {
+impl<T> Future for Processed<'_, T> {
     type Output = T;
 
     fn poll(
@@ -68,7 +68,7 @@ impl<'a, T> From<Processed<'a, T>> for Factory<'a, T> {
     }
 }
 
-impl<'a, T> fmt::Debug for Processed<'a, T> {
+impl<T> fmt::Debug for Processed<'_, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Processed").finish_non_exhaustive()
     }
@@ -107,13 +107,13 @@ impl<'a, T> AllProcessed<'a, T> {
     }
 }
 
-impl<'a, T> fmt::Debug for AllProcessed<'a, T> {
+impl<T> fmt::Debug for AllProcessed<'_, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("AllProcessed").finish_non_exhaustive()
     }
 }
 
-impl<'a, T> Future for AllProcessed<'a, T> {
+impl<T> Future for AllProcessed<'_, T> {
     type Output = T;
 
     fn poll(

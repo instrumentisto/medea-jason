@@ -34,7 +34,7 @@ pub trait NonNullDartValueArgExt<T> {
 
 impl<T> NonNullDartValueArgExt<T> for ptr::NonNull<T> {
     unsafe fn unbox(&self) -> T {
-        *Box::from_raw(self.as_ptr())
+        unsafe { *Box::from_raw(self.as_ptr()) }
     }
 }
 

@@ -11,15 +11,16 @@ use medea_macro::dart_bridge;
 
 use crate::{
     media::track::local,
-    platform,
     platform::{
+        self,
         dart::utils::{dart_future::FutureFromDart, handle::DartHandle},
         TransceiverDirection,
     },
 };
 
 use super::{
-    parameters::Parameters, send_encoding_parameters::SendEncodingParameters,
+    codec_capability::CodecCapability, parameters::Parameters,
+    send_encoding_parameters::SendEncodingParameters,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
@@ -83,6 +84,11 @@ mod transceiver {
             transceiver: Dart_Handle,
             parameters: Dart_Handle,
         ) -> Dart_Handle;
+
+        pub fn set_preferred_codec(
+            transceiver: Dart_Handle,
+            codec_capability: Dart_Handle,
+        );
     }
 }
 
@@ -228,6 +234,15 @@ impl Transceiver {
 
             Ok(())
         }
+    }
+
+    /// Asd
+    pub fn set_preferred_codec(&self, preferred_codec: CodecCapability) {
+        let handle = self.0.get();
+        let codec_handle = preferred_codec.handle();
+        unsafe {
+            transceiver::set_preferred_codec(handle, codec_handle);
+        };
     }
 
     /// Updates parameters of encoding for underlying `sender`.

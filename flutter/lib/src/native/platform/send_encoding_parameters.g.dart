@@ -1,7 +1,5 @@
 import 'dart:ffi';
-
 import 'package:ffi/ffi.dart';
-
 import 'package:medea_jason/src/native/ffi/foreign_value.dart';
 
 void registerFunction(
@@ -13,15 +11,18 @@ void registerFunction(
   required Pointer<NativeFunction<Void Function(Handle, Int64)>> setMaxBitrate,
   required Pointer<NativeFunction<Void Function(Handle, Int64)>>
       setScaleResolutionDownBy,
+  required Pointer<NativeFunction<Void Function(Handle, Pointer<Utf8>)>>
+      setScalabilityMode,
 }) {
   dl.lookupFunction<
-      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer),
-      void Function(Pointer, Pointer, Pointer, Pointer,
+      Void Function(Pointer, Pointer, Pointer, Pointer, Pointer, Pointer),
+      void Function(Pointer, Pointer, Pointer, Pointer, Pointer,
           Pointer)>('register_send_encoding_parameters')(
     newSendEncodingParameters,
     getRid,
     setActive,
     setMaxBitrate,
     setScaleResolutionDownBy,
+    setScalabilityMode,
   );
 }

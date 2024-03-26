@@ -55,7 +55,7 @@ pub unsafe extern "C" fn FutureFromDart__resolve_ok(
     val: DartValue,
 ) {
     propagate_panic(move || {
-        let future = Box::from_raw(future.as_ptr());
+        let future = unsafe { Box::from_raw(future.as_ptr()) };
         future.resolve_ok(val);
     });
 }
@@ -74,8 +74,8 @@ pub unsafe extern "C" fn FutureFromDart__resolve_err(
     val: Dart_Handle,
 ) {
     propagate_panic(move || {
-        let future = Box::from_raw(future.as_ptr());
-        future.resolve_err(Error::from_handle(val));
+        let future = unsafe { Box::from_raw(future.as_ptr()) };
+        future.resolve_err(unsafe { Error::from_handle(val) });
     });
 }
 
@@ -116,7 +116,7 @@ impl FutureFromDart {
         <DartValueArg<T> as TryInto<T>>::Error: fmt::Debug,
         T: 'static,
     {
-        let dart_fut = DartHandle::new(dart_fut);
+        let dart_fut = unsafe { DartHandle::new(dart_fut) };
         let (tx, rx) = oneshot::channel();
         let this = Self(Box::new(|res| {
             drop(tx.send(
@@ -124,10 +124,12 @@ impl FutureFromDart {
             ));
         }));
 
-        future_from_dart::complete_proxy(
-            dart_fut.get(),
-            ptr::NonNull::from(Box::leak(Box::new(this))),
-        );
+        unsafe {
+            future_from_dart::complete_proxy(
+                dart_fut.get(),
+                ptr::NonNull::from(Box::leak(Box::new(this))),
+            );
+        }
 
         async move { rx.await.unwrap() }
     }
@@ -155,7 +157,7 @@ impl FutureFromDart {
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct DartFuture<O>(
-    #[allow(unused_tuple_struct_fields)] Dart_Handle, // read by Dart side
+    #[allow(dead_code)] Dart_Handle, // read by Dart side
     PhantomData<*const O>,
 );
 
@@ -227,10 +229,11 @@ pub mod tests {
     pub unsafe extern "C" fn test__future_from_dart__int(
         future: Dart_Handle,
     ) -> DartFuture<Result<i64, FormatException>> {
-        let future = DartHandle::new(future);
+        let future = unsafe { DartHandle::new(future) };
         async move {
-            let val =
-                FutureFromDart::execute::<i64>(future.get()).await.unwrap();
+            let val = unsafe { FutureFromDart::execute::<i64>(future.get()) }
+                .await
+                .unwrap();
             Ok(val)
         }
         .into_dart_future()
@@ -240,11 +243,12 @@ pub mod tests {
     pub unsafe extern "C" fn test__future_from_dart__string(
         future: Dart_Handle,
     ) -> DartFuture<Result<String, FormatException>> {
-        let future = DartHandle::new(future);
+        let future = unsafe { DartHandle::new(future) };
         async move {
-            let val = FutureFromDart::execute::<String>(future.get())
-                .await
-                .unwrap();
+            let val =
+                unsafe { FutureFromDart::execute::<String>(future.get()) }
+                    .await
+                    .unwrap();
             Ok(val)
         }
         .into_dart_future()
@@ -259,19 +263,22 @@ pub mod tests {
     pub unsafe extern "C" fn register__test__future_from_dart_handle_fn(
         f: TestFutureHandleFunction,
     ) {
-        TEST_FUTURE_HANDLE_FUNCTION = Some(f);
+        unsafe {
+            TEST_FUTURE_HANDLE_FUNCTION = Some(f);
+        }
     }
 
     #[no_mangle]
     pub unsafe extern "C" fn test__future_from_dart__handle(
         future: Dart_Handle,
     ) -> DartFuture<Result<(), FormatException>> {
-        let future = DartHandle::new(future);
+        let future = unsafe { DartHandle::new(future) };
         async move {
-            let val = FutureFromDart::execute::<DartHandle>(future.get())
-                .await
-                .unwrap();
-            (TEST_FUTURE_HANDLE_FUNCTION.unwrap())(val.get());
+            let val =
+                unsafe { FutureFromDart::execute::<DartHandle>(future.get()) }
+                    .await
+                    .unwrap();
+            (unsafe { TEST_FUTURE_HANDLE_FUNCTION.unwrap() })(val.get());
             Ok(())
         }
         .into_dart_future()
@@ -281,9 +288,10 @@ pub mod tests {
     pub unsafe extern "C" fn test__future_from_dart__fails(
         future: Dart_Handle,
     ) -> DartFuture<Result<i64, FormatException>> {
-        let future = DartHandle::new(future);
+        let future = unsafe { DartHandle::new(future) };
         async move {
-            let val = FutureFromDart::execute::<i64>(future.get()).await;
+            let val =
+                unsafe { FutureFromDart::execute::<i64>(future.get()) }.await;
             Ok(val.is_err().into())
         }
         .into_dart_future()

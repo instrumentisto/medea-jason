@@ -647,7 +647,7 @@ impl RtcPeerConnection {
             let mut init = RtcRtpTransceiverInit::new();
             _ = init.direction(direction.into());
 
-            let capabs =
+            let codecs =
                 RtcRtpSender::get_capabilities("video").and_then(|capabs| {
                     Reflect::get(&capabs, &JsString::from("codecs")).ok()
                 });
@@ -655,9 +655,9 @@ impl RtcPeerConnection {
             let mut target_codec = None;
             let mut target_scalability_mode = ScalabilityMode::L1T1;
 
-            if let (false, Some(capabs)) = (svc.is_empty(), capabs) {
+            if let (false, Some(codecs)) = (svc.is_empty(), codecs) {
                 for svc_setting in svc {
-                    let res = Array::from(&capabs).iter().find(|codec| {
+                    let res = Array::from(&codecs).iter().find(|codec| {
                         Reflect::get(codec, &JsString::from("mimeType"))
                             .ok()
                             .and_then(|a| a.as_string())

@@ -22,6 +22,7 @@ void registerFunctions(DynamicLibrary dl) {
     addSendingEncodings: Pointer.fromFunction(_addSendingEncodings),
     getSendParameters: Pointer.fromFunction(_getSendParameters),
     setSendParameters: Pointer.fromFunction(_setSendParameters),
+    setPreferredCodec: Pointer.fromFunction(_setPreferredCodec),
   );
 }
 
@@ -105,4 +106,9 @@ Object _getSendParameters(RtpTransceiver transceiver) {
 Object _setSendParameters(
     RtpTransceiver transceiver, RtpParameters parameters) {
   return () => transceiver.sender.setParameters(parameters);
+}
+
+void _setPreferredCodec(
+    RtpTransceiver transceiver, RtpCodecCapability codecCapability) {
+  transceiver.setCodecPreferences(List.from([codecCapability]));
 }

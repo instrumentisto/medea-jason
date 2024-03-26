@@ -3,6 +3,7 @@
 //! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
 use dart_sys::_Dart_Handle;
+use medea_client_api_proto::ScalabilityMode;
 use medea_macro::dart_bridge;
 
 use crate::platform::dart::utils::handle::DartHandle;
@@ -38,6 +39,11 @@ mod send_encoding_parameters {
         pub fn set_scale_resolution_down_by(
             encoding: Dart_Handle,
             scale_resolution_down_by: i64,
+        );
+
+        pub fn set_scalability_mode(
+            encoding: Dart_Handle,
+            scalability_mode: ptr::NonNull<c_char>,
         );
     }
 }
@@ -104,6 +110,17 @@ impl SendEncodingParameters {
             send_encoding_parameters::set_scale_resolution_down_by(
                 handle,
                 scale_resolution_down_by,
+            );
+        };
+    }
+
+    /// Asd
+    pub fn set_scalability_mode(&self, scalability_mode: ScalabilityMode) {
+        let handle = self.0.get();
+        unsafe {
+            send_encoding_parameters::set_scalability_mode(
+                handle,
+                string_into_c_str(scalability_mode.to_string()),
             );
         };
     }
