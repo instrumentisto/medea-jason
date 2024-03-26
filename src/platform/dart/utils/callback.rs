@@ -47,7 +47,7 @@ pub unsafe extern "C" fn Callback__call_two_arg(
     first: DartValue,
     second: DartValue,
 ) {
-    propagate_panic(move || match &mut cb.as_mut().0 {
+    propagate_panic(move || match &mut unsafe { cb.as_mut() }.0 {
         Kind::TwoArgFnMut(func) => (func)(first, second),
         Kind::FnOnce(_) | Kind::FnMut(_) | Kind::Fn(_) => unreachable!(),
     });
@@ -65,13 +65,13 @@ pub unsafe extern "C" fn Callback__call(
     val: DartValue,
 ) {
     propagate_panic(move || {
-        if matches!(cb.as_ref().0, Kind::FnOnce(_)) {
-            let cb = Box::from_raw(cb.as_ptr());
+        if matches!(unsafe { cb.as_ref() }.0, Kind::FnOnce(_)) {
+            let cb = unsafe { Box::from_raw(cb.as_ptr()) };
             if let Kind::FnOnce(func) = cb.0 {
                 (func)(val);
             }
         } else {
-            match &mut cb.as_mut().0 {
+            match &mut unsafe { cb.as_mut() }.0 {
                 Kind::FnMut(func) => {
                     (func)(val);
                 }
@@ -291,14 +291,16 @@ pub mod tests {
     pub unsafe extern "C" fn register__test__test_callback_handle_function(
         f: TestCallbackHandleFunction,
     ) {
-        TEST_CALLBACK_HANDLE_FUNCTION = Some(f);
+        unsafe {
+            TEST_CALLBACK_HANDLE_FUNCTION = Some(f);
+        }
     }
 
     #[no_mangle]
     pub unsafe extern "C" fn test_callback_listener_dart_handle() -> Dart_Handle
     {
         Callback::from_once(move |val: Dart_Handle| {
-            (TEST_CALLBACK_HANDLE_FUNCTION.unwrap())(val);
+            (unsafe { TEST_CALLBACK_HANDLE_FUNCTION.unwrap() })(val);
         })
         .into_dart()
     }

@@ -161,10 +161,8 @@ impl<'a> WebDriverClientBuilder<'a> {
     }
 
     /// Sets manually provided browser [`Capabilities`].
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
-    pub fn capabilities(
+    pub const fn capabilities(
         self,
         capabilities: Capabilities,
     ) -> WebDriverClientBuilder<'a, Capabilities> {
@@ -189,7 +187,7 @@ impl<'a> WebDriverClientBuilder<'a> {
     }
 }
 
-impl<'a, Caps: Into<Capabilities>> WebDriverClientBuilder<'a, Caps> {
+impl<Caps: Into<Capabilities>> WebDriverClientBuilder<'_, Caps> {
     /// Creates a new [`WebDriverClient`] connected to a [WebDriver].
     ///
     /// # Errors

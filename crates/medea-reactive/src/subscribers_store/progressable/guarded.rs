@@ -24,8 +24,6 @@ impl<T> Guarded<T> {
     }
 
     /// Unwraps this [`Guarded`] into its inner value and its [`Guard`].
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn into_parts(self) -> (T, Guard) {
         (self.value, self.guard)
@@ -33,8 +31,6 @@ impl<T> Guarded<T> {
 
     /// Unwraps this [`Guarded`] into its inner value dropping its [`Guard`]
     /// in-place.
-    // false positive: destructors cannot be evaluated at compile-time
-    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn into_inner(self) -> T {
         self.value
