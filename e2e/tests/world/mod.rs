@@ -204,6 +204,8 @@ impl World {
                     )),
                     on_join: Some("grpc://127.0.0.1:9099".to_owned()),
                     on_leave: Some("grpc://127.0.0.1:9099".to_owned()),
+                    on_start: Some("grpc://127.0.0.1:9099".to_owned()),
+                    on_stop: Some("grpc://127.0.0.1:9099".to_owned()),
                     idle_timeout: None,
                     reconnect_timeout: None,
                     ping_interval: None,
