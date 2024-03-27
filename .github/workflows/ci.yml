@@ -500,10 +500,9 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
-          target: google_apis
           arch: x86_64
           profile: pixel_2
-          avd-name: "min"
+          force-avd-creation: true
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
@@ -511,10 +510,9 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
-          target: google_apis
           arch: x86_64
           profile: pixel_2
-          avd-name: "target"
+          force-avd-creation: true
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
 
