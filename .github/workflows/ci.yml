@@ -325,12 +325,20 @@ jobs:
         platform:
           - ios
           - linux
+          - android
           # TODO: Re-enable once fixed stability on CI
           #- macos
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-12')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
     steps:
+      - name: Enable KVM for Android HW acceleration
+        if: ${{ matrix.platform == 'android' }}
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -351,6 +359,15 @@ jobs:
                        ninja-build pkg-config xvfb
         if: ${{ matrix.platform == 'linux' }}
 
+      - name: Parse Android API versions
+        id: api-version
+        run: |
+          echo "min=$(make flutter.android.version.min)" \
+          >> $GITHUB_OUTPUT
+          echo "target=$(make flutter.android.version.compile)" \
+          >> $GITHUB_OUTPUT
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Start iOS simulator
         id: simulator
         uses: futureware-tech/simulator-action@v3
@@ -363,7 +380,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-jason-${{ matrix.platform }}
-          path: ./flutter/${{ matrix.platform }}/lib/
+          path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
+            || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
+            || (matrix.platform == 'linux' &&   './flutter/linux/lib/')
+            || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
+            || (matrix.platform == 'windows' && './flutter/windows/lib/')
+            ||                                  './flutter/assets/pkg/' }}
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v4
@@ -379,6 +401,17 @@ jobs:
           registry: hub.instrumentisto.com
           username: ${{ secrets.MEDEA_DOCKER_USER }}
           password: ${{ secrets.MEDEA_DOCKER_PASS }}
+
+      - name: P2P mesh on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.target }}
+          target: google_apis
+          arch: x86_64
+          cores: 3
+          profile: pixel_2
+          script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_TAG }} control-tag=build-${{ github.run_number }} server=10.0.2.2
+        if: ${{ matrix.platform == 'android' }}
 
       - name: P2P mesh
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
@@ -415,10 +448,17 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (matrix.platform == 'linux' &&   'ubuntu-22.04')
-              || (matrix.platform == 'windows' && 'windows-latest')
-              ||                                  'macos-13' }}
+    runs-on: ${{ (contains('linux android', matrix.platform) && 'ubuntu-22.04')
+              || (matrix.platform == 'windows'               && 'windows-latest')
+              ||                                                'macos-13' }}
     steps:
+      - name: Enable KVM for Android HW acceleration
+        if: ${{ matrix.platform == 'android' }}
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -452,6 +492,14 @@ jobs:
                                          && 'targets=x86_64')
                                      ||     '' }}
 
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          swap-storage: false
+        if: ${{ matrix.platform == 'android' }}
+
       - name: Parse Android API versions
         id: api-version
         run: |
@@ -460,23 +508,21 @@ jobs:
           echo "target=$(make flutter.android.version.compile)" \
           >> $GITHUB_OUTPUT
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on min Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.min }}
-          target: google_apis
           arch: x86_64
-          cores: 3
           profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
+
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
-          target: google_apis
           arch: x86_64
-          cores: 3
           profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}

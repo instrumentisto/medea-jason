@@ -2,12 +2,14 @@ Feature: Media enabling/disabling
 
   Scenario: Member disables video during call
     Given room with joined members Alice and Bob
+    Then Alice's device video remote track from Bob is enabled
     When Bob disables video and awaits it completes
     Then Alice's device video remote track from Bob is disabled
     And Alice's audio remote track from Bob is enabled
 
   Scenario: Member disables audio during call
     Given room with joined members Alice and Bob
+    Then Alice's audio remote track from Bob is enabled
     When Bob disables audio and awaits it completes
     Then Alice's audio remote track from Bob is disabled
     And Alice's device video remote track from Bob is enabled
@@ -16,15 +18,15 @@ Feature: Media enabling/disabling
     Given room with joined member Alice
     And member Bob with disabled video publishing
     When Bob joins the room
-    Then Alice doesn't have live device video remote track from Bob
-    And Alice's audio remote track from Bob is enabled
+    Then Alice's audio remote track from Bob is enabled
+    And Alice doesn't have live device video remote track from Bob
 
   Scenario: Member disables audio before call
     Given room with joined member Alice
     And member Bob with disabled audio publishing
     When Bob joins the room
-    Then Alice doesn't have live audio remote track from Bob
-    And Alice's device video remote track from Bob is enabled
+    Then Alice's device video remote track from Bob is enabled
+    And Alice doesn't have live audio remote track from Bob
 
   Scenario: Member enables audio during call
     Given room with joined member Alice
@@ -32,6 +34,7 @@ Feature: Media enabling/disabling
     When Bob joins the room
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
+    And Alice's device video remote track from Bob is enabled
     And Alice doesn't have live audio remote track from Bob
     When Bob enables audio and awaits it completes
     Then Alice's audio remote track from Bob is enabled
@@ -42,6 +45,7 @@ Feature: Media enabling/disabling
     When Bob joins the room
     Then Alice receives connection with Bob
     And Bob receives connection with Alice
+    And Alice's audio remote track from Bob is enabled
     And Alice doesn't have live device video remote track from Bob
     When Bob enables video and awaits it completes
     Then Alice's device video remote track from Bob is enabled
