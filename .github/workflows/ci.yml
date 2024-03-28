@@ -380,7 +380,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-jason-${{ matrix.platform }}
-          path: ./flutter/${{ matrix.platform }}/lib/
+          path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
+            || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
+            || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
+            || (matrix.platform == 'windows' && './flutter/windows/lib/')
+            ||                                  './flutter/assets/pkg/' }}
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v4

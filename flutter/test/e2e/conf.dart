@@ -1,5 +1,3 @@
-import 'dart:io';
-
 /// Base address of a servers/clients.
 /// Use `10.0.2.2` for windows test in VM.
 ///
