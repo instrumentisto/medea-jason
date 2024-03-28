@@ -550,7 +550,6 @@ jobs:
           - macos
           - web
           - windows
-          - linux
     runs-on: ${{ (contains('ios macos', matrix.platform) && 'macos-latest')
               || (matrix.platform == 'windows' &&           'windows-latest')
               ||                                            'ubuntu-latest' }}
@@ -586,7 +585,6 @@ jobs:
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
                  || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
                  || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
-                 || (matrix.platform == 'linux' &&   './flutter/linux/lib/')
                  || (matrix.platform == 'windows' && './flutter/windows/lib/')
                  ||                                  './flutter/assets/pkg/' }}
 
