@@ -402,15 +402,28 @@ jobs:
           username: ${{ secrets.MEDEA_DOCKER_USER }}
           password: ${{ secrets.MEDEA_DOCKER_PASS }}
 
-      - name: P2P mesh on Android
+      - name: P2P mesh (Android)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
-          target: google_apis
           arch: x86_64
-          cores: 3
           profile: pixel_2
-          script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_TAG }} control-tag=build-${{ github.run_number }} server=10.0.2.2
+          script: |
+            make test.e2e.native sfu=no up=yes debug=no dockerized=yes \
+                 medea-tag=${{ env.MEDEA_TAG }} \
+                 control-tag=build-${{ github.run_number }} server=10.0.2.2
+        if: ${{ matrix.platform == 'android' }}
+
+      - name: SFU (Android)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.target }}
+          arch: x86_64
+          profile: pixel_2
+          script: |
+            make test.e2e.native sfu=yes up=yes debug=no dockerized=yes \
+                 medea-tag=${{ env.MEDEA_TAG }} \
+                 control-tag=build-${{ github.run_number }} server=10.0.2.2
         if: ${{ matrix.platform == 'android' }}
 
       - name: P2P mesh
@@ -425,6 +438,8 @@ jobs:
                   control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
+        if: ${{ matrix.platform != 'android' }}
+
       - name: SFU
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
@@ -437,6 +452,7 @@ jobs:
                   control-tag=build-${{ github.run_number }}
              ${{ (matrix.platform == 'ios' && 'server=127.0.0.1 background=yes')
               ||                              '' }}
+        if: ${{ matrix.platform != 'android' }}
 
   test-flutter:
     name: test (medea-jason, ${{ matrix.platform }})
