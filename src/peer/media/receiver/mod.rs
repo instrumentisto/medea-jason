@@ -314,6 +314,10 @@ impl Receiver {
         if !self.is_receiving().await {
             return;
         }
+        // Re-check since state might have changed during await.
+        if self.is_track_notified.get() {
+            return;
+        }
         if let Some(track) = self.track.borrow().as_ref() {
             drop(self.peer_events_sender.unbounded_send(
                 PeerEvent::NewRemoteTrack {
