@@ -3040,14 +3040,14 @@ mod state_synchronization {
                 }
             }
 
-            // StateSynchronized with local_sdp = None means to start new
-            // negotiation
+            // `StateSynchronized` with `local_sdp = None` means to start new
+            // negotiation.
             let state = {
                 let mut room_proto = room.peers_state().as_proto();
 
                 let peer = room_proto.peers.get_mut(&PeerId(1)).unwrap();
 
-                // local_sdp = None means that new negotiation is scheduled
+                // `local_sdp = None` means that new negotiation is scheduled.
                 peer.local_sdp = None;
                 peer.remote_sdp = None;
                 peer.negotiation_role = Some(NegotiationRole::Offerer);

@@ -316,7 +316,7 @@ impl Receiver {
         if !self.is_receiving().await {
             return;
         }
-        // Re-check since state might have changed during await.
+        // Re-check since state might have changed during `.await`.
         if self.is_track_notified.get() {
             return;
         }

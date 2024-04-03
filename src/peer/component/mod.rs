@@ -32,7 +32,6 @@ use self::{
     tracks_repository::TracksRepository,
 };
 
-#[doc(inline)]
 pub use local_sdp::DESCRIPTION_APPROVE_TIMEOUT;
 
 /// Synchronization state of a [`Component`].
