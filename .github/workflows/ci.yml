@@ -409,7 +409,10 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
           profile: pixel_2
-          script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_TAG }} control-tag=build-${{ github.run_number }} server=10.0.2.2
+          script: |
+            make test.e2e.native sfu=no up=yes debug=no dockerized=yes \
+              medea-tag=${{ env.MEDEA_TAG }} \
+              control-tag=build-${{ github.run_number }} server=10.0.2.2
         if: ${{ matrix.platform == 'android' }}
 
       - name: SFU (Android)
@@ -418,7 +421,10 @@ jobs:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
           profile: pixel_2
-          script: make test.e2e.native sfu=yes up=yes debug=no dockerized=yes medea-tag=${{ env.MEDEA_TAG }} control-tag=build-${{ github.run_number }} server=10.0.2.2
+          script: |
+            make test.e2e.native sfu=yes up=yes debug=no dockerized=yes \
+              medea-tag=${{ env.MEDEA_TAG }} \
+              control-tag=build-${{ github.run_number }} server=10.0.2.2
         if: ${{ matrix.platform == 'android' }}
 
       - name: P2P mesh
