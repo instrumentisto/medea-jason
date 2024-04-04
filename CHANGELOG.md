@@ -25,10 +25,14 @@ All user visible changes to this project will be documented in this file. This p
 ### Fixed
 
 - Screen sharing in Firefox ([#135]).
+- State synchronization during initial negotiation in P2P mesh mode ([#162]).
+- `ConnectionHandle.on_remote_track_added` callback might be called twice for the same track ([#162]).
+- `RemoteMediaTrack.on_media_direction_changed` callback might not be called on direction update ([#162]).
 
 [#135]: /../../pull/135
 [#138]: /../../pull/138
 [#151]: /../../pull/151
+[#162]: /../../pull/162
 
 
 
