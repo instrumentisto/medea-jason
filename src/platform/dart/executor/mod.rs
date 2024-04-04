@@ -35,7 +35,9 @@ static mut WAKE_PORT: Option<Dart_Port> = None;
 /// Must ONLY be called by Dart during FFI initialization.
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
-    WAKE_PORT = Some(wake_port);
+    unsafe {
+        WAKE_PORT = Some(wake_port);
+    }
 }
 
 /// Polls the provided [`Task`].
@@ -46,7 +48,7 @@ pub unsafe extern "C" fn rust_executor_init(wake_port: Dart_Port) {
 #[no_mangle]
 pub unsafe extern "C" fn rust_executor_poll_task(task: ptr::NonNull<Task>) {
     propagate_panic(move || {
-        _ = Rc::from_raw(task.as_ptr()).poll();
+        _ = unsafe { Rc::from_raw(task.as_ptr()).poll() };
     });
 }
 
