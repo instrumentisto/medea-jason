@@ -1133,7 +1133,7 @@ Future controlApiCreateEndpointDialog(BuildContext context, Call call) {
                           .createPlayEndpoint(roomId, memberId, endpoint);
                     } else {
                       var endpoint =
-                          WebRtcPublishEndpoint(endpointId, P2pMode.Always);
+                          WebRtcPublishEndpoint(endpointId, P2pMode.Never);
                       await call.controlApi
                           .createPublishEndpoint(roomId, memberId, endpoint);
                     }

@@ -37,6 +37,7 @@ void registerFunctions(DynamicLibrary dl) {
 ///
 /// Returns [Future] which will be resolved into created [RtpTransceiver].
 Object _addTransceiver(PeerConnection peer, int kind, RtpTransceiverInit init) {
+  print('add transceiver ######');
   return () => peer.addTransceiver(MediaKind.values[kind], init);
 }
 

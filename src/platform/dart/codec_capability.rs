@@ -25,6 +25,8 @@ mod codec_capability {
 
         pub fn mime_type(codec_capability: Dart_Handle)
             -> ptr::NonNull<c_char>;
+
+        pub fn test();
     }
 }
 
@@ -45,9 +47,13 @@ impl CodecCapability {
         kind: MediaKind,
     ) -> Result<Vec<CodecCapability>, platform::Error> {
         let fut = unsafe {
+            log::error!("hhhhhhhhhhhhhhhhhhh");
+            codec_capability::test();
+            log::error!("vvvvvvvvvvvvvvvvvvv");
             codec_capability::get_sender_codec_capabilities(kind as i64)
         };
 
+        log::error!("pppppppppppp");
         let res: DartHandle =
             unsafe { FutureFromDart::execute(fut) }.await.unwrap();
 
