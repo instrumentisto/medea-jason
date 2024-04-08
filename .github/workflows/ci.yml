@@ -55,7 +55,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          #- android TODO: Re-enable once fixed in `cargo-ndk`.
+          #- android  TODO: Re-enable once fixed in `cargo-ndk`.
           - ios
           - linux
           - macos
@@ -323,8 +323,8 @@ jobs:
       matrix:
         # TODO: Run E2E test on Windows
         platform:
-          - linux
           - android
+          - linux
           # TODO: Re-enable once fixed stability on CI
           #- ios
           #- macos
@@ -334,8 +334,8 @@ jobs:
     steps:
       - name: Enable KVM for Android HW acceleration
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"'\
-              | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+          | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
         if: ${{ matrix.platform == 'android' }}
@@ -382,11 +382,11 @@ jobs:
         with:
           name: build-jason-${{ matrix.platform }}
           path: ${{ (matrix.platform == 'android' && './flutter/android/src/main/jniLibs')
-            || (matrix.platform == 'ios' &&     './flutter/ios/lib/')
-            || (matrix.platform == 'linux' &&   './flutter/linux/lib/')
-            || (matrix.platform == 'macos' &&   './flutter/macos/lib/')
-            || (matrix.platform == 'windows' && './flutter/windows/lib/')
-            ||                                  './flutter/assets/pkg/' }}
+                 || (matrix.platform == 'ios'     && './flutter/ios/lib/')
+                 || (matrix.platform == 'linux'   && './flutter/linux/lib/')
+                 || (matrix.platform == 'macos'   && './flutter/macos/lib/')
+                 || (matrix.platform == 'windows' && './flutter/windows/lib/')
+                 ||                                  './flutter/assets/pkg/' }}
 
       - name: Download `medea-control-api-mock` Docker image
         uses: actions/download-artifact@v4
@@ -403,28 +403,17 @@ jobs:
           username: ${{ secrets.MEDEA_DOCKER_USER }}
           password: ${{ secrets.MEDEA_DOCKER_PASS }}
 
-      - name: P2P mesh (Android)
+      - name: P2P mesh (android)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ steps.api-version.outputs.target }}
           arch: x86_64
           profile: pixel_2
           script: make test.e2e.native sfu=no up=yes debug=no dockerized=yes
-                    medea-tag=${{ env.MEDEA_TAG }}
-                    control-tag=build-${{ github.run_number }} server=10.0.2.2
+                       medea-tag=${{ env.MEDEA_TAG }}
+                       control-tag=build-${{ github.run_number }}
+                       server=10.0.2.2
         if: ${{ matrix.platform == 'android' }}
-
-      - name: SFU (Android)
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ steps.api-version.outputs.target }}
-          arch: x86_64
-          profile: pixel_2
-          script: make test.e2e.native sfu=yes up=yes debug=no dockerized=yes
-                    medea-tag=${{ env.MEDEA_TAG }}
-                    control-tag=build-${{ github.run_number }} server=10.0.2.2
-        if: ${{ matrix.platform == 'android' }}
-
       - name: P2P mesh
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
@@ -439,6 +428,17 @@ jobs:
               ||                              '' }}
         if: ${{ matrix.platform != 'android' }}
 
+      - name: SFU (android)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ steps.api-version.outputs.target }}
+          arch: x86_64
+          profile: pixel_2
+          script: make test.e2e.native sfu=yes up=yes debug=no dockerized=yes
+                       medea-tag=${{ env.MEDEA_TAG }}
+                       control-tag=build-${{ github.run_number }}
+                       server=10.0.2.2
+        if: ${{ matrix.platform == 'android' }}
       - name: SFU
         run: ${{ (matrix.platform == 'linux' && 'xvfb-run -a')
               ||                                '' }}
@@ -463,7 +463,7 @@ jobs:
           - linux
           - macos
           - windows
-    runs-on: ${{ (contains('linux android', matrix.platform) && 'ubuntu-22.04')
+    runs-on: ${{ (contains('android linux', matrix.platform) && 'ubuntu-22.04')
               || (matrix.platform == 'windows'               && 'windows-latest')
               ||                                                'macos-13' }}
     steps:
@@ -476,18 +476,17 @@ jobs:
         if: ${{ env.CACHE == 'true'
              && matrix.platform != 'windows' }}
 
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@1.3.1
         with:
-          tool-cache: false
           android: false
           swap-storage: false
+          tool-cache: false
         if: ${{ matrix.platform == 'android' }}
 
       - name: Enable KVM for Android HW acceleration
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"'\
-              | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+          | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
         if: ${{ matrix.platform == 'android' }}
@@ -533,7 +532,6 @@ jobs:
           profile: pixel_2
           script: make test.flutter
         if: ${{ matrix.platform == 'android' }}
-
       - name: Test on target Android API version
         uses: reactivecircus/android-emulator-runner@v2
         with:
