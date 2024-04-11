@@ -1940,7 +1940,14 @@ impl Drop for InnerRoom {
         if let CloseReason::ByClient { reason, .. } =
             *self.close_reason.borrow()
         {
-            self.rpc.close_with_reason(reason);
+            // Since finalizers might run after isolate has already been shut
+            // down, calling any Dart API functions will cause a segfault. We
+            // schedule finalizer on the Dart executor, so if the isolate is
+            // shutting down, the operation won't run.
+            let rpc = Rc::clone(&self.rpc);
+            platform::spawn(async move {
+                rpc.close_with_reason(reason);
+            });
         };
 
         self.on_close
