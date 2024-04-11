@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
-import 'constraints.dart' as constraints;
 import 'codec_capability.dart' as codec_capability;
+import 'constraints.dart' as constraints;
 import 'ice_candidate.dart' as ice_candidate;
 import 'ice_candidate_error.dart' as ice_candidate_error;
 import 'ice_servers.dart' as ice_servers;

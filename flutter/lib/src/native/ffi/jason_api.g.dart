@@ -5153,14 +5153,6 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _mime_type =
       _mime_typePtr.asFunction<ffi.Pointer<ffi.Char> Function(Object)>();
 
-  void test() {
-    return _test();
-  }
-
-  late final _testPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function()>>('test');
-  late final _test = _testPtr.asFunction<void Function()>();
-
   void rust_executor_init(
     int wake_port,
   ) {

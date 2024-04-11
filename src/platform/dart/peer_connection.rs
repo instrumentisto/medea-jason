@@ -6,8 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
-    ScalabilityMode, SvcSetting,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState, SvcSetting,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -514,65 +513,43 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        mut encodings: Vec<EncodingParameters>,
+        encodings: Vec<EncodingParameters>,
         svc: Vec<SvcSetting>,
     ) -> impl Future<Output = Transceiver> + 'static {
-        log::error!("aaaaaaaaaaaaaaaaaaa");
-        let handle = self.handle.get();
-        // let mut target_codec = None;
+        let handle = self.handle.clone();
+
         async move {
-            let fut = unsafe {
-                let init = TransceiverInit::new(direction);
-                log::error!("qqqqqqqqqqq");
+            let init = TransceiverInit::new(direction);
 
-                let codecs = CodecCapability::get_sender_codec_capabilities(
-                    MediaKind::Video,
-                )
-                .await;
-                log::error!("wwwwwwwwwwwwww");
+            let mut target_scalability_mode = None;
+            let mut target_codec = None;
 
-                let mut target_scalability_mode = ScalabilityMode::L1T1;
+            let codecs =
+                CodecCapability::get_sender_codec_capabilities(kind).await;
 
-                // if let (false, Ok(codecs)) = (svc.is_empty(), codecs) {
-                //     for svc_setting in svc {
-                //         let res = codecs.iter().find(|codec| {
-                //             codec.mime_type()
-                //                 == format!(
-                //                     "video/{}",
-                //                     svc_setting.codec.to_string()
-                //                 )
-                //         });
+            for svc_setting in svc {
+                let res = codecs.iter().find(|codec| {
+                    codec.mime_type()
+                        == format!("video/{}", svc_setting.codec.to_string())
+                });
 
-                //         if res.is_some() {
-                //             target_codec = res.cloned();
-                //             target_scalability_mode =
-                //                 svc_setting.scalability_mode;
+                if res.is_some() {
+                    target_codec = res.cloned();
+                    target_scalability_mode = Some(svc_setting.scalability_mode);
 
-                //             break;
-                //         }
-                //     }
-                // }
+                    break;
+                }
+            }
 
-                // if encodings.is_empty() && target_codec.is_some() {
-                //     encodings.push(EncodingParameters {
-                //         rid: "0".to_owned(),
-                //         active: true,
-                //         max_bitrate: None,
-                //         scale_resolution_down_by: None,
-                //     });
-                // }
-
-                for (i, encoding) in encodings.into_iter().enumerate() {
-                    log::error!("xxxxxx aaa {i:?}");
+            let process_encoding =
+                |encoding: EncodingParameters| {
                     let enc = SendEncodingParameters::new(
                         encoding.rid,
                         encoding.active,
                     );
-                    log::error!("xxxxxx sss {i:?}");
                     if let Some(max_bitrate) = encoding.max_bitrate {
                         enc.set_max_bitrate(max_bitrate.into());
                     }
-                    log::error!("xxxxxx ddd {i:?}");
                     if let Some(scale_resolution_down_by) =
                         encoding.scale_resolution_down_by
                     {
@@ -580,30 +557,42 @@ impl RtcPeerConnection {
                             scale_resolution_down_by.into(),
                         );
                     }
-                    log::error!("xxxxxx fff {i:?}");
-
-                    // enc.set_scalability_mode(target_scalability_mode);
+                    if let Some(target_sm) = target_scalability_mode {
+                        enc.set_scalability_mode(target_sm);
+                    }
 
                     init.add_sending_encodings(enc);
-                    log::error!("xxxxxx ggg {i:?}");
+                };
+
+            if encodings.is_empty() && target_scalability_mode.is_some() {
+                process_encoding(
+                    EncodingParameters {
+                        rid: "0".to_owned(),
+                        active: true,
+                        max_bitrate: None,
+                        scale_resolution_down_by: None,
+                    },
+                );
+            } else {
+                for encoding in encodings {
+                    process_encoding(encoding);
                 }
-                log::error!("eeeeeeeee");
+            };
+
+            let fut = unsafe {
                 peer_connection::add_transceiver(
-                    handle,
+                    handle.get(),
                     kind as i64,
                     init.handle(),
                 )
             };
-            log::error!("bbbbbbbbbbbb");
             let trnsvr: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-                log::error!("ccccccccccc");
             let tr = Transceiver::from(trnsvr);
-            log::error!("ddddddddddddddddd");
 
-            // if let Some(codec) = target_codec {
-            //     tr.set_preferred_codec(codec);
-            // }
+            if let Some(codec) = target_codec {
+                tr.set_preferred_codec(codec);
+            }
 
             tr
         }

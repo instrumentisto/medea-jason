@@ -7,7 +7,7 @@ use medea_macro::dart_bridge;
 
 use crate::{
     media::MediaKind,
-    platform::{self, dart::utils::handle::DartHandle},
+    platform::dart::utils::handle::DartHandle,
 };
 
 use super::utils::{
@@ -25,8 +25,6 @@ mod codec_capability {
 
         pub fn mime_type(codec_capability: Dart_Handle)
             -> ptr::NonNull<c_char>;
-
-        pub fn test();
     }
 }
 
@@ -45,15 +43,11 @@ impl CodecCapability {
     #[must_use]
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
-    ) -> Result<Vec<CodecCapability>, platform::Error> {
+    ) -> Vec<CodecCapability> {
         let fut = unsafe {
-            log::error!("hhhhhhhhhhhhhhhhhhh");
-            codec_capability::test();
-            log::error!("vvvvvvvvvvvvvvvvvvv");
             codec_capability::get_sender_codec_capabilities(kind as i64)
         };
 
-        log::error!("pppppppppppp");
         let res: DartHandle =
             unsafe { FutureFromDart::execute(fut) }.await.unwrap();
 
@@ -62,7 +56,7 @@ impl CodecCapability {
             .map(|capabs: DartHandle| Self::from(capabs))
             .collect();
 
-        Ok(codec_capabilities)
+        codec_capabilities
     }
 
     /// Asd

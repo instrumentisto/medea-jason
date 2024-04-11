@@ -647,13 +647,13 @@ impl RtcPeerConnection {
             let mut init = RtcRtpTransceiverInit::new();
             _ = init.direction(direction.into());
 
+            let mut target_codec = None;
+            let mut target_scalability_mode = None;
+            
             let codecs =
                 RtcRtpSender::get_capabilities("video").and_then(|capabs| {
                     Reflect::get(&capabs, &JsString::from("codecs")).ok()
                 });
-
-            let mut target_codec = None;
-            let mut target_scalability_mode = ScalabilityMode::L1T1;
 
             if let (false, Some(codecs)) = (svc.is_empty(), codecs) {
                 for svc_setting in svc {
@@ -671,25 +671,17 @@ impl RtcPeerConnection {
 
                     if res.is_some() {
                         target_codec = res;
-                        target_scalability_mode = svc_setting.scalability_mode;
+                        target_scalability_mode =
+                            Some(svc_setting.scalability_mode);
 
                         break;
                     }
                 }
             }
 
-            if encodings.is_empty() && target_codec.is_some() {
-                encodings.push(EncodingParameters {
-                    rid: "0".to_owned(),
-                    active: true,
-                    max_bitrate: None,
-                    scale_resolution_down_by: None,
-                });
-            }
-
             let send_encodings = ::js_sys::Array::new();
 
-            for encoding in &encodings {
+            let process_encoding = |encoding: EncodingParameters| {
                 let mut params = RtcRtpEncodingParameters::new();
                 _ = params.rid(&encoding.rid);
                 _ = params.active(encoding.active);
@@ -703,10 +695,25 @@ impl RtcPeerConnection {
                         (*scale_resolution_down_by).into(),
                     );
                 }
-                _ = params
-                    .scalability_mode(&target_scalability_mode.to_string());
+                if let Some(target_sm) = target_scalability_mode {
+                    _ = params
+                        .scalability_mode(&target_sm.to_string());
+                }
 
                 _ = send_encodings.push(&params);
+            };
+
+            if encodings.is_empty() && target_scalability_mode.is_some() {
+                process_encoding(EncodingParameters {
+                    rid: "0".to_owned(),
+                    active: true,
+                    max_bitrate: None,
+                    scale_resolution_down_by: None,
+                });
+            } else {
+                for encoding in encodings {
+                    process_encoding(encoding);
+                }
             }
             _ = init.send_encodings(&send_encodings);
 
