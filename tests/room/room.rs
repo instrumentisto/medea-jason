@@ -3000,7 +3000,6 @@ mod state_synchronization {
                     mids,
                     transceivers_statuses: _,
                 } => {
-                    log::error!("MakeSdpOffer 111");
                     assert_eq!(peer_id, PeerId(1));
                     assert_eq!(mids.len(), 2);
 
@@ -3069,7 +3068,6 @@ mod state_synchronization {
                             mids,
                             transceivers_statuses: _,
                         } => {
-                            log::error!("MakeSdpOffer 222");
                             assert_eq!(peer_id, PeerId(1));
                             assert_eq!(mids.len(), 2);
 
