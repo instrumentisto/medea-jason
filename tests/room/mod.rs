@@ -20,7 +20,7 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use wasm_bindgen_test::*;
 
-use crate::{rpc::RPC_SETTINGS, timeout, yield_now, TEST_ROOM_URL};
+use crate::{delay_for, rpc::RPC_SETTINGS, timeout, yield_now, TEST_ROOM_URL};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
@@ -66,6 +66,7 @@ async fn only_one_strong_rpc_rc_exists() {
 
     assert_eq!(Rc::strong_count(&ws), 3);
     jason.dispose();
+    delay_for(200).await;
     assert_eq!(Rc::strong_count(&ws), 1);
 }
 
