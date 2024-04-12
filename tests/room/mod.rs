@@ -20,7 +20,7 @@ use wasm_bindgen::closure::Closure;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use wasm_bindgen_test::*;
 
-use crate::{rpc::RPC_SETTINGS, timeout, yield_now, TEST_ROOM_URL, delay_for};
+use crate::{delay_for, rpc::RPC_SETTINGS, timeout, yield_now, TEST_ROOM_URL};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
