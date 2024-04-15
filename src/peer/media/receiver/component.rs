@@ -250,7 +250,7 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub fn media_type(&self) -> &MediaType {
+    pub const fn media_type(&self) -> &MediaType {
         &self.media_type
     }
 
