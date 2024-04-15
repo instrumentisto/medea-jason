@@ -94,7 +94,7 @@ impl AsProtoState for State {
             id: self.id,
             connection_mode: self.connection_mode,
             mid: self.mid.clone(),
-            media_type: self.media_type,
+            media_type: self.media_type.clone(),
             sender_id: self.sender_id.clone(),
             muted: false,
             media_direction: self.media_direction().into(),
@@ -198,7 +198,7 @@ impl From<&State> for proto::state::Receiver {
             id: from.id,
             connection_mode: from.connection_mode,
             mid: from.mid.clone(),
-            media_type: from.media_type,
+            media_type: from.media_type.clone(),
             sender_id: from.sender_id.clone(),
             media_direction: from.media_direction().into(),
             muted: false,
@@ -250,8 +250,8 @@ impl State {
 
     /// Returns current [`MediaType`] of this [`State`].
     #[must_use]
-    pub const fn media_type(&self) -> MediaType {
-        self.media_type
+    pub fn media_type(&self) -> &MediaType {
+        &self.media_type
     }
 
     /// Returns current [`MemberId`] of the `Member` from which this

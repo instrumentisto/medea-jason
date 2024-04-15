@@ -118,7 +118,7 @@ impl Sender {
             ));
         }
 
-        let caps = TrackConstraints::from(state.media_type());
+        let caps = TrackConstraints::from(state.media_type().clone());
         let kind = MediaKind::from(&caps);
         let transceiver = match state.mid() {
             // Try to find rcvr transceiver that can be used as sendrecv.

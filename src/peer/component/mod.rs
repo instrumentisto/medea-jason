@@ -378,7 +378,7 @@ impl State {
                     Rc::new(sender::State::new(
                         track.id,
                         mid.clone(),
-                        track.media_type,
+                        track.media_type.clone(),
                         track.media_direction,
                         track.muted,
                         receivers.clone(),
@@ -393,7 +393,7 @@ impl State {
                     Rc::new(receiver::State::new(
                         track.id,
                         mid.clone(),
-                        track.media_type,
+                        track.media_type.clone(),
                         track.media_direction,
                         track.muted,
                         sender.clone(),
