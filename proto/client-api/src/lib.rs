@@ -855,8 +855,8 @@ pub struct TrackPatchEvent {
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
 
-    /// Settings for this [`Track`] encoding.
-    pub encodings: Vec<EncodingParameters>,
+    /// Encoding settings for the [`Track`] which should be patched.
+    pub encodings: Option<Vec<EncodingParameters>>,
 }
 
 /// Media exchange direction of a `Track`.
@@ -909,7 +909,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
-            encodings: Vec::new(),
+            encodings: None,
         }
     }
 }
@@ -923,7 +923,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
-            encodings: Vec::new(),
+            encodings: None,
         }
     }
 
@@ -946,6 +946,10 @@ impl TrackPatchEvent {
 
         if let Some(receivers) = &another.receivers {
             self.receivers = Some(receivers.clone());
+        }
+
+        if let Some(encodings) = &another.encodings {
+            self.encodings = Some(encodings.clone());
         }
     }
 }
@@ -1056,20 +1060,13 @@ pub enum MediaSourceKind {
     Display,
 }
 
-/// [Codec]s used in `Jason`.
+/// [Codec]s supported by Medea and Jason.
 ///
 /// [Codec]: https://bloggeek.me/codec/
 #[derive(
     Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
 )]
 pub enum Codec {
-    // TODO(evdokimovs): I think that this is not needed now:
-    /// [H264] codec.
-    ///
-    /// [H264]: https://bloggeek.me/h-264/
-    #[display(fmt = "H264")]
-    H264,
-
     /// [VP8] codec.
     ///
     /// [VP8]: https://bloggeek.me/vp8/
@@ -1089,7 +1086,19 @@ pub enum Codec {
     AV1,
 }
 
-/// [ScalabilityMode] for [SVC].
+/// [ScalabilityMode] preference for [SVC] (Scalable Video Coding).
+///
+/// In SVC, the scalability is typically defined in terms of layers (L) and
+/// temporal (T) and spatial (S) levels.
+///
+/// The "L" part refers to the number of layers used in the encoding. Each layer
+/// contains different information about the video, with higher layers typically
+/// containing more detail or higher quality representations of the video.
+///
+/// The "T" part refers to temporal scalability layers count. Temporal
+/// scalability allows for different frame rates to be encoded within the same
+/// video stream, which can be useful for adaptive streaming or supporting
+/// devices with varying display capabilities.
 ///
 /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
 /// [SVC]: https://bloggeek.me/svc/
@@ -1203,15 +1212,15 @@ pub enum ScalabilityMode {
     S3T3,
 }
 
-/// Settings for [SVC] configuration.
+/// Configuration settings for [SVC] (Scalable Video Coding).
 ///
 /// [SVC]: https://bloggeek.me/svc/
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SvcSetting {
-    /// Prefered [`Codec`].
+    /// Indicates the codec for which this [`SvcSetting`] is configured.
     pub codec: Codec,
 
-    /// Prefered [`ScalabilityMode`].
+    /// Specifies the preferred [`ScalabilityMode`].
     pub scalability_mode: ScalabilityMode,
 }
 
@@ -1220,16 +1229,28 @@ pub struct SvcSetting {
 /// [0]: https://tinyurl.com/mr3dt9ch
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct EncodingParameters {
-    /// RTP stream ID of this [`EncodingParameters`].
+    /// A string which, if set, specifies an RTP stream ID (RID) to be sent
+    /// using the RID header extension.
     pub rid: String,
 
-    /// Indicates whether this encoding is actively being used or not.
+    /// Indicates that this encoding is actively being sent. Setting it to
+    /// false causes this encoding to no longer be sent. Setting it to true
+    /// causes this encoding to be sent. Since setting the value to false does
+    /// not cause the SSRC to be removed, an `RTCP BYE` is not sent.
     pub active: bool,
 
-    /// The maximum bitrate that can be used to send this encoding.
+    /// When present, indicates the maximum bitrate that can be used to send
+    /// this encoding. The user agent is free to allocate bandwidth between the
+    /// encodings, as long as the [`EncodingParameters::max_bitrate`] value is
+    /// not exceeded.
     pub max_bitrate: Option<u32>,
 
-    /// A factor by which to scale down the video during encoding.
+    /// This member is only present if the sender's kind is "video". The
+    /// video's resolution will be scaled down in each dimension by the given
+    /// value before sending. For example, if the value is 2.0, the video will
+    /// be scaled down by a factor of 2 in each dimension, resulting in sending
+    /// a video of one quarter the size. If the value is 1.0, the video will
+    /// not be affected. The value must be greater than or equal to 1.0.
     pub scale_resolution_down_by: Option<u8>,
 }
 
