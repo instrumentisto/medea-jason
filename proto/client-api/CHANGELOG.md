@@ -17,7 +17,7 @@ All user visible changes to this project will be documented in this file. This p
 
 - `PeerConnectionError` type ([#151]).
 - `IceCandidateError` type ([#151]).
-- `Codec`, `ScalabilityMode`, `SvcSetting` and `EncodingParameters` ([#164]).
+- `Codec`, `ScalabilityMode`, `SvcSetting` and `EncodingParameters` types ([#164]).
 
 [#151]: /../../pull/151
 [#164]: /../../pull/164
