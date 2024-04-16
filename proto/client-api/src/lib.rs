@@ -856,7 +856,7 @@ pub struct TrackPatchEvent {
     pub muted: Option<bool>,
 
     /// Encoding settings for the [`Track`] which should be patched.
-    pub encodings: Option<Vec<EncodingParameters>>,
+    pub encoding_parameters: Option<Vec<EncodingParameters>>,
 }
 
 /// Media exchange direction of a `Track`.
@@ -909,7 +909,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
-            encodings: None,
+            encoding_parameters: None,
         }
     }
 }
@@ -923,7 +923,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
-            encodings: None,
+            encoding_parameters: None,
         }
     }
 
@@ -948,8 +948,8 @@ impl TrackPatchEvent {
             self.receivers = Some(receivers.clone());
         }
 
-        if let Some(encodings) = &another.encodings {
-            self.encodings = Some(encodings.clone());
+        if let Some(encodings) = &another.encoding_parameters {
+            self.encoding_parameters = Some(encodings.clone());
         }
     }
 }
@@ -1044,10 +1044,10 @@ pub struct VideoSettings {
     pub source_kind: MediaSourceKind,
 
     /// [`EncodingParameters`] of this [`VideoSettings`] media.
-    pub encodings: Vec<EncodingParameters>,
+    pub encoding_parameters: Vec<EncodingParameters>,
 
     /// [`SvcSetting`]s of this [`VideoSettings`] media.
-    pub svc: Vec<SvcSetting>,
+    pub svc_settings: Vec<SvcSetting>,
 }
 
 /// Possible media sources of a video [`Track`].
