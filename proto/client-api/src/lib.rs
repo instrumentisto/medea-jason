@@ -854,6 +854,9 @@ pub struct TrackPatchEvent {
     /// Muting and unmuting can be performed without adding/removing tracks
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
+
+    /// [`EncodingParameters`] for the [`Track`] which should be patched.
+    pub encoding_parameters: Option<Vec<EncodingParameters>>,
 }
 
 /// Media exchange direction of a `Track`.
@@ -906,6 +909,7 @@ impl From<TrackPatchCommand> for TrackPatchEvent {
                 }
             }),
             receivers: None,
+            encoding_parameters: None,
         }
     }
 }
@@ -919,6 +923,7 @@ impl TrackPatchEvent {
             muted: None,
             media_direction: None,
             receivers: None,
+            encoding_parameters: None,
         }
     }
 
@@ -941,6 +946,10 @@ impl TrackPatchEvent {
 
         if let Some(receivers) = &another.receivers {
             self.receivers = Some(receivers.clone());
+        }
+
+        if let Some(encodings) = &another.encoding_parameters {
+            self.encoding_parameters = Some(encodings.clone());
         }
     }
 }
@@ -994,7 +1003,7 @@ pub enum Direction {
 }
 
 /// Possible media types of a [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MediaType {
     /// Audio [`Track`].
     Audio(AudioSettings),
@@ -1024,15 +1033,21 @@ pub struct AudioSettings {
 }
 
 /// Settings of a video [`Track`].
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct VideoSettings {
     /// Importance of the video.
     ///
     /// If `false` then video may be not published.
     pub required: bool,
 
-    /// Source kind of this [`VideoSettings`] media.
+    /// Source kind of these [`VideoSettings`].
     pub source_kind: MediaSourceKind,
+
+    /// [`EncodingParameters`] of these [`VideoSettings`].
+    pub encoding_parameters: Vec<EncodingParameters>,
+
+    /// [`SvcSettings`] of these [`VideoSettings`].
+    pub svc_settings: Vec<SvcSettings>,
 }
 
 /// Possible media sources of a video [`Track`].
@@ -1043,6 +1058,194 @@ pub enum MediaSourceKind {
 
     /// Media is obtained with screen-capture.
     Display,
+}
+
+/// Supported [codecs][0].
+///
+/// [0]: https://webrtcglossary.com/codec
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
+)]
+pub enum Codec {
+    /// [VP8] codec.
+    ///
+    /// [VP8]: https://en.wikipedia.org/wiki/VP8
+    #[display(fmt = "VP8")]
+    VP8,
+
+    /// [VP9] codec.
+    ///
+    /// [VP9]: https://en.wikipedia.org/wiki/VP9
+    #[display(fmt = "VP9")]
+    VP9,
+
+    /// [AV1] codec.
+    ///
+    /// [AV1]: https://en.wikipedia.org/wiki/AV1
+    #[display(fmt = "AV1")]
+    AV1,
+}
+
+/// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
+///
+/// In [SVC], the scalability is typically defined in terms of layers (L) and
+/// temporal (T) and spatial (S) levels.
+///
+/// The "L" part refers to the number of layers used in the encoding. Each layer
+/// contains different information about the video, with higher layers typically
+/// containing more detail or higher quality representations of the video.
+///
+/// The "T" part refers to temporal scalability layers count. Temporal
+/// scalability allows for different frame rates to be encoded within the same
+/// video stream, which can be useful for adaptive streaming or supporting
+/// devices with varying display capabilities.
+///
+/// [SVC]: https://webrtcglossary.com/svc
+/// [0]: https://w3.org/TR/webrtc-svc#scalabilitymodes*
+#[derive(
+    Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
+)]
+pub enum ScalabilityMode {
+    /// [L1T1] mode.
+    ///
+    /// [L1T1]: https://w3.org/TR/webrtc-svc#L1T1*
+    #[display(fmt = "L1T1")]
+    L1T1,
+
+    /// [L1T2] mode.
+    ///
+    /// [L1T2]: https://w3.org/TR/webrtc-svc#L1T2*
+    #[display(fmt = "L1T2")]
+    L1T2,
+
+    /// [L1T3] mode.
+    ///
+    /// [L1T3]: https://w3.org/TR/webrtc-svc#L1T3*
+    #[display(fmt = "L1T3")]
+    L1T3,
+
+    /// [L2T1] mode.
+    ///
+    /// [L2T1]: https://w3.org/TR/webrtc-svc#L2T1*
+    #[display(fmt = "L2T1")]
+    L2T1,
+
+    /// [L2T2] mode.
+    ///
+    /// [L2T2]: https://w3.org/TR/webrtc-svc#L2T2*
+    #[display(fmt = "L2T2")]
+    L2T2,
+
+    /// [L2T3] mode.
+    ///
+    /// [L2T3]: https://w3.org/TR/webrtc-svc#L2T3*
+    #[display(fmt = "L2T3")]
+    L2T3,
+
+    /// [L3T1] mode.
+    ///
+    /// [L3T1]: https://w3.org/TR/webrtc-svc#L3T1*
+    #[display(fmt = "L3T1")]
+    L3T1,
+
+    /// [L3T2] mode.
+    ///
+    /// [L3T2]: https://w3.org/TR/webrtc-svc#L3T2*
+    #[display(fmt = "L3T2")]
+    L3T2,
+
+    /// [L3T3] mode.
+    ///
+    /// [L3T3]: https://w3.org/TR/webrtc-svc#L3T3*
+    #[display(fmt = "L3T3")]
+    L3T3,
+
+    /// [S2T1] mode.
+    ///
+    /// [S2T1]: https://w3.org/TR/webrtc-svc#S2T1*
+    #[display(fmt = "S2T1")]
+    S2T1,
+
+    /// [S2T2] mode.
+    ///
+    /// [S2T2]: https://w3.org/TR/webrtc-svc#S2T2*
+    #[display(fmt = "S2T2")]
+    S2T2,
+
+    /// [S2T3] mode.
+    ///
+    /// [S2T3]: https://w3.org/TR/webrtc-svc#S2T3*
+    #[display(fmt = "S2T3")]
+    S2T3,
+
+    /// [S3T1] mode.
+    ///
+    /// [S3T1]: https://w3.org/TR/webrtc-svc#S3T1*
+    #[display(fmt = "S3T1")]
+    S3T1,
+
+    /// [S3T2] mode.
+    ///
+    /// [S3T2]: https://w3.org/TR/webrtc-svc#S3T2*
+    #[display(fmt = "S3T2")]
+    S3T2,
+
+    /// [S3T3] mode.
+    ///
+    /// [S3T3]: https://w3.org/TR/webrtc-svc#S3T3*
+    #[display(fmt = "S3T3")]
+    S3T3,
+}
+
+/// Configuration settings for [SVC (Scalable Video Coding)][SVC].
+///
+/// [SVC]: https://webrtcglossary.com/svc
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SvcSettings {
+    /// [`Codec`] these [`SvcSettings`] are configured for.
+    pub codec: Codec,
+
+    /// Preferred [`ScalabilityMode`].
+    pub scalability_mode: ScalabilityMode,
+}
+
+/// Representation of an [RTCRtpEncodingParameters][0].
+///
+/// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct EncodingParameters {
+    /// [RTP stream ID (RID)][RID] to be sent using the
+    /// [RID header extension][0].
+    ///
+    /// [RID]: https://webrtcglossary.com/rid
+    /// [0]: https://tools.ietf.org/html/rfc8852#section-3.3
+    pub rid: String,
+
+    /// Indicator whether this encoding is actively being sent.
+    ///
+    /// Being `false` doesn't cause the [SSRC] to be removed, so an `RTCP BYE`
+    /// is not sent.
+    ///
+    /// [SSRC]: https://webrtcglossary.com/ssrc
+    pub active: bool,
+
+    /// Maximum bitrate that can be used to send this encoding.
+    ///
+    /// User agent is free to allocate bandwidth between the encodings, as long
+    /// as this value is not exceeded.
+    pub max_bitrate: Option<u32>,
+
+    /// Factor for scaling down video's resolution in each dimension before
+    /// sending.
+    ///
+    /// Only present for video encodings.
+    ///
+    /// For example, if this value is `2`, a video will be scaled down by a
+    /// factor of 2 in each dimension, resulting in sending a video of one
+    /// quarter the size. If this value is `1`, the video won't be affected.
+    ///
+    /// Must be greater than or equal to `1`.
+    pub scale_resolution_down_by: Option<u8>,
 }
 
 /// Estimated connection quality.
