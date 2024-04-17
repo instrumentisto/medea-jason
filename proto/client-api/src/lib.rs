@@ -855,7 +855,7 @@ pub struct TrackPatchEvent {
     /// from transceivers, hence renegotiation is not required.
     pub muted: Option<bool>,
 
-    /// Encoding settings for the [`Track`] which should be patched.
+    /// [`EncodingParameters`] for the [`Track`] which should be patched.
     pub encoding_parameters: Option<Vec<EncodingParameters>>,
 }
 
@@ -1040,14 +1040,14 @@ pub struct VideoSettings {
     /// If `false` then video may be not published.
     pub required: bool,
 
-    /// Source kind of this [`VideoSettings`] media.
+    /// Source kind of these [`VideoSettings`].
     pub source_kind: MediaSourceKind,
 
-    /// [`EncodingParameters`] of this [`VideoSettings`] media.
+    /// [`EncodingParameters`] of these [`VideoSettings`].
     pub encoding_parameters: Vec<EncodingParameters>,
 
-    /// [`SvcSetting`]s of this [`VideoSettings`] media.
-    pub svc_settings: Vec<SvcSetting>,
+    /// [`SvcSettings`] of these [`VideoSettings`].
+    pub svc_settings: Vec<SvcSettings>,
 }
 
 /// Possible media sources of a video [`Track`].
@@ -1060,35 +1060,35 @@ pub enum MediaSourceKind {
     Display,
 }
 
-/// [Codec]s supported by Medea and Jason.
+/// Supported [codecs][0].
 ///
-/// [Codec]: https://bloggeek.me/codec/
+/// [0]: https://webrtcglossary.com/codec
 #[derive(
     Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
 )]
 pub enum Codec {
     /// [VP8] codec.
     ///
-    /// [VP8]: https://bloggeek.me/vp8/
+    /// [VP8]: https://en.wikipedia.org/wiki/VP8
     #[display(fmt = "VP8")]
     VP8,
 
     /// [VP9] codec.
     ///
-    /// [VP9]: https://bloggeek.me/vp9/
+    /// [VP9]: https://en.wikipedia.org/wiki/VP9
     #[display(fmt = "VP9")]
     VP9,
 
     /// [AV1] codec.
     ///
-    /// [AV1]: https://bloggeek.me/av1/
+    /// [AV1]: https://en.wikipedia.org/wiki/AV1
     #[display(fmt = "AV1")]
     AV1,
 }
 
-/// [ScalabilityMode] preference for [SVC] (Scalable Video Coding).
+/// [Scalability mode] preference for [SVC (Scalable Video Coding)][SVC].
 ///
-/// In SVC, the scalability is typically defined in terms of layers (L) and
+/// In [SVC], the scalability is typically defined in terms of layers (L) and
 /// temporal (T) and spatial (S) levels.
 ///
 /// The "L" part refers to the number of layers used in the encoding. Each layer
@@ -1100,157 +1100,151 @@ pub enum Codec {
 /// video stream, which can be useful for adaptive streaming or supporting
 /// devices with varying display capabilities.
 ///
-/// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
-/// [SVC]: https://bloggeek.me/svc/
+/// [SVC]: https://webrtcglossary.com/svc
+/// [0]: https://w3.org/TR/webrtc-svc#scalabilitymodes*
 #[derive(
     Clone, Copy, Debug, Deserialize, Display, Eq, PartialEq, Serialize,
 )]
 pub enum ScalabilityMode {
-    /// [L1T1] [ScalabilityMode].
+    /// [L1T1] mode.
     ///
-    /// [L1T1]: https://w3.org/TR/webrtc-svc/#L1T1*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L1T1]: https://w3.org/TR/webrtc-svc#L1T1*
     #[display(fmt = "L1T1")]
     L1T1,
 
-    /// [L1T2] [ScalabilityMode].
+    /// [L1T2] mode.
     ///
-    /// [L1T2]: https://w3.org/TR/webrtc-svc/#L1T2*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L1T2]: https://w3.org/TR/webrtc-svc#L1T2*
     #[display(fmt = "L1T2")]
     L1T2,
 
-    /// [L1T3] [ScalabilityMode].
+    /// [L1T3] mode.
     ///
-    /// [L1T3]: https://w3.org/TR/webrtc-svc/#L1T3*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L1T3]: https://w3.org/TR/webrtc-svc#L1T3*
     #[display(fmt = "L1T3")]
     L1T3,
 
-    /// [L2T1] [ScalabilityMode].
+    /// [L2T1] mode.
     ///
-    /// [L2T1]: https://w3.org/TR/webrtc-svc/#L2T1*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L2T1]: https://w3.org/TR/webrtc-svc#L2T1*
     #[display(fmt = "L2T1")]
     L2T1,
 
-    /// [L2T2] [ScalabilityMode].
+    /// [L2T2] mode.
     ///
-    /// [L2T2]: https://w3.org/TR/webrtc-svc/#L2T2*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L2T2]: https://w3.org/TR/webrtc-svc#L2T2*
     #[display(fmt = "L2T2")]
     L2T2,
 
-    /// [L2T3] [ScalabilityMode].
+    /// [L2T3] mode.
     ///
-    /// [L2T3]: https://w3.org/TR/webrtc-svc/#L2T3*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L2T3]: https://w3.org/TR/webrtc-svc#L2T3*
     #[display(fmt = "L2T3")]
     L2T3,
 
-    /// [L3T1] [ScalabilityMode].
+    /// [L3T1] mode.
     ///
-    /// [L3T1]: https://w3.org/TR/webrtc-svc/#L3T1*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L3T1]: https://w3.org/TR/webrtc-svc#L3T1*
     #[display(fmt = "L3T1")]
     L3T1,
 
-    /// [L3T2] [ScalabilityMode].
+    /// [L3T2] mode.
     ///
-    /// [L3T2]: https://w3.org/TR/webrtc-svc/#L3T2*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L3T2]: https://w3.org/TR/webrtc-svc#L3T2*
     #[display(fmt = "L3T2")]
     L3T2,
 
-    /// [L3T3] [ScalabilityMode].
+    /// [L3T3] mode.
     ///
-    /// [L3T3]: https://w3.org/TR/webrtc-svc/#L3T3*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [L3T3]: https://w3.org/TR/webrtc-svc#L3T3*
     #[display(fmt = "L3T3")]
     L3T3,
 
-    /// [S2T1] [ScalabilityMode].
+    /// [S2T1] mode.
     ///
-    /// [S2T1]: https://w3.org/TR/webrtc-svc/#S2T1*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [S2T1]: https://w3.org/TR/webrtc-svc#S2T1*
     #[display(fmt = "S2T1")]
     S2T1,
 
-    /// [S2T2] [ScalabilityMode].
+    /// [S2T2] mode.
     ///
-    /// [S2T2]: https://w3.org/TR/webrtc-svc/#S2T2*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [S2T2]: https://w3.org/TR/webrtc-svc#S2T2*
     #[display(fmt = "S2T2")]
     S2T2,
 
-    /// [S2T3] [ScalabilityMode].
+    /// [S2T3] mode.
     ///
-    /// [S2T3]: https://w3.org/TR/webrtc-svc/#S2T3*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [S2T3]: https://w3.org/TR/webrtc-svc#S2T3*
     #[display(fmt = "S2T3")]
     S2T3,
 
-    /// [S3T1] [ScalabilityMode].
+    /// [S3T1] mode.
     ///
-    /// [S3T1]: https://w3.org/TR/webrtc-svc/#S3T1*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [S3T1]: https://w3.org/TR/webrtc-svc#S3T1*
     #[display(fmt = "S3T1")]
     S3T1,
 
-    /// [S3T2] [ScalabilityMode].
+    /// [S3T2] mode.
     ///
-    /// [S3T2]: https://w3.org/TR/webrtc-svc/#S3T2*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [S3T2]: https://w3.org/TR/webrtc-svc#S3T2*
     #[display(fmt = "S3T2")]
     S3T2,
 
-    /// [S3T3] [ScalabilityMode].
+    /// [S3T3] mode.
     ///
-    /// [S3T3]: https://w3.org/TR/webrtc-svc/#S3T3*
-    /// [ScalabilityMode]: https://w3.org/TR/webrtc-svc/#scalabilitymodes*
+    /// [S3T3]: https://w3.org/TR/webrtc-svc#S3T3*
     #[display(fmt = "S3T3")]
     S3T3,
 }
 
-/// Configuration settings for [SVC] (Scalable Video Coding).
+/// Configuration settings for [SVC (Scalable Video Coding)][SVC].
 ///
-/// [SVC]: https://bloggeek.me/svc/
+/// [SVC]: https://webrtcglossary.com/svc
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct SvcSetting {
-    /// Indicates the codec for which this [`SvcSetting`] is configured.
+pub struct SvcSettings {
+    /// [`Codec`] these [`SvcSettings`] are configured for.
     pub codec: Codec,
 
-    /// Specifies the preferred [`ScalabilityMode`].
+    /// Preferred [`ScalabilityMode`].
     pub scalability_mode: ScalabilityMode,
 }
 
-/// Representation of the [RTCRtpEncodingParameters][0].
+/// Representation of an [RTCRtpEncodingParameters][0].
 ///
-/// [0]: https://tinyurl.com/mr3dt9ch
+/// [0]: https://w3.org/TR/webrtc#dom-rtcrtpencodingparameters
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct EncodingParameters {
-    /// A string which, if set, specifies an RTP stream ID (RID) to be sent
-    /// using the RID header extension.
+    /// [RTP stream ID (RID)][RID] to be sent using the
+    /// [RID header extension][0].
+    ///
+    /// [RID]: https://webrtcglossary.com/rid
+    /// [0]: https://tools.ietf.org/html/rfc8852#section-3.3
     pub rid: String,
 
-    /// Indicates that this encoding is actively being sent. Setting it to
-    /// false causes this encoding to no longer be sent. Setting it to true
-    /// causes this encoding to be sent. Since setting the value to false does
-    /// not cause the SSRC to be removed, an `RTCP BYE` is not sent.
+    /// Indicator whether this encoding is actively being sent.
+    ///
+    /// Being `false` doesn't cause the [SSRC] to be removed, so an `RTCP BYE`
+    /// is not sent.
+    ///
+    /// [SSRC]: https://webrtcglossary.com/ssrc
     pub active: bool,
 
-    /// When present, indicates the maximum bitrate that can be used to send
-    /// this encoding. The user agent is free to allocate bandwidth between the
-    /// encodings, as long as the [`EncodingParameters::max_bitrate`] value is
-    /// not exceeded.
+    /// Maximum bitrate that can be used to send this encoding.
+    ///
+    /// User agent is free to allocate bandwidth between the encodings, as long
+    /// as this value is not exceeded.
     pub max_bitrate: Option<u32>,
 
-    /// This member is only present if the sender's kind is "video". The
-    /// video's resolution will be scaled down in each dimension by the given
-    /// value before sending. For example, if the value is 2.0, the video will
-    /// be scaled down by a factor of 2 in each dimension, resulting in sending
-    /// a video of one quarter the size. If the value is 1.0, the video will
-    /// not be affected. The value must be greater than or equal to 1.0.
+    /// Factor for scaling down video's resolution in each dimension before
+    /// sending.
+    ///
+    /// Only present for video encodings.
+    ///
+    /// For example, if this value is `2`, a video will be scaled down by a
+    /// factor of 2 in each dimension, resulting in sending a video of one
+    /// quarter the size. If this value is `1`, the video won't be affected.
+    ///
+    /// Must be greater than or equal to `1`.
     pub scale_resolution_down_by: Option<u8>,
 }
 
