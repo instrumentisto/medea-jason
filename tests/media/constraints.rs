@@ -390,8 +390,8 @@ fn get_device_video_track_constraints() -> DeviceVideoTrackConstraints {
     match VideoSource::from(VideoSettings {
         required: true,
         source_kind: MediaSourceKind::Device,
-        encodings: Vec::new(),
-        svc: None,
+        encoding_parameters: Vec::new(),
+        svc_settings: Vec::new(),
     }) {
         VideoSource::Device(device) => device,
         _ => unreachable!(),

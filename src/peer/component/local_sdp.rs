@@ -19,8 +19,17 @@ use crate::{
     utils::{resettable_delay_for, ResettableDelayHandle},
 };
 
-/// Timeout for a [`LocalSdp`] being approved by the Media Server.
-const DESCRIPTION_APPROVE_TIMEOUT: Duration = Duration::from_secs(10);
+/// Timeout for a local session description being approved by the Media Server.
+pub const DESCRIPTION_APPROVE_TIMEOUT: Duration = {
+    #[cfg(not(feature = "mockable"))]
+    {
+        Duration::from_secs(10)
+    }
+    #[cfg(feature = "mockable")]
+    {
+        Duration::from_millis(500)
+    }
+};
 
 /// Local session description wrapper.
 ///

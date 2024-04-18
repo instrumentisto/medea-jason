@@ -33,7 +33,7 @@ use medea_jason::{
     rpc::MockRpcSession,
     utils::Updatable,
 };
-use wasm_bindgen::{prelude::*, JsValue};
+use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use wasm_bindgen_test::*;
 
@@ -355,8 +355,8 @@ mod disable_recv_tracks {
                         media_type: MediaType::Video(VideoSettings {
                             required: true,
                             source_kind: MediaSourceKind::Device,
-                            encodings: Vec::new(),
-                            svc: None,
+                            encoding_parameters: Vec::new(),
+                            svc_settings: Vec::new(),
                         }),
                     },
                     Track {
@@ -588,7 +588,7 @@ mod receivers_patch_send_tracks {
                     media_direction: None,
                     receivers: Some(Vec::new()),
                     muted: None,
-                    encodings: Vec::new(),
+                    encoding_parameters: None,
                 })]),
                 negotiation_role: None,
             })
@@ -609,7 +609,7 @@ mod receivers_patch_send_tracks {
                         MemberId::from("eva"),
                     ])),
                     muted: None,
-                    encodings: Vec::new(),
+                    encoding_parameters: None,
                 })]),
                 negotiation_role: None,
             })
@@ -705,8 +705,8 @@ mod disable_send_tracks {
             media_type: MediaType::Video(VideoSettings {
                 required,
                 source_kind,
-                encodings: Vec::new(),
-                svc: None,
+                encoding_parameters: Vec::new(),
+                svc_settings: Vec::new(),
             }),
         }
     }
@@ -1068,7 +1068,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
-                    encodings: Vec::new(),
+                    encoding_parameters: None,
                 })],
                 negotiation_role: None,
             })
@@ -1150,7 +1150,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: None,
                     muted: Some(true),
-                    encodings: Vec::new(),
+                    encoding_parameters: None,
                 })],
                 negotiation_role: None,
             })
@@ -1235,7 +1235,7 @@ mod disable_send_tracks {
                     receivers: None,
                     media_direction: Some(MediaDirection::RecvOnly),
                     muted: None,
-                    encodings: Vec::new(),
+                    encoding_parameters: None,
                 })],
                 negotiation_role: None,
             })
@@ -1490,8 +1490,8 @@ mod patches_generation {
                 MediaType::Video(VideoSettings {
                     required: false,
                     source_kind: proto::MediaSourceKind::Device,
-                    encodings: Vec::new(),
-                    svc: None,
+                    encoding_parameters: Vec::new(),
+                    svc_settings: Vec::new(),
                 }),
                 Direction::Send {
                     receivers: Vec::new(),
@@ -1582,7 +1582,7 @@ mod patches_generation {
                                 state,
                                 MediaState::Mute(mute_state::Stable::Muted)
                             )),
-                            encodings: Vec::new(),
+                            encoding_parameters: None,
                         })],
                         negotiation_role: None,
                     })
@@ -1752,8 +1752,8 @@ mod patches_generation {
             MediaType::Video(VideoSettings {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
-                encodings: Vec::new(),
-                svc: None,
+                encoding_parameters: Vec::new(),
+                svc_settings: Vec::new(),
             }),
             Direction::Send {
                 mid: None,
@@ -1810,8 +1810,8 @@ mod patches_generation {
             MediaType::Video(VideoSettings {
                 source_kind: proto::MediaSourceKind::Display,
                 required: false,
-                encodings: Vec::new(),
-                svc: None,
+                encoding_parameters: Vec::new(),
+                svc_settings: Vec::new(),
             }),
             Direction::Send {
                 mid: None,
@@ -1991,7 +1991,7 @@ async fn disable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2023,7 +2023,7 @@ async fn enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2043,7 +2043,7 @@ async fn enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::SendRecv),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2080,7 +2080,7 @@ async fn only_one_gum_performed_on_enable() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2100,7 +2100,7 @@ async fn only_one_gum_performed_on_enable() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2222,7 +2222,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2241,7 +2241,7 @@ async fn only_one_gum_performed_on_enable_by_server() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2304,7 +2304,7 @@ async fn send_enabling_holds_local_tracks() {
                 receivers: None,
                 media_direction: Some(MediaDirection::RecvOnly),
                 muted: None,
-                encodings: Vec::new(),
+                encoding_parameters: None,
             })],
         })
         .unwrap();
@@ -2334,9 +2334,8 @@ mod set_local_media_settings {
     use super::*;
 
     use medea_jason::api::err::{
-        InternalException, LocalMediaInitException,
-        MediaSettingsUpdateException, MediaStateTransitionException,
-        MediaStateTransitionExceptionKind,
+        LocalMediaInitException, MediaSettingsUpdateException,
+        MediaStateTransitionException,
     };
 
     /// Sets up connection between two peers in single room with first peer
@@ -2361,8 +2360,8 @@ mod set_local_media_settings {
                     media_type: MediaType::Video(VideoSettings {
                         required: false,
                         source_kind: MediaSourceKind::Device,
-                        encodings: Vec::new(),
-                        svc: None,
+                        encoding_parameters: Vec::new(),
+                        svc_settings: Vec::new(),
                     }),
                 }],
                 ice_servers: Vec::new(),
@@ -2394,8 +2393,8 @@ mod set_local_media_settings {
                                 media_type: MediaType::Video(VideoSettings {
                                     required: true,
                                     source_kind: MediaSourceKind::Device,
-                                    encodings: Vec::new(),
-                                    svc: None,
+                                    encoding_parameters: Vec::new(),
+                                    svc_settings: Vec::new(),
                                 }),
                             }],
                             ice_servers: Vec::new(),
@@ -2882,6 +2881,7 @@ mod state_synchronization {
     use std::{
         collections::{HashMap, HashSet},
         rc::Rc,
+        time::Duration,
     };
 
     use futures::{channel::mpsc, stream, StreamExt as _};
@@ -2890,12 +2890,13 @@ mod state_synchronization {
         MediaType, MemberId, NegotiationRole, PeerId, TrackId,
     };
     use medea_jason::{
-        media::MediaManager, room::Room, rpc::MockRpcSession,
-        utils::AsProtoState,
+        media::MediaManager, platform::delay_for, room::Room,
+        rpc::MockRpcSession, utils::AsProtoState,
     };
+    use wasm_bindgen::{closure::Closure, JsValue};
     use wasm_bindgen_test::*;
 
-    use crate::timeout;
+    use crate::{get_test_tracks, timeout};
 
     /// Checks whether [`state::Room`] update can create a [`PeerConnection`]
     /// and its [`Sender`]s/[`Receiver`]s.
@@ -2974,6 +2975,144 @@ mod state_synchronization {
         let peer = room.get_peer_by_id(PeerId(0)).unwrap();
         assert!(peer.get_sender_by_id(TrackId(0)).is_some());
         assert!(peer.get_receiver_by_id(TrackId(1)).is_some());
+    }
+
+    /// Checks that negotiation can be restarted after RPC transport disconnect.
+    #[wasm_bindgen_test]
+    async fn disconnect_during_negotiation() {
+        medea_jason::platform::init_logger();
+
+        async fn test(local_confirmed: bool) {
+            let (audio_track, video_track) = get_test_tracks(false, false);
+            let (command_tx, mut command_rx) = mpsc::unbounded();
+            let (event_tx, event_rx) = mpsc::unbounded();
+            let (reconnect_tx, reconnect_rx) = mpsc::unbounded();
+
+            let mut rpc_session = MockRpcSession::new();
+            rpc_session
+                .expect_subscribe()
+                .return_once(move || Box::pin(event_rx));
+            rpc_session
+                .expect_on_connection_loss()
+                .return_once(|| Box::pin(stream::pending()));
+            rpc_session
+                .expect_on_reconnected()
+                .return_once(move || Box::pin(reconnect_rx));
+            rpc_session
+                .expect_reconnect()
+                .returning(|| Box::pin(async { Ok(()) }));
+            rpc_session.expect_close_with_reason().returning(drop);
+            rpc_session.expect_send_command().returning(move |cmd| {
+                let _ = command_tx.unbounded_send(cmd);
+            });
+            let room = Room::new(
+                Rc::new(rpc_session),
+                Rc::new(MediaManager::default()),
+            );
+
+            event_tx
+                .unbounded_send(Event::PeerCreated {
+                    peer_id: PeerId(1),
+                    negotiation_role: NegotiationRole::Offerer,
+                    tracks: vec![audio_track.clone(), video_track.clone()],
+                    ice_servers: Vec::new(),
+                    force_relay: false,
+                    connection_mode: ConnectionMode::Mesh,
+                })
+                .unwrap();
+
+            let sdp_offer = match command_rx.next().await.unwrap() {
+                Command::MakeSdpOffer {
+                    peer_id,
+                    sdp_offer,
+                    mids,
+                    transceivers_statuses: _,
+                } => {
+                    assert_eq!(peer_id, PeerId(1));
+                    assert_eq!(mids.len(), 2);
+
+                    sdp_offer
+                }
+                _ => {
+                    unreachable!()
+                }
+            };
+
+            if local_confirmed {
+                event_tx
+                    .unbounded_send(Event::LocalDescriptionApplied {
+                        peer_id: PeerId(1),
+                        sdp_offer: sdp_offer.clone(),
+                    })
+                    .unwrap();
+            } else {
+                delay_for(
+                    medea_jason::peer::DESCRIPTION_APPROVE_TIMEOUT
+                        + Duration::from_millis(100),
+                )
+                .await;
+            }
+
+            // disconnect and wait for SynchronizeMe command
+            reconnect_tx.unbounded_send(()).unwrap();
+            while let Some(cmd) = command_rx.next().await {
+                if let Command::SynchronizeMe { state } = cmd {
+                    let p = state.peers.get(&PeerId(1)).unwrap();
+                    if local_confirmed {
+                        assert!(p.local_sdp.is_some())
+                    } else {
+                        assert!(p.local_sdp.is_none())
+                    }
+                    break;
+                }
+            }
+
+            // `StateSynchronized` with `local_sdp = None` means to start new
+            // negotiation.
+            let state = {
+                let mut room_proto = room.peers_state().as_proto();
+
+                let peer = room_proto.peers.get_mut(&PeerId(1)).unwrap();
+
+                // `local_sdp = None` means that new negotiation is scheduled.
+                peer.local_sdp = None;
+                peer.remote_sdp = None;
+                peer.negotiation_role = Some(NegotiationRole::Offerer);
+
+                room_proto
+            };
+            event_tx
+                .unbounded_send(Event::StateSynchronized { state })
+                .unwrap();
+
+            timeout(5000, async move {
+                loop {
+                    let command = command_rx.next().await.unwrap();
+
+                    match command {
+                        Command::MakeSdpOffer {
+                            peer_id,
+                            sdp_offer: new_offer,
+                            mids,
+                            transceivers_statuses: _,
+                        } => {
+                            assert_eq!(peer_id, PeerId(1));
+                            assert_eq!(mids.len(), 2);
+
+                            assert_ne!(sdp_offer, new_offer);
+
+                            break;
+                        }
+                        _ => {}
+                    }
+                }
+            })
+            .await
+            .unwrap();
+        }
+
+        test(true).await;
+        test(false).await;
     }
 }
 
@@ -3117,8 +3256,8 @@ async fn sender_answerer() {
                     media_type: MediaType::Video(VideoSettings {
                         required: true,
                         source_kind: MediaSourceKind::Device,
-                        encodings: Vec::new(),
-                        svc: None,
+                        encoding_parameters: Vec::new(),
+                        svc_settings: Vec::new(),
                     }),
                 },
             ],

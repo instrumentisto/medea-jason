@@ -203,7 +203,7 @@ mod sender_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         sender.state().when_updated().await;
 
@@ -218,7 +218,7 @@ mod sender_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         sender.state().when_updated().await;
 
@@ -233,7 +233,7 @@ mod sender_patch {
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         sender.state().when_updated().await;
 
@@ -248,7 +248,7 @@ mod sender_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         sender.state().when_updated().await;
         assert!(sender.general_disabled());
@@ -258,7 +258,7 @@ mod sender_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         sender.state().when_updated().await;
 
@@ -273,7 +273,7 @@ mod sender_patch {
             receivers: None,
             media_direction: None,
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         sender.state().when_updated().await;
 
@@ -350,7 +350,7 @@ mod receiver_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         receiver.state().when_updated().await;
 
@@ -365,7 +365,7 @@ mod receiver_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         receiver.state().when_updated().await;
 
@@ -380,7 +380,7 @@ mod receiver_patch {
             receivers: None,
             media_direction: Some(MediaDirection::SendRecv),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         receiver.state().when_updated().await;
 
@@ -395,7 +395,7 @@ mod receiver_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         receiver.state().when_updated().await;
         assert!(!receiver.enabled_general());
@@ -405,7 +405,7 @@ mod receiver_patch {
             receivers: None,
             media_direction: Some(MediaDirection::RecvOnly),
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         receiver.state().when_updated().await;
 
@@ -420,7 +420,7 @@ mod receiver_patch {
             receivers: None,
             media_direction: None,
             muted: None,
-            encodings: Vec::new(),
+            encoding_parameters: None,
         });
         receiver.state().when_updated().await;
 

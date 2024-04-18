@@ -106,7 +106,7 @@ impl Receiver {
         recv_constraints: &RecvConstraints,
         connection_mode: ConnectionMode,
     ) -> Self {
-        let caps = TrackConstraints::from(state.media_type());
+        let caps = TrackConstraints::from(state.media_type().clone());
         let kind = MediaKind::from(&caps);
 
         #[allow(clippy::if_then_some_else_none)]
@@ -257,6 +257,11 @@ impl Receiver {
             self.muted.get(),
             self.media_direction.get(),
         );
+        if let Some(prev_track) = self.track.replace(Some(new_track)) {
+            platform::spawn(async move {
+                prev_track.stop().await;
+            });
+        };
 
         // It's OK to `.clone()` here, as the `Transceiver` represents a pointer
         // to a garbage-collectable memory on each platform.
@@ -269,9 +274,6 @@ impl Receiver {
             .await;
         }
 
-        if let Some(prev_track) = self.track.replace(Some(new_track)) {
-            prev_track.stop().await;
-        };
         self.maybe_notify_track().await;
     }
 
@@ -314,6 +316,10 @@ impl Receiver {
             return;
         }
         if !self.is_receiving().await {
+            return;
+        }
+        // Re-check since state might have changed during `.await`.
+        if self.is_track_notified.get() {
             return;
         }
         if let Some(track) = self.track.borrow().as_ref() {

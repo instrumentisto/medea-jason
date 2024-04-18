@@ -902,12 +902,13 @@ impl MediaConnections {
         for track in tracks {
             match track.direction {
                 proto::Direction::Send { mid, receivers } => {
+                    let is_muted = send_constraints.muted(&track.media_type);
                     let component = self
                         .create_sender(
                             track.id,
                             track.media_type.clone(),
                             proto::MediaDirection::SendRecv,
-                            send_constraints.muted(track.media_type),
+                            is_muted,
                             mid,
                             receivers,
                             send_constraints,
