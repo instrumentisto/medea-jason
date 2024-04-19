@@ -13,7 +13,7 @@ use std::{
 use js_sys::{Array, JsString, Reflect};
 use medea_client_api_proto::{
     EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
-    ScalabilityMode, SvcSetting,
+    ScalabilityMode, SvcSettings,
 };
 use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
@@ -641,7 +641,7 @@ impl RtcPeerConnection {
         kind: MediaKind,
         direction: TransceiverDirection,
         mut encodings: Vec<EncodingParameters>,
-        svc: Vec<SvcSetting>,
+        svc: Vec<SvcSettings>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
