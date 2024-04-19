@@ -320,7 +320,7 @@ impl InnerMediaConnections {
         kind: MediaKind,
         direction: platform::TransceiverDirection,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
-        self.peer.add_transceiver(kind, direction)
+        self.peer.add_transceiver(kind, direction, todo!(), todo!())
     }
 
     /// Lookups a [`platform::Transceiver`] by the provided [`mid`].

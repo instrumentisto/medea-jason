@@ -4,16 +4,23 @@
 
 use std::{future::Future, rc::Rc};
 
+use dart_sys::_Dart_Handle;
 use futures::future::LocalBoxFuture;
+use medea_client_api_proto::EncodingParameters;
 use medea_macro::dart_bridge;
 
 use crate::{
     media::track::local,
-    platform,
     platform::{
+        self,
         dart::utils::{dart_future::FutureFromDart, handle::DartHandle},
         TransceiverDirection,
     },
+};
+
+use super::{
+    codec_capability::CodecCapability, parameters::Parameters,
+    send_encoding_parameters::SendEncodingParameters,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
@@ -59,6 +66,29 @@ mod transceiver {
 
         /// Disposes the provided [`Transceiver`].
         pub fn dispose(transceiver: Dart_Handle) -> Dart_Handle;
+
+        /// Creates a new [`TransceiverInit`].
+        pub fn create_transceiver_init(direction: i64) -> Dart_Handle;
+
+        /// Adds [`SendEncodingParameters`] to the provided [`TransceiverInit`]
+        pub fn add_sending_encodings(
+            transceiver_init: Dart_Handle,
+            encoding: Dart_Handle,
+        );
+
+        /// Gets [`Parameters`] of the underlying `sender`.
+        pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
+
+        /// Sets [`Parameters`] into the underlying `sender`.
+        pub fn set_send_parameters(
+            transceiver: Dart_Handle,
+            parameters: Dart_Handle,
+        ) -> Dart_Handle;
+
+        pub fn set_preferred_codec(
+            transceiver: Dart_Handle,
+            codec_capability: Dart_Handle,
+        );
     }
 }
 
@@ -169,6 +199,93 @@ impl Transceiver {
                 .into()
         }
     }
+
+    /// Gets [`Parameters`] of the underlying `sender`.
+    pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
+        let handle = self.0.get();
+        async move {
+            let fut = unsafe { transceiver::get_send_parameters(handle) };
+            let params: DartHandle =
+                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+            Parameters::from(params)
+        }
+    }
+
+    /// Sets [`Parameters`] into the underlying `sender`.
+    ///
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
+    /// call fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    pub fn set_send_parameters(
+        &self,
+        params: Parameters,
+    ) -> impl Future<Output = Result<(), platform::Error>> {
+        let handle = self.0.get();
+        let params_handle = params.handle();
+        async move {
+            let fut = unsafe {
+                transceiver::set_send_parameters(handle, params_handle)
+            };
+
+            unsafe { FutureFromDart::execute::<()>(fut) }.await?;
+
+            Ok(())
+        }
+    }
+
+    /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
+    pub fn set_preferred_codec(&self, preferred_codec: CodecCapability) {
+        let handle = self.0.get();
+        let codec_handle = preferred_codec.handle();
+        unsafe {
+            transceiver::set_preferred_codec(handle, codec_handle);
+        };
+    }
+
+    /// Updates parameters of encoding for underlying `sender`.
+    ///
+    /// # Errors
+    ///
+    /// Errors with [`platform::Error`] if the underlying [`setParameters`][1]
+    /// call fails.
+    ///
+    /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    pub async fn update_send_encodings(
+        &self,
+        encodings: Vec<EncodingParameters>,
+    ) -> Result<(), platform::Error> {
+        let params = self.get_send_parameters().await;
+
+        let encs = params.encodings().await?;
+        for enc in encs {
+            let rid = enc.rid();
+
+            let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
+                continue;
+            };
+
+            enc.set_active(encoding.active);
+            if let Some(max_bitrate) = encoding.max_bitrate {
+                enc.set_max_bitrate(max_bitrate.into());
+            }
+            if let Some(scale_resolution_down_by) =
+                encoding.scale_resolution_down_by
+            {
+                enc.set_scale_resolution_down_by(
+                    scale_resolution_down_by.into(),
+                );
+            }
+
+            params.set_encoding(&enc).await;
+        }
+
+        self.set_send_parameters(params).await?;
+
+        Ok(())
+    }
 }
 
 impl Drop for Transceiver {
@@ -179,6 +296,34 @@ impl Drop for Transceiver {
                 let fut = unsafe { transceiver::dispose(transceiver.get()) };
                 unsafe { FutureFromDart::execute::<()>(fut) }.await.unwrap();
             });
+        }
+    }
+}
+
+/// Dart side representation of [RTCRtpTransceiverInit].
+///
+/// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
+pub struct TransceiverInit(DartHandle);
+
+impl TransceiverInit {
+    /// Creates a new [`TransceiverInit`].
+    #[must_use]
+    pub fn new(direction: TransceiverDirection) -> Self {
+        let handle =
+            unsafe { transceiver::create_transceiver_init(direction.into()) };
+        Self(unsafe { DartHandle::new(handle) })
+    }
+
+    /// Returns underlying [`_Dart_Handle`].
+    #[must_use]
+    pub fn handle(&self) -> *mut _Dart_Handle {
+        self.0.get()
+    }
+
+    /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
+    pub fn add_sending_encodings(&self, encoding: SendEncodingParameters) {
+        unsafe {
+            transceiver::add_sending_encodings(self.0.get(), encoding.handle());
         }
     }
 }
