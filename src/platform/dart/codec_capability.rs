@@ -5,10 +5,7 @@
 use dart_sys::_Dart_Handle;
 use medea_macro::dart_bridge;
 
-use crate::{media::MediaKind, platform::dart::utils::handle::DartHandle};
-use crate::platform::codec_capability::{
-    CodecCapability as NewCodecCapability, CodecCapabilityError,
-};
+use crate::{media::MediaKind, platform::dart::utils::handle::DartHandle, platform::Error};
 
 use super::utils::{
     dart_future::FutureFromDart, dart_string_into_rust, list::DartList,
@@ -34,27 +31,6 @@ mod codec_capability {
     }
 }
 
-pub async fn get_codec_capabilities(
-    kind: MediaKind,
-) -> Result<Vec<NewCodecCapability>, CodecCapabilityError> {
-    let fut = unsafe {
-        codec_capability::get_sender_codec_capabilities(kind as i64)
-    };
-
-    let res: DartHandle =
-        unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-
-    Ok(Vec::from(DartList::from(res))
-        .into_iter()
-        .map(|caps: DartHandle| {
-            let mime_type = unsafe { codec_capability::mime_type(caps.get()) };
-            NewCodecCapability {
-                mime_type: unsafe { dart_string_into_rust(mime_type) },
-            }
-        })
-        .collect())
-}
-
 /// Dart side representation of [RTCRtpCodecCapability].
 ///
 /// [RTCRtpCodecCapability]: https://tinyurl.com/4jcp8m4s
@@ -70,7 +46,7 @@ impl From<DartHandle> for CodecCapability {
 impl CodecCapability {
     /// Gets available `sender`'s [`CodecCapability`]s.
     #[must_use]
-    pub async fn get_sender_codec_capabilities(kind: MediaKind) -> Vec<Self> {
+    pub async fn get_sender_codec_capabilities(kind: MediaKind) -> Result<Vec<Self>, Error> {
         let fut = unsafe {
             codec_capability::get_sender_codec_capabilities(kind as i64)
         };
@@ -78,17 +54,17 @@ impl CodecCapability {
         let res: DartHandle =
             unsafe { FutureFromDart::execute(fut) }.await.unwrap();
 
-        Vec::from(DartList::from(res))
+        Ok(Vec::from(DartList::from(res))
             .into_iter()
             .map(|caps: DartHandle| Self::from(caps))
-            .collect()
+            .collect())
     }
 
     /// Gets `mime_type` of this [`CodecCapability`]s.
     #[must_use]
-    pub fn mime_type(&self) -> String {
+    pub fn mime_type(&self) -> Result<String, Error> {
         let mime_type = unsafe { codec_capability::mime_type(self.0.get()) };
-        unsafe { dart_string_into_rust(mime_type) }
+        Ok(unsafe { dart_string_into_rust(mime_type) })
     }
 
     /// Returns underlying [`_Dart_Handle`].
@@ -97,3 +73,4 @@ impl CodecCapability {
         self.0.get()
     }
 }
+

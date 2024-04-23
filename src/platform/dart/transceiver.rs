@@ -19,8 +19,9 @@ use crate::{
 };
 
 use super::{
-    codec_capability::CodecCapability, parameters::Parameters,
+    parameters::Parameters,
     send_encoding_parameters::SendEncodingParameters,
+    codec_capability::CodecCapability,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]

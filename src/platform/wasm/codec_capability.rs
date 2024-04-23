@@ -7,31 +7,43 @@ use web_sys::{
     RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
     RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
+use wasm_bindgen::JsValue;
 
+use crate::platform::Error;
 use crate::platform::codec_capability::{
-    CodecCapability, CodecCapabilityError,
+    CodecCapabilityError,
 };
+use crate::media::MediaKind;
 use crate::platform::TransceiverDirection;
 
-pub fn get_codec_capabilities(
-) -> Result<Vec<CodecCapability>, CodecCapabilityError> {
-    let codecs = RtcRtpSender::get_capabilities("video")
-        .and_then(|capabs| {
-            Reflect::get(&capabs, &JsString::from("codecs")).ok()
-        })
-        .unwrap();
-    Ok(Array::from(&codecs)
-        .iter()
-        .map(|codec| {
-            Reflect::get(&codec, &JsString::from("mimeType"))
-                .ok()
-                .and_then(|a| {
-                    Some(CodecCapability {
-                        mime_type: a.as_string()?,
-                    })
-                })
-                .unwrap()
-        })
-        .collect())
-}
+#[derive(Clone, Debug)]
+pub struct CodecCapability(JsValue);
 
+impl CodecCapability {
+    pub async fn get_sender_codec_capabilities(kind: MediaKind) -> Result<Vec<Self>, Error> {
+        let codecs = RtcRtpSender::get_capabilities("video")
+            .and_then(|capabs| {
+                Reflect::get(&capabs, &JsString::from("codecs")).ok()
+            })
+            .unwrap();
+        Ok(Array::from(&codecs)
+            .iter()
+            .map(|codec| {
+                Self(codec)
+            })
+            .collect())
+    }
+
+    pub fn mime_type(&self) -> Result<String, Error> {
+        Ok(Reflect::get(&self.0, &JsString::from("mimeType"))
+            .ok()
+            .and_then(|a| {
+                Some(a.as_string()?)
+            })
+            .unwrap())
+    }
+
+    pub fn handle(&self) -> &JsValue {
+        &self.0
+    }
+}
