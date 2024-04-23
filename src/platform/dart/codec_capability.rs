@@ -6,6 +6,9 @@ use dart_sys::_Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{media::MediaKind, platform::dart::utils::handle::DartHandle};
+use crate::platform::codec_capability::{
+    CodecCapability as NewCodecCapability, CodecCapabilityError,
+};
 
 use super::utils::{
     dart_future::FutureFromDart, dart_string_into_rust, list::DartList,
@@ -29,6 +32,27 @@ mod codec_capability {
         pub fn mime_type(codec_capability: Dart_Handle)
             -> ptr::NonNull<c_char>;
     }
+}
+
+pub async fn get_codec_capabilities(
+    kind: MediaKind,
+) -> Result<Vec<NewCodecCapability>, CodecCapabilityError> {
+    let fut = unsafe {
+        codec_capability::get_sender_codec_capabilities(kind as i64)
+    };
+
+    let res: DartHandle =
+        unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+
+    Ok(Vec::from(DartList::from(res))
+        .into_iter()
+        .map(|caps: DartHandle| {
+            let mime_type = unsafe { codec_capability::mime_type(caps.get()) };
+            NewCodecCapability {
+                mime_type: unsafe { dart_string_into_rust(mime_type) },
+            }
+        })
+        .collect())
 }
 
 /// Dart side representation of [RTCRtpCodecCapability].

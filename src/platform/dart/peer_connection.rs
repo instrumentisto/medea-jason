@@ -30,7 +30,6 @@ use crate::{
 };
 
 use super::{
-    codec_capability::CodecCapability,
     ice_candidate::{
         IceCandidate as PlatformIceCandidate,
         IceCandidateError as PlatformIceCandidateError,
@@ -142,6 +141,28 @@ mod peer_connection {
 
         /// Closes the provided [`PeerConnection`].
         pub fn close(peer: Dart_Handle);
+    }
+}
+
+impl From<EncodingParameters> for SendEncodingParameters {
+    fn from(from: EncodingParameters) -> Self {
+        let EncodingParameters {
+            rid,
+            active,
+            max_bitrate,
+            scale_resolution_down_by,
+        } = from;
+
+        let enc = SendEncodingParameters::new(rid, active);
+
+        if let Some(b) = max_bitrate {
+            enc.set_max_bitrate(b.into());
+        }
+        if let Some(s) = scale_resolution_down_by {
+            enc.set_scale_resolution_down_by(s.into());
+        }
+
+        enc
     }
 }
 
@@ -505,6 +526,25 @@ impl RtcPeerConnection {
             .map_err(tracerr::wrap!())
     }
 
+    pub async fn new_add_transceiver(
+        &self,
+        kind: MediaKind,
+        init: TransceiverInit,
+    ) -> Transceiver {
+        let fut = unsafe {
+            peer_connection::add_transceiver(
+                self.handle.get(),
+                kind as i64,
+                init.handle(),
+            )
+        };
+        let trnsvr: DartHandle =
+            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+        let tr = Transceiver::from(trnsvr);
+
+        tr
+    }
+
     /// Creates a new [`Transceiver`] (see [RTCRtpTransceiver][1]) and adds it
     /// to the [set of this RTCPeerConnection's transceivers][2].
     ///
@@ -515,86 +555,20 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        encodings: Vec<EncodingParameters>,
-        svc: Vec<SvcSettings>,
     ) -> impl Future<Output = Transceiver> + 'static {
-        let handle = self.handle.clone();
+        let handle = self.handle.get();
 
         async move {
-            let init = TransceiverInit::new(direction);
-
-            let mut target_scalability_mode = None;
-            let mut target_codec = None;
-
-            let codecs =
-                CodecCapability::get_sender_codec_capabilities(kind).await;
-
-            for svc_setting in svc {
-                let res = codecs.iter().find(|codec| {
-                    codec.mime_type()
-                        == format!("video/{}", svc_setting.codec.to_string())
-                });
-
-                if res.is_some() {
-                    target_codec = res.cloned();
-                    target_scalability_mode =
-                        Some(svc_setting.scalability_mode);
-
-                    break;
-                }
-            }
-
-            // TODO(evdokimovs): Refactor
-            let process_encoding = |encoding: EncodingParameters| {
-                let enc =
-                    SendEncodingParameters::new(encoding.rid, encoding.active);
-                if let Some(max_bitrate) = encoding.max_bitrate {
-                    enc.set_max_bitrate(max_bitrate.into());
-                }
-                if let Some(scale_resolution_down_by) =
-                    encoding.scale_resolution_down_by
-                {
-                    enc.set_scale_resolution_down_by(
-                        scale_resolution_down_by.into(),
-                    );
-                }
-                if let Some(target_sm) = target_scalability_mode {
-                    enc.set_scalability_mode(target_sm);
-                }
-
-                init.add_sending_encodings(enc);
-            };
-
-            if encodings.is_empty() && target_scalability_mode.is_some() {
-                process_encoding(EncodingParameters {
-                    // TODO(evdokimovs): Why rid is `0`?
-                    rid: "0".to_owned(),
-                    active: true,
-                    max_bitrate: None,
-                    scale_resolution_down_by: None,
-                });
-            } else {
-                for encoding in encodings {
-                    process_encoding(encoding);
-                }
-            };
-
             let fut = unsafe {
                 peer_connection::add_transceiver(
-                    handle.get(),
+                    handle,
                     kind as i64,
-                    init.handle(),
+                    todo!("Implement me"),
                 )
             };
             let trnsvr: DartHandle =
                 unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            let tr = Transceiver::from(trnsvr);
-
-            if let Some(codec) = target_codec {
-                tr.set_preferred_codec(codec);
-            }
-
-            tr
+            Transceiver::from(trnsvr)
         }
     }
 

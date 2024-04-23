@@ -635,95 +635,17 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    // TODO(evdokimovs): Logic dublication with Dart side as I see
     pub fn add_transceiver(
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        mut encodings: Vec<EncodingParameters>,
-        svc: Vec<SvcSettings>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
             let mut init = RtcRtpTransceiverInit::new();
             _ = init.direction(direction.into());
-
-            let mut target_codec = None;
-            let mut target_scalability_mode = None;
-            let codecs =
-                RtcRtpSender::get_capabilities("video").and_then(|capabs| {
-                    Reflect::get(&capabs, &JsString::from("codecs")).ok()
-                });
-
-            if let (false, Some(codecs)) = (svc.is_empty(), codecs) {
-                for svc_setting in svc {
-                    let res = Array::from(&codecs).iter().find(|codec| {
-                        Reflect::get(codec, &JsString::from("mimeType"))
-                            .ok()
-                            .and_then(|a| a.as_string())
-                            .map_or(false, |mime| {
-                                mime == format!(
-                                    "video/{}",
-                                    svc_setting.codec.to_string()
-                                )
-                            })
-                    });
-
-                    if res.is_some() {
-                        target_codec = res;
-                        target_scalability_mode =
-                            Some(svc_setting.scalability_mode);
-
-                        break;
-                    }
-                }
-            }
-
-            let send_encodings = ::js_sys::Array::new();
-
-            let process_encoding = |encoding: EncodingParameters| {
-                let mut params = RtcRtpEncodingParameters::new();
-                _ = params.rid(&encoding.rid);
-                _ = params.active(encoding.active);
-                if let Some(max_bitrate) = &encoding.max_bitrate {
-                    _ = params.max_bitrate(*max_bitrate);
-                }
-                if let Some(scale_resolution_down_by) =
-                    &encoding.scale_resolution_down_by
-                {
-                    _ = params.scale_resolution_down_by(
-                        (*scale_resolution_down_by).into(),
-                    );
-                }
-                if let Some(target_sm) = target_scalability_mode {
-                    _ = params.scalability_mode(&target_sm.to_string());
-                }
-
-                _ = send_encodings.push(&params);
-            };
-
-            if encodings.is_empty() && target_scalability_mode.is_some() {
-                process_encoding(EncodingParameters {
-                    rid: "0".to_owned(),
-                    active: true,
-                    max_bitrate: None,
-                    scale_resolution_down_by: None,
-                });
-            } else {
-                for encoding in encodings {
-                    process_encoding(encoding);
-                }
-            }
-            _ = init.send_encodings(&send_encodings);
-
             let transceiver =
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
-
-            if let Some(codec) = target_codec {
-                transceiver
-                    .set_codec_preferences(&::js_sys::Array::of1(&codec));
-            }
-
             Transceiver::from(transceiver)
         }
     }

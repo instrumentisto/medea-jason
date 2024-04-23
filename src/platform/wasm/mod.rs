@@ -11,6 +11,7 @@ pub mod rtc_stats;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;
+pub mod codec_capability;
 
 use std::time::Duration;
 
