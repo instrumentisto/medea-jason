@@ -12,6 +12,7 @@ pub mod transceiver;
 pub mod transport;
 pub mod utils;
 pub mod codec_capability;
+pub mod send_encoding_parameters;
 
 use std::time::Duration;
 

@@ -557,7 +557,6 @@ impl RtcPeerConnection {
         direction: TransceiverDirection,
     ) -> impl Future<Output = Transceiver> + 'static {
         let handle = self.handle.get();
-
         async move {
             let fut = unsafe {
                 peer_connection::add_transceiver(
