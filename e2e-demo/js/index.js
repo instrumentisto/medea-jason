@@ -567,8 +567,8 @@ window.onload = async function() {
       let audioSource = audio_select.options[audio_select.selectedIndex];
       if (audioSource) {
         audio.device_id(audioSource.value);
-        audio.exact_auto_gain_control(!diasbleAudioGainControlSwitchEl.checked);
       }
+      audio.exact_auto_gain_control(!diasbleAudioGainControlSwitchEl.checked);
       constraints.audio(audio);
     }
 
@@ -843,13 +843,13 @@ window.onload = async function() {
             if (!isAudioSendEnabled) {
               constraints = await initLocalStream();
             }
-            await room.set_local_media_settings(constraints, false, true);
+            await room.set_local_media_settings(constraints, true, true);
           } catch (e) {
             console.error('Changing audio source failed: ' + e);
           }
     };
     audioSelect.addEventListener('change', audioSwitch);
-    audioGainControlSwitchEl.addEventListener('change', audioSwitch);
+    diasbleAudioGainControlSwitchEl.addEventListener('change', audioSwitch);
 
     let videoSwitch = async () => {
       try {
