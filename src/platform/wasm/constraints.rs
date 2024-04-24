@@ -7,7 +7,8 @@ use crate::media::{
 };
 use derive_more::{AsRef, Into};
 use web_sys::{
-    ConstrainBooleanParameters, ConstrainDomStringParameters, ConstrainDoubleRange, MediaTrackConstraints
+    ConstrainBooleanParameters, ConstrainDomStringParameters,
+    ConstrainDoubleRange, MediaTrackConstraints,
 };
 
 /// [MediaStreamConstraints][1] wrapper.
@@ -49,7 +50,9 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
         let mut constraints = Self::new();
 
         if let Some(auto_gain_control) = track_constraints.auto_gain_control {
-            _ = constraints.auto_gain_control(&ConstrainBooleanParameters::from(auto_gain_control));
+            _ = constraints.auto_gain_control(
+                &ConstrainBooleanParameters::from(auto_gain_control),
+            );
         }
 
         if let Some(device_id) = track_constraints.device_id {
@@ -101,11 +104,10 @@ impl From<ConstrainU32> for ConstrainDoubleRange {
 impl From<ConstrainBoolean> for ConstrainBooleanParameters {
     fn from(from: ConstrainBoolean) -> Self {
         let mut constraint = Self::new();
-        _ =
-            match from {
-                ConstrainBoolean::Exact(val) => constraint.exact(val),
-                ConstrainBoolean::Ideal(val) => constraint.ideal(val),
-            };
+        _ = match from {
+            ConstrainBoolean::Exact(val) => constraint.exact(val),
+            ConstrainBoolean::Ideal(val) => constraint.ideal(val),
+        };
         constraint
     }
 }

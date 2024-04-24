@@ -790,7 +790,10 @@ class RoomHandle extends FrbOpaque {
 class ApiAudioConstraints {
   /// Identifier of the device generating the content for the media track.
   String? deviceId;
-  final ConstrainBoolean? autoGainControl;
+
+  /// Automatically manages changes in the volume of its source
+  /// media to maintain a steady overall volume level.
+  ConstrainBoolean? autoGainControl;
 
   ApiAudioConstraints({
     this.deviceId,

@@ -285,7 +285,6 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
             }
         }
 
-
         if let Some(device_id) = from.device_id {
             match device_id {
                 ConstrainString::Exact(device_id) => unsafe {

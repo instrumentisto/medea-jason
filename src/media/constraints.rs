@@ -997,14 +997,16 @@ impl AudioTrackConstraints {
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
     pub fn exact_auto_gain_control(&mut self, auto_gain_control: bool) {
-        self.auto_gain_control = Some(ConstrainBoolean::Exact(auto_gain_control));
+        self.auto_gain_control =
+            Some(ConstrainBoolean::Exact(auto_gain_control));
     }
 
     /// Sets an ideal [autoGainControl][1] constraint.
     ///
     /// [1]: https://w3.org/TR/mediacapture-streams#dom-constrainboolean
     pub fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
-        self.auto_gain_control = Some(ConstrainBoolean::Ideal(auto_gain_control));
+        self.auto_gain_control =
+            Some(ConstrainBoolean::Ideal(auto_gain_control));
     }
 
     /// Checks whether the provided [`platform::MediaStreamTrack`] satisfies

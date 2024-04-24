@@ -25,9 +25,11 @@ use crate::{
     api::{utils::new_dart_opaque, Error, Error as DartError, ForeignClass},
     connection,
     media::{
-        self, constraints::{ConstrainU32, ConstrainBoolean}, EnumerateDevicesError,
-        EnumerateDisplaysError, InvalidOutputAudioDeviceIdError,
-        MediaDirection, MediaKind, MediaSourceKind, MicVolumeError,
+        self,
+        constraints::{ConstrainBoolean, ConstrainU32},
+        EnumerateDevicesError, EnumerateDisplaysError,
+        InvalidOutputAudioDeviceIdError, MediaDirection, MediaKind,
+        MediaSourceKind, MicVolumeError,
     },
     platform::{self, utils::dart_future::IntoDartFuture},
     room::{self, ConstraintsUpdateError, RoomJoinError},
@@ -97,7 +99,7 @@ pub struct ApiAudioConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
     pub device_id: Option<String>,
-    
+
     /// Automatically manages changes in the volume of its source
     /// media to maintain a steady overall volume level.
     #[frb(non_final)]

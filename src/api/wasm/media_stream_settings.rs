@@ -79,7 +79,6 @@ impl AudioTrackConstraints {
     pub fn ideal_auto_gain_control(&mut self, auto_gain_control: bool) {
         self.0.ideal_auto_gain_control(auto_gain_control);
     }
-
 }
 
 /// Constraints applicable to video tracks that are sourced from some media
