@@ -11,7 +11,7 @@ use medea_macro::dart_bridge;
 use crate::{
     api::DartValue,
     media::{
-        constraints::{ConstrainString, ConstrainU32},
+        constraints::{ConstrainBoolean, ConstrainString, ConstrainU32},
         AudioTrackConstraints, DeviceVideoTrackConstraints,
         DisplayVideoTrackConstraints,
     },
@@ -105,6 +105,7 @@ enum VideoConstraintKind {
 /// [0]: https://tinyurl.com/5bmrr4w5
 enum AudioConstraintKind {
     DeviceId = 0,
+    AutoGainControl = 1,
 }
 
 /// Indicator of necessity of a [MediaStreamConstraints] setting.
@@ -264,6 +265,26 @@ impl From<AudioTrackConstraints> for MediaTrackConstraints {
             let audio = unsafe { constraints::new_audio_constraints() };
             unsafe { DartHandle::new(audio) }
         };
+
+        if let Some(auto_gain_control) = from.auto_gain_control {
+            match auto_gain_control {
+                ConstrainBoolean::Exact(auto_gain_control) => unsafe {
+                    constraints::set_audio_constraint_value(
+                        mandatory.get(),
+                        AudioConstraintKind::AutoGainControl as i64,
+                        DartValue::from(auto_gain_control),
+                    );
+                },
+                ConstrainBoolean::Ideal(auto_gain_control) => unsafe {
+                    constraints::set_audio_constraint_value(
+                        optional.get(),
+                        AudioConstraintKind::AutoGainControl as i64,
+                        DartValue::from(auto_gain_control),
+                    );
+                },
+            }
+        }
+
 
         if let Some(device_id) = from.device_id {
             match device_id {

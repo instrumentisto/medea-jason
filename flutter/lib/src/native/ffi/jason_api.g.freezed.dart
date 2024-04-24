@@ -12,7 +12,7 @@ part of 'jason_api.g.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ApiConstrainFacingMode {
@@ -146,7 +146,7 @@ class _$ApiConstrainFacingMode_ExactImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiConstrainFacingMode_ExactImpl &&
@@ -291,7 +291,7 @@ class _$ApiConstrainFacingMode_IdealImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ApiConstrainFacingMode_IdealImpl &&
@@ -382,6 +382,368 @@ abstract class ApiConstrainFacingMode_Ideal implements ApiConstrainFacingMode {
   @JsonKey(ignore: true)
   _$$ApiConstrainFacingMode_IdealImplCopyWith<
           _$ApiConstrainFacingMode_IdealImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$ConstrainBoolean {
+  bool get field0 => throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(bool field0) exact,
+    required TResult Function(bool field0) ideal,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(bool field0)? exact,
+    TResult? Function(bool field0)? ideal,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(bool field0)? exact,
+    TResult Function(bool field0)? ideal,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ConstrainBoolean_Exact value) exact,
+    required TResult Function(ConstrainBoolean_Ideal value) ideal,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ConstrainBoolean_Exact value)? exact,
+    TResult? Function(ConstrainBoolean_Ideal value)? ideal,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ConstrainBoolean_Exact value)? exact,
+    TResult Function(ConstrainBoolean_Ideal value)? ideal,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $ConstrainBooleanCopyWith<ConstrainBoolean> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ConstrainBooleanCopyWith<$Res> {
+  factory $ConstrainBooleanCopyWith(
+          ConstrainBoolean value, $Res Function(ConstrainBoolean) then) =
+      _$ConstrainBooleanCopyWithImpl<$Res, ConstrainBoolean>;
+  @useResult
+  $Res call({bool field0});
+}
+
+/// @nodoc
+class _$ConstrainBooleanCopyWithImpl<$Res, $Val extends ConstrainBoolean>
+    implements $ConstrainBooleanCopyWith<$Res> {
+  _$ConstrainBooleanCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(_value.copyWith(
+      field0: null == field0
+          ? _value.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ConstrainBoolean_ExactImplCopyWith<$Res>
+    implements $ConstrainBooleanCopyWith<$Res> {
+  factory _$$ConstrainBoolean_ExactImplCopyWith(
+          _$ConstrainBoolean_ExactImpl value,
+          $Res Function(_$ConstrainBoolean_ExactImpl) then) =
+      __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({bool field0});
+}
+
+/// @nodoc
+class __$$ConstrainBoolean_ExactImplCopyWithImpl<$Res>
+    extends _$ConstrainBooleanCopyWithImpl<$Res, _$ConstrainBoolean_ExactImpl>
+    implements _$$ConstrainBoolean_ExactImplCopyWith<$Res> {
+  __$$ConstrainBoolean_ExactImplCopyWithImpl(
+      _$ConstrainBoolean_ExactImpl _value,
+      $Res Function(_$ConstrainBoolean_ExactImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(_$ConstrainBoolean_ExactImpl(
+      null == field0
+          ? _value.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ConstrainBoolean_ExactImpl implements ConstrainBoolean_Exact {
+  const _$ConstrainBoolean_ExactImpl(this.field0);
+
+  @override
+  final bool field0;
+
+  @override
+  String toString() {
+    return 'ConstrainBoolean.exact(field0: $field0)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ConstrainBoolean_ExactImpl &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
+      get copyWith => __$$ConstrainBoolean_ExactImplCopyWithImpl<
+          _$ConstrainBoolean_ExactImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(bool field0) exact,
+    required TResult Function(bool field0) ideal,
+  }) {
+    return exact(field0);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(bool field0)? exact,
+    TResult? Function(bool field0)? ideal,
+  }) {
+    return exact?.call(field0);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(bool field0)? exact,
+    TResult Function(bool field0)? ideal,
+    required TResult orElse(),
+  }) {
+    if (exact != null) {
+      return exact(field0);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ConstrainBoolean_Exact value) exact,
+    required TResult Function(ConstrainBoolean_Ideal value) ideal,
+  }) {
+    return exact(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ConstrainBoolean_Exact value)? exact,
+    TResult? Function(ConstrainBoolean_Ideal value)? ideal,
+  }) {
+    return exact?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ConstrainBoolean_Exact value)? exact,
+    TResult Function(ConstrainBoolean_Ideal value)? ideal,
+    required TResult orElse(),
+  }) {
+    if (exact != null) {
+      return exact(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ConstrainBoolean_Exact implements ConstrainBoolean {
+  const factory ConstrainBoolean_Exact(final bool field0) =
+      _$ConstrainBoolean_ExactImpl;
+
+  @override
+  bool get field0;
+  @override
+  @JsonKey(ignore: true)
+  _$$ConstrainBoolean_ExactImplCopyWith<_$ConstrainBoolean_ExactImpl>
+      get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ConstrainBoolean_IdealImplCopyWith<$Res>
+    implements $ConstrainBooleanCopyWith<$Res> {
+  factory _$$ConstrainBoolean_IdealImplCopyWith(
+          _$ConstrainBoolean_IdealImpl value,
+          $Res Function(_$ConstrainBoolean_IdealImpl) then) =
+      __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({bool field0});
+}
+
+/// @nodoc
+class __$$ConstrainBoolean_IdealImplCopyWithImpl<$Res>
+    extends _$ConstrainBooleanCopyWithImpl<$Res, _$ConstrainBoolean_IdealImpl>
+    implements _$$ConstrainBoolean_IdealImplCopyWith<$Res> {
+  __$$ConstrainBoolean_IdealImplCopyWithImpl(
+      _$ConstrainBoolean_IdealImpl _value,
+      $Res Function(_$ConstrainBoolean_IdealImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(_$ConstrainBoolean_IdealImpl(
+      null == field0
+          ? _value.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ConstrainBoolean_IdealImpl implements ConstrainBoolean_Ideal {
+  const _$ConstrainBoolean_IdealImpl(this.field0);
+
+  @override
+  final bool field0;
+
+  @override
+  String toString() {
+    return 'ConstrainBoolean.ideal(field0: $field0)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ConstrainBoolean_IdealImpl &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
+      get copyWith => __$$ConstrainBoolean_IdealImplCopyWithImpl<
+          _$ConstrainBoolean_IdealImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(bool field0) exact,
+    required TResult Function(bool field0) ideal,
+  }) {
+    return ideal(field0);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(bool field0)? exact,
+    TResult? Function(bool field0)? ideal,
+  }) {
+    return ideal?.call(field0);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(bool field0)? exact,
+    TResult Function(bool field0)? ideal,
+    required TResult orElse(),
+  }) {
+    if (ideal != null) {
+      return ideal(field0);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ConstrainBoolean_Exact value) exact,
+    required TResult Function(ConstrainBoolean_Ideal value) ideal,
+  }) {
+    return ideal(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ConstrainBoolean_Exact value)? exact,
+    TResult? Function(ConstrainBoolean_Ideal value)? ideal,
+  }) {
+    return ideal?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ConstrainBoolean_Exact value)? exact,
+    TResult Function(ConstrainBoolean_Ideal value)? ideal,
+    required TResult orElse(),
+  }) {
+    if (ideal != null) {
+      return ideal(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ConstrainBoolean_Ideal implements ConstrainBoolean {
+  const factory ConstrainBoolean_Ideal(final bool field0) =
+      _$ConstrainBoolean_IdealImpl;
+
+  @override
+  bool get field0;
+  @override
+  @JsonKey(ignore: true)
+  _$$ConstrainBoolean_IdealImplCopyWith<_$ConstrainBoolean_IdealImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -518,7 +880,7 @@ class _$ConstrainU32_ExactImpl implements ConstrainU32_Exact {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_ExactImpl &&
@@ -662,7 +1024,7 @@ class _$ConstrainU32_IdealImpl implements ConstrainU32_Ideal {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_IdealImpl &&
@@ -813,7 +1175,7 @@ class _$ConstrainU32_RangeImpl implements ConstrainU32_Range {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ConstrainU32_RangeImpl &&

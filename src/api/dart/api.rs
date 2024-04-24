@@ -25,7 +25,7 @@ use crate::{
     api::{utils::new_dart_opaque, Error, Error as DartError, ForeignClass},
     connection,
     media::{
-        self, constraints::ConstrainU32, EnumerateDevicesError,
+        self, constraints::{ConstrainU32, ConstrainBoolean}, EnumerateDevicesError,
         EnumerateDisplaysError, InvalidOutputAudioDeviceIdError,
         MediaDirection, MediaKind, MediaSourceKind, MicVolumeError,
     },
@@ -97,6 +97,11 @@ pub struct ApiAudioConstraints {
     /// Identifier of the device generating the content for the media track.
     #[frb(non_final)]
     pub device_id: Option<String>,
+    
+    /// Automatically manages changes in the volume of its source
+    /// media to maintain a steady overall volume level.
+    #[frb(non_final)]
+    pub auto_gain_control: Option<ConstrainBoolean>,
 }
 
 impl From<ApiAudioConstraints> for media::AudioTrackConstraints {
@@ -104,6 +109,12 @@ impl From<ApiAudioConstraints> for media::AudioTrackConstraints {
         let mut res = Self::new();
         if let Some(id) = value.device_id {
             res.device_id(id);
+        }
+        if let Some(auto_gain_control) = value.auto_gain_control {
+            match auto_gain_control {
+                ConstrainBoolean::Exact(e) => res.exact_auto_gain_control(e),
+                ConstrainBoolean::Ideal(i) => res.ideal_auto_gain_control(i),
+            }
         }
         res
     }

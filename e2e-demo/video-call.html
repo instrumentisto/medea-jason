@@ -704,7 +704,17 @@
         <div class="modal-body">
           <label for="connect__select-device_audio">Audio</label>
           <select id="connect__select-device_audio" class="custom-select">
-          </select><br><br>
+          </select>
+          <div class="custom-control custom-switch" style="margin-top: 10px">
+            <input type="checkbox"
+                   id="connection-settings__audio_gain_control"
+                   class="custom-control-input"
+                   autocomplete="off">
+            <label for="connection-settings__audio_gain_control"
+                   class="custom-control-label">
+              Disable audio gain control
+            </label>
+          </div><br>
 
           <label for="connect__select-device_video">Video</label>
           <select id="connect__select-device_video" class="custom-select">
