@@ -37,6 +37,7 @@ use libc::c_void;
 use crate::platform::utils::dart_api;
 
 pub use self::{
+    codec_capability::CodecCapability,
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     executor::spawn,
@@ -46,7 +47,7 @@ pub use self::{
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
-    transceiver::Transceiver,
+    transceiver::{Transceiver, TransceiverInit},
     transport::WebSocketRpcTransport,
     utils::{completer::delay_for, Function},
 };

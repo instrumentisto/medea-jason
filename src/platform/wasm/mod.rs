@@ -23,6 +23,7 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::Window;
 
 pub use self::{
+    codec_capability::CodecCapability,
     constraints::{DisplayMediaStreamConstraints, MediaStreamConstraints},
     error::Error,
     media_device_info::MediaDeviceInfo,
@@ -30,7 +31,7 @@ pub use self::{
     media_track::MediaStreamTrack,
     peer_connection::RtcPeerConnection,
     rtc_stats::RtcStats,
-    transceiver::Transceiver,
+    transceiver::{Transceiver, TransceiverInit},
     transport::WebSocketRpcTransport,
     utils::Function,
 };

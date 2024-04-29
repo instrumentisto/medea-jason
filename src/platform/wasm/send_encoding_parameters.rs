@@ -1,6 +1,6 @@
 use web_sys::RtcRtpEncodingParameters;
 
-use medea_client_api_proto::ScalabilityMode;
+use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
 
 #[derive(Clone, Debug)]
 pub struct SendEncodingParameters(RtcRtpEncodingParameters);
@@ -36,5 +36,27 @@ impl SendEncodingParameters {
     /// Sets `set_scalability_mode`.
     pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
         self.0.scalability_mode(&scalability_mode.to_string());
+    }
+}
+
+impl From<EncodingParameters> for SendEncodingParameters {
+    fn from(from: EncodingParameters) -> Self {
+        let EncodingParameters {
+            rid,
+            active,
+            max_bitrate,
+            scale_resolution_down_by,
+        } = from;
+
+        let mut enc = SendEncodingParameters::new(rid, active);
+
+        if let Some(b) = max_bitrate {
+            enc.set_max_bitrate(b.into());
+        }
+        if let Some(s) = scale_resolution_down_by {
+            enc.set_scale_resolution_down_by(s.into());
+        }
+
+        enc
     }
 }

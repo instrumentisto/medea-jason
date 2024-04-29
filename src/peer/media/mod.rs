@@ -16,6 +16,7 @@ use futures::{
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
+use medea_client_api_proto::{EncodingParameters, SvcSettings};
 use proto::{MediaSourceKind, TrackId};
 use tracerr::Traced;
 
@@ -25,6 +26,10 @@ use crate::{
     media::{track::local, MediaKind},
     peer::{LocalStreamUpdateCriteria, PeerEvent},
     platform,
+    platform::{
+        send_encoding_parameters::SendEncodingParameters, CodecCapability,
+        TransceiverInit,
+    },
     utils::{Caused, Component},
 };
 
@@ -319,8 +324,63 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         direction: platform::TransceiverDirection,
+        encodings: Vec<EncodingParameters>,
+        svc: Vec<SvcSettings>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
-        self.peer.add_transceiver(kind, todo!())
+        let peer = self.peer.clone();
+        async move {
+            let mut init = TransceiverInit::new(direction);
+            let codecs = CodecCapability::get_sender_codec_capabilities(kind)
+                .await
+                .unwrap();
+            let mut target_scalability_mode = None;
+            let mut target_codec = None;
+
+            for svc_setting in svc {
+                let res = codecs.iter().find(|codec| {
+                    codec.mime_type().unwrap()
+                        == format!("video/{}", svc_setting.codec.to_string())
+                });
+
+                if res.is_some() {
+                    target_codec = res.cloned();
+                    target_scalability_mode =
+                        Some(svc_setting.scalability_mode);
+
+                    break;
+                }
+            }
+
+            if encodings.is_empty() && target_scalability_mode.is_some() {
+                let mut enc =
+                    SendEncodingParameters::from(EncodingParameters {
+                        rid: "0".to_owned(),
+                        active: true,
+                        max_bitrate: None,
+                        scale_resolution_down_by: None,
+                    });
+                if let Some(t) = target_scalability_mode {
+                    enc.set_scalability_mode(t);
+                }
+                init.sending_encodings(vec![enc]);
+            } else {
+                encodings
+                    .into_iter()
+                    .map(SendEncodingParameters::from)
+                    .for_each(|mut enc| {
+                        if let Some(target_sm) = target_scalability_mode {
+                            enc.set_scalability_mode(target_sm);
+                        }
+                        init.sending_encodings(vec![enc]);
+                    });
+            };
+
+            let transceiver = peer.add_transceiver(kind, init).await;
+            if let Some(codec) = target_codec {
+                transceiver.set_preferred_codec(codec);
+            }
+            transceiver
+        }
     }
 
     /// Lookups a [`platform::Transceiver`] by the provided [`mid`].
