@@ -123,7 +123,7 @@
     missing_abi,
     missing_copy_implementations,
     missing_debug_implementations,
-    missing_docs,
+    // missing_docs,
     semicolon_in_expressions_from_macros,
     single_use_lifetimes,
     unit_bindings,

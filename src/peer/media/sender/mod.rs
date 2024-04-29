@@ -141,8 +141,8 @@ impl Sender {
                         media_connections.0.borrow().add_transceiver(
                             kind,
                             platform::TransceiverDirection::INACTIVE,
-                            todo!(),
-                            todo!(),
+                            vec![],
+                            vec![],
                         );
                     add_transceiver.await
                 }

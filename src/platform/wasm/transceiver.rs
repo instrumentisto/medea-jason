@@ -26,7 +26,7 @@ pub struct TransceiverInit(RtcRtpTransceiverInit);
 impl TransceiverInit {
     pub fn new(direction: TransceiverDirection) -> Self {
         let mut init = RtcRtpTransceiverInit::new();
-        init.direction(direction.into());
+        let _ = init.direction(direction.into());
         Self(init)
     }
 
@@ -40,9 +40,9 @@ impl TransceiverInit {
     ) {
         let send_encoding = ::js_sys::Array::new();
         encodings.into_iter().for_each(|enc| {
-            send_encoding.push(enc.handle());
+            let _ = send_encoding.push(enc.handle());
         });
-        self.0.send_encodings(&send_encoding);
+        let _ = self.0.send_encodings(&send_encoding);
     }
 }
 
@@ -181,8 +181,8 @@ impl Transceiver {
     }
 
     pub fn set_preferred_codec(&self, codec: CodecCapability) {
-        let mut arr = ::js_sys::Array::of1(codec.handle());
-        self.0.set_codec_preferences(&arr);
+        self.0
+            .set_codec_preferences(&::js_sys::Array::of1(codec.handle()));
     }
 }
 

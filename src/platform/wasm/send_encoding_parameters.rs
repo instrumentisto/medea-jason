@@ -18,11 +18,11 @@ impl SendEncodingParameters {
     }
 
     pub fn set_active(&mut self, active: bool) {
-        self.0.active(active);
+        let _ = self.0.active(active);
     }
 
     pub fn set_max_bitrate(&mut self, max_bitrate: u32) {
-        self.0.max_bitrate(max_bitrate);
+        let _ = self.0.max_bitrate(max_bitrate);
     }
 
     /// Sets `scale_resolution_down_by`.
@@ -30,12 +30,12 @@ impl SendEncodingParameters {
         &mut self,
         scale_resolution_down_by: f32,
     ) {
-        self.0.scale_resolution_down_by(scale_resolution_down_by);
+        let _ = self.0.scale_resolution_down_by(scale_resolution_down_by);
     }
 
     /// Sets `set_scalability_mode`.
     pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
-        self.0.scalability_mode(&scalability_mode.to_string());
+        let _ = self.0.scalability_mode(&scalability_mode.to_string());
     }
 }
 

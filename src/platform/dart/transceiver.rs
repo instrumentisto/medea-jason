@@ -260,7 +260,7 @@ impl Transceiver {
         let params = self.get_send_parameters().await;
 
         let encs = params.encodings().await?;
-        for enc in encs {
+        for mut enc in encs {
             let rid = enc.rid();
 
             let Some(encoding) = encodings.iter().find(|e| e.rid == rid) else {
@@ -303,6 +303,7 @@ impl Drop for Transceiver {
 /// Dart side representation of [RTCRtpTransceiverInit].
 ///
 /// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
+#[derive(Debug)]
 pub struct TransceiverInit(DartHandle);
 
 impl TransceiverInit {
@@ -321,7 +322,10 @@ impl TransceiverInit {
     }
 
     /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
-    pub fn sending_encodings(&self, encodings: Vec<SendEncodingParameters>) {
+    pub fn sending_encodings(
+        &mut self,
+        encodings: Vec<SendEncodingParameters>,
+    ) {
         for encoding in encodings {
             unsafe {
                 transceiver::add_sending_encodings(

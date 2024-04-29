@@ -90,7 +90,7 @@ impl SendEncodingParameters {
     }
 
     /// Sets `active`.
-    pub fn set_active(&self, active: bool) {
+    pub fn set_active(&mut self, active: bool) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_active(handle, active);
@@ -98,7 +98,7 @@ impl SendEncodingParameters {
     }
 
     /// Sets `max_bitrate`.
-    pub fn set_max_bitrate(&self, max_bitrate: i64) {
+    pub fn set_max_bitrate(&mut self, max_bitrate: i64) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_max_bitrate(handle, max_bitrate);
@@ -106,7 +106,10 @@ impl SendEncodingParameters {
     }
 
     /// Sets `scale_resolution_down_by`.
-    pub fn set_scale_resolution_down_by(&self, scale_resolution_down_by: i64) {
+    pub fn set_scale_resolution_down_by(
+        &mut self,
+        scale_resolution_down_by: i64,
+    ) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scale_resolution_down_by(
@@ -117,7 +120,7 @@ impl SendEncodingParameters {
     }
 
     /// Sets `set_scalability_mode`.
-    pub fn set_scalability_mode(&self, scalability_mode: ScalabilityMode) {
+    pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
         let handle = self.0.get();
         unsafe {
             send_encoding_parameters::set_scalability_mode(
@@ -137,7 +140,7 @@ impl From<EncodingParameters> for SendEncodingParameters {
             scale_resolution_down_by,
         } = from;
 
-        let enc = SendEncodingParameters::new(rid, active);
+        let mut enc = SendEncodingParameters::new(rid, active);
 
         if let Some(b) = max_bitrate {
             enc.set_max_bitrate(b.into());

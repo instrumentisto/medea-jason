@@ -6,8 +6,7 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
-    SvcSettings,
+    IceConnectionState, IceServer, PeerConnectionState,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -25,7 +24,7 @@ use crate::{
             },
         },
         IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        SdpType, TransceiverDirection,
+        SdpType,
     },
 };
 
@@ -35,7 +34,6 @@ use super::{
         IceCandidateError as PlatformIceCandidateError,
     },
     media_track::MediaStreamTrack,
-    send_encoding_parameters::SendEncodingParameters,
     transceiver::TransceiverInit,
     utils::string_into_c_str,
 };

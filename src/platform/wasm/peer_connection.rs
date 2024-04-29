@@ -10,10 +10,8 @@ use std::{
     rc::Rc,
 };
 
-use js_sys::{Array, JsString, Reflect};
 use medea_client_api_proto::{
-    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
-    ScalabilityMode, SvcSettings,
+    IceConnectionState, IceServer, PeerConnectionState,
 };
 use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
@@ -21,8 +19,7 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
-    RtcPeerConnectionIceEvent, RtcRtpEncodingParameters, RtcRtpSender,
-    RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
+    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcSdpType,
     RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
 
@@ -36,7 +33,6 @@ use crate::{
         },
         IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
-        TransceiverDirection,
     },
 };
 

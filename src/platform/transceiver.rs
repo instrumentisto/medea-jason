@@ -6,13 +6,9 @@
 #![allow(clippy::same_name_method)]
 
 use bitflags::bitflags;
-use medea_client_api_proto::{
-    Direction as DirectionProto, EncodingParameters, ScalabilityMode,
-};
+use medea_client_api_proto::Direction as DirectionProto;
 #[cfg(target_family = "wasm")]
 use web_sys::RtcRtpTransceiverDirection;
-
-use crate::platform::TransceiverDirection;
 
 bitflags! {
     /// Representation of [RTCRtpTransceiverDirection][1].
