@@ -1,5 +1,6 @@
 //! `wasm32`-platform-specific functionality.
 
+pub mod codec_capability;
 pub mod constraints;
 pub mod error;
 pub mod ice_server;
@@ -8,11 +9,10 @@ pub mod media_devices;
 pub mod media_track;
 pub mod peer_connection;
 pub mod rtc_stats;
+pub mod send_encoding_parameters;
 pub mod transceiver;
 pub mod transport;
 pub mod utils;
-pub mod codec_capability;
-pub mod send_encoding_parameters;
 
 use std::time::Duration;
 

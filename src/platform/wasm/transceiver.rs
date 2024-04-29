@@ -6,14 +6,45 @@ use derive_more::From;
 use js_sys::Array;
 use medea_client_api_proto::EncodingParameters;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{RtcRtpEncodingParameters, RtcRtpTransceiver};
+use web_sys::{
+    RtcRtpEncodingParameters, RtcRtpTransceiver, RtcRtpTransceiverInit,
+};
 
 use crate::{
     media::track::local,
-    platform::{Error, TransceiverDirection},
+    platform::{
+        send_encoding_parameters::SendEncodingParameters,
+        wasm::codec_capability::CodecCapability, Error, TransceiverDirection,
+    },
 };
 
 use super::get_property_by_name;
+
+#[derive(Debug)]
+pub struct TransceiverInit(RtcRtpTransceiverInit);
+
+impl TransceiverInit {
+    pub fn new(direction: TransceiverDirection) -> Self {
+        let mut init = RtcRtpTransceiverInit::new();
+        init.direction(direction.into());
+        Self(init)
+    }
+
+    pub fn handle(&self) -> &RtcRtpTransceiverInit {
+        &self.0
+    }
+
+    pub fn sending_encodings(
+        &mut self,
+        encodings: Vec<SendEncodingParameters>,
+    ) {
+        let send_encoding = ::js_sys::Array::new();
+        encodings.into_iter().for_each(|enc| {
+            send_encoding.push(enc.handle());
+        });
+        self.0.send_encodings(&send_encoding);
+    }
+}
 
 /// Wrapper around [`RtcRtpTransceiver`] which provides handy methods for
 /// direction changes.
@@ -147,6 +178,14 @@ impl Transceiver {
         );
 
         Ok(())
+    }
+
+    pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
+        let mut arr = ::js_sys::Array::new();
+        for codec in codecs {
+            arr.push(codec.handle());
+        }
+        self.0.set_codec_preferences(&arr);
     }
 }
 

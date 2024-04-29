@@ -30,7 +30,10 @@ use crate::{
     media::MediaKind,
     platform::{
         self,
-        wasm::{get_property_by_name, utils::EventListener},
+        wasm::{
+            get_property_by_name, transceiver::TransceiverInit,
+            utils::EventListener,
+        },
         IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
         TransceiverDirection,
@@ -635,19 +638,15 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    pub fn add_transceiver(
+    pub async fn add_transceiver(
         &self,
         kind: MediaKind,
-        direction: TransceiverDirection,
-    ) -> impl Future<Output = Transceiver> + 'static {
+        init: TransceiverInit,
+    ) -> Transceiver {
         let peer = Rc::clone(&self.peer);
-        async move {
-            let mut init = RtcRtpTransceiverInit::new();
-            _ = init.direction(direction.into());
-            let transceiver =
-                peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
-            Transceiver::from(transceiver)
-        }
+        let transceiver = peer
+            .add_transceiver_with_str_and_init(kind.as_str(), init.handle());
+        Transceiver::from(transceiver)
     }
 
     /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a

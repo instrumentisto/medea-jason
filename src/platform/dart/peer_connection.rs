@@ -526,7 +526,13 @@ impl RtcPeerConnection {
             .map_err(tracerr::wrap!())
     }
 
-    pub async fn new_add_transceiver(
+    /// Creates a new [`Transceiver`] (see [RTCRtpTransceiver][1]) and adds it
+    /// to the [set of this RTCPeerConnection's transceivers][2].
+    ///
+    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
+    /// [2]: https://w3.org/TR/webrtc/#transceivers-set
+    // TODO(evdokimovs): It should be much simpler (move logic from there):
+    pub async fn add_transceiver(
         &self,
         kind: MediaKind,
         init: TransceiverInit,
@@ -543,32 +549,6 @@ impl RtcPeerConnection {
         let tr = Transceiver::from(trnsvr);
 
         tr
-    }
-
-    /// Creates a new [`Transceiver`] (see [RTCRtpTransceiver][1]) and adds it
-    /// to the [set of this RTCPeerConnection's transceivers][2].
-    ///
-    /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
-    /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    // TODO(evdokimovs): It should be much simpler (move logic from there):
-    pub fn add_transceiver(
-        &self,
-        kind: MediaKind,
-        direction: TransceiverDirection,
-    ) -> impl Future<Output = Transceiver> + 'static {
-        let handle = self.handle.get();
-        async move {
-            let fut = unsafe {
-                peer_connection::add_transceiver(
-                    handle,
-                    kind as i64,
-                    todo!("Implement me"),
-                )
-            };
-            let trnsvr: DartHandle =
-                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            Transceiver::from(trnsvr)
-        }
     }
 
     /// Returns [`Transceiver`] (see [RTCRtpTransceiver][1]) from a

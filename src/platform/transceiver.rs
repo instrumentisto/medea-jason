@@ -6,7 +6,9 @@
 #![allow(clippy::same_name_method)]
 
 use bitflags::bitflags;
-use medea_client_api_proto::{Direction as DirectionProto, ScalabilityMode, EncodingParameters};
+use medea_client_api_proto::{
+    Direction as DirectionProto, EncodingParameters, ScalabilityMode,
+};
 #[cfg(target_family = "wasm")]
 use web_sys::RtcRtpTransceiverDirection;
 
@@ -120,19 +122,6 @@ impl From<i32> for Direction {
             }
         }
     }
-}
-
-#[derive(Clone, Debug)]
-pub struct SendEncodingParameters {
-    pub scalability_mode: ScalabilityMode,
-    pub encoding_parameters: EncodingParameters,
-}
-
-
-#[derive(Clone, Debug)]
-pub struct TransceiverInit {
-    pub direction: TransceiverDirection,
-    pub sending_encoding: Vec<SendEncodingParameters>,
 }
 
 #[cfg(test)]

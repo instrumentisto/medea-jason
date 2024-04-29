@@ -1,4 +1,5 @@
 use js_sys::{Array, JsString, Reflect};
+use wasm_bindgen::JsValue;
 use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
@@ -7,20 +8,21 @@ use web_sys::{
     RtcRtpTransceiver, RtcRtpTransceiverInit, RtcSdpType,
     RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
-use wasm_bindgen::JsValue;
 
-use crate::platform::Error;
-use crate::platform::codec_capability::{
-    CodecCapabilityError,
+use crate::{
+    media::MediaKind,
+    platform::{
+        codec_capability::CodecCapabilityError, Error, TransceiverDirection,
+    },
 };
-use crate::media::MediaKind;
-use crate::platform::TransceiverDirection;
 
 #[derive(Clone, Debug)]
 pub struct CodecCapability(JsValue);
 
 impl CodecCapability {
-    pub async fn get_sender_codec_capabilities(kind: MediaKind) -> Result<Vec<Self>, Error> {
+    pub async fn get_sender_codec_capabilities(
+        kind: MediaKind,
+    ) -> Result<Vec<Self>, Error> {
         let codecs = RtcRtpSender::get_capabilities("video")
             .and_then(|capabs| {
                 Reflect::get(&capabs, &JsString::from("codecs")).ok()
@@ -28,18 +30,14 @@ impl CodecCapability {
             .unwrap();
         Ok(Array::from(&codecs)
             .iter()
-            .map(|codec| {
-                Self(codec)
-            })
+            .map(|codec| Self(codec))
             .collect())
     }
 
     pub fn mime_type(&self) -> Result<String, Error> {
         Ok(Reflect::get(&self.0, &JsString::from("mimeType"))
             .ok()
-            .and_then(|a| {
-                Some(a.as_string()?)
-            })
+            .and_then(|a| Some(a.as_string()?))
             .unwrap())
     }
 

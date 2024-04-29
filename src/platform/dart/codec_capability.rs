@@ -5,7 +5,10 @@
 use dart_sys::_Dart_Handle;
 use medea_macro::dart_bridge;
 
-use crate::{media::MediaKind, platform::dart::utils::handle::DartHandle, platform::Error};
+use crate::{
+    media::MediaKind,
+    platform::{dart::utils::handle::DartHandle, Error},
+};
 
 use super::utils::{
     dart_future::FutureFromDart, dart_string_into_rust, list::DartList,
@@ -46,7 +49,9 @@ impl From<DartHandle> for CodecCapability {
 impl CodecCapability {
     /// Gets available `sender`'s [`CodecCapability`]s.
     #[must_use]
-    pub async fn get_sender_codec_capabilities(kind: MediaKind) -> Result<Vec<Self>, Error> {
+    pub async fn get_sender_codec_capabilities(
+        kind: MediaKind,
+    ) -> Result<Vec<Self>, Error> {
         let fut = unsafe {
             codec_capability::get_sender_codec_capabilities(kind as i64)
         };
@@ -73,4 +78,3 @@ impl CodecCapability {
         self.0.get()
     }
 }
-

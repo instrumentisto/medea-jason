@@ -19,9 +19,8 @@ use crate::{
 };
 
 use super::{
-    parameters::Parameters,
+    codec_capability::CodecCapability, parameters::Parameters,
     send_encoding_parameters::SendEncodingParameters,
-    codec_capability::CodecCapability,
 };
 
 #[dart_bridge("flutter/lib/src/native/platform/transceiver.g.dart")]
@@ -322,9 +321,14 @@ impl TransceiverInit {
     }
 
     /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
-    pub fn add_sending_encodings(&self, encoding: SendEncodingParameters) {
-        unsafe {
-            transceiver::add_sending_encodings(self.0.get(), encoding.handle());
+    pub fn sending_encodings(&self, encodings: Vec<SendEncodingParameters>) {
+        for encoding in encodings {
+            unsafe {
+                transceiver::add_sending_encodings(
+                    self.0.get(),
+                    encoding.handle(),
+                );
+            }
         }
     }
 }
