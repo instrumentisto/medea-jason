@@ -375,9 +375,10 @@ impl InnerMediaConnections {
                     });
             };
 
-            let transceiver = peer.add_transceiver(kind, init).await;
+            // TODO(evdokimovs): Remove unwrap
+            let transceiver = peer.add_transceiver(kind, init).await.unwrap();
             if let Some(codec) = target_codec {
-                transceiver.set_preferred_codec(codec);
+                transceiver.set_preferred_codecs(vec![codec]);
             }
             transceiver
         }

@@ -2,12 +2,15 @@
 //!
 //! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
-use dart_sys::_Dart_Handle;
+use dart_sys::Dart_Handle;
 use medea_macro::dart_bridge;
 
 use crate::{
     media::MediaKind,
-    platform::{dart::utils::handle::DartHandle, Error},
+    platform::{
+        codec_capability::CodecCapabilityError as Error,
+        dart::utils::handle::DartHandle,
+    },
 };
 
 use super::utils::{
@@ -56,8 +59,9 @@ impl CodecCapability {
             codec_capability::get_sender_codec_capabilities(kind as i64)
         };
 
-        let res: DartHandle =
-            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+        let res: DartHandle = unsafe { FutureFromDart::execute(fut) }
+            .await
+            .map_err(|_| Error::FailedToGetCapabilities)?;
 
         Ok(Vec::from(DartList::from(res))
             .into_iter()
@@ -74,7 +78,7 @@ impl CodecCapability {
 
     /// Returns underlying [`_Dart_Handle`].
     #[must_use]
-    pub fn handle(&self) -> *mut _Dart_Handle {
+    pub fn handle(&self) -> Dart_Handle {
         self.0.get()
     }
 }

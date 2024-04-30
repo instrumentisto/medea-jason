@@ -638,11 +638,11 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         init: TransceiverInit,
-    ) -> Transceiver {
+    ) -> RtcPeerConnectionResult<Transceiver> {
         let peer = Rc::clone(&self.peer);
         let transceiver = peer
             .add_transceiver_with_str_and_init(kind.as_str(), init.handle());
-        Transceiver::from(transceiver)
+        Ok(Transceiver::from(transceiver))
     }
 
     /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a

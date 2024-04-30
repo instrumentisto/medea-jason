@@ -2,11 +2,13 @@
 //!
 //! [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
 
+use dart_sys::Dart_Handle;
 use derive_more::From;
 use medea_macro::dart_bridge;
 
-use crate::platform::dart::utils::{
-    handle::DartHandle, NonNullDartValueArgExt,
+use crate::{
+    api::DartValue,
+    platform::dart::utils::{handle::DartHandle, NonNullDartValueArgExt},
 };
 
 #[dart_bridge("flutter/lib/src/native/ffi/list.g.dart")]
@@ -15,7 +17,10 @@ mod list {
 
     use dart_sys::Dart_Handle;
 
-    use crate::{api::DartValueArg, platform::dart::utils::handle::DartHandle};
+    use crate::{
+        api::{DartValue, DartValueArg},
+        platform::dart::utils::handle::DartHandle,
+    };
 
     extern "C" {
         /// Returns an element by the provided `index` from the provided
@@ -32,6 +37,10 @@ mod list {
         /// [`length`]: https://api.dart.dev/stable/dart-core/List/length.html
         /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn length(list: Dart_Handle) -> u32;
+
+        pub fn init() -> Dart_Handle;
+
+        pub fn add(map: Dart_Handle, value: DartValue);
     }
 }
 
@@ -70,5 +79,32 @@ impl<T: From<DartHandle>> From<DartList> for Vec<T> {
             }
         }
         out
+    }
+}
+
+impl Default for DartList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DartList {
+    /// Creates a new empty [`DartList`].
+    #[must_use]
+    pub fn new() -> Self {
+        let map = unsafe { list::init() };
+        Self(unsafe { DartHandle::new(map) })
+    }
+
+    pub fn add(&mut self, value: DartValue) {
+        unsafe {
+            list::add(self.0.get(), value);
+        }
+    }
+
+    /// Returns the underlying [`Dart_Handle`] of this [`DartList`].
+    #[must_use]
+    pub fn as_handle(&self) -> Dart_Handle {
+        self.0.get()
     }
 }

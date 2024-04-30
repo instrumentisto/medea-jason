@@ -110,6 +110,6 @@ Object _setSendParameters(
 
 /// Sets provided [RtpCodecCapability] as the only prefered [RtpCodecCapability] for the [RtpTransceiver].
 void _setPreferredCodec(
-    RtpTransceiver transceiver, RtpCodecCapability codecCapability) {
-  transceiver.setCodecPreferences(List.from([codecCapability]));
+    RtpTransceiver transceiver, List<RtpCodecCapability> codecCapability) {
+  transceiver.setCodecPreferences(codecCapability);
 }

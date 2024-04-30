@@ -6267,11 +6267,11 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
 
   void set_preferred_codec(
     Object transceiver,
-    Object codec_capability,
+    Object codec_capabilities,
   ) {
     return _set_preferred_codec(
       transceiver,
-      codec_capability,
+      codec_capabilities,
     );
   }
 

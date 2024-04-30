@@ -13,7 +13,9 @@ use crate::{
     media::track::local,
     platform::{
         self,
-        dart::utils::{dart_future::FutureFromDart, handle::DartHandle},
+        dart::utils::{
+            dart_future::FutureFromDart, handle::DartHandle, list::DartList,
+        },
         TransceiverDirection,
     },
 };
@@ -87,7 +89,7 @@ mod transceiver {
 
         pub fn set_preferred_codec(
             transceiver: Dart_Handle,
-            codec_capability: Dart_Handle,
+            codec_capabilities: Dart_Handle,
         );
     }
 }
@@ -237,11 +239,15 @@ impl Transceiver {
     }
 
     /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
-    pub fn set_preferred_codec(&self, preferred_codec: CodecCapability) {
+    pub fn set_preferred_codecs(&self, preferred_codecs: Vec<CodecCapability>) {
         let handle = self.0.get();
-        let codec_handle = preferred_codec.handle();
+        let mut codecs_dart = DartList::new();
+        for codec in preferred_codecs {
+            let codec_handle = codec.handle();
+            codecs_dart.add(codec_handle.into());
+        }
         unsafe {
-            transceiver::set_preferred_codec(handle, codec_handle);
+            transceiver::set_preferred_codec(handle, codecs_dart.as_handle());
         };
     }
 

@@ -9,7 +9,18 @@ void registerFunctions(DynamicLibrary dl) {
     dl,
     get: Pointer.fromFunction(_get),
     length: Pointer.fromFunction(_len, 0),
+    add: Pointer.fromFunction(_add),
+    init: Pointer.fromFunction(_init),
   );
+}
+
+/// Returns an empty [Map].
+Object _init() {
+  return [];
+}
+
+void _add(List<dynamic> list, ForeignValue value) {
+  list.add(value.toDart());
 }
 
 /// Returns a [Pointer] to a [List] element with the provided [index].

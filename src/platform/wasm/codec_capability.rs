@@ -2,7 +2,9 @@ use js_sys::{Array, JsString, Reflect};
 use wasm_bindgen::JsValue;
 use web_sys::RtcRtpSender;
 
-use crate::{media::MediaKind, platform::Error};
+use crate::{
+    media::MediaKind, platform::codec_capability::CodecCapabilityError as Error,
+};
 
 #[derive(Clone, Debug)]
 pub struct CodecCapability(JsValue);
@@ -15,7 +17,8 @@ impl CodecCapability {
             .and_then(|capabs| {
                 Reflect::get(&capabs, &JsString::from("codecs")).ok()
             })
-            .unwrap();
+            .ok_or_else(|| Error::FailedToGetCapabilities)?;
+
         Ok(Array::from(&codecs)
             .iter()
             .map(|codec| Self(codec))
@@ -23,10 +26,10 @@ impl CodecCapability {
     }
 
     pub fn mime_type(&self) -> Result<String, Error> {
-        Ok(Reflect::get(&self.0, &JsString::from("mimeType"))
+        Reflect::get(&self.0, &JsString::from("mimeType"))
             .ok()
             .and_then(|a| Some(a.as_string()?))
-            .unwrap())
+            .ok_or_else(|| Error::FailedToGetMimeType)
     }
 
     pub fn handle(&self) -> &JsValue {

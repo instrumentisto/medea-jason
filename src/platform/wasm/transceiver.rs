@@ -180,9 +180,12 @@ impl Transceiver {
         Ok(())
     }
 
-    pub fn set_preferred_codec(&self, codec: CodecCapability) {
-        self.0
-            .set_codec_preferences(&::js_sys::Array::of1(codec.handle()));
+    pub fn set_preferred_codecs(&self, codecs: Vec<CodecCapability>) {
+        let arr = ::js_sys::Array::new();
+        for codec in codecs {
+            _ = arr.push(codec.handle());
+        }
+        self.0.set_codec_preferences(&arr);
     }
 }
 
