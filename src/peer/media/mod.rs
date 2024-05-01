@@ -254,41 +254,38 @@ async fn target_codecs_and_sm(
     svc: Vec<SvcSettings>,
     kind: MediaKind,
 ) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
-    let mut target_scalability_mode = None;
-    let mut target_codecs = Vec::new();
+    CodecCapability::get_sender_codec_capabilities(kind)
+        .await
+        .map_or_else(
+            |_| (vec![], None),
+            |codecs| {
+                let mut target_scalability_mode = None;
+                let mut target_codecs = Vec::new();
+                let mut codecs: HashMap<String, CodecCapability> = codecs
+                    .into_iter()
+                    .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
+                    .collect();
 
-    if let Ok(codecs) =
-        CodecCapability::get_sender_codec_capabilities(kind).await
-    {
-        let mut codecs: HashMap<String, CodecCapability> = codecs
-            .into_iter()
-            .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
-            .collect();
-
-        for svc_setting in svc {
-            if let Some(codec_cap) =
-                codecs.remove(svc_setting.codec.mime_type())
-            {
-                target_codecs.push(codec_cap);
-                target_scalability_mode = Some(svc_setting.scalability_mode);
-                break;
-            }
-        }
-
-        codecs
-            .into_iter()
-            .filter_map(|(mime, codec)| {
-                if is_required_codec(&mime) {
-                    Some(codec)
-                } else {
-                    None
+                for svc_setting in svc {
+                    if let Some(codec_cap) =
+                        codecs.remove(svc_setting.codec.mime_type())
+                    {
+                        target_codecs.push(codec_cap);
+                        target_scalability_mode =
+                            Some(svc_setting.scalability_mode);
+                        break;
+                    }
                 }
-            })
-            .for_each(|cap| target_codecs.push(cap));
-        (target_codecs, target_scalability_mode)
-    } else {
-        (vec![], None)
-    }
+
+                codecs
+                    .into_iter()
+                    .filter_map(|(mime, codec)| {
+                        is_required_codec(&mime).then_some(codec)
+                    })
+                    .for_each(|cap| target_codecs.push(cap));
+                (target_codecs, target_scalability_mode)
+            },
+        )
 }
 
 fn get_sending_encodings(
@@ -392,7 +389,7 @@ impl InnerMediaConnections {
         encodings: Vec<EncodingParameters>,
         svc: Vec<SvcSettings>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
-        let peer = self.peer.clone();
+        let peer = Rc::clone(&self.peer);
 
         async move {
             let mut init = TransceiverInit::new(direction);
@@ -404,6 +401,7 @@ impl InnerMediaConnections {
                 get_sending_encodings(encodings, target_scalability_mode);
             init.sending_encodings(send_params);
 
+            #[allow(clippy::unwrap_used)]
             let transceiver = peer.add_transceiver(kind, init).await.unwrap();
             if !target_codecs.is_empty() {
                 transceiver.set_preferred_codecs(target_codecs);

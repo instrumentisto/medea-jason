@@ -10,6 +10,8 @@ use crate::{
 pub struct CodecCapability(JsValue);
 
 impl CodecCapability {
+    // Async needed for constency with Dart implementation.
+    #[allow(clippy::unused_async)]
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
@@ -17,22 +19,20 @@ impl CodecCapability {
             .and_then(|capabs| {
                 Reflect::get(&capabs, &JsString::from("codecs")).ok()
             })
-            .ok_or_else(|| Error::FailedToGetCapabilities)?;
+            .ok_or(Error::FailedToGetCapabilities)?;
 
-        Ok(Array::from(&codecs)
-            .iter()
-            .map(|codec| Self(codec))
-            .collect())
+        Ok(Array::from(&codecs).iter().map(Self).collect())
     }
 
     pub fn mime_type(&self) -> Result<String, Error> {
         Reflect::get(&self.0, &JsString::from("mimeType"))
             .ok()
-            .and_then(|a| Some(a.as_string()?))
-            .ok_or_else(|| Error::FailedToGetMimeType)
+            .and_then(|a| a.as_string())
+            .ok_or(Error::FailedToGetMimeType)
     }
 
-    pub fn handle(&self) -> &JsValue {
+    #[must_use]
+    pub const fn handle(&self) -> &JsValue {
         &self.0
     }
 }

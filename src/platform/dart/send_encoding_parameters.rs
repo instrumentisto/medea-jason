@@ -140,7 +140,7 @@ impl From<EncodingParameters> for SendEncodingParameters {
             scale_resolution_down_by,
         } = from;
 
-        let mut enc = SendEncodingParameters::new(rid, active);
+        let mut enc = Self::new(rid, active);
 
         if let Some(b) = max_bitrate {
             enc.set_max_bitrate(b.into());

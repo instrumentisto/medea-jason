@@ -634,6 +634,8 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
+    // Async needed for constency with Dart implementation.
+    #[allow(clippy::unused_async)]
     pub async fn add_transceiver(
         &self,
         kind: MediaKind,

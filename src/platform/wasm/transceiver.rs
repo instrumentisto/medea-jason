@@ -24,13 +24,15 @@ use super::get_property_by_name;
 pub struct TransceiverInit(RtcRtpTransceiverInit);
 
 impl TransceiverInit {
+    #[must_use]
     pub fn new(direction: TransceiverDirection) -> Self {
         let mut init = RtcRtpTransceiverInit::new();
-        let _ = init.direction(direction.into());
+        _ = init.direction(direction.into());
         Self(init)
     }
 
-    pub fn handle(&self) -> &RtcRtpTransceiverInit {
+    #[must_use]
+    pub const fn handle(&self) -> &RtcRtpTransceiverInit {
         &self.0
     }
 
@@ -39,10 +41,10 @@ impl TransceiverInit {
         encodings: Vec<SendEncodingParameters>,
     ) {
         let send_encoding = ::js_sys::Array::new();
-        encodings.into_iter().for_each(|enc| {
-            let _ = send_encoding.push(enc.handle());
-        });
-        let _ = self.0.send_encodings(&send_encoding);
+        for enc in encodings {
+            _ = send_encoding.push(enc.handle());
+        }
+        _ = self.0.send_encodings(&send_encoding);
     }
 }
 

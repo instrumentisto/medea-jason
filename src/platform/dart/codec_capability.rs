@@ -51,7 +51,11 @@ impl From<DartHandle> for CodecCapability {
 
 impl CodecCapability {
     /// Gets available `sender`'s [`CodecCapability`]s.
-    #[must_use]
+    ///
+    /// # Errors
+    ///
+    /// Errors with [`Error::FailedToGetCapabilities`] if fails to get
+    /// capabilities.
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
@@ -59,6 +63,7 @@ impl CodecCapability {
             codec_capability::get_sender_codec_capabilities(kind as i64)
         };
 
+        #[allow(clippy::map_err_ignore)]
         let res: DartHandle = unsafe { FutureFromDart::execute(fut) }
             .await
             .map_err(|_| Error::FailedToGetCapabilities)?;
@@ -70,7 +75,10 @@ impl CodecCapability {
     }
 
     /// Gets `mime_type` of this [`CodecCapability`]s.
-    #[must_use]
+    /// # Errors
+    ///
+    /// Never errors, but [`Result`] is needed for consistency with WASM
+    /// implementation.
     pub fn mime_type(&self) -> Result<String, Error> {
         let mime_type = unsafe { codec_capability::mime_type(self.0.get()) };
         Ok(unsafe { dart_string_into_rust(mime_type) })

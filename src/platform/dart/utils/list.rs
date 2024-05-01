@@ -51,6 +51,19 @@ mod list {
 pub struct DartList(DartHandle);
 
 impl DartList {
+    /// Creates a new empty [`DartList`].
+    #[must_use]
+    pub fn new() -> Self {
+        let map = unsafe { list::init() };
+        Self(unsafe { DartHandle::new(map) })
+    }
+
+    pub fn add(&mut self, value: DartValue) {
+        unsafe {
+            list::add(self.0.get(), value);
+        }
+    }
+
     /// Returns an element by the provided `index` from this [`DartList`].
     #[allow(clippy::unwrap_in_result)]
     #[must_use]
@@ -66,6 +79,12 @@ impl DartList {
     #[must_use]
     pub fn length(&self) -> usize {
         unsafe { list::length(self.0.get()) as usize }
+    }
+
+    /// Returns the underlying [`Dart_Handle`] of this [`DartList`].
+    #[must_use]
+    pub fn as_handle(&self) -> Dart_Handle {
+        self.0.get()
     }
 }
 
@@ -85,26 +104,5 @@ impl<T: From<DartHandle>> From<DartList> for Vec<T> {
 impl Default for DartList {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl DartList {
-    /// Creates a new empty [`DartList`].
-    #[must_use]
-    pub fn new() -> Self {
-        let map = unsafe { list::init() };
-        Self(unsafe { DartHandle::new(map) })
-    }
-
-    pub fn add(&mut self, value: DartValue) {
-        unsafe {
-            list::add(self.0.get(), value);
-        }
-    }
-
-    /// Returns the underlying [`Dart_Handle`] of this [`DartList`].
-    #[must_use]
-    pub fn as_handle(&self) -> Dart_Handle {
-        self.0.get()
     }
 }

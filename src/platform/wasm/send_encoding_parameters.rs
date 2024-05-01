@@ -6,6 +6,8 @@ use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
 pub struct SendEncodingParameters(RtcRtpEncodingParameters);
 
 impl SendEncodingParameters {
+    #[must_use]
+    #[allow(clippy::needless_pass_by_value)]
     pub fn new(rid: String, active: bool) -> Self {
         let mut params = RtcRtpEncodingParameters::new();
         _ = params.rid(&rid);
@@ -13,16 +15,17 @@ impl SendEncodingParameters {
         Self(params)
     }
 
-    pub fn handle(&self) -> &RtcRtpEncodingParameters {
+    #[must_use]
+    pub const fn handle(&self) -> &RtcRtpEncodingParameters {
         &self.0
     }
 
     pub fn set_active(&mut self, active: bool) {
-        let _ = self.0.active(active);
+        _ = self.0.active(active);
     }
 
     pub fn set_max_bitrate(&mut self, max_bitrate: u32) {
-        let _ = self.0.max_bitrate(max_bitrate);
+        _ = self.0.max_bitrate(max_bitrate);
     }
 
     /// Sets `scale_resolution_down_by`.
@@ -30,12 +33,12 @@ impl SendEncodingParameters {
         &mut self,
         scale_resolution_down_by: f32,
     ) {
-        let _ = self.0.scale_resolution_down_by(scale_resolution_down_by);
+        _ = self.0.scale_resolution_down_by(scale_resolution_down_by);
     }
 
     /// Sets `set_scalability_mode`.
     pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
-        let _ = self.0.scalability_mode(&scalability_mode.to_string());
+        _ = self.0.scalability_mode(&scalability_mode.to_string());
     }
 }
 
@@ -48,10 +51,10 @@ impl From<EncodingParameters> for SendEncodingParameters {
             scale_resolution_down_by,
         } = from;
 
-        let mut enc = SendEncodingParameters::new(rid, active);
+        let mut enc = Self::new(rid, active);
 
         if let Some(b) = max_bitrate {
-            enc.set_max_bitrate(b.into());
+            enc.set_max_bitrate(b);
         }
         if let Some(s) = scale_resolution_down_by {
             enc.set_scale_resolution_down_by(s.into());
