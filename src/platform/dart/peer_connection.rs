@@ -507,7 +507,6 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    // TODO(evdokimovs): It should be much simpler (move logic from there):
     pub async fn add_transceiver(
         &self,
         kind: MediaKind,

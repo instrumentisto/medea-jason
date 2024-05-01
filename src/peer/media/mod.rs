@@ -324,63 +324,70 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         direction: platform::TransceiverDirection,
-        encodings: Vec<EncodingParameters>,
+        mut encodings: Vec<EncodingParameters>,
         svc: Vec<SvcSettings>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
         let peer = self.peer.clone();
+        fn is_required_codec(mime: &str) -> bool {
+            mime == "video/rtx" || mime == "video/red" || mime == "video/ulpfec"
+        }
+
         async move {
             let mut init = TransceiverInit::new(direction);
-            let codecs = CodecCapability::get_sender_codec_capabilities(kind)
-                .await
-                .unwrap();
             let mut target_scalability_mode = None;
             let mut target_codecs = Vec::new();
 
-            for svc_setting in svc {
-                let res = codecs.iter().find(|codec| {
-                    let mime = codec.mime_type().unwrap();
-                    let svc_mime =
-                        format!("video/{}", svc_setting.codec.to_string());
-                    mime == svc_mime
-                        || mime == "video/rtx"
-                        || mime == "video/red"
-                        || mime == "video/ulpfec"
-                });
+            if let Ok(codecs) =
+                CodecCapability::get_sender_codec_capabilities(kind).await
+            {
+                let mut codecs: HashMap<String, CodecCapability> = codecs
+                    .into_iter()
+                    .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
+                    .collect();
 
-                if let Some(res) = res {
-                    target_codecs.push(res.clone());
-                    target_scalability_mode =
-                        Some(svc_setting.scalability_mode);
+                for svc_setting in svc {
+                    if let Some(codec_cap) =
+                        codecs.remove(svc_setting.codec.mime_type())
+                    {
+                        target_codecs.push(codec_cap);
+                        target_scalability_mode =
+                            Some(svc_setting.scalability_mode);
+                        break;
+                    }
                 }
+
+                codecs
+                    .into_iter()
+                    .filter_map(|(mime, codec)| {
+                        if is_required_codec(&mime) {
+                            Some(codec)
+                        } else {
+                            None
+                        }
+                    })
+                    .for_each(|cap| target_codecs.push(cap));
             }
 
             if encodings.is_empty() && target_scalability_mode.is_some() {
-                let mut enc =
-                    SendEncodingParameters::from(EncodingParameters {
-                        rid: "0".to_owned(),
-                        active: true,
-                        max_bitrate: None,
-                        scale_resolution_down_by: None,
-                    });
-                if let Some(t) = target_scalability_mode {
-                    enc.set_scalability_mode(t);
-                }
-                init.sending_encodings(vec![enc]);
-            } else {
-                encodings
-                    .into_iter()
-                    .map(SendEncodingParameters::from)
-                    .for_each(|mut enc| {
-                        if let Some(target_sm) = target_scalability_mode {
-                            enc.set_scalability_mode(target_sm);
-                        }
-                        init.sending_encodings(vec![enc]);
-                    });
-            };
+                encodings.push(EncodingParameters::default());
+            }
 
-            // TODO(evdokimovs): Remove unwrap
+            let encs = encodings
+                .into_iter()
+                .map(|enc| {
+                    let mut enc = SendEncodingParameters::from(enc);
+                    if let Some(target_sm) = target_scalability_mode {
+                        enc.set_scalability_mode(target_sm);
+                    }
+                    enc
+                })
+                .collect();
+            init.sending_encodings(encs);
+
             let transceiver = peer.add_transceiver(kind, init).await.unwrap();
-            transceiver.set_preferred_codecs(target_codecs);
+            if !target_codecs.is_empty() {
+                transceiver.set_preferred_codecs(target_codecs);
+            }
             transceiver
         }
     }
