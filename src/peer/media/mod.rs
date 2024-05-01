@@ -334,20 +334,23 @@ impl InnerMediaConnections {
                 .await
                 .unwrap();
             let mut target_scalability_mode = None;
-            let mut target_codec = None;
+            let mut target_codecs = Vec::new();
 
             for svc_setting in svc {
                 let res = codecs.iter().find(|codec| {
-                    codec.mime_type().unwrap()
-                        == format!("video/{}", svc_setting.codec.to_string())
+                    let mime = codec.mime_type().unwrap();
+                    let svc_mime =
+                        format!("video/{}", svc_setting.codec.to_string());
+                    mime == svc_mime
+                        || mime == "video/rtx"
+                        || mime == "video/red"
+                        || mime == "video/ulpfec"
                 });
 
-                if res.is_some() {
-                    target_codec = res.cloned();
+                if let Some(res) = res {
+                    target_codecs.push(res.clone());
                     target_scalability_mode =
                         Some(svc_setting.scalability_mode);
-
-                    break;
                 }
             }
 
@@ -377,9 +380,7 @@ impl InnerMediaConnections {
 
             // TODO(evdokimovs): Remove unwrap
             let transceiver = peer.add_transceiver(kind, init).await.unwrap();
-            if let Some(codec) = target_codec {
-                transceiver.set_preferred_codecs(vec![codec]);
-            }
+            transceiver.set_preferred_codecs(target_codecs);
             transceiver
         }
     }
