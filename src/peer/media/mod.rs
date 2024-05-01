@@ -17,7 +17,7 @@ use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
 use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
 use medea_client_api_proto::{EncodingParameters, SvcSettings};
-use proto::{MediaSourceKind, TrackId};
+use proto::{MediaSourceKind, ScalabilityMode, TrackId};
 use tracerr::Traced;
 
 #[cfg(feature = "mockable")]
@@ -246,6 +246,71 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
+fn is_required_codec(mime: &str) -> bool {
+    mime == "video/rtx" || mime == "video/red" || mime == "video/ulpfec"
+}
+
+async fn target_codecs_and_sm(
+    svc: Vec<SvcSettings>,
+    kind: MediaKind,
+) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
+    let mut target_scalability_mode = None;
+    let mut target_codecs = Vec::new();
+
+    if let Ok(codecs) =
+        CodecCapability::get_sender_codec_capabilities(kind).await
+    {
+        let mut codecs: HashMap<String, CodecCapability> = codecs
+            .into_iter()
+            .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
+            .collect();
+
+        for svc_setting in svc {
+            if let Some(codec_cap) =
+                codecs.remove(svc_setting.codec.mime_type())
+            {
+                target_codecs.push(codec_cap);
+                target_scalability_mode = Some(svc_setting.scalability_mode);
+                break;
+            }
+        }
+
+        codecs
+            .into_iter()
+            .filter_map(|(mime, codec)| {
+                if is_required_codec(&mime) {
+                    Some(codec)
+                } else {
+                    None
+                }
+            })
+            .for_each(|cap| target_codecs.push(cap));
+        (target_codecs, target_scalability_mode)
+    } else {
+        (vec![], None)
+    }
+}
+
+fn get_sending_encodings(
+    mut encodings: Vec<EncodingParameters>,
+    target_sm: Option<ScalabilityMode>,
+) -> Vec<SendEncodingParameters> {
+    if encodings.is_empty() && target_sm.is_some() {
+        encodings.push(EncodingParameters::default());
+    }
+
+    encodings
+        .into_iter()
+        .map(|enc| {
+            let mut enc = SendEncodingParameters::from(enc);
+            if let Some(target_sm) = target_sm {
+                enc.set_scalability_mode(target_sm);
+            }
+            enc
+        })
+        .collect()
+}
+
 /// Actual data of [`MediaConnections`] storage.
 #[derive(Debug)]
 struct InnerMediaConnections {
@@ -324,65 +389,20 @@ impl InnerMediaConnections {
         &self,
         kind: MediaKind,
         direction: platform::TransceiverDirection,
-        mut encodings: Vec<EncodingParameters>,
+        encodings: Vec<EncodingParameters>,
         svc: Vec<SvcSettings>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
         let peer = self.peer.clone();
-        fn is_required_codec(mime: &str) -> bool {
-            mime == "video/rtx" || mime == "video/red" || mime == "video/ulpfec"
-        }
 
         async move {
             let mut init = TransceiverInit::new(direction);
-            let mut target_scalability_mode = None;
-            let mut target_codecs = Vec::new();
 
-            if let Ok(codecs) =
-                CodecCapability::get_sender_codec_capabilities(kind).await
-            {
-                let mut codecs: HashMap<String, CodecCapability> = codecs
-                    .into_iter()
-                    .filter_map(|codec| Some((codec.mime_type().ok()?, codec)))
-                    .collect();
+            let (target_codecs, target_scalability_mode) =
+                target_codecs_and_sm(svc, kind).await;
 
-                for svc_setting in svc {
-                    if let Some(codec_cap) =
-                        codecs.remove(svc_setting.codec.mime_type())
-                    {
-                        target_codecs.push(codec_cap);
-                        target_scalability_mode =
-                            Some(svc_setting.scalability_mode);
-                        break;
-                    }
-                }
-
-                codecs
-                    .into_iter()
-                    .filter_map(|(mime, codec)| {
-                        if is_required_codec(&mime) {
-                            Some(codec)
-                        } else {
-                            None
-                        }
-                    })
-                    .for_each(|cap| target_codecs.push(cap));
-            }
-
-            if encodings.is_empty() && target_scalability_mode.is_some() {
-                encodings.push(EncodingParameters::default());
-            }
-
-            let encs = encodings
-                .into_iter()
-                .map(|enc| {
-                    let mut enc = SendEncodingParameters::from(enc);
-                    if let Some(target_sm) = target_scalability_mode {
-                        enc.set_scalability_mode(target_sm);
-                    }
-                    enc
-                })
-                .collect();
-            init.sending_encodings(encs);
+            let send_params =
+                get_sending_encodings(encodings, target_scalability_mode);
+            init.sending_encodings(send_params);
 
             let transceiver = peer.add_transceiver(kind, init).await.unwrap();
             if !target_codecs.is_empty() {

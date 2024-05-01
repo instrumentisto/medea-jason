@@ -1087,7 +1087,9 @@ pub enum Codec {
 }
 
 impl Codec {
-    pub fn mime_type(&self) -> &'static str {
+    /// Returns MIME-type of this [`Codec`].
+    #[must_use]
+    pub const fn mime_type(&self) -> &'static str {
         match self {
             Self::VP8 => "video/VP8",
             Self::VP9 => "video/VP9",
