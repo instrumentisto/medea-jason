@@ -2,7 +2,7 @@
 
 use inflector::Inflector;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2, TokenTree};
+use proc_macro2::{Span, TokenStream as TokenStream2, TokenTree};
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Parse, ParseStream, Result},
@@ -100,13 +100,13 @@ pub(crate) struct Item {
 
     /// `Handler` trait ident, basically `{}Handler` where `{}` is an enum
     /// name.
-    handler_trait_ident: Ident,
+    handler_trait_ident: syn::Ident,
 }
 
 impl Parse for Item {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let orig_enum = ItemEnum::parse(input)?;
-        let handler_trait_ident = Ident::new(
+        let handler_trait_ident = syn::Ident::new(
             &format!("{}Handler", orig_enum.ident),
             Span::call_site(),
         );
@@ -276,7 +276,7 @@ impl Args {
                 attrs: Vec::new(),
                 by_ref: None,
                 mutability: None,
-                ident: Ident::new("handler", Span::call_site()),
+                ident: syn::Ident::new("handler", Span::call_site()),
                 subpat: None,
             })),
             colon_token: token::Colon::default(),
@@ -288,7 +288,7 @@ impl Args {
             .map(|token| {
                 if let TokenTree::Ident(ident) = &token {
                     if *ident == "Self" {
-                        return TokenTree::Ident(proc_macro2::Ident::new(
+                        return TokenTree::Ident(syn::Ident::new(
                             "T",
                             ident.span(),
                         ));

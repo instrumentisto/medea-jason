@@ -67,8 +67,8 @@ pub enum UpdateLocalStreamError {
 
 /// Events emitted from a [`Sender`] or a [`Receiver`].
 ///
-/// [`Receiver`]: crate::peer::receiver::Receiver
-/// [`Sender`]: crate::peer::sender::Sender
+/// [`Receiver`]: receiver::Receiver
+/// [`Sender`]: sender::Sender
 #[derive(Clone, Copy, Debug)]
 pub enum TrackEvent {
     /// Intention of the `MediaTrack` to mute/unmute himself.
@@ -1071,19 +1071,16 @@ impl PeerConnection {
 
     /// Lookups [`Sender`] by provided [`TrackId`].
     #[must_use]
-    pub fn get_sender_by_id(
-        &self,
-        id: TrackId,
-    ) -> Option<Rc<media::sender::Sender>> {
+    pub fn get_sender_by_id(&self, id: TrackId) -> Option<Rc<media::Sender>> {
         self.media_connections.get_sender_by_id(id)
     }
 
-    /// Lookups [`media::sender::State`] by the provided [`TrackId`].
+    /// Lookups [`sender::State`] by the provided [`TrackId`].
     #[must_use]
     pub fn get_sender_state_by_id(
         &self,
         id: TrackId,
-    ) -> Option<Rc<media::sender::State>> {
+    ) -> Option<Rc<sender::State>> {
         self.media_connections.get_sender_state_by_id(id)
     }
 
