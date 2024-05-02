@@ -116,14 +116,14 @@ mod media_stream_track {
 
         /// Indicates whether `OnAudioLevelChangedCallback` is
         /// supported for this [MediaStreamTrack].
-        /// 
+        ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn is_on_audio_level_available(track: Dart_Handle) -> bool;
 
         /// Sets the provided `OnAudioLevelChangedCallback` for this
         /// [MediaStreamTrack].
         /// It's called for live tracks when audio level of this track changes.
-        /// 
+        ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn on_audio_level_changed(track: Dart_Handle, cb: Dart_Handle);
     }
