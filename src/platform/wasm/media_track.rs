@@ -274,7 +274,7 @@ impl MediaStreamTrack {
     /// Indicates whether `OnAudioLevelChangedCallback` is
     /// supported for this [`MediaStreamTrack`].
     #[must_use]
-    pub fn is_on_audio_level_available(&self) -> bool {
+    pub const fn is_on_audio_level_available(&self) -> bool {
         false
     }
 
