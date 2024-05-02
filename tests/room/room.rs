@@ -33,6 +33,7 @@ use medea_jason::{
     rpc::MockRpcSession,
     utils::Updatable,
 };
+use medea_jason::platform::TransceiverInit;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use wasm_bindgen_test::*;
@@ -3212,11 +3213,13 @@ async fn sender_answerer() {
         .unwrap();
 
     let a_tr = peer
-        .add_transceiver(MediaKind::Audio, platform::TransceiverDirection::RECV)
-        .await;
+        .add_transceiver(MediaKind::Audio, TransceiverInit::new(platform::TransceiverDirection::RECV))
+        .await
+        .unwrap();
     let v_tr = peer
-        .add_transceiver(MediaKind::Video, platform::TransceiverDirection::RECV)
-        .await;
+        .add_transceiver(MediaKind::Video, TransceiverInit::new(platform::TransceiverDirection::RECV))
+        .await
+        .unwrap();
     let offer = peer.create_offer().await.unwrap();
     peer.set_offer(&offer).await.unwrap();
 
