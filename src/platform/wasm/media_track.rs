@@ -11,10 +11,7 @@ use crate::{
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
-    platform::{
-        self,
-        wasm::{get_property_by_name, utils::EventListener},
-    },
+    platform::wasm::{get_property_by_name, utils::EventListener},
 };
 
 /// Wrapper around [MediaStreamTrack][1] received from a
@@ -285,5 +282,9 @@ impl MediaStreamTrack {
     /// [`MediaStreamTrack`].
     ///
     /// It's called for live tracks when audio level of this track changes.
-    pub fn on_audio_level_changed(&self, callback: platform::Function<i32>) {}
+    pub fn on_audio_level_changed<F>(&self, _callback: F)
+    where
+        F: 'static + FnMut(i32),
+    {
+    }
 }
