@@ -11,7 +11,10 @@ use crate::{
     media::{
         track::MediaStreamTrackState, FacingMode, MediaKind, MediaSourceKind,
     },
-    platform::wasm::{get_property_by_name, utils::EventListener},
+    platform::{
+        self,
+        wasm::{get_property_by_name, utils::EventListener},
+    },
 };
 
 /// Wrapper around [MediaStreamTrack][1] received from a
@@ -270,4 +273,17 @@ impl MediaStreamTrack {
             }
         });
     }
+
+    /// Indicates whether `OnAudioLevelChangedCallback` is
+    /// supported for this [`MediaStreamTrack`].
+    #[must_use]
+    pub fn is_on_audio_level_available(&self) -> bool {
+        false
+    }
+
+    /// Sets the provided `OnAudioLevelChangedCallback` for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// It's called for live tracks when audio level of this track changes.
+    pub fn on_audio_level_changed(&self, callback: platform::Function<i32>) {}
 }
