@@ -12,6 +12,11 @@ typedef TrackMediaDirection = MediaDirection;
 /// Representation of the `onEnded` callback.
 typedef OnEndedCallback = void Function();
 
+/// Representation of an `onAudioLevelChanged` callback.
+///
+/// The provided values will be in [0; 100] range.
+typedef OnAudioLevelChangedCallback = void Function(int);
+
 /// Abstraction of a handle to an object allocated on the Rust side.
 abstract class MediaTrack implements AsyncPlatformHandle {
   /// Returns the [MediaKind.Audio] if this [LocalMediaTrack] represents an
@@ -39,6 +44,15 @@ abstract class LocalMediaTrack implements MediaTrack {
   ///
   /// This only works on Web.
   void onEnded(OnEndedCallback f);
+
+  /// Indicates whether [OnAudioLevelChangedCallback] is
+  /// supported for this [MediaTrack].
+  bool isOnAudioLevelAvailable();
+
+  /// Sets the provided [OnAudioLevelChangedCallback] for this [MediaTrack].
+  ///
+  /// It's called for live tracks when audio level of this track changes.
+  void onAudioLevelChanged(OnAudioLevelChangedCallback f);
 
   /// Returns a [MediaStreamTrackState.live] if this [LocalMediaTrack] is
   /// active, or a [MediaStreamTrackState.ended] if it has ended.

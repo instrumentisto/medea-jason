@@ -113,6 +113,19 @@ mod media_stream_track {
         ///
         /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
         pub fn dispose(track: Dart_Handle) -> Dart_Handle;
+
+        /// Indicates whether `OnAudioLevelChangedCallback` is
+        /// supported for this [MediaStreamTrack].
+        /// 
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+        pub fn is_on_audio_level_available(track: Dart_Handle) -> bool;
+
+        /// Sets the provided `OnAudioLevelChangedCallback` for this
+        /// [MediaStreamTrack].
+        /// It's called for live tracks when audio level of this track changes.
+        /// 
+        /// [0]: https://w3.org/TR/mediacapture-streams#mediastreamtrack
+        pub fn on_audio_level_changed(track: Dart_Handle, cb: Dart_Handle);
     }
 }
 
@@ -309,6 +322,33 @@ impl MediaStreamTrack {
                 media_stream_track::on_ended(self.inner.get(), cb.into_dart());
             };
         }
+    }
+
+    /// Indicates whether `OnAudioLevelChangedCallback` is
+    /// supported for this [`MediaStreamTrack`].
+    #[must_use]
+    pub fn is_on_audio_level_available(&self) -> bool {
+        unsafe {
+            media_stream_track::is_on_audio_level_available(self.inner.get())
+        }
+    }
+
+    /// Sets the provided `OnAudioLevelChangedCallback` for this
+    /// [`MediaStreamTrack`].
+    ///
+    /// It's called for live tracks when audio level of this track changes.
+    pub fn on_audio_level_changed<F>(&self, mut f: F)
+    where
+        F: 'static + FnMut(i32),
+    {
+        let cb = Callback::from_fn_mut(move |value: i32| f(value));
+
+        unsafe {
+            media_stream_track::on_audio_level_changed(
+                self.inner.get(),
+                cb.into_dart(),
+            );
+        };
     }
 }
 

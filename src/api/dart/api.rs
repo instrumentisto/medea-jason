@@ -584,6 +584,30 @@ pub fn local_media_track_state(
     )
 }
 
+/// Indicates whether `OnAudioLevelChangedCallback` is
+/// supported for this [`LocalMediaTrack`].
+#[must_use]
+pub fn is_on_audio_level_available(
+    track: RustOpaque<LocalMediaTrack>,
+) -> SyncReturn<bool> {
+    SyncReturn(track.is_on_audio_level_available())
+}
+
+/// Sets the provided `OnAudioLevelChangedCallback` for this
+/// [`LocalMediaTrack`].
+///
+/// It's called for live tracks when audio level of this track changes.
+#[must_use]
+pub fn on_audio_level_changed(
+    track: RustOpaque<LocalMediaTrack>,
+    f: DartOpaque,
+) -> SyncReturn<()> {
+    track.on_audio_level_changed(unsafe {
+        platform::Function::new(f.try_unwrap().unwrap().into_raw().cast())
+    });
+    SyncReturn(())
+}
+
 /// Returns a [`MediaSourceKind::Device`] if the provided [`LocalMediaTrack`] is
 /// sourced from some device (webcam/microphone), or a
 /// [`MediaSourceKind::Display`] if it's captured via
