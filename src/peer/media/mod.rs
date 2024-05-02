@@ -276,13 +276,15 @@ async fn target_codecs_and_sm(
                         break;
                     }
                 }
+                if !codecs.is_empty() {
+                    codecs
+                        .into_iter()
+                        .filter_map(|(mime, codec)| {
+                            is_required_codec(&mime).then_some(codec)
+                        })
+                        .for_each(|cap| target_codecs.push(cap));
+                }
 
-                codecs
-                    .into_iter()
-                    .filter_map(|(mime, codec)| {
-                        is_required_codec(&mime).then_some(codec)
-                    })
-                    .for_each(|cap| target_codecs.push(cap));
                 (target_codecs, target_scalability_mode)
             },
         )
