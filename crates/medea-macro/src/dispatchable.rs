@@ -33,7 +33,7 @@ pub(crate) fn expand(item: Item, args: &Args) -> TokenStream {
         .iter()
         .map(|v| {
             let variant_ident = v.ident.clone();
-            let handler_fn_ident = syn::Ident::new(
+            let handler_fn_ident = Ident::new(
                 &to_handler_fn_name(&variant_ident.to_string()),
                 Span::call_site(),
             );
@@ -43,7 +43,7 @@ pub(crate) fn expand(item: Item, args: &Args) -> TokenStream {
                 .enumerate()
                 .map(|(i, f)| {
                     f.ident.clone().unwrap_or_else(|| {
-                        syn::Ident::new(&format!("f{i}"), Span::call_site())
+                        Ident::new(&format!("f{i}"), Span::call_site())
                     })
                 })
                 .collect();
@@ -145,7 +145,7 @@ impl Item {
             .variants
             .iter()
             .map(|v| {
-                let fn_name_ident = syn::Ident::new(
+                let fn_name_ident = Ident::new(
                     &to_handler_fn_name(&v.ident.to_string()),
                     Span::call_site(),
                 );
@@ -288,7 +288,7 @@ impl Args {
             .map(|token| {
                 if let TokenTree::Ident(ident) = &token {
                     if *ident == "Self" {
-                        return TokenTree::Ident(proc_macro2::Ident::new(
+                        return TokenTree::Ident(Ident::new(
                             "T",
                             ident.span(),
                         ));
