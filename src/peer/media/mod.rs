@@ -276,7 +276,7 @@ async fn target_codecs_and_sm(
                         break;
                     }
                 }
-                if !codecs.is_empty() {
+                if !target_codecs.is_empty() {
                     codecs
                         .into_iter()
                         .filter_map(|(mime, codec)| {
