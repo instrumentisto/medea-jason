@@ -41,6 +41,7 @@ mod send_encoding_parameters {
             scale_resolution_down_by: i64,
         );
 
+        /// Sets `scalability_mode` for the provided [`SendEncodingParameters`].
         pub fn set_scalability_mode(
             encoding: Dart_Handle,
             scalability_mode: ptr::NonNull<c_char>,
@@ -61,7 +62,6 @@ impl From<DartHandle> for SendEncodingParameters {
     }
 }
 
-// TODO(evdokimovs): Expand documentation:
 impl SendEncodingParameters {
     /// Creates a new [`SendEncodingParameters`].
     #[must_use]

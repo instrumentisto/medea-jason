@@ -38,8 +38,14 @@ mod list {
         /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn length(list: Dart_Handle) -> u32;
 
+        /// Initializes new empty [`List`].
+        ///
+        /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn init() -> Dart_Handle;
 
+        /// Adds provided [`DartValue`] to the provided [`List`].
+        ///
+        /// [`List`]: https://api.dart.dev/stable/dart-core/List-class.html
         pub fn add(map: Dart_Handle, value: DartValue);
     }
 }

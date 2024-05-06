@@ -409,6 +409,7 @@ impl InnerMediaConnections {
                 get_sending_encodings(encodings, target_scalability_mode);
             init.sending_encodings(send_params);
 
+            // TODO(reread): Maybe to do not unwrap
             #[allow(clippy::unwrap_used)]
             let transceiver = peer.add_transceiver(kind, init).await.unwrap();
             if !target_codecs.is_empty() {

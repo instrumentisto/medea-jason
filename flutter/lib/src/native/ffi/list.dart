@@ -19,6 +19,7 @@ Object _init() {
   return [];
 }
 
+/// Adds provided [ForeignValue] to the [List].
 void _add(List<dynamic> list, ForeignValue value) {
   list.add(value.toDart());
 }
