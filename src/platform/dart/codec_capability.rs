@@ -75,6 +75,7 @@ impl CodecCapability {
     }
 
     /// Gets `mime_type` of this [`CodecCapability`]s.
+    ///
     /// # Errors
     ///
     /// Never errors, but [`Result`] is needed for consistency with WASM
