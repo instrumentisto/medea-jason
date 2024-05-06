@@ -928,7 +928,7 @@ impl MediaConnections {
             send_constraints.clone(),
             connection_mode,
         );
-        let sender = sender::Sender::new(
+        let sender = Sender::new(
             &sender_state,
             self,
             send_constraints.clone(),
@@ -961,7 +961,7 @@ impl MediaConnections {
             sender,
             connection_mode,
         );
-        let receiver = receiver::Receiver::new(
+        let receiver = Receiver::new(
             &state,
             self,
             mpsc::unbounded().0,

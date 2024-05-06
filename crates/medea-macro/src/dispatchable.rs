@@ -2,7 +2,7 @@
 
 use inflector::Inflector;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2, TokenTree};
+use proc_macro2::{Span, TokenStream as TokenStream2, TokenTree};
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Parse, ParseStream, Result},
@@ -33,7 +33,7 @@ pub(crate) fn expand(item: Item, args: &Args) -> TokenStream {
         .iter()
         .map(|v| {
             let variant_ident = v.ident.clone();
-            let handler_fn_ident = Ident::new(
+            let handler_fn_ident = syn::Ident::new(
                 &to_handler_fn_name(&variant_ident.to_string()),
                 Span::call_site(),
             );
@@ -43,7 +43,7 @@ pub(crate) fn expand(item: Item, args: &Args) -> TokenStream {
                 .enumerate()
                 .map(|(i, f)| {
                     f.ident.clone().unwrap_or_else(|| {
-                        Ident::new(&format!("f{i}"), Span::call_site())
+                        syn::Ident::new(&format!("f{i}"), Span::call_site())
                     })
                 })
                 .collect();
@@ -100,13 +100,13 @@ pub(crate) struct Item {
 
     /// `Handler` trait ident, basically `{}Handler` where `{}` is an enum
     /// name.
-    handler_trait_ident: Ident,
+    handler_trait_ident: syn::Ident,
 }
 
 impl Parse for Item {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let orig_enum = ItemEnum::parse(input)?;
-        let handler_trait_ident = Ident::new(
+        let handler_trait_ident = syn::Ident::new(
             &format!("{}Handler", orig_enum.ident),
             Span::call_site(),
         );
@@ -145,7 +145,7 @@ impl Item {
             .variants
             .iter()
             .map(|v| {
-                let fn_name_ident = Ident::new(
+                let fn_name_ident = syn::Ident::new(
                     &to_handler_fn_name(&v.ident.to_string()),
                     Span::call_site(),
                 );
@@ -276,7 +276,7 @@ impl Args {
                 attrs: Vec::new(),
                 by_ref: None,
                 mutability: None,
-                ident: Ident::new("handler", Span::call_site()),
+                ident: syn::Ident::new("handler", Span::call_site()),
                 subpat: None,
             })),
             colon_token: token::Colon::default(),
@@ -288,7 +288,7 @@ impl Args {
             .map(|token| {
                 if let TokenTree::Ident(ident) = &token {
                     if *ident == "Self" {
-                        return TokenTree::Ident(Ident::new(
+                        return TokenTree::Ident(syn::Ident::new(
                             "T",
                             ident.span(),
                         ));

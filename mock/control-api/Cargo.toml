@@ -2,7 +2,7 @@
 name = "medea-control-api-mock"
 version = "0.2.1-dev"
 edition = "2021"
-rust-version = "1.62"
+rust-version = "1.70"
 description = "RESTful mock server for Medea's Control API."
 authors = ["Instrumentisto Team <developer@instrumentisto.com>"]
 license = "BlueOak-1.0.0"
