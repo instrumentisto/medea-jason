@@ -84,7 +84,7 @@ impl CodecCapability {
         Ok(unsafe { dart_string_into_rust(mime_type) })
     }
 
-    /// Returns underlying [`_Dart_Handle`].
+    /// Returns underlying [`Dart_Handle`].
     #[must_use]
     pub fn handle(&self) -> Dart_Handle {
         self.0.get()
