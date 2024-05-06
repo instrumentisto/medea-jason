@@ -632,6 +632,11 @@ impl RtcPeerConnection {
     /// Creates new [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1])
     /// and adds it to the [set of this RTCPeerConnection's transceivers][2].
     ///
+    /// # Errors
+    ///
+    /// With [`RtcPeerConnectionError::AddTransceiverFailed`] if
+    /// [RTCPeerConnection.addTransceiver()][1] fails.
+    ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
     // Async needed for constency with Dart implementation.

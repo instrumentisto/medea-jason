@@ -1,11 +1,20 @@
+//! [SendEncodingParameters] wrapper.
+//!
+//! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
+
 use web_sys::RtcRtpEncodingParameters;
 
 use medea_client_api_proto::{EncodingParameters, ScalabilityMode};
 
+/// Wrapper around [RTCRtpEncodingParameters] which provides handy methods for
+/// direction changes.
+///
+/// [RTCRtpEncodingParameters]: https://tinyurl.com/mr3dt9ch
 #[derive(Clone, Debug)]
 pub struct SendEncodingParameters(RtcRtpEncodingParameters);
 
 impl SendEncodingParameters {
+    /// Creates a new [`SendEncodingParameters`].
     #[must_use]
     #[allow(clippy::needless_pass_by_value)]
     pub fn new(rid: String, active: bool) -> Self {
@@ -15,15 +24,18 @@ impl SendEncodingParameters {
         Self(params)
     }
 
+    /// Returns underlying [`_Dart_Handle`].
     #[must_use]
     pub const fn handle(&self) -> &RtcRtpEncodingParameters {
         &self.0
     }
 
+    /// Sets `active`.
     pub fn set_active(&mut self, active: bool) {
         _ = self.0.active(active);
     }
 
+    /// Sets `max_bitrate`.
     pub fn set_max_bitrate(&mut self, max_bitrate: u32) {
         _ = self.0.max_bitrate(max_bitrate);
     }

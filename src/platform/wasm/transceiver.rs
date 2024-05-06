@@ -20,10 +20,14 @@ use crate::{
 
 use super::get_property_by_name;
 
+/// Dart side representation of [RTCRtpTransceiverInit].
+///
+/// [RTCRtpTransceiverInit]: https://tinyurl.com/mtdkabcj
 #[derive(Debug)]
 pub struct TransceiverInit(RtcRtpTransceiverInit);
 
 impl TransceiverInit {
+    /// Creates a new [`TransceiverInit`].
     #[must_use]
     pub fn new(direction: TransceiverDirection) -> Self {
         let mut init = RtcRtpTransceiverInit::new();
@@ -31,11 +35,13 @@ impl TransceiverInit {
         Self(init)
     }
 
+    /// Returns underlying [`RtcRtpTransceiverInit`].
     #[must_use]
     pub const fn handle(&self) -> &RtcRtpTransceiverInit {
         &self.0
     }
 
+    /// Adds provided [`SendEncodingParameters`] to this [`TransceiverInit`].
     pub fn sending_encodings(
         &mut self,
         encodings: Vec<SendEncodingParameters>,
@@ -182,6 +188,7 @@ impl Transceiver {
         Ok(())
     }
 
+    /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
     pub fn set_preferred_codecs(&self, codecs: Vec<CodecCapability>) {
         let arr = ::js_sys::Array::new();
         for codec in codecs {

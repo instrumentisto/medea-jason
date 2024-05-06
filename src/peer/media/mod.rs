@@ -246,10 +246,14 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
+/// Returns `true` if the provided MIME-type is required for the all
+/// [`platform::Transceiver`]s.
 fn is_required_codec(mime: &str) -> bool {
     mime == "video/rtx" || mime == "video/red" || mime == "video/ulpfec"
 }
 
+/// Returns required [`CodecCapability`]s and [`ScalabilityMode`] based on the
+/// provided [`SvcSettings`] and [`MediaKind`].
 async fn target_codecs_and_sm(
     svc: Vec<SvcSettings>,
     kind: MediaKind,
@@ -290,6 +294,8 @@ async fn target_codecs_and_sm(
         )
 }
 
+/// Returns [`SendEncodingParameters`] based on the provided
+/// [`EncodingParameters`] and target [`ScalabilityMode`]
 fn get_sending_encodings(
     mut encodings: Vec<EncodingParameters>,
     target_sm: Option<ScalabilityMode>,

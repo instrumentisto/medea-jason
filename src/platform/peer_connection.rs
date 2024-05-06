@@ -148,6 +148,7 @@ pub enum RtcPeerConnectionError {
     #[from(ignore)]
     SetRemoteDescriptionFailed(platform::Error),
 
+    /// Failed to add [`platform::Transceiver`].
     #[display(fmt = "Failed to add Transceiver: {}", _0)]
     #[from(ignore)]
     AddTransceiverFailed(platform::Error),

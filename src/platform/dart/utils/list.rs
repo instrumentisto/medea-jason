@@ -58,6 +58,7 @@ impl DartList {
         Self(unsafe { DartHandle::new(map) })
     }
 
+    /// Adds provided [`DartValue`] into this [`DartList`].
     pub fn add(&mut self, value: DartValue) {
         unsafe {
             list::add(self.0.get(), value);

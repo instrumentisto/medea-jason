@@ -56,7 +56,7 @@
     clippy::missing_assert_message,
     clippy::missing_asserts_for_indexing,
     clippy::missing_const_for_fn,
-    // clippy::missing_docs_in_private_items,
+    clippy::missing_docs_in_private_items,
     clippy::multiple_inherent_impl,
     clippy::multiple_unsafe_ops_per_block,
     clippy::mutex_atomic,
@@ -125,7 +125,7 @@
     missing_abi,
     missing_copy_implementations,
     missing_debug_implementations,
-    // missing_docs,
+    missing_docs,
     semicolon_in_expressions_from_macros,
     single_use_lifetimes,
     unit_bindings,
@@ -151,7 +151,6 @@
 )]
 // TODO: Remove on next `derive_more` major version.
 #![allow(clippy::uninlined_format_args, clippy::use_debug)]
-#![allow(clippy::missing_errors_doc)]
 
 #[macro_use]
 pub mod utils;
