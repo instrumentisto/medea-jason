@@ -13,9 +13,7 @@ use medea_client_api_proto::TrackId;
 use tracerr::Traced;
 
 use crate::{
-    media::{
-        track::local, LocalTracksConstraints, MediaKind, TrackConstraints,
-    },
+    media::{track::local, LocalTracksConstraints, TrackConstraints},
     peer::TrackEvent,
     platform,
     utils::Caused,
@@ -119,7 +117,6 @@ impl Sender {
         }
 
         let caps = TrackConstraints::from(state.media_type().clone());
-        let kind = MediaKind::from(&caps);
         let transceiver = match state.mid() {
             // Try to find rcvr transceiver that can be used as sendrecv.
             None => {
@@ -139,10 +136,8 @@ impl Sender {
                 } else {
                     let add_transceiver =
                         media_connections.0.borrow().add_transceiver(
-                            kind,
+                            state.media_type().clone(),
                             platform::TransceiverDirection::INACTIVE,
-                            vec![],
-                            vec![],
                         );
                     add_transceiver.await
                 }
