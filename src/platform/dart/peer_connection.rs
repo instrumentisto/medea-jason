@@ -517,7 +517,7 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         init: TransceiverInit,
-    ) -> RtcPeerConnectionResult<Transceiver> {
+    ) -> Transceiver {
         let fut = unsafe {
             peer_connection::add_transceiver(
                 self.handle.get(),
@@ -527,11 +527,8 @@ impl RtcPeerConnection {
         };
         let trnsvr: DartHandle = unsafe { FutureFromDart::execute(fut) }
             .await
-            .map_err(RtcPeerConnectionError::AddTransceiverFailed)
-            .map_err(tracerr::wrap!())?;
-        let tr = Transceiver::from(trnsvr);
-
-        Ok(tr)
+            .unwrap();
+        Transceiver::from(trnsvr)
     }
 
     /// Returns [`Transceiver`] (see [RTCRtpTransceiver][1]) from a

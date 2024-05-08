@@ -401,12 +401,9 @@ impl InnerMediaConnections {
             let kind = MediaKind::from(&media_type);
 
             match media_type {
-                // TODO(reread): Maybe to do not unwrap
-                #[allow(clippy::unwrap_used)]
                 MediaType::Audio(_) => peer
                     .add_transceiver(kind, TransceiverInit::new(direction))
-                    .await
-                    .unwrap(),
+                    .await,
                 MediaType::Video(settings) => {
                     let mut init = TransceiverInit::new(direction);
 
@@ -421,10 +418,8 @@ impl InnerMediaConnections {
                         init.sending_encodings(encoding_params);
                     }
 
-                    // TODO(reread): Maybe to do not unwrap
-                    #[allow(clippy::unwrap_used)]
                     let transceiver =
-                        peer.add_transceiver(kind, init).await.unwrap();
+                        peer.add_transceiver(kind, init).await;
                     if !target_codecs.is_empty() {
                         transceiver.set_preferred_codecs(target_codecs);
                     }
