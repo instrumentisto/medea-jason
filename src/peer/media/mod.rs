@@ -15,9 +15,9 @@ use futures::{
 };
 use medea_client_api_proto as proto;
 #[cfg(feature = "mockable")]
-use medea_client_api_proto::{ConnectionMode, MediaType, MemberId};
+use medea_client_api_proto::{ConnectionMode, MemberId};
 use medea_client_api_proto::{EncodingParameters, SvcSettings};
-use proto::{MediaSourceKind, ScalabilityMode, TrackId};
+use proto::{MediaSourceKind, MediaType, ScalabilityMode, TrackId};
 use tracerr::Traced;
 
 #[cfg(feature = "mockable")]
@@ -246,19 +246,15 @@ pub enum GetMidsError {
     ReceiversWithoutMid,
 }
 
-/// Returns `true` if the provided MIME-type is required for the all
-/// [`platform::Transceiver`]s.
-fn is_required_codec(mime: &str) -> bool {
-    mime == "video/rtx" || mime == "video/red" || mime == "video/ulpfec"
-}
-
 /// Returns required [`CodecCapability`]s and [`ScalabilityMode`] based on the
 /// provided [`SvcSettings`] and [`MediaKind`].
-async fn target_codecs_and_sm(
-    svc: Vec<SvcSettings>,
-    kind: MediaKind,
+async fn probe_video_codecs(
+    svc: &Vec<SvcSettings>,
 ) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
-    CodecCapability::get_sender_codec_capabilities(kind)
+    const REQUIRED_CODECS: [&'static str; 3] =
+        ["video/rtx", "video/red", "video/ulpfec"];
+
+    CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
         .await
         .map_or_else(
             |_| (vec![], None),
@@ -284,7 +280,7 @@ async fn target_codecs_and_sm(
                     codecs
                         .into_iter()
                         .filter_map(|(mime, codec)| {
-                            is_required_codec(&mime).then_some(codec)
+                            REQUIRED_CODECS.contains(&mime.as_str()).then_some(codec)
                         })
                         .for_each(|cap| target_codecs.push(cap));
                 }
@@ -296,7 +292,7 @@ async fn target_codecs_and_sm(
 
 /// Returns [`SendEncodingParameters`] based on the provided
 /// [`EncodingParameters`] and target [`ScalabilityMode`]
-fn get_sending_encodings(
+fn get_encodings_params(
     mut encodings: Vec<EncodingParameters>,
     target_sm: Option<ScalabilityMode>,
 ) -> Vec<SendEncodingParameters> {
@@ -392,30 +388,41 @@ impl InnerMediaConnections {
     /// [`platform::RtcPeerConnection`].
     fn add_transceiver(
         &self,
-        kind: MediaKind,
+        media_type: MediaType,
         direction: platform::TransceiverDirection,
-        encodings: Vec<EncodingParameters>,
-        svc: Vec<SvcSettings>,
     ) -> impl Future<Output = platform::Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
 
         async move {
-            let mut init = TransceiverInit::new(direction);
+            let kind = MediaKind::from(&media_type);
 
-            let (target_codecs, target_scalability_mode) =
-                target_codecs_and_sm(svc, kind).await;
+            match media_type {
+                MediaType::Audio(_) => peer
+                    .add_transceiver(kind, TransceiverInit::new(direction))
+                    .await
+                    .unwrap(),
+                MediaType::Video(settings) => {
+                    let mut init = TransceiverInit::new(direction);
 
-            let send_params =
-                get_sending_encodings(encodings, target_scalability_mode);
-            init.sending_encodings(send_params);
+                    let (target_codecs, target_scalability_mode) =
+                        probe_video_codecs(&settings.svc_settings).await;
 
-            // TODO(reread): Maybe to do not unwrap
-            #[allow(clippy::unwrap_used)]
-            let transceiver = peer.add_transceiver(kind, init).await.unwrap();
-            if !target_codecs.is_empty() {
-                transceiver.set_preferred_codecs(target_codecs);
+                    let encoding_params = get_encodings_params(
+                        settings.encoding_parameters,
+                        target_scalability_mode,
+                    );
+                    init.sending_encodings(encoding_params);
+
+                    // TODO(reread): Maybe to do not unwrap
+                    #[allow(clippy::unwrap_used)]
+                    let transceiver =
+                        peer.add_transceiver(kind, init).await.unwrap();
+                    if !target_codecs.is_empty() {
+                        transceiver.set_preferred_codecs(target_codecs);
+                    }
+                    transceiver
+                }
             }
-            transceiver
         }
     }
 
