@@ -525,9 +525,8 @@ impl RtcPeerConnection {
                 init.handle(),
             )
         };
-        let trnsvr: DartHandle = unsafe { FutureFromDart::execute(fut) }
-            .await
-            .unwrap();
+        let trnsvr: DartHandle =
+            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
         Transceiver::from(trnsvr)
     }
 
