@@ -3217,15 +3217,13 @@ async fn sender_answerer() {
             MediaKind::Audio,
             TransceiverInit::new(platform::TransceiverDirection::RECV),
         )
-        .await
-        .unwrap();
+        .await;
     let v_tr = peer
         .add_transceiver(
             MediaKind::Video,
             TransceiverInit::new(platform::TransceiverDirection::RECV),
         )
-        .await
-        .unwrap();
+        .await;
     let offer = peer.create_offer().await.unwrap();
     peer.set_offer(&offer).await.unwrap();
 
