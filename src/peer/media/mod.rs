@@ -251,7 +251,9 @@ pub enum GetMidsError {
 async fn probe_video_codecs(
     svc: &Vec<SvcSettings>,
 ) -> (Vec<CodecCapability>, Option<ScalabilityMode>) {
-    const REQUIRED_CODECS: [&'static str; 3] =
+    /// List of required codecs for every [`MediaKind::Video`]
+    /// [`platform::Transceiver`].
+    const REQUIRED_CODECS: [&str; 3] =
         ["video/rtx", "video/red", "video/ulpfec"];
 
     CodecCapability::get_sender_codec_capabilities(MediaKind::Video)
@@ -280,7 +282,9 @@ async fn probe_video_codecs(
                     codecs
                         .into_iter()
                         .filter_map(|(mime, codec)| {
-                            REQUIRED_CODECS.contains(&mime.as_str()).then_some(codec)
+                            REQUIRED_CODECS
+                                .contains(&mime.as_str())
+                                .then_some(codec)
                         })
                         .for_each(|cap| target_codecs.push(cap));
                 }
@@ -397,6 +401,8 @@ impl InnerMediaConnections {
             let kind = MediaKind::from(&media_type);
 
             match media_type {
+                // TODO(reread): Maybe to do not unwrap
+                #[allow(clippy::unwrap_used)]
                 MediaType::Audio(_) => peer
                     .add_transceiver(kind, TransceiverInit::new(direction))
                     .await

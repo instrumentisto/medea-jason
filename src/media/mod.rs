@@ -65,8 +65,8 @@ impl From<&TrackConstraints> for MediaKind {
 impl From<&MediaType> for MediaKind {
     fn from(media_type: &MediaType) -> Self {
         match media_type {
-            MediaType::Audio(_) => MediaKind::Audio,
-            MediaType::Video(_) => MediaKind::Video,
+            MediaType::Audio(_) => Self::Audio,
+            MediaType::Video(_) => Self::Video,
         }
     }
 }

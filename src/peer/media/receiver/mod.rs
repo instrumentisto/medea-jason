@@ -9,10 +9,7 @@ use medea_client_api_proto as proto;
 use proto::{ConnectionMode, TrackId};
 
 use crate::{
-    media::{
-        track::remote, MediaDirection, RecvConstraints,
-        TrackConstraints,
-    },
+    media::{track::remote, MediaDirection, RecvConstraints, TrackConstraints},
     peer::{
         media::media_exchange_state, MediaConnections, MediaStateControllable,
         PeerEvent, TrackEvent,

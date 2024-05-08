@@ -13,9 +13,7 @@ use medea_client_api_proto::TrackId;
 use tracerr::Traced;
 
 use crate::{
-    media::{
-        track::local, LocalTracksConstraints, TrackConstraints,
-    },
+    media::{track::local, LocalTracksConstraints, TrackConstraints},
     peer::TrackEvent,
     platform,
     utils::Caused,
