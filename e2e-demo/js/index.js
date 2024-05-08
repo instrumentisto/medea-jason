@@ -116,6 +116,15 @@ async function createRoom(roomId, memberId) {
   let isAudioEnabled = document.getElementById('connection-settings__publish_audio').checked;
   let isVideoEnabled = document.getElementById('connection-settings__publish_video').checked;
   let isPublish = document.getElementById('connection-settings__publish_is-enabled').checked;
+  let isSfu = document.getElementById('connection-settings_is-sfu').checked;
+
+  let p2pPolicy;
+  if (isSfu) {
+    p2pPolicy = 'Never';
+  } else {
+    p2pPolicy = 'Always';
+  }
+
   let audioPublishPolicy;
   let videoPublishPolicy;
   if (isAudioEnabled) {
@@ -133,7 +142,7 @@ async function createRoom(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Never',
+      p2p: p2pPolicy,
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -167,6 +176,15 @@ async function createRoom(roomId, memberId) {
 async function createMember(roomId, memberId) {
   let isAudioEnabled = document.getElementById('connection-settings__publish_audio').checked;
   let isVideoEnabled = document.getElementById('connection-settings__publish_video').checked;
+  let isSfu = document.getElementById('connection-settings_is-sfu').checked;
+
+  let p2pPolicy;
+  if (isSfu) {
+    p2pPolicy = 'Never';
+  } else {
+    p2pPolicy = 'Always';
+  }
+
   let audioPublishPolicy;
   let videoPublishPolicy;
   if (isAudioEnabled) {
@@ -190,7 +208,7 @@ async function createMember(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Never',
+      p2p: p2pPolicy,
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
