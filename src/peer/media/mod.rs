@@ -417,7 +417,9 @@ impl InnerMediaConnections {
                         settings.encoding_parameters,
                         target_scalability_mode,
                     );
-                    init.sending_encodings(encoding_params);
+                    if !encoding_params.is_empty() {
+                        init.sending_encodings(encoding_params);
+                    }
 
                     // TODO(reread): Maybe to do not unwrap
                     #[allow(clippy::unwrap_used)]
