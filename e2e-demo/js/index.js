@@ -2,6 +2,91 @@ const controlDomain = 'http://127.0.0.1:8000';
 const controlUrl = controlDomain + '/control-api/';
 const baseUrl = 'ws://127.0.0.1:8080/ws/';
 
+let [listenerWrapper, deleteTrack] = (() => {
+  const tracks = {};
+  const startTimer = () => setInterval(() => {
+    Object.keys(tracks).forEach(id => {
+      const track = tracks[id];
+
+      track.receiver.getStats()
+        .then(res => {
+          res.forEach(stat => {
+            if (!stat) return;
+            let inStats = false;
+            if ((stat.mediaType === 'video' || stat.id.toLowerCase().indexOf('video') > -1) &&
+              stat.type === 'inbound-rtp' && stat.id.indexOf('rtcp') < 0) {
+              inStats = true;
+            }
+            if (inStats) {
+              track.bsnow = stat.bytesReceived;
+              track.tsnow = stat.timestamp;
+              if (track.bsbefore === null || track.tsbefore === null) {
+                track.bsbefore = track.bsnow;
+                track.tsbefore = track.tsnow;
+              } else {
+                let timePassed = track.tsnow - track.tsbefore;
+                let bitrate = Math.round((track.bsnow - track.bsbefore) * 8 / timePassed);
+                track.bitrate = typeof bitrate == 'number' ? bitrate : 0;
+                track.bsbefore = track.bsnow;
+                track.tsbefore = track.tsnow;
+              }
+            }
+          });
+
+          if (typeof track.bitrate != 'number') {
+            return;
+          }
+
+          if (!track.element) {
+            const mediaElements = document.querySelectorAll('.camera-video');
+            for (const i in Object.keys(mediaElements)) {
+              if (mediaElements[i].dataset.trackId == id) {
+                track.element = mediaElements[i];
+                break;
+              }
+            }
+
+            if (!track.element) return;
+          }
+
+          const mediaElement = track.element;
+          mediaElement.dataset.bitrate = track.bitrate;
+          const settings = track.inner.getSettings();
+          mediaElement.dataset.width = settings.width;
+          mediaElement.dataset.height = settings.height;
+          mediaElement.dataset.framerate = settings.frameRate.toFixed(2);;
+        });
+    });
+  }, 1000);
+  let timer;
+
+  return [
+    (evt, listener) => {
+      listener(evt);
+
+      if (evt.track.kind == 'audio') return;
+
+      Object.assign(tracks, { [evt.track.id]: { 'inner': evt.track, 'receiver': evt.receiver } });
+      if (!timer) {
+        timer = startTimer();
+        delete startTimer;
+      }
+    },
+    id => delete tracks[id]
+  ];
+})();
+
+RTCPeerConnection.prototype.addEventListener = function (type, listener, others) {
+  EventTarget.prototype.addEventListener.call(
+    this,
+    type,
+    type == 'track'
+      ? evt => listenerWrapper(evt, listener)
+      : listener,
+    others
+  );
+};
+
 let rust;
 let roomId = window.location.hash.replace('#', '');
 
@@ -48,7 +133,7 @@ async function createRoom(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -105,7 +190,7 @@ async function createMember(roomId, memberId) {
   if (isPublish) {
     pipeline['publish'] = {
       kind: 'WebRtcPublishEndpoint',
-      p2p: 'Always',
+      p2p: 'Never',
       force_relay: false,
       audio_settings: {
         publish_policy: audioPublishPolicy,
@@ -400,7 +485,7 @@ async function startPublishing() {
 
   let publishEndpoint = {
     kind: 'WebRtcPublishEndpoint',
-    p2p: 'Always',
+    p2p: 'Never',
   };
   let isSuccess = await controlApi.createEndpoint(roomId, memberId, 'publish', publishEndpoint);
   if (!isSuccess) {
@@ -705,29 +790,35 @@ window.onload = async function() {
             mediaStream.addTrack(track.get_track());
             playElement.srcObject = mediaStream;
           } else {
-            playElement = memberVideoDiv.getElementsByClassName('camera-video')[0];
+            memberVideoDiv.querySelectorAll('.camera-video').forEach(videoElement => {
+              if (videoElement.dataset.trackId == track.get_track().id) playElement = videoElement;
+            });
             if (playElement === undefined) {
-              playElement = document.createElement('video');
-              playElement.className = 'camera-video';
+              playElement = document.createElement('div');
+              playElement.appendChild(document.createElement('video'))
               playElement.classList.add('camera-video', 'order-1');
-              playElement.playsinline = 'true';
-              playElement.controls = 'true';
-              playElement.autoplay = 'true';
+              playElement.firstChild.playsinline = 'true';
+              playElement.firstChild.controls = 'true';
+              playElement.firstChild.autoplay = 'true';
+              playElement.dataset.trackId = track.get_track().id;
+              playElement.dataset.bitrate = 0;
+              playElement.dataset.width = 0;
+              playElement.dataset.height = 0;
+              playElement.dataset.framerate = 0;
               if (track.media_direction() != 0) {
-                playElement.pause();
+                playElement.firstChild.pause();
                 playElement.style.display = 'none';
               }
               memberVideoDiv.appendChild(playElement);
             }
             let mediaStream = new MediaStream();
             mediaStream.addTrack(track.get_track());
-            playElement.srcObject = mediaStream;
+            playElement.firstChild.srcObject = mediaStream;
           }
         } else {
           playElement = memberVideoDiv.getElementsByClassName('audio')[0];
           if (playElement === undefined) {
             playElement = document.createElement('audio');
-            playElement.className = 'audio';
             playElement.classList.add('audio', 'order-3');
             playElement.controls = 'true';
             playElement.autoplay = 'true';
@@ -745,11 +836,13 @@ window.onload = async function() {
         track.on_media_direction_changed(async (direction) => {
           console.log('New TransceiverDirection: ' + direction);
 
+          const isVideo = track.kind() === rust.MediaKind.Video;
+
           if (direction == 0) {
-            await playElement.play();
+            isVideo ? await playElement.firstChild.play() : await playElement.play();
             playElement.style.display = 'block';
           } else {
-            playElement.pause();
+            isVideo ? await playElement.firstChild.pause() : await playElement.pause();
             playElement.style.display = 'none';
           }
         });
@@ -760,6 +853,7 @@ window.onload = async function() {
           console.log(`Track unmuted: ${track.kind()}`);
         });
         track.on_stopped( () => {
+          deleteTrack(track.get_track().id);
           track.free();
           playElement.remove();
         });
