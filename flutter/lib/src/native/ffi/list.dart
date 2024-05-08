@@ -14,7 +14,7 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns an empty [Map].
+/// Returns an empty [List].
 Object _init() {
   return [];
 }

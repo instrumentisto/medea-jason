@@ -72,21 +72,27 @@ mod transceiver {
         /// Creates a new [`TransceiverInit`].
         pub fn create_transceiver_init(direction: i64) -> Dart_Handle;
 
-        /// Adds [`SendEncodingParameters`] to the provided [`TransceiverInit`]
+        /// Adds [`SendEncodingParameters`] to the provided [`TransceiverInit`].
         pub fn add_sending_encodings(
             transceiver_init: Dart_Handle,
             encoding: Dart_Handle,
         );
 
-        /// Gets [`Parameters`] of the underlying `sender`.
+        /// Gets [`Parameters`] of the underlying [`RTCRtpSender`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc/#rtcrtpsender-interface
         pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
 
-        /// Sets [`Parameters`] into the underlying `sender`.
+        /// Sets [`Parameters`] into the underlying [`RTCRtpSender`][1].
+        ///
+        /// [1]: https://www.w3.org/TR/webrtc/#rtcrtpsender-interface
         pub fn set_send_parameters(
             transceiver: Dart_Handle,
             parameters: Dart_Handle,
         ) -> Dart_Handle;
 
+        /// Overrides the default receive codec preferences used by
+        /// the user agent for this [`Transceiver`].
         pub fn set_preferred_codec(
             transceiver: Dart_Handle,
             codec_capabilities: Dart_Handle,

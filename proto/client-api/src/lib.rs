@@ -1080,12 +1080,6 @@ pub enum Codec {
     /// [VP9]: https://en.wikipedia.org/wiki/VP9
     #[display(fmt = "VP9")]
     VP9,
-
-    /// [AV1] codec.
-    ///
-    /// [AV1]: https://en.wikipedia.org/wiki/AV1
-    #[display(fmt = "AV1")]
-    AV1,
 }
 
 impl Codec {
@@ -1095,7 +1089,6 @@ impl Codec {
         match self {
             Self::VP8 => "video/VP8",
             Self::VP9 => "video/VP9",
-            Self::AV1 => "audio/AV1",
         }
     }
 }
