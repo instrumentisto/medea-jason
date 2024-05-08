@@ -200,7 +200,7 @@ impl Transceiver {
             })
             .is_some();
         if is_api_available {
-            self.0.set_codec_preferences(&arr);
+            return;
         }
         let arr = ::js_sys::Array::new();
         for codec in codecs {
