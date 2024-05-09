@@ -88,7 +88,7 @@ wee_alloc = { version = "0.4", optional = true }
         "MessageEvent",
         "Navigator",
         "RtcBundlePolicy",
-        "RtcConfiguration", "RtcRtpCapabilities",
+        "RtcConfiguration",
         "RtcIceCandidate", "RtcIceCandidateInit",
         "RtcIceConnectionState",
         "RtcIceServer",
@@ -97,13 +97,13 @@ wee_alloc = { version = "0.4", optional = true }
         "RtcPeerConnection", "RtcPeerConnectionIceEvent",
         "RtcPeerConnectionIceErrorEvent",
         "RtcRtpReceiver", "RtcRtpSender",
-        "RtcRtpParameters", "RtcRtpCodecParameters",
-        "RtcRtpEncodingParameters",
         "RtcRtpTransceiver", "RtcRtpTransceiverDirection",
         "RtcRtpTransceiverInit",
         "RtcSdpType",
-        "RtcSessionDescription", "RtcSessionDescriptionInit", "RtcStats",
-        "RtcTrackEvent", "WebSocket", "Window",
+        "RtcSessionDescription", "RtcSessionDescriptionInit",
+        "RtcStats",
+        "RtcTrackEvent",
+        "WebSocket", "Window",
     ]
 
 [build-dependencies]

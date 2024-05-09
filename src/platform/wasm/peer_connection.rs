@@ -27,16 +27,13 @@ use crate::{
     media::MediaKind,
     platform::{
         self,
-        wasm::{
-            get_property_by_name, transceiver::TransceiverInit,
-            utils::EventListener,
-        },
+        wasm::{get_property_by_name, utils::EventListener},
         IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
     },
 };
 
-use super::ice_server::RtcIceServers;
+use super::{ice_server::RtcIceServers, transceiver::TransceiverInit};
 
 /// Shortcut for a [`Result`] holding a [`Traced`] [`RtcPeerConnectionError`].
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -634,17 +631,19 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    // Async is needed for constency with Dart implementation.
-    #[allow(clippy::unused_async)]
-    pub async fn add_transceiver(
+    pub fn add_transceiver(
         &self,
         kind: MediaKind,
         init: TransceiverInit,
-    ) -> Transceiver {
+    ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
-        let transceiver = peer
-            .add_transceiver_with_str_and_init(kind.as_str(), init.handle());
-        Transceiver::from(transceiver)
+        async move {
+            let transceiver = peer.add_transceiver_with_str_and_init(
+                kind.as_str(),
+                init.handle(),
+            );
+            Transceiver::from(transceiver)
+        }
     }
 
     /// Returns [`RtcRtpTransceiver`] (see [RTCRtpTransceiver][1]) from a
