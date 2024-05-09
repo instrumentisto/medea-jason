@@ -30,17 +30,25 @@ impl SendEncodingParameters {
         &self.0
     }
 
-    /// Sets `active`.
+    /// Sets [`active`] of this [`SendEncodingParameters`].
+    ///
+    /// [`active`]:
+    /// https://w3.org/TR/webrtc/#dom-rtcrtpencodingparameters-active
     pub fn set_active(&mut self, active: bool) {
         _ = self.0.active(active);
     }
 
-    /// Sets `max_bitrate`.
+    /// Sets [`maxBitrate`] of this [`SendEncodingParameters`].
+    ///
+    /// [`maxBitrate`]:
+    /// https://w3.org/TR/webrtc/#dom-rtcrtpencodingparameters-maxbitrate
     pub fn set_max_bitrate(&mut self, max_bitrate: u32) {
         _ = self.0.max_bitrate(max_bitrate);
     }
 
-    /// Sets `scale_resolution_down_by`.
+    /// Sets [`scaleResolutionDownBy`] of this [`SendEncodingParameters`].
+    ///
+    /// [`scaleResolutionDownBy`]: https://tinyurl.com/ypzzc75t
     pub fn set_scale_resolution_down_by(
         &mut self,
         scale_resolution_down_by: f32,
@@ -48,7 +56,9 @@ impl SendEncodingParameters {
         _ = self.0.scale_resolution_down_by(scale_resolution_down_by);
     }
 
-    /// Sets `set_scalability_mode`.
+    /// Sets [`scalabilityMode`] of this [`SendEncodingParameters`].
+    ///
+    /// [`scalabilityMode`]: https://tinyurl.com/3zuaee45
     pub fn set_scalability_mode(&mut self, scalability_mode: ScalabilityMode) {
         _ = self.0.scalability_mode(&scalability_mode.to_string());
     }

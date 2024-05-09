@@ -189,7 +189,7 @@ impl Transceiver {
     }
 
     /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
-    pub fn set_preferred_codecs(&self, codecs: Vec<CodecCapability>) {
+    pub fn set_codec_preferences(&self, codecs: Vec<CodecCapability>) {
         let is_api_available =
             get_property_by_name(&self.0, "set_codec_preferences", |val| {
                 if val.is_undefined() {

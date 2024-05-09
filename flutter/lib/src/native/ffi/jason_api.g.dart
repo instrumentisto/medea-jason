@@ -6265,21 +6265,21 @@ class MedeaJasonWire implements FlutterRustBridgeWireBase {
   late final _set_send_parameters =
       _set_send_parametersPtr.asFunction<Object Function(Object, Object)>();
 
-  void set_preferred_codec(
+  void set_codec_preferences(
     Object transceiver,
     Object codec_capabilities,
   ) {
-    return _set_preferred_codec(
+    return _set_codec_preferences(
       transceiver,
       codec_capabilities,
     );
   }
 
-  late final _set_preferred_codecPtr =
+  late final _set_codec_preferencesPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Handle, ffi.Handle)>>(
-          'set_preferred_codec');
-  late final _set_preferred_codec =
-      _set_preferred_codecPtr.asFunction<void Function(Object, Object)>();
+          'set_codec_preferences');
+  late final _set_codec_preferences =
+      _set_codec_preferencesPtr.asFunction<void Function(Object, Object)>();
 
   Object connect(
     ffi.Pointer<ffi.Char> url,

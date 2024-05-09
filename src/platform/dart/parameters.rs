@@ -18,10 +18,11 @@ mod parameters {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Gets [`SendEncodingParameters`].
+        /// Gets [`SendEncodingParameters`] of this [`Parameters`].
         pub fn encodings(parameters: Dart_Handle) -> Dart_Handle;
 
-        /// Sets [`SendEncodingParameters`].
+        /// Sets the provided [`SendEncodingParameters`] into this
+        /// [`Parameters`].
         pub fn set_encoding(
             parameters: Dart_Handle,
             encoding: Dart_Handle,

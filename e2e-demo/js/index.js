@@ -930,6 +930,7 @@ window.onload = async function() {
       $('#connection-settings').modal('show');
       $('#connect-btn').show();
       $('.control').hide();
+
       alert(
         `Call was ended.
         Reason: ${on_closed.reason()};

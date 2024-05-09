@@ -93,7 +93,7 @@ mod transceiver {
 
         /// Overrides the default receive codec preferences used by
         /// the user agent for this [`Transceiver`].
-        pub fn set_preferred_codec(
+        pub fn set_codec_preferences(
             transceiver: Dart_Handle,
             codec_capabilities: Dart_Handle,
         );
@@ -245,7 +245,10 @@ impl Transceiver {
     }
 
     /// Sets preferred [`CodecCapability`] for this [`Transceiver`].
-    pub fn set_preferred_codecs(&self, preferred_codecs: Vec<CodecCapability>) {
+    pub fn set_codec_preferences(
+        &self,
+        preferred_codecs: Vec<CodecCapability>,
+    ) {
         let handle = self.0.get();
         let mut codecs_dart = DartList::new();
         for codec in preferred_codecs {
@@ -253,7 +256,7 @@ impl Transceiver {
             codecs_dart.add(codec_handle.into());
         }
         unsafe {
-            transceiver::set_preferred_codec(handle, codecs_dart.as_handle());
+            transceiver::set_codec_preferences(handle, codecs_dart.as_handle());
         };
     }
 
