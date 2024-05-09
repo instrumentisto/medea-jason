@@ -415,8 +415,8 @@ impl State {
         if let Some(receivers) = track_patch.receivers {
             *self.receivers.borrow_mut() = receivers;
         }
-        if !track_patch.encodings.is_empty() {
-            self.update_encodings.set(Some(track_patch.encodings));
+        if let Some(encoding_parameters) = track_patch.encoding_parameters {
+            self.update_encodings.set(Some(encoding_parameters));
         }
     }
 

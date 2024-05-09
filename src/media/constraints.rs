@@ -6,8 +6,8 @@ use derive_more::Display;
 use futures::stream::LocalBoxStream;
 use medea_client_api_proto::{
     AudioSettings as ProtoAudioConstraints, EncodingParameters,
-    MediaSourceKind, MediaType as ProtoTrackConstraints, MediaType, SvcSetting,
-    VideoSettings,
+    MediaSourceKind, MediaType as ProtoTrackConstraints, MediaType,
+    SvcSettings, VideoSettings,
 };
 use medea_reactive::ObservableCell;
 
@@ -875,7 +875,7 @@ impl VideoSource {
 
     /// Returns configured [`Vec<SvcSetting>`].
     #[must_use]
-    pub fn svc(&self) -> Vec<SvcSetting> {
+    pub fn svc(&self) -> Vec<SvcSettings> {
         match self {
             Self::Device(s) => s.svc.clone(),
             Self::Display(s) => s.svc.clone(),
@@ -893,8 +893,8 @@ impl From<VideoSettings> for VideoSource {
                     width: None,
                     height: None,
                     required: settings.required,
-                    encodings: settings.encodings,
-                    svc: settings.svc,
+                    encodings: settings.encoding_parameters,
+                    svc: settings.svc_settings,
                 })
             }
             MediaSourceKind::Display => {
@@ -904,8 +904,8 @@ impl From<VideoSettings> for VideoSource {
                     frame_rate: None,
                     required: settings.required,
                     device_id: None,
-                    encodings: settings.encodings,
-                    svc: settings.svc,
+                    encodings: settings.encoding_parameters,
+                    svc: settings.svc_settings,
                 })
             }
         }
@@ -976,7 +976,7 @@ impl TrackConstraints {
 
     /// Returns configured [`SvcSetting`]s.
     #[must_use]
-    pub fn svc(&self) -> Vec<SvcSetting> {
+    pub fn svc(&self) -> Vec<SvcSettings> {
         match &self {
             Self::Audio(_) => Vec::new(),
             Self::Video(vs) => vs.svc(),
@@ -1174,7 +1174,7 @@ pub struct DeviceVideoTrackConstraints {
     pub encodings: Vec<EncodingParameters>,
 
     /// [`SvcSetting`]s in decreasing priority.
-    pub svc: Vec<SvcSetting>,
+    pub svc: Vec<SvcSettings>,
 }
 
 /// Constraints applicable to video tracks that are sourced from screen-capture.
@@ -1329,7 +1329,7 @@ pub struct DisplayVideoTrackConstraints {
     pub encodings: Vec<EncodingParameters>,
 
     /// [`SvcSetting`]s in decreasing priority.
-    pub svc: Vec<SvcSetting>,
+    pub svc: Vec<SvcSettings>,
 }
 
 impl DisplayVideoTrackConstraints {

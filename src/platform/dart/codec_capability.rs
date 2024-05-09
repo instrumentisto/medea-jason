@@ -5,10 +5,7 @@
 use dart_sys::_Dart_Handle;
 use medea_macro::dart_bridge;
 
-use crate::{
-    media::MediaKind,
-    platform::dart::utils::handle::DartHandle,
-};
+use crate::{media::MediaKind, platform::dart::utils::handle::DartHandle};
 
 use super::utils::{
     dart_future::FutureFromDart, dart_string_into_rust, list::DartList,
@@ -65,7 +62,7 @@ impl CodecCapability {
         let mime_type = unsafe { codec_capability::mime_type(self.0.get()) };
         unsafe { dart_string_into_rust(mime_type) }
     }
-    
+
     /// Returns underlying [`_Dart_Handle`].
     #[must_use]
     pub fn handle(&self) -> *mut _Dart_Handle {

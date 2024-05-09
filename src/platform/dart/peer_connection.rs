@@ -6,7 +6,8 @@ use std::future::Future;
 
 use derive_more::Display;
 use medea_client_api_proto::{
-    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState, SvcSetting,
+    EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
+    SvcSetting,
 };
 use medea_macro::dart_bridge;
 use tracerr::Traced;
@@ -535,44 +536,40 @@ impl RtcPeerConnection {
 
                 if res.is_some() {
                     target_codec = res.cloned();
-                    target_scalability_mode = Some(svc_setting.scalability_mode);
+                    target_scalability_mode =
+                        Some(svc_setting.scalability_mode);
 
                     break;
                 }
             }
 
-            let process_encoding =
-                |encoding: EncodingParameters| {
-                    let enc = SendEncodingParameters::new(
-                        encoding.rid,
-                        encoding.active,
+            let process_encoding = |encoding: EncodingParameters| {
+                let enc =
+                    SendEncodingParameters::new(encoding.rid, encoding.active);
+                if let Some(max_bitrate) = encoding.max_bitrate {
+                    enc.set_max_bitrate(max_bitrate.into());
+                }
+                if let Some(scale_resolution_down_by) =
+                    encoding.scale_resolution_down_by
+                {
+                    enc.set_scale_resolution_down_by(
+                        scale_resolution_down_by.into(),
                     );
-                    if let Some(max_bitrate) = encoding.max_bitrate {
-                        enc.set_max_bitrate(max_bitrate.into());
-                    }
-                    if let Some(scale_resolution_down_by) =
-                        encoding.scale_resolution_down_by
-                    {
-                        enc.set_scale_resolution_down_by(
-                            scale_resolution_down_by.into(),
-                        );
-                    }
-                    if let Some(target_sm) = target_scalability_mode {
-                        enc.set_scalability_mode(target_sm);
-                    }
+                }
+                if let Some(target_sm) = target_scalability_mode {
+                    enc.set_scalability_mode(target_sm);
+                }
 
-                    init.add_sending_encodings(enc);
-                };
+                init.add_sending_encodings(enc);
+            };
 
             if encodings.is_empty() && target_scalability_mode.is_some() {
-                process_encoding(
-                    EncodingParameters {
-                        rid: "0".to_owned(),
-                        active: true,
-                        max_bitrate: None,
-                        scale_resolution_down_by: None,
-                    },
-                );
+                process_encoding(EncodingParameters {
+                    rid: "0".to_owned(),
+                    active: true,
+                    max_bitrate: None,
+                    scale_resolution_down_by: None,
+                });
             } else {
                 for encoding in encodings {
                     process_encoding(encoding);

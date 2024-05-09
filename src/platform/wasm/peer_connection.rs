@@ -13,7 +13,7 @@ use std::{
 use js_sys::{Array, JsString, Reflect};
 use medea_client_api_proto::{
     EncodingParameters, IceConnectionState, IceServer, PeerConnectionState,
-    ScalabilityMode, SvcSetting,
+    SvcSettings,
 };
 use tracerr::Traced;
 use wasm_bindgen_futures::JsFuture;
@@ -639,8 +639,8 @@ impl RtcPeerConnection {
         &self,
         kind: MediaKind,
         direction: TransceiverDirection,
-        mut encodings: Vec<EncodingParameters>,
-        svc: Vec<SvcSetting>,
+        encodings: Vec<EncodingParameters>,
+        svc: Vec<SvcSettings>,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
@@ -649,7 +649,7 @@ impl RtcPeerConnection {
 
             let mut target_codec = None;
             let mut target_scalability_mode = None;
-            
+
             let codecs =
                 RtcRtpSender::get_capabilities("video").and_then(|capabs| {
                     Reflect::get(&capabs, &JsString::from("codecs")).ok()
@@ -696,8 +696,7 @@ impl RtcPeerConnection {
                     );
                 }
                 if let Some(target_sm) = target_scalability_mode {
-                    _ = params
-                        .scalability_mode(&target_sm.to_string());
+                    _ = params.scalability_mode(&target_sm.to_string());
                 }
 
                 _ = send_encodings.push(&params);
@@ -721,8 +720,8 @@ impl RtcPeerConnection {
                 peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
 
             if let Some(codec) = target_codec {
-                transceiver
-                    .set_codec_preferences(&::js_sys::Array::of1(&codec));
+                // transceiver
+                //     .set_codec_preferences(&::js_sys::Array::of1(&codec));
             }
 
             Transceiver::from(transceiver)
