@@ -1,4 +1,4 @@
-//! [SendEncodingParameters] wrapper.
+//! Representation of a [SendEncodingParameters].
 //!
 //! [SendEncodingParameters]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
 
