@@ -14,12 +14,13 @@ void registerFunctions(DynamicLibrary dl) {
   );
 }
 
-/// Returns an empty [List].
+/// Creates a new empty [List].
 Object _init() {
   return [];
 }
 
-/// Adds provided [ForeignValue] to the [List].
+/// Adds provided [ForeignValue] to the end of provided [List]
+/// extending the length by one.
 void _add(List<dynamic> list, ForeignValue value) {
   list.add(value.toDart());
 }

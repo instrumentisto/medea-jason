@@ -2,7 +2,7 @@
 //!
 //! [1]: https://w3.org/TR/webrtc/#dom-rtcrtpparameters
 
-use dart_sys::_Dart_Handle;
+use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_macro::dart_bridge;
 
@@ -18,10 +18,10 @@ mod parameters {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Gets [`SendEncodingParameters`] of this [`Parameters`].
+        /// Gets [`SendEncodingParameters`] from the provided [`Parameters`].
         pub fn encodings(parameters: Dart_Handle) -> Dart_Handle;
 
-        /// Sets the provided [`SendEncodingParameters`] into this
+        /// Sets the provided [`SendEncodingParameters`] in the provided
         /// [`Parameters`].
         pub fn set_encoding(
             parameters: Dart_Handle,
@@ -43,7 +43,7 @@ impl From<DartHandle> for Parameters {
 }
 
 impl Parameters {
-    /// Gets [`SendEncodingParameters`] of this [`Parameters`].
+    /// Returns [`SendEncodingParameters`] of this [`Parameters`].
     #[must_use]
     pub fn encodings(
         &self,
@@ -67,7 +67,7 @@ impl Parameters {
         })
     }
 
-    /// Sets the provided [`SendEncodingParameters`] into this [`Parameters`].
+    /// Sets the provided [`SendEncodingParameters`] in this [`Parameters`].
     #[must_use]
     pub fn set_encoding(
         &self,
@@ -81,9 +81,9 @@ impl Parameters {
         })
     }
 
-    /// Returns underlying [`_Dart_Handle`].
+    /// Returns the underlying [`Dart_Handle`] of this [`Parameters`].
     #[must_use]
-    pub fn handle(&self) -> *mut _Dart_Handle {
+    pub fn handle(&self) -> Dart_Handle {
         self.0.get()
     }
 }

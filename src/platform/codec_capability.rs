@@ -8,11 +8,9 @@ use crate::{platform, utils::Caused};
 #[derive(Caused, Clone, Copy, Debug, Display, From)]
 #[cause(error = platform::Error)]
 pub enum CodecCapabilityError {
-    /// Failed to get codec capabilities
+    /// Failed to get [`RTCRtpCodecCapability`].
+    ///
+    /// [`RTCRtpCodecCapability`]: https://tinyurl.com/4jcp8m4s
     #[display(fmt = "Failed to get codec capabilities")]
     FailedToGetCapabilities,
-
-    /// Failed to get codec's mimeType
-    #[display(fmt = "Failed to get codec's mimeType")]
-    FailedToGetMimeType,
 }

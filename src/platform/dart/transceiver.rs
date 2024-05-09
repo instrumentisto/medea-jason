@@ -4,7 +4,7 @@
 
 use std::{future::Future, rc::Rc};
 
-use dart_sys::_Dart_Handle;
+use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
 use medea_client_api_proto::EncodingParameters;
 use medea_macro::dart_bridge;
@@ -208,7 +208,9 @@ impl Transceiver {
         }
     }
 
-    /// Gets [`Parameters`] of the underlying `sender`.
+    /// Gets [`Parameters`] of the underlying [`RTCRtpSender`].
+    ///
+    /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
         let handle = self.0.get();
         async move {
@@ -219,7 +221,7 @@ impl Transceiver {
         }
     }
 
-    /// Sets [`Parameters`] into the underlying `sender`.
+    /// Sets [`Parameters`] into the underlying [`RTCRtpSender`].
     ///
     /// # Errors
     ///
@@ -227,6 +229,7 @@ impl Transceiver {
     /// call fails.
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     pub fn set_send_parameters(
         &self,
         params: Parameters,
@@ -256,11 +259,11 @@ impl Transceiver {
             codecs_dart.add(codec_handle.into());
         }
         unsafe {
-            transceiver::set_codec_preferences(handle, codecs_dart.as_handle());
+            transceiver::set_codec_preferences(handle, codecs_dart.handle());
         };
     }
 
-    /// Updates parameters of encoding for underlying `sender`.
+    /// Updates parameters of encoding for underlying [`RTCRtpSender`].
     ///
     /// # Errors
     ///
@@ -268,6 +271,7 @@ impl Transceiver {
     /// call fails.
     ///
     /// [1]: https://w3.org/TR/webrtc/#dom-rtcrtpsender-setparameters
+    /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     pub async fn update_send_encodings(
         &self,
         encodings: Vec<EncodingParameters>,
@@ -330,9 +334,9 @@ impl TransceiverInit {
         Self(unsafe { DartHandle::new(handle) })
     }
 
-    /// Returns underlying [`_Dart_Handle`].
+    /// Returns the underlying [`Dart_Handle`] of this [`TransceiverInit`].
     #[must_use]
-    pub fn handle(&self) -> *mut _Dart_Handle {
+    pub fn handle(&self) -> Dart_Handle {
         self.0.get()
     }
 

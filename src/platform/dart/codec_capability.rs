@@ -24,22 +24,25 @@ mod codec_capability {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Gets [RTCRtpSender]'s available [RTCRtpCodecCapability]s.
+        /// Gets [`RTCRtpSender`]'s available [`RTCRtpCodecCapability`]s.
         ///
-        /// [RTCRtpCodecCapability]: https://tinyurl.com/4jcp8m4s
+        /// [`RTCRtpSender`]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
+        /// [`RTCRtpCodecCapability`]: https://tinyurl.com/4jcp8m4s
         pub fn get_sender_codec_capabilities(kind: i64) -> Dart_Handle;
 
-        /// Gets [RTCRtpCodecCapability.mimeType].
+        /// Gets [`RTCRtpCodecCapability.mimeType`] of the provided
+        /// [`RTCRtpCodecCapability`].
         ///
-        /// [RTCRtpCodecCapability.mimeType]: https://tinyurl.com/yv38zr3a
+        /// [`RTCRtpCodecCapability.mimeType`]: https://tinyurl.com/yv38zr3a
+        /// [`RTCRtpCodecCapability`]: https://tinyurl.com/4jcp8m4s
         pub fn mime_type(codec_capability: Dart_Handle)
             -> ptr::NonNull<c_char>;
     }
 }
 
-/// Dart side representation of [RTCRtpCodecCapability].
+/// Dart side representation of [`RTCRtpCodecCapability`].
 ///
-/// [RTCRtpCodecCapability]: https://tinyurl.com/4jcp8m4s
+/// [`RTCRtpCodecCapability`]: https://tinyurl.com/4jcp8m4s
 #[derive(Clone, Debug)]
 pub struct CodecCapability(DartHandle);
 
@@ -50,12 +53,14 @@ impl From<DartHandle> for CodecCapability {
 }
 
 impl CodecCapability {
-    /// Gets available `sender`'s [`CodecCapability`]s.
+    /// Gets available [`RTCRtpSender`]'s [`CodecCapability`]s.
     ///
     /// # Errors
     ///
     /// Errors with [`Error::FailedToGetCapabilities`] if fails to get
     /// capabilities.
+    ///
+    /// [`RTCRtpSender`]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
     pub async fn get_sender_codec_capabilities(
         kind: MediaKind,
     ) -> Result<Vec<Self>, Error> {
@@ -85,7 +90,7 @@ impl CodecCapability {
         Ok(unsafe { dart_string_into_rust(mime_type) })
     }
 
-    /// Returns underlying [`Dart_Handle`].
+    /// Returns the underlying [`Dart_Handle`] of this [`CodecCapability`].
     #[must_use]
     pub fn handle(&self) -> Dart_Handle {
         self.0.get()
