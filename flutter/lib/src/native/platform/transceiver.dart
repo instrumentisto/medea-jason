@@ -97,7 +97,7 @@ Object _dispose(RtpTransceiver transceiver) {
   return () => transceiver.dispose();
 }
 
-/// Gets [RtpParameters] from the [RtpTransceiver.sender].
+/// Returns [RtpParameters] from the [RtpTransceiver.sender].
 Object _getSendParameters(RtpTransceiver transceiver) {
   return () => transceiver.sender.getParameters();
 }

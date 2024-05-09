@@ -24,13 +24,13 @@ mod codec_capability {
     use dart_sys::Dart_Handle;
 
     extern "C" {
-        /// Gets [`RTCRtpSender`]'s available [`RTCRtpCodecCapability`]s.
+        /// Returns [`RTCRtpSender`]'s available [`RTCRtpCodecCapability`]s.
         ///
         /// [`RTCRtpSender`]: https://w3c.github.io/webrtc-pc/#dom-rtcrtpsender
         /// [`RTCRtpCodecCapability`]: https://tinyurl.com/4jcp8m4s
         pub fn get_sender_codec_capabilities(kind: i64) -> Dart_Handle;
 
-        /// Gets [`RTCRtpCodecCapability.mimeType`] of the provided
+        /// Returns [`RTCRtpCodecCapability.mimeType`] of the provided
         /// [`RTCRtpCodecCapability`].
         ///
         /// [`RTCRtpCodecCapability.mimeType`]: https://tinyurl.com/yv38zr3a
@@ -53,7 +53,7 @@ impl From<DartHandle> for CodecCapability {
 }
 
 impl CodecCapability {
-    /// Gets available [`RTCRtpSender`]'s [`CodecCapability`]s.
+    /// Returns available [`RTCRtpSender`]'s [`CodecCapability`]s.
     ///
     /// # Errors
     ///
@@ -79,7 +79,7 @@ impl CodecCapability {
             .collect())
     }
 
-    /// Gets `mime_type` of this [`CodecCapability`]s.
+    /// Returns `mime_type` of this [`CodecCapability`]s.
     ///
     /// # Errors
     ///

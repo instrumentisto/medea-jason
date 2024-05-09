@@ -25,7 +25,7 @@ mod send_encoding_parameters {
             active: bool,
         ) -> Dart_Handle;
 
-        /// Gets `rid` field from the provided [`SendEncodingParameters`].
+        /// Returns `rid` field from the provided [`SendEncodingParameters`].
         pub fn get_rid(encoding: Dart_Handle) -> ptr::NonNull<c_char>;
 
         /// Sets `active` in the provided [`SendEncodingParameters`].

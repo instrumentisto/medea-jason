@@ -78,7 +78,7 @@ mod transceiver {
             encoding: Dart_Handle,
         );
 
-        /// Gets [`Parameters`] of the underlying [`RTCRtpSender`][1].
+        /// Returns [`Parameters`] of the underlying [`RTCRtpSender`][1].
         ///
         /// [1]: https://www.w3.org/TR/webrtc/#rtcrtpsender-interface
         pub fn get_send_parameters(transceiver: Dart_Handle) -> Dart_Handle;
@@ -208,7 +208,7 @@ impl Transceiver {
         }
     }
 
-    /// Gets [`Parameters`] of the underlying [`RTCRtpSender`].
+    /// Returns [`Parameters`] of the underlying [`RTCRtpSender`].
     ///
     /// [`RTCRtpSender`]: https://w3.org/TR/webrtc#rtcrtpsender-interface
     pub fn get_send_parameters(&self) -> impl Future<Output = Parameters> {
