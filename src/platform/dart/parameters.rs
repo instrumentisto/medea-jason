@@ -1,6 +1,6 @@
-//! Wrapper around [RTCRtpParameters][1].
+//! Wrapper around [RTCRtpParameters].
 //!
-/// [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
+//! [RTCRtpParameters]: https://w3.org/TR/webrtc#dom-rtcrtpparameters
 
 use dart_sys::Dart_Handle;
 use futures::future::LocalBoxFuture;
