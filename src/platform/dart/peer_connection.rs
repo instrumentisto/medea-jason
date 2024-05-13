@@ -24,7 +24,7 @@ use crate::{
             },
         },
         IceCandidate, IceCandidateError, RtcPeerConnectionError, RtcStats,
-        SdpType, TransceiverDirection,
+        SdpType,
     },
 };
 
@@ -34,6 +34,7 @@ use super::{
         IceCandidateError as PlatformIceCandidateError,
     },
     media_track::MediaStreamTrack,
+    transceiver::TransceiverInit,
     utils::string_into_c_str,
 };
 
@@ -106,11 +107,11 @@ mod peer_connection {
             is_force_relayed: bool,
         ) -> Dart_Handle;
 
-        /// Creates a new [`Transceiver`[ in the provided [`PeerConnection`].
+        /// Creates a new [`Transceiver`] in the provided [`PeerConnection`].
         pub fn add_transceiver(
             peer: Dart_Handle,
             kind: i64,
-            direction: i64,
+            init: Dart_Handle,
         ) -> Dart_Handle;
 
         /// Returns newly created SDP offer of the provided [`PeerConnection`].
@@ -506,24 +507,21 @@ impl RtcPeerConnection {
     ///
     /// [1]: https://w3.org/TR/webrtc#dom-rtcrtptransceiver
     /// [2]: https://w3.org/TR/webrtc/#transceivers-set
-    pub fn add_transceiver(
+    pub async fn add_transceiver(
         &self,
         kind: MediaKind,
-        direction: TransceiverDirection,
-    ) -> impl Future<Output = Transceiver> + 'static {
-        let handle = self.handle.get();
-        async move {
-            let fut = unsafe {
-                peer_connection::add_transceiver(
-                    handle,
-                    kind as i64,
-                    direction.into(),
-                )
-            };
-            let trnsvr: DartHandle =
-                unsafe { FutureFromDart::execute(fut) }.await.unwrap();
-            Transceiver::from(trnsvr)
-        }
+        init: TransceiverInit,
+    ) -> Transceiver {
+        let fut = unsafe {
+            peer_connection::add_transceiver(
+                self.handle.get(),
+                kind as i64,
+                init.handle(),
+            )
+        };
+        let trnsvr: DartHandle =
+            unsafe { FutureFromDart::execute(fut) }.await.unwrap();
+        Transceiver::from(trnsvr)
     }
 
     /// Returns [`Transceiver`] (see [RTCRtpTransceiver][1]) from a

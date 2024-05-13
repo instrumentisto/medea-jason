@@ -19,9 +19,8 @@ use web_sys::{
     Event, RtcBundlePolicy, RtcConfiguration, RtcIceCandidateInit,
     RtcIceConnectionState, RtcIceTransportPolicy, RtcOfferOptions,
     RtcPeerConnection as SysRtcPeerConnection, RtcPeerConnectionIceErrorEvent,
-    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcRtpTransceiverInit,
-    RtcSdpType, RtcSessionDescription, RtcSessionDescriptionInit,
-    RtcTrackEvent,
+    RtcPeerConnectionIceEvent, RtcRtpTransceiver, RtcSdpType,
+    RtcSessionDescription, RtcSessionDescriptionInit, RtcTrackEvent,
 };
 
 use crate::{
@@ -31,11 +30,10 @@ use crate::{
         wasm::{get_property_by_name, utils::EventListener},
         IceCandidate, IceCandidateError, MediaStreamTrack,
         RtcPeerConnectionError, RtcStats, SdpType, Transceiver,
-        TransceiverDirection,
     },
 };
 
-use super::ice_server::RtcIceServers;
+use super::{ice_server::RtcIceServers, transceiver::TransceiverInit};
 
 /// Shortcut for a [`Result`] holding a [`Traced`] [`RtcPeerConnectionError`].
 type RtcPeerConnectionResult<T> = Result<T, Traced<RtcPeerConnectionError>>;
@@ -636,14 +634,14 @@ impl RtcPeerConnection {
     pub fn add_transceiver(
         &self,
         kind: MediaKind,
-        direction: TransceiverDirection,
+        init: TransceiverInit,
     ) -> impl Future<Output = Transceiver> + 'static {
         let peer = Rc::clone(&self.peer);
         async move {
-            let mut init = RtcRtpTransceiverInit::new();
-            _ = init.direction(direction.into());
-            let transceiver =
-                peer.add_transceiver_with_str_and_init(kind.as_str(), &init);
+            let transceiver = peer.add_transceiver_with_str_and_init(
+                kind.as_str(),
+                init.handle(),
+            );
             Transceiver::from(transceiver)
         }
     }

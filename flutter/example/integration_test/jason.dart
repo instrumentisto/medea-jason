@@ -32,6 +32,9 @@ void main() {
     if (Platform.isAndroid) {
       deviceLength = 4;
     }
+    if (Platform.isMacOS) {
+      deviceLength = 3;
+    }
 
     expect(devices.length, equals(deviceLength));
     expect(tracks.length, equals(2));

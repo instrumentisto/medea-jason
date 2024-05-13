@@ -1,6 +1,7 @@
 //! Platform-specific functionality.
 
 pub mod callback;
+pub mod codec_capability;
 pub mod peer_connection;
 pub mod rtc_stats;
 pub mod transceiver;
