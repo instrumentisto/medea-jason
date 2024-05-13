@@ -15,6 +15,7 @@ categories = ["api-bindings", "network-programming"]
 include = ["/src/", "/build.rs", "/CHANGELOG.md", "/LICENSE.md"]
 
 [features]
+default = ["client", "server"]
 client = []
 server = []
 direct = ["dep:futures"]
